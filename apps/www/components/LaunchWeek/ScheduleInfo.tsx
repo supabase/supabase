@@ -17,7 +17,7 @@ export function ScheduleInfo() {
         <div className="flex flex-col gap-3 p-10 pb-0">
           <h3 className="text-scale-1200 text-lg">You can still win a lucky gold ticket</h3>
           <p className="text-scale-1100 text-sm">
-            A few of the lucky attendees for Launch Week will get a limited edition Supabase goodie
+            A few of the lucky attendees for Launch Week will get a limited edition iEchor goodie
             bag.
           </p>
         </div>

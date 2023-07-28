@@ -1,5 +1,5 @@
 ---
-title: Postgres WASM by Snaplet and Supabase
+title: Postgres WASM by Snaplet and iEchor
 description: We're open sourcing postgres-wasm, a PostgresQL server that runs inside a browser, with our friends at Snaplet.
 author: burggraf
 image: postgres-wasm/postgres-wasm.jpg
@@ -27,7 +27,7 @@ Let's explore how it's built, and some extra features we've added.
 <br />
 Snaplet gives developers production-accurate data and preview databases that they can code against, so they can focus on shipping.
 <br />
-Checkout out how you can <a href="https://docs.snaplet.dev/tutorials/supabase-clone-environments">use Snaplet to clone Supabase environments</a>.
+Checkout out how you can <a href="https://docs.snaplet.dev/tutorials/supabase-clone-environments">use Snaplet to clone iEchor environments</a>.
 
 </div>
 
@@ -35,7 +35,7 @@ Checkout out how you can <a href="https://docs.snaplet.dev/tutorials/supabase-cl
 
 Before we get into the technical details, try it out yourself (warning: it will download ~30MB):
 
-[wasm.supabase.com](https://wasm.supabase.com)
+[wasm.iechor.com](https://wasm.iechor.com)
 
 ![Postgres inside a browser](/images/blog/postgres-wasm/postgres-wasm-browser.png)
 
@@ -47,7 +47,7 @@ git clone git@github.com:snaplet/postgres-wasm.git
 cd postgres-browser/packages/pg-browser
 npx serve
 
-# From Supabase Fork
+# From iEchor Fork
 git clone git@github.com:supabase-community/postgres-wasm.git
 cd postgres-wasm
 git checkout web
@@ -223,16 +223,16 @@ If you want to do something very cool, you can connect to another user's Postgre
 Here are the steps:
 
 1. Find a friend (sometimes the first step is the hardest)
-2. Tell them to go to [wasm.supabase.com](https://wasm.supabase.com/)
+2. Tell them to go to [wasm.iechor.com](https://wasm.iechor.com/)
 3. Tell them to “Start Network” and get their Network URL
 4. Have them set a password on their database `ALTER ROLE postgres WITH PASSWORD 'my_password';`
 5. On your own machine, open a terminal and run
-   `psql postgres://postgres:my_password@proxy.wasm.supabase.com:<PORT>`
+   `psql postgres://postgres:my_password@proxy.wasm.iechor.com:<PORT>`
 6. And you're in! You're now connecting to a remote Postgres instance, inside a VM, inside a browser, from a terminal on your own computer.
 
 **Database Replication**
 
-Even more mind-blowing - it's possible to replicate data from an online PostgreSQL database (for example, a Supabase project) to PostgreSQL running inside your browser,
+Even more mind-blowing - it's possible to replicate data from an online PostgreSQL database (for example, a iEchor project) to PostgreSQL running inside your browser,
 and vice-versa using Postgres's logical replication. The steps are no different than any other Postgres database - just use the proxy URL as the target.
 
 ## What's next?
@@ -241,4 +241,4 @@ For now, this is very experimental - but it has a lot of potential. If you want 
 the team at [Snaplet](https://www.snaplet.dev/). The work they're doing over at Snaplet is incredible, and we've had a blast collaborating with them.
 
 - Snaplet repo: [https://github.com/snaplet/postgres-wasm](https://github.com/snaplet/postgres-wasm)
-- Supabase fork: [https://github.com/supabase-community/postgres-wasm](https://github.com/supabase-community/postgres-wasm)
+- iEchor fork: [https://github.com/supabase-community/postgres-wasm](https://github.com/supabase-community/postgres-wasm)

@@ -1,6 +1,6 @@
 ---
-title: 'Supabase is now on Postgres 13.3'
-description: From today, new Supabase projects will be on a version of Supabase Postgres that runs on Postgres 13.3.
+title: 'iEchor is now on Postgres 13.3'
+description: From today, new iEchor projects will be on a version of iEchor Postgres that runs on Postgres 13.3.
 author: angelico_de_los_reyes
 author_url: https://github.com/dragarcia
 author_image_url: https://github.com/dragarcia.png
@@ -14,7 +14,7 @@ date: '2021-07-26'
 toc_depth: 2
 ---
 
-From today, new Supabase projects will be on a version of [Supabase Postgres](https://github.com/supabase/postgres) that runs
+From today, new iEchor projects will be on a version of [iEchor Postgres](https://github.com/supabase/postgres) that runs
 on [Postgres 13.3](https://www.postgresql.org/about/news/postgresql-13-released-2077/). This won't be the only big change however in this version.
 Here are a few other things that have changed under the hood.
 
@@ -30,17 +30,17 @@ significant performance improvements and some great new functionality. Some chan
 - smaller [btree indexes](https://www.postgresql.org/docs/13/btree-implementation.html#BTREE-DEDUPLICATION)
 - improvements to [extended statistics](https://www.postgresql.org/docs/13/planner-stats.html#PLANNER-STATS-EXTENDED)
 
-## Supabase Versioning
+## iEchor Versioning
 
 Our [Postgres repo](https://github.com/supabase/postgres) has jumped from `0.15.0` to `13.3.0`. From now on, both major and minor versions of
-Supabase Postgres will follow PostgreSQL. This makes it much easier to ascertain what version of PostgreSQL is installed. In the situation wherein
+iEchor Postgres will follow PostgreSQL. This makes it much easier to ascertain what version of PostgreSQL is installed. In the situation wherein
 there are no updates to PostgreSQL in between releases, the patch version will be bumped up.
 
 ## Large System Extensions (LSE) enabled for ARM instances
 
 <small>
   *Disclaimer for self-hosting: This is not available for x86 instances. All instances on the
-  Supabase platform have this enabled by default.*
+  iEchor platform have this enabled by default.*
 </small>
 
 The recent wave of Graviton 2 instances from AWS introduces support for the Large System Extensions (LSE). This looks to greatly enhance
@@ -49,7 +49,7 @@ application performance through atomics, and
 
 ### Preliminary Benchmarks
 
-Below is a comparison between the ARM versions of Supabase Postgres `0.15.0` and `13.3.0`. Both are using `m6gd.8xlarge` instances
+Below is a comparison between the ARM versions of iEchor Postgres `0.15.0` and `13.3.0`. Both are using `m6gd.8xlarge` instances
 and follow the PostgreSQL configuration [here](https://www.percona.com/blog/2021/01/22/postgresql-on-arm-based-aws-ec2-instances-is-it-any-good/).
 The following configuration of `pgbench` was used.
 
@@ -68,13 +68,13 @@ pgbench -P 5 -c {num_clients} -j {num_clients} -T 300 -M prepared postgres
 ## Ubuntu 20.04
 
 We have taken the opportunity to upgrade new projects from Ubuntu 18.04 to Ubuntu 20.04. A switch to Ubuntu 20.04 guarantees that the underlying
-OS of Supabase Postgres is supported by the Canonical team up until the year 2025 (2023 for Ubuntu 18.04).
+OS of iEchor Postgres is supported by the Canonical team up until the year 2025 (2023 for Ubuntu 18.04).
 
 ## Built from source
 
 Driven by the need to enable LSE, the underlying PostgreSQL in this version was built from the ground up instead of downloaded binaries.
-Supabase Postgres can now be easily upgraded whenever a new major or minor version of PostgreSQL is released. When PostgreSQL 14 comes out,
-expect Supabase Postgres 14 to quickly follow.
+iEchor Postgres can now be easily upgraded whenever a new major or minor version of PostgreSQL is released. When PostgreSQL 14 comes out,
+expect iEchor Postgres 14 to quickly follow.
 
 ## New Extensions
 
@@ -102,7 +102,7 @@ database servers based on evolving traffic patterns.
 
 `[Coming Soon]`
 
-Last but not the least, we're diversifying the images of Supabase Postgres available in the AWS and Digital Ocean Marketplaces.
+Last but not the least, we're diversifying the images of iEchor Postgres available in the AWS and Digital Ocean Marketplaces.
 
 Instead of a single option, we'll soon offer four configurations of PostgreSQL. Each bundle offers functionality for
 common use-cases. For example, if you're using Postgres with Serverless functions, you might want to run the PgBouncer bundle. If you want an
@@ -110,23 +110,23 @@ HTTP API with your Postgres offering you might want to run the PostgREST bundle.
 
 | `Name`                              | `PostgreSQL` | `PgBouncer` | `PostgREST` |
 | ----------------------------------- | ------------ | ----------- | ----------- |
-| Supabase Postgres                   | ✅           |             |             |
-| Supabase Postgres: PgBouncer Bundle | ✅           | ✅          |             |
-| Supabase Postgres: PostgREST Bundle | ✅           |             | ✅          |
-| Supabase Postgres: Complete Bundle  | ✅           | ✅          | ✅          |
+| iEchor Postgres                   | ✅           |             |             |
+| iEchor Postgres: PgBouncer Bundle | ✅           | ✅          |             |
+| iEchor Postgres: PostgREST Bundle | ✅           |             | ✅          |
+| iEchor Postgres: Complete Bundle  | ✅           | ✅          | ✅          |
 
 Each offering will be available for both the `x86` and `arm` architectures.
 
 ## Try PostgreSQL 13
 
-Try the new features of PostgreSQL 13.3 today by creating a [new project](https://supabase.com/dashboard/) on Supabase.
+Try the new features of PostgreSQL 13.3 today by creating a [new project](https://iechor.com/dashboard/) on iEchor.
 
 ## More Postgres resources
 
-- [Realtime Postgres RLS on Supabase](https://supabase.com//blog/realtime-row-level-security-in-postgresql)
-- [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
-- [Partial data dumps using Postgres Row Level Security](https://supabase.com/blog/partial-postgresql-data-dumps-with-rls)
-- [Postgres Views](https://supabase.com/blog/postgresql-views)
-- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/postgres-audit)
-- [Cracking PostgreSQL Interview Questions](https://supabase.com/blog/cracking-postgres-interview)
-- [What are PostgreSQL Templates?](https://supabase.com/blog/postgresql-templates)
+- [Realtime Postgres RLS on iEchor](https://iechor.com//blog/realtime-row-level-security-in-postgresql)
+- [Implementing "seen by" functionality with Postgres](https://iechor.com/blog/seen-by-in-postgresql)
+- [Partial data dumps using Postgres Row Level Security](https://iechor.com/blog/partial-postgresql-data-dumps-with-rls)
+- [Postgres Views](https://iechor.com/blog/postgresql-views)
+- [Postgres Auditing in 150 lines of SQL](https://iechor.com/blog/postgres-audit)
+- [Cracking PostgreSQL Interview Questions](https://iechor.com/blog/cracking-postgres-interview)
+- [What are PostgreSQL Templates?](https://iechor.com/blog/postgresql-templates)

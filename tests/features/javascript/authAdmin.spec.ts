@@ -29,7 +29,7 @@ class AuthenticationAPI extends Hooks {
     expect(error).toBeNull()
     expect(user).not.toBeNull()
 
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
 
     const {
       data: { user: createdUser },
@@ -53,7 +53,7 @@ class AuthenticationAPI extends Hooks {
       password: faker.internet.password(),
       email_confirm: true,
     }
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
 
     const {
       error,
@@ -70,7 +70,7 @@ class AuthenticationAPI extends Hooks {
   async 'admin create user with logged in user should fail'() {
     const { user } = await this.createUserAsAdmin()
 
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email: user.email,
       password: user.password,
@@ -97,7 +97,7 @@ class AuthenticationAPI extends Hooks {
     const { user: user1 } = await this.createUserAsAdmin()
     const { user: user2 } = await this.createUserAsAdmin()
 
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
     const {
       data: { users },
       error,
@@ -117,7 +117,7 @@ class AuthenticationAPI extends Hooks {
     await this.createUserAsAdmin()
     await this.createUserAsAdmin()
 
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
     const {
       data: { users },
       error,
@@ -135,7 +135,7 @@ class AuthenticationAPI extends Hooks {
     const { user } = await this.createUserAsAdmin()
     await this.createUserAsAdmin()
 
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email: user.email,
       password: user.password,
@@ -172,7 +172,7 @@ class AuthenticationAPI extends Hooks {
   async 'get user should work'() {
     const { user } = await this.createUserAsAdmin()
 
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
     const {
       data: { user: foundUser },
       error,
@@ -191,7 +191,7 @@ class AuthenticationAPI extends Hooks {
   async 'update user should work'() {
     const { user } = await this.createUserAsAdmin()
 
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
 
     const updatedUser = {
       email: faker.internet.exampleEmail(),
@@ -216,7 +216,7 @@ class AuthenticationAPI extends Hooks {
   async 'delete user should work'() {
     const { user } = await this.createUserAsAdmin()
 
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
     const {
       data: { user: deletedUser },
       error,
@@ -239,7 +239,7 @@ class AuthenticationAPI extends Hooks {
     const { user } = await this.createUserAsAdmin()
     const { user: villain } = await this.createUserAsAdmin()
 
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
     await supabase.auth.signInWithPassword({
       email: villain.email,
       password: villain.password,
@@ -273,7 +273,7 @@ class AuthenticationAPI extends Hooks {
     }
     error: AuthError
   }> {
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
 
     let fakeUser: AdminUserAttributes
     if (data) {

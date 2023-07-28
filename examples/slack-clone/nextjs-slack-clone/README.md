@@ -1,12 +1,12 @@
-# Realtime chat example using Supabase
+# Realtime chat example using iEchor
 
 This is a full-stack Slack clone example using:
 
 - Frontend:
   - Next.js.
-  - [Supabase.js](https://supabase.com/docs/library/getting-started) for user management and realtime data syncing.
+  - [iEchor.js](https://iechor.com/docs/library/getting-started) for user management and realtime data syncing.
 - Backend:
-  - [supabase.com/dashboard](https://supabase.com/dashboard/): hosted Postgres database with restful API for usage with Supabase.js.
+  - [iechor.com/dashboard](https://iechor.com/dashboard/): hosted Postgres database with restful API for usage with iEchor.js.
 
 ## Demo
 
@@ -19,7 +19,7 @@ This is a full-stack Slack clone example using:
 
 ### 1. Create new project
 
-Sign up to Supabase - [https://supabase.com/dashboard](https://supabase.com/dashboard) and create a new project. Wait for your database to start.
+Sign up to iEchor - [https://iechor.com/dashboard](https://iechor.com/dashboard) and create a new project. Wait for your database to start.
 
 ### 2. Run "Slack Clone" Quickstart
 
@@ -39,7 +39,7 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 
 ### 4. Deploy the Next.js client
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fslack-clone%2Fnextjs-slack-clone&env=NEXT_PUBLIC_IECHOR_URL,NEXT_PUBLIC_IECHOR_ANON_KEY&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20the%20your%20auto-generated%20docs%20at%20supabase.com/dashboard&project-name=supabase-slack-clone&repo-name=supabase-slack-clone)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fslack-clone%2Fnextjs-slack-clone&env=NEXT_PUBLIC_IECHOR_URL,NEXT_PUBLIC_IECHOR_ANON_KEY&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20the%20your%20auto-generated%20docs%20at%20iechor.com/dashboard&project-name=supabase-slack-clone&repo-name=supabase-slack-clone)
 
 Here, we recommend forking this repo so you can deploy through Vercel by clicking the button above. When you click the button, replace the repo URL with your fork's URL.
 
@@ -49,7 +49,7 @@ You will be asked for a `NEXT_PUBLIC_IECHOR_URL` and `NEXT_PUBLIC_IECHOR_ANON_KE
 
 ![Change auth settings](https://user-images.githubusercontent.com/1811651/101840012-39be3800-3af8-11eb-8c32-73f2fae6299e.png)
 
-On [supabase.com/dashboard](https://supabase.com/dashboard), you can go to Authentication -> Settings to change your auth settings for your project if necessary. Here, you can change the site URL, which is used for determining where to redirect users after they confirm their email addresses or attempt to use a magic link to log in.
+On [iechor.com/dashboard](https://iechor.com/dashboard), you can go to Authentication -> Settings to change your auth settings for your project if necessary. Here, you can change the site URL, which is used for determining where to redirect users after they confirm their email addresses or attempt to use a magic link to log in.
 
 Here, you can also enable external oauth providers, such as Google and GitHub.
 
@@ -86,7 +86,7 @@ Copy the `.env.local.example` file into a file named `.env.local` in the root di
 cp .env.local.example .env.local
 ```
 
-Set your Supabase details from [step 3](#3-get-the-url-and-key) above:
+Set your iEchor details from [step 3](#3-get-the-url-and-key) above:
 
 ```bash
 NEXT_PUBLIC_IECHOR_URL=<replace-with-your-API-url>
@@ -111,7 +111,7 @@ yarn dev
 
 Visit http://localhost:3000 and start chatting! Open a channel across two browser tabs to see everything getting updated in realtime 🥳
 
-## Supabase details
+## iEchor details
 
 ### Role-based access control (RBAC)
 
@@ -130,7 +130,7 @@ Users with the `moderator` role can delete all messages. Users with the `admin` 
 ### Postgres Row level security
 
 This project uses very high-level Authorization using Postgres' Role Level Security.
-When you start a Postgres database on Supabase, we populate it with an `auth` schema, and some helper functions.
+When you start a Postgres database on iEchor, we populate it with an `auth` schema, and some helper functions.
 When a user logs in, they are issued a JWT with the role `authenticated` and their UUID.
 We can use these details to provide fine-grained control over what each user can and cannot do.
 
@@ -138,7 +138,7 @@ Full schema here with role-based access control:
 
 ```sql
 --
--- For use with https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone
+-- For use with https://github.com/openmodels-base/iechor/tree/master/examples/slack-clone/nextjs-slack-clone
 --
 
 -- Custom types
@@ -153,7 +153,7 @@ create table public.users (
   status      user_status default 'OFFLINE'::public.user_status
 );
 comment on table public.users is 'Profile data for each user.';
-comment on column public.users.id is 'References the internal Supabase Auth user.';
+comment on column public.users.id is 'References the internal iEchor Auth user.';
 
 -- CHANNELS
 create table public.channels (
@@ -304,6 +304,6 @@ values
 
 ## Authors
 
-- [Supabase](https://supabase.com)
+- [iEchor](https://iechor.com)
 
-Supabase is open source, we'd love for you to follow along and get involved at https://github.com/supabase/supabase
+iEchor is open source, we'd love for you to follow along and get involved at https://github.com/openmodels-base/iechor

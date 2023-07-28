@@ -23,15 +23,15 @@ function AuthPage() {
   // base path for images
   const { basePath } = useRouter()
 
-  // supabase auth widget project details
-  const supabase = createClient(
+  // iechor auth widget project details
+  const iechor = createClient(
     'https://rsnibhkhsbfnncjmwnkj.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxNTIxNDE1MywiZXhwIjoxOTMwNzkwMTUzfQ.OQEbAaTfgDdLCCht251P2JRD3QDnui6nsU8N-tZA_Mc'
   )
 
   const meta_title = 'Auth | Built-in user management'
   const meta_description =
-    'Authentication that you can afford that is built in to your supabase project.'
+    'Authentication that you can afford that is built in to your iechor project.'
 
   return (
     <>
@@ -41,10 +41,10 @@ function AuthPage() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/auth`,
+          url: `https://iechor.com/auth`,
           images: [
             {
-              url: `https://supabase.com${basePath}/images/product/auth/auth-og.jpg`,
+              url: `https://iechor.com${basePath}/images/product/auth/auth-og.jpg`,
             },
           ],
         }}
@@ -60,7 +60,7 @@ function AuthPage() {
             </span>,
           ]}
           subheader={[
-            'Every Supabase project comes with a complete User Management system that works without any additional tools.',
+            'Every iEchor project comes with a complete User Management system that works without any additional tools.',
             "Including PostgreSQL's policy engine, for fine-grained access rules.",
           ]}
           image={[
@@ -142,7 +142,7 @@ function AuthPage() {
               </div>
               <h4 className="h4">Own your data</h4>
               <p className="p text-base">
-                User data stored in your Supabase database so you never have to worry about 3rd
+                User data stored in your iEchor database so you never have to worry about 3rd
                 party privacy issues. Host your data in 8 different locations.
               </p>
             </div>
@@ -212,7 +212,7 @@ function AuthPage() {
               <h2 className="h3">User permissions without the middleware</h2>
 
               <p className="p text-base lg:text-lg">
-                Supabase Auth works without any additional servers. Build Authorization rules with
+                iEchor Auth works without any additional servers. Build Authorization rules with
                 Postgres' Row Level Security, controlling who can create, edit and delete specific
                 rows in your database.
               </p>

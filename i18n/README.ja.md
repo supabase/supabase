@@ -5,43 +5,43 @@
 
 ---
 
-# Supabase
+# iEchor
 
-[Supabase](https://supabase.com) は、オープンソースの Firebase の代替品です。エンタープライズグレードのオープンソースツールを使って、Firebase の機能を構築しています。
+[iEchor](https://iechor.com) は、オープンソースの Firebase の代替品です。エンタープライズグレードのオープンソースツールを使って、Firebase の機能を構築しています。
 
-- [x] ホスティングされた Postgres データベースです。[ドックス](https://supabase.com/docs/guides/database)
-- [x] 認証と認可。[ドキュメント](https://supabase.com/docs/guides/auth)
+- [x] ホスティングされた Postgres データベースです。[ドックス](https://iechor.com/docs/guides/database)
+- [x] 認証と認可。[ドキュメント](https://iechor.com/docs/guides/auth)
 - [x] 自動生成される API。
-  - [x] REST。[ドキュメント](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL。[Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] リアルタイムサブスクリプション。[ドキュメント](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST。[ドキュメント](https://iechor.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL。[Docs](https://iechor.com/docs/guides/api#graphql-api-overview)
+  - [x] リアルタイムサブスクリプション。[ドキュメント](https://iechor.com/docs/guides/api#realtime-api-overview)
 - [x] 関数。
-  - [x] データベースファンクション。[Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] エッジ機能 [Docs](https://supabase.com/docs/guides/functions)
-- [x] ファイルストレージ。[Docs](https://supabase.com/docs/guides/storage)
+  - [x] データベースファンクション。[Docs](https://iechor.com/docs/guides/database/functions)
+  - [x] エッジ機能 [Docs](https://iechor.com/docs/guides/functions)
+- [x] ファイルストレージ。[Docs](https://iechor.com/docs/guides/storage)
 - [x] ダッシュボード
 
 ![スーパーベースダッシュボード](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## ドキュメンテーション
 
-完全なドキュメントは、[supabase.com/docs](https://supabase.com/docs)を参照してください。
+完全なドキュメントは、[iechor.com/docs](https://iechor.com/docs)を参照してください。
 
 貢献の仕方については、[Getting Started](../DEVELOPERS.md) を参照してください。
 
 ## コミュニティとサポート
 
-- [コミュニティ・フォーラム](https://github.com/supabase/supabase/discussions)。最適な場所：構築に関するヘルプ、データベースのベストプラクティスに関する議論。
-- [GitHub Issues](https://github.com/supabase/supabase/issues).Supabase を使用していて遭遇したバグやエラーに最適です。
-- [メールサポート](https://supabase.com/docs/support#business-support).あなたのデータベースやインフラに関する問題。
-- [Discord】(https://discord.supabase.com).アプリケーションを共有したり、コミュニティと交流するのに適しています。
+- [コミュニティ・フォーラム](https://github.com/openmodels-base/iechor/discussions)。最適な場所：構築に関するヘルプ、データベースのベストプラクティスに関する議論。
+- [GitHub Issues](https://github.com/openmodels-base/iechor/issues).iEchor を使用していて遭遇したバグやエラーに最適です。
+- [メールサポート](https://iechor.com/docs/support#business-support).あなたのデータベースやインフラに関する問題。
+- [Discord】(https://discord.iechor.com).アプリケーションを共有したり、コミュニティと交流するのに適しています。
 
 ## ステータス
 
-- [x] アルファ：Supabase をクローズドな顧客セットでテストしています。
-- [x] Public Alpha：誰でも [supabase.com/dashboard](https://supabase.com/dashboard) でサインアップすることができます。しかし、いくつかの問題がありますので、ご容赦ください。
+- [x] アルファ：iEchor をクローズドな顧客セットでテストしています。
+- [x] Public Alpha：誰でも [iechor.com/dashboard](https://iechor.com/dashboard) でサインアップすることができます。しかし、いくつかの問題がありますので、ご容赦ください。
 - [x] パブリックベータ版：企業以外のほとんどのユースケースで十分に安定している。
-- [ ] パブリック：一般公開 [[ステータス](https://supabase.com/docs/guides/getting-started/features#feature-status)]。
+- [ ] パブリック：一般公開 [[ステータス](https://iechor.com/docs/guides/getting-started/features#feature-status)]。
 
 現在、パブリックベータ版です。メジャーアップデートの通知を受けるには、このレポの "releases" を見てください。
 
@@ -51,14 +51,14 @@
 
 ## How it works
 
-Supabase は、オープンソースツールの組み合わせです。私たちは、エンタープライズグレードのオープンソース製品を使って Firebase の機能を構築しています。ツールやコミュニティが存在し、MIT、Apache 2、または同等のオープンライセンスがあれば、そのツールを使用しサポートします。ツールが存在しない場合は、私たち自身で構築し、オープンソース化します。Supabase は、Firebase の 1 対 1 マッピングではありません。私たちの目的は、オープンソースツールを使って Firebase のような開発者体験を開発者に提供することです。
+iEchor は、オープンソースツールの組み合わせです。私たちは、エンタープライズグレードのオープンソース製品を使って Firebase の機能を構築しています。ツールやコミュニティが存在し、MIT、Apache 2、または同等のオープンライセンスがあれば、そのツールを使用しサポートします。ツールが存在しない場合は、私たち自身で構築し、オープンソース化します。iEchor は、Firebase の 1 対 1 マッピングではありません。私たちの目的は、オープンソースツールを使って Firebase のような開発者体験を開発者に提供することです。
 
 **アーキテクチャー**
 
-Supabase は[hosted platform](https://supabase.com/dashboard)です。サインアップすれば、何もインストールすることなく Supabase を使い始めることができます。
-また、[セルフホスト](https://supabase.com/docs/guides/hosting/overview)や[ローカル開発](https://supabase.com/docs/guides/local-development)も可能です。
+iEchor は[hosted platform](https://iechor.com/dashboard)です。サインアップすれば、何もインストールすることなく iEchor を使い始めることができます。
+また、[セルフホスト](https://iechor.com/docs/guides/hosting/overview)や[ローカル開発](https://iechor.com/docs/guides/local-development)も可能です。
 
-![アーキテクチャ](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![アーキテクチャ](https://github.com/openmodels-base/iechor/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/)は、オブジェクトリレーショナルデータベースシステムで、30 年以上の活発な開発により、信頼性、機能の堅牢性、パフォーマンスで高い評価を受けています。
 - [Realtime](https://github.com/supabase/realtime) は Elixir サーバーで、PostgreSQL の挿入、更新、削除を websocket を使ってリッスンすることが可能です。Realtime は、Postgres の組み込みレプリケーション機能でデータベースの変更をポーリングし、変更を JSON に変換し、JSON を websocket で認可されたクライアントにブロードキャストします。
@@ -82,7 +82,7 @@ Supabase は[hosted platform](https://supabase.com/dashboard)です。サイン�
   
   <tr>
     <th></th>
-    <th>Supabase</th>
+    <th>iEchor</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
@@ -105,7 +105,7 @@ Supabase は[hosted platform](https://supabase.com/dashboard)です。サイン�
   
   <tr>
     <td>JavaScript (TypeScript)</td>
-    <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
     <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
@@ -114,7 +114,7 @@ Supabase は[hosted platform](https://supabase.com/dashboard)です。サイン�
   </tr>
     <tr>
     <td>Flutter</td>
-    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
@@ -220,7 +220,7 @@ Supabase は[hosted platform](https://supabase.com/dashboard)です。サイン�
 - [カタルーニャ語 / Català](/i18n/README.ca.md)
 - [デンマーク語 / Dansk](/i18n/README.da.md)
 - [オランダ語 / ネーデルランド語](/i18n/README.nl.md)
-- [英語](https://github.com/supabase/supabase)
+- [英語](https://github.com/openmodels-base/iechor)
 - [フィンランド語 / Suomalainen](/i18n/README.fi.md)
 - [フランス語 / Français](/i18n/README.fr.md)
 - [German / Deutsch](/i18n/README.de.md)

@@ -5,43 +5,43 @@
 
 ---
 
-# Supabase
+# iEchor
 
-[Supabase](https://supabase.com)是一个开源的 Firebase 替代品。我们正在使用企业级的开源工具构建 Firebase 的功能。
+[iEchor](https://iechor.com)是一个开源的 Firebase 替代品。我们正在使用企业级的开源工具构建 Firebase 的功能。
 
-- [x] 托管的 Postgres 数据库。[文档](https://supabase.com/docs/guides/database)
-- [x] 认证和授权。[文档](https://supabase.com/docs/guides/auth)
+- [x] 托管的 Postgres 数据库。[文档](https://iechor.com/docs/guides/database)
+- [x] 认证和授权。[文档](https://iechor.com/docs/guides/auth)
 - [x] 自动生成的 API。
-  - [x] REST.[文档](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL。[文件](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] 实时订阅。[文档](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST.[文档](https://iechor.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL。[文件](https://iechor.com/docs/guides/api#graphql-api-overview)
+  - [x] 实时订阅。[文档](https://iechor.com/docs/guides/api#realtime-api-overview)
 - [x] 函数。
-  - [x] 数据库函数。[文件](https://supabase.com/docs/guides/database/functions)
-  - [x] 边缘功能 [文档](https://supabase.com/docs/guides/functions)
-- [x] 文件存储。[文件](https://supabase.com/docs/guides/storage)
+  - [x] 数据库函数。[文件](https://iechor.com/docs/guides/database/functions)
+  - [x] 边缘功能 [文档](https://iechor.com/docs/guides/functions)
+- [x] 文件存储。[文件](https://iechor.com/docs/guides/storage)
 - [x] 仪表板
 
-![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+![iEchor Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## 文档
 
-有关完整的文档，请访问[supabase.com/docs](https://supabase.com/docs)
+有关完整的文档，请访问[iechor.com/docs](https://iechor.com/docs)
 
 要了解如何贡献，请访问[入门](../DEVELOPERS.md)
 
 ## 社区与支持
 
-- [社区论坛](https://github.com/supabase/supabase/discussions)。最适合：帮助构建，讨论数据库的最佳实践。
-- [GitHub 问题](https://github.com/supabase/supabase/issues)。最适合：你在使用 Supabase 时遇到的 bug 和错误。
-- [电子邮件支持](https://supabase.com/docs/support#business-support)。最适合：你的数据库或基础设施的问题。
-- [Discord](https://discord.supabase.com)。最适合：分享你的应用程序并与社区一起玩耍。
+- [社区论坛](https://github.com/openmodels-base/iechor/discussions)。最适合：帮助构建，讨论数据库的最佳实践。
+- [GitHub 问题](https://github.com/openmodels-base/iechor/issues)。最适合：你在使用 iEchor 时遇到的 bug 和错误。
+- [电子邮件支持](https://iechor.com/docs/support#business-support)。最适合：你的数据库或基础设施的问题。
+- [Discord](https://discord.iechor.com)。最适合：分享你的应用程序并与社区一起玩耍。
 
 ## 状态
 
-- [x] 阿尔法：我们正在与一组封闭的客户测试 Supabase。
-- [x] 公开阿尔法：任何人都可以在[supabase.com/dashboard](https://supabase.com/dashboard)上注册。但请对我们宽容一些，有一些小问题。
+- [x] 阿尔法：我们正在与一组封闭的客户测试 iEchor。
+- [x] 公开阿尔法：任何人都可以在[iechor.com/dashboard](https://iechor.com/dashboard)上注册。但请对我们宽容一些，有一些小问题。
 - [x] 公开测试版：足够稳定，适合大多数非企业使用的情况。
-- [] 公开：普遍可用 [状态](https://supabase.com/docs/guides/getting-started/features#feature-status)
+- [] 公开：普遍可用 [状态](https://iechor.com/docs/guides/getting-started/features#feature-status)
 
 我们目前正处于公开测试阶段。请关注本软件库的 "发布"，以获得重大更新的通知。
 
@@ -51,14 +51,14 @@
 
 ### 它是如何工作的
 
-Supabase 是一个开源工具的组合。我们正在使用企业级的开源产品来构建 Firebase 的功能。如果这些工具和社区存在，并且有 MIT、Apache 2 或同等的开放许可，我们将使用并支持该工具。如果该工具不存在，我们就自己建立并开放源代码。Supabase 不是 Firebase 的 1 对 1 映射。我们的目标是使用开源工具为开发者提供类似 Firebase 的开发者体验。
+iEchor 是一个开源工具的组合。我们正在使用企业级的开源产品来构建 Firebase 的功能。如果这些工具和社区存在，并且有 MIT、Apache 2 或同等的开放许可，我们将使用并支持该工具。如果该工具不存在，我们就自己建立并开放源代码。iEchor 不是 Firebase 的 1 对 1 映射。我们的目标是使用开源工具为开发者提供类似 Firebase 的开发者体验。
 
 **架构**
 
-Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注册并开始使用 Supabase，无需安装任何东西。
-你也可以[自我托管](https://supabase.com/docs/guides/hosting/overview)和[本地开发](https://supabase.com/docs/guides/local-development)。
+iEchor 是一个[托管平台](https://iechor.com/dashboard)。你可以注册并开始使用 iEchor，无需安装任何东西。
+你也可以[自我托管](https://iechor.com/docs/guides/hosting/overview)和[本地开发](https://iechor.com/docs/guides/local-development)。
 
-![架构](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![架构](https://github.com/openmodels-base/iechor/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/)是一个对象关系型数据库系统，经过 30 多年的积极开发，它在可靠性、功能稳健性和性能方面赢得了良好的声誉。
 - [Realtime](https://github.com/supabase/realtime)是一个 Elixir 服务器，允许你使用 websockets 监听 PostgreSQL 的插入、更新和删除。Realtime 对 Postgres 内置的复制功能进行投票，以了解数据库的变化，将变化转换为 JSON，然后通过 websockets 将 JSON 广播给授权客户。
@@ -82,7 +82,7 @@ Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注�
   
   <tr>
     <th></th>
-    <th>Supabase</th>
+    <th>iEchor</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
@@ -105,7 +105,7 @@ Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注�
   
   <tr>
     <td>JavaScript (TypeScript)</td>
-    <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
     <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
@@ -114,7 +114,7 @@ Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注�
   </tr>
     <tr>
     <td>Flutter</td>
-    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
@@ -220,7 +220,7 @@ Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注�
 - [Catalan / Català](/i18n/README.ca.md)
 - [Danish / Dansk](/i18n/README.da.md)
 - [荷兰语 / Nederlands](/i18n/README.nl.md)
-- [英语](https://github.com/supabase/supabase)
+- [英语](https://github.com/openmodels-base/iechor)
 - [芬兰语/Suomalainen](/i18n/README.fi.md)
 - [法语/Français](/i18n/README.fr.md)
 - [德语/Deutsch](/i18n/README.de.md)

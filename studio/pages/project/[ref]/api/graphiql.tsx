@@ -70,7 +70,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
             <h1 className="mt-8 mb-2 text-2xl">Enable the GraphQL Extension</h1>
             <h2 className="text-sm text-scale-1100">
               Toggle the switch below to enable the GraphQL extension. You can then use the GraphQL
-              API with your Supabase Database.
+              API with your iEchor Database.
             </h2>
           </div>
 

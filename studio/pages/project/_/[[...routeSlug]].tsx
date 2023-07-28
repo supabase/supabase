@@ -18,7 +18,7 @@ const Header: FC<Props> = () => {
           <a>
             <img
               src={`${BASE_PATH}/img/supabase-logo.svg`}
-              alt="Supabase"
+              alt="iEchor"
               className="dark:border-dark rounded border p-1 hover:border-white"
               style={{ height: 24 }}
             />

@@ -2,11 +2,11 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'auth',
-  title: 'Integrating With Supabase Auth',
-  description: 'Supabase Edge Functions and Auth.',
+  title: 'Integrating With iEchor Auth',
+  description: 'iEchor Edge Functions and Auth.',
 }
 
-Edge Functions work seamlessly with [Supabase Auth](/docs/guides/auth), allowing you to identify which user called your function.
+Edge Functions work seamlessly with [iEchor Auth](/docs/guides/auth), allowing you to identify which user called your function.
 
 When [invoking](/docs/reference/javascript/invoke) a function with one of the [client libraries](/docs/reference), the logged in user's JWT is automatically attached to the function call and becomes accessible within your function.
 
@@ -14,7 +14,7 @@ This is important, for example, to identify which customer's credit card should 
 
 ## Auth Context & RLS
 
-By creating a supabase client with the auth context from the function, you can do two things:
+By creating a iechor client with the auth context from the function, you can do two things:
 
 1. Get the user object.
 2. Run queries in the context of the user with [Row Level Security (RLS)](/docs/guides/auth/row-level-security) policies enforced.
@@ -25,11 +25,11 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 serve(async (req: Request) => {
   try {
-    // Create a Supabase client with the Auth context of the logged in user.
+    // Create a iEchor client with the Auth context of the logged in user.
     const supabaseClient = createClient(
-      // Supabase API URL - env var exported by default.
+      // iEchor API URL - env var exported by default.
       Deno.env.get('IECHOR_URL') ?? '',
-      // Supabase API ANON KEY - env var exported by default.
+      // iEchor API ANON KEY - env var exported by default.
       Deno.env.get('IECHOR_ANON_KEY') ?? '',
       // Create client with Auth context of the user that called the function.
       // This way your row-level-security (RLS) policies are applied.
@@ -57,7 +57,7 @@ serve(async (req: Request) => {
 })
 ```
 
-See the [example on GitHub](https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/select-from-table-with-auth-rls/index.ts).
+See the [example on GitHub](https://github.com/openmodels-base/iechor/blob/master/examples/edge-functions/supabase/functions/select-from-table-with-auth-rls/index.ts).
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

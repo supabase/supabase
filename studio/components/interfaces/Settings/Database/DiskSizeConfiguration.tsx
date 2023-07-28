@@ -92,7 +92,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                     </span>
                   )}
                   <p className="text-sm opacity-50">
-                    Supabase employs auto-scaling storage and allows for manual disk size <br />{' '}
+                    iEchor employs auto-scaling storage and allows for manual disk size <br />{' '}
                     adjustments when necessary
                   </p>
                 </div>
@@ -141,7 +141,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
               Read more about{' '}
               <a
                 className="underline"
-                href="https://supabase.com/docs/guides/platform/database-size#disk-management"
+                href="https://iechor.com/docs/guides/platform/database-size#disk-management"
               >
                 disk management
               </a>

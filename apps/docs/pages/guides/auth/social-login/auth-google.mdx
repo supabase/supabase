@@ -6,16 +6,16 @@ export const meta = {
   description: 'Use Sign in with Google on the web, in native apps or with Chrome extensions',
 }
 
-Supabase Auth supports Sign in with Google on the web, native Android applications and Chrome extensions.
+iEchor Auth supports Sign in with Google on the web, native Android applications and Chrome extensions.
 
 ## Overview
 
-To support Sign in with Google you need to configure the [Google provider in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) for your project.
+To support Sign in with Google you need to configure the [Google provider in the iEchor dashboard](https://iechor.com/dashboard/project/_/auth/providers) for your project.
 
 There are three general ways to use Sign in with Google, depending on the application you're building:
 
 - Sign in on the web or in web-based apps
-  - Using an OAuth flow initiated by Supabase Auth using [Google Identity Authorization with OAuth 2.0 for Web Server Applications](https://developers.google.com/identity/protocols/oauth2/web-server).
+  - Using an OAuth flow initiated by iEchor Auth using [Google Identity Authorization with OAuth 2.0 for Web Server Applications](https://developers.google.com/identity/protocols/oauth2/web-server).
   - Using a [personalized sign-in button](https://developers.google.com/identity/gsi/web/guides/personalized-button) or [One Tap](https://developers.google.com/identity/gsi/web/guides/display-google-one-tap) and [automatic sign-in](https://developers.google.com/identity/gsi/web/guides/automatic-sign-in-sign-out) for users already logged in to their Google account.
 - Sign in in native Android apps and Chrome extensions
 
@@ -27,9 +27,9 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
 Sign in with Google's OAuth flow is designed for web or browser based sign in methods. It can be used in web-based apps as well as in websites, though sometimes it is worthwhile considering using One Tap login directly.
 
-Behind the scenes, Supabase Auth uses the [Google OAuth 2.0 APIs](https://developers.google.com/identity/openid-connect/openid-connect), which are OpenID Connect certified, to perform the authentication.
+Behind the scenes, iEchor Auth uses the [Google OAuth 2.0 APIs](https://developers.google.com/identity/openid-connect/openid-connect), which are OpenID Connect certified, to perform the authentication.
 
-To initiate sign in, you can use the `signInWithOAuth()` method from the Supabase JavaScript library:
+To initiate sign in, you can use the `signInWithOAuth()` method from the iEchor JavaScript library:
 
 ```ts
 supabase.auth.signInWithOAuth({
@@ -37,7 +37,7 @@ supabase.auth.signInWithOAuth({
 })
 ```
 
-This call takes the user to Google's consent screen. When the flow ends, the user's profile information is exchanged and validated with Supabase Auth before it redirects back to your web application with an access and refresh token representing the user's session.
+This call takes the user to Google's consent screen. When the flow ends, the user's profile information is exchanged and validated with iEchor Auth before it redirects back to your web application with an access and refresh token representing the user's session.
 
 You can additionally extract the `provider_token` from the session (on initial login only) which is the OAuth 2.0 access token issued by Google that grants your application access to the Google services for the authenticated users. Please store this token in local storage, cookies or in your database or server.
 
@@ -60,16 +60,16 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 To use the OAuth 2.0 flow, you will require the following information:
 
 1. Obtain OAuth credentials for your Google Cloud project in the [Credentials](https://console.developers.google.com/apis/credentials) page of the console. When creating a new credential, choose _Web application_. In _Authorized redirect URIs_ enter `https://<project-id>.supabase.co/auth/v1/callback`. This URL will be seen by your users, and you can customize it by configuring [custom domains](/docs/guides/platform/custom-domains).
-2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. Within _Authorized domains_ make sure you add your Supabase project's domain `<project-id>.supabase.co`. Configure the non-sensitive scopes by making sure the following ones are selected: `.../auth/userinfo.email`, `.../auth/userinfo.profile`, `openid`. If you're selecting other sensitive scopes, your app may require additional verification. In those cases, it's best to use [custom domains](/docs/guides/platform/custom-domains).
-3. Finally, add the client ID and secret from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers).
+2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. Within _Authorized domains_ make sure you add your iEchor project's domain `<project-id>.supabase.co`. Configure the non-sensitive scopes by making sure the following ones are selected: `.../auth/userinfo.email`, `.../auth/userinfo.profile`, `openid`. If you're selecting other sensitive scopes, your app may require additional verification. In those cases, it's best to use [custom domains](/docs/guides/platform/custom-domains).
+3. Finally, add the client ID and secret from step 1 in the [Google provider on the iEchor Dashboard](https://iechor.com/dashboard/project/_/auth/providers).
 
 ## Using native sign in
 
 Unlike the OAuth flow which requires the use of a web browser, the native Sign in with Google flow on Android uses the [operating system's built-in functionalities](https://developers.google.com/android/reference/com/google/android/gms/auth/api/identity/package-summary) to prompt the user for consent. Note that native sign-in has been rebranded as _One Tap sign-in on Android_ by Google, which you should not confuse with _One Tap sign in for web_, as mentioned below.
 
-When the user provides consent, Google issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
+When the user provides consent, Google issues an identity token (commonly abbreviated as ID token) that is then sent to your project's iEchor Auth server. When valid, a new user session is started by issuing an access and refresh token from iEchor Auth.
 
-If you are building a Flutter app, you can use [flutter_appauth](https://pub.dev/packages/flutter_appauth) package to sign a user into your Supabase project:
+If you are building a Flutter app, you can use [flutter_appauth](https://pub.dev/packages/flutter_appauth) package to sign a user into your iEchor project:
 
 ````dart
 import 'package:crypto/crypto.dart';
@@ -143,7 +143,7 @@ await signInWithIdToken(
   nonce: rawNonce,
 );```
 
-In the Supabase JavaScript library, which you can use with web-based native frameworks like React Native or Expo, you can invoke this functionality like so:
+In the iEchor JavaScript library, which you can use with web-based native frameworks like React Native or Expo, you can invoke this functionality like so:
 
 ```ts
 await supabase.auth.signInWithIdToken({
@@ -167,9 +167,9 @@ For apps written in Kotlin, please consult the [community maintained library](/d
 - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple AppStore.
 
 2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
-3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_.
+3. Finally, add the client ID from step 1 in the [Google provider on the iEchor Dashboard](https://iechor.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_.
 
-Note that you do not have to configure the OAuth flow in the Supabase Dashboard in order to use native sign in.
+Note that you do not have to configure the OAuth flow in the iEchor Dashboard in order to use native sign in.
 
 ## Using native sign in for Chrome extensions
 
@@ -187,7 +187,7 @@ First, you need to configure your `manifest.json` file like so:
 }
 ```
 
-Then you should call the [`chrome.identity.launchWebAuthFlow()`](https://developer.chrome.com/docs/extensions/reference/identity/#method-launchWebAuthFlow) function to trigger the sign in flow. On success, call the `supabase.auth.signInWithIdToken()` function to complete sign in with your Supabase project.
+Then you should call the [`chrome.identity.launchWebAuthFlow()`](https://developer.chrome.com/docs/extensions/reference/identity/#method-launchWebAuthFlow) function to trigger the sign in flow. On success, call the `supabase.auth.signInWithIdToken()` function to complete sign in with your iEchor project.
 
 ```ts
 const manifest = chrome.runtime.getManifest()
@@ -228,9 +228,9 @@ You will need to configure a client ID for your Chrome extension:
 
 1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Chrome extension_ for the application type. For _Item ID_ provide the unique ID of your Chrome extension. You can get this by calling `chrome.runtime.id` within the extension, or from the Web Store URL of the extension. For example, the [Google Translate extension](https://chrome.google.com/webstore/detail/google-translate/aapbdbdomjkkjkaonfhkkikfgjllcleb) has the Web Store URL `https://chrome.google.com/webstore/detail/google-translate/aapbdbdomjkkjkaonfhkkikfgjllcleb` and the last part `aapbdbdomjkkjkaonfhkkikfgjllcleb` is its unique ID.
 2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app.
-3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_.
+3. Finally, add the client ID from step 1 in the [Google provider on the iEchor Dashboard](https://iechor.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_.
 
-Note that you do not have to configure the OAuth flow in the Supabase Dashboard to sign in with Google inside Chrome extensions.
+Note that you do not have to configure the OAuth flow in the iEchor Dashboard to sign in with Google inside Chrome extensions.
 
 ## Using personalized sign-in buttons, One Tap or automatic sign-in
 
@@ -280,11 +280,11 @@ Use of nonce is recommended, though optional. Make sure each nonce is generated 
 
 ### Configuration [#configuration-personalized-sign-in-button]
 
-1. Obtain OAuth credentials for your Google Cloud project in the [Credentials](https://console.developers.google.com/apis/credentials) page of the console. When creating a new credential, choose _Web application_. As you're using the Google sign in button, you should configure the _Authorized JavaScript origins_ and _Authorized redirect URIs_ to the website where the buttons appear. You should not use your Supabase project domain name. For this use case, the client secret provided is not needed and can be ignored.
+1. Obtain OAuth credentials for your Google Cloud project in the [Credentials](https://console.developers.google.com/apis/credentials) page of the console. When creating a new credential, choose _Web application_. As you're using the Google sign in button, you should configure the _Authorized JavaScript origins_ and _Authorized redirect URIs_ to the website where the buttons appear. You should not use your iEchor project domain name. For this use case, the client secret provided is not needed and can be ignored.
 2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
-3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Authorized Client IDs_.
+3. Finally, add the client ID from step 1 in the [Google provider on the iEchor Dashboard](https://iechor.com/dashboard/project/_/auth/providers) under _Authorized Client IDs_.
 
-Note that you do not have to configure the OAuth flow client ID and secret in the Supabase Dashboard when using this approach!
+Note that you do not have to configure the OAuth flow client ID and secret in the iEchor Dashboard when using this approach!
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

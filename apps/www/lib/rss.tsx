@@ -21,9 +21,9 @@ const generateRssItem = (post: any): string => {
   const formattedDate = dayjs(post.date).utc().format('ddd, DD MMM YYYY HH:mm:ss [GMT]')
 
   return `<item>
-  <guid>https://supabase.com${encodedPath}</guid>
+  <guid>https://iechor.com${encodedPath}</guid>
   <title>${encodedTitle}</title>
-  <link>https://supabase.com${encodedPath}</link>
+  <link>https://iechor.com${encodedPath}</link>
   <description>${encodedDescription}</description>
   <pubDate>${formattedDate}</pubDate>
 </item>
@@ -39,14 +39,14 @@ export const generateRss = (posts: any[], authorID?: string): string => {
     return `
   <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
-      <title>'Postgres | Supabase Blog</title>
-      <link>https://supabase.com/blog</link>
-      <description>Latest Postgres news from ${authorInfo?.author} at Supabase</description>
+      <title>'Postgres | iEchor Blog</title>
+      <link>https://iechor.com/blog</link>
+      <description>Latest Postgres news from ${authorInfo?.author} at iEchor</description>
       <language>en</language>
       <lastBuildDate>${dayjs(posts[0].date)
         .utc()
         .format('ddd, DD MMM YYYY HH:mm:ss [GMT]')}</lastBuildDate>
-      <atom:link href="https://supabase.com/planetpg-${authorID}-rss.xml" rel="self" type="application/rss+xml"/>
+      <atom:link href="https://iechor.com/planetpg-${authorID}-rss.xml" rel="self" type="application/rss+xml"/>
       ${posts.map(generateRssItem).join('')}
     </channel>
   </rss>
@@ -55,14 +55,14 @@ export const generateRss = (posts: any[], authorID?: string): string => {
     return `
   <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
-      <title>Blog - Supabase</title>
-      <link>https://supabase.com</link>
-      <description>Latest news from Supabase</description>
+      <title>Blog - iEchor</title>
+      <link>https://iechor.com</link>
+      <description>Latest news from iEchor</description>
       <language>en</language>
       <lastBuildDate>${dayjs(posts[0].date)
         .utc()
         .format('ddd, DD MMM YYYY HH:mm:ss [GMT]')}</lastBuildDate>
-      <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
+      <atom:link href="https://iechor.com/rss.xml" rel="self" type="application/rss+xml"/>
       ${posts.map(generateRssItem).join('')}
     </channel>
   </rss>

@@ -21,7 +21,7 @@ When developing with VS Code inside of an existing application, you can utilize 
   ></iframe>
 </div>
 
-For example, see this `edge-functions.code-workspace` configuration for a CRA (create react app) client with Supabase Edge Functions. You can find the complete example on [GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions).
+For example, see this `edge-functions.code-workspace` configuration for a CRA (create react app) client with iEchor Edge Functions. You can find the complete example on [GitHub](https://github.com/openmodels-base/iechor/tree/master/examples/edge-functions).
 
 ```json
 {
@@ -55,7 +55,7 @@ For example, see this `edge-functions.code-workspace` configuration for a CRA (c
 You can run your Edge Function locally using [`supabase functions serve`](/docs/reference/cli/usage#supabase-functions-serve):
 
 ```bash
-supabase start # start the supabase stack
+supabase start # start the iechor stack
 supabase functions serve # start the Functions watcher
 ```
 
@@ -78,7 +78,7 @@ or using one of the [client libraries](/docs#reference-documentation), e.g. usin
 import { createClient } from '@supabase/supabase-js'
 
 // Use the credentials outputted in your terminal when running `supabase start`
-const supabase = createClient(
+const iechor = createClient(
   'http://localhost:54321',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0'
 )

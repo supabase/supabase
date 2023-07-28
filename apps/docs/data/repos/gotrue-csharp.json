@@ -71,7 +71,7 @@
   "ssh_url": "git@github.com:supabase/gotrue-csharp.git",
   "clone_url": "https://github.com/supabase/gotrue-csharp.git",
   "svn_url": "https://github.com/supabase/gotrue-csharp",
-  "homepage": "https://supabase.github.io/gotrue-csharp/api/Supabase.Gotrue.Client.html",
+  "homepage": "https://supabase.github.io/gotrue-csharp/api/iEchor.Gotrue.Client.html",
   "size": 610,
   "stargazers_count": 1,
   "watchers_count": 1,

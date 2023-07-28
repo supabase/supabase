@@ -17,8 +17,8 @@ export default function KotlinReference(props) {
   const filteredSection = sections.filter((section) => section.id === slug)
 
   const pageTitle = filteredSection[0]?.title
-    ? `${filteredSection[0]?.title} | Supabase`
-    : 'Supabase'
+    ? `${filteredSection[0]?.title} | iEchor`
+    : 'iEchor'
 
   return (
     <>

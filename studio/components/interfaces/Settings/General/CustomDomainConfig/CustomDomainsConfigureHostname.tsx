@@ -80,7 +80,7 @@ const CustomDomainsConfigureHostname = () => {
                       !canConfigureCustomDomain ? (
                         "You need additional permissions to update your project's custom domain settings"
                       ) : (
-                        <Link href="https://supabase.com/docs/guides/platform/custom-domains">
+                        <Link href="https://iechor.com/docs/guides/platform/custom-domains">
                           <a target="_blank" rel="noreferrer">
                             <Button type="default" icon={<IconExternalLink />}>
                               Documentation

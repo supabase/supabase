@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Supabase Storage API",
-    "description": "API documentation for Supabase Storage",
+    "title": "iEchor Storage API",
+    "description": "API documentation for iEchor Storage",
     "version": "0.0.1"
   },
   "components": {

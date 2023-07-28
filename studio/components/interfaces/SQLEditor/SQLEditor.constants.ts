@@ -426,7 +426,7 @@ insert into public.countries (name,iso2,iso3,local_name,continent) values
     description: 'Build a basic slack clone with Row Level Security.',
     sql: `
 --
--- For use with https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone
+-- For use with https://github.com/openmodels-base/iechor/tree/master/examples/slack-clone/nextjs-slack-clone
 
 -- Custom types
 create type public.app_permission as enum ('channels.delete', 'messages.delete');
@@ -440,7 +440,7 @@ create table public.users (
   status      user_status default 'OFFLINE'::public.user_status
 );
 comment on table public.users is 'Profile data for each user.';
-comment on column public.users.id is 'References the internal Supabase Auth user.';
+comment on column public.users.id is 'References the internal iEchor Auth user.';
 
 -- CHANNELS
 create table public.channels (
@@ -624,7 +624,7 @@ values
     sql: `
 --
 -- For use with:
--- https://github.com/supabase/supabase/tree/master/examples/todo-list/sveltejs-todo-list or
+-- https://github.com/openmodels-base/iechor/tree/master/examples/todo-list/sveltejs-todo-list or
 -- https://github.com/supabase/examples-archive/tree/main/supabase-js-v1/todo-list
 --
 
@@ -674,7 +674,7 @@ create policy "Can update own user data." on users
   for update using (auth.uid() = id);
 
 /**
-* This trigger automatically creates a user entry when a new user signs up via Supabase Auth.
+* This trigger automatically creates a user entry when a new user signs up via iEchor Auth.
 */
 create function public.handle_new_user()
 returns trigger as
@@ -831,7 +831,7 @@ create table profiles (
   constraint username_length check (char_length(username) >= 3)
 );
 -- Set up Row Level Security (RLS)
--- See https://supabase.com/docs/guides/auth/row-level-security for more details.
+-- See https://iechor.com/docs/guides/auth/row-level-security for more details.
 alter table profiles
   enable row level security;
 
@@ -844,8 +844,8 @@ create policy "Users can insert their own profile." on profiles
 create policy "Users can update own profile." on profiles
   for update using (auth.uid() = id);
 
--- This trigger automatically creates a profile entry when a new user signs up via Supabase Auth.
--- See https://supabase.com/docs/guides/auth/managing-user-data#using-triggers for more details.
+-- This trigger automatically creates a profile entry when a new user signs up via iEchor Auth.
+-- See https://iechor.com/docs/guides/auth/managing-user-data#using-triggers for more details.
 create function public.handle_new_user()
 returns trigger as $$
 begin
@@ -863,7 +863,7 @@ insert into storage.buckets (id, name)
   values ('avatars', 'avatars');
 
 -- Set up access controls for storage.
--- See https://supabase.com/docs/guides/storage#policy-examples for more details.
+-- See https://iechor.com/docs/guides/storage#policy-examples for more details.
 create policy "Avatar images are publicly accessible." on storage.objects
   for select using (bucket_id = 'avatars');
 
@@ -875,7 +875,7 @@ create policy "Anyone can upload an avatar." on storage.objects
     id: 16,
     type: 'quickstart',
     title: 'NextAuth Schema Setup',
-    description: 'Sets up a the Schema and Tables for the NextAuth Supabase Adapter.',
+    description: 'Sets up a the Schema and Tables for the NextAuth iEchor Adapter.',
     sql: `
 --
 -- Name: next_auth; Type: SCHEMA;

@@ -167,7 +167,7 @@ export function BarChart({
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
 
-  // For future reference: https://github.com/supabase/supabase/pull/5311#discussion_r800852828
+  // For future reference: https://github.com/openmodels-base/iechor/pull/5311#discussion_r800852828
   const chartHeight = {
     tiny: 76,
     small: 96,

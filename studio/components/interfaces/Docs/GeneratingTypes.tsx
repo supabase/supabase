@@ -46,7 +46,7 @@ export default function GeneratingTypes({ selectedLang }: Props) {
     <>
       <h2 className="doc-heading flex items-center justify-between">
         <span>Generating types</span>
-        <Link href="https://supabase.com/docs/guides/database/api/generating-types">
+        <Link href="https://iechor.com/docs/guides/database/api/generating-types">
           <a target="_blank" rel="noreferrer">
             <Button type="default" icon={<IconExternalLink />}>
               Documentation
@@ -57,13 +57,13 @@ export default function GeneratingTypes({ selectedLang }: Props) {
       <div className="doc-section">
         <article className="text ">
           <p>
-            Supabase APIs are generated from your database, which means that we can use database
+            iEchor APIs are generated from your database, which means that we can use database
             introspection to generate type-safe API definitions.
           </p>
           <p>
             You can generate types from your database either through the{' '}
-            <Link href="https://supabase.com/docs/guides/database/api/generating-types">
-              Supabase CLI
+            <Link href="https://iechor.com/docs/guides/database/api/generating-types">
+              iEchor CLI
             </Link>
             , or by downloading the types file via the button on the right and importing it in your
             application within <code>src/index.ts</code>.
@@ -106,7 +106,7 @@ const localSnippets = {
     title: 'Login via the CLI with your Personal Access Token',
     bash: {
       code: `
-npx supabase login
+npx iechor login
 `,
     },
   }),
@@ -114,7 +114,7 @@ npx supabase login
     title: 'Generate types',
     bash: {
       code: `
-npx supabase gen types typescript --project-id "${ref}" --schema public > types/supabase.ts
+npx iechor gen types typescript --project-id "${ref}" --schema public > types/supabase.ts
 `,
     },
   }),

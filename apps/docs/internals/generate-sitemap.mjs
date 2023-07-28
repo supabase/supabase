@@ -43,7 +43,7 @@ async function generate() {
           .map((path) => {
             return `
               <url>
-                  <loc>${`https://supabase.com/docs/${path}`}</loc>
+                  <loc>${`https://iechor.com/docs/${path}`}</loc>
                   <changefreq>weekly</changefreq>
                   <changefreq>0.5</changefreq>
               </url>

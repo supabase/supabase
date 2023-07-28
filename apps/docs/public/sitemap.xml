@@ -1,4680 +1,4672 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://supabase.com/docs/faq</loc>
+    <loc>https://iechor.com/docs/faq</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/index</loc>
+    <loc>https://iechor.com/docs/index</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/handbook/contributing</loc>
+    <loc>https://iechor.com/docs/handbook/contributing</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/handbook/introduction</loc>
+    <loc>https://iechor.com/docs/handbook/introduction</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai</loc>
+    <loc>https://iechor.com/docs/guides/ai</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/api</loc>
+    <loc>https://iechor.com/docs/guides/api</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth</loc>
+    <loc>https://iechor.com/docs/guides/auth</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/cli</loc>
+    <loc>https://iechor.com/docs/guides/cli</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database</loc>
+    <loc>https://iechor.com/docs/guides/database</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions</loc>
+    <loc>https://iechor.com/docs/guides/functions</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started</loc>
+    <loc>https://iechor.com/docs/guides/getting-started</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations</loc>
+    <loc>https://iechor.com/docs/guides/integrations</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform</loc>
+    <loc>https://iechor.com/docs/guides/platform</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/realtime</loc>
+    <loc>https://iechor.com/docs/guides/realtime</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/resources</loc>
+    <loc>https://iechor.com/docs/guides/resources</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/self-hosting</loc>
+    <loc>https://iechor.com/docs/guides/self-hosting</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/storage</loc>
+    <loc>https://iechor.com/docs/guides/storage</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/index</loc>
+    <loc>https://iechor.com/docs/reference/index</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/choosing-instance-type</loc>
+    <loc>https://iechor.com/docs/guides/ai/choosing-instance-type</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/concepts</loc>
+    <loc>https://iechor.com/docs/guides/ai/concepts</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/engineering-for-scale</loc>
+    <loc>https://iechor.com/docs/guides/ai/engineering-for-scale</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/google-colab</loc>
+    <loc>https://iechor.com/docs/guides/ai/google-colab</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/hugging-face</loc>
+    <loc>https://iechor.com/docs/guides/ai/hugging-face</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/langchain</loc>
+    <loc>https://iechor.com/docs/guides/ai/langchain</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/managing-collections</loc>
+    <loc>https://iechor.com/docs/guides/ai/managing-collections</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/managing-indexes</loc>
+    <loc>https://iechor.com/docs/guides/ai/managing-indexes</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/structured-unstructured</loc>
+    <loc>https://iechor.com/docs/guides/ai/structured-unstructured</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/vecs-python-client</loc>
+    <loc>https://iechor.com/docs/guides/ai/vecs-python-client</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/vector-columns</loc>
+    <loc>https://iechor.com/docs/guides/ai/vector-columns</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/api/api-keys</loc>
+    <loc>https://iechor.com/docs/guides/api/api-keys</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/api/creating-routes</loc>
+    <loc>https://iechor.com/docs/guides/api/creating-routes</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/api/joins-and-nesting</loc>
+    <loc>https://iechor.com/docs/guides/api/joins-and-nesting</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/api/quickstart</loc>
+    <loc>https://iechor.com/docs/guides/api/quickstart</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/api/securing-your-api</loc>
+    <loc>https://iechor.com/docs/guides/api/securing-your-api</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/auth-captcha</loc>
+    <loc>https://iechor.com/docs/guides/auth/auth-captcha</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/auth-email-templates</loc>
+    <loc>https://iechor.com/docs/guides/auth/auth-email-templates</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/auth-email</loc>
+    <loc>https://iechor.com/docs/guides/auth/auth-email</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/auth-helpers</loc>
+    <loc>https://iechor.com/docs/guides/auth/auth-helpers</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/auth-magic-link</loc>
+    <loc>https://iechor.com/docs/guides/auth/auth-magic-link</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/auth-mfa</loc>
+    <loc>https://iechor.com/docs/guides/auth/auth-mfa</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/auth-password-reset</loc>
+    <loc>https://iechor.com/docs/guides/auth/auth-password-reset</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/enterprise-sso</loc>
+    <loc>https://iechor.com/docs/guides/auth/enterprise-sso</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/managing-user-data</loc>
+    <loc>https://iechor.com/docs/guides/auth/managing-user-data</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/phone-login</loc>
+    <loc>https://iechor.com/docs/guides/auth/phone-login</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/row-level-security</loc>
+    <loc>https://iechor.com/docs/guides/auth/row-level-security</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/server-side-rendering</loc>
+    <loc>https://iechor.com/docs/guides/auth/server-side-rendering</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/social-login</loc>
+    <loc>https://iechor.com/docs/guides/auth/social-login</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/cli/managing-environments</loc>
+    <loc>https://iechor.com/docs/guides/cli/managing-environments</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/cli/using-environment-variables-in-config</loc>
+    <loc>https://iechor.com/docs/guides/cli/using-environment-variables-in-config</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/auth</loc>
+    <loc>https://iechor.com/docs/guides/functions/auth</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/cicd-workflow</loc>
+    <loc>https://iechor.com/docs/guides/functions/cicd-workflow</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/connect-to-postgres</loc>
+    <loc>https://iechor.com/docs/guides/functions/connect-to-postgres</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/cors</loc>
+    <loc>https://iechor.com/docs/guides/functions/cors</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/dart-edge</loc>
+    <loc>https://iechor.com/docs/guides/functions/dart-edge</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/debugging</loc>
+    <loc>https://iechor.com/docs/guides/functions/debugging</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/global-deployments</loc>
+    <loc>https://iechor.com/docs/guides/functions/global-deployments</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/import-maps</loc>
+    <loc>https://iechor.com/docs/guides/functions/import-maps</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/kysely-postgres</loc>
+    <loc>https://iechor.com/docs/guides/functions/kysely-postgres</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/local-development</loc>
+    <loc>https://iechor.com/docs/guides/functions/local-development</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/quickstart</loc>
+    <loc>https://iechor.com/docs/guides/functions/quickstart</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/schedule-functions</loc>
+    <loc>https://iechor.com/docs/guides/functions/schedule-functions</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/secrets</loc>
+    <loc>https://iechor.com/docs/guides/functions/secrets</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/storage-caching</loc>
+    <loc>https://iechor.com/docs/guides/functions/storage-caching</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/troubleshooting</loc>
+    <loc>https://iechor.com/docs/guides/functions/troubleshooting</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/typescript-support</loc>
+    <loc>https://iechor.com/docs/guides/functions/typescript-support</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/architecture</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/architecture</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/features</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/features</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/local-development</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/local-development</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/arrays</loc>
+    <loc>https://iechor.com/docs/guides/database/arrays</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/column-encryption</loc>
+    <loc>https://iechor.com/docs/guides/database/column-encryption</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/connecting-to-postgres</loc>
+    <loc>https://iechor.com/docs/guides/database/connecting-to-postgres</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/full-text-search</loc>
+    <loc>https://iechor.com/docs/guides/database/full-text-search</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/functions</loc>
+    <loc>https://iechor.com/docs/guides/database/functions</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/json</loc>
+    <loc>https://iechor.com/docs/guides/database/json</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/managing-passwords</loc>
+    <loc>https://iechor.com/docs/guides/database/managing-passwords</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/managing-timezones</loc>
+    <loc>https://iechor.com/docs/guides/database/managing-timezones</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/overview</loc>
+    <loc>https://iechor.com/docs/guides/database/overview</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/partitions</loc>
+    <loc>https://iechor.com/docs/guides/database/partitions</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/replication</loc>
+    <loc>https://iechor.com/docs/guides/database/replication</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/sql-to-api</loc>
+    <loc>https://iechor.com/docs/guides/database/sql-to-api</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/tables</loc>
+    <loc>https://iechor.com/docs/guides/database/tables</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/testing</loc>
+    <loc>https://iechor.com/docs/guides/database/testing</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/timeouts</loc>
+    <loc>https://iechor.com/docs/guides/database/timeouts</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/vault</loc>
+    <loc>https://iechor.com/docs/guides/database/vault</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/webhooks</loc>
+    <loc>https://iechor.com/docs/guides/database/webhooks</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/appsmith</loc>
+    <loc>https://iechor.com/docs/guides/integrations/appsmith</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/auth0</loc>
+    <loc>https://iechor.com/docs/guides/integrations/auth0</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/authsignal</loc>
+    <loc>https://iechor.com/docs/guides/integrations/authsignal</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/bracket</loc>
+    <loc>https://iechor.com/docs/guides/integrations/bracket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/clerk</loc>
+    <loc>https://iechor.com/docs/guides/integrations/clerk</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/cloudflare-workers</loc>
+    <loc>https://iechor.com/docs/guides/integrations/cloudflare-workers</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/dhiwise</loc>
+    <loc>https://iechor.com/docs/guides/integrations/dhiwise</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/directus</loc>
+    <loc>https://iechor.com/docs/guides/integrations/directus</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/draftbit</loc>
+    <loc>https://iechor.com/docs/guides/integrations/draftbit</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/estuary</loc>
+    <loc>https://iechor.com/docs/guides/integrations/estuary</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/fezto</loc>
+    <loc>https://iechor.com/docs/guides/integrations/fezto</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/flutterflow</loc>
+    <loc>https://iechor.com/docs/guides/integrations/flutterflow</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/forestadmin</loc>
+    <loc>https://iechor.com/docs/guides/integrations/forestadmin</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/illa</loc>
+    <loc>https://iechor.com/docs/guides/integrations/illa</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/integrations</loc>
+    <loc>https://iechor.com/docs/guides/integrations/integrations</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/keyri</loc>
+    <loc>https://iechor.com/docs/guides/integrations/keyri</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/onesignal</loc>
+    <loc>https://iechor.com/docs/guides/integrations/onesignal</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/passage</loc>
+    <loc>https://iechor.com/docs/guides/integrations/passage</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/pgmustard</loc>
+    <loc>https://iechor.com/docs/guides/integrations/pgmustard</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/picket</loc>
+    <loc>https://iechor.com/docs/guides/integrations/picket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/plasmic</loc>
+    <loc>https://iechor.com/docs/guides/integrations/plasmic</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/polyscale</loc>
+    <loc>https://iechor.com/docs/guides/integrations/polyscale</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/prisma</loc>
+    <loc>https://iechor.com/docs/guides/integrations/prisma</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/sequin</loc>
+    <loc>https://iechor.com/docs/guides/integrations/sequin</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/snaplet</loc>
+    <loc>https://iechor.com/docs/guides/integrations/snaplet</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/stytch</loc>
+    <loc>https://iechor.com/docs/guides/integrations/stytch</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/supertokens</loc>
+    <loc>https://iechor.com/docs/guides/integrations/supertokens</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/vercel</loc>
+    <loc>https://iechor.com/docs/guides/integrations/vercel</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/weweb</loc>
+    <loc>https://iechor.com/docs/guides/integrations/weweb</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/integrations/zuplo</loc>
+    <loc>https://iechor.com/docs/guides/integrations/zuplo</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/access-control</loc>
+    <loc>https://iechor.com/docs/guides/platform/access-control</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/backups</loc>
+    <loc>https://iechor.com/docs/guides/platform/backups</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/compute-add-ons</loc>
+    <loc>https://iechor.com/docs/guides/platform/compute-add-ons</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/custom-domains</loc>
+    <loc>https://iechor.com/docs/guides/platform/custom-domains</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/custom-postgres-config</loc>
+    <loc>https://iechor.com/docs/guides/platform/custom-postgres-config</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/database-size</loc>
+    <loc>https://iechor.com/docs/guides/platform/database-size</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/exhaust-cpu</loc>
+    <loc>https://iechor.com/docs/guides/platform/exhaust-cpu</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/exhaust-ram</loc>
+    <loc>https://iechor.com/docs/guides/platform/exhaust-ram</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/going-into-prod</loc>
+    <loc>https://iechor.com/docs/guides/platform/going-into-prod</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/http-status-codes</loc>
+    <loc>https://iechor.com/docs/guides/platform/http-status-codes</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/logs</loc>
+    <loc>https://iechor.com/docs/guides/platform/logs</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/maturity-model</loc>
+    <loc>https://iechor.com/docs/guides/platform/maturity-model</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/metrics</loc>
+    <loc>https://iechor.com/docs/guides/platform/metrics</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects</loc>
+    <loc>https://iechor.com/docs/guides/platform/migrating-and-upgrading-projects</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/network-restrictions</loc>
+    <loc>https://iechor.com/docs/guides/platform/network-restrictions</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/performance</loc>
+    <loc>https://iechor.com/docs/guides/platform/performance</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/permissions</loc>
+    <loc>https://iechor.com/docs/guides/platform/permissions</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/shared-responsibility-model</loc>
+    <loc>https://iechor.com/docs/guides/platform/shared-responsibility-model</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/spend-cap</loc>
+    <loc>https://iechor.com/docs/guides/platform/spend-cap</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/ssl-enforcement</loc>
+    <loc>https://iechor.com/docs/guides/platform/ssl-enforcement</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/sso</loc>
+    <loc>https://iechor.com/docs/guides/platform/sso</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/troubleshooting</loc>
+    <loc>https://iechor.com/docs/guides/platform/troubleshooting</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/realtime/architecture</loc>
+    <loc>https://iechor.com/docs/guides/realtime/architecture</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/realtime/bring-your-own-database</loc>
+    <loc>https://iechor.com/docs/guides/realtime/bring-your-own-database</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/realtime/broadcast</loc>
+    <loc>https://iechor.com/docs/guides/realtime/broadcast</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/realtime/concepts</loc>
+    <loc>https://iechor.com/docs/guides/realtime/concepts</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/realtime/postgres-changes</loc>
+    <loc>https://iechor.com/docs/guides/realtime/postgres-changes</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/realtime/presence</loc>
+    <loc>https://iechor.com/docs/guides/realtime/presence</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/realtime/protocol</loc>
+    <loc>https://iechor.com/docs/guides/realtime/protocol</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/realtime/quickstart</loc>
+    <loc>https://iechor.com/docs/guides/realtime/quickstart</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/realtime/quotas</loc>
+    <loc>https://iechor.com/docs/guides/realtime/quotas</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/realtime/realtime-with-nextjs</loc>
+    <loc>https://iechor.com/docs/guides/realtime/realtime-with-nextjs</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/realtime/subscribing-to-database-changes</loc>
+    <loc>https://iechor.com/docs/guides/realtime/subscribing-to-database-changes</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/resources/examples</loc>
+    <loc>https://iechor.com/docs/guides/resources/examples</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/resources/glossary</loc>
+    <loc>https://iechor.com/docs/guides/resources/glossary</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/self-hosting/docker</loc>
+    <loc>https://iechor.com/docs/guides/self-hosting/docker</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/storage/access-control</loc>
+    <loc>https://iechor.com/docs/guides/storage/access-control</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/storage/cdn</loc>
+    <loc>https://iechor.com/docs/guides/storage/cdn</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/storage/image-transformations</loc>
+    <loc>https://iechor.com/docs/guides/storage/image-transformations</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/storage/quickstart</loc>
+    <loc>https://iechor.com/docs/guides/storage/quickstart</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/storage/storage-sample</loc>
+    <loc>https://iechor.com/docs/guides/storage/storage-sample</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/storage/uploads</loc>
+    <loc>https://iechor.com/docs/guides/storage/uploads</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/learn/auth-deep-dive/auth-deep-dive-jwts</loc>
+    <loc>https://iechor.com/docs/learn/auth-deep-dive/auth-deep-dive-jwts</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/learn/auth-deep-dive/auth-google-oauth</loc>
+    <loc>https://iechor.com/docs/learn/auth-deep-dive/auth-google-oauth</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/learn/auth-deep-dive/auth-gotrue</loc>
+    <loc>https://iechor.com/docs/learn/auth-deep-dive/auth-gotrue</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/learn/auth-deep-dive/auth-policies</loc>
+    <loc>https://iechor.com/docs/learn/auth-deep-dive/auth-policies</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security</loc>
+    <loc>https://iechor.com/docs/learn/auth-deep-dive/auth-row-level-security</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/integrations/llamaindex</loc>
+    <loc>https://iechor.com/docs/guides/ai/integrations/llamaindex</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/quickstarts/face-similarity</loc>
+    <loc>https://iechor.com/docs/guides/ai/quickstarts/face-similarity</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/quickstarts/hello-world</loc>
+    <loc>https://iechor.com/docs/guides/ai/quickstarts/hello-world</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/quickstarts/text-deduplication</loc>
+    <loc>https://iechor.com/docs/guides/ai/quickstarts/text-deduplication</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/examples/building-chatgpt-plugins</loc>
+    <loc>https://iechor.com/docs/guides/ai/examples/building-chatgpt-plugins</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/examples/headless-vector-search</loc>
+    <loc>https://iechor.com/docs/guides/ai/examples/headless-vector-search</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/examples/huggingface-image-captioning</loc>
+    <loc>https://iechor.com/docs/guides/ai/examples/huggingface-image-captioning</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/examples/image-search-openai-clip</loc>
+    <loc>https://iechor.com/docs/guides/ai/examples/image-search-openai-clip</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/examples/nextjs-vector-search</loc>
+    <loc>https://iechor.com/docs/guides/ai/examples/nextjs-vector-search</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/examples/openai</loc>
+    <loc>https://iechor.com/docs/guides/ai/examples/openai</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/api/graphql/graphiql</loc>
+    <loc>https://iechor.com/docs/guides/api/graphql/graphiql</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/api/rest/auto-generated-docs</loc>
+    <loc>https://iechor.com/docs/guides/api/rest/auto-generated-docs</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/api/rest/client-libs</loc>
+    <loc>https://iechor.com/docs/guides/api/rest/client-libs</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/api/rest/generating-types</loc>
+    <loc>https://iechor.com/docs/guides/api/rest/generating-types</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/auth-helpers/auth-ui</loc>
+    <loc>https://iechor.com/docs/guides/auth/auth-helpers/auth-ui</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/auth-helpers/flutter-auth-ui</loc>
+    <loc>https://iechor.com/docs/guides/auth/auth-helpers/flutter-auth-ui</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/auth-helpers/nextjs-pages</loc>
+    <loc>https://iechor.com/docs/guides/auth/auth-helpers/nextjs-pages</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/auth-helpers/nextjs</loc>
+    <loc>https://iechor.com/docs/guides/auth/auth-helpers/nextjs</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/auth-helpers/remix</loc>
+    <loc>https://iechor.com/docs/guides/auth/auth-helpers/remix</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/auth-helpers/sveltekit</loc>
+    <loc>https://iechor.com/docs/guides/auth/auth-helpers/sveltekit</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/quickstarts/react</loc>
+    <loc>https://iechor.com/docs/guides/auth/quickstarts/react</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/social-login/auth-apple</loc>
+    <loc>https://iechor.com/docs/guides/auth/social-login/auth-apple</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/social-login/auth-azure</loc>
+    <loc>https://iechor.com/docs/guides/auth/social-login/auth-azure</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/social-login/auth-bitbucket</loc>
+    <loc>https://iechor.com/docs/guides/auth/social-login/auth-bitbucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/android</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/quickstarts/android</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
   
   <url>
-    <loc>https://supabase.com/docs/guides/auth/social-login/auth-discord</loc>
+    <loc>https://iechor.com/docs/guides/auth/social-login/auth-discord</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/social-login/auth-facebook</loc>
+    <loc>https://iechor.com/docs/guides/auth/social-login/auth-facebook</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/social-login/auth-github</loc>
+    <loc>https://iechor.com/docs/guides/auth/social-login/auth-github</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/social-login/auth-gitlab</loc>
+    <loc>https://iechor.com/docs/guides/auth/social-login/auth-gitlab</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/social-login/auth-google</loc>
+    <loc>https://iechor.com/docs/guides/auth/social-login/auth-google</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/social-login/auth-keycloak</loc>
+    <loc>https://iechor.com/docs/guides/auth/social-login/auth-keycloak</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/social-login/auth-linkedin</loc>
+    <loc>https://iechor.com/docs/guides/auth/social-login/auth-linkedin</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/social-login/auth-notion</loc>
+    <loc>https://iechor.com/docs/guides/auth/social-login/auth-notion</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/social-login/auth-slack</loc>
+    <loc>https://iechor.com/docs/guides/auth/social-login/auth-slack</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/social-login/auth-spotify</loc>
+    <loc>https://iechor.com/docs/guides/auth/social-login/auth-spotify</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/social-login/auth-twitch</loc>
+    <loc>https://iechor.com/docs/guides/auth/social-login/auth-twitch</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/social-login/auth-twitter</loc>
+    <loc>https://iechor.com/docs/guides/auth/social-login/auth-twitter</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/social-login/auth-workos</loc>
+    <loc>https://iechor.com/docs/guides/auth/social-login/auth-workos</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/social-login/auth-zoom</loc>
+    <loc>https://iechor.com/docs/guides/auth/social-login/auth-zoom</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/sso/auth-sso-saml</loc>
+    <loc>https://iechor.com/docs/guides/auth/sso/auth-sso-saml</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/phone-login/messagebird</loc>
+    <loc>https://iechor.com/docs/guides/auth/phone-login/messagebird</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/phone-login/twilio</loc>
+    <loc>https://iechor.com/docs/guides/auth/phone-login/twilio</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/auth/phone-login/vonage</loc>
+    <loc>https://iechor.com/docs/guides/auth/phone-login/vonage</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/examples/cloudflare-turnstile</loc>
+    <loc>https://iechor.com/docs/guides/functions/examples/cloudflare-turnstile</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/examples/discord-bot</loc>
+    <loc>https://iechor.com/docs/guides/functions/examples/discord-bot</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/examples/github-actions</loc>
+    <loc>https://iechor.com/docs/guides/functions/examples/github-actions</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/examples/og-image</loc>
+    <loc>https://iechor.com/docs/guides/functions/examples/og-image</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/examples/rate-limiting</loc>
+    <loc>https://iechor.com/docs/guides/functions/examples/rate-limiting</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/examples/screenshots</loc>
+    <loc>https://iechor.com/docs/guides/functions/examples/screenshots</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/examples/send-emails</loc>
+    <loc>https://iechor.com/docs/guides/functions/examples/send-emails</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/examples/stripe-webhooks</loc>
+    <loc>https://iechor.com/docs/guides/functions/examples/stripe-webhooks</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/examples/telegram-bot</loc>
+    <loc>https://iechor.com/docs/guides/functions/examples/telegram-bot</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/functions/examples/upstash-redis</loc>
+    <loc>https://iechor.com/docs/guides/functions/examples/upstash-redis</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/flutter</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/quickstarts/flutter</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/nextjs</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/quickstarts/nextjs</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/nuxtjs</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/quickstarts/nuxtjs</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/reactjs</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/quickstarts/reactjs</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/redwoodjs</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/quickstarts/redwoodjs</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/solidjs</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/quickstarts/solidjs</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/sveltekit</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/quickstarts/sveltekit</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/vue</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/quickstarts/vue</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/postgres/cascade-deletes</loc>
+    <loc>https://iechor.com/docs/guides/database/postgres/cascade-deletes</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/postgres/dropping-all-tables-in-schema</loc>
+    <loc>https://iechor.com/docs/guides/database/postgres/dropping-all-tables-in-schema</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/postgres/first-row-in-group</loc>
+    <loc>https://iechor.com/docs/guides/database/postgres/first-row-in-group</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/postgres/indexes</loc>
+    <loc>https://iechor.com/docs/guides/database/postgres/indexes</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/postgres/which-version-of-postgres</loc>
+    <loc>https://iechor.com/docs/guides/database/postgres/which-version-of-postgres</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/http</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/http</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/hypopg</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/hypopg</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/pg-safeupdate</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/pg-safeupdate</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/pg_graphql</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/pg_graphql</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/pg_hashids</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/pg_hashids</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/pg_jsonschema</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/pg_jsonschema</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/pg_plan_filter</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/pg_plan_filter</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/pg_stat_monitor</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/pg_stat_monitor</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/pg_stat_statements</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/pg_stat_statements</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/pgaudit</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/pgaudit</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/pgcron</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/pgcron</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/pgjwt</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/pgjwt</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/pgnet</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/pgnet</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/pgrepack</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/pgrepack</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/pgroonga</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/pgroonga</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/pgrouting</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/pgrouting</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/pgsodium</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/pgsodium</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/pgtap</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/pgtap</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/pgvector</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/pgvector</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/plpgsql_check</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/plpgsql_check</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/plv8</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/plv8</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/postgis</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/postgis</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/rum</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/rum</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/timescaledb</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/timescaledb</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/uuid-ossp</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/uuid-ossp</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/wrappers</loc>
+    <loc>https://iechor.com/docs/guides/database/extensions/wrappers</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/sso/azure</loc>
+    <loc>https://iechor.com/docs/guides/platform/sso/azure</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/sso/gsuite</loc>
+    <loc>https://iechor.com/docs/guides/platform/sso/gsuite</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/platform/sso/okta</loc>
+    <loc>https://iechor.com/docs/guides/platform/sso/okta</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/resources/migrating-to-supabase/amazon-rds</loc>
+    <loc>https://iechor.com/docs/guides/resources/migrating-to-supabase/amazon-rds</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/resources/migrating-to-supabase/firebase-auth</loc>
+    <loc>https://iechor.com/docs/guides/resources/migrating-to-supabase/firebase-auth</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/resources/migrating-to-supabase/firebase-storage</loc>
+    <loc>https://iechor.com/docs/guides/resources/migrating-to-supabase/firebase-storage</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/resources/migrating-to-supabase/firestore-data</loc>
+    <loc>https://iechor.com/docs/guides/resources/migrating-to-supabase/firestore-data</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/resources/migrating-to-supabase/heroku</loc>
+    <loc>https://iechor.com/docs/guides/resources/migrating-to-supabase/heroku</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/resources/migrating-to-supabase/render</loc>
+    <loc>https://iechor.com/docs/guides/resources/migrating-to-supabase/render</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-angular</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/tutorials/with-angular</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-expo</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/tutorials/with-expo</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-flutter</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/tutorials/with-flutter</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-kotlin</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/tutorials/with-kotlin</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-ionic-angular</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/tutorials/with-ionic-angular</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-ionic-react</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/tutorials/with-ionic-react</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-ionic-vue</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/tutorials/with-ionic-vue</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-nextjs</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/tutorials/with-nextjs</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-nuxt-3</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/tutorials/with-nuxt-3</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-react</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/tutorials/with-react</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-redwoodjs</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/tutorials/with-redwoodjs</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-solidjs</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/tutorials/with-solidjs</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-svelte</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/tutorials/with-svelte</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-sveltekit</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/tutorials/with-sveltekit</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-vue-3</loc>
+    <loc>https://iechor.com/docs/guides/getting-started/tutorials/with-vue-3</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/self-hosting/analytics/config</loc>
+    <loc>https://iechor.com/docs/guides/self-hosting/analytics/config</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/self-hosting/realtime/config</loc>
+    <loc>https://iechor.com/docs/guides/self-hosting/realtime/config</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/self-hosting/auth/config</loc>
+    <loc>https://iechor.com/docs/guides/self-hosting/auth/config</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/self-hosting/storage/config</loc>
+    <loc>https://iechor.com/docs/guides/self-hosting/storage/config</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/initializing</loc>
+    <loc>https://iechor.com/docs/reference/javascript/initializing</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-api</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-api</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-signup</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-signup</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-signinwithpassword</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-signinwithpassword</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-signinwithotp</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-signinwithotp</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-signinwithoauth</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-signinwithoauth</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-signinwithsso</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-signinwithsso</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-signout</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-signout</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-verifyotp</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-verifyotp</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-getsession</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-getsession</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-getuser</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-getuser</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-updateuser</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-updateuser</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-reauthentication</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-reauthentication</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-resend</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-resend</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-setsession</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-setsession</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-refreshsession</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-refreshsession</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-onauthstatechange</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-onauthstatechange</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-exchangecodeforsession</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-exchangecodeforsession</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-mfa-api</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-mfa-api</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-mfa-enroll</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-mfa-enroll</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-mfa-challenge</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-mfa-challenge</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-mfa-verify</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-mfa-verify</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-mfa-challengeandverify</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-mfa-challengeandverify</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-mfa-unenroll</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-mfa-unenroll</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
     <loc
-      >https://supabase.com/docs/reference/javascript/auth-mfa-getauthenticatorassurancelevel</loc
+      >https://iechor.com/docs/reference/javascript/auth-mfa-getauthenticatorassurancelevel</loc
     >
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/admin-api</loc>
+    <loc>https://iechor.com/docs/reference/javascript/admin-api</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-admin-getuserbyid</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-admin-getuserbyid</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-admin-listusers</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-admin-listusers</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-admin-createuser</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-admin-createuser</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-admin-deleteuser</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-admin-deleteuser</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-admin-inviteuserbyemail</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-admin-inviteuserbyemail</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-resetpasswordforemail</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-resetpasswordforemail</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-admin-generatelink</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-admin-generatelink</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-admin-updateuserbyid</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-admin-updateuserbyid</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-admin-mfa-listfactors</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-admin-mfa-listfactors</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/auth-admin-mfa-deletefactor</loc>
+    <loc>https://iechor.com/docs/reference/javascript/auth-admin-mfa-deletefactor</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/select</loc>
+    <loc>https://iechor.com/docs/reference/javascript/select</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/insert</loc>
+    <loc>https://iechor.com/docs/reference/javascript/insert</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/update</loc>
+    <loc>https://iechor.com/docs/reference/javascript/update</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/upsert</loc>
+    <loc>https://iechor.com/docs/reference/javascript/upsert</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/delete</loc>
+    <loc>https://iechor.com/docs/reference/javascript/delete</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/rpc</loc>
+    <loc>https://iechor.com/docs/reference/javascript/rpc</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/using-filters</loc>
+    <loc>https://iechor.com/docs/reference/javascript/using-filters</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/eq</loc>
+    <loc>https://iechor.com/docs/reference/javascript/eq</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/neq</loc>
+    <loc>https://iechor.com/docs/reference/javascript/neq</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/gt</loc>
+    <loc>https://iechor.com/docs/reference/javascript/gt</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/gte</loc>
+    <loc>https://iechor.com/docs/reference/javascript/gte</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/lt</loc>
+    <loc>https://iechor.com/docs/reference/javascript/lt</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/lte</loc>
+    <loc>https://iechor.com/docs/reference/javascript/lte</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/like</loc>
+    <loc>https://iechor.com/docs/reference/javascript/like</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/ilike</loc>
+    <loc>https://iechor.com/docs/reference/javascript/ilike</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/is</loc>
+    <loc>https://iechor.com/docs/reference/javascript/is</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/in</loc>
+    <loc>https://iechor.com/docs/reference/javascript/in</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/contains</loc>
+    <loc>https://iechor.com/docs/reference/javascript/contains</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/containedby</loc>
+    <loc>https://iechor.com/docs/reference/javascript/containedby</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/rangegt</loc>
+    <loc>https://iechor.com/docs/reference/javascript/rangegt</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/rangegte</loc>
+    <loc>https://iechor.com/docs/reference/javascript/rangegte</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/rangelt</loc>
+    <loc>https://iechor.com/docs/reference/javascript/rangelt</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/rangelte</loc>
+    <loc>https://iechor.com/docs/reference/javascript/rangelte</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/rangeadjacent</loc>
+    <loc>https://iechor.com/docs/reference/javascript/rangeadjacent</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/overlaps</loc>
+    <loc>https://iechor.com/docs/reference/javascript/overlaps</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/textsearch</loc>
+    <loc>https://iechor.com/docs/reference/javascript/textsearch</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/match</loc>
+    <loc>https://iechor.com/docs/reference/javascript/match</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/not</loc>
+    <loc>https://iechor.com/docs/reference/javascript/not</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/or</loc>
+    <loc>https://iechor.com/docs/reference/javascript/or</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/filter</loc>
+    <loc>https://iechor.com/docs/reference/javascript/filter</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/using-modifiers</loc>
+    <loc>https://iechor.com/docs/reference/javascript/using-modifiers</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/db-modifiers-select</loc>
+    <loc>https://iechor.com/docs/reference/javascript/db-modifiers-select</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/order</loc>
+    <loc>https://iechor.com/docs/reference/javascript/order</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/limit</loc>
+    <loc>https://iechor.com/docs/reference/javascript/limit</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/range</loc>
+    <loc>https://iechor.com/docs/reference/javascript/range</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/db-abortsignal</loc>
+    <loc>https://iechor.com/docs/reference/javascript/db-abortsignal</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/single</loc>
+    <loc>https://iechor.com/docs/reference/javascript/single</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/maybesingle</loc>
+    <loc>https://iechor.com/docs/reference/javascript/maybesingle</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/db-csv</loc>
+    <loc>https://iechor.com/docs/reference/javascript/db-csv</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/db-returns</loc>
+    <loc>https://iechor.com/docs/reference/javascript/db-returns</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/functions-invoke</loc>
+    <loc>https://iechor.com/docs/reference/javascript/functions-invoke</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/subscribe</loc>
+    <loc>https://iechor.com/docs/reference/javascript/subscribe</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/getchannels</loc>
+    <loc>https://iechor.com/docs/reference/javascript/getchannels</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/removechannel</loc>
+    <loc>https://iechor.com/docs/reference/javascript/removechannel</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/removeallchannels</loc>
+    <loc>https://iechor.com/docs/reference/javascript/removeallchannels</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/storage-listbuckets</loc>
+    <loc>https://iechor.com/docs/reference/javascript/storage-listbuckets</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/storage-getbucket</loc>
+    <loc>https://iechor.com/docs/reference/javascript/storage-getbucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/storage-createbucket</loc>
+    <loc>https://iechor.com/docs/reference/javascript/storage-createbucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/storage-emptybucket</loc>
+    <loc>https://iechor.com/docs/reference/javascript/storage-emptybucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/storage-updatebucket</loc>
+    <loc>https://iechor.com/docs/reference/javascript/storage-updatebucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/storage-deletebucket</loc>
+    <loc>https://iechor.com/docs/reference/javascript/storage-deletebucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/storage-from-upload</loc>
+    <loc>https://iechor.com/docs/reference/javascript/storage-from-upload</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/storage-from-update</loc>
+    <loc>https://iechor.com/docs/reference/javascript/storage-from-update</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/storage-from-move</loc>
+    <loc>https://iechor.com/docs/reference/javascript/storage-from-move</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/storage-from-copy</loc>
+    <loc>https://iechor.com/docs/reference/javascript/storage-from-copy</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/storage-from-createsignedurl</loc>
+    <loc>https://iechor.com/docs/reference/javascript/storage-from-createsignedurl</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/storage-from-createsignedurls</loc>
+    <loc>https://iechor.com/docs/reference/javascript/storage-from-createsignedurls</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/storage-from-createsigneduploadurl</loc>
+    <loc>https://iechor.com/docs/reference/javascript/storage-from-createsigneduploadurl</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/storage-from-uploadtosignedurl</loc>
+    <loc>https://iechor.com/docs/reference/javascript/storage-from-uploadtosignedurl</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/storage-from-getpublicurl</loc>
+    <loc>https://iechor.com/docs/reference/javascript/storage-from-getpublicurl</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/storage-from-download</loc>
+    <loc>https://iechor.com/docs/reference/javascript/storage-from-download</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/storage-from-remove</loc>
+    <loc>https://iechor.com/docs/reference/javascript/storage-from-remove</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/javascript/storage-from-list</loc>
+    <loc>https://iechor.com/docs/reference/javascript/storage-from-list</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/initializing</loc>
+    <loc>https://iechor.com/docs/reference/dart/initializing</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/auth-signup</loc>
+    <loc>https://iechor.com/docs/reference/dart/auth-signup</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/auth-signinwithpassword</loc>
+    <loc>https://iechor.com/docs/reference/dart/auth-signinwithpassword</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/auth-signinwithotp</loc>
+    <loc>https://iechor.com/docs/reference/dart/auth-signinwithotp</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/sign-in-with-apple</loc>
+    <loc>https://iechor.com/docs/reference/dart/sign-in-with-apple</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/auth-signinwithoauth</loc>
+    <loc>https://iechor.com/docs/reference/dart/auth-signinwithoauth</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/auth-signout</loc>
+    <loc>https://iechor.com/docs/reference/dart/auth-signout</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/auth-verifyotp</loc>
+    <loc>https://iechor.com/docs/reference/dart/auth-verifyotp</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/auth-getsession</loc>
+    <loc>https://iechor.com/docs/reference/dart/auth-getsession</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/auth-getuser</loc>
+    <loc>https://iechor.com/docs/reference/dart/auth-getuser</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/auth-updateuser</loc>
+    <loc>https://iechor.com/docs/reference/dart/auth-updateuser</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/auth-onauthstatechange</loc>
+    <loc>https://iechor.com/docs/reference/dart/auth-onauthstatechange</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/undefined</loc>
+    <loc>https://iechor.com/docs/reference/dart/undefined</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/functions-invoke</loc>
+    <loc>https://iechor.com/docs/reference/dart/functions-invoke</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/select</loc>
+    <loc>https://iechor.com/docs/reference/dart/select</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/insert</loc>
+    <loc>https://iechor.com/docs/reference/dart/insert</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/update</loc>
+    <loc>https://iechor.com/docs/reference/dart/update</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/upsert</loc>
+    <loc>https://iechor.com/docs/reference/dart/upsert</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/delete</loc>
+    <loc>https://iechor.com/docs/reference/dart/delete</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/rpc</loc>
+    <loc>https://iechor.com/docs/reference/dart/rpc</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/subscribe</loc>
+    <loc>https://iechor.com/docs/reference/dart/subscribe</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/removechannel</loc>
+    <loc>https://iechor.com/docs/reference/dart/removechannel</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/removeallchannels</loc>
+    <loc>https://iechor.com/docs/reference/dart/removeallchannels</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/getchannels</loc>
+    <loc>https://iechor.com/docs/reference/dart/getchannels</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/stream</loc>
+    <loc>https://iechor.com/docs/reference/dart/stream</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/storage-listbuckets</loc>
+    <loc>https://iechor.com/docs/reference/dart/storage-listbuckets</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/storage-getbucket</loc>
+    <loc>https://iechor.com/docs/reference/dart/storage-getbucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/storage-createbucket</loc>
+    <loc>https://iechor.com/docs/reference/dart/storage-createbucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/storage-emptybucket</loc>
+    <loc>https://iechor.com/docs/reference/dart/storage-emptybucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/storage-updatebucket</loc>
+    <loc>https://iechor.com/docs/reference/dart/storage-updatebucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/storage-deletebucket</loc>
+    <loc>https://iechor.com/docs/reference/dart/storage-deletebucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/storage-from-upload</loc>
+    <loc>https://iechor.com/docs/reference/dart/storage-from-upload</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/storage-from-update</loc>
+    <loc>https://iechor.com/docs/reference/dart/storage-from-update</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/storage-from-move</loc>
+    <loc>https://iechor.com/docs/reference/dart/storage-from-move</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/storage-from-createsignedurl</loc>
+    <loc>https://iechor.com/docs/reference/dart/storage-from-createsignedurl</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/storage-from-getpublicurl</loc>
+    <loc>https://iechor.com/docs/reference/dart/storage-from-getpublicurl</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/storage-from-download</loc>
+    <loc>https://iechor.com/docs/reference/dart/storage-from-download</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/storage-from-remove</loc>
+    <loc>https://iechor.com/docs/reference/dart/storage-from-remove</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/storage-from-list</loc>
+    <loc>https://iechor.com/docs/reference/dart/storage-from-list</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/using-modifiers</loc>
+    <loc>https://iechor.com/docs/reference/dart/using-modifiers</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/limit</loc>
+    <loc>https://iechor.com/docs/reference/dart/limit</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/order</loc>
+    <loc>https://iechor.com/docs/reference/dart/order</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/range</loc>
+    <loc>https://iechor.com/docs/reference/dart/range</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/single</loc>
+    <loc>https://iechor.com/docs/reference/dart/single</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/using-filters</loc>
+    <loc>https://iechor.com/docs/reference/dart/using-filters</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/or</loc>
+    <loc>https://iechor.com/docs/reference/dart/or</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/not</loc>
+    <loc>https://iechor.com/docs/reference/dart/not</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/match</loc>
+    <loc>https://iechor.com/docs/reference/dart/match</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/eq</loc>
+    <loc>https://iechor.com/docs/reference/dart/eq</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/neq</loc>
+    <loc>https://iechor.com/docs/reference/dart/neq</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/gt</loc>
+    <loc>https://iechor.com/docs/reference/dart/gt</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/gte</loc>
+    <loc>https://iechor.com/docs/reference/dart/gte</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/lt</loc>
+    <loc>https://iechor.com/docs/reference/dart/lt</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/lte</loc>
+    <loc>https://iechor.com/docs/reference/dart/lte</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/like</loc>
+    <loc>https://iechor.com/docs/reference/dart/like</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/ilike</loc>
+    <loc>https://iechor.com/docs/reference/dart/ilike</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/is</loc>
+    <loc>https://iechor.com/docs/reference/dart/is</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/in</loc>
+    <loc>https://iechor.com/docs/reference/dart/in</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/contains</loc>
+    <loc>https://iechor.com/docs/reference/dart/contains</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/containedby</loc>
+    <loc>https://iechor.com/docs/reference/dart/containedby</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/rangelt</loc>
+    <loc>https://iechor.com/docs/reference/dart/rangelt</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/rangegt</loc>
+    <loc>https://iechor.com/docs/reference/dart/rangegt</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/rangegte</loc>
+    <loc>https://iechor.com/docs/reference/dart/rangegte</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/rangelte</loc>
+    <loc>https://iechor.com/docs/reference/dart/rangelte</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/rangeadjacent</loc>
+    <loc>https://iechor.com/docs/reference/dart/rangeadjacent</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/overlaps</loc>
+    <loc>https://iechor.com/docs/reference/dart/overlaps</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/textsearch</loc>
+    <loc>https://iechor.com/docs/reference/dart/textsearch</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/dart/filter</loc>
+    <loc>https://iechor.com/docs/reference/dart/filter</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/initializing</loc>
+    <loc>https://iechor.com/docs/reference/python/initializing</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/auth-signup</loc>
+    <loc>https://iechor.com/docs/reference/python/auth-signup</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/auth-signinwithpassword</loc>
+    <loc>https://iechor.com/docs/reference/python/auth-signinwithpassword</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/auth-signinwithotp</loc>
+    <loc>https://iechor.com/docs/reference/python/auth-signinwithotp</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/auth-signinwithoauth</loc>
+    <loc>https://iechor.com/docs/reference/python/auth-signinwithoauth</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/auth-signout</loc>
+    <loc>https://iechor.com/docs/reference/python/auth-signout</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/auth-verifyotp</loc>
+    <loc>https://iechor.com/docs/reference/python/auth-verifyotp</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/auth-getuser</loc>
+    <loc>https://iechor.com/docs/reference/python/auth-getuser</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/auth-getsession</loc>
+    <loc>https://iechor.com/docs/reference/python/auth-getsession</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/auth-setsession</loc>
+    <loc>https://iechor.com/docs/reference/python/auth-setsession</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/auth-refreshsession</loc>
+    <loc>https://iechor.com/docs/reference/python/auth-refreshsession</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/select</loc>
+    <loc>https://iechor.com/docs/reference/python/select</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/insert</loc>
+    <loc>https://iechor.com/docs/reference/python/insert</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/functions-invoke</loc>
+    <loc>https://iechor.com/docs/reference/python/functions-invoke</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/storage-listbuckets</loc>
+    <loc>https://iechor.com/docs/reference/python/storage-listbuckets</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/storage-getbucket</loc>
+    <loc>https://iechor.com/docs/reference/python/storage-getbucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/storage-createbucket</loc>
+    <loc>https://iechor.com/docs/reference/python/storage-createbucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/storage-emptybucket</loc>
+    <loc>https://iechor.com/docs/reference/python/storage-emptybucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/storage-deletebucket</loc>
+    <loc>https://iechor.com/docs/reference/python/storage-deletebucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/storage-from-upload</loc>
+    <loc>https://iechor.com/docs/reference/python/storage-from-upload</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/storage-from-move</loc>
+    <loc>https://iechor.com/docs/reference/python/storage-from-move</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/storage-from-createsignedurl</loc>
+    <loc>https://iechor.com/docs/reference/python/storage-from-createsignedurl</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/storage-from-getpublicurl</loc>
+    <loc>https://iechor.com/docs/reference/python/storage-from-getpublicurl</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/storage-from-download</loc>
+    <loc>https://iechor.com/docs/reference/python/storage-from-download</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/storage-from-remove</loc>
+    <loc>https://iechor.com/docs/reference/python/storage-from-remove</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/storage-from-list</loc>
+    <loc>https://iechor.com/docs/reference/python/storage-from-list</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/python/subscribe</loc>
+    <loc>https://iechor.com/docs/reference/python/subscribe</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/initializing</loc>
+    <loc>https://iechor.com/docs/reference/csharp/initializing</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/auth-signup</loc>
+    <loc>https://iechor.com/docs/reference/csharp/auth-signup</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/auth-signinwithpassword</loc>
+    <loc>https://iechor.com/docs/reference/csharp/auth-signinwithpassword</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/auth-signinwithotp</loc>
+    <loc>https://iechor.com/docs/reference/csharp/auth-signinwithotp</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/auth-signinwithoauth</loc>
+    <loc>https://iechor.com/docs/reference/csharp/auth-signinwithoauth</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/auth-signout</loc>
+    <loc>https://iechor.com/docs/reference/csharp/auth-signout</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/auth-verifyotp</loc>
+    <loc>https://iechor.com/docs/reference/csharp/auth-verifyotp</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/auth-getsession</loc>
+    <loc>https://iechor.com/docs/reference/csharp/auth-getsession</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/auth-getuser</loc>
+    <loc>https://iechor.com/docs/reference/csharp/auth-getuser</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/auth-updateuser</loc>
+    <loc>https://iechor.com/docs/reference/csharp/auth-updateuser</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/auth-onauthstatechange</loc>
+    <loc>https://iechor.com/docs/reference/csharp/auth-onauthstatechange</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/undefined</loc>
+    <loc>https://iechor.com/docs/reference/csharp/undefined</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/functions-invoke</loc>
+    <loc>https://iechor.com/docs/reference/csharp/functions-invoke</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/select</loc>
+    <loc>https://iechor.com/docs/reference/csharp/select</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/insert</loc>
+    <loc>https://iechor.com/docs/reference/csharp/insert</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/update</loc>
+    <loc>https://iechor.com/docs/reference/csharp/update</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/upsert</loc>
+    <loc>https://iechor.com/docs/reference/csharp/upsert</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/delete</loc>
+    <loc>https://iechor.com/docs/reference/csharp/delete</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/rpc</loc>
+    <loc>https://iechor.com/docs/reference/csharp/rpc</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/subscribe</loc>
+    <loc>https://iechor.com/docs/reference/csharp/subscribe</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/removechannel</loc>
+    <loc>https://iechor.com/docs/reference/csharp/removechannel</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/getchannels</loc>
+    <loc>https://iechor.com/docs/reference/csharp/getchannels</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/storage-listbuckets</loc>
+    <loc>https://iechor.com/docs/reference/csharp/storage-listbuckets</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/storage-getbucket</loc>
+    <loc>https://iechor.com/docs/reference/csharp/storage-getbucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/storage-createbucket</loc>
+    <loc>https://iechor.com/docs/reference/csharp/storage-createbucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/storage-emptybucket</loc>
+    <loc>https://iechor.com/docs/reference/csharp/storage-emptybucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/storage-updatebucket</loc>
+    <loc>https://iechor.com/docs/reference/csharp/storage-updatebucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/storage-deletebucket</loc>
+    <loc>https://iechor.com/docs/reference/csharp/storage-deletebucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/storage-from-upload</loc>
+    <loc>https://iechor.com/docs/reference/csharp/storage-from-upload</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/storage-from-update</loc>
+    <loc>https://iechor.com/docs/reference/csharp/storage-from-update</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/storage-from-move</loc>
+    <loc>https://iechor.com/docs/reference/csharp/storage-from-move</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/storage-from-createsignedurl</loc>
+    <loc>https://iechor.com/docs/reference/csharp/storage-from-createsignedurl</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/storage-from-getpublicurl</loc>
+    <loc>https://iechor.com/docs/reference/csharp/storage-from-getpublicurl</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/storage-from-download</loc>
+    <loc>https://iechor.com/docs/reference/csharp/storage-from-download</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/storage-from-remove</loc>
+    <loc>https://iechor.com/docs/reference/csharp/storage-from-remove</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/storage-from-list</loc>
+    <loc>https://iechor.com/docs/reference/csharp/storage-from-list</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/using-modifiers</loc>
+    <loc>https://iechor.com/docs/reference/csharp/using-modifiers</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/limit</loc>
+    <loc>https://iechor.com/docs/reference/csharp/limit</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/order</loc>
+    <loc>https://iechor.com/docs/reference/csharp/order</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/range</loc>
+    <loc>https://iechor.com/docs/reference/csharp/range</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/undefined</loc>
+    <loc>https://iechor.com/docs/reference/csharp/undefined</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/single</loc>
+    <loc>https://iechor.com/docs/reference/csharp/single</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/using-filters</loc>
+    <loc>https://iechor.com/docs/reference/csharp/using-filters</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/or</loc>
+    <loc>https://iechor.com/docs/reference/csharp/or</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/not</loc>
+    <loc>https://iechor.com/docs/reference/csharp/not</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/match</loc>
+    <loc>https://iechor.com/docs/reference/csharp/match</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/eq</loc>
+    <loc>https://iechor.com/docs/reference/csharp/eq</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/neq</loc>
+    <loc>https://iechor.com/docs/reference/csharp/neq</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/gt</loc>
+    <loc>https://iechor.com/docs/reference/csharp/gt</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/gte</loc>
+    <loc>https://iechor.com/docs/reference/csharp/gte</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/lt</loc>
+    <loc>https://iechor.com/docs/reference/csharp/lt</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/lte</loc>
+    <loc>https://iechor.com/docs/reference/csharp/lte</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/like</loc>
+    <loc>https://iechor.com/docs/reference/csharp/like</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/ilike</loc>
+    <loc>https://iechor.com/docs/reference/csharp/ilike</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/is</loc>
+    <loc>https://iechor.com/docs/reference/csharp/is</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/in</loc>
+    <loc>https://iechor.com/docs/reference/csharp/in</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/contains</loc>
+    <loc>https://iechor.com/docs/reference/csharp/contains</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/containedby</loc>
+    <loc>https://iechor.com/docs/reference/csharp/containedby</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/csharp/textsearch</loc>
+    <loc>https://iechor.com/docs/reference/csharp/textsearch</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/initializing</loc>
+    <loc>https://iechor.com/docs/reference/swift/initializing</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/select</loc>
+    <loc>https://iechor.com/docs/reference/swift/select</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/insert</loc>
+    <loc>https://iechor.com/docs/reference/swift/insert</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/update</loc>
+    <loc>https://iechor.com/docs/reference/swift/update</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/upsert</loc>
+    <loc>https://iechor.com/docs/reference/swift/upsert</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/delete</loc>
+    <loc>https://iechor.com/docs/reference/swift/delete</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/rpc</loc>
+    <loc>https://iechor.com/docs/reference/swift/rpc</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/using-filters</loc>
+    <loc>https://iechor.com/docs/reference/swift/using-filters</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/or</loc>
+    <loc>https://iechor.com/docs/reference/swift/or</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/not</loc>
+    <loc>https://iechor.com/docs/reference/swift/not</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/match</loc>
+    <loc>https://iechor.com/docs/reference/swift/match</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/eq</loc>
+    <loc>https://iechor.com/docs/reference/swift/eq</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/neq</loc>
+    <loc>https://iechor.com/docs/reference/swift/neq</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/gt</loc>
+    <loc>https://iechor.com/docs/reference/swift/gt</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/gte</loc>
+    <loc>https://iechor.com/docs/reference/swift/gte</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/lt</loc>
+    <loc>https://iechor.com/docs/reference/swift/lt</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/lte</loc>
+    <loc>https://iechor.com/docs/reference/swift/lte</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/like</loc>
+    <loc>https://iechor.com/docs/reference/swift/like</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/ilike</loc>
+    <loc>https://iechor.com/docs/reference/swift/ilike</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/is</loc>
+    <loc>https://iechor.com/docs/reference/swift/is</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/in</loc>
+    <loc>https://iechor.com/docs/reference/swift/in</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/contains</loc>
+    <loc>https://iechor.com/docs/reference/swift/contains</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/rangelt</loc>
+    <loc>https://iechor.com/docs/reference/swift/rangelt</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/rangegt</loc>
+    <loc>https://iechor.com/docs/reference/swift/rangegt</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/rangegte</loc>
+    <loc>https://iechor.com/docs/reference/swift/rangegte</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/rangelte</loc>
+    <loc>https://iechor.com/docs/reference/swift/rangelte</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/rangeadjacent</loc>
+    <loc>https://iechor.com/docs/reference/swift/rangeadjacent</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/overlaps</loc>
+    <loc>https://iechor.com/docs/reference/swift/overlaps</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/textsearch</loc>
+    <loc>https://iechor.com/docs/reference/swift/textsearch</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/filter</loc>
+    <loc>https://iechor.com/docs/reference/swift/filter</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/using-modifiers</loc>
+    <loc>https://iechor.com/docs/reference/swift/using-modifiers</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/db-modifiers-select</loc>
+    <loc>https://iechor.com/docs/reference/swift/db-modifiers-select</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/order</loc>
+    <loc>https://iechor.com/docs/reference/swift/order</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/limit</loc>
+    <loc>https://iechor.com/docs/reference/swift/limit</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/range</loc>
+    <loc>https://iechor.com/docs/reference/swift/range</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/auth-api</loc>
+    <loc>https://iechor.com/docs/reference/swift/auth-api</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/auth-signup</loc>
+    <loc>https://iechor.com/docs/reference/swift/auth-signup</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/auth-signinwithpassword</loc>
+    <loc>https://iechor.com/docs/reference/swift/auth-signinwithpassword</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/auth-signinwithotp</loc>
+    <loc>https://iechor.com/docs/reference/swift/auth-signinwithotp</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/auth-signinwithoauth</loc>
+    <loc>https://iechor.com/docs/reference/swift/auth-signinwithoauth</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/auth-signout</loc>
+    <loc>https://iechor.com/docs/reference/swift/auth-signout</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/auth-verifyotp</loc>
+    <loc>https://iechor.com/docs/reference/swift/auth-verifyotp</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/auth-getsession</loc>
+    <loc>https://iechor.com/docs/reference/swift/auth-getsession</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/auth-getuser</loc>
+    <loc>https://iechor.com/docs/reference/swift/auth-getuser</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/auth-updateuser</loc>
+    <loc>https://iechor.com/docs/reference/swift/auth-updateuser</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/auth-setsession</loc>
+    <loc>https://iechor.com/docs/reference/swift/auth-setsession</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/auth-refreshsession</loc>
+    <loc>https://iechor.com/docs/reference/swift/auth-refreshsession</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/auth-onauthstatechange</loc>
+    <loc>https://iechor.com/docs/reference/swift/auth-onauthstatechange</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/functions-invoke</loc>
+    <loc>https://iechor.com/docs/reference/swift/functions-invoke</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/subscribe</loc>
+    <loc>https://iechor.com/docs/reference/swift/subscribe</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/removechannel</loc>
+    <loc>https://iechor.com/docs/reference/swift/removechannel</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/storage-listbuckets</loc>
+    <loc>https://iechor.com/docs/reference/swift/storage-listbuckets</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/storage-getbucket</loc>
+    <loc>https://iechor.com/docs/reference/swift/storage-getbucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/storage-createbucket</loc>
+    <loc>https://iechor.com/docs/reference/swift/storage-createbucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/storage-emptybucket</loc>
+    <loc>https://iechor.com/docs/reference/swift/storage-emptybucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/storage-deletebucket</loc>
+    <loc>https://iechor.com/docs/reference/swift/storage-deletebucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/storage-from-upload</loc>
+    <loc>https://iechor.com/docs/reference/swift/storage-from-upload</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/storage-from-update</loc>
+    <loc>https://iechor.com/docs/reference/swift/storage-from-update</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/storage-from-move</loc>
+    <loc>https://iechor.com/docs/reference/swift/storage-from-move</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/storage-from-createsignedurl</loc>
+    <loc>https://iechor.com/docs/reference/swift/storage-from-createsignedurl</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/storage-from-download</loc>
+    <loc>https://iechor.com/docs/reference/swift/storage-from-download</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/storage-from-remove</loc>
+    <loc>https://iechor.com/docs/reference/swift/storage-from-remove</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/swift/storage-from-list</loc>
+    <loc>https://iechor.com/docs/reference/swift/storage-from-list</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/initializing</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/initializing</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/select</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/select</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/insert</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/insert</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/update</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/update</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/upsert</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/upsert</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/delete</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/delete</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/rpc</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/rpc</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/using-filters</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/using-filters</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/or</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/or</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/not</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/not</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/eq</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/eq</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/neq</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/neq</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/gt</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/gt</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/gte</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/gte</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/lt</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/lt</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/lte</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/lte</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/like</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/like</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/ilike</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/ilike</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/is</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/is</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/in</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/in</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/contains</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/contains</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/rangelt</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/rangelt</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/rangegt</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/rangegt</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/rangegte</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/rangegte</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/rangelte</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/rangelte</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/rangeadjacent</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/rangeadjacent</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/overlaps</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/overlaps</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/textsearch</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/textsearch</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/filter</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/filter</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/order</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/order</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/limit</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/limit</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/range</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/range</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-api</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-api</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-signup</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-signup</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-signinwithpassword</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-signinwithpassword</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-signinwithotp</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-signinwithotp</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-signinwithoauth</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-signinwithoauth</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-signinwithsso</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-signinwithsso</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-signout</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-signout</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-verifyotp</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-verifyotp</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-reauthentication</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-reauthentication</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-resend</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-resend</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-getsession</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-getsession</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-getuser</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-getuser</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-updateuser</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-updateuser</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-setsession</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-setsession</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-refreshsession</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-refreshsession</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-onauthstatechange</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-onauthstatechange</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-resetpasswordforemail</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-resetpasswordforemail</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-exchangecodeforsession</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-exchangecodeforsession</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-mfa-api</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-mfa-api</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-mfa-enroll</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-mfa-enroll</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-mfa-challenge</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-mfa-challenge</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-mfa-verify</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-mfa-verify</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-mfa-challengeandverify</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-mfa-challengeandverify</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-mfa-unenroll</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-mfa-unenroll</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-mfa-getauthenticatorassurancelevel</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-mfa-getauthenticatorassurancelevel</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/admin-api</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/admin-api</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-admin-getuserbyid</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-admin-getuserbyid</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-admin-listusers</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-admin-listusers</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-admin-createuser</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-admin-createuser</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-admin-deleteuser</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-admin-deleteuser</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-admin-inviteuserbyemail</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-admin-inviteuserbyemail</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-admin-generatelink</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-admin-generatelink</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-admin-updateuserbyid</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-admin-updateuserbyid</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-admin-mfa-listfactors</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-admin-mfa-listfactors</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/auth-admin-mfa-deletefactor</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/auth-admin-mfa-deletefactor</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/functions-invoke</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/functions-invoke</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/subscribe</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/subscribe</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/removechannel</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/removechannel</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/removeallchannels</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/removeallchannels</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/storage-listbuckets</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/storage-listbuckets</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/storage-getbucket</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/storage-getbucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/storage-createbucket</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/storage-createbucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/storage-updatebucket</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/storage-updatebucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/storage-emptybucket</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/storage-emptybucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/storage-deletebucket</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/storage-deletebucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/storage-from-upload</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/storage-from-upload</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/storage-from-update</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/storage-from-update</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/storage-from-move</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/storage-from-move</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/storage-from-copy</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/storage-from-copy</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/storage-from-createsignedurl</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/storage-from-createsignedurl</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/storage-from-createsignedurls</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/storage-from-createsignedurls</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/storage-from-createsigneduploadurl</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/storage-from-createsigneduploadurl</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/storage-from-uploadtosignedurl</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/storage-from-uploadtosignedurl</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/storage-from-getpublicurl</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/storage-from-getpublicurl</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/storage-from-download</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/storage-from-download</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/storage-from-remove</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/storage-from-remove</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/kotlin/storage-from-list</loc>
+    <loc>https://iechor.com/docs/reference/kotlin/storage-from-list</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-sso</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-sso</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-sso-info</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-sso-info</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-sso-add</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-sso-add</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-sso-remove</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-sso-remove</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-sso-update</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-sso-update</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-sso-list</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-sso-list</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-sso-show</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-sso-show</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-vanity-subdomains</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-vanity-subdomains</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-vanity-subdomains-get</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-vanity-subdomains-get</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-vanity-subdomains-delete</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-vanity-subdomains-delete</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-vanity-subdomains-check-availability</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-vanity-subdomains-check-availability</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-vanity-subdomains-activate</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-vanity-subdomains-activate</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-test</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-test</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-test-new</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-test-new</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-test-db</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-test-db</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-stop</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-stop</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-status</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-status</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-start</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-start</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-ssl-enforcement</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-ssl-enforcement</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-ssl-enforcement-update</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-ssl-enforcement-update</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-ssl-enforcement-get</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-ssl-enforcement-get</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-secrets</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-secrets</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-secrets-unset</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-secrets-unset</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-secrets-set</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-secrets-set</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-secrets-list</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-secrets-list</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-projects</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-projects</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-projects-list</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-projects-list</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-projects-create</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-projects-create</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-orgs</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-orgs</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-orgs-list</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-orgs-list</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-network-restrictions</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-network-restrictions</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-network-restrictions-update</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-network-restrictions-update</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-network-restrictions-get</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-network-restrictions-get</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-network-bans</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-network-bans</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-network-bans-remove</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-network-bans-remove</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-network-bans-get</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-network-bans-get</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-migration</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-migration</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-migration-up</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-migration-up</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-migration-repair</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-migration-repair</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-migration-new</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-migration-new</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-migration-list</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-migration-list</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-login</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-login</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-link</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-link</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-init</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-init</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-gen</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-gen</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-gen-types</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-gen-types</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-gen-types-typescript</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-gen-types-typescript</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-gen-keys</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-gen-keys</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-functions</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-functions</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-functions-serve</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-functions-serve</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-functions-new</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-functions-new</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-functions-download</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-functions-download</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-functions-deploy</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-functions-deploy</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-functions-delete</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-functions-delete</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-domains</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-domains</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-domains-reverify</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-domains-reverify</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-domains-get</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-domains-get</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-domains-delete</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-domains-delete</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-domains-create</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-domains-create</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-domains-activate</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-domains-activate</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-db</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-db</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-db-reset</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-db-reset</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-db-remote</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-db-remote</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-db-remote-commit</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-db-remote-commit</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-db-push</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-db-push</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-db-lint</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-db-lint</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-db-dump</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-db-dump</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-db-diff</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-db-diff</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-completion</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-completion</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-completion-zsh</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-completion-zsh</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-completion-powershell</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-completion-powershell</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-completion-fish</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-completion-fish</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/cli/supabase-completion-bash</loc>
+    <loc>https://iechor.com/docs/reference/cli/supabase-completion-bash</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/introduction</loc>
+    <loc>https://iechor.com/docs/reference/api/introduction</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/list-all-projects</loc>
+    <loc>https://iechor.com/docs/reference/api/list-all-projects</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/create-a-project</loc>
+    <loc>https://iechor.com/docs/reference/api/create-a-project</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/list-all-organizations</loc>
+    <loc>https://iechor.com/docs/reference/api/list-all-organizations</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/create-an-organization</loc>
+    <loc>https://iechor.com/docs/reference/api/create-an-organization</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/list-all-secrets</loc>
+    <loc>https://iechor.com/docs/reference/api/list-all-secrets</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/bulk-create-secrets</loc>
+    <loc>https://iechor.com/docs/reference/api/bulk-create-secrets</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/bulk-delete-secrets</loc>
+    <loc>https://iechor.com/docs/reference/api/bulk-delete-secrets</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/generate-typescript-types</loc>
+    <loc>https://iechor.com/docs/reference/api/generate-typescript-types</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/create-a-function</loc>
+    <loc>https://iechor.com/docs/reference/api/create-a-function</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/list-all-functions</loc>
+    <loc>https://iechor.com/docs/reference/api/list-all-functions</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/retrieve-a-function</loc>
+    <loc>https://iechor.com/docs/reference/api/retrieve-a-function</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/update-a-function</loc>
+    <loc>https://iechor.com/docs/reference/api/update-a-function</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/delete-a-function</loc>
+    <loc>https://iechor.com/docs/reference/api/delete-a-function</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/retrieve-a-function-body</loc>
+    <loc>https://iechor.com/docs/reference/api/retrieve-a-function-body</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/gets-projects-custom-hostname-config</loc>
+    <loc>https://iechor.com/docs/reference/api/gets-projects-custom-hostname-config</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
     <loc
-      >https://supabase.com/docs/reference/api/deletes-a-projects-custom-hostname-configuration</loc
-    >
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
-    <loc
-      >https://supabase.com/docs/reference/api/updates-projects-custom-hostname-configuration</loc
+      >https://iechor.com/docs/reference/api/deletes-a-projects-custom-hostname-configuration</loc
     >
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -4682,52 +4674,60 @@
 
   <url>
     <loc
-      >https://supabase.com/docs/reference/api/attempts-to-verify-the-dns-configuration-for-projects-custom-hostname-configuration</loc
+      >https://iechor.com/docs/reference/api/updates-projects-custom-hostname-configuration</loc
     >
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/docs/reference/api/activates-a-custom-hostname-for-a-project</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/docs/reference/api/gets-projects-pgsodium-config</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
     <loc
-      >https://supabase.com/docs/reference/api/updates-projects-pgsodium-config-updating-the-root_key-can-cause-all-data-encrypted-with-the-older-key-to-become-inaccessible</loc
+      >https://iechor.com/docs/reference/api/attempts-to-verify-the-dns-configuration-for-projects-custom-hostname-configuration</loc
     >
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/gets-projects-network-bans</loc>
+    <loc>https://iechor.com/docs/reference/api/activates-a-custom-hostname-for-a-project</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/remove-network-bans</loc>
+    <loc>https://iechor.com/docs/reference/api/gets-projects-pgsodium-config</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/gets-projects-network-restrictions</loc>
+    <loc
+      >https://iechor.com/docs/reference/api/updates-projects-pgsodium-config-updating-the-root_key-can-cause-all-data-encrypted-with-the-older-key-to-become-inaccessible</loc
+    >
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/reference/api/updates-projects-network-restrictions</loc>
+    <loc>https://iechor.com/docs/reference/api/gets-projects-network-bans</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://iechor.com/docs/reference/api/remove-network-bans</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://iechor.com/docs/reference/api/gets-projects-network-restrictions</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://iechor.com/docs/reference/api/updates-projects-network-restrictions</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>

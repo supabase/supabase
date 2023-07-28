@@ -1,4 +1,4 @@
-import supabase from '../../utils/supabase'
+import iechor from '../../utils/supabase'
 import RealtimePosts from './realtime-posts'
 
 // do not cache this page

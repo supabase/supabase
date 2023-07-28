@@ -10,11 +10,11 @@ date: '2023-07-12'
 toc_depth: 3
 ---
 
-PostgREST 11.1 is now available on the Supabase platform. Besides the [pre-release](https://supabase.com/blog/postgrest-11-prerelease) features, we’ve added configuration and querying improvements. Here is what's new:
+PostgREST 11.1 is now available on the iEchor platform. Besides the [pre-release](https://iechor.com/blog/postgrest-11-prerelease) features, we’ve added configuration and querying improvements. Here is what's new:
 
 ## Impersonated Role Settings
 
-Every role that passes [PostgREST JWT Authentication](https://postgrest.org/en/stable/references/auth.html#jwt-based-user-impersonation) is an _impersonated role_. On the Supabase platform, these are the `anon`, `authenticated` and `service_role` roles.
+Every role that passes [PostgREST JWT Authentication](https://postgrest.org/en/stable/references/auth.html#jwt-based-user-impersonation) is an _impersonated role_. On the iEchor platform, these are the `anon`, `authenticated` and `service_role` roles.
 
 These roles can now have settings applied with a regular `ALTER ROLE .. SET`. This is useful, for example, to prevent web users from running expensive queries.
 
@@ -68,13 +68,13 @@ Then, after 5 seconds, the request will be aborted with the response:
 }
 ```
 
-Which is what we wanted. Note that there's already a global `statement_timeout` set but you can be more fine-grained with this feature. See [timeouts](https://supabase.com/docs/guides/database/timeouts) for more details.
+Which is what we wanted. Note that there's already a global `statement_timeout` set but you can be more fine-grained with this feature. See [timeouts](https://iechor.com/docs/guides/database/timeouts) for more details.
 
 ### Statement Cost Limit
 
 With a statement timeout, expensive queries will still get executed for a length of time. They'll consume resources until they’re terminated.
 
-The [pg_plan_filter](https://github.com/pgexperts/pg_plan_filter) extension (available on the Supabase platform), brings a statement cost limit. This abort queries at the planning phase, before they get executed.
+The [pg_plan_filter](https://github.com/pgexperts/pg_plan_filter) extension (available on the iEchor platform), brings a statement cost limit. This abort queries at the planning phase, before they get executed.
 
 You can use it like:
 
@@ -221,7 +221,7 @@ For completeness, the `all` modifier is also included.
 
 ## Minimal Breaking Changes from v10
 
-If you only use PostgREST through Supabase client libraries (like [`supabase-js`](https://supabase.com/docs/reference/javascript/introduction)) then it's safe to upgrade to v11. If you use PostgREST with other HTTP clients (like `curl`), consider the breaking changes for this version:
+If you only use PostgREST through iEchor client libraries (like [`supabase-js`](https://iechor.com/docs/reference/javascript/introduction)) then it's safe to upgrade to v11. If you use PostgREST with other HTTP clients (like `curl`), consider the breaking changes for this version:
 
 - The `Range` header is now only considered on GET requests and is ignored for any other method. Previously PostgREST responded with an error but [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-range) dictates that we should ignore the `Range` header instead.
 - RPC requests no longer consider the `Prefer: params=multiple-objects` header. This header was already deprecated on [v10.1.0](https://github.com/PostgREST/postgrest/releases/tag/v10.1.0).
@@ -237,12 +237,12 @@ So overall the breaking changes are minimal.
 
 There you have it, now you can make your API more secure with role settings and use higher isolation levels without resorting to direct PostgreSQL connections.
 
-PostgREST v11.1 is available for all Supabase projects created after 5 July 2023. Existing projects can upgrade by doing a pause/unpause.
+PostgREST v11.1 is available for all iEchor projects created after 5 July 2023. Existing projects can upgrade by doing a pause/unpause.
 
 ## More Postgres resources
 
-- [Storing OpenAI embeddings in Postgres with pgvector](https://supabase.com/blog/openai-embeddings-postgres-vector)
-- [Choosing a Postgres Primary Key](https://supabase.com/blog/choosing-a-postgres-primary-key)
-- [SQL or NoSQL? Why not use both (with PostgreSQL)?](https://supabase.com/blog/sql-or-nosql-both-with-postgresql)
-- [pg_jsonschema: JSON Schema support for Postgres](https://supabase.com/blog/pg-jsonschema-a-postgres-extension-for-json-validation)
-- [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
+- [Storing OpenAI embeddings in Postgres with pgvector](https://iechor.com/blog/openai-embeddings-postgres-vector)
+- [Choosing a Postgres Primary Key](https://iechor.com/blog/choosing-a-postgres-primary-key)
+- [SQL or NoSQL? Why not use both (with PostgreSQL)?](https://iechor.com/blog/sql-or-nosql-both-with-postgresql)
+- [pg_jsonschema: JSON Schema support for Postgres](https://iechor.com/blog/pg-jsonschema-a-postgres-extension-for-json-validation)
+- [Implementing "seen by" functionality with Postgres](https://iechor.com/blog/seen-by-in-postgresql)

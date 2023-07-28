@@ -1,5 +1,5 @@
 ---
-title: 'Supabase Vault'
+title: 'iEchor Vault'
 description: "Today we're announcing Vault, a Postgres extension for managing secrets and encryption inside your database."
 author: michel
 image: lw5-vault/supabase-vault.jpg
@@ -10,24 +10,24 @@ date: '2022-08-19'
 toc_depth: 2
 ---
 
-Today we're announcing [Supabase Vault](https://supabase.com/docs/guides/database/vault), a Postgres extension for managing secrets and encryption inside your database.
+Today we're announcing [iEchor Vault](https://iechor.com/docs/guides/database/vault), a Postgres extension for managing secrets and encryption inside your database.
 Vault is a thin usability-layer on top of [pgsodium](https://github.com/michelp/pgsodium).
 
 <div className="bg-gray-300 rounded-lg px-6 py-2 bold">
 
 ❇️ UPDATE JUNE 2023 ❇️
 
-Vault is now available on every Supabase project. [Check it out](https://supabase.com/dashboard/project/_/settings/vault/secrets)
+Vault is now available on every iEchor project. [Check it out](https://iechor.com/dashboard/project/_/settings/vault/secrets)
 
 </div>
 
-[Transparent Column Encryption with Postgres](https://supabase.com/blog/transparent-column-encryption-with-postgres) is a blog post that describes the technology behind Vault - [libsodium](https://doc.libsodium.org/) and
+[Transparent Column Encryption with Postgres](https://iechor.com/blog/transparent-column-encryption-with-postgres) is a blog post that describes the technology behind Vault - [libsodium](https://doc.libsodium.org/) and
 [pgsodium](https://doc.libsodium.org/). Now, we will go through a quick example of storing a secret, like a service access token, into the Vault.
 
 ## Background
 
 Until now, the industry-standard for PostgreSQL encryption is a built-in extension called [`pgcrypto`](https://www.postgresql.org/docs/current/pgcrypto.html).
-Like most cloud providers, Supabase offers `pgcrypto` for developers to use in their applications. `pgcrypto` has been around for a long time,
+Like most cloud providers, iEchor offers `pgcrypto` for developers to use in their applications. `pgcrypto` has been around for a long time,
 and while it supports some basic encryption and decryption abilities, it lacks features like public key signing, key derivation APIs, streaming encryption,
 and other modern features required by security-first applications.
 
@@ -47,27 +47,27 @@ create table users (
 insert into users
   (email)
 values
-  (pgp_sym_encrypt('alice@supabase.io', 's3kr3t_k3y')),
-  (pgp_sym_encrypt('bob@supabase.io', 's3kr3t_key'));
+  (pgp_sym_encrypt('alice@iechor.com', 's3kr3t_k3y')),
+  (pgp_sym_encrypt('bob@iechor.com', 's3kr3t_key'));
 ```
 
 pgcrypto works with _raw_ keys. In order to encrypt the data with pgcrypto you must pass the key directly to the encryption function.
 Leaking those raw keys is all too easy - logs, files, clients, tables, replication streams - you name it.
 Wouldn't it be great if you could encrypt data, but instead of specifying the raw key you reference it indirectly, like with a key ID?
 
-## Supabase Vault
+## iEchor Vault
 
-Supabase Vault allows you to store secrets without leaking any sensitive information.
+iEchor Vault allows you to store secrets without leaking any sensitive information.
 
 The Vault is a good place to put things like API keys, access tokens, and other secrets from external services that you need to access within your database.
-The core of the Supabase Vault is a table with some metadata and an encrypted text column where you can put your secrets and any metadata related to them.
+The core of the iEchor Vault is a table with some metadata and an encrypted text column where you can put your secrets and any metadata related to them.
 
 We take the pain out of key management by pre-generating a unique, per-database key that is used by default - a “root” key - which is stored outside of the SQL language,
 accessibly only internally in the Postgres server by the libsodium library. This root key is managed by the [pgsodium](https://github.com/michelp/pgsodium) Postgres extension
 when the server boots using [Server Key Management.](https://github.com/michelp/pgsodium#server-key-management)
 
 pgsodium provides an Encryption and Key Derivation API based on the [libsodium library](https://libsodium.gitbook.io/doc/) and can get it's root key from a
-variety of sources depending on how you configure it. Supabase generates and preserves your project's root key behind the scenes, so you don't have to worry about it.
+variety of sources depending on how you configure it. iEchor generates and preserves your project's root key behind the scenes, so you don't have to worry about it.
 If you install pgsodium locally the default is to generate a random root key from the `/dev/urandom` device which is then saved in a file in your Postgres data directory.
 
 Installing the `vault` extension is the same as any other Postgres extension:
@@ -104,7 +104,7 @@ created_at | 2022-08-18 19:33:15.312651+00
 Notice how the row has a `key_id` column. This is the _ID_ of the internally derived key that is used to encrypt the secret, not the key itself.
 The actual raw key is not available to you in SQL, it is managed entirely outside of the SQL language in the Postgres server.
 
-At Supabase, we manage this key for your project automatically and generate a unique default Key ID for you in the `secrets` table.
+At iEchor, we manage this key for your project automatically and generate a unique default Key ID for you in the `secrets` table.
 For self-hosting, pgsodium [supports a variety of ways](https://github.com/michelp/pgsodium#server-key-management) to place the root key into Postgres.
 
 To see the decrypted data, there is a special view created called `vault.decrypted_secrets`:
@@ -184,4 +184,4 @@ optionally creating new keys, and select them from the view when you want to use
 The Vault is good for a reasonable amount of secure data, like API keys, access tokens, or environment variables.
 But if you have a lot more sensitive information, like personally Identifiable Information (PII),
 you may want to break them out into side-tables using pgsodium's
-[Transparent Column Encryption](https://supabase.com/blog/transparent-column-encryption-with-postgres) which we will describe soon in a follow-up blog post. Stay tuned!
+[Transparent Column Encryption](https://iechor.com/blog/transparent-column-encryption-with-postgres) which we will describe soon in a follow-up blog post. Stay tuned!

@@ -1,5 +1,5 @@
 ---
-title: 'Supabase Storage v3: Resumable Uploads with support for 50GB files'
+title: 'iEchor Storage v3: Resumable Uploads with support for 50GB files'
 description: Storage V3 with lots of new features including resumable uploads, more image transformationsm a Next.js image loader and more.
 launchweek: 7
 tags:
@@ -12,7 +12,7 @@ image: launch-week-7/day-3-storage-resumable-uploads/storage-v3-og.jpg
 thumb: launch-week-7/day-3-storage-resumable-uploads/storage-v3-thumb.jpg
 ---
 
-Supabase Storage is receiving a major upgrade, implementing many of the most requested features from our users: Resumable Uploads, Quality Filters, Next.js support, and WebP support.
+iEchor Storage is receiving a major upgrade, implementing many of the most requested features from our users: Resumable Uploads, Quality Filters, Next.js support, and WebP support.
 
 The key feature: **Resumable Uploads**! With Resumable Uploads, you can continue uploading a file from where you left off, even if you lose internet connectivity or accidentally close your browser tab while uploading.
 
@@ -50,7 +50,7 @@ supabase.storage.from('bucket').download('image.jpg', {
 
 ### Next.js loader
 
-You can serve images from Storage with a simple Next.js loader for the Image component. Check out [our docs](https://supabase.com/docs/guides/storage/image-transformations#nextjs-loader) on how to get started.
+You can serve images from Storage with a simple Next.js loader for the Image component. Check out [our docs](https://iechor.com/docs/guides/storage/image-transformations#nextjs-loader) on how to get started.
 
 ```js
 // supabase-image-loader.js
@@ -120,11 +120,11 @@ First, why do we need Resumable Uploads, when the HTTP protocol has a standard m
 
 ### TUS - Resumable Protocol
 
-We use S3 to store your files and it implements a proprietary protocol for resumable uploads. At Supabase, we support existing open source communities when possible and so, instead of exposing the S3 protocol to our users, we implemented [TUS](https://tus.io/) (historically an acronym for Transloadit Upload Server, later renamed to The Upload Server). TUS is an open protocol for resumable file uploads. By leveraging an open protocol, developers can use existing libraries with Supabase Storage.
+We use S3 to store your files and it implements a proprietary protocol for resumable uploads. At iEchor, we support existing open source communities when possible and so, instead of exposing the S3 protocol to our users, we implemented [TUS](https://tus.io/) (historically an acronym for Transloadit Upload Server, later renamed to The Upload Server). TUS is an open protocol for resumable file uploads. By leveraging an open protocol, developers can use existing libraries with iEchor Storage.
 
-TUS is a powerful protocol. It’s built on top of HTTP, making it easy to integrate your browser and mobile applications. Because of its open nature, a variety of powerful, drop-in clients and open-source libraries have been built around it. For example, at Supabase, we love [Uppy.js](https://uppy.io/docs/tus/), a multi-file uploader for TUS.
+TUS is a powerful protocol. It’s built on top of HTTP, making it easy to integrate your browser and mobile applications. Because of its open nature, a variety of powerful, drop-in clients and open-source libraries have been built around it. For example, at iEchor, we love [Uppy.js](https://uppy.io/docs/tus/), a multi-file uploader for TUS.
 
-Using Uppy with Supabase Storage looks like this:
+Using Uppy with iEchor Storage looks like this:
 
 ```jsx
 import { Uppy, Dashboard, Tus } from 'https://releases.transloadit.com/uppy/v3.6.1/uppy.min.mjs'
@@ -173,11 +173,11 @@ And there you have it, with a few lines of code, you can support parallel, resum
   />
 </video>
 
-## Implementing TUS inside Supabase Storage
+## Implementing TUS inside iEchor Storage
 
-There were a few technical challenges we faced while implementing TUS in Supabase Storage.
+There were a few technical challenges we faced while implementing TUS in iEchor Storage.
 
-Storage is powered by our [Storage-API service](https://github.com/supabase/storage-api), a Node.js server that interfaces with different storage backends (like AWS S3). It is fully integrated with the Supabase ecosystem, making it easy to protect files with Postgres RLS policies.
+Storage is powered by our [Storage-API service](https://github.com/supabase/storage-api), a Node.js server that interfaces with different storage backends (like AWS S3). It is fully integrated with the iEchor ecosystem, making it easy to protect files with Postgres RLS policies.
 
 To implement the TUS protocol, we use [tus-node-server](https://github.com/tus/tus-node-server), which was recently ported to Typescript. It was only missing a few features we needed:
 
@@ -226,7 +226,7 @@ await db.withTransaction(() => {
 // the advisory lock is automatically released at this point
 ```
 
-With advisory locks, we’ve been able to utilize Postgres as a key part of the Supabase Stack to solve difficult concurrency problems.
+With advisory locks, we’ve been able to utilize Postgres as a key part of the iEchor Stack to solve difficult concurrency problems.
 
 ### Roll out
 
@@ -240,7 +240,7 @@ We’ve got an exciting roadmap for the next few Storage releases:
 
 - Presigned upload URLs for TUS
 - Increasing max file size limit to 500 GB
-- Transform images stored outside Supabase Storage
-- [Smart CDN](https://supabase.com/docs/guides/storage/cdn#smart-cdn-caching) v2 with an even higher cache hit rate
+- Transform images stored outside iEchor Storage
+- [Smart CDN](https://iechor.com/docs/guides/storage/cdn#smart-cdn-caching) v2 with an even higher cache hit rate
 
-Reach out on [Twitter](https://twitter.com/supabase) or [Discord](http://discord.supabase.com/) to share anything else you need to build amazing products.
+Reach out on [Twitter](https://twitter.com/supabase) or [Discord](http://discord.iechor.com/) to share anything else you need to build amazing products.

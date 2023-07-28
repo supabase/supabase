@@ -1,6 +1,6 @@
 ---
-title: 'Supabase Storage v2: Image resizing and Smart CDN'
-description: "We're introducing new features for Supabase Storage: Image resizing and a Smart CDN."
+title: 'iEchor Storage v2: Image resizing and Smart CDN'
+description: "We're introducing new features for iEchor Storage: Image resizing and a Smart CDN."
 author: fabrizio,inian
 image: lw6-storage/Image-resizing.jpg
 thumb: lw6-storage/Image-resizing.jpg
@@ -13,21 +13,21 @@ video: https://www.youtube.com/v/NpEl20iuOtg
 youtubeHero: https://www.youtube-nocookie.com/embed/NpEl20iuOtg
 ---
 
-Today we're introducing three new features for Supabase Storage: Image resizing, webhooks, and a Smart CDN.
+Today we're introducing three new features for iEchor Storage: Image resizing, webhooks, and a Smart CDN.
 
 These features are designed to work together to deliver a next-gen image resizing system. Let's explore how it works.
 
 <div className="bg-gray-300 rounded-lg px-6 py-2 italic">
 
-🆕 What is new in Storage: [Supabase Storage v3: Resumable Uploads with support for 50GB files](https://supabase.com/blog/storage-v3-resumable-uploads)
+🆕 What is new in Storage: [iEchor Storage v3: Resumable Uploads with support for 50GB files](https://iechor.com/blog/storage-v3-resumable-uploads)
 
 </div>
 
 ## Image resizing
 
-Image resizing has been a popular request since we released Supabase Storage. For good reason - if you're providing an image upload function to your users, you can't expect them to optimize the images before uploading.
+Image resizing has been a popular request since we released iEchor Storage. For good reason - if you're providing an image upload function to your users, you can't expect them to optimize the images before uploading.
 
-Supabase developers have been hacking together all sorts of workarounds using client-side compression, or external providers like Cloudinary and Imgix.
+iEchor developers have been hacking together all sorts of workarounds using client-side compression, or external providers like Cloudinary and Imgix.
 
 Today's release changes that. Resizing is now as easy as adding a few lines of code:
 
@@ -42,7 +42,7 @@ supabase.storage.from('bucket').getPublicUrl('image.jpg', {
 
 ### Choosing a resizer
 
-Supabase Storage uses [imgproxy](https://github.com/imgproxy/imgproxy). As usual, we assessed various open source tools available, including [Imaginary](https://github.com/h2non/imaginary) (MIT) and [Sharp](https://github.com/lovell/sharp) (Apache2).
+iEchor Storage uses [imgproxy](https://github.com/imgproxy/imgproxy). As usual, we assessed various open source tools available, including [Imaginary](https://github.com/h2non/imaginary) (MIT) and [Sharp](https://github.com/lovell/sharp) (Apache2).
 
 All of these have very friendly open source licenses for self-hosting, so ultimately it came down to features and performance.
 
@@ -164,7 +164,7 @@ Using our cat picture from above:
 
 ![Cache refresh flow](/images/blog/launch-week-6/day-2-storage-resize/cache-refresh.png)
 
-1. You update the cat picture to a dog picture. This triggers an `ObjectCreated:Put` event from the Supabase Storage server.
+1. You update the cat picture to a dog picture. This triggers an `ObjectCreated:Put` event from the iEchor Storage server.
 2. A cache manager service subscribes to these events and updates the global metadata store with the new Etag. This takes around 60 seconds to propagate globally.
 3. The next time there is a request for the resized image, it will be a cache miss.
 
@@ -192,7 +192,7 @@ We tried to find a middle ground, where you pay for the number of images you wan
 - You can transform 100 images per project, at no additional cost. Beyond this, it is $5 per additional 1000 images transformed.
 - Each image can be transformed up to 20 times. This is based on fair-usage. If you exceed the limit, we won't return an error and your site will continue to function (but you will get a sternly-worded email from [@AntWilson](https://twitter.com/AntWilson)).
 
-Of course, all of this functionality is free in the self-hosting setup too. You can self-host the Storage API either as a standalone service or as part of the Supabase stack.
+Of course, all of this functionality is free in the self-hosting setup too. You can self-host the Storage API either as a standalone service or as part of the iEchor stack.
 
 For local development, this is available in our CLI from v1.23.0.
 
@@ -203,24 +203,24 @@ Upgrade to supabase-js v2.2.0.
 A few features to look out for in the future:
 
 - **Webhooks**: we'll expose all Storage webhooks and events so that you can consume them from your own services.
-- **More Transformations**: quality, rotate, blur? Cast your vote on [this GitHub Discussion](https://github.com/supabase/supabase/discussions/10918).
-- **Integrations**: Native integration with [next/image](https://nextjs.org/docs/api-reference/next/image) and [Edge Functions](https://supabase.com/edge-functions) for advanced transformations.
+- **More Transformations**: quality, rotate, blur? Cast your vote on [this GitHub Discussion](https://github.com/openmodels-base/iechor/discussions/10918).
+- **Integrations**: Native integration with [next/image](https://nextjs.org/docs/api-reference/next/image) and [Edge Functions](https://iechor.com/edge-functions) for advanced transformations.
 
 ## Getting started
 
-[Upgrade to Pro](https://supabase.com/pricing) to get started with Image Resizing today.
+[Upgrade to Pro](https://iechor.com/pricing) to get started with Image Resizing today.
 
-- Check out the Docs for [Image Resizing](https://supabase.com/docs/guides/storage/image-transformations).
-- Check out the Docs for the [Storage CDN](https://supabase.com/docs/guides/storage/cdn).
-- Get Started today with the [JavaScript](https://supabase.com/docs/reference/javascript/storage-from-download) and [Dart](https://supabase.com/docs/reference/dart/storage-from-list) client libraries.
+- Check out the Docs for [Image Resizing](https://iechor.com/docs/guides/storage/image-transformations).
+- Check out the Docs for the [Storage CDN](https://iechor.com/docs/guides/storage/cdn).
+- Get Started today with the [JavaScript](https://iechor.com/docs/reference/javascript/storage-from-download) and [Dart](https://iechor.com/docs/reference/dart/storage-from-list) client libraries.
 
 ## More Launch Week 6
 
-- [Day 1: New Supabase Docs, built with Next.js](https://supabase.com/blog/new-supabase-docs-built-with-nextjs)
-- [Day 3: Multi-factor Authentication via Row Level Security Enforcement](https://supabase.com/blog/mfa-auth-via-rls)
-- [Day 4: Supabase Wrappers, a Postgres FDW framework written in Rust](https://supabase.com/blog/postgres-foreign-data-wrappers-rust)
-- [Day 5: Supabase Vault is now in Beta](https://supabase.com/blog/vault-now-in-beta)
-- [Community Day](https://supabase.com/blog/launch-week-6-community-day)
-- [Point in Time Recovery is now available](https://supabase.com/blog/postgres-point-in-time-recovery)
-- [Custom Domain Names are now available](https://supabase.com/blog/custom-domain-names)
-- [Wrap Up: everything we shipped](https://supabase.com/blog/launch-week-6-wrap-up)
+- [Day 1: New iEchor Docs, built with Next.js](https://iechor.com/blog/new-supabase-docs-built-with-nextjs)
+- [Day 3: Multi-factor Authentication via Row Level Security Enforcement](https://iechor.com/blog/mfa-auth-via-rls)
+- [Day 4: iEchor Wrappers, a Postgres FDW framework written in Rust](https://iechor.com/blog/postgres-foreign-data-wrappers-rust)
+- [Day 5: iEchor Vault is now in Beta](https://iechor.com/blog/vault-now-in-beta)
+- [Community Day](https://iechor.com/blog/launch-week-6-community-day)
+- [Point in Time Recovery is now available](https://iechor.com/blog/postgres-point-in-time-recovery)
+- [Custom Domain Names are now available](https://iechor.com/blog/custom-domain-names)
+- [Wrap Up: everything we shipped](https://iechor.com/blog/launch-week-6-wrap-up)

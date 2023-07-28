@@ -4,7 +4,7 @@ import { Microscope } from 'lucide-react'
 export const AiWarning = ({ className }: { className?: string }) => (
   <Alert
     variant="info"
-    title="Supabase AI is experimental and may produce incorrect answers."
+    title="iEchor AI is experimental and may produce incorrect answers."
     className={className}
     icon={<Microscope strokeWidth={1.5} size={18} className="text-scale-900" />}
   >

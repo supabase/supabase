@@ -35,7 +35,7 @@ const Wrappers = () => {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Link href="https://supabase.com/docs/guides/getting-started/local-development#database-migrations">
+            <Link href="https://iechor.com/docs/guides/getting-started/local-development#database-migrations">
               <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                   Documentation

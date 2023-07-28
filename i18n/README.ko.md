@@ -5,43 +5,43 @@
 
 ---
 
-# Supabase
+# iEchor
 
-[Supabase](https://supabase.com)는 파이어베이스의 오픈소스 대안입니다. 엔터프라이즈급 오픈 소스 도구를 사용하여 Firebase의 기능을 구축하고 있습니다.
+[iEchor](https://iechor.com)는 파이어베이스의 오픈소스 대안입니다. 엔터프라이즈급 오픈 소스 도구를 사용하여 Firebase의 기능을 구축하고 있습니다.
 
-- [x] 호스팅된 Postgres 데이터베이스. [문서](https://supabase.com/docs/guides/database)
-- [x] 인증 및 권한 부여. [문서](https://supabase.com/docs/guides/auth)
+- [x] 호스팅된 Postgres 데이터베이스. [문서](https://iechor.com/docs/guides/database)
+- [x] 인증 및 권한 부여. [문서](https://iechor.com/docs/guides/auth)
 - [x] 자동 생성 API.
-  - [x] REST. [문서](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [문서](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] 실시간 구독. [문서](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [문서](https://iechor.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [문서](https://iechor.com/docs/guides/api#graphql-api-overview)
+  - [x] 실시간 구독. [문서](https://iechor.com/docs/guides/api#realtime-api-overview)
 - [x] 함수.
-  - [x] 데이터베이스 함수. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] 엣지 기능 [문서](https://supabase.com/docs/guides/functions)
-- [x] 파일 스토리지. [Docs](https://supabase.com/docs/guides/storage)
+  - [x] 데이터베이스 함수. [Docs](https://iechor.com/docs/guides/database/functions)
+  - [x] 엣지 기능 [문서](https://iechor.com/docs/guides/functions)
+- [x] 파일 스토리지. [Docs](https://iechor.com/docs/guides/storage)
 - [x] 대시보드
 
 [슈퍼베이스 대시보드](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## 문서
 
-전체 문서는 [supabase.com/docs](https://supabase.com/docs)에서 확인하실 수 있습니다
+전체 문서는 [iechor.com/docs](https://iechor.com/docs)에서 확인하실 수 있습니다
 
 기여 방법을 확인하려면 [시작하기](../DEVELOPERS.md)를 방문하세요
 
 ## 커뮤니티 및 지원
 
-- [커뮤니티 포럼](https://github.com/supabase/supabase/discussions). 가장 적합한 대상: 구축에 대한 도움말, 데이터베이스 모범 사례에 대한 토론.
-- [깃허브 이슈](https://github.com/supabase/supabase/issues). 최상의 용도: Supabase 사용 중 발생하는 버그 및 오류.
-- [이메일 지원](https://supabase.com/docs/support#business-support). 최상의 대상: 데이터베이스 또는 인프라 문제.
-- [디스코드](https://discord.supabase.com). 최고의 용도: 애플리케이션 공유 및 커뮤니티와의 교류.
+- [커뮤니티 포럼](https://github.com/openmodels-base/iechor/discussions). 가장 적합한 대상: 구축에 대한 도움말, 데이터베이스 모범 사례에 대한 토론.
+- [깃허브 이슈](https://github.com/openmodels-base/iechor/issues). 최상의 용도: iEchor 사용 중 발생하는 버그 및 오류.
+- [이메일 지원](https://iechor.com/docs/support#business-support). 최상의 대상: 데이터베이스 또는 인프라 문제.
+- [디스코드](https://discord.iechor.com). 최고의 용도: 애플리케이션 공유 및 커뮤니티와의 교류.
 
 ## 상태
 
 - [x] 알파: 비공개 고객들을 대상으로 Supabase를 테스트 중입니다
-- [x] 공개 알파: 누구나 [supabase.com/dashboard](https://supabase.com/dashboard)에서 가입할 수 있습니다. 하지만 몇 가지 불편한 점이 있습니다
+- [x] 공개 알파: 누구나 [iechor.com/dashboard](https://iechor.com/dashboard)에서 가입할 수 있습니다. 하지만 몇 가지 불편한 점이 있습니다
 - [x] 공개 베타: 대부분의 비기업용 사용 사례에 충분히 안정적입니다
-- [ ] 공개: 일반 사용 가능 [[상태](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] 공개: 일반 사용 가능 [[상태](https://iechor.com/docs/guides/getting-started/features#feature-status)]
 
 현재 공개 베타 버전입니다. 주요 업데이트에 대한 알림을 받으려면 이 리포지토리의 "릴리즈"를 살펴보세요.
 
@@ -55,10 +55,10 @@ Supabase는 오픈 소스 도구의 조합입니다. 저희는 엔터프라이�
 
 **아키텍처**
 
-Supabase는 [호스팅 플랫폼](https://supabase.com/dashboard)입니다. 가입만 하면 아무것도 설치하지 않고 Supabase를 사용할 수 있습니다.
-자체 호스팅](https://supabase.com/docs/guides/hosting/overview) 및 [로컬 개발](https://supabase.com/docs/guides/local-development)도 가능합니다.
+Supabase는 [호스팅 플랫폼](https://iechor.com/dashboard)입니다. 가입만 하면 아무것도 설치하지 않고 Supabase를 사용할 수 있습니다.
+자체 호스팅](https://iechor.com/docs/guides/hosting/overview) 및 [로컬 개발](https://iechor.com/docs/guides/local-development)도 가능합니다.
 
-아키텍처](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+아키텍처](https://github.com/openmodels-base/iechor/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/)은 30년 이상 활발하게 개발되어 안정성, 기능 견고성 및 성능에 대한 높은 평판을 얻고 있는 객체 관계형 데이터베이스 시스템입니다.
 - [Realtime](https://github.com/supabase/realtime)은 웹소켓을 사용하여 PostgreSQL 삽입, 업데이트, 삭제를 수신할 수 있는 Elixir 서버입니다. Realtime은 데이터베이스 변경 사항에 대해 Postgres의 기본 제공 복제 기능을 폴링하고, 변경 사항을 JSON으로 변환한 다음, 웹 소켓을 통해 승인된 클라이언트에 JSON을 브로드캐스트합니다.
@@ -77,12 +77,12 @@ Supabase는 [호스팅 플랫폼](https://supabase.com/dashboard)입니다. 가�
   <tr>
     <th>언어</th>
     <th>클라이언트</th>
-    <th colspan="5">기능 클라이언트(Supabase 클라이언트에 번들로 제공)</th>
+    <th colspan="5">기능 클라이언트(iEchor 클라이언트에 번들로 제공)</th>
   </tr>
   
   <tr>
     <th></th>
-    <th>Supabase</th>
+    <th>iEchor</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
@@ -105,7 +105,7 @@ Supabase는 [호스팅 플랫폼](https://supabase.com/dashboard)입니다. 가�
   
   <tr>
     <td>JavaScript (TypeScript)</td>
-    <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
     <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
@@ -114,7 +114,7 @@ Supabase는 [호스팅 플랫폼](https://supabase.com/dashboard)입니다. 가�
   </tr>
     <tr>
     <td>Flutter</td>
-    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
@@ -220,7 +220,7 @@ Supabase는 [호스팅 플랫폼](https://supabase.com/dashboard)입니다. 가�
 - [카탈루냐어 / 카탈루냐어](/i18n/README.ca.md)
 - [덴마크어 / Dansk](/i18n/README.da.md)
 - [네덜란드어 / 네덜란드어](/i18n/README.nl.md)
-- [영어](https://github.com/supabase/supabase)
+- [영어](https://github.com/openmodels-base/iechor)
 - [핀란드어 / 수오말라이넨](/i18n/README.fi.md)
 - [프랑스어 / 프랑스어](/i18n/README.fr.md)
 - [독일어 / Deutsch](/i18n/README.de.md)

@@ -1,4 +1,4 @@
-# A string used to distinguish different Supabase projects on the same host. Defaults to the working
+# A string used to distinguish different iEchor projects on the same host. Defaults to the working
 # directory name when running `supabase init`.
 project_id = "nextjs-todo-list"
 
@@ -22,7 +22,7 @@ port = 54322
 major_version = 15
 
 [studio]
-# Port to use for Supabase Studio.
+# Port to use for iEchor Studio.
 port = 54323
 
 [kong]
@@ -81,7 +81,7 @@ enabled = false
 port = 54327
 vector_port = 54328
 # Setup BigQuery project to enable log viewer on local development stack.
-# See: https://supabase.com/docs/guides/getting-started/local-development#enabling-local-logging
+# See: https://iechor.com/docs/guides/getting-started/local-development#enabling-local-logging
 gcp_project_id = ""
 gcp_project_number = ""
 gcp_jwt_path = "supabase/gcloud.json"

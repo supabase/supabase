@@ -129,7 +129,7 @@ const CustomDomainSidePanel = () => {
       header={
         <div className="flex items-center justify-between">
           <h4>Custom domains</h4>
-          <Link href="https://supabase.com/docs/guides/platform/custom-domains">
+          <Link href="https://iechor.com/docs/guides/platform/custom-domains">
             <a target="_blank" rel="noreferrer">
               <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                 About custom domains
@@ -184,7 +184,7 @@ const CustomDomainSidePanel = () => {
                     <p className="text-sm">No custom domain</p>
                   </div>
                   <div className="px-4 py-2">
-                    <p className="text-scale-1000">Use the default supabase domain for your API</p>
+                    <p className="text-scale-1000">Use the default iechor domain for your API</p>
                     <div className="flex items-center space-x-1 mt-2">
                       <p className="text-scale-1200 text-sm">$0</p>
                       <p className="text-scale-1000 translate-y-[1px]"> / month</p>

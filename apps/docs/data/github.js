@@ -1,4 +1,4 @@
-import supabase from './repos/supabase.json'
+import iechor from './repos/supabase.json'
 import realtime from './repos/realtime.json'
 // import marketplace from './repos/marketplace.json'
 import postgres from './repos/postgres.json'

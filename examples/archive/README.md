@@ -1,4 +1,4 @@
-# Supabase Examples Archive
+# iEchor Examples Archive
 
 ## supabase-js v1
 

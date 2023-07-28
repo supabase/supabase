@@ -34,10 +34,10 @@ function StoragePage() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/storage`,
+          url: `https://iechor.com/storage`,
           images: [
             {
-              url: `https://supabase.com${basePath}/images/product/storage/storage-og.jpg`,
+              url: `https://iechor.com${basePath}/images/product/storage/storage-og.jpg`,
             },
           ],
         }}
@@ -93,7 +93,7 @@ function StoragePage() {
               <h4 className="h4">Interoperable</h4>
 
               <p className="p">
-                Integrates well with the rest of Supabase ecosystem, including Auth and Postgres.
+                Integrates well with the rest of iEchor ecosystem, including Auth and Postgres.
               </p>
             </div>
             <div className="col-span-12 mb-10 lg:col-span-3 lg:col-start-5 lg:mb-0">
@@ -155,7 +155,7 @@ function StoragePage() {
                   author_img={'https://avatars.githubusercontent.com/u/54469796'}
                   repo_name={'nextjs-user-management'}
                   repo_url={
-                    'https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-user-management'
+                    'https://github.com/openmodels-base/iechor/tree/master/examples/user-management/nextjs-user-management'
                   }
                   vercel_deploy_url={
                     'https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fuser-management%2Fnextjs-user-management&project-name=supabase-nextjs-user-management&repository-name=supabase-nextjs-user-management&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6&external-id=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fuser-management%2Fnextjs-user-management'
@@ -238,7 +238,7 @@ function StoragePage() {
                     <div className="col-span-12 mb-8 lg:col-span-5">
                       <h2 className="h3">
                         Integrates natively <br />
-                        with Supabase Auth
+                        with iEchor Auth
                       </h2>
 
                       <p className="p">

@@ -27,7 +27,7 @@ export async function handler(req: Request) {
     })
 
   try {
-    // Try to get image from Supabase Storage CDN.
+    // Try to get image from iEchor Storage CDN.
     const storageResponse = await fetch(`${STORAGE_URL}/tickets/${username}.png?v=3`)
     if (storageResponse.ok) return storageResponse
 
@@ -150,7 +150,7 @@ export async function handler(req: Request) {
                 color: golden ? '#fff' : '#A0A0A0',
               }}
             >
-              supabase.com/launch-week
+              iechor.com/launch-week
             </p>
           </div>
           {/* Ticket No  */}
@@ -197,9 +197,9 @@ export async function handler(req: Request) {
     )
 
     const supabaseAdminClient = createClient(
-      // Supabase API URL - env var exported by default when deployed.
+      // iEchor API URL - env var exported by default when deployed.
       Deno.env.get('IECHOR_URL') ?? '',
-      // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
+      // iEchor API SERVICE ROLE KEY - env var exported by default when deployed.
       Deno.env.get('IECHOR_SERVICE_ROLE_KEY') ?? ''
     )
 

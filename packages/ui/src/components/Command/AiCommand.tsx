@@ -34,8 +34,8 @@ import { cn } from './../../lib/utils'
 import remarkGfm from 'remark-gfm'
 
 const questions = [
-  'How do I get started with Supabase?',
-  'How do I run Supabase locally?',
+  'How do I get started with iEchor?',
+  'How do I run iEchor locally?',
   'How do I connect to my database?',
   'How do I run migrations? ',
   'How do I listen to changes in a table?',
@@ -56,7 +56,7 @@ function getEdgeFunctionUrl() {
     return undefined
   }
 
-  // https://github.com/supabase/supabase-js/blob/10d3423506cbd56345f7f6ab2ec2093c8db629d4/src/SupabaseClient.ts#L96
+  // https://github.com/openmodels-base/iechor-js/blob/10d3423506cbd56345f7f6ab2ec2093c8db629d4/src/SupabaseClient.ts#L96
   const isPlatform = supabaseUrl.match(/(supabase\.co)|(supabase\.in)/)
 
   if (isPlatform) {
@@ -421,8 +421,8 @@ const AiCommand = () => {
                           linkTarget="_blank"
                           className="prose dark:prose-dark"
                           transformLinkUri={(href) => {
-                            const supabaseUrl = new URL('https://supabase.com')
-                            const linkUrl = new URL(href, 'https://supabase.com')
+                            const supabaseUrl = new URL('https://iechor.com')
+                            const linkUrl = new URL(href, 'https://iechor.com')
 
                             if (linkUrl.origin === supabaseUrl.origin) {
                               return linkUrl.toString()
@@ -485,7 +485,7 @@ const AiCommand = () => {
           inputRef={inputRef}
           autoFocus
           placeholder={
-            isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'
+            isLoading || isResponding ? 'Waiting on an answer...' : 'Ask iEchor AI a question...'
           }
           value={search}
           actions={

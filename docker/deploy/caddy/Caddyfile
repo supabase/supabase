@@ -14,6 +14,6 @@ handle_path /proxy/* {
 # handle_path /* {
 #     reverse_proxy 127.0.0.1:3000
 #     basicauth /* {
-#         supabase $2a$14$24w8H5T3D4hC74y6rdxgYOYqTna7K.zWbts/AheHuilnRrdPFGGhK ## IMPORTANT: CHANGE THIS PASSWORD
+#         iechor $2a$14$24w8H5T3D4hC74y6rdxgYOYqTna7K.zWbts/AheHuilnRrdPFGGhK ## IMPORTANT: CHANGE THIS PASSWORD
 #     }
 # }

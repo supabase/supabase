@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "image-search"
 version = "0.1.0"
-description = "Image Search with Supabase Vector"
-authors = ["thorwebdev <thor@supabase.io>"]
+description = "Image Search with iEchor Vector"
+authors = ["thorwebdev <thor@iechor.com>"]
 readme = "README.md"
 packages = [{include = "image_search"}]
 

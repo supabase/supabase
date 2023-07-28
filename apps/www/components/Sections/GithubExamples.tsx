@@ -39,8 +39,8 @@ function GithubExamples() {
               </a>
             </Link>
             <Link
-              href="https://github.com/supabase/supabase/tree/master/examples"
-              as="https://github.com/supabase/supabase/tree/master/examples"
+              href="https://github.com/openmodels-base/iechor/tree/master/examples"
+              as="https://github.com/openmodels-base/iechor/tree/master/examples"
               passHref
             >
               <a>

@@ -21,7 +21,7 @@ The `pg_cron` extension is a simple cron-based job scheduler for PostgreSQL that
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](https://iechor.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "pg_cron" and enable the extension.
 
@@ -87,9 +87,9 @@ Vacuum every day at 3:00am (GMT)
 select cron.schedule('nightly-vacuum', '0 3 * * *', 'VACUUM');
 ```
 
-### Invoke Supabase Edge Function every minute
+### Invoke iEchor Edge Function every minute
 
-Make a POST request to a Supabase Edge Function every minute. Note: this requires the [`pg_net` extension](/docs/guides/database/extensions/pgnet) to be enabled.
+Make a POST request to a iEchor Edge Function every minute. Note: this requires the [`pg_net` extension](/docs/guides/database/extensions/pgnet) to be enabled.
 
 ```sql
 select

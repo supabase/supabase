@@ -2,12 +2,12 @@ openref: 0.1
 
 info:
   id: reference/supabase-kotlin
-  title: Supabase Kotlin Client
+  title: iEchor Kotlin Client
   description: |
 
-    Supabase Kotlin.
+    iEchor Kotlin.
 
-  specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_kt_v0.yml
+  specUrl: https://github.com/openmodels-base/iechor/edit/master/spec/supabase_kt_v0.yml
   slugPrefix: '/'
   libraries:
     - name: 'Kotlin'
@@ -18,9 +18,9 @@ functions:
   - id: initializing
     title: 'Initializing'
     description: |
-      ### Create Supabase Client
+      ### Create iEchor Client
 
-      Independently of which Supabase module you are using, you will need to initialize the main client first and install the module.
+      Independently of which iEchor module you are using, you will need to initialize the main client first and install the module.
 
       To create a new client, you can use the `createSupabaseClient` function.
 
@@ -58,7 +58,7 @@ functions:
       On IOS/MacOS: `client.handleDeeplinks(url)`
 
       ### PKCE Authentication flow
-      suapbase-kt supports the [PKCE authentication flow](https://supabase.com/blog/supabase-auth-sso-pkce).
+      suapbase-kt supports the [PKCE authentication flow](https://iechor.com/blog/supabase-auth-sso-pkce).
       To use it, you just have to change the `flowType` in the GoTrue configuration:
       ```kotlin
       install(GoTrue) {
@@ -107,7 +107,7 @@ functions:
 
           `codeVerifierCache` - Interface for saving and loading codes for the PKCE authentication flow. Default: `SettingsCodeVerifierCache`
 
-          `customUrl` - Custom url for the GoTrue API. Can be safely ignored when using Supabase. Default: `null`
+          `customUrl` - Custom url for the GoTrue API. Can be safely ignored when using iEchor. Default: `null`
 
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
 
@@ -131,11 +131,11 @@ functions:
 
           `timeout`: The timeout for the web server, when logging in with OAuth. Default: `1.minutes`.
 
-          `htmlTitle`: The title of the redirect page, when logging in with OAuth. Default: `"Supabase Auth"`.
+          `htmlTitle`: The title of the redirect page, when logging in with OAuth. Default: `"iEchor Auth"`.
 
           `htmlText`: The text of the redirect page, when logging in with OAuth. Default: `"Logged in. You may continue in your app."`.
 
-          `htmlIconUrl`: The icon of the redirect page, when logging in with OAuth. Default: `"https://supabase.com/brand-assets/supabase-logo-icon.png"`.
+          `htmlIconUrl`: The icon of the redirect page, when logging in with OAuth. Default: `"https://iechor.com/brand-assets/supabase-logo-icon.png"`.
       - id: configure-postgrest
         name: Configure PostgREST module
         code: |
@@ -155,7 +155,7 @@ functions:
 
           `defaultSchema` - The default schema to use for database requests. Default: `public`
 
-          `customUrl` - Custom url for the PostgREST API. Can be safely ignored when using Supabase. Default: `null`
+          `customUrl` - Custom url for the PostgREST API. Can be safely ignored when using iEchor. Default: `null`
 
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
       - id: configure-storage
@@ -176,13 +176,13 @@ functions:
 
           `resumable.cache` - Interface for storing resumable upload urls. Default: `SettingsResumableCache`
 
-          `resumable.defaultChunkSize` - The default chunk size for resumable uploads. Supabase currently only supports a chunk size of 6MB, so be careful when changing this value. Default: `6MB`
+          `resumable.defaultChunkSize` - The default chunk size for resumable uploads. iEchor currently only supports a chunk size of 6MB, so be careful when changing this value. Default: `6MB`
 
           `resumable.retryTimeout` - the timeout for retrying resumable uploads when uploading a chunk fails. Default: `5.seconds`
 
           `resumable.onlyUpdateStateAfterChunk` - whether the upload state should only be updated after a chunk was uploaded successfully or also when the chunk is currently being uploaded. Default: `false`
 
-          `customUrl` - Custom url for the Storage API. Can be safely ignored when using Supabase. Default: `null`
+          `customUrl` - Custom url for the Storage API. Can be safely ignored when using iEchor. Default: `null`
 
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
       - id: configure-realtime
@@ -209,7 +209,7 @@ functions:
 
           `websocketConfig` - Custom Ktor websocket config
 
-          `customUrl` - Custom url for the Realtime websocket. Can be safely ignored when using Supabase. Default: `null`
+          `customUrl` - Custom url for the Realtime websocket. Can be safely ignored when using iEchor. Default: `null`
 
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
       - id: configure-functions
@@ -226,7 +226,7 @@ functions:
           }
           ```
         description: |
-          `customUrl` - Custom url for the Functions API. Can be safely ignored when using Supabase. Default: `null`
+          `customUrl` - Custom url for the Functions API. Can be safely ignored when using iEchor. Default: `null`
 
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
       - id: configure-graphql
@@ -247,7 +247,7 @@ functions:
         description: |
           `apolloConfiguration` - Custom configuration for the ApolloClient
 
-          `customUrl` - Custom url for the GraphQL API. Can be safely ignored when using Supabase. Default: `null`
+          `customUrl` - Custom url for the GraphQL API. Can be safely ignored when using iEchor. Default: `null`
 
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the GoTrue plugin. Default: `null`
 
@@ -491,8 +491,8 @@ functions:
       - id: upserting-into-tables-with-constraints
         name: Upserting into tables with constraints
         description: |
-          Running the following will cause Supabase to upsert data into the `users` table.
-          If the username 'supabot' already exists, the `onConflict` argument tells Supabase to overwrite that row
+          Running the following will cause iEchor to upsert data into the `users` table.
+          If the username 'supabot' already exists, the `onConflict` argument tells iEchor to overwrite that row
           based on the column passed into `onConflict`.
         isSpotlight: true
         code: |
@@ -1660,7 +1660,7 @@ functions:
     description: |
       Only relevant for text and tsvector columns. Match only rows where `column` matches the query string in `query`.
 
-      For more information, see [Postgres full text search](https://supabase.com/docs/guides/database/full-text-search).
+      For more information, see [Postgres full text search](https://iechor.com/docs/guides/database/full-text-search).
     examples:
       - id: text-search
         name: Text search
@@ -2068,7 +2068,7 @@ functions:
   - id: auth-api
     title: 'Overview'
     notes: |
-      - The auth methods can be accessed via the Supabase GoTrue Auth client.
+      - The auth methods can be accessed via the iEchor GoTrue Auth client.
     examples:
       - id: create-auth-client
         name: Create gotrue client
@@ -2083,14 +2083,14 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
       Creates a new user.
-      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
+      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://iechor.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, the return value is null and you will be logged in instead.
         - If **Confirm email** is disabled, the return value is the user and you won't be logged in automatically.
-      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://iechor.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://iechor.com/dashboard/project/_/auth/url-configuration).
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
       - If signUpWith() is called for an existing confirmed user:
-        - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
+        - If **Confirm email** is enabled in [your project](https://iechor.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - If **Confirm email** is disabled, the error message, `User already registered` is returned.
     examples:
       - id: sign-up-phone
@@ -2194,7 +2194,7 @@ functions:
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
       - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
-      - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
+      - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://iechor.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -2221,7 +2221,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOAuth'
     notes: |
       - This method is used for signing in using a third-party provider.
-      - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
+      - iEchor supports many different [third-party providers](https://iechor.com/docs/guides/auth#providers).
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
     examples:
       - id: sign-in-using-a-third-party-provider
@@ -2444,7 +2444,7 @@ functions:
       Modifies the user data.
       - In order to use the `modifyUser()` method, the user needs to be signed in first.
       - By default, email updates sends a confirmation link to both the user's current and new email.
-      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://iechor.com/dashboard/project/_/auth/providers).
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
@@ -2483,7 +2483,7 @@ functions:
       Changes the local session.
       - `importSession()` takes in a UserSession.
       - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
-      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://iechor.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
     examples:
       - id: refresh-the-session
         name: Set local session
@@ -2694,7 +2694,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel'
     notes: |
       - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
-      - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP).
+      - In iEchor, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP).
       - If the user has a verified factor, the `next` field will return `AuthenticatorAssuranceLevel.AAL2`, else, it will return `AuthenticatorAssuranceLevel.AAL1`.
     examples:
       - id: get-aal
@@ -3031,7 +3031,7 @@ functions:
   - id: invoke
     title: 'invoke()'
     description: |
-      Invokes a Supabase Function. See the [guide](/docs/guides/functions) for details on writing Functions.
+      Invokes a iEchor Function. See the [guide](/docs/guides/functions) for details on writing Functions.
       - When invoking a function with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
     notes: |
       - Requires an Authorization header.
@@ -3206,7 +3206,7 @@ functions:
       - id: listen-to-updates
         name: Listen to updates
         description: |
-          By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+          By default, iEchor will send only the updated record. If you want to receive the previous values as well you can
           enable full replication for the table you are listening too:
 
           ```sql
@@ -3232,7 +3232,7 @@ functions:
       - id: listen-to-deletes
         name: Listen to deletes
         description: |
-          By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+          By default, iEchor does not send deleted records. If you want to receive the deleted record you can
           enable full replication for the table you are listening too:
 
           ```sql
@@ -3281,7 +3281,7 @@ functions:
     title: 'removeChannel()'
     notes: |
       - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes.
-      - Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+      - iEchor will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
       - id: removes-a-channel
         name: Remove a channel
@@ -3310,7 +3310,7 @@ functions:
     $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllChannels'
     notes: |
       Unsubscribes and removes all Realtime channels from Realtime client.
-      - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+      - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. iEchor will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
       - id: remove-all-channels
         name: Remove all channels
@@ -3678,7 +3678,7 @@ functions:
     title: from.getPublicUrl()
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/kotlin/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/kotlin/storage-updatebucket) or by going to Storage on [iechor.com/dashboard](https://iechor.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: none

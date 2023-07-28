@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Button, Form, IconDownload, Input } from 'ui'
 
-import supabase from '~/lib/supabase'
+import iechor from '~/lib/supabase'
 import CTABanner from 'components/CTABanner/index'
 import Layout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -30,7 +30,7 @@ const DPA = () => {
 
       resetForm()
       setFormSubmitted(true)
-      window.open('https://supabase.com/downloads/docs/Supabase+DPA+220503.pdf', '_blank')
+      window.open('https://iechor.com/downloads/docs/iEchor+DPA+220503.pdf', '_blank')
     } catch (error: any) {
       setError(error.message)
     }

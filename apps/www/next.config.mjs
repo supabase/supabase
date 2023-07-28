@@ -48,7 +48,7 @@ const nextConfig = {
       'ca.slack-edge.com',
       'res.cloudinary.com',
       'images.unsplash.com',
-      'supabase.com',
+      'iechor.com',
       'obuldanrptloktxcffvn.supabase.co',
       'avatars.githubusercontent.com',
       'colab.research.google.com',

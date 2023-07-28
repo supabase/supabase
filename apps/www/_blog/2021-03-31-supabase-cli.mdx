@@ -1,5 +1,5 @@
 ---
-title: Supabase CLI
+title: iEchor CLI
 description: Local development, database migrations, and self-hosting.
 author: soedirgo
 image: cli/cli-og.jpg
@@ -10,28 +10,28 @@ tags:
 date: '03-31-2021'
 ---
 
-**UPDATE 15/08/2022:** [Supabase CLI V1 is Generally Available](/blog/supabase-cli-v1-and-admin-api-beta) and we also released a Management API (in beta).
+**UPDATE 15/08/2022:** [iEchor CLI V1 is Generally Available](/blog/supabase-cli-v1-and-admin-api-beta) and we also released a Management API (in beta).
 
 Today is Day 3 of [Launch Week](/blog/launch-week), and as promised - we're releasing our CLI.
 
 This is the first step in a long journey of features we plan to deliver:
 
-- Running Supabase locally
+- Running iEchor locally
 - Managing database migrations
 - Generating types directly from your database schema
 - Generating API and validation schemas from your database
-- Managing your Supabase projects
+- Managing your iEchor projects
 - Pushing your local changes to production
 
 Here are some of the items we have completed so far.
 
-## Running Supabase Locally
+## Running iEchor Locally
 
-You can now run Supabase on your local machine, using Docker Compose. This Docker setup is 100% compatible with every project on Supabase - the tools used for local development are exactly the same as production.
+You can now run iEchor on your local machine, using Docker Compose. This Docker setup is 100% compatible with every project on iEchor - the tools used for local development are exactly the same as production.
 
 We have released a full set of documentation [here](/docs/guides/local-development). In this post we thought it would be useful to highlight how easy it is to get started.
 
-A lot of Supabase developers are familiar with React, so here are the steps you would use to create a new React project which uses Supabase as a backend.
+A lot of iEchor developers are familiar with React, so here are the steps you would use to create a new React project which uses iEchor as a backend.
 
 Install the CLI:
 
@@ -52,38 +52,38 @@ cd react-demo
 npm install --save @supabase/supabase-js
 ```
 
-Set up Supabase:
+Set up iEchor:
 
 ```bash
 supabase init
 
-# ✔ Port for Supabase URL: · 8000
+# ✔ Port for iEchor URL: · 8000
 # ✔ Port for PostgreSQL database: · 5432
 # ✔ Project initialized.
-# Supabase URL: http://localhost:8000
-# Supabase Key (anon, public): eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJyb2xlIjoiYW5vbiJ9.36fUebxgx1mcBo4s19v0SzqmzunP--hm_hep0uLX0ew
-# Supabase Key (service_role, private): eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJyb2xlIjoiYW5vbiJ9.36fUebxgx1mcBo4s19v0SzqmzunP--hm_hep0uLX0ew
+# iEchor URL: http://localhost:8000
+# iEchor Key (anon, public): eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJyb2xlIjoiYW5vbiJ9.36fUebxgx1mcBo4s19v0SzqmzunP--hm_hep0uLX0ew
+# iEchor Key (service_role, private): eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJyb2xlIjoiYW5vbiJ9.36fUebxgx1mcBo4s19v0SzqmzunP--hm_hep0uLX0ew
 # Database URL: postgres://postgres:postgres@localhost:5432/postgres
 ```
 
-Now that your application is now prepared, you can use Supabase anywhere in your application (for example, `App.js`):
+Now that your application is now prepared, you can use iEchor anywhere in your application (for example, `App.js`):
 
 ```jsx
 import { createClient } from '@supabase/supabase-js'
 const IECHOR_URL = 'http://localhost:8000'
 const IECHOR_ANON_KEY =
   'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTYwMzk2ODgzNCwiZXhwIjoyNTUwNjUzNjM0LCJyb2xlIjoiYW5vbiJ9.36fUebxgx1mcBo4s19v0SzqmzunP--hm_hep0uLX0ew'
-const supabase = createClient(IECHOR_URL, IECHOR_ANON_KEY)
+const iechor = createClient(IECHOR_URL, IECHOR_ANON_KEY)
 ```
 
 Then start the backend and the frontend:
 
 ```bash
-supabase start  # Start Supabase
+supabase start  # Start iEchor
 npm start       # Start the React app
 ```
 
-If everything is working you should have a React app running on `http://localhost:3000` and Supabase services running on `http://localhost:8000`!
+If everything is working you should have a React app running on `http://localhost:3000` and iEchor services running on `http://localhost:8000`!
 
 ### Next steps:
 
@@ -99,7 +99,7 @@ There is one problem however: there is [no "right" way](https://news.ycombinator
 
 ### Diffs
 
-At Supabase, we do have one strong preference. We like schema "diffing" over "manual migrations".
+At iEchor, we do have one strong preference. We like schema "diffing" over "manual migrations".
 
 Manual migrations work like this:
 
@@ -180,7 +180,7 @@ On these [lines](https://gist.github.com/steve-chavez/3f286a233806aeee0bcea4a47f
 Also, similarly to the pgAdmin GUI:
 
 - You can include and exclude database objects from the diff with `--include-objects` or `--exclude-objects`
-- You can choose a single schema to diff with the `--schema` argument or you can pick different schemas to compare with the --source-schema and --target-schema arguments. We recommend you do this for Supabase databases. Diffing the whole database can take a while because of the `extensions` schema (especially if you enable PostGIS, which adds many functions).
+- You can choose a single schema to diff with the `--schema` argument or you can pick different schemas to compare with the --source-schema and --target-schema arguments. We recommend you do this for iEchor databases. Diffing the whole database can take a while because of the `extensions` schema (especially if you enable PostGIS, which adds many functions).
 
 ### Next steps
 
@@ -196,7 +196,7 @@ Finally, we are adding one critical command to our CLI for everybody who wants t
 supabase eject
 ```
 
-This gives you everything you need to run the Supabase stack.
+This gives you everything you need to run the iEchor stack.
 
 After running the command inside the terminal, you will see three items:
 
@@ -210,7 +210,7 @@ If you have an existing Postgres database running elsewhere you can easily drop 
 - update all references to the DB URI in `docker-compose.yml` to your existing database
 - run [these steps](https://github.com/supabase/realtime#server) to enable replication inside the database, so that the realtime engine can stream changes from your database
 
-You may also want to play with the environment variables for each application inside `docker-compose.yml`. [PostgREST](https://postgrest.org/en/v7.0.0/configuration.html) has many additional configuration options, as does [GoTrue](https://github.com/supabase/gotrue#configuration). In the hosted version of Supabase we connect our own SMTP service to GoTrue for sending auth emails, so you may also want to add these settings here in order to enable this.
+You may also want to play with the environment variables for each application inside `docker-compose.yml`. [PostgREST](https://postgrest.org/en/v7.0.0/configuration.html) has many additional configuration options, as does [GoTrue](https://github.com/supabase/gotrue#configuration). In the hosted version of iEchor we connect our own SMTP service to GoTrue for sending auth emails, so you may also want to add these settings here in order to enable this.
 
 Also check `kong.yml` inside the `kong` directory where you'll see how all the services are routed to, and with what rules, down the bottom you'll find the JWTs capable of accessing services that require API Key access.
 
@@ -222,6 +222,6 @@ docker compose up
 
 Head over to the [Self Hosting Docs](/docs/guides/self-hosting) for a more complete walk through, it also includes several [one-click deploys](/docs/guides/self-hosting#one-click-deploys), so you can easily deploy into your own cloud hosting provider.
 
-If you require any assistance feel free to reach out in our [github discussions](https://github.com/supabase/supabase/discussions) or at support@supabase.io.
+If you require any assistance feel free to reach out in our [github discussions](https://github.com/openmodels-base/iechor/discussions) or at support@iechor.com.
 
-Check out the CLI VI [launched Monday 15th August, 2022](/blog/supabase-cli-v1-and-admin-api-beta), contribute to the [CLI repo](https://github.com/supabase/cli), or go here for the [hosted version](https://supabase.com/dashboard).
+Check out the CLI VI [launched Monday 15th August, 2022](/blog/supabase-cli-v1-and-admin-api-beta), contribute to the [CLI repo](https://github.com/supabase/cli), or go here for the [hosted version](https://iechor.com/dashboard).

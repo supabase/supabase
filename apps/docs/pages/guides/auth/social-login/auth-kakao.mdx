@@ -3,10 +3,10 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'auth-kakao',
   title: 'Login with Kakao',
-  description: 'Add Kakao OAuth to your Supabase project',
+  description: 'Add Kakao OAuth to your iEchor project',
 }
 
-To enable Kakao Auth for your project, you need to set up an Kakao OAuth application and add the application credentials to your Supabase Dashboard.
+To enable Kakao Auth for your project, you need to set up an Kakao OAuth application and add the application credentials to your iEchor Dashboard.
 
 ## Overview
 
@@ -16,8 +16,8 @@ Kakao OAuth consists of six broad steps:
 - Obtaining a `REST API key` - this will serve as the `client_id`.
 - Generating the `Client secret code` - this will serve as the `client_secret`.
 - Additional configurations on Kakao Developers Portal.
-- Add your `client id` and `client secret` keys to your [Supabase Project](https://supabase.com/dashboard).
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
+- Add your `client id` and `client secret` keys to your [iEchor Project](https://iechor.com/dashboard).
+- Add the login code to your [iEchor JS Client App](https://github.com/openmodels-base/iechor-js).
 
 ## Access your Kakao Developer account
 
@@ -54,7 +54,7 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 
 - Go to `Product settings` > `Kakao Login` > `Security`.
 - Click on the `Kakao Login` switch to enable Kakao Login.
-- Click on `generate code` at the bottom to generate the `Client secret code` -- this will serve as a `client_secret` for your supabase project.
+- Click on `generate code` at the bottom to generate the `Client secret code` -- this will serve as a `client_secret` for your iechor project.
 - Make sure you enabled `Client sercet code` by selecting `enable` from the `Activation state` section.
 
 ## Additional configurations on Kakao Developers Portal
@@ -64,7 +64,7 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 
 ![Consent items needs to be set.](/docs/img/guides/auth-kakao/kakao-developers-consent-items-set.png)
 
-## Add your OAuth credentials to Supabase
+## Add your OAuth credentials to iEchor
 
 <SocialProviderSettingsSupabase provider="Kakao" />
 

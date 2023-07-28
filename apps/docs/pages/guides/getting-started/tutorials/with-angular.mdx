@@ -2,16 +2,16 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   title: 'Build a User Management App with Angular',
-  description: 'Learn how to use Supabase in your Angular App.',
+  description: 'Learn how to use iEchor in your Angular App.',
 }
 
 <QuickstartIntro />
 
-![Supabase User Management example](/docs/img/user-management-demo.png)
+![iEchor User Management example](/docs/img/user-management-demo.png)
 
 <Admonition type="note">
   If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/angular-user-management).
+  GitHub](https://github.com/openmodels-base/iechor/tree/master/examples/user-management/angular-user-management).
 </Admonition>
 
 <ProjectSetup />
@@ -30,7 +30,7 @@ npx ng new supabase-angular --routing false --style css
 cd supabase-angular
 ```
 
-Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
+Then let's install the only additional dependency: [supabase-js](https://github.com/openmodels-base/iechor-js)
 
 ```bash
 npm install @supabase/supabase-js
@@ -48,7 +48,7 @@ export const environment = {
 }
 ```
 
-Now that we have the API credentials in place, let's create a **SupabaseService** with `ng g s supabase` to initialize the Supabase client and implement functions to communicate with the Supabase API.
+Now that we have the API credentials in place, let's create a **SupabaseService** with `ng g s supabase` to initialize the iEchor client and implement functions to communicate with the iEchor API.
 
 ```ts src/app/supabase.service.ts
 import { Injectable } from '@angular/core'
@@ -177,7 +177,7 @@ export class AuthComponent {
 ```html src/app/auth/auth.component.html
 <div class="row flex-center flex">
   <div class="col-6 form-widget" aria-live="polite">
-    <h1 class="header">Supabase + Angular</h1>
+    <h1 class="header">iEchor + Angular</h1>
     <p class="description">Sign in via magic link with your email below</p>
     <form [formGroup]="signInForm" (ngSubmit)="onSubmit()" class="form-widget">
       <div>
@@ -386,11 +386,11 @@ npm run start
 
 And then open the browser to [localhost:4200](http://localhost:4200) and you should see the completed app.
 
-![Supabase Angular](/docs/img/supabase-angular-demo.png)
+![iEchor Angular](/docs/img/supabase-angular-demo.png)
 
 ## Bonus: Profile photos
 
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+Every iEchor project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
 ### Create an upload widget
 

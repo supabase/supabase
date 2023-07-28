@@ -1,8 +1,8 @@
-# Rate limiting with Upstash Redis in Supabase Edge Functions
+# Rate limiting with Upstash Redis in iEchor Edge Functions
 
-[Redis](https://redis.io/docs/about/) is an open source (BSD licensed), in-memory data structure store used as a database, cache, message broker, and streaming engine. It is optimized for atomic operations like incrementing a value, for example for a view counter or rate limiting. We can even rate limit based on the user ID from Supabase Auth!
+[Redis](https://redis.io/docs/about/) is an open source (BSD licensed), in-memory data structure store used as a database, cache, message broker, and streaming engine. It is optimized for atomic operations like incrementing a value, for example for a view counter or rate limiting. We can even rate limit based on the user ID from iEchor Auth!
 
-[Upstash](https://upstash.com/) provides an HTTP/REST based Redis client which is ideal for serverless use-cases and therefore works well with Supabase Edge Functions.
+[Upstash](https://upstash.com/) provides an HTTP/REST based Redis client which is ideal for serverless use-cases and therefore works well with iEchor Edge Functions.
 
 ## Redis database setup
 
@@ -16,7 +16,7 @@ cp supabase/.env.local.example supabase/.env.local
 
 ## Run locally
 
-Make sure you have the latest version of the [Supabase CLI installed](https://supabase.com/docs/guides/cli#installation).
+Make sure you have the latest version of the [iEchor CLI installed](https://iechor.com/docs/guides/cli#installation).
 
 ```bash
 supabase start

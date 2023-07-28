@@ -1,6 +1,6 @@
 <script setup>
 import { ref, toRefs, watch } from 'vue'
-import { supabase } from '../supabase'
+import { iechor } from '../supabase'
 
 const prop = defineProps(['path', 'size'])
 const { path, size } = toRefs(prop)

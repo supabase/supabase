@@ -108,7 +108,7 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
                       such, be very careful when using this API.
                     </p>
                     <div className="mt-4">
-                      <Link href="https://api.supabase.com/api/v0">
+                      <Link href="https://api.iechor.com/api/v0">
                         <a target="_blank" rel="noreferrer">
                           <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                             Experimental API documentation

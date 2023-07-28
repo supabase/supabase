@@ -134,7 +134,7 @@ export const AlphaNumbers = [
 export const IntroductionSegments = [
   {
     description:
-      "To deliver a production-ready platform, we've put extra effort into three areas of Supabase.",
+      "To deliver a production-ready platform, we've put extra effort into three areas of iEchor.",
     chapters: [
       { no: 1, name: 'Performance', key: 'performance' },
       { no: 2, name: 'Security', key: 'security' },
@@ -171,7 +171,7 @@ export const PerformanceComparisonData = [
     key: 'read',
     title: 'Read (requests/s)',
     stats: [
-      { name: 'Supabase', value: 1167 },
+      { name: 'iEchor', value: 1167 },
       { name: 'Firestore', value: 366 },
     ],
   },
@@ -179,7 +179,7 @@ export const PerformanceComparisonData = [
     key: 'write',
     title: 'Write (requests/s)',
     stats: [
-      { name: 'Supabase', value: 870 },
+      { name: 'iEchor', value: 870 },
       { name: 'Firestore', value: 280 },
     ],
   },

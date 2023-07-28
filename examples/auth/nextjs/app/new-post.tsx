@@ -8,7 +8,7 @@ export default function NewPost() {
   const addPost = async (formData: FormData) => {
     'use server'
     const content = String(formData.get('content'))
-    const supabase = createServerActionClient<Database>({ cookies })
+    const iechor = createServerActionClient<Database>({ cookies })
     await supabase.from('posts').insert({ content }).select()
     revalidatePath('/')
   }

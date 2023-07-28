@@ -96,14 +96,14 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
           key: 'ext-guides',
           icon: `${router.basePath}/img/book.svg`,
           label: 'Guides',
-          href: 'https://supabase.com/docs',
+          href: 'https://iechor.com/docs',
           isExternal: true,
         },
         {
           key: 'ext-guides',
           icon: `${router.basePath}/img/book-open.svg`,
           label: 'API Reference',
-          href: 'https://supabase.com/docs/guides/api',
+          href: 'https://iechor.com/docs/guides/api',
           isExternal: true,
         },
       ],
@@ -129,8 +129,8 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
   return (
     <>
       <Head>
-        <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
-        <meta name="description" content="Supabase Studio" />
+        <title>{title ? `${title} | iEchor` : 'iEchor'}</title>
+        <meta name="description" content="iEchor Studio" />
       </Head>
       <div className="flex h-full">
         <main

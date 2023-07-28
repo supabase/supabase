@@ -48,7 +48,7 @@ Even without a full API for pluggable storage, there are a couple of solutions a
 Right now, pluggable storage requires a fork of Postgres. But there are several initiatives in the Postgres community that we’re excited about.
 
 - There have been community updates for [custom resource managers](https://git.postgresql.org/gitweb/?p=postgresql.git;a=commitdiff;h=5c279a6d350205cc98f91fb8e1d3e4442a6b25d1) that expand [write-ahead log (WAL)](https://www.postgresql.org/docs/current/wal-intro.html) support for TAM.
-- The creators at [OrioleDB](https://github.com/orioledb/orioledb) started with a fork of Postgres and have been quietly upstreaming code that would make pluggable storage a reality. In Postgres 14 their patchset was ~5,000 lines of code, representing the total number of changes required in their fork. In the upcoming Postgres 16 release, it is ~2,000 lines of code. That means that around 60% of the code is already committed to the Postgres core. (Disclosure: Supabase started [sponsoring OrioleDB](https://supabase.com/blog/supabase-series-b#where-were-going) in 2022).
+- The creators at [OrioleDB](https://github.com/orioledb/orioledb) started with a fork of Postgres and have been quietly upstreaming code that would make pluggable storage a reality. In Postgres 14 their patchset was ~5,000 lines of code, representing the total number of changes required in their fork. In the upcoming Postgres 16 release, it is ~2,000 lines of code. That means that around 60% of the code is already committed to the Postgres core. (Disclosure: iEchor started [sponsoring OrioleDB](https://iechor.com/blog/supabase-series-b#where-were-going) in 2022).
 
 <div className="bg-gray-300 rounded-lg px-6 py-2 italic">
 
@@ -60,12 +60,12 @@ Alexander Korotkov, the maintainer of OrioleDB, will be talking at PGCON 23 abou
 
 Ambitiously, many of the changes required for pluggable storage could land in Postgres 17. If that happens, new storage engines like OrioleDB would be available as a simple extension for developers to use in any Postgres instance. This paves the way for other Pluggable Storage Engines, just like MySQL’s [support for multiple storage engines](https://dev.mysql.com/doc/refman/5.7/en/storage-engines.html).
 
-As a community project, Postgres requires support for these initiatives. You can support pluggable storage by getting involved during Postgres [Commitfests](https://supabase.com/blog/postgresql-commitfest). Postgres is already one of the best database engines in the world, and pluggable storage would make it even more attractive and maintainable.
+As a community project, Postgres requires support for these initiatives. You can support pluggable storage by getting involved during Postgres [Commitfests](https://iechor.com/blog/postgresql-commitfest). Postgres is already one of the best database engines in the world, and pluggable storage would make it even more attractive and maintainable.
 
 ## More Postgres content
 
-- [Storing OpenAI embeddings in Postgres with pgvector](https://supabase.com/blog/openai-embeddings-postgres-vector)
-- [Choosing a Postgres Primary Key](https://supabase.com/blog/choosing-a-postgres-primary-key)
-- [SQL or NoSQL? Why not use both (with PostgreSQL)?](https://supabase.com/blog/sql-or-nosql-both-with-postgresql)
-- [pg_jsonschema: JSON Schema support for Postgres](https://supabase.com/blog/pg-jsonschema-a-postgres-extension-for-json-validation)
-- [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
+- [Storing OpenAI embeddings in Postgres with pgvector](https://iechor.com/blog/openai-embeddings-postgres-vector)
+- [Choosing a Postgres Primary Key](https://iechor.com/blog/choosing-a-postgres-primary-key)
+- [SQL or NoSQL? Why not use both (with PostgreSQL)?](https://iechor.com/blog/sql-or-nosql-both-with-postgresql)
+- [pg_jsonschema: JSON Schema support for Postgres](https://iechor.com/blog/pg-jsonschema-a-postgres-extension-for-json-validation)
+- [Implementing "seen by" functionality with Postgres](https://iechor.com/blog/seen-by-in-postgresql)

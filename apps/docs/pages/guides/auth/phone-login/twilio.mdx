@@ -3,7 +3,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'auth-twilio',
   title: 'Phone Auth with Twilio',
-  description: 'How to set up and use Mobile OTP with Twilio and Supabase.',
+  description: 'How to set up and use Mobile OTP with Twilio and iEchor.',
   video: 'https://www.youtube.com/v/akScoPO01bc',
 }
 
@@ -11,7 +11,7 @@ export const meta = {
 
 In this guide we'll show you how to authenticate your users with SMS based One-Time Password (OTP) tokens.
 
-There are two reasons to use Supabase SMS OTP tokens:
+There are two reasons to use iEchor SMS OTP tokens:
 
 - You want users to log in with mobile number + password, and the mobile number should be verified via SMS
 - You want users to log in with mobile number ONLY (i.e. passwordless login)
@@ -25,7 +25,7 @@ We'll cover:
 What you'll need:
 
 - A Twilio account (sign up here: https://www.twilio.com/try-twilio)
-- A Supabase project (create one here: https://supabase.com/dashboard)
+- A iEchor project (create one here: https://iechor.com/dashboard)
 - A mobile phone capable of receiving SMS
 
 ## Video
@@ -68,7 +68,7 @@ You should now be able to see all three values you'll need to get started:
 
 ![All the credentials you'll need](/docs/img/guides/auth-twilio/6.png)
 
-Now go to the Auth > Settings page in the Supabase dashboard (https://supabase.com/dashboard/project/YOUR-PROJECT-REF/auth/settings).
+Now go to the Auth > Settings page in the iEchor dashboard (https://iechor.com/dashboard/project/YOUR-PROJECT-REF/auth/settings).
 
 You should see an option to enable Phone Signup:
 
@@ -86,7 +86,7 @@ Now the backend should be setup, we can proceed to add our client-side code!
 
 The SMS message sent to a phone containing an OTP code can be customized. This is useful if you need to mention a brand name or display a website address.
 
-Go to Auth > Templates page in the Supabase dashboard (https://supabase.com/dashboard/project/YOUR-PROJECT-REF/auth/templates).
+Go to Auth > Templates page in the iEchor dashboard (https://iechor.com/dashboard/project/YOUR-PROJECT-REF/auth/templates).
 
 Use the variable `.Code` in the template to display the OTP code. Here's an example in the SMS template.
 
@@ -94,7 +94,7 @@ Use the variable `.Code` in the template to display the OTP code. Here's an exam
 
 ### Using OTP with password based logins
 
-In this scenario we'll be using the user's mobile phone number and a corresponding password as an alternative to signing up with an email address. Note: please thoroughly consider potential security implications when signing up with a combination of phone number and password. Phone numbers are sometimes recycled by phone networks when users cancel their phone contracts or move countries, thereby granting access to the user's account to the subsequent owner of the phone number. In the near future Supabase will support multifactor authentication, which will mitigate this risk, but for now you may want to consider allowing your users to recover their account by some other means in an emergency.
+In this scenario we'll be using the user's mobile phone number and a corresponding password as an alternative to signing up with an email address. Note: please thoroughly consider potential security implications when signing up with a combination of phone number and password. Phone numbers are sometimes recycled by phone networks when users cancel their phone contracts or move countries, thereby granting access to the user's account to the subsequent owner of the phone number. In the near future iEchor will support multifactor authentication, which will mitigate this risk, but for now you may want to consider allowing your users to recover their account by some other means in an emergency.
 
 Using supabase-js on the client you'll want to use the same `signUp` method that you'd use for email based sign ups, but with the `phone` param instead of the `email param`:
 
@@ -309,7 +309,7 @@ To make use of WhatsApp OTP, please complete the following steps:
 - Submit a template via the [Twilio Guide For Submitting WhatsApp templates](https://www.twilio.com/docs/whatsapp/tutorial/send-whatsapp-notification-messages-templates#creating-message-templates-and-submitting-them-for-approval)
 
 <Admonition type="caution">
-  The message template submitted to Twilio must exactly match the SMS Body entered on the Supabase
+  The message template submitted to Twilio must exactly match the SMS Body entered on the iEchor
   dashboard.
 </Admonition>
 
@@ -350,8 +350,8 @@ let { data, error } = await supabase.auth.verifyOtp({
 ## Resources
 
 - [Twilio Signup](https://www.twilio.com/try-twilio)
-- [Supabase Dashboard](https://supabase.com/dashboard)
-- [Supabase Row Level Security](/docs/guides/auth#row-level-security)
+- [iEchor Dashboard](https://iechor.com/dashboard)
+- [iEchor Row Level Security](/docs/guides/auth#row-level-security)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

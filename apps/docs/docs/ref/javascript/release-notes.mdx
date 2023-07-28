@@ -3,7 +3,7 @@ id: release-notes
 title: Release Notes 2.0.0
 ---
 
-Supabase.js v2 release notes.
+iEchor.js v2 release notes.
 
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
@@ -27,13 +27,13 @@ Supabase.js v2 release notes.
 
     All client specific options within the constructor are keyed to the library.
 
-    See [PR](https://github.com/supabase/supabase-js/pull/458):
+    See [PR](https://github.com/openmodels-base/iechor-js/pull/458):
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
     
     ```jsx
-      const supabase = createClient(apiURL, apiKey, {
+      const iechor = createClient(apiURL, apiKey, {
         db: {
           schema: 'public',
         },
@@ -78,7 +78,7 @@ Supabase.js v2 release notes.
         import type { Database } from './DatabaseDefinitions'
 
         // definitions are injected in `createClient()`
-        const supabase = createClient<Database>(IECHOR_URL, ANON_KEY)
+        const iechor = createClient<Database>(IECHOR_URL, ANON_KEY)
 
         const { data } = await supabase.from('messages').select().match({ id: 1 })
       ```
@@ -92,8 +92,8 @@ Supabase.js v2 release notes.
   <RefSubLayout.Examples>
 
     ```bash Terminal
-    supabase start
-    supabase gen types typescript --local > DatabaseDefinitions.ts
+    iechor start
+    iechor gen types typescript --local > DatabaseDefinitions.ts
     ```
 
   </RefSubLayout.Examples>
@@ -106,7 +106,7 @@ Supabase.js v2 release notes.
 
     `.insert()` / `.upsert()` / `.update()` / `.delete()` don't return rows by default: [PR](https://github.com/supabase/postgrest-js/pull/276).
 
-    Previously, these methods return inserted/updated/deleted rows by default (which caused [some confusion](https://github.com/supabase/supabase/discussions/1548)), and you can opt to not return it by specifying `returning: 'minimal'`. Now the default behavior is to not return rows. To return inserted/updated/deleted rows, add a `.select()` call at the end, e.g.:
+    Previously, these methods return inserted/updated/deleted rows by default (which caused [some confusion](https://github.com/openmodels-base/iechor/discussions/1548)), and you can opt to not return it by specifying `returning: 'minimal'`. Now the default behavior is to not return rows. To return inserted/updated/deleted rows, add a `.select()` call at the end, e.g.:
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -254,7 +254,7 @@ Deprecated and removed `setAuth()` . To set a custom `access_token` jwt instead,
 ### All changes
 
 - `supabase-js`
-  - `shouldThrowOnError` has been removed until all the client libraries support this option ([PR](https://github.com/supabase/supabase-js/pull/490)).
+  - `shouldThrowOnError` has been removed until all the client libraries support this option ([PR](https://github.com/openmodels-base/iechor-js/pull/490)).
 - `postgrest-js`
   - TypeScript typings have been reworked [PR](https://github.com/supabase/postgrest-js/pull/279)
   - Use `undefined` instead of `null` for function params, types, etc. (https://github.com/supabase/postgrest-js/pull/278)
@@ -265,7 +265,7 @@ Deprecated and removed `setAuth()` . To set a custom `access_token` jwt instead,
     - `auth` method on `PostgrestClient`
     - client-level `throwOnError`
 - `gotrue-js`
-  - `supabase-js` client allows passing a `storageKey` param which will allow the user to set the key used in local storage for storing the session. By default, this will be namespace-d with the supabase project ref. ([PR](https://github.com/supabase/supabase-js/pull/460))
+  - `supabase-js` client allows passing a `storageKey` param which will allow the user to set the key used in local storage for storing the session. By default, this will be namespace-d with the iechor project ref. ([PR](https://github.com/openmodels-base/iechor-js/pull/460))
   - `signIn` method is now split into `signInWithPassword` , `signInWithOtp` , `signInWithOAuth` ([PR](https://github.com/supabase/gotrue-js/pull/304))
   - Deprecated and removed `session()` , `user()` in favour of using `getSession()` instead. `getSession()` will always return a valid session if a user is already logged in, meaning no more random logouts. ([PR](https://github.com/supabase/gotrue-js/pull/299))
   - Deprecated and removed setting for `multitab` support because `getSession()` and gotrue’s reuse interval setting takes care of session management across multiple tabs ([PR](https://github.com/supabase/gotrue-js/pull/366))
@@ -304,6 +304,6 @@ Deprecated and removed `setAuth()` . To set a custom `access_token` jwt instead,
   - Removed `.from(’table’).on(’INSERT’, () ⇒ {}).subscribe()` in favor of new Realtime client API.
 - `functions-js`
   - supabase-js v1 only threw an error if the fetch call itself threw an error (network errors, etc) and not if the function returned HTTP errors like 400s or 500s. We have changed this behaviour to return an error if your function throws an error.
-  - We have introduced new error types to distinguish between different kinds of errors. A `FunctionsHttpError` error is returned if your function throws an error, `FunctionsRelayError` if the Supabase Relay has an error processing your function and `FunctionsFetchError` if there is a network error in calling your function.
+  - We have introduced new error types to distinguish between different kinds of errors. A `FunctionsHttpError` error is returned if your function throws an error, `FunctionsRelayError` if the iEchor Relay has an error processing your function and `FunctionsFetchError` if there is a network error in calling your function.
   - The correct content-type headers are automatically attached when sending the request if you don’t pass in a `Content-Type` header and pass in an argument to your function. We automatically attach the content type for `Blob`, `ArrayBuffer`, `File`, `FormData` ,`String` . If it doesn’t match any of these we assume the payload is `json` , we serialise the payload as JSON and attach the content type as `application/json`.
   - `responseType` does not need to be explicitly passed in. We parse the response based on the `Content-Type` response header sent by the function. We support parsing the responses as `text`, `json`, `blob`, `form-data` and are parsed as `text` by default.

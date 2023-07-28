@@ -2,13 +2,13 @@ clispec: '001'
 info:
   id: cli
   version: 1.77.9
-  title: Supabase CLI
+  title: iEchor CLI
   language: sh
   source: https://github.com/supabase/cli
   bugs: https://github.com/supabase/cli/issues
-  spec: https://github.com/supabase/supabase.tools/cli_spec/lib.yaml
+  spec: https://github.com/openmodels-base/iechor.tools/cli_spec/lib.yaml
   description: |
-    Supabase CLI provides you with tools to develop your application locally, and deploy your application to the Supabase platform.
+    iEchor CLI provides you with tools to develop your application locally, and deploy your application to the iEchor platform.
   tags:
     - id: local-dev
       title: Local Development
@@ -42,14 +42,14 @@ flags:
     default_value: 'false'
   - id: workdir
     name: --workdir <string>
-    description: path to a Supabase project directory
+    description: path to a iEchor project directory
     default_value: ''
 commands:
   - id: supabase-vanity-subdomains
-    title: supabase vanity-subdomains
-    summary: Manage vanity subdomains for Supabase projects
+    title: iechor vanity-subdomains
+    summary: Manage vanity subdomains for iEchor projects
     description: |-
-      Manage vanity subdomains for Supabase projects.
+      Manage vanity subdomains for iEchor projects.
 
       Usage of vanity subdomains and custom domains is mutually exclusive.
     tags:
@@ -62,11 +62,11 @@ commands:
       - supabase-vanity-subdomains-get
     flags: []
   - id: supabase-vanity-subdomains-get
-    title: supabase vanity-subdomains get
+    title: iechor vanity-subdomains get
     summary: Get the current vanity subdomain
     tags: []
     links: []
-    usage: supabase vanity-subdomains get
+    usage: iechor vanity-subdomains get
     subcommands: []
     flags:
       - id: experimental
@@ -76,16 +76,16 @@ commands:
         default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-vanity-subdomains-delete
-    title: supabase vanity-subdomains delete
+    title: iechor vanity-subdomains delete
     summary: Deletes a project's vanity subdomain
     description: |
       Deletes the vanity subdomain for a project, and reverts to using the project ref for routing.
     tags: []
     links: []
-    usage: supabase vanity-subdomains delete
+    usage: iechor vanity-subdomains delete
     subcommands: []
     flags:
       - id: experimental
@@ -95,20 +95,20 @@ commands:
         default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-vanity-subdomains-check-availability
-    title: supabase vanity-subdomains check-availability
+    title: iechor vanity-subdomains check-availability
     summary: Checks if a desired subdomain is available for use
     tags: []
     links: []
-    usage: supabase vanity-subdomains check-availability [flags]
+    usage: iechor vanity-subdomains check-availability [flags]
     subcommands: []
     flags:
       - id: desired-subdomain
         name: --desired-subdomain <string>
         description: |
-          The desired vanity subdomain to use for your Supabase project.
+          The desired vanity subdomain to use for your iEchor project.
         default_value: ''
       - id: experimental
         name: --experimental
@@ -117,25 +117,25 @@ commands:
         default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-vanity-subdomains-activate
-    title: supabase vanity-subdomains activate
+    title: iechor vanity-subdomains activate
     summary: Activate a vanity subdomain
     description: |
-      Activate a vanity subdomain for your Supabase project.
+      Activate a vanity subdomain for your iEchor project.
 
-      This reconfigures your Supabase project to respond to requests on your vanity subdomain.
+      This reconfigures your iEchor project to respond to requests on your vanity subdomain.
       After the vanity subdomain is activated, your project's auth services will no longer function on the {project-ref}.{supabase-domain} hostname.
     tags: []
     links: []
-    usage: supabase vanity-subdomains activate [flags]
+    usage: iechor vanity-subdomains activate [flags]
     subcommands: []
     flags:
       - id: desired-subdomain
         name: --desired-subdomain <string>
         description: |
-          The desired vanity subdomain to use for your Supabase project.
+          The desired vanity subdomain to use for your iEchor project.
         default_value: ''
       - id: experimental
         name: --experimental
@@ -144,11 +144,11 @@ commands:
         default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-test
-    title: supabase test
-    summary: Run tests on local Supabase containers
+    title: iechor test
+    summary: Run tests on local iEchor containers
     tags:
       - local-dev
     links: []
@@ -157,11 +157,11 @@ commands:
       - supabase-test-new
     flags: []
   - id: supabase-test-new
-    title: supabase test new
+    title: iechor test new
     summary: Create a new test file
     tags: []
     links: []
-    usage: supabase test new <name> [flags]
+    usage: iechor test new <name> [flags]
     subcommands: []
     flags:
       - id: template
@@ -173,7 +173,7 @@ commands:
             name: pgtap
             type: '[ pgtap ]'
   - id: supabase-test-db
-    title: supabase test db
+    title: iechor test db
     summary: Tests local database with pgTAP
     description: |2
 
@@ -187,7 +187,7 @@ commands:
     examples:
       - id: basic-usage
         name: Basic usage
-        code: supabase test db
+        code: iechor test db
         response: |
           /tmp/supabase/tests/nested/order_test.pg .. ok
           /tmp/supabase/tests/pet_test.sql .......... ok
@@ -196,15 +196,15 @@ commands:
           Result: PASS
     tags: []
     links: []
-    usage: supabase test db
+    usage: iechor test db
     subcommands: []
     flags: []
   - id: supabase-stop
-    title: supabase stop
-    summary: Stop all local Supabase containers
+    title: iechor stop
+    summary: Stop all local iEchor containers
     description: |2
 
-      Stops the Supabase local development stack.
+      Stops the iEchor local development stack.
 
       Requires `supabase/config.toml` to be created in your current working directory by running `supabase init`.
 
@@ -212,20 +212,20 @@ commands:
     examples:
       - id: basic-usage
         name: Basic usage
-        code: supabase stop
+        code: iechor stop
         response: |
-          Stopped supabase local development setup.
+          Stopped iechor local development setup.
       - id: with-backup
         name: Backup local database before stopping
-        code: supabase stop --backup
+        code: iechor stop --backup
         response: |
           Postgres database saved to volume: supabase_db_cli
           Storage directory saved to volume: supabase_storage_cli
-          Stopped supabase local development setup.
+          Stopped iechor local development setup.
     tags:
       - local-dev
     links: []
-    usage: supabase stop [flags]
+    usage: iechor stop [flags]
     subcommands: []
     flags:
       - id: no-backup
@@ -233,21 +233,21 @@ commands:
         description: Deletes all data volumes after stopping.
         default_value: 'false'
   - id: supabase-status
-    title: supabase status
-    summary: Show status of local Supabase containers
+    title: iechor status
+    summary: Show status of local iEchor containers
     description: |2
 
-      Shows status of the Supabase local development stack.
+      Shows status of the iEchor local development stack.
 
       Requires the local development stack to be started by running `supabase start` or `supabase db start`.
 
-      You can export the connection parameters for [initializing supabase-js](https://supabase.com/docs/reference/javascript/initializing) locally by specifying the `-o env` flag. Supported parameters include `JWT_SECRET`, `ANON_KEY`, and `SERVICE_ROLE_KEY`.
+      You can export the connection parameters for [initializing supabase-js](https://iechor.com/docs/reference/javascript/initializing) locally by specifying the `-o env` flag. Supported parameters include `JWT_SECRET`, `ANON_KEY`, and `SERVICE_ROLE_KEY`.
     examples:
       - id: basic-usage
         name: Basic usage
-        code: supabase status
+        code: iechor status
         response: |
-          supabase local development setup is running.
+          iechor local development setup is running.
 
                    API URL: http://localhost:54321
                GraphQL URL: http://localhost:54321/graphql/v1
@@ -259,7 +259,7 @@ commands:
           service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
       - id: output-env
         name: Format status as environment variables
-        code: supabase status -o env
+        code: iechor status -o env
         response: |
           ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
           API_URL="http://localhost:54321"
@@ -271,7 +271,7 @@ commands:
           STUDIO_URL="http://localhost:54323"
       - id: output-custom-name
         name: Customize the names of exported variables
-        code: supabase status -o env --override-name auth.anon_key=IECHOR_ANON_KEY --override-name auth.service_role_key=IECHOR_SERVICE_KEY
+        code: iechor status -o env --override-name auth.anon_key=IECHOR_ANON_KEY --override-name auth.service_role_key=IECHOR_SERVICE_KEY
         response: |
           Stopped services: [supabase_inbucket_cli supabase_rest_cli supabase_studio_cli]
           IECHOR_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
@@ -282,7 +282,7 @@ commands:
     tags:
       - local-dev
     links: []
-    usage: supabase status [flags]
+    usage: iechor status [flags]
     subcommands: []
     flags:
       - id: output
@@ -310,11 +310,11 @@ commands:
         description: Override specific variable names.
         default_value: '[]'
   - id: supabase-start
-    title: supabase start
-    summary: Start containers for Supabase local development
+    title: iechor start
+    summary: Start containers for iEchor local development
     description: |2
 
-      Starts the Supabase local development stack.
+      Starts the iEchor local development stack.
 
       Requires `supabase/config.toml` to be created in your current working directory by running `supabase init`.
 
@@ -326,29 +326,29 @@ commands:
     examples:
       - id: basic-usage
         name: Basic usage
-        code: supabase start
+        code: iechor start
         response: |
           Creating custom roles supabase/roles.sql...
           Applying migration 20220810154536_employee.sql...
           Seeding data supabase/seed.sql...
-          Started supabase local development setup.
+          Started iechor local development setup.
       - id: without-studio
         name: Start containers without studio and imgproxy
-        code: supabase start -x studio,imgproxy
+        code: iechor start -x studio,imgproxy
         response: |
           Excluding container: supabase/studio:20221214-4eecc99
           Excluding container: darthsim/imgproxy:v3.8.0
-          Started supabase local development setup.
+          Started iechor local development setup.
       - id: ignore-health-check
         name: Ignore service health checks
-        code: supabase start --ignore-health-check
+        code: iechor start --ignore-health-check
         response: |
           service not healthy: [supabase_storage_cli]
-          Started supabase local development setup.
+          Started iechor local development setup.
     tags:
       - local-dev
     links: []
-    usage: supabase start [flags]
+    usage: iechor start [flags]
     subcommands: []
     flags:
       - id: exclude
@@ -361,7 +361,7 @@ commands:
         description: Ignore unhealthy services and exit 0
         default_value: 'false'
   - id: supabase-sso
-    title: supabase sso
+    title: iechor sso
     summary: Manage Single Sign-On (SSO) authentication for projects
     tags:
       - management-api
@@ -375,7 +375,7 @@ commands:
       - supabase-sso-update
     flags: []
   - id: supabase-sso-update
-    title: supabase sso update
+    title: iechor sso update
     summary: Update information about an SSO identity provider
     description: |
       Update the configuration settings of a already added SSO identity provider.
@@ -383,27 +383,27 @@ commands:
       - id: basic-usage
         name: Replace domains
         code: |-
-          supabase sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+          iechor sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
             --project-ref abcdefghijklmnopqrst \
             --domains new-company.com,new-company.net
         response: Information about the updated provider.
       - id: add-domains
         name: Add an additional domain
         code: |-
-          supabase sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+          iechor sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
             --project-ref abcdefghijklmnopqrst \
             --add-domains company.net
         response: Information about the updated provider.
       - id: remove-domains
         name: Remove a domain
         code: |-
-          supabase sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+          iechor sso update 6df4d73f-bf21-405f-a084-b11adf19fea5 \
             --project-ref abcdefghijklmnopqrst \
             --remove-domains company.org
         response: Information about the updated provider.
     tags: []
     links: []
-    usage: supabase sso update <provider-id> [flags]
+    usage: iechor sso update <provider-id> [flags]
     subcommands: []
     flags:
       - id: add-domains
@@ -460,10 +460,10 @@ commands:
             type: '[ pretty | json | toml | yaml ]'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-sso-show
-    title: supabase sso show
+    title: iechor sso show
     summary: Show information about an SSO identity provider
     description: |
       Provides the information about an established connection to an identity provider. You can use --metadata to obtain the raw SAML 2.0 Metadata XML document stored in your project's configuration.
@@ -471,13 +471,13 @@ commands:
       - id: basic-usage
         name: Show information
         code: |-
-          supabase sso show 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+          iechor sso show 6df4d73f-bf21-405f-a084-b11adf19fea5 \
             --project-ref abcdefghijklmnopqrst
         response: Information about the identity provider in pretty output.
       - id: metadata-output
         name: Get raw SAML 2.0 Metadata XML
         code: |-
-          supabase sso show 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+          iechor sso show 6df4d73f-bf21-405f-a084-b11adf19fea5 \
             --project-ref abcdefghijklmnopqrst \
             --metadata
         response: |-
@@ -487,7 +487,7 @@ commands:
           contained within the metadata.
     tags: []
     links: []
-    usage: supabase sso show <provider-id> [flags]
+    usage: iechor sso show <provider-id> [flags]
     subcommands: []
     flags:
       - id: metadata
@@ -513,10 +513,10 @@ commands:
             type: '[ pretty | json | toml | yaml ]'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-sso-remove
-    title: supabase sso remove
+    title: iechor sso remove
     summary: Remove an existing SSO identity provider
     description: |
       Remove a connection to an already added SSO identity provider. Removing the provider will prevent existing users from logging in. Please treat this command with care.
@@ -524,14 +524,14 @@ commands:
       - id: basic-usage
         name: Remove a provider
         code: |-
-          supabase sso remove 6df4d73f-bf21-405f-a084-b11adf19fea5 \
+          iechor sso remove 6df4d73f-bf21-405f-a084-b11adf19fea5 \
             --project-ref abcdefghijklmnopqrst
         response: |-
           Information about the removed identity provider. It's a good idea to
           save this in case you need it later on.
     tags: []
     links: []
-    usage: supabase sso remove <provider-id>
+    usage: iechor sso remove <provider-id>
     subcommands: []
     flags:
       - id: output
@@ -553,16 +553,16 @@ commands:
             type: '[ pretty | json | toml | yaml ]'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-sso-list
-    title: supabase sso list
+    title: iechor sso list
     summary: List all SSO identity providers for a project
     description: |
-      List all connections to a SSO identity provider to your Supabase project.
+      List all connections to a SSO identity provider to your iEchor project.
     tags: []
     links: []
-    usage: supabase sso list
+    usage: iechor sso list
     subcommands: []
     flags:
       - id: output
@@ -584,10 +584,10 @@ commands:
             type: '[ pretty | json | toml | yaml ]'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-sso-info
-    title: supabase sso info
+    title: iechor sso info
     summary: |
       Returns the SAML SSO settings required for the identity provider
     description: |
@@ -595,11 +595,11 @@ commands:
     examples:
       - id: basic-usage
         name: Show project information
-        code: supabase sso info --project-ref abcdefghijklmnopqrst
+        code: iechor sso info --project-ref abcdefghijklmnopqrst
         response: Information about your project's SAML 2.0 configuration.
     tags: []
     links: []
-    usage: supabase sso info
+    usage: iechor sso info
     subcommands: []
     flags:
       - id: output
@@ -621,18 +621,18 @@ commands:
             type: '[ pretty | json | toml | yaml ]'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-sso-add
-    title: supabase sso add
+    title: iechor sso add
     summary: Add a new SSO identity provider
     description: |
-      Add and configure a new connection to a SSO identity provider to your Supabase project.
+      Add and configure a new connection to a SSO identity provider to your iEchor project.
     examples:
       - id: basic-usage
         name: Add with Metadata URL
         code: |-
-          supabase sso add \
+          iechor sso add \
             --project-ref abcdefgijklmnopqrst \
             --type saml \
             --metadata-url 'https://...' \
@@ -644,7 +644,7 @@ commands:
       - id: with-xml
         name: Add with Metadata File
         code: |-
-          supabase sso add \
+          iechor sso add \
             --project-ref abcdefgijklmnopqrst \
             --type saml \
             --metadata-file /path/to/metadata/file.xml \
@@ -655,7 +655,7 @@ commands:
           request to the identity provider.
     tags: []
     links: []
-    usage: supabase sso add [flags]
+    usage: iechor sso add [flags]
     subcommands: []
     flags:
       - id: attribute-mapping-file
@@ -711,10 +711,10 @@ commands:
             type: '[ pretty | json | toml | yaml ]'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-ssl-enforcement
-    title: supabase ssl-enforcement
+    title: iechor ssl-enforcement
     summary: Manage SSL enforcement configuration
     tags:
       - management-api
@@ -724,11 +724,11 @@ commands:
       - supabase-ssl-enforcement-update
     flags: []
   - id: supabase-ssl-enforcement-update
-    title: supabase ssl-enforcement update
+    title: iechor ssl-enforcement update
     summary: Update SSL enforcement configuration
     tags: []
     links: []
-    usage: supabase ssl-enforcement update [flags]
+    usage: iechor ssl-enforcement update [flags]
     subcommands: []
     flags:
       - id: disable-db-ssl-enforcement
@@ -748,14 +748,14 @@ commands:
         default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-ssl-enforcement-get
-    title: supabase ssl-enforcement get
+    title: iechor ssl-enforcement get
     summary: Get the current SSL enforcement configuration
     tags: []
     links: []
-    usage: supabase ssl-enforcement get
+    usage: iechor ssl-enforcement get
     subcommands: []
     flags:
       - id: experimental
@@ -765,11 +765,11 @@ commands:
         default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-secrets
-    title: supabase secrets
-    summary: Manage Supabase secrets
+    title: iechor secrets
+    summary: Manage iEchor secrets
     tags:
       - management-api
     links: []
@@ -779,25 +779,25 @@ commands:
       - supabase-secrets-unset
     flags: []
   - id: supabase-secrets-unset
-    title: supabase secrets unset
-    summary: Unset a secret(s) on Supabase
-    description: Unset a secret(s) from the linked Supabase project.
+    title: iechor secrets unset
+    summary: Unset a secret(s) on iEchor
+    description: Unset a secret(s) from the linked iEchor project.
     tags: []
     links: []
-    usage: supabase secrets unset <NAME> ...
+    usage: iechor secrets unset <NAME> ...
     subcommands: []
     flags:
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-secrets-set
-    title: supabase secrets set
-    summary: Set a secret(s) on Supabase
-    description: Set a secret(s) to the linked Supabase project.
+    title: iechor secrets set
+    summary: Set a secret(s) on iEchor
+    description: Set a secret(s) to the linked iEchor project.
     tags: []
     links: []
-    usage: supabase secrets set [flags] <NAME=VALUE> ...
+    usage: iechor secrets set [flags] <NAME=VALUE> ...
     subcommands: []
     flags:
       - id: env-file
@@ -806,24 +806,24 @@ commands:
         default_value: ''
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-secrets-list
-    title: supabase secrets list
-    summary: List all secrets on Supabase
+    title: iechor secrets list
+    summary: List all secrets on iEchor
     description: List all secrets in the linked project.
     tags: []
     links: []
-    usage: supabase secrets list
+    usage: iechor secrets list
     subcommands: []
     flags:
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-projects
-    title: supabase projects
-    summary: Manage Supabase projects
+    title: iechor projects
+    summary: Manage iEchor projects
     tags:
       - management-api
     links: []
@@ -833,20 +833,20 @@ commands:
       - supabase-projects-list
     flags: []
   - id: supabase-projects-list
-    title: supabase projects list
-    summary: List all Supabase projects
-    description: List all Supabase projects the logged-in user can access.
+    title: iechor projects list
+    summary: List all iEchor projects
+    description: List all iEchor projects the logged-in user can access.
     tags: []
     links: []
-    usage: supabase projects list
+    usage: iechor projects list
     subcommands: []
     flags: []
   - id: supabase-projects-create
-    title: supabase projects create
-    summary: Create a project on Supabase
+    title: iechor projects create
+    summary: Create a project on iEchor
     tags: []
     links: []
-    usage: supabase projects create <project name> [flags]
+    usage: iechor projects create <project name> [flags]
     subcommands: []
     flags:
       - id: db-password
@@ -920,19 +920,19 @@ commands:
             name: us-west-2
             type: string
   - id: supabase-projects-api-keys
-    title: supabase projects api-keys
-    summary: List all API keys for a Supabase project
+    title: iechor projects api-keys
+    summary: List all API keys for a iEchor project
     tags: []
     links: []
-    usage: supabase projects api-keys [flags]
+    usage: iechor projects api-keys [flags]
     subcommands: []
     flags:
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-postgres-config
-    title: supabase postgres-config
+    title: iechor postgres-config
     summary: Manage Postgres database config
     tags:
       - management-api
@@ -942,14 +942,14 @@ commands:
       - supabase-postgres-config-update
     flags: []
   - id: supabase-postgres-config-update
-    title: supabase postgres-config update
+    title: iechor postgres-config update
     summary: Update Postgres database config
     description: |-
       Overriding the default Postgres config could result in unstable database behavior.
       Custom configuration also overrides the optimizations generated based on the compute add-ons in use.
     tags: []
     links: []
-    usage: supabase postgres-config update [flags]
+    usage: iechor postgres-config update [flags]
     subcommands: []
     flags:
       - id: config
@@ -968,14 +968,14 @@ commands:
         default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-postgres-config-get
-    title: supabase postgres-config get
+    title: iechor postgres-config get
     summary: Get the current Postgres database config overrides
     tags: []
     links: []
-    usage: supabase postgres-config get
+    usage: iechor postgres-config get
     subcommands: []
     flags:
       - id: experimental
@@ -985,11 +985,11 @@ commands:
         default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-orgs
-    title: supabase orgs
-    summary: Manage Supabase organizations
+    title: iechor orgs
+    summary: Manage iEchor organizations
     tags:
       - management-api
     links: []
@@ -998,25 +998,25 @@ commands:
       - supabase-orgs-list
     flags: []
   - id: supabase-orgs-list
-    title: supabase orgs list
+    title: iechor orgs list
     summary: List all organizations
     description: List all organizations the logged-in user belongs.
     tags: []
     links: []
-    usage: supabase orgs list
+    usage: iechor orgs list
     subcommands: []
     flags: []
   - id: supabase-orgs-create
-    title: supabase orgs create
+    title: iechor orgs create
     summary: Create an organization
     description: Create an organization for the logged-in user.
     tags: []
     links: []
-    usage: supabase orgs create
+    usage: iechor orgs create
     subcommands: []
     flags: []
   - id: supabase-network-restrictions
-    title: supabase network-restrictions
+    title: iechor network-restrictions
     summary: Manage network restrictions
     tags:
       - management-api
@@ -1026,11 +1026,11 @@ commands:
       - supabase-network-restrictions-update
     flags: []
   - id: supabase-network-restrictions-update
-    title: supabase network-restrictions update
+    title: iechor network-restrictions update
     summary: Update network restrictions
     tags: []
     links: []
-    usage: supabase network-restrictions update [flags]
+    usage: iechor network-restrictions update [flags]
     subcommands: []
     flags:
       - id: bypass-cidr-checks
@@ -1048,14 +1048,14 @@ commands:
         default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-network-restrictions-get
-    title: supabase network-restrictions get
+    title: iechor network-restrictions get
     summary: Get the current network restrictions
     tags: []
     links: []
-    usage: supabase network-restrictions get
+    usage: iechor network-restrictions get
     subcommands: []
     flags:
       - id: experimental
@@ -1065,10 +1065,10 @@ commands:
         default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-network-bans
-    title: supabase network-bans
+    title: iechor network-bans
     summary: Manage network bans
     description: |-
       Network bans are IPs that get temporarily blocked if their traffic pattern looks abusive (e.g. multiple failed auth attempts).
@@ -1082,11 +1082,11 @@ commands:
       - supabase-network-bans-remove
     flags: []
   - id: supabase-network-bans-remove
-    title: supabase network-bans remove
+    title: iechor network-bans remove
     summary: Remove a network ban
     tags: []
     links: []
-    usage: supabase network-bans remove [flags]
+    usage: iechor network-bans remove [flags]
     subcommands: []
     flags:
       - id: db-unban-ip
@@ -1100,14 +1100,14 @@ commands:
         default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-network-bans-get
-    title: supabase network-bans get
+    title: iechor network-bans get
     summary: Get the current network bans
     tags: []
     links: []
-    usage: supabase network-bans get
+    usage: iechor network-bans get
     subcommands: []
     flags:
       - id: experimental
@@ -1117,10 +1117,10 @@ commands:
         default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-migration
-    title: supabase migration
+    title: iechor migration
     summary: Manage database migration scripts
     tags:
       - local-dev
@@ -1133,19 +1133,19 @@ commands:
       - supabase-migration-up
     flags: []
   - id: supabase-migration-up
-    title: supabase migration up
+    title: iechor migration up
     summary: Apply pending migrations to local database
     tags: []
     links: []
-    usage: supabase migration up
+    usage: iechor migration up
     subcommands: []
     flags: []
   - id: supabase-migration-squash
-    title: supabase migration squash
+    title: iechor migration squash
     summary: Squash migrations to a single file
     tags: []
     links: []
-    usage: supabase migration squash [flags]
+    usage: iechor migration squash [flags]
     subcommands: []
     flags:
       - id: db-url
@@ -1165,7 +1165,7 @@ commands:
         description: Squash up to the specified version.
         default_value: ''
   - id: supabase-migration-repair
-    title: supabase migration repair
+    title: iechor migration repair
     summary: Repair the migration history table
     description: |2
 
@@ -1178,7 +1178,7 @@ commands:
       For example, your migration history table may look like this after running `db remote commit` for the first time.
 
       ```bash
-      $ supabase migration list
+      $ iechor migration list
               LOCAL      │     REMOTE     │     TIME (UTC)
         ─────────────────┼────────────────┼──────────────────────
           20230103054303 │ 20230103054303 │ 2023-01-03 05:43:03
@@ -1188,7 +1188,7 @@ commands:
 
       ```bash
       $ rm supabase/migrations/20230103054303_remote_commit.sql
-      $ supabase migration list
+      $ iechor migration list
               LOCAL      │     REMOTE     │     TIME (UTC)
         ─────────────────┼────────────────┼──────────────────────
                          │ 20230103054303 │ 2023-01-03 05:43:03
@@ -1197,9 +1197,9 @@ commands:
       Then mark the remote migration `20230103054303` as reverted.
 
       ```bash
-      $ supabase migration repair 20230103054303 --status reverted
+      $ iechor migration repair 20230103054303 --status reverted
       Repaired migration history: 20230103054303 => reverted
-      $ supabase migration list
+      $ iechor migration list
               LOCAL      │     REMOTE     │     TIME (UTC)
         ─────────────────┼────────────────┼──────────────────────
       ```
@@ -1208,17 +1208,17 @@ commands:
     examples:
       - id: basic-usage
         name: Mark a migration as reverted
-        code: supabase migration repair 20230103054303 --status reverted
+        code: iechor migration repair 20230103054303 --status reverted
         response: |
           Repaired migration history: 20230103054303 => reverted
       - id: mark-applied
         name: Mark a migration as applied
-        code: supabase migration repair 20230222032233 --status applied
+        code: iechor migration repair 20230222032233 --status applied
         response: |
           Repaired migration history: 20230222032233 => applied
     tags: []
     links: []
-    usage: supabase migration repair <version> [flags]
+    usage: iechor migration repair <version> [flags]
     subcommands: []
     flags:
       - id: db-url
@@ -1242,7 +1242,7 @@ commands:
             name: reverted
             type: '[ applied | reverted ]'
   - id: supabase-migration-new
-    title: supabase migration new
+    title: iechor migration new
     summary: Create an empty migration script
     description: |2
 
@@ -1254,21 +1254,21 @@ commands:
     examples:
       - id: basic-usage
         name: Basic usage
-        code: supabase migration new schema_test
+        code: iechor migration new schema_test
         response: |
           Created new migration at supabase/migrations/20230306095710_schema_test.sql.
       - id: pipe-stdin
         name: With statements piped from stdin
-        code: echo "create schema if not exists test;" | supabase migration new schema_test
+        code: echo "create schema if not exists test;" | iechor migration new schema_test
         response: |
           Created new migration at supabase/migrations/20230306095710_schema_test.sql.
     tags: []
     links: []
-    usage: supabase migration new <migration name>
+    usage: iechor migration new <migration name>
     subcommands: []
     flags: []
   - id: supabase-migration-list
-    title: supabase migration list
+    title: iechor migration list
     summary: List local and remote migrations
     description: |2
 
@@ -1284,7 +1284,7 @@ commands:
     examples:
       - id: basic-usage
         name: Basic usage
-        code: supabase migration list
+        code: iechor migration list
         response: |2
                 LOCAL      │     REMOTE     │     TIME (UTC)
           ─────────────────┼────────────────┼──────────────────────
@@ -1293,7 +1293,7 @@ commands:
             20230222032233 │                │ 2023-02-22 03:22:33
       - id: with-db-url
         name: Connect to self-hosted database
-        code: supabase migration list --db-url 'postgres://postgres[:percent_encoded_password]@localhost[:port]/postgres'
+        code: iechor migration list --db-url 'postgres://postgres[:percent_encoded_password]@localhost[:port]/postgres'
         response: |2
                 LOCAL      │     REMOTE     │     TIME (UTC)
           ─────────────────┼────────────────┼──────────────────────
@@ -1301,7 +1301,7 @@ commands:
             20230103093141 │ 20230103093141 │ 2023-01-03 09:31:41
     tags: []
     links: []
-    usage: supabase migration list [flags]
+    usage: iechor migration list [flags]
     subcommands: []
     flags:
       - id: db-url
@@ -1313,39 +1313,39 @@ commands:
         description: Password to your remote Postgres database.
         default_value: ''
   - id: supabase-login
-    title: supabase login
+    title: iechor login
     summary: Authenticate using an access token
     description: |2
 
-      Connect the Supabase CLI to your Supabase account by logging in with your [personal access token](https://supabase.com/dashboard/account/tokens).
+      Connect the iEchor CLI to your iEchor account by logging in with your [personal access token](https://iechor.com/dashboard/account/tokens).
 
       Your access token is stored securely in [native credentials storage](https://github.com/zalando/go-keyring#dependencies). If native credentials storage is unavailable, it will be written to a plain text file at `~/.supabase/access-token`.
 
       > If this behavior is not desired, such as in a CI environment, you may skip login by specifying the `IECHOR_ACCESS_TOKEN` environment variable in other commands.
 
-      The Supabase CLI uses the stored token to access Management APIs for projects, functions, secrets, etc.
+      The iEchor CLI uses the stored token to access Management APIs for projects, functions, secrets, etc.
     examples:
       - id: basic-usage
         name: Basic usage
-        code: supabase login
+        code: iechor login
         response: |
-          You can generate an access token from https://supabase.com/dashboard/account/tokens
+          You can generate an access token from https://iechor.com/dashboard/account/tokens
           Enter your access token: sbp_****************************************
-          Finished supabase login.
+          Finished iechor login.
     tags:
       - local-dev
     links: []
-    usage: supabase login
+    usage: iechor login
     subcommands: []
     flags: []
   - id: supabase-link
-    title: supabase link
-    summary: Link to a Supabase project
+    title: iechor link
+    summary: Link to a iEchor project
     description: |2
 
-      Link your local development project to a hosted Supabase project.
+      Link your local development project to a hosted iEchor project.
 
-      PostgREST configurations are fetched from the Supabase platform and validated against your local configuration file.
+      PostgREST configurations are fetched from the iEchor platform and validated against your local configuration file.
 
       Optionally, database settings can be validated if you provide a password. Your database password is saved in native credentials storage if available.
 
@@ -1355,26 +1355,26 @@ commands:
     examples:
       - id: basic-usage
         name: Basic usage
-        code: supabase link --project-ref ********************
+        code: iechor link --project-ref ********************
         response: |
           Enter your database password (or leave blank to skip): ********
-          Finished supabase link.
+          Finished iechor link.
       - id: without-password
         name: Link without database password
-        code: supabase link --project-ref ******************** <<< ""
+        code: iechor link --project-ref ******************** <<< ""
         response: |
           Enter your database password (or leave blank to skip):
-          Finished supabase link.
+          Finished iechor link.
       - id: using-alternate-dns
         name: Link using DNS-over-HTTPS resolver
-        code: supabase link --project-ref ******************** --dns-resolver https
+        code: iechor link --project-ref ******************** --dns-resolver https
         response: |
           Enter your database password (or leave blank to skip):
-          Finished supabase link.
+          Finished iechor link.
     tags:
       - local-dev
     links: []
-    usage: supabase link [flags]
+    usage: iechor link [flags]
     subcommands: []
     flags:
       - id: password
@@ -1383,12 +1383,12 @@ commands:
         default_value: ''
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         required: true
         default_value: ''
   - id: supabase-inspect
-    title: supabase inspect
-    summary: Tools to inspect your Supabase Database
+    title: iechor inspect
+    summary: Tools to inspect your iEchor Database
     tags:
       - local-dev
     links: []
@@ -1398,11 +1398,11 @@ commands:
       - supabase-inspect-db:replication-slots
     flags: []
   - id: supabase-inspect-db:replication-slots
-    title: supabase inspect db:replication-slots
+    title: iechor inspect db:replication-slots
     summary: Shows information about replication slots on the database
     tags: []
     links: []
-    usage: supabase inspect db:replication-slots
+    usage: iechor inspect db:replication-slots
     subcommands: []
     flags:
       - id: db-url
@@ -1410,11 +1410,11 @@ commands:
         description: connect using the specified database url
         default_value: ''
   - id: supabase-inspect-db:index-usage
-    title: supabase inspect db:index-usage
+    title: iechor inspect db:index-usage
     summary: Shows information about the efficiency of indexes
     tags: []
     links: []
-    usage: supabase inspect db:index-usage
+    usage: iechor inspect db:index-usage
     subcommands: []
     flags:
       - id: db-url
@@ -1422,11 +1422,11 @@ commands:
         description: connect using the specified database url
         default_value: ''
   - id: supabase-inspect-db:cache-hit
-    title: supabase inspect db:cache-hit
+    title: iechor inspect db:cache-hit
     summary: Shows cache hit rates for tables and indices
     tags: []
     links: []
-    usage: supabase inspect db:cache-hit
+    usage: iechor inspect db:cache-hit
     subcommands: []
     flags:
       - id: db-url
@@ -1434,30 +1434,30 @@ commands:
         description: connect using the specified database url
         default_value: ''
   - id: supabase-init
-    title: supabase init
+    title: iechor init
     summary: Initialize a local project
     description: |2
 
-      Initialize configurations for Supabase local development.
+      Initialize configurations for iEchor local development.
 
       A `supabase/config.toml` file is created in your current working directory. This configuration is specific to each local project.
 
       > You may override the directory path by specifying the `IECHOR_WORKDIR` environment variable or `--workdir` flag.
 
-      In addition to `config.toml`, the `supabase` directory may also contain other Supabase objects, such as `migrations`, `functions`, `tests`, etc.
+      In addition to `config.toml`, the `supabase` directory may also contain other iEchor objects, such as `migrations`, `functions`, `tests`, etc.
     examples:
       - id: basic-usage
         name: Basic usage
-        code: supabase init
-        response: Finished supabase init.
+        code: iechor init
+        response: Finished iechor init.
       - id: from-workdir
         name: Initialize from an existing directory
-        code: supabase init --workdir .
-        response: Finished supabase init.
+        code: iechor init --workdir .
+        response: Finished iechor init.
     tags:
       - local-dev
     links: []
-    usage: supabase init [flags]
+    usage: iechor init [flags]
     subcommands: []
     flags:
       - id: with-vscode-workspace
@@ -1465,7 +1465,7 @@ commands:
         description: Generate VS Code workspace.
         default_value: 'false'
   - id: supabase-gen
-    title: supabase gen
+    title: iechor gen
     summary: Run code generation tools
     tags:
       - local-dev
@@ -1475,7 +1475,7 @@ commands:
       - supabase-gen-types
     flags: []
   - id: supabase-gen-types
-    title: supabase gen types
+    title: iechor gen types
     summary: Generate types from Postgres schema
     tags: []
     links: []
@@ -1483,13 +1483,13 @@ commands:
       - supabase-gen-types-typescript
     flags: []
   - id: supabase-gen-types-typescript
-    title: supabase gen types typescript
+    title: iechor gen types typescript
     summary: Generate types for TypeScript
     description: |
       Generate types for TypeScript. Must specify one of --local, --linked, --project-id, or --db-url
     tags: []
     links: []
-    usage: supabase gen types typescript [flags]
+    usage: iechor gen types typescript [flags]
     subcommands: []
     flags:
       - id: db-url
@@ -1513,11 +1513,11 @@ commands:
         description: Schemas to generate types for.
         default_value: '[]'
   - id: supabase-gen-keys
-    title: supabase gen keys
+    title: iechor gen keys
     summary: Generate keys for preview branch
     tags: []
     links: []
-    usage: supabase gen keys [flags]
+    usage: iechor gen keys [flags]
     subcommands: []
     flags:
       - id: output
@@ -1543,7 +1543,7 @@ commands:
         default_value: '[]'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
       - id: experimental
         name: --experimental
@@ -1551,8 +1551,8 @@ commands:
         required: true
         default_value: 'false'
   - id: supabase-functions
-    title: supabase functions
-    summary: Manage Supabase Edge functions
+    title: iechor functions
+    summary: Manage iEchor Edge functions
     tags:
       - management-api
     links: []
@@ -1565,11 +1565,11 @@ commands:
       - supabase-functions-serve
     flags: []
   - id: supabase-functions-serve
-    title: supabase functions serve
+    title: iechor functions serve
     summary: Serve all Functions locally
     tags: []
     links: []
-    usage: supabase functions serve [flags]
+    usage: iechor functions serve [flags]
     subcommands: []
     flags:
       - id: env-file
@@ -1586,47 +1586,47 @@ commands:
         description: Disable JWT verification for the Function.
         default_value: 'false'
   - id: supabase-functions-new
-    title: supabase functions new
+    title: iechor functions new
     summary: Create a new Function locally
     tags: []
     links: []
-    usage: supabase functions new <Function name>
+    usage: iechor functions new <Function name>
     subcommands: []
     flags: []
   - id: supabase-functions-list
-    title: supabase functions list
-    summary: List all Functions in Supabase
-    description: List all Functions in the linked Supabase project.
+    title: iechor functions list
+    summary: List all Functions in iEchor
+    description: List all Functions in the linked iEchor project.
     tags: []
     links: []
-    usage: supabase functions list [flags]
+    usage: iechor functions list [flags]
     subcommands: []
     flags:
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-functions-download
-    title: supabase functions download
-    summary: Download a Function from Supabase
+    title: iechor functions download
+    summary: Download a Function from iEchor
     description: |
-      Download the source code for a Function from the linked Supabase project.
+      Download the source code for a Function from the linked iEchor project.
     tags: []
     links: []
-    usage: supabase functions download <Function name> [flags]
+    usage: iechor functions download <Function name> [flags]
     subcommands: []
     flags:
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-functions-deploy
-    title: supabase functions deploy
-    summary: Deploy a Function to Supabase
-    description: Deploy a Function to the linked Supabase project.
+    title: iechor functions deploy
+    summary: Deploy a Function to iEchor
+    description: Deploy a Function to the linked iEchor project.
     tags: []
     links: []
-    usage: supabase functions deploy <Function name> [flags]
+    usage: iechor functions deploy <Function name> [flags]
     subcommands: []
     flags:
       - id: import-map
@@ -1639,27 +1639,27 @@ commands:
         default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-functions-delete
-    title: supabase functions delete
-    summary: Delete a Function from Supabase
+    title: iechor functions delete
+    summary: Delete a Function from iEchor
     description: |
-      Delete a Function from the linked Supabase project. This does NOT remove the Function locally.
+      Delete a Function from the linked iEchor project. This does NOT remove the Function locally.
     tags: []
     links: []
-    usage: supabase functions delete <Function name> [flags]
+    usage: iechor functions delete <Function name> [flags]
     subcommands: []
     flags:
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-domains
-    title: supabase domains
-    summary: Manage custom domain names for Supabase projects
+    title: iechor domains
+    summary: Manage custom domain names for iEchor projects
     description: |
-      Manage custom domain names for Supabase projects.
+      Manage custom domain names for iEchor projects.
 
       Use of custom domains and vanity subdomains is mutually exclusive.
     tags:
@@ -1673,11 +1673,11 @@ commands:
       - supabase-domains-reverify
     flags: []
   - id: supabase-domains-reverify
-    title: supabase domains reverify
+    title: iechor domains reverify
     summary: Re-verify the custom hostname config for your project
     tags: []
     links: []
-    usage: supabase domains reverify
+    usage: iechor domains reverify
     subcommands: []
     flags:
       - id: include-raw-output
@@ -1686,16 +1686,16 @@ commands:
         default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-domains-get
-    title: supabase domains get
+    title: iechor domains get
     summary: Get the current custom hostname config
     description: |
-      Retrieve the custom hostname config for your project, as stored in the Supabase platform.
+      Retrieve the custom hostname config for your project, as stored in the iEchor platform.
     tags: []
     links: []
-    usage: supabase domains get
+    usage: iechor domains get
     subcommands: []
     flags:
       - id: include-raw-output
@@ -1704,14 +1704,14 @@ commands:
         default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-domains-delete
-    title: supabase domains delete
+    title: iechor domains delete
     summary: Deletes the custom hostname config for your project
     tags: []
     links: []
-    usage: supabase domains delete
+    usage: iechor domains delete
     subcommands: []
     flags:
       - id: include-raw-output
@@ -1720,23 +1720,23 @@ commands:
         default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-domains-create
-    title: supabase domains create
+    title: iechor domains create
     summary: Create a custom hostname
     description: |-
-      Create a custom hostname for your Supabase project.
+      Create a custom hostname for your iEchor project.
 
-      Expects your custom hostname to have a CNAME record to your Supabase project's subdomain.
+      Expects your custom hostname to have a CNAME record to your iEchor project's subdomain.
     tags: []
     links: []
-    usage: supabase domains create [flags]
+    usage: iechor domains create [flags]
     subcommands: []
     flags:
       - id: custom-hostname
         name: --custom-hostname <string>
-        description: The custom hostname to use for your Supabase project.
+        description: The custom hostname to use for your iEchor project.
         default_value: ''
       - id: include-raw-output
         name: --include-raw-output
@@ -1744,19 +1744,19 @@ commands:
         default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-domains-activate
-    title: supabase domains activate
+    title: iechor domains activate
     summary: Activate the custom hostname for a project
     description: |-
       Activates the custom hostname configuration for a project.
 
-      This reconfigures your Supabase project to respond to requests on your custom hostname.
-      After the custom hostname is activated, your project's auth services will no longer function on the Supabase-provisioned subdomain.
+      This reconfigures your iEchor project to respond to requests on your custom hostname.
+      After the custom hostname is activated, your project's auth services will no longer function on the iEchor-provisioned subdomain.
     tags: []
     links: []
-    usage: supabase domains activate
+    usage: iechor domains activate
     subcommands: []
     flags:
       - id: include-raw-output
@@ -1765,10 +1765,10 @@ commands:
         default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
-        description: Project ref of the Supabase project.
+        description: Project ref of the iEchor project.
         default_value: ''
   - id: supabase-db
-    title: supabase db
+    title: iechor db
     summary: Manage local Postgres databases
     tags:
       - local-dev
@@ -1783,11 +1783,11 @@ commands:
       - supabase-db-start
     flags: []
   - id: supabase-db-start
-    title: supabase db start
+    title: iechor db start
     summary: Starts local Postgres database
     tags: []
     links: []
-    usage: supabase db start
+    usage: iechor db start
     subcommands: []
     flags:
       - id: db-url
@@ -1795,7 +1795,7 @@ commands:
         description: connect using the specified database url
         default_value: ''
   - id: supabase-db-reset
-    title: supabase db reset
+    title: iechor db reset
     summary: Resets the local database to current migrations
     description: |2
 
@@ -1809,16 +1809,16 @@ commands:
     examples:
       - id: basic-usage
         name: Basic usage
-        code: supabase db reset
+        code: iechor db reset
         response: |
           Resetting database...
           Initializing schema...
           Applying migration 20220810154537_create_employees_table.sql...
           Seeding data supabase/seed.sql...
-          Finished supabase db reset on branch main.
+          Finished iechor db reset on branch main.
     tags: []
     links: []
-    usage: supabase db reset [flags]
+    usage: iechor db reset [flags]
     subcommands: []
     flags:
       - id: linked
@@ -1830,7 +1830,7 @@ commands:
         description: connect using the specified database url
         default_value: ''
   - id: supabase-db-remote
-    title: supabase db remote
+    title: iechor db remote
     summary: Manage remote databases
     tags: []
     links: []
@@ -1838,7 +1838,7 @@ commands:
       - supabase-db-remote-commit
     flags: []
   - id: supabase-db-remote-commit
-    title: supabase db remote commit
+    title: iechor db remote commit
     summary: Commit remote changes as a new migration
     description: |2
 
@@ -1849,7 +1849,7 @@ commands:
       If no entries exist in the migration history table, `pg_dump` will be used to capture all contents of the remote schemas you have created. After that, a new record will be inserted into the migration history table. Subsequent runs of this command will only diff schema changes against the remote database similar to `db diff --linked`.
     tags: []
     links: []
-    usage: supabase db remote commit
+    usage: iechor db remote commit
     subcommands: []
     flags:
       - id: db-url
@@ -1865,7 +1865,7 @@ commands:
         description: List of schema to include.
         default_value: all
   - id: supabase-db-push
-    title: supabase db push
+    title: iechor db push
     summary: Push new migrations to the remote database
     description: |2
 
@@ -1881,26 +1881,26 @@ commands:
     examples:
       - id: basic-usage
         name: Basic usage
-        code: supabase db push
+        code: iechor db push
         response: |
           Linked project is up to date.
       - id: self-hosted
         name: Self hosted
-        code: supabase db push --db-url "postgres://user:pass@localhost:5432/postgres"
+        code: iechor db push --db-url "postgres://user:pass@localhost:5432/postgres"
         response: |
           Pushing migration 20230410135622_create_employees_table.sql...
-          Finished supabase db push.
+          Finished iechor db push.
       - id: dry-run
         name: Dry run
-        code: supabase db push --dry-run
+        code: iechor db push --dry-run
         response: |
           DRY RUN: migrations will *not* be pushed to the database.
           Would push migration 20230410135622_create_employees_table.sql...
           Would push migration 20230425064254_my_table.sql...
-          Finished supabase db push.
+          Finished iechor db push.
     tags: []
     links: []
-    usage: supabase db push [flags]
+    usage: iechor db push [flags]
     subcommands: []
     flags:
       - id: dry-run
@@ -1917,7 +1917,7 @@ commands:
         description: connect using the specified database url
         default_value: ''
   - id: supabase-db-lint
-    title: supabase db lint
+    title: iechor db lint
     summary: Checks local database for typing error
     description: |2
 
@@ -1931,14 +1931,14 @@ commands:
     examples:
       - id: basic-usage
         name: Basic usage
-        code: supabase db lint
+        code: iechor db lint
         response: |
           Linting schema: public
 
           No schema errors found
       - id: schema-warnings
         name: Warnings for a specific schema
-        code: supabase db lint --level warning --schema storage
+        code: iechor db lint --level warning --schema storage
         response: |
           Linting schema: storage
           [
@@ -1955,7 +1955,7 @@ commands:
           ]
     tags: []
     links: []
-    usage: supabase db lint [flags]
+    usage: iechor db lint [flags]
     subcommands: []
     flags:
       - id: level
@@ -1982,7 +1982,7 @@ commands:
         description: connect using the specified database url
         default_value: ''
   - id: supabase-db-dump
-    title: supabase db dump
+    title: iechor db dump
     summary: Dumps data or schemas from the remote database
     description: |2
 
@@ -1990,31 +1990,31 @@ commands:
 
       Requires your local project to be linked to a remote database by running `supabase link`. For self-hosted databases, you can pass in the connection parameters using `--db-url` flag.
 
-      Runs `pg_dump` in a container with additional flags to exclude Supabase managed schemas. The ignored schemas include auth, stroage, and those created by extensions.
+      Runs `pg_dump` in a container with additional flags to exclude iEchor managed schemas. The ignored schemas include auth, stroage, and those created by extensions.
 
       The default dump does not contain any data or custom roles. To dump those contents explicitly, specify either the `--data-only` and `--role-only` flag.
     examples:
       - id: basic-usage
         name: Basic usage
-        code: supabase db dump -f supabase/schema.sql
+        code: iechor db dump -f supabase/schema.sql
         response: |
           Dumping schemas from remote database...
           Dumped schema to supabase/schema.sql.
       - id: role-only
         name: Role only
-        code: supabase db dump -f supabase/roles.sql --role-only
+        code: iechor db dump -f supabase/roles.sql --role-only
         response: |
           Dumping roles from remote database...
           Dumped schema to supabase/roles.sql.
       - id: data-only
         name: Data only
-        code: supabase db dump -f supabase/seed.sql --data-only
+        code: iechor db dump -f supabase/seed.sql --data-only
         response: |
           Dumping data from remote database...
           Dumped schema to supabase/seed.sql.
     tags: []
     links: []
-    usage: supabase db dump [flags]
+    usage: iechor db dump [flags]
     subcommands: []
     flags:
       - id: data-only
@@ -2046,7 +2046,7 @@ commands:
         description: connect using the specified database url
         default_value: ''
   - id: supabase-db-diff
-    title: supabase db diff
+    title: iechor db diff
     summary: Diffs the local database for schema changes
     description: |2
 
@@ -2066,39 +2066,39 @@ commands:
     examples:
       - id: basic-usage
         name: Basic usage
-        code: supabase db diff -f my_table
+        code: iechor db diff -f my_table
         response: |
           Connecting to local database...
           Creating shadow database...
           Applying migration 20230425064254_remote_commit.sql...
           Diffing schemas: auth,extensions,public,storage
-          Finished supabase db diff on branch main.
+          Finished iechor db diff on branch main.
 
           No schema changes found
       - id: linked-project
         name: Against linked project
-        code: supabase db diff -f my_table --linked
+        code: iechor db diff -f my_table --linked
         response: |
           Connecting to local database...
           Creating shadow database...
           Diffing schemas: auth,extensions,public,storage
-          Finished supabase db diff on branch main.
+          Finished iechor db diff on branch main.
 
           WARNING: The diff tool is not foolproof, so you may need to manually rearrange and modify the generated migration.
-          Run supabase db reset to verify that the new migration does not generate errors.
+          Run iechor db reset to verify that the new migration does not generate errors.
       - id: specific-schema
         name: For a specific schema
-        code: supabase db diff -f my_table --schema auth
+        code: iechor db diff -f my_table --schema auth
         response: |
           Connecting to local database...
           Creating shadow database...
           Diffing schemas: auth
-          Finished supabase db diff on branch main.
+          Finished iechor db diff on branch main.
 
           No schema changes found
     tags: []
     links: []
-    usage: supabase db diff [flags]
+    usage: iechor db diff [flags]
     subcommands: []
     flags:
       - id: db-url
@@ -2131,10 +2131,10 @@ commands:
         description: Use pgAdmin to generate schema diff.
         default_value: 'false'
   - id: supabase-completion
-    title: supabase completion
+    title: iechor completion
     summary: Generate the autocompletion script for the specified shell
     description: |
-      Generate the autocompletion script for supabase for the specified shell.
+      Generate the autocompletion script for iechor for the specified shell.
       See each sub-command's help for details on how to use the generated script.
     tags:
       - other-commands
@@ -2146,7 +2146,7 @@ commands:
       - supabase-completion-zsh
     flags: []
   - id: supabase-completion-zsh
-    title: supabase completion zsh
+    title: iechor completion zsh
     summary: Generate the autocompletion script for zsh
     description: |
       Generate the autocompletion script for the zsh shell.
@@ -2164,16 +2164,16 @@ commands:
 
       #### Linux:
 
-          supabase completion zsh > "${fpath[1]}/_supabase"
+          iechor completion zsh > "${fpath[1]}/_supabase"
 
       #### macOS:
 
-          supabase completion zsh > $(brew --prefix)/share/zsh/site-functions/_supabase
+          iechor completion zsh > $(brew --prefix)/share/zsh/site-functions/_supabase
 
       You will need to start a new shell for this setup to take effect.
     tags: []
     links: []
-    usage: supabase completion zsh [flags]
+    usage: iechor completion zsh [flags]
     subcommands: []
     flags:
       - id: no-descriptions
@@ -2181,20 +2181,20 @@ commands:
         description: disable completion descriptions
         default_value: 'false'
   - id: supabase-completion-powershell
-    title: supabase completion powershell
+    title: iechor completion powershell
     summary: Generate the autocompletion script for powershell
     description: |
       Generate the autocompletion script for powershell.
 
       To load completions in your current shell session:
 
-          supabase completion powershell | Out-String | Invoke-Expression
+          iechor completion powershell | Out-String | Invoke-Expression
 
       To load completions for every new session, add the output of the above command
       to your powershell profile.
     tags: []
     links: []
-    usage: supabase completion powershell [flags]
+    usage: iechor completion powershell [flags]
     subcommands: []
     flags:
       - id: no-descriptions
@@ -2202,23 +2202,23 @@ commands:
         description: disable completion descriptions
         default_value: 'false'
   - id: supabase-completion-fish
-    title: supabase completion fish
+    title: iechor completion fish
     summary: Generate the autocompletion script for fish
     description: |
       Generate the autocompletion script for the fish shell.
 
       To load completions in your current shell session:
 
-          supabase completion fish | source
+          iechor completion fish | source
 
       To load completions for every new session, execute once:
 
-          supabase completion fish > ~/.config/fish/completions/supabase.fish
+          iechor completion fish > ~/.config/fish/completions/supabase.fish
 
       You will need to start a new shell for this setup to take effect.
     tags: []
     links: []
-    usage: supabase completion fish [flags]
+    usage: iechor completion fish [flags]
     subcommands: []
     flags:
       - id: no-descriptions
@@ -2226,7 +2226,7 @@ commands:
         description: disable completion descriptions
         default_value: 'false'
   - id: supabase-completion-bash
-    title: supabase completion bash
+    title: iechor completion bash
     summary: Generate the autocompletion script for bash
     description: |
       Generate the autocompletion script for the bash shell.
@@ -2242,16 +2242,16 @@ commands:
 
       #### Linux:
 
-          supabase completion bash > /etc/bash_completion.d/supabase
+          iechor completion bash > /etc/bash_completion.d/supabase
 
       #### macOS:
 
-          supabase completion bash > $(brew --prefix)/etc/bash_completion.d/supabase
+          iechor completion bash > $(brew --prefix)/etc/bash_completion.d/supabase
 
       You will need to start a new shell for this setup to take effect.
     tags: []
     links: []
-    usage: supabase completion bash
+    usage: iechor completion bash
     subcommands: []
     flags:
       - id: no-descriptions

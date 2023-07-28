@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { supabase } from './supabaseClient';
+  import { iechor } from './supabaseClient';
   import type { AuthSession } from '@supabase/supabase-js';
   import Account from './lib/Account.svelte';
   import Auth from './lib/Auth.svelte'

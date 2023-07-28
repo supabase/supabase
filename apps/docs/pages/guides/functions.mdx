@@ -9,10 +9,10 @@ export const meta = {
   hide_table_of_contents: true,
 }
 
-Edge Functions are server-side TypeScript functions, distributed globally at the edge—close to your users. They can be used for listening to webhooks or integrating your Supabase project with third-parties [like Stripe](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/stripe-webhooks). Edge Functions are developed using [Deno](https://deno.com), which offers a few benefits to you as a developer:
+Edge Functions are server-side TypeScript functions, distributed globally at the edge—close to your users. They can be used for listening to webhooks or integrating your iEchor project with third-parties [like Stripe](https://github.com/openmodels-base/iechor/tree/master/examples/edge-functions/supabase/functions/stripe-webhooks). Edge Functions are developed using [Deno](https://deno.com), which offers a few benefits to you as a developer:
 
 - It is open source.
-- It is portable. Supabase Edge Functions run locally, and on any other Deno-compatible platform (including self-hosted infrastructure).
+- It is portable. iEchor Edge Functions run locally, and on any other Deno-compatible platform (including self-hosted infrastructure).
 - It is TypeScript first and supports WASM.
 - Edge Functions are globally distributed for low-latency.
 
@@ -24,7 +24,7 @@ Edge Functions are server-side TypeScript functions, distributed globally at the
 
 ## Examples
 
-Check out the [Edge Function Examples](https://github.com/supabase/supabase/tree/master/examples/edge-functions) in our GitHub repository.
+Check out the [Edge Function Examples](https://github.com/openmodels-base/iechor/tree/master/examples/edge-functions) in our GitHub repository.
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
   {examples.map((x) => (
@@ -43,7 +43,7 @@ Check out the [Edge Function Examples](https://github.com/supabase/supabase/tree
 export const examples = [
   {
     name: 'With supabase-js',
-    description: 'Use the Supabase client inside your Edge Function.',
+    description: 'Use the iEchor client inside your Edge Function.',
     href: '/guides/functions/auth',
   },
   {
@@ -59,39 +59,39 @@ export const examples = [
   },
   {
     name: 'React Native with Stripe',
-    description: 'Full example for using Supabase and Stripe, with Expo.',
+    description: 'Full example for using iEchor and Stripe, with Expo.',
     href: 'https://github.com/supabase-community/expo-stripe-payments-with-supabase-functions',
   },
   {
     name: 'Flutter with Stripe',
-    description: 'Full example for using Supabase and Stripe, with Flutter.',
+    description: 'Full example for using iEchor and Stripe, with Flutter.',
     href: 'https://github.com/supabase-community/flutter-stripe-payments-with-supabase-functions',
   },
   {
     name: 'Building a RESTful Service API',
     description:
       'Learn how to use HTTP methods and paths to build a RESTful service for managing tasks.',
-    href: 'https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/restful-tasks/index.ts',
+    href: 'https://github.com/openmodels-base/iechor/blob/master/examples/edge-functions/supabase/functions/restful-tasks/index.ts',
   },
   {
-    name: 'Working with Supabase Storage',
-    description: 'An example on reading a file from Supabase Storage.',
-    href: 'https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/read-storage/index.ts',
+    name: 'Working with iEchor Storage',
+    description: 'An example on reading a file from iEchor Storage.',
+    href: 'https://github.com/openmodels-base/iechor/blob/master/examples/edge-functions/supabase/functions/read-storage/index.ts',
   },
   {
     name: 'Open Graph Image Generation',
-    description: 'Generate Open Graph images with Deno and Supabase Edge Functions.',
+    description: 'Generate Open Graph images with Deno and iEchor Edge Functions.',
     href: '/guides/functions/examples/og-image',
   },
   {
     name: 'OG Image Generation & Storage CDN Caching',
-    description: 'Cache generated images with Supabase Storage CDN.',
-    href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/og-image-with-storage-cdn',
+    description: 'Cache generated images with iEchor Storage CDN.',
+    href: 'https://github.com/openmodels-base/iechor/tree/master/examples/edge-functions/supabase/functions/og-image-with-storage-cdn',
   },
   {
     name: 'Get User Location',
     description: `Get user location data from user's IP address.`,
-    href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/location',
+    href: 'https://github.com/openmodels-base/iechor/tree/master/examples/edge-functions/supabase/functions/location',
   },
   {
     name: 'Cloudflare Turnstile',
@@ -111,7 +111,7 @@ export const examples = [
   {
     name: 'Oak Server Middleware',
     description: `Request Routing with Oak server middleware.`,
-    href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/oak-server',
+    href: 'https://github.com/openmodels-base/iechor/tree/master/examples/edge-functions/supabase/functions/oak-server',
   },
   {
     name: 'Hugging Face',
@@ -136,7 +136,7 @@ export const examples = [
   {
     name: 'Web Stream',
     description: `Server-Sent Events in Edge Functions.`,
-    href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/streams',
+    href: 'https://github.com/openmodels-base/iechor/tree/master/examples/edge-functions/supabase/functions/streams',
   },
   {
     name: 'Puppeteer',
@@ -156,7 +156,7 @@ export const examples = [
   {
     name: 'Upload File',
     description: `Process multipart/form-data.`,
-    href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/file-upload-storage',
+    href: 'https://github.com/openmodels-base/iechor/tree/master/examples/edge-functions/supabase/functions/file-upload-storage',
   },
   {
     name: 'Upstash Redis',

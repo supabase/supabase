@@ -63,7 +63,7 @@ const PolicySelection: FC<Props> = ({
             target="_blank"
             rel="noreferrer"
             className="text-brand-900 transition-colors hover:text-brand-1200"
-            href="https://supabase.com/docs/guides/auth#policies"
+            href="https://iechor.com/docs/guides/auth#policies"
           >
             here
           </a>

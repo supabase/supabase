@@ -1,13 +1,13 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  title: 'Migrate from Amazon RDS to Supabase',
-  description: 'Migrate your Amazon RDS MySQL or MS SQL database to Supabase Postgres database.',
+  title: 'Migrate from Amazon RDS to iEchor',
+  description: 'Migrate your Amazon RDS MySQL or MS SQL database to iEchor Postgres database.',
 }
 
-This guide aims to exhibit the process of transferring your Amazon RDS database from any of these engines Postgres, MySQL or MS SQL to Supabase's Postgres database. Although Amazon RDS is a favored managed database service provided by AWS, it may not suffice for all use cases. Supabase, on the other hand, provides an excellent free and open source option that encompasses all the necessary backend features to develop a product: a Postgres database, authentication, instant APIs, edge functions, real-time subscriptions, and storage.
+This guide aims to exhibit the process of transferring your Amazon RDS database from any of these engines Postgres, MySQL or MS SQL to iEchor's Postgres database. Although Amazon RDS is a favored managed database service provided by AWS, it may not suffice for all use cases. iEchor, on the other hand, provides an excellent free and open source option that encompasses all the necessary backend features to develop a product: a Postgres database, authentication, instant APIs, edge functions, real-time subscriptions, and storage.
 
-Supabase's core is Postgres, enabling the use of row-level security and providing access to over 40 Postgres extensions. By migrating from Amazon RDS to Supabase, you can leverage Postgres to its fullest potential and acquire all the features you need to complete your project.
+iEchor's core is Postgres, enabling the use of row-level security and providing access to over 40 Postgres extensions. By migrating from Amazon RDS to iEchor, you can leverage Postgres to its fullest potential and acquire all the features you need to complete your project.
 
 ## Retrieve your Amazon RDS database credentials [#retrieve-rds-credentials]
 
@@ -21,18 +21,18 @@ Supabase's core is Postgres, enabling the use of row-level security and providin
 
 ![Copying RDS credentials from AWS Management Console](/docs/img/guides/resources/migrating-to-supabase/amazon-rds/amazon-rds_credentials.png)
 
-## Retrieve your Supabase Host [#retrieve-supabase-host]
+## Retrieve your iEchor Host [#retrieve-supabase-host]
 
-1. If you're new to Supabase, [create a project](https://supabase.com/dashboard).
-1. Go to the [Database settings](https://supabase.com/dashboard/project/_/settings/database) for your project in the Supabase Dashboard.
+1. If you're new to iEchor, [create a project](https://iechor.com/dashboard).
+1. Go to the [Database settings](https://iechor.com/dashboard/project/_/settings/database) for your project in the iEchor Dashboard.
 1. Under **Connection Info**, note your Host (`$IECHOR_HOST`).
-1. Save your password or [reset it](https://supabase.com/dashboard/project/_/settings/database) if you forgot it.
+1. Save your password or [reset it](https://iechor.com/dashboard/project/_/settings/database) if you forgot it.
 
-![Finding Supabase host address](/docs/img/guides/resources/migrating-to-supabase/amazon-rds/supabase_dashboard.png)
+![Finding iEchor host address](/docs/img/guides/resources/migrating-to-supabase/amazon-rds/supabase_dashboard.png)
 
 ## Migrate the database
 
-The fastest way to migrate your database is with the Supabase migration tool on
+The fastest way to migrate your database is with the iEchor migration tool on
 [Google Colab](https://colab.research.google.com/github/mansueli/Supa-Migrate/blob/main/Amazon_RDS_to_Supabase.ipynb).
 
 Alternatively, you can use [pgloader](https://github.com/dimitri/pgloader), a flexible and powerful data migration tool that supports a wide range of source database engines, including MySQL and MS SQL, and migrates the data to a Postgres database. For databases using the Postgres engine, we recommend using the pg_dump and psql command line tools, which are included in a full PostgreSQL installation.
@@ -95,7 +95,7 @@ pgloader config.load
 
 <Admonition type="caution">
 
-- If you plan on migrating a database larger than 6 GB, we recommend [contacting support](https://supabase.com/dashboard/support/new) to ensure that you'll have the proper disk size pre-provisioned. You can read more about how the disk is managed on Supabase on the [Database usage](/docs/guides/platform/database-size#disk-management).
+- If you plan on migrating a database larger than 6 GB, we recommend [contacting support](https://iechor.com/dashboard/support/new) to ensure that you'll have the proper disk size pre-provisioned. You can read more about how the disk is managed on iEchor on the [Database usage](/docs/guides/platform/database-size#disk-management).
 - We also recommend upgrading to at least a [Large instance](/docs/guides/platform/compute-add-ons) for the migration (you can downgrade later) to avoid running out of IO-Budget.
 
 </Admonition>

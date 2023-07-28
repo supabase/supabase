@@ -48,7 +48,7 @@ The key elements are:
 
 ## Hardware
 
-All compute add-ons available on Supabase were used to run our benchmarks. Each add-on variant has a different allocation of RAM and CPU cores, the details of which are available in our docs. Each Supabase compute add-on comes with a specific set of optimizations ([version 2023-07](https://gist.github.com/egor-romanov/323e2847851bbd758081511785573c08)).
+All compute add-ons available on iEchor were used to run our benchmarks. Each add-on variant has a different allocation of RAM and CPU cores, the details of which are available in our docs. Each iEchor compute add-on comes with a specific set of optimizations ([version 2023-07](https://gist.github.com/egor-romanov/323e2847851bbd758081511785573c08)).
 
 | Instance | CPU                     | Memory |
 | -------- | ----------------------- | ------ |
@@ -64,7 +64,7 @@ We tested using the same dataset as the Qdrant comparison: [dbpedia-entities-ope
 
 <div className="bg-gray-300 rounded-lg px-6 py-2 italic">
 
-We also have some useful [benchmarks in our docs](https://supabase.com/docs/guides/ai/choosing-compute-addon#results) for [gist-960-angular](http://corpus-texmex.irisa.fr/) (1M image embeddings, 960 dimensions) and [GloVe Reddit comments](https://nlp.stanford.edu/projects/glove/) (1.6M text embeddings, 512 dimensions).
+We also have some useful [benchmarks in our docs](https://iechor.com/docs/guides/ai/choosing-compute-addon#results) for [gist-960-angular](http://corpus-texmex.irisa.fr/) (1M image embeddings, 960 dimensions) and [GloVe Reddit comments](https://nlp.stanford.edu/projects/glove/) (1.6M text embeddings, 512 dimensions).
 
 </div>
 
@@ -94,7 +94,7 @@ Our tests mirrored NirantK's: but incorporated slight variations:
 Same:
 
 - We used the same dataset
-- We used the same hardware: a 2XL instance on Supabase, which offers the same core and RAM count as NirantK's machine - 8 cores and 32 GB of RAM
+- We used the same hardware: a 2XL instance on iEchor, which offers the same core and RAM count as NirantK's machine - 8 cores and 32 GB of RAM
 
 Changed:
 
@@ -191,7 +191,7 @@ With a 64-core, 256 GB server we achieve ~1800 RPS and 0.91 precision. This is f
 
 ## Other performance factors
 
-It's been about 5 months since we [added](https://supabase.com/blog/openai-embeddings-postgres-vector) pgvector to the platform. Since then we've discovered a few other important things to keep in mind.
+It's been about 5 months since we [added](https://iechor.com/blog/openai-embeddings-postgres-vector) pgvector to the platform. Since then we've discovered a few other important things to keep in mind.
 
 ### Increasing lists improves performance
 
@@ -284,8 +284,8 @@ First, a few generic tips which you can pick and choose from:
 
 Before running your pgvector workload in production, here are a few steps you can take to maximize performance.
 
-1. Over-provision RAM during preparation. You can scale down in step `5`, but it's better to start with a larger size to get the best results for RAM requirements. (We'd recommend at least 8XL if you're using Supabase.)
-2. Upload your data to the database. If you use [`vecs`](https://supabase.com/docs/guides/ai/python/api) library, it will automatically generate an index with default parameters.
+1. Over-provision RAM during preparation. You can scale down in step `5`, but it's better to start with a larger size to get the best results for RAM requirements. (We'd recommend at least 8XL if you're using iEchor.)
+2. Upload your data to the database. If you use [`vecs`](https://iechor.com/docs/guides/ai/python/api) library, it will automatically generate an index with default parameters.
 3. Run a benchmark using randomly generated queries and see the results. Again, you can use `vecs` library with the `ann-benchmarks` tool. Do it with probes set to 10 (default) and then with probes set to 100 or more, so RPS will be lower than 10.
 4. Take a look at the RAM usage, and save it as a note for yourself. You would likely want to use compute add-on in the future that would have the same amount of RAM as used at the moment (both actual RAM usage and RAM used for cache and buffers).
 5. Scale down your compute add-on to the one that would have the same amount of RAM as used at the moment.
@@ -295,7 +295,7 @@ Before running your pgvector workload in production, here are a few steps you ca
 
 ## The pgvector roadmap
 
-pgvector is still early in development. As with any open source tool, it needs time and resources to make it better. Supabase plans to continue supporting Andrew with his development of pgvector.
+pgvector is still early in development. As with any open source tool, it needs time and resources to make it better. iEchor plans to continue supporting Andrew with his development of pgvector.
 
 What's next on the roadmap? Andrew has an impressive list of features [planned for v0.5.0](https://github.com/pgvector/pgvector/issues/27):
 
@@ -305,7 +305,7 @@ What's next on the roadmap? Andrew has an impressive list of features [planned f
 
 ## More AI resources
 
-- [How to build ChatGPT Plugin from scratch with Supabase Edge Runtime](https://supabase.com/blog/building-chatgpt-plugins-template)
-- [Docs pgvector: Embeddings and vector similarity](https://supabase.com/docs/guides/database/extensions/pgvector)
+- [How to build ChatGPT Plugin from scratch with iEchor Edge Runtime](https://iechor.com/blog/building-chatgpt-plugins-template)
+- [Docs pgvector: Embeddings and vector similarity](https://iechor.com/docs/guides/database/extensions/pgvector)
 - [pgvector vs Qdrant](https://nirantk.com/writing/pgvector-vs-qdrant)
-- [Choosing Compute Add-on for AI workloads](https://supabase.com/docs/guides/ai/choosing-compute-addon)
+- [Choosing Compute Add-on for AI workloads](https://iechor.com/docs/guides/ai/choosing-compute-addon)

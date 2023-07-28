@@ -17,7 +17,7 @@ export interface IntegrationInstallationProps extends React.RefAttributes<HTMLLI
   integration: Integration
 }
 
-type HandleIconType = Integration['integration']['name'] | 'Supabase'
+type HandleIconType = Integration['integration']['name'] | 'iEchor'
 
 const HandleIcon = ({ type, className }: { type: HandleIconType; className?: string }) => {
   switch (type) {
@@ -40,8 +40,8 @@ const HandleIcon = ({ type, className }: { type: HandleIconType; className?: str
       )
 
       break
-    case 'Supabase':
-      return <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" className="w-3.5"></img>
+    case 'iEchor':
+      return <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="iEchor" className="w-3.5"></img>
       break
 
     default:
@@ -148,7 +148,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
         <div className="bg border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg">
           <div className="flex flex-col gap-1">
             <div className="flex gap-2 items-center">
-              <HandleIcon type={'Supabase'} />
+              <HandleIcon type={'iEchor'} />
               <span>{project?.name}</span>
               <IconArrowRight size={14} className="text-scale-900" strokeWidth={1.5} />
               {!connection?.metadata?.framework ? (
@@ -197,7 +197,7 @@ const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationC
       >
         <div className="flex flex-col gap-1">
           <div className="flex gap-2 items-center">
-            <HandleIcon type={'Supabase'} />
+            <HandleIcon type={'iEchor'} />
             <span>{project?.name}</span>
             <IconArrowRight size={14} className="text-scale-900" strokeWidth={1.5} />
             <HandleIcon type={type} />

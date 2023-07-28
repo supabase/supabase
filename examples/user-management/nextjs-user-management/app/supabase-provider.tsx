@@ -21,7 +21,7 @@ export default function SupabaseProvider({
   children: React.ReactNode
   session: MaybeSession
 }) {
-  const supabase = createClientComponentClient<Database>()
+  const iechor = createClientComponentClient<Database>()
   const router = useRouter()
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 {
   "name": "shared-data",
   "version": "0.0.0",
-  "description": "Data shared between Supabase apps",
+  "description": "Data shared between iEchor apps",
   "main": "./index.ts",
   "types": "./index.ts",
   "scripts": {},

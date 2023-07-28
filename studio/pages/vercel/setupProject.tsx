@@ -259,7 +259,7 @@ const CreateProject = observer(() => {
 
   return (
     <div className="">
-      <p className="mb-2">Supabase project details</p>
+      <p className="mb-2">iEchor project details</p>
       <div className="py-2">
         <Input
           autoFocus

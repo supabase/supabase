@@ -23,7 +23,7 @@ export default function TicketInfoFooter({
           golden && '!text-white'
         }`}
       >
-        {/* <div>supabase.com/launch-week</div> */}
+        {/* <div>iechor.com/launch-week</div> */}
       </div>
     </div>
   )

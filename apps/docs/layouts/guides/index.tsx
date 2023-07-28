@@ -77,16 +77,16 @@ const Layout: FC<Props> = (props) => {
   return (
     <>
       <Head>
-        <title>{props.meta?.title} | Supabase Docs</title>
+        <title>{props.meta?.title} | iEchor Docs</title>
         <meta name="description" content={props.meta?.description} />
         <meta property="og:image" content={ogImageUrl} />
         <meta name="twitter:image" content={ogImageUrl} />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       <NextSeo
-        canonical={props.meta?.canonical ?? `https://supabase.com/docs${asPath}`}
+        canonical={props.meta?.canonical ?? `https://iechor.com/docs${asPath}`}
         openGraph={{
-          url: `https://supabase.com/docs${asPath}`,
+          url: `https://iechor.com/docs${asPath}`,
           type: 'article',
           videos: props.meta?.video && [
             {
@@ -100,7 +100,7 @@ const Layout: FC<Props> = (props) => {
           article: {
             publishedTime: new Date().toISOString(),
             modifiedTime: new Date().toISOString(),
-            authors: ['Supabase'],
+            authors: ['iEchor'],
           },
         }}
       />
@@ -136,7 +136,7 @@ const Layout: FC<Props> = (props) => {
                 <div className="mt-16 not-prose">
                   <div>
                     <a
-                      href={`https://github.com/supabase/supabase/edit/master/apps/docs/pages${router.asPath}.mdx`}
+                      href={`https://github.com/openmodels-base/iechor/edit/master/apps/docs/pages${router.asPath}.mdx`}
                       className="text-sm transition flex items-center gap-1 text-scale-1000 hover:text-scale-1200 w-fit"
                     >
                       Edit this page on GitHub <IconExternalLink size={14} strokeWidth={1.5} />

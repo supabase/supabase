@@ -48,10 +48,10 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
             <div className="max-w-4xl prose">
               <h2 className="text-lg">Choose best compute setup for you</h2>
               <p className="text-sm lg:max-w-3xl">
-                Every project on the Supabase Platform comes with its own dedicated Postgres
+                Every project on the iEchor Platform comes with its own dedicated Postgres
                 instance running inside a virtual machine (VM). The following table describes the
                 base instance with additional compute add-ons available if you need extra
-                performance when scaling up Supabase.
+                performance when scaling up iEchor.
               </p>
             </div>
           </div>

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 import JSONInput from 'react-json-editor-ajrm'
 import locale from 'react-json-editor-ajrm/locale/en'
-import { supabase } from './utils/supabaseClient'
+import { iechor } from './utils/supabaseClient'
 import { functionsList } from './functionsList'
 
 const sampleObject = { name: 'world' }
@@ -24,7 +24,7 @@ function App() {
 
   return (
     <div className="p-2">
-      <h2 className="mb-2 text-4xl">Supabase Egde Functions Test Client</h2>
+      <h2 className="mb-2 text-4xl">iEchor Egde Functions Test Client</h2>
       <div className="grid grid-cols-1 md:grid-cols-2">
         <div className="p-2">
           <h3 className="mb-2 text-3xl">Request</h3>

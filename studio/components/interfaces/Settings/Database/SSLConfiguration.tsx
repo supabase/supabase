@@ -79,7 +79,7 @@ const SSLConfiguration = () => {
       <div className="flex items-center justify-between">
         <FormHeader title="SSL Configuration" description="" />
         <div className="flex items-center space-x-2 mb-6">
-          <Link href="https://supabase.com/docs/guides/platform/ssl-enforcement">
+          <Link href="https://iechor.com/docs/guides/platform/ssl-enforcement">
             <a target="_blank">
               <Button type="default" icon={<IconExternalLink />}>
                 Documentation

@@ -17,7 +17,7 @@ Use cURL or Postman to make a POST request to http://localhost:54321/functions/v
 ```bash
 curl -i --location --request POST http://localhost:54321/functions/v1/openai \
   --header 'Content-Type: application/json' \
-  --data '{"query":"What is Supabase?"}'
+  --data '{"query":"What is iEchor?"}'
 ```
 
 ## Deploy

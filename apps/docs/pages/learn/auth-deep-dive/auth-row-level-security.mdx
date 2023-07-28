@@ -3,13 +3,13 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'auth-row-level-security',
   title: 'Part Two: Row Level Security',
-  description: 'Supabase Auth Deep Dive Part Two - Row Level Security',
+  description: 'iEchor Auth Deep Dive Part Two - Row Level Security',
   video: 'https://www.youtube.com/v/qY_iQ10IUhs',
 }
 
 ### About
 
-Learn how to restrict access to your database tables by enabling Row Level Security and writing Postgres Policies in the Supabase Dashboard.
+Learn how to restrict access to your database tables by enabling Row Level Security and writing Postgres Policies in the iEchor Dashboard.
 
 ### Watch
 
@@ -24,10 +24,10 @@ Learn how to restrict access to your database tables by enabling Row Level Secur
 
 ### Securing Your Tables
 
-In Supabase, you can access your data directly from the client (often the web browser), you do this by passing your Supabase URL and Anon key to supabase-js like so:
+In iEchor, you can access your data directly from the client (often the web browser), you do this by passing your iEchor URL and Anon key to supabase-js like so:
 
 ```js
-const supabase = createClient(
+const iechor = createClient(
   'https://qwertyuiop.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
 )
@@ -57,7 +57,7 @@ values
   ('Chani', 200);
 ```
 
-Now let's set up a client to read the data, I've created a repl here to show a living example: [https://replit.com/@awalias/supabase-leaderboard-demo#index.js](https://replit.com/@awalias/supabase-leaderboard-demo#index.js). If you copy the snippet you can plug in your own Supabase URL and anon key.
+Now let's set up a client to read the data, I've created a repl here to show a living example: [https://replit.com/@awalias/supabase-leaderboard-demo#index.js](https://replit.com/@awalias/supabase-leaderboard-demo#index.js). If you copy the snippet you can plug in your own iEchor URL and anon key.
 
 You can see that it's possible to freely read from and write to the table by using:
 
@@ -78,9 +78,9 @@ Now let's restrict access. We'll start by fully restricting the table. We can do
 ALTER TABLE leaderboard ENABLE ROW LEVEL SECURITY;
 ```
 
-or via the Supabase Dashboard, by navigating to Auth > Policies, and clicking the red padlock on the leaderboard table, so that it turns white.
+or via the iEchor Dashboard, by navigating to Auth > Policies, and clicking the red padlock on the leaderboard table, so that it turns white.
 
-![Enable row level security in Supabase](/docs/img/auth-deep-dive-2.png)
+![Enable row level security in iEchor](/docs/img/auth-deep-dive-2.png)
 
 You'll notice that reading will return no rows and writing will now fail with an error like:
 
@@ -108,7 +108,7 @@ CREATE POLICY anon_read_leaderboard ON leaderboard
 
 If you'd prefer to use the dashboard to add your policy you can do so by clicking "Add Policy" in the Policies tab and making a policy like this:
 
-![Add a read only policy in Supabase](/docs/img/auth-deep-dive-2-2.png)
+![Add a read only policy in iEchor](/docs/img/auth-deep-dive-2-2.png)
 
 You should now be able to read from your leaderboard, but will still not be able to write, update, or delete from it, which is exactly what we wanted!
 
@@ -128,7 +128,7 @@ In the next guide we will look at using Policies in combination with User Accoun
 - Watch [Part Three: Policies](../../learn/auth-deep-dive/auth-policies)
 - Watch [Part Four: GoTrue](../../learn/auth-deep-dive/auth-gotrue)
 - Watch [Part Five: Google Oauth](../../learn/auth-deep-dive/auth-google-oauth)
-- Sign up for Supabase: [supabase.com/dashboard](https://supabase.com/dashboard)
+- Sign up for iEchor: [iechor.com/dashboard](https://iechor.com/dashboard)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

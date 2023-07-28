@@ -214,12 +214,12 @@ const Connecting = () => (
 const ProjectLinksEmptyState = () => (
   <div className="flex flex-col space-y-4">
     <p>
-      You haven't created a Supabase project yet. Get started by creating a new Supabase project,
+      You haven't created a iEchor project yet. Get started by creating a new iEchor project,
       then close this window and retry adding integration.
     </p>
-    <Link href="https://supabase.com/dashboard">
+    <Link href="https://iechor.com/dashboard">
       <a className="text-brand-900">
-        Start a new Supabase project<span aria-hidden="true"> &rarr;</span>
+        Start a new iEchor project<span aria-hidden="true"> &rarr;</span>
       </a>
     </Link>
   </div>
@@ -326,7 +326,7 @@ const ProjectLinks: FC = observer(() => {
           item.result = { status: 'waiting' }
         })
 
-        // pull vercel project env, check if supabase env is existed or not
+        // pull vercel project env, check if iechor env is existed or not
         const { data: existedEnvs, error: fetchEnvsError }: any = await fetchVercelProjectEnvs({
           id: item.vercelProjectId as string,
           vercelTeamId: _store.teamId,
@@ -344,11 +344,11 @@ const ProjectLinks: FC = observer(() => {
         }
         const found = existedEnvs.find((x: any) => x.key.includes('IECHOR'))
         if (!!found) {
-          console.error('Existed Supabase env: ', found)
+          console.error('Existed iEchor env: ', found)
           runInAction(() => {
             item.result = {
               status: 'fail',
-              message: 'Error: This Vercel project already contains Supabase envs',
+              message: 'Error: This Vercel project already contains iEchor envs',
             }
           })
           continue
@@ -360,13 +360,13 @@ const ProjectLinks: FC = observer(() => {
           runInAction(() => {
             item.result = {
               status: 'fail',
-              message: 'Error: Failed to fetch Supabase project details',
+              message: 'Error: Failed to fetch iEchor project details',
             }
           })
           continue
         }
 
-        // Then create env for vercel project with supabase project
+        // Then create env for vercel project with iechor project
         const vercelEnvs = prepareVercelEvns(defaultVercelEnvs, {
           endpoint: `${projectDetails.autoApiService.protocol ?? 'https'}://${
             projectDetails.autoApiService.endpoint ?? '-'
@@ -410,7 +410,7 @@ const ProjectLinks: FC = observer(() => {
         isValid = false
         runInAction(() => {
           _store.projectLinks[i].error =
-            'Invalid selection. Please choose a Vercel project and a Supabase project to link.'
+            'Invalid selection. Please choose a Vercel project and a iEchor project to link.'
         })
       }
     }
@@ -441,15 +441,15 @@ const ProjectLinks: FC = observer(() => {
   return (
     <div className="flex w-full flex-col space-y-6">
       <div>
-        <h4 className="text-lg">Link Vercel to Supabase</h4>
-        <p>Choose which of your Vercel projects to link to your existing Supabase projects.</p>
+        <h4 className="text-lg">Link Vercel to iEchor</h4>
+        <p>Choose which of your Vercel projects to link to your existing iEchor projects.</p>
       </div>
       <Divider light />
       <div className="space-y-2">
         <div className="flex justify-between">
           <p className="text-scale-1000">Vercel Projects</p>
           <div />
-          <p className="text-scale-1000">Supabase Projects</p>
+          <p className="text-scale-1000">iEchor Projects</p>
         </div>
         <ProjectLinkList />
         <Divider light />

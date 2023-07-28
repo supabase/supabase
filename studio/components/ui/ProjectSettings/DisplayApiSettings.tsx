@@ -44,9 +44,9 @@ const DisplayApiSettings = () => {
           <p className="text-sm text-scale-1000">
             Your API is secured behind an API gateway which requires an API Key for every request.
             <br />
-            You can use the keys below in the Supabase client libraries.
+            You can use the keys below in the iEchor client libraries.
             <br />
-            <a href="https://supabase.com/docs#client-libraries" target="_blank" rel="noreferrer">
+            <a href="https://iechor.com/docs#client-libraries" target="_blank" rel="noreferrer">
               <Button icon={<IconBookOpen />} type="default" className="mt-4">
                 Client Docs
               </Button>

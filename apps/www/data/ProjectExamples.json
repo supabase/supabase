@@ -3,7 +3,7 @@
     "imgUrl": "images/stripe.jpg",
     "title": "Stripe SaaS starter",
     "url": "https://github.com/thorwebdev/nextjs-saas-starter",
-    "description": "Build a SaaS business with Stripe subscriptions and Supabase.",
+    "description": "Build a SaaS business with Stripe subscriptions and iEchor.",
     "icons": [
       {
         "imgUrl": "https://avatars3.githubusercontent.com/u/54469796?s=480&v=4",
@@ -23,8 +23,8 @@
   {
     "imgUrl": "images/slack-clone.jpg",
     "title": "Chat app with Next.js",
-    "url": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone",
-    "description": "Build a full-stack Slack clone using Next.js and Supabase.",
+    "url": "https://github.com/openmodels-base/iechor/tree/master/examples/slack-clone/nextjs-slack-clone",
+    "description": "Build a full-stack Slack clone using Next.js and iEchor.",
     "icons": [
       {
         "imgUrl": "https://avatars3.githubusercontent.com/u/54469796?s=480&v=4",
@@ -41,7 +41,7 @@
     "imgUrl": "images/to-do-app.jpg",
     "title": "Todo list with Vue.js",
     "url": "https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/vue3-ts-todo-list",
-    "description": "Build a simple todo list with Vue and Supabase.",
+    "description": "Build a simple todo list with Vue and iEchor.",
     "icons": [
       {
         "imgUrl": "https://avatars3.githubusercontent.com/u/54469796?s=480&v=4",

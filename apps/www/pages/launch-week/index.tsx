@@ -41,8 +41,8 @@ export default function TicketHome({ users }: Props) {
   const [session, setSession] = useState<Session | null>(null)
   const { isDarkMode } = useTheme()
 
-  const TITLE = 'Supabase LaunchWeek 7'
-  const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023'
+  const TITLE = 'iEchor LaunchWeek 7'
+  const DESCRIPTION = 'iEchor Launch Week 7 | 10–14 April 2023'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/seven/launch-week-7-teaser.jpg`
   const ticketNumber = query.ticketNumber?.toString()
   const bgImageId = query.bgImageId?.toString()
@@ -88,7 +88,7 @@ export default function TicketHome({ users }: Props) {
   }, [])
 
   const Ticket = () =>
-    supabase && (
+    iechor && (
       <div className="w-full max-w-[100vw] px-4 flex justify-center py-8 md:py-20">
         <TicketContainer
           supabase={supabase}

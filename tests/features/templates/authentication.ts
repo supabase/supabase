@@ -11,7 +11,7 @@ describe('authentication', () => {
   test('New users', () => {
     reporter.description('When user sign up then he should be logged in')
 
-    reporter.step('Create Supabase anonymous client', () => {
+    reporter.step('Create iEchor anonymous client', () => {
       /* don't modify! */
     })
 

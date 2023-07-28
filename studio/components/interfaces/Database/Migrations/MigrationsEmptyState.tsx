@@ -53,7 +53,7 @@ const MigrationsEmptyState = () => {
           <p className="text-sm text-scale-1100">
             Database changes are managed through "migrations" and they are a common way of tracking
             changes to your database over time. You can run migrations against your project's
-            database via the Supabase CLI.
+            database via the iEchor CLI.
           </p>
         </div>
 

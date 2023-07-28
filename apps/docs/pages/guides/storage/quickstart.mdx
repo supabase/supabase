@@ -3,11 +3,11 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'storage-quickstart',
   title: 'Storage Quickstart',
-  description: 'Learn how to use Supabase to store and serve files.',
+  description: 'Learn how to use iEchor to store and serve files.',
   sidebar_label: 'Quickstart',
 }
 
-This guide shows the basic functionality of Supabase Storage. Find a full [example application on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-user-management).
+This guide shows the basic functionality of iEchor Storage. Find a full [example application on GitHub](https://github.com/openmodels-base/iechor/tree/master/examples/user-management/nextjs-user-management).
 
 <Admonition type="note">
 
@@ -17,7 +17,7 @@ File, Folder, and Bucket names **must follow** [AWS object key naming guidelines
 
 ## Create a bucket
 
-You can create a bucket using the Supabase Dashboard.
+You can create a bucket using the iEchor Dashboard.
 Since the storage is interoperable with your Postgres database, you can also use SQL or our
 client libraries. Here we create a bucket called "avatars":
 
@@ -29,7 +29,7 @@ client libraries. Here we create a bucket called "avatars":
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Storage](https://supabase.com/dashboard/project/_/storage/buckets) page in the Dashboard.
+1. Go to the [Storage](https://iechor.com/dashboard/project/_/storage/buckets) page in the Dashboard.
 2. Click **New Bucket** and enter a name for the bucket.
 3. Click **Create Bucket**.
 
@@ -61,7 +61,7 @@ const { data, error } = await supabase.storage.createBucket('avatars')
 
 ```dart
 void main() async {
-  final supabase = SupabaseClient('supabaseUrl', 'supabaseKey');
+  final iechor = SupabaseClient('supabaseUrl', 'supabaseKey');
 
   final storageResponse = await supabase
       .storage
@@ -86,7 +86,7 @@ You can upload a file from the Dashboard, or within a browser using our JS libra
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Storage](https://supabase.com/dashboard/project/_/storage/buckets) page in the Dashboard.
+1. Go to the [Storage](https://iechor.com/dashboard/project/_/storage/buckets) page in the Dashboard.
 2. Select the bucket you want to upload the file to.
 3. Click **Upload File**.
 4. Select the file you want to upload.
@@ -108,7 +108,7 @@ const { data, error } = await supabase.storage
 
 ```dart
 void main() async {
-  final supabase = SupabaseClient('supabaseUrl', 'supabaseKey');
+  final iechor = SupabaseClient('supabaseUrl', 'supabaseKey');
 
   // Create file `example.txt` and upload it in `public` bucket
   final file = File('example.txt');
@@ -137,7 +137,7 @@ You can download a file from the Dashboard, or within a browser using our JS lib
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Storage](https://supabase.com/dashboard/project/_/storage/buckets) page in the Dashboard.
+1. Go to the [Storage](https://iechor.com/dashboard/project/_/storage/buckets) page in the Dashboard.
 2. Select the bucket that contains the file.
 3. Select the file that you want to download.
 4. Click **Download**.
@@ -158,7 +158,7 @@ const { data, error } = await supabase.storage.from('avatars').download('public/
 
 ```dart
 void main() async {
-  final supabase = SupabaseClient('supabaseUrl', 'supabaseKey');
+  final iechor = SupabaseClient('supabaseUrl', 'supabaseKey');
 
   final storageResponse = await supabase
       .storage
@@ -184,7 +184,7 @@ To restrict access to your files you can use either the Dashboard or SQL.
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Storage](https://supabase.com/dashboard/project/_/storage/buckets) page in the Dashboard.
+1. Go to the [Storage](https://iechor.com/dashboard/project/_/storage/buckets) page in the Dashboard.
 2. Click **Policies** in the sidebar.
 3. Click **Add Policies** in the `OBJECTS` table to add policies for Files. You can also create policies for Buckets.
 4. Choose whether you want the policy to apply to downloads (SELECT), uploads (INSERT), updates (UPDATE), or deletes (DELETE).
@@ -207,7 +207,7 @@ create policy "Public Access"
 
 ## See also
 
-- [Supabase Storage on GitHub](https://github.com/supabase/storage-api)
+- [iEchor Storage on GitHub](https://github.com/supabase/storage-api)
 - [Swagger API documentation](https://supabase.github.io/storage-api)
 - Official [JavaScript](/docs/reference/javascript/storage-createbucket) and [Dart](/docs/reference/dart/storage-createbucket) documentation
 

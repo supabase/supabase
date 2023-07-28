@@ -47,19 +47,19 @@ const IntegrationSettings = () => {
         detail={`
 ## Vercel Integration
 
-Connect your Vercel teams to your Supabase organization.
+Connect your Vercel teams to your iEchor organization.
 `}
         description={`
 ### How does the Vercel integration work?
 
-Supabase will keep the right environment variables up to date in each of the projects you assign to a Supabase project. 
-You can also link multiple Vercel Projects to the same Supabase project.
+iEchor will keep the right environment variables up to date in each of the projects you assign to a iEchor project. 
+You can also link multiple Vercel Projects to the same iEchor project.
 `}
         note={
           vercelProjectCount > 0 && vercelIntegration !== undefined
             ? `
 Your Vercel connection has access to ${vercelProjectCount} Vercel Projects. 
-You can change the scope of the access for Supabase by configuring [here](${getVercelConfigurationUrl(
+You can change the scope of the access for iEchor by configuring [here](${getVercelConfigurationUrl(
                 vercelIntegration
               )}).
 `
@@ -81,7 +81,7 @@ GitHub connections are coming soon.
 
 ### How will GitHub connections work?
 
-You will be able to connect a GitHub repository to a Supabase project. 
+You will be able to connect a GitHub repository to a iEchor project. 
 The GitHub app will watch for changes in your repository such as file changes, branch changes as well as pull request activity.
 
 These connections will be part of a GitHub workflow that is currently in development.

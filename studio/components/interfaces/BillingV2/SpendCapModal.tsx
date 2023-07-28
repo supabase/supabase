@@ -164,7 +164,7 @@ const SpendCapModal: FC<Props> = ({ visible, onHide }) => {
 
             <p>
               See{' '}
-              <Link href="https://supabase.com/pricing" passHref>
+              <Link href="https://iechor.com/pricing" passHref>
                 <a className="text-brand-900" target="_blank" rel="noreferrer">
                   <span>pricing page</span>
                 </a>

@@ -4,7 +4,7 @@
     "items": [
       {
         "label": "dashboard - Database",
-        "url": "https://supabase.com/docs/guides/database",
+        "url": "https://iechor.com/docs/guides/database",
         "subItems": [
           {
             "label": "Triggers",
@@ -19,19 +19,19 @@
       },
       {
         "label": "dashboard - Auth",
-        "url": "https://supabase.com/docs/guides/auth/overview"
+        "url": "https://iechor.com/docs/guides/auth/overview"
       },
       {
         "label": "dashboard - Edge Functions",
-        "url": "https://supabase.com/docs/guides/functions"
+        "url": "https://iechor.com/docs/guides/functions"
       },
       {
         "label": "dashboard - Realtime",
-        "url": "https://supabase.com/docs/guides/realtime"
+        "url": "https://iechor.com/docs/guides/realtime"
       },
       {
         "label": "dashboard - Storage",
-        "url": "https://supabase.com/docs/guides/storage"
+        "url": "https://iechor.com/docs/guides/storage"
       }
     ]
   },
@@ -40,35 +40,35 @@
     "items": [
       {
         "label": "settings - Database general",
-        "url": "https://supabase.com/docs/guides/database"
+        "url": "https://iechor.com/docs/guides/database"
       },
       {
         "label": "settings - Database settings",
-        "url": "https://supabase.com/docs/guides/auth/overview"
+        "url": "https://iechor.com/docs/guides/auth/overview"
       },
       {
         "label": "settings - API settings",
-        "url": "https://supabase.com/docs/guides/functions"
+        "url": "https://iechor.com/docs/guides/functions"
       },
       {
         "label": "settings - Auth settings",
-        "url": "https://supabase.com/docs/guides/realtime"
+        "url": "https://iechor.com/docs/guides/realtime"
       },
       {
         "label": "settings - Storage settings",
-        "url": "https://supabase.com/docs/guides/storage"
+        "url": "https://iechor.com/docs/guides/storage"
       },
       {
         "label": "settings - subscription settings",
-        "url": "https://supabase.com/docs/guides/storage"
+        "url": "https://iechor.com/docs/guides/storage"
       },
       {
         "label": "settings - usage settings",
-        "url": "https://supabase.com/docs/guides/storage"
+        "url": "https://iechor.com/docs/guides/storage"
       },
       {
         "label": "settings - invoices settings",
-        "url": "https://supabase.com/docs/guides/storage"
+        "url": "https://iechor.com/docs/guides/storage"
       }
     ]
   }

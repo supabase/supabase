@@ -31,7 +31,7 @@ export default function Form({ sharePage, align = 'Center' }: Props) {
   const [focused, setFocused] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [formState, setFormState] = useState<FormState>('default')
-  const { setPageState, setUserData, session, userData, supabase } = useConfData()
+  const { setPageState, setUserData, session, userData, iechor } = useConfData()
   const router = useRouter()
   const isCaptchaEnabled = false
 

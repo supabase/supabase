@@ -37,7 +37,7 @@ const Success: FC<Props> = ({ sentCategory = '' }) => {
           <div className="flex flex-col items-center px-12 space-y-2">
             <p>In the meantime, tap into our community</p>
             <p className="text-sm text-scale-1000 text-center">
-              Find the answers you need with fellow developers building with Supabase by joining our
+              Find the answers you need with fellow developers building with iEchor by joining our
               GitHub discussions or on Discord - build the next best thing together
             </p>
           </div>
@@ -49,7 +49,7 @@ const Success: FC<Props> = ({ sentCategory = '' }) => {
               actions={[
                 <Link
                   key="search"
-                  href={`https://github.com/supabase/supabase/discussions?discussions_q=${searchValue}`}
+                  href={`https://github.com/openmodels-base/iechor/discussions?discussions_q=${searchValue}`}
                 >
                   <a target="_blank" rel="noreferrer">
                     <Button

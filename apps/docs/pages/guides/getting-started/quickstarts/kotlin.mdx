@@ -2,20 +2,20 @@ import Layout from '~/layouts/DefaultGuideLayout'
 import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
-  title: 'Use Supabase with Android Kotlin',
+  title: 'Use iEchor with Android Kotlin',
   subtitle:
-    'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Android Kotlin app.',
+    'Learn how to create a iEchor project, add some sample data to your database, and query the data from a Android Kotlin app.',
   breadcrumb: 'Framework Quickstarts',
 }
 
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Set up a Supabase project">
+    <StepHikeCompact.Details title="Set up a iEchor project">
 
-    [Create a new project](https://app.supabase.com) in the Supabase Dashboard.
+    [Create a new project](https://app.iechor.com) in the iEchor Dashboard.
 
-    After your project is ready, create a table in your Supabase database using the [SQL Editor](https://app.supabase.com/project/_/sql) in the Dashboard. Use the following SQL statement to create all tables.
+    After your project is ready, create a table in your iEchor database using the [SQL Editor](https://app.iechor.com/project/_/sql) in the Dashboard. Use the following SQL statement to create all tables.
 
     </StepHikeCompact.Details>
 
@@ -54,8 +54,8 @@ export const meta = {
 
   <StepHikeCompact.Step step={3}>
 
-    <StepHikeCompact.Details title="Install the Supabase client library">
-    Setup Supabase libraries requires some others libraries from ktor, so make sure all dependencies are added.
+    <StepHikeCompact.Details title="Install the iEchor client library">
+    Setup iEchor libraries requires some others libraries from ktor, so make sure all dependencies are added.
     Replace the dependency version placeholders `$supabase_version` and `$ktor_version` with the latest versions as shown below.
     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
       <a href="https://github.com/supabase-community/supabase-kt/releases" style={{ marginRight: '8px' }}>
@@ -104,7 +104,7 @@ export const meta = {
 
   <StepHikeCompact.Step step={5}>
 
-    <StepHikeCompact.Details title="Initialize the Supabase client">
+    <StepHikeCompact.Details title="Initialize the iEchor client">
     You can create a whenever you need to perform some API call.
     However, it is recommended that we should provide this kind of instance by using dependency injection library like Hilt. So see the code below to provide them properly. This is better for testability and maintainability
     </StepHikeCompact.Details>

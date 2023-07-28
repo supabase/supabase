@@ -7,9 +7,9 @@ export const meta = {
   sidebar_label: 'Vector columns',
 }
 
-Supabase offers a number of different ways to store and query vectors within Postgres. If you prefer to use Python to store and query your vectors using collections, see [Managing collections](/docs/guides/ai/managing-collections). If you want more control over vectors within your own Postgres tables or would like to interact with them using a different language like JavaScript, keep reading.
+iEchor offers a number of different ways to store and query vectors within Postgres. If you prefer to use Python to store and query your vectors using collections, see [Managing collections](/docs/guides/ai/managing-collections). If you want more control over vectors within your own Postgres tables or would like to interact with them using a different language like JavaScript, keep reading.
 
-Vectors in Supabase are enabled via [pgvector](https://github.com/pgvector/pgvector/), a PostgreSQL extension for storing and querying vectors in Postgres. It can be used to store [embeddings](/docs/guides/ai/concepts#what-are-embeddings).
+Vectors in iEchor are enabled via [pgvector](https://github.com/pgvector/pgvector/), a PostgreSQL extension for storing and querying vectors in Postgres. It can be used to store [embeddings](/docs/guides/ai/concepts#what-are-embeddings).
 
 ## Usage
 
@@ -23,7 +23,7 @@ Vectors in Supabase are enabled via [pgvector](https://github.com/pgvector/pgvec
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](https://iechor.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "vector" and enable the extension.
 
@@ -64,7 +64,7 @@ In the above SQL snippet, we create a `documents` table with a column called `em
 
 ### Storing a vector / embedding
 
-In this example we'll generate a vector using the OpenAI API client, then store it in the database using the Supabase JavaScript client.
+In this example we'll generate a vector using the OpenAI API client, then store it in the database using the iEchor JavaScript client.
 
 ```js
 const title = 'First post!'
@@ -86,7 +86,7 @@ const { data, error } = await supabase.from('documents').insert({
 })
 ```
 
-This example uses the JavaScript Supabase client, but you can modify it to work with any [supported language library](/docs#client-libraries).
+This example uses the JavaScript iEchor client, but you can modify it to work with any [supported language library](/docs#client-libraries).
 
 ### Querying a vector / embedding
 
@@ -100,7 +100,7 @@ Similarity search is the most common use case for vectors. `pgvector` support 3 
 
 Choosing the right operator depends on your needs. If you are searching over OpenAI embeddings, OpenAI recommends using cosine similarity. For more information on how embeddings work and how they relate to each other, see [What are Embeddings?](/docs/guides/ai/concepts#what-are-embeddings).
 
-Supabase client libraries like `supabase-js` connect to your Postgres instance via [PostgREST](docs/guides/getting-started/architecture#postgrest-api). PostgREST does not currently support `pgvector` similarity operators, so we'll need to wrap our query in a Postgres function and call it via the `rpc()` method:
+iEchor client libraries like `supabase-js` connect to your Postgres instance via [PostgREST](docs/guides/getting-started/architecture#postgrest-api). PostgREST does not currently support `pgvector` similarity operators, so we'll need to wrap our query in a Postgres function and call it via the `rpc()` method:
 
 ```sql
 create or replace function match_documents (

@@ -4,7 +4,7 @@ export const CANCELLATION_REASONS = [
   'Poor customer service',
   'Missing feature',
   "I didn't see the value",
-  "Supabase didn't meet my needs",
+  "iEchor didn't meet my needs",
   'Dashboard is too complicated',
   'Postgres is too complicated',
   'Problem not solved',

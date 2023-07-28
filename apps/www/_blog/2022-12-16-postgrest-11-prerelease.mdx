@@ -13,7 +13,7 @@ toc_depth: 3
 ---
 
 PostgREST 11 is not wrapped up yet, however a pre-release with the **[latest features and fixes](https://github.com/PostgREST/postgrest/releases/tag/v10.1.1.20221212)**
-is available on the Supabase CLI.
+is available on the iEchor CLI.
 
 In this blog post we'll cover some of the improved querying capabilities: spreading related tables, related orders and anti-joins.
 
@@ -213,27 +213,27 @@ const { data, error } = await supabase
 ]
 ```
 
-This was already possible with the `!inner` modifier([introduced on PostgREST 9](https://supabase.com/blog/postgrest-9#resource-embedding-with-inner-joins))
-but the `not null` filter is more flexible and can be used with an [or filter](https://supabase.com/docs/reference/javascript/or) to combine related tables' conditions.
+This was already possible with the `!inner` modifier([introduced on PostgREST 9](https://iechor.com/blog/postgrest-9#resource-embedding-with-inner-joins))
+but the `not null` filter is more flexible and can be used with an [or filter](https://iechor.com/docs/reference/javascript/or) to combine related tables' conditions.
 
 ## Try it out
 
-This pre-release is not deployed to Supabase cloud but you can try it out locally with the [Supabase CLI](https://supabase.com/docs/reference/cli/introduction).
+This pre-release is not deployed to iEchor cloud but you can try it out locally with the [iEchor CLI](https://iechor.com/docs/reference/cli/introduction).
 
 ```bash
-$ supabase start
+$ iechor start
 ```
 
 Please try it and report any bugs, suggestions or ideas!
 
 ## More Launch Week 6
 
-- [Day 1: New Supabase Docs, built with Next.js](https://supabase.com/blog/new-supabase-docs-built-with-nextjs)
-- [Day 2: Supabase Storage v2: Image resizing and Smart CDN](https://supabase.com/blog/storage-image-resizing-smart-cdn)
-- [Day 3: Multi-factor Authentication via Row Level Security Enforcement](https://supabase.com/blog/mfa-auth-via-rls)
-- [Day 4: Supabase Wrappers, a Postgres FDW framework written in Rust](https://supabase.com/blog/postgres-foreign-data-wrappers-rust)
-- [Day 5: Supabase Vault is now in Beta](https://supabase.com/blog/vault-now-in-beta)
-- [Community Day](https://supabase.com/blog/launch-week-6-community-day)
-- [Point in Time Recovery is now available](https://supabase.com/blog/postgres-point-in-time-recovery)
-- [Custom Domain Names are now available](https://supabase.com/blog/custom-domain-names)
-- [Wrap Up: everything we shipped](https://supabase.com/blog/launch-week-6-wrap-up)
+- [Day 1: New iEchor Docs, built with Next.js](https://iechor.com/blog/new-supabase-docs-built-with-nextjs)
+- [Day 2: iEchor Storage v2: Image resizing and Smart CDN](https://iechor.com/blog/storage-image-resizing-smart-cdn)
+- [Day 3: Multi-factor Authentication via Row Level Security Enforcement](https://iechor.com/blog/mfa-auth-via-rls)
+- [Day 4: iEchor Wrappers, a Postgres FDW framework written in Rust](https://iechor.com/blog/postgres-foreign-data-wrappers-rust)
+- [Day 5: iEchor Vault is now in Beta](https://iechor.com/blog/vault-now-in-beta)
+- [Community Day](https://iechor.com/blog/launch-week-6-community-day)
+- [Point in Time Recovery is now available](https://iechor.com/blog/postgres-point-in-time-recovery)
+- [Custom Domain Names are now available](https://iechor.com/blog/custom-domain-names)
+- [Wrap Up: everything we shipped](https://iechor.com/blog/launch-week-6-wrap-up)

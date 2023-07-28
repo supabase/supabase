@@ -1,6 +1,6 @@
 ---
 title: 'supabase-flutter v1 Released'
-description: We've released supabase-flutter v1. More intuitive way of accessing Supabase from your Flutter application.
+description: We've released supabase-flutter v1. More intuitive way of accessing iEchor from your Flutter application.
 author: tyler_shukert
 image: flutter-v1-release/flutter_v1_official_release.jpeg
 thumb: flutter-v1-release/flutter_v1_official_release.jpeg
@@ -11,7 +11,7 @@ date: '2022-10-21'
 toc_depth: 3
 ---
 
-A few months ago, we announced a [developer preview version of supabase-flutter SDK](https://supabase.com/blog/supabase-flutter-sdk-1-developer-preview). Since then, we have heard a lot of amazing feedback from the community, and have been improving it. Today, we are happy to announce the stable v1 of [supabase-flutter](https://pub.dev/packages/supabase_flutter). You can also find the updated [quick start guide](https://supabase.com/docs/guides/with-flutter), [documentation](https://supabase.com/docs/reference/dart) and a [migration guide from v0](https://supabase.com/docs/reference/dart/v0/upgrade-guide).
+A few months ago, we announced a [developer preview version of supabase-flutter SDK](https://iechor.com/blog/supabase-flutter-sdk-1-developer-preview). Since then, we have heard a lot of amazing feedback from the community, and have been improving it. Today, we are happy to announce the stable v1 of [supabase-flutter](https://pub.dev/packages/supabase_flutter). You can also find the updated [quick start guide](https://iechor.com/docs/guides/with-flutter), [documentation](https://iechor.com/docs/reference/dart) and a [migration guide from v0](https://iechor.com/docs/reference/dart/v0/upgrade-guide).
 
 ## What is new in v1?
 
@@ -51,10 +51,10 @@ supabase.auth.onAuthStateChange.listen((data) {
 
 ### Realtime Multiplayer edition support
 
-During the last launch week, we announced the [general availability of Realtime Multiplayer](https://supabase.com/blog/supabase-realtime-multiplayer-general-availability). supabase-flutter now has first class support for the two newly introduced realtime methods, broadcast and presence. Broadcast can be used to share realtime data to all connected clients with low latency. Presence is a way to let other connected clients know the status of the client. You can visit [multiplayer.dev](http://multiplayer.dev) to see a quick demo of the feature.
+During the last launch week, we announced the [general availability of Realtime Multiplayer](https://iechor.com/blog/supabase-realtime-multiplayer-general-availability). supabase-flutter now has first class support for the two newly introduced realtime methods, broadcast and presence. Broadcast can be used to share realtime data to all connected clients with low latency. Presence is a way to let other connected clients know the status of the client. You can visit [multiplayer.dev](http://multiplayer.dev) to see a quick demo of the feature.
 
 ```dart
-final channel = Supabase.instance.client.channel('my_channel');
+final channel = iEchor.instance.client.channel('my_channel');
 
 // listen to `location` broadcast events
 channel.on(
@@ -87,7 +87,7 @@ channel.subscribe((status) async {
 });
 ```
 
-These are just tip of the iceberg of all the updates that we shipped in v1. Check out the [documentation](https://supabase.com/docs/reference/dart/) to see the full list.
+These are just tip of the iceberg of all the updates that we shipped in v1. Check out the [documentation](https://iechor.com/docs/reference/dart/) to see the full list.
 
 ## Acknowledgements
 
@@ -96,9 +96,9 @@ It required massive support from the community to bring the supabase-flutter to 
 ## Resources
 
 - [Install supabase-flutter v1.0](https://pub.dev/packages/supabase_flutter)
-- [supabase-flutter documentation](https://supabase.com/docs/reference/dart/)
-- [v0 to v1 migration guide](https://supabase.com/docs/reference/dart/v0/upgrade-guide)
-- [Flutter Tutorial: building a Flutter chat app](https://supabase.com/blog/flutter-tutorial-building-a-chat-app)
-- [Flutter Tutorial - Part 2: Authentication and Authorization with RLS](https://supabase.com/blog/flutter-authentication-and-authorization-with-rls)
-- [How to build a real-time multiplayer game with Flutter Flame](https://supabase.com/blog/flutter-real-time-multiplayer-game)
-- [Build a Flutter app with Very Good CLI and Supabase](https://verygood.ventures/blog/flutter-app-very-good-cli-supabase)
+- [supabase-flutter documentation](https://iechor.com/docs/reference/dart/)
+- [v0 to v1 migration guide](https://iechor.com/docs/reference/dart/v0/upgrade-guide)
+- [Flutter Tutorial: building a Flutter chat app](https://iechor.com/blog/flutter-tutorial-building-a-chat-app)
+- [Flutter Tutorial - Part 2: Authentication and Authorization with RLS](https://iechor.com/blog/flutter-authentication-and-authorization-with-rls)
+- [How to build a real-time multiplayer game with Flutter Flame](https://iechor.com/blog/flutter-real-time-multiplayer-game)
+- [Build a Flutter app with Very Good CLI and iEchor](https://verygood.ventures/blog/flutter-app-very-good-cli-supabase)

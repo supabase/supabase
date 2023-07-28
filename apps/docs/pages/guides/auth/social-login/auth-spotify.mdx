@@ -3,18 +3,18 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'auth-spotify',
   title: 'Login with Spotify',
-  description: 'Add Spotify OAuth to your Supabase project',
+  description: 'Add Spotify OAuth to your iEchor project',
 }
 
-To enable Spotify Auth for your project, you need to set up a Spotify OAuth application and add the application credentials to your Supabase Dashboard.
+To enable Spotify Auth for your project, you need to set up a Spotify OAuth application and add the application credentials to your iEchor Dashboard.
 
 ## Overview
 
 Setting up Spotify logins for your application consists of 3 parts:
 
 - Create and configure a Spotify Project and App on the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/).
-- Add your Spotify `API Key` and `API Secret Key` to your [Supabase Project](https://supabase.com/dashboard).
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
+- Add your Spotify `API Key` and `API Secret Key` to your [iEchor Project](https://iechor.com/dashboard).
+- Add the login code to your [iEchor JS Client App](https://github.com/openmodels-base/iechor-js).
 
 ## Access your Spotify Developer account
 
@@ -42,11 +42,11 @@ Setting up Spotify logins for your application consists of 3 parts:
 
 Under `Redirect URIs`:
 
-- Paste your Supabase Callback URL in the box
+- Paste your iEchor Callback URL in the box
 - Click `Add`
 - Click `Save` at the bottom
 
-## Enter your Spotify credentials into your Supabase Project
+## Enter your Spotify credentials into your iEchor Project
 
 <SocialProviderSettingsSupabase provider="Spotify" />
 
@@ -72,8 +72,8 @@ async function signout() {
 
 ## Resources
 
-- [Supabase Account - Free Plan OK](https://supabase.com)
-- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [iEchor Account - Free Plan OK](https://iechor.com)
+- [iEchor JS Client](https://github.com/openmodels-base/iechor-js)
 - [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

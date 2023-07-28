@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
         ui.setNotification({
           category: 'error',
           message:
-            'Please verify your email on GitHub first, then reach out to us at support@supabase.io to log into the dashboard',
+            'Please verify your email on GitHub first, then reach out to us at support@iechor.com to log into the dashboard',
         })
       }
     }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { supabase } from "./db";
+  import { iechor } from "./db";
 
   export let todo;
   export let onDelete = () => {};

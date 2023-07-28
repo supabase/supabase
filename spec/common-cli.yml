@@ -1,213 +1,213 @@
 clisCommon: '001'
 commands:
   - id: supabase-test
-    title: supabase test
+    title: iechor test
     product: 'general'
 
   - id: supabase-login
-    title: supabase login
+    title: iechor login
     product: 'general'
 
   - id: supabase-link
-    title: supabase link
+    title: iechor link
     product: 'general'
 
   - id: supabase-init
-    title: supabase init
+    title: iechor init
     product: 'general'
 
   - id: supabase-test-db
-    title: supabase test db
+    title: iechor test db
     product: 'general'
 
   - id: supabase-stop
-    title: supabase stop
+    title: iechor stop
     product: 'general'
 
   - id: supabase-status
-    title: supabase status
+    title: iechor status
     product: 'general'
 
   - id: supabase-start
-    title: supabase start
+    title: iechor start
     product: 'general'
 
   - id: supabase-gen
-    title: supabase gen
+    title: iechor gen
     product: 'general'
 
   - id: supabase-gen-types
-    title: supabase gen types
+    title: iechor gen types
     product: 'general'
 
   - id: supabase-gen-types-typescript
-    title: supabase gen types typescript
+    title: iechor gen types typescript
     product: 'general'
 
   - id: supabase-secrets
-    title: supabase secrets
+    title: iechor secrets
     product: 'secrets'
 
   - id: supabase-secrets-unset
-    title: supabase secrets unset
+    title: iechor secrets unset
     product: 'secrets'
 
   - id: supabase-secrets-set
-    title: supabase secrets set
+    title: iechor secrets set
     product: 'secrets'
 
   - id: supabase-secrets-list
-    title: supabase secrets list
+    title: iechor secrets list
     product: 'secrets'
 
   - id: supabase-projects
-    title: supabase projects
+    title: iechor projects
     product: 'projects'
 
   - id: supabase-projects-list
-    title: supabase projects list
+    title: iechor projects list
     product: 'projects'
 
   - id: supabase-projects-create
-    title: supabase projects create
+    title: iechor projects create
     product: 'projects'
 
   - id: supabase-orgs
-    title: supabase orgs
+    title: iechor orgs
     product: 'organizations'
 
   - id: supabase-orgs-list
-    title: supabase orgs list
+    title: iechor orgs list
     product: 'organizations'
 
   - id: supabase-migration
-    title: supabase migration
+    title: iechor migration
     product: 'migration'
 
   - id: supabase-migration-new
-    title: supabase migration new
+    title: iechor migration new
     product: 'migration'
 
   - id: supabase-migration-list
-    title: supabase migration list
+    title: iechor migration list
     product: 'migration'
 
   - id: supabase-functions
-    title: supabase functions
+    title: iechor functions
     product: 'functions'
 
   - id: supabase-functions-serve
-    title: supabase functions serve
+    title: iechor functions serve
     product: 'functions'
 
   - id: supabase-functions-new
-    title: supabase functions new
+    title: iechor functions new
     product: 'functions'
 
   - id: supabase-functions-deploy
-    title: supabase functions deploy
+    title: iechor functions deploy
     product: 'functions'
 
   - id: supabase-functions-delete
-    title: supabase functions delete
+    title: iechor functions delete
     product: 'functions'
 
   - id: supabase-domains
-    title: supabase domains
+    title: iechor domains
     product: 'domains'
 
   - id: supabase-domains-reverify
-    title: supabase domains reverify
+    title: iechor domains reverify
     product: 'domains'
 
   - id: supabase-domains-get
-    title: supabase domains get
+    title: iechor domains get
     product: 'domains'
 
   - id: supabase-domains-delete
-    title: supabase domains delete
+    title: iechor domains delete
     product: 'domains'
 
   - id: supabase-domains-create
-    title: supabase domains create
+    title: iechor domains create
     product: 'domains'
 
   - id: supabase-domains-activate
-    title: supabase domains activate
+    title: iechor domains activate
     product: 'domains'
 
   - id: supabase-db
-    title: supabase db
+    title: iechor db
     product: 'database'
 
   - id: supabase-db-reset
-    title: supabase db reset
+    title: iechor db reset
     product: 'database'
 
   - id: supabase-db-remote
-    title: supabase db remote
+    title: iechor db remote
     product: 'database'
 
   - id: supabase-db-remote-commit
-    title: supabase db remote commit
+    title: iechor db remote commit
     product: 'database'
 
   - id: supabase-db-remote-changes
-    title: supabase db remote changes
+    title: iechor db remote changes
     product: 'database'
 
   - id: supabase-db-push
-    title: supabase db push
+    title: iechor db push
     product: 'database'
 
   - id: supabase-db-lint
-    title: supabase db lint
+    title: iechor db lint
     product: 'database'
 
   - id: supabase-db-diff
-    title: supabase db diff
+    title: iechor db diff
     product: 'database'
 
   - id: supabase-completion
-    title: supabase completion
+    title: iechor completion
     product: 'completion'
 
   - id: supabase-completion-zsh
-    title: supabase completion zsh
+    title: iechor completion zsh
     product: 'completion'
 
   - id: supabase-completion-powershell
-    title: supabase completion powershell
+    title: iechor completion powershell
     product: 'completion'
 
   - id: supabase-completion-fish
-    title: supabase completion fish
+    title: iechor completion fish
     product: 'completion'
 
   - id: supabase-completion-bash
-    title: supabase completion bash
+    title: iechor completion bash
     product: 'completion'
 
   - id: supabase-sso
-    title: supabase sso
+    title: iechor sso
     product: 'auth'
 
   - id: supabase-sso-add
-    title: supabase sso add
+    title: iechor sso add
     product: 'auth'
 
   - id: supabase-sso-remove
-    title: supabase sso remove
+    title: iechor sso remove
     product: 'auth'
 
   - id: supabase-sso-update
-    title: supabase sso update
+    title: iechor sso update
     product: 'auth'
 
   - id: supabase-sso-list
-    title: supabase sso list
+    title: iechor sso list
     product: 'auth'
 
   - id: supabase-sso-show
-    title: supabase sso show
+    title: iechor sso show
     product: 'auth'

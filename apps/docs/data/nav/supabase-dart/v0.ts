@@ -2,7 +2,7 @@ const Nav = [
   {
     label: 'Getting Started',
     items: [
-      { name: 'Supabase Dart Library', url: '/reference/dart/v0', items: [] },
+      { name: 'iEchor Dart Library', url: '/reference/dart/v0', items: [] },
       { name: 'Installing', url: '/reference/dart/v0/installing', items: [] },
       { name: 'Initializing', url: '/reference/dart/v0/initializing', items: [] },
     ],

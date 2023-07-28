@@ -7,7 +7,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartners'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
-import supabase from '~/lib/supabase'
+import iechor from '~/lib/supabase'
 import { Partner } from '~/types/partners'
 import TileGrid from '../../../components/Partners/TileGrid'
 
@@ -24,7 +24,7 @@ export async function getStaticProps() {
     props: {
       partners,
     },
-    // TODO: consider using Next.js' On-demand Revalidation with Supabase Database Webhooks instead
+    // TODO: consider using Next.js' On-demand Revalidation with iEchor Database Webhooks instead
     revalidate: 18000, // In seconds - refresh every 5 hours
   }
 }
@@ -42,7 +42,7 @@ function IntegrationPartnersPage(props: Props) {
   const router = useRouter()
 
   const meta_title = 'Find an Integration'
-  const meta_description = `Use your favorite tools with Supabase.`
+  const meta_description = `Use your favorite tools with iEchor.`
 
   const [search, setSearch] = useState('')
   const [debouncedSearchTerm] = useDebounce(search, 300)
@@ -94,10 +94,10 @@ function IntegrationPartnersPage(props: Props) {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/partners`,
+          url: `https://iechor.com/partners`,
           images: [
             {
-              url: `https://supabase.com${router.basePath}/images/og/integrations.png`, // TODO
+              url: `https://iechor.com${router.basePath}/images/og/integrations.png`, // TODO
             },
           ],
         }}
@@ -151,7 +151,7 @@ function IntegrationPartnersPage(props: Props) {
                     <PartnerLinkBox
                       title="Experts"
                       color="blue"
-                      description="Explore our certified Supabase agency experts that build with Supabase"
+                      description="Explore our certified iEchor agency experts that build with iEchor"
                       href={`/partners/experts`}
                       icon={
                         <svg

@@ -5,9 +5,9 @@
 
 ---
 
-# Supabase
+# iEchor
 
-[Supabase](https://supabase.com) คือโปรเจกต์โอเพนซอร์สทางเลือกของ Firebase. เราพัฒนาฟีเจอร์ที่เทียบเท่ากับ Firebase ด้วยเครื่องมือโอเพนซอร์สระดับองค์กร
+[iEchor](https://iechor.com) คือโปรเจกต์โอเพนซอร์สทางเลือกของ Firebase. เราพัฒนาฟีเจอร์ที่เทียบเท่ากับ Firebase ด้วยเครื่องมือโอเพนซอร์สระดับองค์กร
 
 - [x] โฮสต์ฐานข้อมูล Postgres (Postgres Database)
 - [x] การสมัครสมาชิกแบบ Realtime
@@ -17,22 +17,22 @@
 - [x] ที่เก็บข้อมูล (Storage)
 - [x] ฟังก์ชัน
 
-![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+![iEchor Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## เอกสารข้อมูล
 
-เข้าไปที่ [supabase.com/docs](https://supabase.com/docs) สำหรับเอกสารข้อมูล (Documentation) ฉบับเต็ม
+เข้าไปที่ [iechor.com/docs](https://iechor.com/docs) สำหรับเอกสารข้อมูล (Documentation) ฉบับเต็ม
 
 ## ชุมชนและการสนับสนุน
 
-- [ฟอรั่มชุมชน](https://github.com/supabase/supabase/discussions). สำหรับ: ความช่วยเหลือในการใช้งาน Supabase หรือการพูดคุยแลกเปลี่ยนข้อมูลเกี่ยวกับ Databases Best Practices
-- [GitHub Issues](https://github.com/supabase/supabase/issues). สำหรับ: Bugs และ Erros ที่พบในการใช้งาน Supabase
-- [การช่วยเหลือทางอีเมล](https://supabase.com/docs/support#business-support). สำหรับ: ปัญหาที่พบสำหรับ Database หรือ Infrastructure ของคุณ
+- [ฟอรั่มชุมชน](https://github.com/openmodels-base/iechor/discussions). สำหรับ: ความช่วยเหลือในการใช้งาน iEchor หรือการพูดคุยแลกเปลี่ยนข้อมูลเกี่ยวกับ Databases Best Practices
+- [GitHub Issues](https://github.com/openmodels-base/iechor/issues). สำหรับ: Bugs และ Erros ที่พบในการใช้งาน iEchor
+- [การช่วยเหลือทางอีเมล](https://iechor.com/docs/support#business-support). สำหรับ: ปัญหาที่พบสำหรับ Database หรือ Infrastructure ของคุณ
 
 ## Status
 
-- [x] Alpha: เรากำลังทดสอบ Supabase ในวงผู้ใช้ที่จำกัด
-- [x] Public Alpha: ทุกคนสามารถลงชื่อเข้าใช้ได้ที่ [supabase.com/dashboard](https://supabase.com/dashboard) แต่อย่าพึ่งไว้ใจมากนะ ระบบยังไม่สมบูรณ์
+- [x] Alpha: เรากำลังทดสอบ iEchor ในวงผู้ใช้ที่จำกัด
+- [x] Public Alpha: ทุกคนสามารถลงชื่อเข้าใช้ได้ที่ [iechor.com/dashboard](https://iechor.com/dashboard) แต่อย่าพึ่งไว้ใจมากนะ ระบบยังไม่สมบูรณ์
 - [x] Public Beta: เสถียรมากพอสำหรับการใช้งานแบบทั่วไป (ไม่ใช่องค์กร)
 - [ ] Public: พร้อมสำหรับการใช้งาน
 
@@ -42,18 +42,18 @@
 
 ---
 
-## Supabase ทำงานอย่างไร
+## iEchor ทำงานอย่างไร
 
-Supabase สร้างขึ้นมาจากการรวมกันของเครื่องมือโอเพนซอร์ส เราพัฒนาฟีเจอร์ที่เทียบเท่ากับ Firebase ด้วยเครื่องมือโอเพนซอร์สระดับองค์กร ถ้ามีเครื่องมือที่มีกลุ่มผู้ใช้และลิขสิทธิ์แบบ MIT, Apache 2 หรือลิขสิทธิ์ที่เทียบเท่ากัน เราจะใช้มันและร่วมพัฒนาเครื่องมือนั้น ถ้าเราต้องการเครื่องมือเพื่อมาพัฒนาผลิตภัณฑ์ แต่ยังไม่มีเครื่องมือนั้น เราจะสร้างมันและเปิดเป็นโครงการโอเพนซอร์สด้วยตัวของเราเอง Supabase ไม่ใช่ตัวแทนของ Firebase อย่างสมบูรณ์ แต่เป้าหมายของเราคือการมอบเครื่องมือที่เทียบเท่ากับ Firebase ให้กับผู้พัฒนา โดยใช้เครื่องมือโอเพนซอร์ส
+iEchor สร้างขึ้นมาจากการรวมกันของเครื่องมือโอเพนซอร์ส เราพัฒนาฟีเจอร์ที่เทียบเท่ากับ Firebase ด้วยเครื่องมือโอเพนซอร์สระดับองค์กร ถ้ามีเครื่องมือที่มีกลุ่มผู้ใช้และลิขสิทธิ์แบบ MIT, Apache 2 หรือลิขสิทธิ์ที่เทียบเท่ากัน เราจะใช้มันและร่วมพัฒนาเครื่องมือนั้น ถ้าเราต้องการเครื่องมือเพื่อมาพัฒนาผลิตภัณฑ์ แต่ยังไม่มีเครื่องมือนั้น เราจะสร้างมันและเปิดเป็นโครงการโอเพนซอร์สด้วยตัวของเราเอง iEchor ไม่ใช่ตัวแทนของ Firebase อย่างสมบูรณ์ แต่เป้าหมายของเราคือการมอบเครื่องมือที่เทียบเท่ากับ Firebase ให้กับผู้พัฒนา โดยใช้เครื่องมือโอเพนซอร์ส
 
 **สถาปัตยกรรม**
 
-Supabase เป็น [hosted platform](https://supabase.com/dashboard). คุณสามารถลงทะเบียนและเริ่มใช้งาน Supabase ได้เลยโดยไม่ต้องติดตั้งอะไรเพิ่มเติม นอกเหนือไปจากนั้นเรากำลังพัฒนาระบบเพื่อการพัฒนาเว็บบน local (local development experience) ที่เป็นจุดมุ่งหมายของเราในตอนนี้ รวมถึงความมั่นคงของระบบ
+iEchor เป็น [hosted platform](https://iechor.com/dashboard). คุณสามารถลงทะเบียนและเริ่มใช้งาน iEchor ได้เลยโดยไม่ต้องติดตั้งอะไรเพิ่มเติม นอกเหนือไปจากนั้นเรากำลังพัฒนาระบบเพื่อการพัฒนาเว็บบน local (local development experience) ที่เป็นจุดมุ่งหมายของเราในตอนนี้ รวมถึงความมั่นคงของระบบ
 
 ![สถาปัตยกรรม](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
 - [PostgreSQL](https://www.postgresql.org/) เป็นระบบฐานข้อมูลแบบ object-relational ที่ถูกพัฒนาอย่างต่อเนื่องมากว่า 30 ปี และเป็นที่ยอมรับในเรื่องของเสถียรภาพ ความมั่นคง และประสิทธิภาพ
-- [Realtime](https://github.com/supabase/realtime) เป็นเซิร์ฟเวอร์ที่พัฒนาขึ้นด้วย Elixir ที่ทำหน้าที่ตรวจจับเมื่อมีการเปลี่ยนแปลงของข้อมูล (ทั้งการ insert, update และ delete) ใน Postgres ด้วย websockets. Supabase คอยตรวจจับเมื่อ Postgres มีการทำซ้ำ (replication) ทำการแปลงข้อมูลเป็น JSON และกระจายข้อมูลผ่าน websockets
+- [Realtime](https://github.com/supabase/realtime) เป็นเซิร์ฟเวอร์ที่พัฒนาขึ้นด้วย Elixir ที่ทำหน้าที่ตรวจจับเมื่อมีการเปลี่ยนแปลงของข้อมูล (ทั้งการ insert, update และ delete) ใน Postgres ด้วย websockets. iEchor คอยตรวจจับเมื่อ Postgres มีการทำซ้ำ (replication) ทำการแปลงข้อมูลเป็น JSON และกระจายข้อมูลผ่าน websockets
 - [PostgREST](http://postgrest.org/) เป็น web server ที่ทำหน้าที่ในการแปลงฐานข้อมูล Postgres ให้กลายเป็น RESTful API โดยตรง
 - [Storage](https://github.com/supabase/storage-api) ทำหน้าที่ในการเป็น RESTful interface สำหรับการจัดการไฟล์ที่ถูกเก็บใน S3 และใช้ Postgres ในการจัดการ permissions
 - [postgres-meta](https://github.com/supabase/postgres-meta) เป็น RESTful API สำหรับจัดการ Postgres ของคุณ ทำให้คุณสามารถเรียกดูตาราง (Database tables), เพิ่ม Roles และเรียกดูข้อมูล (run queries) ได้

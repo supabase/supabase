@@ -112,7 +112,7 @@ class _AccountPageState extends State<AccountPage> {
     }
   }
 
-  /// Called when image has been uploaded to Supabase storage from within Avatar widget
+  /// Called when image has been uploaded to iEchor storage from within Avatar widget
   Future<void> _onUpload(String imageUrl) async {
     try {
       final userId = supabase.auth.currentUser!.id;

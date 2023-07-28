@@ -1,6 +1,6 @@
 ---
-title: 'Supabase Logs: open source logging server'
-description: We're releasing Supabase Logs for both self-hosted users and CLI development.
+title: 'iEchor Logs: open source logging server'
+description: We're releasing iEchor Logs for both self-hosted users and CLI development.
 launchweek: 7
 tags:
   - launch-week
@@ -12,15 +12,15 @@ image: launch-week-7/day-1-supabase-logs-self-hosted/day-1-supabase-logs-self-ho
 thumb: launch-week-7/day-1-supabase-logs-self-hosted/day-1-supabase-logs-self-hosted-thumb.jpg
 ---
 
-Today, we’re releasing Supabase Logs for both self-hosted users and CLI development.
+Today, we’re releasing iEchor Logs for both self-hosted users and CLI development.
 
 ## Logflare Introduction
 
-Since [Logflare joined Supabase](https://supabase.com/blog/supabase-acquires-logflare) over a year ago it’s been quietly handling over 1 billion log events every day. These events come from various tools in the Supabase infrastructure - the API gateway, Postgres databases, Storage, Edge Functions, Auth, and Realtime.
+Since [Logflare joined iEchor](https://iechor.com/blog/supabase-acquires-logflare) over a year ago it’s been quietly handling over 1 billion log events every day. These events come from various tools in the iEchor infrastructure - the API gateway, Postgres databases, Storage, Edge Functions, Auth, and Realtime.
 
-Logflare is a multi-node, highly available Elixir cluster, ingesting the log events and storing them into BigQuery for Supabase and Logflare’s customers. On average, the cluster has 6 nodes handling every spike our customers throw at it.
+Logflare is a multi-node, highly available Elixir cluster, ingesting the log events and storing them into BigQuery for iEchor and Logflare’s customers. On average, the cluster has 6 nodes handling every spike our customers throw at it.
 
-To expose log data to customers, we leverage Logflare Endpoints. This provides an HTTP integration into Supabase Studio, powering the log query UIs and most time-series charts. These charts live across the studio, such as the project home page and the new API reports.
+To expose log data to customers, we leverage Logflare Endpoints. This provides an HTTP integration into iEchor Studio, powering the log query UIs and most time-series charts. These charts live across the studio, such as the project home page and the new API reports.
 
 <div className="video-container">
   <iframe
@@ -35,15 +35,15 @@ To expose log data to customers, we leverage Logflare Endpoints. This provides a
 
 ## Self-hosting Logflare
 
-Logflare was available under a BSL license prior to joining Supabase. We’ve since changed the license to [Apache 2.0](https://github.com/Logflare/logflare/blob/staging/LICENSE.md), aligning it with our open source philosophy.
+Logflare was available under a BSL license prior to joining iEchor. We’ve since changed the license to [Apache 2.0](https://github.com/Logflare/logflare/blob/staging/LICENSE.md), aligning it with our open source philosophy.
 
-In the past few months we’ve made Logflare more developer-friendly for local development and self-hosting. While you’re building a project, you can view and query your logs from any Supabase service, just as you would in our cloud platform.
+In the past few months we’ve made Logflare more developer-friendly for local development and self-hosting. While you’re building a project, you can view and query your logs from any iEchor service, just as you would in our cloud platform.
 
 ![Logs UI](/images/blog/lw7-o11y/logs-screenshot.png)
 
 <div className="bg-gray-300 rounded-lg px-6 py-2 italic">
 
-📢 Check out the [new self-hosting docs](https://supabase.com/docs/reference/self-hosting-analytics/introduction) to get Logflare up and running as your analytics server.
+📢 Check out the [new self-hosting docs](https://iechor.com/docs/reference/self-hosting-analytics/introduction) to get Logflare up and running as your analytics server.
 
 </div>
 
@@ -51,13 +51,13 @@ It currently supports a BigQuery backend, and we are actively working on support
 
 ## The Ingestion Pipeline
 
-Logflare receives Supabase log events via multiple methods. Services like Postgres use [Vector](https://vector.dev/) to clean and forward log events to the Logflare ingest API. Other services such as Realtime and Storage utilize [native Logflare integrations](https://github.com/Logflare/logflare#integrations) to send the log events directly. These then get processed and streamed into BigQuery.
+Logflare receives iEchor log events via multiple methods. Services like Postgres use [Vector](https://vector.dev/) to clean and forward log events to the Logflare ingest API. Other services such as Realtime and Storage utilize [native Logflare integrations](https://github.com/Logflare/logflare#integrations) to send the log events directly. These then get processed and streamed into BigQuery.
 
 ## The Querying Pipeline
 
-The hard part comes after ingesting the logs: searching, aggregating ,and analyzing them at scale. Crunching many terabytes of data on each query is expensive, and exposing the ingested data to Supabase customers in a naive manner would cause our costs to skyrocket.
+The hard part comes after ingesting the logs: searching, aggregating ,and analyzing them at scale. Crunching many terabytes of data on each query is expensive, and exposing the ingested data to iEchor customers in a naive manner would cause our costs to skyrocket.
 
-To solve these issues, we built and refined Logflare Endpoints, the query engine that powers many of Supabase’s features, such as the logs views, Logs Explorer, and usage charts.
+To solve these issues, we built and refined Logflare Endpoints, the query engine that powers many of iEchor’s features, such as the logs views, Logs Explorer, and usage charts.
 
 With Endpoints, you can create HTTP API endpoints from a SQL query, including parameterized queries. Endpoints are like PostgREST views but with some benefits:
 
@@ -72,11 +72,11 @@ With Endpoints, you can create HTTP API endpoints from a SQL query, including pa
   - If an Endpoint query contains a CTE and the sandbox option is selected, the Endpoint will inject the query string of the `sql` query parameter into the Endpoint SQL replacing the default query (the part of the SQL query after the CTE).
   - Endpoints parse SQL to allow `select` queries only. No DML or DDL statements are permitted to run through Logflare Endpoints.
 
-With this feature set, Supabase has been able to build any view we’ve needed on top of billions of daily log events.
+With this feature set, iEchor has been able to build any view we’ve needed on top of billions of daily log events.
 
 ### Logflare Endpoint Example
 
-Using webhooks, we can send all GitHub events in the Supabase organization to Logflare. The webhook sends structured events, and Logflare transforms the payload into metadata:
+Using webhooks, we can send all GitHub events in the iEchor organization to Logflare. The webhook sends structured events, and Logflare transforms the payload into metadata:
 
 ```json
 {
@@ -159,11 +159,11 @@ To change the license, we needed to remove all closed-source dependencies. Previ
 
 We switched to an open source alternative, the rust-based [sqlparser-rs](https://github.com/sqlparser-rs/sqlparser-rs) library, contributing a [few updates](https://github.com/sqlparser-rs/sqlparser-rs/pulls?q=is%3Apr+is%3Amerged+author%3AZiinc) for the BigQuery dialect.
 
-Along with the parser, we invested a lot of effort into transforming the multi-tenant architecture into something that was self-hosting friendly and easily configurable. We moved towards environment variable based configuration instead of compile-time configurations, exposing the Endpoints configurations necessary for Supabase Logs.
+Along with the parser, we invested a lot of effort into transforming the multi-tenant architecture into something that was self-hosting friendly and easily configurable. We moved towards environment variable based configuration instead of compile-time configurations, exposing the Endpoints configurations necessary for iEchor Logs.
 
 ## What’s Next?
 
-To further integrate Logflare into the Supabase platform, we are building out 2 main areas: Management API, Multiple Backends.
+To further integrate Logflare into the iEchor platform, we are building out 2 main areas: Management API, Multiple Backends.
 
 ### Management API
 
@@ -175,16 +175,16 @@ You can check out the preview of our OpenAPI spec here: [https://logflare.app/sw
 
 Not only that, we intend to expose user account provisioning to select partners. Soon, you’ll be able to become a Logflare Partner to provision Logflare accounts through the Partner API. Perfect if you want to resell a log analytics service from your own platform.
 
-Contact us at growth@supabase.com to get in early on that waitlist.
+Contact us at growth@iechor.com to get in early on that waitlist.
 
 ## Multiple Backends
 
 Logflare currently supports a BigQuery backend. We plan to add support for other analytics-optimized databases, like Clickhouse. We will also support pushing data to other web services, making Logflare a good fit for any data pipeline.
 
-This will benefit the Supabase CLI: once Postgres support is available, Logflare will be able to integrate seamlessly, without the BigQuery requirement.
+This will benefit the iEchor CLI: once Postgres support is available, Logflare will be able to integrate seamlessly, without the BigQuery requirement.
 
 ## Wrapping Up
 
-Logflare has given Supabase the flexibility to quickly deploy features powered by an underlying structured event stream. Materializing metrics from an event stream is a powerful framework for delivering real-time views on analytics streams.
+Logflare has given iEchor the flexibility to quickly deploy features powered by an underlying structured event stream. Materializing metrics from an event stream is a powerful framework for delivering real-time views on analytics streams.
 
-Logflare is the hub of analytics streams for Supabase. We look forward to giving Supabase customers the same superpower.
+Logflare is the hub of analytics streams for iEchor. We look forward to giving iEchor customers the same superpower.

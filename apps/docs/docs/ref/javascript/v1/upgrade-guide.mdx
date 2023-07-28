@@ -42,7 +42,7 @@ _Optionally_ if you are using custom configuration with `createClient` then foll
 <TabPanel id="1.0x" label="Before">
 
 ```ts src/supabaseClient.ts
-const supabase = createClient(IECHOR_URL, IECHOR_ANON_KEY, {
+const iechor = createClient(IECHOR_URL, IECHOR_ANON_KEY, {
   schema: 'custom',
   persistSession: false,
 })
@@ -52,7 +52,7 @@ const supabase = createClient(IECHOR_URL, IECHOR_ANON_KEY, {
 <TabPanel id="2.0x" label="After">
 
 ```ts src/supabaseClient.ts
-const supabase = createClient(IECHOR_URL, IECHOR_ANON_KEY, {
+const iechor = createClient(IECHOR_URL, IECHOR_ANON_KEY, {
   db: {
     schema: 'custom',
   },
@@ -403,7 +403,7 @@ const {
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-#### Use a custom `access_token` JWT with Supabase
+#### Use a custom `access_token` JWT with iEchor
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -423,7 +423,7 @@ const { user, error } = supabase.auth.setAuth(access_token)
 </TabPanel>
 <TabPanel id="2.0x" label="After">
 ```ts
-const supabase = createClient(
+const iechor = createClient(
   IECHOR_URL,
   IECHOR_ANON_KEY,
   {
@@ -446,8 +446,8 @@ const supabase = createClient(
 
 The cookie-related methods like `setAuthCookie` and `getUserByCookie` have been removed.
 
-For Next.js you can use the [Auth Helpers](https://supabase.com/docs/guides/auth/auth-helpers/nextjs) to help you manage cookies.
-If you can't use the Auth Helpers, you can use [server-side rendering](https://supabase.com/docs/guides/auth/server-side-rendering).
+For Next.js you can use the [Auth Helpers](https://iechor.com/docs/guides/auth/auth-helpers/nextjs) to help you manage cookies.
+If you can't use the Auth Helpers, you can use [server-side rendering](https://iechor.com/docs/guides/auth/server-side-rendering).
 
 Some the [PR](https://github.com/supabase/gotrue-js/pull/340) for additional background information.
 
@@ -455,7 +455,7 @@ Some the [PR](https://github.com/supabase/gotrue-js/pull/340) for additional bac
 
 `.insert()` / `.upsert()` / `.update()` / `.delete()` don't return rows by default: [PR](https://github.com/supabase/postgrest-js/pull/276).
 
-Previously, these methods return inserted/updated/deleted rows by default (which caused [some confusion](https://github.com/supabase/supabase/discussions/1548)), and you can opt to not return it by specifying `returning: 'minimal'`. Now the default behavior is to not return rows. To return inserted/updated/deleted rows, add a `.select()` call at the end.
+Previously, these methods return inserted/updated/deleted rows by default (which caused [some confusion](https://github.com/openmodels-base/iechor/discussions/1548)), and you can opt to not return it by specifying `returning: 'minimal'`. Now the default behavior is to not return rows. To return inserted/updated/deleted rows, add a `.select()` call at the end.
 
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>

@@ -701,11 +701,11 @@ export interface paths {
     get: operations["VercelConnectionsController_getVercelConnections"];
   };
   "/platform/integrations/vercel/connections": {
-    /** Connects a Vercel project to a supabase project */
+    /** Connects a Vercel project to a iechor project */
     post: operations["VercelConnectionsController_createVercelConnection"];
   };
   "/platform/integrations/vercel/connections/{connection_id}/sync-envs": {
-    /** Syncs supabase project envs with given connection id */
+    /** Syncs iechor project envs with given connection id */
     post: operations["VercelConnectionsController_syncVercelConnectionEnvs"];
   };
   "/platform/integrations/vercel/connections/{connection_id}": {
@@ -8223,7 +8223,7 @@ export interface operations {
       500: never;
     };
   };
-  /** Connects a Vercel project to a supabase project */
+  /** Connects a Vercel project to a iechor project */
   VercelConnectionsController_createVercelConnection: {
     requestBody: {
       content: {
@@ -8240,7 +8240,7 @@ export interface operations {
       500: never;
     };
   };
-  /** Syncs supabase project envs with given connection id */
+  /** Syncs iechor project envs with given connection id */
   VercelConnectionsController_syncVercelConnectionEnvs: {
     parameters: {
       path: {
@@ -8249,7 +8249,7 @@ export interface operations {
     };
     responses: {
       201: never;
-      /** @description Failed to sync supabase project envs with given connection id */
+      /** @description Failed to sync iechor project envs with given connection id */
       500: never;
     };
   };

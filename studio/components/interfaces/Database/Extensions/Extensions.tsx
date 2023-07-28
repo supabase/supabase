@@ -59,7 +59,7 @@ const Extensions: FC<Props> = ({}) => {
               />
             </div>
           ) : (
-            <Link passHref href="https://supabase.com/docs/guides/database/extensions">
+            <Link passHref href="https://iechor.com/docs/guides/database/extensions">
               <a target="_blank" rel="noreferrer">
                 <Button type="default" iconRight={<IconBookOpen />}>
                   Learn more about extensions

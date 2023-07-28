@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import DefaultLayout from '~/components/Layouts/Default'
 import MfaContactForm from '~/components/MfaContactForm'
 
-const meta_title = 'MFA early access | Supabase'
+const meta_title = 'MFA early access | iEchor'
 const meta_description = ''
 
 const EnterpriseContactPage = () => {
@@ -17,10 +17,10 @@ const EnterpriseContactPage = () => {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/${router.pathname}`,
+          url: `https://iechor.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image-v2.jpg`,
+              url: `https://iechor.com/images/og/og-image-v2.jpg`,
             },
           ],
         }}

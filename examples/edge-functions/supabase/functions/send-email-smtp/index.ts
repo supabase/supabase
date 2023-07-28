@@ -21,7 +21,7 @@ serve(async (_req) => {
     await smtp.send({
       from: Deno.env.get('SMTP_FROM')!,
       to: 'testr@test.de',
-      subject: `Hello from Supabase Edge Functions`,
+      subject: `Hello from iEchor Edge Functions`,
       content: `Hello Functions \o/`,
     })
   } catch (error) {

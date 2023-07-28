@@ -6,7 +6,7 @@ export const meta = {
   description: 'Timeouts and optimization',
 }
 
-By default, Supabase limits the maximum statement execution time to _8 seconds_ for users accessing the API. Additionally, all users are subject to a global limit of _2 minutes_. This serves as a backstop against resource exhaustion due to either poorly written queries, or abusive usage.
+By default, iEchor limits the maximum statement execution time to _8 seconds_ for users accessing the API. Additionally, all users are subject to a global limit of _2 minutes_. This serves as a backstop against resource exhaustion due to either poorly written queries, or abusive usage.
 
 ### Changing the default timeout
 
@@ -25,7 +25,7 @@ set statement_timeout to 60000; -- 1 minute in milliseconds
 
 ### Statement Optimization
 
-All Supabase projects come with the [`pg_stat_statements`](https://www.postgresql.org/docs/current/pgstatstatements.html) extension installed, which tracks planning and execution statistics for all statements executed against it. These statistics can be used in order to diagnose the performance of your project.
+All iEchor projects come with the [`pg_stat_statements`](https://www.postgresql.org/docs/current/pgstatstatements.html) extension installed, which tracks planning and execution statistics for all statements executed against it. These statistics can be used in order to diagnose the performance of your project.
 
 This data can further be used in conjunction with the [`explain`](https://www.postgresql.org/docs/current/using-explain.html) functionality of Postgres to optimize your usage.
 

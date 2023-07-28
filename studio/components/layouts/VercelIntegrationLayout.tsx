@@ -11,7 +11,7 @@ const VercelIntegrationLayout: FC<Props> = ({ children }) => {
   return (
     <>
       <Head>
-        <title>Supabase + Vercel</title>
+        <title>iEchor + Vercel</title>
       </Head>
 
       <main className="flex flex-col w-full h-full overflow-y-auto">
@@ -20,7 +20,7 @@ const VercelIntegrationLayout: FC<Props> = ({ children }) => {
             <div className="max-w-xl flex justify-between items-center mx-auto py-4">
               <div className="flex justify-start lg:w-0 lg:flex-1">
                 <div>
-                  <span className="sr-only">Supabase</span>
+                  <span className="sr-only">iEchor</span>
                   <img
                     className="h-6 w-auto sm:h-6"
                     src={`${BASE_PATH}/img/supabase-logo.svg`}

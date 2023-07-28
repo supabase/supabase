@@ -9,19 +9,19 @@ export const meta = {
   tocVideo: 'rOLyOsBR1Uc',
 }
 
-This guide shows you how to set up your local Supabase development environment that integrates with GitHub Actions to automatically test and release schema changes to staging and production Supabase projects.
+This guide shows you how to set up your local iEchor development environment that integrates with GitHub Actions to automatically test and release schema changes to staging and production iEchor projects.
 
 ![Deploy migration](/docs/img/guides/cli/cicd-github.png)
 
 ## Set up a local environment
 
-The first step is to set up your local repository with the Supabase CLI:
+The first step is to set up your local repository with the iEchor CLI:
 
 ```bash
 supabase init
 ```
 
-You should see a new `supabase` directory. Then you need to link your local repository with your Supabase project:
+You should see a new `supabase` directory. Then you need to link your local repository with your iEchor project:
 
 ```bash
 supabase login
@@ -31,10 +31,10 @@ supabase link --project-ref $PROJECT_ID
 You can get your `$PROJECT_ID` from your project's dashboard URL:
 
 ```
-https://supabase.com/dashboard/project/<project-id>
+https://iechor.com/dashboard/project/<project-id>
 ```
 
-If you're using an existing Supabase project, you might have made schema changes through the Dashboard.
+If you're using an existing iEchor project, you might have made schema changes through the Dashboard.
 Run the following command to pull these changes before making local schema changes from the CLI:
 
 ```sql
@@ -155,11 +155,11 @@ In a production environment, we recommend using a CI/CD pipeline to deploy new m
 
 ![Deploy migration](/docs/img/guides/cli/cicd-github.png)
 
-This example uses two Supabase projects, one for production and one for staging.
+This example uses two iEchor projects, one for production and one for staging.
 
 Prepare your environments by:
 
-- Creating separate Supabase projects for staging and production
+- Creating separate iEchor projects for staging and production
 - Pushing your git repository to GitHub and enabling GitHub Actions
 
 <Admonition type="caution">
@@ -170,7 +170,7 @@ You need a _new_ project for staging. A project which has already been modified 
 
 ### Configure GitHub Actions
 
-The Supabase CLI requires a few environment variables to run in non-interactive mode.
+The iEchor CLI requires a few environment variables to run in non-interactive mode.
 
 - `IECHOR_ACCESS_TOKEN` is your personal access token
 - `IECHOR_DB_PASSWORD` is your project specific database password
@@ -206,12 +206,12 @@ jobs:
         with:
           version: latest
 
-      - name: Start Supabase local development setup
-        run: supabase start
+      - name: Start iEchor local development setup
+        run: iechor start
 
       - name: Verify generated types are checked in
         run: |
-          supabase gen types typescript --local > types.gen.ts
+          iechor gen types typescript --local > types.gen.ts
           if ! git diff --ignore-space-at-eol --exit-code --quiet types.gen.ts; then
             echo "Detected uncommitted changes after build. See status below:"
             git diff
@@ -247,8 +247,8 @@ jobs:
         with:
           version: latest
 
-      - run: supabase link --project-ref $IECHOR_PROJECT_ID
-      - run: supabase db push
+      - run: iechor link --project-ref $IECHOR_PROJECT_ID
+      - run: iechor db push
 ```
 
 </TabPanel>
@@ -279,16 +279,16 @@ jobs:
         with:
           version: latest
 
-      - run: supabase link --project-ref $IECHOR_PROJECT_ID
-      - run: supabase db push
+      - run: iechor link --project-ref $IECHOR_PROJECT_ID
+      - run: iechor db push
 ```
 
 </TabPanel>
 </Tabs>
 
-The full example code is available in the [demo repository](https://github.com/supabase/supabase-action-example).
+The full example code is available in the [demo repository](https://github.com/openmodels-base/iechor-action-example).
 
-Commit these files to git and push to your `main` branch on GitHub. Update these environment variables to match your Supabase projects:
+Commit these files to git and push to your `main` branch on GitHub. Update these environment variables to match your iEchor projects:
 
 - `IECHOR_ACCESS_TOKEN`
 - `PRODUCTION_PROJECT_ID`
@@ -321,7 +321,7 @@ Once the test error is resolved, merge this PR and watch the deployment in actio
 
 After verifying your staging project has successfully migrated, create another PR from `develop` to `main` and merge it to deploy the migration to the production project.
 
-The `release` job applies all new migration scripts merged in `supabase/migrations` directory to a linked Supabase project. You can control which project the job links to via `PROJECT_ID` environment variable.
+The `release` job applies all new migration scripts merged in `supabase/migrations` directory to a linked iEchor project. You can control which project the job links to via `PROJECT_ID` environment variable.
 
 ## Troubleshooting
 
@@ -350,7 +350,7 @@ supabase migration list
 
 ### Permission denied on db remote commit
 
-If you have been using Supabase hosted projects for a long time, you might encounter the following permission error when executing `db remote commit`.
+If you have been using iEchor hosted projects for a long time, you might encounter the following permission error when executing `db remote commit`.
 
 ```bash
 Error: Error running pg_dump on remote database: pg_dump: error: query failed: ERROR:  permission denied for table _type
@@ -358,7 +358,7 @@ Error: Error running pg_dump on remote database: pg_dump: error: query failed: E
 pg_dump: error: query was: LOCK TABLE "graphql"."_type" IN ACCESS SHARE MODE
 ```
 
-To resolve this error, you need to grant `postgres` role permissions to `graphql` schema. You can do that by running the following query from Supabase dashboard's SQL Editor.
+To resolve this error, you need to grant `postgres` role permissions to `graphql` schema. You can do that by running the following query from iEchor dashboard's SQL Editor.
 
 ```sql
 grant all on all tables in schema graphql to postgres, anon, authenticated, service_role;
@@ -368,13 +368,13 @@ grant all on all sequences in schema graphql to postgres, anon, authenticated, s
 
 ### Permission denied on db push
 
-If you created a table through Supabase dashboard, and your new migration script contains `ALTER TABLE` statements, you might run into permission error when applying them on staging or production databases.
+If you created a table through iEchor dashboard, and your new migration script contains `ALTER TABLE` statements, you might run into permission error when applying them on staging or production databases.
 
 ```bash
 ERROR: must be owner of table employees (SQLSTATE 42501); while executing migration <timestamp>
 ```
 
-This is because tables created through Supabase dashboard are owned by `supabase_admin` role while the migration scripts executed through CLI are under `postgres` role.
+This is because tables created through iEchor dashboard are owned by `supabase_admin` role while the migration scripts executed through CLI are under `postgres` role.
 
 One way to solve this is to reassign the owner of those tables to `postgres` role. For example, if your table is named `users` in the public schema, you can run the following command to reassign owner.
 

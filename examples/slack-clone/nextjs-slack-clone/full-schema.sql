@@ -1,5 +1,5 @@
 --
--- For use with https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone
+-- For use with https://github.com/openmodels-base/iechor/tree/master/examples/slack-clone/nextjs-slack-clone
 --
 
 -- Custom types
@@ -14,7 +14,7 @@ create table public.users (
   status      user_status default 'OFFLINE'::public.user_status
 );
 comment on table public.users is 'Profile data for each user.';
-comment on column public.users.id is 'References the internal Supabase Auth user.';
+comment on column public.users.id is 'References the internal iEchor Auth user.';
 
 -- CHANNELS
 create table public.channels (

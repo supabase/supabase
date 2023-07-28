@@ -4,7 +4,7 @@ import { Database } from '../database.types'
 import AccountForm from './account-form'
 
 export default async function Account() {
-  const supabase = createServerComponentClient<Database>({ cookies })
+  const iechor = createServerComponentClient<Database>({ cookies })
 
   const {
     data: { session },

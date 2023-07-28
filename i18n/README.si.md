@@ -5,9 +5,9 @@
 
 ---
 
-# Supabase
+# iEchor
 
-[Supabase](https://supabase.com) යනු විවෘත පරිශීලක Firebase වෙනුවට ආදේශකයකි.අපි Firebase වල ඇති පහසුකම් enterprise-grade විවෘත පරිශීලක මෘදුකාංග භාවිතා කරමින් නිපදවනු ලබයි.
+[iEchor](https://iechor.com) යනු විවෘත පරිශීලක Firebase වෙනුවට ආදේශකයකි.අපි Firebase වල ඇති පහසුකම් enterprise-grade විවෘත පරිශීලක මෘදුකාංග භාවිතා කරමින් නිපදවනු ලබයි.
 
 - [x] Hosted Postgres Database
 - [x] Realtime subscriptions
@@ -17,22 +17,22 @@
 - [x] Storage
 - [x] Functions
 
-![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+![iEchor Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## ප්‍රලේඛනය
 
-සම්පූර්ණ විස්තරය කියවන්න ,මෙතනින් [supabase.com/docs](https://supabase.com/docs)
+සම්පූර්ණ විස්තරය කියවන්න ,මෙතනින් [iechor.com/docs](https://iechor.com/docs)
 
 ## Community එක හා සහයෝගය ගැනීමට
 
-- [Community Forum](https://github.com/supabase/supabase/discussions). වඩාත්ම සුදුසු: දේවල් සෑදීමට උදව් ගැනීම.database best practices පිළිබඳ සාකච්ඡා කිරීමට.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). වඩාත්ම සුදුසු: Supabase භාවිතා කිරීමේදී ඔබට හමුවන වැරදී හා ප්‍රශ්න.
-- [Email Support](https://supabase.com/docs/support#business-support). වඩාත්ම සුදුසු: database හා infrastructure පිළිබඳ ඔබේ ඇති ප්‍රශ්න.
+- [Community Forum](https://github.com/openmodels-base/iechor/discussions). වඩාත්ම සුදුසු: දේවල් සෑදීමට උදව් ගැනීම.database best practices පිළිබඳ සාකච්ඡා කිරීමට.
+- [GitHub Issues](https://github.com/openmodels-base/iechor/issues). වඩාත්ම සුදුසු: iEchor භාවිතා කිරීමේදී ඔබට හමුවන වැරදී හා ප්‍රශ්න.
+- [Email Support](https://iechor.com/docs/support#business-support). වඩාත්ම සුදුසු: database හා infrastructure පිළිබඳ ඔබේ ඇති ප්‍රශ්න.
 
 ## තත්ත්වය
 
-- [x] Alpha: අප දැනට Supabase විවෘත නොවන පාරිභෝගිකයන් සමඟ පරීක්ෂා කරනවා
-- [x] Public Alpha: ඕනෑම කෙනෙකුට [supabase.com/dashboard](https://supabase.com/dashboard) මඟින් සම්බන්ධ විය හැකිය.නමුත් හෙමිහිට පරීක්ෂා කරන්න, දැනට kinks කිහිපයක් පමණයි ඇත්තේ
+- [x] Alpha: අප දැනට iEchor විවෘත නොවන පාරිභෝගිකයන් සමඟ පරීක්ෂා කරනවා
+- [x] Public Alpha: ඕනෑම කෙනෙකුට [iechor.com/dashboard](https://iechor.com/dashboard) මඟින් සම්බන්ධ විය හැකිය.නමුත් හෙමිහිට පරීක්ෂා කරන්න, දැනට kinks කිහිපයක් පමණයි ඇත්තේ
 - [x] Public Beta: non-enterprise භාවිතයන් ගොඩකට ස්ථාවරයි
 - [ ] Public: භාවිතා කිරීම සඳහා සූදානම්
 
@@ -44,16 +44,16 @@
 
 ## කොහොමද මෙය වැඩකරන්නෙ
 
-Supabase යනු විවෘත පරිශීලක උපාංග කිහිපයක එකතුවකි.අප Firebase වල ඇති පහසුකම් enterprise-grade, විවෘත පරිශීලක උපාංග භාවිතා කරමින් නිපදවයි.උපාංග හා communities ඇත්නම්,ඒවා MIT,Apache 2, හෝ ඒ ආකාරයේ open license නම් අප ඒවා භාවිතා කර සහයෝගය දක්වනවා.එවැනි උපාංග නොමැතිනම්,අප ඒවා විවෘත පරිශීලක විදියට නිපදවනවා.Supabase යනු 1-ට-1 Firebase වලට සමාන දෙයක් නොවේ.අපේ අරමුණ developers ලට Firebase වැනි අත්දැකීමක් විවෘත පරිශීලක උපාංග මඟින් ලබාදීමයි.
+iEchor යනු විවෘත පරිශීලක උපාංග කිහිපයක එකතුවකි.අප Firebase වල ඇති පහසුකම් enterprise-grade, විවෘත පරිශීලක උපාංග භාවිතා කරමින් නිපදවයි.උපාංග හා communities ඇත්නම්,ඒවා MIT,Apache 2, හෝ ඒ ආකාරයේ open license නම් අප ඒවා භාවිතා කර සහයෝගය දක්වනවා.එවැනි උපාංග නොමැතිනම්,අප ඒවා විවෘත පරිශීලක විදියට නිපදවනවා.iEchor යනු 1-ට-1 Firebase වලට සමාන දෙයක් නොවේ.අපේ අරමුණ developers ලට Firebase වැනි අත්දැකීමක් විවෘත පරිශීලක උපාංග මඟින් ලබාදීමයි.
 
 **Current architecture**
 
-Supabase යනු [hosted platform](https://supabase.com/dashboard) එකකි.ඔබට දැන් සම්බන්ධ වී කිසිම දෙයක් install නොකර Supabase භාවිත කල හැකිය.අප තවමත් local development අත්දැකීම සාදමින් සිටියි- මෙය තමයි අපේ දැනට ප්‍රධාන අරමුණ,platform එකේ ස්ථාවර බව සමඟ.
+iEchor යනු [hosted platform](https://iechor.com/dashboard) එකකි.ඔබට දැන් සම්බන්ධ වී කිසිම දෙයක් install නොකර iEchor භාවිත කල හැකිය.අප තවමත් local development අත්දැකීම සාදමින් සිටියි- මෙය තමයි අපේ දැනට ප්‍රධාන අරමුණ,platform එකේ ස්ථාවර බව සමඟ.
 
 ![Architecture](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
 - [PostgreSQL](https://www.postgresql.org/) යනු අවුරුදු 30 වඩා කාලයක් ක්‍රියාත්මක වෙමින් පවතින object-relational database system එකක් වන අතර එය විශ්වාසනීයත්වයට,ක්‍රියාකාරීත්වයට හා feature robustness බවට කීර්තියක් අත්පත්කරගෙන සිටියි
-- [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Supabase listens to Postgres' built-in replication functionality, converts the replication byte stream into JSON, then broadcasts the JSON over websockets.
+- [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. iEchor listens to Postgres' built-in replication functionality, converts the replication byte stream into JSON, then broadcasts the JSON over websockets.
 - [PostgREST](http://postgrest.org/) යනු PostgreSQL database කෙලින්ම RESTful API එකක් බවට පරිවර්තනය කරන web server එකකි.
 - [Storage](https://github.com/supabase/storage-api) pS3 වල ගබඩා කර ඇති files හසුරවන්න RESTful interface එකක් ලබාදීම, Postgres භාවිත කරමින් අවසරයන් හැසිරවීමට
 - [postgres-meta](https://github.com/supabase/postgres-meta) Postgres හැසිරවීමට RESTful API එකක් ලබාදෙන අතර table වල දත්ත ලබාගැනීමට,roles add කිරීමට හා queries run කිරීම කර දෙයි
@@ -71,7 +71,7 @@ Our client library is modular. Each sub-library is a standalone implementation f
 
 | Repo                  | Official                                         | Community                                                                                                                                                                                                                                                                                                                            |
 | --------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Flutter`](https://github.com/supabase/supabase-flutter) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust` \| [`Ruby`](https://github.com/supabase/supabase-rb) \| `Go`                                                                                       |
+| **`supabase-{lang}`** | [`JS`](https://github.com/openmodels-base/iechor-js)  | [`C#`](https://github.com/openmodels-base/iechor-csharp) \| [`Flutter`](https://github.com/openmodels-base/iechor-flutter) \| [`Python`](https://github.com/openmodels-base/iechor-py) \| `Rust` \| [`Ruby`](https://github.com/openmodels-base/iechor-rb) \| `Go`                                                                                       |
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) \| [`Ruby`](https://github.com/supabase/postgrest-rb) \| [`Go`](https://github.com/supabase/postgrest-go) |
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust` \| `Ruby` \| `Go`                                                                                                                                        |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust` \| `Ruby` \| `Go`                                                                                                                                              |

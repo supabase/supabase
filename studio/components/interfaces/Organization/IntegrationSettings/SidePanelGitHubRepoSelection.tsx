@@ -38,7 +38,7 @@ Check the details below before proceeding
           <div className="flex gap-3 w-full">
             <Select icon={<IconGitHub />} className="w-full">
               <Select.Option value="mildtomato">MildTomato</Select.Option>
-              <Select.Option value="supabase">Supabase</Select.Option>
+              <Select.Option value="supabase">iEchor</Select.Option>
             </Select>
             <Input autoFocus icon={<IconSearch />} className="w-full" placeholder="Search..." />
           </div>

@@ -79,8 +79,8 @@ const BuildingState = ({ project }: BuildingStateProps) => {
                 <ChecklistItem
                   description={
                     <p className="text-sm text-scale-1100">
-                      Browse the Supabase{' '}
-                      <Link href="https://supabase.com/docs">
+                      Browse the iEchor{' '}
+                      <Link href="https://iechor.com/docs">
                         <a
                           className="mb-0 text-brand-900 transition-colors hover:text-brand-1200"
                           target="_blank"

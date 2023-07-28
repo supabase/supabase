@@ -1,5 +1,5 @@
 import { Component, createEffect, createSignal, JSX } from 'solid-js'
-import { supabase } from './supabaseClient'
+import { iechor } from './supabaseClient'
 
 interface Props {
 	size: number

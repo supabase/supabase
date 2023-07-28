@@ -3,15 +3,15 @@
     "title": "Docs Updated",
     "shipped": true,
     "date": "12 Dec 2022",
-    "description": "Supabase Docs",
+    "description": "iEchor Docs",
     "d": 1,
     "dd": "Monday",
     "youtube_id": "OpPOaJI_Z28",
-    "blogpost": "https://supabase.com/blog/new-supabase-docs-built-with-nextjs",
-    "docs": "https://supabase.com/docs",
+    "blogpost": "https://iechor.com/blog/new-supabase-docs-built-with-nextjs",
+    "docs": "https://iechor.com/docs",
     "steps": [
       {
-        "title": "Supabase Docs",
+        "title": "iEchor Docs",
         "blog": "/blog/new-supabase-docs-built-with-nextjs",
         "docs": "/docs",
         "isNew": true,
@@ -27,8 +27,8 @@
     "d": 2,
     "dd": "Tuesday",
     "youtube_id": "iqZlPtl_b-I",
-    "blogpost": "https://supabase.com/blog",
-    "docs": "https://supabase.com/docs",
+    "blogpost": "https://iechor.com/blog",
+    "docs": "https://iechor.com/docs",
     "steps": [
       {
         "title": "Image Transformations",
@@ -54,8 +54,8 @@
     "d": 3,
     "dd": "Wednesday",
     "youtube_id": "CGZr5tybW18",
-    "blogpost": "https://supabase.com/blog",
-    "docs": "https://supabase.com/docs",
+    "blogpost": "https://iechor.com/blog",
+    "docs": "https://iechor.com/docs",
     "steps": [
       {
         "title": "Multi-factor Authentication",
@@ -67,18 +67,18 @@
     ]
   },
   {
-    "title": "Supabase Wrappers - FDW Framework",
+    "title": "iEchor Wrappers - FDW Framework",
     "shipped": true,
     "date": "15 Dec 2022",
-    "description": "Supabase Wrappers",
+    "description": "iEchor Wrappers",
     "d": 4,
     "dd": "Thursday",
     "youtube_id": "QA2qC5F-4OU",
     "blogpost": "/blog/postgres-foreign-data-wrappers-rust",
-    "docs": "https://supabase.com/docs",
+    "docs": "https://iechor.com/docs",
     "steps": [
       {
-        "title": "Supabase Wrappers",
+        "title": "iEchor Wrappers",
         "blog": "/blog/postgres-foreign-data-wrappers-rust",
         "docs": "https://supabase.github.io/wrappers/",
         "isNew": true,
@@ -87,15 +87,15 @@
     ]
   },
   {
-    "title": "Supabase Vault Release",
+    "title": "iEchor Vault Release",
     "shipped": true,
     "date": "16 Dec 2022",
     "description": "Vault Release",
     "d": 5,
     "dd": "Friday",
     "youtube_id": "6bGQotxisoY",
-    "blogpost": "https://supabase.com/blog",
-    "docs": "https://supabase.com/docs",
+    "blogpost": "https://iechor.com/blog",
+    "docs": "https://iechor.com/docs",
     "steps": [
       {
         "title": "Vault Release",

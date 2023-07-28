@@ -53,10 +53,10 @@ function Database() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/database`,
+          url: `https://iechor.com/database`,
           images: [
             {
-              url: `https://supabase.com${basePath}/images/product/database/database-og.jpg`,
+              url: `https://iechor.com${basePath}/images/product/database/database-og.jpg`,
             },
           ],
         }}
@@ -72,7 +72,7 @@ function Database() {
             </span>,
           ]}
           subheader={[
-            'Every Supabase project is a dedicated PostgreSQL database, trusted by millions of developers.',
+            'Every iEchor project is a dedicated PostgreSQL database, trusted by millions of developers.',
             'PostgreSQL is one of the worlds most scalable databases.',
           ]}
           image={[
@@ -114,7 +114,7 @@ function Database() {
                 </div>
               </div>
               <h4 className="h4">Just Postgres</h4>
-              <p className="p">Every Supabase project is a dedicated Postgres database.</p>
+              <p className="p">Every iEchor project is a dedicated Postgres database.</p>
               <p className="p text-sm">
                 100% portable. Bring your existing Postgres database, or migrate away at any time.
               </p>
@@ -236,7 +236,7 @@ function Database() {
             text={[
               <p key={0}>
                 We introspect your database and provide instant APIs. Focus on building your
-                product, while Supabase handles the CRUD.
+                product, while iEchor handles the CRUD.
               </p>,
             ]}
             footer={[
@@ -288,14 +288,14 @@ function Database() {
             <div className="col-span-12 mb-8 lg:col-span-6 xl:col-span-5">
               <h2 className="h3">Extend your database</h2>
 
-              <p className="p">Supabase works natively with Postgres extensions.</p>
+              <p className="p">iEchor works natively with Postgres extensions.</p>
               <p className="p">
                 Choose from a huge collection of Postgres extensions, enabled with a single click.
               </p>
 
               <FeatureColumn
                 title="40+ preinstalled extensions"
-                text="We only show a few of the extensions supported by supabase here, but we preinstall many more that you can use right away."
+                text="We only show a few of the extensions supported by iechor here, but we preinstall many more that you can use right away."
               />
               <Link href="/docs/guides/database" passHref>
                 <a>

@@ -42,7 +42,7 @@ export async function getIntegrations({ orgSlug }: IntegrationsVariables, signal
     {
       id: '1',
       type: 'VERCEL',
-      createdBy: 'alaister@supabase.io',
+      createdBy: 'alaister@iechor.com',
       createdAt: '2023-06-05T06:56:25.565Z',
       metadata: {
         vercelTeam: 'alaister-team',
@@ -83,7 +83,7 @@ export async function getIntegrations({ orgSlug }: IntegrationsVariables, signal
     {
       id: '2',
       type: 'VERCEL',
-      createdBy: 'alaister@supabase.io',
+      createdBy: 'alaister@iechor.com',
       createdAt: '2023-06-05T06:56:25.565Z',
       metadata: {
         vercelTeam: 'alaister-team',

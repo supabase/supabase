@@ -4,7 +4,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartners'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
-import supabase from '~/lib/supabase'
+import iechor from '~/lib/supabase'
 import { Partner } from '~/types/partners'
 import TileGrid from '../../../components/Partners/TileGrid'
 
@@ -44,10 +44,10 @@ function ExpertPartnersPage(props: Props) {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/partners/experts`,
+          url: `https://iechor.com/partners/experts`,
           images: [
             {
-              url: `https://supabase.com${router.basePath}/images/product/database/database-og.jpg`, // TODO
+              url: `https://iechor.com${router.basePath}/images/product/database/database-og.jpg`, // TODO
             },
           ],
         }}

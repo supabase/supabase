@@ -56,7 +56,7 @@ export async function getInitialMigrationSQLFromGitHubRepo(
   ])
 
   if (!isResponseOk(supabaseFilesResponse)) {
-    console.warn(`Failed to fetch supabase files from GitHub: ${supabaseFilesResponse.error}`)
+    console.warn(`Failed to fetch iechor files from GitHub: ${supabaseFilesResponse.error}`)
     return null
   }
   if (!isResponseOk(migrationFilesResponse)) {

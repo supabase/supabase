@@ -2,7 +2,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'sveltekit',
-  title: 'Supabase Auth with SvelteKit',
+  title: 'iEchor Auth with SvelteKit',
   description: 'Convenience helpers for implementing user authentication in SvelteKit.',
   sidebar_label: 'SvelteKit',
 }
@@ -21,15 +21,15 @@ npm install @supabase/auth-helpers-sveltekit @supabase/supabase-js
 
 ### Declare Environment Variables
 
-Retrieve your project's URL and anon key from your [API settings](https://supabase.com/dashboard/project/_/settings/api), and create a `.env.local` file with the following environment variables:
+Retrieve your project's URL and anon key from your [API settings](https://iechor.com/dashboard/project/_/settings/api), and create a `.env.local` file with the following environment variables:
 
 ```bash .env.local
-# Find these in your Supabase project settings https://supabase.com/dashboard/project/_/settings/api
+# Find these in your iEchor project settings https://iechor.com/dashboard/project/_/settings/api
 PUBLIC_IECHOR_URL=https://your-project.supabase.co
 PUBLIC_IECHOR_ANON_KEY=your-anon-key
 ```
 
-### Creating a Supabase Client
+### Creating a iEchor Client
 
 <Tabs
   scrollable
@@ -117,13 +117,13 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 <Admonition type="info">
 
-Note that we are specifying filterSerializedResponseHeaders here. We need to tell SvelteKit that supabase needs the content-range header.
+Note that we are specifying filterSerializedResponseHeaders here. We need to tell SvelteKit that iechor needs the content-range header.
 
 </Admonition>
 
 ### Code Exchange Route
 
-The `Code Exchange` route is required for the [server-side auth flow](https://supabase.com/docs/guides/auth/server-side-rendering) implemented by the SvelteKit Auth Helpers. It exchanges an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
+The `Code Exchange` route is required for the [server-side auth flow](https://iechor.com/docs/guides/auth/server-side-rendering) implemented by the SvelteKit Auth Helpers. It exchanges an auth `code` for the user's `session`, which is set as a cookie for future requests made to iEchor.
 
 <Tabs
   scrollable
@@ -138,7 +138,7 @@ Create a new file at `src/routes/auth/callback/+server.js` and populate with the
 ```js src/routes/auth/callback/+server.js
 import { redirect } from '@sveltejs/kit'
 
-export const GET = async ({ url, locals: { supabase } }) => {
+export const GET = async ({ url, locals: { iechor } }) => {
   const code = url.searchParams.get('code')
 
   if (code) {
@@ -158,7 +158,7 @@ Create a new file at `src/routes/auth/callback/+server.ts` and populate with the
 ```ts src/routes/auth/callback/+server.ts
 import { redirect } from '@sveltejs/kit'
 
-export const GET = async ({ url, locals: { supabase } }) => {
+export const GET = async ({ url, locals: { iechor } }) => {
   const code = url.searchParams.get('code')
 
   if (code) {
@@ -174,7 +174,7 @@ export const GET = async ({ url, locals: { supabase } }) => {
 
 ### Generate types from your database
 
-In order to get the most out of TypeScript and it's intellisense, you should import the generated Database types into the `app.d.ts` type definition file that comes with your SvelteKit project, where `import('./DatabaseDefinitions')` points to the generated types file outlined in [v2 docs here](https://supabase.com/docs/reference/javascript/release-notes#typescript-support) after you have logged in, linked, and generated types through the Supabase CLI.
+In order to get the most out of TypeScript and it's intellisense, you should import the generated Database types into the `app.d.ts` type definition file that comes with your SvelteKit project, where `import('./DatabaseDefinitions')` points to the generated types file outlined in [v2 docs here](https://iechor.com/docs/reference/javascript/release-notes#typescript-support) after you have logged in, linked, and generated types through the iEchor CLI.
 
 ```ts src/app.d.ts
 // src/app.d.ts
@@ -247,7 +247,7 @@ export const load = async ({ locals: { getSession } }) => {
 
 #### Shared Load functions and pages
 
-To utilize Supabase in shared load functions and within pages, it is essential to create a Supabase client in the root layout load.
+To utilize iEchor in shared load functions and within pages, it is essential to create a iEchor client in the root layout load.
 
 <Tabs
   scrollable
@@ -265,7 +265,7 @@ import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
 export const load = async ({ fetch, data, depends }) => {
   depends('supabase:auth')
 
-  const supabase = createSupabaseLoadClient({
+  const iechor = createSupabaseLoadClient({
     supabaseUrl: PUBLIC_IECHOR_URL,
     supabaseKey: PUBLIC_IECHOR_ANON_KEY,
     event: { fetch },
@@ -293,7 +293,7 @@ import type { Database } from '../DatabaseDefinitions'
 export const load = async ({ fetch, data, depends }) => {
   depends('supabase:auth')
 
-  const supabase = createSupabaseLoadClient<Database>({
+  const iechor = createSupabaseLoadClient<Database>({
     supabaseUrl: PUBLIC_IECHOR_URL,
     supabaseKey: PUBLIC_IECHOR_ANON_KEY,
     event: { fetch },
@@ -310,7 +310,7 @@ export const load = async ({ fetch, data, depends }) => {
 
 <Admonition type="info">
 
-TypeScript types can be [generated with the Supabase CLI](https://supabase.com/docs/reference/javascript/typescript-support) and passed to `createSupabaseLoadClient` to add type support to the Supabase client.
+TypeScript types can be [generated with the iEchor CLI](https://iechor.com/docs/reference/javascript/typescript-support) and passed to `createSupabaseLoadClient` to add type support to the iEchor client.
 
 </Admonition>
 
@@ -325,7 +325,7 @@ The usage of `depends` tells sveltekit that this load function should be execute
 
 #### Setting up the event listener on the client side
 
-We need to create an event listener in the root `+layout.svelte` file in order to catch supabase events being triggered.
+We need to create an event listener in the root `+layout.svelte` file in order to catch iechor events being triggered.
 
 ```svelte src/routes/+layout.svelte
 <!-- src/routes/+layout.svelte -->
@@ -358,14 +358,14 @@ The usage of `invalidate` tells SvelteKit that the root `+layout.ts` load functi
 
 #### Sign in / Sign up / Sign out
 
-We can access the supabase instance in our `+page.svelte` file through the data object.
+We can access the iechor instance in our `+page.svelte` file through the data object.
 
 ```svelte src/routes/auth/+page.svelte
 <!-- // src/routes/auth/+page.svelte -->
 <script>
   export let data
-  let { supabase } = data
-  $: ({ supabase } = data)
+  let { iechor } = data
+  $: ({ iechor } = data)
 
   let email
   let password
@@ -419,7 +419,7 @@ We can access the supabase instance in our `+page.svelte` file through the data 
 import { fail } from '@sveltejs/kit'
 
 export const actions = {
-  default: async ({ request, url, locals: { supabase } }) => {
+  default: async ({ request, url, locals: { iechor } }) => {
     const formData = await request.formData()
     const email = formData.get('email')
     const password = formData.get('password')
@@ -465,7 +465,7 @@ export const actions = {
 ```js src/routes/login/+page.server.ts
 // src/routes/login/+page.server.ts
 export const actions = {
-  default: async ({ request, url, locals: { supabase } }) => {
+  default: async ({ request, url, locals: { iechor } }) => {
     const formData = await request.formData()
     const email = formData.get('email') as string
     const password = formData.get('password') as string
@@ -647,7 +647,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 ### Client-side data fetching with RLS
 
-For [row level security](https://supabase.com/docs/guides/auth/row-level-security) to work properly when fetching data client-side, you need to use `supabaseClient` from `PageData` and only run your query once the session is defined client-side:
+For [row level security](https://iechor.com/docs/guides/auth/row-level-security) to work properly when fetching data client-side, you need to use `supabaseClient` from `PageData` and only run your query once the session is defined client-side:
 
 ```svelte src/routes/+page.svelte
 <script lang="ts">
@@ -711,7 +711,7 @@ import { fail, redirect } from '@sveltejs/kit'
 import { AuthApiError } from '@supabase/supabase-js'
 
 export const actions = {
-  signin: async ({ request, locals: { supabase } }) => {
+  signin: async ({ request, locals: { iechor } }) => {
     const formData = await request.formData()
 
     const email = formData.get('email') as string
@@ -742,7 +742,7 @@ export const actions = {
     throw redirect(303, '/dashboard')
   },
 
-  signout: async ({ locals: { supabase } }) => {
+  signout: async ({ locals: { iechor } }) => {
     await supabase.auth.signOut()
     throw redirect(303, '/')
   },
@@ -775,9 +775,9 @@ await supabase.auth.signUp({
 
 ### Migrate from 0.8.x to 0.9 [#migration-0-9]
 
-#### Set up the Supabase client [#migration-set-up-supabase-client]
+#### Set up the iEchor client [#migration-set-up-supabase-client]
 
-In version 0.9 we now setup our Supabase client for the server inside of a `hooks.server.ts` file.
+In version 0.9 we now setup our iEchor client for the server inside of a `hooks.server.ts` file.
 
 <Tabs
   scrollable
@@ -839,7 +839,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 #### Initialize the client [#migration-initialize-client]
 
-In order to use the Supabase library in your client code you will need to setup a shared load function inside the root `+layout.ts` and create a `+layout.svelte` to handle our event listening for Auth events.
+In order to use the iEchor library in your client code you will need to setup a shared load function inside the root `+layout.ts` and create a `+layout.svelte` to handle our event listening for Auth events.
 
 <Tabs
   scrollable
@@ -886,7 +886,7 @@ import type { Database } from '../DatabaseDefinitions'
 export const load: LayoutLoad = async ({ fetch, data, depends }) => {
   depends('supabase:auth')
 
-  const supabase = createSupabaseLoadClient<Database>({
+  const iechor = createSupabaseLoadClient<Database>({
     supabaseUrl: PUBLIC_IECHOR_URL,
     supabaseKey: PUBLIC_IECHOR_ANON_KEY,
     event: { fetch },
@@ -933,7 +933,7 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 
 #### Set up hooks [#migration-set-up-hooks]
 
-Since version 0.9 relies on `hooks.server.ts` to setup our client, we no longer need the `hooks.client.ts` in our project for Supabase related code.
+Since version 0.9 relies on `hooks.server.ts` to setup our client, we no longer need the `hooks.client.ts` in our project for iEchor related code.
 
 #### Typings [#migration-typings]
 
@@ -953,7 +953,7 @@ Since version 0.9 relies on `hooks.server.ts` to setup our client, we no longer 
 // for information about these interfaces
 // and what to do when importing types
 declare namespace App {
-  interface Supabase {
+  interface iEchor {
     Database: import('./DatabaseDefinitions').Database
     SchemaName: 'public'
   }
@@ -1127,7 +1127,7 @@ export const GET: RequestHandler = async ({ locals: { supabase, getSession } }) 
 
 ### Migrate from 0.7.x to 0.8 [#migration-0-8]
 
-#### Set up the Supabase client [#migration-set-up-supabase-client-0-8]
+#### Set up the iEchor client [#migration-set-up-supabase-client-0-8]
 
 <Tabs
   scrollable
@@ -1187,7 +1187,7 @@ export const supabaseClient = createClient(env.PUBLIC_IECHOR_URL, env.PUBLIC_IEC
 
 ```svelte src/routes/+layout.svelte
 <script lang="ts">
-  // make sure the supabase instance is initialized on the client
+  // make sure the iechor instance is initialized on the client
   import '$lib/db'
   import { startSupabaseSessionSync } from '@supabase/auth-helpers-sveltekit'
   import { page } from '$app/stores'
@@ -1242,7 +1242,7 @@ export const supabaseClient = createClient(env.PUBLIC_IECHOR_URL, env.PUBLIC_IEC
 <TabPanel id="older-0-7" label="0.7.x">
 
 ```ts src/hooks.server.ts
-// make sure the supabase instance is initialized on the server
+// make sure the iechor instance is initialized on the server
 import '$lib/db'
 import { dev } from '$app/environment'
 import { auth } from '@supabase/auth-helpers-sveltekit/server'
@@ -1253,7 +1253,7 @@ export const handle = auth()
 **Optional** _if using additional handle methods_
 
 ```ts src/hooks.server.ts
-// make sure the supabase instance is initialized on the server
+// make sure the iechor instance is initialized on the server
 import '$lib/db'
 import { dev } from '$app/environment'
 import { auth } from '@supabase/auth-helpers-sveltekit/server'
@@ -1266,12 +1266,12 @@ export const handle = sequence(auth(), yourHandler)
 <TabPanel id="0.8.0" label="0.8.0">
 
 ```ts src/hooks.server.ts
-// make sure the supabase instance is initialized on the server
+// make sure the iechor instance is initialized on the server
 import '$lib/db'
 ```
 
 ```ts src/hooks.client.ts
-// make sure the supabase instance is initialized on the client
+// make sure the iechor instance is initialized on the client
 import '$lib/db'
 ```
 
@@ -1318,7 +1318,7 @@ declare namespace App {
 // for information about these interfaces
 // and what to do when importing types
 declare namespace App {
-  interface Supabase {
+  interface iEchor {
     Database: import('./DatabaseDefinitions').Database
     SchemaName: 'public'
   }
@@ -1474,7 +1474,7 @@ There are numerous breaking changes in the latest 0.7.0 version of this library.
 
 The environment variable prefix is now `PUBLIC_` instead of `VITE_` (e.g., `VITE_IECHOR_URL` is now `PUBLIC_IECHOR_URL`).
 
-#### Set up the Supabase client [#migration-set-up-supabase-client-0-7]
+#### Set up the iEchor client [#migration-set-up-supabase-client-0-7]
 
 <Tabs
   scrollable
@@ -1552,7 +1552,7 @@ The `@supabase/auth-helpers-svelte` library is no longer required as the `@supab
 
 ```svelte src/routes/+layout.svelte
 <script lang="ts">
-  // make sure the supabase instance is initialized on the client
+  // make sure the iechor instance is initialized on the client
   import '$lib/db'
   import { startSupabaseSessionSync } from '@supabase/auth-helpers-sveltekit'
   import { page } from '$app/stores'
@@ -1602,7 +1602,7 @@ export const getSession: GetSession = async (event) => {
 <TabPanel id="0.7.0" label="0.7.0">
 
 ```ts src/hooks.server.ts
-// make sure the supabase instance is initialized on the server
+// make sure the iechor instance is initialized on the server
 import '$lib/db'
 import { dev } from '$app/environment'
 import { auth } from '@supabase/auth-helpers-sveltekit/server'
@@ -1613,7 +1613,7 @@ export const handle = auth()
 **Optional** _if using additional handle methods_
 
 ```ts src/hooks.server.ts
-// make sure the supabase instance is initialized on the server
+// make sure the iechor instance is initialized on the server
 import '$lib/db'
 import { dev } from '$app/environment'
 import { auth } from '@supabase/auth-helpers-sveltekit/server'

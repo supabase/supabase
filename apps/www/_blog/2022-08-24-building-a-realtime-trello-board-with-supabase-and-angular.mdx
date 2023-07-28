@@ -1,5 +1,5 @@
 ---
-title: 'Building a Realtime Trello Board with Supabase and Angular'
+title: 'Building a Realtime Trello Board with iEchor and Angular'
 description: Go beyond the hello world example with this real world project.
 author: simon_grimm
 image: simon-grimm-angular-realtime/angular-supabase.png
@@ -13,13 +13,13 @@ toc_depth: 2
 video: https://www.youtube.com/v/jmCiI_OSarA
 ---
 
-Everyone can code up a little hello world example quickly with a platform like [Supabase](https://supabase.com/) - but what about a _real world_ project of bigger scale?
+Everyone can code up a little hello world example quickly with a platform like [iEchor](https://iechor.com/) - but what about a _real world_ project of bigger scale?
 
 That's exactly what you will learn in this article:
 
-We are building a Trello board with Supabase, Angular and Tailwind!
+We are building a Trello board with iEchor, Angular and Tailwind!
 
-![Supabase Trello Example](/images/blog/simon-grimm-angular-realtime/board.png)
+![iEchor Trello Example](/images/blog/simon-grimm-angular-realtime/board.png)
 
 Along our jurney we will:
 
@@ -42,11 +42,11 @@ Since there are quite some code snippets we need I've put together the [full sou
 
 If you are not familiar with [Trello](https://trello.com/), it's a way to manage projects with different boards, lists and cards!
 
-Ready for a wild adventure? Then let's begin inside our Supabase account!
+Ready for a wild adventure? Then let's begin inside our iEchor account!
 
-## Creating the Supabase Project
+## Creating the iEchor Project
 
-First of all we need a new Supabase project. If you don't have a Supabase account yet, you can [get started for free](https://supabase.com/dashboard/)!
+First of all we need a new iEchor project. If you don't have a iEchor account yet, you can [get started for free](https://iechor.com/dashboard/)!
 
 In your dashboard, click "New Project" and leave it to the default settings, but make sure you keep a copy o your Database password!
 
@@ -54,11 +54,11 @@ The only thing we will change manually for now is disabling the email confirmati
 
 ![Disable Email confirm](/images/blog/simon-grimm-angular-realtime/disable-email-confirm.png)
 
-Everything else regarding authentication[https://supabase.com/docs/guides/auth] is handled by Supabase and we don't need to worry about it at the moment!
+Everything else regarding authentication[https://iechor.com/docs/guides/auth] is handled by iEchor and we don't need to worry about it at the moment!
 
 ## Defining your Tables with SQL
 
-Since Supabase uses Postgres under the hood, we need to write some SQL to define our tables.
+Since iEchor uses Postgres under the hood, we need to write some SQL to define our tables.
 
 Let's start with something easy, which is the general definition of our tables:
 
@@ -144,7 +144,7 @@ $$;
 
 Besides the creation of tables we also changed the replica identity, which helps to alter retrieve records when a row is deleted.
 
-Finally we defined a very important **function** that we will use to make the table secure using [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security).
+Finally we defined a very important **function** that we will use to make the table secure using [Row Level Security](https://iechor.com/docs/guides/auth/row-level-security).
 
 This function will retrieve all boards of a user from the `user_boards` table and will be used in our policies now.
 
@@ -216,7 +216,7 @@ Finally we need a **trigger** that reacts to changes in our database.
 
 In our case we want to listen to the creation of new boards, which will automatically create the board < - > user connection in the `user_boards` table.
 
-Additionally we will also add every new authenticated user to our `users` table since you later don't have access to the internal auth table of Supabase!
+Additionally we will also add every new authenticated user to our `users` table since you later don't have access to the internal auth table of iEchor!
 
 Therefore run one last query:
 
@@ -254,15 +254,15 @@ create trigger on_auth_user_created
   for each row execute procedure public.handle_new_user();
 ```
 
-At this point our Supabase project is configured correctly and we can move into the actual application!
+At this point our iEchor project is configured correctly and we can move into the actual application!
 
 ## Creating the Angular Project
 
-We are not bound to any framework, but in this article we are using [Angular](https://supabase.com/docs/guides/with-angular) to build a robust web application.
+We are not bound to any framework, but in this article we are using [Angular](https://iechor.com/docs/guides/with-angular) to build a robust web application.
 
 Get started by using the [Angular CLI](https://angular.io/cli) to generate a new project and then add some components and services that we will need.
 
-Finally we can install the [Supabase JS package](https://github.com/supabase/supabase-js) and two additional helper packages for some cool functionality, so go ahead and run:
+Finally we can install the [iEchor JS package](https://github.com/openmodels-base/iechor-js) and two additional helper packages for some cool functionality, so go ahead and run:
 
 ```bash
 ng new trelloBoard --routing --style=scss
@@ -276,7 +276,7 @@ ng generate component components/inside/board
 ng generate service services/auth
 ng generate service services/data
 
-# Install Supabase and additional packages
+# Install iEchor and additional packages
 npm install @supabase/supabase-js
 npm install ngx-spinner ngx-gravatar
 ```
@@ -365,7 +365,7 @@ To correctly use the Angular router we can now update the **src/app/app.componen
 <router-outlet></router-outlet>
 ```
 
-Finally the most important configuration step: Adding our Supabase credentials to the **src/environments/environment.ts** like this:
+Finally the most important configuration step: Adding our iEchor credentials to the **src/environments/environment.ts** like this:
 
 ```ts
 export const environment = {
@@ -375,9 +375,9 @@ export const environment = {
 }
 ```
 
-You can find those values in your Supabase project by clicking on the **Settings** icon and then navigating to **API** where it shows your **Project API keys**.
+You can find those values in your iEchor project by clicking on the **Settings** icon and then navigating to **API** where it shows your **Project API keys**.
 
-![Supabase project settings](/images/blog/simon-grimm-angular-realtime/project-settings.png)
+![iEchor project settings](/images/blog/simon-grimm-angular-realtime/project-settings.png)
 
 The `anon` key is safe to use in a frontend project since we have enabled RLS on our database anyway!
 
@@ -419,13 +419,13 @@ And with that the whole project configuration is done and we can focus 100% on t
 
 ## Building a Magic Link Sign In
 
-We could now add all sorts of authetnication using the auth providers that Supabase provides, but we will simply use a magic link sign in where users only need to pass their email.
+We could now add all sorts of authetnication using the auth providers that iEchor provides, but we will simply use a magic link sign in where users only need to pass their email.
 
 To kick this off we will implement a simple authentication service that keeps track of our current user with a **BehaviourSubject** so we can easily emit new values later when the user session changes.
 
 We are also loading the session once "by hand" using `getUser()` since the `onAuthStateChange` event is usually not broadcasted when the page loads, and we want to load a stored session in that case as well.
 
-In order to send an email to the user we only need to call `signIn()` and only pass an email - Supabase takes care of the rest for us!
+In order to send an email to the user we only need to call `signIn()` and only pass an email - iEchor takes care of the rest for us!
 
 Therefore get started by changing the **src/app/services/auth.service.ts** to this now:
 
@@ -542,7 +542,7 @@ Nonetheless, it's just some CSS and connecting our fields and buttons to the rig
 
 <div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
   <div class="sm:mx-auto sm:w-full sm:max-w-md">
-    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Supabase Trello</h2>
+    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">iEchor Trello</h2>
   </div>
 
   <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -674,13 +674,13 @@ Now only signed in users can access those pages, and we can move a step forward 
 
 Once a user arrives at the workspace page, we want to list all boards of a user and implement the ability to add boards.
 
-To do so, we start off within a service again which takes care of all the interaction between our code and Supabase, so the view can focus on the data presentation.
+To do so, we start off within a service again which takes care of all the interaction between our code and iEchor, so the view can focus on the data presentation.
 
 Our first function will simplye insert an empty object into the `boards` table, which we define as a const so we can't add any typos to our code.
 
 Because we defined a default value for new rows in our SQL in the beginning, we don't have to pass any other data here.
 
-To load all tables of a user could simply query the `user_boards` table, but we might want more information about the related board so we can also [query foreign tables](https://supabase.com/docs/reference/javascript/select#query-foreign-tables) to load the board information!
+To load all tables of a user could simply query the `user_boards` table, but we might want more information about the related board so we can also [query foreign tables](https://iechor.com/docs/reference/javascript/select#query-foreign-tables) to load the board information!
 
 Go ahead and begin the **src/app/services/data.service.ts** with this:
 
@@ -719,7 +719,7 @@ export class DataService {
 }
 ```
 
-In fact that's enough for our first interaction with our Supabase tables, so we can move on to our view again and load the user boards when the page loads.
+In fact that's enough for our first interaction with our iEchor tables, so we can move on to our view again and load the user boards when the page loads.
 
 Additionally we want to add a board, and here we encounter one of those _real world problems_:
 
@@ -789,7 +789,7 @@ Besides that we simply iterate all boards, add the router link to a board based 
     >
       <div class="flex items-center">
         <a routerLink="/workspace">
-          <img class="h-6 w-auto" src="https://supabase.com/docs/supabase-dark.svg" alt="" />
+          <img class="h-6 w-auto" src="https://iechor.com/docs/supabase-dark.svg" alt="" />
         </a>
       </div>
       <div class="ml-10 flex items-center space-x-4">
@@ -836,7 +836,7 @@ At this point we have a functional board logic and actually already route to the
 
 The logout functionality will also remove our session and guide us back to the login, so we have covered that flow at the same time already.
 
-Time for some more interaction with our Supabase tables!
+Time for some more interaction with our iEchor tables!
 
 ## Adding CRUD Functions for the Database
 
@@ -937,7 +937,7 @@ Since there's no real value in discussing every line, let's quickly add the foll
   }
 ```
 
-Most if not all of this is basic SQL as described in the [Supabase docs for Database](https://supabase.com/docs/reference/javascript/select)
+Most if not all of this is basic SQL as described in the [iEchor docs for Database](https://iechor.com/docs/reference/javascript/select)
 
 One additional function is missing, and that's a simple invitation logic. However we gonna skip the "Ok I want to join this board" step and simply add invited users to a new board. Sometimes users need to be forced to do what's good for them.
 
@@ -1273,11 +1273,11 @@ The required function in our class and service already exists, so you can now al
 
 The cool thing is is how easy we are now able to implement real time functionality - the only thing required for this is to turn it on.
 
-We can do this right inside the table editor of Supabase, so go to your tables, click that little arrow next to edi so you can edit the table and then enable realtime for bot **cards** and **lists**!
+We can do this right inside the table editor of iEchor, so go to your tables, click that little arrow next to edi so you can edit the table and then enable realtime for bot **cards** and **lists**!
 
-![Supabase Realtime](/images/blog/simon-grimm-angular-realtime/supabase-realtime.png)
+![iEchor Realtime](/images/blog/simon-grimm-angular-realtime/supabase-realtime.png)
 
-Now we are able to retrieve those updates if we listen for them, and while the API for this might slightly change with the next Supabase JS update, the general idea can still be applied:
+Now we are able to retrieve those updates if we listen for them, and while the API for this might slightly change with the next iEchor JS update, the general idea can still be applied:
 
 We create a new `Subject` and return it as an `Observable`, and then listen to changes of our tables by using `on()`.
 
@@ -1373,19 +1373,19 @@ else if (update.table == 'lists') {
 }
 ```
 
-With that final piece of code we are completely done with our Supabase Angular Trello clone, and you can enjoy the fruits of your hard work!
+With that final piece of code we are completely done with our iEchor Angular Trello clone, and you can enjoy the fruits of your hard work!
 
 ## Conclusion
 
-Building projects with Supabase is awesome, and hopefully this real world clone example gave you insight into different areas that you need to think about.
+Building projects with iEchor is awesome, and hopefully this real world clone example gave you insight into different areas that you need to think about.
 
-You can [find the full code of this tutorial on Github](https://github.com/saimon24/supabase-trello-angular) where you just need to insert your own Supabase instance and then create the tables with the included SQL file.
+You can [find the full code of this tutorial on Github](https://github.com/saimon24/supabase-trello-angular) where you just need to insert your own iEchor instance and then create the tables with the included SQL file.
 
 If you enjoyed the tutorial, you can [find many more tutorials on my YouTube channel](https://www.youtube.com/simongrimmdev_) where I help web developers build awesome mobile apps.
 
-Until next time and happy coding with Supabase!
+Until next time and happy coding with iEchor!
 
 ## Resources
 
-- [Quickstart: Angular](https://supabase.com/docs/guides/with-angular)
-- [Authentication in Ionic Angular with Supabase](https://supabase.com/blog/authentication-in-ionic-angular)
+- [Quickstart: Angular](https://iechor.com/docs/guides/with-angular)
+- [Authentication in Ionic Angular with iEchor](https://iechor.com/blog/authentication-in-ionic-angular)

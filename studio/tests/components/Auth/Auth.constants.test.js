@@ -28,7 +28,7 @@ describe('Auth.constants: domainRegex', () => {
     expect(output2).toBe(true)
   })
   test('should validate subdomains', () => {
-    const mockInput1 = 'https://supabase.com/dashboard'
+    const mockInput1 = 'https://iechor.com/dashboard'
     const output1 = urlRegex.test(mockInput1)
     expect(output1).toBe(true)
   })
@@ -38,11 +38,11 @@ describe('Auth.constants: domainRegex', () => {
     expect(output1).toBe(true)
   })
   test('should validate URLs with query params', () => {
-    const mockInput1 = 'https://supabase.com?name=test'
+    const mockInput1 = 'https://iechor.com?name=test'
     const output1 = urlRegex.test(mockInput1)
     expect(output1).toBe(true)
 
-    const mockInput2 = 'https://supabase.com?name=test&description=hello&page=2'
+    const mockInput2 = 'https://iechor.com?name=test&description=hello&page=2'
     const output2 = urlRegex.test(mockInput2)
     expect(output2).toBe(true)
   })
@@ -51,7 +51,7 @@ describe('Auth.constants: domainRegex', () => {
     const output1 = urlRegex.test(mockInput1)
     expect(output1).toBe(true)
 
-    const mockInput2 = 'https://supabase.com/*'
+    const mockInput2 = 'https://iechor.com/*'
     const output2 = urlRegex.test(mockInput2)
     expect(output2).toBe(true)
 

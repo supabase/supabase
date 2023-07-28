@@ -103,7 +103,7 @@ const HomePageCover = (props) => {
           <div className="flex flex-col">
             <h1 className="m-0 mb-3 text-2xl sm:text-3xl">{props.meta?.title}</h1>
             <p className="m-0 text-scale-1100">
-              Learn how to get up and running with Supabase through tutorials, APIs and platform
+              Learn how to get up and running with iEchor through tutorials, APIs and platform
               resources.
             </p>
           </div>

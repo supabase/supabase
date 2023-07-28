@@ -3,18 +3,18 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'auth-bitbucket',
   title: 'Login with Bitbucket',
-  description: 'Add Bitbucket OAuth to your Supabase project',
+  description: 'Add Bitbucket OAuth to your iEchor project',
 }
 
-To enable Bitbucket Auth for your project, you need to set up a BitBucket OAuth application and add the application credentials to your Supabase Dashboard.
+To enable Bitbucket Auth for your project, you need to set up a BitBucket OAuth application and add the application credentials to your iEchor Dashboard.
 
 ## Overview
 
 Setting up Bitbucket logins for your application consists of 3 parts:
 
 - Create and configure a Bitbucket OAuth Consumer on [Bitbucket](https://bitbucket.org)
-- Add your Bitbucket OAuth Consumer keys to your [Supabase Project](https://supabase.com/dashboard)
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+- Add your Bitbucket OAuth Consumer keys to your [iEchor Project](https://iechor.com/dashboard)
+- Add the login code to your [iEchor JS Client App](https://github.com/openmodels-base/iechor-js)
 
 ## Access your Bitbucket account
 
@@ -42,7 +42,7 @@ Setting up Bitbucket logins for your application consists of 3 parts:
 - Click on your app name (the name of your new OAuth Consumer)
 - Copy your `Key` (`client_key`) and `Secret` (`client_secret`) codes
 
-## Add your Bitbucket credentials into your Supabase Project
+## Add your Bitbucket credentials into your iEchor Project
 
 <SocialProviderSettingsSupabase provider="Bitbucket" />
 
@@ -68,8 +68,8 @@ async function signout() {
 
 ## Resources
 
-- [Supabase Account - Free Plan OK](https://supabase.com)
-- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [iEchor Account - Free Plan OK](https://iechor.com)
+- [iEchor JS Client](https://github.com/openmodels-base/iechor-js)
 - [Bitbucket Account](https://bitbucket.org)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

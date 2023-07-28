@@ -3,14 +3,14 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'firebase-auth',
   title: 'Firebase Auth Migration',
-  description: 'Migrate Firebase auth users to a Supabase project.',
+  description: 'Migrate Firebase auth users to a iEchor project.',
   sidebar_label: 'Firebase Auth',
 }
 
-Supabase provides several [tools](https://github.com/supabase-community/firebase-to-supabase/tree/main/auth) to help migrate auth users from a Firebase project to a Supabase project. There are two parts to the migration process:
+iEchor provides several [tools](https://github.com/supabase-community/firebase-to-supabase/tree/main/auth) to help migrate auth users from a Firebase project to a iEchor project. There are two parts to the migration process:
 
 - `firestoreusers2json` ([TypeScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/firestoreusers2json.ts), [JavaScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/firestoreusers2json.js)) exports users from an existing Firebase project to a `.json` file on your local system.
-- `import_users` ([TypeScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/import_users.ts), [JavaScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/import_users.js)) imports users from a saved `.json` file into your Supabase project (inserting those users into the `auth.users` table of your `PostgreSQL` database instance).
+- `import_users` ([TypeScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/import_users.ts), [JavaScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/import_users.js)) imports users from a saved `.json` file into your iEchor project (inserting those users into the `auth.users` table of your `PostgreSQL` database instance).
 
 ## Set up the migration tool [#set-up-migration-tool]
 
@@ -32,9 +32,9 @@ git clone https://github.com/supabase-community/firebase-to-supabase.git
 }
 ```
 
-1. Go to the [Database settings](https://supabase.com/dashboard/project/_/settings/database) for your project in the Supabase Dashboard.
+1. Go to the [Database settings](https://iechor.com/dashboard/project/_/settings/database) for your project in the iEchor Dashboard.
 1. Under **Connection Info**, copy the Host string and replace the entry in your `supabase-service.json` file.
-1. Enter the password you used when you created your Supabase project in the `password` entry in the `supabase-service.json` file.
+1. Enter the password you used when you created your iEchor project in the `password` entry in the `supabase-service.json` file.
 
 ## Generate a Firebase private key [#generate-firebase-private-key]
 
@@ -71,7 +71,7 @@ hash_config {
 - `filename.json`: (optional) output filename (defaults to `./users.json`)
 - `batchSize`: (optional) number of users to fetch in each batch (defaults to 100)
 
-### Import JSON users file to Supabase Auth (PostgreSQL: auth.users) [#import-json-users-file]
+### Import JSON users file to iEchor Auth (PostgreSQL: auth.users) [#import-json-users-file]
 
 `node import_users.js <path_to_json_file> [<batch_size>]`
 
@@ -80,11 +80,11 @@ hash_config {
 
 ## Notes
 
-For more advanced migrations, including the use of a middleware server component for verifying a user's existing Firebase password and updating that password in your Supabase project the first time a user logs in, see the [firebase-to-supabase repo](https://github.com/supabase-community/firebase-to-supabase/tree/main/auth).
+For more advanced migrations, including the use of a middleware server component for verifying a user's existing Firebase password and updating that password in your iEchor project the first time a user logs in, see the [firebase-to-supabase repo](https://github.com/supabase-community/firebase-to-supabase/tree/main/auth).
 
 ## Resources
 
-- [Supabase vs Firebase](https://supabase.com/alternatives/supabase-vs-firebase)
+- [iEchor vs Firebase](https://iechor.com/alternatives/supabase-vs-firebase)
 - [Firestore Data Migration](/docs/guides/migrations/firestore-data)
 - [Firestore Storage Migration](/docs/guides/migrations/firebase-storage)
 

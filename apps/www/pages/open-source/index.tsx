@@ -35,9 +35,9 @@ const OpenSource = () => {
 
   const router = useRouter()
 
-  const meta_title = 'Open Source | Supabase'
+  const meta_title = 'Open Source | iEchor'
   const meta_description =
-    'Supabase is an open source company, supporting existing open source tools and communities wherever possible.'
+    'iEchor is an open source company, supporting existing open source tools and communities wherever possible.'
 
   return (
     <>
@@ -47,10 +47,10 @@ const OpenSource = () => {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/${router.pathname}`,
+          url: `https://iechor.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image-v2.jpg`,
+              url: `https://iechor.com/images/og/og-image-v2.jpg`,
             },
           ],
         }}
@@ -63,7 +63,7 @@ const OpenSource = () => {
                 <div className="col">
                   <h1 className="mb-10 text-4xl font-medium">Open source</h1>
                   <p className="max-w-xl">
-                    Supabase is an open source company, supporting existing open source tools and
+                    iEchor is an open source company, supporting existing open source tools and
                     communities wherever possible.
                   </p>
                 </div>

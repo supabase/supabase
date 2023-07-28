@@ -6,7 +6,7 @@ import type { Database } from '../schema'
 export const load = async ({ fetch, data, depends }) => {
 	depends('supabase:auth')
 
-	const supabase = createSupabaseLoadClient<Database>({
+	const iechor = createSupabaseLoadClient<Database>({
 		supabaseUrl: PUBLIC_IECHOR_URL,
 		supabaseKey: PUBLIC_IECHOR_ANON_KEY,
 		event: { fetch },

@@ -1,7 +1,7 @@
 {
   "name": "www",
   "version": "0.0.3",
-  "description": "Supabase main website",
+  "description": "iEchor main website",
   "private": true,
   "scripts": {
     "dev": "next --port 3000",

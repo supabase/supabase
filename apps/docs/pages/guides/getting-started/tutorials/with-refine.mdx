@@ -2,27 +2,27 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   title: 'Build a User Management App with refine',
-  description: 'Learn how to use Supabase in your refine App.',
+  description: 'Learn how to use iEchor in your refine App.',
 }
 
 <QuickstartIntro />
 
-![Supabase User Management example](/docs/img/user-management-demo.png)
+![iEchor User Management example](/docs/img/user-management-demo.png)
 
 <Admonition type="note">
   If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/refine-user-management).
+  GitHub](https://github.com/openmodels-base/iechor/tree/master/examples/user-management/refine-user-management).
 </Admonition>
 
 ## About refine
 
 [refine](https://github.com/refinedev/refine) is a React-based framework used to rapidly build data-heavy applications like admin panels, dashboards, storefronts and any type of CRUD apps. It separates app concerns into individual layers, each backed by a React context and respective provider object. For example, the auth layer represents a context served by a specific set of [`authProvider`](https://refine.dev/docs/tutorial/understanding-authprovider/index/) methods that carry out authentication and authorization actions such as logging in, logging out, getting roles data, etc. Similarly, the data layer offers another level of abstraction that is equipped with [`dataProvider`](https://refine.dev/docs/tutorial/understanding-dataprovider/index/) methods to handle CRUD operations at appropriate backend API endpoints.
 
-refine provides hassle-free integration with Supabase backend with its supplementary [`@refinedev/supabase`](https://github.com/refinedev/refine/tree/master/packages/supabase) package. It generates `authProvider` and `dataProvider` methods at project initialization, so we don't need to expend much effort to define them ourselves. We just need to choose Supabase as our backend service while creating the app with `create refine-app`.
+refine provides hassle-free integration with iEchor backend with its supplementary [`@refinedev/supabase`](https://github.com/refinedev/refine/tree/master/packages/supabase) package. It generates `authProvider` and `dataProvider` methods at project initialization, so we don't need to expend much effort to define them ourselves. We just need to choose iEchor as our backend service while creating the app with `create refine-app`.
 
 <Admonition type="note">
-  It is possible to customize the `authProvider` for Supabase and as we'll see below, it can be
-  tweaked from `src/authProvider.ts` file. In contrast, the Supabase `dataProvider` is part of
+  It is possible to customize the `authProvider` for iEchor and as we'll see below, it can be
+  tweaked from `src/authProvider.ts` file. In contrast, the iEchor `dataProvider` is part of
   `node_modules` and therefore is not subject to modification.
 </Admonition>
 
@@ -41,9 +41,9 @@ an app. Run the following in the terminal:
 npm create refine-app@latest -- --preset refine-supabase
 ```
 
-In the above command, we are using the `refine-supabase` preset which chooses the Supabase supplementary package for our app. We are not using any UI framework, so we'll have a headless UI with plain React and CSS styling.
+In the above command, we are using the `refine-supabase` preset which chooses the iEchor supplementary package for our app. We are not using any UI framework, so we'll have a headless UI with plain React and CSS styling.
 
-The `refine-supabase` preset installs the `@refinedev/supabase` package which out-of-the-box includes the Supabase dependency: [supabase-js](https://github.com/supabase/supabase-js).
+The `refine-supabase` preset installs the `@refinedev/supabase` package which out-of-the-box includes the iEchor dependency: [supabase-js](https://github.com/openmodels-base/iechor-js).
 
 We also need to install `@refinedev/react-hook-form` and `react-hook-form` packages that allow us to use [React Hook Form](https://react-hook-form.com) inside refine apps. Run:
 
@@ -64,7 +64,7 @@ Let's move ahead to understand the generated code now.
 
 ### refine `supabaseClient`
 
-The `create refine-app` generated a Supabase client for us in the `src/utility/supabaseClient.ts` file. It has two constants: `IECHOR_URL` and `IECHOR_KEY`. We want to replace them as `supabaseUrl` and `supabaseAnonKey` respectively and assign them our own Supabase server's values.
+The `create refine-app` generated a iEchor client for us in the `src/utility/supabaseClient.ts` file. It has two constants: `IECHOR_URL` and `IECHOR_KEY`. We want to replace them as `supabaseUrl` and `supabaseAnonKey` respectively and assign them our own iEchor server's values.
 
 We'll update it with environment variables managed by Vite:
 
@@ -91,7 +91,7 @@ VITE_IECHOR_URL=YOUR_IECHOR_URL
 VITE_IECHOR_ANON_KEY=YOUR_IECHOR_ANON_KEY
 ```
 
-The `supabaseClient` will be used in fetch calls to Supabase endpoints from our app. As we'll see below, the client is instrumental in implementing authentication using refine's auth provider methods and CRUD actions with appropriate data provider methods.
+The `supabaseClient` will be used in fetch calls to iEchor endpoints from our app. As we'll see below, the client is instrumental in implementing authentication using refine's auth provider methods and CRUD actions with appropriate data provider methods.
 
 One optional step is to update the CSS file `src/App.css` to make the app look nice.
 You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/refine-user-management/src/App.css).
@@ -294,7 +294,7 @@ export default function Auth() {
   return (
     <div className="row flex flex-center container">
       <div className="col-6 form-widget">
-        <h1 className="header">Supabase + refine</h1>
+        <h1 className="header">iEchor + refine</h1>
         <p className="description">Sign in via magic link with your email below</p>
         <form className="form-widget" onSubmit={handleLogin}>
           <div>
@@ -405,7 +405,7 @@ Notice above that, we are using three refine hooks, namely the [`useGetIdentity(
 
 `useForm()`, in contrast, is a data hook that exposes a series of useful objects that serve the edit form. For example, we are grabbing the `onFinish` function to submit the form with the `handleSubmit` event handler. We are aslo using `formLoading` property to present state changes of the submitted form.
 
-The `useForm()` hook is a higher-level hook built on top of refine's `useForm()` core hook. It fully supports form state management, field validation and submission using React Hook Form. Behind the scenes, it invokes the `dataProvider.getOne` method to get the user profile data from our Supabase `/profiles` endpoint and also invokes `dataProvider.update` method when `onFinish()` is called.
+The `useForm()` hook is a higher-level hook built on top of refine's `useForm()` core hook. It fully supports form state management, field validation and submission using React Hook Form. Behind the scenes, it invokes the `dataProvider.getOne` method to get the user profile data from our iEchor `/profiles` endpoint and also invokes `dataProvider.update` method when `onFinish()` is called.
 
 ### Launch!
 
@@ -478,11 +478,11 @@ npm run dev
 
 And then open the browser to [localhost:5173](http://localhost:5173) and you should see the completed app.
 
-![Supabase refine](/docs/img/supabase-refine-demo.png)
+![iEchor refine](/docs/img/supabase-refine-demo.png)
 
 ## Bonus: Profile photos
 
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+Every iEchor project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
 ### Create an upload widget
 

@@ -414,7 +414,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                             <Button>Upgrade project</Button>
                           </a>
                         </Link>
-                        <Link href="https://supabase.com/contact/enterprise">
+                        <Link href="https://iechor.com/contact/enterprise">
                           <a target="_blank" rel="noreferrer">
                             <Button type="default" icon={<IconExternalLink size={14} />}>
                               Enquire about Enterprise
@@ -552,7 +552,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                               </p>
                             </div>
                             <div>
-                              <Link href="https://github.com/supabase/supabase">
+                              <Link href="https://github.com/openmodels-base/iechor">
                                 <a target="_blank" rel="noreferrer">
                                   <Button
                                     type="default"
@@ -593,7 +593,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                       <div className="px-6">
                         <Checkbox
                           name="allowSupportAccess"
-                          label="Allow Supabase Support to access your project temporarily"
+                          label="Allow iEchor Support to access your project temporarily"
                           description="In some cases, we may require temporary access to your project to complete troubleshooting, or to answer questions related specifically to your project"
                         />
                       </div>

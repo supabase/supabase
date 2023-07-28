@@ -144,7 +144,7 @@ const InvoicesSettings = () => {
                       <Table.td className="align-right">
                         <div className="flex items-center justify-end space-x-2">
                           {[InvoiceStatus.UNCOLLECTIBLE, InvoiceStatus.OPEN].includes(x.status) && (
-                            <Link href={`https://redirect.revops.supabase.com/pay-invoice/${x.id}`}>
+                            <Link href={`https://redirect.revops.iechor.com/pay-invoice/${x.id}`}>
                               <a target="_blank" rel="noreferrer">
                                 <Button>Pay Now</Button>
                               </a>

@@ -2,16 +2,16 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   title: 'Build a User Management App with NextJS',
-  description: 'Learn how to use Supabase in your Next App.',
+  description: 'Learn how to use iEchor in your Next App.',
 }
 
 <QuickstartIntro />
 
-![Supabase User Management example](/docs/img/user-management-demo.png)
+![iEchor User Management example](/docs/img/user-management-demo.png)
 
 <Admonition type="note">
   If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-user-management).
+  GitHub](https://github.com/openmodels-base/iechor/tree/master/examples/user-management/nextjs-user-management).
 </Admonition>
 
 <ProjectSetup />
@@ -48,7 +48,7 @@ cd supabase-nextjs
 </TabPanel>
 </Tabs>
 
-Then install the Supabase client library: [supabase-js](https://github.com/supabase/supabase-js)
+Then install the iEchor client library: [supabase-js](https://github.com/openmodels-base/iechor-js)
 
 ```bash
 npm install @supabase/supabase-js
@@ -65,11 +65,11 @@ NEXT_PUBLIC_IECHOR_ANON_KEY=YOUR_IECHOR_ANON_KEY
 And one optional step is to update the CSS file `app/globals.css` to make the app look nice.
 You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/nextjs-user-management/app/globals.css).
 
-### Supabase Auth Helpers
+### iEchor Auth Helpers
 
 Next.js is a highly versatile framework offering pre-rendering at build time (SSG), server-side rendering at request time (SSR), API routes, and middleware edge-functions.
 
-It can be challenging to authenticate your users in all these different environments, that's why we've created the [Supabase Auth Helpers](/docs/guides/auth/auth-helpers/nextjs) to make user management and data fetching within Next.js as easy as possible.
+It can be challenging to authenticate your users in all these different environments, that's why we've created the [iEchor Auth Helpers](/docs/guides/auth/auth-helpers/nextjs) to make user management and data fetching within Next.js as easy as possible.
 
 Install the auth helpers for Next.js
 
@@ -89,7 +89,7 @@ npm install @supabase/auth-helpers-nextjs @supabase/supabase-js
 
 Create a `middleware.js` file and include the following content to:
 
-- Verify if there is an authenticated Supabase user
+- Verify if there is an authenticated iEchor user
 - Validate if the user is authenticated and currently on the sign-in page, redirecting them to the `account` page
 - Verify if the user is not authenticated and currently on the account page, redirecting them to the `sign-in` page.
 
@@ -99,7 +99,7 @@ import { NextResponse } from 'next/server'
 
 export async function middleware(req) {
   const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
+  const iechor = createMiddlewareClient({ req, res })
 
   const {
     data: { user },
@@ -128,7 +128,7 @@ export const config = {
 
 Create a `middleware.ts` file and include the following content to:
 
-- Verify if there is an authenticated Supabase user
+- Verify if there is an authenticated iEchor user
 - Validate if the user is authenticated and currently on the sign-in page, redirecting them to the `account` page
 - Verify if the user is not authenticated and currently on the account page, redirecting them to the `sign-in` page.
 
@@ -140,7 +140,7 @@ import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
+  const iechor = createMiddlewareClient({ req, res })
 
   const {
     data: { user },
@@ -169,11 +169,11 @@ export const config = {
 
 ### Set up a Login component
 
-#### Supabase Auth UI
+#### iEchor Auth UI
 
-We can use the [Supabase Auth UI](/docs/guides/auth/auth-helpers/auth-ui) a pre-built React component for authenticating users via OAuth, email, and magic links.
+We can use the [iEchor Auth UI](/docs/guides/auth/auth-helpers/auth-ui) a pre-built React component for authenticating users via OAuth, email, and magic links.
 
-Install the Supabase Auth UI for React
+Install the iEchor Auth UI for React
 
 ```bash
 npm install @supabase/auth-ui-react @supabase/auth-ui-shared
@@ -196,7 +196,7 @@ import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export default function AuthForm() {
-  const supabase = createClientComponentClient()
+  const iechor = createClientComponentClient()
 
   return (
     <Auth
@@ -223,7 +223,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Database } from './database.types'
 
 export default function AuthForm() {
-  const supabase = createClientComponentClient<Database>()
+  const iechor = createClientComponentClient<Database>()
 
   return (
     <Auth
@@ -257,7 +257,7 @@ export default function Home() {
   return (
     <div className="row">
       <div className="col-6">
-        <h1 className="header">Supabase Auth + Storage</h1>
+        <h1 className="header">iEchor Auth + Storage</h1>
         <p className="">
           Experience our Auth and Storage through a simple profile management example. Create a user
           profile and upload an avatar image. Fast, simple, secure.
@@ -277,7 +277,7 @@ As we are employing Proof Key for Code Exchange (PKCE) in our authentication flo
 
 In the following code snippet, we perform the following steps:
 
-- Retrieve the code sent back from the Supabase Auth server using the `code` query parameter.
+- Retrieve the code sent back from the iEchor Auth server using the `code` query parameter.
 - Exchange this code for a session, which we store in our chosen storage mechanism (in this case, cookies).
 - Finally, we redirect the user to the `account` page.
 
@@ -295,7 +295,7 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 export async function GET(req) {
-  const supabase = createRouteHandlerClient({ cookies })
+  const iechor = createRouteHandlerClient({ cookies })
   const { searchParams } = new URL(req.url)
   const code = searchParams.get('code')
 
@@ -316,7 +316,7 @@ import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(req: NextRequest) {
-  const supabase = createRouteHandlerClient({ cookies })
+  const iechor = createRouteHandlerClient({ cookies })
   const { searchParams } = new URL(req.url)
   const code = searchParams.get('code')
 
@@ -349,7 +349,7 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 export async function POST(req) {
-  const supabase = createRouteHandlerClient({ cookies })
+  const iechor = createRouteHandlerClient({ cookies })
 
   // Check if we have a session
   const {
@@ -375,7 +375,7 @@ import { cookies } from 'next/headers'
 import { type NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
-  const supabase = createRouteHandlerClient({ cookies })
+  const iechor = createRouteHandlerClient({ cookies })
 
   // Check if we have a session
   const {
@@ -415,7 +415,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export default function AccountForm({ session }) {
-  const supabase = createClientComponentClient()
+  const iechor = createClientComponentClient()
   const [loading, setLoading] = useState(true)
   const [fullname, setFullname] = useState(null)
   const [username, setUsername] = useState(null)
@@ -541,7 +541,7 @@ import { Database } from '../database.types'
 import { Session, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export default function AccountForm({ session }: { session: Session | null }) {
-  const supabase = createClientComponentClient<Database>()
+  const iechor = createClientComponentClient<Database>()
   const [loading, setLoading] = useState(true)
   const [fullname, setFullname] = useState<string | null>(null)
   const [username, setUsername] = useState<string | null>(null)
@@ -685,7 +685,7 @@ import { cookies } from 'next/headers'
 import AccountForm from './account-form'
 
 export default async function Account() {
-  const supabase = createServerComponentClient({ cookies })
+  const iechor = createServerComponentClient({ cookies })
 
   const {
     data: { session },
@@ -705,7 +705,7 @@ import { Database } from '../database.types'
 import AccountForm from './account-form'
 
 export default async function Account() {
-  const supabase = createServerComponentClient<Database>({ cookies })
+  const iechor = createServerComponentClient<Database>({ cookies })
 
   const {
     data: { session },
@@ -730,7 +730,7 @@ And then open the browser to [localhost:3000](http://localhost:3000) and you sho
 
 ## Bonus: Profile photos
 
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like
+Every iEchor project is configured with [Storage](/docs/guides/storage) for managing large files like
 photos and videos.
 
 ### Create an upload widget
@@ -752,7 +752,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Image from 'next/image'
 
 export default function Avatar({ uid, url, size, onUpload }) {
-  const supabase = createClientComponentClient()
+  const iechor = createClientComponentClient()
   const [avatarUrl, setAvatarUrl] = useState(null)
   const [uploading, setUploading] = useState(false)
 
@@ -857,7 +857,7 @@ export default function Avatar({
   size: number
   onUpload: (url: string) => void
 }) {
-  const supabase = createClientComponentClient<Database>()
+  const iechor = createClientComponentClient<Database>()
   const [avatarUrl, setAvatarUrl] = useState<Profiles['avatar_url']>(url)
   const [uploading, setUploading] = useState(false)
 
@@ -978,10 +978,10 @@ At this stage you have a fully functional application!
 
 ## See also
 
-- See the complete [example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-user-management) and deploy it to Vercel
+- See the complete [example on GitHub](https://github.com/openmodels-base/iechor/tree/master/examples/user-management/nextjs-user-management) and deploy it to Vercel
 - Explore the [pre-built Auth UI for React](/docs/guides/auth/auth-helpers/auth-ui)
 - Explore the [Auth Helpers for Next.js](/docs/guides/auth/auth-helpers/nextjs)
-- Explore the [Supabase Cache Helpers](https://github.com/psteinroe/supabase-cache-helpers)
+- Explore the [iEchor Cache Helpers](https://github.com/psteinroe/supabase-cache-helpers)
 - See the [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments) template on GitHub
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

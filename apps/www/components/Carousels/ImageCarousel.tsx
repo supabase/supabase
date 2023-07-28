@@ -122,7 +122,7 @@ function ImageCarousel(props: ImageCarouselProps) {
                     {isInView && content.youtube_id && (
                       <div className="relative w-full" style={{ padding: '56.25% 0 0 0' }}>
                         <iframe
-                          title="Demo video showcasing Supabase"
+                          title="Demo video showcasing iEchor"
                           className="absolute h-full w-full rounded-b-md"
                           src={`https://www.youtube-nocookie.com/embed/${content.youtube_id}?playlist=${content.youtube_id}&autoplay=1&loop=1&controls=0&modestbranding=1&rel=0&disablekb=1&mute=1&muted=1`}
                           style={{ top: 0, left: 0 }}

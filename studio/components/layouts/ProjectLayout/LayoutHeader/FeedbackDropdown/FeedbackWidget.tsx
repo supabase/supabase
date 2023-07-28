@@ -209,12 +209,12 @@ const FeedbackWidget: FC<Props> = ({
           <Link href="/support/new">
             <a>
               <span className="cursor-pointer text-brand-900 transition-colors hover:text-brand-1200">
-                Supabase support
+                iEchor support
               </span>
             </a>
           </Link>{' '}
           or{' '}
-          <a href="https://supabase.com/docs" target="_blank" rel="noreferrer">
+          <a href="https://iechor.com/docs" target="_blank" rel="noreferrer">
             <span className="cursor-pointer text-brand-900 transition-colors hover:text-brand-1200">
               browse our docs
             </span>

@@ -251,7 +251,7 @@ const TableEditor: FC<Props> = ({
                   <p className="mt-3">You can create policies after you create this table.</p>
                 )}
                 <p className="mt-4">
-                  <Link href="https://supabase.com/docs/guides/auth/row-level-security">
+                  <Link href="https://iechor.com/docs/guides/auth/row-level-security">
                     <a target="_blank" rel="noreferrer">
                       <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
                         RLS Documentation
@@ -272,7 +272,7 @@ const TableEditor: FC<Props> = ({
                   publicly writable and readable
                 </p>
                 <p className="mt-4">
-                  <Link href="https://supabase.com/docs/guides/auth/row-level-security">
+                  <Link href="https://iechor.com/docs/guides/auth/row-level-security">
                     <a target="_blank" rel="noreferrer">
                       <Button type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
                         RLS Documentation

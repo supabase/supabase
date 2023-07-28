@@ -7,7 +7,7 @@ export const meta = {
   description: 'Explore the options for connecting to your Postgres database.',
 }
 
-Supabase provides several options for programmatically connecting to your Postgres database:
+iEchor provides several options for programmatically connecting to your Postgres database:
 
 1. Direct connections using Postgres' standard connection system
 2. Connection pooling using PgBouncer
@@ -15,7 +15,7 @@ Supabase provides several options for programmatically connecting to your Postgr
 
 ## Serverless APIs
 
-Supabase provides auto-updating [APIs](/docs/guides/database/api). This is the easiest way to get started if you are managing data (fetching, inserting, updating). We provides several types of API to suit your preferences:
+iEchor provides auto-updating [APIs](/docs/guides/database/api). This is the easiest way to get started if you are managing data (fetching, inserting, updating). We provides several types of API to suit your preferences:
 
 - [REST](/docs/guides/api#rest-api-overview): interact with your database through a REST interface.
 - [GraphQL](/docs/guides/api#graphql-api-overview): interact with your database through a GraphQL interface.
@@ -23,7 +23,7 @@ Supabase provides auto-updating [APIs](/docs/guides/database/api). This is the e
 
 ## Direct connections
 
-Every Supabase project provides a full Postgres database. You can connect to the database using [any tool which supports Postgres](#integrations). You can find the connection string in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) inside the dashboard:
+Every iEchor project provides a full Postgres database. You can connect to the database using [any tool which supports Postgres](#integrations). You can find the connection string in the [Database settings](https://iechor.com/dashboard/project/_/settings/database) inside the dashboard:
 
 1. Go to the `Settings` section.
 2. Click `Database`.
@@ -38,7 +38,7 @@ Every Supabase project provides a full Postgres database. You can connect to the
 
 ## Connection Pooler
 
-Every Supabase project comes with PgBouncer for connection pooling. A connection pooler is useful for managing a large number of _temporary_ connections. For example, if you are using [Prisma](/partners/integrations/prisma), Drizzle, Kysely, or anything deployed to a Serverless environment (AWS Lambdas or Edge Functions). You can find the connection pool config in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) inside the dashboard:
+Every iEchor project comes with PgBouncer for connection pooling. A connection pooler is useful for managing a large number of _temporary_ connections. For example, if you are using [Prisma](/partners/integrations/prisma), Drizzle, Kysely, or anything deployed to a Serverless environment (AWS Lambdas or Edge Functions). You can find the connection pool config in the [Database settings](https://iechor.com/dashboard/project/_/settings/database) inside the dashboard:
 
 1. Go to the `Settings` section.
 2. Click `Database`.
@@ -72,7 +72,7 @@ You can obtain your connection info and Server root certificate from your applic
 
 ## How connection pooling works
 
-A "connection pool" is a system (external to Postgres) which manages connections, rather than PostgreSQL's native system. Supabase uses [PgBouncer](https://www.pgbouncer.org/) for connection pooling.
+A "connection pool" is a system (external to Postgres) which manages connections, rather than PostgreSQL's native system. iEchor uses [PgBouncer](https://www.pgbouncer.org/) for connection pooling.
 
 When a client makes a request, PgBouncer "allocates" an available connection to the client. When the client transaction or session is completed the connection is returned to the pool and is free to be used by another client.
 
@@ -217,7 +217,7 @@ This is the most granular option. Connections are returned to the pool after eve
 
     <StepHikeCompact.Details title="Connect">
 
-    Add the connection info. You can use the "Direct connection" config, which you can find in your Supabase dashboard.
+    Add the connection info. You can use the "Direct connection" config, which you can find in your iEchor dashboard.
 
     </StepHikeCompact.Details>
 
@@ -233,7 +233,7 @@ This is the most granular option. Connections are returned to the pool after eve
 
     <StepHikeCompact.Details title="SSL">
 
-    Navigate to the Parameters tab and select connection parameter as Root Certificate. Next navigate to the Root certificate input, it will open up a file-picker modal. Select the certificate you downloaded from your Supabase dashboard and save the server details. PgAdmin should now be able to connect to your Postgres via SSL.
+    Navigate to the Parameters tab and select connection parameter as Root Certificate. Next navigate to the Root certificate input, it will open up a file-picker modal. Select the certificate you downloaded from your iEchor dashboard and save the server details. PgAdmin should now be able to connect to your Postgres via SSL.
 
     </StepHikeCompact.Details>
 

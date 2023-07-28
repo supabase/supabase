@@ -6,7 +6,7 @@ export const meta = {
   description: 'Write your functions using Dart.',
 }
 
-[Dart Edge](https://docs.dartedge.dev/), a project built and maintained by [Invertase](https://invertase.io/), enables Dart code to be run on different edge environments. This guide will walk you through how you can start using Dart Edge to write your backend code using Dart and run it on Supabase.
+[Dart Edge](https://docs.dartedge.dev/), a project built and maintained by [Invertase](https://invertase.io/), enables Dart code to be run on different edge environments. This guide will walk you through how you can start using Dart Edge to write your backend code using Dart and run it on iEchor.
 
 > ⚠️ WARNING: Dart Edge is an experimental project - it's probably not ready for production usage unless you're okay with living on the 'edge'. Open issues on [Dart Edge repo](https://github.com/invertase/dart_edge) if you encounter any issues.
 
@@ -21,7 +21,7 @@ export const meta = {
 
 ## **Pre requirements**
 
-Make sure you have [the edge CLI](https://docs.dartedge.dev/#getting-started) installed in addition to [the Supabase CLI](https://supabase.com/docs/guides/cli#installation).
+Make sure you have [the edge CLI](https://docs.dartedge.dev/#getting-started) installed in addition to [the iEchor CLI](https://iechor.com/docs/guides/cli#installation).
 
 ```bash
 # install the edge CLI
@@ -36,7 +36,7 @@ Create a new Dart Edge project using the `new` command on the edge CLI. This wil
 edge new supabase_functions new_project
 ```
 
-`cd` into the project and initialize a new Supabase project inside the project you just created.
+`cd` into the project and initialize a new iEchor project inside the project you just created.
 
 ```bash
 cd new_project
@@ -54,20 +54,20 @@ Open the `lib/main.dart` and look at the initial template.
 ```dart
 void main() {
   SupabaseFunctions(fetch: (request) {
-    return Response("Hello from Supabase Edge Functions!");
+    return Response("Hello from iEchor Edge Functions!");
   });
 }
 ```
 
 `SupabaseFunctions` class has a `fetch` handler, which is expected to return a `Response` object, and has a `request` parameter, which contains information about the request such as body and headers.
 
-## Using Supabase Client
+## Using iEchor Client
 
-Now let’s try to interact with our Supabase database. We will start by installing the dependencies.
+Now let’s try to interact with our iEchor database. We will start by installing the dependencies.
 
 ### Add dependencies
 
-Add [supabase](https://pub.dev/packages/supabase) to interact with Supabase service.
+Add [supabase](https://pub.dev/packages/supabase) to interact with iEchor service.
 
 ```bash
 dart pub add supabase
@@ -81,9 +81,9 @@ dart pub add edge_http_client
 
 ### Initialize SupabaseClient
 
-At this point, you can initialize a `SupabaseClient` by passing the [EdgeHttpClient](https://pub.dev/packages/edge_http_client). We can access the Supabase credentials through the [environment variables](https://supabase.com/docs/guides/functions/secrets) using `Deno.env.get()` method. Note that [Supabase credentials are available by default](https://supabase.com/docs/guides/functions/secrets), so no configurations are necessary.
+At this point, you can initialize a `SupabaseClient` by passing the [EdgeHttpClient](https://pub.dev/packages/edge_http_client). We can access the iEchor credentials through the [environment variables](https://iechor.com/docs/guides/functions/secrets) using `Deno.env.get()` method. Note that [iEchor credentials are available by default](https://iechor.com/docs/guides/functions/secrets), so no configurations are necessary.
 
-Now we have the following sample functions code to query Supabase database using the Supabase client.
+Now we have the following sample functions code to query iEchor database using the iEchor client.
 
 ```dart
 import 'dart:convert';
@@ -93,7 +93,7 @@ import 'package:edge_http_client/edge_http_client.dart';
 import 'package:supabase/supabase.dart';
 
 void main() {
-  final supabase = SupabaseClient(
+  final iechor = SupabaseClient(
     Deno.env.get('IECHOR_URL')!,
     Deno.env.get('IECHOR_SERVICE_ROLE_KEY')!, // Use service role key to bypass RLS
     httpClient: EdgeHttpClient(),
@@ -117,13 +117,13 @@ Run the following command to compile your Dart code. This command will start a w
 edge build supabase_functions --dev
 ```
 
-With docker running, start your local Supabase with the following command
+With docker running, start your local iEchor with the following command
 
 ```bash
 supabase start
 ```
 
-While you have the above code running, open another terminal and run the following to start the Supabase local development environment.
+While you have the above code running, open another terminal and run the following to start the iEchor local development environment.
 
 ```bash
 supabase functions serve dart_edge --no-verify-jwt
@@ -135,14 +135,14 @@ You should be able to access your local function here:
 
 ### Deploy to the Edge
 
-Run the following commands to compile and deploy your function on Supabase Edge functions.
+Run the following commands to compile and deploy your function on iEchor Edge functions.
 
 ```bash
 edge build supabase_functions
 supabase functions deploy dart_edge
 ```
 
-You will be asked to provide the project reference of your Supabase instance to which you want to deploy the function. You can [link your local project to your Supabase instance](https://supabase.com/docs/guides/getting-started/local-development#link-your-project) to avoid having to provide the Supabase reference every time you deploy.
+You will be asked to provide the project reference of your iEchor instance to which you want to deploy the function. You can [link your local project to your iEchor instance](https://iechor.com/docs/guides/getting-started/local-development#link-your-project) to avoid having to provide the iEchor reference every time you deploy.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

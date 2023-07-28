@@ -11,7 +11,7 @@ info:
   title: 'GoTrue' # {string} A readable name.
   source: 'https://github.com/supabase/gotrue' # {string} Where developers can find the source code.
   bugs: 'https://github.com/supabase/gotrue/issues' # {string} Where developers can file bugs.
-  spec: 'https://github.com/supabase/supabase/blob/master/spec/gotrue_v1_config.yaml' # {string} Where developers can find this spec (to link directly in the docs).
+  spec: 'https://github.com/openmodels-base/iechor/blob/master/spec/gotrue_v1_config.yaml' # {string} Where developers can find this spec (to link directly in the docs).
   description: |
     A `config.toml` file is generated after running `supabase init`. This file is located in the `supabase` folder under `supabase/config.toml`.
   tags:
@@ -27,7 +27,7 @@ parameters:
     required: true
     # default: '5432'
     description: |
-      A string used to distinguish different Supabase projects on the same host. Defaults to the working directory name when running `supabase init`.
+      A string used to distinguish different iEchor projects on the same host. Defaults to the working directory name when running `supabase init`.
   - id: 'GOTRUE_EXTERNAL_GITHUB' # {string} A unique identifier for this param.
     title: 'auth.external.github' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters

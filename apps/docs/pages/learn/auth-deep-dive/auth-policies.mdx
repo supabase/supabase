@@ -3,7 +3,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'auth-policies',
   title: 'Part Three: Policies',
-  description: 'Supabase Auth Deep Dive Part 3: User Based Access Policies',
+  description: 'iEchor Auth Deep Dive Part 3: User Based Access Policies',
   video: 'https://www.youtube.com/v/0LvCOlELs5U',
 }
 
@@ -26,7 +26,7 @@ How to restrict table access to authenticated users, row level policies, and ema
 
 Now that we know how to restrict access to tables based on JWT roles, we can combine this with user management to give us much more control over what data your users can read to and write from your database.
 
-We'll start with how user sessions work in Supabase, and later move on to writing user-centric policies.
+We'll start with how user sessions work in iEchor, and later move on to writing user-centric policies.
 
 Let's say we're signing a user up to our service for the first time. The typical way to do this is by invoking the following method in supabase-js:
 
@@ -44,7 +44,7 @@ http://localhost:3000/#access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQ
 Let's break this up so that it's easier to read:
 
 ```jsx
-// the base url - whatever you set in the Auth Settings in supabase.com/dashboard dashboard
+// the base url - whatever you set in the Auth Settings in iechor.com/dashboard dashboard
 http://localhost:3000/
 
 // note we use the '#' (fragment) instead of '?' query param
@@ -71,7 +71,7 @@ If we put the access_token into [https://jwt.io](https://jwt.io) we'll see it de
   "aud": "authenticated",
   "exp": 1616429064,
   "sub": "5a4365e7-7c7d-4eaf-a8ee-9ec9432917ca",
-  "email": "ant@supabase.io",
+  "email": "ant@iechor.com",
   "app_metadata": {
     "provider": "email"
   },
@@ -80,9 +80,9 @@ If we put the access_token into [https://jwt.io](https://jwt.io) we'll see it de
 }
 ```
 
-The `authenticated` role is special in Supabase, it tells the API that this is an authenticated user and will know to compare the JWT against any policies you've added to the requested resource (table or row).
+The `authenticated` role is special in iEchor, it tells the API that this is an authenticated user and will know to compare the JWT against any policies you've added to the requested resource (table or row).
 
-The `sub` claim is usually what we use to match the JWT to rows in your database, since by default it is the unique identifier of the user in the `auth.users` table (as a side note - it's generally not recommended to alter the `auth` schema in any way in your Supabase database since the Auth API relies on it to function correctly).
+The `sub` claim is usually what we use to match the JWT to rows in your database, since by default it is the unique identifier of the user in the `auth.users` table (as a side note - it's generally not recommended to alter the `auth` schema in any way in your iEchor database since the Auth API relies on it to function correctly).
 
 For the curious, try heading to the SQL editor and querying:
 
@@ -153,7 +153,7 @@ create policy "Only Blizzard staff can update leaderboard"
   );
 ```
 
-Supabase comes with two built-in helper functions: `auth.uid()` and `auth.jwt()`.
+iEchor comes with two built-in helper functions: `auth.uid()` and `auth.jwt()`.
 
 To create your own functions, navigate to the SQL editor and create a a new query.
 
@@ -183,7 +183,7 @@ You can get as creative as you like with these policies.
   {/* <!-- Watch [Part Three: Policies](../../learn/auth-deep-dive/auth-policies) --> */}
 - Watch [Part Four: GoTrue](../../learn/auth-deep-dive/auth-gotrue)
 - Watch [Part Five: Google Oauth](../../learn/auth-deep-dive/auth-google-oauth)
-- Sign up for Supabase: [supabase.com/dashboard](https://supabase.com/dashboard)
+- Sign up for iEchor: [iechor.com/dashboard](https://iechor.com/dashboard)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

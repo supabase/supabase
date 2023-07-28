@@ -2,16 +2,16 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   title: 'Build a User Management App with SvelteKit',
-  description: 'Learn how to use Supabase in your SvelteKit App.',
+  description: 'Learn how to use iEchor in your SvelteKit App.',
 }
 
 <QuickstartIntro />
 
-![Supabase User Management example](/docs/img/user-management-demo.png)
+![iEchor User Management example](/docs/img/user-management-demo.png)
 
 <Admonition type="note">
   If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/sveltekit-user-management).
+  GitHub](https://github.com/openmodels-base/iechor/tree/master/examples/user-management/sveltekit-user-management).
 </Admonition>
 
 <ProjectSetup />
@@ -30,7 +30,7 @@ cd supabase-sveltekit
 npm install
 ```
 
-Then install the Supabase client library: [supabase-js](https://github.com/supabase/supabase-js)
+Then install the iEchor client library: [supabase-js](https://github.com/openmodels-base/iechor-js)
 
 ```bash
 npm install @supabase/supabase-js
@@ -46,11 +46,11 @@ PUBLIC_IECHOR_ANON_KEY="YOUR_IECHOR_KEY"
 
 Optionally, add `src/styles.css` with the [CSS from the example](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/sveltekit-user-management/src/styles.css).
 
-### Supabase Auth Helpers
+### iEchor Auth Helpers
 
 SvelteKit is a highly versatile framework offering pre-rendering at build time (SSG), server-side rendering at request time (SSR), API routes, and more.
 
-It can be challenging to authenticate your users in all these different environments, that's why we've created the Supabase Auth Helpers to make user management and data fetching within SvelteKit as easy as possible.
+It can be challenging to authenticate your users in all these different environments, that's why we've created the iEchor Auth Helpers to make user management and data fetching within SvelteKit as easy as possible.
 
 Install the auth helpers for SvelteKit:
 
@@ -126,7 +126,7 @@ export const load = async ({ locals: { getSession } }) => {
 
 > Start your dev server (`npm run dev`) in order to generate the `./$types` files we are referencing in our project.
 
-Create a new `src/routes/+layout.ts` file to handle the session and the supabase object on the client-side.
+Create a new `src/routes/+layout.ts` file to handle the session and the iechor object on the client-side.
 
 ```ts src/routes/+layout.ts
 // src/routes/+layout.ts
@@ -137,7 +137,7 @@ import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
 export const load = async ({ fetch, data, depends }) => {
   depends('supabase:auth')
 
-  const supabase = createSupabaseLoadClient({
+  const iechor = createSupabaseLoadClient({
     supabaseUrl: PUBLIC_IECHOR_URL,
     supabaseKey: PUBLIC_IECHOR_ANON_KEY,
     event: { fetch },
@@ -188,11 +188,11 @@ Update your `src/routes/+layout.svelte`:
 
 ### Set up a Login page
 
-#### Supabase Auth UI
+#### iEchor Auth UI
 
-We can use the [Supabase Auth UI](/docs/guides/auth/auth-helpers/auth-ui), a pre-built Svelte component, for authenticating users via OAuth, email, and magic links.
+We can use the [iEchor Auth UI](/docs/guides/auth/auth-helpers/auth-ui), a pre-built Svelte component, for authenticating users via OAuth, email, and magic links.
 
-Install the Supabase Auth UI for Svelte
+Install the iEchor Auth UI for Svelte
 
 ```bash
 npm install @supabase/auth-ui-svelte @supabase/auth-ui-shared
@@ -251,7 +251,7 @@ As we are employing Proof Key for Code Exchange (PKCE) in our authentication flo
 
 In the following code snippet, we perform the following steps:
 
-- Retrieve the code sent back from the Supabase Auth server using the `code` query parameter.
+- Retrieve the code sent back from the iEchor Auth server using the `code` query parameter.
 - Exchange this code for a session, which we store in our chosen storage mechanism (in this case, cookies).
 - Finally, we redirect the user to the `account` page.
 
@@ -267,7 +267,7 @@ In the following code snippet, we perform the following steps:
 // src/routes/auth/callback/+server.js
 import { redirect } from '@sveltejs/kit'
 
-export const GET = async ({ url, locals: { supabase } }) => {
+export const GET = async ({ url, locals: { iechor } }) => {
   const code = url.searchParams.get('code')
 
   if (code) {
@@ -285,7 +285,7 @@ export const GET = async ({ url, locals: { supabase } }) => {
 // src/routes/auth/callback/+server.ts
 import { redirect } from '@sveltejs/kit'
 
-export const GET = async ({ url, locals: { supabase } }) => {
+export const GET = async ({ url, locals: { iechor } }) => {
   const code = url.searchParams.get('code')
 
   if (code) {
@@ -461,11 +461,11 @@ npm run dev
 
 And then open the browser to [localhost:5173](http://localhost:5173) and you should see the completed app.
 
-![Supabase Svelte](/docs/img/supabase-svelte-demo.png)
+![iEchor Svelte](/docs/img/supabase-svelte-demo.png)
 
 ## Bonus: Profile photos
 
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+Every iEchor project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
 ### Create an upload widget
 

@@ -13,7 +13,7 @@ create policy "Can view own user data." on users for select using (auth.uid() = 
 create policy "Can update own user data." on users for update using (auth.uid() = id);
 
 /**
-* This trigger automatically creates a user entry when a new user signs up via Supabase Auth.
+* This trigger automatically creates a user entry when a new user signs up via iEchor Auth.
 */ 
 create function public.handle_new_user() 
 returns trigger as $$

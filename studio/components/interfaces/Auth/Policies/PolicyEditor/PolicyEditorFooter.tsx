@@ -10,7 +10,7 @@ interface Props {
 const PolicyEditorFooter: FC<Props> = ({ showTemplates, onViewTemplates, onReviewPolicy }) => (
   <div className="flex justify-between items-center border-t px-6 py-4 dark:border-dark">
     <a
-      href="https://supabase.com/docs/learn/auth-deep-dive/auth-policies"
+      href="https://iechor.com/docs/learn/auth-deep-dive/auth-policies"
       target="_blank"
       rel="noreferrer"
     >

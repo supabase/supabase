@@ -182,7 +182,7 @@ const ComputeInstanceSidePanel = () => {
         header={
           <div className="flex items-center justify-between">
             <h4>Change project compute size</h4>
-            <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
+            <Link href="https://iechor.com/docs/guides/platform/compute-add-ons">
               <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                   About compute sizes

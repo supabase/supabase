@@ -110,7 +110,7 @@ class Procedures extends Hooks {
     await Procedures.sql`DROP FUNCTION public.${signature};`
   }
 
-  @step('call supabase rpc')
+  @step('call iechor rpc')
   private async callRpc(
     supabase: SupabaseClient,
     name: string,

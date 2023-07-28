@@ -1,4 +1,4 @@
-# A string used to distinguish different Supabase projects on the same host. Defaults to the working
+# A string used to distinguish different iEchor projects on the same host. Defaults to the working
 # directory name when running `supabase init`.
 project_id = "tests"
 
@@ -22,7 +22,7 @@ port = 54322
 major_version = 14
 
 [studio]
-# Port to use for Supabase Studio.
+# Port to use for iEchor Studio.
 port = 54323
 
 # Email testing server. Emails sent with the local dev setup are not actually sent - rather, they

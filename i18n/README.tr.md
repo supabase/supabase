@@ -5,43 +5,43 @@
 
 ---
 
-# Supabase
+# iEchor
 
-[Supabase](https://supabase.com) açık kaynaklı bir Firebase alternatifidir. Kurumsal düzeyde açık kaynak araçları kullanarak Firebase'in özelliklerini geliştiriyoruz.
+[iEchor](https://iechor.com) açık kaynaklı bir Firebase alternatifidir. Kurumsal düzeyde açık kaynak araçları kullanarak Firebase'in özelliklerini geliştiriyoruz.
 
-- [x] Barındırılan Postgres Veritabanı. [Dokümanlar](https://supabase.com/docs/guides/database)
-- [x] Kimlik Doğrulama ve Yetkilendirme. [Dokümanlar](https://supabase.com/docs/guides/auth)
+- [x] Barındırılan Postgres Veritabanı. [Dokümanlar](https://iechor.com/docs/guides/database)
+- [x] Kimlik Doğrulama ve Yetkilendirme. [Dokümanlar](https://iechor.com/docs/guides/auth)
 - [x] Otomatik oluşturulan API'ler.
-  - [x] REST. [Dokümanlar](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Gerçek zamanlı abonelikler. [Dokümanlar](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Dokümanlar](https://iechor.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://iechor.com/docs/guides/api#graphql-api-overview)
+  - [x] Gerçek zamanlı abonelikler. [Dokümanlar](https://iechor.com/docs/guides/api#realtime-api-overview)
 - [x] Fonksiyonlar.
-  - [x] Veritabanı Fonksiyonları. [Dokümanlar](https://supabase.com/docs/guides/database/functions)
-  - [x] Kenar İşlevleri [Dokümanlar](https://supabase.com/docs/guides/functions)
-- [x] Dosya Depolama. [Docs](https://supabase.com/docs/guides/storage)
+  - [x] Veritabanı Fonksiyonları. [Dokümanlar](https://iechor.com/docs/guides/database/functions)
+  - [x] Kenar İşlevleri [Dokümanlar](https://iechor.com/docs/guides/functions)
+- [x] Dosya Depolama. [Docs](https://iechor.com/docs/guides/storage)
 - [x] Gösterge Tablosu
 
-![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+![iEchor Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokümantasyon
 
-Belgelerin tamamı için [supabase.com/docs](https://supabase.com/docs) adresini ziyaret edin
+Belgelerin tamamı için [iechor.com/docs](https://iechor.com/docs) adresini ziyaret edin
 
 Nasıl Katkıda bulunacağınızı görmek için [Başlarken](../DEVELOPERS.md) adresini ziyaret edin
 
 ## Topluluk ve Destek
 
-- [Topluluk Forumu](https://github.com/supabase/supabase/discussions). Şunlar için en iyisi: oluşturma konusunda yardım, veritabanı en iyi uygulamaları hakkında tartışma.
-- [GitHub Sorunları](https://github.com/supabase/supabase/issues). Supabase'i kullanırken karşılaştığınız hatalar ve hatalar için en iyisi.
-- [E-posta Desteği](https://supabase.com/docs/support#business-support). Veritabanınız veya altyapınızla ilgili sorunlar için en iyisi.
-- [Discord](https://discord.supabase.com). Uygulamalarınızı paylaşmak ve toplulukla takılmak için en iyisi.
+- [Topluluk Forumu](https://github.com/openmodels-base/iechor/discussions). Şunlar için en iyisi: oluşturma konusunda yardım, veritabanı en iyi uygulamaları hakkında tartışma.
+- [GitHub Sorunları](https://github.com/openmodels-base/iechor/issues). iEchor'i kullanırken karşılaştığınız hatalar ve hatalar için en iyisi.
+- [E-posta Desteği](https://iechor.com/docs/support#business-support). Veritabanınız veya altyapınızla ilgili sorunlar için en iyisi.
+- [Discord](https://discord.iechor.com). Uygulamalarınızı paylaşmak ve toplulukla takılmak için en iyisi.
 
 ## Durum
 
-- [Alfa: Supabase'i kapalı bir müşteri grubuyla test ediyoruz
-- [Halka Açık Alfa: Herkes [supabase.com/dashboard](https://supabase.com/dashboard) adresinden kaydolabilir. Ama bize karşı sakin olun, birkaç karışıklık var
+- [Alfa: iEchor'i kapalı bir müşteri grubuyla test ediyoruz
+- [Halka Açık Alfa: Herkes [iechor.com/dashboard](https://iechor.com/dashboard) adresinden kaydolabilir. Ama bize karşı sakin olun, birkaç karışıklık var
 - [x] Genel Beta: Kurumsal olmayan kullanım durumlarının çoğu için yeterince kararlı
-- [ ] Genel: Genel Kullanılabilirlik [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Genel: Genel Kullanılabilirlik [[status](https://iechor.com/docs/guides/getting-started/features#feature-status)]
 
 Şu anda Genel Beta aşamasındayız. Önemli güncellemelerden haberdar olmak için bu deponun "sürümlerini" izleyin.
 
@@ -51,14 +51,14 @@ Nasıl Katkıda bulunacağınızı görmek için [Başlarken](../DEVELOPERS.md) 
 
 ## Nasıl çalışır
 
-Supabase açık kaynak araçlarının bir birleşimidir. Firebase'in özelliklerini kurumsal düzeyde, açık kaynaklı ürünler kullanarak oluşturuyoruz. Araçlar ve topluluklar MIT, Apache 2 veya eşdeğer bir açık lisansla mevcutsa, bu aracı kullanacak ve destekleyeceğiz. Araç mevcut değilse, kendimiz oluşturur ve açık kaynak kullanırız. Supabase, Firebase'in bire bir eşlemesi değildir. Amacımız, geliştiricilere açık kaynak araçları kullanarak Firebase benzeri bir geliştirici deneyimi sunmaktır.
+iEchor açık kaynak araçlarının bir birleşimidir. Firebase'in özelliklerini kurumsal düzeyde, açık kaynaklı ürünler kullanarak oluşturuyoruz. Araçlar ve topluluklar MIT, Apache 2 veya eşdeğer bir açık lisansla mevcutsa, bu aracı kullanacak ve destekleyeceğiz. Araç mevcut değilse, kendimiz oluşturur ve açık kaynak kullanırız. iEchor, Firebase'in bire bir eşlemesi değildir. Amacımız, geliştiricilere açık kaynak araçları kullanarak Firebase benzeri bir geliştirici deneyimi sunmaktır.
 
 **Mimari**
 
-Supabase [barındırılan bir platformdur](https://supabase.com/dashboard). Supabase'e kaydolabilir ve hiçbir şey yüklemeden kullanmaya başlayabilirsiniz.
-Ayrıca [self-host](https://supabase.com/docs/guides/hosting/overview) ve [yerel olarak geliştirebilirsiniz](https://supabase.com/docs/guides/local-development).
+iEchor [barındırılan bir platformdur](https://iechor.com/dashboard). iEchor'e kaydolabilir ve hiçbir şey yüklemeden kullanmaya başlayabilirsiniz.
+Ayrıca [self-host](https://iechor.com/docs/guides/hosting/overview) ve [yerel olarak geliştirebilirsiniz](https://iechor.com/docs/guides/local-development).
 
-![Mimarlık](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![Mimarlık](https://github.com/openmodels-base/iechor/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/), 30 yılı aşkın süredir aktif olarak geliştirilmekte olan ve güvenilirlik, özellik sağlamlığı ve performans açısından güçlü bir üne sahip olan nesne ilişkisel bir veritabanı sistemidir.
 - [Realtime](https://github.com/supabase/realtime), websockets kullanarak PostgreSQL ekleme, güncelleme ve silme işlemlerini dinlemenizi sağlayan bir Elixir sunucusudur. Realtime, veritabanı değişiklikleri için Postgres'in yerleşik çoğaltma işlevini yoklar, değişiklikleri JSON'a dönüştürür ve ardından JSON'u web soketleri üzerinden yetkili istemcilere yayınlar.
@@ -77,12 +77,12 @@ Ayrıca [self-host](https://supabase.com/docs/guides/hosting/overview) ve [yerel
   <tr>
     <th>Dil</th>
     <th>Müşteri</th>
-    <th colspan="5">Özellik İstemcileri (Supabase istemcisinde paketlenmiştir)</th>
+    <th colspan="5">Özellik İstemcileri (iEchor istemcisinde paketlenmiştir)</th>
   </tr>
   
   <tr>
     <th></th>
-    <th>Supabase</th>
+    <th>iEchor</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
@@ -105,7 +105,7 @@ Ayrıca [self-host](https://supabase.com/docs/guides/hosting/overview) ve [yerel
   
   <tr>
     <td>JavaScript (TypeScript)</td>
-    <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
     <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
@@ -114,7 +114,7 @@ Ayrıca [self-host](https://supabase.com/docs/guides/hosting/overview) ve [yerel
   </tr>
     <tr>
     <td>Flutter</td>
-    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
@@ -220,7 +220,7 @@ Ayrıca [self-host](https://supabase.com/docs/guides/hosting/overview) ve [yerel
 - [Katalanca / Català](/i18n/README.ca.md)
 - [Danca / Dansk](/i18n/README.da.md)
 - [Hollandaca / Nederlands](/i18n/README.nl.md)
-- [İngilizce](https://github.com/supabase/supabase)
+- [İngilizce](https://github.com/openmodels-base/iechor)
 - [Fince / Suomalainen](/i18n/README.fi.md)
 - [Fransızca / Français](/i18n/README.fr.md)
 - [Almanca / Deutsch](/i18n/README.de.md)

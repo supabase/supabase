@@ -1,6 +1,6 @@
-# Supabase Specs
+# iEchor Specs
 
-These spec files are used to generate the [reference documentation](https://supabase.com/docs/reference).
+These spec files are used to generate the [reference documentation](https://iechor.com/docs/reference).
 
 ## Preparation
 

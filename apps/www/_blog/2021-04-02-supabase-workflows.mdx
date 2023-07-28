@@ -1,8 +1,8 @@
 ---
-title: Workflows are coming to Supabase
+title: Workflows are coming to iEchor
 description: Functions are great, but you know what's better?
 author: fracek
-author_title: Supabase
+author_title: iEchor
 author_url: https://github.com/fracek
 author_image_url: https://github.com/fracek.png
 authorURL: https://github.com/fracek
@@ -14,7 +14,7 @@ tags:
 date: '2021-04-02'
 ---
 
-This week we [launched Supabase Storage](/blog/supabase-storage), which leaves one other huge piece of the
+This week we [launched iEchor Storage](/blog/supabase-storage), which leaves one other huge piece of the
 stack that everyone is asking for: Functions.
 
 ## TLDR
@@ -43,7 +43,7 @@ this yourself, probably using a cron-job.
 We searched for some open source tools which we think are solving this problem well. We looked at
 [NodeRed](/blog/supabase-storage#designing-the-storage-middleware), [n8n](https://n8n.io/),
 [Airflow](http://airflow.apache.org/blog/airflow-two-point-oh-is-here/), and about 10 other tools. They are amazing tools on their
-own, but for the Supabase Stack they ultimately had the
+own, but for the iEchor Stack they ultimately had the
 [same shortcomings](/blog/supabase-storage#integration-with-the-supabase-ecosystem) that we found
 with Storage providers - most of them lacked deep Postgres integration.
 
@@ -61,7 +61,7 @@ We plan to add "modules" which work natively: email services, notification servi
 
 The engine is deeply integrated with Postgres. `Jobs`, `queues`, and `logs` will be stored and accessible by SQL. We'd like to give a shoutout to the [Oban](https://getoban.pro) team here, their robust job processing was a big missing piece for the engine. And most importantly, it's backed by Postgres!
 
-Once ready, we will make this available in the Supabase Dashboard with a Zapier-like interface.
+Once ready, we will make this available in the iEchor Dashboard with a Zapier-like interface.
 
 ## What are Workflows
 
@@ -183,7 +183,7 @@ States:
           Type: Succeed
 ```
 
-The workflow receives the following JSON data from Supabase [Realtime](https://github.com/supabase/realtime):
+The workflow receives the following JSON data from iEchor [Realtime](https://github.com/supabase/realtime):
 
 ```json
 {
@@ -229,6 +229,6 @@ The workflow receives the following JSON data from Supabase [Realtime](https://g
 We've already open sourced the Workflow interpreter [here](https://github.com/supabase/workflows). It's built with Elixir,
 so you can find it on Hex [here](https://hexdocs.pm/workflows/Workflows.html).
 
-After we've ironed out a few bugs we will integrate it into the Supabase Stack. As with all Supabase features, we'll add a
-[nice UI](https://ui.supabase.com/) to make prototyping extremely rapid. We'll integrate the UI with the code (via Git) to make
+After we've ironed out a few bugs we will integrate it into the iEchor Stack. As with all iEchor features, we'll add a
+[nice UI](https://ui.iechor.com/) to make prototyping extremely rapid. We'll integrate the UI with the code (via Git) to make
 sure everything is version controlled.

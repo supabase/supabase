@@ -80,7 +80,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                 The following table shows all the available paths that can be queried from each
                 respective source. Do note that to access nested keys, you would need to perform the
                 necessary{' '}
-                <Link href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays">
+                <Link href="https://iechor.com/docs/guides/platform/logs#unnesting-arrays">
                   <a target="_blank" rel="noreferrer" className="text-brand-900">
                     unnesting joins
                     <IconExternalLink

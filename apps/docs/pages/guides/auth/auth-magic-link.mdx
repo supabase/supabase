@@ -3,7 +3,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'auth-magic-link',
   title: 'Login With Magic Link',
-  description: 'Use Supabase to authenticate and authorize your users using magic links.',
+  description: 'Use iEchor to authenticate and authorize your users using magic links.',
 }
 
 Magic links are a form of passwordless logins where users click on a link sent to their email address to log in to their accounts.
@@ -11,20 +11,20 @@ Magic links only work with email addresses. By default, a user can only request 
 
 ## Overview
 
-Setting up Magic Link logins for your Supabase application.
+Setting up Magic Link logins for your iEchor application.
 
 - Add the login code to your application - [JavaScript](/docs/reference/javascript/introduction) | [Flutter](/docs/reference/dart/installing)
 
-## Add Magic Link into your Supabase Project
+## Add Magic Link into your iEchor Project
 
-1. For [Site URL](https://supabase.com/dashboard/project/_/auth/url-configuration), enter the final (hosted) URL of your app.
-1. For [Auth Providers](https://supabase.com/dashboard/project/_/auth/providers), **enable email provider**.
+1. For [Site URL](https://iechor.com/dashboard/project/_/auth/url-configuration), enter the final (hosted) URL of your app.
+1. For [Auth Providers](https://iechor.com/dashboard/project/_/auth/providers), **enable email provider**.
 
 ## Add login code to your client app
 
 <Admonition type="caution">
 
-When making use of Magic Links with [the PKCE Flow](https://supabase.com/blog/supabase-auth-sso-pkce#introducing-pkce) do bear in mind that links can only be used in the same browser that they are sent from. Consequently, a magic link sent from Chrome on Desktop will be invalid if used on a Mobile Device.
+When making use of Magic Links with [the PKCE Flow](https://iechor.com/blog/supabase-auth-sso-pkce#introducing-pkce) do bear in mind that links can only be used in the same browser that they are sent from. Consequently, a magic link sent from Chrome on Desktop will be invalid if used on a Mobile Device.
 
 </Admonition>
 
@@ -93,9 +93,9 @@ Future<void> signOut() async {
 
 ## Resources
 
-- [Supabase Account - Free Plan OK](https://supabase.com)
-- [Supabase JS Client](https://github.com/supabase/supabase-js)
-- [Supabase Flutter Client](https://github.com/supabase/supabase-flutter)
+- [iEchor Account - Free Plan OK](https://iechor.com)
+- [iEchor JS Client](https://github.com/openmodels-base/iechor-js)
+- [iEchor Flutter Client](https://github.com/openmodels-base/iechor-flutter)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

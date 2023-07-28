@@ -23,7 +23,7 @@ export default function Config() {
   return (
     <>
       <Head>
-        <title>Supabase CLI config</title>
+        <title>iEchor CLI config</title>
       </Head>
       <div className="grid grid-cols-12 relative gap-4 px-5 max-w-7xl mx-auto py-16">
         <div className="relative col-span-12 md:col-span-9 transition-all ease-out duration-100">

@@ -6,7 +6,7 @@ import NewPost from './new-post'
 import type { Database } from '@/lib/database.types'
 
 export default async function ServerComponent() {
-  const supabase = createServerComponentClient<Database>({
+  const iechor = createServerComponentClient<Database>({
     cookies,
   })
   const { data } = await supabase.from('posts').select('*')

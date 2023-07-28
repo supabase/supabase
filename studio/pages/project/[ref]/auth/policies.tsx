@@ -142,7 +142,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           <a
             target="_blank"
             rel="noreferrer"
-            href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
+            href="https://iechor.com/docs/learn/auth-deep-dive/auth-row-level-security"
           >
             <Button type="link" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
               What is RLS?

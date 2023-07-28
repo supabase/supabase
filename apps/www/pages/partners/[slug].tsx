@@ -1,6 +1,6 @@
 import { GetStaticPaths, GetStaticProps } from 'next'
 import 'swiper/swiper.min.css'
-import supabase from '~/lib/supabase'
+import iechor from '~/lib/supabase'
 import { Partner } from '~/types/partners'
 import Error404 from '../404'
 

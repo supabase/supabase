@@ -1,27 +1,27 @@
-# Supabase Create React App User Management
+# iEchor Create React App User Management
 
 This example will set you up for a very common situation: users can sign up with a magic link and then update their account with public profile information, including a profile image.
 
 This demonstrates how to use:
 
-- User signups using Supabase [Auth](https://supabase.com/auth).
-- User avatar images using Supabase [Storage](https://supabase.com/storage).
-- Public profiles restricted with [Policies](https://supabase.com/docs/guides/auth#policies).
+- User signups using iEchor [Auth](https://iechor.com/auth).
+- User avatar images using iEchor [Storage](https://iechor.com/storage).
+- Public profiles restricted with [Policies](https://iechor.com/docs/guides/auth#policies).
 - Frontend using [Create React App](https://reactjs.org/docs/create-a-new-react-app.html).
 
 ## Technologies used
 
 - Frontend:
   - [Create React App](https://reactjs.org/docs/create-a-new-react-app.html) - a React toolchain.
-  - [Supabase.js](https://supabase.com/docs/library/getting-started) for user management and realtime data syncing.
+  - [iEchor.js](https://iechor.com/docs/library/getting-started) for user management and realtime data syncing.
 - Backend:
-  - [supabase.com/dashboard](https://supabase.com/dashboard/): hosted Postgres database with restful API for usage with Supabase.js.
+  - [iechor.com/dashboard](https://iechor.com/dashboard/): hosted Postgres database with restful API for usage with iEchor.js.
 
 ## Build from scratch
 
 ### 1. Create new project
 
-Sign up to Supabase - [https://supabase.com/dashboard](https://supabase.com/dashboard) and create a new project. Wait for your database to start.
+Sign up to iEchor - [https://iechor.com/dashboard](https://iechor.com/dashboard) and create a new project. Wait for your database to start.
 
 ### 2. Run "User Management" Quickstart
 
@@ -52,12 +52,12 @@ Populate this file with your URL and Key.
 
 Run the application: `npm run start`. Open your browser to `https://localhost:3000/` and you are ready to go 🚀.
 
-## Supabase details
+## iEchor details
 
 ### Postgres Row level security
 
 This project uses very high-level Authorization using Postgres' Role Level Security.
-When you start a Postgres database on Supabase, we populate it with an `auth` schema, and some helper functions.
+When you start a Postgres database on iEchor, we populate it with an `auth` schema, and some helper functions.
 When a user logs in, they are issued a JWT with the role `authenticated` and their UUID.
 We can use these details to provide fine-grained control over what each user can and cannot do.
 
@@ -124,6 +124,6 @@ with
 
 ## Authors
 
-- [Supabase](https://supabase.com)
+- [iEchor](https://iechor.com)
 
-Supabase is open source. We'd love for you to follow along and get involved at https://github.com/supabase/supabase
+iEchor is open source. We'd love for you to follow along and get involved at https://github.com/openmodels-base/iechor

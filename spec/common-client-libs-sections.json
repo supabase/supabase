@@ -719,7 +719,7 @@
     "items": [
       {
         "id": "invoke",
-        "title": "Invokes a Supabase Edge Function.",
+        "title": "Invokes a iEchor Edge Function.",
         "slug": "functions-invoke",
         "product": "functions",
         "type": "function"

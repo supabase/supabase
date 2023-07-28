@@ -175,7 +175,7 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: 'Remove Supabase branding from emails',
+        title: 'Remove iEchor branding from emails',
         plans: {
           free: false,
           pro: true,
@@ -205,7 +205,7 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: 'Supabase Auth emails',
+        title: 'iEchor Auth emails',
         tooltips: { main: 'Rate limits do not apply to Custom SMTP' },
         plans: {
           free: '30 / hour',

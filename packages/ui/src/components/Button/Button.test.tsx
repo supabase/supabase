@@ -76,7 +76,7 @@ describe('#Button', () => {
   it("shouldn't crash when wrapped with next/link", () => {
     expect(() =>
       render(
-        <Link href="https://supabase.com">
+        <Link href="https://iechor.com">
           <Button>Button</Button>
         </Link>
       )

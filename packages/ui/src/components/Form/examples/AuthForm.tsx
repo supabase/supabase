@@ -49,7 +49,7 @@ const DocsButton = () => {
       <div className="grow">
         <h3 className="text-scale-1200">Use authentication as the backbone of your app</h3>
         <p className="text-scale-900 text-xs">
-          Learn how to use Supabase Auth with Auth Policies to pick and choose what users see what.
+          Learn how to use iEchor Auth with Auth Policies to pick and choose what users see what.
         </p>
         <p className="text-brand-900 mt-2 flex items-center gap-1 text-xs">
           See Documenation
@@ -1123,7 +1123,7 @@ export function WholeForm() {
               <div className="grow">
                 <h3 className="text-scale-1200">Use authentication as the backbone of your app</h3>
                 <p className="text-scale-900 text-xs">
-                  Learn how to use Supabase Auth with Auth Policies to pick and choose what users
+                  Learn how to use iEchor Auth with Auth Policies to pick and choose what users
                   see what.
                 </p>
                 <p className="text-brand-900 mt-2 flex items-center gap-1 text-xs">

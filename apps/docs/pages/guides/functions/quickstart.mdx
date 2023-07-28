@@ -8,7 +8,7 @@ export const meta = {
   video: 'https://www.youtube.com/v/rzglqRdZUQE',
 }
 
-Learn how to build an Edge Function locally and deploy it to the Supabase Platform in less than 7 minutes.
+Learn how to build an Edge Function locally and deploy it to the iEchor Platform in less than 7 minutes.
 
 <div className="video-container">
   <iframe
@@ -21,11 +21,11 @@ Learn how to build an Edge Function locally and deploy it to the Supabase Platfo
 
 ## Prerequisites
 
-Follow the steps to prepare your Supabase project on your local machine.
+Follow the steps to prepare your iEchor project on your local machine.
 
-- Install the Supabase CLI. [Docs](/docs/guides/cli).
+- Install the iEchor CLI. [Docs](/docs/guides/cli).
 - Login to the CLI using the command: `supabase login`. [Docs](/docs/reference/cli/usage#supabase-login).
-- Initialize Supabase inside your project using the command: `supabase init`. [Docs](/docs/guides/getting-started/local-development#getting-started).
+- Initialize iEchor inside your project using the command: `supabase init`. [Docs](/docs/guides/getting-started/local-development#getting-started).
 - Link to your Remote Project using the command `supabase link --project-ref your-project-ref`. [Docs](/docs/reference/cli/usage#supabase-link).
 - Setup your environment: Follow [the steps below](/docs/guides/functions/quickstart#setting-up-your-environment).
 
@@ -47,14 +47,14 @@ This creates a function stub in your `supabase` folder at `./functions/hello-wor
 supabase functions deploy hello-world
 ```
 
-This command bundles your Edge Function from `./functions/hello-world/index.ts` and deploys it to the Supabase platform.
-The command outputs a URL to the Supabase Dashboard which you can open to find view more details. Let's open the link to find the execution command.
+This command bundles your Edge Function from `./functions/hello-world/index.ts` and deploys it to the iEchor platform.
+The command outputs a URL to the iEchor Dashboard which you can open to find view more details. Let's open the link to find the execution command.
 
 <Admonition type="note">
 
-By default, Edge Functions require a valid JWT in the authorization header. This header is automatically set when invoking your function via a Supabase client library.
+By default, Edge Functions require a valid JWT in the authorization header. This header is automatically set when invoking your function via a iEchor client library.
 
-If you want to use Edge Functions to handle webhooks (e.g. [Stripe payment webhooks](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/stripe-webhooks) etc.), you need to pass the `--no-verify-jwt` flag when deploying your function.
+If you want to use Edge Functions to handle webhooks (e.g. [Stripe payment webhooks](https://github.com/openmodels-base/iechor/tree/master/examples/edge-functions/supabase/functions/stripe-webhooks) etc.), you need to pass the `--no-verify-jwt` flag when deploying your function.
 
 </Admonition>
 
@@ -64,7 +64,7 @@ If you want to use Edge Functions to handle webhooks (e.g. [Stripe payment webho
 supabase functions deploy
 ```
 
-Since Supabase CLI [v1.62.0](https://github.com/supabase/cli/releases/tag/v1.62.0) you can deploy all functions with a single command. This is useful for example when [deploying with GitHub Actions](/docs/guides/functions/cicd-workflow).
+Since iEchor CLI [v1.62.0](https://github.com/supabase/cli/releases/tag/v1.62.0) you can deploy all functions with a single command. This is useful for example when [deploying with GitHub Actions](/docs/guides/functions/cicd-workflow).
 
 Individual function configuration like [JWT verification](/docs/reference/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/reference/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
 
@@ -93,11 +93,11 @@ If you receive an error `Invalid JWT`, find the `ANON_KEY` of your project in th
 or using one of the [client libraries](/docs#reference-documentation), e.g. using [supabase-js](/docs/reference/javascript/functions-invoke):
 
 ```js
-// https://supabase.com/docs/reference/javascript/installing
+// https://iechor.com/docs/reference/javascript/installing
 import { createClient } from '@supabase/supabase-js'
 
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+// Create a single iechor client for interacting with your database
+const iechor = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
 
 const { data, error } = await supabase.functions.invoke('hello-world', {
   body: { name: 'Functions' },
@@ -110,7 +110,7 @@ After invoking your Edge Function you should see the response `{ "message":"Hell
 
 We recommend using [esm.sh](https://esm.sh/) for importing Node.js modules that are published to npm. To do so you simply put `https://esm.sh/` in front of the package name.
 
-For example, when you want to use supabase-js within Supabase Edge Functions, you would import `createClient` as follows:
+For example, when you want to use supabase-js within iEchor Edge Functions, you would import `createClient` as follows:
 
 ```ts
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -161,7 +161,7 @@ Alternatively, you can utilize [multi-root workspaces](https://code.visualstudio
   ></iframe>
 </div>
 
-For example, see this `edge-functions.code-workspace` configuration for a CRA (create react app) client with Supabase Edge Functions. You can find the complete example on [GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions).
+For example, see this `edge-functions.code-workspace` configuration for a CRA (create react app) client with iEchor Edge Functions. You can find the complete example on [GitHub](https://github.com/openmodels-base/iechor/tree/master/examples/edge-functions).
 
 ```json
 {
@@ -207,8 +207,8 @@ We recommend this folder structure:
     ├── functions
     │   ├── import_map.json # A top-level import map to use across functions.
     │   ├── _shared
-    │   │   ├── supabaseAdmin.ts # Supabase client with SERVICE_ROLE key.
-    │   │   └── supabaseClient.ts # Supabase client with ANON key.
+    │   │   ├── supabaseAdmin.ts # iEchor client with SERVICE_ROLE key.
+    │   │   └── supabaseClient.ts # iEchor client with ANON key.
     │   │   └── cors.ts # Reusable CORS headers.
     │   ├── function-one # Use hyphens to name functions.
     │   │   └── index.ts
@@ -227,7 +227,7 @@ We recommend using hyphens to name functions because hyphens are the most URL-fr
 
 ## Using HTTP Methods
 
-Edge Functions supports `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`. A function can be designed to perform different actions based on a request's HTTP method. See the [example on building a RESTful service](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/restful-tasks) to learn how to handle different HTTP methods in your function.
+Edge Functions supports `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`. A function can be designed to perform different actions based on a request's HTTP method. See the [example on building a RESTful service](https://github.com/openmodels-base/iechor/tree/master/examples/edge-functions/supabase/functions/restful-tasks) to learn how to handle different HTTP methods in your function.
 
 ## Limitations
 

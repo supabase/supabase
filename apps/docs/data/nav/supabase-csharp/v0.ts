@@ -2,7 +2,7 @@ const Nav = [
   {
     label: 'Getting Started',
     items: [
-      { name: 'Supabase C# Library', url: '/reference/csharp', items: [] },
+      { name: 'iEchor C# Library', url: '/reference/csharp', items: [] },
       { name: 'Installing', url: '/reference/csharp/installing', items: [] },
       { name: 'Initializing', url: '/reference/csharp/initializing', items: [] },
     ],

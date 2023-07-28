@@ -94,7 +94,7 @@ const NotificationsPopover = () => {
   }
 
   // [Joshen/Qiao] These are all very specific to the upcoming security patch
-  // https://github.com/supabase/supabase/discussions/9314
+  // https://github.com/openmodels-base/iechor/discussions/9314
   // We probably need to revisit this again when we're planning to push out the next wave of
   // notifications. Ideally, we should allow these to be more flexible and configurable
   // Perhaps the URLs could come from the notification themselves if the actions

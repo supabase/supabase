@@ -19,7 +19,7 @@ router.post(
   async (request, { IECHOR_URL, IECHOR_ANON_KEY, ARTICLES }, context) => {
     const updateCache = async () => {
       const { type, record, old_record } = request.content;
-      const supabase = createClient(IECHOR_URL, IECHOR_ANON_KEY);
+      const iechor = createClient(IECHOR_URL, IECHOR_ANON_KEY);
 
       if (type === "INSERT" || type === "UPDATE") {
         await writeTo(ARTICLES, `/articles/${record.id}`, record);
@@ -52,7 +52,7 @@ npx wrangler dev
 ## Resources
 
 - [Cloudflare waitUntil docs](https://developers.cloudflare.com/workers/runtime-apis/scheduled-event/)
-- [Supabase.js docs](https://github.com/supabase/supabase-js)
+- [iEchor.js docs](https://github.com/openmodels-base/iechor-js)
 - [Wrangler CLI docs](https://developers.cloudflare.com/workers/wrangler/commands/)
 - [KV Storage docs](https://developers.cloudflare.com/workers/runtime-apis/kv/)
 - [Thunder Client VS Code extension](https://marketplace.visualstudio.com/items?itemName=rangav.vscode-thunder-client)

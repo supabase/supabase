@@ -3,18 +3,18 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'auth-slack',
   title: 'Login with Slack',
-  description: 'Add Slack OAuth to your Supabase project',
+  description: 'Add Slack OAuth to your iEchor project',
 }
 
-To enable Slack Auth for your project, you need to set up a Slack OAuth application and add the application credentials to your Supabase Dashboard.
+To enable Slack Auth for your project, you need to set up a Slack OAuth application and add the application credentials to your iEchor Dashboard.
 
 ## Overview
 
 Setting up Slack logins for your application consists of 3 parts:
 
 - Create and configure a Slack Project and App on the [Slack Developer Dashboard](https://api.slack.com/apps).
-- Add your Slack `API Key` and `API Secret Key` to your [Supabase Project](https://supabase.com/dashboard).
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
+- Add your Slack `API Key` and `API Secret Key` to your [iEchor Project](https://iechor.com/dashboard).
+- Add the login code to your [iEchor JS Client App](https://github.com/openmodels-base/iechor-js).
 
 ## Access your Slack Developer account
 
@@ -52,9 +52,9 @@ Under the sidebar, select `OAuth & Permissions` and look for `Redirect URLs`:
 
 Under `Scopes`:
 
-- Add the following scopes under the `User Token Scopes`: `profile`, `email`, `openid`. These scopes are the default scopes that Supabase Auth uses to request for user information. You can add any additional scopes that you may need as well.
+- Add the following scopes under the `User Token Scopes`: `profile`, `email`, `openid`. These scopes are the default scopes that iEchor Auth uses to request for user information. You can add any additional scopes that you may need as well.
 
-## Enter your Slack credentials into your Supabase Project
+## Enter your Slack credentials into your iEchor Project
 
 <SocialProviderSettingsSupabase provider="Slack" />
 
@@ -80,8 +80,8 @@ async function signout() {
 
 ## Resources
 
-- [Supabase Account - Free Plan OK](https://supabase.com)
-- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [iEchor Account - Free Plan OK](https://iechor.com)
+- [iEchor JS Client](https://github.com/openmodels-base/iechor-js)
 - [Slack Developer Dashboard](https://api.slack.com/apps)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

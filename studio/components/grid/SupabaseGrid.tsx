@@ -23,7 +23,7 @@ import {
 } from './SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
-/** Supabase Grid: React component to render database table */
+/** iEchor Grid: React component to render database table */
 
 export const SupabaseGrid = forwardRef<SupabaseGridRef, SupabaseGridProps>((props, ref) => {
   const monaco = useMonaco()

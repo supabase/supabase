@@ -2,13 +2,13 @@ openref: 0.1
 
 info:
   id: reference/supabase-py
-  title: Supabase Python Client
+  title: iEchor Python Client
   description: |
 
-    Supabase Python(Community).
+    iEchor Python(Community).
 
   definition: ../../spec/enrichments/tsdoc_v2/combined.json
-  specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_py_v2.yml
+  specUrl: https://github.com/openmodels-base/iechor/edit/master/spec/supabase_py_v2.yml
   slugPrefix: '/'
   libraries:
     - name: 'Python'
@@ -18,10 +18,10 @@ info:
 functions:
   - id: initializing
     description: |
-      You can initialize a new Supabase client using the `create_client()` method.
+      You can initialize a new iEchor client using the `create_client()` method.
 
-      The Supabase client is your entrypoint to the rest of the Supabase functionality
-      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+      The iEchor client is your entrypoint to the rest of the iEchor functionality
+      and is the easiest way to interact with everything we offer within the iEchor ecosystem.
 
     examples:
       - id: create-client
@@ -29,7 +29,7 @@ functions:
         code: |
           ```
           import os
-          from supabase import create_client, Client
+          from iechor import create_client, Client
 
           url: str = os.environ.get("IECHOR_URL")
           key: str = os.environ.get("IECHOR_KEY")
@@ -40,7 +40,7 @@ functions:
         code: |
           ```
           import os
-          from supabase import create_client, Client
+          from iechor import create_client, Client
 
           url: str = os.environ.get("IECHOR_URL")
           key: str = os.environ.get("IECHOR_KEY")
@@ -50,13 +50,13 @@ functions:
   - id: sign-up
     title: 'sign_up()'
     notes: |
-      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
+      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://iechor.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
-      - By default, when the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+      - By default, when the user confirms their email address, they are redirected to the [`SITE_URL`](https://iechor.com/docs/reference/auth/config#site_url). You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://iechor.com/dashboard/project/_/auth/url-configuration).
       - If sign_up() is called for an existing confirmed user:
-          - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
+          - If **Confirm email** is enabled in [your project](https://iechor.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
           - If **Confirm email** is disabled, the error message, `User already registered` is returned.
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/auth-getuser).
     examples:
@@ -94,7 +94,7 @@ functions:
         isSpotlight: true
         code: |
           ```
-          data = supabase.auth.sign_in_with_password({"email": "j0@supabase.io", "password": "testsupabasenow"})
+          data = supabase.auth.sign_in_with_password({"email": "j0@iechor.com", "password": "testsupabasenow"})
           ```
       - id: sign-in-with-phone-and-password
         name: Sign in with phone and password
@@ -118,7 +118,7 @@ functions:
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
       - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
-      - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
+      - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://iechor.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -147,7 +147,7 @@ functions:
     title: 'sign_in_with_oauth'
     notes: |
       - This method is used for signing in using a third-party provider.
-      - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
+      - iEchor supports many different [third-party providers](https://iechor.com/docs/guides/auth#providers).
     examples:
       - id: sign-in-using-a-third-party-provider
         name: Sign in using a third-party provider
@@ -249,7 +249,7 @@ functions:
       - `setSession()` takes in a refresh token and uses it to get a new session.
       - The refresh token can only be used once to obtain a new session.
       - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
-      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://iechor.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
       - If you are using React Native, you will need to install a Buffer polyfill via a library such as [rn-nodeify](https://github.com/tradle/rn-nodeify) to properly use the library.
     examples:
       - id: set-session
@@ -274,8 +274,8 @@ functions:
   - id: select
     title: 'Fetch data: select()'
     notes: |
-      - By default, Supabase projects return a maximum of 1,000 rows. This setting can be changed in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests.
-      - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+      - By default, iEchor projects return a maximum of 1,000 rows. This setting can be changed in your project's [API settings](https://iechor.com/dashboard/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests.
+      - `apikey` is a reserved keyword if you're using the [iEchor Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/openmodels-base/iechor/issues/5465).
     examples:
       - id: getting-your-data
         name: Getting your data
@@ -639,7 +639,7 @@ functions:
   - id: invoke
     title: 'invoke()'
     description: |
-      Invoke a Supabase Function.
+      Invoke a iEchor Function.
     notes: |
       - Requires an Authorization header.
       - When you pass in a body to your function, we automatically attach the Content-Type header for `Blob`, `ArrayBuffer`, `File`, `FormData` and `String`. If it doesn't match any of these types we assume the payload is `json`, serialise it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
@@ -782,7 +782,7 @@ functions:
   - id: from-get-public-url
     title: 'from_.get_public_url()'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [iechor.com/dashboard](https://iechor.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: none

@@ -61,7 +61,7 @@ function CaseStudyPage(props: any) {
   const content = props.blog.content
 
   const meta = {
-    title: props.blog.meta_title ?? `${props.blog.name} | Supabase Customer Stories`,
+    title: props.blog.meta_title ?? `${props.blog.name} | iEchor Customer Stories`,
     description: props.blog.meta_description ?? props.blog.description,
     image:
       `${SITE_ORIGIN}${props.blog.og_image}` ??
@@ -184,7 +184,7 @@ function CaseStudyPage(props: any) {
                         <div className="">
                           <p>Ready to get started?</p>
                           <div>
-                            <Link href="https://supabase.com/contact/enterprise">
+                            <Link href="https://iechor.com/contact/enterprise">
                               <a className="no-underline">
                                 <Button type="default" iconRight={<IconChevronRight />}>
                                   Contact sales

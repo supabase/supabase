@@ -133,7 +133,7 @@ function BlogPostPage(props: any) {
   const meta = {
     title: props.blog.meta_title ?? props.blog.title,
     description: props.blog.meat_description ?? props.blog.description,
-    url: `https://supabase.com/blog/${props.blog.slug}`,
+    url: `https://iechor.com/blog/${props.blog.slug}`,
   }
 
   return (
@@ -170,7 +170,7 @@ function BlogPostPage(props: any) {
           },
           images: [
             {
-              url: `https://supabase.com${basePath}/images/blog/${
+              url: `https://iechor.com${basePath}/images/blog/${
                 props.blog.image ? props.blog.image : props.blog.thumb
               }`,
               alt: `${props.blog.title} thumbnail`,

@@ -7572,7 +7572,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "The following is placed here to display on supabase.com/docs/reference/javascript/subscribe."
+                "shortText": "The following is placed here to display on iechor.com/docs/reference/javascript/subscribe."
               },
               "parameters": [
                 {
@@ -13484,7 +13484,7 @@
                               "kindString": "Call signature",
                               "flags": {},
                               "comment": {
-                                "shortText": "The following is placed here to display on supabase.com/docs/reference/javascript/subscribe."
+                                "shortText": "The following is placed here to display on iechor.com/docs/reference/javascript/subscribe."
                               },
                               "parameters": [
                                 {
@@ -21155,7 +21155,7 @@
                               "kindString": "Call signature",
                               "flags": {},
                               "comment": {
-                                "shortText": "The following is placed here to display on supabase.com/docs/reference/javascript/subscribe."
+                                "shortText": "The following is placed here to display on iechor.com/docs/reference/javascript/subscribe."
                               },
                               "parameters": [
                                 {
@@ -28797,7 +28797,7 @@
                       "kindString": "Call signature",
                       "flags": {},
                       "comment": {
-                        "shortText": "The following is placed here to display on supabase.com/docs/reference/javascript/subscribe."
+                        "shortText": "The following is placed here to display on iechor.com/docs/reference/javascript/subscribe."
                       },
                       "parameters": [
                         {

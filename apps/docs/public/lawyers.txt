@@ -5,7 +5,7 @@ ____________
 
 For compliance.
 
-Supabase™ is a trademark of Supabase Inc.
+iEchor™ is a trademark of iEchor Inc.
 
 If you're a creator/contributor to one of these packages, thanks!
 
@@ -22,7 +22,7 @@ JavaScript/TypeScript
  5  lodash.clonedeep@4.5.0                MIT                     https://github.com/lodash/lodash                                      https://github.com/lodash/lodash/raw/master/LICENSE                                      @supabase/realtime-js
  6  websocket@1.0.34                      Apache-2.0              https://github.com/theturtle32/WebSocket-Node                         https://github.com/theturtle32/WebSocket-Node/raw/master/LICENSE                         @supabase/realtime-js
  7  argparse@2.0.1                        Python-2.0              https://github.com/nodeca/argparse                                    https://github.com/nodeca/argparse/raw/master/LICENSE                                    @supabase/sql-formatter
- 8  @supabase/supabase-js@1.1.2           MIT                     https://github.com/supabase/supabase-js                               https://github.com/supabase/supabase-js/raw/master/LICENSE                               issue-tracker
+ 8  @supabase/supabase-js@1.1.2           MIT                     https://github.com/openmodels-base/iechor-js                               https://github.com/openmodels-base/iechor-js/raw/master/LICENSE                               issue-tracker
  9  @supabase/ui@0.6.1                    MIT                     https://github.com/supabase/ui                                                          https://github.com/supabase/ui/blob/master/LICENSE                                       issue-tracker
 10  autoprefixer@10.1.0                   MIT                     https://github.com/postcss/autoprefixer                               https://github.com/postcss/autoprefixer/raw/master/LICENSE                               issue-tracker
 11  crypto-js@4.0.0                       MIT                     http://github.com/brix/crypto-js                                      http://github.com/brix/crypto-js/raw/master/LICENSE                                      issue-tracker
@@ -36,7 +36,7 @@ JavaScript/TypeScript
 19  @headlessui/react@1.2.0               MIT                     https://github.com/tailwindlabs/headlessui                            https://github.com/tailwindlabs/headlessui                                               supabase-ui-web
 20  @mdx-js/loader@1.6.22                 MIT                     https://github.com/mdx-js/mdx                                         https://github.com/mdx-js/mdx/raw/master/license                                         supabase-ui-web
 21  @next/mdx@10.1.1                      MIT                     https://github.com/vercel/next.js                                     https://github.com/vercel/next.js/raw/master/license.md                                  supabase-ui-web
-22  @supabase/supabase-js@1.7.5           MIT                     https://github.com/supabase/supabase-js                               https://github.com/supabase/supabase-js/raw/master/LICENSE                               supabase-ui-web
+22  @supabase/supabase-js@1.7.5           MIT                     https://github.com/openmodels-base/iechor-js                               https://github.com/openmodels-base/iechor-js/raw/master/LICENSE                               supabase-ui-web
 23  @supabase/ui@0.25.1                   MIT                     https://github.com/supabase/ui                                                          https://github.com/supabase/ui/blob/master/LICENSE                                       supabase-ui-web
 24  @types/react-copy-to-clipboard@5.0.0  MIT                     https://github.com/DefinitelyTyped/DefinitelyTyped                    https://github.com/DefinitelyTyped/DefinitelyTyped/raw/master/LICENSE                    supabase-ui-web
 25  gray-matter@4.0.2                     MIT                     https://github.com/jonschlinkert/gray-matter                          https://github.com/jonschlinkert/gray-matter/raw/master/LICENSE                          supabase-ui-web

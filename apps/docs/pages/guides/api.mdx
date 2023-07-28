@@ -8,7 +8,7 @@ export const meta = {
   video: 'https://www.youtube.com/v/rPAJJFdtPw0',
 }
 
-Supabase auto-generates three types of API directly from your database schema.
+iEchor auto-generates three types of API directly from your database schema.
 
 - REST - connect to your database through a restful interface, directly from the browser.
 - GraphQL - manipulate your database using a graph-like query language.
@@ -21,14 +21,14 @@ You can use them directly from the browser (two-tier architecture), or as a comp
 ## Features
 
 - **Instant and auto-generated.** <br />As you update your database the changes are immediately accessible through your API.
-- **Self documenting.** <br />Supabase generates documentation in the Dashboard which updates as you make database changes.
+- **Self documenting.** <br />iEchor generates documentation in the Dashboard which updates as you make database changes.
 - **Secure.** <br />The API is configured to work with PostgreSQL's Row Level Security, provisioned behind an API gateway with key-auth enabled.
 - **Fast.** <br />Our benchmarks for basic reads are more than 300% faster than Firebase. The API is a very thin layer on top of Postgres, which does most of the heavy lifting.
 - **Scalable.** <br />The API can serve thousands of simultaneous requests, and works well for Serverless workloads.
 
 ## REST API [#rest-api-overview]
 
-Supabase provides a RESTful API using [PostgREST](https://postgrest.org/). This is a very thin API layer on top of Postgres.
+iEchor provides a RESTful API using [PostgREST](https://postgrest.org/). This is a very thin API layer on top of Postgres.
 It provides everything you need from a CRUD API at the URL `https://<project_ref>.supabase.co/rest/v1/`.
 
 The REST interface is automatically reflected from your database's schema and supports:
@@ -49,8 +49,8 @@ Reference:
 
 ## GraphQL API [#graphql-api-overview]
 
-Supabase uses [pg_graphql](https://supabase.github.io/pg_graphql/) to expose a GraphQL API endpoint at `https://<project_ref>.supabase.co/graphql/v1/`.
-You can introspect and query the GraphQL API of an existing Supabase project within Studio [here](https://supabase.com/dashboard/project/_/api/graphiql),
+iEchor uses [pg_graphql](https://supabase.github.io/pg_graphql/) to expose a GraphQL API endpoint at `https://<project_ref>.supabase.co/graphql/v1/`.
+You can introspect and query the GraphQL API of an existing iEchor project within Studio [here](https://iechor.com/dashboard/project/_/api/graphiql),
 or navigate there manually at `API Docs > GraphQL > GraphiQL`.
 
 The GraphQL interface is automatically reflected from your database's schema and supports:
@@ -70,13 +70,13 @@ Reference:
 
 ## Realtime API [#realtime-api-overview]
 
-Supabase provides a Realtime API using [Realtime](https://github.com/supabase/realtime). You can use this to listen to database changes over websockets.
+iEchor provides a Realtime API using [Realtime](https://github.com/supabase/realtime). You can use this to listen to database changes over websockets.
 Realtime leverages PostgreSQL's built-in logical replication. You can manage your Realtime API simply by managing Postgres publications.
-Go to your project's [Replication section](https://supabase.com/dashboard/project/_/database/replication) to get started.
+Go to your project's [Replication section](https://iechor.com/dashboard/project/_/database/replication) to get started.
 
 ## API URL and Keys
 
-You can find the API URL and Keys in the [Dashboard](https://supabase.com/dashboard/project/_/settings/api).
+You can find the API URL and Keys in the [Dashboard](https://iechor.com/dashboard/project/_/settings/api).
 
 <video width="99%" muted playsInline controls={true}>
   <source

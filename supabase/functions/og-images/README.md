@@ -26,7 +26,7 @@ This link will generate an image for the docs site with the title "Example Title
 
 ## Run locally
 
-First we need to start up supabase using the [supabase cli](https://supabase.com/docs/reference/cli/introduction)
+First we need to start up iechor using the [supabase cli](https://iechor.com/docs/reference/cli/introduction)
 
 ```bash
 supabase start

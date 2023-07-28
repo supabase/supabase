@@ -89,7 +89,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'Documentation',
-            url: 'https://supabase.com/docs/guides/platform/database-size',
+            url: 'https://iechor.com/docs/guides/platform/database-size',
           },
         ],
         chartDescription: 'The data refreshes every 24 hours.',
@@ -141,7 +141,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'Storage',
-            url: 'https://supabase.com/docs/guides/storage',
+            url: 'https://iechor.com/docs/guides/storage',
           },
         ],
       },
@@ -176,7 +176,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'Auth',
-            url: 'https://supabase.com/docs/guides/auth',
+            url: 'https://iechor.com/docs/guides/auth',
           },
         ],
       },
@@ -193,7 +193,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'SSO with SAML 2.0',
-            url: 'https://supabase.com/docs/guides/auth/sso/auth-sso-saml',
+            url: 'https://iechor.com/docs/guides/auth/sso/auth-sso-saml',
           },
         ],
       },
@@ -212,7 +212,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'Documentation',
-            url: 'https://supabase.com/docs/guides/storage/image-transformations',
+            url: 'https://iechor.com/docs/guides/storage/image-transformations',
           },
         ],
       },
@@ -228,7 +228,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'Edge Functions',
-            url: 'https://supabase.com/docs/guides/functions',
+            url: 'https://iechor.com/docs/guides/functions',
           },
         ],
       },
@@ -244,7 +244,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'Realtime Quotas',
-            url: 'https://supabase.com/docs/guides/realtime/quotas',
+            url: 'https://iechor.com/docs/guides/realtime/quotas',
           },
         ],
       },
@@ -263,7 +263,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'Realtime Quotas',
-            url: 'https://supabase.com/docs/guides/realtime/quotas',
+            url: 'https://iechor.com/docs/guides/realtime/quotas',
           },
         ],
       },

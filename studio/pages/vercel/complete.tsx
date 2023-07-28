@@ -43,7 +43,7 @@ function IntegrationComplete() {
               rel="noreferrer"
               className="hover:text-green-1000"
             >
-              Open Supabase Dashboard →
+              Open iEchor Dashboard →
             </a>
           </div>
 

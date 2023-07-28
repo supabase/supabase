@@ -181,7 +181,7 @@ const RolesList = ({}) => {
           <div>
             {supabaseRoles.length > 0 && (
               <div className="bg-scale-100 dark:bg-scale-200 border border-scale-300 dark:border-scale-500 px-6 py-3 rounded-t flex items-center space-x-4">
-                <p className="text-sm text-scale-1100">Roles managed by Supabase</p>
+                <p className="text-sm text-scale-1100">Roles managed by iEchor</p>
                 <Badge color="green">Protected</Badge>
               </div>
             )}

@@ -4,7 +4,7 @@ import StepHikeCompact from '~/components/StepHikeCompact'
 export const meta = {
   title: 'Vector search with Next.js and OpenAI',
   subtitle:
-    'Learn how to build a ChatGPT-style doc search powered by Next.js, OpenAI, and Supabase.',
+    'Learn how to build a ChatGPT-style doc search powered by Next.js, OpenAI, and iEchor.',
   breadcrumb: 'AI Examples',
   video: 'https://www.youtube.com/v/xmfNUCjszh4',
   tocVideo: 'xmfNUCjszh4',
@@ -16,19 +16,19 @@ While our [Headless Vector search](/docs/guides/ai/examples/headless-vector-sear
 2. Store you embeddings in Postgres using pgvector.
 3. Deploy a function for answering your users' questions.
 
-You can read our [Supabase Clippy](https://supabase.com/blog/chatgpt-supabase-docs) blog post for a full example.
+You can read our [iEchor Clippy](https://iechor.com/blog/chatgpt-supabase-docs) blog post for a full example.
 
-We assume that you have a Next.js project with a collection of `.mdx` files nested inside your `pages` directory. We will start developing locally with the Supabase CLI and then push our local database changes to our hosted Supabase project. You can find the [full Next.js example on GitHub](https://github.com/supabase-community/nextjs-openai-doc-search).
+We assume that you have a Next.js project with a collection of `.mdx` files nested inside your `pages` directory. We will start developing locally with the iEchor CLI and then push our local database changes to our hosted iEchor project. You can find the [full Next.js example on GitHub](https://github.com/supabase-community/nextjs-openai-doc-search).
 
 ## Create a project
 
-1. [Create a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
+1. [Create a new project](https://iechor.com/dashboard) in the iEchor Dashboard.
 1. Enter your project details.
 1. Wait for the new database to launch.
 
 ## Prepare the database
 
-Let's prepare the database schema. We can use the "OpenAI Vector Search" quickstart in the [SQL Editor](https://supabase.com/dashboard/project/_/sql), or you can copy/paste the SQL below and run it yourself.
+Let's prepare the database schema. We can use the "OpenAI Vector Search" quickstart in the [SQL Editor](https://iechor.com/dashboard/project/_/sql), or you can copy/paste the SQL below and run it yourself.
 
 <Tabs
   scrollable
@@ -38,7 +38,7 @@ Let's prepare the database schema. We can use the "OpenAI Vector Search" quickst
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [SQL Editor](https://supabase.com/dashboard/project/_/sql) page in the Dashboard.
+1. Go to the [SQL Editor](https://iechor.com/dashboard/project/_/sql) page in the Dashboard.
 2. Click **OpenAI Vector Search**.
 3. Click **Run**.
 
@@ -49,18 +49,18 @@ Let's prepare the database schema. We can use the "OpenAI Vector Search" quickst
 
   <StepHikeCompact.Step step={1}>
 
-    <StepHikeCompact.Details title="Set up Supabase locally">
+    <StepHikeCompact.Details title="Set up iEchor locally">
 
-    Make sure you have the latest version of the [Supabase CLI installed]().
+    Make sure you have the latest version of the [iEchor CLI installed]().
 
-    Initialize Supabase in the root directory of your app.
+    Initialize iEchor in the root directory of your app.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Details>
 
     ```bash
-    supabase init
+    iechor init
     ```
 
     </StepHikeCompact.Details>
@@ -70,14 +70,14 @@ Let's prepare the database schema. We can use the "OpenAI Vector Search" quickst
   <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Create a migrations file">
 
-    To make changes to our local database, we need to create a new migration. This will create a new `.sql` file in our `supabase/migrations` folder, where we can write SQL that will be applied to our local database when starting Supabase locally.
+    To make changes to our local database, we need to create a new migration. This will create a new `.sql` file in our `supabase/migrations` folder, where we can write SQL that will be applied to our local database when starting iEchor locally.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
       ```bash
-      supabase migration new init
+      iechor migration new init
       ```
 
     </StepHikeCompact.Code>
@@ -150,7 +150,7 @@ Let's prepare the database schema. We can use the "OpenAI Vector Search" quickst
 
     Anytime the user sends a query, we want to find the content that's relevant to their questions. We can do this using pgvector's similarity search.
 
-    These are quite complex SQL operations, so let's wrap them in database functions that we can call from our frontend using [RPC](https://supabase.com/docs/reference/javascript/rpc).
+    These are quite complex SQL operations, so let's wrap them in database functions that we can call from our frontend using [RPC](https://iechor.com/docs/reference/javascript/rpc).
 
     </StepHikeCompact.Details>
 
@@ -209,16 +209,16 @@ Let's prepare the database schema. We can use the "OpenAI Vector Search" quickst
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={5}>
-    <StepHikeCompact.Details title="Start Supabase Locally">
+    <StepHikeCompact.Details title="Start iEchor Locally">
 
-    Start Supabase locally. At this point all files in `supabase/migrations` will be applied to your database and you're ready to go.
+    Start iEchor locally. At this point all files in `supabase/migrations` will be applied to your database and you're ready to go.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
       ```bash
-      supabase start
+      iechor start
       ```
 
     </StepHikeCompact.Code>
@@ -226,18 +226,18 @@ Let's prepare the database schema. We can use the "OpenAI Vector Search" quickst
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={6}>
-    <StepHikeCompact.Details title="Push changes to your Supabase database">
+    <StepHikeCompact.Details title="Push changes to your iEchor database">
 
-    Once ready, you can link your local project to your cloud hosted Supabase project and push the local changes to your hosted instance.
+    Once ready, you can link your local project to your cloud hosted iEchor project and push the local changes to your hosted instance.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
       ```bash
-      supabase link --project-ref=your-project-ref
+      iechor link --project-ref=your-project-ref
 
-      supabase db push
+      iechor db push
       ```
 
     </StepHikeCompact.Code>
@@ -278,7 +278,7 @@ With our database set up, we need to process and store all `.mdx` files in the `
     <StepHikeCompact.Details title="Set up environment variables">
 
     We need some environment variables to run the script. Add them to your `.env` file and make sure your `.env` file is not committed to source control!
-    You can get your local Supabase credentials by running `supabase status`.
+    You can get your local iEchor credentials by running `supabase status`.
 
     </StepHikeCompact.Details>
 
@@ -403,8 +403,8 @@ All of this is glued together in a [Vercel Edge Function](https://vercel.com/doc
       ```ts
       const prompt = codeBlock`
         ${oneLine`
-          You are a very enthusiastic Supabase representative who loves
-          to help people! Given the following sections from the Supabase
+          You are a very enthusiastic iEchor representative who loves
+          to help people! Given the following sections from the iEchor
           documentation, answer the question using only that information,
           outputted in markdown format. If you are unsure and the answer
           is not explicitly written in the documentation, say
@@ -530,8 +530,8 @@ const handleConfirm = React.useCallback(
 
 Want to learn more about the awesome tech that is powering this?
 
-- Read about how we built [ChatGPT for the Supabase Docs](https://supabase.com/blog/chatgpt-supabase-docs).
-- Read the pgvector Docs for [Embeddings and vector similarity](https://supabase.com/docs/guides/database/extensions/pgvector)
+- Read about how we built [ChatGPT for the iEchor Docs](https://iechor.com/blog/chatgpt-supabase-docs).
+- Read the pgvector Docs for [Embeddings and vector similarity](https://iechor.com/docs/guides/database/extensions/pgvector)
 - Watch Greg's video for a full breakdown:
 
 <div class="video-container">

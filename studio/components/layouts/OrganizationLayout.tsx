@@ -18,7 +18,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
 
   return (
     <AccountLayout
-      title={selectedOrganization?.name ?? 'Supabase'}
+      title={selectedOrganization?.name ?? 'iEchor'}
       breadcrumbs={[{ key: `org-settings`, label: 'Settings' }]}
     >
       <ScaffoldHeader>

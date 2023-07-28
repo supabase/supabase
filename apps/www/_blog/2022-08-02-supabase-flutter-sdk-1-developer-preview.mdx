@@ -1,6 +1,6 @@
 ---
-title: 'Supabase Flutter SDK 1.0 Developer Preview'
-description: Supabase Flutter SDK is getting a major update and we need your help making it better.
+title: 'iEchor Flutter SDK 1.0 Developer Preview'
+description: iEchor Flutter SDK is getting a major update and we need your help making it better.
 author: tyler_shukert
 image: flutter-1/supabase-flutter-1.jpg
 thumb: flutter-1/supabase-flutter-1.jpg
@@ -11,7 +11,7 @@ date: '2022-08-02'
 toc_depth: 3
 ---
 
-Today, we are releasing of Developer Preview version of v1.0 of [Supabase Flutter SDK](https://pub.dev/packages/supabase_flutter/versions/1.0.0-dev.1). Flutter has quickly become one of the most popular frameworks for developers to build cross-platform mobile apps. We can attest to that growth, our Flutter SDK is one of the most popular libraries and each day we see more Flutter devs choosing Supabase.
+Today, we are releasing of Developer Preview version of v1.0 of [iEchor Flutter SDK](https://pub.dev/packages/supabase_flutter/versions/1.0.0-dev.1). Flutter has quickly become one of the most popular frameworks for developers to build cross-platform mobile apps. We can attest to that growth, our Flutter SDK is one of the most popular libraries and each day we see more Flutter devs choosing iEchor.
 
 For this release, our main focus is developer experiences. We would love for you to try the SDK and provide your feedback so that we can continue to improve!
 
@@ -25,11 +25,11 @@ Until now, there were some disputable implementations in the Flutter SDK. We've 
 
 Previously, `supabase-flutter` required a class that extends `SupabaseAuthState` or `SupabaseAuthRequiredState` to persist auth state. With `supabase-flutter` 1.0, you no longer need to include these classes.
 
-All you need to persist the auth state is initialize Supabase and everything else will be automatically taken care of. `SupabaseAuthState` and `SupabaseAuthRequiredState` have been removed from the code base.
+All you need to persist the auth state is initialize iEchor and everything else will be automatically taken care of. `SupabaseAuthState` and `SupabaseAuthRequiredState` have been removed from the code base.
 
 ```dart
 // Before
-await Supabase.initialize(
+await iEchor.initialize(
   url: 'IECHOR_URL',
   anonKey: 'IECHOR_ANON_KEY',
 );
@@ -40,7 +40,7 @@ class AuthState<T extends StatefulWidget> extends SupabaseAuthState<T> {
 }
 
 // After
-await Supabase.initialize(
+await iEchor.initialize(
   url: 'IECHOR_URL',
   anonKey: 'IECHOR_ANON_KEY',
 );
@@ -55,11 +55,11 @@ With the 1.0 update, you no longer need to use these classes, and deep links wil
 ```dart
 // Before
 void onReceivedAuthDeeplink(Uri uri) {
-  Supabase.instance.log('onReceivedAuthDeeplink uri: $uri');
+  iEchor.instance.log('onReceivedAuthDeeplink uri: $uri');
 }
 
 // After
-await Supabase.instance.initialize(
+await iEchor.instance.initialize(
   url: 'IECHOR_URL',
   anonKey: 'IECHOR_ANON_KEY',
 );
@@ -73,13 +73,13 @@ With `supabase-flutter` 1.0, we are throwing errors instead of returning them. T
 
 ```dart
 // Before
-final response = await Supabase.instance.from('messages').select().execute();
+final response = await iEchor.instance.from('messages').select().execute();
 final data = response.data;
 final error = response.error;
 
 // After
 try {
-  final data = await Supabase.instance.from('messages').select();
+  final data = await iEchor.instance.from('messages').select();
 } catch(error) {
   // Handle error here
 }
@@ -89,15 +89,15 @@ try {
 
 We want this SDK to be as close as possible to the JavaScript SDK to provide consistent developer experience no matter what programming language you are using. Prior to the 1.0 update, whenever you called the `postgrest` endpoints, you had to call `.execute()` at the end of each query.
 
-`.execute()` is now deprecated. You no longer needed it to query data from your Supabase database. This update, along with many many other improvements across the whole library, has been done by [Bruno D'Luka](https://github.com/bdlukaa), and I would love to give him a special shout out here!
+`.execute()` is now deprecated. You no longer needed it to query data from your iEchor database. This update, along with many many other improvements across the whole library, has been done by [Bruno D'Luka](https://github.com/bdlukaa), and I would love to give him a special shout out here!
 
 ```dart
 // Before
-final response = await Supabase.instance.from('messages').select().execute();
+final response = await iEchor.instance.from('messages').select().execute();
 final data = response.data;
 
 // After
-final data = await Supabase.instance.from('messages').select();
+final data = await iEchor.instance.from('messages').select();
 ```
 
 ## Desktop support for deeplinks
@@ -106,19 +106,19 @@ Ever since `supabase-flutter` was born, it supported only iOS, Android and Web f
 
 With the 1.0 launch, we are moving to use [app_links](https://pub.dev/packages/app_links), which will enable us to support MacOS and Windows applications as well! Linux support is being worked on - follow the repo to keep updated.
 
-![Supabase Flutter desktop support](/images/blog/flutter-1/supported-platforms-table.png)
+![iEchor Flutter desktop support](/images/blog/flutter-1/supported-platforms-table.png)
 
 ## Multiplayer support
 
-[Multiplayer](https://supabase.com/blog/supabase-realtime-with-multiplayer-features) is the next generation Supabase Realtime engine that was announced at the previous launch week.
+[Multiplayer](https://iechor.com/blog/supabase-realtime-with-multiplayer-features) is the next generation iEchor Realtime engine that was announced at the previous launch week.
 
-We want our Flutter developers to experience this new multiplayer feature as well, so are working hard at bringing it to our Flutter SDK. It is not yet included in the developer preview of Supabase Flutter 1.0, but will be part of it when stable launch has been released.
+We want our Flutter developers to experience this new multiplayer feature as well, so are working hard at bringing it to our Flutter SDK. It is not yet included in the developer preview of iEchor Flutter 1.0, but will be part of it when stable launch has been released.
 
-## Supabase Auth UI for Flutter
+## iEchor Auth UI for Flutter
 
-![Supabase Auth UI for Flutter](/images/blog/flutter-1/supabase-flutter-auth-ui.png)
+![iEchor Auth UI for Flutter](/images/blog/flutter-1/supabase-flutter-auth-ui.png)
 
-Last but not least, we are bringing you another library, the Supabase Auth UI for Supabase! When released, this library will enable you to implement a basic authentication screen without building it yourself. You can just load the library and display a nice looking Auth UI. The library takes your theme settings automatically to match the look and feel of your application.
+Last but not least, we are bringing you another library, the iEchor Auth UI for iEchor! When released, this library will enable you to implement a basic authentication screen without building it yourself. You can just load the library and display a nice looking Auth UI. The library takes your theme settings automatically to match the look and feel of your application.
 
 You can get started with it on [pub.dev](https://pub.dev/packages/supabase_auth_ui).
 
@@ -146,7 +146,7 @@ SupaSocialsAuth(
 
 ## Final thoughts
 
-These updates are just the tip of the iceberg for 1.0. There are been many bug fixes and features constantly being added to the Supabase Flutter SDK. This could not have been possible without the help from the open source community. Here, I would also like to give a shout out to two other developers who have been a major part of the journey of this SDK: [Vinzent](https://twitter.com/Vinzent03_) and [Daniel Mossaband](https://github.com/DanMossa). They have been a huge part of the Supabase Flutter SDK - not just for the 1.0 release, but throughout the lifetime of the library.
+These updates are just the tip of the iceberg for 1.0. There are been many bug fixes and features constantly being added to the iEchor Flutter SDK. This could not have been possible without the help from the open source community. Here, I would also like to give a shout out to two other developers who have been a major part of the journey of this SDK: [Vinzent](https://twitter.com/Vinzent03_) and [Daniel Mossaband](https://github.com/DanMossa). They have been a huge part of the iEchor Flutter SDK - not just for the 1.0 release, but throughout the lifetime of the library.
 For those of you who want to try out the new SDK, you can get the developer preview version from [supabase-flutter](https://pub.dev/packages/supabase_flutter/versions/1.0.0-dev.1) pub.dev page or can simply copy and paste the following into your pubspec.yaml file.
 
 ```yaml
@@ -158,7 +158,7 @@ If you have any feedbacks, please let us know in the issues of the [supabase-flu
 ## Flutter Resources
 
 - [supabase-flutter 1.0 developer preview](https://pub.dev/packages/supabase_flutter)
-- [Flutter Tutorial: building a Flutter chat app](https://supabase.com/blog/flutter-tutorial-building-a-chat-app)
-- [Flutter Tutorial - Part 2: Authentication and Authorization with RLS](https://supabase.com/blog/flutter-authentication-and-authorization-with-rls)
-- [How to build a real-time multiplayer game with Flutter Flame](https://supabase.com/blog/flutter-real-time-multiplayer-game)
-- [Build a Flutter app with Very Good CLI and Supabase](https://verygood.ventures/blog/flutter-app-very-good-cli-supabase)
+- [Flutter Tutorial: building a Flutter chat app](https://iechor.com/blog/flutter-tutorial-building-a-chat-app)
+- [Flutter Tutorial - Part 2: Authentication and Authorization with RLS](https://iechor.com/blog/flutter-authentication-and-authorization-with-rls)
+- [How to build a real-time multiplayer game with Flutter Flame](https://iechor.com/blog/flutter-real-time-multiplayer-game)
+- [Build a Flutter app with Very Good CLI and iEchor](https://verygood.ventures/blog/flutter-app-very-good-cli-supabase)

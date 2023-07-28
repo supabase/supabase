@@ -44,8 +44,8 @@ const Footer = () => (
     <hr className="border-scale-400 my-6"></hr>
     <div className="flex gap-4 items-center justify-between">
       <div className="flex flex-col lg:flex-row gap-3 ">
-        <Link href="https://supabase.com/">
-          <a className="text-xs text-scale-900">&copy; Supabase Inc</a>
+        <Link href="https://iechor.com/">
+          <a className="text-xs text-scale-900">&copy; iEchor Inc</a>
         </Link>
         <span className="text-xs text-scale-900">—</span>
         {secondaryLinks.map((item) => (
@@ -56,7 +56,7 @@ const Footer = () => (
       </div>
       <div className="flex items-center gap-2">
         <Button type="text" asChild>
-          <a href="https://github.com/supabase/supabase" target="_blank" rel="noreferrer noopener">
+          <a href="https://github.com/openmodels-base/iechor" target="_blank" rel="noreferrer noopener">
             <svg
               width="17"
               height="17"
@@ -106,7 +106,7 @@ const Footer = () => (
           </a>
         </Button>
         <Button type="text" asChild>
-          <a href="https://discord.supabase.com/" target="_blank" rel="noreferrer noopener">
+          <a href="https://discord.iechor.com/" target="_blank" rel="noreferrer noopener">
             <svg
               width="17"
               height="17"

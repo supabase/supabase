@@ -85,8 +85,8 @@ function Blog(props: any) {
     }
   }, [tag, router.isReady])
 
-  const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
-  const meta_description = 'Get all your Supabase News on the Supabase blog.'
+  const meta_title = 'iEchor Blog: Open Source Firebase alternative Blog'
+  const meta_description = 'Get all your iEchor News on the iEchor blog.'
 
   return (
     <>
@@ -96,10 +96,10 @@ function Blog(props: any) {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/${router.pathname}`,
+          url: `https://iechor.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image-v2.jpg`,
+              url: `https://iechor.com/images/og/og-image-v2.jpg`,
             },
           ],
         }}
@@ -107,12 +107,12 @@ function Blog(props: any) {
           {
             rel: 'alternate',
             type: 'application/rss+xml',
-            href: `https://supabase.com/rss.xml`,
+            href: `https://iechor.com/rss.xml`,
           },
         ]}
       />
       <DefaultLayout>
-        <h1 className="sr-only">Supabase blog</h1>
+        <h1 className="sr-only">iEchor blog</h1>
         <div className="overflow-hidden py-12">
           <div className="container mx-auto mt-16 px-8 sm:px-16 xl:px-20">
             <div className="mx-auto ">

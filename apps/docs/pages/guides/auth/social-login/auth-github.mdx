@@ -3,18 +3,18 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'auth-github',
   title: 'Login with GitHub',
-  description: 'Add GitHub OAuth to your Supabase project',
+  description: 'Add GitHub OAuth to your iEchor project',
 }
 
-To enable GitHub Auth for your project, you need to set up a GitHub OAuth application and add the application credentials to your Supabase Dashboard.
+To enable GitHub Auth for your project, you need to set up a GitHub OAuth application and add the application credentials to your iEchor Dashboard.
 
 ## Overview
 
 Setting up GitHub logins for your application consists of 3 parts:
 
 - Create and configure a GitHub OAuth App on [GitHub](https://github.com)
-- Add your GitHub OAuth keys to your [Supabase Project](https://supabase.com/dashboard)
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+- Add your GitHub OAuth keys to your [iEchor Project](https://iechor.com/dashboard)
+- Add the login code to your [iEchor JS Client App](https://github.com/openmodels-base/iechor-js)
 
 ## Access your GitHub account
 
@@ -53,7 +53,7 @@ Copy your new OAuth credentials
 - Click `Generate a new client secret`.
 - Copy and save your `Client secret`.
 
-## Enter your GitHub credentials into your Supabase Project
+## Enter your GitHub credentials into your iEchor Project
 
 <SocialProviderSettingsSupabase provider="GitHub" />
 
@@ -79,8 +79,8 @@ async function signout() {
 
 ## Resources
 
-- [Supabase Account - Free Plan OK](https://supabase.com)
-- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [iEchor Account - Free Plan OK](https://iechor.com)
+- [iEchor JS Client](https://github.com/openmodels-base/iechor-js)
 - [GitHub Developer Settings](https://github.com/settings/developers)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

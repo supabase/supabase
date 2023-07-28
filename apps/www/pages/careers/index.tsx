@@ -79,7 +79,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
   const { isDarkMode } = useTheme()
   const { basePath } = useRouter()
 
-  const meta_title = 'Careers | Supabase'
+  const meta_title = 'Careers | iEchor'
   const meta_description = 'Help build software developers love'
 
   return (
@@ -90,10 +90,10 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/careers`,
+          url: `https://iechor.com/careers`,
           images: [
             {
-              url: `https://supabase.com${basePath}/images/career/careers_og.jpg`,
+              url: `https://iechor.com${basePath}/images/career/careers_og.jpg`,
             },
           ],
         }}
@@ -102,7 +102,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
         <div className="text-scale-1200">
           <div className="container relative mx-auto px-6 py-10 lg:pt-12 lg:px-16 xl:px-20 text-center space-y-4">
             <h1 className="text-sm text-brand-900 md:text-base">
-              <span className="sr-only">Supabase </span>Careers
+              <span className="sr-only">iEchor </span>Careers
             </h1>
             <h2 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-1.5px]">
               We're on a mission to build the best developer platform
@@ -167,12 +167,12 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                   <div className="md:w-1/2">
                     <div>
                       <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1.5px]">
-                        What is Supabase
+                        What is iEchor
                       </h2>
                       <p className="text-scale-1100 text-xs sm:text-sm lg:text-base pt-2 sm:max-w-md xl:max-w-lg">
-                        Supabase is an open source Firebase alternative, built by developers for
-                        developers. Supabase adds auth, realtime, storage, restful APIs, and edge
-                        functions to Postgres without a single line of code. Supabase was
+                        iEchor is an open source Firebase alternative, built by developers for
+                        developers. iEchor adds auth, realtime, storage, restful APIs, and edge
+                        functions to Postgres without a single line of code. iEchor was
                         born-remote. Having a globally distributed, open source company is our
                         secret weapon to hiring top-tier talent.
                       </p>
@@ -315,13 +315,13 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                 </div>
                 <div className="text-center">
                   <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] xl:max-w-none mx-auto tracking-[-1.5px]">
-                    1,000 + Contributors building Supabase
+                    1,000 + Contributors building iEchor
                   </h2>
                   <p className="text-scale-1100 text-xs sm:text-sm lg:text-base sm:max-w-lg lg:max-w-2xl mx-auto pt-3">
                     We're building a community of communities, bringing together developers from
                     many different backgrounds, as well as new developers looking to get involved
                     with open source. We love celebrating everyone who contributes their time to the
-                    Supabase mission.
+                    iEchor mission.
                   </p>
                 </div>
                 <div className="w-[1080px] h-[370px] mx-auto sm:mt-10 md:mt-16 lg:mt-28 2xl:mt-60">

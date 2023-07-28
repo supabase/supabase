@@ -37,7 +37,7 @@
               "kindString": "Class",
               "flags": {},
               "comment": {
-                "shortText": "Supabase Client.",
+                "shortText": "iEchor Client.",
                 "text": "An isomorphic Javascript client for interacting with Postgres.\n"
               },
               "children": [
@@ -182,7 +182,7 @@
                           "kindString": "Parameter",
                           "flags": {},
                           "comment": {
-                            "shortText": "The unique Supabase URL which is supplied when you create a new project in your project dashboard."
+                            "shortText": "The unique iEchor URL which is supplied when you create a new project in your project dashboard."
                           },
                           "type": {
                             "type": "intrinsic",
@@ -196,7 +196,7 @@
                           "kindString": "Parameter",
                           "flags": {},
                           "comment": {
-                            "shortText": "The unique Supabase Key which is supplied when you create a new project in your project dashboard."
+                            "shortText": "The unique iEchor Key which is supplied when you create a new project in your project dashboard."
                           },
                           "type": {
                             "type": "intrinsic",
@@ -257,7 +257,7 @@
                   "kindString": "Property",
                   "flags": {},
                   "comment": {
-                    "shortText": "Supabase Auth allows you to create and manage user sessions for access to data that is secured by access policies."
+                    "shortText": "iEchor Auth allows you to create and manage user sessions for access to data that is secured by access policies."
                   },
                   "sources": [
                     {
@@ -669,7 +669,7 @@
                       "kindString": "Get signature",
                       "flags": {},
                       "comment": {
-                        "shortText": "Supabase Functions allows you to deploy and invoke edge functions."
+                        "shortText": "iEchor Functions allows you to deploy and invoke edge functions."
                       },
                       "type": {
                         "type": "reference",
@@ -701,7 +701,7 @@
                       "kindString": "Get signature",
                       "flags": {},
                       "comment": {
-                        "shortText": "Supabase Storage allows you to manage user-generated content, such as photos or videos."
+                        "shortText": "iEchor Storage allows you to manage user-generated content, such as photos or videos."
                       },
                       "type": {
                         "type": "reference",
@@ -1929,7 +1929,7 @@
                   "kindString": "Call signature",
                   "flags": {},
                   "comment": {
-                    "shortText": "Creates a new Supabase Client."
+                    "shortText": "Creates a new iEchor Client."
                   },
                   "typeParameter": [
                     {
@@ -3738,7 +3738,7 @@
                         "isOptional": true
                       },
                       "comment": {
-                        "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                        "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in iEchor. Defaults to 'public'."
                       },
                       "sources": [
                         {
@@ -18252,8 +18252,8 @@
                       {
                         "kind": "inline-tag",
                         "tag": "@link",
-                        "text": "https://github.com/supabase/supabase-js/issues/92",
-                        "target": "https://github.com/supabase/supabase-js/issues/92"
+                        "text": "https://github.com/openmodels-base/iechor-js/issues/92",
+                        "target": "https://github.com/openmodels-base/iechor-js/issues/92"
                       }
                     ]
                   },
@@ -19537,7 +19537,7 @@
                 "summary": [
                   {
                     "kind": "text",
-                    "text": "Types for the schema from the [type\ngenerator](https://supabase.com/docs/reference/javascript/next/typescript-support)"
+                    "text": "Types for the schema from the [type\ngenerator](https://iechor.com/docs/reference/javascript/next/typescript-support)"
                   }
                 ]
               },
@@ -27373,8 +27373,8 @@
                       {
                         "kind": "inline-tag",
                         "tag": "@link",
-                        "text": "https://github.com/supabase/supabase-js/issues/92",
-                        "target": "https://github.com/supabase/supabase-js/issues/92"
+                        "text": "https://github.com/openmodels-base/iechor-js/issues/92",
+                        "target": "https://github.com/openmodels-base/iechor-js/issues/92"
                       }
                     ]
                   },
@@ -31924,8 +31924,8 @@
                       {
                         "kind": "inline-tag",
                         "tag": "@link",
-                        "text": "https://github.com/supabase/supabase-js/issues/92",
-                        "target": "https://github.com/supabase/supabase-js/issues/92"
+                        "text": "https://github.com/openmodels-base/iechor-js/issues/92",
+                        "target": "https://github.com/openmodels-base/iechor-js/issues/92"
                       }
                     ]
                   },
@@ -40556,7 +40556,7 @@
                     "isOptional": true
                   },
                   "comment": {
-                    "shortText": "The number of seconds the asset is cached in the browser and in the Supabase CDN. This is set in the `Cache-Control: max-age=<seconds>` header. Defaults to 3600 seconds."
+                    "shortText": "The number of seconds the asset is cached in the browser and in the iEchor CDN. This is set in the `Cache-Control: max-age=<seconds>` header. Defaults to 3600 seconds."
                   },
                   "sources": [
                     {

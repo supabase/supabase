@@ -133,7 +133,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     }
   }, [router])
 
-  const SITE_TITLE = 'Supabase Documentation'
+  const SITE_TITLE = 'iEchor Documentation'
 
   const AuthContainer = (props) => {
     return IS_PLATFORM || LOCAL_IECHOR ? (

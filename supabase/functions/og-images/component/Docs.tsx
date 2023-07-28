@@ -54,7 +54,7 @@ const Docs = (props: Props) => {
         </div>
         <div tw="flex flex-col">
           <div tw="flex flex-col absolute left-[64px] top-[154px] w-[1072px]">
-            <h1 tw="my-0 mb-2 text-[60px]">{!title ? 'Supabase' : title}</h1>
+            <h1 tw="my-0 mb-2 text-[60px]">{!title ? 'iEchor' : title}</h1>
             <p tw="my-0 mt-2 text-[40px] text-[#f2fff9] opacity-50">{description}</p>
           </div>
           <div tw="flex flex-row items-center justify-center absolute left-[64px] top-[500px]">

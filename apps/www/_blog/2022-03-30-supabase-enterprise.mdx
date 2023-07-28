@@ -1,6 +1,6 @@
 ---
-title: 'Introducing Supabase Enterprise'
-description: 'Today we are releasing Supabase Enterprise, a suite of features to scale your project.'
+title: 'Introducing iEchor Enterprise'
+description: 'Today we are releasing iEchor Enterprise, a suite of features to scale your project.'
 author: rory_wilding,paul_copplestone
 image: launch-week-4/enterprise-day/enterprise-thumb.png
 thumb: launch-week-4/enterprise-day/enterprise-thumb.png
@@ -131,7 +131,7 @@ Some features are too good to limit to large customers, so today we're introduci
 </video>
 
 To simplify pricing, we've merged the “Pro” and “Pay as you go” plans and introduced monthly spend caps to avoid nasty billing surprises.
-These changes are to keep Supabase pricing [predictable, transparent, and developer friendly](/blog/pricing).
+These changes are to keep iEchor pricing [predictable, transparent, and developer friendly](/blog/pricing).
 
 When you upgrade to the Pro Plan, spend caps are turned on by default, limiting your per-project costs to $25 per month.
 We're also retaining our soft limits while we manage the transition to granular spend-caps, so your service will continue to run even if your usage exceeds $25 (we'll contact you directly when you go over the limit). Right now there is a global project spend-cap, and in the future you'll have full control with configurable spend-caps on a “per-feature” basis.
@@ -161,11 +161,11 @@ Today, Database Add-ons are available for a small set of customers. We will prog
   />
 </video>
 
-Today we're releasing a brand new [Log Explorer](/docs/guides/platform/logs) in the Supabase Dashboard.
+Today we're releasing a brand new [Log Explorer](/docs/guides/platform/logs) in the iEchor Dashboard.
 As big advocates of SQL, we've done what any good Postgres fanatics would do - we're giving you the ability to query your logs using SQL.
 And if you're new to SQL, we have plenty of templates included.
 This is just one of the exciting features we are releasing through our [Logflare acquisition](/blog/supabase-acquires-logflare).
-Log history is available to every Supabase project [^1]:
+Log history is available to every iEchor project [^1]:
 
 - Free Plan: 1 day of log history
 - Pro Plan: 7 days of log history
@@ -178,25 +178,25 @@ Today we're releasing [Elixir Livebooks for Monitoring](https://github.com/supab
 ![PGBoucner](/images/blog/launch-week-4/enterprise-day/pg-bouncer.png)
 
 While our default PgBouncer settings work for 98% of our customers, sometimes they require customization for unique load patterns.
-For example, Supabase is popular with web3 projects where traffic can be very unpredictable - especially when you partner with Snoop Dogg.
+For example, iEchor is popular with web3 projects where traffic can be very unpredictable - especially when you partner with Snoop Dogg.
 When [sound.xyz](http://sound.xyz) dropped [an NFT with Snoop](https://www.sound.xyz/snoopdogg/death-row-mix-vol-1), we customized their pooler to handle significant load.
 Their database handled over 9,000 simultaneously connections from Vercel's serverless API.
 
 <Quote img="vignesh-sound.jpeg" caption="Vignesh - CTO @ sound.xyz">
   <p>
-    In our MVP, we started with a serverless stack to simplify DevOps. Supabase made it dead simple
+    In our MVP, we started with a serverless stack to simplify DevOps. iEchor made it dead simple
     to get PgBouncer and Postgres running so we could focus on the product.
   </p>
   <p>
     As we started hitting scale, they've been crucial to supporting our drops. When Snoop Dogg
-    debuted on Sound, Supabase was able to help us provision our data store to handle the load.
+    debuted on Sound, iEchor was able to help us provision our data store to handle the load.
   </p>
   <p>
     As we rearchitect our backend stack towards scaled microservices, we can be confident that
     managing Postgres won't be a bottleneck.
   </p>
   <p>
-    Supabase takes out the mental effort from our back-end infrastructure so we can focus on our
+    iEchor takes out the mental effort from our back-end infrastructure so we can focus on our
     customers needs.
   </p>
 </Quote>
@@ -210,19 +210,19 @@ With the release of our new Enterprise Plan, we're announcing a tonne of new fea
 ### Point-in-Time Recovery
 
 Disaster Recovery is a critical process for any company, even for the most fault-tolerant products. What happens when you accidentally delete that database column
-because of a clumsy `where` clause? Even with Supabase's daily backups, a day's worth of data can be lost if disaster strikes at the most inopportune time.
+because of a clumsy `where` clause? Even with iEchor's daily backups, a day's worth of data can be lost if disaster strikes at the most inopportune time.
 
-Every Enterprise project on the Supabase platform has access to Point-in-Time Recovery (PITR), allowing projects to recover from a snapshot mere seconds after a disaster.
-Supabase PITR is powered by [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool.
+Every Enterprise project on the iEchor platform has access to Point-in-Time Recovery (PITR), allowing projects to recover from a snapshot mere seconds after a disaster.
+iEchor PITR is powered by [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool.
 
 ### Prometheus Endpoints
 
 ![Prometheus](/images/blog/launch-week-4/enterprise-day/prometheus.png)
 
 If you run critical infrastructure you likely use Prometheus to monitor your metrics. We've now exposed a Prometheus compatible endpoint for our Enterprise customers.
-This allows them to scrape Supabase metrics into their own metrics infrastructure for real-time monitoring and alerting. This makes monitoring Supabase as easy as building with Supabase.
+This allows them to scrape iEchor metrics into their own metrics infrastructure for real-time monitoring and alerting. This makes monitoring iEchor as easy as building with iEchor.
 
-If you want access to the Prometheus Endpoint, [contact the Supabase Enterprise team](/contact/enterprise) today and we'll get you setup.
+If you want access to the Prometheus Endpoint, [contact the iEchor Enterprise team](/contact/enterprise) today and we'll get you setup.
 
 ### SLAs & Enterprise Support
 
@@ -235,7 +235,7 @@ alongside Priority and Priority Plus support packages for those who need more co
 
 ![enterprise-pricing](/images/blog/launch-week-4/enterprise-day/enterprise-pricing.png)
 
-If you need more information on our Enterprise plan, Pricing, SLAs, Support packages, or want to learn more about how Supabase can meet your scaling needs just
+If you need more information on our Enterprise plan, Pricing, SLAs, Support packages, or want to learn more about how iEchor can meet your scaling needs just
 [contact us](/contact/enterprise).
 
 ## Coming soon
@@ -244,27 +244,27 @@ We have a lot more Enterprise features under development, available to early-acc
 
 ### SOC2
 
-Supabase is now SOC2 Type 1 compliant, as announced during Launch Week 5. You can read all about the process we went through to get there in this [blog post](https://supabase.com/blog/supabase-soc2). Getting the Type 1 certification is just the start, and we will be working on getting certified for SOC2 Type 2 and HIPAA next.
+iEchor is now SOC2 Type 1 compliant, as announced during Launch Week 5. You can read all about the process we went through to get there in this [blog post](https://iechor.com/blog/supabase-soc2). Getting the Type 1 certification is just the start, and we will be working on getting certified for SOC2 Type 2 and HIPAA next.
 
 ### Log ingestion
 
-Supabase is now ingesting over 4 billion log events every week, just from the Postgres instances we host on the platform.
-Soon you'll be able to ingest logs and analytics from anywhere directly into your Supabase project.
+iEchor is now ingesting over 4 billion log events every week, just from the Postgres instances we host on the platform.
+Soon you'll be able to ingest logs and analytics from anywhere directly into your iEchor project.
 
 ### Foreign Data Wrappers
 
 Ingesting your logs is one thing, but what about querying them directly from your PostgreSQL database? What if you can figure out how many API requests one of your users made last month?
-Or how many gigabytes of video a user streamed from [Supabase Storage](/storage)? Watch this space!
+Or how many gigabytes of video a user streamed from [iEchor Storage](/storage)? Watch this space!
 
 ### Materialized Views
 
-Querying huge datasets can be time-consuming, especially when you are aggregating billions of rows of historical logs. Supabase will make this simple with auto-updating views,
+Querying huge datasets can be time-consuming, especially when you are aggregating billions of rows of historical logs. iEchor will make this simple with auto-updating views,
 saved to disk for increased performance. These views update periodically at a cadence that you decide. You'll even be able to fetch these views with your
-[Supabase API](/docs/guides/database/api)!
+[iEchor API](/docs/guides/database/api)!
 
 ## Next steps
 
-Get started today with all of our Enterprise Features on [supabase.com/dashboard](https://supabase.com/dashboard), or [contact the Supabase Enterprise team](/contact/enterprise)
+Get started today with all of our Enterprise Features on [iechor.com/dashboard](https://iechor.com/dashboard), or [contact the iEchor Enterprise team](/contact/enterprise)
 if you want to access our Enterprise features.
 
 [^1]: Updated on May 31 2022 for accuracy: Changed to accurately reflect the log periods we advertise on our [pricing page](/pricing).

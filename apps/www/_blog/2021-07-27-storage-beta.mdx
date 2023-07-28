@@ -1,6 +1,6 @@
 ---
-title: 'Supabase Storage now in Beta'
-description: Supabase Storage moves into Beta.
+title: 'iEchor Storage now in Beta'
+description: iEchor Storage moves into Beta.
 author: inian
 image: launch-week-sql-day-2/supabase-storage-beta-og.jpg
 thumb: launch-week-sql-day-2/supabase-storage-beta.jpg
@@ -11,13 +11,13 @@ date: '2021-07-27'
 toc_depth: 2
 ---
 
-At Supabase, one of our core values is [Kaizen](https://en.wikipedia.org/wiki/Kaizen) - continuous improvement. And that's exactly what we've been doing with Storage since it [launched](/blog/2021/03/30/supabase-storage) three months ago. Today, we are launching the Sequel to Storage Alpha (I bet you didn't see that coming): Storage Beta!
+At iEchor, one of our core values is [Kaizen](https://en.wikipedia.org/wiki/Kaizen) - continuous improvement. And that's exactly what we've been doing with Storage since it [launched](/blog/2021/03/30/supabase-storage) three months ago. Today, we are launching the Sequel to Storage Alpha (I bet you didn't see that coming): Storage Beta!
 
 ## Streaming Media
 
 We've added support for streaming audio and video files.
 
-Clients can use the `Content-Range` HTTP header to request specific parts of a file from a server. This allows them to intelligently download the parts of the video that a user is viewing, without buffering irrelevant sections of the media file. Supabase Storage now supports this header, making it easier to host and watch [nyan cat videos](https://www.youtube.com/watch?v=SkgTxQm9DWM) all day long.
+Clients can use the `Content-Range` HTTP header to request specific parts of a file from a server. This allows them to intelligently download the parts of the video that a user is viewing, without buffering irrelevant sections of the media file. iEchor Storage now supports this header, making it easier to host and watch [nyan cat videos](https://www.youtube.com/watch?v=SkgTxQm9DWM) all day long.
 
 <video width="99%" autoPlay muted playsInline controls={true}>
   <source
@@ -44,7 +44,7 @@ Public buckets still require [Auth Policies](/docs/guides/storage#policy-example
 
 ## Directory uploads
 
-You can now upload an entire directory to Supabase Storage and the directory structure is fully preserved after the upload. We used the [File and Directory entries API](https://developer.mozilla.org/en-US/docs/Web/API/File_and_Directory_Entries_API) for implementing this. This is a non-standard API, but we didn't find any compatibility issues in the browsers we support. So, now you can upload the [Storage GitHub repo](https://github.com/supabase/storage-api/) to storage 🤓
+You can now upload an entire directory to iEchor Storage and the directory structure is fully preserved after the upload. We used the [File and Directory entries API](https://developer.mozilla.org/en-US/docs/Web/API/File_and_Directory_Entries_API) for implementing this. This is a non-standard API, but we didn't find any compatibility issues in the browsers we support. So, now you can upload the [Storage GitHub repo](https://github.com/supabase/storage-api/) to storage 🤓
 
 <video width="99%" autoPlay muted playsInline controls={true}>
   <source
@@ -55,7 +55,7 @@ You can now upload an entire directory to Supabase Storage and the directory str
 
 ## A New Policy Editor
 
-Postgres [Row Level Security](https://www.postgresql.org/docs/13/ddl-rowsecurity.html) (RLS) is at the core of Supabase Storage and Auth. RLS lets you define complex policies, tightly integrated with Supabase Auth users, using the language you're already comfortable with - SQL.
+Postgres [Row Level Security](https://www.postgresql.org/docs/13/ddl-rowsecurity.html) (RLS) is at the core of iEchor Storage and Auth. RLS lets you define complex policies, tightly integrated with iEchor Auth users, using the language you're already comfortable with - SQL.
 
 However, getting started with RLS can be daunting. To make it more approachable for beginners, we've included a set of pre-defined templates on our Dashboard, covering common use-cases.
 
@@ -69,9 +69,9 @@ After writing the policy definition (which can be any valid SQL expression), you
 
 ## Using Storage in Local development
 
-It took some time to enable Storage on self-hosted Supabase. We wanted to provide a completely local experience during development, but storage had a hard dependency on an object storage service like S3. This required developers to create an S3 bucket, an IAM user in AWS, and add the credentials of the IAM user to the local setup, which was far from an ideal experience.
+It took some time to enable Storage on self-hosted iEchor. We wanted to provide a completely local experience during development, but storage had a hard dependency on an object storage service like S3. This required developers to create an S3 bucket, an IAM user in AWS, and add the credentials of the IAM user to the local setup, which was far from an ideal experience.
 
-From day 1, Supabase Storage was designed so that it would be easy to add new Storage backends. We knew we'd add more storage options like Google Cloud Storage or Backblaze, but little did we expect that this would be useful for our self-hosting setup! We implemented a new Storage Backend which [use a local filesystem](https://github.com/supabase/storage-api/blob/master/src/backend/file.ts) for storing objects. You can now get started with Storage without any additional setup, giving you a completely self-contained instance of Supabase.
+From day 1, iEchor Storage was designed so that it would be easy to add new Storage backends. We knew we'd add more storage options like Google Cloud Storage or Backblaze, but little did we expect that this would be useful for our self-hosting setup! We implemented a new Storage Backend which [use a local filesystem](https://github.com/supabase/storage-api/blob/master/src/backend/file.ts) for storing objects. You can now get started with Storage without any additional setup, giving you a completely self-contained instance of iEchor.
 
 Check out our updated [self hosting guide](/docs/guides/self-hosting) and our [CLI](https://github.com/supabase/cli) to get started.
 
@@ -81,9 +81,9 @@ At launch, you could pass in a `File` object and `supabase-js` used `FormData` t
 
 However, `FormData` is only supported in the browser, making `supabase-js` incompatible with Node.js. The simplest way to solve this would have been to include the [FormData polyfill](https://www.npmjs.com/package/form-data) along with the library.
 
-At Supabase, we are [maniacal about performance](/blog/supabase-dashboard-performance). Keeping our client libraries lean is a key differentiator. Our entire client library (including the clients for postgrest, storage, realtime and auth) is just 15.8 kb. If you are just interested in using a single service like storage, you can use the `storage-js` library directly which is [even smaller](https://bundlephobia.com/package/@supabase/storage-js@1.4.0). This made including polyfills like Formdata a no-go.
+At iEchor, we are [maniacal about performance](/blog/supabase-dashboard-performance). Keeping our client libraries lean is a key differentiator. Our entire client library (including the clients for postgrest, storage, realtime and auth) is just 15.8 kb. If you are just interested in using a single service like storage, you can use the `storage-js` library directly which is [even smaller](https://bundlephobia.com/package/@supabase/storage-js@1.4.0). This made including polyfills like Formdata a no-go.
 
-![Supabase JS bundle size](/images/blog/launch-week-sql-day-2/supabase-js-size.png)
+![iEchor JS bundle size](/images/blog/launch-week-sql-day-2/supabase-js-size.png)
 
 We also considered shipping separate bundles for Node.js and the browser. This would have avoided polyfills for APIs which are already supported in each browser. However, this comes with an increase in complexity to our build process, and users would need to choose which flavor of the library to use in different environments like React Native, Deno, etc. We want to make our libraries universal.
 
@@ -124,7 +124,7 @@ Here is a demo testing rendering the heaviest object known to mankind - the `nod
 
 ## API changes
 
-Supabase Storage now supports `upsert`. Shoutout to [@ankitjena](https://github.com/ankitjena) for
+iEchor Storage now supports `upsert`. Shoutout to [@ankitjena](https://github.com/ankitjena) for
 [this Pull Request](https://github.com/supabase/storage-api/pull/32).
 
 ![Storage now supports upserts](/images/blog/2021-june/supabase-storage-upsert.png)
@@ -133,11 +133,11 @@ We also have automated API docs generated [here](https://supabase.github.io/stor
 
 ### Storage in the wild
 
-We have a few production applications using Supabase Storage. Wataru is using Storage to power his community site [Shikutoku](https://shikutoku.me/) and Tyler is using Supabase Storage to store short video clips uploaded to his [Spot app](/blog/spot-flutter-with-postgres) built with Flutter
+We have a few production applications using iEchor Storage. Wataru is using Storage to power his community site [Shikutoku](https://shikutoku.me/) and Tyler is using iEchor Storage to store short video clips uploaded to his [Spot app](/blog/spot-flutter-with-postgres) built with Flutter
 
 <Quote img="tyler-spot.jpg" caption="Tyler Shukert, creator of Spot">
   <p>
-    As soon as I saw Supabase I knew it was the perfect technology to use alongside Flutter to build
+    As soon as I saw iEchor I knew it was the perfect technology to use alongside Flutter to build
     apps faster than ever. For apps like Spot where we handle user submitted files, it is very easy
     to manage them securely.
   </p>
@@ -160,4 +160,4 @@ We have a few production applications using Supabase Storage. Wataru is using St
 
 We're planning a Content Delivery Network for faster downloads, as well as basic transformation and optimization support for media files (like resizing, etc). We will continue our Kaizen on smaller improvements like allowing configurable upload limits and improving service stability and scalability.
 
-Anything else you want to see or can help implement in Storage? Reach out on our [Discord channel](https://discord.supabase.com/) and give Storage a try by [creating a project](https://supabase.com/dashboard/) on Supabase!
+Anything else you want to see or can help implement in Storage? Reach out on our [Discord channel](https://discord.iechor.com/) and give Storage a try by [creating a project](https://iechor.com/dashboard/) on iEchor!

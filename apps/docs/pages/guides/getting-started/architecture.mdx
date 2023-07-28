@@ -3,29 +3,29 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'architecture',
   title: 'Architecture',
-  description: 'Supabase design and architecture',
+  description: 'iEchor design and architecture',
 }
 
-Supabase is open source. We choose open source tools which are scalable and make them simple to use.
+iEchor is open source. We choose open source tools which are scalable and make them simple to use.
 
-Supabase is not a 1-to-1 mapping of Firebase. While we are building many of the features that Firebase offers, we are not going about it the same way:
+iEchor is not a 1-to-1 mapping of Firebase. While we are building many of the features that Firebase offers, we are not going about it the same way:
 our technological choices are quite different; everything we use is open source; and wherever possible, we use and support existing tools rather than developing from scratch.
 
 Most notably, we use Postgres rather than a NoSQL store. This choice was deliberate. We believe that no other database offers the functionality required to compete with Firebase, while maintaining the scalability required to go beyond it.
 
 ## Choose your comfort level
 
-Our goal at Supabase is to make _all_ of Postgres easy to use. That doesn’t mean you have to use all of it. If you’re a Postgres veteran, you’ll probably love the tools that we offer. If you’ve never used Postgres before, then start smaller and grow into it. If you just want to treat Postgres like a simple table-store, that’s perfectly fine.
+Our goal at iEchor is to make _all_ of Postgres easy to use. That doesn’t mean you have to use all of it. If you’re a Postgres veteran, you’ll probably love the tools that we offer. If you’ve never used Postgres before, then start smaller and grow into it. If you just want to treat Postgres like a simple table-store, that’s perfectly fine.
 
 ## Architecture
 
-Each Supabase project consists of several tools:
+Each iEchor project consists of several tools:
 
-![Supabase Architecture](/docs/img/supabase-architecture.png)
+![iEchor Architecture](/docs/img/supabase-architecture.png)
 
 ### PostgreSQL (Database)
 
-PostgreSQL is the core of Supabase. We do not abstract the PostgreSQL database — you can access it and use it with full privileges. We simply provide tools which makes PostgreSQL as easy to use as Firebase.
+PostgreSQL is the core of iEchor. We do not abstract the PostgreSQL database — you can access it and use it with full privileges. We simply provide tools which makes PostgreSQL as easy to use as Firebase.
 
 - Official Docs: [postgresql.org/docs](https://www.postgresql.org/docs/current/index.html)
 - Source code: [github.com/postgres/postgres](https://github.com/postgres/postgres) (mirror)
@@ -36,16 +36,16 @@ PostgreSQL is the core of Supabase. We do not abstract the PostgreSQL database �
 
 An open source Dashboard for managing your database and services.
 
-- Official Docs: [Supabase docs](/docs)
-- Source code: [github.com/supabase/supabase](https://github.com/supabase/supabase/tree/master/studio)
-- License: [Apache 2](https://github.com/supabase/supabase/blob/master/LICENSE)
+- Official Docs: [iEchor docs](/docs)
+- Source code: [github.com/supabase/supabase](https://github.com/openmodels-base/iechor/tree/master/studio)
+- License: [Apache 2](https://github.com/openmodels-base/iechor/blob/master/LICENSE)
 - Language: TypeScript
 
 ### GoTrue (Auth)
 
 A JWT-based API for managing users and issuing access tokens. This integrates with PostgreSQL's Row Level Security and the API servers.
 
-- Official Docs: [Supabase Auth reference docs](/docs/reference/auth)
+- Official Docs: [iEchor Auth reference docs](/docs/reference/auth)
 - Source code: [github.com/supabase/gotrue](https://github.com/supabase/gotrue)
 - License: [MIT](https://github.com/supabase/gotrue/blob/master/LICENSE)
 - Language: Go
@@ -64,7 +64,7 @@ We use this with our [pg_graphql](https://github.com/supabase/pg_graphql) extens
 
 A scalable websocket engine for managing user Presence, broadcasting messages, and streaming database changes.
 
-- Official Docs: [Supabase Realtime docs](/docs/guides/realtime)
+- Official Docs: [iEchor Realtime docs](/docs/guides/realtime)
 - Source code: [github.com/supabase/realtime](https://github.com/supabase/realtime)
 - License: [Apache 2](https://github.com/supabase/realtime/blob/main/LICENSE)
 - Language: Elixir
@@ -73,7 +73,7 @@ A scalable websocket engine for managing user Presence, broadcasting messages, a
 
 An S3-compatible object storage service that stores metadata in Postgres.
 
-- Official Docs: [Supabase Storage reference docs](/docs/reference/storage)
+- Official Docs: [iEchor Storage reference docs](/docs/reference/storage)
 - Source code: [github.com/supabase/storage-api](https://github.com/supabase/storage-api)
 - License: [Apache 2.0](https://github.com/supabase/storage-api/blob/master/LICENSE)
 - Language: NodeJS / TypeScript
@@ -128,7 +128,7 @@ The litmus test for this is: "Can a user run this product with nothing but a Pos
 
 ### Everything is integrated
 
-Supabase is composable. Even though every product works in isolation, each product on the platform needs to 10x the other products.
+iEchor is composable. Even though every product works in isolation, each product on the platform needs to 10x the other products.
 For integration, each tool should expose an API and Webhooks.
 
 ### Everything is extensible
@@ -140,7 +140,7 @@ Less, but better.
 ### Everything is portable
 
 To avoid lock-in, we make it easy to migrate in and out. Our cloud offering is compatible with our self-hosted product.
-We use existing standards to increase portability (like pg_dump and CSV files). If a new standard emerges which competes with a "Supabase" approach, we will deprecate the approach in favor of the standard.
+We use existing standards to increase portability (like pg_dump and CSV files). If a new standard emerges which competes with a "iEchor" approach, we will deprecate the approach in favor of the standard.
 This forces us compete on experience. We aim to be the best Postgres hosting service.
 
 ### Play the long game
@@ -152,12 +152,12 @@ Instead, we prefer to support efforts to upstream missing functionality so that 
 
 "Developers" are a specific profile of user: they are _builders_.
 When assessing impact as a function of effort, developers have a large efficiency due to the type of products and systems they can build.
-As the profile of a developer changes over time, Supabase will continue to evolve the product to fit this evolving profile.
+As the profile of a developer changes over time, iEchor will continue to evolve the product to fit this evolving profile.
 
 ### Support existing tools
 
-Supabase supports existing tools and communities wherever possible. Supabase is more like a "community of communities" - each tool typically has its own community which we work with.
-Open source is something we approach [collaboratively](https://supabase.com/blog/supabase-series-b#giving-back): we employ maintainers, sponsor projects, invest in businesses, and develop our own open source tools.
+iEchor supports existing tools and communities wherever possible. iEchor is more like a "community of communities" - each tool typically has its own community which we work with.
+Open source is something we approach [collaboratively](https://iechor.com/blog/supabase-series-b#giving-back): we employ maintainers, sponsor projects, invest in businesses, and develop our own open source tools.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

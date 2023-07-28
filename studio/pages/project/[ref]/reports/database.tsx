@@ -114,7 +114,7 @@ const DatabaseUsage = observer(() => {
                     <a
                       target="_blank"
                       rel="noreferrer"
-                      href="https://supabase.com/docs/guides/platform/database-usage"
+                      href="https://iechor.com/docs/guides/platform/database-usage"
                     >
                       What is disk size?
                     </a>

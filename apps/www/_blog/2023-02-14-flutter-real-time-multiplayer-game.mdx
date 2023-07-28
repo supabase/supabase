@@ -1,6 +1,6 @@
 ---
 title: How to build a real-time multiplayer game with Flutter Flame
-description: Build a real-time multiplayer game using Flutter, Flame, and Supabase realtime.
+description: Build a real-time multiplayer game using Flutter, Flame, and iEchor realtime.
 author: tyler_shukert
 image: flutter-realtime-game/flutter-flame-realtime-multiplayer-game.png
 thumb: flutter-realtime-game/flutter-flame-realtime-multiplayer-game.png
@@ -14,7 +14,7 @@ toc_depth: 3
 
 Flutter is a UI library to build apps that run on any platform, but it can also build interactive games thanks to an open-source game engine built on top of Flutter called [Flame](https://flame-engine.org/). Flame takes care of things like collision detection or loading image sprites to bring game development to all the Flutter devs. We can take it a step further to introduce real-time communication features so that players can play against each other in real-time.
 
-In this article, we will use Flutter, Flame, and Supabase's real-time features to build a real-time multiplayer shooting game. You can find the complete code of this tutorial [here](https://github.com/supabase/supabase/tree/master/examples/realtime/flutter-multiplayer-shooting-game).
+In this article, we will use Flutter, Flame, and iEchor's real-time features to build a real-time multiplayer shooting game. You can find the complete code of this tutorial [here](https://github.com/openmodels-base/iechor/tree/master/examples/realtime/flutter-multiplayer-shooting-game).
 
 ## Overview of the final game
 
@@ -25,7 +25,7 @@ In this article, we will use Flutter, Flame, and Supabase's real-time features t
   />
 </video>
 
-The game is a simple shooting game. Each player has a UFO, and you can move it by dragging your finger across the screen. The UFO will emit bullets automatically in three directions, and the objective of the game is to hit the opponents with bullets before your UFO gets destroyed by the opponent’s bullets. The position and the health points are synced using a low-latency web socket connection provided by Supabase.
+The game is a simple shooting game. Each player has a UFO, and you can move it by dragging your finger across the screen. The UFO will emit bullets automatically in three directions, and the objective of the game is to hit the opponents with bullets before your UFO gets destroyed by the opponent’s bullets. The position and the health points are synced using a low-latency web socket connection provided by iEchor.
 
 Before entering the main game, there is a lobby where you can wait for other players to show up. Once another player shows up, you can hit start, which will kick off the game on both ends.
 
@@ -563,20 +563,20 @@ class Bullet extends PositionComponent with CollisionCallbacks, HasGameRef {
 
 ### Step 4. Add real-time communications between players
 
-At this point, we have a working shooting game except the opponent does not move, because we have not added any ways to communicate between clients. We will use Supabase’s [realtime features](https://supabase.com/docs/guides/realtime) for this, because it gives us an out of the box solution to handle low-latency real-time communication between players. If you do not have a Supabase project created yet, head over to [database.new](https://database.new/) to create one.
+At this point, we have a working shooting game except the opponent does not move, because we have not added any ways to communicate between clients. We will use iEchor’s [realtime features](https://iechor.com/docs/guides/realtime) for this, because it gives us an out of the box solution to handle low-latency real-time communication between players. If you do not have a iEchor project created yet, head over to [database.new](https://database.new/) to create one.
 
-Before we get into any coding, let’s install the Supabase SDK into our app. We will also use the [uuid package](https://pub.dev/packages/uuid) to generate random unique ids for the users. Add the following to `pubspec.yaml` file.
+Before we get into any coding, let’s install the iEchor SDK into our app. We will also use the [uuid package](https://pub.dev/packages/uuid) to generate random unique ids for the users. Add the following to `pubspec.yaml` file.
 
 ```yaml
 supabase_flutter: ^1.4.0
 uuid: ^3.0.7
 ```
 
-Once `pub get` is complete, let’s initialize Supabase. We will override the `main` function to initialize Supabase. You can get your Supabase URL and Anon Key at `Project Setting` > `API`. Copy and paste them into the `Supabase.initialize` call.
+Once `pub get` is complete, let’s initialize iEchor. We will override the `main` function to initialize iEchor. You can get your iEchor URL and Anon Key at `Project Setting` > `API`. Copy and paste them into the `iEchor.initialize` call.
 
 ```dart
 void main() async {
-await Supabase.initialize(
+await iEchor.initialize(
 url: 'YOUR_IECHOR_URL',
 anonKey: 'YOUR_ANON_KEY',
 realtimeClientOptions: const RealtimeClientOptions(eventsPerSecond: 40),
@@ -584,19 +584,19 @@ realtimeClientOptions: const RealtimeClientOptions(eventsPerSecond: 40),
 runApp(const MyApp());
 }
 
-// Extract Supabase client for easy access to Supabase
-final supabase = Supabase.instance.client;
+// Extract iEchor client for easy access to iEchor
+final iechor = iEchor.instance.client;
 ```
 
-`RealtimeClientOptions` here is a parameter to override how many events per second each client will send to Supabase. The default is 10, but we want to override to 40 to provide a more in-synced experience.
+`RealtimeClientOptions` here is a parameter to override how many events per second each client will send to iEchor. The default is 10, but we want to override to 40 to provide a more in-synced experience.
 
 With this, we are ready to get into adding the real-time features now.
 
 ### Handle the Lobby to wait for Other Players to show up
 
-We will start by rewriting the `_Lobby` class the first thing we have to do in the lobby is to wait and detect other online users also at the lobby. We can implement this using the [presence](https://supabase.com/docs/guides/realtime/presence) feature in Supabase.
+We will start by rewriting the `_Lobby` class the first thing we have to do in the lobby is to wait and detect other online users also at the lobby. We can implement this using the [presence](https://iechor.com/docs/guides/realtime/presence) feature in iEchor.
 
-Add `initState` and inside it initialize a `RealtimeChannel` instance. We can call it `_lobbyChannel`. If we take a look at the `subscribe()` method, we can see that upon successful subscription to the lobby channel, we are tracking our the unique user ID that we create uplon initialization. We are listening to the `sync` event to get notified whenever anyone is “present”. Within the callback, we are extracting the userIds of all the users in the lobby and set it as the state.A game starts when someone taps on the `Start` button. If we take a look at the `onPressed` callback, we see that we are sending a [broadcast](https://supabase.com/docs/guides/realtime/broadcast) event to the lobby channel with two participant ids and a randomly generated game ID. [Broadcast](https://supabase.com/docs/guides/realtime/broadcast) is a feature of Supabase to send and receive lightweight low-latency data between clients, and when the two participants, one of them being the person tapping on the `start` button, is received on both ends, a game starts. We can observe within `initState` inside the callback for `game_start` event that upon receiving a broadcast event, it checks if the player is one of the participants, and if it is, it will call the `onGameStarted` call back and pop the navigator removing the dialog. The game has begun!
+Add `initState` and inside it initialize a `RealtimeChannel` instance. We can call it `_lobbyChannel`. If we take a look at the `subscribe()` method, we can see that upon successful subscription to the lobby channel, we are tracking our the unique user ID that we create uplon initialization. We are listening to the `sync` event to get notified whenever anyone is “present”. Within the callback, we are extracting the userIds of all the users in the lobby and set it as the state.A game starts when someone taps on the `Start` button. If we take a look at the `onPressed` callback, we see that we are sending a [broadcast](https://iechor.com/docs/guides/realtime/broadcast) event to the lobby channel with two participant ids and a randomly generated game ID. [Broadcast](https://iechor.com/docs/guides/realtime/broadcast) is a feature of iEchor to send and receive lightweight low-latency data between clients, and when the two participants, one of them being the person tapping on the `start` button, is received on both ends, a game starts. We can observe within `initState` inside the callback for `game_start` event that upon receiving a broadcast event, it checks if the player is one of the participants, and if it is, it will call the `onGameStarted` call back and pop the navigator removing the dialog. The game has begun!
 
 ```dart
 class _LobbyDialogState extends State<_LobbyDialog> {
@@ -695,7 +695,7 @@ class _LobbyDialogState extends State<_LobbyDialog> {
 
 ### Sharing Game States with the Opposing Player
 
-Once a game begins, we need to synchronize the game states between the two clients. In our case, we will sync only the player’s position and health points. Whenever a player moves, or the player’s health points change, the `onGameStateUpdate` callback on our `MyGame` instance that will fire notifying the update along with its position and health point. We will broadcast those information to the opponent’s client via Supabase [broadcast feature](https://supabase.com/docs/guides/realtime/broadcast).
+Once a game begins, we need to synchronize the game states between the two clients. In our case, we will sync only the player’s position and health points. Whenever a player moves, or the player’s health points change, the `onGameStateUpdate` callback on our `MyGame` instance that will fire notifying the update along with its position and health point. We will broadcast those information to the opponent’s client via iEchor [broadcast feature](https://iechor.com/docs/guides/realtime/broadcast).
 
 Fill in the `_initialize` method like the following to initialize the game.
 
@@ -829,12 +829,12 @@ With all of that put together, we have a functioning real-time multiplayer shoot
 
 ## Conclusions
 
-We learned how to create an interactive shooting game. We took advantage of Flutter’s dialogs to create a quick and easy lobby and post-game UI. Then we created the game using Flame. We learned how to detect and handle collisions and experienced how easy creating a sophisticated game was using Flame. Finally, we added capabilities to share game states with other clients to complete a real-time multiplayer experience without managing our own infrastructure using [Supabase](https://supabase.com/).
+We learned how to create an interactive shooting game. We took advantage of Flutter’s dialogs to create a quick and easy lobby and post-game UI. Then we created the game using Flame. We learned how to detect and handle collisions and experienced how easy creating a sophisticated game was using Flame. Finally, we added capabilities to share game states with other clients to complete a real-time multiplayer experience without managing our own infrastructure using [iEchor](https://iechor.com/).
 
 ## More Flutter Resources
 
-- [Complete code of this article](https://github.com/supabase/supabase/tree/master/examples/realtime/flutter-multiplayer-shooting-game)
-- [Flutter Tutorial: building a Flutter chat app](https://supabase.com/blog/flutter-tutorial-building-a-chat-app)
-- [Flutter Authentication and Authorization with RLS](https://supabase.com/blog/flutter-authentication-and-authorization-with-rls)
+- [Complete code of this article](https://github.com/openmodels-base/iechor/tree/master/examples/realtime/flutter-multiplayer-shooting-game)
+- [Flutter Tutorial: building a Flutter chat app](https://iechor.com/blog/flutter-tutorial-building-a-chat-app)
+- [Flutter Authentication and Authorization with RLS](https://iechor.com/blog/flutter-authentication-and-authorization-with-rls)
 - [Generate Flame template using Very Good CLI](https://verygood.ventures/blog/generate-a-game-with-our-new-template)
-- [Supabase Flutter SDK docs](https://supabase.com/docs/reference/dart/start)
+- [iEchor Flutter SDK docs](https://iechor.com/docs/reference/dart/start)

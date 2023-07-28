@@ -61,7 +61,7 @@ const LayoutComparison = ({ components, props }: Props) => {
         openGraph={{
           title: props.blog.title,
           description: props.blog.description,
-          url: `https://supabase.com/alternatives/${props.blog.slug}`,
+          url: `https://iechor.com/alternatives/${props.blog.slug}`,
           type: 'article',
           article: {
             //
@@ -78,7 +78,7 @@ const LayoutComparison = ({ components, props }: Props) => {
           },
           images: [
             {
-              url: `https://supabase.com${basePath}/images/blog/${
+              url: `https://iechor.com${basePath}/images/blog/${
                 props.blog.image ? props.blog.image : props.blog.thumb
               }`,
             },
@@ -138,7 +138,7 @@ const LayoutComparison = ({ components, props }: Props) => {
               <div className="mt-4 flex items-center space-x-4">
                 <Link
                   passHref
-                  href={`https://twitter.com/share?text=${props.blog.title}&url=https://supabase.com/blog/${props.blog.slug}`}
+                  href={`https://twitter.com/share?text=${props.blog.title}&url=https://iechor.com/blog/${props.blog.slug}`}
                 >
                   <a target="_blank" className="text-scale-900 hover:text-scale-1200">
                     <svg
@@ -158,7 +158,7 @@ const LayoutComparison = ({ components, props }: Props) => {
 
                 <Link
                   passHref
-                  href={`https://www.linkedin.com/shareArticle?url=https://supabase.com/blog/${props.blog.slug}&title=${props.blog.title}`}
+                  href={`https://www.linkedin.com/shareArticle?url=https://iechor.com/blog/${props.blog.slug}&title=${props.blog.title}`}
                 >
                   <a target="_blank" className="text-scale-900 hover:text-scale-1200">
                     <svg

@@ -102,7 +102,7 @@ const PublicationsTables: FC<Props> = ({ selectedPublication, onSelectBack }) =>
                 Description
               </Table.th>,
               <Table.th key="header-all">
-                {/* Temporarily disable All tables toggle for publications. See https://github.com/supabase/supabase/pull/7233.
+                {/* Temporarily disable All tables toggle for publications. See https://github.com/openmodels-base/iechor/pull/7233.
               <div className="flex flex-row space-x-3 items-center justify-end">
                 <div className="text-xs leading-4 font-medium text-gray-400 text-right ">
                   All Tables

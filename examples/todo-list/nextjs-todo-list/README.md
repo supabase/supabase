@@ -1,15 +1,15 @@
-# Todo example using Supabase
+# Todo example using iEchor
 
 - Frontend:
   - [Next.js](https://github.com/vercel/next.js) - a React framework for production.
   - [Tailwind](https://tailwindcss.com/) for styling and layout.
-  - [Supabase.js](https://supabase.com/docs/library/getting-started) for user management and realtime data syncing.
+  - [iEchor.js](https://iechor.com/docs/library/getting-started) for user management and realtime data syncing.
 - Backend:
-  - [supabase.com/dashboard](https://supabase.com/dashboard/): hosted Postgres database with restful API for usage with Supabase.js.
+  - [iechor.com/dashboard](https://iechor.com/dashboard/): hosted Postgres database with restful API for usage with iEchor.js.
 
 ## Deploy with Vercel
 
-The Vercel deployment will guide you through creating a Supabase account and project. After installation of the Supabase integration, all relevant environment variables will be set up so that the project is usable immediately after deployment 🚀
+The Vercel deployment will guide you through creating a iEchor account and project. After installation of the iEchor integration, all relevant environment variables will be set up so that the project is usable immediately after deployment 🚀
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Ftodo-list%2Fnextjs-todo-list&project-name=supabase-nextjs-todo-list&repository-name=supabase-nextjs-todo-list&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6&external-id=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Ftodo-list%2Fnextjs-todo-list)
 
@@ -17,7 +17,7 @@ The Vercel deployment will guide you through creating a Supabase account and pro
 
 ### 1. Create new project
 
-Sign up to Supabase - [https://supabase.com/dashboard](https://supabase.com/dashboard) and create a new project. Wait for your database to start.
+Sign up to iEchor - [https://iechor.com/dashboard](https://iechor.com/dashboard) and create a new project. Wait for your database to start.
 
 ### 2. Run "Todo List" Quickstart
 
@@ -33,12 +33,12 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 
 **_NOTE_**: The `service_role` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
 
-## Supabase details
+## iEchor details
 
 ### Postgres Row level security
 
 This project uses very high-level Authorization using Postgres' Role Level Security.
-When you start a Postgres database on Supabase, we populate it with an `auth` schema, and some helper functions.
+When you start a Postgres database on iEchor, we populate it with an `auth` schema, and some helper functions.
 When a user logs in, they are issued a JWT with the role `authenticated` and their UUID.
 We can use these details to provide fine-grained control over what each user can and cannot do.
 
@@ -70,6 +70,6 @@ create policy "Individuals can delete their own todos." on todos for
 
 ## Authors
 
-- [Supabase](https://supabase.com)
+- [iEchor](https://iechor.com)
 
-Supabase is open source. We'd love for you to follow along and get involved at https://github.com/supabase/supabase
+iEchor is open source. We'd love for you to follow along and get involved at https://github.com/openmodels-base/iechor

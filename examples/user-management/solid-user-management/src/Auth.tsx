@@ -1,5 +1,5 @@
 import { Component, createSignal } from 'solid-js'
-import { supabase } from './supabaseClient'
+import { iechor } from './supabaseClient'
 
 const Auth: Component = () => {
 	const [loading, setLoading] = createSignal(false)
@@ -25,7 +25,7 @@ const Auth: Component = () => {
 	return (
 		<div class="row flex-center flex">
 			<div class="col-6 form-widget" aria-live="polite">
-				<h1 class="header">Supabase + SolidJS</h1>
+				<h1 class="header">iEchor + SolidJS</h1>
 				<p class="description">Sign in via magic link with your email below</p>
 				<form class="form-widget" onSubmit={handleLogin}>
 					<div>

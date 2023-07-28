@@ -2,23 +2,23 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   title: 'Self-Hosting with Docker',
-  description: 'Learn how to configure and deploy Supabase with Docker.',
-  subtitle: 'Learn how to configure and deploy Supabase with Docker.',
+  description: 'Learn how to configure and deploy iEchor with Docker.',
+  subtitle: 'Learn how to configure and deploy iEchor with Docker.',
 }
 
-Docker is the easiest way to get started with self-hosted Supabase. This guide assumes you are running the command from the machine you intend to host from.
+Docker is the easiest way to get started with self-hosted iEchor. This guide assumes you are running the command from the machine you intend to host from.
 
 ## Before you begin
 
 You need the following installed in your system: [Git](https://git-scm.com/downloads) and Docker ([Windows](https://docs.docker.com/desktop/install/windows-install/), [MacOS](https://docs.docker.com/desktop/install/mac-install/), or [Linux](https://docs.docker.com/desktop/install/linux-install/)).
 
-## Running Supabase
+## Running iEchor
 
-Running a self-hosted Supabase project is simple. Follow the steps below:
+Running a self-hosted iEchor project is simple. Follow the steps below:
 
 ```sh
 # Get the code
-git clone --depth 1 https://github.com/supabase/supabase
+git clone --depth 1 https://github.com/openmodels-base/iechor
 
 # Go to the docker folder
 cd supabase/docker
@@ -30,13 +30,13 @@ cp .env.example .env
 docker compose up
 ```
 
-Now visit [localhost:3000](http://localhost:3000) to start using Supabase Studio.
+Now visit [localhost:3000](http://localhost:3000) to start using iEchor Studio.
 
 That's everything you need to get started. The rest of this guide will help you to customize your setup.
 
 ## Securing your setup
 
-While we provided you with some example secrets for getting started, you should NEVER deploy your Supabase setup using the defaults we have provided.
+While we provided you with some example secrets for getting started, you should NEVER deploy your iEchor setup using the defaults we have provided.
 
 ### Generate API Keys
 
@@ -64,7 +64,7 @@ Update the `.env` file with your own secrets. In particular, these are required:
 
 ### Adding a firewall
 
-We recommend using a firewall to restrict access to your Supabase setup (something like `ufw`). One thing to highlight is that Docker usually [makes changes to your iptables](https://askubuntu.com/questions/652556/uncomplicated-firewall-ufw-is-not-blocking-anything-when-using-docker). 
+We recommend using a firewall to restrict access to your iEchor setup (something like `ufw`). One thing to highlight is that Docker usually [makes changes to your iptables](https://askubuntu.com/questions/652556/uncomplicated-firewall-ufw-is-not-blocking-anything-when-using-docker). 
 
 To disable this behavior, you can add the following to your `/etc/docker/daemon.json` file and then run `sudo service docker restart`:
 
@@ -81,7 +81,7 @@ The services running on the machine are not exposed to the internet by default. 
 1. Install Caddy using the official [instructions](https://caddyserver.com/docs/install).
 2. Modify the `Caddyfile` at `./docker/deploy/caddy/Caddyfile`.
     1. Replace `localhost` with your domain.
-    2. Uncomment the "Dashboard" section if you want to expose the Supabase Dashboard. You **MUST** set a password for this to be secure.
+    2. Uncomment the "Dashboard" section if you want to expose the iEchor Dashboard. You **MUST** set a password for this to be secure.
 3. Run `caddy run --config ./docker/deploy/caddy/Caddyfile` to start Caddy.
 
 You can now access your services at the following URLs:
@@ -95,11 +95,11 @@ You can now access your services at the following URLs:
 
 ## Stop 
 
-You can stop Supabase by running `docker compose stop` in same directory as your `docker-compose.yml` file.
+You can stop iEchor by running `docker compose stop` in same directory as your `docker-compose.yml` file.
 
 ## Uninstall
 
-You can stop Supabase by running `docker compose down -v` in same directory as your `docker-compose.yml` file.
+You can stop iEchor by running `docker compose down -v` in same directory as your `docker-compose.yml` file.
 
 ## Advanced configuration
 
@@ -131,7 +131,7 @@ POSTGRES_PORT=5432
 
 Once you have done this, you can safely comment out the `db` section of the `docker-compose` file, and remove any instances where the services `depends_on` the `db` image.
 
-Supabase services require your external database to be initialized with a specific schema. Refer to our [postgres/migrations](https://github.com/supabase/postgres/tree/develop/migrations) repository for instructions on running these migrations.
+iEchor services require your external database to be initialized with a specific schema. Refer to our [postgres/migrations](https://github.com/supabase/postgres/tree/develop/migrations) repository for instructions on running these migrations.
 
 Note that you need superuser permission on the postgres role to perform the initial schema migration. Once completed, the postgres role will be demoted to non-superuser to prevent abuse.
 
@@ -146,7 +146,7 @@ By default, Storage backend is set to `file`, which is to use local files as the
 
 ### Setting up logging with the Analytics server
 
-Additional configuration is required for self-hosting the Analytics server. For the full setup instructions, see [Self Hosting Analytics](https://supabase.com/docs/reference/self-hosting-analytics/introduction#getting-started).
+Additional configuration is required for self-hosting the Analytics server. For the full setup instructions, see [Self Hosting Analytics](https://iechor.com/docs/reference/self-hosting-analytics/introduction#getting-started).
 
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

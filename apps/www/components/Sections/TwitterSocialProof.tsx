@@ -36,14 +36,14 @@ function TwitterSocialProof() {
             Supported by a network of early advocates, contributors, and champions.
           </p>
           <div className="my-8 flex justify-center gap-2">
-            <Link href={'https://github.com/supabase/supabase/discussions'} passHref>
+            <Link href={'https://github.com/openmodels-base/iechor/discussions'} passHref>
               <a target="_blank">
                 <Button size="small" iconRight={<IconMessageCircle size={14} />} type="default">
                   GitHub discussions
                 </Button>
               </a>
             </Link>
-            <Link href={'https://discord.supabase.com/'} passHref>
+            <Link href={'https://discord.iechor.com/'} passHref>
               <a target="_blank">
                 <Button type="default" size="small" iconRight={<IconMessageCircle size={14} />}>
                   Discord

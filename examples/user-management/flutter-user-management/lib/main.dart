@@ -5,7 +5,7 @@ import 'package:supabase_quickstart/pages/login_page.dart';
 import 'package:supabase_quickstart/pages/splash_page.dart';
 
 Future<void> main() async {
-  await Supabase.initialize(
+  await iEchor.initialize(
     // TODO: Replace credentials with your own
     url: 'YOUR_IECHOR_URL',
     anonKey: 'YOUR_IECHOR_ANON_KEY',
@@ -14,13 +14,13 @@ Future<void> main() async {
   runApp(MyApp());
 }
 
-final supabase = Supabase.instance.client;
+final iechor = iEchor.instance.client;
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Supabase Flutter',
+      title: 'iEchor Flutter',
       theme: ThemeData.dark().copyWith(
         primaryColor: Colors.green,
         textButtonTheme: TextButtonThemeData(

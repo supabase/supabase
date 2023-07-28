@@ -2,20 +2,20 @@ import Layout from '~/layouts/DefaultGuideLayout'
 import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
-  title: 'Use Supabase with refine',
+  title: 'Use iEchor with refine',
   subtitle:
-    'Learn how to create a Supabase project, add some sample data to your database, and query the data from a refine app.',
+    'Learn how to create a iEchor project, add some sample data to your database, and query the data from a refine app.',
   breadcrumb: 'Framework Quickstarts',
 }
 
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Set up a Supabase project with sample data">
+    <StepHikeCompact.Details title="Set up a iEchor project with sample data">
 
-    [Create a new project](https://app.supabase.com) in the Supabase Dashboard.
+    [Create a new project](https://app.iechor.com) in the iEchor Dashboard.
 
-    After your project is ready, create a table in your Supabase database using the [SQL Editor](https://app.supabase.com/project/_/sql) in the Dashboard. Use the following SQL statement to create a `countries` table with some sample data.
+    After your project is ready, create a table in your iEchor database using the [SQL Editor](https://app.iechor.com/project/_/sql) in the Dashboard. Use the following SQL statement to create a `countries` table with some sample data.
 
     </StepHikeCompact.Details>
 
@@ -43,7 +43,7 @@ export const meta = {
 
     Create a [refine](https://github.com/refinedev/refine) app using the [create refine-app](https://refine.dev/docs/getting-started/quickstart/).
 
-    The `refine-supabase` preset adds `@refinedev/supabase` supplementary package that supports Supabase in a refine app. `@refinedev/supabase` out-of-the-box includes the Supabase dependency: [supabase-js](https://github.com/supabase/supabase-js).
+    The `refine-supabase` preset adds `@refinedev/supabase` supplementary package that supports iEchor in a refine app. `@refinedev/supabase` out-of-the-box includes the iEchor dependency: [supabase-js](https://github.com/openmodels-base/iechor-js).
 
     </StepHikeCompact.Details>
 
@@ -60,7 +60,7 @@ export const meta = {
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Open your refine app in VS Code">
 
-    You will develop your app, connect to the Supabase backend and run the refine app in VS Code.
+    You will develop your app, connect to the iEchor backend and run the refine app in VS Code.
 
     </StepHikeCompact.Details>
 
@@ -99,7 +99,7 @@ export const meta = {
 <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Update `supabaseClient`">
 
-      You now have to update the `supabaseClient` with the `IECHOR_URL` and `IECHOR_KEY` of your Supabase API. The `supabaseClient` is used in auth provider and data provider methods that allow the refine app to connect to your Supabase backend.
+      You now have to update the `supabaseClient` with the `IECHOR_URL` and `IECHOR_KEY` of your iEchor API. The `supabaseClient` is used in auth provider and data provider methods that allow the refine app to connect to your iEchor backend.
 
     </StepHikeCompact.Details>
 

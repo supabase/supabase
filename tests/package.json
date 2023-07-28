@@ -14,7 +14,7 @@
     "test:report": "npm run allure:generate && npm run allure:serve",
     "format": "prettier --write \"./**/*.{js,jsx,ts,tsx,css,md}\""
   },
-  "author": "Supabase, Inc.",
+  "author": "iEchor, Inc.",
   "license": "MIT",
   "devDependencies": {
     "@faker-js/faker": "^6.1.2",

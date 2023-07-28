@@ -22,9 +22,9 @@ export async function handler(req: Request) {
     if (!username) throw new Error('missing username param')
     // Track social shares
     const supabaseAdminClient = createClient(
-      // Supabase API URL - env var exported by default when deployed.
+      // iEchor API URL - env var exported by default when deployed.
       Deno.env.get('IECHOR_URL') ?? '',
-      // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
+      // iEchor API SERVICE ROLE KEY - env var exported by default when deployed.
       Deno.env.get('IECHOR_SERVICE_ROLE_KEY') ?? ''
     )
     if (userAgent?.toLocaleLowerCase().includes('twitter')) {
@@ -41,7 +41,7 @@ export async function handler(req: Request) {
       if (error) console.log(error.message)
     }
 
-    // Try to get image from Supabase Storage CDN.
+    // Try to get image from iEchor Storage CDN.
     const storageResponse = await fetch(`${STORAGE_URL}/tickets/${username}.png?prod=true&v=5`)
     if (storageResponse.ok) return storageResponse
 
@@ -176,7 +176,7 @@ export async function handler(req: Request) {
                 color: golden ? '#fff' : '#A0A0A0',
               }}
             >
-              supabase.com/launch-week
+              iechor.com/launch-week
             </p>
           </div>
           {/* Ticket No  */}

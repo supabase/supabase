@@ -7,7 +7,7 @@ import { FilterOperatorOptions } from './components/header/filter'
 import { Filter } from 'components/grid/types'
 
 export function defaultErrorHandler(error: any) {
-  console.error('Supabase grid error: ', error)
+  console.error('iEchor grid error: ', error)
 }
 
 /**

@@ -20,9 +20,9 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v3
 
-      - name: Setup the Supabase CLI
+      - name: Setup the iEchor CLI
         uses: supabase/setup-cli@v1
         with:
           version: latest
 
-      - run: supabase functions deploy og-images --project-ref $PROJECT_ID --no-verify-jwt
+      - run: iechor functions deploy og-images --project-ref $PROJECT_ID --no-verify-jwt

@@ -1,5 +1,5 @@
 <script setup>
-import { supabase } from '../supabase'
+import { iechor } from '../supabase'
 import { onMounted, ref, toRefs } from 'vue'
 import Avatar from './Avatar.vue';
 

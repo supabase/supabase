@@ -72,7 +72,7 @@
       "type": "string"
     },
     "supabase_url": {
-      "title": "Supabase Url",
+      "title": "iEchor Url",
       "type": "string"
     },
     "updated_at": {

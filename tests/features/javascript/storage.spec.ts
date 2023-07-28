@@ -14,7 +14,7 @@ import fetch from 'cross-fetch'
 class Storage extends Hooks {
   static buckets: Pick<Bucket, 'name'>[] = [] as any
   static async after() {
-    const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
     const requests = []
     for (const bucket of this.buckets) {
       requests.push(
@@ -37,7 +37,7 @@ class Storage extends Hooks {
   @params({ public: true })
   @params({ public: false })
   async 'create bucket'(params: { public: boolean }) {
-    const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
     const bucketName = faker.unique(faker.random.word)
     const { data: bucket, error } = await supabase.storage.createBucket(bucketName, {
       public: params.public,
@@ -60,7 +60,7 @@ class Storage extends Hooks {
   @params({ public: true })
   @params({ public: false })
   async 'user cannot create bucket because of RLS'(params: { public: boolean }) {
-    const { supabase } = await this.createSignedInSupaClient()
+    const { iechor } = await this.createSignedInSupaClient()
     const bucketName = faker.unique(faker.random.word)
 
     const { data: bucket, error } = await supabase.storage.createBucket(bucketName, {
@@ -76,7 +76,7 @@ class Storage extends Hooks {
   @description('list buckets should return all buckets')
   @test
   async 'list buckets as admin'() {
-    const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
 
     const bucket1 = await this.createBucket()
     const bucket2 = await this.createBucket()
@@ -91,7 +91,7 @@ class Storage extends Hooks {
   @description('get bucket should return bucket info')
   @test
   async 'get bucket'() {
-    const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
     const bucket = await this.createBucket()
 
     const { data: gotBucket, error } = await supabase.storage.getBucket(bucket.id)
@@ -105,7 +105,7 @@ class Storage extends Hooks {
   @params({ public: true })
   @params({ public: false })
   async 'update bucket'(params: { public: boolean }) {
-    const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
     const bucket = await this.createBucket(params.public)
 
     const {
@@ -127,7 +127,7 @@ class Storage extends Hooks {
   @description('get bucket should return bucket info')
   @test
   async 'delete bucket'() {
-    const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
     const bucket = await this.createBucket()
 
     const {
@@ -152,7 +152,7 @@ class Storage extends Hooks {
   @description('upload to bucket')
   @test
   async 'upload to bucket'() {
-    const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
     const bucket = await this.createBucket()
 
     const file = {
@@ -172,7 +172,7 @@ class Storage extends Hooks {
   @description('list files in bucket')
   @test
   async 'list files'() {
-    const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
     const bucket = await this.createBucket()
 
     const files: { path: string; data: string }[] = []
@@ -220,7 +220,7 @@ class Storage extends Hooks {
   @description('download file')
   @test
   async 'download file from bucket'() {
-    const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
     const bucket = await this.createBucket()
 
     const file = {
@@ -239,7 +239,7 @@ class Storage extends Hooks {
   @description('move file')
   @test
   async '[skip-local] move file in bucket'() {
-    const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
     const bucket = await this.createBucket()
 
     const file = {
@@ -264,7 +264,7 @@ class Storage extends Hooks {
   @description('copy file')
   @test
   async '[skip-local] copy file in bucket'() {
-    const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
     const bucket = await this.createBucket()
 
     const file = {
@@ -296,7 +296,7 @@ class Storage extends Hooks {
   @description('get public link to file in the public bucket')
   @test
   async 'get public link to file'() {
-    const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
     const bucket = await this.createBucket()
 
     const file = {
@@ -322,7 +322,7 @@ class Storage extends Hooks {
   @description('get public link to file in the private bucket')
   @test
   async 'get public link to private file'() {
-    const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
     const bucket = await this.createBucket(false)
 
     const file = {
@@ -350,7 +350,7 @@ class Storage extends Hooks {
   @params({ public: true })
   @params({ public: false })
   async 'get signed link to file'(params: { public: boolean }) {
-    const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
     const bucket = await this.createBucket(params.public)
 
     const file = {
@@ -378,7 +378,7 @@ class Storage extends Hooks {
   @description('update file check if it will change')
   @test
   async 'update file'() {
-    const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
     const bucket = await this.createBucket()
 
     const file = {
@@ -407,7 +407,7 @@ class Storage extends Hooks {
 
   @step('create bucket')
   async createBucket(pub = true) {
-    const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
+    const iechor = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ADMIN)
     const bucketName = faker.unique(faker.random.word)
 
     const { data: bucket, error } = await supabase.storage.createBucket(bucketName, {

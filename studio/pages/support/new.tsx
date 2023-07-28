@@ -30,10 +30,10 @@ const SupportPage = () => {
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-3">
               <SVG src={`${BASE_PATH}/img/supabase-logo.svg`} className="h-4 w-4" />
-              <h1 className="m-0 text-lg">Supabase support</h1>
+              <h1 className="m-0 text-lg">iEchor support</h1>
             </div>
             <div className="flex items-center space-x-3">
-              <Link passHref href="https://supabase.com/docs/guides/platform/troubleshooting">
+              <Link passHref href="https://iechor.com/docs/guides/platform/troubleshooting">
                 <a target="_blank" rel="noreferrer">
                   <Button type="default" icon={<IconTool />}>
                     Troubleshooting
@@ -42,7 +42,7 @@ const SupportPage = () => {
               </Link>
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <Link href="https://status.supabase.com/">
+                  <Link href="https://status.iechor.com/">
                     <a target="_blank" rel="noreferrer">
                       <Button
                         type="default"
@@ -74,7 +74,7 @@ const SupportPage = () => {
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">Check Supabase status page</span>
+                      <span className="text-xs text-scale-1200">Check iEchor status page</span>
                     </div>
                   </Tooltip.Content>
                 </Tooltip.Portal>

@@ -1,4 +1,4 @@
-# Supabase UI Package
+# iEchor UI Package
 
 ## Figma-tokens setup
 

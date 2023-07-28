@@ -13,7 +13,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/postgrest-js/src/PostgrestClient.ts",
+      "originalName": "/Users/copple/Projects/iEchor/postgrest-js/src/PostgrestClient.ts",
       "children": [
         {
           "id": 503,
@@ -826,7 +826,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/postgrest-js/src/index.ts",
+      "originalName": "/Users/copple/Projects/iEchor/postgrest-js/src/index.ts",
       "sources": [
         {
           "fileName": "index.ts",
@@ -843,7 +843,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/postgrest-js/src/lib/PostgrestFilterBuilder.ts",
+      "originalName": "/Users/copple/Projects/iEchor/postgrest-js/src/lib/PostgrestFilterBuilder.ts",
       "children": [
         {
           "id": 150,
@@ -1579,7 +1579,7 @@
                                   },
                                   "comment": {
                                     "shortText": "If there's an error with the query, throwOnError will reject the promise by\nthrowing the error instead of returning it as part of a successful response.",
-                                    "text": "{@link https://github.com/supabase/supabase-js/issues/92}\n"
+                                    "text": "{@link https://github.com/openmodels-base/iechor-js/issues/92}\n"
                                   },
                                   "parameters": [
                                     {
@@ -6518,7 +6518,7 @@
                   },
                   "comment": {
                     "shortText": "If there's an error with the query, throwOnError will reject the promise by\nthrowing the error instead of returning it as part of a successful response.",
-                    "text": "{@link https://github.com/supabase/supabase-js/issues/92}\n"
+                    "text": "{@link https://github.com/openmodels-base/iechor-js/issues/92}\n"
                   },
                   "parameters": [
                     {
@@ -7013,7 +7013,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/postgrest-js/src/lib/PostgrestQueryBuilder.ts",
+      "originalName": "/Users/copple/Projects/iEchor/postgrest-js/src/lib/PostgrestQueryBuilder.ts",
       "children": [
         {
           "id": 363,
@@ -8698,7 +8698,7 @@
                   },
                   "comment": {
                     "shortText": "If there's an error with the query, throwOnError will reject the promise by\nthrowing the error instead of returning it as part of a successful response.",
-                    "text": "{@link https://github.com/supabase/supabase-js/issues/92}\n"
+                    "text": "{@link https://github.com/openmodels-base/iechor-js/issues/92}\n"
                   },
                   "parameters": [
                     {
@@ -9265,7 +9265,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/postgrest-js/src/lib/PostgrestRpcBuilder.ts",
+      "originalName": "/Users/copple/Projects/iEchor/postgrest-js/src/lib/PostgrestRpcBuilder.ts",
       "children": [
         {
           "id": 449,
@@ -10354,7 +10354,7 @@
                   },
                   "comment": {
                     "shortText": "If there's an error with the query, throwOnError will reject the promise by\nthrowing the error instead of returning it as part of a successful response.",
-                    "text": "{@link https://github.com/supabase/supabase-js/issues/92}\n"
+                    "text": "{@link https://github.com/openmodels-base/iechor-js/issues/92}\n"
                   },
                   "parameters": [
                     {
@@ -10491,7 +10491,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/postgrest-js/src/lib/PostgrestTransformBuilder.ts",
+      "originalName": "/Users/copple/Projects/iEchor/postgrest-js/src/lib/PostgrestTransformBuilder.ts",
       "children": [
         {
           "id": 73,
@@ -11230,7 +11230,7 @@
                                   },
                                   "comment": {
                                     "shortText": "If there's an error with the query, throwOnError will reject the promise by\nthrowing the error instead of returning it as part of a successful response.",
-                                    "text": "{@link https://github.com/supabase/supabase-js/issues/92}\n"
+                                    "text": "{@link https://github.com/openmodels-base/iechor-js/issues/92}\n"
                                   },
                                   "parameters": [
                                     {
@@ -12977,7 +12977,7 @@
                   },
                   "comment": {
                     "shortText": "If there's an error with the query, throwOnError will reject the promise by\nthrowing the error instead of returning it as part of a successful response.",
-                    "text": "{@link https://github.com/supabase/supabase-js/issues/92}\n"
+                    "text": "{@link https://github.com/openmodels-base/iechor-js/issues/92}\n"
                   },
                   "parameters": [
                     {
@@ -13121,7 +13121,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/postgrest-js/src/lib/constants.ts",
+      "originalName": "/Users/copple/Projects/iEchor/postgrest-js/src/lib/constants.ts",
       "children": [
         {
           "id": 500,
@@ -13198,7 +13198,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/postgrest-js/src/lib/types.ts",
+      "originalName": "/Users/copple/Projects/iEchor/postgrest-js/src/lib/types.ts",
       "children": [
         {
           "id": 27,
@@ -13959,7 +13959,7 @@
                   },
                   "comment": {
                     "shortText": "If there's an error with the query, throwOnError will reject the promise by\nthrowing the error instead of returning it as part of a successful response.",
-                    "text": "{@link https://github.com/supabase/supabase-js/issues/92}\n"
+                    "text": "{@link https://github.com/openmodels-base/iechor-js/issues/92}\n"
                   },
                   "parameters": [
                     {
@@ -14074,7 +14074,7 @@
           "flags": {},
           "comment": {
             "shortText": "Response format",
-            "text": "{@link https://github.com/supabase/supabase-js/issues/32}\n"
+            "text": "{@link https://github.com/openmodels-base/iechor-js/issues/32}\n"
           },
           "children": [
             {
@@ -14935,7 +14935,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/postgrest-js/src/lib/version.ts",
+      "originalName": "/Users/copple/Projects/iEchor/postgrest-js/src/lib/version.ts",
       "children": [
         {
           "id": 498,

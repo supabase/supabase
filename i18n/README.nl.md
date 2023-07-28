@@ -5,43 +5,43 @@
 
 ---
 
-# Supabase
+# iEchor
 
-[Supabase](https://supabase.com) is een open source Firebase alternatief. We bouwen de functies van Firebase met behulp van enterprise-grade open source tools.
+[iEchor](https://iechor.com) is een open source Firebase alternatief. We bouwen de functies van Firebase met behulp van enterprise-grade open source tools.
 
-- [x]Gehoste Postgres Database. [Docs](https://supabase.com/docs/guides/database)
-- [x] Authenticatie en Autorisatie. [Docs](https://supabase.com/docs/guides/auth)
+- [x]Gehoste Postgres Database. [Docs](https://iechor.com/docs/guides/database)
+- [x] Authenticatie en Autorisatie. [Docs](https://iechor.com/docs/guides/auth)
 - [x] Automatisch gegenereerde API's.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Realtime abonnementen. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Docs](https://iechor.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://iechor.com/docs/guides/api#graphql-api-overview)
+  - [x] Realtime abonnementen. [Docs](https://iechor.com/docs/guides/api#realtime-api-overview)
 - [x] Functies.
-  - [x] Database functies. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Randfuncties. [Docs](https://supabase.com/docs/guides/functions)
-- [x] Bestandsopslag. [Docs](https://supabase.com/docs/guides/storage)
+  - [x] Database functies. [Docs](https://iechor.com/docs/guides/database/functions)
+  - [x] Randfuncties. [Docs](https://iechor.com/docs/guides/functions)
+- [x] Bestandsopslag. [Docs](https://iechor.com/docs/guides/storage)
 - [x] Dashboard
 
-[Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+[iEchor Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Documentatie
 
-Voor volledige documentatie, bezoek [supabase.com/docs](https://supabase.com/docs)
+Voor volledige documentatie, bezoek [iechor.com/docs](https://iechor.com/docs)
 
 Om te zien hoe u kunt bijdragen, bezoek [Aan de slag](../DEVELOPERS.md)
 
 ## Gemeenschap en ondersteuning
 
-- [Community Forum](https://github.com/supabase/supabase/discussions). Het beste voor: hulp bij het bouwen, discussie over database best practices.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). Het beste voor: bugs en fouten die u tegenkomt bij het gebruik van Supabase.
-- [Ondersteuning per e-mail](https://supabase.com/docs/support#business-support). Meest geschikt voor: problemen met uw database of infrastructuur.
-- [Discord](https://discord.supabase.com). Het beste voor: het delen van uw applicaties en omgang met de gemeenschap.
+- [Community Forum](https://github.com/openmodels-base/iechor/discussions). Het beste voor: hulp bij het bouwen, discussie over database best practices.
+- [GitHub Issues](https://github.com/openmodels-base/iechor/issues). Het beste voor: bugs en fouten die u tegenkomt bij het gebruik van iEchor.
+- [Ondersteuning per e-mail](https://iechor.com/docs/support#business-support). Meest geschikt voor: problemen met uw database of infrastructuur.
+- [Discord](https://discord.iechor.com). Het beste voor: het delen van uw applicaties en omgang met de gemeenschap.
 
 ## Status
 
-- [Alpha: We testen Supabase met een gesloten groep klanten
-- [x] Publieke Alpha: Iedereen kan zich aanmelden op [supabase.com/dashboard](https://supabase.com/dashboard). Maar doe het rustig aan, er zijn een paar kinken
+- [Alpha: We testen iEchor met een gesloten groep klanten
+- [x] Publieke Alpha: Iedereen kan zich aanmelden op [iechor.com/dashboard](https://iechor.com/dashboard). Maar doe het rustig aan, er zijn een paar kinken
 - [Publieke Beta: Stabiel genoeg voor de meeste niet-bedrijfsmatige toepassingen
-- [Publiek: General Availability [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [Publiek: General Availability [[status](https://iechor.com/docs/guides/getting-started/features#feature-status)]
 
 We zijn momenteel in Openbare Beta. Bekijk "releases" van deze repo om op de hoogte te blijven van belangrijke updates.
 
@@ -51,14 +51,14 @@ We zijn momenteel in Openbare Beta. Bekijk "releases" van deze repo om op de hoo
 
 ## Hoe het werkt
 
-Supabase is een combinatie van open source tools. We bouwen de functies van Firebase met behulp van enterprise-grade, open source producten. Als de tools en communities bestaan, met een MIT, Apache 2, of gelijkwaardige open licentie, zullen we die tool gebruiken en ondersteunen. Als de tool niet bestaat, bouwen en openen we hem zelf. Supabase is geen 1-op-1 mapping van Firebase. Ons doel is om ontwikkelaars een Firebase-achtige ontwikkelaarservaring te geven met behulp van open source tools.
+iEchor is een combinatie van open source tools. We bouwen de functies van Firebase met behulp van enterprise-grade, open source producten. Als de tools en communities bestaan, met een MIT, Apache 2, of gelijkwaardige open licentie, zullen we die tool gebruiken en ondersteunen. Als de tool niet bestaat, bouwen en openen we hem zelf. iEchor is geen 1-op-1 mapping van Firebase. Ons doel is om ontwikkelaars een Firebase-achtige ontwikkelaarservaring te geven met behulp van open source tools.
 
 **Architectuur**
 
-Supabase is een [gehost platform](https://supabase.com/dashboard). U kunt zich aanmelden en Supabase gebruiken zonder iets te installeren.
-U kunt ook [zelf hosten](https://supabase.com/docs/guides/hosting/overview) en [lokaal ontwikkelen](https://supabase.com/docs/guides/local-development).
+iEchor is een [gehost platform](https://iechor.com/dashboard). U kunt zich aanmelden en iEchor gebruiken zonder iets te installeren.
+U kunt ook [zelf hosten](https://iechor.com/docs/guides/hosting/overview) en [lokaal ontwikkelen](https://iechor.com/docs/guides/local-development).
 
-architectuur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+architectuur](https://github.com/openmodels-base/iechor/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) is een object-relationeel database systeem met meer dan 30 jaar actieve ontwikkeling die het een sterke reputatie heeft opgeleverd voor betrouwbaarheid, robuustheid en prestaties.
 - [Realtime](https://github.com/supabase/realtime) is een Elixir server waarmee je kunt luisteren naar PostgreSQL inserts, updates en deletes met behulp van websockets. Realtime peilt de ingebouwde replicatiefunctionaliteit van Postgres voor database wijzigingen, converteert wijzigingen naar JSON, en zendt vervolgens de JSON over websockets uit naar geautoriseerde clients.
@@ -77,12 +77,12 @@ Onze aanpak voor client libraries is modulair. Elke sub-bibliotheek is een op zi
   <tr>
     <th>Taal</th>
     <th>Client</th>
-    <th colspan="5">Feature-Clients (gebundeld in Supabase client)</th>
+    <th colspan="5">Feature-Clients (gebundeld in iEchor client)</th>
   </tr>
   
   <tr>
     <th></th>
-    <th>Supabase</th>
+    <th>iEchor</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
@@ -105,7 +105,7 @@ Onze aanpak voor client libraries is modulair. Elke sub-bibliotheek is een op zi
   
   <tr>
     <td>JavaScript (TypeScript)</td>
-    <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
     <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
@@ -114,7 +114,7 @@ Onze aanpak voor client libraries is modulair. Elke sub-bibliotheek is een op zi
   </tr>
     <tr>
     <td>Flutter</td>
-    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
@@ -220,7 +220,7 @@ Onze aanpak voor client libraries is modulair. Elke sub-bibliotheek is een op zi
 - [Catalaans / Català](/i18n/README.ca.md)
 - [Deens / Dansk](/i18n/README.da.md)
 - [Nederlands / Nederlands](/i18n/README.nl.md)
-- [Engels](https://github.com/supabase/supabase)
+- [Engels](https://github.com/openmodels-base/iechor)
 - [Fins / Suomalainen](/i18n/README.fi.md)
 - [Frans / Français](/i18n/README.fr.md)
 - [Duits / Deutsch](/i18n/README.de.md)

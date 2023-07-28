@@ -3,10 +3,10 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'performance',
   title: 'Performance Tuning',
-  description: 'Getting the best results out of your Supabase project',
+  description: 'Getting the best results out of your iEchor project',
 }
 
-The Supabase platform automatically optimizes your Postgres database to take advantage of the compute resources of the plan your project is on. However, these optimizations are based on assumptions about the type of workflow the project is being utilized for, and it is likely that better results can be obtained by tuning the database for your particular workflow.
+The iEchor platform automatically optimizes your Postgres database to take advantage of the compute resources of the plan your project is on. However, these optimizations are based on assumptions about the type of workflow the project is being utilized for, and it is likely that better results can be obtained by tuning the database for your particular workflow.
 
 ## Examining Query Performance
 
@@ -26,7 +26,7 @@ Thankfully there are solutions to all these issues, which we will cover in the f
 
 ### Postgres Cumulative Statistics system
 
-Postgres collects data about its own operations using the [cumulative statistics system](https://www.postgresql.org/docs/current/monitoring-stats.html). In addition to this, every Supabase project has the [pg_stat_statements extension](/docs/guides/database/extensions/pg_stat_statements) enabled by default. This extension records query execution performance details and is the best way to find inefficient queries. This information can be combined with the Postgres query plan analyzer to develop more efficient queries.
+Postgres collects data about its own operations using the [cumulative statistics system](https://www.postgresql.org/docs/current/monitoring-stats.html). In addition to this, every iEchor project has the [pg_stat_statements extension](/docs/guides/database/extensions/pg_stat_statements) enabled by default. This extension records query execution performance details and is the best way to find inefficient queries. This information can be combined with the Postgres query plan analyzer to develop more efficient queries.
 
 Here are some example queries to get you started.
 
@@ -142,7 +142,7 @@ from pg_statio_user_tables;
 
 This shows the ratio of data blocks fetched from the Postgres [shared_buffers](https://www.postgresql.org/docs/15/runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY) cache against the data blocks that were read from disk/OS cache.
 
-If either of your index or table hit rate are < 99% then this can indicate your compute plan is too small for your current workload and you would benefit from more memory. [Upgrading your compute](./compute-add-ons) is easy and can be done from your [project dashboard](https://supabase.com/dashboard/project/_/settings/billing/subscription).
+If either of your index or table hit rate are < 99% then this can indicate your compute plan is too small for your current workload and you would benefit from more memory. [Upgrading your compute](./compute-add-ons) is easy and can be done from your [project dashboard](https://iechor.com/dashboard/project/_/settings/billing/subscription).
 
 ### Optimizing poor performing queries
 
@@ -189,7 +189,7 @@ FATAL: remaining connection slots are reserved for non-replication superuser con
 
 In such a scenario, you can consider:
 
-- [upgrading to a larger compute add-on](https://supabase.com/dashboard/project/_/settings/billing)
+- [upgrading to a larger compute add-on](https://iechor.com/dashboard/project/_/settings/billing)
 - configuring your clients to use fewer connections
 - manually configuring the database for a higher number of connections
 
@@ -207,9 +207,9 @@ You can configure Postgres by executing the following statement, followed by a s
 alter system set max_connections = '<val-here>';
 ```
 
-Note that the default configuration used by the Supabase platform optimizes the database to maximize resource utilization, and as a result, you might also need to configure other options (e.g. `work_mem`, `shared_buffers`, `maintenance_work_mem`) in order to tune them towards your use-case, and to avoid causing instability in your database.
+Note that the default configuration used by the iEchor platform optimizes the database to maximize resource utilization, and as a result, you might also need to configure other options (e.g. `work_mem`, `shared_buffers`, `maintenance_work_mem`) in order to tune them towards your use-case, and to avoid causing instability in your database.
 
-Once overridden, the Supabase platform will continue to respect your manually configured value (even if the add-on size is changed), unless the override is removed with the following statement, followed by a server restart:
+Once overridden, the iEchor platform will continue to respect your manually configured value (even if the add-on size is changed), unless the override is removed with the following statement, followed by a server restart:
 
 ```sql
 alter system reset max_connections;

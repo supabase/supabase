@@ -31,12 +31,12 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
             You can either{' '}
             <a
               className="underline"
-              href="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
+              href="https://iechor.com/docs/guides/platform/performance#examining-query-performance"
             >
               optimize your query
             </a>
             , or{' '}
-            <a className="underline" href="https://supabase.com/docs/guides/database/timeouts">
+            <a className="underline" href="https://iechor.com/docs/guides/database/timeouts">
               increase the statement timeout
             </a>
             .

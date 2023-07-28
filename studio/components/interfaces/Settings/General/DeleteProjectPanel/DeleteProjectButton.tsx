@@ -143,7 +143,7 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
             <div className="space-y-1">
               <h4 className="text-base">We're sad that you're leaving.</h4>
               <p className="text-sm text-scale-1100">
-                We always strive to improve Supabase as much as we can. Please let us know the
+                We always strive to improve iEchor as much as we can. Please let us know the
                 reasons you are deleting your project so that we can improve in the future.
               </p>
             </div>

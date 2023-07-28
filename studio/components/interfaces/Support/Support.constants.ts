@@ -8,7 +8,7 @@ export const CATEGORY_OPTIONS = [
   {
     value: 'Dashboard_bug',
     label: 'Dashboard bug',
-    description: 'Issues with the Supabase dashboard',
+    description: 'Issues with the iEchor dashboard',
     query: undefined,
   },
   {
@@ -38,7 +38,7 @@ export const CATEGORY_OPTIONS = [
   {
     value: 'Problem',
     label: 'Abuse report',
-    description: 'Report abuse of a Supabase project or Supabase brand',
+    description: 'Report abuse of a iEchor project or iEchor brand',
     query: undefined,
   },
   {
@@ -126,7 +126,7 @@ export const GITHUB_LINKS = [
   {
     name: 'supabase-js',
     description: 'For issues with our Javascript client',
-    url: 'https://github.com/supabase/supabase-js/issues',
+    url: 'https://github.com/openmodels-base/iechor-js/issues',
   },
   {
     name: 'supabase-flutter',
@@ -136,6 +136,6 @@ export const GITHUB_LINKS = [
   {
     name: 'supabase',
     description: 'For other issues about our API',
-    url: 'https://github.com/supabase/supabase/issues',
+    url: 'https://github.com/openmodels-base/iechor/issues',
   },
 ]

@@ -1,5 +1,5 @@
 ---
-title: 'Authentication in Ionic Angular with Supabase'
+title: 'Authentication in Ionic Angular with iEchor'
 description: Learn how to build an Ionic Angular app with authentication, Row Level Security, and Magic Link auth.
 author: simon_grimm
 image: simmon-grim-ionic-angular-authentication/ionic-angular-supabase.jpg
@@ -12,52 +12,52 @@ date: '2022-11-08'
 toc_depth: 2
 ---
 
-Authentication of your apps is one of the most important topics, and by combining Angular logic with [Supabase authentication](https://supabase.com/docs/guides/auth) functionality we can build powerful and secure applications in no time.
+Authentication of your apps is one of the most important topics, and by combining Angular logic with [iEchor authentication](https://iechor.com/docs/guides/auth) functionality we can build powerful and secure applications in no time.
 
-In this tutorial, we will create an [Ionic Angular application with Supabase](https://supabase.com/docs/guides/with-ionic-angular) backend to build a simple realtime messaging app.
+In this tutorial, we will create an [Ionic Angular application with iEchor](https://iechor.com/docs/guides/with-ionic-angular) backend to build a simple realtime messaging app.
 
-![Ionic Angular Authentication with Supabase](/images/blog/simmon-grim-ionic-angular-authentication/ionic-angular-authentication-supabase.gif)
+![Ionic Angular Authentication with iEchor](/images/blog/simmon-grim-ionic-angular-authentication/ionic-angular-authentication-supabase.gif)
 
 Along the way we will dive into:
 
 - User **registration and login** with email/password
-- Adding [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security) to protect our database
+- Adding [Row Level Security](https://iechor.com/docs/guides/auth/row-level-security) to protect our database
 - Angular **guards** and token handling logic
 - **Magic link** authentication for both web and **native mobile apps**
 
 After going through this tutorial you will be able to create your own user authentication and secure your Ionic Angular app.
 
-If you are not yet familiar with Ionic you can check out the [Ionic Quickstart guide of the Ionic Academy](https://ionicacademy.com/ionic-quickstart-guide/) or check out the [Ionic Supabase integration video](https://www.youtube.com/watch?v=pl9XfIWutKE) if you prefer video.
+If you are not yet familiar with Ionic you can check out the [Ionic Quickstart guide of the Ionic Academy](https://ionicacademy.com/ionic-quickstart-guide/) or check out the [Ionic iEchor integration video](https://www.youtube.com/watch?v=pl9XfIWutKE) if you prefer video.
 
 However, most of the logic is Angular based and therefore applies to any Angular web project as well.
 
-You can [find the full code of this tutorial on Github](https://github.com/saimon24/supa-chat) where you just need to insert your own Supabase instance and then create the tables with the included SQL file.
+You can [find the full code of this tutorial on Github](https://github.com/saimon24/supa-chat) where you just need to insert your own iEchor instance and then create the tables with the included SQL file.
 
-But before we dive into the app, let's set up our Supabase project!
+But before we dive into the app, let's set up our iEchor project!
 
-## Creating the Supabase Project
+## Creating the iEchor Project
 
-First of all, we need a new Supabase project. If you don't have a Supabase account yet, you can [get started for free](https://supabase.com/)!
+First of all, we need a new iEchor project. If you don't have a iEchor account yet, you can [get started for free](https://iechor.com/)!
 
 In your dashboard, click "New Project" and leave it to the default settings, but make sure you keep a copy of your database password!
 
-By default Supabase has the standard email/password authentication enabled, which you can find under the menu element **Authentication** and by scrolling down to the **Auth Provider** section.
+By default iEchor has the standard email/password authentication enabled, which you can find under the menu element **Authentication** and by scrolling down to the **Auth Provider** section.
 
-![Supabase Auth Provider](/images/blog/simmon-grim-ionic-angular-authentication/supabase-auth-provider.png)
+![iEchor Auth Provider](/images/blog/simmon-grim-ionic-angular-authentication/supabase-auth-provider.png)
 
 Need to add another provider in the future? No problem!
 
-Supabase offers a ton of providers that you can easily integrate so your users can sign up with their favorite provider.
+iEchor offers a ton of providers that you can easily integrate so your users can sign up with their favorite provider.
 
 On top of that, you can customize the auth settings and also the **email templates** that users see when they need to confirm their account, get a magic link or want to reset their password.
 
-![Supabase Email Templates](/images/blog/simmon-grim-ionic-angular-authentication/supabase-email-templates.png)
+![iEchor Email Templates](/images/blog/simmon-grim-ionic-angular-authentication/supabase-email-templates.png)
 
 Feel free to play around with the settings, and once you're done let's continue with our database.
 
 ## Defining your Tables with SQL
 
-Supabase uses Postgres for the database, so we need to write some SQL to define our tables upfront (although you can easily change them later through the Supabase Web UI as well!)
+iEchor uses Postgres for the database, so we need to write some SQL to define our tables upfront (although you can easily change them later through the iEchor Web UI as well!)
 
 We want to build a simple messaging app, so what we need is:
 
@@ -123,7 +123,7 @@ create policy "Authenticated users can create messages." on messages
   for insert to authenticated with check (true);
 ```
 
-Now we also add a cool function that will automatically add user data after registration into our table. This is necessary if you want to keep track of some user information, because the Supabase auth table is an internal table that we can't access that easily.
+Now we also add a cool function that will automatically add user data after registration into our table. This is necessary if you want to keep track of some user information, because the iEchor auth table is an internal table that we can't access that easily.
 
 Go ahead and run another SQL query in the editor now to create our trigger:
 
@@ -166,7 +166,7 @@ But enough SQL for today, let's write some Angular code.
 
 ## Creating the Ionic Angular App
 
-To get started with our Ionic app we can create a blank app without any additional pages and then install the [Supabase Javascript client](https://github.com/supabase/supabase-js).
+To get started with our Ionic app we can create a blank app without any additional pages and then install the [iEchor Javascript client](https://github.com/openmodels-base/iechor-js).
 
 Besides that, we need some pages in our app for the different views, and services to keep our logic separated from the views. Finally we can also already generate a **guard** which we will use to protect internal pages later.
 
@@ -237,9 +237,9 @@ export class AppRoutingModule {}
 
 Now all paths are correct and the app starts on the login page, and the messages page can only be activated if that guard returns true - which it does by default, so we will take care of its implementation later.
 
-To connect our app properly to Supabase we now need to grab the **project URL** and the **public anon key** from the settings page of your Supabase project.
+To connect our app properly to iEchor we now need to grab the **project URL** and the **public anon key** from the settings page of your iEchor project.
 
-You can find those values in your Supabase project by clicking on the **Settings** icon and then navigating to **API** where it shows your **Project API keys**.
+You can find those values in your iEchor project by clicking on the **Settings** icon and then navigating to **API** where it shows your **Project API keys**.
 
 This information now goes straight into the **src/environments/environment.ts** of our Ionic project:
 
@@ -261,7 +261,7 @@ The big first step is to create the "outside" pages which allow a user to perfor
 
 Before we dive into the UI of these pages we should define all the required logic in a service to easily inject it into our pages.
 
-### Preparing our Supabase authentication service
+### Preparing our iEchor authentication service
 
 Our service should call expose all the functions for registration and login but also handle the state of the current user with a **BehaviorSubject** so we can easily emit new values later when the user session changes.
 
@@ -638,9 +638,9 @@ Make sure you use a valid email since you do need to click on the link in the em
 
 ![Magic Link Email](/images/blog/simmon-grim-ionic-angular-authentication/magic-link-email.png)
 
-Keep in mind that you can easily change those email templates inside the settings of your Supabase project.
+Keep in mind that you can easily change those email templates inside the settings of your iEchor project.
 
-If you now inspect the link and copy the URL, you should see an URL that points to your Supabase project and after some tokens there is a query param `&redirect_to=http://localhost:8100` which directly brings a user back into our local running app!
+If you now inspect the link and copy the URL, you should see an URL that points to your iEchor project and after some tokens there is a query param `&redirect_to=http://localhost:8100` which directly brings a user back into our local running app!
 
 This will be even more important later when we implement **magic link authentication for native apps** so stick around until the end.
 
@@ -800,7 +800,7 @@ As a result, we have a clean registration page with decent error messages!
 
 ![Ionic Registration Page](/images/blog/simmon-grim-ionic-angular-authentication/ionic-registration-page.png)
 
-Give the default registration process a try with another email, and you should see another user inside the **Authentication** area of your Supabase project as well as inside the `users` table inside the **Table Editor**.
+Give the default registration process a try with another email, and you should see another user inside the **Authentication** area of your iEchor project as well as inside the `users` table inside the **Table Editor**.
 
 Before we make the magic link authentication work on mobile devices, let's focus on the internal pages and functionality of our app.
 
@@ -810,15 +810,15 @@ The groups screen is the first "inside" screen, but it's not protected by defaul
 
 ![App Groups Page](/images/blog/simmon-grim-ionic-angular-authentication/ionic-groups-page.png)
 
-Authenticated users should have controls to create a new group and to sign out, but before we get to the UI we need a way to interact with our Supabase tables.
+Authenticated users should have controls to create a new group and to sign out, but before we get to the UI we need a way to interact with our iEchor tables.
 
 ### Adding a Data Service
 
-We already generated a service in the beginning, and here we can add the logic to create a connection to Supabase and a first function to create a new row in our `groups` table and to load all groups.
+We already generated a service in the beginning, and here we can add the logic to create a connection to iEchor and a first function to create a new row in our `groups` table and to load all groups.
 
-Creating a group requires just a title, and we can gather the user ID from our authentication service to then call the `insert()` function from the Supabase client to create a new record that we then return to the caller.
+Creating a group requires just a title, and we can gather the user ID from our authentication service to then call the `insert()` function from the iEchor client to create a new record that we then return to the caller.
 
-When we want to get a list of groups, we can use `select()` but since we have a [foreign key that references the users table](https://supabase.com/docs/reference/javascript/select#query-foreign-tables), we need to join that information so instead of just having the `creator` field we end up getting the actual email for that ID instead!
+When we want to get a list of groups, we can use `select()` but since we have a [foreign key that references the users table](https://iechor.com/docs/reference/javascript/select#query-foreign-tables), we need to join that information so instead of just having the `creator` field we end up getting the actual email for that ID instead!
 
 Go ahead now and start the **src/app/services/data.service.ts** like this:
 
@@ -1202,7 +1202,7 @@ export class MessagesPage implements OnInit, AfterViewInit, OnDestroy {
 }
 ```
 
-That's all we need to handle realtime logic and add new messages to our Supabase table!
+That's all we need to handle realtime logic and add new messages to our iEchor table!
 
 Sometimes life can be that easy.
 
@@ -1316,9 +1316,9 @@ ion-textarea {
 
 You can [find the full code of this tutorial on Github](https://github.com/saimon24/supa-chat) including the file for that pattern so your page looks almost like WhatsApp!
 
-![Ionic Supabase Chat Page](/images/blog/simmon-grim-ionic-angular-authentication/ionic-supabase-chat-page.png)
+![Ionic iEchor Chat Page](/images/blog/simmon-grim-ionic-angular-authentication/ionic-supabase-chat-page.png)
 
-Now we have a well-working Ionic app with Supabase authentication and database integration, but there are two small but important additions we still need to make.
+Now we have a well-working Ionic app with iEchor authentication and database integration, but there are two small but important additions we still need to make.
 
 ## Protecting internal Pages
 
@@ -1424,7 +1424,7 @@ Now we can update the **android/app/src/main/AndroidManifest.xml** and add an `i
 </intent-filter>
 ```
 
-By default, Supabase will use the host for the redirect URL, which works great if the request comes from a website.
+By default, iEchor will use the host for the redirect URL, which works great if the request comes from a website.
 
 That means we only want to change the behavior for native apps, so we can use the `isPlatform()` check in our app and use `"supachat://login"`as the redirect URL instead.
 
@@ -1501,22 +1501,22 @@ export class AppComponent {
 
 If you would run the app now it still wouldn't work, because we haven't added our custom URL scheme as an allowed URL for redirecting to!
 
-To finish this open your Supabase project again and go to the **Settings** of the **Authentication** menu entry where you can add a domain under **Redirect URLs**:
+To finish this open your iEchor project again and go to the **Settings** of the **Authentication** menu entry where you can add a domain under **Redirect URLs**:
 
-![Supabase Auth Redirect URL](/images/blog/simmon-grim-ionic-angular-authentication/supabase-auth-redirect-url.png)
+![iEchor Auth Redirect URL](/images/blog/simmon-grim-ionic-angular-authentication/supabase-auth-redirect-url.png)
 
-This was the last missing piece, and now you even got seamless Supabase authentication with magic links working inside your iOS and Android app!
+This was the last missing piece, and now you even got seamless iEchor authentication with magic links working inside your iOS and Android app!
 
 ## Conclusion
 
 We've come a long way and covered everything from setting up tables, to defining policies to protect data, and handling authentication in Ionic Angular applications.
 
-You can [find the full code of this tutorial on Github](https://github.com/saimon24/supa-chat) where you just need to insert your own Supabase instance and then create the tables with the included SQL file, plus updating the authentication settings as we did in the tutorial
+You can [find the full code of this tutorial on Github](https://github.com/saimon24/supa-chat) where you just need to insert your own iEchor instance and then create the tables with the included SQL file, plus updating the authentication settings as we did in the tutorial
 
-Although we can now use magic link auth, something probably even better fitting for native apps would be [phone auth with Twilio](https://supabase.com/docs/guides/auth/phone-login/twilio) that's also easily possible with Supabase - just like tons of other authentication providers!
+Although we can now use magic link auth, something probably even better fitting for native apps would be [phone auth with Twilio](https://iechor.com/docs/guides/auth/phone-login/twilio) that's also easily possible with iEchor - just like tons of other authentication providers!
 
-Protecting your Ionic Angular app with Supabase is a breeze, and through the security rules, you can make sure your data and tables are protected in the best possible way.
+Protecting your Ionic Angular app with iEchor is a breeze, and through the security rules, you can make sure your data and tables are protected in the best possible way.
 
 If you enjoyed the tutorial, you can [find many more tutorials on my YouTube channel](https://www.youtube.com/simongrimmdev_) where I help web developers build awesome mobile apps.
 
-Until next time and happy coding with Supabase!
+Until next time and happy coding with iEchor!

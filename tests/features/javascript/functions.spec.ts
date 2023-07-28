@@ -26,7 +26,7 @@ class Functions extends Hooks {
         resolve({ error, stdout, stderr })
       )
     })
-    const { supabase } = await this.createSignedInSupaClient()
+    const { iechor } = await this.createSignedInSupaClient()
     const sb = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_ANON_KEY)
     const {
       data: { session },

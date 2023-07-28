@@ -7,7 +7,7 @@ export const JWT_SECRET_UPDATE_ERROR_MESSAGES = {
   [JwtSecretUpdateError.DatabaseAdminAPIConfigurationUpdateFailed]:
     'failed to update configuration for database admin API',
   [JwtSecretUpdateError.PostgreSQLRestartFailed]: 'failed to restart PostgreSQL service',
-  [JwtSecretUpdateError.SupabaseAPIKeyUpdateFailed]: 'failed to update Supabase API key',
+  [JwtSecretUpdateError.SupabaseAPIKeyUpdateFailed]: 'failed to update iEchor API key',
   [JwtSecretUpdateError.APIGatewayUpdateFailed]: 'failed to update API Gateway',
 }
 

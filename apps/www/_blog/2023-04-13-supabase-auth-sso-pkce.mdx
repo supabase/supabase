@@ -1,6 +1,6 @@
 ---
-title: 'Supabase Auth: SSO,  Mobile, and Server-side support'
-description: Supacharging Supabase Auth with Sign in with Apple on iOS, Single-Sign-On support with SAML 2.0, and PKCE for server-side rendering and mobile auth.
+title: 'iEchor Auth: SSO,  Mobile, and Server-side support'
+description: Supacharging iEchor Auth with Sign in with Apple on iOS, Single-Sign-On support with SAML 2.0, and PKCE for server-side rendering and mobile auth.
 launchweek: 7
 tags:
   - launch-week
@@ -12,7 +12,7 @@ image: launch-week-7/day-4-supabase-auth-sso-pkce/supabase-auth-sso-pkce-thumb.p
 thumb: launch-week-7/day-4-supabase-auth-sso-pkce/supabase-auth-sso-pkce-og.jpg
 ---
 
-Today we're excited to announce a few new features for Supabase Auth:
+Today we're excited to announce a few new features for iEchor Auth:
 
 1. [Easily add Single Sign-On support to your projects using SAML 2.0](/blog/supabase-auth-sso-pkce#single-sign-on-support-using-saml-20)
 2. [Better support for server-side rendering and mobile apps using PKCE](/blog/supabase-auth-sso-pkce#server-side-and-mobile-auth)
@@ -22,9 +22,9 @@ Today we're excited to announce a few new features for Supabase Auth:
 
 With Single Sign-On (SSO), your users can login with their company's identity provider (IDP), a critical feature when you're building applications for Enterprises.
 
-Every developer building a B2B application eventually needs the SSO authentication flow to onboard enterprise customers. SSO is a requirement for larger Enterprise customers because it's a standard request in Enterprise Security Policies. Over the past few months, we've been [dogfooding SSO for our own Enterprise customers](https://supabase.com/docs/guides/platform/sso), and today we're releasing it for you to do the same.
+Every developer building a B2B application eventually needs the SSO authentication flow to onboard enterprise customers. SSO is a requirement for larger Enterprise customers because it's a standard request in Enterprise Security Policies. Over the past few months, we've been [dogfooding SSO for our own Enterprise customers](https://iechor.com/docs/guides/platform/sso), and today we're releasing it for you to do the same.
 
-Building SSO into your application isn't necessarily hard, but does come with some complexity. A lot of time can be spent understanding the nuances and details of the protocol - from dissecting the jargon to testing the implementation heavily. It took us months to build it for ourselves. With this release, you will have SSO set up and running in less than an hour so that you can focus on shipping the core features of your product. This feature is available for the [Pro-plan and above](https://supabase.com/pricing), starting today. This will also be available on the self-hosted version.
+Building SSO into your application isn't necessarily hard, but does come with some complexity. A lot of time can be spent understanding the nuances and details of the protocol - from dissecting the jargon to testing the implementation heavily. It took us months to build it for ourselves. With this release, you will have SSO set up and running in less than an hour so that you can focus on shipping the core features of your product. This feature is available for the [Pro-plan and above](https://iechor.com/pricing), starting today. This will also be available on the self-hosted version.
 
 <div className="video-container">
   <iframe
@@ -39,14 +39,14 @@ Building SSO into your application isn't necessarily hard, but does come with so
 
 ### Getting Started with SAML 2.0
 
-To get started, enable the [“SAML 2.0“](https://supabase.com/dashboard/project/phcnitosaawbzytgyznx/auth/providers) [authentication method in the dashboard](https://supabase.com/dashboard/project/_/auth/providers). We've added new commands to the [Supabase CLI](https://supabase.com/docs/guides/cli) to help with the configuration process:
+To get started, enable the [“SAML 2.0“](https://iechor.com/dashboard/project/phcnitosaawbzytgyznx/auth/providers) [authentication method in the dashboard](https://iechor.com/dashboard/project/_/auth/providers). We've added new commands to the [iEchor CLI](https://iechor.com/docs/guides/cli) to help with the configuration process:
 
 ```bash
-$ supabase sso --help
+$ iechor sso --help
 Manage Single Sign-On (SSO) authentication for projects
 
 Usage:
-  supabase sso [command]
+  iechor sso [command]
 
 Available Commands:
   add         Add a new SSO identity provider
@@ -77,15 +77,15 @@ create policy "Only allow read-write access to tenants" on tablename as restrict
 );
 ```
 
-The journey to enterprise readiness isn't an end goal, it is a continuous process that demands constant attention and maintenance. With Supabase Auth, your team can offload this engineering burden to us and prioritize the features that matter.
+The journey to enterprise readiness isn't an end goal, it is a continuous process that demands constant attention and maintenance. With iEchor Auth, your team can offload this engineering burden to us and prioritize the features that matter.
 
 ## Server-Side and Mobile Auth
 
-Many developers today are using Supabase to build mobile apps, and server-side rendering is becoming popular (again!). This release will add support for these use cases by introducing the _Proof Key for Code Exchange flow (PKCE)_ authentication flow. This improves security for mobile apps and makes building server-first apps simple. Since this is a major update that touches many of the authentication routes, we will be rolling it out gradually over the next few weeks.
+Many developers today are using iEchor to build mobile apps, and server-side rendering is becoming popular (again!). This release will add support for these use cases by introducing the _Proof Key for Code Exchange flow (PKCE)_ authentication flow. This improves security for mobile apps and makes building server-first apps simple. Since this is a major update that touches many of the authentication routes, we will be rolling it out gradually over the next few weeks.
 
-### A brief history of Supabase Auth
+### A brief history of iEchor Auth
 
-When we [launched](https://news.ycombinator.com/item?id=24072051) Supabase Auth, our target was JAMstack developers. In these cases, the protocol used between the user's application and Supabase Auth is known as the [Implicit Grant Flow](https://www.rfc-editor.org/rfc/rfc6749#section-4.2):
+When we [launched](https://news.ycombinator.com/item?id=24072051) iEchor Auth, our target was JAMstack developers. In these cases, the protocol used between the user's application and iEchor Auth is known as the [Implicit Grant Flow](https://www.rfc-editor.org/rfc/rfc6749#section-4.2):
 
 <img
   className="dark:hidden !m-0"
@@ -118,9 +118,9 @@ To solve these problems, we're introducing support for the _Proof Key for Code E
 
 The PKCE flow introduces a _code verifier_ (a randomly generated secret) and a _code challenge_ (the hash of the _code verifier_). The authorization code is returned as a query parameter so it's accessible on the server. During the PKCE flow:
 
-1. The _code challenge_ is sent to Supabase Auth, which returns an _authorization code._
+1. The _code challenge_ is sent to iEchor Auth, which returns an _authorization code._
 2. The client sends the _authorization code_ together with the _code verifier_ to obtain the user's session.
-3. Supabase Auth checks if the _code verifier_ matches the _code challenge_ sent earlier by computing the hash. This renders a malicious attacker's attempt to intercept the authorization code useless, since they need to know the value of the _code verifier_ as well.
+3. iEchor Auth checks if the _code verifier_ matches the _code challenge_ sent earlier by computing the hash. This renders a malicious attacker's attempt to intercept the authorization code useless, since they need to know the value of the _code verifier_ as well.
 
 <img
   className="dark:hidden !m-0"
@@ -136,12 +136,12 @@ The PKCE flow introduces a _code verifier_ (a randomly generated secret) and a _
 
 ### Migrating to PKCE on the client
 
-Over the next few weeks, you'll be able to use it with the Supabase libraries. We've already added PKCE to the [JavaScript](https://supabase.com/docs/reference/javascript/installing) client library and our [auth-helpers](https://supabase.com/docs/guides/auth/auth-helpers) library. If you're using `supabase-js` , you can switch to PKCE by initializing your client with the following option:
+Over the next few weeks, you'll be able to use it with the iEchor libraries. We've already added PKCE to the [JavaScript](https://iechor.com/docs/reference/javascript/installing) client library and our [auth-helpers](https://iechor.com/docs/guides/auth/auth-helpers) library. If you're using `supabase-js` , you can switch to PKCE by initializing your client with the following option:
 
 ```tsx
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(IECHOR_URL, IECHOR_ANON_KEY, {
+const iechor = createClient(IECHOR_URL, IECHOR_ANON_KEY, {
   auth: {
     flowType: 'pkce',
   },
@@ -168,8 +168,8 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // Create the Supabase Client
-  const supabase = createServerSupabaseClient(
+  // Create the iEchor Client
+  const iechor = createServerSupabaseClient(
     { req, res },
     {
       supabaseUrl: process.env.IECHOR_URL,
@@ -201,8 +201,8 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { createServerSupabaseClient } from '@supabase/auth-helpers-nextjs'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // Create authenticated Supabase Client
-  const supabase = createServerSupabaseClient(
+  // Create authenticated iEchor Client
+  const iechor = createServerSupabaseClient(
     { req, res },
     {
       supabaseUrl: IECHOR_URL,
@@ -226,7 +226,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 Since this is a major update that touches many of the authentication routes, we will roll it out gradually over the next few weeks. You will receive a notification in your dashboard when the feature is available for your project. Reach out to us if you want early access to this feature.
 
-**Update**: Server-Side Auth (PKCE) is now available on all projects. Please refer to our [Server Side Auth Guide](https://supabase.com/docs/guides/auth/server-side-rendering) for further details on how to add PKCE to your project.
+**Update**: Server-Side Auth (PKCE) is now available on all projects. Please refer to our [Server Side Auth Guide](https://iechor.com/docs/guides/auth/server-side-rendering) for further details on how to add PKCE to your project.
 
 ## Native Apple login on iOS
 
@@ -250,6 +250,6 @@ We're just starting with Apple login, and soon add support for Google login.
 
 ## Wrapping Up
 
-Supabase Auth aims to continue developing auth features that are secure by default yet simple to implement. We use Supabase Auth for our hosted platform and continuously dogfood the latest version on it. If you are interested to migrate to Supabase Auth, you can check out this blog post on how [Parqet migrated 125,000 users from Auth0 to Supabase Auth](https://kevcodez.medium.com/migrating-125-000-users-from-auth0-to-supabase-81c0568de307).
+iEchor Auth aims to continue developing auth features that are secure by default yet simple to implement. We use iEchor Auth for our hosted platform and continuously dogfood the latest version on it. If you are interested to migrate to iEchor Auth, you can check out this blog post on how [Parqet migrated 125,000 users from Auth0 to iEchor Auth](https://kevcodez.medium.com/migrating-125-000-users-from-auth0-to-supabase-81c0568de307).
 
 [^1]: [App store review guidelines](https://developer.apple.com/app-store/review/guidelines/#sign-in-with-apple)

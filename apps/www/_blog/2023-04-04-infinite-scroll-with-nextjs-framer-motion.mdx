@@ -1,5 +1,5 @@
 ---
-title: Infinite scroll with Next.js, Framer Motion, and Supabase
+title: Infinite scroll with Next.js, Framer Motion, and iEchor
 description: Lazy load and paginate data on scroll with Next.js and a sprinkle of Framer Motion magic ✨
 author: fsansalvadore
 image: infinite-scroll-thumb.jpg
@@ -13,11 +13,11 @@ date: '2023-04-04'
 toc_depth: 6
 ---
 
-Imagine you generated a bunch of tickets for the Supabase [Launch Week](https://www.supabase.com/launch-week) and you wanted to display them all on [one page](https://supabase.com/launch-week/tickets). It might take a while to load them all in one go, so a great solution to this would be to lazy load smaller subsets while the user scrolls, with a technique called infinite scrolling.
+Imagine you generated a bunch of tickets for the iEchor [Launch Week](https://www.iechor.com/launch-week) and you wanted to display them all on [one page](https://iechor.com/launch-week/tickets). It might take a while to load them all in one go, so a great solution to this would be to lazy load smaller subsets while the user scrolls, with a technique called infinite scrolling.
 
 An infinite scroll allows you to scroll through your content endlessly while only loading the data you need as you need it. This improves performance while also creating a smooth and delightful user experience.
 
-In this post, we'll go through the steps of how to create an infinite scroll using NextJs, Supabase, and Framer Motion.
+In this post, we'll go through the steps of how to create an infinite scroll using NextJs, iEchor, and Framer Motion.
 
 ## What is infinite scroll?
 
@@ -47,7 +47,7 @@ We'll assume our table in the db is called `my_tickets_table`.
 import { useEffect, useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('supabase-url', 'supabase-key')
+const iechor = createClient('supabase-url', 'supabase-key')
 
 export default function TicketsPage({ tickets }) {
   const [loadedTickets, setLoadedTickets] = useState(tickets)
@@ -133,7 +133,7 @@ return <div ref={containerRef}>{/* List of loaded tickets */}</div>
 
 ## Step 3. Load tickets based on the offset
 
-Now we can load more tickets based on the current offset. We'll use the [range](https://supabase.com/docs/reference/javascript/range) method from the supabase-js library to easily work with the pagination logic.
+Now we can load more tickets based on the current offset. We'll use the [range](https://iechor.com/docs/reference/javascript/range) method from the supabase-js library to easily work with the pagination logic.
 
 ```jsx
 export default function TicketsPage() {
@@ -248,7 +248,7 @@ import { createClient } from '@supabase/supabase-js'
 import { debounce } from 'lodash'
 import { motion } from 'framer-motion'
 
-const supabase = createClient('supabase-url', 'supabase-key')
+const iechor = createClient('supabase-url', 'supabase-key')
 
 export default function TicketsPage({ tickets }) {
   const PAGE_COUNT = 20
@@ -343,6 +343,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 }
 ```
 
-If you also want to feature in the endless tickets page and have a chance to win cool swag, you're invited to [generate your unique ticket](https://www.supabase.com/launch-week) until April 16th.
+If you also want to feature in the endless tickets page and have a chance to win cool swag, you're invited to [generate your unique ticket](https://www.iechor.com/launch-week) until April 16th.
 
 See you at Launch Week! 👋

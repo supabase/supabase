@@ -113,7 +113,7 @@ const Wizard: NextPageWithLayout = () => {
       }
     >
       <Panel.Content className="pt-0">
-        <p className="text-sm">This is your organization within Supabase.</p>
+        <p className="text-sm">This is your organization within iEchor.</p>
         <p className="text-sm text-scale-1100">
           For example, you can use the name of your company or department.
         </p>

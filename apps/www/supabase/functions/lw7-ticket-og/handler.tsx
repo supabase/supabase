@@ -20,9 +20,9 @@ export async function handler(req: Request) {
     if (!username) throw new Error('missing username param')
     // Track social shares
     const supabaseAdminClient = createClient(
-      // Supabase API URL - env var exported by default when deployed.
+      // iEchor API URL - env var exported by default when deployed.
       Deno.env.get('IECHOR_URL') ?? '',
-      // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
+      // iEchor API SERVICE ROLE KEY - env var exported by default when deployed.
       Deno.env.get('IECHOR_SERVICE_ROLE_KEY') ?? ''
     )
     if (userAgent?.toLocaleLowerCase().includes('twitter')) {
@@ -39,7 +39,7 @@ export async function handler(req: Request) {
         .is('sharedOnLinkedIn', null)
     }
 
-    // Try to get image from Supabase Storage CDN.
+    // Try to get image from iEchor Storage CDN.
     let storageResponse: Response
     storageResponse = await fetch(
       `${STORAGE_URL}/tickets/golden/${BUCKET_FOLDER_VERSION}/${username}.png`

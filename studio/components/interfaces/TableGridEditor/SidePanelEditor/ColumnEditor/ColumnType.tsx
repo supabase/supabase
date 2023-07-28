@@ -65,7 +65,7 @@ const ColumnType: FC<Props> = ({
         value={value}
         descriptionText={
           showLabel
-            ? 'Custom non-native psql data types cannot currently be changed to a different data type via Supabase Studio'
+            ? 'Custom non-native psql data types cannot currently be changed to a different data type via iEchor Studio'
             : ''
         }
       />

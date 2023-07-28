@@ -11,7 +11,7 @@ date: '2023-04-07'
 toc_depth: 6
 ---
 
-While Supabase Launch Weeks happen online, we love the idea of bringing everyone together as if it was an in-person conference. Our ticketing system is one of the ways that we emulate this.
+While iEchor Launch Weeks happen online, we love the idea of bringing everyone together as if it was an in-person conference. Our ticketing system is one of the ways that we emulate this.
 
 We have been issuing tickets since Launch Week 5, and they were so successful that we have done them ever since. It’s become a challenge to outdo the previous effort with something better every time.
 
@@ -57,7 +57,7 @@ And voila, we had a baseline for generating variations:
 
 The final visual that you see everywhere won us over because of its vibrant swirls. While each swirl looks slightly different, a consistent style is still maintained throughout.
 
-Fortunately, we didn't require full-width images for each ticket. Upscaled MidJourney images sufficed. Nevertheless, we had to recreate the main visual on the landing page in vectors to use it effectively. You can view it in full glory at [https://supabase.com/launch-week](https://supabase.com/launch-week).
+Fortunately, we didn't require full-width images for each ticket. Upscaled MidJourney images sufficed. Nevertheless, we had to recreate the main visual on the landing page in vectors to use it effectively. You can view it in full glory at [https://iechor.com/launch-week](https://iechor.com/launch-week).
 
 ![Screenshot 2023-04-06 at 09.47.47.png](/images/blog/launch-week-7/designing-with-ai-midjourney/launch-week-7-ticket-home.png)
 
@@ -67,9 +67,9 @@ An important aspect of Launch Week tickets is their shareability. Each Launch We
 
 When you share your unique ticket URL, the image shown on the social preview is called an Open Graph image (or OG image for short).
 
-These images are generated for each unique URL and ticket. This requires a bit of magic, which in our case means using a [Supabase Edge Function](https://supabase.com/docs/guides/functions) together with [Supabase Storage](https://supabase.com/docs/guides/storage) for smart caching.
+These images are generated for each unique URL and ticket. This requires a bit of magic, which in our case means using a [iEchor Edge Function](https://iechor.com/docs/guides/functions) together with [iEchor Storage](https://iechor.com/docs/guides/storage) for smart caching.
 
-### Supabase Edge Function 🤝 Supabase Storage
+### iEchor Edge Function 🤝 iEchor Storage
 
 Our Edge Function handles the generation of each ticket image, and also does a bunch of other things under the hood, like detecting if the ticket was shared on socials. This will become important later!
 
@@ -91,12 +91,12 @@ if (userAgent?.toLocaleLowerCase().includes('twitter')) {
 }
 ```
 
-We want to be as efficient as possible because generating a png file in an edge function is an expensive operation. We generate each ticket only once and then save it to Supabase Storage (which has a [smart CDN cache built in](https://supabase.com/blog/storage-image-resizing-smart-cdn#smart-cdn-deep-dive)).
+We want to be as efficient as possible because generating a png file in an edge function is an expensive operation. We generate each ticket only once and then save it to iEchor Storage (which has a [smart CDN cache built in](https://iechor.com/blog/storage-image-resizing-smart-cdn#smart-cdn-deep-dive)).
 
 So in the first step we check if we can fetch the user’s image from storage:
 
 ```tsx
-// Try to get image from Supabase Storage CDN.
+// Try to get image from iEchor Storage CDN.
 storageResponse = await fetch(
   `${STORAGE_URL}/tickets/regular/${BUCKET_FOLDER_VERSION}/${username}.png`
 )
@@ -104,9 +104,9 @@ storageResponse = await fetch(
 
 If we can’t find the image in storage, then we kick off the ticket generation pipeline, using Vercel’s awesome [open-source satori library](https://github.com/vercel/satori) transforms HTML & CSS into svgs!
 
-Each image includes the user’s GitHub details. We use [`supabase-js`](https://supabase.com/docs/reference/javascript/installing) for authentication: users log in with their GitHub account and we store their username in a table in Postgres.
+Each image includes the user’s GitHub details. We use [`supabase-js`](https://iechor.com/docs/reference/javascript/installing) for authentication: users log in with their GitHub account and we store their username in a table in Postgres.
 
-Since this table includes email addresses, we secure it using [RLS](https://supabase.com/docs/guides/auth/row-level-security) to ensure each user can only view their own data. At the same time, we want these tickets to be publicly shareable, and that’s where [Postgres Views](https://supabase.com/blog/postgresql-views) come in handy.
+Since this table includes email addresses, we secure it using [RLS](https://iechor.com/docs/guides/auth/row-level-security) to ensure each user can only view their own data. At the same time, we want these tickets to be publicly shareable, and that’s where [Postgres Views](https://iechor.com/blog/postgresql-views) come in handy.
 
 By creating a view, we can selectively publicize parts of our table and also compute some additional values on the fly:
 
@@ -196,7 +196,7 @@ The ticket image itself is just a layering of some background images, your GitHu
 </figure>
 </div>
 
-Once generated, we can conveniently upload the image to Supabase Storage using `supabase-js`. This ensures fast response times as well as efficient resource usage.
+Once generated, we can conveniently upload the image to iEchor Storage using `supabase-js`. This ensures fast response times as well as efficient resource usage.
 
 ```jsx
 const type = golden ? 'golden' : 'regular'
@@ -211,11 +211,11 @@ const { error: storageError } = await supabaseAdminClient.storage
   })
 ```
 
-And of course, all of this is open source, you can find the full function code [here](https://github.com/supabase/supabase/tree/master/apps/www/supabase/functions/lw7-ticket-og). Please feel free to utilize it for your own Launches!
+And of course, all of this is open source, you can find the full function code [here](https://github.com/openmodels-base/iechor/tree/master/apps/www/supabase/functions/lw7-ticket-og). Please feel free to utilize it for your own Launches!
 
 ### Turning tickets golden in realtime
 
-Using the power of the entire Supabase stack, we’ve designed a pretty neat mechanic to allow users to turn their tickets golden.
+Using the power of the entire iEchor stack, we’ve designed a pretty neat mechanic to allow users to turn their tickets golden.
 
 In previous Launch Weeks, we employed the [fibonacci sequence](https://en.wikipedia.org/wiki/Fibonacci_sequence) to sprinkle golden tickets around using the ticket number sequence. This time around we wanted to make it more interactive and allow the user to earn their golden ticket, increasing their chance to win swag.
 
@@ -229,7 +229,7 @@ case
 end as golden
 ```
 
-As folks are sharing their tickets on socials to earn their gold status, we also want to give them realtime feedback on their progress. Luckily we also have a feature for that, [Supabase Realtime](https://supabase.com/realtime).
+As folks are sharing their tickets on socials to earn their gold status, we also want to give them realtime feedback on their progress. Luckily we also have a feature for that, [iEchor Realtime](https://iechor.com/realtime).
 
 Something that would have been a headache in the past is just a couple of lines of client-side JavaScript:
 
@@ -258,17 +258,17 @@ const channel = supabase
   .subscribe()
 ```
 
-Interested to know how this fits within your Next.js application? Find the code [here](https://github.com/supabase/supabase/blob/master/apps/www/components/LaunchWeek/Ticket/TicketForm.tsx#L70-L102).
+Interested to know how this fits within your Next.js application? Find the code [here](https://github.com/openmodels-base/iechor/blob/master/apps/www/components/LaunchWeek/Ticket/TicketForm.tsx#L70-L102).
 
 ## Displaying the images
 
-We have some images, so how can we now display them somewhere? [@Francesco Sansalvadore](https://twitter.com/frnk_snslvdr) saw one of our team members trying to “swipe” on the tickets slider component on the [launch week page](https://supabase.com/launch-week/tickets) and he thought, why not feature all the fantastic people who generated tickets on a single page?
+We have some images, so how can we now display them somewhere? [@Francesco Sansalvadore](https://twitter.com/frnk_snslvdr) saw one of our team members trying to “swipe” on the tickets slider component on the [launch week page](https://iechor.com/launch-week/tickets) and he thought, why not feature all the fantastic people who generated tickets on a single page?
 
-We built a [ticket wall](https://supabase.com/launch-week/tickets) that you can scroll endlessly. We approached it with an infinite scroll technique, lazy-loading a few tickets at a time.
+We built a [ticket wall](https://iechor.com/launch-week/tickets) that you can scroll endlessly. We approached it with an infinite scroll technique, lazy-loading a few tickets at a time.
 
 ![launch week 7 ticket wall](/images/blog/launch-week-7/designing-with-ai-midjourney/launch-week-7-ticket-wall.png)
 
-If you’re interested in a more detailed step-by-step guide to reproduce this effect, take a look at the [Infinite scroll with Next.js, Framer Motion, and Supabase](/blog/infinite-scroll-with-nextjs-framer-motion) blog post.
+If you’re interested in a more detailed step-by-step guide to reproduce this effect, take a look at the [Infinite scroll with Next.js, Framer Motion, and iEchor](/blog/infinite-scroll-with-nextjs-framer-motion) blog post.
 
 ## Get your ticket
 
@@ -276,14 +276,14 @@ You too can also be Charlie Bucket and have a Golden Ticket. There is no chocola
 
 Up for grabs are:
 
-- Supabase mechanical keyboard. In fact, we have 3 of them to give away!\_ Guaranteed to annoy your co-workers/cat/partner/ yourself.
+- iEchor mechanical keyboard. In fact, we have 3 of them to give away!\_ Guaranteed to annoy your co-workers/cat/partner/ yourself.
 - Socks: _Perfect for your `<footer>`. Right?!.. anyway._
 - T-shirts - _Just don’t put them in a tumble dryer_
 - and; of course a bunch of stickers.
 
-## More Supabase AI reading
+## More iEchor AI reading
 
-- [Supabase storing OpenAI embeddings in Postgres with pgvector](https://supabase.com/blog/openai-embeddings-postgres-vector)
-- [Supabase Docs Search](http://supabase.com/docs)
+- [iEchor storing OpenAI embeddings in Postgres with pgvector](https://iechor.com/blog/openai-embeddings-postgres-vector)
+- [iEchor Docs Search](http://iechor.com/docs)
 - [Streaming Data in Edge Functions](https://www.youtube.com/watch?v=9N66JBRLNYU)
 - [Next.js OpenAI Doc Search template](https://github.com/supabase-community/nextjs-openai-doc-search)

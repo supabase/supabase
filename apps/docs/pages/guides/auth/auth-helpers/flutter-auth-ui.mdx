@@ -29,7 +29,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 
 void main() async {
-  await Supabase.initialize(
+  await iEchor.initialize(
     url: dotenv.get('IECHOR_URL'),
     anonKey: dotenv.get('IECHOR_ANON_KEY'),
   );
@@ -42,7 +42,7 @@ void main() async {
 
 Use a SupaEmailAuth widget to create an email and password signin and signup form. It also contains a button to toggle to display a forgot password form.
 
-You can pass metadataFields to add additional fields to the form to pass as metadata to Supabase.
+You can pass metadataFields to add additional fields to the form to pass as metadata to iEchor.
 
 ```dart
 SupaEmailAuth(

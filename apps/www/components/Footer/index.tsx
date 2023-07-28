@@ -42,7 +42,7 @@ const Footer = (props: Props) => {
                   }
                   width={160}
                   height={30}
-                  alt="Supabase"
+                  alt="iEchor"
                 />
               </a>
             </Link>
@@ -72,7 +72,7 @@ const Footer = (props: Props) => {
               </a>
 
               <a
-                href="https://discord.supabase.com/"
+                href="https://discord.iechor.com/"
                 className="text-scale-900 hover:text-scale-1200 transition"
               >
                 <span className="sr-only">Discord</span>
@@ -148,7 +148,7 @@ const Footer = (props: Props) => {
           </div>
         </div>
         <div className="border-scale-500 dark:border-scale-600 mt-32 flex justify-between border-t pt-8">
-          <small className="small">&copy; Supabase Inc</small>
+          <small className="small">&copy; iEchor Inc</small>
           <DarkModeToggle />
         </div>
       </SectionContainer>

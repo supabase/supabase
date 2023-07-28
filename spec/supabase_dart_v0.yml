@@ -2,14 +2,14 @@ openref: 0.1
 
 info:
   id: reference/dart
-  title: Supabase Dart Client
+  title: iEchor Dart Client
   description: |
 
-    Supabase Dart.
+    iEchor Dart.
 
   definition: ../../spec/enrichments/tsdoc_v1/combined.json
   slugPrefix: '/'
-  specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_dart_v0.yml
+  specUrl: https://github.com/openmodels-base/iechor/edit/master/spec/supabase_dart_v0.yml
   libraries:
     - name: 'Dart'
       id: 'dart'
@@ -27,11 +27,11 @@ functions:
       dart pub add supabase
       ```
 
-      Find the source code on [GitHub](https://github.com/supabase/supabase-dart).
+      Find the source code on [GitHub](https://github.com/openmodels-base/iechor-dart).
 
       ## Flutter
 
-      For Flutter project, you can use [supabase_flutter](https://github.com/supabase/supabase-flutter).
+      For Flutter project, you can use [supabase_flutter](https://github.com/openmodels-base/iechor-flutter).
 
       ```bash
       flutter pub add supabase_flutter
@@ -46,29 +46,29 @@ functions:
     title: Initializing
     description: |
       ## Dart
-      You can initialize a new Supabase client using the `SupabaseClient()` method.
+      You can initialize a new iEchor client using the `SupabaseClient()` method.
 
-      The Supabase client is your entrypoint to the rest of the Supabase functionality
-      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+      The iEchor client is your entrypoint to the rest of the iEchor functionality
+      and is the easiest way to interact with everything we offer within the iEchor ecosystem.
 
 
       ## Flutter
 
-      For `supabase_flutter`, you will be using the static `initialize()` method on `Supabase` class.
+      For `supabase_flutter`, you will be using the static `initialize()` method on `iEchor` class.
 
     examples:
       - id: dart-supabase-client
         name: Dart SupabaseClient()
         code: |
           ```dart
-          final supabase = SupabaseClient('https://xyzcompany.supabase.co', 'public-anon-key');
+          final iechor = SupabaseClient('https://xyzcompany.supabase.co', 'public-anon-key');
           ```
       - id: flutter-initialize
         name: Flutter initialize()
         code: |
           ```dart title="main.dart"
           Future<void> main() async {
-            await Supabase.initialize(url: 'https://xyzcompany.supabase.co', anonKey: 'public-anon-key');
+            await iEchor.initialize(url: 'https://xyzcompany.supabase.co', anonKey: 'public-anon-key');
             runApp(MyApp());
           }
           ```
@@ -78,10 +78,10 @@ functions:
     description: |
       Creates a new user.
     notes: |
-      - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [supabase.com/dashboard](https://supabase.com/dashboard)
+      - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [iechor.com/dashboard](https://iechor.com/dashboard)
       - If "Email Confirmations" is turned on, a user is returned but session will be null
       - If "Email Confirmations" is turned off, both a `user` and a `session` will be returned
-      - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [supabase.com/dashboard](https://supabase.com/dashboard)
+      - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [iechor.com/dashboard](https://iechor.com/dashboard)
     examples:
       - id: sign-up
         name: Sign up.
@@ -106,7 +106,7 @@ functions:
     notes: |
       - A user can sign up via email, phone number.
       - If you provide `email` without a `password`, the user will be sent a magic link.
-      - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [supabase.com/dashboard](https://supabase.com/dashboard)
+      - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [iechor.com/dashboard](https://iechor.com/dashboard)
       - Similarly, if you provide `phone` without a `password`, the user will be sent a one time password.
       - If you are looking to sign users in with OAuth in Flutter apps, go to [`signInWithProvider()`](/docs/reference/dart/v0/auth-signinwithprovider).
     examples:
@@ -335,7 +335,7 @@ functions:
   - id: invoke
     title: 'invoke()'
     description: |
-      Invokes a Supabase Function. See the [guide](/docs/guides/functions) for details on writing Functions.
+      Invokes a iEchor Function. See the [guide](/docs/guides/functions) for details on writing Functions.
     notes: |
       - Requires an Authorization header.
       - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
@@ -384,10 +384,10 @@ functions:
       Performs vertical filtering with SELECT.
     title: 'Fetch data: select()'
     notes: |
-      - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
+      - By default, iEchor projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `select()` can be combined with [Modifiers](/docs/reference/dart/using-modifiers)
       - `select()` can be combined with [Filters](/docs/reference/dart/using-filters)
-      - If using the Supabase hosted platform `apikey` is technically a reserved keyword, since the API gateway will pluck it out for authentication. [It should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+      - If using the iEchor hosted platform `apikey` is technically a reserved keyword, since the API gateway will pluck it out for authentication. [It should be avoided as a column name](https://github.com/openmodels-base/iechor/issues/5465).
     examples:
       - id: getting-your-data
         name: Getting your data
@@ -598,8 +598,8 @@ functions:
       - id: upserting-into-tables-with-constraints
         name: Upserting into tables with constraints
         description: |
-          Running the following will cause supabase to upsert data into the `users` table.
-          If the username 'supabot' already exists, the `onConflict` argument tells supabase to overwrite that row
+          Running the following will cause iechor to upsert data into the `users` table.
+          If the username 'supabot' already exists, the `onConflict` argument tells iechor to overwrite that row
           based on the column passed into `onConflict`.
         isSpotlight: true
         code: |
@@ -727,7 +727,7 @@ functions:
       - id: listen-to-updates
         name: Listen to updates
         description: |
-          By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+          By default, iEchor will send only the updated record. If you want to receive the previous values as well you can
           enable full replication for the table you are listening too:
 
           ```sql
@@ -745,7 +745,7 @@ functions:
       - id: listen-to-deletes
         name: Listen to deletes
         description: |
-          By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+          By default, iEchor does not send deleted records. If you want to receive the deleted record you can
           enable full replication for the table you are listening too:
 
           ```sql
@@ -787,7 +787,7 @@ functions:
       Removes an active subscription and returns the number of open connections.
     title: 'removeSubscription()'
     notes: |
-      - Removing subscriptions is a great way to maintain the performance of your project's database. Supabase will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
+      - Removing subscriptions is a great way to maintain the performance of your project's database. iEchor will automatically handle cleanup 30 seconds after a user is disconnected, but unused subscriptions may cause degradation as more users are simultaneously subscribed.
     examples:
       - id: remove-a-subscription
         name: Remove a subscription
@@ -1073,7 +1073,7 @@ functions:
       Retrieve URLs for assets in public buckets
     title: 'from.getPublicUrl()'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [iechor.com/dashboard](https://iechor.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: none

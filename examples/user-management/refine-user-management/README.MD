@@ -1,6 +1,6 @@
-# Supabase refine User Management
+# iEchor refine User Management
 
-This repo is a quick sample of how you can get started building apps using [refine](https://github.com/refinedev/refine) and Supabase: users can sign up with a magic link and then update their account with public profile information, including a profile image.
+This repo is a quick sample of how you can get started building apps using [refine](https://github.com/refinedev/refine) and iEchor: users can sign up with a magic link and then update their account with public profile information, including a profile image.
 
 
 
@@ -32,7 +32,7 @@ npm run build
 
 ### 1. Create new project
 
-Sign up to Supabase - [https://app.supabase.com](https://app.supabase.com) and create a new project. Wait for your database to start.
+Sign up to iEchor - [https://app.iechor.com](https://app.iechor.com) and create a new project. Wait for your database to start.
 
 ### 2. Run "User Management" Quickstart
 
@@ -63,12 +63,12 @@ Populate this file with your URL and Key.
 
 Run the application: `npm run dev`. Open your browser to `https://localhost:5173/` and you are ready to go 🚀.
 
-## Supabase details
+## iEchor details
 
 ### Postgres Row level security
 
 This project uses very high-level Authorization using Postgres' Role Level Security.
-When you start a Postgres database on Supabase, we populate it with an `auth` schema, and some helper functions.
+When you start a Postgres database on iEchor, we populate it with an `auth` schema, and some helper functions.
 When a user logs in, they are issued a JWT with the role `authenticated` and their UUID.
 We can use these details to provide fine-grained control over what each user can and cannot do.
 

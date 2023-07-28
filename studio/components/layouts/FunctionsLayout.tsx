@@ -117,7 +117,7 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
                     >
                       Terminal Instructions
                     </Button>
-                    <Link href="https://supabase.com/docs/guides/functions">
+                    <Link href="https://iechor.com/docs/guides/functions">
                       <a target="_link">
                         <Button
                           type="default"

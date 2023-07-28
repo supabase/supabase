@@ -57,7 +57,7 @@ const CustomerQuotesSection = (props: Props) => {
             <div className="relative w-full flex items-center justify-center h-10">
               <Image
                 src={logo}
-                alt={`Supabase + ${customer.customer}`}
+                alt={`iEchor + ${customer.customer}`}
                 layout="fill"
                 objectFit="contain"
                 objectPosition="center"

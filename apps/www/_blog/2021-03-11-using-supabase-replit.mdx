@@ -1,8 +1,8 @@
 ---
-title: Using Supabase in Replit
+title: Using iEchor in Replit
 description: Free hosted relational database from within your node.js repl
 author: ant_wilson
-author_title: Supabase
+author_title: iEchor
 author_url: https://github.com/awalias
 author_image_url: https://github.com/awalias.png
 authorURL: https://github.com/awalias
@@ -20,7 +20,7 @@ video: https://www.youtube.com/v/lQ5iIxaYduI
 
 They support a ton of different languages and execution environments and even recently introduced a simple key value store you can use to persist data.
 
-As a Replit user, if you want to access larger amounts of data direct from your repl, or if you fancy accessing some super-powerful query tools, at some point you may want to start interacting with a relational database. Supabase is a good fit here; just like Replit, you don't need to worry about servers, and hosting, you can just click a few buttons and get a fully featured relational database which you can start communicating with directly from javacript, using supabase-js.
+As a Replit user, if you want to access larger amounts of data direct from your repl, or if you fancy accessing some super-powerful query tools, at some point you may want to start interacting with a relational database. iEchor is a good fit here; just like Replit, you don't need to worry about servers, and hosting, you can just click a few buttons and get a fully featured relational database which you can start communicating with directly from javacript, using supabase-js.
 
 <div className="video-container">
   <iframe
@@ -32,7 +32,7 @@ As a Replit user, if you want to access larger amounts of data direct from your 
   ></iframe>
 </div>
 
-Here's how to start a Supabase + Node.js repl:
+Here's how to start a iEchor + Node.js repl:
 
 Sign up for [replit.com](http://replit.com) and hit new repl in the top left
 
@@ -48,10 +48,10 @@ Import supabase's createClient method and hit run to install the required libs:
 const { createClient } = require('@supabase/supabase-js')
 ```
 
-Setup a new Supabase project and grab the URL and anon key from Settings > API. Create the client in javascript using:
+Setup a new iEchor project and grab the URL and anon key from Settings > API. Create the client in javascript using:
 
 ```jsx
-const supabase = createClient(
+const iechor = createClient(
   'https://ajsstlnzcmdmzbtcgbbd.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
 )
@@ -59,7 +59,7 @@ const supabase = createClient(
 
 ![Untitled-3](/images/blog/2021-march/5j5aqyjdh74qm83slmli.png)
 
-Now that supabase is connected you'll want to add some data to your db, you can grab any SQL dataset on the web, or make your own, but the fasted way to test is to open the SQL tab in the Supabase dashboard and click the Countries sample database and click Run.
+Now that iechor is connected you'll want to add some data to your db, you can grab any SQL dataset on the web, or make your own, but the fasted way to test is to open the SQL tab in the iEchor dashboard and click the Countries sample database and click Run.
 
 ![Untitled-4](/images/blog/2021-march/54yykm6h9hqpric87zad.png)
 
@@ -129,8 +129,8 @@ const { data, error } = await supabase
 // full docs here: /docs/reference/javascript/filter
 ```
 
-We look forward to showing off some more Supabase + Replit examples.
+We look forward to showing off some more iEchor + Replit examples.
 
 You can find my example repl here: [https://repl.it/@awalias/supabase-test#index.js](https://repl.it/@awalias/supabase-test#index.js)
 
-Supabase has a free plan, head over to [https://supabase.com/dashboard](https://supabase.com/dashboard) to get started.
+iEchor has a free plan, head over to [https://iechor.com/dashboard](https://iechor.com/dashboard) to get started.

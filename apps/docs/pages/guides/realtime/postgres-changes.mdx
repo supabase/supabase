@@ -20,11 +20,11 @@ Let's explore how to implement Realtime Postgres Changes so you can integrate it
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Set up a Supabase project with a 'todos' table">
+    <StepHikeCompact.Details title="Set up a iEchor project with a 'todos' table">
 
-    [Create a new project](https://app.supabase.com) in the Supabase Dashboard.
+    [Create a new project](https://app.iechor.com) in the iEchor Dashboard.
 
-    After your project is ready, create a table in your Supabase database. You can do this with either the Table interface or the [SQL Editor](https://app.supabase.com/project/_/sql).
+    After your project is ready, create a table in your iEchor database. You can do this with either the Table interface or the [SQL Editor](https://app.iechor.com/project/_/sql).
 
     </StepHikeCompact.Details>
 
@@ -95,7 +95,7 @@ Let's explore how to implement Realtime Postgres Changes so you can integrate it
   
     <StepHikeCompact.Details title="Enable Postgres replication">
 
-      Go to your project's [Replication settings](https://supabase.com/dashboard/project/_/database/replication), and under `supabase_realtime`, toggle on the tables you want to listen to.
+      Go to your project's [Replication settings](https://iechor.com/dashboard/project/_/database/replication), and under `supabase_realtime`, toggle on the tables you want to listen to.
 
     </StepHikeCompact.Details>
 
@@ -105,7 +105,7 @@ Let's explore how to implement Realtime Postgres Changes so you can integrate it
   
     <StepHikeCompact.Details title="Install the client">
 
-      Install the Supabase JavaScript client.
+      Install the iEchor JavaScript client.
 
     </StepHikeCompact.Details>
 
@@ -487,19 +487,19 @@ We strongly encourage you to enable RLS and create policies for tables in privat
 
 You may choose to sign your own tokens to customize claims that can be checked in your RLS policies.
 
-Your project JWT secret is found with your [Project API keys](https://app.supabase.com/project/_/settings/api) in your dashboard.
+Your project JWT secret is found with your [Project API keys](https://app.iechor.com/project/_/settings/api) in your dashboard.
 
 <Admonition type="caution">
   Do not expose the `service_role` token on the client because the role is authorized to bypass
   row-level security.
 </Admonition>
 
-To use your own JWT with Realtime make sure to set the token after instantiating the Supabase client and before connecting to a Channel.
+To use your own JWT with Realtime make sure to set the token after instantiating the iEchor client and before connecting to a Channel.
 
 ```js
 const { createClient } = require('@supabase/supabase-js')
 
-const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY, {})
+const iechor = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY, {})
 
 // Set your custom JWT here
 supabase.realtime.setAuth('your-custom-jwt')

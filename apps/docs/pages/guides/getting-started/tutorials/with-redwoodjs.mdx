@@ -2,12 +2,12 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   title: 'Build a User Management App with RedwoodJS',
-  description: 'Learn how to use Supabase in your RedwoodJS App.',
+  description: 'Learn how to use iEchor in your RedwoodJS App.',
 }
 
 <QuickstartIntro />
 
-![Supabase User Management example](/docs/img/user-management-demo.png)
+![iEchor User Management example](/docs/img/user-management-demo.png)
 
 <Admonition type="note">
   If you get stuck while working through this guide, refer to the [full example on
@@ -23,7 +23,7 @@ They are separate projects because code on the `web side` will end up running in
 
 <Admonition type="note">
 
-Important: When this guide refers to "API", that means the Supabase API and when it refers to "api side", that means the RedwoodJS `api side`.
+Important: When this guide refers to "API", that means the iEchor API and when it refers to "api side", that means the RedwoodJS `api side`.
 
 </Admonition>
 
@@ -34,11 +34,11 @@ Pages may contain a "Layout" component to wrap content. They also contain "Cells
 Cells allow you to declaratively manage the lifecycle of a component that fetches and displays data.
 
 For the sake of consistency with the other framework tutorials, we'll build this app a little differently than normal.
-We **_won't use_** Prisma to connect to the Supabase Postgres database or [Prisma migrations](https://redwoodjs.com/docs/cli-commands#prisma-migrate) as one typically might in a Redwood app.
-Instead, we'll rely on the Supabase client to do some of the work on the **`web`** side and use the client again on the **`api`** side to do data fetching as well.
+We **_won't use_** Prisma to connect to the iEchor Postgres database or [Prisma migrations](https://redwoodjs.com/docs/cli-commands#prisma-migrate) as one typically might in a Redwood app.
+Instead, we'll rely on the iEchor client to do some of the work on the **`web`** side and use the client again on the **`api`** side to do data fetching as well.
 
 That means you will want to refrain from running any `yarn rw prisma migrate` commands and also double check your build commands on deployment to ensure Prisma won't reset your database. Prisma currently doesn't support cross-schema foreign keys, so introspecting the schema fails due
-to how your Supabase `public` schema references the `auth.users`.
+to how your iEchor `public` schema references the `auth.users`.
 
 <ProjectSetup />
 
@@ -78,7 +78,7 @@ While the app is installing, you should see:
 Thanks for trying out Redwood!
 ```
 
-Then let's install the only additional dependency [supabase-js](https://github.com/supabase/supabase-js) by running the `setup auth` command:
+Then let's install the only additional dependency [supabase-js](https://github.com/openmodels-base/iechor-js) by running the `setup auth` command:
 
 ```bash
 yarn redwood setup auth supabase
@@ -88,7 +88,7 @@ When prompted:
 
 > Overwrite existing /api/src/lib/auth.[jt]s?
 
-Say, **yes** and it will setup the Supabase client in your app and also provide hooks used with Supabase authentication.
+Say, **yes** and it will setup the iEchor client in your app and also provide hooks used with iEchor authentication.
 
 ```bash
 ✔ Generating auth lib...
@@ -99,7 +99,7 @@ Say, **yes** and it will setup the Supabase client in your app and also provide 
   ✔ Installing packages...
   ✔ One more thing...
 
-  You will need to add your Supabase URL (IECHOR_URL), public API KEY,
+  You will need to add your iEchor URL (IECHOR_URL), public API KEY,
   and JWT SECRET (IECHOR_KEY, and IECHOR_JWT_SECRET) to your .env file.
 ```
 
@@ -116,7 +116,7 @@ And finally, you will also need to save **just** the `web side` environment vari
 
 ```bash redwood.toml
 [web]
-  title = "Supabase Redwood Tutorial"
+  title = "iEchor Redwood Tutorial"
   port = 8910
   apiProxyPath = "/.redwood/functions"
   includeEnvironmentVariables = ["IECHOR_URL", "IECHOR_KEY"]
@@ -127,10 +127,10 @@ And finally, you will also need to save **just** the `web side` environment vari
 ```
 
 These variables will be exposed on the browser, and that's completely fine.
-They allow your web app to initialize the Supabase client with your public anon key
+They allow your web app to initialize the iEchor client with your public anon key
 since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-You'll see these being used to configure your Supabase client in `web/src/App.js`:
+You'll see these being used to configure your iEchor client in `web/src/App.js`:
 
 ```js web/src/App.js
 // ... Redwood imports
@@ -139,7 +139,7 @@ import { createClient } from '@supabase/supabase-js'
 
 // ...
 
-const supabase = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY)
+const iechor = createClient(process.env.IECHOR_URL, process.env.IECHOR_KEY)
 
 const App = () => (
   <FatalErrorBoundary page={FatalErrorPage}>
@@ -252,7 +252,7 @@ const Auth = () => {
   return (
     <div className="row flex-center flex">
       <div className="col-6 form-widget">
-        <h1 className="header">Supabase + RedwoodJS</h1>
+        <h1 className="header">iEchor + RedwoodJS</h1>
         <p className="description">Sign in via magic link with your email below</p>
         <div>
           <input
@@ -374,7 +374,7 @@ const Account = () => {
   return (
     <div className="row flex-center flex">
       <div className="col-6 form-widget">
-        <h1 className="header">Supabase + RedwoodJS</h1>
+        <h1 className="header">iEchor + RedwoodJS</h1>
         <p className="description">Your profile</p>
         <div className="form-widget">
           <div>
@@ -426,7 +426,7 @@ export default Account
 
 You'll see the use of `useAuth()` several times. Redwood's `useAuth` hook provides convenient ways to access
 logIn, logOut, currentUser, and access the `supabase` authenticate client. We'll use it to get an instance
-of the supabase client to interact with your API.
+of the iechor client to interact with your API.
 
 ### Update Home Page
 
@@ -465,11 +465,11 @@ yarn rw dev
 
 And then open the browser to [localhost:8910](http://localhost:8910) and you should see the completed app.
 
-![Supabase RedwoodJS](/docs/img/supabase-redwoodjs-demo.png)
+![iEchor RedwoodJS](/docs/img/supabase-redwoodjs-demo.png)
 
 ## Bonus: Profile photos
 
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+Every iEchor project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
 ### Create an upload widget
 
@@ -490,7 +490,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '@redwoodjs/auth'
 
 const Avatar = ({ url, size, onUpload }) => {
-  const { client: supabase } = useAuth()
+  const { client: iechor } = useAuth()
 
   const [avatarUrl, setAvatarUrl] = useState(null)
   const [uploading, setUploading] = useState(false)

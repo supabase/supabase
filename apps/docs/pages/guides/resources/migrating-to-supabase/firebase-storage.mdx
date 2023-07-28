@@ -3,14 +3,14 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'firebase-storage',
   title: 'Firebase Storage Migration',
-  description: 'Migrate Firebase Storage files to Supabase Storage.',
+  description: 'Migrate Firebase Storage files to iEchor Storage.',
   sidebar_label: 'Firebase Storage',
 }
 
-Supabase provides several [tools](https://github.com/supabase-community/firebase-to-supabase/tree/main/storage) to convert storage files from Firebase Storage to Supabase Storage. Conversion is a two-step process:
+iEchor provides several [tools](https://github.com/supabase-community/firebase-to-supabase/tree/main/storage) to convert storage files from Firebase Storage to iEchor Storage. Conversion is a two-step process:
 
 1. Files are downloaded from a Firebase storage bucket to a local filesystem.
-2. Files are uploaded from the local filesystem to a Supabase storage bucket.
+2. Files are uploaded from the local filesystem to a iEchor storage bucket.
 
 ## Set up the migration tool [#set-up-migration-tool]
 
@@ -21,7 +21,7 @@ git clone https://github.com/supabase-community/firebase-to-supabase.git
 ```
 
 1. In the `/storage` directory, rename [supabase-keys-sample.js](https://github.com/supabase-community/firebase-to-supabase/blob/main/storage/supabase-keys-sample.js) to `supabase-keys.js`.
-1. Go to your Supabase project's [API settings](https://supabase.com/dashboard/project/_/settings/api) in the Dashboard.
+1. Go to your iEchor project's [API settings](https://iechor.com/dashboard/project/_/settings/api) in the Dashboard.
 1. Copy the **Project URL** and update the `IECHOR_URL` value in `supabase-keys.js`.
 1. Under **Project API keys**, copy the **service_role** key and update the `IECHOR_KEY` value in `supabase-keys.js`.
 
@@ -47,7 +47,7 @@ git clone https://github.com/supabase-community/firebase-to-supabase.git
 
 To process in batches using multiple command-line executions, you must use the same parameters with a new `<token>` on subsequent calls. Use the token displayed on the last call to continue the process at a given point.
 
-### Upload files to Supabase Storage bucket [#upload-to-supabase-storage-bucket]
+### Upload files to iEchor Storage bucket [#upload-to-supabase-storage-bucket]
 
 `node upload.js <prefix> <folder> <bucket>`
 
@@ -57,13 +57,13 @@ To process in batches using multiple command-line executions, you must use the s
 
 <Admonition type="note">
 
-If the bucket doesn't exist, it's created as a `non-public` bucket. You must set permissions on this new bucket in the [Supabase Dashboard](https://supabase.com/dashboard/project/_/storage/buckets) before users can download any files.
+If the bucket doesn't exist, it's created as a `non-public` bucket. You must set permissions on this new bucket in the [iEchor Dashboard](https://iechor.com/dashboard/project/_/storage/buckets) before users can download any files.
 
 </Admonition>
 
 ## Resources
 
-- [Supabase vs Firebase](https://supabase.com/alternatives/supabase-vs-firebase)
+- [iEchor vs Firebase](https://iechor.com/alternatives/supabase-vs-firebase)
 - [Firestore Data Migration](/docs/guides/migrations/firestore-data)
 - [Firebase Auth Migration](/docs/guides/migrations/firebase-auth)
 

@@ -14,14 +14,14 @@ image: launch-week-6/pggraphql/og-pg-graphql.png
 thumb: launch-week-6/pggraphql/og-pg-graphql.png
 ---
 
-It's been 4 months since the [1.0.0 release of pg_graphql](https://supabase.com/blog/pg-graphql-v1).
+It's been 4 months since the [1.0.0 release of pg_graphql](https://iechor.com/blog/pg-graphql-v1).
 Since then, we’ve pushed several features to improve the APIs that `pg_graphql` produces.
 
 In this article, we’ll walk through those features and show examples of each.
 
 <div className="bg-gray-300 rounded-lg px-6 py-2 italic">
 
-📢 These features are only available on projects with Postgres version `15.1.0.63` or higher. For help with upgrading, please review the [migrating and upgrading projects guide](https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects).
+📢 These features are only available on projects with Postgres version `15.1.0.63` or higher. For help with upgrading, please review the [migrating and upgrading projects guide](https://iechor.com/docs/guides/platform/migrating-and-upgrading-projects).
 
 </div>
 
@@ -113,7 +113,7 @@ to return all `blog`s where the `name` is `null`.
 
 ### **`like`**, **`ilike`**, and **`startsWith`**
 
-Text filtering options in `pg_graphql` have historically been restricted to equality checks. The hesitation was due to concerns about exposing a default filter that is difficult to index. The combination of [citext](https://www.postgresql.org/docs/current/citext.html) and [PGroonga available on the platform](https://supabase.com/docs/guides/database/extensions/pgroonga) solves those scalability risks and enabled us to expand the `StringFilter` with options for `like` `ilike` and `startsWith`.
+Text filtering options in `pg_graphql` have historically been restricted to equality checks. The hesitation was due to concerns about exposing a default filter that is difficult to index. The combination of [citext](https://www.postgresql.org/docs/current/citext.html) and [PGroonga available on the platform](https://iechor.com/docs/guides/database/extensions/pgroonga) solves those scalability risks and enabled us to expand the `StringFilter` with options for `like` `ilike` and `startsWith`.
 
 ```graphql
 input StringFilter {
@@ -202,6 +202,6 @@ The headline features we aim to launch in coming releases of `pg_graphql` includ
 
 ## More pg_graphql
 
-- [Introducing pg_graphql: A GraphQL extension for PostgreSQL](https://supabase.com/blog/pg-graphql)
-- [GraphQL is now available in Supabase](https://supabase.com/blog/graphql-now-available)
-- [pg_graphql v1.0](https://supabase.com/blog/pg-graphql-v1)
+- [Introducing pg_graphql: A GraphQL extension for PostgreSQL](https://iechor.com/blog/pg-graphql)
+- [GraphQL is now available in iEchor](https://iechor.com/blog/graphql-now-available)
+- [pg_graphql v1.0](https://iechor.com/blog/pg-graphql-v1)

@@ -70,7 +70,7 @@ const TopNavBar: FC = () => {
                   src={isDarkMode ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
                   width={124}
                   height={24}
-                  alt="Supabase Logo"
+                  alt="iEchor Logo"
                 />
               </a>
             </Link>
@@ -127,7 +127,7 @@ const TopNavBar: FC = () => {
         <div className="col-span-4 flex items-center justify-end gap-3">
           <Button type="outline" asChild>
             <a
-              href="https://supabase.com/dashboard"
+              href="https://iechor.com/dashboard"
               className="text-scale-1100 text-sm"
               target="_blank"
               rel="noreferrer noopener"

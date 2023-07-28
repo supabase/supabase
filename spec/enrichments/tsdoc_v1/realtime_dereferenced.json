@@ -13,7 +13,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/realtime-js/src/RealtimeClient.ts",
+      "originalName": "/Users/copple/Projects/iEchor/realtime-js/src/RealtimeClient.ts",
       "children": [
         {
           "id": 228,
@@ -5013,7 +5013,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/realtime-js/src/RealtimeSubscription.ts",
+      "originalName": "/Users/copple/Projects/iEchor/realtime-js/src/RealtimeSubscription.ts",
       "children": [
         {
           "id": 140,
@@ -9384,7 +9384,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/realtime-js/src/index.ts",
+      "originalName": "/Users/copple/Projects/iEchor/realtime-js/src/index.ts",
       "sources": [
         {
           "fileName": "index.ts",
@@ -9401,7 +9401,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/realtime-js/src/lib/constants.ts",
+      "originalName": "/Users/copple/Projects/iEchor/realtime-js/src/lib/constants.ts",
       "children": [
         {
           "id": 15,
@@ -10019,7 +10019,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/realtime-js/src/lib/push.ts",
+      "originalName": "/Users/copple/Projects/iEchor/realtime-js/src/lib/push.ts",
       "children": [
         {
           "id": 74,
@@ -15554,7 +15554,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/realtime-js/src/lib/serializer.ts",
+      "originalName": "/Users/copple/Projects/iEchor/realtime-js/src/lib/serializer.ts",
       "children": [
         {
           "id": 49,
@@ -16020,7 +16020,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/realtime-js/src/lib/timer.ts",
+      "originalName": "/Users/copple/Projects/iEchor/realtime-js/src/lib/timer.ts",
       "children": [
         {
           "id": 35,
@@ -16307,7 +16307,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/realtime-js/src/lib/transformers.ts",
+      "originalName": "/Users/copple/Projects/iEchor/realtime-js/src/lib/transformers.ts",
       "children": [
         {
           "id": 372,
@@ -18246,7 +18246,7 @@
             "isConst": true
           },
           "comment": {
-            "shortText": "Fixes timestamp to be ISO-8601. Swaps the space between the date and time for a 'T'\nSee https://github.com/supabase/supabase/issues/18",
+            "shortText": "Fixes timestamp to be ISO-8601. Swaps the space between the date and time for a 'T'\nSee https://github.com/openmodels-base/iechor/issues/18",
             "tags": [
               {
                 "tag": "example",
@@ -18264,7 +18264,7 @@
                 "isExported": true
               },
               "comment": {
-                "shortText": "Fixes timestamp to be ISO-8601. Swaps the space between the date and time for a 'T'\nSee https://github.com/supabase/supabase/issues/18",
+                "shortText": "Fixes timestamp to be ISO-8601. Swaps the space between the date and time for a 'T'\nSee https://github.com/openmodels-base/iechor/issues/18",
                 "tags": [
                   {
                     "tag": "example",
@@ -18369,7 +18369,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/realtime-js/src/lib/version.ts",
+      "originalName": "/Users/copple/Projects/iEchor/realtime-js/src/lib/version.ts",
       "children": [
         {
           "id": 2,

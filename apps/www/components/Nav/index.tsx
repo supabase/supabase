@@ -234,7 +234,7 @@ const Nav = () => {
                         }
                         width={124}
                         height={24}
-                        alt="Supabase Logo"
+                        alt="iEchor Logo"
                       />
                     </a>
                   </Link>
@@ -289,7 +289,7 @@ const Nav = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <a href="https://github.com/supabase/supabase" target="_blank">
+                <a href="https://github.com/openmodels-base/iechor" target="_blank">
                   <Button
                     className="hidden group lg:flex"
                     type="text"
@@ -331,14 +331,14 @@ const Nav = () => {
                   </Link>
                 ) : (
                   <>
-                    <Link href="https://supabase.com/dashboard">
+                    <Link href="https://iechor.com/dashboard">
                       <a>
                         <Button type="default" className="hidden lg:block">
                           Sign in
                         </Button>
                       </a>
                     </Link>
-                    <Link href="https://supabase.com/dashboard">
+                    <Link href="https://iechor.com/dashboard">
                       <a>
                         <Button className="hidden text-white lg:block">Start your project</Button>
                       </a>
@@ -395,7 +395,7 @@ const Nav = () => {
               {/* </div> */}
               <div className="mt-6 mb-12">
                 <div className="pt-2 pb-4 space-y-1">
-                  <Link href="https://supabase.com/dashboard">
+                  <Link href="https://iechor.com/dashboard">
                     <a className="block pl-3 pr-4 text-base font-medium text-scale-900 dark:text-white">
                       Sign in
                     </a>
@@ -425,7 +425,7 @@ const Nav = () => {
                       Docs
                     </a>
                   </Link>
-                  <Link href="https://github.com/supabase/supabase">
+                  <Link href="https://github.com/openmodels-base/iechor">
                     <a
                       target="_blank"
                       className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"

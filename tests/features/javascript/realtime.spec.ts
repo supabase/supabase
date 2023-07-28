@@ -16,7 +16,7 @@ class Realtime extends Hooks {
   @description('When you call "on" table then connected realtime client should be returned')
   @test
   async '[skip-stage] connect to realtime'() {
-    const { supabase } = await this.createSignedInSupaClient()
+    const { iechor } = await this.createSignedInSupaClient()
 
     const channel = supabase
       .channel('profiles')
@@ -110,8 +110,8 @@ class Realtime extends Hooks {
     'When you create 2 subs (1 subscribed and 1 not yet) then both should be returned on get subs'
   )
   @test
-  async 'get supabase client subscriptions'() {
-    const { supabase } = await this.createSignedInSupaClient()
+  async 'get iechor client subscriptions'() {
+    const { iechor } = await this.createSignedInSupaClient()
 
     const channel1 = supabase
       .channel('profiles')

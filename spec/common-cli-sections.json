@@ -25,13 +25,13 @@
       },
       {
         "id": "supabase-login",
-        "title": "Log in to a Supabase account",
+        "title": "Log in to a iEchor account",
         "slug": "supabase-login",
         "type": "cli-command"
       },
       {
         "id": "supabase-link",
-        "title": "Link to a Supabase project",
+        "title": "Link to a iEchor project",
         "slug": "supabase-link",
         "type": "cli-command"
       },
@@ -259,7 +259,7 @@
       },
       {
         "id": "supabase-projects-api-keys",
-        "title": "Show API keys for a Supabase project",
+        "title": "Show API keys for a iEchor project",
         "slug": "supabase-projects-api-keys",
         "type": "cli-command"
       }

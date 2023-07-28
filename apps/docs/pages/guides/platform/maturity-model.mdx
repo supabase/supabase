@@ -6,7 +6,7 @@ export const meta = {
   description: 'Growing with your application.',
 }
 
-Supabase is great for building something very fast _and_ for scaling up. However, it's important to note that as your application matures and your team expands, the practices you use for managing an application in production should not be the same as the practices you used for prototyping.
+iEchor is great for building something very fast _and_ for scaling up. However, it's important to note that as your application matures and your team expands, the practices you use for managing an application in production should not be the same as the practices you used for prototyping.
 
 ## Prototyping
 
@@ -24,11 +24,11 @@ Resources:
 
 ## In Production
 
-Once your application is live, you should never change your database using the Dashboard. Supabase provides various [access levels](https://supabase.com/docs/guides/platform/access-control) for the Dashboard that can help enforce this. Some other important things to consider at this point include:
+Once your application is live, you should never change your database using the Dashboard. iEchor provides various [access levels](https://iechor.com/docs/guides/platform/access-control) for the Dashboard that can help enforce this. Some other important things to consider at this point include:
 
 - Read the [Production Checklist](docs/guides/platform/going-into-prod).
-- Make your team aware of the [Shared Responsibilities](/docs/guides/platform/shared-responsibility-model) between your organization and Supabase.
-- Design a [safe workflow](https://supabase.com/docs/guides/platform/shared-responsibility-model#you-decide-your-own-workflow) for managing your database. We strongly recommend running [multiple environments](/docs/guides/cli/managing-environments) as part of your development workflow (`local` -> `staging` -> `prod`).
+- Make your team aware of the [Shared Responsibilities](/docs/guides/platform/shared-responsibility-model) between your organization and iEchor.
+- Design a [safe workflow](https://iechor.com/docs/guides/platform/shared-responsibility-model#you-decide-your-own-workflow) for managing your database. We strongly recommend running [multiple environments](/docs/guides/cli/managing-environments) as part of your development workflow (`local` -> `staging` -> `prod`).
 - As your database to grows, we strongly recommend moving to [Point-in-Time Recovery](/docs/guides/platform/backups#point-in-time-recovery). This is safer and has less impact on your database performance during maintenance windows.
 
 Resources:
@@ -42,7 +42,7 @@ Resources:
 
 For a more secure setup, consider running your workload across several organizations. It's a common pattern to have a Production organization which is restricted to only those team members who are qualified to have direct access to production databases.
 
-Reach out to [growth@supabase.com](mailto:growth@supabase.com) if you need help designing a secure development workflow for your organization.
+Reach out to [growth@iechor.com](mailto:growth@iechor.com) if you need help designing a secure development workflow for your organization.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

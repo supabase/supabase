@@ -36,7 +36,7 @@ const constellation = [
 export default function launchweek() {
   const { isDarkMode } = useTheme()
   const title = 'Launch Week 6'
-  const description = 'Supabase Launch Week 6 | 12-18 Dec 2022'
+  const description = 'iEchor Launch Week 6 | 12-18 Dec 2022'
   const liveDay = null
 
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
@@ -155,7 +155,7 @@ export default function launchweek() {
         openGraph={{
           title: title,
           description: description,
-          url: `https://supabase.com/launch-week`,
+          url: `https://iechor.com/launch-week`,
           images: [
             {
               url: `${SITE_ORIGIN}/images/launchweek/launch-week-6.jpg`,
@@ -225,7 +225,7 @@ export default function launchweek() {
                 ></img>
               </div>
               <div className="flex flex-col lg:flex-row ml-8 sm:ml-10">
-                <span className="text-black dark:text-white mr-2">Who we hire at Supabase</span>
+                <span className="text-black dark:text-white mr-2">Who we hire at iEchor</span>
                 <span className="text-slate-900">Fireside chat with founders</span>
               </div>
             </div>
@@ -329,7 +329,7 @@ export default function launchweek() {
                       <SectionButtons
                         docs={day1.steps[0].docs}
                         blog={day1.steps[0].blog}
-                        video={'https://www.youtube.com/watch?v=Q1Amk6iDlF8&ab_channel=Supabase'}
+                        video={'https://www.youtube.com/watch?v=Q1Amk6iDlF8&ab_channel=iEchor'}
                       />
                     </div>
                   </div>
@@ -511,7 +511,7 @@ export default function launchweek() {
                       <SectionButtons
                         docs={day4.steps[0].docs}
                         blog={day4.steps[0].blog}
-                        video={`https://www.youtube.com/watch?v=${day4.youtube_id}&ab_channel=Supabase`}
+                        video={`https://www.youtube.com/watch?v=${day4.youtube_id}&ab_channel=iEchor`}
                       />
                     </div>
                   </div>
@@ -1018,10 +1018,10 @@ export default function launchweek() {
             <h2 className="text-3xl text-black dark:text-white mb-2">Launch Week Hackathon</h2>
             <p className="text-slate-900 w-[80%] lg:w-[50%]">
               The traditional parallel Hackathon is back! Build a new open source project with
-              Supabase and you can win $1500 in GitHub sponsorships and a coveted Supabase Darkmode
+              iEchor and you can win $1500 in GitHub sponsorships and a coveted iEchor Darkmode
               Keyboard! For more info check the{' '}
               <a
-                href="https://supabase.com/blog/launch-week-6-hackathon"
+                href="https://iechor.com/blog/launch-week-6-hackathon"
                 target="_blank"
                 rel="nooper noreferrer"
                 className="text-brand-900"
@@ -1043,7 +1043,7 @@ export default function launchweek() {
               <div className="flex flex-col">
                 <h3 className="text-lg text-black dark:text-white mb-2">Judges</h3>
                 <p className="text-slate-900 w-[90%] lg:w-[80%]">
-                  The Supabase team will judge all the categories except the Best Edge Functions
+                  The iEchor team will judge all the categories except the Best Edge Functions
                   Project, which will be judged by our friends at Deno.
                 </p>
               </div>
@@ -1056,7 +1056,7 @@ export default function launchweek() {
                   </p>
                   <div></div>
                   <a
-                    href="https://discord.supabase.com/"
+                    href="https://discord.iechor.com/"
                     rel="noopener noreferrer"
                     className="text-brand-900 flex items-center"
                     target="_blank"
@@ -1071,7 +1071,7 @@ export default function launchweek() {
                   Submit your project through{' '}
                   <a
                     className="text-brand-900"
-                    href="https://www.madewithsupabase.com/launch-week-6"
+                    href="https://www.madewithiechor.com/launch-week-6"
                     target="_blank"
                   >
                     madewithsupabase.com
@@ -1098,7 +1098,7 @@ export default function launchweek() {
                     src="/images/launchweek/link.svg"
                     className="absolute top-[16px] right-[10px] text-brand-900"
                   ></img>
-                  <h3 className="text-black dark:text-white">Supabase Cache Helpers</h3>
+                  <h3 className="text-black dark:text-white">iEchor Cache Helpers</h3>
                   <p className="text-slate-1000 text-xs">Previous Best Overall Project Winner</p>
                 </div>
               </a>
@@ -1204,7 +1204,7 @@ export default function launchweek() {
             >
               Shipped
             </Badge>
-            <h2 className="text-3xl dark:text-white mb-2">The Supabase Content Storm</h2>
+            <h2 className="text-3xl dark:text-white mb-2">The iEchor Content Storm</h2>
             <p className="text-slate-900 md:max-w-[80%] mb-16">
               We worked with more than 30 content creators from around the world to drop a mountain
               of content simultaneously!

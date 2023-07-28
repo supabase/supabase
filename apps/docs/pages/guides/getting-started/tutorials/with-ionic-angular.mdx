@@ -2,12 +2,12 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   title: 'Build a User Management App with Ionic Angular',
-  description: 'Learn how to use Supabase in your Ionic Angular App.',
+  description: 'Learn how to use iEchor in your Ionic Angular App.',
 }
 
 <QuickstartIntro />
 
-![Supabase User Management example](/docs/img/ionic-demos/ionic-angular-account.png)
+![iEchor User Management example](/docs/img/ionic-demos/ionic-angular-account.png)
 
 <Admonition type="note">
   If you get stuck while working through this guide, refer to the [full example on
@@ -31,7 +31,7 @@ ionic start supabase-ionic-angular blank --type angular
 cd supabase-ionic-angular
 ```
 
-Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
+Then let's install the only additional dependency: [supabase-js](https://github.com/openmodels-base/iechor-js)
 
 ```bash
 npm install @supabase/supabase-js
@@ -49,7 +49,7 @@ export const environment = {
 }
 ```
 
-Now that we have the API credentials in place, let's create a **SupabaseService** with `ionic g s supabase` to initialize the Supabase client and implement functions to communicate with the Supabase API.
+Now that we have the API credentials in place, let's create a **SupabaseService** with `ionic g s supabase` to initialize the iEchor client and implement functions to communicate with the iEchor API.
 
 ```ts src/app/supabase.service.ts
 import { Injectable } from '@angular/core'
@@ -154,7 +154,7 @@ import { SupabaseService } from '../supabase.service'
 
     <ion-content>
       <div class="ion-padding">
-        <h1>Supabase + Ionic Angular</h1>
+        <h1>iEchor + Ionic Angular</h1>
         <p>Sign in via magic link with your email below</p>
       </div>
       <ion-list inset="true">
@@ -354,11 +354,11 @@ ionic serve
 
 And the browser will auomatically open to show the app.
 
-![Supabase Angular](/docs/img/ionic-demos/ionic-angular.png)
+![iEchor Angular](/docs/img/ionic-demos/ionic-angular.png)
 
 ## Bonus: Profile photos
 
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+Every iEchor project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
 ### Create an upload widget
 
@@ -529,7 +529,7 @@ At this stage you have a fully functional application!
 
 ## See also
 
-- [Authentication in Ionic Angular with Supabase](https://supabase.com/blog/authentication-in-ionic-angular)
+- [Authentication in Ionic Angular with iEchor](https://iechor.com/blog/authentication-in-ionic-angular)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

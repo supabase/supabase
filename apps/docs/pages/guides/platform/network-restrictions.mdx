@@ -8,17 +8,17 @@ export const meta = {
 
 <Admonition type="note">
 
-Network Restrictions is currently in beta and is slowly being made available to all projects. [Contact support](https://supabase.com/dashboard/support/new) if you'd like to request early access.
+Network Restrictions is currently in beta and is slowly being made available to all projects. [Contact support](https://iechor.com/dashboard/support/new) if you'd like to request early access.
 
 </Admonition>
 
-Each Supabase project comes with configurable restrictions on the IP ranges that are allowed to connect to Postgres and PgBouncer ("your database"). These restrictions are enforced before traffic reaches your database. If a connection is not restricted by IP, it still needs to authenticate successfully with valid database credentials.
+Each iEchor project comes with configurable restrictions on the IP ranges that are allowed to connect to Postgres and PgBouncer ("your database"). These restrictions are enforced before traffic reaches your database. If a connection is not restricted by IP, it still needs to authenticate successfully with valid database credentials.
 
 To get started:
 
-1. [Install](/docs/guides/cli) the Supabase CLI 1.22.0+.
-1. [Log in](/docs/guides/getting-started/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
-1. If your project was created before 23rd December 2022, it will need to be [upgraded to the latest Supabase version](/docs/guides/platform/migrating-and-upgrading-projects) before Network Restrictions can be used.
+1. [Install](/docs/guides/cli) the iEchor CLI 1.22.0+.
+1. [Log in](/docs/guides/getting-started/local-development#log-in-to-the-supabase-cli) to your iEchor account using the CLI.
+1. If your project was created before 23rd December 2022, it will need to be [upgraded to the latest iEchor version](/docs/guides/platform/migrating-and-upgrading-projects) before Network Restrictions can be used.
 1. Ensure that you have [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project that you are enabling network restrictions.
 
 ## Check restrictions
@@ -28,7 +28,7 @@ You can use the `get` subcommand of the CLI to retrieve the restrictions current
 If restrictions have been applied, the output of the `get` command will reflect the IP ranges allowed to connect:
 
 ```bash
-> supabase network-restrictions --project-ref {ref} get --experimental
+> iechor network-restrictions --project-ref {ref} get --experimental
 DB Allowed CIDRs: [128.12.1.1/16 183.12.1.1/24]
 Restrictions applied successfully: true
 ```
@@ -36,7 +36,7 @@ Restrictions applied successfully: true
 If restrictions have never been applied to your project, the list of allowed CIDRs will be empty, but they will also not have been applied ("Restrictions applied successfully: false"). As a result, all IPs are allowed to connect to your database:
 
 ```bash
-> supabase network-restrictions --project-ref {ref} get --experimental
+> iechor network-restrictions --project-ref {ref} get --experimental
 DB Allowed CIDRs: []
 Restrictions applied successfully: false
 ```
@@ -46,7 +46,7 @@ Restrictions applied successfully: false
 The `update` subcommand is used to apply network restrictions to your project:
 
 ```bash
-> supabase network-restrictions --project-ref {ref} update --db-allow-cidr 128.12.1.1/16 --db-allow-cidr 183.12.1.1/24 --experimental
+> iechor network-restrictions --project-ref {ref} update --db-allow-cidr 128.12.1.1/16 --db-allow-cidr 183.12.1.1/24 --experimental
 DB Allowed CIDRs: [128.12.1.1/16 183.12.1.1/24]
 Restrictions applied successfully: true
 ```
@@ -59,7 +59,7 @@ To add to the existing restrictions, you must include the existing restrictions 
 To remove all restrictions on your project, you can use the `update` subcommand with the CIDR `0.0.0.0/0`:
 
 ```bash
-> supabase network-restrictions --project-ref {ref} update --db-allow-cidr 0.0.0.0/0 --experimental
+> iechor network-restrictions --project-ref {ref} update --db-allow-cidr 0.0.0.0/0 --experimental
 DB Allowed CIDRs: [0.0.0.0/0]
 Restrictions applied successfully: true
 ```

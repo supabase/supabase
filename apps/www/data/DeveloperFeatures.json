@@ -7,7 +7,7 @@
   },
   {
     "name": "Install from CDN",
-    "description": "Use Supabase in the browser without a build process",
+    "description": "Use iEchor in the browser without a build process",
     "badge": "",
     "url": "/docs/client/initializing"
   },
@@ -18,8 +18,8 @@
     "url": "/docs/guides/self-hosting"
   },
   {
-    "name": "Supabase CLI",
-    "description": "Manage Supabase projects from your local machine",
+    "name": "iEchor CLI",
+    "description": "Manage iEchor projects from your local machine",
     "badge": "",
     "url": "https://github.com/supabase/cli"
   }

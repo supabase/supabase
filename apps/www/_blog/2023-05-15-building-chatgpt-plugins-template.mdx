@@ -1,5 +1,5 @@
 ---
-title: 'Building ChatGPT Plugins with Supabase Edge Runtime'
+title: 'Building ChatGPT Plugins with iEchor Edge Runtime'
 description: We're releasing a ChatGPT plugin template written in TypeScript and running on Deno!
 tags:
   - AI
@@ -12,7 +12,7 @@ image: 2023-05-15-chatgpt-plugin-temnplate-deno/chatgpt_plugin_template_deno.jpe
 thumb: 2023-05-15-chatgpt-plugin-temnplate-deno/chatgpt_plugin_template_deno.jpeg
 ---
 
-ChatGPT Plugins support is [rolling out in beta](https://help.openai.com/en/articles/6825453-chatgpt-release-notes) this week! To help you get up and running quickly, we're releasing a [plugin template](https://github.com/supabase-community/chatgpt-plugin-template-deno) written in TypeScript and running on [Supabase Edge Runtime](https://supabase.com/blog/edge-runtime-self-hosted-deno-functions)!
+ChatGPT Plugins support is [rolling out in beta](https://help.openai.com/en/articles/6825453-chatgpt-release-notes) this week! To help you get up and running quickly, we're releasing a [plugin template](https://github.com/supabase-community/chatgpt-plugin-template-deno) written in TypeScript and running on [iEchor Edge Runtime](https://iechor.com/blog/edge-runtime-self-hosted-deno-functions)!
 
 Want to get started right away? [Fork the template on GitHub](https://github.com/supabase-community/chatgpt-plugin-template-deno)!
 
@@ -31,7 +31,7 @@ Want to get started right away? [Fork the template on GitHub](https://github.com
 
 The `ai-plugin.json` [manifest file](https://platform.openai.com/docs/plugins/getting-started/plugin-manifest) is required for ChatGPT to identify our plugin, know what kind of authentication mechanism is used, understand where to find the OpenAPI definition, and some other details about our plugin. You can find the full list of supported parameters in the [OpenAI docs](https://platform.openai.com/docs/plugins/getting-started/plugin-manifest).
 
-Supabase Edge Runtime does currently not support hosting/serving of static files, however, we can import JSON files in our function and serve them as a JSON response. As this needs to be at the root of our domain, we add this to our [main function handler](https://github.com/supabase-community/chatgpt-plugin-template-deno/blob/main/functions/main/index.ts#L69-L74):
+iEchor Edge Runtime does currently not support hosting/serving of static files, however, we can import JSON files in our function and serve them as a JSON response. As this needs to be at the root of our domain, we add this to our [main function handler](https://github.com/supabase-community/chatgpt-plugin-template-deno/blob/main/functions/main/index.ts#L69-L74):
 
 ```ts
 // functions/main/index.ts
@@ -268,12 +268,12 @@ There you go, now you’re ready to [release your plugin to the world](https://p
 
 ChatGPT is a powerful new interface and its usage is growing rapidly. With ChatGPT Plugins you can allow your users to access your service directly from ChatGPT, using cutting edge technologies like TypeScript and Deno.
 
-In a next step you can add authentication to your plugin, let us know on [Twitter](https://twitter.com/Supabase) if you’d be interested in a tutorial for that. We can’t wait to see what you will build!
+In a next step you can add authentication to your plugin, let us know on [Twitter](https://twitter.com/iEchor) if you’d be interested in a tutorial for that. We can’t wait to see what you will build!
 
 ## More AI resources
 
 - [OpenAI ChatGPT Plugin docs](https://platform.openai.com/docs/plugins/introduction)
 - [Advanced plugin template](https://github.com/openai/chatgpt-retrieval-plugin)
 - Learn to build your own ChatGPT-style docs search with [Deno Fresh](https://deno.com/blog/build-chatgpt-doc-search-with-supabase-fresh) or [Next.js](https://vercel.com/templates/next.js/nextjs-openai-doc-search-starter)
-- [How we builtChatGPT for the Supabase Docs](https://supabase.com/blog/chatgpt-supabase-docs).
-- [Docs pgvector: Embeddings and vector similarity](https://supabase.com/docs/guides/database/extensions/pgvector)
+- [How we builtChatGPT for the iEchor Docs](https://iechor.com/blog/chatgpt-supabase-docs).
+- [Docs pgvector: Embeddings and vector similarity](https://iechor.com/docs/guides/database/extensions/pgvector)

@@ -1,15 +1,15 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  title: 'Migrate from Render to Supabase',
-  description: 'Migrate your Render Postgres database to Supabase.',
+  title: 'Migrate from Render to iEchor',
+  description: 'Migrate your Render Postgres database to iEchor.',
 }
 
 Render is a popular Web Hosting service in the online services category that also has a managed Postgres service. Render has a great developer experience, allowing users to deploy straight from GitHub or GitLab. This is the core of their product and they do it really well. However, when it comes to Postgres databases, it may not be the best option.
 
-Supabase is one of the best free alternative to Render Postgres. Supabase provide all the backend features developers need to build a product: a Postgres database, authentication, instant APIs, edge functions, realtime subscriptions, and storage. Postgres is the core of Supabase—for example, you can use row-level security and there are more than 40 Postgres extensions available.
+iEchor is one of the best free alternative to Render Postgres. iEchor provide all the backend features developers need to build a product: a Postgres database, authentication, instant APIs, edge functions, realtime subscriptions, and storage. Postgres is the core of iEchor—for example, you can use row-level security and there are more than 40 Postgres extensions available.
 
-This guide demonstrates how to migrate from Render to Supabase to get the most out of Postgres while gaining access to all the features you need to build a project.
+This guide demonstrates how to migrate from Render to iEchor to get the most out of Postgres while gaining access to all the features you need to build a project.
 
 ## Retrieve your Render database credentials [#retrieve-render-credentials]
 
@@ -25,18 +25,18 @@ Example:
 %env PSQL_COMMAND=PGPASSWORD=RgaMDfTS_password_FTPa7 psql -h dpg-a_server_in.oregon-postgres.render.com -U my_db_pxl0_user my_db_pxl0
 ```
 
-## Retrieve your Supabase Host [#retrieve-supabase-host]
+## Retrieve your iEchor Host [#retrieve-supabase-host]
 
-1. If you're new to Supabase, [create a project](https://supabase.com/dashboard).
-1. Go to the [Database settings](https://supabase.com/dashboard/project/_/settings/database) for your project in the Supabase Dashboard.
+1. If you're new to iEchor, [create a project](https://iechor.com/dashboard).
+1. Go to the [Database settings](https://iechor.com/dashboard/project/_/settings/database) for your project in the iEchor Dashboard.
 1. Under **Connection Info**, note your Host (`$IECHOR_HOST`).
-1. Save your password or [reset it](https://supabase.com/dashboard/project/_/settings/database) if you forgot it.
+1. Save your password or [reset it](https://iechor.com/dashboard/project/_/settings/database) if you forgot it.
 
-![Finding Supabase host address](/docs/img/guides/resources/migrating-to-supabase/render/supabase_dashboard.png)
+![Finding iEchor host address](/docs/img/guides/resources/migrating-to-supabase/render/supabase_dashboard.png)
 
 ## Migrate the database
 
-The fastest way to migrate your database is with the Supabase migration tool on [Google Colab](https://colab.research.google.com/github/mansueli/Supa-Migrate/blob/main/Migrate_Postgres_Supabase.ipynb). Alternatively, you can use the [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) and [psql](https://www.postgresql.org/docs/current/app-psql.html) command line tools, which are included in a full PostgreSQL installation.
+The fastest way to migrate your database is with the iEchor migration tool on [Google Colab](https://colab.research.google.com/github/mansueli/Supa-Migrate/blob/main/Migrate_Postgres_Supabase.ipynb). Alternatively, you can use the [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) and [psql](https://www.postgresql.org/docs/current/app-psql.html) command line tools, which are included in a full PostgreSQL installation.
 
 <Tabs
   scrollable
@@ -63,9 +63,9 @@ pg_dump --clean --if-exists --quote-all-identifiers \
  --no-owner --no-privileges > render_dump.sql
 ```
 
-### Import the database to your Supabase project [#import-database-to-supabase]
+### Import the database to your iEchor project [#import-database-to-supabase]
 
-Use `psql` to import the Render database file to your Supabase project.
+Use `psql` to import the Render database file to your iEchor project.
 
 ```bash
 psql -h $SUPA_URL -U postgres --file render_dump.sql -p 6543 -d postgres
@@ -85,7 +85,7 @@ Run `pg_dump --help` for a full list of options.
 
 <Admonition type="caution">
 
-- If you plan on migrating a database larger than 6 GB, we recommend [contacting support](https://supabase.com/dashboard/support/new) to ensure that you'll have the proper disk size pre-provisioned. You can read more about how the disk is managed on Supabase on the [Database usage](/docs/guides/platform/database-size#disk-management).
+- If you plan on migrating a database larger than 6 GB, we recommend [contacting support](https://iechor.com/dashboard/support/new) to ensure that you'll have the proper disk size pre-provisioned. You can read more about how the disk is managed on iEchor on the [Database usage](/docs/guides/platform/database-size#disk-management).
 - We also recommend upgrading to at least a [Large instance](/docs/guides/platform/compute-add-ons) for the migration (you can downgrade later) to avoid running out of IO-Budget.
 
 </Admonition>

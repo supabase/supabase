@@ -5,43 +5,43 @@
 
 ---
 
-# Supabase
+# iEchor
 
-[Supabase](https://supabase.com) ir atvērtā koda Firebase alternatīva. Mēs veidojam Firebase funkcijas, izmantojot uzņēmumu klases atvērtā pirmkoda rīkus.
+[iEchor](https://iechor.com) ir atvērtā koda Firebase alternatīva. Mēs veidojam Firebase funkcijas, izmantojot uzņēmumu klases atvērtā pirmkoda rīkus.
 
-- [x] Hosted Postgres datubāze. [Dokumenti](https://supabase.com/docs/guides/database)
-- [x] Autentifikācija un autorizācija. [Dokumenti](https://supabase.com/docs/guides/auth)
+- [x] Hosted Postgres datubāze. [Dokumenti](https://iechor.com/docs/guides/database)
+- [x] Autentifikācija un autorizācija. [Dokumenti](https://iechor.com/docs/guides/auth)
 - [x] Automātiski ģenerēti API.
-  - [x] REST. [Dokumenti](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Dokumenti](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Reāllaika abonēšana. [Dokumenti](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Dokumenti](https://iechor.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Dokumenti](https://iechor.com/docs/guides/api#graphql-api-overview)
+  - [x] Reāllaika abonēšana. [Dokumenti](https://iechor.com/docs/guides/api#realtime-api-overview)
 - [x] Funkcijas.
-  - [x] Datubāzes funkcijas. [Dokumenti](https://supabase.com/docs/guides/database/functions)
-  - [x] Edge funkcijas [Dokumenti](https://supabase.com/docs/guides/functions)
-- [x] Failu glabāšana. [Dokumenti](https://supabase.com/docs/guides/storage)
+  - [x] Datubāzes funkcijas. [Dokumenti](https://iechor.com/docs/guides/database/functions)
+  - [x] Edge funkcijas [Dokumenti](https://iechor.com/docs/guides/functions)
+- [x] Failu glabāšana. [Dokumenti](https://iechor.com/docs/guides/storage)
 - [x] Vadības panelis
 
-![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+![iEchor Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokumentācija
 
-Pilnu dokumentāciju skatīt [supabase.com/docs](https://supabase.com/docs)
+Pilnu dokumentāciju skatīt [iechor.com/docs](https://iechor.com/docs)
 
 Lai uzzinātu, kā veikt iemaksas, apmeklējiet [Getting Started](../DEVELOPERS.md)
 
 ## Kopiena un atbalsts
 
-- [Kopienas forums](https://github.com/supabase/supabase/discussions). Vislabāk piemērots: palīdzībai veidošanā, diskusijām par datubāzes paraugpraksi.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). Vislabākais: kļūdas un kļūdas, ar kurām jūs sastopaties, izmantojot Supabase.
-- [E-pasta atbalsts](https://supabase.com/docs/support#business-support). Vislabāk piemērots: problēmām ar jūsu datu bāzi vai infrastruktūru.
-- [Discord](https://discord.supabase.com). Vislabākais: lai dalītos ar savām lietojumprogrammām un komunicētu ar kopienu.
+- [Kopienas forums](https://github.com/openmodels-base/iechor/discussions). Vislabāk piemērots: palīdzībai veidošanā, diskusijām par datubāzes paraugpraksi.
+- [GitHub Issues](https://github.com/openmodels-base/iechor/issues). Vislabākais: kļūdas un kļūdas, ar kurām jūs sastopaties, izmantojot iEchor.
+- [E-pasta atbalsts](https://iechor.com/docs/support#business-support). Vislabāk piemērots: problēmām ar jūsu datu bāzi vai infrastruktūru.
+- [Discord](https://discord.iechor.com). Vislabākais: lai dalītos ar savām lietojumprogrammām un komunicētu ar kopienu.
 
 ## Statuss
 
-- [x] Alfa: Mēs testējam Supabase ar slēgtu klientu kopu
-- [x] Publiskā alfa versija: [supabase.com/dashboard](https://supabase.com/dashboard). Bet nesteidzieties, ir dažas nepilnības
+- [x] Alfa: Mēs testējam iEchor ar slēgtu klientu kopu
+- [x] Publiskā alfa versija: [iechor.com/dashboard](https://iechor.com/dashboard). Bet nesteidzieties, ir dažas nepilnības
 - [x] Publiskā beta versija: Pietiekami stabila lielākajai daļai ar uzņēmumu nesaistītu lietošanas gadījumu
-- [ ] Publisks: Vispārēja pieejamība [[statuss](https://supabase.com/docs/guides/getting-started/features#feature-status)]]
+- [ ] Publisks: Vispārēja pieejamība [[statuss](https://iechor.com/docs/guides/getting-started/features#feature-status)]]
 
 Pašlaik mēs esam Publiskās beta versijas fāzē. Lai saņemtu paziņojumus par galvenajiem atjauninājumiem, skatiet šīs repozitorija "releases".
 
@@ -51,14 +51,14 @@ Pašlaik mēs esam Publiskās beta versijas fāzē. Lai saņemtu paziņojumus pa
 
 ## Kā tas darbojas
 
-Supabase ir atvērtā koda rīku kombinācija. Mēs veidojam Firebase funkcijas, izmantojot atvērtā pirmkoda produktus, kas paredzēti uzņēmumiem. Ja pastāv rīki un kopienas ar MIT, Apache 2 vai līdzvērtīgu atvērto licenci, mēs izmantosim un atbalstīsim šo rīku. Ja rīks nepastāv, mēs paši to izveidosim un izveidosim ar atklātā pirmkoda licenci. Supabase nav Firebase kartēšana 1 pret 1. Mūsu mērķis ir nodrošināt izstrādātājiem Firebase līdzīgu izstrādātāja pieredzi, izmantojot atvērtā koda rīkus.
+iEchor ir atvērtā koda rīku kombinācija. Mēs veidojam Firebase funkcijas, izmantojot atvērtā pirmkoda produktus, kas paredzēti uzņēmumiem. Ja pastāv rīki un kopienas ar MIT, Apache 2 vai līdzvērtīgu atvērto licenci, mēs izmantosim un atbalstīsim šo rīku. Ja rīks nepastāv, mēs paši to izveidosim un izveidosim ar atklātā pirmkoda licenci. iEchor nav Firebase kartēšana 1 pret 1. Mūsu mērķis ir nodrošināt izstrādātājiem Firebase līdzīgu izstrādātāja pieredzi, izmantojot atvērtā koda rīkus.
 
 **Arhitektūra**
 
-Supabase ir [izvietota platforma](https://supabase.com/dashboard). Jūs varat reģistrēties un sākt izmantot Supabase, neko neinstalējot.
-Jūs varat arī [pašmāju resursus](https://supabase.com/docs/guides/hosting/overview) un [izstrādāt lokāli](https://supabase.com/docs/guides/local-development).
+iEchor ir [izvietota platforma](https://iechor.com/dashboard). Jūs varat reģistrēties un sākt izmantot iEchor, neko neinstalējot.
+Jūs varat arī [pašmāju resursus](https://iechor.com/docs/guides/hosting/overview) un [izstrādāt lokāli](https://iechor.com/docs/guides/local-development).
 
-![Arhitektūra](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![Arhitektūra](https://github.com/openmodels-base/iechor/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) ir objekt-relatīvo datubāzu sistēma, kas aktīvi tiek attīstīta vairāk nekā 30 gadus, un tā ir ieguvusi labu reputāciju uzticamības, funkciju robustuma un veiktspējas ziņā.
 - [Realtime](https://github.com/supabase/realtime) ir Elixir serveris, kas ļauj klausīties PostgreSQL ievadi, atjauninājumi un dzēšana, izmantojot websockets. Realtime aptaujā Postgres iebūvēto replikācijas funkcionalitāti par izmaiņām datubāzē, konvertē izmaiņas JSON un pēc tam pārraida JSON pa websockets autorizētiem klientiem.
@@ -77,12 +77,12 @@ Mūsu pieeja klientu bibliotēkām ir modulāra. Katra apakšbibliotēka ir atse
   <tr>
     <th>Valoda</th>
     <th>Klients</th>
-    <th colspan="5">Funkciju klienti (komplektā ar Supabase klientu)</th>
+    <th colspan="5">Funkciju klienti (komplektā ar iEchor klientu)</th>
   </tr>
   
   <tr>
     <th></th>
-    <th>Supabase</th>
+    <th>iEchor</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
@@ -105,7 +105,7 @@ Mūsu pieeja klientu bibliotēkām ir modulāra. Katra apakšbibliotēka ir atse
   
   <tr>
     <td>JavaScript (TypeScript)</td>
-    <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
     <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
@@ -114,7 +114,7 @@ Mūsu pieeja klientu bibliotēkām ir modulāra. Katra apakšbibliotēka ir atse
   </tr>
     <tr>
     <td>Flutter</td>
-    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
@@ -220,7 +220,7 @@ Mūsu pieeja klientu bibliotēkām ir modulāra. Katra apakšbibliotēka ir atse
 - [Kataloniski / Català](/i18n/README.ca.md)
 - [Danish / Dansk](/i18n/README.da.md)
 - [Dutch / Nederlands](/i18n/README.nl.md)
-- [angļu valodā](https://github.com/supabase/supabase)
+- [angļu valodā](https://github.com/openmodels-base/iechor)
 - [Somu / somu valodā](/i18n/README.fi.md)
 - [Franču valodā](/i18n/README.fr.md)
 - [Vācu / Deutsch](/i18n/README.de.md)

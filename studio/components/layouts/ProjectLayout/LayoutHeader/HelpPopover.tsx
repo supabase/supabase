@@ -33,28 +33,28 @@ const HelpPopover: FC<Props> = () => {
           <div className="my-5 space-y-4 px-5">
             <h5 className="text-scale-1200">Need help with your project?</h5>
             <p className="text-sm text-scale-900">
-              For issues with your project hosted on supabase.com, or other inquiries about our
+              For issues with your project hosted on iechor.com, or other inquiries about our
               hosted services.
             </p>
             <div className="space-x-1">
-              <Link passHref href="https://supabase.com/docs/guides/platform/troubleshooting">
+              <Link passHref href="https://iechor.com/docs/guides/platform/troubleshooting">
                 <Button asChild type="default" icon={<IconTool />}>
                   <a target="_blank" rel="noreferrer">
                     Troubleshooting
                   </a>
                 </Button>
               </Link>
-              <Link passHref href="https://supabase.com/docs/">
+              <Link passHref href="https://iechor.com/docs/">
                 <Button asChild type="text" size="tiny" icon={<IconBookOpen />}>
                   <a target="_blank" rel="noreferrer">
                     Docs
                   </a>
                 </Button>
               </Link>
-              <Link passHref href="https://status.supabase.com/">
+              <Link passHref href="https://status.iechor.com/">
                 <Button asChild type="text" size="tiny" icon={<IconActivity />}>
                   <a target="_blank" rel="noreferrer">
-                    Supabase Status
+                    iEchor Status
                   </a>
                 </Button>
               </Link>
@@ -87,7 +87,7 @@ const HelpPopover: FC<Props> = () => {
                 style={{ background: '#404EED' }}
               >
                 <a
-                  href="https://discord.supabase.com"
+                  href="https://discord.iechor.com"
                   target="_blank"
                   rel="noreferrer"
                   className="dark block cursor-pointer"
@@ -113,7 +113,7 @@ const HelpPopover: FC<Props> = () => {
             <div className="px-5">
               <div className="relative space-y-2 overflow-hidden rounded px-5 py-4 pb-12 shadow-md">
                 <a
-                  href="https://github.com/supabase/supabase/discussions"
+                  href="https://github.com/openmodels-base/iechor/discussions"
                   target="_blank"
                   rel="noreferrer"
                   className="block cursor-pointer"

@@ -123,7 +123,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                 >
                   <AiIcon />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-900 to-brand-1100">
-                    Ask Supabase AI
+                    Ask iEchor AI
                     {search ? (
                       <>
                         {': '}
@@ -184,7 +184,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                     onSelect={() => setPages([...pages, COMMAND_ROUTES.GENERATE_SQL])}
                   >
                     <AiIcon className="text-scale-1100" />
-                    <CommandLabel>Generate SQL with Supabase AI</CommandLabel>
+                    <CommandLabel>Generate SQL with iEchor AI</CommandLabel>
                   </CommandItem>
                 </CommandGroup>
               )}
@@ -207,7 +207,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                   {sharedItems.tools.map((item) => {
                     const itemUrl = (
                       projectRef ? item.url.replace('_', projectRef) : item.url
-                    ).split('https://supabase.com/dashboard')[1]
+                    ).split('https://iechor.com/dashboard')[1]
 
                     return (
                       <CommandItem

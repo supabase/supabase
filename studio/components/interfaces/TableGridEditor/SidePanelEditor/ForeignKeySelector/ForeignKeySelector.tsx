@@ -327,7 +327,7 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
                     </p>
                     <p className="mt-2">
                       <a
-                        href="https://supabase.com/docs/guides/database/postgres/cascade-deletes"
+                        href="https://iechor.com/docs/guides/database/postgres/cascade-deletes"
                         target="_blank"
                         rel="noreferrer"
                         className="text-brand-900 opacity-75"

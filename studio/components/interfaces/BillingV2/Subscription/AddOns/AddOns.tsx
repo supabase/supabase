@@ -65,7 +65,7 @@ const AddOns = ({}: AddOnsProps) => {
               <div className="space-y-2">
                 <p className="text-sm text-scale-1100">More information</p>
                 <div>
-                  <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
+                  <Link href="https://iechor.com/docs/guides/platform/compute-add-ons">
                     <a target="_blank" rel="noreferrer">
                       <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                         <p className="text-sm">Compute add-ons</p>
@@ -75,7 +75,7 @@ const AddOns = ({}: AddOnsProps) => {
                   </Link>
                 </div>
                 <div>
-                  <Link href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery">
+                  <Link href="https://iechor.com/docs/guides/platform/backups#point-in-time-recovery">
                     <a target="_blank" rel="noreferrer">
                       <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                         <p className="text-sm">PITR backups</p>
@@ -85,7 +85,7 @@ const AddOns = ({}: AddOnsProps) => {
                   </Link>
                 </div>
                 <div>
-                  <Link href="https://supabase.com/docs/guides/platform/custom-domains">
+                  <Link href="https://iechor.com/docs/guides/platform/custom-domains">
                     <a target="_blank" rel="noreferrer">
                       <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                         <p className="text-sm">Custom domains</p>
@@ -95,7 +95,7 @@ const AddOns = ({}: AddOnsProps) => {
                   </Link>
                 </div>
                 <div>
-                  <Link href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler">
+                  <Link href="https://iechor.com/docs/guides/database/connecting-to-postgres#connection-pooler">
                     <a target="_blank" rel="noreferrer">
                       <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                         <p className="text-sm">Connection Pooler</p>

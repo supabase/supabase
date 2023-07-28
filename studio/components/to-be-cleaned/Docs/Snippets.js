@@ -31,13 +31,13 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = '${endpoint}'
 const supabaseKey = process.env.IECHOR_KEY
-const supabase = createClient(supabaseUrl, supabaseKey)`,
+const iechor = createClient(supabaseUrl, supabaseKey)`,
     },
     python: {
       language: 'python',
       code: `
 import os
-from supabase import create_client, Client
+from iechor import create_client, Client
 
 url: str = '${endpoint}'
 key: str = os.environ.get("IECHOR_KEY")
@@ -51,7 +51,7 @@ const supabaseUrl = '${endpoint}';
 const supabaseKey = String.fromEnvironment('IECHOR_KEY');
 
 Future<void> main() async {
-  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
+  await iEchor.initialize(url: supabaseUrl, anonKey: supabaseKey);
   runApp(MyApp());
 }`,
     },
@@ -86,7 +86,7 @@ curl '${endpoint}/rest/v1/' \\
       code: `
 const IECHOR_URL = "${endpoint}"
 
-const supabase = createClient(IECHOR_URL, process.env.${keyName || 'IECHOR_KEY'});
+const iechor = createClient(IECHOR_URL, process.env.${keyName || 'IECHOR_KEY'});
 `,
     },
   }),

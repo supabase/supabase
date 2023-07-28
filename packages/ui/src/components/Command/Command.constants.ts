@@ -1,5 +1,5 @@
 export const COMMAND_ROUTES = {
-  AI: 'Supabase AI',
+  AI: 'iEchor AI',
   DOCS_SEARCH: 'Docs Search',
   GENERATE_SQL: 'Generate SQL',
   THEME: 'Theme',

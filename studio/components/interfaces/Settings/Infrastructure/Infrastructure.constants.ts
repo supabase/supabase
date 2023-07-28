@@ -47,12 +47,12 @@ export const INFRA_ACTIVITY_METRICS: CategoryMeta[] = [
         links: [
           {
             name: 'Compute Add-Ons',
-            url: 'https://supabase.com/docs/guides/platform/compute-add-ons',
+            url: 'https://iechor.com/docs/guides/platform/compute-add-ons',
           },
-          { name: 'High CPU Usage', url: 'https://supabase.com/docs/guides/platform/exhaust-cpu' },
+          { name: 'High CPU Usage', url: 'https://iechor.com/docs/guides/platform/exhaust-cpu' },
           {
             name: 'Metrics',
-            url: 'https://supabase.com/docs/guides/platform/metrics',
+            url: 'https://iechor.com/docs/guides/platform/metrics',
           },
         ],
       },
@@ -68,12 +68,12 @@ export const INFRA_ACTIVITY_METRICS: CategoryMeta[] = [
         links: [
           {
             name: 'Compute Add-Ons',
-            url: 'https://supabase.com/docs/guides/platform/compute-add-ons',
+            url: 'https://iechor.com/docs/guides/platform/compute-add-ons',
           },
-          { name: 'High RAM Usage', url: 'https://supabase.com/docs/guides/platform/exhaust-ram' },
+          { name: 'High RAM Usage', url: 'https://iechor.com/docs/guides/platform/exhaust-ram' },
           {
             name: 'Metrics',
-            url: 'https://supabase.com/docs/guides/platform/metrics',
+            url: 'https://iechor.com/docs/guides/platform/metrics',
           },
         ],
       },
@@ -86,11 +86,11 @@ export const INFRA_ACTIVITY_METRICS: CategoryMeta[] = [
         links: [
           {
             name: 'Disk Throughput and IOPS',
-            url: 'https://supabase.com/docs/guides/platform/compute-add-ons#disk-throughput-and-iops',
+            url: 'https://iechor.com/docs/guides/platform/compute-add-ons#disk-throughput-and-iops',
           },
           {
             name: 'Metrics',
-            url: 'https://supabase.com/docs/guides/platform/metrics',
+            url: 'https://iechor.com/docs/guides/platform/metrics',
           },
         ],
         description:

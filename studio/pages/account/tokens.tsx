@@ -20,18 +20,18 @@ const UserAccessTokens: NextPageWithLayout = () => {
       <div className="flex items-center justify-between">
         <FormHeader
           title="Access Tokens"
-          description="Personal access tokens can be used with our management API or the Supabase CLI. These tokens will have the same permissions as you have."
+          description="Personal access tokens can be used with our management API or the iEchor CLI. These tokens will have the same permissions as you have."
         />
         <div className="flex items-center space-x-4 mb-6">
           <div className="flex items-center space-x-2">
-            <Link href="https://supabase.com/docs/reference/api/introduction">
+            <Link href="https://iechor.com/docs/reference/api/introduction">
               <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                   API Docs
                 </Button>
               </a>
             </Link>
-            <Link href="https://supabase.com/docs/reference/cli/start">
+            <Link href="https://iechor.com/docs/reference/cli/start">
               <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                   CLI docs

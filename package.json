@@ -2,7 +2,7 @@
   "name": "supabase",
   "description": "The open source Firebase alternative.",
   "version": "0.0.0",
-  "author": "Supabase, Inc.",
+  "author": "iEchor, Inc.",
   "license": "Apache-2.0",
   "private": true,
   "workspaces": [
@@ -52,7 +52,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/supabase/supabase.git"
+    "url": "git+https://github.com/openmodels-base/iechor.git"
   },
   "engines": {
     "npm": ">=9.0.0 <10.0.0",

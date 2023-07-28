@@ -2,171 +2,171 @@
   "tools": [
     {
       "label": "Table Editor",
-      "url": "https://supabase.com/dashboard/project/_/editor"
+      "url": "https://iechor.com/dashboard/project/_/editor"
     },
     {
       "label": "SQL Editor",
-      "url": "https://supabase.com/dashboard/project/_/sql"
+      "url": "https://iechor.com/dashboard/project/_/sql"
     },
     {
       "label": "Database",
-      "url": "https://supabase.com/dashboard/project/_/database/tables",
+      "url": "https://iechor.com/dashboard/project/_/database/tables",
       "subItems": [
         {
           "label": "Tables",
-          "url": "https://supabase.com/dashboard/project/_/database/tables"
+          "url": "https://iechor.com/dashboard/project/_/database/tables"
         },
         {
           "label": "Triggers",
-          "url": "https://supabase.com/dashboard/project/_/database/triggers"
+          "url": "https://iechor.com/dashboard/project/_/database/triggers"
         },
         {
           "label": "Functions",
-          "url": "https://supabase.com/dashboard/project/_/database/functions"
+          "url": "https://iechor.com/dashboard/project/_/database/functions"
         },
         {
           "label": "Extensions",
-          "url": "https://supabase.com/dashboard/project/_/database/extensions"
+          "url": "https://iechor.com/dashboard/project/_/database/extensions"
         },
         {
           "label": "Roles",
-          "url": "https://supabase.com/dashboard/project/_/database/roles"
+          "url": "https://iechor.com/dashboard/project/_/database/roles"
         },
         {
           "label": "Replication",
-          "url": "https://supabase.com/dashboard/project/_/database/replication"
+          "url": "https://iechor.com/dashboard/project/_/database/replication"
         },
         {
           "label": "Webhooks",
-          "url": "https://supabase.com/dashboard/project/_/database/webhooks"
+          "url": "https://iechor.com/dashboard/project/_/database/webhooks"
         },
         {
           "label": "Backups",
-          "url": "https://supabase.com/dashboard/project/_/database/backups/scheduled"
+          "url": "https://iechor.com/dashboard/project/_/database/backups/scheduled"
         }
       ]
     },
     {
       "label": "Auth",
-      "url": "https://supabase.com/dashboard/project/_/auth/users",
+      "url": "https://iechor.com/dashboard/project/_/auth/users",
       "subItems": [
         {
           "label": "Users",
-          "url": "https://supabase.com/dashboard/project/_/auth/users"
+          "url": "https://iechor.com/dashboard/project/_/auth/users"
         },
         {
           "label": "Policies",
-          "url": "https://supabase.com/dashboard/project/_/auth/policies"
+          "url": "https://iechor.com/dashboard/project/_/auth/policies"
         },
         {
           "label": "Providers",
-          "url": "https://supabase.com/dashboard/project/_/auth/providers"
+          "url": "https://iechor.com/dashboard/project/_/auth/providers"
         },
         {
           "label": "Email Templates",
-          "url": "https://supabase.com/dashboard/project/_/auth/templates"
+          "url": "https://iechor.com/dashboard/project/_/auth/templates"
         },
         {
           "label": "URL Configuration",
-          "url": "https://supabase.com/dashboard/project/_/auth/url-configuration"
+          "url": "https://iechor.com/dashboard/project/_/auth/url-configuration"
         }
       ]
     },
     {
       "label": "Storage",
-      "url": "https://supabase.com/dashboard/project/_/storage"
+      "url": "https://iechor.com/dashboard/project/_/storage"
     },
     {
       "label": "Edge Functions",
-      "url": "https://supabase.com/dashboard/project/_/functions"
+      "url": "https://iechor.com/dashboard/project/_/functions"
     },
     {
       "label": "Logs",
-      "url": "https://supabase.com/dashboard/project/_/logs/explorer",
+      "url": "https://iechor.com/dashboard/project/_/logs/explorer",
       "subItems": [
         {
           "label": "Postgres logs",
-          "url": "https://supabase.com/dashboard/project/_/logs/postgres-logs"
+          "url": "https://iechor.com/dashboard/project/_/logs/postgres-logs"
         },
         {
           "label": "PostgREST logs",
-          "url": "https://supabase.com/dashboard/project/_/logs/postgrest-logs"
+          "url": "https://iechor.com/dashboard/project/_/logs/postgrest-logs"
         },
         {
           "label": "Postgres logs",
-          "url": "https://supabase.com/dashboard/project/_/logs/pgbouncer-logs"
+          "url": "https://iechor.com/dashboard/project/_/logs/pgbouncer-logs"
         },
         {
           "label": "Auth logs logs",
-          "url": "https://supabase.com/dashboard/project/_/logs/auth-logs"
+          "url": "https://iechor.com/dashboard/project/_/logs/auth-logs"
         },
         {
           "label": "Storage logs",
-          "url": "https://supabase.com/dashboard/project/_/logs/storage-logs"
+          "url": "https://iechor.com/dashboard/project/_/logs/storage-logs"
         },
         {
           "label": "realtime logs",
-          "url": "https://supabase.com/dashboard/project/_/logs/realtime-logs"
+          "url": "https://iechor.com/dashboard/project/_/logs/realtime-logs"
         }
       ]
     },
     {
       "label": "API Docs",
-      "url": "https://supabase.com/dashboard/project/_/api",
+      "url": "https://iechor.com/dashboard/project/_/api",
       "subItems": [
         {
           "label": "Auth docs",
-          "url": "https://supabase.com/dashboard/project/_/api?page=auth"
+          "url": "https://iechor.com/dashboard/project/_/api?page=auth"
         },
         {
           "label": "User management docs",
-          "url": "https://supabase.com/dashboard/project/_/api?page=users"
+          "url": "https://iechor.com/dashboard/project/_/api?page=users"
         },
         {
           "label": "Graphql",
-          "url": "https://supabase.com/dashboard/project/_/api/graphiql"
+          "url": "https://iechor.com/dashboard/project/_/api/graphiql"
         }
       ]
     },
     {
       "label": "Project Settings",
-      "url": "https://supabase.com/dashboard/project/_/settings/general",
+      "url": "https://iechor.com/dashboard/project/_/settings/general",
       "subItems": [
         {
           "label": "General settings",
-          "url": "https://supabase.com/dashboard/project/_/settings/general"
+          "url": "https://iechor.com/dashboard/project/_/settings/general"
         },
         {
           "label": "Database settings",
-          "url": "https://supabase.com/dashboard/project/_/settings/database"
+          "url": "https://iechor.com/dashboard/project/_/settings/database"
         },
         {
           "label": "API settings",
-          "url": "https://supabase.com/dashboard/project/_/settings/api"
+          "url": "https://iechor.com/dashboard/project/_/settings/api"
         },
         {
           "label": "Auth settings",
-          "url": "https://supabase.com/dashboard/project/_/settings/auth"
+          "url": "https://iechor.com/dashboard/project/_/settings/auth"
         },
         {
           "label": "Storage settings",
-          "url": "https://supabase.com/dashboard/project/_/settings/storage"
+          "url": "https://iechor.com/dashboard/project/_/settings/storage"
         },
         {
           "label": "Subscription settings",
-          "url": "https://supabase.com/dashboard/project/_/settings/billing/subscription"
+          "url": "https://iechor.com/dashboard/project/_/settings/billing/subscription"
         },
         {
           "label": "Project Usage",
-          "url": "https://supabase.com/dashboard/project/_/settings/billing/usage"
+          "url": "https://iechor.com/dashboard/project/_/settings/billing/usage"
         },
         {
           "label": "Project Invoices",
-          "url": "https://supabase.com/dashboard/project/_/settings/billing/invoices"
+          "url": "https://iechor.com/dashboard/project/_/settings/billing/invoices"
         },
         {
           "label": "Project Invoices",
-          "url": "https://supabase.com/dashboard/project/_/settings/billing/invoices"
+          "url": "https://iechor.com/dashboard/project/_/settings/billing/invoices"
         }
       ]
     }
@@ -174,59 +174,59 @@
   "projectTools": [
     {
       "label": "Your Projects",
-      "url": "https://supabase.com/dashboard/projects"
+      "url": "https://iechor.com/dashboard/projects"
     },
     {
       "label": "Project API Keys",
-      "url": "https://supabase.com/dashboard/project/_/settings/api"
+      "url": "https://iechor.com/dashboard/project/_/settings/api"
     }
   ],
   "support": [
     {
       "label": "Support",
-      "url": "https://supabase.com/support"
+      "url": "https://iechor.com/support"
     },
     {
       "label": "System Status",
-      "url": "https://status.supabase.com/"
+      "url": "https://status.iechor.com/"
     },
     {
       "label": "Github Discussions",
-      "url": "https://github.com/supabase/supabase/discussions"
+      "url": "https://github.com/openmodels-base/iechor/discussions"
     }
   ],
   "quickstarts": [
     {
       "label": "React",
-      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/reactjs"
+      "url": "https://iechor.com/docs/guides/getting-started/quickstarts/reactjs"
     },
     {
       "label": "Next.js",
-      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/nextjs"
+      "url": "https://iechor.com/docs/guides/getting-started/quickstarts/nextjs"
     },
     {
       "label": "Nuxt.js",
-      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/nuxtjs"
+      "url": "https://iechor.com/docs/guides/getting-started/quickstarts/nuxtjs"
     },
     {
       "label": "Flutter",
-      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/flutter"
+      "url": "https://iechor.com/docs/guides/getting-started/quickstarts/flutter"
     },
     {
       "label": "Kotlin",
-      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/android"
+      "url": "https://iechor.com/docs/guides/getting-started/quickstarts/android"
     },
     {
       "label": "SvelteKit",
-      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/sveltekit"
+      "url": "https://iechor.com/docs/guides/getting-started/quickstarts/sveltekit"
     },
     {
       "label": "SolidJS",
-      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/solidjs"
+      "url": "https://iechor.com/docs/guides/getting-started/quickstarts/solidjs"
     },
     {
       "label": "Vue",
-      "url": "https://supabase.com/docs/guides/getting-started/quickstarts/vue"
+      "url": "https://iechor.com/docs/guides/getting-started/quickstarts/vue"
     }
   ],
   "docsGeneral": [
@@ -238,7 +238,7 @@
     {
       "icon": "inbox",
       "label": "Read the Changelog",
-      "url": "https://supabase.com/changelog"
+      "url": "https://iechor.com/changelog"
     }
   ]
 }

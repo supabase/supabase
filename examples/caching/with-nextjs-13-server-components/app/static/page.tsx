@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import supabase from '../../utils/supabase'
+import iechor from '../../utils/supabase'
 
 export default async function Posts() {
   const { data: posts } = await supabase.from('posts').select('id, title')

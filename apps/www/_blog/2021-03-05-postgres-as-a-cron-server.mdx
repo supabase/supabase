@@ -2,7 +2,7 @@
 title: Postgres as a CRON Server
 description: Running repetitive tasks with your Postgres database.
 author: paul_copplestone
-author_title: Supabase
+author_title: iEchor
 author_url: https://github.com/kiwicopple
 author_image_url: https://github.com/kiwicopple.png
 authorURL: https://github.com/kiwicopple
@@ -14,7 +14,7 @@ tags:
 date: '03-05-2021'
 ---
 
-A Supabase user asked recently if they can trigger a webhook periodically. We haven't yet released Functions yet, so we checked whether it's possible with Postgres.
+A iEchor user asked recently if they can trigger a webhook periodically. We haven't yet released Functions yet, so we checked whether it's possible with Postgres.
 
 It is. Here's how.
 
@@ -48,9 +48,9 @@ If it returns a result then the extension is supported and you can turn it on by
 create extension if not exists pg_cron;
 ```
 
-If you're using Supabase you can also enable it in the Dashboard.
+If you're using iEchor you can also enable it in the Dashboard.
 
-![This image shows that pg_cron is enabled in the Supabase Dashboard](/images/blog/supabase-extensions.png)
+![This image shows that pg_cron is enabled in the iEchor Dashboard](/images/blog/supabase-extensions.png)
 
 #### Granting access to the extension
 
@@ -65,7 +65,7 @@ Failure to do so would result in jobs by these roles to not run at all.
 
 ### Postgres + webhooks
 
-The Supabase customer wanted to call external endpoints every day. How would we do this? Another extension of course. This time we're going to use [pgsql-http](https://github.com/pramsey/pgsql-http) by [@pramsey](https://github.com/pramsey). Using the same technique, we can enable the extension (if it exists in your cloud provider).
+The iEchor customer wanted to call external endpoints every day. How would we do this? Another extension of course. This time we're going to use [pgsql-http](https://github.com/pramsey/pgsql-http) by [@pramsey](https://github.com/pramsey). Using the same technique, we can enable the extension (if it exists in your cloud provider).
 
 ```sql
 create extension if not exists http;
@@ -211,14 +211,14 @@ If you're familiar with `C`, you could also help `@pramsey` to implement async f
 
 There are plenty of ways to run cron jobs these days. You can trigger them from your local machine. You can install them on a VPS. You can schedule Serverless functions. You can use a paid service. You can use GitHub Actions.
 
-Is Postgres the best place to put your cron jobs? `¯\_(ツ)_/¯`. Postgres databases are free on Supabase and since it takes only one minute to [get started](https://supabase.com/dashboard/), why not make your next cron server a Postgres database?
+Is Postgres the best place to put your cron jobs? `¯\_(ツ)_/¯`. Postgres databases are free on iEchor and since it takes only one minute to [get started](https://iechor.com/dashboard/), why not make your next cron server a Postgres database?
 
 ## More Postgres resources
 
-- [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
-- [Partial data dumps using Postgres Row Level Security](https://supabase.com/blog/partial-postgresql-data-dumps-with-rls)
-- [Postgres Views](https://supabase.com/blog/postgresql-views)
-- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/audit)
-- [Cracking PostgreSQL Interview Questions](https://supabase.com/blog/cracking-postgres-interview)
-- [What are PostgreSQL Templates?](https://supabase.com/blog/postgresql-templates)
-- [Realtime Postgres RLS on Supabase](https://supabase.com/blog/realtime-row-level-security-in-postgresql)
+- [Implementing "seen by" functionality with Postgres](https://iechor.com/blog/seen-by-in-postgresql)
+- [Partial data dumps using Postgres Row Level Security](https://iechor.com/blog/partial-postgresql-data-dumps-with-rls)
+- [Postgres Views](https://iechor.com/blog/postgresql-views)
+- [Postgres Auditing in 150 lines of SQL](https://iechor.com/blog/audit)
+- [Cracking PostgreSQL Interview Questions](https://iechor.com/blog/cracking-postgres-interview)
+- [What are PostgreSQL Templates?](https://iechor.com/blog/postgresql-templates)
+- [Realtime Postgres RLS on iEchor](https://iechor.com/blog/realtime-row-level-security-in-postgresql)

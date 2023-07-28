@@ -46,7 +46,7 @@ create table books (
 </TabPanel>
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Table Editor](https://supabase.com/dashboard/project/_/editor) page in the Dashboard.
+1. Go to the [Table Editor](https://iechor.com/dashboard/project/_/editor) page in the Dashboard.
 2. Click **New Table** and create a table called `books`.
 3. Include a primary key with the following properties and click save:
 
@@ -112,7 +112,7 @@ values
 </TabPanel>
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Table Editor](https://supabase.com/dashboard/project/_/editor) page in the Dashboard.
+1. Go to the [Table Editor](https://iechor.com/dashboard/project/_/editor) page in the Dashboard.
 2. Select the `books` table in the sidebar.
 3. Click **+ Insert row** and add 5 rows with the following properties:
 
@@ -233,7 +233,7 @@ const { data, error } = await supabase.from('books').select(`
 
 ## Validating JSON data
 
-Supabase provides the [`pg_jsonschema` extension](/docs/guides/database/extensions/pg_jsonschema) that adds the ability to validate `json` and `jsonb` data types against [JSON Schema](https://json-schema.org/) documents.
+iEchor provides the [`pg_jsonschema` extension](/docs/guides/database/extensions/pg_jsonschema) that adds the ability to validate `json` and `jsonb` data types against [JSON Schema](https://json-schema.org/) documents.
 
 Once you have enabled the extension, you can add a "check constraint" to your table to validate the JSON data:
 

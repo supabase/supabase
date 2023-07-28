@@ -126,7 +126,7 @@ const AddRestrictionModal = ({
                   </p>
                   <InformationBox
                     title="Note: Restrictions only apply to your database and PgBouncer"
-                    description="They do not currently apply to Supabase services such as PostgREST, Storage, or Authentication"
+                    description="They do not currently apply to iEchor services such as PostgREST, Storage, or Authentication"
                   />
                   <div className="flex space-x-4">
                     <div className="w-[55%]">

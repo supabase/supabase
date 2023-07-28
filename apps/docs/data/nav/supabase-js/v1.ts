@@ -2,7 +2,7 @@ const Nav = [
   {
     label: 'Getting Started',
     items: [
-      { name: 'Supabase JavaScript Library', url: '/reference/javascript/v1', items: [] },
+      { name: 'iEchor JavaScript Library', url: '/reference/javascript/v1', items: [] },
       { name: 'Installing', url: '/reference/javascript/v1/installing', items: [] },
       { name: 'Initializing', url: '/reference/javascript/v1/initializing', items: [] },
       { name: 'Generating Types', url: '/reference/javascript/v1/generating-types', items: [] },

@@ -3,13 +3,13 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'storage-access-control',
   title: 'Access Control',
-  description: 'Manage who can access your Supabase Storage files.',
+  description: 'Manage who can access your iEchor Storage files.',
   video: 'https://www.youtube.com/v/4ERX__Y908k',
 }
 
-Supabase Storage is integrated with your [Postgres Database](/docs/guides/database).
+iEchor Storage is integrated with your [Postgres Database](/docs/guides/database).
 This means that you can use the same [Row Level Security Policies](/docs/guides/auth#policies)
-for managing access to your files. Supabase Storage stores metadata in the `objects` and `buckets` table in the storage schema.
+for managing access to your files. iEchor Storage stores metadata in the `objects` and `buckets` table in the storage schema.
 
 To allow read access to files, the RLS policy must allow users to `SELECT` the `objects` table and for uploading a new object, the RLS policy must grant users access to `INSERT` into the `objects` table and so on. The mapping between the different API calls and the database permissions required is documented in the [Reference docs](/docs/reference/javascript/storage-createbucket).
 
@@ -51,7 +51,7 @@ You can access the storage API directly with the same endpoint. See the <a href=
 
 ## Helper functions
 
-Supabase Storage provides SQL helper functions which you can use in your database queries and
+iEchor Storage provides SQL helper functions which you can use in your database queries and
 policies.
 
 ---

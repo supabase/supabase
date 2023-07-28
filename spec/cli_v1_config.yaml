@@ -11,7 +11,7 @@ info:
   title: 'CLI' # {string} A readable name.
   source: 'https://github.com/supabase/cli' # {string} Where developers can find the source code.
   bugs: 'https://github.com/supabase/cli/issues' # {string} Where developers can file bugs.
-  spec: 'https://github.com/supabase/supabase/blob/master/web/spec/cli_config_001.yml' # {string} Where developers can find this spec (to link directly in the docs).
+  spec: 'https://github.com/openmodels-base/iechor/blob/master/web/spec/cli_config_001.yml' # {string} Where developers can find this spec (to link directly in the docs).
   description: |
     A `config.toml` file is generated after running `supabase init`.
 
@@ -46,7 +46,7 @@ parameters:
     tags: ['general'] # {string[]} These tags are useful for grouping parameters
     required: true
     description: |
-      A string used to distinguish different Supabase projects on the same host. Defaults to the working directory name when running `supabase init`.
+      A string used to distinguish different iEchor projects on the same host. Defaults to the working directory name when running `supabase init`.
 
   - id: 'api.port'
     title: 'api.port'
@@ -128,7 +128,7 @@ parameters:
     tags: ['dashboard']
     required: true
     description: |
-      Port to use for Supabase Studio.
+      Port to use for iEchor Studio.
     links: []
 
   - id: 'inbucket.port'
@@ -179,7 +179,7 @@ parameters:
       The maximum file size allowed (e.g. "5MB", "500KB").
     links:
       - name: 'Storage server configuration'
-        link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
+        link: 'https://iechor.com/docs/guides/self-hosting/storage/config'
 
   - id: 'auth.site_url'
     title: 'auth.site_url'
@@ -190,7 +190,7 @@ parameters:
       The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails.
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+        link: 'https://iechor.com/docs/reference/auth'
 
   - id: 'auth.additional_redirect_urls'
     title: 'auth.additional_redirect_urls'
@@ -201,7 +201,7 @@ parameters:
       A list of _exact_ URLs that auth providers are permitted to redirect to post authentication.
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+        link: 'https://iechor.com/docs/reference/auth'
 
   - id: 'auth.jwt_expiry'
     title: 'auth.jwt_expiry'
@@ -212,7 +212,7 @@ parameters:
       How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week).
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+        link: 'https://iechor.com/docs/reference/auth'
 
   - id: 'auth.enable_signup'
     title: 'auth.enable_signup'
@@ -223,7 +223,7 @@ parameters:
       Allow/disallow new user signups to your project.
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+        link: 'https://iechor.com/docs/reference/auth'
 
   - id: 'auth.email.enable_signup'
     title: 'auth.email.enable_signup'
@@ -234,7 +234,7 @@ parameters:
       Allow/disallow new user signups via email to your project.
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+        link: 'https://iechor.com/docs/reference/auth'
 
   - id: 'auth.email.double_confirm_changes'
     title: 'auth.email.double_confirm_changes'
@@ -245,7 +245,7 @@ parameters:
       If enabled, a user will be required to confirm any email change on both the old, and new email addresses. If disabled, only the new email is required to confirm.
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+        link: 'https://iechor.com/docs/reference/auth'
 
   - id: 'auth.email.enable_confirmations'
     title: 'auth.email.enable_confirmations'
@@ -256,7 +256,7 @@ parameters:
       If enabled, users need to confirm their email address before signing in.
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+        link: 'https://iechor.com/docs/reference/auth'
 
   - id: 'auth.external.provider.enabled'
     title: 'auth.external.<provider>.enabled'
@@ -280,7 +280,7 @@ parameters:
       - `spotify`
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+        link: 'https://iechor.com/docs/reference/auth'
 
   - id: 'auth.external.provider.client_id'
     title: 'auth.external.<provider>.client_id'
@@ -290,7 +290,7 @@ parameters:
       Client ID for the external OAuth provider.
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+        link: 'https://iechor.com/docs/reference/auth'
 
   - id: 'auth.external.provider.secret'
     title: 'auth.external.<provider>.secret'
@@ -300,7 +300,7 @@ parameters:
       Client secret for the external OAuth provider.
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+        link: 'https://iechor.com/docs/reference/auth'
 
   - id: 'auth.external.provider.url'
     title: 'auth.external.<provider>.url'
@@ -314,7 +314,7 @@ parameters:
       for example: https://keycloak.example.com/realms/myrealm .
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+        link: 'https://iechor.com/docs/reference/auth'
 
   - id: 'auth.external.provider.redirect_uri'
     title: 'auth.external.<provider>.redirect_uri'
@@ -325,7 +325,7 @@ parameters:
       The URI a OAuth2 provider will redirect to with the code and state values.
     links:
       - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+        link: 'https://iechor.com/docs/reference/auth'
 
   - id: 'functions.function_name.verify_jwt'
     title: 'functions.<function_name>.verify_jwt'
@@ -340,7 +340,7 @@ parameters:
       Note that the `--no-verify-jwt` flag overrides this configuration.
     links:
       - name: '`supabase functions` CLI subcommands'
-        link: 'https://supabase.com/docs/reference/cli/supabase-functions'
+        link: 'https://iechor.com/docs/reference/cli/supabase-functions'
 
   - id: 'functions.function_name.import_map'
     title: 'functions.<function_name>.import_map'
@@ -352,4 +352,4 @@ parameters:
       Note that the `--import-map` flag overrides this configuration.
     links:
       - name: '`supabase functions` CLI subcommands'
-        link: 'https://supabase.com/docs/reference/cli/supabase-functions'
+        link: 'https://iechor.com/docs/reference/cli/supabase-functions'

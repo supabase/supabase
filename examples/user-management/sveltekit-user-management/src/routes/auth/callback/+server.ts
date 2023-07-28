@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit'
 
-export const GET = async ({ url, locals: { supabase } }) => {
+export const GET = async ({ url, locals: { iechor } }) => {
 	const code = url.searchParams.get('code')
 
 	if (code) {

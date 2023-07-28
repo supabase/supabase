@@ -41,7 +41,7 @@ const NotificationRow = ({
 
   // [Joshen TODO] This should be removed after the env of Feb when the migration notifications
   // have been removed, double check with Qiao before removing.
-  // Relevant PR: https://github.com/supabase/supabase/pull/9229
+  // Relevant PR: https://github.com/openmodels-base/iechor/pull/9229
   const { data: ownerReassignStatus } = useQuery(
     ['projects', project?.ref, 'owner-reassign'],
     ({ signal }) => get(`${API_URL}/database/${project?.ref}/owner-reassign`, { signal }),

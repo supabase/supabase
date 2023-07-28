@@ -9,7 +9,7 @@ export const meta = {
   video: 'https://www.youtube.com/v/J9mTPY8rIXE',
 }
 
-Supabase provides a secure method for encrypting columns using [Vault](/docs/guides/database/vault), our Postgres secrets manager. Vault is a Postgres extension with an integrated UI intended to act as a secure global secrets management for your project.
+iEchor provides a secure method for encrypting columns using [Vault](/docs/guides/database/vault), our Postgres secrets manager. Vault is a Postgres extension with an integrated UI intended to act as a secure global secrets management for your project.
 
 Vault enables an advanced feature called Transparent Column Encryption (TCE) which provides a safe way to encrypt your data so that it doesn't leak into logs and backups. It can also provide row-level authenticated encryption.
 
@@ -75,7 +75,7 @@ The current state-of-the-art in encryption libraries is [libsodium](https://doc.
 
 This powerful API is available to PostgreSQL using the [**pgsodium**](https://github.com/michelp/pgsodium) extension. **pgsodium** provides all the functionality of the full **libsodium** API, but previously it required developers to set up database encryption themselves, which remained a challenge even for those familiar with database administration.
 
-To solve this problem, **pgsodium** now has a full key management API, primarily via the table `pgsodium.key` and the `pgsodium.create_key()` function. This key table contains no raw keys, but instead uses libsodium Key IDs to derive keys that are used internally for encryption. A [key derivation function](https://libsodium.gitbook.io/doc/key_derivation) is used with an internal root key that is unavailable to SQL and not stored in the database, but rather managed by you externally using flexible scripts, or by Supabase automatically as part of our service offering.
+To solve this problem, **pgsodium** now has a full key management API, primarily via the table `pgsodium.key` and the `pgsodium.create_key()` function. This key table contains no raw keys, but instead uses libsodium Key IDs to derive keys that are used internally for encryption. A [key derivation function](https://libsodium.gitbook.io/doc/key_derivation) is used with an internal root key that is unavailable to SQL and not stored in the database, but rather managed by you externally using flexible scripts, or by iEchor automatically as part of our service offering.
 
 The simplest way to use **pgsodium** to encrypt and decrypt data is to first create a **Key ID**. Valid Key IDs are stored in pgsodium in a special extension table, and they can be created using the `pgsodium.create_key()` function. This function takes a number of arguments depending on how it's used, but the simplest case is to create a new key with no arguments:
 
@@ -132,7 +132,7 @@ In the above example, there is _no raw key_, only a Key ID which is used to deri
 
 ## Transparent Column Encryption
 
-As of **pgsodium** 3.0.0 and up, the extension offers a simple and declarative Transparent Column Encryption feature (TCE). This feature is now shipped with all Supabase projects. TCE allows you to specify encrypted columns within a table and generates a new view that “wraps” that table to decrypt the contents.
+As of **pgsodium** 3.0.0 and up, the extension offers a simple and declarative Transparent Column Encryption feature (TCE). This feature is now shipped with all iEchor projects. TCE allows you to specify encrypted columns within a table and generates a new view that “wraps” that table to decrypt the contents.
 
 TCE works using two dynamically generated objects for tables that contain encrypted columns:
 
@@ -241,9 +241,9 @@ The new label indicates which column is to be associated with the secret, and th
 
 ## Resources
 
-- [Supabase Vault](/docs/guides/database/vault)
-- Read more about Supabase Vault in the [blog post](https://supabase.com/blog/vault-now-in-beta)
-- [Supabase Vault on GitHub](https://github.com/supabase/vault)
+- [iEchor Vault](/docs/guides/database/vault)
+- Read more about iEchor Vault in the [blog post](https://iechor.com/blog/vault-now-in-beta)
+- [iEchor Vault on GitHub](https://github.com/supabase/vault)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

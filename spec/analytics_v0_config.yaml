@@ -7,7 +7,7 @@ info:
   title: 'Analytics' # {string} A readable name.
   source: 'https://github.com/supabase/realtime' # {string} Where developers can find the source code.
   bugs: 'https://github.com/supabase/realtime/issues' # {string} Where developers can file bugs.
-  spec: 'https://github.com/supabase/supabase/blob/master/spec/realtime_v0_config.yml' # {string} Where developers can find this spec (to link directly in the docs).
+  spec: 'https://github.com/openmodels-base/iechor/blob/master/spec/realtime_v0_config.yml' # {string} Where developers can find this spec (to link directly in the docs).
   description: |
     You can use environment variables to configure your Analytics Server.
   tags:
@@ -43,7 +43,7 @@ parameters:
     default: 'false'
     type: 'boolean'
     description: |
-      This is a special mode for Logflare which will seed additional resources for usage with Supabase self-hosted.
+      This is a special mode for Logflare which will seed additional resources for usage with iEchor self-hosted.
   - id: 'PHX_HTTP_PORT' # {string} A unique identifier for this param.
     title: 'PHX_HTTP_PORT' # {string} Any name.
     tags: ['general'] # {string[]} These tags are useful for grouping parameters

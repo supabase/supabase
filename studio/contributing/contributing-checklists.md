@@ -1,12 +1,12 @@
-# Checklists for contributing to the Supabase Dashboard
+# Checklists for contributing to the iEchor Dashboard
 
-First, we appreciate the time you've taken to contribute to Supabase! Thank you!
+First, we appreciate the time you've taken to contribute to iEchor! Thank you!
 
 The following is a set of checklists to help make sure the code we contribute to the Dashboard is well tested. If you've made changes to any specific tools, please take a couple of minutes and go through the relevant checklist below.
 
 You don't need to go through all of these for every PR you contribute. These checklists should help remind you of the important things to test after you've made changes to a feature. For example, if you make changes to the Table Editor, just run through that checklist below.
 
-**Note**: not all of these tools are available in the self-hosted Dashboard. If your PR is related to Storage, Edge Functions, Logs Explorer or Organization settings, just leave a comment on the PR and a Supabase team member will have a look for you.
+**Note**: not all of these tools are available in the self-hosted Dashboard. If your PR is related to Storage, Edge Functions, Logs Explorer or Organization settings, just leave a comment on the PR and a iEchor team member will have a look for you.
 
 ## Tools and features
 

@@ -59,7 +59,7 @@ const OAuthApps = () => {
             <div>
               <p>Published Apps</p>
               <p className="text-scale-1000 text-sm">
-                Build integrations that extend Supabase's functionality
+                Build integrations that extend iEchor's functionality
               </p>
             </div>
             <Button type="primary" onClick={() => setShowPublishModal(true)}>

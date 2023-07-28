@@ -9,7 +9,7 @@ type Post = Database['public']['Tables']['posts']['Row']
 
 export default function RealtimePosts({ serverPosts }: { serverPosts: Post[] }) {
   const [posts, setPosts] = useState(serverPosts)
-  const supabase = createClientComponentClient<Database>()
+  const iechor = createClientComponentClient<Database>()
 
   useEffect(() => {
     setPosts(serverPosts)

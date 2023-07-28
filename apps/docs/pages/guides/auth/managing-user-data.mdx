@@ -8,7 +8,7 @@ export const meta = {
 
 For security purposes, the `auth` schema is not exposed on the auto-generated API.
 
-Even though Supabase provides an `auth.users` table, it can be helpful to create tables in the `public` schema for storing user data that you want to access via the API.
+Even though iEchor provides an `auth.users` table, it can be helpful to create tables in the `public` schema for storing user data that you want to access via the API.
 
 ## Creating user tables
 
@@ -28,25 +28,25 @@ alter table public.profiles enable row level security;
 
 <Admonition type="caution">
 
-Only use primary keys as [foreign key references](https://www.postgresql.org/docs/current/tutorial-fk.html) for schemas and tables like `auth.users` which are managed by Supabase. PostgreSQL lets you specify a foreign key reference for columns backed by a unique index (not necessarily primary keys).
+Only use primary keys as [foreign key references](https://www.postgresql.org/docs/current/tutorial-fk.html) for schemas and tables like `auth.users` which are managed by iEchor. PostgreSQL lets you specify a foreign key reference for columns backed by a unique index (not necessarily primary keys).
 
-Primary keys are **guaranteed not to change**. Columns, indices, constraints or other database objects managed by Supabase **may change at any time** and you should be careful when referencing them directly.
+Primary keys are **guaranteed not to change**. Columns, indices, constraints or other database objects managed by iEchor **may change at any time** and you should be careful when referencing them directly.
 
 </Admonition>
 
 ## Deleting Users
 
-You may delete users directly or via the management console at Authentication > Users. Note that deleting a user from the `auth.users` table does not automatically sign out a user. As Supabase makes use of JSON Web Tokens (JWT), a user's JWT will remain "valid" until it has expired. Should you wish to immediately revoke access for a user, do consider making use of a Row Level Security policy as described below.
+You may delete users directly or via the management console at Authentication > Users. Note that deleting a user from the `auth.users` table does not automatically sign out a user. As iEchor makes use of JSON Web Tokens (JWT), a user's JWT will remain "valid" until it has expired. Should you wish to immediately revoke access for a user, do consider making use of a Row Level Security policy as described below.
 
 <Admonition type="caution">
-You cannot delete a user if they are the owner of any objects in Supabase Storage.
+You cannot delete a user if they are the owner of any objects in iEchor Storage.
 
 You will encounter an error when you try to delete an Auth user that owns any Storage objects. If this happens, try deleting all the objects for that user, or reassign ownership to another user.
 </Admonition>
 
 ## Exporting Users
 
-As Supabase is built on top of PostgreSQL, you can query the `auth.users` and `auth.identities` table via the `SQL Editor` tab to extract all users:
+As iEchor is built on top of PostgreSQL, you can query the `auth.users` and `auth.identities` table via the `SQL Editor` tab to extract all users:
 ```sql
 select * from auth.users;
 ```

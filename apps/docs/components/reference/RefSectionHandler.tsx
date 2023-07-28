@@ -25,7 +25,7 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
 
   const [slug] = router.query.slug
 
-  // When user lands on a url like http://supabase.com/docs/reference/javascript/sign-up
+  // When user lands on a url like http://iechor.com/docs/reference/javascript/sign-up
   // find the #sign-up element and scroll to that
   useEffect(() => {
     document.getElementById(slug)?.scrollIntoView()
@@ -49,11 +49,11 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
       case 'client-lib':
         return props.spec.info.title
       case 'cli':
-        return 'Supabase CLI reference'
+        return 'iEchor CLI reference'
       case 'api':
-        return 'Supabase API reference'
+        return 'iEchor API reference'
       default:
-        return 'Supabase Docs'
+        return 'iEchor Docs'
     }
   }
 
@@ -67,13 +67,13 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
       <Head>
         <title>{fullTitle}</title>
         <meta name="description" content={section?.title ?? pageTitle} />
-        <meta property="og:image" content={`https://supabase.com/docs/img/supabase-og-image.png`} />
+        <meta property="og:image" content={`https://iechor.com/docs/img/supabase-og-image.png`} />
         <meta
           name="twitter:image"
-          content={`https://supabase.com/docs/img/supabase-og-image.png`}
+          content={`https://iechor.com/docs/img/supabase-og-image.png`}
         />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="canonical" href={`https://supabase.com${router.basePath}${path}`} />
+        <link rel="canonical" href={`https://iechor.com${router.basePath}${path}`} />
       </Head>
       {props.isOldVersion && <OldVersionAlert sections={props.sections} />}
       <RefSubLayout>

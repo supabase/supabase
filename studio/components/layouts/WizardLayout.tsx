@@ -39,7 +39,7 @@ const Header: FC<any> = ({ organization, project }) => {
                 <a>
                   <img
                     src={`${BASE_PATH}/img/supabase-logo.svg`}
-                    alt="Supabase"
+                    alt="iEchor"
                     className="rounded border p-1 hover:border-white dark:border-dark"
                     style={{ height: 24 }}
                   />

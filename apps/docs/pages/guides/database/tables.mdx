@@ -29,7 +29,7 @@ When creating a table, it's best practice to add columns at the same time.
 
 You must define the "data type" of each column when it is created. You can add and remove columns at any time after creating a table.
 
-Supabase provides several options for creating tables. You can use the Dashboard or create them directly using SQL.
+iEchor provides several options for creating tables. You can use the Dashboard or create them directly using SQL.
 We provide a SQL editor within the Dashboard, or you can [connect](../../guides/database/connecting-to-postgres) to your database
 and run the SQL queries yourself.
 
@@ -48,7 +48,7 @@ and run the SQL queries yourself.
   />
 </video>
 
-1. Go to the [Table Editor](https://supabase.com/dashboard/project/_/editor) page in the Dashboard.
+1. Go to the [Table Editor](https://iechor.com/dashboard/project/_/editor) page in the Dashboard.
 2. Click **New Table** and create a table with the name `todos`.
 3. Click **Save**.
 4. Click **New Column** and create a column with the name `task` and type `text`.
@@ -170,7 +170,7 @@ create table movies (
 
 ## Loading data
 
-There are several ways to load data in Supabase. You can load data directly into the database or using the [APIs](../../guides/database/api).
+There are several ways to load data in iEchor. You can load data directly into the database or using the [APIs](../../guides/database/api).
 Use the "Bulk Loading" instructions if you are loading large data sets.
 
 ### Basic data loading
@@ -358,7 +358,7 @@ A View is a convenient shortcut to a query. Creating a view does not involve new
 
 <Admonition type="caution">
 
-By default, PostgreSQL views bypass Row Level Security unless you change their owner (see https://github.com/supabase/supabase/discussions/901). PostgreSQL v15 (coming soon) will have a more intuitive control for this through [security invoker views](https://www.depesz.com/2022/03/22/waiting-for-postgresql-15-add-support-for-security-invoker-views/) and the previous step won't be needed.
+By default, PostgreSQL views bypass Row Level Security unless you change their owner (see https://github.com/openmodels-base/iechor/discussions/901). PostgreSQL v15 (coming soon) will have a more intuitive control for this through [security invoker views](https://www.depesz.com/2022/03/22/waiting-for-postgresql-15-add-support-for-security-invoker-views/) and the previous step won't be needed.
 
 </Admonition>
 
@@ -378,7 +378,7 @@ Say we have the following tables from a database of a university:
 | --- | ------------------------ | ------- |
 | 1   | Introduction to Postgres | PG101   |
 | 2   | Authentication Theories  | AUTH205 |
-| 3   | Fundamentals of Supabase | SUP412  |
+| 3   | Fundamentals of iEchor | SUP412  |
 
 **`grades`**
 

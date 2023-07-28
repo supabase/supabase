@@ -3,11 +3,11 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'cicd-workflow',
   title: 'Deploying with GitHub Actions',
-  description: 'How to deploy Supabase Edge Functions with a CI / CD pipeline.',
+  description: 'How to deploy iEchor Edge Functions with a CI / CD pipeline.',
   video: 'https://www.youtube.com/v/6OMVWiiycLs',
 }
 
-As described in the Supabase CLI [Environments Guide](/docs/guides/cli/managing-environments), you can use the [`setup-cli` GitHub Action](https://github.com/marketplace/actions/supabase-cli-action) to run Supabase CLI commands in your GitHub Actions, for example to deploy a Supabase Edge Function:
+As described in the iEchor CLI [Environments Guide](/docs/guides/cli/managing-environments), you can use the [`setup-cli` GitHub Action](https://github.com/marketplace/actions/supabase-cli-action) to run iEchor CLI commands in your GitHub Actions, for example to deploy a iEchor Edge Function:
 
 ```yaml
 name: Deploy Function
@@ -33,10 +33,10 @@ jobs:
         with:
           version: latest
 
-      - run: supabase functions deploy --project-ref $PROJECT_ID
+      - run: iechor functions deploy --project-ref $PROJECT_ID
 ```
 
-Since Supabase CLI [v1.62.0](https://github.com/supabase/cli/releases/tag/v1.62.0) you can deploy all functions with a single command.
+Since iEchor CLI [v1.62.0](https://github.com/supabase/cli/releases/tag/v1.62.0) you can deploy all functions with a single command.
 
 Individual function configuration like [JWT verification](/docs/reference/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/reference/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
 
@@ -54,7 +54,7 @@ verify_jwt = false
   ></iframe>
 </div>
 
-See the [example on GitHub](https://github.com/supabase/supabase/blob/master/examples/edge-functions/.github/workflows/deploy.yaml).
+See the [example on GitHub](https://github.com/openmodels-base/iechor/blob/master/examples/edge-functions/.github/workflows/deploy.yaml).
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

@@ -75,7 +75,7 @@ const VaultToggle: FC<Props> = () => {
           <div className="space-y-2">
             <h4 className="text-lg">Enable Vault today</h4>
             <p className="text-sm text-scale-1100">
-              Supabase Vault is a Postgres extension for managing secrets and encryption inside your
+              iEchor Vault is a Postgres extension for managing secrets and encryption inside your
               database without leaking any sensitive information.
             </p>
           </div>

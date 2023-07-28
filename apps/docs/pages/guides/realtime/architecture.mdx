@@ -3,7 +3,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'architecture',
   title: 'Realtime Architecture',
-  description: 'Architecture of the Supabase Realtime service',
+  description: 'Architecture of the iEchor Realtime service',
   sidebar_label: 'Architecture',
 }
 
@@ -19,7 +19,7 @@ Phoenix is fast and able to handle millions of concurrent connections.
 
 Phoenix can handle many concurrent connections because Elixir provides lightweight processes (not OS processes) to work with.
 
-Client-facing WebSocket servers need to handle many concurrent connections. Elixir & Phoenix let the Supabase Realtime cluster do this easily.
+Client-facing WebSocket servers need to handle many concurrent connections. Elixir & Phoenix let the iEchor Realtime cluster do this easily.
 
 ## Channels
 
@@ -37,7 +37,7 @@ This works globally. A client connected to a Realtime node in the United States 
 
 Broadcast is useful for getting messages to users in the same location very quickly. If a group of clients are connected to a node in Singapore, the message only needs to go to that Realtime node in Singapore and back down. If users are close to a Realtime node they'll get Broadcast messages in the time it takes to ping the cluster.
 
-Thanks to the Realtime cluster, you (an amazing Supabase user) don't have to think about which regions your clients are connected to.
+Thanks to the Realtime cluster, you (an amazing iEchor user) don't have to think about which regions your clients are connected to.
 
 If you're using Broadcast, Presence, or streaming database changes, messages will always get to your users via the shortest path possible.
 

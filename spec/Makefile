@@ -19,7 +19,7 @@ init:
 download: download.api.v1 download.storage.v1 download.tsdoc.v2
 
 download.api.v1:
-	curl -sS https://api.supabase.com/api/v1-json > $(REPO_DIR)/api_v0_openapi.json
+	curl -sS https://api.iechor.com/api/v1-json > $(REPO_DIR)/api_v0_openapi.json
 
 
 # This flow needs to be updated, so we'l comment out for the moment

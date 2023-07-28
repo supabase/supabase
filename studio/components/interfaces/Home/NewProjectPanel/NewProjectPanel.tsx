@@ -77,7 +77,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                     </Button>
                   </a>
                 </Link>
-                <Link href="https://supabase.com/docs/guides/database">
+                <Link href="https://iechor.com/docs/guides/database">
                   <a target="_blank" rel="noreferrer">
                     <Button type="default" icon={<IconExternalLink size={14} />}>
                       About Database
@@ -95,7 +95,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
             <div className="max-w-2xl space-y-2">
               <h3 className="text-xl text-scale-1200">Explore our other products</h3>
               <p className="text-base text-scale-1100">
-                Supabase provides all the backend features you need to build a product. You can use
+                iEchor provides all the backend features you need to build a product. You can use
                 it completely, or just the features you need.
               </p>
             </div>
@@ -119,7 +119,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                         <Button type="default">Explore Auth</Button>
                       </a>
                     </Link>
-                    <Link href="https://supabase.com/docs/guides/auth">
+                    <Link href="https://iechor.com/docs/guides/auth">
                       <a target="_blank" rel="noreferrer">
                         <Button
                           className="translate-y-[1px]"
@@ -153,7 +153,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                         <Button type="default">Explore Storage</Button>
                       </a>
                     </Link>
-                    <Link href="https://supabase.com/docs/guides/storage">
+                    <Link href="https://iechor.com/docs/guides/storage">
                       <a target="_blank" rel="noreferrer">
                         <Button
                           className="translate-y-[1px]"
@@ -188,7 +188,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                         <Button type="default">Explore Functions</Button>
                       </a>
                     </Link>
-                    <Link href="https://supabase.com/docs/guides/functions">
+                    <Link href="https://iechor.com/docs/guides/functions">
                       <a target="_blank" rel="noreferrer">
                         <Button
                           className="translate-y-[1px]"
@@ -216,7 +216,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Link href="https://supabase.com/docs/guides/realtime">
+                    <Link href="https://iechor.com/docs/guides/realtime">
                       <a target="_blank" rel="noreferrer">
                         <Button
                           className="translate-y-[1px]"
@@ -241,8 +241,8 @@ const NewProjectPanel: FC<Props> = ({}) => {
             <h3 className="text-xl text-scale-1200">Connecting to your new project</h3>
             <p className="text-base text-scale-1100 lg:max-w-sm">
               Interact with your database through the{' '}
-              <Link href="https://supabase.com/docs/reference">
-                <a className="text-brand-900">Supabase client libraries</a>
+              <Link href="https://iechor.com/docs/reference">
+                <a className="text-brand-900">iEchor client libraries</a>
               </Link>{' '}
               with your API keys.
             </p>
@@ -257,7 +257,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                 <Button type="default">View API settings</Button>
               </a>
             </Link>
-            <Link href="https://supabase.com/docs/guides/database/api">
+            <Link href="https://iechor.com/docs/guides/database/api">
               <a target="_blank" rel="noreferrer">
                 <Button className="translate-y-[1px]" type="default" icon={<IconExternalLink />}>
                   About APIs

@@ -152,7 +152,7 @@ const PITRSidePanel = () => {
       header={
         <div className="flex items-center justify-between">
           <h4>Point in Time Recovery</h4>
-          <Link href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery">
+          <Link href="https://iechor.com/docs/guides/platform/backups#point-in-time-recovery">
             <a target="_blank" rel="noreferrer">
               <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                 About point in time recovery

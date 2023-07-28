@@ -13,7 +13,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/storage-js/src/StorageClient.ts",
+      "originalName": "/Users/copple/Projects/iEchor/storage-js/src/StorageClient.ts",
       "children": [
         {
           "id": 313,
@@ -1547,7 +1547,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/storage-js/src/index.ts",
+      "originalName": "/Users/copple/Projects/iEchor/storage-js/src/index.ts",
       "children": [
         {
           "id": 381,
@@ -1653,7 +1653,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/storage-js/src/lib/StorageBucketApi.ts",
+      "originalName": "/Users/copple/Projects/iEchor/storage-js/src/lib/StorageBucketApi.ts",
       "children": [
         {
           "id": 107,
@@ -3049,7 +3049,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/storage-js/src/lib/StorageFileApi.ts",
+      "originalName": "/Users/copple/Projects/iEchor/storage-js/src/lib/StorageFileApi.ts",
       "children": [
         {
           "id": 170,
@@ -6687,7 +6687,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/storage-js/src/lib/constants.ts",
+      "originalName": "/Users/copple/Projects/iEchor/storage-js/src/lib/constants.ts",
       "children": [
         {
           "id": 4,
@@ -6764,7 +6764,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/storage-js/src/lib/fetch.ts",
+      "originalName": "/Users/copple/Projects/iEchor/storage-js/src/lib/fetch.ts",
       "children": [
         {
           "id": 7,
@@ -9023,7 +9023,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/storage-js/src/lib/helpers.ts",
+      "originalName": "/Users/copple/Projects/iEchor/storage-js/src/lib/helpers.ts",
       "children": [
         {
           "id": 69,
@@ -9146,7 +9146,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/storage-js/src/lib/index.ts",
+      "originalName": "/Users/copple/Projects/iEchor/storage-js/src/lib/index.ts",
       "children": [
         {
           "id": 305,
@@ -9262,7 +9262,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/storage-js/src/lib/types.ts",
+      "originalName": "/Users/copple/Projects/iEchor/storage-js/src/lib/types.ts",
       "children": [
         {
           "id": 74,
@@ -10052,7 +10052,7 @@
       "flags": {
         "isExported": true
       },
-      "originalName": "/Users/copple/Projects/Supabase/storage-js/src/lib/version.ts",
+      "originalName": "/Users/copple/Projects/iEchor/storage-js/src/lib/version.ts",
       "children": [
         {
           "id": 2,

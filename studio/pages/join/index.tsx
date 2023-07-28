@@ -172,7 +172,7 @@ const JoinOrganizationPage = () => {
                 {name ? name : organization_name ? `${organization_name}` : 'an organization'}
               </p>
               {!token_does_not_exist && (
-                <p className="text-sm text-scale-900">an organization on Supabase</p>
+                <p className="text-sm text-scale-900">an organization on iEchor</p>
               )}
             </>
           ) : (
@@ -245,7 +245,7 @@ const JoinOrganizationPage = () => {
         <a className="flex items-center justify-center gap-4">
           <img
             src={`${router.basePath}/img/supabase-logo.svg`}
-            alt="Supabase"
+            alt="iEchor"
             className="block h-[24px] cursor-pointer rounded"
           />
         </a>

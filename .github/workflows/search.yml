@@ -45,11 +45,11 @@ jobs:
       - name: Download dependencies
         run: npm ci
 
-      - name: Link Supabase project
-        run: npx supabase link --project-ref $PROJECT_ID
+      - name: Link iEchor project
+        run: npx iechor link --project-ref $PROJECT_ID
 
       - name: Run migrations
-        run: npx supabase db push
+        run: npx iechor db push
 
       - name: Update embeddings
         working-directory: ./apps/docs

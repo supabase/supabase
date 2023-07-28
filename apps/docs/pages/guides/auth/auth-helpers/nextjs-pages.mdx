@@ -2,7 +2,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'nextjs-pages',
-  title: 'Supabase Auth with Next.js Pages Directory',
+  title: 'iEchor Auth with Next.js Pages Directory',
   description:
     'Authentication helpers for Next.js API routes, middleware, and SSR in the Pages Directory.',
   sidebar_label: 'Next.js (pages)',
@@ -31,7 +31,7 @@ npm install @supabase/auth-helpers-react
 
 ## Set up environment variables
 
-Retrieve your project URL and anon key in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api) in the Dashboard to set up the following environment variables. For local development you can set them in a `.env.local` file. See an [example](https://github.com/supabase/auth-helpers/blob/main/examples/nextjs/.env.local.example).
+Retrieve your project URL and anon key in your project's [API settings](https://iechor.com/dashboard/project/_/settings/api) in the Dashboard to set up the following environment variables. For local development you can set them in a `.env.local` file. See an [example](https://github.com/supabase/auth-helpers/blob/main/examples/nextjs/.env.local.example).
 
 ```bash .env.local
 NEXT_PUBLIC_IECHOR_URL=your-supabase-url
@@ -56,7 +56,7 @@ import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { useState } from 'react'
 
 function MyApp({ Component, pageProps }) {
-  // Create a new supabase browser client on every first render.
+  // Create a new iechor browser client on every first render.
   const [supabaseClient] = useState(() => createPagesBrowserClient())
 
   return (
@@ -86,7 +86,7 @@ function MyApp({
 }: AppProps<{
   initialSession: Session
 }>) {
-  // Create a new supabase browser client on every first render.
+  // Create a new iechor browser client on every first render.
   const [supabaseClient] = useState(() => createPagesBrowserClient())
 
   return (
@@ -107,7 +107,7 @@ You can now determine if a user is authenticated by checking that the `user` obj
 
 ### Code Exchange API Route
 
-The `Code Exchange` API route is required for the [server-side auth flow](https://supabase.com/docs/guides/auth/server-side-rendering) implemented by the Next.js Auth Helpers. It exchanges an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
+The `Code Exchange` API route is required for the [server-side auth flow](https://iechor.com/docs/guides/auth/server-side-rendering) implemented by the Next.js Auth Helpers. It exchanges an auth `code` for the user's `session`, which is set as a cookie for future requests made to iEchor.
 
 <Tabs
   scrollable
@@ -127,7 +127,7 @@ const handler = async (req, res) => {
   const { code } = req.query
 
   if (code) {
-    const supabase = createPagesServerClient({ req, res })
+    const iechor = createPagesServerClient({ req, res })
     await supabase.auth.exchangeCodeForSession(String(code))
   }
 
@@ -151,7 +151,7 @@ const handler: NextApiHandler = async (req, res) => {
   const { code } = req.query
 
   if (code) {
-    const supabase = createPagesServerClient({ req, res })
+    const iechor = createPagesServerClient({ req, res })
     await supabase.auth.exchangeCodeForSession(String(code))
   }
 
@@ -166,11 +166,11 @@ export default handler
 
 ## Usage with TypeScript
 
-You can pass types that were [generated with the Supabase CLI](/docs/reference/javascript/typescript-support#generating-types) to the Supabase Client to get enhanced type safety and auto completion:
+You can pass types that were [generated with the iEchor CLI](/docs/reference/javascript/typescript-support#generating-types) to the iEchor Client to get enhanced type safety and auto completion:
 
 ### Browser client
 
-Creating a new supabase client object:
+Creating a new iechor client object:
 
 ```tsx
 import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs'
@@ -179,7 +179,7 @@ import { Database } from '../database.types'
 const supabaseClient = createPagesBrowserClient<Database>()
 ```
 
-Retrieving a supabase client object from the SessionContext:
+Retrieving a iechor client object from the SessionContext:
 
 ```tsx
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
@@ -191,7 +191,7 @@ const supabaseClient = useSupabaseClient<Database>()
 ### Server client
 
 ```tsx
-// Creating a new supabase server client object (e.g. in API route):
+// Creating a new iechor server client object (e.g. in API route):
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type { Database } from 'types_db'
@@ -260,7 +260,7 @@ export default LoginPage
 
 ## Server-side rendering (SSR)
 
-Create a server supabase client to retrieve the logged in user's session:
+Create a server iechor client to retrieve the logged in user's session:
 
 ```jsx pages/profile.js
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
@@ -270,8 +270,8 @@ export default function Profile({ user }) {
 }
 
 export const getServerSideProps = async (ctx) => {
-  // Create authenticated Supabase Client
-  const supabase = createPagesServerClient(ctx)
+  // Create authenticated iEchor Client
+  const iechor = createPagesServerClient(ctx)
   // Check if we have a session
   const {
     data: { session },
@@ -296,7 +296,7 @@ export const getServerSideProps = async (ctx) => {
 
 ## Server-side data fetching with RLS
 
-You can use the server supabase client to run [row level security](/docs/learn/auth-deep-dive/auth-row-level-security) authenticated queries server-side:
+You can use the server iechor client to run [row level security](/docs/learn/auth-deep-dive/auth-row-level-security) authenticated queries server-side:
 
 <Tabs
   scrollable
@@ -320,8 +320,8 @@ export default function ProtectedPage({ user, data }) {
 }
 
 export const getServerSideProps = async (ctx) => {
-  // Create authenticated Supabase Client
-  const supabase = createPagesServerClient(ctx)
+  // Create authenticated iEchor Client
+  const iechor = createPagesServerClient(ctx)
   // Check if we have a session
   const {
     data: { session },
@@ -366,8 +366,8 @@ export default function ProtectedPage({ user, data }: { user: User; data: any })
 }
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  // Create authenticated Supabase Client
-  const supabase = createPagesServerClient(ctx)
+  // Create authenticated iEchor Client
+  const iechor = createPagesServerClient(ctx)
   // Check if we have a session
   const {
     data: { session },
@@ -425,8 +425,8 @@ export default function ProtectedPage({ user, allRepos }) {
 }
 
 export const getServerSideProps = async (ctx) => {
-  // Create authenticated Supabase Client
-  const supabase = createPagesServerClient(ctx)
+  // Create authenticated iEchor Client
+  const iechor = createPagesServerClient(ctx)
   // Check if we have a session
   const {
     data: { session },
@@ -477,8 +477,8 @@ export default function ProtectedPage({ user, allRepos }: { user: User; allRepos
 }
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  // Create authenticated Supabase Client
-  const supabase = createPagesServerClient(ctx)
+  // Create authenticated iEchor Client
+  const iechor = createPagesServerClient(ctx)
   // Check if we have a session
   const {
     data: { session },
@@ -514,7 +514,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
 ## Protecting API routes
 
-Create a server supabase client to retrieve the logged in user's session:
+Create a server iechor client to retrieve the logged in user's session:
 
 <Tabs
   scrollable
@@ -528,8 +528,8 @@ Create a server supabase client to retrieve the logged in user's session:
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 
 const ProtectedRoute = async (req, res) => {
-  // Create authenticated Supabase Client
-  const supabase = createPagesServerClient({ req, res })
+  // Create authenticated iEchor Client
+  const iechor = createPagesServerClient({ req, res })
   // Check if we have a session
   const {
     data: { session },
@@ -557,8 +557,8 @@ import { NextApiHandler } from 'next'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 
 const ProtectedRoute: NextApiHandler = async (req, res) => {
-  // Create authenticated Supabase Client
-  const supabase = createPagesServerClient({ req, res })
+  // Create authenticated iEchor Client
+  const iechor = createPagesServerClient({ req, res })
   // Check if we have a session
   const {
     data: { session },
@@ -591,10 +591,10 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
-  // We need to create a response and hand it to the supabase client to be able to modify the response headers.
+  // We need to create a response and hand it to the iechor client to be able to modify the response headers.
   const res = NextResponse.next()
-  // Create authenticated Supabase Client.
-  const supabase = createMiddlewareClient({ req, res })
+  // Create authenticated iEchor Client.
+  const iechor = createMiddlewareClient({ req, res })
   // Check if we have a session
   const {
     data: { session },
@@ -687,8 +687,8 @@ import { NextApiHandler } from 'next'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 
 const ProtectedRoute: NextApiHandler = async (req, res) => {
-  // Create authenticated Supabase Client
-  const supabase = createPagesServerClient({ req, res })
+  // Create authenticated iEchor Client
+  const iechor = createPagesServerClient({ req, res })
   // Check if we have a session
   const {
     data: { session },
@@ -745,8 +745,8 @@ export default function Profile({ user }: { user: User }) {
 }
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  // Create authenticated Supabase Client
-  const supabase = createPagesServerClient(ctx)
+  // Create authenticated iEchor Client
+  const iechor = createPagesServerClient(ctx)
   // Check if we have a session
   const {
     data: { session },
@@ -809,10 +809,10 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
-  // We need to create a response and hand it to the supabase client to be able to modify the response headers.
+  // We need to create a response and hand it to the iechor client to be able to modify the response headers.
   const res = NextResponse.next()
-  // Create authenticated Supabase Client.
-  const supabase = createMiddlewareClient({ req, res })
+  // Create authenticated iEchor Client.
+  const iechor = createMiddlewareClient({ req, res })
   // Check if we have a session
   const {
     data: { session },
@@ -882,9 +882,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
 - The `UserProvider` has been replaced by the `SessionContextProvider`. Make sure to wrap your `pages/_app.js` componenent with the `SessionContextProvider`. Then, throughout your application you can use the `useSessionContext` hook to get the `session` and the `useSupabaseClient` hook to get an authenticated `supabaseClient`.
 - The `useUser` hook now returns the `user` object or `null`.
-- Usage with TypeScript: You can pass types that were [generated with the Supabase CLI](/docs/reference/javascript/typescript-support#generating-types) to the Supabase Client to get enhanced type safety and auto completion:
+- Usage with TypeScript: You can pass types that were [generated with the iEchor CLI](/docs/reference/javascript/typescript-support#generating-types) to the iEchor Client to get enhanced type safety and auto completion:
 
-Creating a new supabase client object:
+Creating a new iechor client object:
 
 ```tsx
 import { Database } from '../database.types'
@@ -892,7 +892,7 @@ import { Database } from '../database.types'
 const [supabaseClient] = useState(() => createPagesBrowserClient<Database>())
 ```
 
-Retrieving a supabase client object from the SessionContext:
+Retrieving a iechor client object from the SessionContext:
 
 ```tsx
 import { useSupabaseClient } from '@supabase/auth-helpers-react'

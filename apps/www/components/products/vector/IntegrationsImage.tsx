@@ -30,7 +30,7 @@ const IntegrationsImage = () => {
       >
         <Image
           src={image}
-          alt="Diagram of Machine Learning tools that integrate with Supabase Vector"
+          alt="Diagram of Machine Learning tools that integrate with iEchor Vector"
           layout="fill"
           objectFit="contain"
         />

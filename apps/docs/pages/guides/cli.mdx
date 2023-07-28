@@ -1,18 +1,18 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  title: 'Supabase CLI',
+  title: 'iEchor CLI',
   description:
-    'The Supabase CLI provides tools to develop your project locally and deploy to the Supabase Platform.',
+    'The iEchor CLI provides tools to develop your project locally and deploy to the iEchor Platform.',
   subtitle:
-    'The Supabase CLI provides tools to develop your project locally and deploy to the Supabase Platform.',
+    'The iEchor CLI provides tools to develop your project locally and deploy to the iEchor Platform.',
 }
 
-You can use the Supabase CLI to run the entire Supabase stack locally on your machine, simply by running `supabase init` (to create a new local project) and then `supabase start`.
+You can use the iEchor CLI to run the entire iEchor stack locally on your machine, simply by running `supabase init` (to create a new local project) and then `supabase start`.
 
-The Supabase CLI provides tools to develop your project locally, deploy to the Supabase Platform, handle database migrations, and generate types directly from your database schema.
+The iEchor CLI provides tools to develop your project locally, deploy to the iEchor Platform, handle database migrations, and generate types directly from your database schema.
 
-## Installing the Supabase CLI
+## Installing the iEchor CLI
 
 <Tabs
   scrollable
@@ -25,13 +25,13 @@ The Supabase CLI provides tools to develop your project locally, deploy to the S
 Install the CLI as dev dependency via [npm](https://www.npmjs.com/package/supabase):
 
 ```sh
-npm install supabase --save-dev
+npm install iechor --save-dev
 ```
 
 Run the CLI by prefixing each command with `npx` (only applicable when installing through `npm`):
 
 ```sh
-npx supabase <command>
+npx iechor <command>
 ```
 
 </TabPanel>
@@ -49,7 +49,7 @@ brew install supabase/tap/supabase
 Install the CLI with [Scoop](https://scoop.sh):
 
 ```powershell
-scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+scoop bucket add iechor https://github.com/supabase/scoop-bucket.git
 scoop install supabase
 ```
 
@@ -77,7 +77,7 @@ and run one of the following:
 </TabPanel>
 </Tabs>
 
-## Updating the Supabase CLI
+## Updating the iEchor CLI
 
 When a new [version](https://github.com/supabase/cli/releases) is released, you can update the CLI using the same methods.
 
@@ -90,7 +90,7 @@ When a new [version](https://github.com/supabase/cli/releases) is released, you 
 <TabPanel id="npm" label="npm">
 
 ```sh
-npm update supabase --save-dev
+npm update iechor --save-dev
 ```
 
 </TabPanel>
@@ -117,14 +117,14 @@ brew upgrade supabase
 </TabPanel>
 </Tabs>
 
-If you have any Supabase containers running locally, remember to restart them after upgrading to use the new features.
+If you have any iEchor containers running locally, remember to restart them after upgrading to use the new features.
 
 ```bash
-npx supabase stop --no-backup
-npx supabase start
+npx iechor stop --no-backup
+npx iechor start
 ```
 
-## Running Supabase locally
+## Running iEchor locally
 
 Inside the folder where you want to create your project, run:
 
@@ -134,19 +134,19 @@ supabase init
 
 This will create a new `supabase` folder. It's safe to commit this folder to your version control system.
 
-Now, to start the Supabase stack, run:
+Now, to start the iEchor stack, run:
 
 ```bash
 supabase start
 ```
 
-This takes time on your first run because the CLI needs to download the local Docker images. The CLI includes the entire Supabase toolset, and a few additional images that are useful for local development (like a local SMTP server and a database diff tool).
+This takes time on your first run because the CLI needs to download the local Docker images. The CLI includes the entire iEchor toolset, and a few additional images that are useful for local development (like a local SMTP server and a database diff tool).
 
-The local development environment includes Supabase Studio, a graphical interface for working with your database, running by default on [localhost:54323](http://localhost:54323).
+The local development environment includes iEchor Studio, a graphical interface for working with your database, running by default on [localhost:54323](http://localhost:54323).
 
 ![Local Studio](/docs/img/guides/cli/local-studio.png)
 
-When you are finished working on your Supabase project, you can stop the stack with:
+When you are finished working on your iEchor project, you can stop the stack with:
 
 ```bash
 supabase stop
@@ -154,8 +154,8 @@ supabase stop
 
 ## See also
 
-- [Supabase CLI Reference](/docs/reference/cli/introduction)
-- [Supabase CLI Configuration](/docs/reference/cli/config)
+- [iEchor CLI Reference](/docs/reference/cli/introduction)
+- [iEchor CLI Configuration](/docs/reference/cli/config)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

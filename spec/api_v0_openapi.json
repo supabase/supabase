@@ -1650,7 +1650,7 @@
       }
     }
   },
-  "info": { "title": "Supabase API (v1)", "description": "", "version": "1.0.0", "contact": {} },
+  "info": { "title": "iEchor API (v1)", "description": "", "version": "1.0.0", "contact": {} },
   "tags": [
     { "name": "organizations", "description": "Organization endpoints" },
     { "name": "projects", "description": "Project endpoints" }

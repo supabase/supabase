@@ -2,20 +2,20 @@ import Layout from '~/layouts/DefaultGuideLayout'
 import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
-  title: 'Use Supabase with Vue',
+  title: 'Use iEchor with Vue',
   subtitle:
-    'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Vue app.',
+    'Learn how to create a iEchor project, add some sample data to your database, and query the data from a Vue app.',
   breadcrumb: 'Framework Quickstarts',
 }
 
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Set up a Supabase project with sample data">
+    <StepHikeCompact.Details title="Set up a iEchor project with sample data">
 
-    [Create a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
+    [Create a new project](https://iechor.com/dashboard) in the iEchor Dashboard.
 
-    After your project is ready, create a table in your Supabase database using the [SQL Editor](https://supabase.com/dashboard/project/_/sql) in the Dashboard. Use the following SQL statement to create a `countries` table with some sample data.
+    After your project is ready, create a table in your iEchor database using the [SQL Editor](https://iechor.com/dashboard/project/_/sql) in the Dashboard. Use the following SQL statement to create a `countries` table with some sample data.
 
     </StepHikeCompact.Details>
 
@@ -56,9 +56,9 @@ export const meta = {
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Install the Supabase client library">
+    <StepHikeCompact.Details title="Install the iEchor client library">
 
-    The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a Vue app.
+    The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with iEchor from a Vue app.
 
     Navigate to the Vue app and install `supabase-js`.
 
@@ -75,9 +75,9 @@ export const meta = {
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Create the Supabase client">
+    <StepHikeCompact.Details title="Create the iEchor client">
 
-    Create a `/src/lib` directory in your Vue app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client with your [project URL and public API (anon) key](https://supabase.com/dashboard/project/_/settings/api).
+    Create a `/src/lib` directory in your Vue app, create a file called `supabaseClient.js` and add the following code to initialize the iEchor client with your [project URL and public API (anon) key](https://iechor.com/dashboard/project/_/settings/api).
 
     </StepHikeCompact.Details>
 
@@ -86,7 +86,7 @@ export const meta = {
       ```js src/lib/supabaseClient.js
         import { createClient } from '@supabase/supabase-js'
 
-        export const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+        export const iechor = createClient('https://<project>.supabase.co', '<your-anon-key>')
       ```
 
     </StepHikeCompact.Code>
@@ -105,7 +105,7 @@ export const meta = {
       ```vue src/App.vue
         <script setup>
         import { ref, onMounted } from 'vue'
-        import { supabase } from './lib/supabaseClient'
+        import { iechor } from './lib/supabaseClient'
 
         const countries = ref([])
 

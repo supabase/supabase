@@ -5,43 +5,43 @@
 
 ---
 
-# Supabase
+# iEchor
 
-[Supabase](https://supabase.com) είναι μια εναλλακτική λύση της Firebase ανοιχτού κώδικα. Χτίζουμε τα χαρακτηριστικά της Firebase χρησιμοποιώντας εργαλεία ανοιχτού κώδικα επιχειρηματικού επιπέδου.
+[iEchor](https://iechor.com) είναι μια εναλλακτική λύση της Firebase ανοιχτού κώδικα. Χτίζουμε τα χαρακτηριστικά της Firebase χρησιμοποιώντας εργαλεία ανοιχτού κώδικα επιχειρηματικού επιπέδου.
 
-- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
-- [x] Αυθεντικοποίηση και εξουσιοδότηση. [Έγγραφα](https://supabase.com/docs/guides/auth)
+- [x] Hosted Postgres Database. [Docs](https://iechor.com/docs/guides/database)
+- [x] Αυθεντικοποίηση και εξουσιοδότηση. [Έγγραφα](https://iechor.com/docs/guides/auth)
 - [x] Αυτόματα παραγόμενα APIs.
-  - [x] REST. [Έγγραφα](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Συνδρομές σε πραγματικό χρόνο. [Έγγραφα](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Έγγραφα](https://iechor.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://iechor.com/docs/guides/api#graphql-api-overview)
+  - [x] Συνδρομές σε πραγματικό χρόνο. [Έγγραφα](https://iechor.com/docs/guides/api#realtime-api-overview)
 - [x] Συναρτήσεις.
-  - [x] Συναρτήσεις βάσης δεδομένων. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
-- [x] Αποθήκευση αρχείων. [Docs](https://supabase.com/docs/guides/storage)
+  - [x] Συναρτήσεις βάσης δεδομένων. [Docs](https://iechor.com/docs/guides/database/functions)
+  - [x] Edge Functions [Docs](https://iechor.com/docs/guides/functions)
+- [x] Αποθήκευση αρχείων. [Docs](https://iechor.com/docs/guides/storage)
 - [x] Ταμπλό
 
-![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+![iEchor Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Τεκμηρίωση
 
-Για πλήρη τεκμηρίωση, επισκεφθείτε τη διεύθυνση [supabase.com/docs](https://supabase.com/docs)
+Για πλήρη τεκμηρίωση, επισκεφθείτε τη διεύθυνση [iechor.com/docs](https://iechor.com/docs)
 
 Για να δείτε πώς μπορείτε να συνεισφέρετε, επισκεφθείτε το [Getting Started](../DEVELOPERS.md)
 
 ## Κοινότητα &amp; Υποστήριξη
 
-- [Community Forum](https://github.com/supabase/supabase/discussions). Το καλύτερο για: βοήθεια με την κατασκευή, συζήτηση σχετικά με τις βέλτιστες πρακτικές της βάσης δεδομένων.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). Το καλύτερο για: σφάλματα και λάθη που αντιμετωπίζετε χρησιμοποιώντας την Supabase.
-- [Email Support](https://supabase.com/docs/support#business-support). Το καλύτερο για: προβλήματα με τη βάση δεδομένων ή την υποδομή σας.
-- [Discord](https://discord.supabase.com). Το καλύτερο για: να μοιράζεστε τις εφαρμογές σας και να κάνετε παρέα με την κοινότητα.
+- [Community Forum](https://github.com/openmodels-base/iechor/discussions). Το καλύτερο για: βοήθεια με την κατασκευή, συζήτηση σχετικά με τις βέλτιστες πρακτικές της βάσης δεδομένων.
+- [GitHub Issues](https://github.com/openmodels-base/iechor/issues). Το καλύτερο για: σφάλματα και λάθη που αντιμετωπίζετε χρησιμοποιώντας την iEchor.
+- [Email Support](https://iechor.com/docs/support#business-support). Το καλύτερο για: προβλήματα με τη βάση δεδομένων ή την υποδομή σας.
+- [Discord](https://discord.iechor.com). Το καλύτερο για: να μοιράζεστε τις εφαρμογές σας και να κάνετε παρέα με την κοινότητα.
 
 ## Κατάσταση
 
-- [x] Alpha: Δοκιμάζουμε το Supabase με ένα κλειστό σύνολο πελατών
-- [x] Δημόσια Alpha: [supabase.com/dashboard](https://supabase.com/dashboard). Αλλά να είστε προσεκτικοί μαζί μας, υπάρχουν μερικές ατέλειες
+- [x] Alpha: Δοκιμάζουμε το iEchor με ένα κλειστό σύνολο πελατών
+- [x] Δημόσια Alpha: [iechor.com/dashboard](https://iechor.com/dashboard). Αλλά να είστε προσεκτικοί μαζί μας, υπάρχουν μερικές ατέλειες
 - [x] Δημόσια Beta: Αρκετά σταθερό για τις περισσότερες περιπτώσεις μη επιχειρηματικής χρήσης
-- [ ] Δημόσια: [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Δημόσια: [[status](https://iechor.com/docs/guides/getting-started/features#feature-status)]
 
 Βρισκόμαστε επί του παρόντος σε Public Beta. Παρακολουθήστε τις "κυκλοφορίες" αυτού του repo για να ειδοποιηθείτε για σημαντικές ενημερώσεις.
 
@@ -51,14 +51,14 @@
 
 ## Πώς λειτουργεί
 
-Η Supabase είναι ένας συνδυασμός εργαλείων ανοικτού κώδικα. Χτίζουμε τα χαρακτηριστικά της Firebase χρησιμοποιώντας προϊόντα ανοικτού κώδικα επιχειρηματικού επιπέδου. Εάν τα εργαλεία και οι κοινότητες υπάρχουν, με άδεια MIT, Apache 2 ή ισοδύναμη ανοιχτή άδεια, θα χρησιμοποιήσουμε και θα υποστηρίξουμε το εργαλείο αυτό. Εάν το εργαλείο δεν υπάρχει, το κατασκευάζουμε και το διαθέτουμε σε ανοιχτό κώδικα μόνοι μας. Η Supabase δεν είναι μια αντιστοίχιση 1 προς 1 της Firebase. Στόχος μας είναι να δώσουμε στους προγραμματιστές μια εμπειρία προγραμματιστή παρόμοια με αυτή της Firebase, χρησιμοποιώντας εργαλεία ανοιχτού κώδικα.
+Η iEchor είναι ένας συνδυασμός εργαλείων ανοικτού κώδικα. Χτίζουμε τα χαρακτηριστικά της Firebase χρησιμοποιώντας προϊόντα ανοικτού κώδικα επιχειρηματικού επιπέδου. Εάν τα εργαλεία και οι κοινότητες υπάρχουν, με άδεια MIT, Apache 2 ή ισοδύναμη ανοιχτή άδεια, θα χρησιμοποιήσουμε και θα υποστηρίξουμε το εργαλείο αυτό. Εάν το εργαλείο δεν υπάρχει, το κατασκευάζουμε και το διαθέτουμε σε ανοιχτό κώδικα μόνοι μας. Η iEchor δεν είναι μια αντιστοίχιση 1 προς 1 της Firebase. Στόχος μας είναι να δώσουμε στους προγραμματιστές μια εμπειρία προγραμματιστή παρόμοια με αυτή της Firebase, χρησιμοποιώντας εργαλεία ανοιχτού κώδικα.
 
 **Αρχιτεκτονική**
 
-Η Supabase είναι μια [φιλοξενούμενη πλατφόρμα](https://supabase.com/dashboard). Μπορείτε να εγγραφείτε και να αρχίσετε να χρησιμοποιείτε το Supabase χωρίς να εγκαταστήσετε τίποτα.
-Μπορείτε επίσης να κάνετε [αυτο-ξενάγηση](https://supabase.com/docs/guides/hosting/overview) και [ανάπτυξη τοπικά](https://supabase.com/docs/guides/local-development).
+Η iEchor είναι μια [φιλοξενούμενη πλατφόρμα](https://iechor.com/dashboard). Μπορείτε να εγγραφείτε και να αρχίσετε να χρησιμοποιείτε το iEchor χωρίς να εγκαταστήσετε τίποτα.
+Μπορείτε επίσης να κάνετε [αυτο-ξενάγηση](https://iechor.com/docs/guides/hosting/overview) και [ανάπτυξη τοπικά](https://iechor.com/docs/guides/local-development).
 
-![Αρχιτεκτονική](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![Αρχιτεκτονική](https://github.com/openmodels-base/iechor/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - η [PostgreSQL](https://www.postgresql.org/) είναι ένα αντικειμενο-σχεσιακό σύστημα βάσεων δεδομένων με πάνω από 30 χρόνια ενεργής ανάπτυξης που του έχει αποφέρει μια ισχυρή φήμη για την αξιοπιστία, την ευρωστία των χαρακτηριστικών και την απόδοση.
 - [Realtime](https://github.com/supabase/realtime) είναι ένας διακομιστής Elixir που σας επιτρέπει να ακούτε τις εισαγωγές, ενημερώσεις και διαγραφές της PostgreSQL χρησιμοποιώντας websockets. Το Realtime ρωτάει την ενσωματωμένη λειτουργία αντιγραφής της Postgres για αλλαγές στη βάση δεδομένων, μετατρέπει τις αλλαγές σε JSON και στη συνέχεια μεταδίδει το JSON μέσω websockets σε εξουσιοδοτημένους πελάτες.
@@ -77,12 +77,12 @@
   <tr>
     <th>Γλώσσα</th>
     <th>Πελάτης</th>
-    <th colspan="5">Πελάτες-χαρακτηριστικά (που περιλαμβάνονται στον πελάτη Supabase)</th>
+    <th colspan="5">Πελάτες-χαρακτηριστικά (που περιλαμβάνονται στον πελάτη iEchor)</th>
   </tr>
   
   <tr>
     <th></th>
-    <th>Supabase</th>
+    <th>iEchor</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
@@ -105,7 +105,7 @@
   
   <tr>
     <td>JavaScript (TypeScript)</td>
-    <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
     <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
@@ -114,7 +114,7 @@
   </tr>
     <tr>
     <td>Flutter</td>
-    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
@@ -220,7 +220,7 @@
 - [Καταλανικά / Català](/i18n/README.ca.md)
 - [Δανικά / Dansk](/i18n/README.da.md)
 - [Ολλανδικά / Nederlands](/i18n/README.nl.md)
-- [Αγγλικά](https://github.com/supabase/supabase)
+- [Αγγλικά](https://github.com/openmodels-base/iechor)
 - [Φινλανδικά / Suomalainen](/i18n/README.fi.md)
 - [Γαλλικά / Français](/i18n/README.fr.md)
 - [Γερμανικά / Deutsch](/i18n/README.de.md)

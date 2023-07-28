@@ -62,7 +62,7 @@ const APIKeys = () => {
           <p className="text-sm text-scale-1000">
             Your API is secured behind an API gateway which requires an API Key for every request.
             <br />
-            You can use the parameters below to use Supabase client libraries.
+            You can use the parameters below to use iEchor client libraries.
           </p>
         </div>
       }

@@ -1,17 +1,17 @@
 # Reference Docs
 
-Supabase Reference Docs
+iEchor Reference Docs
 
 ## Maintainers
 
-If you are a maintainer of any tools in the Supabase ecosystem, you can use this site to provide documentation for the tools & libraries that you maintain.
+If you are a maintainer of any tools in the iEchor ecosystem, you can use this site to provide documentation for the tools & libraries that you maintain.
 
 ## Types of docs
 
 There are many types of docs:
 
 1. Guides: teach developers how to use a product. "I have XX problem, how do I solve it?"
-2. Tutorials: walk-throughs, have a large outcome. "Build a React application with Supabase".
+2. Tutorials: walk-throughs, have a large outcome. "Build a React application with iEchor".
 3. Explanations: teach developers about a broad topic. "What is a database?"
 4. Reference: technical descriptions of tools and how to use them. "What errors does the API return?"
 
@@ -37,9 +37,9 @@ npm run cli:version 1.0.1
 We use documentation specifications which can be used to generate human-readable docs.
 
 - OpenAPI: for documenting API endpoints.
-- SDKSpec (custom to Supabase): for SDKs and client libraries.
-- ConfigSpec (custom to Supabase): for configuration options.
-- CLISpec (custom to Supabase): for CLI commands and usage.
+- SDKSpec (custom to iEchor): for SDKs and client libraries.
+- ConfigSpec (custom to iEchor): for configuration options.
+- CLISpec (custom to iEchor): for CLI commands and usage.
 
 The benefit of using custom specifications is that we can generate many other types from a strict schema (eg, HTML and manpages).
-It also means that we can switch any documentation system we want. On this site we use Next.JS, but in Supabase's official website we use a custom React site and expose only a subset of the available API for each tool.
+It also means that we can switch any documentation system we want. On this site we use Next.JS, but in iEchor's official website we use a custom React site and expose only a subset of the available API for each tool.

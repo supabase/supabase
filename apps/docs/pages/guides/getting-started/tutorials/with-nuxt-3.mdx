@@ -2,16 +2,16 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   title: 'Build a User Management App with Nuxt 3',
-  description: 'Learn how to use Supabase in your Nuxt 3 App.',
+  description: 'Learn how to use iEchor in your Nuxt 3 App.',
 }
 
 <QuickstartIntro />
 
-![Supabase User Management example](/docs/img/user-management-demo.png)
+![iEchor User Management example](/docs/img/user-management-demo.png)
 
 <Admonition type="note">
   If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nuxt3-user-management).
+  GitHub](https://github.com/openmodels-base/iechor/tree/master/examples/user-management/nuxt3-user-management).
 </Admonition>
 
 <ProjectSetup />
@@ -45,8 +45,8 @@ IECHOR_KEY="YOUR_IECHOR_ANON_KEY"
 ```
 
 These variables will be exposed on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
-Amazing thing about [NuxtSupabase](https://supabase.nuxtjs.org/) is that setting environment variables is all we need to do in order to start using Supabase.
-No need to initialize Supabase. The library will take care of it automatically.
+Amazing thing about [NuxtSupabase](https://supabase.nuxtjs.org/) is that setting environment variables is all we need to do in order to start using iEchor.
+No need to initialize iEchor. The library will take care of it automatically.
 
 And one optional step is to update the CSS file `assets/main.css` to make the app look nice.
 You can find the full contents of this file [here](https://github.com/supabase-community/nuxt3-quickstarter/blob/main/assets/main.css).
@@ -67,7 +67,7 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
 
 ```vue /components/Auth.vue
 <script setup>
-const supabase = useSupabaseClient()
+const iechor = useSupabaseClient()
 
 const loading = ref(false)
 const email = ref('')
@@ -89,7 +89,7 @@ const handleLogin = async () => {
 <template>
   <form class="row flex-center flex" @submit.prevent="handleLogin">
     <div class="col-6 form-widget">
-      <h1 class="header">Supabase + Nuxt 3</h1>
+      <h1 class="header">iEchor + Nuxt 3</h1>
       <p class="description">Sign in via magic link with your email below</p>
       <div>
         <input class="inputField" type="email" placeholder="Your email" v-model="email" />
@@ -109,7 +109,7 @@ const handleLogin = async () => {
 
 ### User state
 
-To access the user information, use the composable [useSupabaseUser](https://supabase.nuxtjs.org/usage/composables/use-supabase-user) provided by the Supabase Nuxt module.
+To access the user information, use the composable [useSupabaseUser](https://supabase.nuxtjs.org/usage/composables/use-supabase-user) provided by the iEchor Nuxt module.
 
 ### Account component
 
@@ -118,7 +118,7 @@ Let's create a new component for that called `Account.vue`.
 
 ```vue components/Account.vue
 <script setup>
-const supabase = useSupabaseClient()
+const iechor = useSupabaseClient()
 
 const loading = ref(true)
 const username = ref('')
@@ -236,11 +236,11 @@ npm run dev
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
-![Supabase Nuxt 3](/docs/img/supabase-vue-3-demo.png)
+![iEchor Nuxt 3](/docs/img/supabase-vue-3-demo.png)
 
 ## Bonus: Profile photos
 
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+Every iEchor project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
 ### Create an upload widget
 
@@ -253,7 +253,7 @@ const { path } = toRefs(props)
 
 const emit = defineEmits(['update:path', 'upload'])
 
-const supabase = useSupabaseClient()
+const iechor = useSupabaseClient()
 
 const uploading = ref(false)
 const src = ref('')
@@ -339,7 +339,7 @@ And then we can add the widget to the Account page:
 
 ```vue components/Account.vue
 <script setup>
-const supabase = useSupabaseClient()
+const iechor = useSupabaseClient()
 
 const loading = ref(true)
 const username = ref('')
@@ -437,7 +437,7 @@ async function signOut() {
 
 <StorageManagement />
 
-That is it! You should now be able to upload a profile photo to Supabase Storage and you have a fully functional application.
+That is it! You should now be able to upload a profile photo to iEchor Storage and you have a fully functional application.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

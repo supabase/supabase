@@ -32,7 +32,7 @@ export abstract class Hooks {
     }
   }
 
-  @step('Create Supabase client')
+  @step('Create iEchor client')
   createSupaClient(
     url: string,
     key: string,
@@ -51,7 +51,7 @@ export abstract class Hooks {
     username: string
     id: string
   }> {
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
 
     const fakeUser = {
       email: faker.internet.exampleEmail(),
@@ -127,7 +127,7 @@ export abstract class Hooks {
     return supabase.auth.getUser()
   }
 
-  @step((user: User) => `Get user by ID (${user.id}) from Supabase auth schema`)
+  @step((user: User) => `Get user by ID (${user.id}) from iEchor auth schema`)
   async selectUser(user: User): Promise<[{ email: string }]> {
     return Hooks.sql`
         select
@@ -189,13 +189,13 @@ export abstract class Hooks {
     return supabase.auth.updateUser(attr)
   }
 
-  @step('Create signed in supabase client')
+  @step('Create signed in iechor client')
   async createSignedInSupaClient() {
     // create user
     const fakeUser = await this.createUser()
 
     // sign in as user
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
     const {
       data: { user },
       error: signInError,

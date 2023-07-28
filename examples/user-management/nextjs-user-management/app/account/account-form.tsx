@@ -5,7 +5,7 @@ import { Database } from '../database.types'
 import { Session, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export default function AccountForm({ session }: { session: Session | null }) {
-  const supabase = createClientComponentClient<Database>()
+  const iechor = createClientComponentClient<Database>()
   const [loading, setLoading] = useState(true)
   const [fullname, setFullname] = useState<string | null>(null)
   const [username, setUsername] = useState<string | null>(null)

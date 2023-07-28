@@ -49,7 +49,7 @@
           "kindString": "Class",
           "flags": {},
           "comment": {
-            "shortText": "Supabase Client.",
+            "shortText": "iEchor Client.",
             "text": "An isomorphic Javascript client for interacting with Postgres.\n"
           },
           "children": [
@@ -84,7 +84,7 @@
                       "kindString": "Parameter",
                       "flags": {},
                       "comment": {
-                        "shortText": "The unique Supabase URL which is supplied when you create a new project in your project dashboard."
+                        "shortText": "The unique iEchor URL which is supplied when you create a new project in your project dashboard."
                       },
                       "type": {
                         "type": "intrinsic",
@@ -98,7 +98,7 @@
                       "kindString": "Parameter",
                       "flags": {},
                       "comment": {
-                        "shortText": "The unique Supabase Key which is supplied when you create a new project in your project dashboard."
+                        "shortText": "The unique iEchor Key which is supplied when you create a new project in your project dashboard."
                       },
                       "type": {
                         "type": "intrinsic",
@@ -375,7 +375,7 @@
                                     "isOptional": true
                                   },
                                   "comment": {
-                                    "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                                    "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in iEchor. Defaults to 'public'."
                                   },
                                   "sources": [
                                     {
@@ -448,7 +448,7 @@
               "kindString": "Property",
               "flags": {},
               "comment": {
-                "shortText": "Supabase Auth allows you to create and manage user sessions for access to data that is secured by access policies."
+                "shortText": "iEchor Auth allows you to create and manage user sessions for access to data that is secured by access policies."
               },
               "sources": [
                 {
@@ -860,7 +860,7 @@
                   "kindString": "Get signature",
                   "flags": {},
                   "comment": {
-                    "shortText": "Supabase Functions allows you to deploy and invoke edge functions."
+                    "shortText": "iEchor Functions allows you to deploy and invoke edge functions."
                   },
                   "type": {
                     "type": "reference",
@@ -892,7 +892,7 @@
                   "kindString": "Get signature",
                   "flags": {},
                   "comment": {
-                    "shortText": "Supabase Storage allows you to manage user-generated content, such as photos or videos."
+                    "shortText": "iEchor Storage allows you to manage user-generated content, such as photos or videos."
                   },
                   "type": {
                     "type": "reference",
@@ -1483,7 +1483,7 @@
                                     "isOptional": true
                                   },
                                   "comment": {
-                                    "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                                    "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in iEchor. Defaults to 'public'."
                                   },
                                   "sources": [
                                     {
@@ -2335,7 +2335,7 @@
               "kindString": "Call signature",
               "flags": {},
               "comment": {
-                "shortText": "Creates a new Supabase Client."
+                "shortText": "Creates a new iEchor Client."
               },
               "parameters": [
                 {
@@ -2630,7 +2630,7 @@
                                 "isOptional": true
                               },
                               "comment": {
-                                "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                                "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in iEchor. Defaults to 'public'."
                               },
                               "sources": [
                                 {
@@ -4408,7 +4408,7 @@
                     "isOptional": true
                   },
                   "comment": {
-                    "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                    "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in iEchor. Defaults to 'public'."
                   },
                   "sources": [
                     {

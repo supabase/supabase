@@ -26,7 +26,7 @@ export async function fetchVercelProjects({
 
 /**
  * /v6/projects/:id returns project alias with domain info.
- * We need this to setup Supabase Auth site url on project creation.
+ * We need this to setup iEchor Auth site url on project creation.
  *
  * Do not update to /v8/projects/:id as it doesn't return alias info
  */

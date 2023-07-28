@@ -3,14 +3,14 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'auth-workos',
   title: 'Login with WorkOS',
-  description: 'Add WorkOS OAuth to your Supabase project',
+  description: 'Add WorkOS OAuth to your iEchor project',
 }
 
-To enable WorkOS Auth for your project, you need to set up WorkOS OAuth application and add the application credentials to your Supabase Dashboard.
+To enable WorkOS Auth for your project, you need to set up WorkOS OAuth application and add the application credentials to your iEchor Dashboard.
 
 ## Overview
 
-In this guide, we will cover how to use Supabase OAuth with WorkOS to implement Single-Sign-On(SSO).
+In this guide, we will cover how to use iEchor OAuth with WorkOS to implement Single-Sign-On(SSO).
 
 The procedure consists of five broad steps:
 
@@ -18,7 +18,7 @@ The procedure consists of five broad steps:
 - Obtain the `Client ID` from the Configuration tab and configure redirect URI.
 - Obtain the `WorkOS Secret` from the credentials tab.
 - Connect a WorkOS Supported Identity Provider
-- Add your WorkOS credentials into your Supabase project
+- Add your WorkOS credentials into your iEchor project
 
 ## Create a WorkOS Organization
 
@@ -28,7 +28,7 @@ Log in to the dashboard and hop over to the Organizations tab to create and orga
 ## Obtain the Client ID and configure Redirect URI
 
 Head over to the Configuration tab and configure the redirect URI.The redirect URI should look like `https://<project-ref>.supabase.co/auth/v1/callback`
-Note that this is distinct from the redirect URI referred to in the Supabase dashboard
+Note that this is distinct from the redirect URI referred to in the iEchor dashboard
 
 ![Fetch Client ID and configure Redirect URI](/docs/img/guides/auth-workos/workos-clientid-redirect-uri.png)
 
@@ -46,7 +46,7 @@ Set up the identity provider by visiting the setup link.
 
 You can pick between any one of the many identity providers that WorkOS supports.
 
-## Add your WorkOS credentials into your Supabase Project
+## Add your WorkOS credentials into your iEchor Project
 
 <SocialProviderSettingsSupabase provider="WorkOS" />
 

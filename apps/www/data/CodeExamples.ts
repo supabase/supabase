@@ -20,7 +20,7 @@ export const createUserExample: ExampleProps = {
   // Initialize 
   const supabaseUrl = 'https://chat-room.supabase.co'
   const supabaseKey = 'public-anon-key'
-  const supabase = createClient(supabaseUrl, supabaseKey)
+  const iechor = createClient(supabaseUrl, supabaseKey)
   
   // Create a new user
   const { user, error } = await supabase.auth.signUpWithPassword({
@@ -42,7 +42,7 @@ export const subscribeExample: ExampleProps = {
   // Initialize 
   const supabaseUrl = 'https://chat-room.supabase.co'
   const supabaseKey = 'public-anon-key'
-  const supabase = createClient(supabaseUrl, supabaseKey)
+  const iechor = createClient(supabaseUrl, supabaseKey)
   
   // Get notified of all new chat messages
   const realtime = supabase
@@ -66,7 +66,7 @@ export const readExample: ExampleProps = {
   // Initialize 
   const supabaseUrl = 'https://chat-room.supabase.co'
   const supabaseKey = 'public-anon-key'
-  const supabase = createClient(supabaseUrl, supabaseKey)
+  const iechor = createClient(supabaseUrl, supabaseKey)
   
   // Get public rooms and their messages
   const publicRooms = await supabase
@@ -91,12 +91,12 @@ export const createExample: ExampleProps = {
   // Initialize 
   const supabaseUrl = 'https://chat-room.supabase.co'
   const supabaseKey = 'public-anon-key'
-  const supabase = createClient(supabaseUrl, supabaseKey)
+  const iechor = createClient(supabaseUrl, supabaseKey)
   
   // Create a new chat room
   const newRoom = await supabase
     .from('rooms')
-    .insert({ name: 'Supabase Fan Club', public: true })
+    .insert({ name: 'iEchor Fan Club', public: true })
     `,
   },
 }
@@ -112,7 +112,7 @@ export const updateExample: ExampleProps = {
   // Initialize 
   const supabaseUrl = 'https://chat-room.supabase.co'
   const supabaseKey = 'public-anon-key'
-  const supabase = createClient(supabaseUrl, supabaseKey)
+  const iechor = createClient(supabaseUrl, supabaseKey)
   
   // Update multiple users
   const updatedUsers = await supabase
@@ -142,7 +142,7 @@ export const updateExample: ExampleProps = {
 //   // Initialize
 //   const supabaseUrl = 'https://chat-room.supabase.co'
 //   const supabaseKey = 'public-anon-key'
-//   const supabase = createClient(supabaseUrl, supabaseKey)
+//   const iechor = createClient(supabaseUrl, supabaseKey)
 
 //   // Get notified of all new chat messages
 //   const realtime = supabase
@@ -158,7 +158,7 @@ export const updateExample: ExampleProps = {
 //   // Initialize
 //   const supabaseUrl = 'https://chat-room.supabase.co'
 //   const supabaseKey = 'public-anon-key'
-//   const supabase = createClient(supabaseUrl, supabaseKey)
+//   const iechor = createClient(supabaseUrl, supabaseKey)
 
 //   // Get public rooms and their messages
 //   const publicRooms = await supabase
@@ -175,12 +175,12 @@ export const updateExample: ExampleProps = {
 //   // Initialize
 //   const supabaseUrl = 'https://chat-room.supabase.co'
 //   const supabaseKey = 'public-anon-key'
-//   const supabase = createClient(supabaseUrl, supabaseKey)
+//   const iechor = createClient(supabaseUrl, supabaseKey)
 
 //   // Create a new chat room
 //   const newRoom = await supabase
 //     .from('rooms')
-//     .insert({ name: 'Supabase Fan Club', public: true })
+//     .insert({ name: 'iEchor Fan Club', public: true })
 //   `
 // const updateExample = `
 //   import { createClient } from '@supabase/supabase-js'
@@ -188,7 +188,7 @@ export const updateExample: ExampleProps = {
 //   // Initialize
 //   const supabaseUrl = 'https://chat-room.supabase.co'
 //   const supabaseKey = 'public-anon-key'
-//   const supabase = createClient(supabaseUrl, supabaseKey)
+//   const iechor = createClient(supabaseUrl, supabaseKey)
 
 //   // Update multiple users
 //   const updatedUsers = await supabase
@@ -200,7 +200,7 @@ export const updateExample: ExampleProps = {
 //   import { NextApiRequest, NextApiResponse } from 'next';
 //   import { createClient } from '@supabase/supabase-js';
 
-//   const supabase = createClient(
+//   const iechor = createClient(
 //     process.env.NEXT_PUBLIC_IECHOR_URL,
 //     process.env.IECHOR_SECRET_KEY
 //   );
@@ -227,7 +227,7 @@ export const updateExample: ExampleProps = {
 //     // Initialize
 //     const supabaseUrl = 'https://chat-room.supabase.co'
 //     const supabaseKey = 'public-anon-key'
-//     const supabase = Supabase.createClient(supabaseUrl, supabaseKey)
+//     const iechor = iEchor.createClient(supabaseUrl, supabaseKey)
 
 //     // Get public rooms and their messages
 //     supabase

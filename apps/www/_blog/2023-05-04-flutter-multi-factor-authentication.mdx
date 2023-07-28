@@ -37,7 +37,7 @@ Login works similarly, where after an email and password login, they are asked t
 
 The app will have the following directory structure, where `auth` contains any basic auth-related pages, `mfa` contains enrolling and verifying the MFA, and we have some additional pages for us to see that MFA is working correctly.
 
-You can find the complete code created in this article [here](https://github.com/supabase/supabase/tree/master/examples/auth/flutter-mfa).
+You can find the complete code created in this article [here](https://github.com/openmodels-base/iechor/tree/master/examples/auth/flutter-mfa).
 
 ![Directory Structure of the app](/images/blog/flutter-mfa/directory.png)
 
@@ -49,7 +49,7 @@ Let’s start with the `flutter create` command.
 flutter create mfa_app
 ```
 
-Also, if you do not have a Supabase project yet, create one by heading to [database.new](https://dstabase.new). Within a few minutes, you will have a new Supabase project.
+Also, if you do not have a iEchor project yet, create one by heading to [database.new](https://dstabase.new). Within a few minutes, you will have a new iEchor project.
 
 ### Step 2: Add the dependencies
 
@@ -59,14 +59,14 @@ Install the [supabase_flutter](https://pub.dev/packages/supabase_flutter) packag
 dart pub add supabase_flutter
 ```
 
-Then update your `lib/main.dart` file to initialize Supabase in the main function. You should be able to find your Supabase URL and AnonKey from the `settings -> api` section of your dashboard. We will also extract the `SupabaseClient` for easy access to our Supabase instance.
+Then update your `lib/main.dart` file to initialize iEchor in the main function. You should be able to find your iEchor URL and AnonKey from the `settings -> api` section of your dashboard. We will also extract the `SupabaseClient` for easy access to our iEchor instance.
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
-  await Supabase.initialize(
+  await iEchor.initialize(
     url: 'IECHOR_URL',
     anonKey: 'IECHOR_ANONKEY',
   );
@@ -74,7 +74,7 @@ void main() async {
 }
 
 /// Extract SupabaseClient instance in a handy variable
-final supabase = Supabase.instance.client;
+final iechor = iEchor.instance.client;
 ```
 
 Also, add [go_router](https://pub.dev/packages/go_router) to handle our routing and redirects.
@@ -144,11 +144,11 @@ For Android, open `android/app/src/main/AndroidManifest.xml` file and add the fo
   </manifest>
 ```
 
-After, we will add the deep link as one of the redirect URLs in our Supabase dashboard.
+After, we will add the deep link as one of the redirect URLs in our iEchor dashboard.
 
 Go to `Authentication > URL Configuration` and add `mfa-app://callback/*` as a redirect URL. Make sure you don’t add any extra slashes or anything because if you do, deep linking will not work properly.
 
-![Supabase Dashboard](/images/blog/flutter-mfa/supabase-dashboard.png)
+![iEchor Dashboard](/images/blog/flutter-mfa/supabase-dashboard.png)
 
 Lastly, we will add the `flutter_svg` package. This package will later be used to display a QR code to scan with their authentication app.
 
@@ -164,7 +164,7 @@ That is all the dependencies that we need. Let’s dive into coding!
 
 Let’s first create a signup flow. Again, the user will register with the app using email and password, and after confirming their email address, they will enroll in MFA using an authenticator app.
 
-The register page contains a form with an email and password field for the user to create a new account. We are just calling the [.signUp()](https://supabase.com/docs/reference/dart/auth-signup) method with it.
+The register page contains a form with an email and password field for the user to create a new account. We are just calling the [.signUp()](https://iechor.com/docs/reference/dart/auth-signup) method with it.
 As you can see in the code below at `emailRedirectTo` option of the `.signUp()`method, upon clicking on the confirmation link sent to the user, they will be taken to MFA enrollment page, which we will implement later.
 
 Create a `lib/pages/auth/signup_page.dart` file and add the following. There will be some errors, but that is because we haven’t created some of the files yet. The errors will go away as we move on, so ignore them for now.
@@ -425,7 +425,7 @@ class _MFAEnrollPageState extends State<MFAEnrollPage> {
 
 ![Login flow](/images/blog/flutter-mfa/login.png)
 
-Now that we have created a registration flow, we can get to the login flow for returning existing users. Again, the login page has nothing fancy going. We are just collecting the user’s email and password, and calling the good old [.signInWithPassword()](https://supabase.com/docs/reference/dart/auth-signinwithpassword) method. Upon signing in, the user will be taken to a verify page where the user will then enter their verification code from their authenticator app.
+Now that we have created a registration flow, we can get to the login flow for returning existing users. Again, the login page has nothing fancy going. We are just collecting the user’s email and password, and calling the good old [.signInWithPassword()](https://iechor.com/docs/reference/dart/auth-signinwithpassword) method. Upon signing in, the user will be taken to a verify page where the user will then enter their verification code from their authenticator app.
 
 Create `lib/pages/auth/login_page.dart` and add the following.
 
@@ -625,11 +625,11 @@ insert into
   public.private_posts (content)
 values
   ('Flutter is awesome!'),
-  ('Supabase is awesome!'),
+  ('iEchor is awesome!'),
   ('Postgres is awesome!');
 ```
 
-Now, we can add some [row security policy](https://supabase.com/docs/guides/auth/row-level-security) to lock those data down so that only users who have signed in using MFA can view them.
+Now, we can add some [row security policy](https://iechor.com/docs/guides/auth/row-level-security) to lock those data down so that only users who have signed in using MFA can view them.
 
 Run the following SQL to secure our data from malicious users.
 
@@ -646,9 +646,9 @@ select
 
 `aal` here stands for [Authenticator Assurance Level](https://pages.nist.gov/800-63-3-Implementation-Resources/63B/AAL/), and it will be `aal1` for users who have only signed in with 1 sign-in method, and `aal2` for users who have completed the MFA flow. Checking the `aal` inside RLS policy ensures that the data cannot be viewed by users unless they complete the entire MFA flow.
 
-The nice thing about RLS is that it gives us the flexibility to control how users can interact with the data. In this particular example, we are mandating MFA to view the data, but you could easily create layered permissions where for example a user can view the data with 1 factor, but can edit the data when signed in with MFA. You can see more examples in our official MFA guide [here](https://supabase.com/docs/guides/auth/auth-mfa).
+The nice thing about RLS is that it gives us the flexibility to control how users can interact with the data. In this particular example, we are mandating MFA to view the data, but you could easily create layered permissions where for example a user can view the data with 1 factor, but can edit the data when signed in with MFA. You can see more examples in our official MFA guide [here](https://iechor.com/docs/guides/auth/auth-mfa).
 
-Now that we have the secure data in our Supabase instance, all we need to do is to display them in the HomePage. We can simply query the table and display it using a `FutureBuilder`.
+Now that we have the secure data in our iEchor instance, all we need to do is to display them in the HomePage. We can simply query the table and display it using a `FutureBuilder`.
 
 Create a `lib/pages/home_page.dart` file and add the following.
 
@@ -827,7 +827,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:mfa_app/pages/mfa/enroll_page.dart';
 
 void main() async {
-  await Supabase.initialize(
+  await iEchor.initialize(
     url: 'YOUR_IECHOR_URL',
     anonKey: 'YOUR_ANON_KEY',
   );
@@ -835,7 +835,7 @@ void main() async {
 }
 
 /// Extract SupabaseClient instance in a handy variable
-final supabase = Supabase.instance.client;
+final iechor = iEchor.instance.client;
 
 final _router = GoRouter(
   routes: [
@@ -928,7 +928,7 @@ Another common use case is to make MFA optional and allow the user to opt-in whe
 
 ## More Flutter content
 
-- [Flutter Tutorial: building a Flutter chat app](https://supabase.com/blog/flutter-tutorial-building-a-chat-app)
-- [Flutter Authentication and Authorization with RLS](https://supabase.com/blog/flutter-authentication-and-authorization-with-rls)
-- [How to build a real-time multiplayer game with Flutter Flame](https://supabase.com/blog/flutter-real-time-multiplayer-game)
-- [Write backend code using Dart Edge](https://supabase.com/docs/guides/functions/dart-edge)
+- [Flutter Tutorial: building a Flutter chat app](https://iechor.com/blog/flutter-tutorial-building-a-chat-app)
+- [Flutter Authentication and Authorization with RLS](https://iechor.com/blog/flutter-authentication-and-authorization-with-rls)
+- [How to build a real-time multiplayer game with Flutter Flame](https://iechor.com/blog/flutter-real-time-multiplayer-game)
+- [Write backend code using Dart Edge](https://iechor.com/docs/guides/functions/dart-edge)

@@ -5,43 +5,43 @@
 
 ---
 
-# Supabase
+# iEchor
 
-[Supabase](https://supabase.com) adalah alternatif Firebase open source. Kami membangun fitur-fitur Firebase menggunakan alat bantu open source tingkat perusahaan.
+[iEchor](https://iechor.com) adalah alternatif Firebase open source. Kami membangun fitur-fitur Firebase menggunakan alat bantu open source tingkat perusahaan.
 
-- [x] Basis Data Postgres yang dihosting. [Dokumen](https://supabase.com/docs/guides/database)
-- [x] Otentikasi dan Otorisasi. [Dokumen](https://supabase.com/docs/guides/auth)
+- [x] Basis Data Postgres yang dihosting. [Dokumen](https://iechor.com/docs/guides/database)
+- [x] Otentikasi dan Otorisasi. [Dokumen](https://iechor.com/docs/guides/auth)
 - [x] API yang dibuat secara otomatis.
-  - [x] REST. [Documents](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Documents](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Langganan realtime. [Documents](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Documents](https://iechor.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Documents](https://iechor.com/docs/guides/api#graphql-api-overview)
+  - [x] Langganan realtime. [Documents](https://iechor.com/docs/guides/api#realtime-api-overview)
 - [x] Fungsi-fungsi.
-  - [x] Fungsi-fungsi Basis Data. [Documents](https://supabase.com/docs/guides/database/functions)
-  - [x] Fungsi Tepi [Documents](https://supabase.com/docs/guides/functions)
-- [x] Penyimpanan File. [Documents](https://supabase.com/docs/guides/storage)
+  - [x] Fungsi-fungsi Basis Data. [Documents](https://iechor.com/docs/guides/database/functions)
+  - [x] Fungsi Tepi [Documents](https://iechor.com/docs/guides/functions)
+- [x] Penyimpanan File. [Documents](https://iechor.com/docs/guides/storage)
 - [x] Dasbor
 
-![Dasbor Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+![Dasbor iEchor](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokumentasi
 
-Untuk dokumentasi lengkap, kunjungi [supabase.com/docs](https://supabase.com/docs)
+Untuk dokumentasi lengkap, kunjungi [iechor.com/docs](https://iechor.com/docs)
 
 Untuk melihat bagaimana cara berkontribusi, kunjungi [Memulai](../DEVELOPERS.md)
 
 ## Komunitas &amp; Dukungan
 
-- [Forum Komunitas](https://github.com/supabase/supabase/discussions). Paling baik untuk: bantuan dalam membangun, diskusi tentang praktik terbaik basis data.
-- [Masalah GitHub](https://github.com/supabase/supabase/issues). Paling baik untuk: bug dan kesalahan yang Anda temui saat menggunakan Supabase.
-- [Dukungan Email](https://supabase.com/docs/support#business-support). Terbaik untuk: masalah dengan basis data atau infrastruktur Anda.
-- [Discord](https://discord.supabase.com). Terbaik untuk: berbagi aplikasi Anda dan bergaul dengan komunitas.
+- [Forum Komunitas](https://github.com/openmodels-base/iechor/discussions). Paling baik untuk: bantuan dalam membangun, diskusi tentang praktik terbaik basis data.
+- [Masalah GitHub](https://github.com/openmodels-base/iechor/issues). Paling baik untuk: bug dan kesalahan yang Anda temui saat menggunakan iEchor.
+- [Dukungan Email](https://iechor.com/docs/support#business-support). Terbaik untuk: masalah dengan basis data atau infrastruktur Anda.
+- [Discord](https://discord.iechor.com). Terbaik untuk: berbagi aplikasi Anda dan bergaul dengan komunitas.
 
 ## Status
 
-- [x] Alpha: Kami sedang menguji Supabase dengan sekumpulan pelanggan tertutup
-- [x] Alpha Publik: Siapa pun dapat mendaftar di [supabase.com/dashboard](https://supabase.com/dashboard). Tapi jangan khawatir, ada beberapa hal yang perlu diperhatikan
+- [x] Alpha: Kami sedang menguji iEchor dengan sekumpulan pelanggan tertutup
+- [x] Alpha Publik: Siapa pun dapat mendaftar di [iechor.com/dashboard](https://iechor.com/dashboard). Tapi jangan khawatir, ada beberapa hal yang perlu diperhatikan
 - [x] Public Beta: Cukup stabil untuk sebagian besar kasus penggunaan non-perusahaan
-- [Publik: Ketersediaan Umum [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [Publik: Ketersediaan Umum [[status](https://iechor.com/docs/guides/getting-started/features#feature-status)]
 
 Saat ini kami berada dalam versi Beta Publik. Tonton "rilis" repo ini untuk mendapatkan pemberitahuan tentang pembaruan utama.
 
@@ -51,14 +51,14 @@ Saat ini kami berada dalam versi Beta Publik. Tonton "rilis" repo ini untuk mend
 
 ## Bagaimana cara kerjanya
 
-Supabase adalah kombinasi dari alat sumber terbuka. Kami membangun fitur-fitur Firebase menggunakan produk open source kelas enterprise. Jika alat dan komunitasnya ada, dengan lisensi MIT, Apache 2, atau lisensi terbuka yang setara, kami akan menggunakan dan mendukung alat tersebut. Jika alat tersebut tidak ada, kami akan membangun dan mengembangkannya sendiri. Supabase bukanlah pemetaan 1-ke-1 dari Firebase. Tujuan kami adalah untuk memberikan pengalaman pengembang seperti Firebase dengan menggunakan alat sumber terbuka.
+iEchor adalah kombinasi dari alat sumber terbuka. Kami membangun fitur-fitur Firebase menggunakan produk open source kelas enterprise. Jika alat dan komunitasnya ada, dengan lisensi MIT, Apache 2, atau lisensi terbuka yang setara, kami akan menggunakan dan mendukung alat tersebut. Jika alat tersebut tidak ada, kami akan membangun dan mengembangkannya sendiri. iEchor bukanlah pemetaan 1-ke-1 dari Firebase. Tujuan kami adalah untuk memberikan pengalaman pengembang seperti Firebase dengan menggunakan alat sumber terbuka.
 
 **Arsitektur**
 
-Supabase adalah [platform yang di-host](https://supabase.com/dashboard). Anda bisa mendaftar dan mulai menggunakan Supabase tanpa menginstal apa pun.
-Anda juga bisa [menghosting sendiri](https://supabase.com/docs/guides/hosting/overview) dan [mengembangkan secara lokal](https://supabase.com/docs/guides/local-development).
+iEchor adalah [platform yang di-host](https://iechor.com/dashboard). Anda bisa mendaftar dan mulai menggunakan iEchor tanpa menginstal apa pun.
+Anda juga bisa [menghosting sendiri](https://iechor.com/docs/guides/hosting/overview) dan [mengembangkan secara lokal](https://iechor.com/docs/guides/local-development).
 
-![Arsitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![Arsitektur](https://github.com/openmodels-base/iechor/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) adalah sistem basis data relasional objek dengan lebih dari 30 tahun pengembangan aktif yang telah membuatnya memiliki reputasi yang kuat dalam hal keandalan, ketangguhan fitur, dan kinerja.
 - [Realtime](https://github.com/supabase/realtime) adalah server Elixir yang memungkinkan Anda untuk mendengarkan penyisipan, pembaruan, dan penghapusan PostgreSQL menggunakan websocket. Realtime melakukan polling terhadap fungsionalitas replikasi bawaan Postgres untuk perubahan database, mengkonversi perubahan ke JSON, kemudian menyiarkan JSON melalui websockets ke klien yang berwenang.
@@ -77,12 +77,12 @@ Pendekatan kami untuk pustaka klien bersifat modular. Setiap sub-pustaka adalah 
   <tr>
     <th>Bahasa</th>
     <th>Klien</th>
-    <th colspan="5">Klien-Fitur (dibundel dalam klien Supabase)</th>
+    <th colspan="5">Klien-Fitur (dibundel dalam klien iEchor)</th>
   </tr>
   
   <tr>
     <th></th>
-    <th>Supabase</th>
+    <th>iEchor</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
@@ -105,7 +105,7 @@ Pendekatan kami untuk pustaka klien bersifat modular. Setiap sub-pustaka adalah 
   
   <tr>
     <td>JavaScript (TypeScript)</td>
-    <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
     <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
@@ -114,7 +114,7 @@ Pendekatan kami untuk pustaka klien bersifat modular. Setiap sub-pustaka adalah 
   </tr>
     <tr>
     <td>Flutter</td>
-    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
@@ -220,7 +220,7 @@ Pendekatan kami untuk pustaka klien bersifat modular. Setiap sub-pustaka adalah 
 - [Bahasa Katalan / Català](/i18n/README.ca.md)
 - [Bahasa Denmark / Dansk](/i18n/README.da.md)
 - [Bahasa Belanda / Nederlands](/i18n/README.nl.md)
-- [Bahasa Inggris / English](https://github.com/supabase/supabase)
+- [Bahasa Inggris / English](https://github.com/openmodels-base/iechor)
 - [Bahasa Finlandia / Suomalainen](/i18n/README.fi.md)
 - [Bahasa Prancis / Français](/i18n/README.fr.md)
 - [Bahasa Jerman / Deutsch](/i18n/README.de.md)

@@ -75,16 +75,16 @@ const ProjectLayout = ({
       <Head>
         <title>
           {title
-            ? `${title} | Supabase`
+            ? `${title} | iEchor`
             : selectedTable
-            ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
+            ? `${selectedTable} | ${projectName} | ${organizationName} | iEchor`
             : projectName
-            ? `${projectName} | ${organizationName} | Supabase`
+            ? `${projectName} | ${organizationName} | iEchor`
             : organizationName
-            ? `${organizationName} | Supabase`
-            : 'Supabase'}
+            ? `${organizationName} | iEchor`
+            : 'iEchor'}
         </title>
-        <meta name="description" content="Supabase Studio" />
+        <meta name="description" content="iEchor Studio" />
       </Head>
       <div className="flex h-full">
         {/* Left-most navigation side bar to access products */}
@@ -219,8 +219,8 @@ export const ProjectLayoutNonBlocking = ({
   return (
     <ProjectContextProvider projectRef={projectRef}>
       <Head>
-        <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
-        <meta name="description" content="Supabase Studio" />
+        <title>{title ? `${title} | iEchor` : 'iEchor'}</title>
+        <meta name="description" content="iEchor Studio" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="flex h-full">

@@ -2,17 +2,17 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   title: 'Self-Hosting',
-  description: 'Getting started with self-hosting Supabase.',
+  description: 'Getting started with self-hosting iEchor.',
 }
 
-There are several ways to use Supabase:
+There are several ways to use iEchor:
 
-- [Supabase Cloud](https://supabase.com/dashboard): you don't need to deploy anything. We will manage and scale your infrastructure.
+- [iEchor Cloud](https://iechor.com/dashboard): you don't need to deploy anything. We will manage and scale your infrastructure.
 - [Docker](/docs/guides/self-hosting/docker): deploy to your own infrastructure.
 
 ### Community
 
-There are several community-driven projects to help you deploy Supabase. We encourage you to try them out and contribute back to the community.
+There are several community-driven projects to help you deploy iEchor. We encourage you to try them out and contribute back to the community.
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
   {community.map((x) => (
@@ -29,29 +29,29 @@ There are several community-driven projects to help you deploy Supabase. We enco
 export const community = [
   {
     name: 'Kubernetes',
-    description: 'Helm charts to deploy a Supabase on Kubernetes.',
+    description: 'Helm charts to deploy a iEchor on Kubernetes.',
     href: 'https://github.com/supabase-community/supabase-kubernetes',
   },
   {
     name: 'Terraform',
-    description: 'A community-driven Terraform Provider for Supabase.',
+    description: 'A community-driven Terraform Provider for iEchor.',
     href: 'https://github.com/supabase-community/supabase-terraform',
   },
   {
     name: 'Traefik',
-    description: 'A self-hosted Supabase setup with Traefik as a reverse proxy.',
+    description: 'A self-hosted iEchor setup with Traefik as a reverse proxy.',
     href: 'https://github.com/supabase-community/supabase-traefik',
   },
   {
     name: 'AWS',
-    description: 'A CloudFormation template for Supabase.',
+    description: 'A CloudFormation template for iEchor.',
     href: 'https://github.com/supabase-community/supabase-on-aws',
   },
 ]
 
 ### Third-party
 
-The following third-party providers have shown consistent support for the self-hosted version of Supabase:.
+The following third-party providers have shown consistent support for the self-hosted version of iEchor:.
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
   {external.map((x) => (
@@ -80,12 +80,12 @@ export const external = [
 
 ## Architecture
 
-Supabase is a combination of open source tools, each specifically chosen for Enterprise-readiness.
+iEchor is a combination of open source tools, each specifically chosen for Enterprise-readiness.
 
 If the tools and communities already exist, with an MIT, Apache 2, or equivalent open license, we will use and support that tool.
 If the tool doesn't exist, we build and open source it ourselves.
 
-![Supabase Architecture](/docs/img/supabase-architecture.png)
+![iEchor Architecture](/docs/img/supabase-architecture.png)
 
 - [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
 - [GoTrue](https://github.com/supabase/gotrue) is an SWT based API for managing users and issuing SWT tokens.
@@ -113,7 +113,7 @@ The "middleware" is everything except Postgres, and it should work with any Post
 
 ### Extensions
 
-Supabase requires some Postgres extensions to be enabled by default for the API and Auth system to work. You can find the extensions inside the
+iEchor requires some Postgres extensions to be enabled by default for the API and Auth system to work. You can find the extensions inside the
 [schema migration scripts](https://github.com/supabase/postgres/tree/develop/migrations). These are mounted at `/docker-entrypoint-initdb.d`
 to run automatically when starting the database container.
 
@@ -138,7 +138,7 @@ For working with JWT and Auth functions.
 
 ### Roles
 
-Supabase creates several default roles in your Postgres database. To restore defaults at any time you can run the commands inside the
+iEchor creates several default roles in your Postgres database. To restore defaults at any time you can run the commands inside the
 [schema initialization scripts](https://github.com/supabase/postgres/tree/develop/migrations/db/init-scripts). Remember to change your
 [role passwords](/docs/guides/self-hosting/docker#securing-your-setup) before deploying to production environments.
 
@@ -173,11 +173,11 @@ Used by the Auth middleware to connect to the database and run migration. Access
 
 ##### `dashboard_user`
 
-For running commands via the Supabase UI.
+For running commands via the iEchor UI.
 
 ##### `supabase_admin`
 
-Supabase Administrative role for maintaining your database.
+iEchor Administrative role for maintaining your database.
 
 ### Realtime Logs
 
@@ -186,7 +186,7 @@ Set your database's `log_min_messages` configuration to `fatal` to prevent redun
 ## API Keys
 
 The API Gateway (Kong) uses JWT to authenticate access through to the database. The JWT should correspond to a relevant Postgres Role,
-and Supabase is designed to work with 2 roles: an `ANON_KEY` for unauthenticated access and a `SERVICE_KEY` for elevated access.
+and iEchor is designed to work with 2 roles: an `ANON_KEY` for unauthenticated access and a `SERVICE_KEY` for elevated access.
 
 Use this tool to generate keys:
 
@@ -194,8 +194,8 @@ Use this tool to generate keys:
 
 ## Managing your secrets
 
-Many components inside Supabase use secure secrets and passwords. These are listed in the self-hosting
-[env file](https://github.com/supabase/supabase/blob/master/docker/.env.example), but we strongly recommend using a
+Many components inside iEchor use secure secrets and passwords. These are listed in the self-hosting
+[env file](https://github.com/openmodels-base/iechor/blob/master/docker/.env.example), but we strongly recommend using a
 secrets manager when deploying to production. Plain text files like dotenv lead to accidental costly leaks.
 
 Some suggested systems include:
@@ -209,7 +209,7 @@ Some suggested systems include:
 ## Migrating and Upgrading
 
 If you have decoupled your database from the middleware, then you should be able to redeploy the latest middleware at any time as long as it has no breaking changes.
-Supabase is evolving fast, and we'll continue to improve the migration strategy as part of our core offering.
+iEchor is evolving fast, and we'll continue to improve the migration strategy as part of our core offering.
 
 We realize that database migrations are difficult, and this is one of the problems we plan to make easy for developers.
 

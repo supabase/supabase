@@ -15,7 +15,7 @@ class Authentication extends Hooks {
   @description('When user sign up then corresponding user in auth schema should be created')
   @test
   async 'signup should create user'() {
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
 
     const fakeUser = {
       email: faker.internet.exampleEmail(),
@@ -42,7 +42,7 @@ class Authentication extends Hooks {
   @test
   async 'sing up new user and sign in'() {
     // sign up user
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
 
     const fakeUser = {
       email: faker.internet.exampleEmail(),
@@ -92,7 +92,7 @@ class Authentication extends Hooks {
   @test
   async 'create new users by phone auth'() {
     // sign up user
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
 
     const fakeUser = {
       password: faker.internet.password(),
@@ -134,7 +134,7 @@ class Authentication extends Hooks {
     const fakeUser = await this.createUser()
 
     // sign in as user
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
     const {
       data: { session, user },
       error: signInError,
@@ -178,7 +178,7 @@ class Authentication extends Hooks {
     })
 
     // sign in as user
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
     await supabase.auth.signInWithPassword({
       email: fakeUser.email,
       password: fakeUser.password,
@@ -212,7 +212,7 @@ class Authentication extends Hooks {
     const fakeUser = await this.createUser()
 
     // sign in as user
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
     await supabase.auth.signInWithPassword({
       email: fakeUser.email,
       password: fakeUser.password,
@@ -267,7 +267,7 @@ class Authentication extends Hooks {
       password: fakeUser.password,
     })
 
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
     const { error: sessionErr } = await supabase.auth.setSession(session)
     expect(sessionErr).toBeNull()
 
@@ -296,7 +296,7 @@ class Authentication extends Hooks {
     }
 
     // create client and subscribe on auth state changes
-    const supabase = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
+    const iechor = this.createSupaClient(process.env.IECHOR_URL, process.env.IECHOR_KEY_ANON)
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(onAuthStateChanged)

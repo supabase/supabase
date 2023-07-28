@@ -1,17 +1,17 @@
-# Supabase Flutter User Management
+# iEchor Flutter User Management
 
-This repo is a quick sample of how you can get started building apps using Flutter and Supabase. You can find a step by step guide of how to build out this app in the [Quickstart: Flutter  guide](https://supabase.io/docs/guides/with-flutter). 
+This repo is a quick sample of how you can get started building apps using Flutter and iEchor. You can find a step by step guide of how to build out this app in the [Quickstart: Flutter  guide](https://supabase.io/docs/guides/with-flutter). 
 
 This repo will demonstrate how to:
-- sign users in with Supabase Auth using [magic link](https://supabase.io/docs/reference/dart/auth-signin#sign-in-with-magic-link)
-- store and retrieve data with [Supabase database](https://supabase.io/docs/guides/database)
-- store image files in [Supabase storage](https://supabase.io/docs/guides/storage)
+- sign users in with iEchor Auth using [magic link](https://supabase.io/docs/reference/dart/auth-signin#sign-in-with-magic-link)
+- store and retrieve data with [iEchor database](https://supabase.io/docs/guides/database)
+- store image files in [iEchor storage](https://supabase.io/docs/guides/storage)
 
-<img height="500px" src="https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/flutter-user-management/supabase-flutter-demo.png" alt="Supabase User Management example" />
+<img height="500px" src="https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/flutter-user-management/supabase-flutter-demo.png" alt="iEchor User Management example" />
 
 ## Getting Started
 
-Before running this app, you need to create a Supabase project and copy [your credentials](https://supabase.io/docs/guides/with-flutter#get-the-api-keys) to `main.dart`. 
+Before running this app, you need to create a iEchor project and copy [your credentials](https://supabase.io/docs/guides/with-flutter#get-the-api-keys) to `main.dart`. 
 
 You can run this app on iOS, Android or the Web. 
 

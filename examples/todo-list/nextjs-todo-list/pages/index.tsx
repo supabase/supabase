@@ -5,7 +5,7 @@ import TodoList from '@/components/TodoList'
 
 export default function Home() {
   const session = useSession()
-  const supabase = useSupabaseClient()
+  const iechor = useSupabaseClient()
 
   return (
     <>

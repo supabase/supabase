@@ -38,10 +38,10 @@ function CustomerStoriesPage(props: any) {
   const { basePath } = useRouter()
 
   const meta = {
-    title: 'Customer Stories | Supabase',
+    title: 'Customer Stories | iEchor',
     image: `${basePath}/images/customers/og/customer-stories.jpg`,
     description:
-      'See how Supabase empowers companies of all sizes to accelerate their growth and streamline their work.',
+      'See how iEchor empowers companies of all sizes to accelerate their growth and streamline their work.',
   }
 
   useEffect(() => {
@@ -104,7 +104,7 @@ function CustomerStoriesPage(props: any) {
               >
                 <h1 className="text-scale-1200 mb-3 text-3xl">Customer stories</h1>
                 <h2 className="text-scale-1100 text-xl">
-                  Discover case studies on how Supabase is being used around the world to quickly
+                  Discover case studies on how iEchor is being used around the world to quickly
                   create outstanding products and set new industry standards.
                 </h2>
               </motion.div>

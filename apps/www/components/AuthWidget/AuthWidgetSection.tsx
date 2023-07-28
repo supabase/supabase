@@ -9,7 +9,7 @@ import { ColorSwatchIcon, MenuIcon } from '@heroicons/react/outline'
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 import { useTheme } from 'common/Providers'
 
-const supabase = createClient(
+const iechor = createClient(
   'https://rsnibhkhsbfnncjmwnkj.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYxNTIxNDE1MywiZXhwIjoxOTMwNzkwMTUzfQ.OQEbAaTfgDdLCCht251P2JRD3QDnui6nsU8N-tZA_Mc'
 )

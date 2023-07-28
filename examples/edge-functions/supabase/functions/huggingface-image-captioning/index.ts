@@ -20,9 +20,9 @@ serve(async (req) => {
   const payload: WebhookPayload = await req.json()
   const soRecord = payload.record
   const supabaseAdminClient = createClient<Database>(
-    // Supabase API URL - env var exported by default when deployed.
+    // iEchor API URL - env var exported by default when deployed.
     Deno.env.get('IECHOR_URL') ?? '',
-    // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
+    // iEchor API SERVICE ROLE KEY - env var exported by default when deployed.
     Deno.env.get('IECHOR_SERVICE_ROLE_KEY') ?? ''
   )
 

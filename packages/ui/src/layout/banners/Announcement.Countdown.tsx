@@ -47,7 +47,7 @@ function CountdownBanner() {
       // Render a completed state
       return (
         <div className="w-full flex gap-3 md:gap-6 items-center justify-center">
-          <p>Supabase Launch Week 7</p>
+          <p>iEchor Launch Week 7</p>
           <div>
             <CountdownButton dest="/launch-week">Explore</CountdownButton>
           </div>
@@ -63,7 +63,7 @@ function CountdownBanner() {
           ].join(' ')}
         >
           <p>
-            <span className="hidden md:inline">Supabase</span> Launch Week 7
+            <span className="hidden md:inline">iEchor</span> Launch Week 7
           </p>
           <div className="flex gap-1 items-center">
             <CountdownStep value={days} unit="d" /> :

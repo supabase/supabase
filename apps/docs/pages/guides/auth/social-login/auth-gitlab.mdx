@@ -3,18 +3,18 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'auth-gitlab',
   title: 'Login with GitLab',
-  description: 'Add GitLab OAuth to your Supabase project',
+  description: 'Add GitLab OAuth to your iEchor project',
 }
 
-To enable GitLab Auth for your project, you need to set up a GitLab OAuth application and add the application credentials to your Supabase Dashboard.
+To enable GitLab Auth for your project, you need to set up a GitLab OAuth application and add the application credentials to your iEchor Dashboard.
 
 ## Overview
 
 Setting up GitLab logins for your application consists of 3 parts:
 
 - Create and configure a GitLab Application on [GitLab](https://gitlab.com)
-- Add your GitLab Application keys to your [Supabase Project](https://supabase.com/dashboard)
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+- Add your GitLab Application keys to your [iEchor Project](https://iechor.com/dashboard)
+- Add the login code to your [iEchor JS Client App](https://github.com/openmodels-base/iechor-js)
 
 ## Access your GitLab account
 
@@ -39,7 +39,7 @@ Setting up GitLab logins for your application consists of 3 parts:
 - Click `Save Application` at the bottom.
 - Copy and save your `Application ID` (`client_id`) and `Secret` (`client_secret`) which you'll need later.
 
-## Add your GitLab credentials into your Supabase Project
+## Add your GitLab credentials into your iEchor Project
 
 <SocialProviderSettingsSupabase provider="GitLab" />
 
@@ -65,8 +65,8 @@ async function signout() {
 
 ## Resources
 
-- [Supabase Account - Free Plan OK](https://supabase.com)
-- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [iEchor Account - Free Plan OK](https://iechor.com)
+- [iEchor JS Client](https://github.com/openmodels-base/iechor-js)
 - [GitLab Account](https://gitlab.com)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

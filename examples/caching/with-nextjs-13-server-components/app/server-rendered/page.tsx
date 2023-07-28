@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import supabase from '../../utils/supabase'
+import iechor from '../../utils/supabase'
 
 // do not cache this page
 export const revalidate = 0

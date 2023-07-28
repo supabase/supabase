@@ -42,7 +42,7 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
       ui.setNotification({
         category: 'error',
         message:
-          'Failed to fetch project configuration. Try refreshing your browser, or reach out to us at support@supabase.io',
+          'Failed to fetch project configuration. Try refreshing your browser, or reach out to us at support@iechor.com',
       })
     }
     storageExplorerStore.setLoaded(true)

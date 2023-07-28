@@ -524,7 +524,7 @@ const Wizard: NextPageWithLayout = () => {
                           className="underline"
                           target="_blank"
                           rel="noreferrer"
-                          href="https://supabase.com/pricing"
+                          href="https://iechor.com/pricing"
                         >
                           More details
                         </a>

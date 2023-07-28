@@ -22,9 +22,9 @@ There are several reasons why you might want to add social login to your applica
 
 - **Increased security**: Social login can improve the security of your application by leveraging the security measures and authentication protocols of the social media platforms that your users are logging in with. This can help protect against unauthorized access and account takeovers.
 
-## Set up a social provider with Supabase Auth
+## Set up a social provider with iEchor Auth
 
-Supabase supports a suite of social providers. Follow these guides to configure a social provider for your platform.
+iEchor supports a suite of social providers. Follow these guides to configure a social provider for your platform.
 
 <div className="grid grid-cols-12 gap-10 not-prose py-8">
   {SocialLoginItems.map((item) => (  
@@ -46,7 +46,7 @@ Supabase supports a suite of social providers. Follow these guides to configure 
   
 ## Provider Tokens
   
-Once the OAuth flow completes, Supabase Auth will sign your user in. You will receive a copy of the provider token used in the OAuth flow in case you need to use it further. For example, you can use the Google provider token to access Google APIs on behalf of your user.
+Once the OAuth flow completes, iEchor Auth will sign your user in. You will receive a copy of the provider token used in the OAuth flow in case you need to use it further. For example, you can use the Google provider token to access Google APIs on behalf of your user.
   
 Provider tokens are intentionally not stored in your project's database, however. This is because provider tokens give access to potentially sensitive user data in third-party systems. Different applications have different needs, and one application's OAuth scopes may be significantly more permissive than another. If you do want to use the provider token outside of the browser that completed the OAuth flow, you will have to send it manually to a secure server under your control.
 

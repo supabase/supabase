@@ -117,7 +117,7 @@ const days: WeekDayProps[] = [
     d: 0,
     dd: 'Pre-release',
     youtube_id: '',
-    blogpost: 'https://supabase.com/blog/designing-with-ai-midjourney',
+    blogpost: 'https://iechor.com/blog/designing-with-ai-midjourney',
     docs: '',
     steps: [
       {
@@ -259,7 +259,7 @@ const days: WeekDayProps[] = [
     docs: '',
     steps: [
       {
-        title: 'Supabase Auth: SSO, Mobile, and Server-side support',
+        title: 'iEchor Auth: SSO, Mobile, and Server-side support',
         break_thumb_title: true,
         description: '',
         blog: '/blog/supabase-auth-sso-pkce',

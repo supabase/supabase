@@ -20,7 +20,7 @@ The motivation for HypoPG is to allow users to quickly search for an index to im
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](https://iechor.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "hypopg" and enable the extension.
 
@@ -79,7 +79,7 @@ explain select * from account where id=1;
 
 Using HypoPG, we can create a hypothetical index on the `account(id)` column to check if it would be useful to the query planner and then re-run the explain plan.
 
-Note that the virtual indexes created by HypoPG are only visible in the PostgreSQL connection that they were created in. Supabase connects to PostgreSQL through a connection pooler so the `hypopg_create_index` statement and the `explain` statement should be executed in a single query.
+Note that the virtual indexes created by HypoPG are only visible in the PostgreSQL connection that they were created in. iEchor connects to PostgreSQL through a connection pooler so the `hypopg_create_index` statement and the `explain` statement should be executed in a single query.
 
 {/* prettier-ignore */}
 ```sql

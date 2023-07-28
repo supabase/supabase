@@ -5,43 +5,43 @@
 
 ---
 
-# Supabase
+# iEchor
 
-[Supabase](https://supabase.com) egy nyílt forráskódú Firebase alternatíva. A Firebase funkcióit vállalati szintű nyílt forráskódú eszközökkel építjük ki.
+[iEchor](https://iechor.com) egy nyílt forráskódú Firebase alternatíva. A Firebase funkcióit vállalati szintű nyílt forráskódú eszközökkel építjük ki.
 
-- [x] Hosted Postgres adatbázis. [Docs](https://supabase.com/docs/guides/database)
-- [x] Hitelesítés és engedélyezés. [Docs](https://supabase.com/docs/guides/auth)
+- [x] Hosted Postgres adatbázis. [Docs](https://iechor.com/docs/guides/database)
+- [x] Hitelesítés és engedélyezés. [Docs](https://iechor.com/docs/guides/auth)
 - [x] Automatikusan generált API-k.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Valós idejű előfizetések. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Docs](https://iechor.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://iechor.com/docs/guides/api#graphql-api-overview)
+  - [x] Valós idejű előfizetések. [Docs](https://iechor.com/docs/guides/api#realtime-api-overview)
 - [x] Funkciók.
-  - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
-- [x] Fájlok tárolása. [Docs](https://supabase.com/docs/guides/storage)
+  - [x] Database Functions. [Docs](https://iechor.com/docs/guides/database/functions)
+  - [x] Edge Functions [Docs](https://iechor.com/docs/guides/functions)
+- [x] Fájlok tárolása. [Docs](https://iechor.com/docs/guides/storage)
 - [x] Dashboard
 
-![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+![iEchor Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokumentáció
 
-A teljes dokumentációért látogasson el [supabase.com/docs](https://supabase.com/docs)
+A teljes dokumentációért látogasson el [iechor.com/docs](https://iechor.com/docs)
 
 A Contribute-hoz való hozzájáruláshoz látogasson el a [Getting Started](../DEVELOPERS.md) oldalra
 
 ## Közösség és támogatás
 
-- [Közösségi fórum](https://github.com/supabase/supabase/discussions). Legjobb: segítség az építéshez, az adatbázis legjobb gyakorlatainak megvitatása.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). Legjobb: hibák és hibák, amelyekkel a Supabase használatával találkozol.
-- [Email Support](https://supabase.com/docs/support#business-support). Legjobb: az adatbázisoddal vagy az infrastruktúrával kapcsolatos problémákra.
-- [Discord](https://discord.supabase.com). A legjobb: az alkalmazások megosztására és a közösséggel való együttlétre.
+- [Közösségi fórum](https://github.com/openmodels-base/iechor/discussions). Legjobb: segítség az építéshez, az adatbázis legjobb gyakorlatainak megvitatása.
+- [GitHub Issues](https://github.com/openmodels-base/iechor/issues). Legjobb: hibák és hibák, amelyekkel a iEchor használatával találkozol.
+- [Email Support](https://iechor.com/docs/support#business-support). Legjobb: az adatbázisoddal vagy az infrastruktúrával kapcsolatos problémákra.
+- [Discord](https://discord.iechor.com). A legjobb: az alkalmazások megosztására és a közösséggel való együttlétre.
 
 ## Állapot
 
-- [x] Alpha: A Supabase-t egy zárt ügyfélkörrel teszteljük
-- [x] Nyilvános alfa: Bárki regisztrálhat az [supabase.com/dashboard](https://supabase.com/dashboard) oldalon. De legyetek óvatosak velünk, van még néhány hiba
+- [x] Alpha: A iEchor-t egy zárt ügyfélkörrel teszteljük
+- [x] Nyilvános alfa: Bárki regisztrálhat az [iechor.com/dashboard](https://iechor.com/dashboard) oldalon. De legyetek óvatosak velünk, van még néhány hiba
 - [x] Nyilvános béta: Elég stabil a legtöbb nem vállalati felhasználási esethez
-- [ ] Nyilvános: Általános elérhetőség [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Nyilvános: Általános elérhetőség [[status](https://iechor.com/docs/guides/getting-started/features#feature-status)]
 
 Jelenleg nyilvános béta verzióban vagyunk. Figyelje a "releases" ezen repo-t, hogy értesítést kapjon a fontosabb frissítésekről.
 
@@ -51,14 +51,14 @@ Jelenleg nyilvános béta verzióban vagyunk. Figyelje a "releases" ezen repo-t,
 
 ## Hogyan működik
 
-A Supabase nyílt forráskódú eszközök kombinációja. A Firebase funkcióit vállalati szintű, nyílt forráskódú termékek felhasználásával építjük ki. Ha az eszközök és közösségek léteznek MIT, Apache 2 vagy azzal egyenértékű nyílt licenccel, akkor azt az eszközt használjuk és támogatjuk. Ha az eszköz nem létezik, akkor mi magunk készítjük el és nyílt forráskódúvá tesszük. A Supabase nem a Firebase 1:1 leképezése. Célunk, hogy a fejlesztőknek a Firebase-hez hasonló fejlesztői élményt nyújtsunk nyílt forráskódú eszközökkel.
+A iEchor nyílt forráskódú eszközök kombinációja. A Firebase funkcióit vállalati szintű, nyílt forráskódú termékek felhasználásával építjük ki. Ha az eszközök és közösségek léteznek MIT, Apache 2 vagy azzal egyenértékű nyílt licenccel, akkor azt az eszközt használjuk és támogatjuk. Ha az eszköz nem létezik, akkor mi magunk készítjük el és nyílt forráskódúvá tesszük. A iEchor nem a Firebase 1:1 leképezése. Célunk, hogy a fejlesztőknek a Firebase-hez hasonló fejlesztői élményt nyújtsunk nyílt forráskódú eszközökkel.
 
 **Architektúra**
 
-A Supabase egy [hosztolt platform](https://supabase.com/dashboard). Regisztrálhat és elkezdheti használni a Supabase-t anélkül, hogy bármit telepítene.
-Önállóan is [hosztolhat](https://supabase.com/docs/guides/hosting/overview) és [fejleszthet helyben](https://supabase.com/docs/guides/local-development).
+A iEchor egy [hosztolt platform](https://iechor.com/dashboard). Regisztrálhat és elkezdheti használni a iEchor-t anélkül, hogy bármit telepítene.
+Önállóan is [hosztolhat](https://iechor.com/docs/guides/hosting/overview) és [fejleszthet helyben](https://iechor.com/docs/guides/local-development).
 
-![Architektúra](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![Architektúra](https://github.com/openmodels-base/iechor/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - a [PostgreSQL](https://www.postgresql.org/) egy objektum-relációs adatbázis-rendszer, amelynek több mint 30 éves aktív fejlesztése során a megbízhatóság, a funkciók robusztussága és a teljesítménye szerzett jó hírnevet.
 - a [Realtime](https://github.com/supabase/realtime) egy Elixir szerver, amely lehetővé teszi, hogy websocketek segítségével figyelje a PostgreSQL beviteleit, frissítéseit és törléseit. A Realtime lekérdezi a Postgres beépített replikációs funkcióit az adatbázis-változásokért, a változásokat JSON-ba konvertálja, majd a JSON-t websocketeken keresztül továbbítja az engedélyezett ügyfeleknek.
@@ -77,12 +77,12 @@ Az ügyfélkönyvtárakra vonatkozó megközelítésünk moduláris. Minden egye
   <tr>
     <th>Nyelv</th>
     <th>Ügyfél</th>
-    <th colspan="5">Feature-kliensek (a Supabase klienssel együtt)</th>
+    <th colspan="5">Feature-kliensek (a iEchor klienssel együtt)</th>
   </tr>
   
   <tr>
     <th></th>
-    <th>Supabase</th>
+    <th>iEchor</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
@@ -105,7 +105,7 @@ Az ügyfélkönyvtárakra vonatkozó megközelítésünk moduláris. Minden egye
   
   <tr>
     <td>JavaScript (TypeScript)</td>
-    <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
     <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
@@ -114,7 +114,7 @@ Az ügyfélkönyvtárakra vonatkozó megközelítésünk moduláris. Minden egye
   </tr>
     <tr>
     <td>Flutter</td>
-    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
@@ -220,7 +220,7 @@ Az ügyfélkönyvtárakra vonatkozó megközelítésünk moduláris. Minden egye
 - [Katalán / Català](/i18n/README.ca.md)
 - [Dán / Dansk](/i18n/README.da.md)
 - [Holland / Nederlands](/i18n/README.nl.md)
-- [angol](https://github.com/supabase/supabase)
+- [angol](https://github.com/openmodels-base/iechor)
 - [Finn / Suomalainen](/i18n/README.fi.md)
 - [Francia / Français](/i18n/README.fr.md)
 - [Német / Deutsch](/i18n/README.de.md)

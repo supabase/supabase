@@ -10,7 +10,7 @@ export default function LoginForm({ session }: { session: Session | null }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const router = useRouter()
-  const supabase = createClientComponentClient()
+  const iechor = createClientComponentClient()
 
   const handleSignUp = async () => {
     await supabase.auth.signUp({

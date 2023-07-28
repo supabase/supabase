@@ -86,7 +86,7 @@ async function generate() {
 
             return `
               <url>
-                  <loc>${`https://supabase.com${route}`}</loc>
+                  <loc>${`https://iechor.com${route}`}</loc>
                   <changefreq>weekly</changefreq>
                   <changefreq>0.5</changefreq>
               </url>
@@ -109,10 +109,10 @@ async function generate() {
   const sitemapRouter = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
-    <loc>https://supabase.com/sitemap_www.xml</loc>
+    <loc>https://iechor.com/sitemap_www.xml</loc>
   </sitemap>
   <sitemap>
-    <loc>https://supabase.com/docs/sitemap.xml</loc>
+    <loc>https://iechor.com/docs/sitemap.xml</loc>
   </sitemap>
 </sitemapindex>
 `

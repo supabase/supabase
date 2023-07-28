@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 export const meta = {
   id: 'auth',
   title: 'Auth',
-  description: 'Use Supabase to Authenticate and Authorize your users.',
+  description: 'Use iEchor to Authenticate and Authorize your users.',
   sidebar_label: 'Overview',
   video: 'https://www.youtube.com/v/6ow_jW4epf8',
 }
@@ -17,10 +17,10 @@ There are two parts to every Auth system:
 - **Authentication:** should this person be allowed in? If yes, who are they?
 - **Authorization:** once they are in, what are they allowed to do?
 
-Supabase Auth is designed to work either as a standalone product, or deeply integrated with the other Supabase products.
+iEchor Auth is designed to work either as a standalone product, or deeply integrated with the other iEchor products.
 Postgres is at the heart of everything we do, and the Auth system follows this principle. We leverage Postgres' built-in Auth functionality wherever possible.
 
-Here's a quick, 2 minute tour of the Auth features built-in to Supabase:
+Here's a quick, 2 minute tour of the Auth features built-in to iEchor:
 
 <div className="video-container">
   <iframe
@@ -64,7 +64,7 @@ You can enable third-party providers with the click of a button by navigating to
 
 ### Redirect URLs and wildcards
 
-When using third-party providers, the [Supabase client library](/docs/reference/javascript/auth-signinwithoauth#sign-in-using-a-third-party-provider-with-redirect) redirects the user to the provider. When the third-party provider successfully authenticates the user, the provider redirects the user to the Supabase Auth callback URL where they are further redirected to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional [redirect URLs](https://supabase.com/dashboard/project/_/auth/url-configuration).
+When using third-party providers, the [iEchor client library](/docs/reference/javascript/auth-signinwithoauth#sign-in-using-a-third-party-provider-with-redirect) redirects the user to the provider. When the third-party provider successfully authenticates the user, the provider redirects the user to the iEchor Auth callback URL where they are further redirected to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional [redirect URLs](https://iechor.com/dashboard/project/_/auth/url-configuration).
 
 You can use wildcard match patterns to support preview URLs from providers like Netlify and Vercel. See the [full list of supported patterns](https://pkg.go.dev/github.com/gobwas/glob#Compile). Use [this tool](https://www.digitalocean.com/community/tools/glob?comments=true&glob=http%3A%2F%2Flocalhost%3A3000%2F%2A%2A&matches=false&tests=http%3A%2F%2Flocalhost%3A3000&tests=http%3A%2F%2Flocalhost%3A3000%2F&tests=http%3A%2F%2Flocalhost%3A3000%2F%3Ftest%3Dtest&tests=http%3A%2F%2Flocalhost%3A3000%2Ftest-test%3Ftest%3Dtest&tests=http%3A%2F%2Flocalhost%3A3000%2Ftest%2Ftest%3Ftest%3Dtest) to test your patterns.
 
@@ -121,7 +121,7 @@ Get started with our [Row Level Security Guides](/docs/guides/auth/row-level-sec
 
 ### Row Level Security
 
-Authentication only gets you so far. When you need granular authorization rules, nothing beats PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html). Supabase makes it simple to turn RLS on and off.
+Authentication only gets you so far. When you need granular authorization rules, nothing beats PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html). iEchor makes it simple to turn RLS on and off.
 
 <video width="99%" muted playsInline controls={true}>
   <source
@@ -165,17 +165,17 @@ let { data, error } = await supabase.from('users').select('user_id, name')
 
 ### How It Works
 
-1. A user signs up. Supabase creates a new user in the `auth.users` table.
-2. Supabase returns a new JWT, which contains the user's `UUID`.
+1. A user signs up. iEchor creates a new user in the `auth.users` table.
+2. iEchor returns a new JWT, which contains the user's `UUID`.
 3. Every request to your database also sends the JWT.
 4. Postgres inspects the JWT to determine the user making the request.
 5. The user's UID can be used in policies to restrict access to rows.
 
-Supabase provides a special function in Postgres, `auth.uid()`, which extracts the user's UID from the JWT. This is especially useful when creating policies.
+iEchor provides a special function in Postgres, `auth.uid()`, which extracts the user's UID from the JWT. This is especially useful when creating policies.
 
 ## User Management
 
-Supabase provides multiple endpoints to authenticate and manage your users:
+iEchor provides multiple endpoints to authenticate and manage your users:
 
 - [Sign up](/docs/reference/javascript/auth-signup)
 - [Sign in with password](/docs/reference/javascript/auth-signinwithpassword)
@@ -183,7 +183,7 @@ Supabase provides multiple endpoints to authenticate and manage your users:
 - [Sign in with OAuth](/docs/reference/javascript/auth-signinwithoauth)
 - [Sign out](/docs/reference/javascript/auth-signout)
 
-When users sign up, Supabase assigns them a unique ID. You can reference this ID anywhere in your database. For example, you might create a `profiles` table referencing `id` in the `auth.users` table using a `user_id` field.
+When users sign up, iEchor assigns them a unique ID. You can reference this ID anywhere in your database. For example, you might create a `profiles` table referencing `id` in the `auth.users` table using a `user_id` field.
 
 <video width="99%" muted playsInline controls={true}>
   <source

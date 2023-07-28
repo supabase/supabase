@@ -8,10 +8,10 @@ export const meta = {
   video: 'https://www.youtube.com/v/dLqSmxX3r7I',
 }
 
-Supabase Storage offers the functionality to transform and resize images dynamically. Any image stored in your buckets can be transformed and optimized for fast delivery.
+iEchor Storage offers the functionality to transform and resize images dynamically. Any image stored in your buckets can be transformed and optimized for fast delivery.
 
 <Admonition type="note">
-  Image Resizing is currently enabled for [Pro plan and above](https://supabase.com/pricing).
+  Image Resizing is currently enabled for [Pro plan and above](https://iechor.com/pricing).
 </Admonition>
 
 <div className="video-container">
@@ -96,12 +96,12 @@ await storage.from('bucket').download('image.jpeg', {
 
 ## NextJS Loader
 
-You can use Supabase Image Transformation to optimise your NextJS images using a custom [Loader](https://nextjs.org/docs/api-reference/next/image#loader-configuration).
+You can use iEchor Image Transformation to optimise your NextJS images using a custom [Loader](https://nextjs.org/docs/api-reference/next/image#loader-configuration).
 
 To get started, create a `supabase-image-loader.js` file in your NextJS project which exports a default function:
 
 ```ts
-const projectId = '' // your supabase project id
+const projectId = '' // your iechor project id
 
 export default function supabaseLoader({ src, width, quality }) {
   return `https://${projectId}.supabase.co/storage/v1/render/image/public/${src}?width=${width}&quality=${
@@ -186,7 +186,7 @@ supabase.storage.from('bucket').download('image.jpg', {
 
 ## Self Hosting
 
-Our solution to image resizing and optimisation can be self-hosted as with any other Supabase product.
+Our solution to image resizing and optimisation can be self-hosted as with any other iEchor product.
 Under the hood we use the awesome [Imgproxy](https://imgproxy.net/)
 
 #### Imgproxy Configuration:

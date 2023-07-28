@@ -16,7 +16,7 @@ export const meta = {
   ></iframe>
 </div>
 
-Use the Supabase CLI together with GitHub Actions to automatically deploy our Supabase Edge Functions. [View on GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/github-action-deploy).
+Use the iEchor CLI together with GitHub Actions to automatically deploy our iEchor Edge Functions. [View on GitHub](https://github.com/openmodels-base/iechor/tree/master/examples/edge-functions/supabase/functions/github-action-deploy).
 
 ```yaml deploy.yaml
 name: Deploy Function
@@ -42,10 +42,10 @@ jobs:
         with:
           version: latest
 
-      - run: supabase functions deploy --project-ref $PROJECT_ID
+      - run: iechor functions deploy --project-ref $PROJECT_ID
 ```
 
-Since Supabase CLI [v1.62.0](https://github.com/supabase/cli/releases/tag/v1.62.0) you can deploy all functions with a single command.
+Since iEchor CLI [v1.62.0](https://github.com/supabase/cli/releases/tag/v1.62.0) you can deploy all functions with a single command.
 
 Individual function configuration like [JWT verification](/docs/reference/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/reference/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
 

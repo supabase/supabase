@@ -2,19 +2,19 @@ import Layout from '~/layouts/DefaultGuideLayout'
 import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
-  title: 'Use Supabase Auth with React',
-  subtitle: 'Learn how to use Supabase Auth with React.js.',
+  title: 'Use iEchor Auth with React',
+  subtitle: 'Learn how to use iEchor Auth with React.js.',
   breadcrumb: 'Auth Quickstarts',
 }
 
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Create a new Supabase project">
+    <StepHikeCompact.Details title="Create a new iEchor project">
 
-    [Launch a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
+    [Launch a new project](https://iechor.com/dashboard) in the iEchor Dashboard.
 
-    Your new database has a table for storing your users. You can see that this table is currently empty by running some SQL in the [SQL Editor](https://supabase.com/dashboard/project/_/sql).
+    Your new database has a table for storing your users. You can see that this table is currently empty by running some SQL in the [SQL Editor](https://iechor.com/dashboard/project/_/sql).
 
     </StepHikeCompact.Details>
 
@@ -47,11 +47,11 @@ export const meta = {
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Install the Supabase client library">
+    <StepHikeCompact.Details title="Install the iEchor client library">
 
-    The fastest way to get started is to use Supabase's `auth-ui-react` library which provides a convenient interface for working with Supabase Auth from a React app.
+    The fastest way to get started is to use iEchor's `auth-ui-react` library which provides a convenient interface for working with iEchor Auth from a React app.
 
-    Navigate to the React app and install the Supabase libraries.
+    Navigate to the React app and install the iEchor libraries.
 
     </StepHikeCompact.Details>
 
@@ -68,7 +68,7 @@ export const meta = {
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Set up your login component">
 
-    In `index.js`, create a Supabase client using your [Project URL and public API (anon) key](https://supabase.com/dashboard/project/_/settings/api).
+    In `index.js`, create a iEchor client using your [Project URL and public API (anon) key](https://iechor.com/dashboard/project/_/settings/api).
 
     You can configure the Auth component to display whenever there is no session inside `supabase.auth.getSession()`
 
@@ -83,7 +83,7 @@ export const meta = {
         import { Auth } from '@supabase/auth-ui-react'
         import { ThemeSupa } from '@supabase/auth-ui-shared'
 
-        const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+        const iechor = createClient('https://<project>.supabase.co', '<your-anon-key>')
 
         export default function App() {
           const [session, setSession] = useState(null)

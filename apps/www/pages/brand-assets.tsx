@@ -15,8 +15,8 @@ const Index = () => {
   // base path for images
   const router = useRouter()
 
-  const meta_title = 'Branding | Supabase'
-  const meta_description = 'Get Supabase Brand assets here.'
+  const meta_title = 'Branding | iEchor'
+  const meta_description = 'Get iEchor Brand assets here.'
 
   return (
     <>
@@ -26,10 +26,10 @@ const Index = () => {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/${router.pathname}`,
+          url: `https://iechor.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image-v2.jpg`,
+              url: `https://iechor.com/images/og/og-image-v2.jpg`,
             },
           ],
         }}
@@ -39,10 +39,10 @@ const Index = () => {
           <SectionContainer className="pb-0 md:pb-0 lg:pb-0">
             <div className="max-w-xl">
               <h1 className="text-scale-1200 text-5xl">Brand assets</h1>
-              <p className="text-scale-1200 text-2xl">Download official Supabase logos</p>
+              <p className="text-scale-1200 text-2xl">Download official iEchor logos</p>
               <p className="text-scale-1200 text-sm">
-                All Supabase trademarks, logos, or other brand elements can never be modified or
-                used for any other purpose other than to represent Supabase Inc.
+                All iEchor trademarks, logos, or other brand elements can never be modified or
+                used for any other purpose other than to represent iEchor Inc.
               </p>
             </div>
           </SectionContainer>
@@ -51,7 +51,7 @@ const Index = () => {
               <div className="relative col-span-12 h-60 w-full overflow-auto rounded-lg lg:col-span-5">
                 <Image
                   src={supabaseLogoPreview}
-                  alt="Supabase logo Preview"
+                  alt="iEchor logo Preview"
                   layout="fill"
                   objectFit="cover"
                 />
@@ -59,10 +59,10 @@ const Index = () => {
               <div className="col-span-12 flex items-center lg:col-span-7">
                 <div className="p-16">
                   <div className="space-y-2">
-                    <h1 className="text-scale-1200 text-4xl">Supabase logos</h1>
+                    <h1 className="text-scale-1200 text-4xl">iEchor logos</h1>
                     <p className="text-scale-1100 text-sm">
                       <p>
-                        Download Supabase official logos, including as SVG's, in both light and dark
+                        Download iEchor official logos, including as SVG's, in both light and dark
                         theme.
                       </p>
                       <p>Do not use any other color for the wordmark.</p>

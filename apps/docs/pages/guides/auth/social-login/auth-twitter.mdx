@@ -3,18 +3,18 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'auth-twitter',
   title: 'Login with Twitter',
-  description: 'Add Twitter OAuth to your Supabase project',
+  description: 'Add Twitter OAuth to your iEchor project',
 }
 
-To enable Twitter Auth for your project, you need to set up a Twitter OAuth application with [elevated access](https://developer.twitter.com/en/portal/products/elevated) and add the application credentials in the Supabase Dashboard.
+To enable Twitter Auth for your project, you need to set up a Twitter OAuth application with [elevated access](https://developer.twitter.com/en/portal/products/elevated) and add the application credentials in the iEchor Dashboard.
 
 ## Overview
 
 Setting up Twitter logins for your application consists of 3 parts:
 
 - Create and configure a Twitter Project and App on the [Twitter Developer Dashboard](https://developer.twitter.com/en/portal/dashboard).
-- Add your Twitter `API Key` and `API Secret Key` to your [Supabase Project](https://supabase.com/dashboard).
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
+- Add your Twitter `API Key` and `API Secret Key` to your [iEchor Project](https://iechor.com/dashboard).
+- Add the login code to your [iEchor JS Client App](https://github.com/openmodels-base/iechor-js).
 
 ## Access your Twitter Developer account
 
@@ -47,7 +47,7 @@ Setting up Twitter logins for your application consists of 3 parts:
 - Enter your `Privacy policy URL`.
 - Click `Save`.
 
-## Enter your Twitter credentials into your Supabase Project
+## Enter your Twitter credentials into your iEchor Project
 
 <SocialProviderSettingsSupabase provider="Twitter" />
 
@@ -73,8 +73,8 @@ async function signout() {
 
 ## Resources
 
-- [Supabase Account - Free Plan OK](https://supabase.com)
-- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [iEchor Account - Free Plan OK](https://iechor.com)
+- [iEchor JS Client](https://github.com/openmodels-base/iechor-js)
 - [Twitter Developer Dashboard](https://developer.twitter.com/en/portal/dashboard)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

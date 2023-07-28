@@ -3,13 +3,13 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'auth-google-oauth',
   title: 'Part Five: Google Oauth',
-  description: 'Supabase Deep Dive Part 5: Google OAuth Provider',
+  description: 'iEchor Deep Dive Part 5: Google OAuth Provider',
   video: 'https://www.youtube.com/v/_XM9ziOzWk4',
 }
 
 ### About
 
-How to add Google OAuth Logins to your Supabase Application.
+How to add Google OAuth Logins to your iEchor Application.
 
 ### Watch
 
@@ -46,15 +46,15 @@ And click to create a new set of credentials, select OAuth client ID as the opti
 
 ![Create new oauth client id credentials](/docs/img/auth-5-5.png)
 
-Now choose Web Application (assuming you're creating a web app) and in the Authorized redirect URI section you need to add: `https://<your-ref>.supabase.co/auth/v1/callback`. You can find your Supabase URL in Settings > API inside the Supabase dashboard.
+Now choose Web Application (assuming you're creating a web app) and in the Authorized redirect URI section you need to add: `https://<your-ref>.supabase.co/auth/v1/callback`. You can find your iEchor URL in Settings > API inside the iEchor dashboard.
 
 ![Add your redirect URI](/docs/img/auth-5-6.png)
 
-Now you can grab the client ID and secret from the popup, and insert them into the google section inside the Supabase dashboard in Auth > Settings:
+Now you can grab the client ID and secret from the popup, and insert them into the google section inside the iEchor dashboard in Auth > Settings:
 
 ![take client id and secret](/docs/img/auth-5-7.png)
 
-![insert client id and secret into supabase dashboard in auth > auth](/docs/img/auth-5-8.png)
+![insert client id and secret into iechor dashboard in auth > auth](/docs/img/auth-5-8.png)
 
 Hit save. Now you should be able to navigate in the browser to:
 
@@ -70,7 +70,7 @@ You can additionally add a query parameter `redirect_to=` to the end of the URL 
 https://<your-ref>.supabase.co/auth/v1/authorize?provider=google&redirect_to=http://localhost:3000/welcome
 ```
 
-But make sure any URL you enter here is on the same host as the site url that you have entered on the Auth > Settings page on the Supabase dashboard. (There is additional functionality coming soon, where you'll be able to add additional URLs to the allow list).
+But make sure any URL you enter here is on the same host as the site url that you have entered on the Auth > Settings page on the iEchor dashboard. (There is additional functionality coming soon, where you'll be able to add additional URLs to the allow list).
 
 If you want to redirect the user to a specific page in your website or app after a successful authentication.
 
@@ -84,7 +84,7 @@ Note however that your app will usually have to be verified by Google before you
 
 The only thing left to implement is the UI, but if you prefer to use something pre-built, we have a handy [Auth Widget](https://github.com/supabase/ui/#using-supabase-ui-auth), where you can enable/disable whichever auth providers you want to support.
 
-For any support please get in touch at beta at [supabase.com](https://supabase.com) or for feature requests open an issue in the [backend](https://github.com/supabase/gotrue) or [frontend](https://github.com/supabase/gotrue-js) repos.
+For any support please get in touch at beta at [iechor.com](https://iechor.com) or for feature requests open an issue in the [backend](https://github.com/supabase/gotrue) or [frontend](https://github.com/supabase/gotrue-js) repos.
 
 ### Resources
 
@@ -97,7 +97,7 @@ For any support please get in touch at beta at [supabase.com](https://supabase.c
 - Watch [Part Three: Policies](../../learn/auth-deep-dive/auth-policies)
 - Watch [Part Four: GoTrue](../../learn/auth-deep-dive/auth-gotrue)
   {/* <!-- - Watch [Part Five: Google Oauth](../../learn/auth-deep-dive/auth-google-oauth) --> */}
-- Sign up for Supabase: [supabase.com/dashboard](https://supabase.com/dashboard)
+- Sign up for iEchor: [iechor.com/dashboard](https://iechor.com/dashboard)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

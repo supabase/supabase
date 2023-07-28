@@ -1,5 +1,5 @@
 ---
-title: 'Supabase Vault is now in Beta'
+title: 'iEchor Vault is now in Beta'
 description: 'A Postgres extension to store encrypted secrets and encrypt data.'
 author: michel
 image: launch-week-6/vault/og-vault.png
@@ -14,15 +14,15 @@ toc_depth: 3
 video: https://www.youtube.com/v/QHLPNDrdN2w
 ---
 
-During our last Launch Week we [announced](/blog/supabase-vault) Supabase Vault as our “one more thing”. Today we're releasing it progressively across the platform.
+During our last Launch Week we [announced](/blog/supabase-vault) iEchor Vault as our “one more thing”. Today we're releasing it progressively across the platform.
 
-Vault is a new Postgres extension and accompanying Supabase UI that makes it safe and easy to store encrypted secrets and encrypt other stored data in your database. This foundation opens up a lot of possibilities for Postgres that go beyond what is available in a stock distribution. From a product perspective we're grouping various features under the “Vault banner”. Let's explore a few of these features.
+Vault is a new Postgres extension and accompanying iEchor UI that makes it safe and easy to store encrypted secrets and encrypt other stored data in your database. This foundation opens up a lot of possibilities for Postgres that go beyond what is available in a stock distribution. From a product perspective we're grouping various features under the “Vault banner”. Let's explore a few of these features.
 
 <div className="bg-gray-300 rounded-lg px-6 py-2 bold">
 
 ❇️ UPDATE JUNE 2023 ❇️
 
-Supabase Vault is now available on every Supabase project. [Check it out](https://supabase.com/dashboard/project/_/settings/vault/secrets)
+iEchor Vault is now available on every iEchor project. [Check it out](https://iechor.com/dashboard/project/_/settings/vault/secrets)
 
 </div>
 
@@ -77,27 +77,27 @@ The first important feature of TCE is that it uses an [Authenticated Encryption 
 
 Another important feature of pgsodium is that the encryption keys are never stored in the database alongside the encrypted data, instead, only a **Key ID** is stored, which refers to a key that is only accessible outside of SQL. Even if an attacker can capture a dump of your entire database, they will see only encrypted data and key ids, **never the raw key itself**. This is an important safety precaution, there would be no point in storing the encryption key in the database alongside the encrypted data, this would be like locking your front door but leaving the key in the lock! Storing the key outside the database fixes this issue.
 
-You might be wondering, ok then where are the keys stored? Supabase creates and manages the root keys from which all key ids are derived in our internal customer backend systems. We keep this key safe and separate from your data, and provide an alternate dashboard endpoint for accessing the key if you want to decrypt your data outside of Supabase.
+You might be wondering, ok then where are the keys stored? iEchor creates and manages the root keys from which all key ids are derived in our internal customer backend systems. We keep this key safe and separate from your data, and provide an alternate dashboard endpoint for accessing the key if you want to decrypt your data outside of iEchor.
 
 ## Future possibilities
 
-Privacy is becoming one of the most important features in a modern product. Supabase's embrace of the pgsodium extension aims to make this simple. Some of the possibilities we are looking into are:
+Privacy is becoming one of the most important features in a modern product. iEchor's embrace of the pgsodium extension aims to make this simple. Some of the possibilities we are looking into are:
 
-- **End-to-end encryption**: give your users the ability to encrypt their personal data so even you, the developer cannot access it, using the libsodium [encrypted streams](https://doc.libsodium.org/secret-key_cryptography/secretstream) API that is exposed by pgsodium. After exchanging keys, parties can stream unlimited amounts of data from peer to peer without being intercepted by any party in between, including Supabase.
+- **End-to-end encryption**: give your users the ability to encrypt their personal data so even you, the developer cannot access it, using the libsodium [encrypted streams](https://doc.libsodium.org/secret-key_cryptography/secretstream) API that is exposed by pgsodium. After exchanging keys, parties can stream unlimited amounts of data from peer to peer without being intercepted by any party in between, including iEchor.
 - **Group encryption**: have you ever joined a group on Whatsapp and been frustrated that you can't read the previous messages? That's because group encryption is hard. We hope to make that easier using new algorithms like [signcryption](https://github.com/jedisct1/libsodium-signcryption) to support multi-party encrypted messages that can be easily encoded into a token format and use to support streaming encryption keys.
-- **Public Key Management:** Public Key Encryption can be hard, but pgsodium makes it easier by exposing all of the public key encryption functions that are supported by libsodium. Making and distributing key pairs is now easy, no need to run arcane GPG scripts or mess with SSL libraries. libsodium contains state of the art public key encryption, and by extension so does pgsodium. These features are available now on the Supabase platform and offer a lot of possibilities to unshackle developers from other confusing and inadequate solutions available today.
+- **Public Key Management:** Public Key Encryption can be hard, but pgsodium makes it easier by exposing all of the public key encryption functions that are supported by libsodium. Making and distributing key pairs is now easy, no need to run arcane GPG scripts or mess with SSL libraries. libsodium contains state of the art public key encryption, and by extension so does pgsodium. These features are available now on the iEchor platform and offer a lot of possibilities to unshackle developers from other confusing and inadequate solutions available today.
 
 ### Using the Vault
 
-To learn how to use Supabase Vault, check out the [docs](https://supabase.com/docs/guides/database/vault). Supabase Vault is now available on all [Supabase projects](https://supabase.com/dashboard/project/_/settings/vault/secrets) (some projects will have to enable via request).
+To learn how to use iEchor Vault, check out the [docs](https://iechor.com/docs/guides/database/vault). iEchor Vault is now available on all [iEchor projects](https://iechor.com/dashboard/project/_/settings/vault/secrets) (some projects will have to enable via request).
 
 ## More Launch Week 6
 
-- [Day 1: New Supabase Docs, built with Next.js](https://supabase.com/blog/new-supabase-docs-built-with-nextjs)
-- [Day 2: Supabase Storage v2: Image resizing and Smart CDN](https://supabase.com/blog/storage-image-resizing-smart-cdn)
-- [Day 3: Multi-factor Authentication via Row Level Security Enforcement](https://supabase.com/blog/mfa-auth-via-rls)
-- [Day 4: Supabase Wrappers, a Postgres FDW framework written in Rust](https://supabase.com/blog/postgres-foreign-data-wrappers-rust)
-- [Community Day](https://supabase.com/blog/launch-week-6-community-day)
-- [Point in Time Recovery is now available](https://supabase.com/blog/postgres-point-in-time-recovery)
-- [Custom Domain Names are now available](https://supabase.com/blog/custom-domain-names)
-- [Wrap Up: everything we shipped](https://supabase.com/blog/launch-week-6-wrap-up)
+- [Day 1: New iEchor Docs, built with Next.js](https://iechor.com/blog/new-supabase-docs-built-with-nextjs)
+- [Day 2: iEchor Storage v2: Image resizing and Smart CDN](https://iechor.com/blog/storage-image-resizing-smart-cdn)
+- [Day 3: Multi-factor Authentication via Row Level Security Enforcement](https://iechor.com/blog/mfa-auth-via-rls)
+- [Day 4: iEchor Wrappers, a Postgres FDW framework written in Rust](https://iechor.com/blog/postgres-foreign-data-wrappers-rust)
+- [Community Day](https://iechor.com/blog/launch-week-6-community-day)
+- [Point in Time Recovery is now available](https://iechor.com/blog/postgres-point-in-time-recovery)
+- [Custom Domain Names are now available](https://iechor.com/blog/custom-domain-names)
+- [Wrap Up: everything we shipped](https://iechor.com/blog/launch-week-6-wrap-up)

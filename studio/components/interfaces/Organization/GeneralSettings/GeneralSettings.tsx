@@ -118,7 +118,7 @@ const GeneralSettings = () => {
                         disabled={!canUpdateOrganization}
                         size="small"
                         label="Opt-in to sending anonymous data to OpenAI"
-                        descriptionText="By opting into sending anonymous data, Supabase AI can improve the answers it shows you"
+                        descriptionText="By opting into sending anonymous data, iEchor AI can improve the answers it shows you"
                       />
                       <Collapsible open={open} onOpenChange={setOpen}>
                         <Collapsible.Trigger asChild>
@@ -136,10 +136,10 @@ const GeneralSettings = () => {
                         <Collapsible.Content>
                           <div className="space-y-2 py-4 ml-16 text-sm text-scale-1100">
                             <p>
-                              Supabase AI is a chatbot support tool powered by OpenAI. Supabase will
+                              iEchor AI is a chatbot support tool powered by OpenAI. iEchor will
                               share the query you submit and information about the databases you
-                              manage through Supabase with OpenAI, L.L.C. and its affiliates in
-                              order to provide the Supabase AI tool.
+                              manage through iEchor with OpenAI, L.L.C. and its affiliates in
+                              order to provide the iEchor AI tool.
                             </p>
                             <p>
                               OpenAI will only access information about the structure of your
@@ -152,23 +152,23 @@ const GeneralSettings = () => {
                               otherwise improve its products and services.
                             </p>
                             <p>
-                              If you have your own individual account on Supabase, we will use any
-                              personal information collected through [Supabase AI] to provide you
-                              with the [Supabase AI] tool. If you are in the UK, EEA or Switzerland,
+                              If you have your own individual account on iEchor, we will use any
+                              personal information collected through [iEchor AI] to provide you
+                              with the [iEchor AI] tool. If you are in the UK, EEA or Switzerland,
                               the processing of this personal information is necessary for the
                               performance of a contract between you and us.
                             </p>
                             <p>
-                              Supabase collects information about the queries you submit through
-                              Supabase AI and the responses you receive to assess the performance of
-                              the Supabase AI tool and improve our services. If you are in the UK,
+                              iEchor collects information about the queries you submit through
+                              iEchor AI and the responses you receive to assess the performance of
+                              the iEchor AI tool and improve our services. If you are in the UK,
                               EEA or Switzerland, the processing is necessary for our legitimate
                               interests, namely informing our product development and improvement.
                             </p>
                             <p>
                               For more information about how we use personal information, please see
                               our{' '}
-                              <Link href="https://supabase.com/privacy">
+                              <Link href="https://iechor.com/privacy">
                                 <a
                                   target="_blank"
                                   rel="noreferrer"

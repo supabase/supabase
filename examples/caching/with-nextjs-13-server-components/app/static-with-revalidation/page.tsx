@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import supabase from '../../utils/supabase'
+import iechor from '../../utils/supabase'
 
 // cache this page for 1 minute
 export const revalidate = 60

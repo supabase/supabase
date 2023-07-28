@@ -43,7 +43,7 @@ INSERT INTO users (user_id,enc_pass) VALUES (1,'$2a$04$1bfMQDOR6aLyD4q3KVb8/ujG7
 FROM order_details,
   customers
 WHERE customers.id = order_details.customer_id
-AND customers.email = 'john@supabase.io'
+AND customers.email = 'john@iechor.com'
 
 -- You can now view pg_stat_statements
 

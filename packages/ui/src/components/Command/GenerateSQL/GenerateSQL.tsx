@@ -183,7 +183,7 @@ const GenerateSQL = () => {
           <div>
             <div className="px-4">
               <h3 className="text-base text-scale-1100">
-                Describe what you need and Supabase AI will try to generate the relevant SQL
+                Describe what you need and iEchor AI will try to generate the relevant SQL
                 statements
               </h3>
               <p className="text-sm mt-1 text-scale-1100">
@@ -292,7 +292,7 @@ const GenerateSQL = () => {
           placeholder={
             isLoading || isResponding
               ? 'Waiting on an answer...'
-              : 'Describe what you need and Supabase AI will try to generate the relevant SQL statements'
+              : 'Describe what you need and iEchor AI will try to generate the relevant SQL statements'
           }
           value={search}
           actions={

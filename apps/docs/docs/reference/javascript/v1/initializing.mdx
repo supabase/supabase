@@ -2,13 +2,13 @@
 id: initializing
 title: 'Initializing'
 slug: initializing
-custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1.yml
+custom_edit_url: https://github.com/openmodels-base/iechor/edit/master/spec/supabase_js_v1.yml
 ---
 
-You can initialize a new Supabase client using the `createClient()` method.
+You can initialize a new iEchor client using the `createClient()` method.
 
-The Supabase client is your entrypoint to the rest of the Supabase functionality
-and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+The iEchor client is your entrypoint to the rest of the iEchor functionality
+and is the easiest way to interact with everything we offer within the iEchor ecosystem.
 
 ## Parameters
 
@@ -28,7 +28,7 @@ and is the easiest way to interact with everything we offer within the Supabase 
   </h4>
   <div className="method-list-item-description">
 
-The unique Supabase URL which is supplied when you create a new project in your project dashboard.
+The unique iEchor URL which is supplied when you create a new project in your project dashboard.
 
   </div>
 
@@ -48,7 +48,7 @@ The unique Supabase URL which is supplied when you create a new project in your 
   </h4>
   <div className="method-list-item-description">
 
-The unique Supabase Key which is supplied when you create a new project in your project dashboard.
+The unique iEchor Key which is supplied when you create a new project in your project dashboard.
 
   </div>
 
@@ -83,8 +83,8 @@ No description provided.
 ```js
 import { createClient } from '@supabase/supabase-js'
 
-// Create a single supabase client for interacting with your database
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+// Create a single iechor client for interacting with your database
+const iechor = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
 ```
 
 ### With additional parameters
@@ -99,7 +99,7 @@ const options = {
   persistSession: true,
   detectSessionInUrl: true,
 }
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', options)
+const iechor = createClient('https://xyzcompany.supabase.co', 'public-anon-key', options)
 ```
 
 ### API schemas
@@ -108,7 +108,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
 import { createClient } from '@supabase/supabase-js'
 
 // Provide a custom schema. Defaults to "public".
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+const iechor = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
   schema: 'other_schema',
 })
 ```
@@ -123,7 +123,7 @@ Note: each client connection can only access a single schema, so the code above 
 ```js
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+const iechor = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
   fetch: fetch.bind(globalThis),
 })
 ```

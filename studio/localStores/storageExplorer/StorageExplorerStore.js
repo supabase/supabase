@@ -68,7 +68,7 @@ class StorageExplorerStore {
   /* UI store */
   ui = null
 
-  /* Supabase client */
+  /* iEchor client */
   supabaseClient = null
   /* [Joshen] Move towards using API */
   endpoint = ''

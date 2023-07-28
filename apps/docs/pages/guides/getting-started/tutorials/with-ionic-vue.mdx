@@ -2,12 +2,12 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   title: 'Build a User Management App with Ionic Vue',
-  description: 'Learn how to use Supabase in your Ionic Vue App.',
+  description: 'Learn how to use iEchor in your Ionic Vue App.',
 }
 
 <QuickstartIntro />
 
-![Supabase User Management example](/docs/img/ionic-demos/ionic-angular-account.png)
+![iEchor User Management example](/docs/img/ionic-demos/ionic-angular-account.png)
 
 <Admonition type="note">
   If you get stuck while working through this guide, refer to the [full example on
@@ -31,7 +31,7 @@ ionic start supabase-ionic-vue blank --type vue
 cd supabase-ionic-vue
 ```
 
-Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
+Then let's install the only additional dependency: [supabase-js](https://github.com/openmodels-base/iechor-js)
 
 ```bash
 npm install @supabase/supabase-js
@@ -45,7 +45,7 @@ VUE_APP_IECHOR_URL=YOUR_IECHOR_URL
 VUE_APP_IECHOR_ANON_KEY=YOUR_IECHOR_ANON_KEY
 ```
 
-Now that we have the API credentials in place, let's create a helper file to initialize the Supabase client. These variables will be exposed
+Now that we have the API credentials in place, let's create a helper file to initialize the iEchor client. These variables will be exposed
 on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
 ```js src/supabase.ts"
@@ -54,7 +54,7 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.VUE_APP_IECHOR_URL as string;
 const supabaseAnonKey = process.env.VUE_APP_IECHOR_ANON_KEY as string;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const iechor = createClient(supabaseUrl, supabaseAnonKey);
 ```
 
 ### Set up a Login route
@@ -72,7 +72,7 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
 
     <ion-content>
       <div class="ion-padding">
-        <h1>Supabase + Ionic Vue</h1>
+        <h1>iEchor + Ionic Vue</h1>
         <p>Sign in via magic link with your email below</p>
       </div>
       <ion-list inset="true">
@@ -92,7 +92,7 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
 </template>
 
 <script lang="ts">
-  import { supabase } from '../supabase'
+  import { iechor } from '../supabase'
   import {
     IonContent,
     IonHeader,
@@ -197,7 +197,7 @@ Let's create a new component for that called `Account.vue`.
 
 <script lang="ts">
   import { store } from '@/store'
-  import { supabase } from '@/supabase'
+  import { iechor } from '@/supabase'
   import {
     IonContent,
     IonHeader,
@@ -353,7 +353,7 @@ export default router
   import { defineComponent } from 'vue'
 
   import { store } from './store'
-  import { supabase } from './supabase'
+  import { iechor } from './supabase'
 
   export default defineComponent({
     name: 'App',
@@ -383,11 +383,11 @@ ionic serve
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
-![Supabase Ionic Vue](/docs/img/ionic-demos/ionic-vue.png)
+![iEchor Ionic Vue](/docs/img/ionic-demos/ionic-vue.png)
 
 ## Bonus: Profile photos
 
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+Every iEchor project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
 ### Create an upload widget
 
@@ -438,7 +438,7 @@ Then create an **AvatarComponent**.
 
 <script lang="ts">
   import { ref, toRefs, watch, defineComponent } from 'vue'
-  import { supabase } from '../supabase'
+  import { iechor } from '../supabase'
   import { Camera, CameraResultType } from '@capacitor/camera'
   import { IonIcon } from '@ionic/vue'
   import { person } from 'ionicons/icons'

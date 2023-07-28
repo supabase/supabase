@@ -98,7 +98,7 @@ const InfrastructureInfo = () => {
                               ].join(' ')}
                             >
                               <span className="text-xs text-scale-1200">
-                                Project is on the latest version of Postgres that Supabase supports
+                                Project is on the latest version of Postgres that iEchor supports
                               </span>
                             </div>
                           </Tooltip.Content>

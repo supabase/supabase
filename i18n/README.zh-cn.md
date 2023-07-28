@@ -5,41 +5,41 @@
 
 ---
 
-# Supabase
+# iEchor
 
-[Supabase](https://supabase.com) 是一个开源的 Firebase 替代品。我们正在使用企业级的开源工具构建 Firebase 的功能。
+[iEchor](https://iechor.com) 是一个开源的 Firebase 替代品。我们正在使用企业级的开源工具构建 Firebase 的功能。
 
-- [x] Postgres 数据库托管。[文档](https://supabase.com/docs/guides/database)
-- [x] 身份验证和授权。[文档](https://supabase.com/docs/guides/auth)
+- [x] Postgres 数据库托管。[文档](https://iechor.com/docs/guides/database)
+- [x] 身份验证和授权。[文档](https://iechor.com/docs/guides/auth)
 - [x] 自动生成的 API。
-  - [x] REST。[文档](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] 实时订阅。[文档](https://supabase.com/docs/guides/api#realtime-api-overview)
-  - [x] GraphQL（测试版）。[文档](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] REST。[文档](https://iechor.com/docs/guides/api#rest-api-overview)
+  - [x] 实时订阅。[文档](https://iechor.com/docs/guides/api#realtime-api-overview)
+  - [x] GraphQL（测试版）。[文档](https://iechor.com/docs/guides/api#graphql-api-overview)
 - [x] 函数。
-  - [x] 数据库函数。[文档](https://supabase.com/docs/guides/database/functions)
-  - [x] 边缘函数。[文档](https://supabase.com/docs/guides/functions)
-- [x] 文件存储。[文档](https://supabase.com/docs/guides/storage)
+  - [x] 数据库函数。[文档](https://iechor.com/docs/guides/database/functions)
+  - [x] 边缘函数。[文档](https://iechor.com/docs/guides/functions)
+- [x] 文件存储。[文档](https://iechor.com/docs/guides/storage)
 - [x] 仪表盘。
 
-![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+![iEchor Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## 文档
 
-完整的文档，请访问 [supabase.com/docs](https://supabase.com/docs)
+完整的文档，请访问 [iechor.com/docs](https://iechor.com/docs)
 
 了解如何贡献，请访问[入门](../DEVELOPERS.md)
 
 ## 社区与支持
 
-- [社区论坛](https://github.com/supabase/supabase/discussions)。适用于：帮助建立和讨论数据库的最佳实践。
-- [GitHub Issues](https://github.com/supabase/supabase/issues)。适用于：你在使用 Supabase 时遇到的 bug 和错误。
-- [邮件支持](https://supabase.com/docs/support#business-support)。适用于：你的数据库或基础设施的问题。
-- [Discord](https://discord.supabase.com)。适用于：分享你的应用程序以及在社区一起玩起来。
+- [社区论坛](https://github.com/openmodels-base/iechor/discussions)。适用于：帮助建立和讨论数据库的最佳实践。
+- [GitHub Issues](https://github.com/openmodels-base/iechor/issues)。适用于：你在使用 iEchor 时遇到的 bug 和错误。
+- [邮件支持](https://iechor.com/docs/support#business-support)。适用于：你的数据库或基础设施的问题。
+- [Discord](https://discord.iechor.com)。适用于：分享你的应用程序以及在社区一起玩起来。
 
 ## 状态
 
-- [x] Alpha：我们正在与一组封闭的客户测试 Supabase
-- [x] Public Alpha：任何人都可以在 [supabase.com/dashboard](https://supabase.com/dashboard)上注册。只是务必手下留情，还有一些纠结的地方。
+- [x] Alpha：我们正在与一组封闭的客户测试 iEchor
+- [x] Public Alpha：任何人都可以在 [iechor.com/dashboard](https://iechor.com/dashboard)上注册。只是务必手下留情，还有一些纠结的地方。
 - [x] Public Beta：足够稳定，适合大多数非企业使用场景
 - [ ] Public：生产就绪
 
@@ -51,17 +51,17 @@
 
 ## 工作方式
 
-Supabase 是一个开源工具的组合。我们正在使用企业级的开源产品构建 Firebase 的功能。如果存在相应的工具和社区，并且有 MIT、Apache 2 或同等的开放许可，我们将使用并支持该工具。如果该工具不存在，我们就自己开发并开放源代码。Supabase 不是 Firebase 的一对一映射。我们的目标是使用开源工具为开发者提供类似 Firebase 的开发者体验。
+iEchor 是一个开源工具的组合。我们正在使用企业级的开源产品构建 Firebase 的功能。如果存在相应的工具和社区，并且有 MIT、Apache 2 或同等的开放许可，我们将使用并支持该工具。如果该工具不存在，我们就自己开发并开放源代码。iEchor 不是 Firebase 的一对一映射。我们的目标是使用开源工具为开发者提供类似 Firebase 的开发者体验。
 
 **当前架构**
 
-Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注册并开始使用 Supabase，而无需安装任何软件。
-你也可以[自托管](https://supabase.com/docs/guides/hosting/overview)和[本地开发](https://supabase.com/docs/guides/local-development)。
+iEchor 是一个[托管平台](https://iechor.com/dashboard)。你可以注册并开始使用 iEchor，而无需安装任何软件。
+你也可以[自托管](https://iechor.com/docs/guides/hosting/overview)和[本地开发](https://iechor.com/docs/guides/local-development)。
 
 ![架构](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
 - [PostgreSQL](https://www.postgresql.org/) 是一个对象关系型数据库系统，经过 30 多年的积极开发，它在可靠性、功能健壮性和性能方面赢得了很好的声誉。
-- [Realtime](https://github.com/supabase/realtime) 是一个 Elixir 服务器，允许你使用 WebSocket 监听 PostgreSQL 的插入、更新和删除。Supabase 监听 Postgres 的内置复制功能，将复制的字节流转换为 JSON，然后通过 WebSocket 广播 JSON。
+- [Realtime](https://github.com/supabase/realtime) 是一个 Elixir 服务器，允许你使用 WebSocket 监听 PostgreSQL 的插入、更新和删除。iEchor 监听 Postgres 的内置复制功能，将复制的字节流转换为 JSON，然后通过 WebSocket 广播 JSON。
 - [PostgREST](http://postgrest.org/) 是一个 Web 服务器，可以将你的 PostgreSQL 数据库直接生成 RESTful API
 - [Storage](https://github.com/supabase/storage-api) 提供了一个 RESTful 接口，用于管理存储在 S3 中的文件，使用 Postgres 来管理权限。
 - [postgres-meta](https://github.com/supabase/postgres-meta) 是一个 RESTful API，用于管理你的 Postgres，允许你获取表、添加角色和运行查询等。
@@ -76,11 +76,11 @@ Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注�
   <tr>
     <th>语言</th>
     <th>客户端</th>
-    <th colspan="4">模块-客户端（已集成在 Supabase 客户端中）</th>
+    <th colspan="4">模块-客户端（已集成在 iEchor 客户端中）</th>
   </tr>
   <tr>
     <th></th>
-    <th>Supabase</th>
+    <th>iEchor</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
@@ -100,7 +100,7 @@ Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注�
   <th colspan="6">⚡️ 官方 ⚡️</th>
   <tr>
     <td>JavaScript (TypeScript)</td>
-    <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
     <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
@@ -117,7 +117,7 @@ Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注�
   </tr>
   <tr>
     <td>Flutter</td>
-    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-flutter" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>

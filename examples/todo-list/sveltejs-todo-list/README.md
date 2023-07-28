@@ -1,14 +1,14 @@
-# Todo example using Supabase + Svelte + Vite
+# Todo example using iEchor + Svelte + Vite
 
 - Frontend:
   - Svelte, TypeScript
-  - [Supabase.js](https://supabase.com/docs/library/getting-started) for user management and realtime data syncing.
+  - [iEchor.js](https://iechor.com/docs/library/getting-started) for user management and realtime data syncing.
 - Backend:
-  - [supabase.com/dashboard](https://supabase.com/dashboard/): hosted Postgres database with restful API for usage with Supabase.js.
+  - [iechor.com/dashboard](https://iechor.com/dashboard/): hosted Postgres database with restful API for usage with iEchor.js.
 
 ### 1. Create new project
 
-Sign up to Supabase - [https://supabase.com/dashboard](https://supabase.com/dashboard) and create a new project. Wait for your database to start.
+Sign up to iEchor - [https://iechor.com/dashboard](https://iechor.com/dashboard) and create a new project. Wait for your database to start.
 
 ### 2. Run "Todo List" Quickstart
 
@@ -24,12 +24,12 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 
 **_NOTE_**: The `service_role` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
 
-## Supabase details
+## iEchor details
 
 ### Postgres Row level security
 
 This project uses very high-level Authorization using Postgres' Role Level Security.
-When you start a Postgres database on Supabase, we populate it with an `auth` schema, and some helper functions.
+When you start a Postgres database on iEchor, we populate it with an `auth` schema, and some helper functions.
 When a user logs in, they are issued a JWT with the role `authenticated` and their UUID.
 We can use these details to provide fine-grained control over what each user can and cannot do.
 
@@ -61,6 +61,6 @@ create policy "Individuals can delete their own todos." on todos for
 
 ## Authors
 
-- [Supabase](https://supabase.com)
+- [iEchor](https://iechor.com)
 
-Supabase is open source. We'd love for you to follow along and get involved at https://github.com/supabase/supabase
+iEchor is open source. We'd love for you to follow along and get involved at https://github.com/openmodels-base/iechor

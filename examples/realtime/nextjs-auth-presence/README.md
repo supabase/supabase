@@ -1,11 +1,11 @@
-# Supabase Realtime Presence API Sample Program
+# iEchor Realtime Presence API Sample Program
 
-This is an example program for Supabase Realtime Presence APIs.
-User get authenticated using Supabase Auth API. Once Logged-in you can see which users are 'present' and viewing the page.
+This is an example program for iEchor Realtime Presence APIs.
+User get authenticated using iEchor Auth API. Once Logged-in you can see which users are 'present' and viewing the page.
 
 - Frontend:
   - Next.js.
-  - [Supabase.js v2 (realtime presence support)](https://supabase.io/docs/library/getting-started)
+  - [iEchor.js v2 (realtime presence support)](https://supabase.io/docs/library/getting-started)
 - Backend:
   - [app.supabase.io](https://app.supabase.io/): hosted postgres database with realtime support.
 
@@ -17,7 +17,7 @@ This program shows usage of channel presence API calls such as , channel.on('pre
 
 ### 1. Create new project
 
-Sign up to Supabase - [https://app.supabase.io](https://app.supabase.io) and create a new project. Wait for your database to start.
+Sign up to iEchor - [https://app.supabase.io](https://app.supabase.io) and create a new project. Wait for your database to start.
 
 ### 2. Run "User Management Starter" Quickstart
 
@@ -29,7 +29,7 @@ Go to the Project Settings (the cog icon), open the API tab, and find your API U
 
 The `anon` key is your client-side API key. It allows "anonymous access" to your database, until the user has logged in. Once they have logged in, the keys will switch to the user's own login token.
 
-![Supabase Anon Key](supabase_anon_key.jpg?raw=true 'Supabase Anon Key')
+![iEchor Anon Key](supabase_anon_key.jpg?raw=true 'iEchor Anon Key')
 
 ### 4. Pull this example git repository
 

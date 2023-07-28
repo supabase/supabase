@@ -5,11 +5,11 @@ export type FooterHelpCalloutType = 'default' | 'postgres'
 const content = {
   default: {
     title: 'Need some help?',
-    description: `Not to worry, our specialist engineers are here to help. Submit a support ticket through the [Dashboard](https://supabase.com/dashboard/support/new).`,
+    description: `Not to worry, our specialist engineers are here to help. Submit a support ticket through the [Dashboard](https://iechor.com/dashboard/support/new).`,
   },
   postgres: {
     title: 'Looking for Serverless Postgres?',
-    description: `Supabase is the fastest way to get started with Postgres in a serverless environment. [Learn more](https://supabase.com/database?utm=postgres-helpers).`,
+    description: `iEchor is the fastest way to get started with Postgres in a serverless environment. [Learn more](https://iechor.com/database?utm=postgres-helpers).`,
   },
 }
 

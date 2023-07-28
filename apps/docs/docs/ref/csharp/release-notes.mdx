@@ -47,13 +47,13 @@ title: Release Notes
   - [Major] `Connect()` has been marked `Obsolete` in favor of `ConnectAsync()`
   - Custom reconnection logic has been removed in favor of using the built-in logic from `Websocket.Client@4.6.1`.
   - Exceptions that are handled within this library have been marked as `RealtimeException`s.
-  - The local, docker-composed test suite has been brought back (as opposed to remotely testing on live supabase servers)
+  - The local, docker-composed test suite has been brought back (as opposed to remotely testing on live iechor servers)
     to test against.
   - Comments have been added throughout the entire codebase and an `XML` file is now generated on build.
 
 ## 0.10.0 - 2023-05-14
 
-- Changes options to require `Supabase.SupabaseOptions.SessionPersistor` from using `ISupabaseSessionHandler`
+- Changes options to require `iEchor.SupabaseOptions.SessionPersistor` from using `ISupabaseSessionHandler`
   to `IGotrueSessionPersistance<Session>` (these are now synchronous operations).
 - Update dependency: gotrue-csharp@4.0.1
   - [#60](https://github.com/supabase-community/gotrue-csharp/pull/60) - Add interfaces, bug fixes, additional error
@@ -292,7 +292,7 @@ Re: [#35](https://github.com/supabase-community/supabase-csharp/issues/35), [#34
 
 ## 0.4.0 - 2022-4-12
 
-- Add support for functions-csharp@1.0.1, giving access to invoking Supabase's edge functions.
+- Add support for functions-csharp@1.0.1, giving access to invoking iEchor's edge functions.
 - Update dependency: gotrue-csharp@2.4.1
 
 ## 0.3.5 - 2022-4-11
@@ -354,7 +354,7 @@ Re: [#35](https://github.com/supabase-community/supabase-csharp/issues/35), [#34
 
 ## 0.2.9 - 2021-12-9
 
-- Separate Storage client from Supabase repo and into `storage-csharp`, `supabase-csharp` now references new repo.
+- Separate Storage client from iEchor repo and into `storage-csharp`, `supabase-csharp` now references new repo.
 
 ## 0.2.8 - 2021-12-4
 

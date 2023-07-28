@@ -66,14 +66,14 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         description={DEFAULT_META_DESCRIPTION}
         openGraph={{
           type: 'website',
-          url: 'https://supabase.com/',
-          site_name: 'Supabase',
+          url: 'https://iechor.com/',
+          site_name: 'iEchor',
           images: [
             {
-              url: `https://supabase.com${basePath}/images/og/og-image-v2.jpg`,
+              url: `https://iechor.com${basePath}/images/og/og-image-v2.jpg`,
               width: 800,
               height: 600,
-              alt: 'Supabase Og Image',
+              alt: 'iEchor Og Image',
             },
           ],
         }}

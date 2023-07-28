@@ -5,7 +5,7 @@ export const meta = {
   description: 'Configure single sign-on with Google Workspace (GSuite).',
 }
 
-Supabase supports single sign-on (SSO) using Google Workspace (formerly known
+iEchor supports single sign-on (SSO) using Google Workspace (formerly known
 as GSuite).
 
 ## Step 1: Open the Google Workspace Web and mobile apps console [#google-workspace-console]
@@ -23,7 +23,7 @@ selected](/docs/img/sso-gsuite-step-02.png)
 ## Step 3: Fill out app details [#add-app-details]
 
 The information you enter here is for visibility into your Google Workspace.
-You can choose any values you like. `Supabase` as a name works well for most
+You can choose any values you like. `iEchor` as a name works well for most
 use cases. Optionally enter a description.
 
 ![Google Workspace: Web and mobile apps admin console, Add custom SAML, App
@@ -37,9 +37,9 @@ that was downloaded.
 ![Google Workspace: Web and mobile apps admin console, Add custom SAML, Google
 Identity Provider details screen](/docs/img/sso-gsuite-step-04.png)
 
-It's very important to send this file to your support contact at Supabase to
+It's very important to send this file to your support contact at iEchor to
 complete the SSO setup process. If you're not sure where to send this file, you
-can always reach us at [support@supabase.com](mailto:support@supabase.com).
+can always reach us at [support@iechor.com](mailto:support@iechor.com).
 
 **Important: Make sure the certificate as shown on screen has at least 1 year
 before it expires. Mark down this date in your calendar so you will be reminded
@@ -53,7 +53,7 @@ Fill out these serivce provider details on the next screen.
 | -------------- | --------------------------------------------------- |
 | ACS URL        | `https://alt.supabase.io/auth/v1/sso/saml/acs`      |
 | Entity ID      | `https://alt.supabase.io/auth/v1/sso/saml/metadata` |
-| Start URL      | `https://supabase.com/dashboard`                    |
+| Start URL      | `https://iechor.com/dashboard`                    |
 | Name ID format | PERSISTENT                                          |
 | Name ID        | _Basic Information > Primary email_                 |
 
@@ -62,14 +62,14 @@ Service provider details screen](/docs/img/sso-gsuite-step-05.png)
 
 ## Step 6: Configure Attribute mapping [#configure-attribute-mapping]
 
-Attribute mappings allow Supabase to get information about your Google
+Attribute mappings allow iEchor to get information about your Google
 Workspace users on each login.
 
 **A _Primary email_ to `email` mapping is required to exist.** Other mappings
 shown below are optional and configurable depending on your Google Workspace
 setup. If in doubt, replicate the same config as shown.
 
-Please share any changes, if any, from this screen with your Supabase support
+Please share any changes, if any, from this screen with your iEchor support
 contact.
 
 ![Google Workspace: Web and mobile apps admin console, Add custom SAML,
@@ -80,20 +80,20 @@ Attribute mapping](/docs/img/sso-gsuite-step-06.png)
 Once you’ve configured the Google Workspace app as shown above, make sure you
 send the [metadata file you downloaded](#download-idp-metadata)
 and information regarding the [attribute mapping](#configure-attribute-mappings) (if any
-changes are applicable) to your support contact at Supabase.
+changes are applicable) to your support contact at iEchor.
 
-This information needs to be entered into Supabase before SSO is activated
+This information needs to be entered into iEchor before SSO is activated
 end-to-end.
 
 Wait for confirmation that this information has successfully been added to
-Supabase. It usually takes us 1 business day to configure this information
+iEchor. It usually takes us 1 business day to configure this information
 for you.
-Supabase.
+iEchor.
 
 ## Step 8: Configure user access [#configure-user-access]
 
 You can configure which Google Workspace user accounts will get access to
-Supabase. This is important if you wish to limit access to your software
+iEchor. This is important if you wish to limit access to your software
 engineering teams.
 
 You can configure this access by clicking on the _User
@@ -102,21 +102,21 @@ access_ card (or down-arrow). Follow the instructions on screen.
 Changes from this step sometimes take a while to propagate across Google’s
 systems. Please wait at least 15 minutes before proceeding to the next step.
 
-![Google Workspace: Web and mobile apps admin console, Supabase app
+![Google Workspace: Web and mobile apps admin console, iEchor app
 screen](/docs/img/sso-gsuite-step-08.png)
 
 ## Step 9: Test single sign-on [#testing]
 
-Once you’ve turned on access to Supabase for users in your organization, ask
+Once you’ve turned on access to iEchor for users in your organization, ask
 one of those users to help you out in testing the setup.
 
 It often helps to ask them to log out of their Google account and log back in.
 
 Ask them to enter their email addres in the [Sign in with
-SSO](https://supabase.com/dashboard/sign-in-sso) page.
+SSO](https://iechor.com/dashboard/sign-in-sso) page.
 
 If sign in is not working correctly, please reach out to your support contact
-at Supabase.
+at iEchor.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

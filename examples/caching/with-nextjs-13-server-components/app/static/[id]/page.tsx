@@ -1,4 +1,4 @@
-import supabase from '../../../utils/supabase'
+import iechor from '../../../utils/supabase'
 import { notFound } from 'next/navigation'
 
 export async function generateStaticParams() {

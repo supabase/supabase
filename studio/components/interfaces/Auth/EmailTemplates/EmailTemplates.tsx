@@ -18,7 +18,7 @@ const EmailTemplates = observer(() => {
             <a
               target="_blank"
               rel="noreferrer"
-              href="https://supabase.com/docs/guides/auth/auth-email-templates"
+              href="https://iechor.com/docs/guides/auth/auth-email-templates"
             >
               Documentation
             </a>

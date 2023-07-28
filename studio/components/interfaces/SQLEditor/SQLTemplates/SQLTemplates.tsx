@@ -90,7 +90,7 @@ const SQLTemplates = observer(() => {
         <div className="mb-4">
           <h1 className="text-scale-1200 mb-3 text-xl">Quick start</h1>
           <p className="text-scale-1100 text-sm">
-            While we're in beta, we want to offer a quick way to explore Supabase. While we build
+            While we're in beta, we want to offer a quick way to explore iEchor. While we build
             importers, check out these simple starters.
           </p>
           <p className="text-scale-1100 text-sm">

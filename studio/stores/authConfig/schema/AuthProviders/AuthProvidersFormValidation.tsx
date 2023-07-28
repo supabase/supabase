@@ -58,7 +58,7 @@ const PROVIDER_EMAIL = {
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+            [Learn more](https://iechor.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -357,7 +357,7 @@ const PROVIDER_PHONE = {
   misc: {
     iconKey: 'phone-icon4',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+            [Learn more](https://iechor.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -381,7 +381,7 @@ const EXTERNAL_PROVIDER_APPLE = {
     EXTERNAL_APPLE_SECRET: {
       title: 'Secret Key (for OAuth)',
       description: `Secret key used in the OAuth flow.
-[Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#generate-a-client_secret)`,
+[Learn more](https://iechor.com/docs/guides/auth/social-login/auth-apple#generate-a-client_secret)`,
       type: 'string',
       isSecret: true,
     },
@@ -496,7 +496,7 @@ const EXTERNAL_PROVIDER_APPLE = {
     iconKey: 'apple-icon',
     requiresRedirect: true,
     helper: `Register this callback URL when using Sign in with Apple on the web in the Apple Developer Center.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+            [Learn more](https://iechor.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
     alert: {
       title: `Apple OAuth secret keys expire every 6 months`,
       description: `A new secret should be generated every 6 months, otherwise users on the web will not be able to sign in.`,
@@ -521,7 +521,7 @@ const EXTERNAL_PROVIDER_AZURE = {
     EXTERNAL_AZURE_SECRET: {
       // [TODO] Change docs
       title: 'Secret Value',
-      description: `Enter the data from Value, not the Secret ID. [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-azure#obtain-a-secret-id)`,
+      description: `Enter the data from Value, not the Secret ID. [Learn more](https://iechor.com/docs/guides/auth/social-login/auth-azure#obtain-a-secret-id)`,
       type: 'string',
       isSecret: true,
     },
@@ -843,7 +843,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
     iconKey: 'google-icon',
     requiresRedirect: true,
     helper: `Register this callback URL when using Sign-in with Google on the web using OAuth.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+            [Learn more](https://iechor.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
 
@@ -1262,7 +1262,7 @@ export const PROVIDER_SAML = {
     SAML_ENABLED: {
       title: 'Enable SAML 2.0 Single Sign-on',
       description:
-        'You will need to use the [Supabase CLI](https://supabase.com/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to set up SAML after enabling it',
+        'You will need to use the [iEchor CLI](https://iechor.com/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to set up SAML after enabling it',
       type: 'boolean',
     },
   },

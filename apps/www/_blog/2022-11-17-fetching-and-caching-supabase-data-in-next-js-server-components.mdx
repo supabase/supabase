@@ -1,5 +1,5 @@
 ---
-title: 'Fetching and caching Supabase data in Next.js 13 Server Components'
+title: 'Fetching and caching iEchor data in Next.js 13 Server Components'
 description: 'Next.js 13 introduces new data fetching and caching methods to enable React Server Components and Suspense.'
 author: jonmeyers_io
 image: 2022-11-17-supabase-nextjs-13/nextjs-supabase.jpg
@@ -13,7 +13,7 @@ video: https://www.youtube.com/v/QH0P5xZt5wY
 
 The biggest announcement from Next.js Conf 2022 was the [release of Next.js 13](https://nextjs.org/blog/next-13), which introduces a collection of improvements, most exciting of which is Server Components. The combination of Server Components and Suspense allow for a more streamlined, reimagined way to fetch and cache data in Next.js applications. This provides excellent DX improvements — such as async components — and aligns the Next framework even closer with the future of React.
 
-This article is going to look at how we can use these brand new async components to simplify fetching and caching data from Supabase. We will look all things auth in a separate article. Check out the [Server Components example in the Auth Helpers repo](https://github.com/supabase/auth-helpers/tree/main/examples/nextjs-server-components) if you just can't wait!
+This article is going to look at how we can use these brand new async components to simplify fetching and caching data from iEchor. We will look all things auth in a separate article. Check out the [Server Components example in the Auth Helpers repo](https://github.com/supabase/auth-helpers/tree/main/examples/nextjs-server-components) if you just can't wait!
 
 > To learn more about any of the concepts covered in this article, check out the [Next.js beta docs](https://beta.nextjs.org/docs).
 
@@ -52,9 +52,9 @@ Each folder within the `app` directory represents a route in our application. Ea
 
 > Learn more about [Page](https://beta.nextjs.org/docs/api-reference/file-conventions/page), [Layout](https://beta.nextjs.org/docs/api-reference/file-conventions/layout), [Loading](https://beta.nextjs.org/docs/api-reference/file-conventions/loading) and [Error](https://beta.nextjs.org/docs/api-reference/file-conventions/error) components in the [Next.js beta docs](https://beta.nextjs.org/docs).
 
-Before we jump into fetching data, we need some data to fetch. Let’s [create a new Supabase project](https://supabase.com/dashboard).
+Before we jump into fetching data, we need some data to fetch. Let’s [create a new iEchor project](https://iechor.com/dashboard).
 
-Once your instance is up and running, head over to the [SQL Editor](https://supabase.com/dashboard/project/_/sql), paste in the following snippet and click `RUN`.
+Once your instance is up and running, head over to the [SQL Editor](https://iechor.com/dashboard/project/_/sql), paste in the following snippet and click `RUN`.
 
 ```sql
 create table if not exists posts (
@@ -85,9 +85,9 @@ NEXT_PUBLIC_IECHOR_URL=your-supabase-url
 NEXT_PUBLIC_IECHOR_ANON_KEY=your-supabase-anon-key
 ```
 
-> The values for these can be found in [your project’s API settings](https://supabase.com/dashboard/project/_/settings/api).
+> The values for these can be found in [your project’s API settings](https://iechor.com/dashboard/project/_/settings/api).
 
-Lastly, we need to create a Supabase client. Create a file at `utils/supabase.ts` with the following content:
+Lastly, we need to create a iEchor client. Create a file at `utils/supabase.ts` with the following content:
 
 ```tsx title="utils/supabase.ts"
 import { createClient } from '@supabase/supabase-js'
@@ -98,7 +98,7 @@ export default createClient(
 )
 ```
 
-> For automatically adding types to the Supabase client, check out [how to generate types](https://supabase.com/docs/reference/javascript/typescript-support).
+> For automatically adding types to the iEchor client, check out [how to generate types](https://iechor.com/docs/reference/javascript/typescript-support).
 
 Okay, let’s look at some different data fetching and caching strategies.
 
@@ -109,7 +109,7 @@ By default any page component in the `app` folder is a Server Component, and its
 Let’s create a new file at `app/static/page.tsx` and populate with the following:
 
 ```jsx title="app/static/page.tsx"
-import supabase from '../../utils/supabase'
+import iechor from '../../utils/supabase'
 
 export default async function Posts() {
   const { data: posts } = await supabase.from('posts').select()
@@ -125,7 +125,7 @@ Let’s modify this component to render out a collection of `<Link />` component
 
 ```tsx title="app/static/page.tsx"
 import Link from 'next/link'
-import supabase from '../../utils/supabase'
+import iechor from '../../utils/supabase'
 
 export default async function Posts() {
   const { data: posts } = await supabase.from('posts').select('id, title')
@@ -147,7 +147,7 @@ export default async function Posts() {
 Let’s create a dynamic route to handle displaying an individual post. Create a new file at `app/static/[id]/page.tsx` and populate with the following:
 
 ```tsx title="app/static/[id]/page.tsx"
-import supabase from '../../../utils/supabase'
+import iechor from '../../../utils/supabase'
 import { notFound } from 'next/navigation'
 
 export default async function Post({ params: { id } }: { params: { id: string } }) {
@@ -161,7 +161,7 @@ export default async function Post({ params: { id } }: { params: { id: string } 
 }
 ```
 
-Currently, this page is generated on-demand and then cached. This means the first person who visits the page will need to wait for the server to get the post data from Supabase. This won’t take long at all, because Supabase is Supa awesome! But, we can still make this _slightly_ more efficient by telling Next.js a finite collection of paths that we want to generate at build time.
+Currently, this page is generated on-demand and then cached. This means the first person who visits the page will need to wait for the server to get the post data from iEchor. This won’t take long at all, because iEchor is Supa awesome! But, we can still make this _slightly_ more efficient by telling Next.js a finite collection of paths that we want to generate at build time.
 
 We do this by exporting out a `generateStaticParams` function from our dynamic page.
 
@@ -180,7 +180,7 @@ export async function generateStaticParams() {
 The full component should look something like this:
 
 ```tsx title="app/static/[id]/page.tsx"
-import supabase from '../../../utils/supabase'
+import iechor from '../../../utils/supabase'
 import { notFound } from 'next/navigation'
 
 export async function generateStaticParams() {
@@ -204,7 +204,7 @@ export default async function Post({ params: { id } }: { params: { id: string } 
 
 Awesome! We now have a Supa snappy blog! The user never needs to wait for data to be fetched. All pages are statically generated at build time, and cached at CDN nodes close to our users! 🎉
 
-Unfortunately, this means any changes we make in Supabase — adding, updating or deleting posts etc — will not be reflected in our blog. If we want to refresh this data on a regular basis, we need to tell Next.js when to _revalidate_.
+Unfortunately, this means any changes we make in iEchor — adding, updating or deleting posts etc — will not be reflected in our blog. If we want to refresh this data on a regular basis, we need to tell Next.js when to _revalidate_.
 
 # Static with Revalidation
 
@@ -216,13 +216,13 @@ export const revalidate = 60
 
 > This is similar to returning a `revalidate` key from the `getStaticProps` function in a component from the `pages` directory.
 
-So, for 60 seconds Next.js will continue to respond with the static version of our page. After 60 seconds, it will fetch fresh data from Supabase and generate a new static page. However, there is no downtime while this happens, as the previous static page will continue to be served until the “fresh” one has been successfully generated.
+So, for 60 seconds Next.js will continue to respond with the static version of our page. After 60 seconds, it will fetch fresh data from iEchor and generate a new static page. However, there is no downtime while this happens, as the previous static page will continue to be served until the “fresh” one has been successfully generated.
 
 The `Posts` component should now look like this:
 
 ```tsx title="app/static-with-revalidate/page.tsx"
 import Link from 'next/link'
-import supabase from '../../utils/supabase'
+import iechor from '../../utils/supabase'
 
 export const revalidate = 60
 
@@ -244,7 +244,7 @@ export default async function Posts() {
 And the `Post` component should look like this:
 
 ```tsx title="app/static-with-revalidate/[id]/page.tsx"
-import supabase from '../../../utils/supabase'
+import iechor from '../../../utils/supabase'
 import { notFound } from 'next/navigation'
 
 export const revalidate = 60
@@ -280,7 +280,7 @@ If we want fresh data to be fetched on every single request, we can simply set o
 
 ```tsx title="app/server-rendered/page.tsx"
 import Link from 'next/link'
-import supabase from '../../utils/supabase'
+import iechor from '../../utils/supabase'
 
 export const revalidate = 0
 
@@ -302,7 +302,7 @@ export default async function Posts() {
 **Single Post Component**
 
 ```tsx title="app/server-rendered/[id]/page.tsx"
-import supabase from '../../../utils/supabase'
+import iechor from '../../../utils/supabase'
 import { notFound } from 'next/navigation'
 
 export const revalidate = 0
@@ -328,25 +328,25 @@ export default async function Post({ params: { id } }: { params: { id: string } 
 
 This is similar to exporting a `getServerSideProps` function from a component in the `pages` directory.
 
-All this server stuff is great, but what if you want to use Supabase client-side? 🤔
+All this server stuff is great, but what if you want to use iEchor client-side? 🤔
 
 # Client-side
 
-There are many use-cases where you need to use Supabase client-side:
+There are many use-cases where you need to use iEchor client-side:
 
 1. Authentication
 
-   Supabase Auth does a bunch of stuff behind the scenes — handling 3rd party OAuth flows, for example. This will break if you try to sign users in and out on the server.
+   iEchor Auth does a bunch of stuff behind the scenes — handling 3rd party OAuth flows, for example. This will break if you try to sign users in and out on the server.
 
 2. Realtime
 
-   Supabase manages the awesome power of websockets on your behalf — something that is not yet solved in this serverless world.
+   iEchor manages the awesome power of websockets on your behalf — something that is not yet solved in this serverless world.
 
 3. You prefer it
 
    There is nothing wrong with this! You do you!
 
-To use Supabase client-side, we need to tell Next.js that this is a [Client Component](https://beta.nextjs.org/docs/rendering/server-and-client-components#client-components). We do this by specifying the `use client` directive at the top of our component. This opts into a similar flow to the `pages` directory — the component is rendered on the server and hydrated client-side.
+To use iEchor client-side, we need to tell Next.js that this is a [Client Component](https://beta.nextjs.org/docs/rendering/server-and-client-components#client-components). We do this by specifying the `use client` directive at the top of our component. This opts into a similar flow to the `pages` directory — the component is rendered on the server and hydrated client-side.
 
 > The React team is [working on an awesome new hook called "use"](https://github.com/acdlite/rfcs/blob/first-class-promises/text/0000-first-class-support-for-promises.md#example-use-in-client-components-and-hooks), which will drastically simplify fetching data client-side, but for now, we still need to rely on the combination of `useState` and `useEffect`.
 
@@ -356,7 +356,7 @@ Let’s implement client-side data fetching.
 'use client'
 
 import { useEffect, useState } from 'react'
-import supabase from '../../utils/supabase'
+import iechor from '../../utils/supabase'
 
 export default function ClientPosts() {
   const [isLoading, setIsLoading] = useState(true)
@@ -376,20 +376,20 @@ export default function ClientPosts() {
 }
 ```
 
-> Again, check out [how to generate types](https://supabase.com/docs/reference/javascript/typescript-support) to add proper typing for Post.
+> Again, check out [how to generate types](https://iechor.com/docs/reference/javascript/typescript-support) to add proper typing for Post.
 
 But now we have loading spinners! Yuck!
 
 # Realtime
 
-Realtime allows us to subscribe to changes in Supabase — inserted, updated or deleted posts — and update our UI dynamically. In order to receive realtime events, we need to [enable replication](https://supabase.com/dashboard/project/_/database/replication) on the posts table.
+Realtime allows us to subscribe to changes in iEchor — inserted, updated or deleted posts — and update our UI dynamically. In order to receive realtime events, we need to [enable replication](https://iechor.com/dashboard/project/_/database/replication) on the posts table.
 
 Let’s merge the two previous concepts and fetch the initial state of our posts in a Server Component, and then render a Client Component to do client-y things — like subscribe to changes in the DB and update the UI dynamically:
 
 **Server Component**
 
 ```tsx title="app/realtime/page.tsx"
-import supabase from '../../utils/supabase'
+import iechor from '../../utils/supabase'
 import RealtimePosts from './realtime-posts'
 
 export const revalidate = 0
@@ -406,7 +406,7 @@ export default async function Realtime() {
 'use client'
 
 import { useEffect, useState } from 'react'
-import supabase from '../../utils/supabase'
+import iechor from '../../utils/supabase'
 
 export default function RealtimePosts({ serverPosts }: { serverPosts: any }) {
   const [posts, setPosts] = useState(serverPosts)
@@ -446,7 +446,7 @@ Additionally, by allowing any component in the tree to be either a server or cli
 
 # More Next.js 13 Resources
 
-- [Next.js Quickstart](https://supabase.com/docs/guides/with-nextjs)
+- [Next.js Quickstart](https://iechor.com/docs/guides/with-nextjs)
 - [Next.js 13 Beta Docs](https://beta.nextjs.org/docs)
-- [Creating an authenticated Supabase client in Next.js 13 Server Component](https://github.com/supabase/auth-helpers/tree/main/examples/nextjs-server-components)
-- [Data fetching and caching with Next.js 13 - Supabase Happy Hour #26](https://www.youtube.com/watch?v=QH0P5xZt5wY)
+- [Creating an authenticated iEchor client in Next.js 13 Server Component](https://github.com/supabase/auth-helpers/tree/main/examples/nextjs-server-components)
+- [Data fetching and caching with Next.js 13 - iEchor Happy Hour #26](https://www.youtube.com/watch?v=QH0P5xZt5wY)

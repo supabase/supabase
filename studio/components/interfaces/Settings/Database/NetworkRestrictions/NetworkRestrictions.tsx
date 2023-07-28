@@ -106,7 +106,7 @@ const NetworkRestrictions = ({}) => {
             description="Allow specific IP ranges to have access to your database."
           />
           <div className="flex items-center space-x-2 mb-6">
-            <Link href="https://supabase.com/docs/guides/platform/network-restrictions">
+            <Link href="https://iechor.com/docs/guides/platform/network-restrictions">
               <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink />}>
                   Documentation
@@ -214,7 +214,7 @@ const NetworkRestrictions = ({}) => {
                       database.
                     </p>
                     <p className="text-scale-1000 text-sm">
-                      Note: Restrictions only apply to your database, and not to Supabase services
+                      Note: Restrictions only apply to your database, and not to iEchor services
                     </p>
                   </div>
                 </div>
@@ -237,7 +237,7 @@ const NetworkRestrictions = ({}) => {
                       database
                     </p>
                     <p className="text-scale-1000 text-sm">
-                      Note: Restrictions only apply to your database, and not to Supabase services
+                      Note: Restrictions only apply to your database, and not to iEchor services
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">

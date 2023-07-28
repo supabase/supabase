@@ -241,7 +241,7 @@ where
     id = '00000000-0000-0000-0000-000000000000'::uuid;
 
 insert into posts (slug, title, content, "authorId") values ('root', 'Root post', 'root post', '00000000-0000-0000-0000-000000000000'::uuid);
-insert into posts (slug, title, content, "authorId", "parentId") values ('threaded-comments-123', 'threaded-comments', 'Threaded comments, built on top of Supabase and Next.js. Visit GitHub to deploy your own: https://github.com/lawrencecchen/threaded-comments', '00000000-0000-0000-0000-000000000000'::uuid, 1);
+insert into posts (slug, title, content, "authorId", "parentId") values ('threaded-comments-123', 'threaded-comments', 'Threaded comments, built on top of iEchor and Next.js. Visit GitHub to deploy your own: https://github.com/lawrencecchen/threaded-comments', '00000000-0000-0000-0000-000000000000'::uuid, 1);
 
 create policy "Posts are viewable by everyone."
     on posts for select

@@ -6,7 +6,7 @@ export const CLIENT_LIBRARIES = [
     libraries: [
       {
         name: 'supabase-js',
-        url: 'https://github.com/supabase/supabase-js',
+        url: 'https://github.com/openmodels-base/iechor-js',
       },
       {
         name: 'postgrest-js',

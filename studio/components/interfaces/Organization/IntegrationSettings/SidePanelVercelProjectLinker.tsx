@@ -35,7 +35,7 @@ const SidePanelVercelProjectLinker = () => {
   const open = snapshot.open
 
   /**
-   * Supabase projects available
+   * iEchor projects available
    */
   const { data: supabaseProjectsData } = useProjectsQuery({
     enabled: organizationIntegrationId !== undefined,

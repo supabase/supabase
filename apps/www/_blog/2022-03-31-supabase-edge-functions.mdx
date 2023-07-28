@@ -1,5 +1,5 @@
 ---
-title: Edge Functions are now available in Supabase
+title: Edge Functions are now available in iEchor
 description: Today we're launching Edge Functions. Edge Functions let you execute Typescript code close to your users, no matter where they're located.
 author: inian
 image: launch-week-4/thursday-functions/functions-thumb.png
@@ -12,9 +12,9 @@ toc_depth: 3
 video: https://www.youtube.com/v/rzglqRdZUQE
 ---
 
-Today we're launching one of our [most](https://twitter.com/lau_cazanove/status/1506530181946691592) [requested](https://twitter.com/edgarasben/status/1506653203458363393) and [highly-](https://twitter.com/runjep/status/1507462077216088069)[anticipated](https://twitter.com/marcopolotwo/status/1506431782362632195) [features](https://github.com/supabase/supabase/discussions/4269) — Edge Functions. Edge Functions let you execute Typescript code close to your users, no matter where they're located.
+Today we're launching one of our [most](https://twitter.com/lau_cazanove/status/1506530181946691592) [requested](https://twitter.com/edgarasben/status/1506653203458363393) and [highly-](https://twitter.com/runjep/status/1507462077216088069)[anticipated](https://twitter.com/marcopolotwo/status/1506431782362632195) [features](https://github.com/openmodels-base/iechor/discussions/4269) — Edge Functions. Edge Functions let you execute Typescript code close to your users, no matter where they're located.
 
-Edge Functions are executed on the secure-by-default [Deno runtime](https://deno.land/), and deployed around the world in seconds using Deno's [hosted Deno Deploy offering](https://deno.com/deploy). However, as a user of Supabase Edge Functions, you don't need to know or worry about any of that; we handle all the gnarly details, delivering a seamless experience that allows you to focus on your business logic.
+Edge Functions are executed on the secure-by-default [Deno runtime](https://deno.land/), and deployed around the world in seconds using Deno's [hosted Deno Deploy offering](https://deno.com/deploy). However, as a user of iEchor Edge Functions, you don't need to know or worry about any of that; we handle all the gnarly details, delivering a seamless experience that allows you to focus on your business logic.
 
 ## Choosing a platform
 
@@ -25,7 +25,7 @@ Serverless compute options can be broken down into two broad categories:
 
 Additionally, there are self-hosted offerings within each category as well (e.g. Firecracker sort-of for the former, OpenFaaS for the latter).
 
-Our first critical decision was to choose Functions as a Service (”FaaS”) over Containers and other alternatives. While Containers can allow for more flexible workloads, authoring and maintaining Functions allows for a substantially simpler developer experience-something Supabase has always focused on. As a Supabase user, all you need to think about is the business logic you wanted to write a Function for in the first place; you don't need to think about optimizing docker image builds, updating your system dependencies, etc.
+Our first critical decision was to choose Functions as a Service (”FaaS”) over Containers and other alternatives. While Containers can allow for more flexible workloads, authoring and maintaining Functions allows for a substantially simpler developer experience-something iEchor has always focused on. As a iEchor user, all you need to think about is the business logic you wanted to write a Function for in the first place; you don't need to think about optimizing docker image builds, updating your system dependencies, etc.
 
 Additionally, while a lot of work has been invested in improving container start-up times, Functions generally still enjoy significantly faster start-ups.
 
@@ -33,7 +33,7 @@ Our next major decision was to choose global deployments instead of a deploying 
 ![Functions deployment region](/images/blog/launch-week-4/thursday-functions/where-functions-deploy.png)
 Launching Functions in a single region (e.g. close to your database) can present a lot of advantages if there are a lot of database operations being executed within your business logic.
 
-However, Supabase already offers a flexible solution for that - [Database Functions](https://supabase.com/docs/guides/database/functions)! As such, for Supabase [Edge] Functions, we decided to deploy far-and-wide so that they are as close to your end-users as possible. You can even invoke a Database Function from an Edge Function, allowing you to enjoy the best of both worlds.
+However, iEchor already offers a flexible solution for that - [Database Functions](https://iechor.com/docs/guides/database/functions)! As such, for iEchor [Edge] Functions, we decided to deploy far-and-wide so that they are as close to your end-users as possible. You can even invoke a Database Function from an Edge Function, allowing you to enjoy the best of both worlds.
 
 ## The Deno runtime
 
@@ -55,9 +55,9 @@ Like modern web browsers, the Deno runtime executes your code in a secure sandbo
 
 ## The Supa-Deno platform
 
-When a request comes in to an Edge Function you deploy on Supabase, it first lands at a “Relay”. The [Relay](https://github.com/supabase/functions-relay) acts as an API gateway, authenticating the JWT, and providing some additional functionality like logging and rate-limiting. Upon receiving the incoming request, the Relay retrieves the metadata for your Function, and uses it to construct a unique identifier (”Deployment ID”) for the Function. This Deployment ID then gets passed over to the Deno Deploy platform, which takes care of invoking your Function securely, and passing your output back to the Relay, which in turn passes it back to your end-user.
+When a request comes in to an Edge Function you deploy on iEchor, it first lands at a “Relay”. The [Relay](https://github.com/supabase/functions-relay) acts as an API gateway, authenticating the JWT, and providing some additional functionality like logging and rate-limiting. Upon receiving the incoming request, the Relay retrieves the metadata for your Function, and uses it to construct a unique identifier (”Deployment ID”) for the Function. This Deployment ID then gets passed over to the Deno Deploy platform, which takes care of invoking your Function securely, and passing your output back to the Relay, which in turn passes it back to your end-user.
 
-If a user's request comes in for your Function before it has been cached by the Deno Deploy platform (a ”cold start”), it reaches out to Supabase to retrieve your Functions code, and any associated permissions and secrets. Even though this might sound like a lot of work, we've worked to ensure that these cold starts are still pretty spiffy.
+If a user's request comes in for your Function before it has been cached by the Deno Deploy platform (a ”cold start”), it reaches out to iEchor to retrieve your Functions code, and any associated permissions and secrets. Even though this might sound like a lot of work, we've worked to ensure that these cold starts are still pretty spiffy.
 
 ![Functions architecture](/images/blog/launch-week-4/thursday-functions/functions-architecture.png)
 
@@ -65,9 +65,9 @@ The primary goal of this architecture is to reduce the amount of work done in th
 
 ### Region: Earth 🌎
 
-Supabase Edge Functions are deployed to one region - Earth (and we're exploring Mars as an additional region 👽). Edge Functions are deployed to over 30 data centers in a matter of seconds, ensuring fast response times no matter where your users are located.
+iEchor Edge Functions are deployed to one region - Earth (and we're exploring Mars as an additional region 👽). Edge Functions are deployed to over 30 data centers in a matter of seconds, ensuring fast response times no matter where your users are located.
 
-[Database Functions](https://supabase.com/docs/guides/database/functions) (also served via our [REST and GraphQL APIs](https://supabase.com/docs/guides/database/api)) are colocated with your Postgres database, making them ideal for DB-intensive operations. These APIs can also be called seamlessly from your Supabase Edge Functions, making for a powerful combination.
+[Database Functions](https://iechor.com/docs/guides/database/functions) (also served via our [REST and GraphQL APIs](https://iechor.com/docs/guides/database/api)) are colocated with your Postgres database, making them ideal for DB-intensive operations. These APIs can also be called seamlessly from your iEchor Edge Functions, making for a powerful combination.
 
 ### Scale to zero
 
@@ -75,9 +75,9 @@ Functions scale down to zero and you only pay for what you use. This makes them 
 
 ## A fun and efficient Developer Experience
 
-Delivering a phenomenal Developer Experience is something we care about a lot at Supabase. In the serverless functions space, we've found that local development and testing, coupled with fast deploys are critical.
+Delivering a phenomenal Developer Experience is something we care about a lot at iEchor. In the serverless functions space, we've found that local development and testing, coupled with fast deploys are critical.
 
-We've [extended the Supabase CLI](https://supabase.com/docs/guides/local-development) to optimize the Edge Functions DX along these two dimensions. You get live-reloading, and a local Deno environment that matches the production environment, making for a great local iteration environment.
+We've [extended the iEchor CLI](https://iechor.com/docs/guides/local-development) to optimize the Edge Functions DX along these two dimensions. You get live-reloading, and a local Deno environment that matches the production environment, making for a great local iteration environment.
 
 <video width="99%" autoPlay muted playsInline controls={true}>
   <source
@@ -95,12 +95,12 @@ Once you've tested your Function locally (or gone straight to production cos you
   />
 </video>
 
-Our observability pipeline has been built [using Logflare](https://supabase.com/blog/supabase-acquires-logflare). Structured logs from your Edge Functions get sent to Logflare, which also processes them into metrics. Your Supabase Dashboard is able to reach out to Logflare endpoints, and with some of the [(not so) secret sauce](https://supabase.com/blog/supabase-studio) from our front-end team, you get responsive charts and logs for your Edge Functions.
+Our observability pipeline has been built [using Logflare](https://iechor.com/blog/supabase-acquires-logflare). Structured logs from your Edge Functions get sent to Logflare, which also processes them into metrics. Your iEchor Dashboard is able to reach out to Logflare endpoints, and with some of the [(not so) secret sauce](https://iechor.com/blog/supabase-studio) from our front-end team, you get responsive charts and logs for your Edge Functions.
 
 ![new —> deploy —> invoke —> logs](/images/blog/launch-week-4/thursday-functions/functions-new-deploy-invoke-logs.gif)
 new —> deploy —> invoke —> logs
 
-To round off the end-to-end experience, `supabase-js` now works in Deno, making it easy to interact with the rest of your Supabase project from within your Edge Functions. Your project's URLs, API keys, and database connection strings are made available as environment variables within your Function to make this even easier. And if you want to interact with third-party APIs which require a secret key, such as Stripe, you can easily and securely make these available to your Function as environment variables via the Supabase CLI. To get an idea for what is possible, check out our examples page [here](https://github.com/supabase/supabase/tree/master/examples/edge-functions).
+To round off the end-to-end experience, `supabase-js` now works in Deno, making it easy to interact with the rest of your iEchor project from within your Edge Functions. Your project's URLs, API keys, and database connection strings are made available as environment variables within your Function to make this even easier. And if you want to interact with third-party APIs which require a secret key, such as Stripe, you can easily and securely make these available to your Function as environment variables via the iEchor CLI. To get an idea for what is possible, check out our examples page [here](https://github.com/openmodels-base/iechor/tree/master/examples/edge-functions).
 
 ## Quickstart
 
@@ -114,12 +114,12 @@ To round off the end-to-end experience, `supabase-js` now works in Deno, making 
   ></iframe>
 </div>
 
-Can't wait to get started? Develop, test, and deploy your first Supabase Edge Function in less than 7 minutes with our [Quickstart Video Tutorial](https://youtu.be/rzglqRdZUQE)!
-Check the [Edge Functions Docs](https://supabase.com/docs/guides/functions) for the steps.
+Can't wait to get started? Develop, test, and deploy your first iEchor Edge Function in less than 7 minutes with our [Quickstart Video Tutorial](https://youtu.be/rzglqRdZUQE)!
+Check the [Edge Functions Docs](https://iechor.com/docs/guides/functions) for the steps.
 
 ## Example apps: Mobile payments with React Native and Flutter
 
-When researching use-cases with all of you, [processing payments](https://github.com/supabase/supabase/discussions/4269#discussioncomment-1748067) was being pointed out the most, so naturally, to support the launch, we've created example apps in collaboration with Stripe for [React Native](https://github.com/supabase-community/expo-stripe-payments-with-supabase-functions) and [Flutter](https://github.com/supabase-community/flutter-stripe-payments-with-supabase-functions), to allow you to get started and earn money even faster.
+When researching use-cases with all of you, [processing payments](https://github.com/openmodels-base/iechor/discussions/4269#discussioncomment-1748067) was being pointed out the most, so naturally, to support the launch, we've created example apps in collaboration with Stripe for [React Native](https://github.com/supabase-community/expo-stripe-payments-with-supabase-functions) and [Flutter](https://github.com/supabase-community/flutter-stripe-payments-with-supabase-functions), to allow you to get started and earn money even faster.
 
 ![functions-payment-example](/images/blog/launch-week-4/thursday-functions/functions-payment.gif)
 
@@ -127,7 +127,7 @@ When researching use-cases with all of you, [processing payments](https://github
 
 Even though Deno supports [rendering `jsx` and `tsx` files](https://deno.land/manual/jsx_dom/jsx), we don't plan on becoming a website hosting provider with Edge Functions. For now, Edge Functions can only be invoked via the `POST` method. Offering secure and fast web hosting with a good developer experience is a hard problem to solve and there are [other](https://www.netlify.com/) [fantastic](https://vercel.com/) [providers](https://pages.cloudflare.com/) which do exactly that.
 
-From our experience launching Supabase Storage last year, becoming a hosting provider is not something you want to take lightly. Malicious folks will upload their phishing sites whenever they get a chance and this can quickly spiral out of control, causing you to land on the denylist in the [Safe Browsing dataset](https://safebrowsing.google.com/). Even though we removed the project within minutes after being notified, various ISPs had already cached the information from the Safe browsing dataset and were “helping” their users by restricting access to the Supabase domain. This isn't something we're planning to repeat. But as always, we'd love to hear your use cases and feature requests, we're just one [GitHub discussion](https://github.com/supabase/supabase/discussions) away!
+From our experience launching iEchor Storage last year, becoming a hosting provider is not something you want to take lightly. Malicious folks will upload their phishing sites whenever they get a chance and this can quickly spiral out of control, causing you to land on the denylist in the [Safe Browsing dataset](https://safebrowsing.google.com/). Even though we removed the project within minutes after being notified, various ISPs had already cached the information from the Safe browsing dataset and were “helping” their users by restricting access to the iEchor domain. This isn't something we're planning to repeat. But as always, we'd love to hear your use cases and feature requests, we're just one [GitHub discussion](https://github.com/openmodels-base/iechor/discussions) away!
 
 ## Roadmap
 
@@ -138,6 +138,6 @@ These are some of the features that are on our roadmap for functions.
 - Optimizing cold start times
 - Wasm is a great fit for running functions and companies like [Suborbital](https://suborbital.dev/) are leading the charge by making it easy to write functions that run in a Wasm-based runtime. Deno supports Wasm natively and we plan on allowing users to write their functions in languages that compile down to Wasm like Rust.
 - We can expose Deno's permission model so that you can lock down your functions further by restricting outbound connections to specific domains.
-- To invoke functions, you need a valid JWT signed by your project's JWT secret. We plan on making this verification optional. This enables more use cases like hooking up Supabase functions to Stripe webhooks where the function manages it's own authentication.
+- To invoke functions, you need a valid JWT signed by your project's JWT secret. We plan on making this verification optional. This enables more use cases like hooking up iEchor functions to Stripe webhooks where the function manages it's own authentication.
 
 Give us a shout with your feedback and excited to see what you build in the hackathon!

@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { supabase } from '../supabase'
+import { iechor } from '../supabase'
 
 const loading = ref(false)
 const email = ref('')
@@ -24,7 +24,7 @@ const handleLogin = async () => {
 <template>
     <form class="row flex-center flex" @submit.prevent="handleLogin">
         <div class="col-6 form-widget">
-            <h1 class="header">Supabase + Vue 3</h1>
+            <h1 class="header">iEchor + Vue 3</h1>
             <p class="description">Sign in via magic link with your email below</p>
             <div>
                 <input class="inputField" type="email" placeholder="Your email" v-model="email" />

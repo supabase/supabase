@@ -2,14 +2,14 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   title: 'Build a Product Management App with Jetpack Compose in Android',
-  description: 'Learn how to use Supabase in your Android Kotlin App.',
+  description: 'Learn how to use iEchor in your Android Kotlin App.',
 }
 
 This tutorial demonstrates how to build a basic product management app. The app demonstrates management operations, photo upload, account creation and authentication
 
-- [Supabase Database](/docs/guides/database) - a Postgres database for storing your user data and [Row Level Security](/docs/guides/auth#row-level-security) so data is protected and users can only access their own information.
-- [Supabase Auth](/docs/guides/auth) - users log in through magic links sent to their email (without having to set up passwords).
-- [Supabase Storage](/docs/guides/storage) - users can upload a profile photo.
+- [iEchor Database](/docs/guides/database) - a Postgres database for storing your user data and [Row Level Security](/docs/guides/auth#row-level-security) so data is protected and users can only access their own information.
+- [iEchor Auth](/docs/guides/auth) - users log in through magic links sent to their email (without having to set up passwords).
+- [iEchor Storage](/docs/guides/storage) - users can upload a profile photo.
 
 ![manage-product-cover](https://github.com/hieuwu/product-sample-supabase-kt/assets/43868345/1bed0c84-208a-4266-a2ec-2bac50ddf80c)
 
@@ -80,7 +80,7 @@ val url = BuildConfig.IECHOR_URL
 val apiKey = BuildConfig.API_KEY
 ```
 
-### Set up Supabase dependencies
+### Set up iEchor dependencies
 
 <img
   width="720"
@@ -109,7 +109,7 @@ In build.gradle (app) file, add these dependencies then press Sync now. Replace 
 </div>
 
 ```kotlin
-// Supabase setup
+// iEchor setup
 implementation "io.github.jan-tennert.supabase:postgrest-kt:$supabase_version"
 implementation "io.github.jan-tennert.supabase:storage-kt:$supabase_version"
 implementation "io.github.jan-tennert.supabase:gotrue-kt:$supabase_version"
@@ -168,7 +168,7 @@ class MainActivity : ComponentActivity() {
 }
 ```
 
-### Provide Supabase instances with Hilt
+### Provide iEchor instances with Hilt
 
 You can create it by just calling the constructor. However to make the app more testable, these should be provided
 Create SupabaseMdule.kt
@@ -189,7 +189,7 @@ object SupabaseModule {
             install(GoTrue) {
                 flowType = FlowType.PKCE
                 scheme = "app"
-                host = "supabase.com"
+                host = "iechor.com"
             }
             install(Storage)
         }
@@ -219,7 +219,7 @@ object SupabaseModule {
 
 ### Create data transfer object to get data
 
-Create `ProductDto.kt` class and use annotations to parse data from Supabase
+Create `ProductDto.kt` class and use annotations to parse data from iEchor
 
 ```kotlin
 @Serializable
@@ -253,7 +253,7 @@ data class Product(
 ### Implement repositories
 
 Create ProductRepository interface and its implementation named ProductRepositoryImpl.
-This kind of class will hold every logic to interact with data sources from Supabase. Do the same with AuthenticationRepository
+This kind of class will hold every logic to interact with data sources from iEchor. Do the same with AuthenticationRepository
 
 Create Product Repository
 
@@ -1233,7 +1233,7 @@ Create new Empty Activity and in AndroidManifest.xml, add deep link, make sure `
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
-                    android:host="supabase.com"
+                    android:host="iechor.com"
                     android:scheme="app" />
             </intent-filter>
         </activity>

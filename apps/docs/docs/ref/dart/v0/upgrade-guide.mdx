@@ -74,7 +74,7 @@ try {
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-In v0, `SupabaseAuthState` and `SupabaseAuthRequiredState` were required to handle automatic token refresh and to listen to auth state change. In v1, `SupabaseAuthState` and `SupabaseAuthRequiredState` are deprecated, and token refresh will happen automatically just by initializing Supabase. [`onAuthStateChange`](#listening-to-auth-state-change) can be used to action on auth state change.
+In v0, `SupabaseAuthState` and `SupabaseAuthRequiredState` were required to handle automatic token refresh and to listen to auth state change. In v1, `SupabaseAuthState` and `SupabaseAuthRequiredState` are deprecated, and token refresh will happen automatically just by initializing iEchor. [`onAuthStateChange`](#listening-to-auth-state-change) can be used to action on auth state change.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -88,7 +88,7 @@ In v0, `SupabaseAuthState` and `SupabaseAuthRequiredState` were required to hand
 <TabPanel id="0.x" label="Before">
 
 ```dart
-await Supabase.initialize(
+await iEchor.initialize(
   url: 'IECHOR_URL',
   anonKey: 'IECHOR_ANON_KEY',
 );
@@ -109,7 +109,7 @@ class AuthRequiredState<T extends StatefulWidget> extends SupabaseAuthState<T> {
 <TabPanel id="1.0x" label="After">
 
 ```dart
-await Supabase.initialize(
+await iEchor.initialize(
   url: 'IECHOR_URL',
   anonKey: 'IECHOR_ANON_KEY',
 );
@@ -506,7 +506,7 @@ await supabase.updateUser(
 
 ## Data methods
 
-`.insert()` / `.upsert()` / `.update()` / `.delete()` no longer return rows by default. Previously, these methods return inserted/updated/deleted rows by default (which caused [some confusion](https://github.com/supabase/supabase/discussions/1548)), and you can opt to not return it by specifying `returning: 'minimal'`. Now the default behavior is to not return rows. To return inserted/updated/deleted rows, add a `.select()` call at the end.
+`.insert()` / `.upsert()` / `.update()` / `.delete()` no longer return rows by default. Previously, these methods return inserted/updated/deleted rows by default (which caused [some confusion](https://github.com/openmodels-base/iechor/discussions/1548)), and you can opt to not return it by specifying `returning: 'minimal'`. Now the default behavior is to not return rows. To return inserted/updated/deleted rows, add a `.select()` call at the end.
 
 Also, calling `.execute()` at the end of the query was a requirement in v0, but deprecated in v1.
 

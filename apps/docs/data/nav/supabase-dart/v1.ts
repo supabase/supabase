@@ -2,7 +2,7 @@ const Nav = [
   {
     label: 'Getting Started',
     items: [
-      { name: 'Supabase Flutter Library', url: '/reference/dart', items: [] },
+      { name: 'iEchor Flutter Library', url: '/reference/dart', items: [] },
       { name: 'Installing', url: '/reference/dart/installing', items: [] },
       { name: 'Initializing', url: '/reference/dart/initializing', items: [] },
       { name: 'Upgrading to supabase-flutter v1', url: '/reference/dart/upgrade-guide', items: [] },

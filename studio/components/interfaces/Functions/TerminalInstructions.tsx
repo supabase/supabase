@@ -126,7 +126,7 @@ const TerminalInstructions: FC<Props> = ({ closable = false, removeBorder = fals
             </p>
           </div>
           <div className="flex gap-2">
-            <Link passHref href="https://supabase.com/docs/guides/functions">
+            <Link passHref href="https://iechor.com/docs/guides/functions">
               <a target="_blank" rel="noreferrer">
                 <Button type="default" iconRight={<IconBookOpen />}>
                   Documentation
@@ -135,7 +135,7 @@ const TerminalInstructions: FC<Props> = ({ closable = false, removeBorder = fals
             </Link>
             <Link
               passHref
-              href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
+              href="https://github.com/openmodels-base/iechor/tree/master/examples/edge-functions/supabase/functions"
             >
               <a target="_blank" rel="noreferrer">
                 <Button type="default" iconRight={<IconCode />}>

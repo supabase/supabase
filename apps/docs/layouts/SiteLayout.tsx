@@ -52,7 +52,7 @@ const levelsData = {
   },
   supabase_cli: {
     icon: '/docs/img/icons/menu/reference-cli',
-    name: 'Supabase CLI',
+    name: 'iEchor CLI',
   },
   platform: {
     icon: '/docs/img/icons/menu/platform',
@@ -225,7 +225,7 @@ const HeaderLogo = memo(function HeaderLogo() {
           src={isDarkMode ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
           width={96}
           height={24}
-          alt="Supabase Logo"
+          alt="iEchor Logo"
         />
         <span className="font-mono text-sm font-medium text-brand-900">DOCS</span>
       </a>
@@ -323,7 +323,7 @@ const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
   return (
     <>
       <Head>
-        <title>Supabase Docs</title>
+        <title>iEchor Docs</title>
       </Head>
       <main>
         <div className="flex flex-row h-screen">

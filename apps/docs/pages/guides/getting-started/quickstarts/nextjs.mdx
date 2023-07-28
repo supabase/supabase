@@ -2,20 +2,20 @@ import Layout from '~/layouts/DefaultGuideLayout'
 import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
-  title: 'Use Supabase with Next.js',
+  title: 'Use iEchor with Next.js',
   subtitle:
-    'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Next.js app.',
+    'Learn how to create a iEchor project, add some sample data to your database, and query the data from a Next.js app.',
   breadcrumb: 'Framework Quickstarts',
 }
 
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Set up a Supabase project with sample data">
+    <StepHikeCompact.Details title="Set up a iEchor project with sample data">
 
-    [Create a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
+    [Create a new project](https://iechor.com/dashboard) in the iEchor Dashboard.
 
-    After your project is ready, create a table in your Supabase database using the [SQL Editor](https://supabase.com/dashboard/project/_/sql) in the Dashboard.
+    After your project is ready, create a table in your iEchor database using the [SQL Editor](https://iechor.com/dashboard/project/_/sql) in the Dashboard.
 
     Use the following SQL statement to create a `countries` table with some sample data.
 
@@ -45,7 +45,7 @@ export const meta = {
     <StepHikeCompact.Details title="Create a Next.js app">
 
     Use the `create-next-app` command and the `with-supabase` template, to create a Next.js app pre-configured with:
-    - [Supabase Auth](https://supabase.com/docs/guides/auth/auth-helpers/nextjs)
+    - [iEchor Auth](https://iechor.com/docs/guides/auth/auth-helpers/nextjs)
     - [TypeScript](https://www.typescriptlang.org/)
     - [Tailwind CSS](https://tailwindcss.com/)
 
@@ -62,9 +62,9 @@ export const meta = {
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Declare Supabase Environment Variables">
+    <StepHikeCompact.Details title="Declare iEchor Environment Variables">
 
-    Rename `.env.local.example` to `.env.local` and populate with [your project's URL and Anon Key](https://supabase.com/dashboard/project/_/settings/api).
+    Rename `.env.local.example` to `.env.local` and populate with [your project's URL and Anon Key](https://iechor.com/dashboard/project/_/settings/api).
 
     </StepHikeCompact.Details>
 
@@ -80,11 +80,11 @@ export const meta = {
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Query Supabase data from Next.js">
+    <StepHikeCompact.Details title="Query iEchor data from Next.js">
 
     Create a new file at `app/countries/page.tsx` and populate with the following.
 
-    This will select all the rows from the `countries` table in Supabase and render them on the page.
+    This will select all the rows from the `countries` table in iEchor and render them on the page.
 
     </StepHikeCompact.Details>
 
@@ -95,7 +95,7 @@ export const meta = {
         import { cookies } from "next/headers";
 
         export default async function Index() {
-          const supabase = createServerComponentClient({ cookies });
+          const iechor = createServerComponentClient({ cookies });
 
           const { data: countries } = await supabase.from("countries").select();
 

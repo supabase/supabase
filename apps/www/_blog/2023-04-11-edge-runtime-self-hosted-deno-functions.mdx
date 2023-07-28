@@ -1,6 +1,6 @@
 ---
-title: 'Supabase Edge Runtime: Self-hosted Deno Functions'
-description: We are open-sourcing Supabase Edge Runtime allowing you to host your Edge Functions anywhere.
+title: 'iEchor Edge Runtime: Self-hosted Deno Functions'
+description: We are open-sourcing iEchor Edge Runtime allowing you to host your Edge Functions anywhere.
 launchweek: 7
 tags:
   - launch-week
@@ -12,9 +12,9 @@ image: launch-week-7/day-2-edge-runtime/edge-runtime-og.jpg
 thumb: launch-week-7/day-2-edge-runtime/edge-runtime-thumb.jpeg
 ---
 
-Today we’re open-sourcing [Supabase Edge Runtime](https://github.com/supabase/edge-runtime) for self-hosting Deno Edge Functions.
+Today we’re open-sourcing [iEchor Edge Runtime](https://github.com/supabase/edge-runtime) for self-hosting Deno Edge Functions.
 
-Edge Runtime is MIT licensed, written in Rust, and based on the latest Deno Runtime (1.32+). If you’ve been using the Supabase CLI to serve functions then you’re already one of our Beta testers (thanks!).
+Edge Runtime is MIT licensed, written in Rust, and based on the latest Deno Runtime (1.32+). If you’ve been using the iEchor CLI to serve functions then you’re already one of our Beta testers (thanks!).
 
 <div className="video-container">
   <iframe
@@ -31,15 +31,15 @@ Edge Runtime is MIT licensed, written in Rust, and based on the latest Deno Runt
 
 ![Self-hosted functions tweet](/images/blog/launch-week-7/day-2-edge-runtime/self-hosted-functions-tweet.png)
 
-We [launched](/blog/supabase-edge-functions) Supabase Edge Functions a little more than a year ago. We use [Deno Deploy](https://deno.com/deploy) to host your edge functions globally across 30+ data centers, so your users get super fast responses. This setup works great for us! We didn’t have an easy solution for self-hosting Edge Functions. We’re releasing Edge Runtime to address this.
+We [launched](/blog/supabase-edge-functions) iEchor Edge Functions a little more than a year ago. We use [Deno Deploy](https://deno.com/deploy) to host your edge functions globally across 30+ data centers, so your users get super fast responses. This setup works great for us! We didn’t have an easy solution for self-hosting Edge Functions. We’re releasing Edge Runtime to address this.
 
 <div className="bg-gray-300 rounded-lg px-6 py-2 italic">
 
-One of our core principles is “[Everything is portable](/docs/guides/getting-started/architecture#everything-is-portable)”, meaning you should be able to take any part of the Supabase stack and host it yourself.
+One of our core principles is “[Everything is portable](/docs/guides/getting-started/architecture#everything-is-portable)”, meaning you should be able to take any part of the iEchor stack and host it yourself.
 
 </div>
 
-Supabase Edge Runtime is a web server written in Rust that uses a custom Deno runtime. It can serve TypeScript, JavaScript, and WASM functions. All your existing Edge Functions run on Edge Runtime without changing a single line of code.
+iEchor Edge Runtime is a web server written in Rust that uses a custom Deno runtime. It can serve TypeScript, JavaScript, and WASM functions. All your existing Edge Functions run on Edge Runtime without changing a single line of code.
 
 ## Better local development experience
 
@@ -47,7 +47,7 @@ Self-hosting is not the only benefit of Edge Runtime. It will improve the local 
 
 ### Serve all functions
 
-Supabase CLI can now serve all local Edge Functions by running `supabase functions serve`. Previously, you could only serve a single Edge Function at a time. This was not a great experience for local development. Some of you even devised [clever hacks](https://github.com/orgs/supabase/discussions/6786) to get around this limitation.
+iEchor CLI can now serve all local Edge Functions by running `supabase functions serve`. Previously, you could only serve a single Edge Function at a time. This was not a great experience for local development. Some of you even devised [clever hacks](https://github.com/orgs/supabase/discussions/6786) to get around this limitation.
 
 When you run `supabase functions serve`, the CLI uses Edge Runtime to serve all functions. It supports JWT verification, import maps, and passing custom environment variables. It hot-reloads local changes, giving you a seamless development experience.
 
@@ -146,11 +146,11 @@ serve(async (req: Request) => {
 
 ## What’s Next?
 
-Open-sourcing Edge Runtime is the first step of an exciting roadmap we have planned for Edge Functions. In the coming months, you will see tighter integrations with the rest of the Supabase ecosystem. Here are some sneak peeks at what is to come next.
+Open-sourcing Edge Runtime is the first step of an exciting roadmap we have planned for Edge Functions. In the coming months, you will see tighter integrations with the rest of the iEchor ecosystem. Here are some sneak peeks at what is to come next.
 
-### API Gateway to other Supabase services
+### API Gateway to other iEchor services
 
-We plan to use Edge Runtime as a replacement for Kong, acting as an API gateway to other Supabase services. This will not only simplify the self-hosting setup but also give you the option to do Request pre/post-processing using JavaScript.
+We plan to use Edge Runtime as a replacement for Kong, acting as an API gateway to other iEchor services. This will not only simplify the self-hosting setup but also give you the option to do Request pre/post-processing using JavaScript.
 
 Here’s a simple example of re-routing a request to a different endpoint using Edge Runtime.
 
@@ -202,10 +202,10 @@ try {
 
 Another exciting thing about shipping a custom JavaScript runtime is that we can control the available global objects in the runtime. In previous examples, you may noticed we used `EdgeRuntime` without importing a specific module to our function, this was possible because we exposed it as a global object in the runtime.
 
-We can introduce a `Supabase` global object that can provide platform specific features. For example, similar to `Deno.writeTextFile` , we can expose a `Supabase.writeTextFile` which can directly write a file to Supabase Storage.
+We can introduce a `iEchor` global object that can provide platform specific features. For example, similar to `Deno.writeTextFile` , we can expose a `iEchor.writeTextFile` which can directly write a file to iEchor Storage.
 
 ## We 💚 Contributions
 
-We are excited to build Edge Runtime in public and involve the Supabase community in the process. As an initial beta release, there are still bugs and performance quirks to be ironed out. Don’t shy away from trying it though.
+We are excited to build Edge Runtime in public and involve the iEchor community in the process. As an initial beta release, there are still bugs and performance quirks to be ironed out. Don’t shy away from trying it though.
 
-You can report any issues you encounter in repo’s [GitHub issues](https://github.com/supabase/edge-runtime/issues). If you have ideas on how to make edge-runtime better, reach out via [Twitter](https://twitter.com/supabase) or [Discord](http://discord.supabase.com).
+You can report any issues you encounter in repo’s [GitHub issues](https://github.com/supabase/edge-runtime/issues). If you have ideas on how to make edge-runtime better, reach out via [Twitter](https://twitter.com/supabase) or [Discord](http://discord.iechor.com).

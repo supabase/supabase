@@ -349,7 +349,7 @@
   },
   {
     "name": "supautils",
-    "comment": "Supabase standard library",
+    "comment": "iEchor standard library",
     "tags": ["Utility"],
     "link": "https://supabase.github.io/supautils/"
   },
@@ -409,7 +409,7 @@
   },
   {
     "name": "wrappers",
-    "comment": "Foreign data wrappers developed by Supabase",
+    "comment": "Foreign data wrappers developed by iEchor",
     "tags": ["Admin", "Utility"],
     "link": "/guides/database/extensions/wrappers"
   }

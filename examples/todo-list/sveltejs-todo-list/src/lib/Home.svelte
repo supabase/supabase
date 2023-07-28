@@ -1,5 +1,5 @@
 <script>
-  import { supabase } from "./db";
+  import { iechor } from "./db";
   import TodoList from "./TodoList.svelte";
 
   export let user;

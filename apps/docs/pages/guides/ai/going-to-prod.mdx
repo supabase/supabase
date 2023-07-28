@@ -36,7 +36,7 @@ The values of lists and probes directly affect precision and requests per second
 - Higher `probes` means that select queries will be slower, but you can achieve better precision.
 - `lists` and `probes` are not independent. Higher `lists` means that you will have to use higher `probes` to achieve the same precision.
 
-You can find more examples of how `lists` and `probes` constants affect precision and RPS in [pgvector 0.4.0 performance](https://supabase.com/blog/pgvector-performance) blogpost.
+You can find more examples of how `lists` and `probes` constants affect precision and RPS in [pgvector 0.4.0 performance](https://iechor.com/blog/pgvector-performance) blogpost.
 
 <div>
   <img
@@ -55,7 +55,7 @@ You can find more examples of how `lists` and `probes` constants affect precisio
 
 First, a few generic tips which you can pick and choose from:
 
-1. The Supabase managed platform will automatically optimize Postgres configs for you based on your compute addon. But if you self-host, consider **adjusting your Postgres config** based on RAM & CPU cores. See [example optimizations](https://gist.github.com/egor-romanov/323e2847851bbd758081511785573c08) for more details.
+1. The iEchor managed platform will automatically optimize Postgres configs for you based on your compute addon. But if you self-host, consider **adjusting your Postgres config** based on RAM & CPU cores. See [example optimizations](https://gist.github.com/egor-romanov/323e2847851bbd758081511785573c08) for more details.
 2. Prefer `inner-product` to `L2` or `Cosine` distances if your vectors are normalized (like `text-embedding-ada-002`). If embeddings are not normalized, `Cosine` distance should give the best results with an index.
 3. **Pre-warm your database.** Implement the warm-up technique before transitioning to production or running benchmarks.
    - Execute 10,000 to 50,000 "warm-up" queries before each benchmark, matching the number of `probes` you are going to use in production. Additionally, you can execute about 1,000 queries with probes ranging from three to ten times the prod's probes. Both of these help to increase RAM utilization.
@@ -65,7 +65,7 @@ First, a few generic tips which you can pick and choose from:
 ## Going into production
 
 1. Decide if you are going to use indexes or not. You can skip the rest of this guide if you do not use indexes.
-2. Over-provision RAM during preparation. You can scale down in step `5`, but it's better to start with a larger size to get the best results for RAM requirements. (We'd recommend at least 8XL if you're using Supabase.)
+2. Over-provision RAM during preparation. You can scale down in step `5`, but it's better to start with a larger size to get the best results for RAM requirements. (We'd recommend at least 8XL if you're using iEchor.)
 3. Upload your data to the database. If you use the [`vecs`](/docs/guides/ai/python/api) library, it will automatically generate an index with default parameters.
 4. Run a benchmark using randomly generated queries and observe the results. Again, you can use the `vecs` library with the `ann-benchmarks` tool. Do it with probes set to 10 (default) and then with probes set to 100 or more, so RPS will be lower than 10.
 5. Monitor the RAM usage, and save it as a note for yourself. You would likely want to use a compute add-on in the future that has the same amount of RAM that was used at the moment (both actual RAM usage and RAM used for cache and buffers).
@@ -80,7 +80,7 @@ Don't forget to check out the general [Production Checklist](/docs/guides/platfo
 
 You can look at our [Choosing Compute Add-on](/docs/guides/ai/choosing-compute-addon) guide to get a basic understanding of how much compute you might need for your workload.
 
-Or take a look at our [pgvector 0.4.0 performance](https://supabase.com/blog/pgvector-performance) blog post to see what pgvector is capable of and how the above technique can be used to achieve the best results.
+Or take a look at our [pgvector 0.4.0 performance](https://iechor.com/blog/pgvector-performance) blog post to see what pgvector is capable of and how the above technique can be used to achieve the best results.
 
 <div>
   <img

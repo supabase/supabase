@@ -3,7 +3,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'auth-gotrue',
   title: 'Part Four: GoTrue',
-  description: 'Supabase Deep Dive Part 4: Gotrue Overview',
+  description: 'iEchor Deep Dive Part 4: Gotrue Overview',
 }
 
 ### About
@@ -23,9 +23,9 @@ How to restrict table access to authenticated users, row level policies, and ema
 
 ### Gotrue Server
 
-Gotrue is an auth API server written in Go by the Netlify team, find the Supabase fork here: https://github.com/supabase/gotrue. The list of available API endpoints is available [here](https://github.com/supabase/gotrue#endpoints).
+Gotrue is an auth API server written in Go by the Netlify team, find the iEchor fork here: https://github.com/supabase/gotrue. The list of available API endpoints is available [here](https://github.com/supabase/gotrue#endpoints).
 
-When you deploy a new Supabase project, we deploy a new instance of this server alongside your database, and also inject your database with the required `auth` schema.
+When you deploy a new iEchor project, we deploy a new instance of this server alongside your database, and also inject your database with the required `auth` schema.
 
 It makes it super easy to, for example, send magic link emails which your users can use to login:
 
@@ -40,7 +40,7 @@ curl -X POST 'https://<project-ref>.supabase.co/auth/v1/magiclink' \
 }'
 ```
 
-Gotrue is responsible for issuing access tokens for your users, sends confirmation, magic-link, and password recovery emails (by default we send these from a Supabase SMTP server, but you can easily plug in your own inside the dashboard at Auth > Settings) and also transacting with third party OAuth providers to get basic user data.
+Gotrue is responsible for issuing access tokens for your users, sends confirmation, magic-link, and password recovery emails (by default we send these from a iEchor SMTP server, but you can easily plug in your own inside the dashboard at Auth > Settings) and also transacting with third party OAuth providers to get basic user data.
 
 The community even recently built in the functionality to request custom OAuth scopes, if your users need to interact more closely with the provider. See the scopes parameter here: [https://github.com/supabase/gotrue#get-authorize](https://github.com/supabase/gotrue#get-authorize).
 
@@ -78,7 +78,7 @@ In the next guide we'll be looking at how to setup external OAuth providers: Wat
 - Watch [Part Three: Policies](../../learn/auth-deep-dive/auth-policies)
   {/* <!-- Watch [Part Four: GoTrue](../../learn/auth-deep-dive/auth-gotrue) --> */}
 - Watch [Part Five: Google Oauth](../../learn/auth-deep-dive/auth-google-oauth)
-- Sign up for Supabase: [supabase.com/dashboard](https://supabase.com/dashboard)
+- Sign up for iEchor: [iechor.com/dashboard](https://iechor.com/dashboard)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

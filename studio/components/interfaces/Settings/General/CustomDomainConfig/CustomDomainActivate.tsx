@@ -58,7 +58,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
 
         <Panel.Content className="w-full">
           <div className="flex items-center justify-between">
-            <Link href="https://supabase.com/docs/guides/platform/custom-domains">
+            <Link href="https://iechor.com/docs/guides/platform/custom-domains">
               <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink />}>
                   Documentation
@@ -113,7 +113,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
             <code className="text-sm">{customDomain.hostname}</code> for the project?
           </div>
         }
-        description="The existing Supabase subdomain will be deactivated."
+        description="The existing iEchor subdomain will be deactivated."
         buttonLabel="Activate"
         buttonLoadingLabel="Activating"
         onSelectCancel={() => setIsActivateConfirmModalVisible(false)}

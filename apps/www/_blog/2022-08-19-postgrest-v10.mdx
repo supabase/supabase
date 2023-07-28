@@ -10,9 +10,9 @@ date: '2022-08-19'
 toc_depth: 3
 ---
 
-PostgREST turns your PostgreSQL database automatically into a RESTful API. Today, PostgREST v10 was [released](https://github.com/PostgREST/postgrest/releases/tag/v10.0.0). v10 is not available on the Supabase Platform yet, but it is available for [self-hosting](https://supabase.com/docs/guides/hosting/overview) or as a executable binary from the GitHub release page.
+PostgREST turns your PostgreSQL database automatically into a RESTful API. Today, PostgREST v10 was [released](https://github.com/PostgREST/postgrest/releases/tag/v10.0.0). v10 is not available on the iEchor Platform yet, but it is available for [self-hosting](https://iechor.com/docs/guides/hosting/overview) or as a executable binary from the GitHub release page.
 
-Let's take a look at some of its new features that go hand in hand with [supabase-js v2](https://supabase.com/blog/supabase-js-v2).
+Let's take a look at some of its new features that go hand in hand with [supabase-js v2](https://iechor.com/blog/supabase-js-v2).
 
 ## EXPLAIN
 
@@ -96,7 +96,7 @@ Here you can see the “Filter” node, which is a simple `false` as defined by 
 
 ### Getting the Query Identifier
 
-`explain()` is also useful for getting the [pg_stat_statements](https://www.postgresql.org/docs/current/pgstatstatements.html) query identifier, which you can use in the Supabase logs to obtain the generated SQL queries. Here we use the json `format` and the `verbose` option to get it.
+`explain()` is also useful for getting the [pg_stat_statements](https://www.postgresql.org/docs/current/pgstatstatements.html) query identifier, which you can use in the iEchor logs to obtain the generated SQL queries. Here we use the json `format` and the `verbose` option to get it.
 
 ```jsx
 const { data, error } = await supabase
@@ -280,4 +280,4 @@ One-to-many and many-to-one relationships keep working as always, no change in t
 
 Computed relationships are the first step towards PostgREST extensibility, customizing the aggregate used for the response and custom operators are planned for next releases.
 
-We’ll release PostgREST 10 on the Supabase platform over the next month.
+We’ll release PostgREST 10 on the iEchor platform over the next month.

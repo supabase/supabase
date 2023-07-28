@@ -5,7 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 void main() async {
-  await Supabase.initialize(
+  await iEchor.initialize(
     url: 'supabaseUrl',
     anonKey: 'supabaseAnonKey',
     realtimeClientOptions: const RealtimeClientOptions(eventsPerSecond: 40),
@@ -13,7 +13,7 @@ void main() async {
   runApp(const MyApp());
 }
 
-final supabase = Supabase.instance.client;
+final iechor = iEchor.instance.client;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

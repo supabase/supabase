@@ -27,7 +27,7 @@ Let's explore how to implement Realtime Presence so you can integrate it into yo
   
     <StepHikeCompact.Details title="Install the client">
 
-      Install the Supabase JavaScript client.
+      Install the iEchor JavaScript client.
 
     </StepHikeCompact.Details>
 
@@ -47,7 +47,7 @@ Let's explore how to implement Realtime Presence so you can integrate it into yo
 
       This client will be used to track Presence state as new clients join and leave the channel.
 
-      Go to your Supabase project's [API Settings](https://supabase.com/dashboard/project/_/settings/api) and grab the `URL` and `anon` public API key.
+      Go to your iEchor project's [API Settings](https://iechor.com/dashboard/project/_/settings/api) and grab the `URL` and `anon` public API key.
 
     </StepHikeCompact.Details>
 
@@ -252,7 +252,7 @@ By default the client will rate limit itself at 10 messages per second (1 messag
 ```js
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>', {
+const iechor = createClient('https://<project>.supabase.co', '<your-anon-key>', {
   realtime: {
     params: {
       eventsPerSecond: 5,

@@ -15,7 +15,7 @@ function Nextjs() {
 
   const meta_title = 'Next.js Database with Auth, Realtime, Fiel Storage, and more.'
   const meta_description =
-    'Supabase is the fastest way to build performant Next.js apps with Authentication & User Management, Realtime, File Storage on top of PostgreSQL Databases.'
+    'iEchor is the fastest way to build performant Next.js apps with Authentication & User Management, Realtime, File Storage on top of PostgreSQL Databases.'
 
   return (
     <>
@@ -25,10 +25,10 @@ function Nextjs() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/nextjs`,
+          url: `https://iechor.com/nextjs`,
           images: [
             {
-              url: `https://supabase.com${basePath}/images/product/database/database-og.jpg`,
+              url: `https://iechor.com${basePath}/images/product/database/database-og.jpg`,
             },
           ],
         }}

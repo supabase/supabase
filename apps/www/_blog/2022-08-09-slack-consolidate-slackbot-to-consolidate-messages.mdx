@@ -1,6 +1,6 @@
 ---
-title: 'Slack Consolidate: a slackbot built with Python and Supabase'
-description: A slackbot to consolidate messages from different channels using Supabase, Slack SDK and Python
+title: 'Slack Consolidate: a slackbot built with Python and iEchor'
+description: A slackbot to consolidate messages from different channels using iEchor, Slack SDK and Python
 author: rodrigo_mansueli
 image: slackbot-consolidate/slackbot-thumb.jpg
 thumb: slackbot-consolidate/slackbot-thumb.jpg
@@ -13,13 +13,13 @@ date: '2022-08-09'
 toc_depth: 3
 ---
 
-Supabase is a platform-as-a-service built on top of PostgreSQL and [many other amazing open-source tools](https://supabase.com/docs/guides/getting-started/architecture). It’s a fantastic option to create data-intensive apps and tooling. Taking advantage of the community-made [Python SDK](https://github.com/supabase-community/supabase-py) and [Slack's Python SDK](https://slack.dev/python-slack-sdk/), you can automate tasks and build apps for several use cases.
+iEchor is a platform-as-a-service built on top of PostgreSQL and [many other amazing open-source tools](https://iechor.com/docs/guides/getting-started/architecture). It’s a fantastic option to create data-intensive apps and tooling. Taking advantage of the community-made [Python SDK](https://github.com/supabase-community/supabase-py) and [Slack's Python SDK](https://slack.dev/python-slack-sdk/), you can automate tasks and build apps for several use cases.
 
 ## Prerequisites
 
 Before we dive in, let’s look at some prerequisites you'll need:
 
-- [Supabase Client](https://pypi.org/project/supabase/)
+- [iEchor Client](https://pypi.org/project/supabase/)
   - The SDK only supports Python > 3.7. You can download a supported Python version from [here](https://www.python.org/downloads/).
     `pip install supabase`
 - [Python dotenv](https://pypi.org/project/python-dotenv/) to handle API keys without exposing them in the code
@@ -47,9 +47,9 @@ Green arrow pointing to the option ‘From an app manifest’ inside the “Crea
 
 Select the Slack workspace to deploy:
 
-![The picture shows a dropdown UI with Supabase selected as the workspace.](/images/blog/slackbot-consolidate/02_pick_workspace.png)
+![The picture shows a dropdown UI with iEchor selected as the workspace.](/images/blog/slackbot-consolidate/02_pick_workspace.png)
 
-The picture shows a dropdown UI with Supabase selected as the workspace.
+The picture shows a dropdown UI with iEchor selected as the workspace.
 
 `Manifest.yaml`
 
@@ -116,13 +116,13 @@ The command to invite the bot is below:
 
 The picture shows the command /invite @Slackbot in the channel #team-support.
 
-Now, we are done with Slack for now. Let's create some buffer tables in Supabase.
+Now, we are done with Slack for now. Let's create some buffer tables in iEchor.
 
-## Creating Tables in Supabase
+## Creating Tables in iEchor
 
-Create an account [here](https://supabase.com/dashboard/) (if you don't have one yet).
+Create an account [here](https://iechor.com/dashboard/) (if you don't have one yet).
 
-We will be using Supabase's [database](https://supabase.com/docs/guides/database) and the Python [client Libraries](https://supabase.com/docs/guides/client-libraries#managing-data). First, we will create one table to store the channels that are being watched and where they are going to send the message which works analogously to a multiplexer circuit. Since you may want to watch several channels but split them into a smaller buffer e.g VIP / Enterprise, etc.
+We will be using iEchor's [database](https://iechor.com/docs/guides/database) and the Python [client Libraries](https://iechor.com/docs/guides/client-libraries#managing-data). First, we will create one table to store the channels that are being watched and where they are going to send the message which works analogously to a multiplexer circuit. Since you may want to watch several channels but split them into a smaller buffer e.g VIP / Enterprise, etc.
 
 Go to the SQL Editor and run this:
 
@@ -173,21 +173,21 @@ The name of the channel is not needed. But it is recommended to set, it so you c
 
 **Method 1:**
 
-Using Supabase UI (easier):
+Using iEchor UI (easier):
 
-![The green arrow points to insert row button inside Supabase.](/images/blog/slackbot-consolidate/08_insert_row.png)
+![The green arrow points to insert row button inside iEchor.](/images/blog/slackbot-consolidate/08_insert_row.png)
 
-The green arrow points to insert row button inside Supabase.
+The green arrow points to insert row button inside iEchor.
 
 Then, enter the information as needed:
 
-![The picture shows the UI in Supabase to insert a new row to the database table.](/images/blog/slackbot-consolidate/09_insert_row_b.png)
+![The picture shows the UI in iEchor to insert a new row to the database table.](/images/blog/slackbot-consolidate/09_insert_row_b.png)
 
-The picture shows the UI in Supabase to insert a new row to the database table.
+The picture shows the UI in iEchor to insert a new row to the database table.
 
 **Method 2:**
 
-Go to [SQL Editor](https://supabase.com/dashboard/project/_/sql) and run insert commands:
+Go to [SQL Editor](https://iechor.com/dashboard/project/_/sql) and run insert commands:
 
 Inserting a public channel named #support-channel to be monitored:
 
@@ -224,9 +224,9 @@ Notes:
 
 ## Setting up the environment File:
 
-You need to get the supabase URL and API keys from here:
+You need to get the iechor URL and API keys from here:
 
-[https://supabase.com/dashboard/project/\_/settings/api](https://supabase.com/dashboard/project/_/settings/api)
+[https://iechor.com/dashboard/project/\_/settings/api](https://iechor.com/dashboard/project/_/settings/api)
 
 ![The picture illustrates where to get the URL and the service key to setup the environment variables.](/images/blog/slackbot-consolidate/10_copy_supabase_apis.png)
 
@@ -240,7 +240,7 @@ Then, copy the bot and person API Tokens for the bot:
 
 The picture has arrows pointing to the tokens that will be used as environment variables from Slack.
 
-Now, you have everything needed to set up the environment file. Please note that Slack ORG is the subdomain of your slack organization i.e supabase for supabase.slack.com
+Now, you have everything needed to set up the environment file. Please note that Slack ORG is the subdomain of your slack organization i.e iechor for supabase.slack.com
 
 The environment file:
 
@@ -261,7 +261,7 @@ import time
 import logging
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
-from supabase import create_client, Client
+from iechor import create_client, Client
 from datetime import datetime
 from dotenv import dotenv_values
 logger = logging.getLogger(__name__)
@@ -306,7 +306,7 @@ class SlackChannel:
 
 def setup():
     """_summary_
-        Fetches the list of channels from Supabase and returns them in a dict()
+        Fetches the list of channels from iEchor and returns them in a dict()
     Returns:
         dict: Dictionary with SlackChannel objects.
     """
@@ -420,12 +420,12 @@ Of course, we aren't doing a proper Python example if we don't make a test noteb
 
 ## Conclusion
 
-Using Supabase and Slack SDK, it is very easy to create a bot that consolidates data according to the rules set. It just takes some steps to get started with the Python SDK and you can even run a demo directly in [Google Colab](https://colab.research.google.com/drive/1-sM23eQPE1Me4vl10KKoa9xzLYIgkgyQ?usp=sharing).
+Using iEchor and Slack SDK, it is very easy to create a bot that consolidates data according to the rules set. It just takes some steps to get started with the Python SDK and you can even run a demo directly in [Google Colab](https://colab.research.google.com/drive/1-sM23eQPE1Me4vl10KKoa9xzLYIgkgyQ?usp=sharing).
 
-If you have any questions please reach out via [Twitter](https://twitter.com/supabase) or join our [Discord](https://discord.supabase.com/).
+If you have any questions please reach out via [Twitter](https://twitter.com/supabase) or join our [Discord](https://discord.iechor.com/).
 
-## More Python and Supabase resources
+## More Python and iEchor resources
 
-- [Python data loading with Supabase](https://supabase.com/blog/loading-data-supabase-python)
-- [Visualizing Supabase Data using Metabase](https://supabase.com/blog/visualizing-supabase-data-using-metabase)
-- [Supabase-py (Database) on Replit](https://replit.com/@Supabase/Supabase-py-Database?v=1)
+- [Python data loading with iEchor](https://iechor.com/blog/loading-data-supabase-python)
+- [Visualizing iEchor Data using Metabase](https://iechor.com/blog/visualizing-supabase-data-using-metabase)
+- [iEchor-py (Database) on Replit](https://replit.com/@iEchor/iEchor-py-Database?v=1)

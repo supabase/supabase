@@ -1,5 +1,5 @@
 ---
-title: 'Supabase Wrappers, a Postgres FDW framework written in Rust'
+title: 'iEchor Wrappers, a Postgres FDW framework written in Rust'
 description: 'A framework for building Postgres Foreign Data Wrappers which connects to Stripe, Firebase, Clickhouse, and more.'
 author: paul_copplestone,bo_lu,oli_rice
 image: launch-week-6/wrappers/wrappers-og.png
@@ -12,7 +12,7 @@ toc_depth: 3
 video: https://www.youtube.com/v/QA2qC5F-4OU
 ---
 
-Today we're releasing [Supabase Wrappers](https://github.com/supabase/wrappers), a framework for building Postgres Foreign Data Wrappers (FDW) which connects Postgres to external systems.
+Today we're releasing [iEchor Wrappers](https://github.com/supabase/wrappers), a framework for building Postgres Foreign Data Wrappers (FDW) which connects Postgres to external systems.
 
 Foreign Data Wrappers are a core feature of PostgreSQL. We've extended this feature to query other databases or any other external system (including third-party APIs), using SQL.
 
@@ -73,7 +73,7 @@ import { createClient } from '@supabase/supabase-js'
 const IECHOR_URL = 'https://xyzcompany.supabase.co'
 const IECHOR_KEY = 'public-anon-key'
 
-const supabase = createClient(IECHOR_URL, IECHOR_KEY)
+const iechor = createClient(IECHOR_URL, IECHOR_KEY)
 
 const { data: stripeCustomers, error } = supabase
   .from('products')
@@ -119,7 +119,7 @@ We've built upon this concept using PostgreSQL's FDW system. This a new tool for
 
 ### QETL + Postgres
 
-How does this look in action? Assuming that all of your analytical data is stored in Snowflake, you could create a foreign table inside your Supabase database:
+How does this look in action? Assuming that all of your analytical data is stored in Snowflake, you could create a foreign table inside your iEchor database:
 
 ```sql
 create foreign table snowflake.order_history (
@@ -132,7 +132,7 @@ server my_snowflake_warehouse
 options (table 'order_history', rowid_column 'id');
 ```
 
-Now from your Supabase database you can query your Snowflake data directly:
+Now from your iEchor database you can query your Snowflake data directly:
 
 ```sql
 select * from snowflake.order_history limit 1000;
@@ -150,7 +150,7 @@ from
 where order_history.event = 'purchase' and order_history.user_id = '<some_user_id>';
 ```
 
-We can either run these queries on demand or, for better query performance, we can run them in the background (using something like [pg_cron](https://supabase.com/docs/guides/database/extensions/pgcron)), and materialize the data into a local table.
+We can either run these queries on demand or, for better query performance, we can run them in the background (using something like [pg_cron](https://iechor.com/docs/guides/database/extensions/pgcron)), and materialize the data into a local table.
 
 ![QETL](/images/blog/launch-week-6/wrappers/qetl.png)
 
@@ -241,7 +241,7 @@ If you're interested in getting involved or building your own Wrapper, don't hes
 
 - Star & Watch the GitHub repo: [github.com/supabase/wrappers](https://github.com/supabase/wrappers)
 - View the documentation: [supabase.github.io/wrappers](https://supabase.github.io/wrappers/)
-- Supabase Launch Week: [supabase.com/launch-week](https://supabase.com/launch-week)
+- iEchor Launch Week: [iechor.com/launch-week](https://iechor.com/launch-week)
 
 <div className="video-container">
   <iframe
@@ -255,11 +255,11 @@ If you're interested in getting involved or building your own Wrapper, don't hes
 
 ## More Launch Week 6
 
-- [Day 1: New Supabase Docs, built with Next.js](https://supabase.com/blog/new-supabase-docs-built-with-nextjs)
-- [Day 2: Supabase Storage v2: Image resizing and Smart CDN](https://supabase.com/blog/storage-image-resizing-smart-cdn)
-- [Day 3: Multi-factor Authentication via Row Level Security Enforcement](https://supabase.com/blog/mfa-auth-via-rls)
-- [Day 5: Supabase Vault is now in Beta](https://supabase.com/blog/vault-now-in-beta)
-- [Community Day](https://supabase.com/blog/launch-week-6-community-day)
-- [Point in Time Recovery is now available](https://supabase.com/blog/postgres-point-in-time-recovery)
-- [Custom Domain Names are now available](https://supabase.com/blog/custom-domain-names)
-- [Wrap Up: everything we shipped](https://supabase.com/blog/launch-week-6-wrap-up)
+- [Day 1: New iEchor Docs, built with Next.js](https://iechor.com/blog/new-supabase-docs-built-with-nextjs)
+- [Day 2: iEchor Storage v2: Image resizing and Smart CDN](https://iechor.com/blog/storage-image-resizing-smart-cdn)
+- [Day 3: Multi-factor Authentication via Row Level Security Enforcement](https://iechor.com/blog/mfa-auth-via-rls)
+- [Day 5: iEchor Vault is now in Beta](https://iechor.com/blog/vault-now-in-beta)
+- [Community Day](https://iechor.com/blog/launch-week-6-community-day)
+- [Point in Time Recovery is now available](https://iechor.com/blog/postgres-point-in-time-recovery)
+- [Custom Domain Names are now available](https://iechor.com/blog/custom-domain-names)
+- [Wrap Up: everything we shipped](https://iechor.com/blog/launch-week-6-wrap-up)

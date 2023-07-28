@@ -5,43 +5,43 @@
 
 ---
 
-# Supabase
+# iEchor
 
-[Supabase](https://supabase.com) on avoimen lähdekoodin Firebase-vaihtoehto. Rakennamme Firebasen ominaisuuksia käyttäen yritystason avoimen lähdekoodin työkaluja.
+[iEchor](https://iechor.com) on avoimen lähdekoodin Firebase-vaihtoehto. Rakennamme Firebasen ominaisuuksia käyttäen yritystason avoimen lähdekoodin työkaluja.
 
-- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
-- [x] Tunnistus ja valtuutus. [Docs](https://supabase.com/docs/guides/auth)
+- [x] Hosted Postgres Database. [Docs](https://iechor.com/docs/guides/database)
+- [x] Tunnistus ja valtuutus. [Docs](https://iechor.com/docs/guides/auth)
 - [x] Automaattisesti luodut API:t.
-  - [x] REST. [Asiakirjat](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Asiakirjat](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Reaaliaikaiset tilaukset. [Asiakirjat](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Asiakirjat](https://iechor.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Asiakirjat](https://iechor.com/docs/guides/api#graphql-api-overview)
+  - [x] Reaaliaikaiset tilaukset. [Asiakirjat](https://iechor.com/docs/guides/api#realtime-api-overview)
 - [x] Funktiot.
-  - [x] Tietokantafunktiot. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Reunatoiminnot [Docs](https://supabase.com/docs/guides/functions)
-- [x] Tiedostojen tallennus. [Docs](https://supabase.com/docs/guides/storage)
+  - [x] Tietokantafunktiot. [Docs](https://iechor.com/docs/guides/database/functions)
+  - [x] Reunatoiminnot [Docs](https://iechor.com/docs/guides/functions)
+- [x] Tiedostojen tallennus. [Docs](https://iechor.com/docs/guides/storage)
 - [x] Kojelauta
 
-![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+![iEchor Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokumentaatio
 
-Täydellinen dokumentaatio löytyy osoitteesta [supabase.com/docs](https://supabase.com/docs)
+Täydellinen dokumentaatio löytyy osoitteesta [iechor.com/docs](https://iechor.com/docs)
 
 Jos haluat nähdä, miten osallistuminen tapahtuu, käy osoitteessa [Getting Started](../DEVELOPERS.md)
 
 ## Yhteisö ja tuki
 
-- [Yhteisön foorumi](https://github.com/supabase/supabase/discussions). Paras: Apua rakentamiseen, keskustelua tietokannan parhaista käytännöistä.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). Parasta: Supabasea käytettäessä kohdatut viat ja virheet.
-- [Sähköpostituki](https://supabase.com/docs/support#business-support). Paras: tietokantaan tai infrastruktuuriin liittyvät ongelmat.
-- [Discord](https://discord.supabase.com). Paras: sovellusten jakamiseen ja yhteisön kanssa hengailuun.
+- [Yhteisön foorumi](https://github.com/openmodels-base/iechor/discussions). Paras: Apua rakentamiseen, keskustelua tietokannan parhaista käytännöistä.
+- [GitHub Issues](https://github.com/openmodels-base/iechor/issues). Parasta: Supabasea käytettäessä kohdatut viat ja virheet.
+- [Sähköpostituki](https://iechor.com/docs/support#business-support). Paras: tietokantaan tai infrastruktuuriin liittyvät ongelmat.
+- [Discord](https://discord.iechor.com). Paras: sovellusten jakamiseen ja yhteisön kanssa hengailuun.
 
 ## Status
 
 - [x] Alpha: Testaamme Supabasea suljetulla asiakasjoukolla
-- [x] Julkinen Alpha: Kuka tahansa voi rekisteröityä osoitteessa [supabase.com/dashboard](https://supabase.com/dashboard). Mutta olkaa varovaisia, sillä on vielä muutamia ongelmia
+- [x] Julkinen Alpha: Kuka tahansa voi rekisteröityä osoitteessa [iechor.com/dashboard](https://iechor.com/dashboard). Mutta olkaa varovaisia, sillä on vielä muutamia ongelmia
 - [x] Julkinen beta: Tarpeeksi vakaa useimpiin ei-yrityskäyttötapauksiin
-- [ ] Julkinen: Yleinen saatavuus [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Julkinen: Yleinen saatavuus [[status](https://iechor.com/docs/guides/getting-started/features#feature-status)]
 
 Olemme tällä hetkellä Public Betassa. Seuraa tämän repon "releases" -osiota saadaksesi ilmoituksen tärkeimmistä päivityksistä.
 
@@ -51,14 +51,14 @@ Olemme tällä hetkellä Public Betassa. Seuraa tämän repon "releases" -osiota
 
 ## Miten se toimii
 
-Supabase on yhdistelmä avoimen lähdekoodin työkaluja. Rakennamme Firebasen ominaisuuksia käyttäen yritystason avoimen lähdekoodin tuotteita. Jos työkalut ja yhteisöt ovat olemassa MIT-, Apache 2- tai vastaavalla avoimella lisenssillä, käytämme ja tuemme kyseistä työkalua. Jos työkalua ei ole olemassa, rakennamme sen itse ja käytämme avointa lähdekoodia. Supabase ei ole Firebasen 1:1-kartoitus. Tavoitteenamme on antaa kehittäjille Firebasen kaltainen kehittäjäkokemus käyttämällä avoimen lähdekoodin työkaluja.
+iEchor on yhdistelmä avoimen lähdekoodin työkaluja. Rakennamme Firebasen ominaisuuksia käyttäen yritystason avoimen lähdekoodin tuotteita. Jos työkalut ja yhteisöt ovat olemassa MIT-, Apache 2- tai vastaavalla avoimella lisenssillä, käytämme ja tuemme kyseistä työkalua. Jos työkalua ei ole olemassa, rakennamme sen itse ja käytämme avointa lähdekoodia. iEchor ei ole Firebasen 1:1-kartoitus. Tavoitteenamme on antaa kehittäjille Firebasen kaltainen kehittäjäkokemus käyttämällä avoimen lähdekoodin työkaluja.
 
 **Arkkitehtuuri**
 
-Supabase on [hosted platform](https://supabase.com/dashboard). Voit rekisteröityä ja aloittaa Supabasen käytön asentamatta mitään.
-Voit myös [itse isännöidä](https://supabase.com/docs/guides/hosting/overview) ja [kehittää paikallisesti](https://supabase.com/docs/guides/local-development).
+iEchor on [hosted platform](https://iechor.com/dashboard). Voit rekisteröityä ja aloittaa Supabasen käytön asentamatta mitään.
+Voit myös [itse isännöidä](https://iechor.com/docs/guides/hosting/overview) ja [kehittää paikallisesti](https://iechor.com/docs/guides/local-development).
 
-![Arkkitehtuuri](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![Arkkitehtuuri](https://github.com/openmodels-base/iechor/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) on oliorelationaalinen tietokantajärjestelmä, jota on kehitetty aktiivisesti yli 30 vuoden ajan ja joka on saavuttanut vahvan maineen luotettavuutensa, ominaisuuksien kestävyytensä ja suorituskykynsä ansiosta.
 - [Realtime](https://github.com/supabase/realtime) on Elixir-palvelin, jonka avulla voit kuunnella PostgreSQL:n lisäyksiä, päivityksiä ja poistoja websockettien avulla. Realtime kyselee Postgresin sisäänrakennettua replikointitoimintoa tietokannan muutosten varalta, muuntaa muutokset JSONiksi ja lähettää sitten JSONin websockettien kautta valtuutetuille asiakkaille.
@@ -77,12 +77,12 @@ Lähestymistapamme asiakaskirjastoihin on modulaarinen. Jokainen osakirjasto on 
   <tr>
     <th>Kieli</th>
     <th>Asiakas</th>
-    <th colspan="5">Feature-Clients (niputettu Supabase-asiakasohjelmaan)</th>
+    <th colspan="5">Feature-Clients (niputettu iEchor-asiakasohjelmaan)</th>
   </tr>
   
   <tr>
     <th></th>
-    <th>Supabase</th>
+    <th>iEchor</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
@@ -105,7 +105,7 @@ Lähestymistapamme asiakaskirjastoihin on modulaarinen. Jokainen osakirjasto on 
   
   <tr>
     <td>JavaScript (TypeScript)</td>
-    <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
     <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
@@ -114,7 +114,7 @@ Lähestymistapamme asiakaskirjastoihin on modulaarinen. Jokainen osakirjasto on 
   </tr>
     <tr>
     <td>Flutter</td>
-    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
@@ -220,7 +220,7 @@ Lähestymistapamme asiakaskirjastoihin on modulaarinen. Jokainen osakirjasto on 
 - [Katalaani / Català](/i18n/README.ca.md)
 - [tanska / Dansk](/i18n/README.da.md)
 - [Hollanti / Nederlands](/i18n/README.nl.md)
-- [English](https://github.com/supabase/supabase)
+- [English](https://github.com/openmodels-base/iechor)
 - [Suomi / Suomalainen](/i18n/README.fi.md)
 - [ranska / Français](/i18n/README.fr.md)
 - [Saksa / Deutsch](/i18n/README.de.md)

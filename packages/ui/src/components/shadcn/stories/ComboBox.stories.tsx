@@ -444,17 +444,17 @@ export const ComboOrgPicker = {
     const orgs: Status[] = [
       {
         value: 'supabase',
-        label: 'Supabase',
+        label: 'iEchor',
         icon: Circle,
       },
       {
         value: 'supabaselabz',
-        label: 'Supabase Labs',
+        label: 'iEchor Labs',
         icon: ArrowUpCircle,
       },
       {
         value: 'supabasedemos',
-        label: 'Supabase Demos',
+        label: 'iEchor Demos',
         icon: CheckCircle2,
       },
     ]
@@ -575,17 +575,17 @@ export const MultipleComboPickers = {
     const orgs: Status[] = [
       {
         value: 'supabase',
-        label: 'Supabase',
+        label: 'iEchor',
         icon: Circle,
       },
       {
         value: 'supabaselabz',
-        label: 'Supabase Labs',
+        label: 'iEchor Labs',
         icon: ArrowUpCircle,
       },
       {
         value: 'supabasedemos',
-        label: 'Supabase Demos',
+        label: 'iEchor Demos',
         icon: CheckCircle2,
       },
     ]
@@ -612,9 +612,9 @@ export const MultipleComboPickers = {
         label: 'studio-self-hosted.vercel.app',
       },
       {
-        value: 'supabase.com',
+        value: 'iechor.com',
         icon: CheckCircle2,
-        label: 'supabase.com',
+        label: 'iechor.com',
       },
       {
         value: 'supabase.green',
@@ -622,9 +622,9 @@ export const MultipleComboPickers = {
         label: 'supabase.green',
       },
       {
-        value: 'app.supabase.com',
+        value: 'app.iechor.com',
         icon: CheckCircle2,
-        label: 'app.supabase.com',
+        label: 'app.iechor.com',
       },
       {
         value: 'supabase-studio.vercel.app',

@@ -73,7 +73,7 @@ dependencies {
     implementation 'androidx.compose.material3:material3:1.0.0-alpha02'
     implementation "androidx.compose.material:material:1.1.1"
     
-    // Supabase setup
+    // iEchor setup
     implementation "io.github.jan-tennert.supabase:gotrue-kt:1.0.0"
     implementation "io.github.jan-tennert.supabase:postgrest-kt:1.0.0"
     implementation "io.github.jan-tennert.supabase:storage-kt:1.0.0"

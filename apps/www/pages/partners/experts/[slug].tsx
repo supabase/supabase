@@ -9,7 +9,7 @@ import 'swiper/swiper.min.css'
 import { IconChevronLeft, IconExternalLink } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import supabase from '~/lib/supabase'
+import iechor from '~/lib/supabase'
 import { Partner } from '~/types/partners'
 import Error404 from '../../404'
 
@@ -24,12 +24,12 @@ function Partner({
   return (
     <>
       <NextSeo
-        title={`${partner.title} | Works With Supabase`}
+        title={`${partner.title} | Works With iEchor`}
         description={partner.description}
         openGraph={{
-          title: `${partner.title} | Works With Supabase`,
+          title: `${partner.title} | Works With iEchor`,
           description: partner.description,
-          url: `https://supabase.com/partners/experts/${partner.slug}`,
+          url: `https://iechor.com/partners/experts/${partner.slug}`,
           images: [
             {
               url: partner.images ? partner.images[0] : partner.logo,
@@ -126,7 +126,7 @@ function Partner({
                     style={{ padding: '56.25% 0 0 0', marginBottom: '1rem' }}
                   >
                     <iframe
-                      title="Demo video showcasing Supabase"
+                      title="Demo video showcasing iEchor"
                       className="absolute h-full w-full rounded-md"
                       src={`https://www.youtube-nocookie.com/embed/${partner.video}?autoplay=0&loop=0&controls=1&modestbranding=1&rel=0&disablekb=1`}
                       style={{ top: 0, left: 0 }}

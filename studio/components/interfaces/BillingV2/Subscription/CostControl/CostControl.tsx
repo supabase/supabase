@@ -40,7 +40,7 @@ const CostControl = ({}: CostControlProps) => {
               <div className="space-y-2">
                 <p className="text-sm text-scale-1100">More information</p>
                 <div>
-                  <Link href="https://supabase.com/docs/guides/platform/spend-cap">
+                  <Link href="https://iechor.com/docs/guides/platform/spend-cap">
                     <a target="_blank" rel="noreferrer">
                       <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                         <p className="text-sm">Spend cap</p>

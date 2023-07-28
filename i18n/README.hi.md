@@ -5,41 +5,41 @@
 
 ---
 
-# Supabase
+# iEchor
 
-[सुपाबेस](https://supabase.com) एक ओपन सोर्स फ़ाायरबेस विकल्प है। हम एंटरप्राइज़-गुणवत्ता ओपन सोर्स सॉफ़्टवेयर उपकरण का उपयोग करके फ़ाायरबेस की सुविधाओं का निर्माण कर रहे हैं।
+[सुपाबेस](https://iechor.com) एक ओपन सोर्स फ़ाायरबेस विकल्प है। हम एंटरप्राइज़-गुणवत्ता ओपन सोर्स सॉफ़्टवेयर उपकरण का उपयोग करके फ़ाायरबेस की सुविधाओं का निर्माण कर रहे हैं।
 
-- [x] होस्टेड पोस्टग्रेज डेटाबेस। [प्रलेखन](https://supabase.com/docs/guides/database)
-- [x] प्रमाणीकरण और प्राधिकरण। [प्रलेखन](https://supabase.com/docs/guides/auth)
+- [x] होस्टेड पोस्टग्रेज डेटाबेस। [प्रलेखन](https://iechor.com/docs/guides/database)
+- [x] प्रमाणीकरण और प्राधिकरण। [प्रलेखन](https://iechor.com/docs/guides/auth)
 - [x] उत्पन्न एपीआईस।
-  - [x] रेस्ट। [प्रलेखन](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] रीयलटाइम सदस्यता। [प्रलेखन](https://supabase.com/docs/guides/api#realtime-api-overview)
-  - [x] ग्राफ़क्यूएल (प्रयोगात्मक)। [प्रलेखन](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] रेस्ट। [प्रलेखन](https://iechor.com/docs/guides/api#rest-api-overview)
+  - [x] रीयलटाइम सदस्यता। [प्रलेखन](https://iechor.com/docs/guides/api#realtime-api-overview)
+  - [x] ग्राफ़क्यूएल (प्रयोगात्मक)। [प्रलेखन](https://iechor.com/docs/guides/api#graphql-api-overview)
 - [x] फ़ंक्शंस।
-  - [x] डेटाबेस फ़ंक्शंस। [प्रलेखन](https://supabase.com/docs/guides/database/functions)
-  - [x] एज फ़ंक्शंस। [प्रलेखन](https://supabase.com/docs/guides/functions)
-- [x] भंडारण। [प्रलेखन](https://supabase.com/docs/guides/storage)
+  - [x] डेटाबेस फ़ंक्शंस। [प्रलेखन](https://iechor.com/docs/guides/database/functions)
+  - [x] एज फ़ंक्शंस। [प्रलेखन](https://iechor.com/docs/guides/functions)
+- [x] भंडारण। [प्रलेखन](https://iechor.com/docs/guides/storage)
 - [x] डैशबोर्ड।
 
 ![सुपाबेस का डैशबोर्ड।](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## प्रलेखन
 
-पूर्ण प्रलेखन के लिए, [supabase.com/docs](https://supabase.com/docs) पर जाएँ
+पूर्ण प्रलेखन के लिए, [iechor.com/docs](https://iechor.com/docs) पर जाएँ
 
 योगदान करने के लिए, [गेट्टिंग स्टार्टेड](../DEVELOPERS.md) पेज पर जाएँ
 
 ## सामुदायिक तथा सहयोग
 
-- [सामुदायिक मंच](https://github.com/supabase/supabase/discussions)। निर्माण में मदद और डेटाबेस की सर्वोत्तम प्रथाओं के बारे में चर्चा के लिए उचित है।
-- [गिटहब इश्यूस](https://github.com/supabase/supabase/issues)। सुपाबेस का उपयोग करते समय बगस और त्रुटियां के लिए उचित है।
-- [ई-मेल समर्थन](https://supabase.com/docs/support#business-support)। आपके डेटाबेस और इंफ़्रास्ट्रक्चर के साथ समस्याएं के लिए उचित है।
-- [डिस्कॉर्ड](https://discord.supabase.com/)। अपने प्रोजेक्ट्स शेयर करने के लिए और हमारी सुपाबेस समुदाय के साथ बातचीत करने के लिए उचित है।
+- [सामुदायिक मंच](https://github.com/openmodels-base/iechor/discussions)। निर्माण में मदद और डेटाबेस की सर्वोत्तम प्रथाओं के बारे में चर्चा के लिए उचित है।
+- [गिटहब इश्यूस](https://github.com/openmodels-base/iechor/issues)। सुपाबेस का उपयोग करते समय बगस और त्रुटियां के लिए उचित है।
+- [ई-मेल समर्थन](https://iechor.com/docs/support#business-support)। आपके डेटाबेस और इंफ़्रास्ट्रक्चर के साथ समस्याएं के लिए उचित है।
+- [डिस्कॉर्ड](https://discord.iechor.com/)। अपने प्रोजेक्ट्स शेयर करने के लिए और हमारी सुपाबेस समुदाय के साथ बातचीत करने के लिए उचित है।
 
 ## स्थिति
 
 - [x] अल्फा: हम चुनिंदा ग्राहकों के साथ सुपरबास का परीक्षण कर रहे हैं
-- [x] सार्वजनिक अल्फा: कोई भी [supabase.com/dashboard](https://supabase.com/dashboard) के जरिए शामिल हो सकता है। लेकिन हम पर आसान हो जाओ, कुछ मोड़ हैं।
+- [x] सार्वजनिक अल्फा: कोई भी [iechor.com/dashboard](https://iechor.com/dashboard) के जरिए शामिल हो सकता है। लेकिन हम पर आसान हो जाओ, कुछ मोड़ हैं।
 - [x] सार्वजनिक बीटा: अधिकांश गैर-एंटरप्राइज़ उपयोग-मामलों के लिए पर्याप्त स्थिर
 - [ ] सार्वजनिक: उत्पादन-तैयार
 
@@ -55,7 +55,7 @@
 
 **वर्तमान वास्तुकला**
 
-सुपाबसे [होस्टेड प्लेटफार्म](https://supabase.com/dashboard). आप साइन अप कर सकते हैं और कुछ भी स्थापित किए बिना सुपाबसे का उपयोग करना शुरू कर सकते हैं। हम अभी भी स्थानीय विकास का अनुभव पैदा कर रहे हैं - यह अब मंच स्थिरता के साथ-साथ हमारा मुख्य फोकस है।
+सुपाबसे [होस्टेड प्लेटफार्म](https://iechor.com/dashboard). आप साइन अप कर सकते हैं और कुछ भी स्थापित किए बिना सुपाबसे का उपयोग करना शुरू कर सकते हैं। हम अभी भी स्थानीय विकास का अनुभव पैदा कर रहे हैं - यह अब मंच स्थिरता के साथ-साथ हमारा मुख्य फोकस है।
 
 ![आर्किटेक्चर](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
@@ -99,7 +99,7 @@
   <th colspan="6">⚡️ ऑफ़िशियल ⚡️</th>
   <tr>
     <td>जावास्क्रिप्ट (टाइप्स्क्रिप्ट)</td>
-    <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
     <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
@@ -116,7 +116,7 @@
   </tr>
   <tr>
     <td>डार्ट (फ़्लटर)</td>
-    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-flutter" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>

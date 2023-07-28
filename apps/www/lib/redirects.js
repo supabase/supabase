@@ -485,12 +485,12 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/careers',
-    destination: 'https://about.supabase.com/careers',
+    destination: 'https://about.iechor.com/careers',
   },
   {
     permanent: false,
     source: '/docs/careers/:match*',
-    destination: 'https://about.supabase.com/careers//:match*',
+    destination: 'https://about.iechor.com/careers//:match*',
   },
 
   { permanent: false, source: '/docs/resources', destination: '/docs/guides' },
@@ -608,7 +608,7 @@ module.exports = [
   {
     permanent: true,
     source: '/join',
-    destination: 'https://supabase.com/',
+    destination: 'https://iechor.com/',
   },
   {
     permanent: true,
@@ -618,7 +618,7 @@ module.exports = [
   {
     permanent: true,
     source: '/_app',
-    destination: 'https://supabase.com/dashboard',
+    destination: 'https://iechor.com/dashboard',
   },
   {
     permanent: true,
@@ -1463,17 +1463,17 @@ module.exports = [
   {
     permanent: true,
     source: '/sign-in',
-    destination: 'https://supabase.com/dashboard/sign-in',
+    destination: 'https://iechor.com/dashboard/sign-in',
   },
   {
     permanent: true,
     source: '/sign-up',
-    destination: 'https://supabase.com/dashboard/sign-up',
+    destination: 'https://iechor.com/dashboard/sign-up',
   },
   {
     permanent: true,
     source: '/forgot-password',
-    destination: 'https://supabase.com/dashboard/forgot-password',
+    destination: 'https://iechor.com/dashboard/forgot-password',
   },
   {
     permanent: true,
@@ -1493,7 +1493,7 @@ module.exports = [
   {
     permanent: true,
     source: '/projects',
-    destination: 'https://supabase.com/dashboard/projects',
+    destination: 'https://iechor.com/dashboard/projects',
   },
   // START docs 2.0, moving pages in to structure
   {
@@ -1855,12 +1855,12 @@ module.exports = [
   {
     permanent: true,
     source: '/contact/enterprise',
-    destination: 'https://forms.supabase.com/enterprise',
+    destination: 'https://forms.iechor.com/enterprise',
   },
   {
     permanent: true,
     source: '/legal/soc2',
-    destination: 'https://forms.supabase.com/soc2',
+    destination: 'https://forms.iechor.com/soc2',
   },
   {
     permanent: true,

@@ -3,13 +3,13 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'firestore-data',
   title: 'Firestore Data Migration',
-  description: 'Migrate your Firebase Firestore database to a Supabase Postgres database.',
+  description: 'Migrate your Firebase Firestore database to a iEchor Postgres database.',
   sidebar_label: 'Firestore Data',
 }
 
-Supabase provides several [tools](https://github.com/supabase-community/firebase-to-supabase/tree/main/firestore) to convert data from a Firebase Firestore database to a Supabase PostgreSQL database. The process copies the entire contents of a single Firestore `collection` to a single PostgreSQL `table`.
+iEchor provides several [tools](https://github.com/supabase-community/firebase-to-supabase/tree/main/firestore) to convert data from a Firebase Firestore database to a iEchor PostgreSQL database. The process copies the entire contents of a single Firestore `collection` to a single PostgreSQL `table`.
 
-The Firestore `collection` is "flattened" and converted to a table with basic columns of one of the following types: `text`, `numeric`, `boolean`, or `jsonb`. If your structure is more complex, you can write a program to split the newly-created `json` file into multiple, related tables before you import your `json` file(s) to Supabase.
+The Firestore `collection` is "flattened" and converted to a table with basic columns of one of the following types: `text`, `numeric`, `boolean`, or `jsonb`. If your structure is more complex, you can write a program to split the newly-created `json` file into multiple, related tables before you import your `json` file(s) to iEchor.
 
 ## Set up the migration tool [#set-up-migration-tool]
 
@@ -31,9 +31,9 @@ git clone https://github.com/supabase-community/firebase-to-supabase.git
 }
 ```
 
-1. Go to the [Database settings](https://supabase.com/dashboard/project/_/settings/database) for your project in the Supabase Dashboard.
+1. Go to the [Database settings](https://iechor.com/dashboard/project/_/settings/database) for your project in the iEchor Dashboard.
 1. Under **Connection Info**, copy the Host string and replace the entry in your `supabase-service.json` file.
-1. Enter the password you used when you created your Supabase project in the `password` entry in the `supabase-service.json` file.
+1. Enter the password you used when you created your iEchor project in the `password` entry in the `supabase-service.json` file.
 
 ## Generate a Firebase private key [#generate-firebase-private-key]
 
@@ -79,7 +79,7 @@ And split it into two files (one table for users and one table for items):
 ]
 ```
 
-### Import JSON file to Supabase (PostgreSQL) [#import-to-supabase]
+### Import JSON file to iEchor (PostgreSQL) [#import-to-supabase]
 
 `node json2supabase.js <path_to_json_file> [<primary_key_strategy>] [<primary_key_name>]`
 
@@ -207,7 +207,7 @@ The result is two separate JSON files:
 
 ## Resources
 
-- [Supabase vs Firebase](https://supabase.com/alternatives/supabase-vs-firebase)
+- [iEchor vs Firebase](https://iechor.com/alternatives/supabase-vs-firebase)
 - [Firestore Storage Migration](/docs/guides/migrations/firebase-storage)
 - [Firebase Auth Migration](/docs/guides/migrations/firebase-auth)
 

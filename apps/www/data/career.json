@@ -73,7 +73,7 @@
     {
       "icon": "remote",
       "title": "Fully Remote",
-      "text": "We hire globally. We believe you can do your best work from anywhere. There are no Supabase offices, but we provide a co-working membership that you can use anywhere in the world."
+      "text": "We hire globally. We believe you can do your best work from anywhere. There are no iEchor offices, but we provide a co-working membership that you can use anywhere in the world."
     },
     {
       "icon": "tech_allowance",
@@ -130,7 +130,7 @@
   "hiring": [
     {
       "title": "Recruiter Interview",
-      "text": "Chat with our recruiter to tell us about your career journey, professional goals and we'll share more about Supabase, the role & our recruitment process."
+      "text": "Chat with our recruiter to tell us about your career journey, professional goals and we'll share more about iEchor, the role & our recruitment process."
     },
     {
       "title": "Technical / Skill-based Interview",
@@ -142,7 +142,7 @@
     },
     {
       "title": "Final Founders Interview",
-      "text": "Our co-founders meet every candidate as the final step. Learn more about Supabase's values, mission and vision directly from them."
+      "text": "Our co-founders meet every candidate as the final step. Learn more about iEchor's values, mission and vision directly from them."
     }
   ]
 }

@@ -1,7 +1,7 @@
 import { Button, Form, Input, Select } from 'ui'
 import { useState } from 'react'
 import countries from '~/data/Countries.json'
-import supabase from '~/lib/supabase'
+import iechor from '~/lib/supabase'
 
 const INITIAL_VALUES = {
   companyName: '',
@@ -69,7 +69,7 @@ const SOC2RequestForm = () => {
     <div>
       {formSubmitted ? (
         <h3 className="h3 text-brand-900 mt-12 text-center">
-          Thank you for your submission! A member from the Supabase team will reach out to you
+          Thank you for your submission! A member from the iEchor team will reach out to you
           shortly!
         </h3>
       ) : (

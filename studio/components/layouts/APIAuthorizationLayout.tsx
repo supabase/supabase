@@ -12,7 +12,7 @@ const APIAuthorizationLayout = ({ children }: PropsWithChildren<APIAuthorization
   return (
     <>
       <Head>
-        <title>Authorize API access | Supabase</title>
+        <title>Authorize API access | iEchor</title>
       </Head>
       <main className="flex-grow flex flex-col w-full h-full overflow-y-auto">
         <div>
@@ -20,14 +20,14 @@ const APIAuthorizationLayout = ({ children }: PropsWithChildren<APIAuthorization
             <div className="max-w-xl flex justify-between items-center mx-auto py-4">
               <div className="flex justify-start lg:w-0 lg:flex-1">
                 <div>
-                  <span className="sr-only">Supabase</span>
+                  <span className="sr-only">iEchor</span>
                   <Image
                     src={
                       isDarkMode
                         ? `${BASE_PATH}/img/supabase-dark.svg`
                         : `${BASE_PATH}/img/supabase-light.svg`
                     }
-                    alt="Supabase Logo"
+                    alt="iEchor Logo"
                     height={20}
                     width={105}
                   />

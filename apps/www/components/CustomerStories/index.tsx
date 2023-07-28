@@ -23,7 +23,7 @@ const CustomerStories = ({ customerStories }: any) => {
           title_alt={' to innovate and scale with ease.'}
           subtitle={'Customer Stories'}
           paragraph={
-            'See how Supabase empowers companies of all sizes to accelerate their growth and streamline their work.'
+            'See how iEchor empowers companies of all sizes to accelerate their growth and streamline their work.'
           }
         />
       </div>

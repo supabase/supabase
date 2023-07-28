@@ -2,12 +2,12 @@ openref: 0.1
 
 info:
   id: reference/supabase-swift
-  title: Supabase Swift Client
+  title: iEchor Swift Client
   description: |
 
-    Supabase Swift.
+    iEchor Swift.
 
-  specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_swift_v0.yml
+  specUrl: https://github.com/openmodels-base/iechor/edit/master/spec/supabase_swift_v0.yml
   slugPrefix: '/'
   libraries:
     - id: 'Swift'
@@ -18,8 +18,8 @@ functions:
     title: 'Initializing'
     $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
     description: |
-      You can initialize Supabase with the `SupabaseClient` by passing your `Project URL` and `Project Key`. You can find these under your `Project Settings` → `API Settings`
-      The Supabase client is your entrypoint to the rest of the Supabase functionality and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+      You can initialize iEchor with the `SupabaseClient` by passing your `Project URL` and `Project Key`. You can find these under your `Project Settings` → `API Settings`
+      The iEchor client is your entrypoint to the rest of the iEchor functionality and is the easiest way to interact with everything we offer within the iEchor ecosystem.
 
     examples:
       - id: initialize-client
@@ -33,10 +33,10 @@ functions:
     title: 'Fetch data: select()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.select'
     notes: |
-      - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
+      - By default, iEchor projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `select()` can be combined with [Modifiers](/docs/reference/javascript/using-modifiers)
       - `select()` can be combined with [Filters](/docs/reference/javascript/using-filters)
-      - If using the Supabase hosted platform `apikey` is technically a reserved keyword, since the API gateway will pluck it out for authentication. [It should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+      - If using the iEchor hosted platform `apikey` is technically a reserved keyword, since the API gateway will pluck it out for authentication. [It should be avoided as a column name](https://github.com/openmodels-base/iechor/issues/5465).
       - The recommended solution for getting data is to use the value property which will return a decoded model. Create a struct codable model of the of your database to get this easily decoded.
     examples:
       - id: getting-your-data
@@ -274,8 +274,8 @@ functions:
       - id: upserting-into-tables-with-constraints
         name: Upserting into tables with constraints
         description: |
-          Running the following will cause supabase to upsert data into the `users` table.
-          If the username 'supabot' already exists, the `onConflict` argument tells supabase to overwrite that row
+          Running the following will cause iechor to upsert data into the `users` table.
+          If the username 'supabot' already exists, the `onConflict` argument tells iechor to overwrite that row
           based on the column passed into `onConflict`.
         isSpotlight: true
         code: |
@@ -1471,7 +1471,7 @@ functions:
     description: |
       Only relevant for text and tsvector columns. Match only rows where `column`matches the query string in `query`.
 
-      For more information, see [Postgres full text search](https://supabase.com/docs/guides/database/full-text-search).
+      For more information, see [Postgres full text search](https://iechor.com/docs/guides/database/full-text-search).
     examples:
       - id: text-search
         name: Text search
@@ -1971,27 +1971,27 @@ functions:
   - id: auth-api
     title: 'Overview'
     notes: |
-      - The auth methods can be accessed via the Supabase GoTrue Auth client.
+      - The auth methods can be accessed via the iEchor GoTrue Auth client.
     examples:
       - id: create-auth-client
         name: Create auth client
         isSpotlight: true
         code: |
           ```js
-          let supabase = SupabaseClient(supabaseURL: "https://xyzcompany.supabase.co'", supabaseKey: "public-anon-key")
+          let iechor = SupabaseClient(supabaseURL: "https://xyzcompany.supabase.co'", supabaseKey: "public-anon-key")
           let auth = supabase.auth
           ```
   - id: sign-up
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
-      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
+      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://iechor.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
-      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://iechor.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://iechor.com/dashboard/project/_/auth/url-configuration).
       - If signUp() is called for an existing confirmed user:
-          - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
+          - If **Confirm email** is enabled in [your project](https://iechor.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
           - If **Confirm email** is disabled, the error message, `User already registered` is returned.
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/auth-getuser).
     examples:
@@ -2065,7 +2065,7 @@ functions:
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
       - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
-      - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
+      - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://iechor.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -2089,7 +2089,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOAuth'
     notes: |
       - This method is used for signing in using a third-party provider.
-      - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
+      - iEchor supports many different [third-party providers](https://iechor.com/docs/guides/auth#providers).
     examples:
       - id: sign-in-using-a-third-party-provider
         name: Sign in using a third-party provider
@@ -2097,7 +2097,7 @@ functions:
         description: |
           - getOAuthSignInURL() provides the URL which needs to be opened in a SFSafariViewController instance.
           - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs.
-          - For full implementation example check out [Supabase-Swift Github](https://github.com/supabase-community/supabase-swift#social-login-implementation).
+          - For full implementation example check out [iEchor-Swift Github](https://github.com/supabase-community/supabase-swift#social-login-implementation).
         code: |
           ```js
           let url = try await supabase.auth
@@ -2114,7 +2114,7 @@ functions:
           - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
           - getOAuthSignInURL() provides the URL which needs to be opened in a SFSafariViewController instance.
           - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs.
-          - For full implementation example check out [Supabase-Swift Github](https://github.com/supabase-community/supabase-swift#social-login-implementation).
+          - For full implementation example check out [iEchor-Swift Github](https://github.com/supabase-community/supabase-swift#social-login-implementation).
         code: |
           ```js
           let url = try await supabase.auth
@@ -2209,7 +2209,7 @@ functions:
     notes: |
       - In order to use the `updateUser()` method, the user needs to be signed in first.
       - By default, email updates sends a confirmation link to both the user's current and new email.
-      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://iechor.com/dashboard/project/_/auth/providers).
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
@@ -2244,7 +2244,7 @@ functions:
       - `setSession()` takes in a refresh token and uses it to get a new session.
       - The refresh token can only be used once to obtain a new session.
       - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
-      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://iechor.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
     examples:
       - id: refresh-the-session
         name: Refresh the session
@@ -2300,7 +2300,7 @@ functions:
   - id: invoke
     title: 'invoke()'
     description: |
-      Invokes a Supabase Function. See the [guide](/docs/guides/functions) for details on writing Functions.
+      Invokes a iEchor Function. See the [guide](/docs/guides/functions) for details on writing Functions.
     notes: |
       - Requires an Authorization header.
       - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
@@ -2382,7 +2382,7 @@ functions:
       - id: listen-to-updates
         name: Listen to updates
         description: |
-          By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+          By default, iEchor will send only the updated record. If you want to receive the previous values as well you can
           enable full replication for the table you are listening too:
 
           ```sql
@@ -2399,7 +2399,7 @@ functions:
       - id: listen-to-deletes
         name: Listen to deletes
         description: |
-          By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+          By default, iEchor does not send deleted records. If you want to receive the deleted record you can
           enable full replication for the table you are listening too:
 
           ```sql
@@ -2448,7 +2448,7 @@ functions:
     title: 'removeChannel()'
     notes: |
       - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes.
-      - Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+      - iEchor will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
       - id: removes-a-channel
         name: Remove a channel

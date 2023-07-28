@@ -2,16 +2,16 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   title: 'Build a User Management App with Svelte',
-  description: 'Learn how to use Supabase in your Svelte App.',
+  description: 'Learn how to use iEchor in your Svelte App.',
 }
 
 <QuickstartIntro />
 
-![Supabase User Management example](/docs/img/user-management-demo.png)
+![iEchor User Management example](/docs/img/user-management-demo.png)
 
 <Admonition type="note">
   If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/svelte-user-management).
+  GitHub](https://github.com/openmodels-base/iechor/tree/master/examples/user-management/svelte-user-management).
 </Admonition>
 
 <ProjectSetup />
@@ -30,7 +30,7 @@ cd supabase-svelte
 npm install
 ```
 
-Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
+Then let's install the only additional dependency: [supabase-js](https://github.com/openmodels-base/iechor-js)
 
 ```bash
 npm install @supabase/supabase-js
@@ -44,7 +44,7 @@ VITE_IECHOR_URL=YOUR_IECHOR_URL
 VITE_IECHOR_ANON_KEY=YOUR_IECHOR_ANON_KEY
 ```
 
-Now that we have the API credentials in place, let's create a helper file to initialize the Supabase client. These variables will be exposed
+Now that we have the API credentials in place, let's create a helper file to initialize the iEchor client. These variables will be exposed
 on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
 ```js src/supabaseClient.ts
@@ -53,7 +53,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_IECHOR_URL
 const supabaseAnonKey = import.meta.env.VITE_IECHOR_ANON_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const iechor = createClient(supabaseUrl, supabaseAnonKey)
 ```
 
 And one optional step is to update the CSS file `src/app.css` to make the app look nice.
@@ -65,7 +65,7 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
 
 ```html src/lib/Auth.svelte
 <script lang="ts">
-  import { supabase } from 'src/supabaseClient'
+  import { iechor } from 'src/supabaseClient'
 
   let loading = false
   let email = ''
@@ -88,7 +88,7 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
 
 <div class="row flex-center flex">
   <div class="col-6 form-widget" aria-live="polite">
-    <h1 class="header">Supabase + Svelte</h1>
+    <h1 class="header">iEchor + Svelte</h1>
     <p class="description">Sign in via magic link with your email below</p>
     <form class="form-widget" on:submit|preventDefault="{handleLogin}">
       <div>
@@ -120,7 +120,7 @@ Let's create a new component for that called `Account.svelte`.
 <script lang="ts">
   import { onMount } from "svelte";
   import type { AuthSession } from "@supabase/supabase-js";
-  import { supabase } from "../supabaseClient";
+  import { iechor } from "../supabaseClient";
 
   export let session: AuthSession;
 
@@ -216,7 +216,7 @@ Now that we have all the components in place, let's update `App.svelte`:
 ```html src/App.svelte
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { supabase } from './supabaseClient'
+  import { iechor } from './supabaseClient'
   import type { AuthSession } from '@supabase/supabase-js'
   import Account from './lib/Account.svelte'
   import Auth from './lib/Auth.svelte'
@@ -251,13 +251,13 @@ npm run dev
 
 And then open the browser to [localhost:5173](http://localhost:5173) and you should see the completed app.
 
-> ⚠️ WARNING: Svelte uses Vite and the default port is `5173`, Supabase uses `port 3000`. To change the redirection port for supabase go to: `Authentication > Settings` and change the `Site Url` to `localhost:5173`
+> ⚠️ WARNING: Svelte uses Vite and the default port is `5173`, iEchor uses `port 3000`. To change the redirection port for iechor go to: `Authentication > Settings` and change the `Site Url` to `localhost:5173`
 
-![Supabase Svelte](/docs/img/supabase-svelte-demo.png)
+![iEchor Svelte](/docs/img/supabase-svelte-demo.png)
 
 ## Bonus: Profile photos
 
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+Every iEchor project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
 ### Create an upload widget
 
@@ -266,7 +266,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 ```html src/lib/Avatar.svelte
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
-  import { supabase } from '../supabaseClient'
+  import { iechor } from '../supabaseClient'
 
   export let size: number
   export let url: string

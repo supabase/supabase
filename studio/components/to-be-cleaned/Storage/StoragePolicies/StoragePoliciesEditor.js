@@ -35,7 +35,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
         <p className="text-sm text-scale-900">
           Based on the operations you have selected, you can use the highlighted functions in the{' '}
           <a
-            href="https://supabase.com/docs/reference/javascript/storage-from-list"
+            href="https://iechor.com/docs/reference/javascript/storage-from-list"
             target="_blank"
             rel="noreferrer"
             className="underline"

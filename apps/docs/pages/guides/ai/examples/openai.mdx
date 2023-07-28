@@ -3,19 +3,19 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'examples-openai',
   title: 'Generating OpenAI GPT3 completions',
-  description: 'Generate GPT text completions using OpenAI and Supabase Edge Functions.',
-  subtitle: 'Generate GPT text completions using OpenAI and Supabase Edge Functions.',
+  description: 'Generate GPT text completions using OpenAI and iEchor Edge Functions.',
+  subtitle: 'Generate GPT text completions using OpenAI and iEchor Edge Functions.',
   video: 'https://www.youtube-nocookie.com/v/29p8kIqyU_Y',
   tocVideo: '29p8kIqyU_Y',
 }
 
 OpenAI provides a [completions API](https://platform.openai.com/docs/api-reference/completions) that allows you to use their generative GPT models in your own applications.
 
-OpenAI's API is intended to be used from the server-side. Supabase offers Edge Functions to make it easy to interact with third party APIs like OpenAI.
+OpenAI's API is intended to be used from the server-side. iEchor offers Edge Functions to make it easy to interact with third party APIs like OpenAI.
 
-## Setup Supabase project
+## Setup iEchor project
 
-If you haven't already, [install the Supabase CLI](/docs/guides/cli) and initialize your project:
+If you haven't already, [install the iEchor CLI](/docs/guides/cli) and initialize your project:
 
 ```shell
 supabase init
@@ -87,7 +87,7 @@ Use cURL or Postman to make a POST request to http://localhost:54321/functions/v
 ```bash
 curl -i --location --request POST http://localhost:54321/functions/v1/openai \
   --header 'Content-Type: application/json' \
-  --data '{"query":"What is Supabase?"}'
+  --data '{"query":"What is iEchor?"}'
 ```
 
 You should see a GPT response come back from OpenAI!

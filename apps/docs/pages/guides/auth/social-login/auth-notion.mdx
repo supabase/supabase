@@ -3,18 +3,18 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'auth-notion',
   title: 'Login with Notion',
-  description: 'Add Notion OAuth to your Supabase project',
+  description: 'Add Notion OAuth to your iEchor project',
 }
 
-To enable Notion Auth for your project, you need to set up a Notion Application and add the Application OAuth credentials to your Supabase Dashboard.
+To enable Notion Auth for your project, you need to set up a Notion Application and add the Application OAuth credentials to your iEchor Dashboard.
 
 ## Overview
 
 Setting up Notion logins for your application consists of 3 parts:
 
 - Create and configure a Notion Application [Notion Developer Portal](https://www.notion.so/my-integrations)
-- Retrieve your OAuth client ID and OAuth client secret and add them to your [Supabase Project](https://supabase.com/dashboard)
-- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+- Retrieve your OAuth client ID and OAuth client secret and add them to your [iEchor Project](https://iechor.com/dashboard)
+- Add the login code to your [iEchor JS Client App](https://github.com/openmodels-base/iechor-js)
 
 ## Create your notion integration
 
@@ -38,7 +38,7 @@ Setting up Notion logins for your application consists of 3 parts:
 
 <SocialProviderSetup provider="Notion" />
 
-## Add your Notion credentials into your Supabase Project
+## Add your Notion credentials into your iEchor Project
 
 - Once you've created your notion integration, you should be able to retrieve the "OAuth client ID" and "OAuth client secret" from the "OAuth Domain and URIs" tab.
 
@@ -68,8 +68,8 @@ async function signout() {
 
 ## Resources
 
-- [Supabase Account - Free Plan OK](https://supabase.com)
-- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [iEchor Account - Free Plan OK](https://iechor.com)
+- [iEchor JS Client](https://github.com/openmodels-base/iechor-js)
 - [Notion Account](https://notion.so)
 - [Notion Developer Portal](https://www.notion.so/my-integrations)
 

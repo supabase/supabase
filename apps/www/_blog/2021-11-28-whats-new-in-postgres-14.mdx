@@ -16,7 +16,7 @@ toc_depth: 3
 Every web developer knows the importance of choosing a suitable database for building modern apps.
 Even though NoSQL, NewSQL, and other types of databases have received a great deal of buzz in the last few years,
 relational database management systems (or RDBMS) are still relevant for several critical business use cases and will likely do so in the foreseeable future.
-Among the many open-source relational databases available, [PostgreSQL](https://supabase.com/docs/guides/database/introduction) is a popular choice among developers.
+Among the many open-source relational databases available, [PostgreSQL](https://iechor.com/docs/guides/database/introduction) is a popular choice among developers.
 It was named [DBMS of the year in 2020](https://db-engines.com/en/blog_post/85) by
 DBEngines, and with every release of PostgreSQL new features are available making it easy for developers and administrators to run their apps.
 
@@ -110,7 +110,7 @@ Aside from query pipelining, the latest PostgreSQL 14 release brings several oth
 
 ### Monitoring and troubleshooting queries
 
-Ask any database troubleshooting expert, and they will tell you that without a way to correlate data across different database components, investigating and monitoring query-related issues can quickly become a nightmare. When it comes to PostgreSQL, the SQL statement’s query_id can be used for this purpose, allowing database experts an easy way to identify workload patterns quickly, detect rogue run-away or slow queries, and common query-related issues. Before PostgreSQL 14, this information was only available using the pg_stat_statements [extension](https://supabase.com/docs/guides/database/extensions), which shows aggregate statistics about queries that have finished executing, but now this information is additionally available for live running queries with pg_stat_activity, in the EXPLAIN VERBOSE statement, and log files.
+Ask any database troubleshooting expert, and they will tell you that without a way to correlate data across different database components, investigating and monitoring query-related issues can quickly become a nightmare. When it comes to PostgreSQL, the SQL statement’s query_id can be used for this purpose, allowing database experts an easy way to identify workload patterns quickly, detect rogue run-away or slow queries, and common query-related issues. Before PostgreSQL 14, this information was only available using the pg_stat_statements [extension](https://iechor.com/docs/guides/database/extensions), which shows aggregate statistics about queries that have finished executing, but now this information is additionally available for live running queries with pg_stat_activity, in the EXPLAIN VERBOSE statement, and log files.
 An example of using query_id IN EXPLAIN (VERBOSE) statement
 
 Start by altering the system to enable the query_id
@@ -141,13 +141,13 @@ Notice that the query identifier is in the output:<br />
 
 Security remains top of mind for every organization, and PostgreSQL 14 brings some critical enhancements in this area.
 
-Have you ever wanted to [manage database user access](https://supabase.com/docs/guides/auth/managing-user-data) so that only specific individuals have read-only access? For example, consider a situation where you would like to host some sample data online for a demo and not allow demo users to modify or delete data. With the latest PostgreSQL version 14, you can easily set that up using a single GRANT statement.
+Have you ever wanted to [manage database user access](https://iechor.com/docs/guides/auth/managing-user-data) so that only specific individuals have read-only access? For example, consider a situation where you would like to host some sample data online for a demo and not allow demo users to modify or delete data. With the latest PostgreSQL version 14, you can easily set that up using a single GRANT statement.
 
 ```sql hideCopy
 grant pg_read_all_data to bobfries;
 ```
 
-From an authentication perspective, if you're still managing passwords in the database without [third-party login providers](https://supabase.com/docs/guides/auth#third-party-logins),
+From an authentication perspective, if you're still managing passwords in the database without [third-party login providers](https://iechor.com/docs/guides/auth#third-party-logins),
 you may want to read this. Since version 10, PostgreSQL supports several different hashing mechanisms such as MD5 and SCRAM-SHA-256 to store user passwords on disk.
 However, to keep up with the [latest security weaknesses around MD5](https://en.wikipedia.org/wiki/MD5#Security) and meet regulatory compliance requirements,
 PostgreSQL 14 has made SCRAM-SHA-256 the default password management mechanism. So, if you are using old PostgreSQL client software,
@@ -157,16 +157,16 @@ you may want to update it, to be able to connect to the newer versions of the da
 
 Indeed, there's a lot more to explore in the latest PostgreSQL, and we've barely scratched the surface of what PostgreSQL 14 has to offer.
 There's no better way to experience some of these features than by trying them out for yourself.
-You can check out these new features within your Supabase project without having to perform a local installation.
+You can check out these new features within your iEchor project without having to perform a local installation.
 
-Explore the [Supabase dashboard now](https://supabase.com/dashboard) and get started with your new project.
+Explore the [iEchor dashboard now](https://iechor.com/dashboard) and get started with your new project.
 
 ## More Postgres resources
 
-- [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
-- [Partial data dumps using Postgres Row Level Security](https://supabase.com/blog/partial-postgresql-data-dumps-with-rls)
-- [Postgres Views](https://supabase.com/blog/postgresql-views)
-- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/audit)
-- [Cracking PostgreSQL Interview Questions](https://supabase.com/blog/cracking-postgres-interview)
-- [What are PostgreSQL Templates?](https://supabase.com/blog/postgresql-templates)
-- [Realtime Postgres RLS on Supabase](https://supabase.com/blog/realtime-row-level-security-in-postgresql)
+- [Implementing "seen by" functionality with Postgres](https://iechor.com/blog/seen-by-in-postgresql)
+- [Partial data dumps using Postgres Row Level Security](https://iechor.com/blog/partial-postgresql-data-dumps-with-rls)
+- [Postgres Views](https://iechor.com/blog/postgresql-views)
+- [Postgres Auditing in 150 lines of SQL](https://iechor.com/blog/audit)
+- [Cracking PostgreSQL Interview Questions](https://iechor.com/blog/cracking-postgres-interview)
+- [What are PostgreSQL Templates?](https://iechor.com/blog/postgresql-templates)
+- [Realtime Postgres RLS on iEchor](https://iechor.com/blog/realtime-row-level-security-in-postgresql)

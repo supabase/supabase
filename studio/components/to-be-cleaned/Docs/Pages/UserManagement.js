@@ -16,14 +16,14 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
       <h2 className="doc-heading">User Management</h2>
       <div className="doc-section">
         <article className="text ">
-          <p>Supabase makes it easy to manage your users.</p>
+          <p>iEchor makes it easy to manage your users.</p>
           <p>
-            Supabase assigns each user a unique ID. You can reference this ID anywhere in your
+            iEchor assigns each user a unique ID. You can reference this ID anywhere in your
             database. For example, you might create a <code>profiles</code> table references the
             user using a <code>user_id</code> field.
           </p>
           <p>
-            Supabase already has built in the routes to sign up, login, and log out for managing
+            iEchor already has built in the routes to sign up, login, and log out for managing
             users in your apps and websites.
           </p>
         </article>
@@ -34,7 +34,7 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
         <article className="text ">
           <p>Allow your users to sign up and create a new account.</p>
           <p>
-            After they have signed up, all interactions using the Supabase JS client will be
+            After they have signed up, all interactions using the iEchor JS client will be
             performed as "that user".
           </p>
         </article>
@@ -51,7 +51,7 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
         <article className="text ">
           <p>If an account is created, users can login to your app.</p>
           <p>
-            After they have logged in, all interactions using the Supabase JS client will be
+            After they have logged in, all interactions using the iEchor JS client will be
             performed as "that user".
           </p>
         </article>
@@ -68,7 +68,7 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
         <article className="text ">
           <p>Send a user a passwordless link which they can use to redeem an access_token.</p>
           <p>
-            After they have clicked the link, all interactions using the Supabase JS client will be
+            After they have clicked the link, all interactions using the iEchor JS client will be
             performed as "that user".
           </p>
         </article>
@@ -168,7 +168,7 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
           <p>
             View all the available{' '}
             <a
-              href="https://supabase.com/docs/guides/auth#providers"
+              href="https://iechor.com/docs/guides/auth#providers"
               target="_blank"
               rel="noreferrer"
             >
@@ -176,7 +176,7 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
             </a>
           </p>
           <p>
-            After they have logged in, all interactions using the Supabase JS client will be
+            After they have logged in, all interactions using the iEchor JS client will be
             performed as "that user".
           </p>
           <p>
@@ -268,7 +268,7 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
       <div className="doc-section ">
         <article className="text ">
           <p>
-            After calling log out, all interactions using the Supabase JS client will be
+            After calling log out, all interactions using the iEchor JS client will be
             "anonymous".
           </p>
         </article>
@@ -285,7 +285,7 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
         <article className="text ">
           <p>Send a user a passwordless link which they can use to sign up and log in.</p>
           <p>
-            After they have clicked the link, all interactions using the Supabase JS client will be
+            After they have clicked the link, all interactions using the iEchor JS client will be
             performed as "that user".
           </p>
           <p>

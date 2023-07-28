@@ -1,6 +1,6 @@
 ---
-title: 'GraphQL is now available in Supabase'
-description: GraphQL support is now in general availability on the Supabase platform via our open source PostgreSQL extension, pg_graphql.
+title: 'GraphQL is now available in iEchor'
+description: GraphQL support is now in general availability on the iEchor platform via our open source PostgreSQL extension, pg_graphql.
 author: oli_rice,dthyresson
 image: launch-week-4/tuesday-graphql/graphql-thumb-og.png
 thumb: launch-week-4/tuesday-graphql/graphql-thumb.png
@@ -15,12 +15,12 @@ toc_depth: 3
 
 🆕 `pg_graphql` has undergone significant enhancements since this announcement. Here is what is new:
 
-- [pg_graphql v1.0](https://supabase.com/blog/pg-graphql-v1)
-- [New Features in pg_graphql v1.2](https://supabase.com/blog/whats-new-in-pg-graphql-v1-2)
+- [pg_graphql v1.0](https://iechor.com/blog/pg-graphql-v1)
+- [New Features in pg_graphql v1.2](https://iechor.com/blog/whats-new-in-pg-graphql-v1-2)
 
 </div>
 
-GraphQL support is now in general availability on the Supabase platform via our [open source](https://github.com/supabase/pg_graphql/) PostgreSQL extension, [`pg_graphql`](https://supabase.github.io/pg_graphql/).
+GraphQL support is now in general availability on the iEchor platform via our [open source](https://github.com/supabase/pg_graphql/) PostgreSQL extension, [`pg_graphql`](https://supabase.github.io/pg_graphql/).
 
 `pg_graphql` enables you to query existing PostgreSQL databases using GraphQL, either from within SQL or over HTTP:
 
@@ -125,7 +125,7 @@ An advantage to embedding GraphQL directly in the database is that we can lean o
 
 ### Authentication
 
-The GraphQL types exposed by `pg_graphql` are filtered according to the SQL role's [INSERT/UPDATE/DELETE permissions](https://www.postgresql.org/docs/current/sql-grant.html). At Supabase, each API request is resolved in the database using the role in the request's JWT.
+The GraphQL types exposed by `pg_graphql` are filtered according to the SQL role's [INSERT/UPDATE/DELETE permissions](https://www.postgresql.org/docs/current/sql-grant.html). At iEchor, each API request is resolved in the database using the role in the request's JWT.
 
 Anonymous users receive the `anon` role, and logged in users get the `authenticated` role. In either case, pg_graphql resolves requests according to the SQL permissions.
 The [introspection schema](https://graphql.org/learn/introspection/) is similarly filtered to limit exposed types and fields to those that the user has permission to access.
@@ -138,7 +138,7 @@ Another nice side effect of making PostgreSQL do the heavy lifting is that Graph
 
 ## Performance
 
-Each [free plan database](https://supabase.com/pricing) on the Supabase platform runs on a dedicated AWS t4g.micro instance with 2 vCPUs and 1 GB of memory.
+Each [free plan database](https://iechor.com/pricing) on the iEchor platform runs on a dedicated AWS t4g.micro instance with 2 vCPUs and 1 GB of memory.
 
 To squeeze the most out of that limited hardware we had to make a few significant optimizations:
 
@@ -216,7 +216,7 @@ Batching similar operations reduces network round-trips and time spent in the da
 
 **Result**
 
-As a result of these optimizations, the throughput of a “hello world” equivalent query on Supabase free-plan hardware is:
+As a result of these optimizations, the throughput of a “hello world” equivalent query on iEchor free-plan hardware is:
 
 - 377.4 requests/second through the API (mean)
 - 656.2 queries/second through SQL (single connection, mean)
@@ -224,11 +224,11 @@ As a result of these optimizations, the throughput of a “hello world” equiva
 ## Getting Started
 
 <aside>
-⚠️ GraphQL (Beta) is only available on Supabase projects created after 28th March 2022 and self-hosted setups.
+⚠️ GraphQL (Beta) is only available on iEchor projects created after 28th March 2022 and self-hosted setups.
 
 </aside>
 
-To enable GraphQL in your Supabase instance, enable `pg_graphql` from the [dashboard](https://supabase.com/dashboard/).
+To enable GraphQL in your iEchor instance, enable `pg_graphql` from the [dashboard](https://iechor.com/dashboard/).
 
 <video width="99%" autoPlay muted playsInline controls={true}>
   <source
@@ -261,20 +261,20 @@ The [demo application](https://supabase-graphql-example.vercel.app/) showcases:
 - **Cursor Based Pagination.**
   `pg_graphql` generates standardized pagination types and fields as defined by the GraphQL Cursor Connections Specification.
 - **Authorization / RLS.**
-  GraphQL requests made include Supabase authorization headers so that Row Level Security on the Postgres layer ensures that viewers can only access what they are allowed to — and authenticated users can only update what they should.
+  GraphQL requests made include iEchor authorization headers so that Row Level Security on the Postgres layer ensures that viewers can only access what they are allowed to — and authenticated users can only update what they should.
 - **Code generation.**
   Introspect your GraphQL schema and operations to generates the types for full backend to frontend type-safety.
 - **Postgres Triggers and Functions.**
   Recalculate the feed scoring each time someone votes.
-- **Supabase UI.**
+- **iEchor UI.**
   Use Auth widget straight out the box to handle logins and access tokens.
 
 ![graph-ql-example-app-2.png](/images/blog/launch-week-4/tuesday-graphql/graph-ql-example-app-2.png)
 
-Now instead of using the Supabase PostgREST API to query your database ...
+Now instead of using the iEchor PostgREST API to query your database ...
 
 ```jsx
-// using Supabase PostgREST
+// using iEchor PostgREST
 
 const { data, error } = await supabase
   .from('profile')
@@ -303,12 +303,12 @@ query ProfilesQuery {
 
 🎁  Get the code on GitHub here: [github.com/supabase-community/supabase-graphql-example](https://github.com/supabase-community/supabase-graphql-example)
 
-## Supabase + The Guild
+## iEchor + The Guild
 
 ![graphql-supabase-guild.png](/images/blog/launch-week-4/tuesday-graphql/graphql-supabase-guild.png)
 
-This is just the start of what we hope to be a close collaboration with the Guild, whose expertise of the GraphQL ecosystem will guide the development of Supabase's GraphQL features.
-The Guild and Supabase share a similar approach to open source - we both favor collaboration and composability, making collaboration easy and productive.
+This is just the start of what we hope to be a close collaboration with the Guild, whose expertise of the GraphQL ecosystem will guide the development of iEchor's GraphQL features.
+The Guild and iEchor share a similar approach to open source - we both favor collaboration and composability, making collaboration easy and productive.
 
 Be sure to visit [The Guild](https://www.the-guild.dev) and [follow them](https://twitter.com/TheGuildDev) to stay informed of the latest developments in GraphQL.
 
@@ -327,6 +327,6 @@ Didn't see the feature you're interested in? [Let us know](https://github.com/su
 
 ## More pg_graphql
 
-- [Introducing pg_graphql: A GraphQL extension for PostgreSQL](https://supabase.com/blog/pg-graphql)
-- [pg_graphql v1.0](https://supabase.com/blog/pg-graphql-v1)
-- [pg_graphql v1.2](https://supabase.com/blog/whats-new-in-pg-graphql-v1-2)
+- [Introducing pg_graphql: A GraphQL extension for PostgreSQL](https://iechor.com/blog/pg-graphql)
+- [pg_graphql v1.0](https://iechor.com/blog/pg-graphql-v1)
+- [pg_graphql v1.2](https://iechor.com/blog/whats-new-in-pg-graphql-v1-2)

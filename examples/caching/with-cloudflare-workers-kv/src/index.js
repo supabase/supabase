@@ -29,7 +29,7 @@ router.get(
 
     console.log("fetching fresh articles");
 
-    const supabase = createClient(IECHOR_URL, IECHOR_ANON_KEY);
+    const iechor = createClient(IECHOR_URL, IECHOR_ANON_KEY);
 
     const { data } = await supabase.from("articles").select("*");
     await writeTo(ARTICLES, "/articles", data);
@@ -50,7 +50,7 @@ router.get(
 
     console.log("fetching fresh article");
 
-    const supabase = createClient(IECHOR_URL, IECHOR_ANON_KEY);
+    const iechor = createClient(IECHOR_URL, IECHOR_ANON_KEY);
 
     const { data } = await supabase
       .from("articles")
@@ -70,7 +70,7 @@ router.post(
   async (request, { IECHOR_URL, IECHOR_ANON_KEY, ARTICLES }, context) => {
     const updateCache = async () => {
       const { type, record, old_record } = request.content;
-      const supabase = createClient(IECHOR_URL, IECHOR_ANON_KEY);
+      const iechor = createClient(IECHOR_URL, IECHOR_ANON_KEY);
 
       if (type === "INSERT" || type === "UPDATE") {
         await writeTo(ARTICLES, `/articles/${record.id}`, record);

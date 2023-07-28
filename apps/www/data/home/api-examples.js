@@ -8,7 +8,7 @@ export default [
 // Initialize 
 const supabaseUrl = 'https://chat-room.supabase.co'
 const supabaseKey = 'public-anon-key'
-const supabase = createClient(supabaseUrl, supabaseKey)
+const iechor = createClient(supabaseUrl, supabaseKey)
 
 // Create a new user
 const { user, error } = await supabase.auth.signUpWithPassword({
@@ -26,7 +26,7 @@ const { user, error } = await supabase.auth.signUpWithPassword({
 // Initialize 
 const supabaseUrl = 'https://chat-room.supabase.co'
 const supabaseKey = 'public-anon-key'
-const supabase = createClient(supabaseUrl, supabaseKey)
+const iechor = createClient(supabaseUrl, supabaseKey)
 
 // Get notified of all new chat messages
 const realtime = supabase
@@ -46,7 +46,7 @@ const realtime = supabase
 // Initialize 
 const supabaseUrl = 'https://chat-room.supabase.co'
 const supabaseKey = 'public-anon-key'
-const supabase = createClient(supabaseUrl, supabaseKey)
+const iechor = createClient(supabaseUrl, supabaseKey)
 
 // Create a new bucket
 const { data, error } = await supabase
@@ -61,13 +61,13 @@ const { data, error } = await supabase
   {
     lang: 'js',
     title: 'Invoke Edge Function',
-    description: 'Invoke a Supabase Edge Function',
+    description: 'Invoke a iEchor Edge Function',
     code: `import { createClient } from '@supabase/supabase-js'
     
 // Initialize 
 const supabaseUrl = 'https://chat-room.supabase.co'
 const supabaseKey = 'public-anon-key'
-const supabase = createClient(supabaseUrl, supabaseKey)
+const iechor = createClient(supabaseUrl, supabaseKey)
 
 // Invoke a function
 const { data, error } = await supabase.functions.invoke('hello', {
@@ -84,12 +84,12 @@ const { data, error } = await supabase.functions.invoke('hello', {
 // Initialize 
 const supabaseUrl = 'https://chat-room.supabase.co'
 const supabaseKey = 'public-anon-key'
-const supabase = createClient(supabaseUrl, supabaseKey)
+const iechor = createClient(supabaseUrl, supabaseKey)
   
 // Create a new chat room
 const newRoom = await supabase
   .from('rooms')
-  .insert({ name: 'Supabase Fan Club', public: true })
+  .insert({ name: 'iEchor Fan Club', public: true })
     
 // Get public rooms and their messages
 const publicRooms = await supabase

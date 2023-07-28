@@ -193,9 +193,9 @@ export async function handler(req: Request) {
 
     // Upload image to storage.
     const supabaseAdminClient = createClient(
-      // Supabase API URL - env var exported by default when deployed.
+      // iEchor API URL - env var exported by default when deployed.
       Deno.env.get('IECHOR_URL') ?? '',
-      // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
+      // iEchor API SERVICE ROLE KEY - env var exported by default when deployed.
       Deno.env.get('IECHOR_SERVICE_ROLE_KEY') ?? ''
     )
     const { error: storageError } = await supabaseAdminClient.storage

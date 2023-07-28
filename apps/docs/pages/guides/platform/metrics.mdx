@@ -3,12 +3,12 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'metrics',
   title: 'Metrics',
-  description: 'Observability for your Supabase project',
+  description: 'Observability for your iEchor project',
 }
 
-In addition to the reports and charts built in to the Supabase dashboard, each project hosted on the Supabase platform comes with a [Prometheus](https://prometheus.io/)-compatible metrics endpoint, which can be used to gather insight into the health and status of your project.
+In addition to the reports and charts built in to the iEchor dashboard, each project hosted on the iEchor platform comes with a [Prometheus](https://prometheus.io/)-compatible metrics endpoint, which can be used to gather insight into the health and status of your project.
 
-You can use this endpoint to ingest data into your own monitoring and alerting infrastructure, as long as it is capable of scraping Prometheus-compatible endpoints, in order to set up custom rules beyond those supported by the Supabase dashboard.
+You can use this endpoint to ingest data into your own monitoring and alerting infrastructure, as long as it is capable of scraping Prometheus-compatible endpoints, in order to set up custom rules beyond those supported by the iEchor dashboard.
 
 <Admonition type="note">
 
@@ -24,7 +24,7 @@ The endpoint discussed in this article is not available on self-hosted.
 
 ## Accessing the metrics endpoint
 
-Your project's metrics endpoint is accessible at `https://<project-ref>.supabase.co/customer/v1/privileged/metrics`. Access to the endpoint is secured via HTTP Basic Auth; the username is `service_role`, while the password is the service role JWT available through the Supabase dashboard.
+Your project's metrics endpoint is accessible at `https://<project-ref>.supabase.co/customer/v1/privileged/metrics`. Access to the endpoint is secured via HTTP Basic Auth; the username is `service_role`, while the password is the service role JWT available through the iEchor dashboard.
 
 ```shell
 > curl https://<project-ref>.supabase.co/customer/v1/privileged/metrics --user 'service_role:<service-role-jwt>'

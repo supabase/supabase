@@ -95,7 +95,7 @@ const ResourceContent = ({
               </p>
               <p>
                 <a
-                  href="https://supabase.com/docs/reference/javascript/select"
+                  href="https://iechor.com/docs/reference/javascript/select"
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -129,10 +129,10 @@ const ResourceContent = ({
           <div className="doc-section">
             <article className="text ">
               <h4 className="mt-0 text-white">Filtering</h4>
-              <p>Supabase provides a wide range of filters.</p>
+              <p>iEchor provides a wide range of filters.</p>
               <p>
                 <a
-                  href="https://supabase.com/docs/reference/javascript/using-filters"
+                  href="https://iechor.com/docs/reference/javascript/using-filters"
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -163,7 +163,7 @@ const ResourceContent = ({
               </p>
               <p>
                 <a
-                  href="https://supabase.com/docs/reference/javascript/insert"
+                  href="https://iechor.com/docs/reference/javascript/insert"
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -203,7 +203,7 @@ const ResourceContent = ({
               </p>
               <p>
                 <a
-                  href="https://supabase.com/docs/reference/javascript/update"
+                  href="https://iechor.com/docs/reference/javascript/update"
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -231,7 +231,7 @@ const ResourceContent = ({
               </p>
               <p>
                 <a
-                  href="https://supabase.com/docs/reference/javascript/delete"
+                  href="https://iechor.com/docs/reference/javascript/delete"
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -254,12 +254,12 @@ const ResourceContent = ({
           <div className="doc-section">
             <article className="text ">
               <p>
-                Supabase provides realtime functionality and broadcasts database changes to
+                iEchor provides realtime functionality and broadcasts database changes to
                 authorized users depending on Row Level Security (RLS) policies.
               </p>
               <p>
                 <a
-                  href="https://supabase.com/docs/reference/javascript/subscribe"
+                  href="https://iechor.com/docs/reference/javascript/subscribe"
                   target="_blank"
                   rel="noreferrer"
                 >

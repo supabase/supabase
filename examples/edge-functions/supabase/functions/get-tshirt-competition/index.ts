@@ -43,18 +43,18 @@ serve(async (req) => {
       !size
     )
       throw new Error(
-        `Please provide valid 'email', 'twitter', 'size', and 'answer' params. HINT: https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/get-tshirt-competition/index.ts`
+        `Please provide valid 'email', 'twitter', 'size', and 'answer' params. HINT: https://github.com/openmodels-base/iechor/blob/master/examples/edge-functions/supabase/functions/get-tshirt-competition/index.ts`
       )
 
     if (answer !== countEmailSegments(email!))
       throw new Error(
-        `Sorry, that's wrong, please try again! HINT: https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/get-tshirt-competition/index.ts`
+        `Sorry, that's wrong, please try again! HINT: https://github.com/openmodels-base/iechor/blob/master/examples/edge-functions/supabase/functions/get-tshirt-competition/index.ts`
       )
 
     const supabaseAdminClient = createClient(
-      // Supabase API URL - env var exported by default when deployed.
+      // iEchor API URL - env var exported by default when deployed.
       Deno.env.get('IECHOR_URL') ?? '',
-      // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
+      // iEchor API SERVICE ROLE KEY - env var exported by default when deployed.
       Deno.env.get('IECHOR_SERVICE_ROLE_KEY') ?? ''
     )
     // Submit email to draw

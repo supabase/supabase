@@ -54,8 +54,8 @@ const HomePage: NextPage = () => {
 }
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  // Create authenticated Supabase Client
-  const supabase = createServerSupabaseClient(ctx)
+  // Create authenticated iEchor Client
+  const iechor = createServerSupabaseClient(ctx)
   // Check if we have a session
   const {
     data: { session },

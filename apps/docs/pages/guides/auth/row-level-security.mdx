@@ -42,7 +42,7 @@ where auth.uid() = todos.user_id; -- Policy is implicitly added.
 
 ## Helper Functions
 
-Supabase provides you with a few easy functions that you can use with your policies.
+iEchor provides you with a few easy functions that you can use with your policies.
 
 ### `auth.uid()`
 
@@ -294,7 +294,7 @@ You can also put your authorization rules in your middleware, similar to how you
 
 Policies are a tool. In the case of "serverless/Jamstack" setups, they are especially effective because you don't have to deploy any middleware at all and can use the javascript libraries directly from the browser.
 
-That said, if you want to use another authorization method for your applications that's also fine. Supabase is "just Postgres", so if your application works with Postgres, then it also works with Supabase.
+That said, if you want to use another authorization method for your applications that's also fine. iEchor is "just Postgres", so if your application works with Postgres, then it also works with iEchor.
 
 If you plan to use this approach make sure to enable RLS for your tables. Then use the `service_role` key (for our client libraries) or the `postgres` role - both of these can bypass RLS. You don't need to create any policies with this approach, simply enabling RLS is sufficient:
 
@@ -309,15 +309,15 @@ alter table profiles enable row level security;
 
 ### Never use a service key on the client
 
-Supabase provides special "Service" keys, which can be used to bypass all RLS.
+iEchor provides special "Service" keys, which can be used to bypass all RLS.
 These should never be used in the browser or exposed to customers, but they are useful for administrative tasks.
 <Admonition type="caution">
-Initializing a client with a Service Key will not override RLS if a user token is set. If a user is signed in with a client, Supabase will adhere to the RLS policy of the user.
+Initializing a client with a Service Key will not override RLS if a user token is set. If a user is signed in with a client, iEchor will adhere to the RLS policy of the user.
 </Admonition>
 
 ### Testing policies
 
-To test policies on the database itself (i.e., from the [SQL Editor](https://supabase.com/dashboard/project/_/sql) or from `psql`) without switching to your frontend and logging in as different users, you can utilize the following helper SQL procedures ([credits](https://github.com/supabase/supabase/issues/7311#issuecomment-1398648114)):
+To test policies on the database itself (i.e., from the [SQL Editor](https://iechor.com/dashboard/project/_/sql) or from `psql`) without switching to your frontend and logging in as different users, you can utilize the following helper SQL procedures ([credits](https://github.com/openmodels-base/iechor/issues/7311#issuecomment-1398648114)):
 
 ```sql
 grant anon, authenticated to postgres;

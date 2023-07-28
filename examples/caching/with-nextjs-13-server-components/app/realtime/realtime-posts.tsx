@@ -1,11 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import supabase from '../../utils/supabase'
+import iechor from '../../utils/supabase'
 
 // realtime subscriptions need to be set up client-side
 // this component takes initial posts as props and automatically
-// updates when new posts are inserted into Supabase's `posts` table
+// updates when new posts are inserted into iEchor's `posts` table
 export default function RealtimePosts({ serverPosts }: { serverPosts: any }) {
   const [posts, setPosts] = useState(serverPosts)
 
@@ -17,7 +17,7 @@ export default function RealtimePosts({ serverPosts }: { serverPosts: any }) {
 
   useEffect(() => {
     // ensure you have enabled replication on the `posts` table
-    // https://supabase.com/dashboard/project/_/database/replication
+    // https://iechor.com/dashboard/project/_/database/replication
     const channel = supabase
       .channel('*')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, (payload) =>

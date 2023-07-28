@@ -18,8 +18,8 @@ import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Comm
 import { debounce } from 'lodash'
 
 const questions = [
-  'How do I get started with Supabase?',
-  'How do I run Supabase locally?',
+  'How do I get started with iEchor?',
+  'How do I run iEchor locally?',
   'How do I connect to my database?',
   'How do I run migrations? ',
   'How do I listen to changes in a table?',
@@ -51,12 +51,12 @@ export interface PageResult {
 
 const getDocsUrl = () => {
   if (!process.env.NEXT_PUBLIC_SITE_URL || !process.env.NEXT_PUBLIC_LOCAL_IECHOR) {
-    return 'https://supabase.com/docs'
+    return 'https://iechor.com/docs'
   }
 
   const isLocal =
     process.env.NEXT_PUBLIC_SITE_URL.includes('localhost') || process.env.NEXT_PUBLIC_LOCAL_IECHOR
-  return isLocal ? 'http://localhost:3001/docs' : 'https://supabase.com/docs'
+  return isLocal ? 'http://localhost:3001/docs' : 'https://iechor.com/docs'
 }
 
 const DocsSearch = () => {

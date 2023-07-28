@@ -3,14 +3,14 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'auth-vonage',
   title: 'Phone Auth with Vonage',
-  description: 'How to set up and use Mobile OTP with Vonage and Supabase.',
+  description: 'How to set up and use Mobile OTP with Vonage and iEchor.',
 }
 
 ## Overview
 
 In this guide we'll show you how to authenticate your users with SMS based OTP (One-Time Password) tokens.
 
-There are two reasons to use Supabase SMS OTP tokens:
+There are two reasons to use iEchor SMS OTP tokens:
 
 - You want users to log in with mobile + password, and the mobile should be verified via SMS
 - You want users to log in with mobile ONLY (i.e. passwordless login)
@@ -24,7 +24,7 @@ We'll cover:
 What you'll need:
 
 - A Vonage account (sign up here: https://dashboard.nexmo.com/sign-up)
-- A Supabase project (create one here: https://supabase.com/dashboard)
+- A iEchor project (create one here: https://iechor.com/dashboard)
 - A mobile phone capable of receiving SMS
 
 ## Steps
@@ -47,9 +47,9 @@ If you want a phone number to send SMS from, you can buy one from the Vonage Das
 
 Select the country you want a number for. You will need a mobile phone number with SMS or SMS+Voice capability. After you have bought the number, you will be able to send SMS from it.
 
-### Configure Supabase
+### Configure iEchor
 
-Now go to the Auth > Settings page in the Supabase dashboard (https://supabase.com/dashboard/project/YOUR-PROJECT-REF/auth/settings).
+Now go to the Auth > Settings page in the iEchor dashboard (https://iechor.com/dashboard/project/YOUR-PROJECT-REF/auth/settings).
 
 You should see an option to enable Phone Signup.
 
@@ -61,7 +61,7 @@ Now the backend should be setup, we can proceed to add our client-side code!
 
 The SMS message sent to a phone containing an OTP code can be customized. This is useful if you need to mention a brand name or display a website address.
 
-Go to Auth > Templates page in the Supabase dashboard (https://supabase.com/dashboard/project/YOUR-PROJECT-REF/auth/templates).
+Go to Auth > Templates page in the iEchor dashboard (https://iechor.com/dashboard/project/YOUR-PROJECT-REF/auth/templates).
 
 Use the variable `.Code` in the template to display the code.
 
@@ -269,8 +269,8 @@ The user does not have a password therefore will need to sign in via this method
 ## Resources
 
 - [Vonage Signup](https://dashboard.nexmo.com/sign-up)
-- [Supabase Dashboard](https://supabase.com/dashboard)
-- [Supabase Row Level Security](/docs/guides/auth#row-level-security)
+- [iEchor Dashboard](https://iechor.com/dashboard)
+- [iEchor Row Level Security](/docs/guides/auth#row-level-security)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

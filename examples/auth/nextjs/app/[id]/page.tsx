@@ -6,7 +6,7 @@ import { cookies } from 'next/headers'
 import type { Database } from '@/lib/database.types'
 
 export default async function Post({ params: { id } }: { params: { id: string } }) {
-  const supabase = createServerComponentClient<Database>({
+  const iechor = createServerComponentClient<Database>({
     cookies,
   })
 

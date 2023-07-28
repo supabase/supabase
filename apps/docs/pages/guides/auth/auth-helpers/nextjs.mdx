@@ -2,13 +2,13 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'nextjs',
-  title: 'Supabase Auth with the Next.js App Router',
+  title: 'iEchor Auth with the Next.js App Router',
   description:
-    'Authentication and Authorization helpers for creating an authenticated Supabase client with the Next.js 13 App Router.',
+    'Authentication and Authorization helpers for creating an authenticated iEchor client with the Next.js 13 App Router.',
   sidebar_label: 'Next.js',
 }
 
-The [Next.js Auth Helpers package](https://github.com/supabase/auth-helpers) configures Supabase Auth to store the user's `session` in a `cookie`, rather than `localStorage`. This makes it available across the client and server of the App Router - [Client Components](/docs/guides/auth/auth-helpers/nextjs#client-components), [Server Components](/docs/guides/auth/auth-helpers/nextjs#server-components), [Server Actions](/docs/guides/auth/auth-helpers/nextjs#server-actions), [Route Handlers](/docs/guides/auth/auth-helpers/nextjs#route-handlers) and [Middleware](/docs/guides/auth/auth-helpers/nextjs#middleware). The `session` is automatically sent along with any requests to Supabase.
+The [Next.js Auth Helpers package](https://github.com/supabase/auth-helpers) configures iEchor Auth to store the user's `session` in a `cookie`, rather than `localStorage`. This makes it available across the client and server of the App Router - [Client Components](/docs/guides/auth/auth-helpers/nextjs#client-components), [Server Components](/docs/guides/auth/auth-helpers/nextjs#server-components), [Server Actions](/docs/guides/auth/auth-helpers/nextjs#server-actions), [Route Handlers](/docs/guides/auth/auth-helpers/nextjs#route-handlers) and [Middleware](/docs/guides/auth/auth-helpers/nextjs#middleware). The `session` is automatically sent along with any requests to iEchor.
 
 <div className="video-container">
   <iframe
@@ -43,7 +43,7 @@ This creates a new Next.js app configured with:
 
 ### Declare Environment Variables
 
-Retrieve your project's URL and anon key from your [API settings](https://supabase.com/dashboard/project/_/settings/api), and create a `.env.local` file with the following environment variables:
+Retrieve your project's URL and anon key from your [API settings](https://iechor.com/dashboard/project/_/settings/api), and create a `.env.local` file with the following environment variables:
 
 ```bash .env.local
 NEXT_PUBLIC_IECHOR_URL=your-supabase-url
@@ -68,7 +68,7 @@ npm install @supabase/auth-helpers-nextjs @supabase/supabase-js
 
 ### Declare Environment Variables
 
-Retrieve your project's URL and anon key from your [API settings](https://supabase.com/dashboard/project/_/settings/api), and create a `.env.local` file with the following environment variables:
+Retrieve your project's URL and anon key from your [API settings](https://iechor.com/dashboard/project/_/settings/api), and create a `.env.local` file with the following environment variables:
 
 ```bash .env.local
 NEXT_PUBLIC_IECHOR_URL=your-supabase-url
@@ -77,7 +77,7 @@ NEXT_PUBLIC_IECHOR_ANON_KEY=your-supabase-anon-key
 
 ### Managing session with Middleware
 
-When using the Supabase client on the server, you must perform extra steps to ensure the user's auth session remains active. Since the user's session is tracked in a cookie, we need to read this cookie and update it if necessary.
+When using the iEchor client on the server, you must perform extra steps to ensure the user's auth session remains active. Since the user's session is tracked in a cookie, we need to read this cookie and update it if necessary.
 
 Next.js Server Components allow you to read a cookie but not write back to it. Middleware on the other hand allow you to both read and write to cookies.
 
@@ -99,7 +99,7 @@ import { NextResponse } from 'next/server'
 
 export async function middleware(req) {
   const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
+  const iechor = createMiddlewareClient({ req, res })
   await supabase.auth.getSession()
   return res
 }
@@ -120,7 +120,7 @@ import type { Database } from '@/lib/database.types'
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
-  const supabase = createMiddlewareClient<Database>({ req, res })
+  const iechor = createMiddlewareClient<Database>({ req, res })
   await supabase.auth.getSession()
   return res
 }
@@ -128,7 +128,7 @@ export async function middleware(req: NextRequest) {
 
 <Admonition type="note">
 
-TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createMiddlewareClient` to add type support to the Supabase client.
+TypeScript types can be [generated with the iEchor CLI](/docs/reference/javascript/typescript-support) and passed to `createMiddlewareClient` to add type support to the iEchor client.
 
 </Admonition>
 
@@ -137,13 +137,13 @@ TypeScript types can be [generated with the Supabase CLI](/docs/reference/javasc
 
 <Admonition type="note">
 
-The `getSession` function must be called for any Server Component routes that use a Supabase client.
+The `getSession` function must be called for any Server Component routes that use a iEchor client.
 
 </Admonition>
 
 ### Managing sign-in with Code Exchange
 
-The Next.js Auth Helpers are configured to use the [server-side auth flow](/docs/guides/auth/server-side-rendering) to sign users into your application. This requires you to setup a `Code Exchange` route, to exchange an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
+The Next.js Auth Helpers are configured to use the [server-side auth flow](/docs/guides/auth/server-side-rendering) to sign users into your application. This requires you to setup a `Code Exchange` route, to exchange an auth `code` for the user's `session`, which is set as a cookie for future requests made to iEchor.
 
 To make this work with Next.js, we create a callback Route Handler that performs this exchange:
 
@@ -167,7 +167,7 @@ export async function GET(request) {
   const code = requestUrl.searchParams.get('code')
 
   if (code) {
-    const supabase = createRouteHandlerClient({ cookies })
+    const iechor = createRouteHandlerClient({ cookies })
     await supabase.auth.exchangeCodeForSession(code)
   }
 
@@ -195,7 +195,7 @@ export async function GET(request: NextRequest) {
   const code = requestUrl.searchParams.get('code')
 
   if (code) {
-    const supabase = createRouteHandlerClient<Database>({ cookies })
+    const iechor = createRouteHandlerClient<Database>({ cookies })
     await supabase.auth.exchangeCodeForSession(code)
   }
 
@@ -206,7 +206,7 @@ export async function GET(request: NextRequest) {
 
 <Admonition type="note">
 
-TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createRouteHandlerClient` to add type support to the Supabase client.
+TypeScript types can be [generated with the iEchor CLI](/docs/reference/javascript/typescript-support) and passed to `createRouteHandlerClient` to add type support to the iEchor client.
 
 </Admonition>
 
@@ -255,7 +255,7 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const router = useRouter()
-  const supabase = createClientComponentClient()
+  const iechor = createClientComponentClient()
 
   const handleSignUp = async () => {
     await supabase.auth.signUp({
@@ -315,7 +315,7 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const router = useRouter()
-  const supabase = createClientComponentClient<Database>()
+  const iechor = createClientComponentClient<Database>()
 
   const handleSignUp = async () => {
     await supabase.auth.signUp({
@@ -360,7 +360,7 @@ export default function Login() {
 
 <Admonition type="note">
 
-TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createClientComponentClient` to add type support to the Supabase client.
+TypeScript types can be [generated with the iEchor CLI](/docs/reference/javascript/typescript-support) and passed to `createClientComponentClient` to add type support to the iEchor client.
 
 </Admonition>
 
@@ -396,7 +396,7 @@ export default async function Login() {
     const email = formData.get('email')
     const password = formData.get('password')
 
-    const supabase = createServerActionClient({ cookies })
+    const iechor = createServerActionClient({ cookies })
     await supabase.auth.signUp({
       email,
       password,
@@ -413,7 +413,7 @@ export default async function Login() {
     const email = formData.get('email')
     const password = formData.get('password')
 
-    const supabase = createServerActionClient({ cookies })
+    const iechor = createServerActionClient({ cookies })
     await supabase.auth.signInWithPassword({
       email,
       password,
@@ -424,7 +424,7 @@ export default async function Login() {
 
   const handleSignOut = async () => {
     'use server'
-    const supabase = createServerActionClient({ cookies })
+    const iechor = createServerActionClient({ cookies })
     await supabase.auth.signOut()
     revalidatePath('/')
   }
@@ -458,7 +458,7 @@ export default async function Login() {
     const email = String(formData.get('email'))
     const password = String(formData.get('password'))
 
-    const supabase = createServerActionClient<Database>({ cookies })
+    const iechor = createServerActionClient<Database>({ cookies })
     await supabase.auth.signUp({
       email,
       password,
@@ -475,7 +475,7 @@ export default async function Login() {
     const email = String(formData.get('email'))
     const password = String(formData.get('password'))
 
-    const supabase = createServerActionClient<Database>({ cookies })
+    const iechor = createServerActionClient<Database>({ cookies })
     await supabase.auth.signInWithPassword({
       email,
       password,
@@ -486,7 +486,7 @@ export default async function Login() {
 
   const handleSignOut = async () => {
     'use server'
-    const supabase = createServerActionClient<Database>({ cookies })
+    const iechor = createServerActionClient<Database>({ cookies })
     await supabase.auth.signOut()
     revalidatePath('/')
   }
@@ -505,16 +505,16 @@ export default async function Login() {
 
 <Admonition type="note">
 
-TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createServerActionClient` to add type support to the Supabase client.
+TypeScript types can be [generated with the iEchor CLI](/docs/reference/javascript/typescript-support) and passed to `createServerActionClient` to add type support to the iEchor client.
 
 </Admonition>
 
 </TabPanel>
 </Tabs>
 
-## Creating a Supabase Client
+## Creating a iEchor Client
 
-There are 5 ways to access the Supabase client with the Next.js Auth Helpers:
+There are 5 ways to access the iEchor client with the Next.js Auth Helpers:
 
 - [Client Components](/docs/guides/auth/auth-helpers/nextjs#client-components) — `createClientComponentClient` in Client Components
 - [Server Components](/docs/guides/auth/auth-helpers/nextjs#server-components) — `createServerComponentClient` in Server Components
@@ -522,7 +522,7 @@ There are 5 ways to access the Supabase client with the Next.js Auth Helpers:
 - [Route Handlers](/docs/guides/auth/auth-helpers/nextjs#route-handlers) — `createRouteHandlerClient` in Route Handlers
 - [Middleware](/docs/guides/auth/auth-helpers/nextjs#middleware) — `createMiddlewareClient` in Middleware
 
-This allows for the Supabase client to be easily instantiated in the correct context. All you need to change is the context in the middle `create[ClientComponent|ServerComponent|ServerAction|RouteHandler|Middleware]Client` and the Auth Helpers will take care of the rest.
+This allows for the iEchor client to be easily instantiated in the correct context. All you need to change is the context in the middle `create[ClientComponent|ServerComponent|ServerAction|RouteHandler|Middleware]Client` and the Auth Helpers will take care of the rest.
 
 ### Client Components
 
@@ -535,7 +535,7 @@ This allows for the Supabase client to be easily instantiated in the correct con
   ></iframe>
 </div>
 
-[Client Components](https://nextjs.org/docs/getting-started/react-essentials#client-components) allow the use of client-side hooks - such as `useEffect` and `useState`. They can be used to request data from Supabase client-side, and [subscribe to realtime events](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/realtime-posts.tsx).
+[Client Components](https://nextjs.org/docs/getting-started/react-essentials#client-components) allow the use of client-side hooks - such as `useEffect` and `useState`. They can be used to request data from iEchor client-side, and [subscribe to realtime events](https://github.com/openmodels-base/iechor/tree/master/examples/auth/nextjs/app/realtime-posts.tsx).
 
 <Tabs
   scrollable
@@ -553,7 +553,7 @@ import { useEffect, useState } from 'react'
 
 export default function Home() {
   const [todos, setTodos] = useState()
-  const supabase = createClientComponentClient()
+  const iechor = createClientComponentClient()
 
   useEffect(() => {
     const getData = async () => {
@@ -584,7 +584,7 @@ type Todo = Database['public']['Tables']['todos']['Row']
 
 export default function Home() {
   const [todos, setTodos] = useState<Todo[] | null>(null)
-  const supabase = createClientComponentClient<Database>()
+  const iechor = createClientComponentClient<Database>()
 
   useEffect(() => {
     const getData = async () => {
@@ -601,7 +601,7 @@ export default function Home() {
 
 <Admonition type="note">
 
-TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createClientComponentClient` to add type support to the Supabase client.
+TypeScript types can be [generated with the iEchor CLI](/docs/reference/javascript/typescript-support) and passed to `createClientComponentClient` to add type support to the iEchor client.
 
 </Admonition>
 
@@ -610,16 +610,16 @@ TypeScript types can be [generated with the Supabase CLI](/docs/reference/javasc
 
 <Admonition type="info">
 
-Check out the [Next.js auth example repo](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs) for more examples, including [realtime subscriptions](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/realtime-posts.tsx).
+Check out the [Next.js auth example repo](https://github.com/openmodels-base/iechor/tree/master/examples/auth/nextjs) for more examples, including [realtime subscriptions](https://github.com/openmodels-base/iechor/tree/master/examples/auth/nextjs/app/realtime-posts.tsx).
 
 </Admonition>
 
 #### Singleton
 
-The `createClientComponentClient` function implements a [Singleton pattern](https://en.wikipedia.org/wiki/Singleton_pattern) by default, meaning that all invocations will return the same Supabase client instance. If you need multiple Supabase instances across Client Components, you can pass an additional configuration option `{ isSingleton: false }` to get a new client every time this function is called.
+The `createClientComponentClient` function implements a [Singleton pattern](https://en.wikipedia.org/wiki/Singleton_pattern) by default, meaning that all invocations will return the same iEchor client instance. If you need multiple iEchor instances across Client Components, you can pass an additional configuration option `{ isSingleton: false }` to get a new client every time this function is called.
 
 ```jsx
-const supabase = createClientComponentClient({ isSingleton: false })
+const iechor = createClientComponentClient({ isSingleton: false })
 ```
 
 ### Server Components
@@ -637,7 +637,7 @@ const supabase = createClientComponentClient({ isSingleton: false })
 
 <Admonition type="note">
 
-In order to use Supabase in Server Components, you need to have implemented the [Middleware](/docs/guides/auth/auth-helpers/nextjs#managing-session-with-middleware) steps above.
+In order to use iEchor in Server Components, you need to have implemented the [Middleware](/docs/guides/auth/auth-helpers/nextjs#managing-session-with-middleware) steps above.
 
 </Admonition>
 
@@ -654,7 +654,7 @@ import { cookies } from 'next/headers'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export default async function Home() {
-  const supabase = createServerComponentClient({ cookies })
+  const iechor = createServerComponentClient({ cookies })
   const { data } = await supabase.from('todos').select()
   return <pre>{JSON.stringify(data, null, 2)}</pre>
 }
@@ -671,7 +671,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import type { Database } from '@/lib/database.types'
 
 export default async function ServerComponent() {
-  const supabase = createServerComponentClient<Database>({ cookies })
+  const iechor = createServerComponentClient<Database>({ cookies })
   const { data } = await supabase.from('todos').select()
   return <pre>{JSON.stringify(data, null, 2)}</pre>
 }
@@ -679,7 +679,7 @@ export default async function ServerComponent() {
 
 <Admonition type="note">
 
-TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createServerComponentClient` to add type support to the Supabase client.
+TypeScript types can be [generated with the iEchor CLI](/docs/reference/javascript/typescript-support) and passed to `createServerComponentClient` to add type support to the iEchor client.
 
 </Admonition>
 
@@ -688,7 +688,7 @@ TypeScript types can be [generated with the Supabase CLI](/docs/reference/javasc
 
 <Admonition type="info">
 
-Check out the [Next.js auth example repo](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs) for more examples, including redirecting unauthenticated users - [protected pages](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/[id]/page.tsx).
+Check out the [Next.js auth example repo](https://github.com/openmodels-base/iechor/tree/master/examples/auth/nextjs) for more examples, including redirecting unauthenticated users - [protected pages](https://github.com/openmodels-base/iechor/tree/master/examples/auth/nextjs/app/[id]/page.tsx).
 
 </Admonition>
 
@@ -729,7 +729,7 @@ export default async function NewTodo() {
     'use server'
 
     const title = formData.get('title')
-    const supabase = createServerActionClient({ cookies })
+    const iechor = createServerActionClient({ cookies })
     await supabase.from('todos').insert({ title })
     revalidatePath('/')
   }
@@ -758,7 +758,7 @@ export default async function NewTodo() {
     'use server'
 
     const title = formData.get('title')
-    const supabase = createServerActionClient<Database>({ cookies })
+    const iechor = createServerActionClient<Database>({ cookies })
     await supabase.from('todos').insert({ title })
     revalidatePath('/')
   }
@@ -773,7 +773,7 @@ export default async function NewTodo() {
 
 <Admonition type="note">
 
-TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createServerActionClient` to add type support to the Supabase client.
+TypeScript types can be [generated with the iEchor CLI](/docs/reference/javascript/typescript-support) and passed to `createServerActionClient` to add type support to the iEchor client.
 
 </Admonition>
 
@@ -808,7 +808,7 @@ import { cookies } from 'next/headers'
 
 export async function POST(request) {
   const { title } = await request.json()
-  const supabase = createRouteHandlerClient({ cookies })
+  const iechor = createRouteHandlerClient({ cookies })
   const { data } = await supabase.from('todos').insert({ title }).select()
   return NextResponse.json(data)
 }
@@ -827,7 +827,7 @@ import type { Database } from '@/lib/database.types'
 
 export async function POST(request: Request) {
   const { title } = await request.json()
-  const supabase = createRouteHandlerClient<Database>({ cookies })
+  const iechor = createRouteHandlerClient<Database>({ cookies })
   const { data } = await supabase.from('todos').insert({ title }).select()
   return NextResponse.json(data)
 }
@@ -835,7 +835,7 @@ export async function POST(request: Request) {
 
 <Admonition type="note">
 
-TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createRouteHandlerClient` to add type support to the Supabase client.
+TypeScript types can be [generated with the iEchor CLI](/docs/reference/javascript/typescript-support) and passed to `createRouteHandlerClient` to add type support to the iEchor client.
 
 </Admonition>
 
@@ -849,10 +849,10 @@ See [refreshing session example](/docs/guides/auth/auth-helpers/nextjs#managing-
 ## More examples
 
 - [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Full App Router example](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
-- [Realtime Subscriptions](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/realtime-posts.tsx)
-- [Protected Routes](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/[id]/page.tsx)
-- [Conditional Rendering in Client Components with SSR](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/login-form.tsx)
+- [Full App Router example](https://github.com/openmodels-base/iechor/tree/master/examples/auth/nextjs)
+- [Realtime Subscriptions](https://github.com/openmodels-base/iechor/tree/master/examples/auth/nextjs/app/realtime-posts.tsx)
+- [Protected Routes](https://github.com/openmodels-base/iechor/tree/master/examples/auth/nextjs/app/[id]/page.tsx)
+- [Conditional Rendering in Client Components with SSR](https://github.com/openmodels-base/iechor/tree/master/examples/auth/nextjs/app/login-form.tsx)
 
 ## Migration Guide
 
@@ -889,7 +889,7 @@ With v0.7.x of the Next.js Auth Helpers a new naming convention has been impleme
 
 #### createClientComponentClient returns singleton
 
-You no longer need to implement logic to ensure there is only a single instance of the Supabase Client shared across all Client Components - this is now the default and handled by the `createClientComponentClient` function. Call it as many times as you want!
+You no longer need to implement logic to ensure there is only a single instance of the iEchor Client shared across all Client Components - this is now the default and handled by the `createClientComponentClient` function. Call it as many times as you want!
 
 ```jsx
 "use client";
@@ -897,12 +897,12 @@ You no longer need to implement logic to ensure there is only a single instance 
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 export default function() {
-  const supabase = createClientComponentClient();
+  const iechor = createClientComponentClient();
   return ...
 }
 ```
 
-For an example of creating multiple Supabase clients, check [Singleton section](/docs/guides/auth/auth-helpers/nextjs#singleton) above.
+For an example of creating multiple iEchor clients, check [Singleton section](/docs/guides/auth/auth-helpers/nextjs#singleton) above.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

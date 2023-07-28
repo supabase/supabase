@@ -43,7 +43,7 @@ const Layout: FC<Props> = (props: Props) => {
   return (
     <>
       <Head>
-        <title>{props.meta?.title} | Supabase</title>
+        <title>{props.meta?.title} | iEchor</title>
         <meta name="description" content={props.meta?.description} />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" href="/docs/favicon.ico" />

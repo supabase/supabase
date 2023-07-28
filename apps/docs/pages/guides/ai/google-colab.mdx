@@ -3,8 +3,8 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'ai-google-colab',
   title: 'Google Colab',
-  description: 'Use Google Colab to manage your Supabase Vector store.',
-  subtitle: 'Use Google Colab to manage your Supabase Vector store.',
+  description: 'Use Google Colab to manage your iEchor Vector store.',
+  subtitle: 'Use Google Colab to manage your iEchor Vector store.',
   sidebar_label: 'Google Colab',
 }
 
@@ -15,9 +15,9 @@ export const meta = {
   <img src="/docs/img/ai/colab-badge.svg" />
 </a>
 
-Google Colab is a hosted Jupyter Notebook service. It provides free access to computing resources, including GPUs and TPUs, and is well-suited to machine learning, data science, and education. We can use Colab to manage collections using [Supabase Vecs](/docs/guides/ai/vecs-python-client).
+Google Colab is a hosted Jupyter Notebook service. It provides free access to computing resources, including GPUs and TPUs, and is well-suited to machine learning, data science, and education. We can use Colab to manage collections using [iEchor Vecs](/docs/guides/ai/vecs-python-client).
 
-In this tutorial we'll connect to a database running on the Supabase [platform](https://supabase.com/dashboard/). If you don't already have a database, you can create one here: [database.new](https://database.new).
+In this tutorial we'll connect to a database running on the iEchor [platform](https://iechor.com/dashboard/). If you don't already have a database, you can create one here: [database.new](https://database.new).
 
 ## Create a new notebook
 
@@ -27,7 +27,7 @@ Start by visiting [colab.research.google.com](https://colab.research.google.com/
 
 ## Install Vecs
 
-We'll use the Supabase Vector client, [Vecs](/docs/guides/ai/vecs-python-client), to manage our collections.
+We'll use the iEchor Vector client, [Vecs](/docs/guides/ai/vecs-python-client), to manage our collections.
 
 At the top of the notebook add the notebook paste the following code and hit the "execute" button (`ctrl+enter`):
 
@@ -39,7 +39,7 @@ pip install vecs
 
 ## Connect to your database
 
-Find the Postgres connection string for your Supabase project in the [database settings](https://supabase.com/dashboard/_/settings/database) of the dashboard. Copy the "URI" format, which should look something like `postgresql:/postgres:<password>@<host>:5432/postgres`
+Find the Postgres connection string for your iEchor project in the [database settings](https://iechor.com/dashboard/_/settings/database) of the dashboard. Copy the "URI" format, which should look something like `postgresql:/postgres:<password>@<host>:5432/postgres`
 
 Create a new code block below the install block (`ctrl+m b`) and add the following code using the Postgres URI you copied above:
 
@@ -79,7 +79,7 @@ collection.upsert(
 )
 ```
 
-This will create a table inside your database within the `vecs` schema, called `colab_collection`. You can view the inserted items in the [Table Editor](https://supabase.com/dashboard/project/_/editor/), by selecting the `vecs` schema from the schema dropdown.
+This will create a table inside your database within the `vecs` schema, called `colab_collection`. You can view the inserted items in the [Table Editor](https://iechor.com/dashboard/project/_/editor/), by selecting the `vecs` schema from the schema dropdown.
 
 ![Colab documents](/docs/img/ai/google-colab/colab-documents.png)
 

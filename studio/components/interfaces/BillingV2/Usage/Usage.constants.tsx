@@ -58,12 +58,12 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'Compute Add-Ons',
-            url: 'https://supabase.com/docs/guides/platform/compute-add-ons',
+            url: 'https://iechor.com/docs/guides/platform/compute-add-ons',
           },
-          { name: 'High CPU Usage', url: 'https://supabase.com/docs/guides/platform/exhaust-cpu' },
+          { name: 'High CPU Usage', url: 'https://iechor.com/docs/guides/platform/exhaust-cpu' },
           {
             name: 'Metrics',
-            url: 'https://supabase.com/docs/guides/platform/metrics',
+            url: 'https://iechor.com/docs/guides/platform/metrics',
           },
         ],
       },
@@ -79,12 +79,12 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'Compute Add-Ons',
-            url: 'https://supabase.com/docs/guides/platform/compute-add-ons',
+            url: 'https://iechor.com/docs/guides/platform/compute-add-ons',
           },
-          { name: 'High RAM Usage', url: 'https://supabase.com/docs/guides/platform/exhaust-ram' },
+          { name: 'High RAM Usage', url: 'https://iechor.com/docs/guides/platform/exhaust-ram' },
           {
             name: 'Metrics',
-            url: 'https://supabase.com/docs/guides/platform/metrics',
+            url: 'https://iechor.com/docs/guides/platform/metrics',
           },
         ],
       },
@@ -97,11 +97,11 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'Disk Throughput and IOPS',
-            url: 'https://supabase.com/docs/guides/platform/compute-add-ons#disk-throughput-and-iops',
+            url: 'https://iechor.com/docs/guides/platform/compute-add-ons#disk-throughput-and-iops',
           },
           {
             name: 'Metrics',
-            url: 'https://supabase.com/docs/guides/platform/metrics',
+            url: 'https://iechor.com/docs/guides/platform/metrics',
           },
         ],
         description:
@@ -154,7 +154,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'Documentation',
-            url: 'https://supabase.com/docs/guides/platform/database-size',
+            url: 'https://iechor.com/docs/guides/platform/database-size',
           },
         ],
         chartDescription: 'The data refreshes every 24 hours.',
@@ -181,7 +181,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
                     Auto-scaling
                   </Badge>
                 </div>
-                <Link href="https://supabase.com/docs/guides/platform/database-usage#disk-management">
+                <Link href="https://iechor.com/docs/guides/platform/database-usage#disk-management">
                   <a>
                     <Button size="tiny" type="default" icon={<IconExternalLink size={14} />}>
                       What is disk size?
@@ -237,7 +237,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'Storage',
-            url: 'https://supabase.com/docs/guides/storage',
+            url: 'https://iechor.com/docs/guides/storage',
           },
         ],
       },
@@ -272,7 +272,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'Auth',
-            url: 'https://supabase.com/docs/guides/auth',
+            url: 'https://iechor.com/docs/guides/auth',
           },
         ],
       },
@@ -289,7 +289,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'SSO with SAML 2.0',
-            url: 'https://supabase.com/docs/guides/auth/sso/auth-sso-saml',
+            url: 'https://iechor.com/docs/guides/auth/sso/auth-sso-saml',
           },
         ],
       },
@@ -306,7 +306,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'Documentation',
-            url: 'https://supabase.com/docs/guides/storage/image-transformations',
+            url: 'https://iechor.com/docs/guides/storage/image-transformations',
           },
         ],
       },
@@ -322,7 +322,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'Edge Functions',
-            url: 'https://supabase.com/docs/guides/functions',
+            url: 'https://iechor.com/docs/guides/functions',
           },
         ],
       },
@@ -338,7 +338,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'Realtime Quotas',
-            url: 'https://supabase.com/docs/guides/realtime/quotas',
+            url: 'https://iechor.com/docs/guides/realtime/quotas',
           },
         ],
       },
@@ -355,7 +355,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         links: [
           {
             name: 'Realtime Quotas',
-            url: 'https://supabase.com/docs/guides/realtime/quotas',
+            url: 'https://iechor.com/docs/guides/realtime/quotas',
           },
         ],
       },

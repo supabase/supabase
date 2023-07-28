@@ -210,7 +210,7 @@ export const PgbouncerConfig: FC<ConfigProps> = ({ projectRef, bouncerInfo, conn
                     className="text-green-900"
                     target="_blank"
                     rel="noreferrer"
-                    href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool"
+                    href="https://iechor.com/docs/guides/database/connecting-to-postgres#connection-pool"
                   >
                     click here
                   </a>

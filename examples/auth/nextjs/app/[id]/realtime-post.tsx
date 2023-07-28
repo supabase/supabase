@@ -8,7 +8,7 @@ import type { Database } from '@/lib/database.types'
 type Post = Database['public']['Tables']['posts']['Row']
 
 export default function RealtimePost({ serverPost }: { serverPost: Post }) {
-  const supabase = createClientComponentClient<Database>()
+  const iechor = createClientComponentClient<Database>()
   const [post, setPost] = useState(serverPost)
 
   useEffect(() => {

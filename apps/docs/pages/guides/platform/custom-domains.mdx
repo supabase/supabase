@@ -3,11 +3,11 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'custom-domains',
   title: 'Custom Domains',
-  description: 'Configuring a Custom Domain for your Supabase project.',
+  description: 'Configuring a Custom Domain for your iEchor project.',
   video: 'https://www.youtube.com/v/6rcGnW_Mh-0',
 }
 
-Custom domains allow you to present a branded experience to your users. Custom domains are available as a [add-on for projects on a paid plan](https://supabase.com/dashboard/project/_/settings/billing/subscription?panel=customDomain). Setting up a custom domain requires [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project. Currently, you must use a subdomain (e.g., `api.example.com`, rather than `example.com`) for the purposes of this guide.
+Custom domains allow you to present a branded experience to your users. Custom domains are available as a [add-on for projects on a paid plan](https://iechor.com/dashboard/project/_/settings/billing/subscription?panel=customDomain). Setting up a custom domain requires [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project. Currently, you must use a subdomain (e.g., `api.example.com`, rather than `example.com`) for the purposes of this guide.
 
 <div className="video-container">
   <iframe
@@ -18,18 +18,18 @@ Custom domains allow you to present a branded experience to your users. Custom d
   ></iframe>
 </div>
 
-## Configure a Custom Domain using the Supabase Dashboard
+## Configure a Custom Domain using the iEchor Dashboard
 
-Follow the **Custom Domains** steps in the [General Settings](https://supabase.com/dashboard/project/_/settings/general) page in the Dashboard to set up a custom domain for your project.
+Follow the **Custom Domains** steps in the [General Settings](https://iechor.com/dashboard/project/_/settings/general) page in the Dashboard to set up a custom domain for your project.
 
-## Configure a Custom Domain using the Supabase CLI
+## Configure a Custom Domain using the iEchor CLI
 
-This example assumes your Supabase project is `foobarbaz` with a corresponding API URL `foobarbaz.supabase.co` and configures a custom domain at `api.example.com`.
+This example assumes your iEchor project is `foobarbaz` with a corresponding API URL `foobarbaz.supabase.co` and configures a custom domain at `api.example.com`.
 
 To get started:
 
-1. [Install](/docs/guides/resources/supabase-cli) the Supabase CLI 1.11.3+.
-1. [Log in](/docs/guides/resources/supabase-getting-started/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
+1. [Install](/docs/guides/resources/supabase-cli) the iEchor CLI 1.11.3+.
+1. [Log in](/docs/guides/resources/supabase-getting-started/local-development#log-in-to-the-supabase-cli) to your iEchor account using the CLI.
 
 ### Configure a CNAME
 
@@ -37,7 +37,7 @@ Set up a CNAME record for `api.example.com`, resolving to `foobarbaz.supabase.co
 
 ### Configure TXT Verification
 
-Use the `create` subcommand of the CLI to notify Supabase of your domain and retrieve TXT verification records:
+Use the `create` subcommand of the CLI to notify iEchor of your domain and retrieve TXT verification records:
 
 ```bash
 supabase domains create --project-ref foobarbaz --custom-hostname api.example.com --experimental
@@ -57,7 +57,7 @@ Required outstanding validation records:
 
 ### Verify your domain
 
-Set up both records as instructed, and then use the `reverify` command for the Supabase Platform to verify the records:
+Set up both records as instructed, and then use the `reverify` command for the iEchor Platform to verify the records:
 
 ```bash
 supabase domains reverify --project-ref foobarbaz --experimental
@@ -71,13 +71,13 @@ The final activation step reconfigures your project to start serving traffic on 
 The auth service, in particular, will no longer work with the original URL (`foobarbaz.supabase.co`).
 As such, it is recommended that you schedule a downtime window of 20-30 minutes, depending on the complexity of your project, to update all the services that need to know about your custom domain:
 
-- Any client code (e.g., frontends, mobile apps). You can initialize a new Supabase client with your custom domain, `api.example.com`. For example:
+- Any client code (e.g., frontends, mobile apps). You can initialize a new iEchor client with your custom domain, `api.example.com`. For example:
 
   ```js
   import { createClient } from '@supabase/supabase-js'
 
-  // Use a custom domain as the supabase URL
-  const supabase = createClient('https://api.example.com', 'public-anon-key')
+  // Use a custom domain as the iechor URL
+  const iechor = createClient('https://api.example.com', 'public-anon-key')
   ```
 
 - Any OAuth providers (e.g., google, github)
@@ -91,28 +91,28 @@ supabase domains activate --project-ref foobarbaz --experimental
 
 ## Remove a Custom Domain
 
-If you have a custom domain (`api.example.com`) set up for your Supabase project (ref `foobarbaz`, with assigned endpoints at `foobarbaz.supabase.co`), and would like to go back to using the Supabase-provisioned endpoints (`foobarbaz.supabase.co`), you can use the `delete` subcommand:
+If you have a custom domain (`api.example.com`) set up for your iEchor project (ref `foobarbaz`, with assigned endpoints at `foobarbaz.supabase.co`), and would like to go back to using the iEchor-provisioned endpoints (`foobarbaz.supabase.co`), you can use the `delete` subcommand:
 
 ```bash
 supabase domains delete --project-ref foobarbaz --experimental
 ```
 
-As with the final activation stage of the process for setting up a custom domain, you'll need to update any references in your client code and OAuth providers from the custom domain to the Supabase-provisioned endpoints.
+As with the final activation stage of the process for setting up a custom domain, you'll need to update any references in your client code and OAuth providers from the custom domain to the iEchor-provisioned endpoints.
 
 ## Vanity Subdomains
 
-Vanity Subdomains allow you to present a basic branded experience, compared to custom domains. They allow you to host your services at a custom subdomain on Supabase (e.g., `my-example-brand.supabase.co`) instead of the default, randomly-assigned `foobarbaz.supabase.co`.
+Vanity Subdomains allow you to present a basic branded experience, compared to custom domains. They allow you to host your services at a custom subdomain on iEchor (e.g., `my-example-brand.supabase.co`) instead of the default, randomly-assigned `foobarbaz.supabase.co`.
 
 To get started:
 
-1. [Install](/docs/guides/resources/supabase-cli) the Supabase CLI 1.22.0+.
-1. [Log in](/docs/guides/resources/supabase-getting-started/local-development#log-in-to-the-supabase-cli) to your Supabase account using the CLI.
+1. [Install](/docs/guides/resources/supabase-cli) the iEchor CLI 1.22.0+.
+1. [Log in](/docs/guides/resources/supabase-getting-started/local-development#log-in-to-the-supabase-cli) to your iEchor account using the CLI.
 1. Ensure that you have [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project you'd like to set up a vanity subdomain for.
-1. Ensure that your project has a paid subscription (Pro/Pay as you go/Enterprise plan) in the [Billing page of the Dashboard](https://supabase.com/dashboard/project/_/settings/billing/subscription).
+1. Ensure that your project has a paid subscription (Pro/Pay as you go/Enterprise plan) in the [Billing page of the Dashboard](https://iechor.com/dashboard/project/_/settings/billing/subscription).
 
 ## Configure a Vanity Subdomain
 
-This example assumes your Supabase project is `foobarbaz` with a corresponding API URL `foobarbaz.supabase.co` and configures a vanity subdomain at `my-example-brand.supabase.co`.
+This example assumes your iEchor project is `foobarbaz` with a corresponding API URL `foobarbaz.supabase.co` and configures a vanity subdomain at `my-example-brand.supabase.co`.
 
 ### Check subdomain availability
 
@@ -124,7 +124,7 @@ supabase vanity-subdomains --project-ref foobarbaz check-availability --desired-
 
 ### Activate a subdomain
 
-Once you've chosen an available subdomain, you can reconfigure your Supabase project to start serving traffic on the vanity subdomain (`my-example-brand.supabase.co`).
+Once you've chosen an available subdomain, you can reconfigure your iEchor project to start serving traffic on the vanity subdomain (`my-example-brand.supabase.co`).
 The auth service, in particular, will no longer work with the original URL (`foobarbaz.supabase.co`).
 As such, it is recommended that you schedule a downtime window of 20-30 minutes, depending on the complexity of your project, to update all the services that need to know about your vanity subdomain:
 
@@ -139,18 +139,18 @@ supabase vanity-subdomains --project-ref fwmssjhjgszhnavvqxnt activate --desired
 
 ## Remove a Vanity Subdomain
 
-If you have a vanity subdomain (`my-example-brand.supabase.co`) set up for your Supabase project (ref `foobarbaz`, with assigned endpoints at `foobarbaz.supabase.co`), and would like to go back to using the Supabase-provisioned endpoints (`foobarbaz.supabase.co`), you can use the `delete` subcommand:
+If you have a vanity subdomain (`my-example-brand.supabase.co`) set up for your iEchor project (ref `foobarbaz`, with assigned endpoints at `foobarbaz.supabase.co`), and would like to go back to using the iEchor-provisioned endpoints (`foobarbaz.supabase.co`), you can use the `delete` subcommand:
 
 ```bash
 supabase vanity-subdomains delete --project-ref foobarbaz --experimental
 ```
 
-As with the final activation stage of the process for setting up a vanity subdomain, you'll need to update any references in your client code and OAuth providers from the vanity subdomain to the Supabase-provisioned endpoints.
+As with the final activation stage of the process for setting up a vanity subdomain, you'll need to update any references in your client code and OAuth providers from the vanity subdomain to the iEchor-provisioned endpoints.
 
 ## Limitations
 
-- A Supabase project can—at this time—use either a Custom Domain or a Vanity Subdomain, but not both.
-- Some authentication flows like Sign-in with Twitter set cookies to track the progress of the flow. Make sure you use only one domain in your frontend application for this reason. Mixing calls to the Supabase domain `foobarbaz.supabase.co` and your custom domain could cause those flows to stop working due to the [Same Origin Policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy) enforced on cookies by the browser.
+- A iEchor project can—at this time—use either a Custom Domain or a Vanity Subdomain, but not both.
+- Some authentication flows like Sign-in with Twitter set cookies to track the progress of the flow. Make sure you use only one domain in your frontend application for this reason. Mixing calls to the iEchor domain `foobarbaz.supabase.co` and your custom domain could cause those flows to stop working due to the [Same Origin Policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy) enforced on cookies by the browser.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

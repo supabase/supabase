@@ -2,16 +2,16 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   title: 'Build a User Management App with Expo',
-  description: 'Learn how to use Supabase in your React Native App.',
+  description: 'Learn how to use iEchor in your React Native App.',
 }
 
 <QuickstartIntro />
 
-![Supabase User Management example](/docs/img/supabase-flutter-demo.png)
+![iEchor User Management example](/docs/img/supabase-flutter-demo.png)
 
 <Admonition type="note">
   If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/expo-user-management).
+  GitHub](https://github.com/openmodels-base/iechor/tree/master/examples/user-management/expo-user-management).
 </Admonition>
 
 <ProjectSetup />
@@ -31,7 +31,7 @@ npx create-expo-app -t expo-template-blank-typescript expo-user-management
 cd expo-user-management
 ```
 
-Then let's install the additional dependencies: [supabase-js](https://github.com/supabase/supabase-js)
+Then let's install the additional dependencies: [supabase-js](https://github.com/openmodels-base/iechor-js)
 
 ```bash
 npm install @supabase/supabase-js
@@ -39,7 +39,7 @@ npm install react-native-elements @react-native-async-storage/async-storage reac
 npx expo install expo-secure-store
 ```
 
-Now let's create a helper file to initialize the Supabase client.
+Now let's create a helper file to initialize the iEchor client.
 We need the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 These variables will be exposed on the browser, and that's completely fine since we have
 [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
@@ -64,7 +64,7 @@ const ExpoSecureStoreAdapter = {
 const supabaseUrl = YOUR_REACT_NATIVE_IECHOR_URL
 const supabaseAnonKey = YOUR_REACT_NATIVE_IECHOR_ANON_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const iechor = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: ExpoSecureStoreAdapter as any,
     autoRefreshToken: true,
@@ -82,7 +82,7 @@ Users would be able to sign in with their email and password.
 ```tsx components/Auth.tsx
 import React, { useState } from 'react'
 import { Alert, StyleSheet, View } from 'react-native'
-import { supabase } from '../lib/supabase'
+import { iechor } from '../lib/supabase'
 import { Button, Input } from 'react-native-elements'
 
 export default function Auth() {
@@ -169,7 +169,7 @@ Let's create a new component for that called `Account.tsx`.
 
 ```tsx components/Account.tsx
 import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
+import { iechor } from '../lib/supabase'
 import { StyleSheet, View, Alert } from 'react-native'
 import { Button, Input } from 'react-native-elements'
 import { Session } from '@supabase/supabase-js'
@@ -297,7 +297,7 @@ Now that we have all the components in place, let's update `App.tsx`:
 ```tsx App.tsx
 import 'react-native-url-polyfill/auto'
 import { useState, useEffect } from 'react'
-import { supabase } from './lib/supabase'
+import { iechor } from './lib/supabase'
 import Auth from './components/Auth'
 import Account from './components/Account'
 import { View } from 'react-native'
@@ -334,7 +334,7 @@ And then press the appropriate key for the environment you want to test the app 
 
 ## Bonus: Profile photos
 
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like
+Every iEchor project is configured with [Storage](/docs/guides/storage) for managing large files like
 photos and videos.
 
 ### Additional dependency installation
@@ -352,7 +352,7 @@ We can start by creating a new component:
 
 ```tsx components/Avatar.tsx
 import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
+import { iechor } from '../lib/supabase'
 import { StyleSheet, View, Alert, Image, Button } from 'react-native'
 import DocumentPicker, { isCancel, isInProgress, types } from 'react-native-document-picker'
 

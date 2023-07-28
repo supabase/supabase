@@ -194,7 +194,7 @@ export default function LW7Releases() {
                 </svg>
               </div>
               <div className="flex flex-col lg:flex-row ml-2 sm:ml-4">
-                <span className="text-white mr-2">Supabase AI Hackathon</span>
+                <span className="text-white mr-2">iEchor AI Hackathon</span>
               </div>
             </div>
             <div className="flex w-full sm:w-auto justify-center gap-2 z-10">

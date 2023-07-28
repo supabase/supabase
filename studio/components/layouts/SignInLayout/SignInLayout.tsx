@@ -94,7 +94,7 @@ const SignInLayout = ({
           <nav className="relative flex items-center justify-between sm:h-10">
             <div className="flex items-center flex-grow flex-shrink-0 lg:flex-grow-0">
               <div className="flex items-center justify-between w-full md:w-auto">
-                <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/projects'}>
+                <Link href={logoLinkToMarketingSite ? 'https://iechor.com' : '/projects'}>
                   <a>
                     <Image
                       src={
@@ -102,7 +102,7 @@ const SignInLayout = ({
                           ? `${BASE_PATH}/img/supabase-dark.svg`
                           : `${BASE_PATH}/img/supabase-light.svg`
                       }
-                      alt="Supabase Logo"
+                      alt="iEchor Logo"
                       height={24}
                       width={120}
                     />
@@ -112,7 +112,7 @@ const SignInLayout = ({
             </div>
 
             <div className="items-center hidden space-x-3 md:ml-10 md:flex md:pr-4">
-              <Link href="https://supabase.com/docs">
+              <Link href="https://iechor.com/docs">
                 <a target="_blank" rel="noreferrer">
                   <Button type="default" icon={<IconFileText />}>
                     Documentation
@@ -137,12 +137,12 @@ const SignInLayout = ({
             {showDisclaimer && (
               <div className="sm:text-center">
                 <p className="text-xs text-scale-900 sm:mx-auto sm:max-w-sm">
-                  By continuing, you agree to Supabase's{' '}
-                  <Link href="https://supabase.com/terms">
+                  By continuing, you agree to iEchor's{' '}
+                  <Link href="https://iechor.com/terms">
                     <a className="underline hover:text-scale-1100">Terms of Service</a>
                   </Link>{' '}
                   and{' '}
-                  <Link href="https://supabase.com/privacy">
+                  <Link href="https://iechor.com/privacy">
                     <a className="underline hover:text-scale-1100">Privacy Policy</a>
                   </Link>
                   , and to receive periodic emails with updates.
@@ -167,7 +167,7 @@ const SignInLayout = ({
                   className="flex items-center gap-4"
                 >
                   <img
-                    src={`https://supabase.com${quote.img_url}`}
+                    src={`https://iechor.com${quote.img_url}`}
                     alt={quote.handle}
                     className="w-12 h-12 rounded-full"
                   />

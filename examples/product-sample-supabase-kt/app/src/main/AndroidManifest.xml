@@ -22,7 +22,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
-                    android:host="supabase.com"
+                    android:host="iechor.com"
                     android:scheme="app" />
             </intent-filter>
         </activity>

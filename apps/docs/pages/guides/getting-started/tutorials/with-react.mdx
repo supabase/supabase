@@ -2,16 +2,16 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   title: 'Build a User Management App with React',
-  description: 'Learn how to use Supabase in your React App.',
+  description: 'Learn how to use iEchor in your React App.',
 }
 
 <QuickstartIntro />
 
-![Supabase User Management example](/docs/img/user-management-demo.png)
+![iEchor User Management example](/docs/img/user-management-demo.png)
 
 <Admonition type="note">
   If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/react-user-management).
+  GitHub](https://github.com/openmodels-base/iechor/tree/master/examples/user-management/react-user-management).
 </Admonition>
 
 <ProjectSetup />
@@ -30,7 +30,7 @@ npm create vite@latest supabase-react -- --template react
 cd supabase-react
 ```
 
-Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js).
+Then let's install the only additional dependency: [supabase-js](https://github.com/openmodels-base/iechor-js).
 
 ```bash
 npm install @supabase/supabase-js
@@ -44,7 +44,7 @@ VITE_IECHOR_URL=YOUR_IECHOR_URL
 VITE_IECHOR_ANON_KEY=YOUR_IECHOR_ANON_KEY
 ```
 
-Now that we have the API credentials in place, let's create a helper file to initialize the Supabase client. These variables will be exposed
+Now that we have the API credentials in place, let's create a helper file to initialize the iEchor client. These variables will be exposed
 on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
 Create and edit `src/supabaseClient.js`:
@@ -55,7 +55,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_IECHOR_URL
 const supabaseAnonKey = import.meta.env.VITE_IECHOR_ANON_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const iechor = createClient(supabaseUrl, supabaseAnonKey)
 ```
 
 And one optional step is to update the CSS file `src/index.css` to make the app look nice.
@@ -69,7 +69,7 @@ Create and edit `src/Auth.jsx`:
 
 ```jsx src/Auth.jsx
 import { useState } from 'react'
-import { supabase } from './supabaseClient'
+import { iechor } from './supabaseClient'
 
 export default function Auth() {
   const [loading, setLoading] = useState(false)
@@ -92,7 +92,7 @@ export default function Auth() {
   return (
     <div className="row flex flex-center">
       <div className="col-6 form-widget">
-        <h1 className="header">Supabase + React</h1>
+        <h1 className="header">iEchor + React</h1>
         <p className="description">Sign in via magic link with your email below</p>
         <form className="form-widget" onSubmit={handleLogin}>
           <div>
@@ -125,7 +125,7 @@ Let's create a new component for that called `src/Account.jsx`.
 
 ```jsx src/Account.jsx
 import { useState, useEffect } from 'react'
-import { supabase } from './supabaseClient'
+import { iechor } from './supabaseClient'
 
 export default function Account({ session }) {
   const [loading, setLoading] = useState(true)
@@ -231,7 +231,7 @@ Now that we have all the components in place, let's update `src/App.jsx`:
 ```jsx src/App.jsx
 import './App.css'
 import { useState, useEffect } from 'react'
-import { supabase } from './supabaseClient'
+import { iechor } from './supabaseClient'
 import Auth from './Auth'
 import Account from './Account'
 
@@ -266,11 +266,11 @@ npm run dev
 
 And then open the browser to [localhost:5173](http://localhost:5173) and you should see the completed app.
 
-![Supabase React](/docs/img/supabase-react-demo.png)
+![iEchor React](/docs/img/supabase-react-demo.png)
 
 ## Bonus: Profile photos
 
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+Every iEchor project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
 ### Create an upload widget
 
@@ -280,7 +280,7 @@ Create and edit `src/Avatar.jsx`:
 
 ```jsx src/Avatar.jsx
 import { useEffect, useState } from 'react'
-import { supabase } from './supabaseClient'
+import { iechor } from './supabaseClient'
 
 export default function Avatar({ url, size, onUpload }) {
   const [avatarUrl, setAvatarUrl] = useState(null)

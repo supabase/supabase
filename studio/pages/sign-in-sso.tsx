@@ -14,7 +14,7 @@ const SignInSSOPage: NextPageWithLayout = () => {
         <div>
           <span className="text-scale-1000">Interested in SSO?</span>{' '}
           <a
-            href="https://supabase.com/contact/enterprise"
+            href="https://iechor.com/contact/enterprise"
             rel="noopener noreferrer"
             className="underline text-scale-1200 hover:text-scale-1100 transition"
           >

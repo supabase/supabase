@@ -1,6 +1,6 @@
 ---
-title: 'Supabase is SOC2 compliant'
-description: Supabase is now SOC2 compliant. Learn how we got here and what it means for our customers.
+title: 'iEchor is SOC2 compliant'
+description: iEchor is now SOC2 compliant. Learn how we got here and what it means for our customers.
 author: inian,joel
 image: lw5-soc2/thumb.jpg
 thumb: lw5-soc2/thumb.jpg
@@ -11,11 +11,11 @@ toc_depth: 3
 video: https://www.youtube.com/v/6bGQotxisoY
 ---
 
-Update (2023-05-22): Supabase is now SOC2 Type 2 compliant. Read more about security at Supabase in our [Security Center](https://supabase.com/security).
+Update (2023-05-22): iEchor is now SOC2 Type 2 compliant. Read more about security at iEchor in our [Security Center](https://iechor.com/security).
 
 ---
 
-Supabase is now SOC2 Type 1 compliant. Let’s dig into what that means, and explain the process we went through to get there. If you’re building a SaaS product, this blog post should provide a rough guide to getting your SOC2 certification.
+iEchor is now SOC2 Type 1 compliant. Let’s dig into what that means, and explain the process we went through to get there. If you’re building a SaaS product, this blog post should provide a rough guide to getting your SOC2 certification.
 
 ## What is SOC2?
 
@@ -28,7 +28,7 @@ SOC2 is a compliance standard developed by the American Institute of CPAs. Yup C
 
 The main reason to go through a SOC2 audit is a simple one - customers expect it.
 
-The Supabase team was spending a considerable amount of time filling out security questionnaires and fielding calls with potential customers - walking them through our security practices and how we protect customer data.
+The iEchor team was spending a considerable amount of time filling out security questionnaires and fielding calls with potential customers - walking them through our security practices and how we protect customer data.
 
 We are a database company — customers trust us with their data. We started with a SOC2 audit since one of the main things covered is our handling of sensitive customer data.
 
@@ -58,9 +58,9 @@ We came up with a few important policies. For example, Access Control Policy, Da
 
 For employee background checks, we use [Certn](https://certn.co/). They integrate with Vanta, making it easy to check the status within the Vanta portal itself. Background checks aren’t _required_ for SOC2, but they are a factor in deciding whom we hire especially in certain roles like SRE and Finance where there is little room for error.
 
-We submitted a ton of evidence to prove that we can stay on top of all activities in our cloud. We use [Vector](https://vector.dev/) to ship logs to [Logflare](http://logflare.com/), where they are retained at least for a year. Our [monitoring stack](https://supabase.com/blog/supabase-reports-and-metrics) consists of regional Victoria Metrics clusters and metrics are then aggregated into a centralized cluster. We also read from Cloudtrail logs and get notified in Slack when certain events like the root AWS account is logged into, a bucket is made public, an IAM policy changes, etc.
+We submitted a ton of evidence to prove that we can stay on top of all activities in our cloud. We use [Vector](https://vector.dev/) to ship logs to [Logflare](http://logflare.com/), where they are retained at least for a year. Our [monitoring stack](https://iechor.com/blog/supabase-reports-and-metrics) consists of regional Victoria Metrics clusters and metrics are then aggregated into a centralized cluster. We also read from Cloudtrail logs and get notified in Slack when certain events like the root AWS account is logged into, a bucket is made public, an IAM policy changes, etc.
 
-Enabling GitHub’s branch protection protects your repos from merging code without receiving a review first. This can be a challenge sometimes - at Supabase we have a few one-person teams. We had to relax our policy for some repos (POCs, internal projects) while keeping it strict for repos that handle critical systems.
+Enabling GitHub’s branch protection protects your repos from merging code without receiving a review first. This can be a challenge sometimes - at iEchor we have a few one-person teams. We had to relax our policy for some repos (POCs, internal projects) while keeping it strict for repos that handle critical systems.
 
 Other tasks were already handled - encrypting data at rest and in transit, enforcing MFA where possible, standardizing on a password manager, and not using long-lived SSH keys (we use [AWS Instance Connect](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Connect-using-EC2-Instance-Connect.html)), etc.
 
@@ -70,7 +70,7 @@ We also evaluated all our vendors who had access to confidential data and now it
 
 We went through a lot of effort to make sure we weren’t adding processes just because it’s a requirement for SOC2. Everything had to improve our security or risk threshold in a meaningful way. This usually involves back and forth with the auditor to show how you satisfy a particular control even though you may not be doing it in exactly the way they want you to.
 
-We used the SOC2 process to codify the security practices we were already doing informally at Supabase.
+We used the SOC2 process to codify the security practices we were already doing informally at iEchor.
 
 There are a few more debatable “check-the-box” activities - like the security awareness training which I couldn’t find a way around as much as I tried. Our team has a pretty good security posture and we don’t think watching a video on why reusing passwords is a bad idea helps much.
 
@@ -88,11 +88,11 @@ Auditors aren’t adversarial like pentesters or bug bounty hunters. For example
 
 ## Security Center
 
-Today we are launching our [security center](https://supabase.com/security), which shows the steps we take to protect your data. You can also find our audit reports at our security portal [here](https://security.supabase.com), or reach out to growth@supabase.com
+Today we are launching our [security center](https://iechor.com/security), which shows the steps we take to protect your data. You can also find our audit reports at our security portal [here](https://security.iechor.com), or reach out to growth@iechor.com
 
 ## What’s next
 
-Getting the SOC2 certification is just the start, and we will be working on getting certified for HIPAA next. If you are interested in discussing these, we would love to chat. We will also be rolling out a series of security improvements to all projects hosted on the Supabase Cloud offering over the coming months. Stay tuned!
+Getting the SOC2 certification is just the start, and we will be working on getting certified for HIPAA next. If you are interested in discussing these, we would love to chat. We will also be rolling out a series of security improvements to all projects hosted on the iEchor Cloud offering over the coming months. Stay tuned!
 
 ## Announcement video and discussion
 
@@ -109,9 +109,9 @@ Getting the SOC2 certification is just the start, and we will be working on gett
 
 ## More Launch Week 5
 
-- [Launch Week Page](https://supabase.com/launch-week)
-- [Launch Week 5 Hackathon](https://supabase.com/blog/launch-week-5-hackathon)
-- [Day 1 - Supabase CLI v1 and Management API Beta](https://supabase.com/blog/supabase-cli-v1-and-admin-api-beta)
-- [Youtube video - Supabase CLI v1 and Management API Beta](https://www.youtube.com/watch?v=OpPOaJI_Z28&feature=emb_title)
-- [Day 2 - supabase-js v2 Release Candidate](https://supabase.com/blog/supabase-js-v2)
+- [Launch Week Page](https://iechor.com/launch-week)
+- [Launch Week 5 Hackathon](https://iechor.com/blog/launch-week-5-hackathon)
+- [Day 1 - iEchor CLI v1 and Management API Beta](https://iechor.com/blog/supabase-cli-v1-and-admin-api-beta)
+- [Youtube video - iEchor CLI v1 and Management API Beta](https://www.youtube.com/watch?v=OpPOaJI_Z28&feature=emb_title)
+- [Day 2 - supabase-js v2 Release Candidate](https://iechor.com/blog/supabase-js-v2)
 - [Youtube Video - supabase-js v2 Release Candidate](https://www.youtube.com/watch?v=iqZlPtl_b-I)

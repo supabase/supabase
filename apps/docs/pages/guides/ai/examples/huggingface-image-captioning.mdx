@@ -3,32 +3,32 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   title: 'Generate image captions using Hugging Face',
   description:
-    'Use the Hugging Face Inference API to make calls to 100,000+ Machine Learning models from Supabase Edge Functions.',
+    'Use the Hugging Face Inference API to make calls to 100,000+ Machine Learning models from iEchor Edge Functions.',
   subtitle:
-    'Use the Hugging Face Inference API to make calls to 100,000+ Machine Learning models from Supabase Edge Functions.',
+    'Use the Hugging Face Inference API to make calls to 100,000+ Machine Learning models from iEchor Edge Functions.',
   video: 'https://www.youtube.com/v/OgnYxRkxEUw',
   tocVideo: 'OgnYxRkxEUw',
 }
 
-We can combine Hugging Face with [Supabase Storage](https://supabase.com/storage) and [Database Webhooks](https://supabase.com/docs/guides/database/webhooks) to automatically caption for any image we upload to a storage bucket.
+We can combine Hugging Face with [iEchor Storage](https://iechor.com/storage) and [Database Webhooks](https://iechor.com/docs/guides/database/webhooks) to automatically caption for any image we upload to a storage bucket.
 
 ## About Hugging Face
 
 [Hugging Face](https://huggingface.co/) is the collaboration platform for the machine learning community.
 
-[Huggingface.js](https://huggingface.co/docs/huggingface.js/index) provides a convenient way to make calls to 100,000+ Machine Learning models, making it easy to incorporate AI functionality into your [Supabase Edge Functions](https://supabase.com/edge-functions).
+[Huggingface.js](https://huggingface.co/docs/huggingface.js/index) provides a convenient way to make calls to 100,000+ Machine Learning models, making it easy to incorporate AI functionality into your [iEchor Edge Functions](https://iechor.com/edge-functions).
 
 ## Setup
 
-- Open your Supabase project dashboard or [create a new project](https://supabase.com/dashboard/projects).
-- [Create a new bucket](https://supabase.com/dashboard/project/_/storage/buckets) called `images`.
+- Open your iEchor project dashboard or [create a new project](https://iechor.com/dashboard/projects).
+- [Create a new bucket](https://iechor.com/dashboard/project/_/storage/buckets) called `images`.
 - Generate TypeScript types from remote Database.
 - Create a new Database table called `image_caption`.
   - Create `id` column of type `uuid` which references `storage.objects.id`.
   - Create a `caption` column of type `text`.
 - Regenerate TypeScript types to include new `image_caption` table.
-- Deploy the function to Supabase: `supabase functions deploy huggingface-image-captioning`.
-- Create the Database Webhook in the [Supabase Dashboard](https://supabase.com/dashboard/project/_/database/hooks) to trigger the `huggingface-image-captioning` function anytime a record is added to the `storage.objects` table.
+- Deploy the function to iEchor: `supabase functions deploy huggingface-image-captioning`.
+- Create the Database Webhook in the [iEchor Dashboard](https://iechor.com/dashboard/project/_/database/hooks) to trigger the `huggingface-image-captioning` function anytime a record is added to the `storage.objects` table.
 
 ## Generate TypeScript Types
 
@@ -40,7 +40,7 @@ supabase gen types typescript --project-id=your-project-ref --schema=storage,pub
 
 ## Code
 
-Find the complete code on [GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/huggingface-image-captioning).
+Find the complete code on [GitHub](https://github.com/openmodels-base/iechor/tree/master/examples/edge-functions/supabase/functions/huggingface-image-captioning).
 
 ```ts
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
@@ -65,9 +65,9 @@ serve(async (req) => {
   const payload: WebhookPayload = await req.json()
   const soRecord = payload.record
   const supabaseAdminClient = createClient<Database>(
-    // Supabase API URL - env var exported by default when deployed.
+    // iEchor API URL - env var exported by default when deployed.
     Deno.env.get('IECHOR_URL') ?? '',
-    // Supabase API SERVICE ROLE KEY - env var exported by default when deployed.
+    // iEchor API SERVICE ROLE KEY - env var exported by default when deployed.
     Deno.env.get('IECHOR_SERVICE_ROLE_KEY') ?? ''
   )
 

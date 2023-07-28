@@ -52,7 +52,7 @@
               "kindString": "Class",
               "flags": {},
               "comment": {
-                "shortText": "Supabase Client.",
+                "shortText": "iEchor Client.",
                 "text": "An isomorphic Javascript client for interacting with Postgres.\n"
               },
               "children": [
@@ -87,7 +87,7 @@
                           "kindString": "Parameter",
                           "flags": {},
                           "comment": {
-                            "shortText": "The unique Supabase URL which is supplied when you create a new project in your project dashboard."
+                            "shortText": "The unique iEchor URL which is supplied when you create a new project in your project dashboard."
                           },
                           "type": {
                             "type": "intrinsic",
@@ -101,7 +101,7 @@
                           "kindString": "Parameter",
                           "flags": {},
                           "comment": {
-                            "shortText": "The unique Supabase Key which is supplied when you create a new project in your project dashboard."
+                            "shortText": "The unique iEchor Key which is supplied when you create a new project in your project dashboard."
                           },
                           "type": {
                             "type": "intrinsic",
@@ -378,7 +378,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                                        "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in iEchor. Defaults to 'public'."
                                       },
                                       "sources": [
                                         {
@@ -451,7 +451,7 @@
                   "kindString": "Property",
                   "flags": {},
                   "comment": {
-                    "shortText": "Supabase Auth allows you to create and manage user sessions for access to data that is secured by access policies."
+                    "shortText": "iEchor Auth allows you to create and manage user sessions for access to data that is secured by access policies."
                   },
                   "sources": [
                     {
@@ -863,7 +863,7 @@
                       "kindString": "Get signature",
                       "flags": {},
                       "comment": {
-                        "shortText": "Supabase Functions allows you to deploy and invoke edge functions."
+                        "shortText": "iEchor Functions allows you to deploy and invoke edge functions."
                       },
                       "type": {
                         "type": "reference",
@@ -895,7 +895,7 @@
                       "kindString": "Get signature",
                       "flags": {},
                       "comment": {
-                        "shortText": "Supabase Storage allows you to manage user-generated content, such as photos or videos."
+                        "shortText": "iEchor Storage allows you to manage user-generated content, such as photos or videos."
                       },
                       "type": {
                         "type": "reference",
@@ -1486,7 +1486,7 @@
                                         "isOptional": true
                                       },
                                       "comment": {
-                                        "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                                        "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in iEchor. Defaults to 'public'."
                                       },
                                       "sources": [
                                         {
@@ -2338,7 +2338,7 @@
                   "kindString": "Call signature",
                   "flags": {},
                   "comment": {
-                    "shortText": "Creates a new Supabase Client."
+                    "shortText": "Creates a new iEchor Client."
                   },
                   "parameters": [
                     {
@@ -2633,7 +2633,7 @@
                                     "isOptional": true
                                   },
                                   "comment": {
-                                    "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                                    "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in iEchor. Defaults to 'public'."
                                   },
                                   "sources": [
                                     {
@@ -4411,7 +4411,7 @@
                         "isOptional": true
                       },
                       "comment": {
-                        "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'."
+                        "shortText": "The Postgres schema which your tables belong to. Must be on the list of exposed schemas in iEchor. Defaults to 'public'."
                       },
                       "sources": [
                         {
@@ -18287,7 +18287,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/postgrest-js/src/PostgrestClient.ts",
+          "originalName": "/Users/copple/Projects/iEchor/postgrest-js/src/PostgrestClient.ts",
           "children": [
             {
               "id": 503,
@@ -19100,7 +19100,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/postgrest-js/src/index.ts",
+          "originalName": "/Users/copple/Projects/iEchor/postgrest-js/src/index.ts",
           "sources": [
             {
               "fileName": "index.ts",
@@ -19117,7 +19117,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/postgrest-js/src/lib/PostgrestFilterBuilder.ts",
+          "originalName": "/Users/copple/Projects/iEchor/postgrest-js/src/lib/PostgrestFilterBuilder.ts",
           "children": [
             {
               "id": 150,
@@ -19853,7 +19853,7 @@
                                       },
                                       "comment": {
                                         "shortText": "If there's an error with the query, throwOnError will reject the promise by\nthrowing the error instead of returning it as part of a successful response.",
-                                        "text": "{@link https://github.com/supabase/supabase-js/issues/92}\n"
+                                        "text": "{@link https://github.com/openmodels-base/iechor-js/issues/92}\n"
                                       },
                                       "parameters": [
                                         {
@@ -24792,7 +24792,7 @@
                       },
                       "comment": {
                         "shortText": "If there's an error with the query, throwOnError will reject the promise by\nthrowing the error instead of returning it as part of a successful response.",
-                        "text": "{@link https://github.com/supabase/supabase-js/issues/92}\n"
+                        "text": "{@link https://github.com/openmodels-base/iechor-js/issues/92}\n"
                       },
                       "parameters": [
                         {
@@ -25288,7 +25288,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/postgrest-js/src/lib/PostgrestQueryBuilder.ts",
+          "originalName": "/Users/copple/Projects/iEchor/postgrest-js/src/lib/PostgrestQueryBuilder.ts",
           "children": [
             {
               "id": 363,
@@ -26973,7 +26973,7 @@
                       },
                       "comment": {
                         "shortText": "If there's an error with the query, throwOnError will reject the promise by\nthrowing the error instead of returning it as part of a successful response.",
-                        "text": "{@link https://github.com/supabase/supabase-js/issues/92}\n"
+                        "text": "{@link https://github.com/openmodels-base/iechor-js/issues/92}\n"
                       },
                       "parameters": [
                         {
@@ -27540,7 +27540,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/postgrest-js/src/lib/PostgrestRpcBuilder.ts",
+          "originalName": "/Users/copple/Projects/iEchor/postgrest-js/src/lib/PostgrestRpcBuilder.ts",
           "children": [
             {
               "id": 449,
@@ -28629,7 +28629,7 @@
                       },
                       "comment": {
                         "shortText": "If there's an error with the query, throwOnError will reject the promise by\nthrowing the error instead of returning it as part of a successful response.",
-                        "text": "{@link https://github.com/supabase/supabase-js/issues/92}\n"
+                        "text": "{@link https://github.com/openmodels-base/iechor-js/issues/92}\n"
                       },
                       "parameters": [
                         {
@@ -28766,7 +28766,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/postgrest-js/src/lib/PostgrestTransformBuilder.ts",
+          "originalName": "/Users/copple/Projects/iEchor/postgrest-js/src/lib/PostgrestTransformBuilder.ts",
           "children": [
             {
               "id": 73,
@@ -29505,7 +29505,7 @@
                                       },
                                       "comment": {
                                         "shortText": "If there's an error with the query, throwOnError will reject the promise by\nthrowing the error instead of returning it as part of a successful response.",
-                                        "text": "{@link https://github.com/supabase/supabase-js/issues/92}\n"
+                                        "text": "{@link https://github.com/openmodels-base/iechor-js/issues/92}\n"
                                       },
                                       "parameters": [
                                         {
@@ -31252,7 +31252,7 @@
                       },
                       "comment": {
                         "shortText": "If there's an error with the query, throwOnError will reject the promise by\nthrowing the error instead of returning it as part of a successful response.",
-                        "text": "{@link https://github.com/supabase/supabase-js/issues/92}\n"
+                        "text": "{@link https://github.com/openmodels-base/iechor-js/issues/92}\n"
                       },
                       "parameters": [
                         {
@@ -31396,7 +31396,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/postgrest-js/src/lib/constants.ts",
+          "originalName": "/Users/copple/Projects/iEchor/postgrest-js/src/lib/constants.ts",
           "children": [
             {
               "id": 500,
@@ -31473,7 +31473,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/postgrest-js/src/lib/types.ts",
+          "originalName": "/Users/copple/Projects/iEchor/postgrest-js/src/lib/types.ts",
           "children": [
             {
               "id": 27,
@@ -32234,7 +32234,7 @@
                       },
                       "comment": {
                         "shortText": "If there's an error with the query, throwOnError will reject the promise by\nthrowing the error instead of returning it as part of a successful response.",
-                        "text": "{@link https://github.com/supabase/supabase-js/issues/92}\n"
+                        "text": "{@link https://github.com/openmodels-base/iechor-js/issues/92}\n"
                       },
                       "parameters": [
                         {
@@ -32349,7 +32349,7 @@
               "flags": {},
               "comment": {
                 "shortText": "Response format",
-                "text": "{@link https://github.com/supabase/supabase-js/issues/32}\n"
+                "text": "{@link https://github.com/openmodels-base/iechor-js/issues/32}\n"
               },
               "children": [
                 {
@@ -33210,7 +33210,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/postgrest-js/src/lib/version.ts",
+          "originalName": "/Users/copple/Projects/iEchor/postgrest-js/src/lib/version.ts",
           "children": [
             {
               "id": 498,
@@ -33274,7 +33274,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/realtime-js/src/RealtimeClient.ts",
+          "originalName": "/Users/copple/Projects/iEchor/realtime-js/src/RealtimeClient.ts",
           "children": [
             {
               "id": 228,
@@ -38275,7 +38275,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/realtime-js/src/RealtimeSubscription.ts",
+          "originalName": "/Users/copple/Projects/iEchor/realtime-js/src/RealtimeSubscription.ts",
           "children": [
             {
               "id": 140,
@@ -42647,7 +42647,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/realtime-js/src/index.ts",
+          "originalName": "/Users/copple/Projects/iEchor/realtime-js/src/index.ts",
           "sources": [
             {
               "fileName": "index.ts",
@@ -42664,7 +42664,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/realtime-js/src/lib/constants.ts",
+          "originalName": "/Users/copple/Projects/iEchor/realtime-js/src/lib/constants.ts",
           "children": [
             {
               "id": 15,
@@ -43282,7 +43282,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/realtime-js/src/lib/push.ts",
+          "originalName": "/Users/copple/Projects/iEchor/realtime-js/src/lib/push.ts",
           "children": [
             {
               "id": 74,
@@ -48820,7 +48820,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/realtime-js/src/lib/serializer.ts",
+          "originalName": "/Users/copple/Projects/iEchor/realtime-js/src/lib/serializer.ts",
           "children": [
             {
               "id": 49,
@@ -49286,7 +49286,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/realtime-js/src/lib/timer.ts",
+          "originalName": "/Users/copple/Projects/iEchor/realtime-js/src/lib/timer.ts",
           "children": [
             {
               "id": 35,
@@ -49573,7 +49573,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/realtime-js/src/lib/transformers.ts",
+          "originalName": "/Users/copple/Projects/iEchor/realtime-js/src/lib/transformers.ts",
           "children": [
             {
               "id": 372,
@@ -51512,7 +51512,7 @@
                 "isConst": true
               },
               "comment": {
-                "shortText": "Fixes timestamp to be ISO-8601. Swaps the space between the date and time for a 'T'\nSee https://github.com/supabase/supabase/issues/18",
+                "shortText": "Fixes timestamp to be ISO-8601. Swaps the space between the date and time for a 'T'\nSee https://github.com/openmodels-base/iechor/issues/18",
                 "tags": [
                   {
                     "tag": "example",
@@ -51530,7 +51530,7 @@
                     "isExported": true
                   },
                   "comment": {
-                    "shortText": "Fixes timestamp to be ISO-8601. Swaps the space between the date and time for a 'T'\nSee https://github.com/supabase/supabase/issues/18",
+                    "shortText": "Fixes timestamp to be ISO-8601. Swaps the space between the date and time for a 'T'\nSee https://github.com/openmodels-base/iechor/issues/18",
                     "tags": [
                       {
                         "tag": "example",
@@ -51635,7 +51635,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/realtime-js/src/lib/version.ts",
+          "originalName": "/Users/copple/Projects/iEchor/realtime-js/src/lib/version.ts",
           "children": [
             {
               "id": 2,
@@ -51699,7 +51699,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/storage-js/src/StorageClient.ts",
+          "originalName": "/Users/copple/Projects/iEchor/storage-js/src/StorageClient.ts",
           "children": [
             {
               "id": 313,
@@ -53233,7 +53233,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/storage-js/src/index.ts",
+          "originalName": "/Users/copple/Projects/iEchor/storage-js/src/index.ts",
           "children": [
             {
               "id": 381,
@@ -53339,7 +53339,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/storage-js/src/lib/StorageBucketApi.ts",
+          "originalName": "/Users/copple/Projects/iEchor/storage-js/src/lib/StorageBucketApi.ts",
           "children": [
             {
               "id": 107,
@@ -54735,7 +54735,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/storage-js/src/lib/StorageFileApi.ts",
+          "originalName": "/Users/copple/Projects/iEchor/storage-js/src/lib/StorageFileApi.ts",
           "children": [
             {
               "id": 170,
@@ -58373,7 +58373,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/storage-js/src/lib/constants.ts",
+          "originalName": "/Users/copple/Projects/iEchor/storage-js/src/lib/constants.ts",
           "children": [
             {
               "id": 4,
@@ -58450,7 +58450,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/storage-js/src/lib/fetch.ts",
+          "originalName": "/Users/copple/Projects/iEchor/storage-js/src/lib/fetch.ts",
           "children": [
             {
               "id": 7,
@@ -60709,7 +60709,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/storage-js/src/lib/helpers.ts",
+          "originalName": "/Users/copple/Projects/iEchor/storage-js/src/lib/helpers.ts",
           "children": [
             {
               "id": 69,
@@ -60832,7 +60832,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/storage-js/src/lib/index.ts",
+          "originalName": "/Users/copple/Projects/iEchor/storage-js/src/lib/index.ts",
           "children": [
             {
               "id": 305,
@@ -60948,7 +60948,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/storage-js/src/lib/types.ts",
+          "originalName": "/Users/copple/Projects/iEchor/storage-js/src/lib/types.ts",
           "children": [
             {
               "id": 74,
@@ -61738,7 +61738,7 @@
           "flags": {
             "isExported": true
           },
-          "originalName": "/Users/copple/Projects/Supabase/storage-js/src/lib/version.ts",
+          "originalName": "/Users/copple/Projects/iEchor/storage-js/src/lib/version.ts",
           "children": [
             {
               "id": 2,

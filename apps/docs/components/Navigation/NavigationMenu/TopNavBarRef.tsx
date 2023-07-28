@@ -66,7 +66,7 @@ const TopNavBarRef: FC = () => {
                 src={isDarkMode ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
                 width={96}
                 height={24}
-                alt="Supabase Logo"
+                alt="iEchor Logo"
               />
               <span className="font-mono text-sm font-medium text-brand-900">DOCS</span>
             </a>
@@ -106,17 +106,17 @@ const TopNavBarRef: FC = () => {
         </div>
         <div className="hidden lg:flex grow items-center justify-end gap-3">
           <Button type="text" asChild>
-            <a href="https://supabase.com" target="_blank" rel="noreferrer noopener">
-              Supabase.com
+            <a href="https://iechor.com" target="_blank" rel="noreferrer noopener">
+              iEchor.com
             </a>
           </Button>
           <Button type="text" asChild>
-            <a href="https://supabase.com/dashboard" target="_blank" rel="noreferrer noopener">
+            <a href="https://iechor.com/dashboard" target="_blank" rel="noreferrer noopener">
               Dashboard
             </a>
           </Button>
           <Link
-            href="https://github.com/supabase/supabase"
+            href="https://github.com/openmodels-base/iechor"
             target="_blank"
             rel="noreferrer noopener"
           >

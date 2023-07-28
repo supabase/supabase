@@ -2,12 +2,12 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   title: 'Build a User Management App with Ionic React',
-  description: 'Learn how to use Supabase in your Ionic React App.',
+  description: 'Learn how to use iEchor in your Ionic React App.',
 }
 
 <QuickstartIntro />
 
-![Supabase User Management example](/docs/img/ionic-demos/ionic-angular-account.png)
+![iEchor User Management example](/docs/img/ionic-demos/ionic-angular-account.png)
 
 <Admonition type="note">
   If you get stuck while working through this guide, refer to the [full example on
@@ -31,7 +31,7 @@ ionic start supabase-ionic-react blank --type react
 cd supabase-ionic-react
 ```
 
-Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
+Then let's install the only additional dependency: [supabase-js](https://github.com/openmodels-base/iechor-js)
 
 ```bash
 npm install @supabase/supabase-js
@@ -45,7 +45,7 @@ REACT_APP_IECHOR_URL=YOUR_IECHOR_URL
 REACT_APP_IECHOR_ANON_KEY=YOUR_IECHOR_ANON_KEY
 ```
 
-Now that we have the API credentials in place, let's create a helper file to initialize the Supabase client. These variables will be exposed
+Now that we have the API credentials in place, let's create a helper file to initialize the iEchor client. These variables will be exposed
 on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
 ```js src/supabaseClient.js
@@ -54,7 +54,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.REACT_APP_IECHOR_URL
 const supabaseAnonKey = process.env.REACT_APP_IECHOR_ANON_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const iechor = createClient(supabaseUrl, supabaseAnonKey)
 ```
 
 ### Set up a Login route
@@ -77,7 +77,7 @@ import {
   useIonToast,
   useIonLoading,
 } from '@ionic/react';
-import { supabase } from '../supabaseClient';
+import { iechor } from '../supabaseClient';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
@@ -107,7 +107,7 @@ export function LoginPage() {
 
       <IonContent>
         <div className="ion-padding">
-          <h1>Supabase + Ionic React</h1>
+          <h1>iEchor + Ionic React</h1>
           <p>Sign in via magic link with your email below</p>
         </div>
         <IonList inset={true}>
@@ -156,7 +156,7 @@ import {
   useIonRouter
 } from '@ionic/react';
 import { useEffect, useState } from 'react';
-import { supabase } from '../supabaseClient';
+import { iechor } from '../supabaseClient';
 
 export function AccountPage() {
   const [showLoading, hideLoading] = useIonLoading();
@@ -298,7 +298,7 @@ Now that we have all the components in place, let's update `App.tsx`:
 import { Redirect, Route } from 'react-router-dom'
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react'
 import { IonReactRouter } from '@ionic/react-router'
-import { supabase } from './supabaseClient'
+import { iechor } from './supabaseClient'
 
 import '@ionic/react/css/ionic.bundle.css'
 
@@ -350,11 +350,11 @@ ionic serve
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
-![Supabase Ionic React](/docs/img/ionic-demos/ionic-react.png)
+![iEchor Ionic React](/docs/img/ionic-demos/ionic-react.png)
 
 ## Bonus: Profile photos
 
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+Every iEchor project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
 ### Create an upload widget
 
@@ -398,7 +398,7 @@ import { IonIcon } from '@ionic/react';
 import { person } from 'ionicons/icons';
 import { Camera, CameraResultType } from '@capacitor/camera';
 import { useEffect, useState } from 'react';
-import { supabase } from '../supabaseClient';
+import { iechor } from '../supabaseClient';
 import './Avatar.css'
 export function Avatar({
   url,

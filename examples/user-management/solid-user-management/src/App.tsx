@@ -1,5 +1,5 @@
 import { Component, createEffect, createSignal } from 'solid-js'
-import { supabase } from './supabaseClient'
+import { iechor } from './supabaseClient'
 import { AuthSession } from '@supabase/supabase-js'
 import Account from './Account'
 import Auth from './Auth'

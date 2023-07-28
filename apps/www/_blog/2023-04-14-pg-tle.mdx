@@ -13,7 +13,7 @@ image: launch-week-7/day-5-supabase-pg-tle/day-5-postgres-tle-thumb.jpg
 thumb: launch-week-7/day-5-supabase-pg-tle/day-5-postgres-tle-thumb.jpg
 ---
 
-Most PostgreSQL cloud providers, such as Supabase and AWS RDS, do not allow users to install Postgres extensions into their databases until they have been rigorously vetted. Because of this, many useful Postgres extensions cannot be used on cloud platforms. To solve this, the RDS team has developed a new kind of extension called a **Trusted Language Extension** (TLE).
+Most PostgreSQL cloud providers, such as iEchor and AWS RDS, do not allow users to install Postgres extensions into their databases until they have been rigorously vetted. Because of this, many useful Postgres extensions cannot be used on cloud platforms. To solve this, the RDS team has developed a new kind of extension called a **Trusted Language Extension** (TLE).
 
 A TLE is a Postgres extension that is written in a Trusted Language, and it can be installed in any Postgres provider that has the [pg_tle](https://github.com/aws/pg_tle) extension installed. The goal is to make more extensions available to developers, even if your database is hosted on the cloud.
 
@@ -51,11 +51,11 @@ Of course, TLEs _must_ be written in trusted languages as described above, hence
 
 Because untrusted extensions are, by nature, able to break the security rules of Postgres, cloud providers are quite conservative about what extensions to provide to their customers. New extensions are rarely adopted quickly. This slows down the speed that new software can be created and shared. Open source requires opportunity and momentum, and by closing off the opportunity for Postgres users to quickly create, install, evaluate and iterate extensions, progress is slowed. TLEs offer an opportunity for open source developers to create and share code without having to wait for cloud providers or other gatekeepers to install it.
 
-When AWS released `pg_tle`, we realized immediately how powerful the tool is, and how it will change the way people release and install trusted extensions forever. We started collaborating with the TLE team at AWS, exchanging ideas and resources to further promote TLEs in both our database platform and theirs. By providing the TLE extension in both Supabase and AWS, we are unifying a standard package platform across two of the largest Postgres providers. We hope that other Postgres cloud providers will join the collaboration so that extension developers can leverage a large community base that greatly multiplies the reach of their efforts.
+When AWS released `pg_tle`, we realized immediately how powerful the tool is, and how it will change the way people release and install trusted extensions forever. We started collaborating with the TLE team at AWS, exchanging ideas and resources to further promote TLEs in both our database platform and theirs. By providing the TLE extension in both iEchor and AWS, we are unifying a standard package platform across two of the largest Postgres providers. We hope that other Postgres cloud providers will join the collaboration so that extension developers can leverage a large community base that greatly multiplies the reach of their efforts.
 
 ## Installing TLEs with database.dev
 
-pg_tle is available on new Supabase projects and on Amazon RDS for Postgres 14.5 and higher. Supabase also includes an extension called [pgsql-http](https://github.com/pramsey/pgsql-http) for making HTTP calls from SQL to REST APIs. So, naturally putting two and two together, we thought it would be cool to see if it’s possible to install TLEs from a REST API using only SQL!
+pg_tle is available on new iEchor projects and on Amazon RDS for Postgres 14.5 and higher. iEchor also includes an extension called [pgsql-http](https://github.com/pramsey/pgsql-http) for making HTTP calls from SQL to REST APIs. So, naturally putting two and two together, we thought it would be cool to see if it’s possible to install TLEs from a REST API using only SQL!
 
 We've created a new package registry, dbdev, that makes it easy to install extensions in your database migrations - as easy as: `select dbdev.install('langchain-embedding_search')`.
 You can read more about dbdev in our other blog post: [dbdev: a PostgreSQL Package Manager](/blog/dbdev).

@@ -13,10 +13,10 @@ const FunctionsEmptyState = () => {
           <p className="max-w-lg text-sm text-scale-1100">
             Edge Functions are server-side Typescript functions, distributed globally at the edge -
             close to your users. They can be used for listening to webhooks or integrating your
-            Supabase project with third-parties.
+            iEchor project with third-parties.
           </p>
           <div className="flex gap-2">
-            <Link passHref href="https://supabase.com/docs/guides/functions">
+            <Link passHref href="https://iechor.com/docs/guides/functions">
               <a target="_blank" rel="noreferrer">
                 <Button type="default" iconRight={<IconBookOpen />}>
                   Documentation
@@ -25,7 +25,7 @@ const FunctionsEmptyState = () => {
             </Link>
             <Link
               passHref
-              href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
+              href="https://github.com/openmodels-base/iechor/tree/master/examples/edge-functions/supabase/functions"
             >
               <a target="_blank" rel="noreferrer">
                 <Button type="default" iconRight={<IconCode />}>

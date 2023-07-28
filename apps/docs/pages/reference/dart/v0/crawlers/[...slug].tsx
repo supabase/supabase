@@ -17,8 +17,8 @@ export default function DartReference(props) {
   const filteredSection = sections.filter((section) => section.slug === slug)
 
   const pageTitle = filteredSection[0]?.title
-    ? `${filteredSection[0]?.title} | Supabase`
-    : 'Supabase'
+    ? `${filteredSection[0]?.title} | iEchor`
+    : 'iEchor'
   return (
     <>
       <RefSEO title={pageTitle} />

@@ -66,7 +66,7 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
     answer = answer.replace(/`/g, '').replace(/sql\n/g, '').trim()
 
     const formattedSql = codeBlock`
-      -- Note: This query was generated via Supabase AI, please verify the correctness of the
+      -- Note: This query was generated via iEchor AI, please verify the correctness of the
       -- SQL snippet before running it against your database as we are not able to guarantee it
       -- will do exactly what you requested the AI.
 

@@ -1,10 +1,10 @@
-# Image Search with Supabase Vector
+# Image Search with iEchor Vector
 
 In this example we're implementing image search using the [OpenAI CLIP Model](https://github.com/openai/CLIP), which was trained on a variety of (image, text)-pairs.
 
 We're implementing two methods in the [`/image_search/main.py` file](/image_search/main.py):
 
-1. The `seed` method generates embeddings for the images in the `images` folder and upserts them into a collection in Supabase Vector.
+1. The `seed` method generates embeddings for the images in the `images` folder and upserts them into a collection in iEchor Vector.
 2. Thw `search` method generates an embedding from the search query and performs a vector similarity search query.
 
 ## Setup
@@ -20,15 +20,15 @@ We're implementing two methods in the [`/image_search/main.py` file](/image_sear
 
 - `supabase start`
 - `poetry run seed`
-- Check the embeddings stored in the local Supabase Dashboard: http://localhost:54323/project/default/editor > schema: vecs
+- Check the embeddings stored in the local iEchor Dashboard: http://localhost:54323/project/default/editor > schema: vecs
 
 ### Perform a search
 
 - `poetry run search "bike in front of red brick wall"`
 
-## Run on hosted Supabase project
+## Run on hosted iEchor project
 
-- Set `DB_CONNECTION` with the connection string from your hosted Supabase Dashboard: https://supabase.com/dashboard/project/_/settings/database > Connection string > URI
+- Set `DB_CONNECTION` with the connection string from your hosted iEchor Dashboard: https://iechor.com/dashboard/project/_/settings/database > Connection string > URI
 
 ## Attributions
 

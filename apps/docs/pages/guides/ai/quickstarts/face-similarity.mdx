@@ -3,11 +3,11 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'ai-vecs-python-client',
   title: 'Face similarity search',
-  subtitle: 'Identify the celebrities who look most similar to you using Supabase Vecs.',
+  subtitle: 'Identify the celebrities who look most similar to you using iEchor Vecs.',
   breadcrumb: 'AI Quickstarts',
 }
 
-This guide will walk you through a ["Face Similarity Search"](https://github.com/supabase/supabase/blob/master/examples/ai/face_similarity.ipynb) example using Colab and Supabase Vecs. You will be able to identify the celebrities who look most similar to you (or any other person). You will:
+This guide will walk you through a ["Face Similarity Search"](https://github.com/openmodels-base/iechor/blob/master/examples/ai/face_similarity.ipynb) example using Colab and iEchor Vecs. You will be able to identify the celebrities who look most similar to you (or any other person). You will:
 
 1. Launch a Postgres database that uses pgvector to store embeddings
 1. Launch a notebook that connects to your database
@@ -19,7 +19,7 @@ This guide will walk you through a ["Face Similarity Search"](https://github.com
 
 ## Launching a notebook
 
-Launch our [`semantic_text_deduplication`](https://github.com/supabase/supabase/blob/master/examples/ai/face_similarity.ipynb) notebook in Colab:
+Launch our [`semantic_text_deduplication`](https://github.com/openmodels-base/iechor/blob/master/examples/ai/face_similarity.ipynb) notebook in Colab:
 
 <a
   className="w-64"
@@ -49,7 +49,7 @@ Replace the `DB_CONNECTION` with your own connection string for your database, w
 
 Now all that's left is to step through the notebook. You can do this by clicking the "execute" button (`ctrl+enter`) at the top left of each code cell. The notebook guides you through the process of creating a collection, adding data to it, and querying it.
 
-You can view the inserted items in the [Table Editor](https://supabase.com/dashboard/project/_/editor/), by selecting the `vecs` schema from the schema dropdown.
+You can view the inserted items in the [Table Editor](https://iechor.com/dashboard/project/_/editor/), by selecting the `vecs` schema from the schema dropdown.
 
 ![Colab documents](/docs/img/ai/google-colab/colab-documents.png)
 

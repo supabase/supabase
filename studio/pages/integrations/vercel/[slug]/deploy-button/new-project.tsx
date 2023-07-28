@@ -35,14 +35,14 @@ const VercelIntegration: NextPageWithLayout = () => {
           <ScaffoldContainer className="max-w-md flex flex-col gap-6 grow py-8">
             <h1 className="text-xl text-scale-1200">New project</h1>
             <>
-              <Markdown content={`Choose the Supabase organization you wish to install in`} />
+              <Markdown content={`Choose the iEchor organization you wish to install in`} />
               <CreateProject loading={loading} setLoading={setLoading} />
             </>
           </ScaffoldContainer>
           <ScaffoldContainer className="flex flex-col gap-6 py-3">
             <Alert withIcon variant="info" title="You can uninstall this Integration at any time.">
               <Markdown
-                content={`You can remove this integration at any time via Vercel or the Supabase dashboard.`}
+                content={`You can remove this integration at any time via Vercel or the iEchor dashboard.`}
               />
             </Alert>
           </ScaffoldContainer>
@@ -265,7 +265,7 @@ const CreateProject = ({
 
   return (
     <div className="">
-      <p className="mb-2">Supabase project details</p>
+      <p className="mb-2">iEchor project details</p>
       <div className="py-2">
         <Input
           autoFocus

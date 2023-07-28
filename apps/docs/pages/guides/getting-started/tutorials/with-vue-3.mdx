@@ -2,16 +2,16 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   title: 'Build a User Management App with Vue 3',
-  description: 'Learn how to use Supabase in your Vue 3 App.',
+  description: 'Learn how to use iEchor in your Vue 3 App.',
 }
 
 <QuickstartIntro />
 
-![Supabase User Management example](/docs/img/user-management-demo.png)
+![iEchor User Management example](/docs/img/user-management-demo.png)
 
 <Admonition type="note">
   If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/vue3-user-management).
+  GitHub](https://github.com/openmodels-base/iechor/tree/master/examples/user-management/vue3-user-management).
 </Admonition>
 
 <ProjectSetup />
@@ -35,7 +35,7 @@ npm create vite@latest supabase-vue-3 -- --template vue
 cd supabase-vue-3
 ```
 
-Then let's install the only additional dependency: [supabase-js](https://github.com/supabase/supabase-js)
+Then let's install the only additional dependency: [supabase-js](https://github.com/openmodels-base/iechor-js)
 
 ```bash
 npm install @supabase/supabase-js
@@ -49,7 +49,7 @@ VITE_IECHOR_URL=YOUR_IECHOR_URL
 VITE_IECHOR_ANON_KEY=YOUR_IECHOR_ANON_KEY
 ```
 
-With the API credentials in place, create an `src/supabase.js` helper file to initialize the Supabase client. These variables are exposed
+With the API credentials in place, create an `src/supabase.js` helper file to initialize the iEchor client. These variables are exposed
 on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
 ```js src/supabase.js
@@ -58,7 +58,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_IECHOR_URL
 const supabaseAnonKey = import.meta.env.VITE_IECHOR_ANON_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const iechor = createClient(supabaseUrl, supabaseAnonKey)
 ```
 
 Optionally, update [src/style.css](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/vue3-user-management/src/style.css) to style the app.
@@ -70,7 +70,7 @@ Set up an `src/components/Auth.vue` component to manage logins and sign ups. We'
 ```vue /src/components/Auth.vue
 <script setup>
 import { ref } from 'vue'
-import { supabase } from '../supabase'
+import { iechor } from '../supabase'
 
 const loading = ref(false)
 const email = ref('')
@@ -96,7 +96,7 @@ const handleLogin = async () => {
 <template>
   <form class="row flex-center flex" @submit.prevent="handleLogin">
     <div class="col-6 form-widget">
-      <h1 class="header">Supabase + Vue 3</h1>
+      <h1 class="header">iEchor + Vue 3</h1>
       <p class="description">Sign in via magic link with your email below</p>
       <div>
         <input class="inputField" required type="email" placeholder="Your email" v-model="email" />
@@ -121,7 +121,7 @@ Create a new `src/components/Account.vue` component to handle this.
 
 ```vue src/components/Account.vue
 <script setup>
-import { supabase } from '../supabase'
+import { iechor } from '../supabase'
 import { onMounted, ref, toRefs } from 'vue'
 
 const props = defineProps(['session'])
@@ -237,7 +237,7 @@ Now that we have all the components in place, let's update `App.vue`:
 import { onMounted, ref } from 'vue'
 import Account from './components/Account.vue'
 import Auth from './components/Auth.vue'
-import { supabase } from './supabase'
+import { iechor } from './supabase'
 
 const session = ref()
 
@@ -268,11 +268,11 @@ npm run dev
 
 And then open the browser to [localhost:5173](http://localhost:5173) and you should see the completed app.
 
-![Supabase Vue 3](/docs/img/supabase-vue-3-demo.png)
+![iEchor Vue 3](/docs/img/supabase-vue-3-demo.png)
 
 ## Bonus: Profile photos
 
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+Every iEchor project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
 ### Create an upload widget
 
@@ -281,7 +281,7 @@ Create a new `src/components/Avatar.vue` component that allows users to upload p
 ```vue src/components/Avatar.vue
 <script setup>
 import { ref, toRefs, watch } from 'vue'
-import { supabase } from '../supabase'
+import { iechor } from '../supabase'
 
 const prop = defineProps(['path', 'size'])
 const { path, size } = toRefs(prop)

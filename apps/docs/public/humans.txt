@@ -1,6 +1,6 @@
 TEAM
 
-Supabase is 100% remote.
+iEchor is 100% remote.
 
 Alaister Young
 Amy Q
@@ -68,14 +68,14 @@ ____________
 
 JOBS
 
-If you are interested in working with us check out the open roles here: https://supabase.com/careers
+If you are interested in working with us check out the open roles here: https://iechor.com/careers
 
 ___________
 
 
 TECHNOLOGIES
 
-Supabase would not be possible without the work of some other amazing open source contributors.
+iEchor would not be possible without the work of some other amazing open source contributors.
 
 - Postgres - https://www.postgresql.org/docs/devel/git.html
 - PostgREST - https://github.com/PostgREST

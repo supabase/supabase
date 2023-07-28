@@ -19,7 +19,7 @@ export default function LaunchHero() {
           </div>
 
           <div className="flex gap-3">
-            <Link href="https://www.madewithsupabase.com/tag/Launch%20Week%205">
+            <Link href="https://www.madewithiechor.com/tag/Launch%20Week%205">
               <Button type="primary" size="small" className="text-white">
                 view projects
               </Button>
@@ -61,7 +61,7 @@ export default function LaunchHero() {
           <img
             className="z-10 w-full rounded-xl border"
             src="/images/launchweek/launchweek-day-placeholder.jpg"
-            alt="Supabase"
+            alt="iEchor"
           />
           <iframe
             className="absolute top-0 w-full rounded-xl"

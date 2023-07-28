@@ -48,9 +48,9 @@ const featureHighlights = [
     highlightLines: '15..20',
   },
   {
-    title: 'Use anything from Supabase',
+    title: 'Use anything from iEchor',
     description:
-      'supabase-js can interact with any part of the Supabase stack from Edge Functions, while respecting auth row level security policies.',
+      'supabase-js can interact with any part of the iEchor stack from Edge Functions, while respecting auth row level security policies.',
     highlightLines: '22..27',
   },
   {
@@ -61,7 +61,7 @@ const featureHighlights = [
   },
   {
     title: 'No limits',
-    description: `You're empowered to run any logic you like using any data from the Supabase database.`,
+    description: `You're empowered to run any logic you like using any data from the iEchor database.`,
     highlightLines: '29..39',
   },
 ]
@@ -94,10 +94,10 @@ function Database() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/edge-functions`,
+          url: `https://iechor.com/edge-functions`,
           images: [
             {
-              url: `https://supabase.com${basePath}/images/product/database/database-og.jpg`,
+              url: `https://iechor.com${basePath}/images/product/database/database-og.jpg`,
             },
           ],
         }}
@@ -167,8 +167,8 @@ function Database() {
                 <div>
                   <h3 className="h3">Anatomy of an Edge Function</h3>
                   <p className="p">
-                    Asynchronous tasks within minutes using Supabase Functions with simple
-                    authenticated access to the rest of the Supabase Ecosystem.
+                    Asynchronous tasks within minutes using iEchor Functions with simple
+                    authenticated access to the rest of the iEchor Ecosystem.
                   </p>
                 </div>
                 <div className="flex flex-col gap-3">
@@ -223,7 +223,7 @@ import { Customer } from 'types'
 
 serve(async (req) => {
   try {
-    // create a supabase client with Auth context of the user that called the function
+    // create a iechor client with Auth context of the user that called the function
     const supabaseClient = createClient(
       Deno.env.get('IECHOR_URL') ?? '',
       Deno.env.get('IECHOR_ANON_KEY') ?? '',
@@ -243,7 +243,7 @@ serve(async (req) => {
     if (error) throw error
 
     const customer = await stripe.customers.create({
-      description: 'My First Stripe Customer (created by a Supabase edge function)',
+      description: 'My First Stripe Customer (created by a iEchor edge function)',
       phone: data.phone,
       address: data.address,
       email: user.email,

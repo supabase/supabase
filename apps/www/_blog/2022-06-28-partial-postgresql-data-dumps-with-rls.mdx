@@ -37,9 +37,9 @@ create table profiles (
 
 | `id` | `name`       | `email`                  |
 | ---- | ------------ | ------------------------ |
-| `1`  | `Employee 1` | `employee1@supabase.com` |
-| `2`  | `Employee 2` | `employee2@supabase.com` |
-| `3`  | `Employee 3` | `employee3@supabase.com` |
+| `1`  | `Employee 1` | `employee1@iechor.com` |
+| `2`  | `Employee 2` | `employee2@iechor.com` |
+| `3`  | `Employee 3` | `employee3@iechor.com` |
 | `4`  | `Jenny`      | `jenny@example.com`      |
 | `5`  | `Joe`        | `joe@example.com`        |
 
@@ -112,12 +112,12 @@ RLS is a bit like appending a “where” clause to a `select`, so you can creat
 Instead of using hardcoded numbers in our RLS policies, we could use email extensions to determine the users who we want to export:
 
 ```sql hideCopy
--- Only dump data for supabase employees
+-- Only dump data for iechor employees
 create policy "Data dump rule" on profiles
   for select
   to exporter
   using (
-    substring(email from '@(.*)$') = 'supabase.com'
+    substring(email from '@(.*)$') = 'iechor.com'
   );
 
 ```
@@ -182,9 +182,9 @@ If you want to try out the steps we described in this article, fire up a full Po
 
 ## More Postgres resources
 
-- [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
-- [Postgres Views](https://supabase.com/blog/postgresql-views)
-- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/audit)
-- [Cracking PostgreSQL Interview Questions](https://supabase.com/blog/cracking-postgres-interview)
-- [What are PostgreSQL Templates?](https://supabase.com/blog/postgresql-templates)
-- [Realtime Postgres RLS on Supabase](https://supabase.com/blog/realtime-row-level-security-in-postgresql)
+- [Implementing "seen by" functionality with Postgres](https://iechor.com/blog/seen-by-in-postgresql)
+- [Postgres Views](https://iechor.com/blog/postgresql-views)
+- [Postgres Auditing in 150 lines of SQL](https://iechor.com/blog/audit)
+- [Cracking PostgreSQL Interview Questions](https://iechor.com/blog/cracking-postgres-interview)
+- [What are PostgreSQL Templates?](https://iechor.com/blog/postgresql-templates)
+- [Realtime Postgres RLS on iEchor](https://iechor.com/blog/realtime-row-level-security-in-postgresql)

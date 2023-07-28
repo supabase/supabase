@@ -15,7 +15,7 @@ import { Admonition, Button, ExpandableVideo, IconChevronLeft, IconExternalLink 
 import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import supabase from '~/lib/supabase'
+import iechor from '~/lib/supabase'
 import { Partner } from '~/types/partners'
 import Error404 from '../../404'
 
@@ -52,12 +52,12 @@ function Partner({
   return (
     <>
       <NextSeo
-        title={`${partner.title} | Works With Supabase`}
+        title={`${partner.title} | Works With iEchor`}
         description={partner.description}
         openGraph={{
-          title: `${partner.title} | Works With Supabase`,
+          title: `${partner.title} | Works With iEchor`,
           description: partner.description,
-          url: `https://supabase.com/partners/integrations/${partner.slug}`,
+          url: `https://iechor.com/partners/integrations/${partner.slug}`,
           images: [
             {
               url: partner.images ? partner.images[0] : partner.logo,
@@ -243,7 +243,7 @@ function Partner({
               <div className="bg-scale-100 dark:bg-scale-300 hover:border-scale-600 hover:dark:border-scale-700 border-scale-300 dark:border-scale-400 rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
                 <div className="flex flex-row justify-between">
                   <h1 className="text-2xl font-medium self-center">
-                    Get started with {partner.title} and Supabase.
+                    Get started with {partner.title} and iEchor.
                   </h1>
                   <a href={partner.call_to_action_link} target="_blank" rel="noreferrer">
                     <Button size="medium" type="secondary">

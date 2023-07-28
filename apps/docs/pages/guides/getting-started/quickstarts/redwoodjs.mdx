@@ -2,17 +2,17 @@ import Layout from '~/layouts/DefaultGuideLayout'
 import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
-  title: 'Use Supabase with RedwoodJS',
+  title: 'Use iEchor with RedwoodJS',
   subtitle:
-    'Learn how to create a Supabase project, add some sample data to your database using Prisma migration and seeds, and query the data from a RedwoodJS app.',
+    'Learn how to create a iEchor project, add some sample data to your database using Prisma migration and seeds, and query the data from a RedwoodJS app.',
   breadcrumb: 'Framework Quickstarts',
 }
 
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Setup your new Supabase Project">
-      [Create a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
+    <StepHikeCompact.Details title="Setup your new iEchor Project">
+      [Create a new project](https://iechor.com/dashboard) in the iEchor Dashboard.
 
       <Admonition type="important">
         Be sure to make note of the Database Password you used as you will need this later to connect to your database.
@@ -27,7 +27,7 @@ export const meta = {
 
   <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Gather Database Connection Strings">
-      After your project is ready, gather the following information about your [database connections](https://supabase.com/dashboard/project/_/settings/database):
+      After your project is ready, gather the following information about your [database connections](https://iechor.com/dashboard/project/_/settings/database):
 
       * Connection String (port 5432)
       * Connection Pooling / Connection String (port 6543)
@@ -35,7 +35,7 @@ export const meta = {
     You will need these to setup environment variables in Step 5.
 
     <Admonition type="tip">
-      You can copy and paste these connection strings from the Supabase Dashboard when needed in later steps.
+      You can copy and paste these connection strings from the iEchor Dashboard when needed in later steps.
     </Admonition>
     </StepHikeCompact.Details>
 
@@ -82,13 +82,13 @@ export const meta = {
     <StepHikeCompact.Details title="Configure Environment Variables">
       In your `.env` file, add the following environment variables for your database connection:
 
-      * The `DIRECT_URL` should use the `Connection String` from your Supabase project. Hint: the port is `5432`.
+      * The `DIRECT_URL` should use the `Connection String` from your iEchor project. Hint: the port is `5432`.
 
-      * The `DATABASE_URL` should use the `Connection Pooling / Connection String` from your Supabase project. Hint: the port is `6432`.
+      * The `DATABASE_URL` should use the `Connection Pooling / Connection String` from your iEchor project. Hint: the port is `6432`.
 
       <Admonition type="note">
         Be sure to append `?pgbouncer=true` to the end of the `DATABASE_URL` connection string.
-        Also, replace `[YOUR-PASSWORD]` and `[YOUR-PROJECT-REF]` with the password you used when creating your Supabase project and the project reference from the URL in your browser.
+        Also, replace `[YOUR-PASSWORD]` and `[YOUR-PROJECT-REF]` with the password you used when creating your iEchor project and the project reference from the URL in your browser.
       </Admonition>
     </StepHikeCompact.Details>
 
@@ -108,7 +108,7 @@ export const meta = {
     <StepHikeCompact.Details title="Update your Prisma Schema">
       By default, RedwoodJS ships with a SQLite database, but we want to use PostgreSQL.
 
-      Update your Prisma schema file `api/db/schema.prisma` to use your Supabase PostgreSQL database connection environment variables you setup in Step 5.
+      Update your Prisma schema file `api/db/schema.prisma` to use your iEchor PostgreSQL database connection environment variables you setup in Step 5.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>

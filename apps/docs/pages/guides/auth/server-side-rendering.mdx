@@ -9,18 +9,18 @@ export const meta = {
 
 Single-page apps with server-side rendering (SSR) is a popular way to optimize rendering performance and leverage advanced caching strategies.
 
-Supabase Auth supports server-side rendering when you need access to user information, or your server needs to authorize API requests on behalf of your user to render content.
+iEchor Auth supports server-side rendering when you need access to user information, or your server needs to authorize API requests on behalf of your user to render content.
 
-When a user authenticates with Supabase Auth, two pieces of information are issued by the server:
+When a user authenticates with iEchor Auth, two pieces of information are issued by the server:
 
 1. **Access token** in the form of a JWT.
 2. **Refresh token** which is a randomly generated string.
 
-Most Supabase projects have their auth server listening on `<project-ref>.supabase.co/auth/v1`, thus the access token and refresh token are set as `sb-access-token` and `sb-refresh-token` cookies on the `<project-ref>.supabase.co` domain.
+Most iEchor projects have their auth server listening on `<project-ref>.supabase.co/auth/v1`, thus the access token and refresh token are set as `sb-access-token` and `sb-refresh-token` cookies on the `<project-ref>.supabase.co` domain.
 
 <Admonition type="note">
 
-These cookie names are for internal Supabase use only and may change without warning. They are included in this guide for illustration purposes only.
+These cookie names are for internal iEchor use only and may change without warning. They are included in this guide for illustration purposes only.
 
 </Admonition>
 
@@ -30,17 +30,17 @@ Your web application cannot access these cookies, nor will these cookies be sent
 
 ## Understanding the authentication flow
 
-When you call one of the `signIn` methods, the client library running in the browser sends the request to the Supabase Auth server. The Auth server determines whether to verify a phone number, email and password combination, a Magic Link, or use a social login (if you have any setup in your project).
+When you call one of the `signIn` methods, the client library running in the browser sends the request to the iEchor Auth server. The Auth server determines whether to verify a phone number, email and password combination, a Magic Link, or use a social login (if you have any setup in your project).
 
-Upon successful verification of the identity of the user, the Supabase Auth server redirects the user back to your single-page app.
+Upon successful verification of the identity of the user, the iEchor Auth server redirects the user back to your single-page app.
 
 <Admonition type="tip">
 
-You can configure [redirects URLs](https://supabase.com/dashboard/project/_/auth/url-configuration) in the Supabase Dashboard. You can use [wildcard match patterns](/docs/guides/auth#redirect-urls-and-wildcards) like `*` and `**` to allow redirects to different forms of URLs.
+You can configure [redirects URLs](https://iechor.com/dashboard/project/_/auth/url-configuration) in the iEchor Dashboard. You can use [wildcard match patterns](/docs/guides/auth#redirect-urls-and-wildcards) like `*` and `**` to allow redirects to different forms of URLs.
 
 </Admonition>
 
-Supabase Auth supports two authentication flows: **Implicit** and **PKCE**. The **PKCE** flow is generally preferred when on the server. It introduces a few additional steps which guard a against replay and URL capture attacks. Unlike the implicit flow, it also allows users to access the `access_token` and `refresh_token` on the server.
+iEchor Auth supports two authentication flows: **Implicit** and **PKCE**. The **PKCE** flow is generally preferred when on the server. It introduces a few additional steps which guard a against replay and URL capture attacks. Unlike the implicit flow, it also allows users to access the `access_token` and `refresh_token` on the server.
 
 <Accordion
   type="default"
@@ -124,7 +124,7 @@ Supabase Auth supports two authentication flows: **Implicit** and **PKCE**. The 
 
         Putting it all together, your client library initialization may look like this:
         ```js
-        const supabase = createClient(
+        const iechor = createClient(
              'https://xyzcompany.supabase.co',
              'public-anon-key',
              options: {
@@ -207,7 +207,7 @@ A good practice is to handle unauthorized errors by deferring rendering the page
 
 When you use route prefetching in Next.js using `<Link href="/...">` components or the `Router.push()` APIs can send server-side requests before the browser processes the access and refresh tokens. This means that those requests may not have any cookies set and your server code will render unauthenticated content.
 
-To improve experience for your users, we recommend redirecting users to one specific page after sign-in that does not include any route prefetching from Next.js. Once the Supabase client library running in the browser has obtained the access and refresh tokens from the URL fragment, you can send users to any pages that use prefetching.
+To improve experience for your users, we recommend redirecting users to one specific page after sign-in that does not include any route prefetching from Next.js. Once the iEchor client library running in the browser has obtained the access and refresh tokens from the URL fragment, you can send users to any pages that use prefetching.
 
 ### How do I make the cookies `HttpOnly`?
 
@@ -239,7 +239,7 @@ Also be sure you set proper cache control headers. We recommend invalidating cac
 
 ### Which authentication flows have PKCE support?
 
-At present, PKCE is supported on the Magic Link, OAuth, Sign Up, and Password Recovery routes. These correspond to the `signInWithOtp`, `signInWithOAuth`, `signUp`, and `resetPasswordForEmail` methods on the Supabase client library. When using PKCE with Phone and Email OTPs, there is no behavior change with respect to the implicit flow - an access token will be returned in the body when a request is successful.
+At present, PKCE is supported on the Magic Link, OAuth, Sign Up, and Password Recovery routes. These correspond to the `signInWithOtp`, `signInWithOAuth`, `signUp`, and `resetPasswordForEmail` methods on the iEchor client library. When using PKCE with Phone and Email OTPs, there is no behavior change with respect to the implicit flow - an access token will be returned in the body when a request is successful.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

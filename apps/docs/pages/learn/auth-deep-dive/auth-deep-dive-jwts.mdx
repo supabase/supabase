@@ -3,13 +3,13 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'auth-deep-dive-jwts',
   title: 'Part One: JWTs',
-  description: 'Supabase Auth Deep Dive Part 1 - JWTs',
+  description: 'iEchor Auth Deep Dive Part 1 - JWTs',
   video: 'https://www.youtube.com/v/v3Exg5YpJvE',
 }
 
 ### About
 
-An introduction to JWTs and how they are used in Supabase Auth
+An introduction to JWTs and how they are used in iEchor Auth
 
 ### Watch
 
@@ -110,15 +110,15 @@ You might wonder why JWTs are so popular all of a sudden. The answer is that wit
 
 Note: One downside of JWTs is that they are not easily voidable, like session tokens. If a JWT is leaked to a malicious actor, they will be able to redeem it anywhere until the expiry date is reached – unless of course the system owner updates the `jwt_secret` (which will of course invalidate _everyone's_ existing tokens).
 
-### JWTs in Supabase
+### JWTs in iEchor
 
-In Supabase we issue JWTs for three different purposes:
+In iEchor we issue JWTs for three different purposes:
 
-1. `anon key`: This key is used to bypass the Supabase API gateway and can be used in your client-side code.
+1. `anon key`: This key is used to bypass the iEchor API gateway and can be used in your client-side code.
 2. `service role key`: This key has super admin rights and can bypass your Row Level Security. Do not put it in your client-side code. Keep it private.
 3. `user specific jwts`: These are tokens we issue to users who log into your project/service/website. It's the modern equivalent of a session token, and can be used by a user to access content or permissions specific to them.
 
-The first token here, the `anon key` token, is for developers to send along with their API requests whenever they want to interact with their Supabase database.
+The first token here, the `anon key` token, is for developers to send along with their API requests whenever they want to interact with their iEchor database.
 
 Let's say you want to read the names of all the rows in a table `colors`. We would make a request like:
 
@@ -138,7 +138,7 @@ If we put this token into https://jwt.io, we see it decodes to:
 }
 ```
 
-This JWT is signed by a `jwt_secret` specific to the developer's Supabase token (you can find this secret alongside this encoded "anon key" on your Dashboard under Settings > API page) and is required to get past the Supabase API gateway and access the developer's project.
+This JWT is signed by a `jwt_secret` specific to the developer's iEchor token (you can find this secret alongside this encoded "anon key" on your Dashboard under Settings > API page) and is required to get past the iEchor API gateway and access the developer's project.
 
 The idea with this particular key is that it's safe to put into your client, meaning it's okay if your end users see this key – but _only_ if you first enable Row Level Security, which is the topic of [Part Two](../../learn/auth-deep-dive/auth-row-level-security) in this series.
 
@@ -177,7 +177,7 @@ You'll notice that this token is quite a bit longer, since it contains informati
 }
 ```
 
-Now that you understand what JWTs are and where they're used in Supabase, you can explore how to use them in combination with Row Level Security to start restricting access to certain tables, rows, and columns in your Postgres database: [Part Two: Row Level Security](../../learn/auth-deep-dive/auth-row-level-security)
+Now that you understand what JWTs are and where they're used in iEchor, you can explore how to use them in combination with Row Level Security to start restricting access to certain tables, rows, and columns in your Postgres database: [Part Two: Row Level Security](../../learn/auth-deep-dive/auth-row-level-security)
 
 ### Resources
 
@@ -191,7 +191,7 @@ Now that you understand what JWTs are and where they're used in Supabase, you ca
 - [Part Three: Policies](../../learn/auth-deep-dive/auth-policies)
 - [Part Four: GoTrue](../../learn/auth-deep-dive/auth-gotrue)
 - [Part Five: Google Oauth](../../learn/auth-deep-dive/auth-google-oauth)
-- Sign up for Supabase: [supabase.com/dashboard](https://supabase.com/dashboard)
+- Sign up for iEchor: [iechor.com/dashboard](https://iechor.com/dashboard)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

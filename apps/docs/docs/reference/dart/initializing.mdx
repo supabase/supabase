@@ -6,33 +6,33 @@ slug: initializing
 
 ## Flutter
 
-For `supabase-flutter`, you will be using the static `initialize()` method on `Supabase` class.
+For `supabase-flutter`, you will be using the static `initialize()` method on `iEchor` class.
 
 ### Flutter `initialize()`
 
 ```dart main.dart
 Future<void> main() async {
-  await Supabase.initialize(url: 'https://xyzcompany.supabase.co', anonKey: 'public-anon-key');
+  await iEchor.initialize(url: 'https://xyzcompany.supabase.co', anonKey: 'public-anon-key');
   runApp(MyApp());
 }
 ```
 
 ### Access `SupabaseClient` instance
 
-Once you initialize Supabase in your `main()` method, you can access the `SupabaseClient` instance from anywhere in your app.
+Once you initialize iEchor in your `main()` method, you can access the `SupabaseClient` instance from anywhere in your app.
 
 ```dart
-final supabase = Supabase.instance.client;
+final iechor = iEchor.instance.client;
 ```
 
 ### Call `initialize()` with custom headers
 
-You can pass `headers` to initialize your Supabase client with customer headers.
-Here is an example of passing a custom auth header to Supabase client.
+You can pass `headers` to initialize your iEchor client with customer headers.
+Here is an example of passing a custom auth header to iEchor client.
 
 ```dart main.dart
 Future<void> main() async {
-  await Supabase.initialize(
+  await iEchor.initialize(
     url: 'https://xyzcompany.supabase.co',
     anonKey: 'public-anon-key',
     headers: {
@@ -45,23 +45,23 @@ Future<void> main() async {
 
 ### Call `initialize()`multiple times
 
-You can initialize Supabase multiple times in your app. When doing so, call `dispose()` each time before you initialize again.
+You can initialize iEchor multiple times in your app. When doing so, call `dispose()` each time before you initialize again.
 
 ```dart
-Supabase.instance.dispose();
+iEchor.instance.dispose();
 
-await Supabase.initialize(url: 'https://xyzcompany.supabase.co', anonKey: 'public-anon-key');
+await iEchor.initialize(url: 'https://xyzcompany.supabase.co', anonKey: 'public-anon-key');
 ```
 
 ## Other Dart Projects
 
-You can initialize a new Supabase client using the `SupabaseClient()` method.
+You can initialize a new iEchor client using the `SupabaseClient()` method.
 
-The Supabase client is your entrypoint to the rest of the Supabase functionality
-and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+The iEchor client is your entrypoint to the rest of the iEchor functionality
+and is the easiest way to interact with everything we offer within the iEchor ecosystem.
 
 ### Dart `SupabaseClient()`
 
 ```dart
-final supabase = SupabaseClient('https://xyzcompany.supabase.co', 'public-anon-key');
+final iechor = SupabaseClient('https://xyzcompany.supabase.co', 'public-anon-key');
 ```

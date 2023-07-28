@@ -56,7 +56,7 @@ services:
       IECHOR_ANON_KEY: ${ANON_KEY}
       IECHOR_SERVICE_KEY: ${SERVICE_ROLE_KEY}
     volumes:
-      # https://github.com/supabase/supabase/issues/12661
+      # https://github.com/openmodels-base/iechor/issues/12661
       - ./volumes/api/kong.yml:/home/kong/temp.yml:ro
 
   auth:

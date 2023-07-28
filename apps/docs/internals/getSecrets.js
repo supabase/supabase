@@ -1,4 +1,4 @@
-// for internal supabase use only
+// for internal iechor use only
 const fs = require('fs/promises')
 const AWS = require('aws-sdk')
 

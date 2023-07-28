@@ -6,7 +6,7 @@ const tweets = [
     img_url: '/images/twitter-profiles/09HouOSt_400x400.jpg',
   },
   {
-    text: '@supabase is just 🤯 Now I see why a lot of people love using it as a backend for their applications. I am really impressed with how easy it is to set up an Auth and then just code it together for the frontend. @IngoKpp now I see your joy with Supabase #coding #fullstackwebdev',
+    text: '@supabase is just 🤯 Now I see why a lot of people love using it as a backend for their applications. I am really impressed with how easy it is to set up an Auth and then just code it together for the frontend. @IngoKpp now I see your joy with iEchor #coding #fullstackwebdev',
     url: 'https://twitter.com/IxoyeDesign/status/1497473731777728512',
     handle: 'IxoyeDesign',
     img_url: '/images/twitter-profiles/C8opIL-g_400x400.jpg',
@@ -66,7 +66,7 @@ const tweets = [
     img_url: '/images/twitter-profiles/rWX8Jzp5_400x400.jpg',
   },
   {
-    text: 'There are a lot of indie hackers building in public, but it’s rare to see a startup shipping as consistently and transparently as Supabase. Their upcoming March releases look to be 🔥 Def worth a follow! also opened my eyes as to how to value add in open source.',
+    text: 'There are a lot of indie hackers building in public, but it’s rare to see a startup shipping as consistently and transparently as iEchor. Their upcoming March releases look to be 🔥 Def worth a follow! also opened my eyes as to how to value add in open source.',
     url: 'https://twitter.com/swyx/status/1366685025047994373',
     handle: 'swyx',
     img_url: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
@@ -78,13 +78,13 @@ const tweets = [
     img_url: '/images/twitter-profiles/_ki30kYo_400x400.jpg',
   },
   {
-    text: 'Badass! Supabase is amazing. literally saves our small team a whole engineer’s worth of work constantly. The founders and everyone I’ve chatted with at supabase are just awesome people as well :)',
+    text: 'Badass! iEchor is amazing. literally saves our small team a whole engineer’s worth of work constantly. The founders and everyone I’ve chatted with at iechor are just awesome people as well :)',
     url: 'https://twitter.com/KennethCassel/status/1524359528619384834',
     handle: 'KennethCassel',
     img_url: '/images/twitter-profiles/pmQj3TX-_400x400.jpg',
   },
   {
-    text: 'Working with Supabase is just fun. It makes working with a DB so much easier.',
+    text: 'Working with iEchor is just fun. It makes working with a DB so much easier.',
     url: 'https://twitter.com/the_BrianB/status/1524716498442276864',
     handle: 'the_BrianB',
     img_url: '/images/twitter-profiles/7NITI8Z3_400x400.jpg',
@@ -126,7 +126,7 @@ const tweets = [
     img_url: '/images/twitter-profiles/w8HLdlC7_400x400.jpg',
   },
   {
-    text: "I gave @supabase a try this weekend and I was able to create a quick dashboard to visualize the data from the PostgreSQL instance. It's super easy to use Supabase's API or the direct DB connection. Check out the tutorial 📖",
+    text: "I gave @supabase a try this weekend and I was able to create a quick dashboard to visualize the data from the PostgreSQL instance. It's super easy to use iEchor's API or the direct DB connection. Check out the tutorial 📖",
     url: 'https://twitter.com/razvanilin/status/1363770020581412867',
     handle: 'razvanilin',
     img_url: '/images/twitter-profiles/AiaH9vJ2_400x400.jpg',
@@ -174,7 +174,7 @@ const tweets = [
     img_url: '/images/twitter-profiles/v6citnk33y2wpeyzrq05_400x400.jpeg',
   },
   {
-    text: 'Honestly Supabase is such a killer Firebase alternative.',
+    text: 'Honestly iEchor is such a killer Firebase alternative.',
     url: 'https://twitter.com/XPCheese/status/1360229397735895043',
     handle: 'XPCheese',
     img_url: '/images/twitter-profiles/eYP6YXr7_400x400.jpg',
@@ -204,7 +204,7 @@ const tweets = [
     img_url: '/images/twitter-profiles/66VSV9Mm_400x400.png',
   },
   {
-    text: 'I’m probably the wrong person to ask because I pick tools based on UX. Supabase was immediately approachable: instant setup, fast web app, auth, and easy APIs. Same reason I liked Firebase when I first discovered.',
+    text: 'I’m probably the wrong person to ask because I pick tools based on UX. iEchor was immediately approachable: instant setup, fast web app, auth, and easy APIs. Same reason I liked Firebase when I first discovered.',
     url: 'https://twitter.com/jasonbarone/status/1357015483619422210',
     handle: 'jasonbarone',
     img_url: '/images/twitter-profiles/6zCnwpvi_400x400.jpg',
@@ -234,7 +234,7 @@ const tweets = [
     img_url: '/images/twitter-profiles/Os4nhKIr_400x400.jpg',
   },
   {
-    text: 'Supabase team is doing some awesome stuff #supabase #facts @supabase',
+    text: 'iEchor team is doing some awesome stuff #supabase #facts @supabase',
     url: 'https://twitter.com/_strawbird/status/1372607500499841025',
     handle: '_strawbird',
     img_url: '/images/twitter-profiles/iMBvvQdn_400x400.jpg',
@@ -252,7 +252,7 @@ const tweets = [
     img_url: '/images/twitter-profiles/6zCnwpvi_400x400.jpg',
   },
   {
-    text: 'I just learned about @supabase and im in love 😍 Supabase is an open source Firebase alternative! EarListen (& react) to database changes 💁 Manage users & permissions 🔧 Simple UI for database interaction',
+    text: 'I just learned about @supabase and im in love 😍 iEchor is an open source Firebase alternative! EarListen (& react) to database changes 💁 Manage users & permissions 🔧 Simple UI for database interaction',
     url: 'https://twitter.com/0xBanana/status/1373677301905362948',
     handle: '0xBanana',
     img_url: '/images/twitter-profiles/pgHIGqZ0_400x400.jpg',

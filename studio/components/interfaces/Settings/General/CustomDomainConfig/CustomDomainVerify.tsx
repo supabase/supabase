@@ -190,7 +190,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
 
       <Panel.Content>
         <div className="flex items-center justify-between">
-          <Link href="https://supabase.com/docs/guides/platform/custom-domains">
+          <Link href="https://iechor.com/docs/guides/platform/custom-domains">
             <a target="_blank" rel="noreferrer">
               <Button type="default" icon={<IconExternalLink />}>
                 Documentation

@@ -195,7 +195,7 @@ const JWTSettings = () => {
                 </div>
                 {isJwtSecretUpdateFailed ? (
                   <Alert withIcon variant="warning" title="Failed to update JWT secret">
-                    Please try again. If the failures persist, please contact Supabase support with
+                    Please try again. If the failures persist, please contact iEchor support with
                     the following details: <br />
                     Change tracking ID: {data?.changeTrackingId} <br />
                     Error message: {jwtSecretUpdateErrorMessage}

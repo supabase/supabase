@@ -21,9 +21,9 @@ export default function IndexPage() {
   const [showComputeModal, setShowComputeModal] = useState(false)
   const [activeMobilePlan, setActiveMobilePlan] = useState('Free')
 
-  const meta_title = 'Pricing & fees | Supabase'
+  const meta_title = 'Pricing & fees | iEchor'
   const meta_description =
-    'Explore Supabase fees and pricing information. Find our competitive pricing plans, with no hidden pricing. We have a generous free plan for those getting started, and Pay As You Go for those scaling up.'
+    'Explore iEchor fees and pricing information. Find our competitive pricing plans, with no hidden pricing. We have a generous free plan for those getting started, and Pay As You Go for those scaling up.'
 
   const plansExceptEnterprise = plans.filter((it) => it.name !== 'Enterprise')
   const planEnterprise = plans.find((it) => it.name === 'Enterprise')!
@@ -57,7 +57,7 @@ export default function IndexPage() {
       price: 'Starts from $5',
       description: 'Increase the capability of your database only for what you need.',
       leftCtaText: 'Documentation',
-      leftCtaLink: 'https://supabase.com/docs/guides/platform/compute-add-ons',
+      leftCtaLink: 'https://iechor.com/docs/guides/platform/compute-add-ons',
       rightCtaText: 'See Pricing breakdown',
       rightCtaLink: '#open-modal',
     },
@@ -67,9 +67,9 @@ export default function IndexPage() {
       icon: 'custom-domain-upgrade',
       price: 'Flat fee $10',
       description:
-        'Use your own domain for your Supabase project to present a more polished product to your users.',
+        'Use your own domain for your iEchor project to present a more polished product to your users.',
       leftCtaText: 'Documentation',
-      leftCtaLink: 'https://supabase.com/docs/guides/platform/custom-domains',
+      leftCtaLink: 'https://iechor.com/docs/guides/platform/custom-domains',
       rightCtaText: 'See more',
       rightCtaLink: 'http://',
     },
@@ -80,7 +80,7 @@ export default function IndexPage() {
       price: 'Starts from $100',
       description: 'Roll back to any specific point in time and ensure that data is not lost.',
       leftCtaText: 'Documentation',
-      leftCtaLink: 'https://supabase.com/docs/guides/platform/backups',
+      leftCtaLink: 'https://iechor.com/docs/guides/platform/backups',
       rightCtaText: 'See Pricing breakdown',
       rightCtaLink: 'http://',
     },
@@ -118,7 +118,7 @@ export default function IndexPage() {
           <p className="p">{priceDescription}</p>
         </div>
         <p className="p">{description}</p>
-        <Link href="https://supabase.com/dashboard" passHref>
+        <Link href="https://iechor.com/dashboard" passHref>
           <a>
             <Button size="medium" block>
               Get started
@@ -137,10 +137,10 @@ export default function IndexPage() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/${router.pathname}`,
+          url: `https://iechor.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image-v2.jpg`,
+              url: `https://iechor.com/images/og/og-image-v2.jpg`,
             },
           ],
         }}
@@ -367,7 +367,7 @@ export default function IndexPage() {
           <div className="text-center">
             <h2 className="text-scale-1200 text-3xl">Easily customizable add-ons</h2>
             <p className="text-scale-1100 mt-4 mb-8 lg:mb-16 text-lg">
-              Level up your Supabase experience with add-ons.
+              Level up your iEchor experience with add-ons.
             </p>
           </div>
 
@@ -423,8 +423,8 @@ export default function IndexPage() {
           <div className="flex flex-col md:flex-row items-center gap-4 justify-center text-center">
             <span className="prose">Got something you'd like to see here?</span>
             <Link
-              href="https://github.com/supabase/supabase/discussions/categories/feature-requests"
-              as="https://github.com/supabase/supabase/discussions/categories/feature-requests"
+              href="https://github.com/openmodels-base/iechor/discussions/categories/feature-requests"
+              as="https://github.com/openmodels-base/iechor/discussions/categories/feature-requests"
             >
               <a target="_blank">
                 <Button size="tiny" type="default">
@@ -870,8 +870,8 @@ export default function IndexPage() {
 
                     <td className="px-6 pt-5">
                       <Link
-                        href="https://supabase.com/dashboard"
-                        as="https://supabase.com/dashboard"
+                        href="https://iechor.com/dashboard"
+                        as="https://iechor.com/dashboard"
                       >
                         <a>
                           <Button size="tiny" type="primary" block>
@@ -883,8 +883,8 @@ export default function IndexPage() {
 
                     <td className="px-6 pt-5">
                       <Link
-                        href="https://supabase.com/dashboard"
-                        as="https://supabase.com/dashboard"
+                        href="https://iechor.com/dashboard"
+                        as="https://iechor.com/dashboard"
                       >
                         <a>
                           <Button size="tiny" type="primary" block>
@@ -895,7 +895,7 @@ export default function IndexPage() {
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://forms.supabase.com/team">
+                      <Link href="https://forms.iechor.com/team">
                         <a>
                           <Button size="tiny" type="primary" block>
                             Contact us
@@ -905,7 +905,7 @@ export default function IndexPage() {
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://forms.supabase.com/enterprise">
+                      <Link href="https://forms.iechor.com/enterprise">
                         <a>
                           <Button size="tiny" type="default" block>
                             Contact us
@@ -952,7 +952,7 @@ export default function IndexPage() {
                 Can&apos;t find the answer to your question, you can{' '}
                 <a
                   target="_blank"
-                  href="https://supabase.com/dashboard/support/new"
+                  href="https://iechor.com/dashboard/support/new"
                   className="transition text-brand-900 hover:text-brand-1000"
                 >
                   open a support ticket
@@ -963,7 +963,7 @@ export default function IndexPage() {
                 For enterprise enquries,{' '}
                 <a
                   target="_blank"
-                  href="https://supabase.com/dashboard/support/new"
+                  href="https://iechor.com/dashboard/support/new"
                   className="transition text-brand-900 hover:text-brand-1000"
                 >
                   you can contact the team here

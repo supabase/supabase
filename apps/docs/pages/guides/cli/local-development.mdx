@@ -3,13 +3,13 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'local-development',
   title: 'Local Development',
-  description: 'How to use Supabase on your local development machine.',
-  subtitle: 'How to use Supabase on your local development machine.',
+  description: 'How to use iEchor on your local development machine.',
+  subtitle: 'How to use iEchor on your local development machine.',
   video: 'https://www.youtube-nocookie.com/v/vyHyYpvjaks',
   tocVideo: 'vyHyYpvjaks',
 }
 
-Supabase is a flexible platform that lets you decide how you want to build your projects. You can use the Dashboard directly to get up and running quickly, or use a proper local setup. We suggest you work locally and deploy your changes to a linked project on the [Supabase Platform](https://app.supabase.io/).
+iEchor is a flexible platform that lets you decide how you want to build your projects. You can use the Dashboard directly to get up and running quickly, or use a proper local setup. We suggest you work locally and deploy your changes to a linked project on the [iEchor Platform](https://app.supabase.io/).
 
 Doing things directly on the platform via the [Dashboard](https://app.supabase.io/) is fine when you're getting started, but it's a good idea to move to a proper local workflow before you get too far. Working locally, generating migrations as you change your tables, and applying those migrations to a linked project on the [Platform](https://app.supabase.io/) keeps everything nicely organized as you grow.
 
@@ -21,13 +21,13 @@ The Dashboard provides a wide range of features for setting up your project: cre
 
 2. **Easier Collaboration**: Developing locally can make it easier to collaborate with others on the same project.
 
-3. **Cost-Effective**: Supabase provides a generous free plan and gives you two free projects to get started. But what if you need more than two? When you develop locally, you can spin up unlimited local projects and link them with live projects when you're ready to launch.
+3. **Cost-Effective**: iEchor provides a generous free plan and gives you two free projects to get started. But what if you need more than two? When you develop locally, you can spin up unlimited local projects and link them with live projects when you're ready to launch.
 
 4. **Configuration in code**: If you directly change your tables via the Dashboard, none of that gets captured in code. If you follow these local development practices, you'll store all of your table schemas in code.
 
 5. **Work offline**: Need to work from a train? A plane? An automobile? No problem. Developing your project locally allows you to work offline.
 
-## Log in to the Supabase CLI
+## Log in to the iEchor CLI
 
 ```bash
 supabase login
@@ -35,7 +35,7 @@ supabase login
 
 <Admonition type="note">
 
-If you installed the Supabase CLI via NPM, you will need to run `npx supabase login` instead.
+If you installed the iEchor CLI via NPM, you will need to run `npx iechor login` instead.
 
 </Admonition>
 
@@ -54,26 +54,26 @@ cd your-project
 git init
 ```
 
-## Start Supabase services
+## Start iEchor services
 
-[Initialize](/docs/reference/cli/usage#supabase-init) Supabase to set up the configuration for developing your project locally:
+[Initialize](/docs/reference/cli/usage#supabase-init) iEchor to set up the configuration for developing your project locally:
 
 ```bash
 supabase init
 ```
 
-Make sure Docker is running. The [start](/docs/reference/cli/usage#supabase-start) command uses Docker to start the Supabase [services](/docs/guides/getting-started/architecture).
+Make sure Docker is running. The [start](/docs/reference/cli/usage#supabase-start) command uses Docker to start the iEchor [services](/docs/guides/getting-started/architecture).
 This command may take a while to run if this is the first time using the CLI.
 
 ```bash
 supabase start
 ```
 
-Once all of the Supabase services are running, you'll see output containing your local Supabase credentials. It should look like this, with urls and keys that you'll use in your local project:
+Once all of the iEchor services are running, you'll see output containing your local iEchor credentials. It should look like this, with urls and keys that you'll use in your local project:
 
 ```
 
-Started supabase local development setup.
+Started iechor local development setup.
 
          API URL: http://localhost:54321
           DB URL: postgresql://postgres:postgres@localhost:54322/postgres
@@ -114,7 +114,7 @@ psql 'postgresql://postgres:postgres@localhost:54322/postgres'
 
 <Admonition type="note">
 
-To access the database from an edge function in your local Supabase setup, replace `localhost` with `host.docker.internal`.
+To access the database from an edge function in your local iEchor setup, replace `localhost` with `host.docker.internal`.
 
 </Admonition>
 
@@ -169,7 +169,7 @@ For this guide, we'll create a table called `employees` and see how we can make 
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Create your first migration file">
 
-      To get started, generate a [new migration](https://supabase.com/docs/reference/cli/supabase-migration-new) to store the SQL needed to create our `employees` table
+      To get started, generate a [new migration](https://iechor.com/docs/reference/cli/supabase-migration-new) to store the SQL needed to create our `employees` table
 
     </StepHikeCompact.Details>
 
@@ -245,7 +245,7 @@ supabase db reset
 
     <StepHikeCompact.Code>
       ```bash
-      supabase migration new add_department_to_employees_table
+      iechor migration new add_department_to_employees_table
 
 ````
     </StepHikeCompact.Code>
@@ -334,7 +334,7 @@ Create a new table called `cities`, with columns `id`, `name` and `population`. 
 
 ```
 Diffing schemas: public
-Finished supabase db diff on branch main.
+Finished iechor db diff on branch main.
 
 create table "public"."cities" (
     "id" bigint primary key generated always as identity,
@@ -350,11 +350,11 @@ Alternately, you can view your table definitions directly from the Table Editor:
 
 You can then copy this SQL into a new migration file, and run `supabase db reset` to apply the changes.
 
-The last step is deploying these changes to a live Supabase project.
+The last step is deploying these changes to a live iEchor project.
 
 ## Deploy your project
 
-You've been developing your project locally, making changes to your tables via migrations. It's time to deploy your project to the Supabase Platform and start scaling up to millions of users! Head over to [Supabase](https://supabase.com/dashboard) and create a new project to deploy to.
+You've been developing your project locally, making changes to your tables via migrations. It's time to deploy your project to the iEchor Platform and start scaling up to millions of users! Head over to [iEchor](https://iechor.com/dashboard) and create a new project to deploy to.
 
 ### Link your project
 
@@ -362,7 +362,7 @@ Associate your project with your remote project using [`supabase link`](/docs/re
 
 ```bash
 supabase link --project-ref <project-id>
-# You can get <project-id> from your project's dashboard URL: https://supabase.com/dashboard/project/<project-id>
+# You can get <project-id> from your project's dashboard URL: https://iechor.com/dashboard/project/<project-id>
 
 supabase db remote commit
 # Capture any changes that you have made to your remote database before you went through the steps above
@@ -370,7 +370,7 @@ supabase db remote commit
 ```
 
 `supabase/migrations` is now populated with a migration in `..._remote_commit.sql`.
-This migration captures any changes required for your local database to match the schema of your remote Supabase project.
+This migration captures any changes required for your local database to match the schema of your remote iEchor project.
 
 <Admonition type="note">
 
@@ -386,7 +386,7 @@ Deploy any local database migrations using [`db push`](/docs/reference/cli/usage
 supabase db push
 ```
 
-Visiting your live project on [Supabase](https://supabase.com/dashboard), you'll see a new `employees` table, complete with the `department` column you added in the second migration above.
+Visiting your live project on [iEchor](https://iechor.com/dashboard), you'll see a new `employees` table, complete with the `department` column you added in the second migration above.
 
 ### Deploy Edge Functions
 
@@ -425,12 +425,12 @@ supabase db remote commit --schema auth
 
 ### Enabling Local Logging
 
-Local logs rely on the Supabase Analytics Server. This can be enabled via the CLI configuration, and requires a Google Cloud project and BigQuery access.
+Local logs rely on the iEchor Analytics Server. This can be enabled via the CLI configuration, and requires a Google Cloud project and BigQuery access.
 
 <Admonition type="note">
   The Google Cloud project must have billing enabled. The dataset created and managed by Analytics
   will be within the US. Read more about this requirement
-  [here](https://supabase.com/docs/reference/self-hosting-analytics/introduction#bigquery).
+  [here](https://iechor.com/docs/reference/self-hosting-analytics/introduction#bigquery).
 </Admonition>
 
 Requirements:
@@ -459,10 +459,10 @@ This will switch the logging drivers and will direct logs to the Analytics serve
 
 ## Limitations and considerations
 
-The local development environment is not as feature-complete as the Supabase Platform. Here are some of the differences:
+The local development environment is not as feature-complete as the iEchor Platform. Here are some of the differences:
 
 - You cannot update your project settings in the Dashboard. This must be done using the local config file.
-- The CLI version determines the local version of Studio used, so make sure you keep your local [Supabase CLI up to date](https://github.com/supabase/cli#getting-started). We're constantly adding new features and bug fixes.
+- The CLI version determines the local version of Studio used, so make sure you keep your local [iEchor CLI up to date](https://github.com/supabase/cli#getting-started). We're constantly adding new features and bug fixes.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

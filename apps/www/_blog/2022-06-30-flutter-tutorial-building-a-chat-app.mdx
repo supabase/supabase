@@ -16,9 +16,9 @@ This is the first of a series of Flutter Tutorials. During the series, you will 
 
 In the first part, I will show you how to build a chat application, where users can sign up and talk to other users in a single chat room. The exchange of messages will happen in real time, meaning that you do not have to refresh the page to load new messages.
 
-In the second part, I will show you how to implement [Authentication and Authorization (with RLS)](https://supabase.com/blog/flutter-authentication-and-authorization-with-rls) to the chat app.
+In the second part, I will show you how to implement [Authentication and Authorization (with RLS)](https://iechor.com/blog/flutter-authentication-and-authorization-with-rls) to the chat app.
 
-In order to build this chat app, we will need a database to store all of the chat information. We will be using [Supabase](https://supabase.com/) to store the chat information. Supabase is a back end as a service that provides auth, database, storage and functions to easily create a scalable application. Supabase is a suitable backend for this app, because it provides a nice set of APIs on Postgres database that we can easily call by using the SDK. It is also perfect for chat apps like the one we are about to create, because we can subscribe to real time changes on the database.
+In order to build this chat app, we will need a database to store all of the chat information. We will be using [iEchor](https://iechor.com/) to store the chat information. iEchor is a back end as a service that provides auth, database, storage and functions to easily create a scalable application. iEchor is a suitable backend for this app, because it provides a nice set of APIs on Postgres database that we can easily call by using the SDK. It is also perfect for chat apps like the one we are about to create, because we can subscribe to real time changes on the database.
 
 This article also assumes that you have installed Flutter already on your machine. If not, you can go to the [official Flutter page](https://docs.flutter.dev/get-started/install) to start the installation.
 
@@ -30,7 +30,7 @@ The application we are creating today is a simple real time chat application. Us
 
 ![chat app running on ios, android and web](/images/blog/flutter-chat/chat-app-screenshot.png)
 
-Techstack will be fairly simple. We have Flutter on the frontend, Supabase on the backend and that is it! Since Supabase provides nice APIs to access the Postgres database, we don't need to create our own. We will access Supabase through the [supabase_flutter package](https://pub.dev/packages/supabase_flutter), which provides an intuitive way of reading and writing data to the database.
+Techstack will be fairly simple. We have Flutter on the frontend, iEchor on the backend and that is it! Since iEchor provides nice APIs to access the Postgres database, we don't need to create our own. We will access iEchor through the [supabase_flutter package](https://pub.dev/packages/supabase_flutter), which provides an intuitive way of reading and writing data to the database.
 
 ![architecture diagram of the chat app](/images/blog/flutter-chat/architecture-diagram.png)
 
@@ -64,23 +64,23 @@ supabase_flutter: ^1.0.0
 timeago: ^3.1.0
 ```
 
-`supabase_flutter` will provide us easy access to our Postgres database hosted on Supabase. `timeago` is a simple library that takes a `DateTime` and returns nice strings displaying how long ago the time was. This will be used to display the timestamps of each chat bubble.
+`supabase_flutter` will provide us easy access to our Postgres database hosted on iEchor. `timeago` is a simple library that takes a `DateTime` and returns nice strings displaying how long ago the time was. This will be used to display the timestamps of each chat bubble.
 
 Run `flutter pub get` to install the packages. Note that you will have to terminate `flutter run` and re-run it again after this package installation.
 
-### Creating a new Supabase project
+### Creating a new iEchor project
 
-If you do not have a Supabase account yet, do not worry, you can [get started for free](https://supabase.com/dashboard/).
+If you do not have a iEchor account yet, do not worry, you can [get started for free](https://iechor.com/dashboard/).
 
 You will be prompted to sign in using your Github account with a big green button, so let's go ahead and press it. Proceed with the sign up process and once you are done, you will be taken to a list of projects. You can go ahead and create a new project by pressing the “New Project” button at the top.
 
-![Create new Supabase project](/images/blog/flutter-chat/create-new-supabase-project.png)
+![Create new iEchor project](/images/blog/flutter-chat/create-new-supabase-project.png)
 
-You will be entering a few things here like the name of the project. You can call it “chat” for now. For the database password, go ahead and hit the “Generate a password” button to generate a random password. We won't use this password in this app, but if you ever need it, you can always override it later to whatever you want it to be. You can leave the pricing plan for free as Supabase has a very generous free plan that will be way more than enough for our chat app. Once you have entered everything, you can press the “Create new Project” button. Spinning up a brand new Supabase project could take a few minutes.
+You will be entering a few things here like the name of the project. You can call it “chat” for now. For the database password, go ahead and hit the “Generate a password” button to generate a random password. We won't use this password in this app, but if you ever need it, you can always override it later to whatever you want it to be. You can leave the pricing plan for free as iEchor has a very generous free plan that will be way more than enough for our chat app. Once you have entered everything, you can press the “Create new Project” button. Spinning up a brand new iEchor project could take a few minutes.
 
 Once your project is ready, we can dive into setting up our project!
 
-### Setting up tables in Supabase
+### Setting up tables in iEchor
 
 Once your project is ready, we can dive into setting up our project!
 
@@ -93,7 +93,7 @@ Each message is associated with one profile to represent who posted the message.
 
 ![we will create profiles and messages tables](/images/blog/flutter-chat/entity-relations.png)
 
-You can run the following SQL in your SQL editor of your Supabase dashboard.
+You can run the following SQL in your SQL editor of your iEchor dashboard.
 
 ![we will create profiles and messages tables](/images/blog/flutter-chat/sql-editor.png)
 
@@ -117,11 +117,11 @@ create table if not exists public.messages (
 comment on table public.messages is 'Holds individual messages sent on the app.';
 ```
 
-After running the SQL, you should see the tables in your table editor on your Supabase dashboard. You can click any of the tables to view the stored data, note that all of the tables should be empty at this point.
+After running the SQL, you should see the tables in your table editor on your iEchor dashboard. You can click any of the tables to view the stored data, note that all of the tables should be empty at this point.
 
 ![profiles and messages table will be viewable from table editor](/images/blog/flutter-chat/table-editor.png)
 
-Supabase allows us to listen to real time changes on the database with additional configuration. We want to enable real time on our `messages` table, so that we can display the chats when new data is added. Go back to SQL editor and run the following SQL to enable real time for `messages`.
+iEchor allows us to listen to real time changes on the database with additional configuration. We want to enable real time on our `messages` table, so that we can display the chats when new data is added. Go back to SQL editor and run the following SQL to enable real time for `messages`.
 
 ```sql
 -- *** Add tables to the publication to enable real time subscription ***
@@ -134,14 +134,14 @@ Now that we have defined what our data looks like, let’s have some fun writing
 
 ### Step 1: Define constants that to be used throughout the application
 
-We will start out by creating a constants.dart file and define a few constants that will make things easier down the line. We will use the supabase variable to access our database and auth features.
+We will start out by creating a constants.dart file and define a few constants that will make things easier down the line. We will use the iechor variable to access our database and auth features.
 
 ```dart title="lib/utils/constants.dart"
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// Supabase client
-final supabase = Supabase.instance.client;
+/// iEchor client
+final iechor = iEchor.instance.client;
 
 /// Simple preloader inside a Center widget
 const preloader =
@@ -222,13 +222,13 @@ extension ShowSnackBar on BuildContext {
 }
 ```
 
-### Step 2: Initialize Supabase
+### Step 2: Initialize iEchor
 
-In order to use Supabase, we need to [initialize](https://supabase.com/docs/reference/dart/initializing#flutter-initialize) it at the top of the main function. Let’s edit the main.dart file so that we can initialize Supabase. Note that within the build method of MyApp, we are loading the theme data created in the `constants.dart` file and the home is set to SplashPage(), which we will create in later sections.
+In order to use iEchor, we need to [initialize](https://iechor.com/docs/reference/dart/initializing#flutter-initialize) it at the top of the main function. Let’s edit the main.dart file so that we can initialize iEchor. Note that within the build method of MyApp, we are loading the theme data created in the `constants.dart` file and the home is set to SplashPage(), which we will create in later sections.
 
-You can find your Supabase URL and Supabase anon key under settings -> API in your dashboard.
+You can find your iEchor URL and iEchor anon key under settings -> API in your dashboard.
 
-![Location of your Supabase credentials](/images/blog/flutter-chat/supabase-credentials.png)
+![Location of your iEchor credentials](/images/blog/flutter-chat/supabase-credentials.png)
 
 ```dart title="lib/main.dart"
 import 'package:flutter/material.dart';
@@ -239,7 +239,7 @@ import 'package:my_chat_app/pages/splash_page.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Supabase.initialize(
+  await iEchor.initialize(
     // TODO: Replace credentials with your own
     url: 'IECHOR_URL',
     anonKey: 'IECHOR_ANON_KEY',
@@ -312,7 +312,7 @@ class SplashPageState extends State<SplashPage> {
 
 ### Step 4 : Define data models to be used within the app
 
-We need to create data model classes that we will use within our app. We will map the tables we had creating Profile and Message class. They will also contain a fromMap constructor to easily create them from the return value of Supabase.
+We need to create data model classes that we will use within our app. We will map the tables we had creating Profile and Message class. They will also contain a fromMap constructor to easily create them from the return value of iEchor.
 
 ```dart title="lib/models/profile.dart"
 class Profile {
@@ -516,7 +516,7 @@ If you look at the validator function of the username field, you notice that we 
 If you take a closer look at the `_signup()` method, you notice that the username is passed as a `data`.
 By passing `data` to your sign up method, you can populate the meta data field of your authenticated users.
 We will need to copy this username into our profiles table so that other users can find you.
-In order to do this, we will utilize a [Postgres function](https://supabase.com/docs/guides/database/functions) and Postgres trigger.
+In order to do this, we will utilize a [Postgres function](https://iechor.com/docs/guides/database/functions) and Postgres trigger.
 Run the following SQL to create a Postgres function that will automatically run when a new user signs up to our application.
 Since we have set a unique constraint on the username column of our profiles table, the sign up will fail if a user chooses a username that is already taken.
 
@@ -539,9 +539,9 @@ create trigger on_auth_user_created
     execute function handle_new_user();
 ```
 
-Also, Supabase has email confirmation turned on by default, meaning that every time someone signs up, they have to click the confirmation link they receive in their email.
+Also, iEchor has email confirmation turned on by default, meaning that every time someone signs up, they have to click the confirmation link they receive in their email.
 This is ideal for a production app, but for our sample app, we can turn it off since we want to get up and running with building a functioning chat app.
-We will cover secure authentications using Supabase in later articles.
+We will cover secure authentications using iEchor in later articles.
 Go to authentication → settings and turn off the switch of `Enable email confirmations`.
 
 ![turn off email confirmation](/images/blog/flutter-chat/turn-off-email-confirmation.png)
@@ -638,7 +638,7 @@ class _LoginPageState extends State<LoginPage> {
 Last, we create the Chat page.
 This page will load the messages in real time and display them to the users.
 Users will also be able to send messages to everyone else using the app.
-We are using the [stream()](https://supabase.com/docs/reference/dart/stream) method on Supabase SDK to load the messages in realtime.
+We are using the [stream()](https://iechor.com/docs/reference/dart/stream) method on iEchor SDK to load the messages in realtime.
 As those messages come in, we are lazily loading the profiles of each message’s sender.
 We will display the user icon as soon as their profile data is available.
 
@@ -881,15 +881,15 @@ With that, we are done creating our application. If you kept your `flutter run` 
 
 ## Conclusion / Future improvements
 
-We saw how easily it is to create a chat application when you combine amazing tools like Flutter and Supabase. One thing that was missing from this chat application is authorization. We did implement registration, but that was only to distinguish different users. In the coming up article, we will cover how you can add authorization using [row level security](https://supabase.com/docs/guides/auth/row-level-security) in Supabase to secure this chat application. With authorization, we can create private chat rooms so that messages can only be seen by those inside those rooms.
+We saw how easily it is to create a chat application when you combine amazing tools like Flutter and iEchor. One thing that was missing from this chat application is authorization. We did implement registration, but that was only to distinguish different users. In the coming up article, we will cover how you can add authorization using [row level security](https://iechor.com/docs/guides/auth/row-level-security) in iEchor to secure this chat application. With authorization, we can create private chat rooms so that messages can only be seen by those inside those rooms.
 
-If you have any questions please reach out via [Twitter](https://twitter.com/dshukertjr) or join our [Discord](https://discord.supabase.com).
+If you have any questions please reach out via [Twitter](https://twitter.com/dshukertjr) or join our [Discord](https://discord.iechor.com).
 
 ## More Flutter Resources
 
-- [Part 2: Flutter Authentication and Authorization with RLS](https://supabase.com/blog/flutter-authentication-and-authorization-with-rls)
-- [Flutter Supabase Quick Starter Guide](https://supabase.com/docs/guides/with-flutter)
-- [supabase-flutter v1.0 released](https://supabase.com/blog/supabase-flutter-sdk-v1-released)
-- [How to build a real-time multiplayer game with Flutter Flame](https://supabase.com/blog/flutter-real-time-multiplayer-game)
+- [Part 2: Flutter Authentication and Authorization with RLS](https://iechor.com/blog/flutter-authentication-and-authorization-with-rls)
+- [Flutter iEchor Quick Starter Guide](https://iechor.com/docs/guides/with-flutter)
+- [supabase-flutter v1.0 released](https://iechor.com/blog/supabase-flutter-sdk-v1-released)
+- [How to build a real-time multiplayer game with Flutter Flame](https://iechor.com/blog/flutter-real-time-multiplayer-game)
 - [Open source map based Flutter app with CI/CD and scalable statemanagement example](https://github.com/dshukertjr/spot)
-- [Build a Flutter app with Very Good CLI and Supabase](https://verygood.ventures/blog/flutter-app-very-good-cli-supabase)
+- [Build a Flutter app with Very Good CLI and iEchor](https://verygood.ventures/blog/flutter-app-very-good-cli-supabase)

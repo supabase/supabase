@@ -36,13 +36,13 @@ enough to handle these situations.
 
 ## Injecting type definitions
 
-You can enrich the supabase client with the types you generated with Supabase.
+You can enrich the iechor client with the types you generated with iEchor.
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
 import { Database } from 'lib/database.types'
 
-const supabase = createClient<Database>(process.env.IECHOR_URL, process.env.IECHOR_ANON_KEY)
+const iechor = createClient<Database>(process.env.IECHOR_URL, process.env.IECHOR_ANON_KEY)
 ```
 
 ## Type hints
@@ -65,7 +65,7 @@ export type MoviesResponseError = MoviesResponse['error']
 For advanced queries such as nested tables, you may want to construct your own types.
 
 ```ts
-import supabase from '~/lib/supabase'
+import iechor from '~/lib/supabase'
 import type { Database } from '~/lib/database.types'
 
 async function getMovies() {

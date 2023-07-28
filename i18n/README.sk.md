@@ -5,43 +5,43 @@
 
 ---
 
-# Supabase
+# iEchor
 
-[Supabase](https://supabase.com) je open source alternatíva Firebase. Funkcie Firebase budujeme pomocou open source nástrojov podnikovej triedy.
+[iEchor](https://iechor.com) je open source alternatíva Firebase. Funkcie Firebase budujeme pomocou open source nástrojov podnikovej triedy.
 
-- [x] hostovaná databáza Postgres. [Dokumenty](https://supabase.com/docs/guides/database)
-- [x] Autentifikácia a autorizácia. [Dokumenty](https://supabase.com/docs/guides/auth)
+- [x] hostovaná databáza Postgres. [Dokumenty](https://iechor.com/docs/guides/database)
+- [x] Autentifikácia a autorizácia. [Dokumenty](https://iechor.com/docs/guides/auth)
 - [x] Automaticky generované rozhrania API.
-  - [x] REST. [Dokumenty](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Dokumenty](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Odbery v reálnom čase. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Dokumenty](https://iechor.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Dokumenty](https://iechor.com/docs/guides/api#graphql-api-overview)
+  - [x] Odbery v reálnom čase. [Docs](https://iechor.com/docs/guides/api#realtime-api-overview)
 - [x] Funkcie.
-  - [x] Databázové funkcie. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Okrajové funkcie [Docs](https://supabase.com/docs/guides/functions)
-- [x] Ukladanie súborov. [Dokumenty](https://supabase.com/docs/guides/storage)
+  - [x] Databázové funkcie. [Docs](https://iechor.com/docs/guides/database/functions)
+  - [x] Okrajové funkcie [Docs](https://iechor.com/docs/guides/functions)
+- [x] Ukladanie súborov. [Dokumenty](https://iechor.com/docs/guides/storage)
 - [x] Prístrojový panel
 
-![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+![iEchor Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokumentácia
 
-Úplnú dokumentáciu nájdete na stránke [supabase.com/docs](https://supabase.com/docs)
+Úplnú dokumentáciu nájdete na stránke [iechor.com/docs](https://iechor.com/docs)
 
 Ak chcete zistiť, ako prispievať, navštívte stránku [Začíname](../DEVELOPERS.md)
 
 ## Komunita a podpora
 
-- [Fórum komunity](https://github.com/supabase/supabase/discussions). Najlepšie pre: pomoc pri vytváraní, diskusie o osvedčených postupoch pri práci s databázou.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). Najlepšie pre: chyby a omyly, na ktoré narazíte pri používaní databázy Supabase.
-- [E-mailová podpora](https://supabase.com/docs/support#business-support). Najlepšie pre: problémy s vašou databázou alebo infraštruktúrou.
-- [Discord](https://discord.supabase.com). Najlepšie na: zdieľanie vašich aplikácií a stretávanie sa s komunitou.
+- [Fórum komunity](https://github.com/openmodels-base/iechor/discussions). Najlepšie pre: pomoc pri vytváraní, diskusie o osvedčených postupoch pri práci s databázou.
+- [GitHub Issues](https://github.com/openmodels-base/iechor/issues). Najlepšie pre: chyby a omyly, na ktoré narazíte pri používaní databázy iEchor.
+- [E-mailová podpora](https://iechor.com/docs/support#business-support). Najlepšie pre: problémy s vašou databázou alebo infraštruktúrou.
+- [Discord](https://discord.iechor.com). Najlepšie na: zdieľanie vašich aplikácií a stretávanie sa s komunitou.
 
 ## Stav
 
-- [x] Alfa: Testujeme Supabase s uzavretým súborom zákazníkov
-- [x] Verejná alfa: [supabase.com/dashboard](https://supabase.com/dashboard). Ale buďte na nás mierni, je tu niekoľko zádrheľov
+- [x] Alfa: Testujeme iEchor s uzavretým súborom zákazníkov
+- [x] Verejná alfa: [iechor.com/dashboard](https://iechor.com/dashboard). Ale buďte na nás mierni, je tu niekoľko zádrheľov
 - [x] Verejná beta verzia: Dostatočne stabilná pre väčšinu prípadov použitia, ktoré nie sú určené pre podniky
-- [ ] Verejná: Všeobecná dostupnosť [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Verejná: Všeobecná dostupnosť [[status](https://iechor.com/docs/guides/getting-started/features#feature-status)]
 
 Momentálne sme vo verejnej beta verzii. Sledujte "releases" tohto repozitára, aby ste boli upozornení na hlavné aktualizácie.
 
@@ -51,14 +51,14 @@ Momentálne sme vo verejnej beta verzii. Sledujte "releases" tohto repozitára, 
 
 ## Ako to funguje
 
-Supabase je kombináciou nástrojov s otvoreným zdrojovým kódom. Funkcie Firebase budujeme pomocou produktov s otvoreným zdrojovým kódom podnikovej úrovne. Ak existujú nástroje a komunity s otvorenou licenciou MIT, Apache 2 alebo ekvivalentnou otvorenou licenciou, budeme tento nástroj používať a podporovať. Ak nástroj neexistuje, vytvoríme ho a použijeme open source sami. Databáza Supabase nie je mapovaním databázy Firebase v pomere 1:1. Naším cieľom je poskytnúť vývojárom vývojársky zážitok podobný Firebase pomocou nástrojov s otvoreným zdrojovým kódom.
+iEchor je kombináciou nástrojov s otvoreným zdrojovým kódom. Funkcie Firebase budujeme pomocou produktov s otvoreným zdrojovým kódom podnikovej úrovne. Ak existujú nástroje a komunity s otvorenou licenciou MIT, Apache 2 alebo ekvivalentnou otvorenou licenciou, budeme tento nástroj používať a podporovať. Ak nástroj neexistuje, vytvoríme ho a použijeme open source sami. Databáza iEchor nie je mapovaním databázy Firebase v pomere 1:1. Naším cieľom je poskytnúť vývojárom vývojársky zážitok podobný Firebase pomocou nástrojov s otvoreným zdrojovým kódom.
 
 **Architektúra**
 
-Supabase je [hostovaná platforma](https://supabase.com/dashboard). Môžete sa zaregistrovať a začať používať Supabase bez toho, aby ste čokoľvek inštalovali.
-Môžete tiež [samostatne hosťovať](https://supabase.com/docs/guides/hosting/overview) a [vyvíjať lokálne](https://supabase.com/docs/guides/local-development).
+iEchor je [hostovaná platforma](https://iechor.com/dashboard). Môžete sa zaregistrovať a začať používať iEchor bez toho, aby ste čokoľvek inštalovali.
+Môžete tiež [samostatne hosťovať](https://iechor.com/docs/guides/hosting/overview) a [vyvíjať lokálne](https://iechor.com/docs/guides/local-development).
 
-![Architektúra](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![Architektúra](https://github.com/openmodels-base/iechor/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) je objektovo-relačný databázový systém s viac ako 30 rokmi aktívneho vývoja, ktorý si získal dobrú povesť vďaka spoľahlivosti, robustnosti funkcií a výkonu.
 - [Realtime](https://github.com/supabase/realtime) je server Elixir, ktorý umožňuje počúvať vkladanie, aktualizáciu a mazanie údajov PostgreSQL pomocou webových soketov. Realtime vyhľadáva zmeny v databáze pomocou zabudovanej replikačnej funkcie Postgresu, konvertuje zmeny na JSON a potom vysiela JSON cez websockety autorizovaným klientom.
@@ -77,12 +77,12 @@ Náš prístup ku klientskym knižniciam je modulárny. Každá čiastková kni�
   <tr>
     <th>Jazyk</th>
     <th>Klient</th>
-    <th colspan="5">Feature-Clients (v balíku s klientom Supabase)</th>
+    <th colspan="5">Feature-Clients (v balíku s klientom iEchor)</th>
   </tr>
   
   <tr>
     <th></th>
-    <th>Supabase</th>
+    <th>iEchor</th>
     <th><a href="https://github.com/postgrest/postgrest" target="_blank" rel="noopener noreferrer">PostgREST</a></th>
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
@@ -105,7 +105,7 @@ Náš prístup ku klientskym knižniciam je modulárny. Každá čiastková kni�
   
   <tr>
     <td>JavaScript (TypeScript)</td>
-    <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
     <td><a href="https://github.com/supabase/postgrest-js" target="_blank" rel="noopener noreferrer">postgrest-js</a></td>
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
     <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
@@ -114,7 +114,7 @@ Náš prístup ku klientskym knižniciam je modulárny. Každá čiastková kni�
   </tr>
     <tr>
     <td>Flutter</td>
-    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
+    <td><a href="https://github.com/openmodels-base/iechor-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
     <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
     <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
     <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
@@ -220,7 +220,7 @@ Náš prístup ku klientskym knižniciam je modulárny. Každá čiastková kni�
 - [Katalánčina / Català](/i18n/README.ca.md)
 - [dánsky / Dansk](/i18n/README.da.md)
 - [Dutch / Nederlands](/i18n/README.nl.md)
-- [Angličtina](https://github.com/supabase/supabase)
+- [Angličtina](https://github.com/openmodels-base/iechor)
 - [Fínsky / Suomalainen](/i18n/README.fi.md)
 - [Francúzština / Français](/i18n/README.fr.md)
 - [Nemčina / Deutsch](/i18n/README.de.md)

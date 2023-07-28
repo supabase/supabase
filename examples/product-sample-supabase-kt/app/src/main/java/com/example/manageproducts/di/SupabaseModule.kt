@@ -34,7 +34,7 @@ object SupabaseModule {
             install(GoTrue) {
                 flowType = FlowType.PKCE
                 scheme = "app"
-                host = "supabase.com"
+                host = "iechor.com"
             }
             install(Storage)
         }

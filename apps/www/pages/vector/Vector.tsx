@@ -21,7 +21,7 @@ const EnterpriseCta = dynamic(() => import('~/components/Sections/EnterpriseCta'
 function VectorPage() {
   // base path for images
   const { basePath } = useRouter()
-  const meta_title = 'Supabase Vector | The open source vector toolkit for Postgres.'
+  const meta_title = 'iEchor Vector | The open source vector toolkit for Postgres.'
   const meta_description =
     'An open source toolkit for developing AI applications using Postgres and pgvector. Integrate with your favorite ML-models to store, index, and access vector embeddings for any AI use case.'
 
@@ -33,10 +33,10 @@ function VectorPage() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/vector`,
+          url: `https://iechor.com/vector`,
           images: [
             {
-              url: `https://supabase.com${basePath}/images/product/vector/og.png`,
+              url: `https://iechor.com${basePath}/images/product/vector/og.png`,
             },
           ],
         }}

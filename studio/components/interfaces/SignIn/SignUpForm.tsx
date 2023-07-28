@@ -76,7 +76,7 @@ const SignUpForm = () => {
       >
         <Alert className="w-full" withIcon variant="success" title="Check your email to confirm">
           You've successfully signed up. Please check your email to confirm your account before
-          signing in to the Supabase dashboard
+          signing in to the iEchor dashboard
         </Alert>
       </div>
       <Form

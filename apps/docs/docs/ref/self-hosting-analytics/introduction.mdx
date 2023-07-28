@@ -14,9 +14,9 @@ hideTitle: true
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-The Supabase Analytics server is a Logflare self-hostable instance that manages the ingestion and query pipelines for searching and aggregating structured analytics events.
+The iEchor Analytics server is a Logflare self-hostable instance that manages the ingestion and query pipelines for searching and aggregating structured analytics events.
 
-When self-hosting the Analytics server, the full logging experience matching that of the Supabase Platform is available in the Studio instance, allowing for an integrated and enhanced development experience.
+When self-hosting the Analytics server, the full logging experience matching that of the iEchor Platform is available in the Studio instance, allowing for an integrated and enhanced development experience.
 However, it's important to note that certain [differences](#differences) may arise due to the platform's infrastructure.
 
 <Admonition type="info" label="Logflare Technical Docs">
@@ -66,7 +66,7 @@ After the service account is created, you will need to create a key for the serv
 
 ### Docker Compose
 
-Using the example [self-hosting stack based on docker-compose](https://github.com/supabase/supabase/tree/master/docker), you include the logging related services using the following command
+Using the example [self-hosting stack based on docker-compose](https://github.com/openmodels-base/iechor/tree/master/docker), you include the logging related services using the following command
 
 You will first need to update the `.env.example` file with the necessary environment variables.
 
@@ -92,26 +92,26 @@ This would include two additional docker services to your compose stack: Logflar
 
 #### Vector Usage
 
-In the Docker Compose example, we utilize vector to coordinate the logging pipeline between the services. However, if you peer into the [vector configuration file](https://github.com/supabase/supabase/blob/master/docker/volumes/logs/vector.yml), you will be able to see that Vector sends logs to the Analytics ingestion endpoint.
+In the Docker Compose example, we utilize vector to coordinate the logging pipeline between the services. However, if you peer into the [vector configuration file](https://github.com/openmodels-base/iechor/blob/master/docker/volumes/logs/vector.yml), you will be able to see that Vector sends logs to the Analytics ingestion endpoint.
 
 If you need to customize the logging pipeline for your own needs, you must ensure that the payloads matches the expected event schema structure. Without the correct structure, it would cause the Studio Logs UI features to break.
 
 ### Standalone Docker Container
 
-If desired, you can utilize the standalone docker-container. Please refer to the [docker-compose file](https://github.com/supabase/supabase/tree/master/docker/docker-compose-logging.yml) for required docker configuration.
+If desired, you can utilize the standalone docker-container. Please refer to the [docker-compose file](https://github.com/openmodels-base/iechor/tree/master/docker/docker-compose-logging.yml) for required docker configuration.
 
 Additional supplementary technical documentation on self-hosting and using the `supabase/logflare` image for a full Logflare experience is available at the [official Logflare documentation](https://docs.logflare.app/self-hosting/).
 
 ## Differences
 
-API logs rely on Kong instead of the Supabase Cloud API Gateway. Logs from Kong are not enriched with platform-only data.
+API logs rely on Kong instead of the iEchor Cloud API Gateway. Logs from Kong are not enriched with platform-only data.
 
 Within the self-hosted setup, all logs are routed to Logflare via Vector. As Kong routes API requests to PostgREST, self-hosted or local deployments will result in Kong request logs instead.
-This would result in differences in the log event metadata between self-hosted API requests and Supabase Platform requests.
+This would result in differences in the log event metadata between self-hosted API requests and iEchor Platform requests.
 
 ## BigQuery
 
-All log event data is stored in and queried from BigQuery. To use the Analytics server with Supabase you'll need a Google Cloud Platform account for access to BigQuery.
+All log event data is stored in and queried from BigQuery. To use the Analytics server with iEchor you'll need a Google Cloud Platform account for access to BigQuery.
 
 Make sure to set the `GOOGLE_DATASET_ID_APPEND`, `GOOGLE_PROJECT_ID` and `GOOGLE_PROJECT_NUMBER` environment variables.
 
@@ -164,7 +164,7 @@ The self-hosted example is only used as a minimal example on running the entire 
 
     - [Source code](https://github.com/logflare/logflare)
     - [OpenAPI docs](https://logflare.app/api/openapi)
-    - [Supabase Acquires Logflare](https://supabase.com/blog/supabase-acquires-logflare)
+    - [iEchor Acquires Logflare](https://iechor.com/blog/supabase-acquires-logflare)
     - [Logflare self-hosting docs](https://docs.logflare.app/self-hosting)
 
   </RefSubLayout.Examples>

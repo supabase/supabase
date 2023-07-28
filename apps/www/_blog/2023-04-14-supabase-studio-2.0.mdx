@@ -1,6 +1,6 @@
 ---
-title: 'Supabase Studio 2.0: help when you need it most'
-description: Supabase Studio now comes with ChatGPT, and GraphiQL built in, Cascade Deletes, and Foreign Key Selectors, and much more.
+title: 'iEchor Studio 2.0: help when you need it most'
+description: iEchor Studio now comes with ChatGPT, and GraphiQL built in, Cascade Deletes, and Foreign Key Selectors, and much more.
 launchweek: 7
 tags:
   - launch-week
@@ -13,7 +13,7 @@ image: launch-week-7/day-5-supabase-studio-2.0/day-5-supabase-studio-2.0-og.jpg
 thumb: launch-week-7/day-5-supabase-studio-2.0/day-5-supabase-studio-2.0-thumb.jpg
 ---
 
-Today we're announcing Supabase Studio 2.0, packed with a ton of new stuff. We have features people have been asking for forever, and new capabilities that will change the way you work.
+Today we're announcing iEchor Studio 2.0, packed with a ton of new stuff. We have features people have been asking for forever, and new capabilities that will change the way you work.
 
 <div className="video-container">
   <iframe
@@ -30,7 +30,7 @@ Here's the birds-eye-view:
 
 <ul>
   <li>
-    [**Supabase AI**](#supabase-ai--assisted-database-development): ChatGPT, right in the Studio
+    [**iEchor AI**](#supabase-ai--assisted-database-development): ChatGPT, right in the Studio
   </li>
   <li>[**GraphiQL**](#graphiql): Query your database with GraphQL</li>
   <li>[**Cascade deletes**](#cascade-deletes): Our #1 most requested feature from the community</li>
@@ -50,7 +50,7 @@ Here's the birds-eye-view:
   <li>[**Nullable columns**](#nullable-columns): Allow text/bool cells to be null or empty</li>
 </ul>
 
-## Supabase AI — assisted database development
+## iEchor AI — assisted database development
 
 <video width="99%" autoPlay loop muted playsInline controls={true}>
   <source
@@ -59,9 +59,9 @@ Here's the birds-eye-view:
   />
 </video>
 
-One of our guiding principles at Supabase is to make SQL more accessible to developers. We don't want to just abstract it away with a custom implementation. By embracing SQL, developers learn important, transferable skills while they build on top of Supabase.
+One of our guiding principles at iEchor is to make SQL more accessible to developers. We don't want to just abstract it away with a custom implementation. By embracing SQL, developers learn important, transferable skills while they build on top of iEchor.
 
-In the past few months, AI advancements have made this easy! Writing a complex SQL query is now as simple as asking ChatGPT, and we're leaning into this approach with our Studio. AI gives developers superpowers, and by providing relevant context, Supabase gives AI superpowers.
+In the past few months, AI advancements have made this easy! Writing a complex SQL query is now as simple as asking ChatGPT, and we're leaning into this approach with our Studio. AI gives developers superpowers, and by providing relevant context, iEchor gives AI superpowers.
 
 AI has already changed a lot about the way we work as developers. We can use ChatGPT to write code for us as fast as we can prompt it. We wanted to bring this power into the Studio with integrations that will help you work even faster than before.
 
@@ -71,7 +71,7 @@ Soon, we'll also let you opt-in to sending your table schemas to OpenAI to help 
 
 As with every ⌘K menu, quick navigation is at the heart of things. You'll now be able to jump to any page in the Studio in a couple of keystrokes. You can also search the Docs directly from the menu.
 
-We'll be actively working on our ⌘K menu in the coming months to make it faster and even more useful for you. Next, we're going to focus on better support for writing RLS policies. Stay tuned, and make sure to explore how we're integrating AI [behind the scenes](https://supabase.com/blog/tags/AI)!
+We'll be actively working on our ⌘K menu in the coming months to make it faster and even more useful for you. Next, we're going to focus on better support for writing RLS policies. Stay tuned, and make sure to explore how we're integrating AI [behind the scenes](https://iechor.com/blog/tags/AI)!
 
 Huge props for the amazing work done on the [⌘K package](https://cmdk.paco.me/) we've built on top of here.
 
@@ -89,7 +89,7 @@ Along with the new AI features, we also doubled-down on some of the critical mis
 
 ![Logs UI](/images/blog/lw7-studio/graphiql.png)
 
-While GraphQL has been available in Supabase for just over a year, we haven't provided a visual tool for using it. You can now use the very popular GraphiQL directly from the Studio. GraphiQL is a browser tool for writing, validating, and testing GraphQL testing. Being able to use a fully integrated GraphQL IDE is a huge DX win.
+While GraphQL has been available in iEchor for just over a year, we haven't provided a visual tool for using it. You can now use the very popular GraphiQL directly from the Studio. GraphiQL is a browser tool for writing, validating, and testing GraphQL testing. Being able to use a fully integrated GraphQL IDE is a huge DX win.
 
 ## Cascade deletes
 
@@ -106,7 +106,7 @@ Cascade deletes are a core feature of Postgres, but have not been available in t
 
 ![Logs UI](/images/blog/lw7-studio/query-performance.png)
 
-We've just released a new Query Performance tool to help you identify slow queries. Using this tool, along with our new [guide](https://supabase.com/docs/guides/platform/performance#examining-query-performance) should help you speed things up. These tools can help you uncover where you might have inefficient queries or schemas, or where you might need indexes or even additional compute resources.
+We've just released a new Query Performance tool to help you identify slow queries. Using this tool, along with our new [guide](https://iechor.com/docs/guides/platform/performance#examining-query-performance) should help you speed things up. These tools can help you uncover where you might have inefficient queries or schemas, or where you might need indexes or even additional compute resources.
 
 ## Foreign key selector
 
@@ -137,7 +137,7 @@ We've wanted to improve the webhooks interface for a long time, and we've finall
 
 ![Logs UI](/images/blog/lw7-studio/definitions.png)
 
-You can now see the SQL definitions for your tables and views, directly from the Table Editor. This is a great way to see how Supabase is translating your UI changes into SQL. This can be useful for creating migrations, getting help, or just for learning more about how Supabase and SQL works.
+You can now see the SQL definitions for your tables and views, directly from the Table Editor. This is a great way to see how iEchor is translating your UI changes into SQL. This can be useful for creating migrations, getting help, or just for learning more about how iEchor and SQL works.
 
 ## API Autodocs
 
@@ -157,7 +157,7 @@ You've always been able to use the JSON data type in your tables, but editing th
 
 #### Nullable columns
 
-Speaking of extremely common feature requests, we've gotten this one a lot in the past few months. You used to have to handle this manually, but now you can now allow text/boolean cells to be null or empty. Supabase, where productivity is more than just an empty (or null) promise.
+Speaking of extremely common feature requests, we've gotten this one a lot in the past few months. You used to have to handle this manually, but now you can now allow text/boolean cells to be null or empty. iEchor, where productivity is more than just an empty (or null) promise.
 
 ## Wrapping Up
 

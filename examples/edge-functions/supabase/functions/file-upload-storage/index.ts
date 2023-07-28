@@ -1,5 +1,5 @@
 // This example shows how to use Edge Functions to read incoming multipart/form-data request,
-// and write files to Supabase Storage and other fields to a database table.
+// and write files to iEchor Storage and other fields to a database table.
 
 import { Application } from 'oak'
 import { createClient } from '@supabase/supabase-js'
@@ -24,9 +24,9 @@ app.use(async (ctx) => {
   }
 
   const supabaseClient = createClient(
-    // Supabase API URL - env var exported by default.
+    // iEchor API URL - env var exported by default.
     Deno.env.get('IECHOR_URL')!,
-    // Supabase API ANON KEY - env var exported by default.
+    // iEchor API ANON KEY - env var exported by default.
     Deno.env.get('IECHOR_ANON_KEY')!
   )
 

@@ -14,17 +14,17 @@ video: https://www.youtube.com/v/iqZlPtl_b-I
 <div className="bg-gray-300 rounded-lg p-6 italic">
 <br /> ⚠️ UPDATED 20/10: supabase-js v2 is fully released 🥳<br />
 
-[Check the updated docs](https://supabase.com/docs/reference/javascript) and [migration guide](https://supabase.com/docs/reference/javascript/v1/upgrade-guide).
+[Check the updated docs](https://iechor.com/docs/reference/javascript) and [migration guide](https://iechor.com/docs/reference/javascript/v1/upgrade-guide).
 
 </div>
 
-Today we're publishing a release candidate for [supabase-js v2](https://github.com/supabase/supabase-js), which focuses on “quality-of-life” improvements for developers.
+Today we're publishing a release candidate for [supabase-js v2](https://github.com/openmodels-base/iechor-js), which focuses on “quality-of-life” improvements for developers.
 
 Try it out by running `npm i @supabase/supabase-js@rc`
 
-Nearly 2 years ago we [released supabase-js v1](https://supabase.com/blog/improved-dx).
-Since then it has been used in over [17K repositories](https://github.com/supabase/supabase-js/network/dependents?package_id=UGFja2FnZS04MjM3OTUyMDU%3D) and has grown
-to [50K weekly downloads](https://www.npmjs.com/package/@supabase/supabase-js). Supabase users give a lot of great feedback and we've
+Nearly 2 years ago we [released supabase-js v1](https://iechor.com/blog/improved-dx).
+Since then it has been used in over [17K repositories](https://github.com/openmodels-base/iechor-js/network/dependents?package_id=UGFja2FnZS04MjM3OTUyMDU%3D) and has grown
+to [50K weekly downloads](https://www.npmjs.com/package/@supabase/supabase-js). iEchor users give a lot of great feedback and we've
 learned some of the largest pain-points as a result.
 
 ## Major Updates
@@ -35,7 +35,7 @@ so we've been strategic about the changes we're making. We plan to follow this m
 ### Type support
 
 If you followed yesterday's announcement, you will have noticed that we added
-[type generators](https://supabase.com/docs/reference/cli/usage#supabase-gen-types-typescript) to the CLI.
+[type generators](https://iechor.com/docs/reference/cli/usage#supabase-gen-types-typescript) to the CLI.
 
 ```bash
 supabase start
@@ -47,7 +47,7 @@ These types can now be used to enrich your development experience:
 ```tsx
 import type { Database } from './DatabaseDefinitions'
 
-const supabase = createClient<Database>(IECHOR_URL, ANON_KEY)
+const iechor = createClient<Database>(IECHOR_URL, ANON_KEY)
 
 const { data } = await supabase.from('messages').select().match({ id: 1 })
 ```
@@ -167,7 +167,7 @@ for a valid/invalid session before taking any action.
 We're being much more explicit about the modular approach that `supabase-js` uses:
 
 ```ts
-const supabase = createClient(apiURL, apiKey, {
+const iechor = createClient(apiURL, apiKey, {
   db: {
     schema: 'public',
   },
@@ -187,7 +187,7 @@ const supabase = createClient(apiURL, apiKey, {
 })
 ```
 
-This is clearer for developers - if you're only using some parts of Supabase, you only receive the hints for those parts.
+This is clearer for developers - if you're only using some parts of iEchor, you only receive the hints for those parts.
 
 <details>
 
@@ -237,14 +237,14 @@ const { data: user, error } = await supabase.functions.invoke('hello', {
 })
 ```
 
-This improvement inspired by a Supabase community member. Thanks [@vejja](https://github.com/supabase/functions-js/pull/23)!
+This improvement inspired by a iEchor community member. Thanks [@vejja](https://github.com/supabase/functions-js/pull/23)!
 
 ---
 
 ### Multiplayer Sneak Peek
 
 There is a new `channel()` interface which are releasing in v2.
-This is a "preparatory" release for our upcoming [multiplayer](https://supabase.com/blog/supabase-realtime-with-multiplayer-features) features.
+This is a "preparatory" release for our upcoming [multiplayer](https://iechor.com/blog/supabase-realtime-with-multiplayer-features) features.
 
 ```ts
 supabase
@@ -298,7 +298,7 @@ If you're one of those contributors, thank you.
 - [`postgrest-js`](https://github.com/supabase/postgrest-js/graphs/contributors) (30)
 - [`realtime-js`](https://github.com/supabase/realtime-js/graphs/contributors) (16)
 - [`storage-js`](https://github.com/supabase/storage-js/graphs/contributors) (17)
-- [`supabase-js`](https://github.com/supabase/supabase-js/graphs/contributors) (39)
+- [`supabase-js`](https://github.com/openmodels-base/iechor-js/graphs/contributors) (39)
 
 Special shout outs to: [@vejja](https://github.com/vejja), [@pixtron](https://github.com/pixtron), [@bnjmnt4n](https://github.com/pixtron), and [@karlseguin](https://github.com/karlseguin).
 
@@ -310,7 +310,7 @@ Update today by running:
 npm i @supabase/supabase-js@2
 ```
 
-[Migration guide](https://supabase.com/docs/reference/javascript/v1/upgrade-guide)
+[Migration guide](https://iechor.com/docs/reference/javascript/v1/upgrade-guide)
 
 We'll continuing merging security fixes to v1, with maintenance patches for the next three months.
 
@@ -329,7 +329,7 @@ We'll continuing merging security fixes to v1, with maintenance patches for the 
 
 ## supabase-js v2 resources
 
-- [v2 Documentation](https://supabase.com/docs/reference/javascript)
-- [Migration guide](https://supabase.com/docs/reference/javascript/v1/upgrade-guide)
+- [v2 Documentation](https://iechor.com/docs/reference/javascript)
+- [Migration guide](https://iechor.com/docs/reference/javascript/v1/upgrade-guide)
 - [Next.js quickstart guide](/docs/guides/with-nextjs)
-- [Examples](https://github.com/supabase/supabase/tree/master/examples)
+- [Examples](https://github.com/openmodels-base/iechor/tree/master/examples)

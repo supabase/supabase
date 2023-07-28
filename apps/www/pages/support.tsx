@@ -14,9 +14,9 @@ type Props = {}
 const Index = ({}: Props) => {
   const router = useRouter()
 
-  const meta_title = 'Help & Support | Supabase'
+  const meta_title = 'Help & Support | iEchor'
   const meta_description =
-    'Find help and support for Supabase. Our support agents provide answers on all types of issues, including account information, billing, and refunds.'
+    'Find help and support for iEchor. Our support agents provide answers on all types of issues, including account information, billing, and refunds.'
 
   return (
     <>
@@ -26,10 +26,10 @@ const Index = ({}: Props) => {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/${router.pathname}`,
+          url: `https://iechor.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image-v2.jpg`,
+              url: `https://iechor.com/images/og/og-image-v2.jpg`,
             },
           ],
         }}
@@ -43,7 +43,7 @@ const Index = ({}: Props) => {
               </h1>
               <h1 className="h1">Get Support</h1>
               <p className="text-scale-1100 lg:text-lg">
-                The Supabase Support Team is ready to help.
+                The iEchor Support Team is ready to help.
               </p>
             </div>
             <div className="text-scale-1200 mt-16 grid gap-5 sm:grid-cols-3 md:grid-cols-12">
@@ -81,8 +81,8 @@ const Index = ({}: Props) => {
                     pt-14 dark:border-gray-600"
                   >
                     <Link
-                      href="https://github.com/supabase/supabase/issues"
-                      as="https://github.com/supabase/supabase/issues"
+                      href="https://github.com/openmodels-base/iechor/issues"
+                      as="https://github.com/openmodels-base/iechor/issues"
                     >
                       <a target="_blank">
                         <Button size="medium" type="default" iconRight={<IconGitHub />}>
@@ -129,8 +129,8 @@ const Index = ({}: Props) => {
                     dark:border-gray-600 lg:justify-evenly"
                   >
                     <Link
-                      href="https://github.com/supabase/supabase/discussions"
-                      as="https://github.com/supabase/supabase/discussions"
+                      href="https://github.com/openmodels-base/iechor/discussions"
+                      as="https://github.com/openmodels-base/iechor/discussions"
                     >
                       <a target="_blank">
                         <Button size="medium" type="default" iconRight={<IconMessageCircle />}>
@@ -138,7 +138,7 @@ const Index = ({}: Props) => {
                         </Button>
                       </a>
                     </Link>
-                    <Link href="https://discord.supabase.com/" as="https://discord.supabase.com/">
+                    <Link href="https://discord.iechor.com/" as="https://discord.iechor.com/">
                       <a target="_blank">
                         <Button
                           size="medium"
@@ -199,7 +199,7 @@ const Index = ({}: Props) => {
                     border-gray-100 bg-white p-5
                     pt-14 dark:border-gray-600"
                   >
-                    <a href="https://supabase.com/dashboard/support/new">
+                    <a href="https://iechor.com/dashboard/support/new">
                       <Button size="medium" type="default" iconRight={<IconMail />}>
                         Email Support
                       </Button>

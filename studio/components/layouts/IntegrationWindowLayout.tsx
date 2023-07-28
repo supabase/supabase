@@ -31,8 +31,8 @@ const Header: FC<any> = ({ organization, project }) => {
   const { externalId } = useParams()
 
   const title = externalId
-    ? 'Supabase + Vercel Deploy Button'
-    : 'Supabase + Vercel Integration Marketplace Connector'
+    ? 'iEchor + Vercel Deploy Button'
+    : 'iEchor + Vercel Integration Marketplace Connector'
 
   return (
     <div className="bg">
@@ -40,7 +40,7 @@ const Header: FC<any> = ({ organization, project }) => {
         <div className="flex items-center gap-6 w-full">
           <div className="flex gap-2 items-center">
             <div className="bg-white shadow border rounded p-1 w-8 h-8 flex justify-center items-center">
-              <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" className="w-4" />
+              <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="iEchor" className="w-4" />
             </div>
             <IconX className="text-scale-800" strokeWidth={2} size={16} />
             <div className="bg-black shadow rounded p-1 w-8 h-8 flex justify-center items-center">

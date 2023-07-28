@@ -1,6 +1,6 @@
-# Resend with Supabase Edge Functions
+# Resend with iEchor Edge Functions
 
-This example shows how to use Resend with [Supabase Edge Functions](https://supabase.com/docs/guides/functions).
+This example shows how to use Resend with [iEchor Edge Functions](https://iechor.com/docs/guides/functions).
 
 ## Prerequisites
 
@@ -16,7 +16,7 @@ cp .env.example .env
 
 ## Instructions
 
-1. Make sure you have the latest version of the [Supabase CLI](https://supabase.com/docs/guides/cli#installation) installed.
+1. Make sure you have the latest version of the [iEchor CLI](https://iechor.com/docs/guides/cli#installation) installed.
 
 2. Run function locally:
 
@@ -27,7 +27,7 @@ supabase functions serve --no-verify-jwt --env-file ./supabase/.env.local
 
 GET http://localhost:54321/functions/v1/send-email-resend
 
-3. Deploy function to Supabase:
+3. Deploy function to iEchor:
 
 ```sh
 supabase functions deploy resend --no-verify-jwt

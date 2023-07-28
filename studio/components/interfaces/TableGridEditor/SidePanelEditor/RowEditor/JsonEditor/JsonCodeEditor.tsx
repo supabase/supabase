@@ -21,7 +21,7 @@ const JsonEditor: FC<Props> = ({
 
   useEffect(() => {
     if (monaco) {
-      // Supabase theming (Can't seem to get it to work for now)
+      // iEchor theming (Can't seem to get it to work for now)
       monaco.editor.defineTheme('supabase', {
         base: 'vs-dark', // can also be vs-dark or hc-black
         inherit: true, // can also be false to completely replace the builtin rules

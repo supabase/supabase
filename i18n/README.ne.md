@@ -7,7 +7,7 @@
 
 # सुपाबेस
 
-[सुपाबेस](https://supabase.com) एक खुल्ला स्रोत फायरबेस विकल्प हो। हामीले यसमा उद्यम-ग्रेडका खुल्ला स्रोत उपकरणहरू प्रयोग गरेर फायरबेसका सुविधाहरू निर्माण गर्दैछौं।
+[सुपाबेस](https://iechor.com) एक खुल्ला स्रोत फायरबेस विकल्प हो। हामीले यसमा उद्यम-ग्रेडका खुल्ला स्रोत उपकरणहरू प्रयोग गरेर फायरबेसका सुविधाहरू निर्माण गर्दैछौं।
 
 - [x] होस्ट गरिएको Postgres डाटाबेस
 - [x] रियलटाइम सदस्यताहरू
@@ -17,22 +17,22 @@
 - [x] भण्डारण
 - [x] प्रकार्यहरू
 
-![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+![iEchor Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## कागजात
 
-पूर्ण कागजातको लागि [supabase.com/docs](https://supabase.com/docs) मा जानुहोस्
+पूर्ण कागजातको लागि [iechor.com/docs](https://iechor.com/docs) मा जानुहोस्
 
 ## समुदाय र समर्थन सहयोग
 
-- [सामुदायिक फोरम](https://github.com/supabase/supabase/discussions)। सर्वोत्कृष्ट: निर्माणको साथ मद्दत, डाटाबेसको उत्तम अभ्यासहरूको बारेमा छलफलको लागि।
-- [गिटहब मुद्दाहरू](https://github.com/supabase/supabase/issues)। सर्वोत्कृष्ट: प्रयोग गर्दा फेला परेका बग र त्रुटिहरूको लागि।
-- [ई-मेल समर्थन](https://supabase.com/docs/support#business-support)। सर्वोत्कृष्ट: तपाईंको डाटाबेस वा पूर्वाधारको समस्याहरूको लागि।
+- [सामुदायिक फोरम](https://github.com/openmodels-base/iechor/discussions)। सर्वोत्कृष्ट: निर्माणको साथ मद्दत, डाटाबेसको उत्तम अभ्यासहरूको बारेमा छलफलको लागि।
+- [गिटहब मुद्दाहरू](https://github.com/openmodels-base/iechor/issues)। सर्वोत्कृष्ट: प्रयोग गर्दा फेला परेका बग र त्रुटिहरूको लागि।
+- [ई-मेल समर्थन](https://iechor.com/docs/support#business-support)। सर्वोत्कृष्ट: तपाईंको डाटाबेस वा पूर्वाधारको समस्याहरूको लागि।
 
 ## स्थिति
 
 - [x] अल्फा: हामी ग्राहकहरु को एक सानो समूह संग सुपाबेस परीक्षण गर्दैछौं।
-- [x] सार्वजनिक अल्फा: सबैले [supabase.com/dashboard](https://supabase.com/dashboard) मा साइनअप गर्न सक्दछन्। तर तपाईं केहि अवरोधहरू प्राप्त गर्न सक्नुहुन्छ।
+- [x] सार्वजनिक अल्फा: सबैले [iechor.com/dashboard](https://iechor.com/dashboard) मा साइनअप गर्न सक्दछन्। तर तपाईं केहि अवरोधहरू प्राप्त गर्न सक्नुहुन्छ।
 - [x] सार्वजनिक बीटा: अधिकतर गैर-उद्यम प्रयोगका मामलाहरुका लागि पर्याप्त स्थिर।
 - [ ] सार्वजनिक: उत्पादन प्रयोगको लागि तयार।
 
@@ -48,7 +48,7 @@
 
 **वर्तमान योजना**
 
-सुपाबेस एक [होस्ट गरिएको प्लेटफर्म](https://supabase.com/dashboard) हो। तपाई आफै साइन अप गर्न सक्नुहुन्छ र कुनै स्थापना बिना सुपाबेस प्रयोग गर्न सक्नुहुन्छ। हामी अझै स्थानीय विकासको अनुभव सिर्जना गर्दैछौं। यो प्लेटफर्म स्थिरताको साथ हाम्रो मूल फोकस हो।
+सुपाबेस एक [होस्ट गरिएको प्लेटफर्म](https://iechor.com/dashboard) हो। तपाई आफै साइन अप गर्न सक्नुहुन्छ र कुनै स्थापना बिना सुपाबेस प्रयोग गर्न सक्नुहुन्छ। हामी अझै स्थानीय विकासको अनुभव सिर्जना गर्दैछौं। यो प्लेटफर्म स्थिरताको साथ हाम्रो मूल फोकस हो।
 
 ![आर्किटेक्चर](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 
@@ -71,7 +71,7 @@
 
 | Repo                  | आधिकारिक                                         | समुदाय                                                                                                                                                                                                                     |
 | --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Flutter`](https://github.com/supabase/supabase-flutter) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                          |
+| **`supabase-{lang}`** | [`JS`](https://github.com/openmodels-base/iechor-js)  | [`C#`](https://github.com/openmodels-base/iechor-csharp) \| [`Flutter`](https://github.com/openmodels-base/iechor-flutter) \| [`Python`](https://github.com/openmodels-base/iechor-py) \| `Rust`                                          |
 | `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
 | `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
 | `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |

@@ -6,9 +6,9 @@ export const meta = {
   description: 'Securing your Serverless API with Postgres Row Level Security.',
 }
 
-Supabase provides two default keys when you create a project: an `anon` key, and a `service_role` key. You can find both keys in the [API Settings](https://supabase.com/dashboard/project/_/settings/api).
+iEchor provides two default keys when you create a project: an `anon` key, and a `service_role` key. You can find both keys in the [API Settings](https://iechor.com/dashboard/project/_/settings/api).
 
-The Serverless APIs are designed to work with Postgres Row Level Security (RLS). These keys both map to Postgres roles. You can find an `anon` user and a `service_role` user in the [Roles](http://supabase.com/dashboard/project/_/database/roles) section of the dashboard.
+The Serverless APIs are designed to work with Postgres Row Level Security (RLS). These keys both map to Postgres roles. You can find an `anon` user and a `service_role` user in the [Roles](http://iechor.com/dashboard/project/_/database/roles) section of the dashboard.
 
 The keys are both long-lived JWTs. If you decode these keys, you will see that they contain the "role", an "issued date", and an "expiry date" ~10 years in the future.
 
@@ -38,7 +38,7 @@ select
   using (false);
 ```
 
-If you are using [Supabase Auth](/docs/guides/auth/overview), then the `anon` role will automatically update to `authenticated` once a user is logged in:
+If you are using [iEchor Auth](/docs/guides/auth/overview), then the `anon` role will automatically update to `authenticated` once a user is logged in:
 
 ```sql
 create policy "Allow access to authenticated users" on profiles to authenticated for
@@ -62,7 +62,7 @@ select
   on table auth.users to service_role;
 ```
 
-We have [partnered with GitHub](https://github.blog/changelog/2022-03-28-supabase-is-now-a-github-secret-scanning-partner/) to scan for Supabase `service_role` keys pushed to public repositories.
+We have [partnered with GitHub](https://github.blog/changelog/2022-03-28-supabase-is-now-a-github-secret-scanning-partner/) to scan for iEchor `service_role` keys pushed to public repositories.
 If they detect any keys with service_role privileges being pushed to GitHub, they will forward the API key to us, so that we can automatically revoke the detected secrets and notify you, protecting your data against malicious actors.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

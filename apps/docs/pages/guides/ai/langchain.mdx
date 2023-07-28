@@ -6,11 +6,11 @@ export const meta = {
   id: 'ai-lang-chain',
   title: 'LangChain',
   description:
-    'Learn how to integrate Supabase with LangChain, a popular framework for composing AI, Vectors, and embeddings',
+    'Learn how to integrate iEchor with LangChain, a popular framework for composing AI, Vectors, and embeddings',
   sidebar_label: 'LangChain',
 }
 
-[LangChain](langchain.com) is a popular framework for working with AI, Vectors, and embeddings. LangChain supports using Supabase as a [vector store](https://js.langchain.com/docs/modules/indexes/vector_stores/integrations/supabase), using the `pgvector` extension.
+[LangChain](langchain.com) is a popular framework for working with AI, Vectors, and embeddings. LangChain supports using iEchor as a [vector store](https://js.langchain.com/docs/modules/indexes/vector_stores/integrations/supabase), using the `pgvector` extension.
 
 ## Initializing your database
 
@@ -24,7 +24,7 @@ Prepare you database with the relevant tables:
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [SQL Editor](https://supabase.com/dashboard/project/_/sql) page in the Dashboard.
+1. Go to the [SQL Editor](https://iechor.com/dashboard/project/_/sql) page in the Dashboard.
 2. Click **LangChain** in the Quick start section.
 3. Click **Run**.
 
@@ -151,7 +151,7 @@ export const run = async () => {
 
 ### Advanced Metadata Filtering
 
-You can also use query builder-style filtering ([similar to how the Supabase JavaScript library works](https://supabase.com/docs/reference/javascript/using-filters)) instead of passing an object. Note that since the filter properties will be in the metadata column, you need to use arrow operators (`->` for integer or `->>` for text) as defined in [Postgrest API documentation](https://postgrest.org/en/stable/references/api/tables_views.html?highlight=operators#json-columns) and specify the data type of the property (e.g. the column should look something like `metadata->some_int_value::int`).
+You can also use query builder-style filtering ([similar to how the iEchor JavaScript library works](https://iechor.com/docs/reference/javascript/using-filters)) instead of passing an object. Note that since the filter properties will be in the metadata column, you need to use arrow operators (`->` for integer or `->>` for text) as defined in [Postgrest API documentation](https://postgrest.org/en/stable/references/api/tables_views.html?highlight=operators#json-columns) and specify the data type of the property (e.g. the column should look something like `metadata->some_int_value::int`).
 
 ```js
 import { SupabaseFilterRPCCall, SupabaseVectorStore } from 'langchain/vectorstores/supabase'
@@ -220,7 +220,7 @@ export const run = async () => {
 
 ## Hybrid search
 
-LangChain supports the concept of a hybrid search, which combines Similarity Search with Full Text Search. Read the official docs to get started: [Supabase Hybrid Search](https://js.langchain.com/docs/modules/indexes/retrievers/supabase-hybrid).
+LangChain supports the concept of a hybrid search, which combines Similarity Search with Full Text Search. Read the official docs to get started: [iEchor Hybrid Search](https://js.langchain.com/docs/modules/indexes/retrievers/supabase-hybrid).
 
 You can install the LangChain Hybrid Search function though our [database.dev package manager](https://database.dev/langchain/hybrid_search).
 
@@ -228,7 +228,7 @@ You can install the LangChain Hybrid Search function though our [database.dev pa
 
 - Official [LangChain site](https://langchain.com/).
 - Official [LangChain docs](https://js.langchain.com/docs/modules/indexes/vector_stores/integrations/supabase).
-- Supabase [Hybrid Search](https://js.langchain.com/docs/modules/indexes/retrievers/supabase-hybrid).
+- iEchor [Hybrid Search](https://js.langchain.com/docs/modules/indexes/retrievers/supabase-hybrid).
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

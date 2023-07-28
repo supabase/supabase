@@ -243,7 +243,7 @@ const ColumnEditor = ({
           <FormSectionLabel
             className="lg:!col-span-4"
             description={
-              <Link href="https://supabase.com/docs/guides/database/tables#data-types" passHref>
+              <Link href="https://iechor.com/docs/guides/database/tables#data-types" passHref>
                 <Button
                   asChild
                   type="default"

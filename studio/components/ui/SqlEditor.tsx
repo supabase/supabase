@@ -25,7 +25,7 @@ const SqlEditor: FC<Props> = ({
 
   useEffect(() => {
     if (monaco) {
-      // Supabase theming (Can't seem to get it to work for now)
+      // iEchor theming (Can't seem to get it to work for now)
       monaco.editor.defineTheme('supabase', {
         base: 'vs-dark',
         inherit: true,

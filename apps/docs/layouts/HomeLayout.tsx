@@ -31,19 +31,19 @@ const HomeLayout: FC<Props> = (props: Props) => {
   return (
     <>
       <Head>
-        <title>{asPath === '/' ? 'Supabase Docs' : `${props.meta?.title} | Supabase Docs`}</title>
+        <title>{asPath === '/' ? 'iEchor Docs' : `${props.meta?.title} | iEchor Docs`}</title>
         <meta name="description" content={props.meta?.description} />
-        <meta property="og:image" content={`https://supabase.com/docs/img/supabase-og-image.png`} />
+        <meta property="og:image" content={`https://iechor.com/docs/img/supabase-og-image.png`} />
         <meta
           name="twitter:image"
-          content={`https://supabase.com/docs/img/supabase-og-image.png`}
+          content={`https://iechor.com/docs/img/supabase-og-image.png`}
         />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       <NextSeo
-        canonical={props.meta?.canonical ?? `https://supabase.com/docs${asPath}`}
+        canonical={props.meta?.canonical ?? `https://iechor.com/docs${asPath}`}
         openGraph={{
-          url: `https://supabase.com/docs${asPath}`,
+          url: `https://iechor.com/docs${asPath}`,
           type: 'article',
           videos: props.meta?.video && [
             {
@@ -57,7 +57,7 @@ const HomeLayout: FC<Props> = (props: Props) => {
           article: {
             publishedTime: new Date().toISOString(),
             modifiedTime: new Date().toISOString(),
-            authors: ['Supabase'],
+            authors: ['iEchor'],
           },
         }}
       />

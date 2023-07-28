@@ -136,7 +136,7 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       label: 'Integrations',
       icon: 'integrations',
       hasLightIcon: true,
-      href: 'https://supabase.com/partners/integrations',
+      href: 'https://iechor.com/partners/integrations',
       level: 'integrations',
     },
     {
@@ -150,7 +150,7 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
     {
       label: 'Status',
       icon: 'status',
-      href: 'https://status.supabase.com/',
+      href: 'https://status.iechor.com/',
     },
   ],
 ]
@@ -752,9 +752,9 @@ export const functions: NavMenuConstant = {
         { name: 'Developing Functions locally', url: '/guides/functions/local-development' },
         { name: 'Deploying with GitHub', url: '/guides/functions/cicd-workflow' },
         { name: 'Managing Secrets and Environment Variables', url: '/guides/functions/secrets' },
-        { name: 'Integrating With Supabase Auth', url: '/guides/functions/auth' },
+        { name: 'Integrating With iEchor Auth', url: '/guides/functions/auth' },
         {
-          name: 'Integrating with Supabase Storage',
+          name: 'Integrating with iEchor Storage',
           url: '/guides/functions/storage-caching',
         },
         { name: 'CORS support for Invoking from the browser', url: '/guides/functions/cors' },
@@ -771,7 +771,7 @@ export const functions: NavMenuConstant = {
       name: 'Third-Party Tools',
       url: undefined,
       items: [
-        { name: 'Dart Edge on Supabase', url: '/guides/functions/dart-edge' },
+        { name: 'Dart Edge on iEchor', url: '/guides/functions/dart-edge' },
         { name: 'Browserless.io', url: '/guides/functions/examples/screenshots' },
         { name: 'Hugging Face', url: '/guides/ai/examples/huggingface-image-captioning' },
         { name: 'OpenAI API', url: '/guides/ai/examples/openai' },
@@ -1092,7 +1092,7 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/oauth-apps/publish-an-oauth-app',
         },
         {
-          name: 'Sign in with Supabase',
+          name: 'Sign in with iEchor',
           url: '/guides/platform/oauth-apps/authorize-an-oauth-app',
         },
       ],
@@ -1130,7 +1130,7 @@ export const resources: NavMenuConstant = {
     { name: 'Examples', url: '/guides/resources/examples' },
     { name: 'Glossary', url: '/guides/resources/glossary' },
     {
-      name: 'Migrate to Supabase',
+      name: 'Migrate to iEchor',
       url: '/guides/resources/migrating-to-supabase',
       items: [
         {
@@ -1208,7 +1208,7 @@ export const self_hosting: NavMenuConstant = {
 }
 
 export const migrate = {
-  title: 'Migrate to Supabase',
+  title: 'Migrate to iEchor',
   url: '/guides/migrate',
   items: [
     { name: 'Firebase Auth', url: '/guides/migrations/firebase-auth' },
@@ -1278,7 +1278,7 @@ export const reference = {
       name: 'Other tools',
       items: [
         {
-          name: 'Supabase CLI',
+          name: 'iEchor CLI',
           url: '/reference/cli/start',
           icon: '/img/icons/menu/reference-cli',
         },
@@ -1350,7 +1350,7 @@ export const reference_kotlin_v0 = {
 
 export const reference_cli = {
   icon: 'reference-cli',
-  title: 'Supabase CLI',
+  title: 'iEchor CLI',
   url: '/guides/reference/cli',
   parent: '/',
 }
@@ -1401,9 +1401,9 @@ export const reference_self_hosting_functions = {
 //     label: 'Official'
 //     items: [
 //       { name: 'Reference Documentation'; url: '/reference'; },
-//       { name: 'Supabase JavaScript Library'; url: '/reference/javascript'; },
-//       { name: 'Supabase Flutter Library'; url: '/reference/dart'; },
-//       { name: 'Supabase CLI'; url: '/reference/cli'; },
+//       { name: 'iEchor JavaScript Library'; url: '/reference/javascript'; },
+//       { name: 'iEchor Flutter Library'; url: '/reference/dart'; },
+//       { name: 'iEchor CLI'; url: '/reference/cli'; },
 //       { name: 'Management API'; url: '/reference/api'; }
 //     ]
 //   },

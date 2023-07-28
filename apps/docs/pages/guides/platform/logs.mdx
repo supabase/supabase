@@ -4,14 +4,14 @@ import { logConstants } from 'shared-data'
 export const meta = {
   id: 'logs',
   title: 'Logging',
-  description: 'Getting started with Supabase Log Browser',
+  description: 'Getting started with iEchor Log Browser',
 }
 
-The Supabase Platform includes a Logs Explorer that allows log tracing and debugging. Log retention is based on your [project's pricing plan](https://supabase.com/pricing).
+The iEchor Platform includes a Logs Explorer that allows log tracing and debugging. Log retention is based on your [project's pricing plan](https://iechor.com/pricing).
 
 ## Product Logs
 
-Supabase provides a logging interface specific to each product. You can use simple regular expressions for keywords and patterns to search log event messages. You can also export and download the log events matching your query as a spreadsheet.
+iEchor provides a logging interface specific to each product. You can use simple regular expressions for keywords and patterns to search log event messages. You can also export and download the log events matching your query as a spreadsheet.
 
 {/* <!-- To update screenshots, ensure that at least one log line is selected to display the metadata. Can use meme.town as an example. --> */}
 
@@ -23,35 +23,35 @@ Supabase provides a logging interface specific to each product. You can use simp
 >
 <TabPanel id="api" label="API">
 
-[API logs](https://supabase.com/dashboard/project/_/database/api-logs) show all network requests and response for the REST and GraphQL [APIs](../../guides/database/api).
+[API logs](https://iechor.com/dashboard/project/_/database/api-logs) show all network requests and response for the REST and GraphQL [APIs](../../guides/database/api).
 
 ![API Logs](/docs/img/guides/platform/logs/logs-api.png)
 
 </TabPanel>
 <TabPanel id="postgres" label="Postgres">
 
-[Postgres logs](https://supabase.com/dashboard/project/_/logs/postgres-logs) show queries and activity for your [database](../../guides/database).
+[Postgres logs](https://iechor.com/dashboard/project/_/logs/postgres-logs) show queries and activity for your [database](../../guides/database).
 
 ![Postgres Logs](/docs/img/guides/platform/logs/logs-database.png)
 
 </TabPanel>
 <TabPanel id="auth" label="Auth">
 
-[Auth logs](https://supabase.com/dashboard/project/_/logs/auth-logs) show all server logs for your [Auth usage](../../guides/auth).
+[Auth logs](https://iechor.com/dashboard/project/_/logs/auth-logs) show all server logs for your [Auth usage](../../guides/auth).
 
 ![Auth Logs](/docs/img/guides/platform/logs/logs-auth.png)
 
 </TabPanel>
 <TabPanel id="storage" label="Storage">
 
-[Storage logs](https://supabase.com/dashboard/project/_/logs/storage-logs) shows all server logs for your [Storage API](../../guides/storage).
+[Storage logs](https://iechor.com/dashboard/project/_/logs/storage-logs) shows all server logs for your [Storage API](../../guides/storage).
 
 ![Storage Logs](/docs/img/guides/platform/logs/logs-storage.png)
 
 </TabPanel>
 <TabPanel id="realtime" label="Realtime">
 
-[Realtime logs](https://supabase.com/dashboard/project/_/logs/realtime-logs) show all server logs for your [Realtime API usage](../../guides/realtime).
+[Realtime logs](https://iechor.com/dashboard/project/_/logs/realtime-logs) show all server logs for your [Realtime API usage](../../guides/realtime).
 
 <Admonition type="note">
 
@@ -64,7 +64,7 @@ Realtime connections are not logged by default. Turn on [Realtime connection log
 </TabPanel>
 <TabPanel id="functions" label="Edge Functions">
 
-For each [Edge Function](https://supabase.com/dashboard/project/_/functions), logs are available under the following tabs:
+For each [Edge Function](https://iechor.com/dashboard/project/_/functions), logs are available under the following tabs:
 
 **Invocations**
 
@@ -85,14 +85,14 @@ The Logs tab displays logs emitted during function execution.
 
 ## Logging Postgres Queries
 
-By default, query logs are disabled for new Supabase projects, as they can reveal metadata about the contents of your database (such as table and column names).
+By default, query logs are disabled for new iEchor projects, as they can reveal metadata about the contents of your database (such as table and column names).
 
 To enable query logs:
 
-1. [Enable the pgAudit extension](https://supabase.com/dashboard/project/_/database/extensions).
-2. [Restart your project](https://supabase.com/dashboard/project/_/settings/general) using the **Fast database reboot** option.
+1. [Enable the pgAudit extension](https://iechor.com/dashboard/project/_/database/extensions).
+2. [Restart your project](https://iechor.com/dashboard/project/_/settings/general) using the **Fast database reboot** option.
 3. Configure `pgaudit.log` (see below). Perform a fast reboot if needed.
-4. View your query logs under [Logs > Postgres Logs](https://supabase.com/dashboard/project/_/logs/postgres-logs).
+4. View your query logs under [Logs > Postgres Logs](https://iechor.com/dashboard/project/_/logs/postgres-logs).
 
 ### Configuring `pgaudit.log`
 
@@ -150,7 +150,7 @@ If any permission errors are encountered when executing `alter role postgres ...
 
 ## Logging Realtime Connections
 
-Realtime doesn't log new WebSocket connections or Channel joins by default. Enable connection logging per client by including an `info` `log_level` parameter when instantiating the Supabase client.
+Realtime doesn't log new WebSocket connections or Channel joins by default. Enable connection logging per client by including an `info` `log_level` parameter when instantiating the iEchor client.
 
 ```javascript
 import { createClient } from '@supabase/supabase-js'
@@ -160,12 +160,12 @@ const options = {
     log_level: 'info',
   },
 }
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', options)
+const iechor = createClient('https://xyzcompany.supabase.co', 'public-anon-key', options)
 ```
 
 ## Logs Explorer
 
-The [Logs Explorer](https://supabase.com/dashboard/project/_/logs-explorer) exposes logs from each part of the Supabase stack as a separate table that can be queried and joined using SQL.
+The [Logs Explorer](https://iechor.com/dashboard/project/_/logs-explorer) exposes logs from each part of the iEchor stack as a separate table that can be queried and joined using SQL.
 
 ![Logs Explorer](/docs/img/guides/platform/logs/logs-explorer.png)
 

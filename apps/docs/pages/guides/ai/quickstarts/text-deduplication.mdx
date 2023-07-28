@@ -4,11 +4,11 @@ import HuggingFaceDeployment from '~/components/MDX/ai/quickstart_hf_deployment.
 export const meta = {
   id: 'ai-vecs-python-client',
   title: 'Semantic Text Deduplication',
-  subtitle: 'Finding duplicate movie reviews with Supabase Vecs.',
+  subtitle: 'Finding duplicate movie reviews with iEchor Vecs.',
   breadcrumb: 'AI Quickstarts',
 }
 
-This guide will walk you through a ["Semantic Text Deduplication"](https://github.com/supabase/supabase/blob/master/examples/ai/semantic_text_deduplication.ipynb) example using Colab and Supabase Vecs. You'll learn how to find similar movie reviews using embeddings, and remove any that seem like duplicates. You will:
+This guide will walk you through a ["Semantic Text Deduplication"](https://github.com/openmodels-base/iechor/blob/master/examples/ai/semantic_text_deduplication.ipynb) example using Colab and iEchor Vecs. You'll learn how to find similar movie reviews using embeddings, and remove any that seem like duplicates. You will:
 
 1. Launch a Postgres database that uses pgvector to store embeddings
 1. Launch a notebook that connects to your database
@@ -20,7 +20,7 @@ This guide will walk you through a ["Semantic Text Deduplication"](https://githu
 
 ## Launching a notebook
 
-Launch our [`semantic_text_deduplication`](https://github.com/supabase/supabase/blob/master/examples/ai/semantic_text_deduplication.ipynb) notebook in Colab:
+Launch our [`semantic_text_deduplication`](https://github.com/openmodels-base/iechor/blob/master/examples/ai/semantic_text_deduplication.ipynb) notebook in Colab:
 
 <a
   className="w-64"
@@ -50,7 +50,7 @@ Replace the `DB_CONNECTION` with your own connection string for your database, w
 
 Now all that's left is to step through the notebook. You can do this by clicking the "execute" button (`ctrl+enter`) at the top left of each code cell. The notebook guides you through the process of creating a collection, adding data to it, and querying it.
 
-You can view the inserted items in the [Table Editor](https://supabase.com/dashboard/project/_/editor/), by selecting the `vecs` schema from the schema dropdown.
+You can view the inserted items in the [Table Editor](https://iechor.com/dashboard/project/_/editor/), by selecting the `vecs` schema from the schema dropdown.
 
 ![Colab documents](/docs/img/ai/google-colab/colab-documents.png)
 

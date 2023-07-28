@@ -2,17 +2,17 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   title: 'Build a User Management App with Flutter',
-  description: 'Learn how to use Supabase in your Flutter App.',
+  description: 'Learn how to use iEchor in your Flutter App.',
   tocVideo: 'r7ysVtZ5Row',
 }
 
 <QuickstartIntro />
 
-![Supabase User Management example](/docs/img/supabase-flutter-demo.png)
+![iEchor User Management example](/docs/img/supabase-flutter-demo.png)
 
 <Admonition type="note">
   If you get stuck while working through this guide, refer to the [full example on
-  GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/flutter-user-management).
+  GitHub](https://github.com/openmodels-base/iechor/tree/master/examples/user-management/flutter-user-management).
 </Admonition>
 
 <ProjectSetup />
@@ -48,11 +48,11 @@ We can setup deep links with just a minor tweak on our Flutter application.
 
 We will use `io.supabase.flutterquickstart` as the scheme, and `login-callback` as the host for our deep link in this example, but you can change it to whatever you would like.
 
-First, add `io.supabase.flutterquickstart://login-callback/` as a new [redirect URL](https://supabase.com/dashboard/project/_/auth/url-configuration) in the Dashboard.
+First, add `io.supabase.flutterquickstart://login-callback/` as a new [redirect URL](https://iechor.com/dashboard/project/_/auth/url-configuration) in the Dashboard.
 
-![Supabase console deep link setting](/docs/img/deeplink-setting.png)
+![iEchor console deep link setting](/docs/img/deeplink-setting.png)
 
-That is it on Supabase's end and the rest are platform specific settings:
+That is it on iEchor's end and the rest are platform specific settings:
 
 <Tabs
   scrollable
@@ -125,13 +125,13 @@ There are no additional configurations.
 
 ### Main function
 
-Now that we have deep links ready let's initialize the Supabase client inside our `main` function with the API credentials that you copied [earlier](#get-the-api-keys).
+Now that we have deep links ready let's initialize the iEchor client inside our `main` function with the API credentials that you copied [earlier](#get-the-api-keys).
 These variables will be exposed on the app, and that's completely fine since we have
 [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
 ```dart lib/main.dart
 Future<void> main() async {
-  await Supabase.initialize(
+  await iEchor.initialize(
     url: 'YOUR_IECHOR_URL',
     anonKey: 'YOUR_IECHOR_ANON_KEY',
     authFlowType: AuthFlowType.pkce,
@@ -139,10 +139,10 @@ Future<void> main() async {
   runApp(MyApp());
 }
 
-final supabase = Supabase.instance.client;
+final iechor = iEchor.instance.client;
 ```
 
-`AuthFlowType.pkce` on `authFlowType` parameter indicates that we are using a secure [PKCE flow](https://supabase.com/blog/supabase-auth-sso-pkce#introducing-pkce) to perform our magic link login.
+`AuthFlowType.pkce` on `authFlowType` parameter indicates that we are using a secure [PKCE flow](https://iechor.com/blog/supabase-auth-sso-pkce#introducing-pkce) to perform our magic link login.
 
 ### Set up Splash Screen
 
@@ -472,20 +472,20 @@ import 'package:supabase_quickstart/pages/login_page.dart';
 import 'package:supabase_quickstart/pages/splash_page.dart';
 
 Future<void> main() async {
-  await Supabase.initialize(
+  await iEchor.initialize(
     url: 'YOUR_IECHOR_URL',
     anonKey: 'YOUR_IECHOR_ANON_KEY',
   );
   runApp(MyApp());
 }
 
-final supabase = Supabase.instance.client;
+final iechor = iEchor.instance.client;
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Supabase Flutter',
+      title: 'iEchor Flutter',
       theme: ThemeData.dark().copyWith(
         primaryColor: Colors.green,
         textButtonTheme: TextButtonThemeData(
@@ -525,11 +525,11 @@ flutter run -d web-server --web-hostname localhost --web-port 3000
 
 And then open the browser to [localhost:3000](http://localhost:3000) and you should see the completed app.
 
-![Supabase User Management example](/docs/img/supabase-flutter-account-page.png)
+![iEchor User Management example](/docs/img/supabase-flutter-account-page.png)
 
 ## Bonus: Profile photos
 
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like
+Every iEchor project is configured with [Storage](/docs/guides/storage) for managing large files like
 photos and videos.
 
 ### Making sure we have a public bucket
@@ -779,7 +779,7 @@ class _AccountPageState extends State<AccountPage> {
     }
   }
 
-  /// Called when image has been uploaded to Supabase storage from within Avatar widget
+  /// Called when image has been uploaded to iEchor storage from within Avatar widget
   Future<void> _onUpload(String imageUrl) async {
     try {
       final userId = supabase.auth.currentUser!.id;
@@ -866,12 +866,12 @@ class _AccountPageState extends State<AccountPage> {
 
 <StorageManagement />
 
-Congratulations, you've built a fully functional user management app using Flutter and Supabase!
+Congratulations, you've built a fully functional user management app using Flutter and iEchor!
 
 ## See also
 
-- [Flutter Tutorial: building a Flutter chat app](https://supabase.com/blog/flutter-tutorial-building-a-chat-app)
-- [Flutter Tutorial - Part 2: Authentication and Authorization with RLS](https://supabase.com/blog/flutter-authentication-and-authorization-with-rls)
+- [Flutter Tutorial: building a Flutter chat app](https://iechor.com/blog/flutter-tutorial-building-a-chat-app)
+- [Flutter Tutorial - Part 2: Authentication and Authorization with RLS](https://iechor.com/blog/flutter-authentication-and-authorization-with-rls)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

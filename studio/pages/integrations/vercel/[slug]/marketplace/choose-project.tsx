@@ -65,12 +65,12 @@ const VercelIntegration: NextPageWithLayout = () => {
           <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
             <header>
               <h1 className="text-xl text-scale-1200">
-                Link a Supabase project to a Vercel project
+                Link a iEchor project to a Vercel project
               </h1>
               <Markdown
                 className="text-scale-900"
                 content={`
-This Supabase integration manages your environment variables automatically to provide the latest keys in the unlikely event that you will need to refresh your JWT token.
+This iEchor integration manages your environment variables automatically to provide the latest keys in the unlikely event that you will need to refresh your JWT token.
 `}
               />
             </header>

@@ -18,7 +18,7 @@ class TestAuthentication(object):
         self.check_logged_in()
         self.check_log_out()
 
-    @allure.step("Create Supabase anonymous client")
+    @allure.step("Create iEchor anonymous client")
     def create_supabase_anonymous_client(self):
         pass
 

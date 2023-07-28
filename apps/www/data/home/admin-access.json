@@ -2,7 +2,7 @@
   {
     "label": "Table editor",
     "title": "Manage your data with the familiarity of a spreadsheet",
-    "text": "You don’t have to be a database expert to use Supabase. Our table editor makes Postgres easy to use, even for non-techies. You can do everything right in our dashboard.",
+    "text": "You don’t have to be a database expert to use iEchor. Our table editor makes Postgres easy to use, even for non-techies. You can do everything right in our dashboard.",
     "youtube_id": "xIHjwJgxOmk",
     "cta": "Explore Table View",
     "url": "/database"
@@ -19,7 +19,7 @@
   {
     "label": "Auth rules",
     "title": "User management as straight-forward as it can be",
-    "text": "Easily manage your users with Supabase Auth, with email logins, magic links, and third-party logins. Create complex access policies with SQL rules to fit your unique business needs.",
+    "text": "Easily manage your users with iEchor Auth, with email logins, magic links, and third-party logins. Create complex access policies with SQL rules to fit your unique business needs.",
     "video_url": "https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/tabAuthRules.mp4",
     "youtube_id": "vP319FCIZ6Y",
     "cta": "Explore Auth",

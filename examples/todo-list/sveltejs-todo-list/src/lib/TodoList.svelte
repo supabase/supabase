@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { User } from "@supabase/supabase-js";
   import Todo from "./Todo.svelte";
-  import { supabase } from "./db";
+  import { iechor } from "./db";
   import Alert from "./Alert.svelte";
   import { onMount } from "svelte";
 

@@ -5,7 +5,7 @@ import LoginForm from './login-form'
 import type { Database } from '@/lib/database.types'
 
 export default async function Login() {
-  const supabase = createServerComponentClient<Database>({ cookies })
+  const iechor = createServerComponentClient<Database>({ cookies })
 
   const {
     data: { session },

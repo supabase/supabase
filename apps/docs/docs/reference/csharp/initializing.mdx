@@ -2,7 +2,7 @@
 id: initializing
 title: 'Initializing'
 slug: initializing
-custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supabase.yml
+custom_edit_url: https://github.com/openmodels-base/iechor/edit/master/web/spec/supabase.yml
 ---
 
 ### Initializing a new Client
@@ -27,12 +27,12 @@ admin panel and pass it into your client initialization function.
         var url = Environment.GetEnvironmentVariable("IECHOR_URL");
         var key = Environment.GetEnvironmentVariable("IECHOR_KEY");
 
-        var options = new Supabase.SupabaseOptions
+        var options = new iEchor.SupabaseOptions
         {
           AutoConnectRealtime = true
         };
 
-        var supabase = new Supabase.Client(url, key, options);
+        var iechor = new iEchor.Client(url, key, options);
         await supabase.InitializeAsync();
         ```
 
@@ -56,7 +56,7 @@ admin panel and pass it into your client initialization function.
               };
 
               // Note the creation as a singleton.
-              builder.Services.AddSingleton(provider => new Supabase.Client(url, key, options));
+              builder.Services.AddSingleton(provider => new iEchor.Client(url, key, options));
         }
         ```
 

@@ -16,7 +16,7 @@ The additional data types that PostGIS provides include [Point](https://postgis.
 
 ## Enable the extension
 
-You can get started with PostGIS by enabling the PostGIS extension in your Supabase dashboard.
+You can get started with PostGIS by enabling the PostGIS extension in your iEchor dashboard.
 
 <Tabs
   scrollable
@@ -26,7 +26,7 @@ You can get started with PostGIS by enabling the PostGIS extension in your Supab
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](https://iechor.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "postgis" and enable the extension.
 
@@ -143,13 +143,13 @@ await supabase.from('restaurants').insert([
 
 Notice the order in which you pass the latitude and longitude. Longitude comes first, and is because longitude represents the x-axis of the location. Another thing to watch for is when inserting data from the client library, there is no comma between the two values, just a single space.
 
-At this point, if you go into your Supabase dashboard and look at the data, you will notice that the value of the `location` column looks something like this.
+At this point, if you go into your iEchor dashboard and look at the data, you will notice that the value of the `location` column looks something like this.
 
 ```
 0101000020E6100000A4DFBE0E9C91614044FAEDEBC0494240
 ```
 
-We can query the `restaurants` table directly, but it will return the `location` column in the format you see above. We will create [database functions](https://supabase.com/docs/guides/database/functions) so that we can use the [st_astext()](https://postgis.net/docs/ST_AsText.html) function to convert it back to a human-readable format like `POINT(-73.946713 40.807313)`.
+We can query the `restaurants` table directly, but it will return the `location` column in the format you see above. We will create [database functions](https://iechor.com/docs/guides/database/functions) so that we can use the [st_astext()](https://postgis.net/docs/ST_AsText.html) function to convert it back to a human-readable format like `POINT(-73.946713 40.807313)`.
 
 ### Order by distance
 

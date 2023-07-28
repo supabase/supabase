@@ -78,9 +78,9 @@ const WrappersDisabledState = () => {
       >
         <div className="w-3/5 space-y-8">
           <div className="space-y-2">
-            <h4 className="text-lg">Supabase Wrappers</h4>
+            <h4 className="text-lg">iEchor Wrappers</h4>
             <p className="text-sm text-scale-1100">
-              Supabase Wrappers is a framework for building Postgres Foreign Data Wrappers (FDW)
+              iEchor Wrappers is a framework for building Postgres Foreign Data Wrappers (FDW)
               which connect Postgres to external systems. Query your data warehouse or third-party
               APIs directly from your database.
             </p>
@@ -107,7 +107,7 @@ const WrappersDisabledState = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-2 my-1 ml-[1px]">
-                <Link href="https://supabase.com/docs/guides/database/extensions/wrappers">
+                <Link href="https://iechor.com/docs/guides/database/extensions/wrappers">
                   <a target="_blank" rel="noreferrer">
                     <Button type="default" icon={<IconExternalLink />}>
                       About Wrappers
@@ -118,7 +118,7 @@ const WrappersDisabledState = () => {
             </div>
           ) : (
             <div className="flex items-center space-x-2">
-              <Link href="https://supabase.com/docs/guides/database/extensions/wrappers">
+              <Link href="https://iechor.com/docs/guides/database/extensions/wrappers">
                 <a target="_blank" rel="noreferrer">
                   <Button type="default" icon={<IconExternalLink />}>
                     About Wrappers

@@ -16,8 +16,8 @@ title: Typescript Support
   <RefSubLayout.Examples>
 
     ```bash Terminal
-    supabase start
-    supabase gen types typescript --local > lib/database.types.ts
+    iechor start
+    iechor gen types typescript --local > lib/database.types.ts
     ```
 
   </RefSubLayout.Examples>
@@ -59,7 +59,7 @@ title: Typescript Support
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-    You can enrich the supabase client with the types you generated with Supabase.
+    You can enrich the iechor client with the types you generated with iEchor.
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
@@ -67,7 +67,7 @@ title: Typescript Support
     import { createClient } from '@supabase/supabase-js'
     import { Database } from 'lib/database.types'
 
-    const supabase = createClient<Database>(
+    const iechor = createClient<Database>(
       process.env.IECHOR_URL,
       process.env.IECHOR_ANON_KEY
     )
@@ -109,7 +109,7 @@ title: Typescript Support
   </RefSubLayout.Details>
   <RefSubLayout.Examples>
     ```ts ./index.ts
-      import supabase from '~/lib/supabase'
+      import iechor from '~/lib/supabase'
       import type { Database } from '~/lib/database.types'
 
       async function getMovies() {

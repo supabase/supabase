@@ -57,7 +57,7 @@ const NavigationBar: FC<Props> = ({}) => {
           <a className="block">
             <img
               src={`${router.basePath}/img/supabase-logo.svg`}
-              alt="Supabase"
+              alt="iEchor"
               className="mx-auto h-[40px] w-6 cursor-pointer rounded"
             />
           </a>

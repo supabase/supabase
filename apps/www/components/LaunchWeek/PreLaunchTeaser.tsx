@@ -25,7 +25,7 @@ export function PreLaunchTeaser() {
           <img
             className="z-10 w-full rounded-xl border"
             src="/images/launchweek/launchweek-day-placeholder.jpg"
-            alt="Supabase"
+            alt="iEchor"
           />
           <iframe
             className="absolute top-0 w-full rounded-xl"
@@ -71,7 +71,7 @@ export function PreLaunchTeaser() {
               <h4 className="text-scale-1200 text-base">Founders Fireside Chat</h4>
               <p className="text-scale-1100 text-sm">
                 Our two co-founders, Copple and Ant, discuss open source development and the future
-                of Supabase.
+                of iEchor.
               </p>
             </div>
           </div>
@@ -81,9 +81,9 @@ export function PreLaunchTeaser() {
               <NewspaperIcon strokeWidth={1} />
             </div>
             <div>
-              <h3 className="text-scale-1200 text-base">Supabase Series B</h3>
+              <h3 className="text-scale-1200 text-base">iEchor Series B</h3>
               <p className="text-scale-1100 text-sm">
-                Supabase raised $80M in May, bringing our total funding to $116M.
+                iEchor raised $80M in May, bringing our total funding to $116M.
               </p>
             </div>
             <div>

@@ -2,13 +2,13 @@ openref: 0.1
 
 info:
   id: reference/supabase-js
-  title: Supabase Client
+  title: iEchor Client
   description: |
 
-    Supabase JavaScript.
+    iEchor JavaScript.
 
   definition: ../../spec/enrichments/tsdoc_v2/combined.json
-  specUrl: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v2.yml
+  specUrl: https://github.com/openmodels-base/iechor/edit/master/spec/supabase_js_v2.yml
   slugPrefix: '/'
   libraries:
     - id: 'JavaScript'
@@ -18,10 +18,10 @@ functions:
   - id: initializing
     $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
     description: |
-      You can initialize a new Supabase client using the `createClient()` method.
+      You can initialize a new iEchor client using the `createClient()` method.
 
-      The Supabase client is your entrypoint to the rest of the Supabase functionality
-      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+      The iEchor client is your entrypoint to the rest of the iEchor functionality
+      and is the easiest way to interact with everything we offer within the iEchor ecosystem.
 
     examples:
       - id: create-client
@@ -30,8 +30,8 @@ functions:
           ```js
           import { createClient } from '@supabase/supabase-js'
 
-          // Create a single supabase client for interacting with your database
-          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+          // Create a single iechor client for interacting with your database
+          const iechor = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
           ```
         response: |
           {
@@ -56,7 +56,7 @@ functions:
               headers: { 'x-my-custom-header': 'my-app-name' },
             },
           }
-          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
+          const iechor = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
           ```
         response: |
           {
@@ -69,7 +69,7 @@ functions:
           import { createClient } from '@supabase/supabase-js'
 
           // Provide a custom schema. Defaults to "public".
-          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+          const iechor = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
             db: { schema: 'other_schema' }
           })
           ```
@@ -84,7 +84,7 @@ functions:
           ```js
           import { createClient } from '@supabase/supabase-js'
 
-          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+          const iechor = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
             global: { fetch: fetch.bind(globalThis) }
           })
           ```
@@ -99,7 +99,7 @@ functions:
           import { createClient } from '@supabase/supabase-js'
           import AsyncStorage from "@react-native-async-storage/async-storage";
 
-          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", {
+          const iechor = createClient("https://xyzcompany.supabase.co", "public-anon-key", {
             auth: {
               storage: AsyncStorage,
               autoRefreshToken: true,
@@ -109,18 +109,18 @@ functions:
           });
           ```
 
-          For React Native we recommend using `AsyncStorage` as the storage implementation for Supabase Auth.
+          For React Native we recommend using `AsyncStorage` as the storage implementation for iEchor Auth.
   - id: auth.signUp()
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
-      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
+      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://iechor.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
-      - By default, when the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+      - By default, when the user confirms their email address, they are redirected to the [`SITE_URL`](https://iechor.com/docs/reference/auth/config#site_url). You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://iechor.com/dashboard/project/_/auth/url-configuration).
       - If signUp() is called for an existing confirmed user:
-          - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
+          - If **Confirm email** is enabled in [your project](https://iechor.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
           - If **Confirm email** is disabled, the error message, `User already registered` is returned.
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/auth-getuser).
     examples:
@@ -192,7 +192,7 @@ functions:
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
-      - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+      - The magic link's destination URL is determined by the [`SITE_URL`](https://iechor.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect URLs in [your project](https://iechor.com/dashboard/project/_/auth/url-configuration).
     examples:
       - id: sign-in-with-email.
         name: Sign in with email.
@@ -219,7 +219,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOAuth'
     notes: |
       - This method is used for signing in using a third-party provider.
-      - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
+      - iEchor supports many different [third-party providers](https://iechor.com/docs/guides/auth#providers).
     examples:
       - id: sign-in-using-a-third-party-provider
         name: Sign in using a third-party provider
@@ -235,8 +235,8 @@ functions:
         name: Sign in using a third-party provider with redirect
         isSpotlight: false
         description: |
-          When the third-party provider successfully authenticates the user, the provider will redirect the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). It does not redirect the user immediately after invoking this method.
-          You can modify the `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+          When the third-party provider successfully authenticates the user, the provider will redirect the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](https://iechor.com/docs/reference/auth/config#site_url). It does not redirect the user immediately after invoking this method.
+          You can modify the `SITE_URL` or add additional redirect URLs in [your project](https://iechor.com/dashboard/project/_/auth/url-configuration).
         js: |
           ```js
           const { data, error } = await supabase.auth.signInWithOAuth({
@@ -334,7 +334,7 @@ functions:
     notes: |
       - In order to use the `updateUser()` method, the user needs to be signed in first.
       - By Default, email updates sends a confirmation link to both the user's current and new email.
-      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://iechor.com/dashboard/project/_/auth/providers).
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
@@ -367,7 +367,7 @@ functions:
       - `setSession()` takes in a refresh token and uses it to get a new session.
       - The refresh token can only be used once to obtain a new session.
       - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
-      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://iechor.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
     examples:
       - id: refresh-the-session
         name: Refresh the session
@@ -461,7 +461,7 @@ functions:
             if (event == 'PASSWORD_RECOVERY') console.log('PASSWORD_RECOVERY', session)
           })
           ```
-  - id: Supabase Auth Admin Api
+  - id: iEchor Auth Admin Api
     title: 'Overview'
     notes: |
       - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
@@ -746,10 +746,10 @@ functions:
     description: 'This is the description'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.select'
     notes: |
-      - By default, Supabase projects return a maximum of 1,000 rows. This setting can be changed in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
+      - By default, iEchor projects return a maximum of 1,000 rows. This setting can be changed in your project's [API settings](https://iechor.com/dashboard/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `select()` can be combined with [Filters](/docs/reference/javascript/using-filters)
       - `select()` can be combined with [Modifiers](/docs/reference/javascript/using-modifiers)
-      - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+      - `apikey` is a reserved keyword if you're using the [iEchor Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/openmodels-base/iechor/issues/5465).
     examples:
       - id: getting-your-data
         name: Getting your data
@@ -4931,7 +4931,7 @@ functions:
   - id: invoke()
     title: 'invoke()'
     description: |
-      Invoke a Supabase Function.
+      Invoke a iEchor Function.
     $ref: '@supabase/functions-js.FunctionsClient.invoke'
     notes: |
       - Requires an Authorization header.
@@ -4952,7 +4952,7 @@ functions:
       - id: error-handling.
         name: Error handling.
         description: |
-          A `FunctionsHttpError` error is returned if your function throws an error, `FunctionsRelayError` if the Supabase Relay has an error processing your function and `FunctionsFetchError` if there is a network error in calling your function.
+          A `FunctionsHttpError` error is returned if your function throws an error, `FunctionsRelayError` if the iEchor Relay has an error processing your function and `FunctionsFetchError` if there is a network error in calling your function.
         isSpotlight: true
         js: |
           ```js
@@ -5036,7 +5036,7 @@ functions:
       - id: listen-to-updates
         name: Listen to updates
         description: |
-          By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+          By default, iEchor will send only the updated record. If you want to receive the previous values as well you can
           enable full replication for the table you are listening to:
 
           ```sql
@@ -5054,7 +5054,7 @@ functions:
       - id: listen-to-deletes
         name: Listen to deletes
         description: |
-          By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+          By default, iEchor does not send deleted records. If you want to receive the deleted record you can
           enable full replication for the table you are listening too:
 
           ```sql
@@ -5109,7 +5109,7 @@ functions:
     title: 'removeChannel()'
     $ref: '@supabase/supabase-js.index.SupabaseClient.removeChannel'
     notes: |
-      - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+      - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. iEchor will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
       - id: removes-a-channel
         name: Removes a channel
@@ -5123,7 +5123,7 @@ functions:
     title: 'removeAllChannels()'
     $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllChannels'
     notes: |
-      - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+      - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. iEchor will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
     examples:
       - id: remove-all-channels
         name: Remove all channels
@@ -5406,7 +5406,7 @@ functions:
     title: 'from.getPublicUrl()'
     $ref: '@supabase/storage-js.packages/StorageFileApi.default.getPublicUrl'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [iechor.com/dashboard](https://iechor.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: none

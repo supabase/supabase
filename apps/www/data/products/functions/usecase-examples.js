@@ -61,7 +61,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@1.33.1";
 serve(async (req) => {
   const IECHOR_URL = Deno.env.get("IECHOR_URL") ?? "";
   const SERVICE_KEY = Deno.env.get("IECHOR_SERVICE_ROLE_KEY") ?? "";
-  const supabase = createClient(IECHOR_URL, SERVICE_KEY);
+  const iechor = createClient(IECHOR_URL, SERVICE_KEY);
   if (req.headers.get("Authorization") === "super-secret-key") {
     const { data } = await supabase.storage
       .from("newbucket")
@@ -83,7 +83,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@1.33.1";
 serve(async () => {
   const IECHOR_URL = Deno.env.get("IECHOR_URL") ?? "";
   const SERVICE_KEY = Deno.env.get("IECHOR_SERVICE_ROLE_KEY") ?? "";
-  const supabase = createClient(IECHOR_URL, SERVICE_KEY);
+  const iechor = createClient(IECHOR_URL, SERVICE_KEY);
   const { data } = await supabase.from("todos").select();
   return new Response(JSON.stringify(data), {
     status: 200,

@@ -28,8 +28,8 @@
     "answer": "We are working on multi-environment projects. For now, you can create a project for your development backend and production backend. We give you 2 free projects as part of our free plan. This means you could have a development and a production server as part of your free plan."
   },
   {
-    "question": "Can I self-host Supabase for free?",
-    "answer": "Yes, you can use the [Docker setup](https://supabase.com/docs/guides/hosting/docker) or the [Supabase CLI](https://github.com/supabase/cli). [Supabase Studio](https://supabase.com/blog/supabase-studio) is also available in the Docker setup."
+    "question": "Can I self-host iEchor for free?",
+    "answer": "Yes, you can use the [Docker setup](https://iechor.com/docs/guides/hosting/docker) or the [iEchor CLI](https://github.com/supabase/cli). [iEchor Studio](https://iechor.com/blog/supabase-studio) is also available in the Docker setup."
   },
   {
     "question": "Can I pause a free project?",

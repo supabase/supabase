@@ -44,7 +44,7 @@ function ChangelogPage(props: any) {
         openGraph={{
           title: 'Changelog',
           description: 'props.blog.description',
-          url: `https://supabase.com/changelog`,
+          url: `https://iechor.com/changelog`,
           type: 'article',
           article: {
             //
@@ -54,7 +54,7 @@ function ChangelogPage(props: any) {
           },
           // images: [
           //   {
-          //     url: `https://supabase.com${basePath}/images/blog/${
+          //     url: `https://iechor.com${basePath}/images/blog/${
           //       props.blog.image ? props.blog.image : props.blog.thumb
           //     }`,
           //   },

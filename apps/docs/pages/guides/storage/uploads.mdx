@@ -3,11 +3,11 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'storage-uploads',
   title: 'Storage Uploads',
-  description: 'Learn how to upload files to Supabase Storage.',
+  description: 'Learn how to upload files to iEchor Storage.',
   sidebar_label: 'Uploads',
 }
 
-Supabase Storage provides two methods for uploading files:
+iEchor Storage provides two methods for uploading files:
 
 - Standard Uploads
 - Resumable Uploads
@@ -28,8 +28,8 @@ It uses the traditional `multipart/form-data` format and is simple to implement 
 ```javascript
 import { createClient } from '@supabase/supabase-js'
 
-// Create Supabase client
-const supabase = createClient('your_project_url', 'your_supabase_api_key')
+// Create iEchor client
+const iechor = createClient('your_project_url', 'your_supabase_api_key')
 
 // Upload file using standard upload
 async function uploadFile(file) {
@@ -51,7 +51,7 @@ async function uploadFile(file) {
 
 The Resumable upload method is recommended for uploading large files that may exceed 6MB in size or for scenarios where network stability is a concern or if you simply want to have a progress bar for your uploads.
 
-Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resumable uploads. TUS stands for The Upload Server and is an open protocol for supporting resumable uploads. The protocol allows the upload process to be resumed from where it left off in case of interruptions.
+iEchor Storage implements the [TUS protocol](https://tus.io/) to enable resumable uploads. TUS stands for The Upload Server and is an open protocol for supporting resumable uploads. The protocol allows the upload process to be resumed from where it left off in case of interruptions.
 This method can be implemented using the tus-js-client library, or other client-side libraries like [Uppy-js](https://uppy.io/docs/tus/) that support the TUS protocol.
 
 Here's an example of how to upload a file using `tus-js-client`:
@@ -130,7 +130,7 @@ If you provide the `x-upsert` header the last client to complete the upload will
 
 ### UppyJS Example
 
-You can check a full example using UppyJS [Here](https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-uppy)
+You can check a full example using UppyJS [Here](https://github.com/openmodels-base/iechor/tree/master/examples/storage/resumable-upload-uppy)
 
 Framework integration for UppyJS:
 
@@ -151,13 +151,13 @@ If you want to know more about our CDN, check the [CDN](/docs/guides/storage/cdn
 
 ## Access Control with RLS Policies
 
-Both the standard file upload and TUS resumable file upload methods in Supabase Storage support Row-Level Security (RLS) policies. RLS allows you to define fine-grained access control rules to restrict access to files based on user roles, permissions, or other criteria. This ensures that your files are secure and accessible only to authorized users.
+Both the standard file upload and TUS resumable file upload methods in iEchor Storage support Row-Level Security (RLS) policies. RLS allows you to define fine-grained access control rules to restrict access to files based on user roles, permissions, or other criteria. This ensures that your files are secure and accessible only to authorized users.
 
 For more information on RLS policies, see the [Storage Access Control](/docs/guides/storage/access-control) guide.
 
 ## Conclusion
 
-Supabase Storage provides multiple options for uploading files, including standard file upload and TUS resumable file upload, both of which use RLS policies for access control.
+iEchor Storage provides multiple options for uploading files, including standard file upload and TUS resumable file upload, both of which use RLS policies for access control.
 Additionally, there are client-side libraries like Uppy-js that make it easy to implement TUS uploads in your application. Choose the upload method that best fits your needs based on file size, network stability, and other requirements.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

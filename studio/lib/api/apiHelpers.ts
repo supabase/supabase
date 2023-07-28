@@ -106,9 +106,9 @@ export const toCamelCase = (object, whitelist = []) => {
  * Moves all Namespaced variables to the root
  *
  * @example
- * flattenNamespaceOnUser('https://supabase.io', { email: "copple@supabase.io", "https://supabase.io": { username: 'copple' } })
+ * flattenNamespaceOnUser('https://supabase.io', { email: "copple@iechor.com", "https://supabase.io": { username: 'copple' } })
  * //=>
- * { email: "copple@supabase.io", username: 'copple' })
+ * { email: "copple@iechor.com", username: 'copple' })
  */
 export const flattenNamespaceOnUser = (
   NAMESPACE: string,

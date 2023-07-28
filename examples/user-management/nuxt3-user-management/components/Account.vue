@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-const supabase = useSupabaseClient()
+const iechor = useSupabaseClient()
 
 const loading = ref(false)
 const username = ref('')
