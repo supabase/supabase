@@ -28,7 +28,7 @@ acls:
 basicauth_credentials:
 - consumer: DASHBOARD
   username: supabase
-  password: this_password_is_insecure_and_should_be_updated1
+  password: this_password_is_insecure_and_should_be_updated
 
 
 ###
