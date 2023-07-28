@@ -4,12 +4,10 @@ export default {
   metaTitle: 'Partner with Supabase',
   metaDescription: 'Become a Supabase Partner and enable new business opportunities.',
   heroSection: {
-    // title: 'Partners',
+    title: 'Partners',
     h1: <span className="heading-gradient">Partner with Supabase</span>,
     subheader: (
       <>
-        {/* Grow your business with Supabase. Get the resources and technical support you need to build
-        solutions that integrate with our services. */}
         Apply to the Partners program to list your integration <br className="hidden md:block" /> in
         our marketplace and grow your business.
       </>
@@ -17,7 +15,7 @@ export default {
     image: (
       <div className="relative z-10 flex items-center justify-center mb-4">
         <div
-          className="w-12 h-12 rounded bg-brand-800 border border-brand-900 flex items-center justify-center"
+          className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#3ECF8E] via-[#3ECF8E] to-[#3ecfb2] border border-brand-900 flex items-center justify-center"
           style={{
             boxShadow: '0 0 20px #25e7761f, 0 0 30px rgba(238, 240, 190, 0.1)',
           }}

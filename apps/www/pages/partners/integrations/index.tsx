@@ -86,6 +86,8 @@ function IntegrationPartnersPage(props: Props) {
     })
   }, [debouncedSearchTerm, router])
 
+  console.log(partners)
+
   return (
     <>
       <NextSeo
@@ -102,7 +104,7 @@ function IntegrationPartnersPage(props: Props) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout className="bg-scale-500 dark:bg-scale-100">
         <SectionContainer className="space-y-16">
           <div>
             <h1 className="h1">{meta_title}</h1>
