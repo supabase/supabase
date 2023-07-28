@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import { IconAward, IconCompass, IconDollarSign, IconGlobe } from 'ui'
 
 export default {
   metaTitle: 'Partner with Supabase',
@@ -63,4 +63,78 @@ export default {
       },
     ],
   },
+  featureBlocks: [
+    {
+      title: 'Technical support',
+      description: 'Access technical support to back your integrations and customer projects.',
+      icon: <IconCompass strokeWidth={1.5} />,
+    },
+    {
+      title: 'Expand your ecosystem',
+      description: 'Offer your own products and services to Supabase customers.',
+      icon: <IconGlobe strokeWidth={1.5} />,
+    },
+    {
+      title: 'Business Growth',
+      description: 'Explore new revenue streams and growth potential.',
+      icon: <IconDollarSign strokeWidth={1.5} />,
+    },
+    {
+      title: 'Scaling',
+      description: 'Invoke Edge Functions based on any event in your database',
+      icon: <IconAward strokeWidth={1.5} />,
+    },
+  ],
+  featuredApps: [
+    {
+      name: 'Arengu',
+      type: 'integration',
+      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/arengu/arengu_logo.jpeg',
+    },
+    {
+      name: 'Auth0',
+      type: 'integration',
+      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/auth0/auth0_dark.png?t=2023-07-19T19%3A13%3A04.189Z',
+    },
+    {
+      name: 'Appsmith',
+      type: 'integration',
+      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/appsmith/appsmith-logo.png',
+    },
+    {
+      name: 'CALDA',
+      type: 'experts',
+      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/experts/calda/calda_logo.jpeg',
+    },
+    {
+      name: 'Morrow',
+      type: 'experts',
+      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/experts/morrow/morrow-logo.png',
+    },
+    {
+      name: 'Voypost',
+      type: 'experts',
+      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/experts/voypost/33024474.png',
+    },
+    {
+      name: 'Vercel',
+      type: 'integration',
+      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/vercel/vercel-icon.jpeg',
+    },
+    {
+      name: 'Prisma',
+      type: 'integration',
+      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/prisma/prisma-icon.png',
+    },
+    {
+      name: 'Cloudflare-workers',
+      type: 'integration',
+      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/cloudflare-integration/cloudflare_workers_logo.png?t=2023-07-21T11%3A07%3A47.005Z',
+    },
+    {
+      name: 'Codesandbox',
+      type: 'integration',
+      logo: 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/codesandbox/codesandbox_logo.jpeg',
+    },
+  ],
 }
