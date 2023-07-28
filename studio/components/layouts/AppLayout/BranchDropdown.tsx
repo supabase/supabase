@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useBranchesQuery } from 'data/branches/branches-query'
+import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import {
   Badge,
   Button,
@@ -23,6 +23,44 @@ import {
   Popover_Shadcn_,
 } from 'ui'
 import { useSelectedProject } from 'hooks'
+import { sanitizeRoute } from './ProjectDropdown'
+
+const BranchLink = ({
+  branch,
+  isSelected,
+  setOpen,
+}: {
+  branch: Branch
+  isSelected: boolean
+  setOpen: (value: boolean) => void
+}) => {
+  const router = useRouter()
+  const sanitizedRoute = sanitizeRoute(router.route, router.query)
+  const href =
+    sanitizedRoute?.replace('[ref]', branch.project_ref) ?? `/project/${branch.project_ref}`
+
+  return (
+    <Link passHref href={href}>
+      <CommandItem_Shadcn_
+        asChild
+        value={branch.name}
+        className="cursor-pointer w-full flex items-center justify-between"
+        onSelect={() => {
+          setOpen(false)
+          router.push(href)
+        }}
+        onClick={() => {
+          setOpen(false)
+        }}
+      >
+        <a>
+          {branch.name}
+          {isSelected && <IconCheck />}
+        </a>
+      </CommandItem_Shadcn_>
+    </Link>
+  )
+}
 
 const BranchDropdown = () => {
   const router = useRouter()
@@ -82,34 +120,14 @@ const BranchDropdown = () => {
                 <CommandList_Shadcn_>
                   <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>
                   <CommandGroup_Shadcn_>
-                    {branches?.map((branch) => {
-                      const href = {
-                        pathname: router.pathname,
-                        query: { ...router.query, ref: branch.project_ref },
-                      }
-
-                      return (
-                        <Link passHref href={href} key={branch.id}>
-                          <CommandItem_Shadcn_
-                            asChild
-                            value={branch.name}
-                            className="cursor-pointer w-full flex items-center justify-between"
-                            onSelect={() => {
-                              setOpen(false)
-                              router.push(href)
-                            }}
-                            onClick={() => {
-                              setOpen(false)
-                            }}
-                          >
-                            <a>
-                              {branch.name}
-                              {branch.id === selectedBranch?.id && <IconCheck />}
-                            </a>
-                          </CommandItem_Shadcn_>
-                        </Link>
-                      )
-                    })}
+                    {branches?.map((branch) => (
+                      <BranchLink
+                        key={branch.id}
+                        branch={branch}
+                        isSelected={branch.id === selectedBranch?.id}
+                        setOpen={setOpen}
+                      />
+                    ))}
                   </CommandGroup_Shadcn_>
                   <CommandGroup_Shadcn_ className="border-t">
                     <Link passHref href={`/project/${ref}/branches`}>
