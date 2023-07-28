@@ -41,9 +41,9 @@ const Partners = () => {
           </SectionContainer>
           <div className="relative z-20 w-full flex py-16 mb-16 -mt-10 md:mb-24 md:-mt-20 justify-center gap-2 overflow-hidden mx-auto max-w-4xl before:content[''] before:absolute before:inset-0 before:w-full before:bg-[linear-gradient(to_right,var(--colors-scale5)_0%,transparent_10%,transparent_90%,var(--colors-scale5)_100%)] dark:before:bg-[linear-gradient(to_right,var(--colors-scale1)_0%,transparent_10%,transparent_90%,var(--colors-scale1)_100%)] before:z-10">
             <div className="absolute w-32 h-32 md:w-40 md:h-40 rounded-full bg-scale-100/90 backdrop-blur-2xl backdrop-filter from-scale-200 to-scale-100 border-4 border-scale-100 shadow-xl top-1/2 -translate-x-1/2 left-1/2 -translate-y-1/2 flex items-center justify-center z-30">
-              <div className="absolute inset-0 w-full h-full transform animate-spin">
+              <div className="absolute inset-0 w-full h-full transform">
                 <svg
-                  className="absolute inset-[-2px] transform !animate-[transformSpin_3s_both_cubic-bezier(.5,.2,.5,.8)_infinite] opacity-50"
+                  className="absolute inset-[-2px] transform animate-[transformSpin_3s_both_cubic-bezier(.5,.2,.5,.8)_infinite] opacity-90"
                   viewBox="0 0 182 183"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -204,7 +204,7 @@ const Partners = () => {
             })}
           </div>
         </SectionContainer>
-        <div className="bg-scale-500 dark:bg-scale-100 border-t border-b">
+        <div className="bg-scale-400 dark:bg-scale-100 border-t border-b">
           <SectionContainer className="flex flex-col gap-8">
             <div className="flex flex-col lg:flex-row gap-8 xl:gap-10 justify-between">
               <div className="w-full lg:w-1/2 gap-2 flex flex-col items-start">
@@ -221,8 +221,14 @@ const Partners = () => {
                   label="Learn more"
                 />
               </div>
-              <div className="relative w-full lg:w-1/2 min-h-[300px] border bg-scale-300 flex items-center justify-center aspect-video">
-                simple diagram on how you can use Supabase API to control projects
+              <div className="relative w-full lg:w-1/2 min-h-[300px] border bg-scale-300 flex items-center justify-center aspect-video rounded-xl overflow-hidden">
+                <Image
+                  src="/images/partners/register-oauth-app.svg"
+                  alt="Register app via API"
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                />
               </div>
             </div>
             {/* <div className="w-full col-span-full flex gap-4 lg:gap-8 xl:gap-10">
