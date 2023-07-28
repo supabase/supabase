@@ -15,9 +15,11 @@ import CreateBranchSidePanel from './CreateBranchSidePanel'
 import PreviewBranches from './PreviewBranches'
 import PullRequests from './PullRequests'
 import UpdateBranchSidePanel from './UpdateBranchSidePanel'
+import { useRouter } from 'next/router'
 
 const BranchManagement = () => {
   const { ui } = useStore()
+  const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
 
@@ -34,8 +36,17 @@ const BranchManagement = () => {
 
   const { mutate: deleteBranch, isLoading: isDeleting } = useBranchDeleteMutation({
     onSuccess: () => {
+      if (selectedBranchToDelete?.project_ref === ref) {
+        ui.setNotification({
+          category: 'success',
+          message:
+            'Successfully deleted branch. You are now currently on the main branch of your project.',
+        })
+        router.push(`/project/${projectRef}/branches`)
+      } else {
+        ui.setNotification({ category: 'success', message: 'Successfully deleted branch' })
+      }
       setSelectedBranchToDelete(undefined)
-      ui.setNotification({ category: 'success', message: 'Successfully deleted branch' })
     },
   })
 
