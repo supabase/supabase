@@ -1,9 +1,11 @@
-_format_version: '1.1'
+_format_version: '2.1'
+_transform: true
 
 ###
 ### Consumers / Users
 ###
 consumers:
+  - username: DASHBOARD
   - username: anon
     keyauth_credentials:
       - key: $SUPABASE_ANON_KEY
@@ -21,9 +23,22 @@ acls:
     group: admin
 
 ###
+### Dashboard credentials
+###
+basicauth_credentials:
+- consumer: DASHBOARD
+  username: supabase
+  password: super_secure_password
+- consumer: DASHBOARD
+  username: your_user
+  password: your_password
+
+
+###
 ### API Routes
 ###
 services:
+
   ## Open Auth routes
   - name: auth-v1-open
     url: http://auth:9999/verify
@@ -175,6 +190,7 @@ services:
         strip_path: true
         paths:
           - /analytics/v1/
+
   ## Secure Database routes
   - name: meta
     _comment: 'pg-meta: /pg/* -> http://pg-meta:8080/*'
@@ -193,3 +209,18 @@ services:
           hide_groups_header: true
           allow:
             - admin
+
+  ## Protected Dashboard - catch all remaining routes
+  - name: dashboard
+    _comment: 'Studio: /* -> http://studio:3000/*'
+    url: http://studio:3000/
+    routes:
+      - name: dashboard-all
+        strip_path: true
+        paths:
+          - /*
+    plugins:
+      - name: cors
+      - name: basic-auth
+        config:
+          hide_credentials: true
