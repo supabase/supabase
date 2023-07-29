@@ -68,7 +68,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       // Check validity of project that the user is trying to access
       const projects = projectsRef.current ?? []
       const isValidProject = projects.some((project) => project.ref === ref)
-      const isValidBranch = projects.some((project) => project.preview_branch_refs.includes(ref))
+      const isValidBranch = projects.some((project) => project.preview_branch_refs?.includes(ref))
 
       if (!isValidProject && !isValidBranch) {
         ui.setNotification({ category: 'error', message: 'This project does not exist' })
