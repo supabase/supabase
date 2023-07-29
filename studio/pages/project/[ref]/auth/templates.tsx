@@ -11,12 +11,11 @@ import { useCheckPermissions, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => {
-  const { authConfig } = useStore()
-  const { project } = useProjectContext()
+  const { authConfig, ui } = useStore()
 
   useEffect(() => {
     authConfig.load()
-  }, [project?.ref])
+  }, [ui.selectedProjectRef])
 
   const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
 
