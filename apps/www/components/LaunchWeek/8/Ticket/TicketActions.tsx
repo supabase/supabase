@@ -56,17 +56,11 @@ export default function TicketActions({
   const handleShare = async (social: 'twitter' | 'linkedin') => {
     if (!supabase) return
     if (social === 'twitter') {
-      await supabase
-        .from(LW_TABLE)
-        .update({ sharedOnTwitter: 'now' })
-        .eq('username', username)
-        .is('sharedOnTwitter', null)
+      await supabase.from(LW_TABLE).update({ sharedOnTwitter: 'now' }).eq('username', username)
+      window.open(tweetUrl, '_blank')
     } else if (social === 'linkedin') {
-      await supabase
-        .from(LW_TABLE)
-        .update({ sharedOnLinkedIn: 'now' })
-        .eq('username', username)
-        .is('sharedOnLinkedIn', null)
+      await supabase.from(LW_TABLE).update({ sharedOnLinkedIn: 'now' }).eq('username', username)
+      window.open(linkedInUrl, '_blank')
     }
   }
 
@@ -82,11 +76,8 @@ export default function TicketActions({
               Connect with GitHub
             </div>
           </div>
-          <a
-            onKeyUp={() => handleShare('twitter')}
-            href={tweetUrl}
-            rel="noopener noreferrer prefetch"
-            target="_blank"
+          <button
+            onClick={() => handleShare('twitter')}
             className={[
               `flex items-center justify-center gap-2 rounded text-scale-500 py-1 px-3 border border-[#3e3e3e] text-xs mb-1 transition-all ease-out hover:text-scale-100 hover:bg-[#dfe1e3]`,
               userData.sharedOnTwitter ? 'bg-[#E6E8EB] text-scale-500' : 'text-white',
@@ -98,12 +89,9 @@ export default function TicketActions({
               </div>
             )}
             Share on Twitter
-          </a>
-          <a
-            onKeyUp={() => handleShare('linkedin')}
-            href={linkedInUrl}
-            rel="noopener noreferrer prefetch"
-            target="_blank"
+          </button>
+          <button
+            onClick={() => handleShare('linkedin')}
             className={[
               `flex items-center justify-center gap-2 rounded text-scale-500 py-1 px-3 border border-[#3e3e3e] text-xs mb-1 transition-all ease-out hover:text-scale-100 hover:bg-[#dfe1e3]`,
               userData.sharedOnLinkedIn ? 'bg-[#E6E8EB] text-scale-500' : 'text-white',
@@ -115,7 +103,7 @@ export default function TicketActions({
               </div>
             )}
             Share on Linkedin
-          </a>
+          </button>
         </>
       ) : (
         !username && (

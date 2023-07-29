@@ -33,9 +33,9 @@ functions:
 
       *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your E-Mail. To send the token, rather than a redirect url, you have to change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`*
 
-      **On Android, IOS & MacOS**, it uses deeplinks. Refer to the guide below on how to setup deeplinks.
+      **On Android, IOS & MacOS**, it uses deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you could use Native Google Auth or a WebView for OAuth. Refer to our [demo](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login) to learn more.
       **On JS**, it uses the website origin as the callback url. Session importing gets handled automatically.
-      **Windows & Linux** currently have no default implementation. Feel free to create a PR.
+      **Windows, tvOS, watchOS & Linux** currently have no default implementation. Feel free to create a PR.
 
       You always make your own implementation and use `gotrue.parseFragmentAndImportSession(fragment)` to let [supabase-kt](https://github.com/supabase-community/supabase-kt) handle the parsing & importing of the session after receiving a callback.
 
@@ -45,17 +45,25 @@ functions:
       1. **Setup a deeplink for you app** \
       On Android you may setup a [deeplink](https://developer.android.com/training/app-links/deep-linking) in your Android manifest. \
       On IOS & MacOS you may setup a [url scheme](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app).
-      2. **Configure the GoTrue plugin**
+      2. **Add your deeplink to the [redirect URLs](https://supabase.com/dashboard/project/_/auth/url-configuration)** \
+      **Pattern**: scheme://host
+      3. **Configure the GoTrue plugin**
       You have to set the `host` and the `scheme` in the GoTrue config:
           ```kotlin
           install(GoTrue) {
-             host = "deeplink host"
+             host = "deeplink host" // this can be anything, eg. your package name or app/company url (not your supabase url)
              scheme = "deeplink scheme"
           }
           ```
-      3. **Call platform specific function on startup** \
+      4. **Call platform specific function on startup** \
       On Android: `client.handleDeeplinks(intent)` \
       On IOS/MacOS: `client.handleDeeplinks(url)`
+
+      Then you can just login using OAuth:
+      ```kotlin
+      client.gotrue.loginWith(Google)
+      ```
+      Or open OTP links directly in your app.
 
       ### PKCE Authentication flow
       supabase-kt supports the [PKCE authentication flow](https://supabase.com/blog/supabase-auth-sso-pkce).
@@ -65,6 +73,7 @@ functions:
         flowType = FlowType.PKCE
       }
       ```
+      That's it! If you already implemented deeplinks to handle OTPs and OAuth you don't have to change anything!
     examples:
       - id: initialize-client
         name: Initialize Client
@@ -596,7 +605,7 @@ functions:
           `delete()`, and `rpc()`
         code: |
           ```kotlin
-          client.postgrest["cities"].select(columns = Columns.list("name, country_id")) {
+          client.postgrest["cities"].select(columns = Columns.list("name", "country_id")) {
               City::name eq "The Shire"
               //or
               eq("name", "The Shire")
@@ -2172,8 +2181,7 @@ functions:
           ```kotlin
           client.gotrue.loginWith(IDToken) {
               idToken = "token"
-              clientId = "oauth client id"
-              provider = Google //Or Apple
+              provider = Google //Also supported: Apple, Azure and Facebook
               //optional:
               nonce = "nonce"
               data = buildJsonObject {
@@ -2181,6 +2189,7 @@ functions:
               }
           }
           ```
+
   - id: sign-in-with-otp
     title: 'sendOtpTo()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
@@ -2313,8 +2322,22 @@ functions:
         name: Sign out
         isSpotlight: true
         code: |
-          ```js
+          ```kotlin
           client.gotrue.logout()
+          ```
+      - id: sign-out-all-sessions
+        name: Sign out all sessions
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.gotrue.logout(LogoutScope.GLOBAL)
+          ```
+      - id: sign-out-others
+        name: Sign out all sessions except the current
+        isSpotlight: true
+        code: |
+          ```kotlin
+          client.gotrue.logout(LogoutScope.OTHERS)
           ```
   - id: verify-otp
     title: 'Verify OTPs'
@@ -3114,6 +3137,7 @@ functions:
               println(it)
           }
 
+          client.realtime.connect()
           channel.join(blockUntilJoined = true)
 
           channel.broadcast(event = "message", Message("I joined!", "John"))
@@ -3138,6 +3162,7 @@ functions:
               connectedUsers -= it.decodeLeavesAs<PresenceState>()
           }
 
+          client.realtime.connect()
           channel.join(blockUntilJoined = true)
           //send own state
           channel.track(PresenceState(username = "John"))
@@ -3160,6 +3185,7 @@ functions:
               }
           }
 
+          client.realtime.connect()
           channel.join()
           ```
       - id: listen-to-a-specific-table
@@ -3183,6 +3209,7 @@ functions:
               }
           }
 
+          client.realtime.connect()
           channel.join()
           ```
       - id: listen-to-inserts
@@ -3201,6 +3228,7 @@ functions:
               println(it.record)
           }
 
+          client.realtime.connect()
           channel.join()
           ```
       - id: listen-to-updates
@@ -3227,6 +3255,7 @@ functions:
               println(it.oldRecord)
           }
 
+          client.realtime.connect()
           channel.join()
           ```
       - id: listen-to-deletes
@@ -3252,6 +3281,7 @@ functions:
               println(it.oldRecord)
           }
 
+          client.realtime.connect()
           channel.join()
           ```
       - id: listening-to-row-level-changes
@@ -3272,6 +3302,7 @@ functions:
               println(it.oldRecord)
           }
 
+          client.realtime.connect()
           channel.join()
           ```
 
@@ -3325,13 +3356,13 @@ functions:
     notes: |
       Returns all Realtime channels.
     examples:
-        - id: get-all-channels
-          name: Get all channels
-          isSpotlight: true
-          code: |
-            ```kotlin
-            val channels = client.realtime.subscriptions.entries
-            ```
+      - id: get-all-channels
+        name: Get all channels
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val channels = client.realtime.subscriptions.entries
+          ```
   - id: list-buckets
     title: listBuckets()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
