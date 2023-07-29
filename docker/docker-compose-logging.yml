@@ -93,7 +93,7 @@ services:
 
   analytics:
     container_name: supabase-analytics
-    image: supabase/logflare:1.3.17
+    image: supabase/logflare:1.3.26
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:4000/health" ]
       timeout: 5s
@@ -106,13 +106,9 @@ services:
         condition: service_healthy
     ports:
       - ${LOGFLARE_HTTP_PORT}:4000/tcp
-    volumes:
-      - type: bind
-        source: ${PWD}/gcloud.json
-        target: /opt/app/rel/logflare/bin/gcloud.json
-        read_only: true
     environment:
       MY_POD_IP: 127.0.0.1
+      LOGFLARE_NODE_HOST:  127.0.0.1
       DB_USERNAME: supabase_admin
       DB_DATABASE: ${POSTGRES_DB}
       DB_HOSTNAME: ${POSTGRES_HOST}
@@ -125,6 +121,16 @@ services:
       LOGFLARE_SINGLE_TENANT: true
       LOGFLARE_SUPABASE_MODE: true
       LOGFLARE_MIN_CLUSTER_SIZE: 1
+      POSTGRES_BACKEND_URL: postgresql://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      POSTGRES_BACKEND_SCHEMA: _analytics
+      RELEASE_COOKIE: cookie
+      LOGFLARE_FEATURE_FLAG_OVERRIDE: multibackend=true
+    entrypoint: |
+                  sh -c `cat <<'EOF' > run.sh && sh run.sh
+                  ./logflare eval Logflare.Release.migrate
+                  ./logflare start --sname logflare
+                  EOF
+                  `
   vector:
     container_name: supabase-vector
     image: timberio/vector:0.28.1-alpine
