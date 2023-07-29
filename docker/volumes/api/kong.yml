@@ -215,7 +215,7 @@ services:
       - name: dashboard-all
         strip_path: true
         paths:
-          - /*
+          - /
     plugins:
       - name: cors
       - name: basic-auth
