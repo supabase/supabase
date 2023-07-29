@@ -1,4 +1,5 @@
 import { partition } from 'lodash'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button, IconSearch, Input } from 'ui'
 
@@ -15,7 +16,6 @@ import CreateBranchSidePanel from './CreateBranchSidePanel'
 import PreviewBranches from './PreviewBranches'
 import PullRequests from './PullRequests'
 import UpdateBranchSidePanel from './UpdateBranchSidePanel'
-import { useRouter } from 'next/router'
 
 const BranchManagement = () => {
   const { ui } = useStore()
@@ -73,7 +73,10 @@ const BranchManagement = () => {
               {isError && <AlertError error={error} subject="Failed to retrieve branches" />}
               {isSuccess && (
                 <>
-                  <MainBranchPanel branch={mainBranch} onSelectUpdate={() => {}} />
+                  <MainBranchPanel
+                    branch={mainBranch}
+                    onSelectUpdate={() => setSelectedBranchToUpdate(mainBranch)}
+                  />
                   <PullRequests previewBranches={previewBranches} />
                   <PreviewBranches
                     previewBranches={previewBranches}

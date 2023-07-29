@@ -3,6 +3,7 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { integrationKeys } from './keys'
 import { IntegrationsVariables, Integration } from './integrations.types'
+import { ResponseError } from 'types'
 
 export type IntegrationsResponse = Integration[]
 
@@ -22,7 +23,7 @@ export async function getIntegrations({ orgSlug }: IntegrationsVariables, signal
 
 export type IntegrationsData = Awaited<ReturnType<typeof getIntegrations>>
 export type ProjectIntegrationConnectionsData = Awaited<ReturnType<typeof getIntegrations>>
-export type IntegrationsError = unknown
+export type IntegrationsError = ResponseError
 
 export const useOrgIntegrationsQuery = <TData = IntegrationsData>(
   { orgSlug }: IntegrationsVariables,
