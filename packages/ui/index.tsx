@@ -119,6 +119,8 @@ export {
   AlertDescription as AlertDescription_Shadcn_,
 } from './src/components/shadcn/ui/alert'
 
+export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
+
 export {
   useFormField as useFormField_Shadcn_,
   Form as Form_Shadcn_,

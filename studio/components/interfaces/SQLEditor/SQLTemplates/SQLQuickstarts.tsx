@@ -32,7 +32,7 @@ import AISettingsModal from '../AISettingsModal'
 import { createSqlSnippetSkeleton } from '../SQLEditor.utils'
 import SQLCard from './SQLCard'
 
-const SQLTemplates = observer(() => {
+const SQLQuickstarts = observer(() => {
   const { ui } = useStore()
   const { ref } = useParams()
   const router = useRouter()
@@ -241,17 +241,20 @@ const SQLTemplates = observer(() => {
             )}
           </div>
         </div>
-        <div>
+        <div className="mb-8">
           <div className="mb-4">
-            <h1 className="text-scale-1200 mb-3 text-xl">Scripts</h1>
-            <p className="text-scale-1100 text-sm">Quick scripts to run on your database.</p>
+            <h1 className="text-scale-1200 mb-3 text-xl">Quick start</h1>
+            <p className="text-scale-1100 text-sm">
+              While we're in beta, we want to offer a quick way to explore Supabase. While we build
+              importers, check out these simple starters.
+            </p>
             <p className="text-scale-1100 text-sm">
               Click on any script to fill the query box, modify the script, then click
               <span className="text-code">Run</span>.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-            {sql.map((x) => (
+            {quickStart.map((x) => (
               <SQLCard
                 key={x.title}
                 title={x.title}
@@ -261,8 +264,8 @@ const SQLTemplates = observer(() => {
                   handleNewQuery(sql, title)
                   Telemetry.sendEvent(
                     {
-                      category: 'scripts',
-                      action: 'script_clicked',
+                      category: 'quickstart',
+                      action: 'quickstart_clicked',
                       label: x.title,
                     },
                     telemetryProps,
@@ -278,4 +281,4 @@ const SQLTemplates = observer(() => {
   )
 })
 
-export default SQLTemplates
+export default SQLQuickstarts
