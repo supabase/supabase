@@ -210,9 +210,9 @@
     "title": "Inspect",
     "items": [
       {
-        "id": "supabase-inspect",
+        "id": "supabase-inspect-db",
         "title": "Inspect database statistics",
-        "slug": "supabase-inspect",
+        "slug": "supabase-inspect-db",
         "type": "cli-command"
       },
       {
@@ -385,7 +385,7 @@
       },
       {
         "id": "supabase-branches-get",
-        "title": "Retrieve details of a preview branch",
+        "title": "Retrieve connection details of a preview branch",
         "slug": "supabase-branches-get",
         "type": "cli-command"
       },
