@@ -1928,11 +1928,6 @@ module.exports = [
     source: '/docs/support',
     destination: '/support',
   },
-  {
-    permanent: true,
-    source: '/docs/guides/cli/local-development',
-    destination: '/docs/guides/getting-started/local-development',
-  },
 
   // old case studies moved to /customers
 
@@ -2078,13 +2073,16 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/guides/cli/using-environment-variables-in-config',
-    destination: '/guides/cli/managing-config',
+    source: '/docs/guides/cli/using-environment-variables-in-config',
+    destination: '/docs/guides/cli/managing-config',
   },
   {
     permanent: true,
-    source: '/guides/getting-started/local-development',
-    destination: '/guides/cli/local-development',
+    source: '/docs/guides/getting-started/local-development',
+    destination: '/docs/guides/cli/local-development',
+  },
+  {
+    permanent: true,
     source: '/blog/flutter-authentication-and-authorization-with-rls',
     destination: '/blog/flutter-authorization-with-rls',
   },
