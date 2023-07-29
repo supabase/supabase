@@ -58,7 +58,7 @@ functions:
       On IOS/MacOS: `client.handleDeeplinks(url)`
 
       ### PKCE Authentication flow
-      suapbase-kt supports the [PKCE authentication flow](https://supabase.com/blog/supabase-auth-sso-pkce).
+      supabase-kt supports the [PKCE authentication flow](https://supabase.com/blog/supabase-auth-sso-pkce).
       To use it, you just have to change the `flowType` in the GoTrue configuration:
       ```kotlin
       install(GoTrue) {
