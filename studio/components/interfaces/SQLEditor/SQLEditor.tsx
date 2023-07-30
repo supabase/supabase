@@ -434,7 +434,7 @@ const SQLEditor = () => {
             }}
             initial="visible"
             animate="visible"
-            className="w-full flex justify-center z-10 h-[60px] bg-brand-200 border-b border-brand-400 px-5"
+            className="w-full flex justify-center z-10 h-[60px] bg-brand-300 border-b border-brand-400 px-5"
           >
             <div
               className={cn(
@@ -442,76 +442,7 @@ const SQLEditor = () => {
                 'flex items-center gap-3'
               )}
             >
-              {/* <div className="group h-12 w-12 relative group"> */}
-              {/* <div className="absolute duration-2000 h-12 w-12 skew--y-[24deg]">
-                  <div
-                    className={cn(
-                      'transition-all',
-                      'absolute top-3 left-3 h-4 w-4 border border-brand',
-                      'group-hover:top-4 group-hover:left-4 group-hover:rotate--0 group-hover:skew-x--12 duration-200 delay-75'
-                    )}
-                  ></div>
-                  <div
-                    className={cn(
-                      'transition-all',
-                      'absolute top-3 left-5 h-4 w-4 border border-brand',
-                      'group-hover:top-4 group-hover:left-4 group-hover:rotate--0 group-hover:skew-x--12 duration-200 delay-200'
-                    )}
-                  ></div>
-                  <div
-                    className={cn(
-                      'transition-all',
-                      'absolute top-5 left-3 h-4 w-4 border border-brand',
-                      'group-hover:top-4 group-hover:left-4 group-hover:rotate--0 group-hover:skew-x--12 duration-200 delay-400'
-                    )}
-                  ></div>
-                  <div
-                    className={cn(
-                      'transition-all',
-                      'absolute top-5 left-5 h-4 w-4 border border-brand',
-                      'group-hover:top-4 group-hover:left-4 group-hover:rotate--0 group-hover:skew-x--12 duration-200 delay-600'
-                    )}
-                  ></div>
-                </div> */}
-
-              {/* <div className="absolute top-0.5 right-0.5 duration-2000 h-12 w-12 skew-y-[24deg] hover:top-0 hover:right-0">
-                  <div
-                    className={cn(
-                      'transition-all',
-                      'absolute top-3 left-3 h-4 w-4 border border-brand',
-                      'group-hover:top-4 group-hover:left-4 group-hover:rotate--0 group-hover:skew-x--12 duration-200 delay-75'
-                    )}
-                  ></div>
-                  <div
-                    className={cn(
-                      'transition-all',
-                      'absolute top-3 left-5 h-4 w-4 border border-brand',
-                      'group-hover:top-4 group-hover:left-4 group-hover:rotate--0 group-hover:skew-x--12 duration-200 delay-200'
-                    )}
-                  ></div>
-                  <div
-                    className={cn(
-                      'transition-all',
-                      'absolute top-5 left-3 h-4 w-4 border border-brand',
-                      'group-hover:top-4 group-hover:left-4 group-hover:rotate--0 group-hover:skew-x--12 duration-200 delay-400'
-                    )}
-                  ></div>
-                  <div
-                    className={cn(
-                      'transition-all',
-                      'absolute top-5 left-5 h-4 w-4 border border-brand',
-                      'group-hover:top-4 group-hover:left-4 group-hover:rotate--0 group-hover:skew-x--12 duration-200 delay-600'
-                    )}
-                  ></div>
-                </div> */}
-              {/* </div> */}
-              {/* <div className="flex flex-row gap-3 items-center">
-                <motion.div layoutId="ask-ai-input-icon">
-                  <AiIcon className="w-4 h-4 text-brand" />
-                </motion.div>
-              </div> */}
-
-              <AiIconAnimation />
+              <AiIconAnimation loading={isEditSqlLoading} />
 
               <AnimatePresence initial={false} exitBeforeEnter>
                 {debugSolution && (
@@ -547,7 +478,7 @@ const SQLEditor = () => {
                       disabled={isDiffOpen}
                       ref={inputRef}
                       className={cn(
-                        '!p-0 bg-transparent border-transparent text-sm text-brand placeholder:text-brand-600 focus:!ring-0',
+                        '!p-0 bg-transparent border-transparent text-sm text-brand placeholder:text-brand-500 focus:!ring-0',
                         'focus-visible:ring-0 focus-visible:ring-offset-0',
                         'appearance-none outline-none'
                         // "after:content-['_↗']",
@@ -555,6 +486,11 @@ const SQLEditor = () => {
                         // 'after:placeholder:content-["hello"]'
                       )}
                       placeholder={!debugSolution ? 'Ask Supabase AI to modify your query' : ''}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Escape' && !aiInput) {
+                          setAiOpen(false)
+                        }
+                      }}
                       onKeyPress={async (e) => {
                         if (e.key === 'Enter') {
                           console.log('entering')
@@ -730,18 +666,17 @@ const SQLEditor = () => {
                     >
                       <IconCornerDownLeft size={16} strokeWidth={1.5} />
                     </div>
-
+                    <button
+                      onClick={() => setIsAISettingsOpen(true)}
+                      className="text-brand-500 hover:text-brand hover:text transition"
+                    >
+                      <IconSettings className="cursor-pointer" />
+                    </button>
                     <button
                       className="text-brand hover:text-brand-600"
                       onClick={() => setAiOpen(false)}
                     >
                       <IconX size={21} />
-                    </button>
-                    <button
-                      onClick={() => setIsAISettingsOpen(true)}
-                      className="text-lighter hover:text transition"
-                    >
-                      <IconSettings className="cursor-pointer" />
                     </button>
                   </>
                 )}
@@ -770,22 +705,12 @@ const SQLEditor = () => {
                   'group',
                   'absolute z-10',
                   'rounded-lg',
-                  'right-5 top-1.5',
-                  'w-10 h-10 bg-brand-400 border border-brand-600 shadow-sm',
+                  'right-[18px] top-4',
                   'transition-all duration-200',
-                  'ease-out hover:w-[155px]',
-                  'flex items-center justify-center group-hover:justify-between gap-3'
+                  'ease-out'
                 )}
               >
-                <span
-                  className={cn(
-                    'hidden text-brand w-0 ',
-                    'group-hover:w-auto group-hover:inline-block truncate'
-                  )}
-                >
-                  Supabase AI
-                </span>
-                <AiIcon className="text-brand w-4 h-4" />
+                <AiIconAnimation loading={false} allowHoverEffect />
               </button>
             )}
 
