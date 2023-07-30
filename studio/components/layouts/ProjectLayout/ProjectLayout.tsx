@@ -16,6 +16,27 @@ import { ProjectContextProvider } from './ProjectContext'
 import ProjectPausedState from './ProjectPausedState'
 import RestoringState from './RestoringState'
 import UpgradingState from './UpgradingState'
+import AppLayout from '../AppLayout/AppLayout'
+
+// [Joshen] This is temporary while we unblock users from managing their project
+// if their project is not responding well for any reason. Eventually needs a bit of an overhaul
+const routesToIgnoreProjectDetailsRequest = [
+  '/project/[ref]/settings/general',
+  '/project/[ref]/settings/database',
+  '/project/[ref]/settings/storage',
+  '/project/[ref]/settings/billing/subscription',
+  '/project/[ref]/settings/billing/usage',
+  '/project/[ref]/settings/billing/invoices',
+]
+
+const routesToIgnorePostgrestConnection = [
+  '/project/[ref]/reports',
+  '/project/[ref]/settings/general',
+  '/project/[ref]/settings/database',
+  '/project/[ref]/settings/billing/subscription',
+  '/project/[ref]/settings/billing/usage',
+  '/project/[ref]/settings/billing/invoices',
+]
 
 export interface ProjectLayoutProps {
   title?: string
@@ -39,11 +60,12 @@ const ProjectLayout = ({
 }: PropsWithChildren<ProjectLayoutProps>) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const ongoingIncident = useFlag('ongoingIncident')
   const selectedOrganization = useSelectedOrganization()
   const selectedProject = useSelectedProject()
   const projectName = selectedProject?.name
   const organizationName = selectedOrganization?.name
+
+  const navLayoutV2 = useFlag('navigationLayoutV2')
 
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
   const ignorePausedState =
@@ -51,49 +73,48 @@ const ProjectLayout = ({
   const showPausedState = isPaused && !ignorePausedState
 
   return (
-    <ProjectContextProvider projectRef={projectRef}>
-      <Head>
-        <title>
-          {title
-            ? `${title} | Supabase`
-            : selectedTable
-            ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
-            : projectName
-            ? `${projectName} | ${organizationName} | Supabase`
-            : organizationName
-            ? `${organizationName} | Supabase`
-            : 'Supabase'}
-        </title>
-        <meta name="description" content="Supabase Studio" />
-      </Head>
-      <div className="flex h-full">
-        {/* Left-most navigation side bar to access products */}
-        {!hideIconBar && <NavigationBar />}
+    <AppLayout>
+      <ProjectContextProvider projectRef={projectRef}>
+        <Head>
+          <title>
+            {title
+              ? `${title} | Supabase`
+              : selectedTable
+              ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
+              : projectName
+              ? `${projectName} | ${organizationName} | Supabase`
+              : organizationName
+              ? `${organizationName} | Supabase`
+              : 'Supabase'}
+          </title>
+          <meta name="description" content="Supabase Studio" />
+        </Head>
+        <div className="flex h-full">
+          {/* Left-most navigation side bar to access products */}
+          {!hideIconBar && <NavigationBar />}
 
-        {/* Product menu bar */}
-        {!showPausedState && (
-          <MenuBarWrapper isLoading={isLoading} productMenu={productMenu}>
-            <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-          </MenuBarWrapper>
-        )}
-
-        <main
-          className="flex flex-col flex-1 w-full overflow-x-hidden"
-          style={{ height: ongoingIncident ? 'calc(100vh - 44px)' : '100vh' }}
-        >
-          {!hideHeader && <LayoutHeader />}
-          {showPausedState ? (
-            <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
-              <div className="w-full">
-                <ProjectPausedState product={product} />
-              </div>
-            </div>
-          ) : (
-            <ContentWrapper isLoading={isLoading}>{children}</ContentWrapper>
+          {/* Product menu bar */}
+          {!showPausedState && (
+            <MenuBarWrapper isLoading={isLoading} productMenu={productMenu}>
+              <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+            </MenuBarWrapper>
           )}
-        </main>
-      </div>
-    </ProjectContextProvider>
+
+          <main className="flex flex-col flex-1 w-full overflow-x-hidden">
+            {!navLayoutV2 && !hideHeader && <LayoutHeader />}
+            {showPausedState ? (
+              <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+                <div className="w-full">
+                  <ProjectPausedState product={product} />
+                </div>
+              </div>
+            ) : (
+              <ContentWrapper isLoading={isLoading}>{children}</ContentWrapper>
+            )}
+          </main>
+        </div>
+      </ProjectContextProvider>
+    </AppLayout>
   )
 }
 
@@ -108,8 +129,14 @@ interface MenuBarWrapperProps {
 }
 
 const MenuBarWrapper = ({ isLoading, productMenu, children }: MenuBarWrapperProps) => {
+  const router = useRouter()
   const selectedProject = useSelectedProject()
-  return <>{!isLoading && productMenu && selectedProject !== undefined ? children : null}</>
+  const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
+
+  const showMenuBar =
+    !requiresProjectDetails || (requiresProjectDetails && selectedProject !== undefined)
+
+  return <>{!isLoading && productMenu && showMenuBar ? children : null}</>
 }
 
 interface ContentWrapperProps {
@@ -133,17 +160,11 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
   const selectedProject = useSelectedProject()
   const router = useRouter()
 
-  const routesToIgnorePostgrestConnection = [
-    '/project/[ref]/reports',
-    '/project/[ref]/settings/general',
-    '/project/[ref]/settings/database',
-    '/project/[ref]/settings/billing/subscription',
-    '/project/[ref]/settings/billing/usage',
-    '/project/[ref]/settings/billing/invoices',
-  ]
-
-  const requiresDbConnection: boolean = router.pathname !== '/project/[ref]/settings/general'
+  const requiresDbConnection: boolean =
+    !router.pathname.includes('/project/[ref]/settings') ||
+    router.pathname.includes('/project/[ref]/settings/vault')
   const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
+  const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
   const isProjectUpgrading = selectedProject?.status === PROJECT_STATUS.UPGRADING
   const isProjectRestoring = selectedProject?.status === PROJECT_STATUS.RESTORING
@@ -155,7 +176,7 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
 
   return (
     <>
-      {isLoading || selectedProject === undefined ? (
+      {isLoading || (requiresProjectDetails && selectedProject === undefined) ? (
         <Connecting />
       ) : isProjectUpgrading ? (
         <UpgradingState />
@@ -168,7 +189,7 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
       ) : requiresDbConnection && isProjectBuilding ? (
         <BuildingState project={selectedProject} />
       ) : (
-        <Fragment key={selectedProject.ref}>{children}</Fragment>
+        <Fragment key={selectedProject?.ref}>{children}</Fragment>
       )}
     </>
   )
@@ -190,44 +211,44 @@ export const ProjectLayoutNonBlocking = ({
   const selectedProject = useSelectedProject()
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const ongoingIncident = useFlag('ongoingIncident')
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
   const ignorePausedState =
     router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
   const showPausedState = isPaused && !ignorePausedState
 
+  const navLayoutV2 = useFlag('navigationLayoutV2')
+
   return (
-    <ProjectContextProvider projectRef={projectRef}>
-      <Head>
-        <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
-        <meta name="description" content="Supabase Studio" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <div className="flex h-full">
-        {/* Left-most navigation side bar to access products */}
-        {!hideIconBar && <NavigationBar />}
+    <AppLayout>
+      <ProjectContextProvider projectRef={projectRef}>
+        <Head>
+          <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
+          <meta name="description" content="Supabase Studio" />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+        <div className="flex h-full">
+          {/* Left-most navigation side bar to access products */}
+          {!hideIconBar && <NavigationBar />}
 
-        {/* Product menu bar */}
-        {productMenu && !showPausedState && (
-          <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-        )}
-
-        <main
-          className="flex w-full flex-1 flex-col overflow-x-hidden"
-          style={{ height: ongoingIncident ? 'calc(100vh - 44px)' : '100vh' }}
-        >
-          {!hideHeader && <LayoutHeader />}
-          {showPausedState ? (
-            <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
-              <div className="w-full">
-                <ProjectPausedState product={product} />
-              </div>
-            </div>
-          ) : (
-            children
+          {/* Product menu bar */}
+          {productMenu && !showPausedState && (
+            <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
           )}
-        </main>
-      </div>
-    </ProjectContextProvider>
+
+          <main className="flex w-full flex-1 flex-col overflow-x-hidden">
+            {!navLayoutV2 && !hideHeader && <LayoutHeader />}
+            {showPausedState ? (
+              <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+                <div className="w-full">
+                  <ProjectPausedState product={product} />
+                </div>
+              </div>
+            ) : (
+              children
+            )}
+          </main>
+        </div>
+      </ProjectContextProvider>
+    </AppLayout>
   )
 }

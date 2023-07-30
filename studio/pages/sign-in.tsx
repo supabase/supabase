@@ -15,7 +15,7 @@ const SignInPage: NextPageWithLayout = () => {
   useEffect(() => {
     // if the dashboard is running locally, redirect straight to the projects page
     if (!IS_PLATFORM) {
-      router.replace('/projects')
+      router.replace('/project/default')
       return
     }
 

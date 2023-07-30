@@ -666,6 +666,44 @@ const EXTERNAL_PROVIDER_FACEBOOK = {
   },
 }
 
+const EXTERNAL_PROVIDER_FIGMA = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'Figma',
+  properties: {
+    EXTERNAL_FIGMA_ENABLED: {
+      title: 'Figma enabled',
+      type: 'boolean',
+    },
+    EXTERNAL_FIGMA_CLIENT_ID: {
+      title: 'Client ID',
+      type: 'string',
+    },
+    EXTERNAL_FIGMA_SECRET: {
+      title: 'Client Secret',
+      type: 'string',
+      isSecret: true,
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_FIGMA_ENABLED: boolean().required(),
+    EXTERNAL_FIGMA_CLIENT_ID: string().when('EXTERNAL_FIGMA_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client ID is required'),
+      otherwise: (schema) => schema,
+    }),
+    EXTERNAL_FIGMA_SECRET: string().when('EXTERNAL_FIGMA_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client Secret is required'),
+      otherwise: (schema) => schema,
+    }),
+  }),
+  misc: {
+    iconKey: 'figma-icon',
+    requiresRedirect: true,
+  },
+}
+
 const EXTERNAL_PROVIDER_GITHUB = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
@@ -1283,6 +1321,7 @@ export const PROVIDERS_SCHEMAS = [
   EXTERNAL_PROVIDER_BITBUCKET,
   EXTERNAL_PROVIDER_DISCORD,
   EXTERNAL_PROVIDER_FACEBOOK,
+  EXTERNAL_PROVIDER_FIGMA,
   EXTERNAL_PROVIDER_GITHUB,
   EXTERNAL_PROVIDER_GITLAB,
   EXTERNAL_PROVIDER_GOOGLE,
