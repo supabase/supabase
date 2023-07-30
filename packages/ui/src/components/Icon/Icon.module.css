@@ -3,7 +3,7 @@
 }
 
 .sbui-icon-container--brand {
-  @apply bg-brand-800 bg-opacity-10 text-brand-800;
+  @apply bg-brand-500 bg-opacity-10 text-brand-500;
 }
 
 .sbui-icon-container--gray {

@@ -299,7 +299,7 @@ const Nav = () => {
                     className="hidden group lg:flex"
                     type="text"
                     icon={
-                      <div className="flex items-center justify-center w-4 h-4 text-brand-800">
+                      <div className="flex items-center justify-center w-4 h-4 text-brand-500">
                         <div
                           className={[
                             `text-scale-900 flex h-3 w-3 items-center justify-center

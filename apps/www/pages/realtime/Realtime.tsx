@@ -66,7 +66,7 @@ function RealtimePage() {
             <div className="bg-scale-300 border-scale-500 relative flex h-[372px] w-[560px] items-center justify-center overflow-hidden rounded border drop-shadow-md">
               <div
                 className={[
-                  'border-brand-800 relative h-12 w-48 bg-[#34B27B]',
+                  'border-brand-500 relative h-12 w-48 bg-[#34B27B]',
                   `flex items-center justify-center ${RealtimeStyles['shape']}`,
                 ].join(' ')}
               >

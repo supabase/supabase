@@ -254,7 +254,7 @@ const TableForm = ({
                         key={column.name}
                         className={[
                           'px-2 py-1 rounded cursor-pointer transition',
-                          `${isSelected ? 'bg-brand-800' : 'bg-scale-500 hover:bg-scale-700'}`,
+                          `${isSelected ? 'bg-brand-500' : 'bg-scale-500 hover:bg-scale-700'}`,
                         ].join(' ')}
                         onClick={() => {
                           if (isSelected) {
