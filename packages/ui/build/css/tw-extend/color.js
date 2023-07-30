@@ -545,7 +545,7 @@ module.exports = {
 },
 "brand-600": {
   cssVariable: "var(--brand-600)",
-  value: "hsl(152.89999999999998, 60%, 50%)"
+  value: "hsl(153, 59.5%, 70%)"
 },
 "brand-DEFAULT": {
   cssVariable: "var(--brand-default)",

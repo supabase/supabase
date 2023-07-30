@@ -14,7 +14,7 @@ import { useCheckPermissions, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { Button, IconSearch, IconX, Input, Menu, cn } from 'ui'
+import { Button, IconPlus, IconSearch, IconX, Input, Menu, cn } from 'ui'
 import QueryItem from './QueryItem'
 
 const SideBarContent = observer(() => {
@@ -101,13 +101,12 @@ const SideBarContent = observer(() => {
           <div className="space-y-6">
             <div className="px-3 flex flex-col gap-2">
               <Button
-                // isActive={false}
                 type="default"
-                className="mx-3"
+                className="mx-3 justify-start"
                 onClick={() => {
                   handleNewQuery()
                 }}
-                icon={<IconSearch size="tiny" />}
+                icon={<IconPlus size="tiny" />}
               >
                 New query
               </Button>
@@ -129,20 +128,27 @@ const SideBarContent = observer(() => {
                 <div className="editor-product-menu">
                   <div className="flex flex-row justify-between">
                     <Menu.Group title="Favorites" />
-                    <IconSearch
-                      className={cn(
-                        'w-4',
-                        'h-4',
-                        'cursor-pointer',
-                        isFavoritesFilterOpen ? 'text-scale-1200' : 'text-scale-900'
-                      )}
+                    <button
+                      className="flex items-center w-4 h-4 cursor-pointer mr-3"
                       onClick={() => {
-                        setIsFavoritesFilterOpen((state) => !state)
+                        setIsFavoritesFilterOpen(!isFavoritesFilterOpen)
                       }}
-                    />
+                    >
+                      <IconSearch
+                        className={cn(
+                          'w-4',
+                          'h-4',
+                          'cursor-pointer',
+                          isFavoritesFilterOpen ? 'text-scale-1200' : 'text-scale-900'
+                        )}
+                        onClick={() => {
+                          setIsFavoritesFilterOpen((state) => !state)
+                        }}
+                      />
+                    </button>
                   </div>
                   {isFavoritesFilterOpen && (
-                    <div className="pl-3 mb-2">
+                    <div className="pl-3 mb-2 mr-3">
                       <Input
                         autoFocus
                         size="tiny"
@@ -151,6 +157,12 @@ const SideBarContent = observer(() => {
                         disabled={isLoading}
                         onChange={(e) => setFavoritesFilterString(e.target.value)}
                         value={favoritesFilterString}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') {
+                            setIsFavoritesFilterOpen(false)
+                            setFavoritesFilterString('')
+                          }
+                        }}
                         actions={
                           favoritesFilterString && (
                             <IconX
@@ -196,6 +208,12 @@ const SideBarContent = observer(() => {
                       disabled={isLoading}
                       onChange={(e) => setSnippetsFilterString(e.target.value)}
                       value={snippetsFilterString}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Escape') {
+                          setIsSnippetsFilterOpen(false)
+                          setSnippetsFilterString('')
+                        }
+                      }}
                       actions={
                         snippetsFilterString && (
                           <IconX
