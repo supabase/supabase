@@ -1,11 +1,11 @@
 import { useParams } from 'common'
-import { AiIconAnimation } from 'components/animations/ai-icon'
+
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useStore } from 'hooks'
 import { useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { AiIcon, Button, Form, IconLoader, Input, Modal, cn } from 'ui'
+import { AiIconAnimation, Button, Form, IconLoader, Input, Modal, cn } from 'ui'
 
 export interface RenameQueryModalProps {
   snippet: SqlSnippet

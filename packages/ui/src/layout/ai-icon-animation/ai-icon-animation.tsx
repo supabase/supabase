@@ -1,7 +1,8 @@
 // make a function that returns a component
 
 import { useState, useEffect } from 'react'
-import styles from './ai-icon-style.module.css'
+// @ts-expect-error
+import styles from '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 import { cn } from 'ui'
 
 interface Props {
