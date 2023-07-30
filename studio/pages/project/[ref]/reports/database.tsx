@@ -90,11 +90,7 @@ const DatabaseUsage = observer(() => {
                   value={databaseSize}
                   max={databaseSizeLimit > 0 ? databaseSizeLimit : Infinity}
                   barClass={`${
-                    sizeIsExceeded
-                      ? 'bg-red-900'
-                      : sizeIsApproaching
-                      ? 'bg-yellow-900'
-                      : 'bg-brand-900'
+                    sizeIsExceeded ? 'bg-red-900' : sizeIsApproaching ? 'bg-yellow-900' : 'bg-brand'
                   }`}
                   labelBottom={formatBytes(databaseSize)}
                   labelTop={databaseSizeLimit > 0 ? formatBytes(databaseSizeLimit) : ''}
@@ -134,7 +130,7 @@ const DatabaseUsage = observer(() => {
                       ? 'bg-red-900'
                       : egressIsApproaching
                       ? 'bg-yellow-900'
-                      : 'bg-brand-900'
+                      : 'bg-brand'
                   }`}
                   labelBottom={formatBytes(usage?.db_egress?.usage ?? 0)}
                   labelTop={databaseEgressLimit > 0 ? formatBytes(databaseEgressLimit) : ''}

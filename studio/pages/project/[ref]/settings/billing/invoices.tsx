@@ -21,7 +21,7 @@ const ProjectBilling: NextPageWithLayout = () => {
         >
           You might be looking for the{' '}
           <Link href={`/org/${organization?.slug}/invoices`}>
-            <a className="text-brand-900">organization's invoices</a>
+            <a className="text-brand">organization's invoices</a>
           </Link>{' '}
           page instead.
         </Alert>

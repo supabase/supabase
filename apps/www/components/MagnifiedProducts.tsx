@@ -93,7 +93,7 @@ function Product({
               lazyBoundary="100px"
             />
           </motion.div>
-          <div className="text-brand-1100 dark:text-brand-900 flex justify-center relative opacity-70 md:absolute md:bottom-0 md:opacity-0 group-hover:opacity-100 transition-opacity md:translate-y-8 md:-left-20 md:md:-right-20 font-mono uppercase text-center text-xs mt-2">
+          <div className="text-brand-600 dark:text-brand flex justify-center relative opacity-70 md:absolute md:bottom-0 md:opacity-0 group-hover:opacity-100 transition-opacity md:translate-y-8 md:-left-20 md:md:-right-20 font-mono uppercase text-center text-xs mt-2">
             <span>{product.name}</span>
           </div>
         </a>

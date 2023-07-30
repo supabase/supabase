@@ -205,7 +205,7 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
     <>
       {data.isForeign ? (
         <div className="rounded-lg overflow-hidden">
-          <header className="text-[0.5rem] leading-5 font-bold px-2 text-center bg-brand-900 text-gray-300">
+          <header className="text-[0.5rem] leading-5 font-bold px-2 text-center bg-brand text-gray-300">
             {data.name}
             {targetPosition && (
               <Handle
@@ -219,7 +219,7 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
         </div>
       ) : (
         <div className="rounded-lg overflow-hidden" style={{ width: NODE_WIDTH / 2 }}>
-          <header className="text-[0.5rem] leading-5 font-bold px-2 text-center bg-brand-900 text-gray-300">
+          <header className="text-[0.5rem] leading-5 font-bold px-2 text-center bg-brand text-gray-300">
             {data.name}
           </header>
 
@@ -230,7 +230,7 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
             >
               <span
                 className={clsx(
-                  column.isPrimary && 'border-l-2 border-l-brand-900 pl-[6px] pr-2',
+                  column.isPrimary && 'border-l-2 border-l-brand pl-[6px] pr-2',
                   'pl-2 text-ellipsis overflow-hidden whitespace-nowrap'
                 )}
               >

@@ -7,7 +7,7 @@ import * as data from '~/data/blog/PostgresFTSComparison'
 import remarkGfm from 'remark-gfm'
 
 const barColors = {
-  pg: 'var(--colors-brand11)',
+  pg: 'hsl(var(--brand-600))',
   meilisearch: 'var(--colors-blue11)',
   typesense: 'var(--colors-violet11)',
   'sqlite-disk': 'var(--colors-orange11)',

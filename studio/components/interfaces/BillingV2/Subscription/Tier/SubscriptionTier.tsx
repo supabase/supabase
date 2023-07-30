@@ -75,7 +75,7 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
           <div className="col-span-12 lg:col-span-7 space-y-6">
             <div>
               <p className="text-sm">This project is currently on the plan:</p>
-              <p className="text-2xl text-brand-900 uppercase">{tierName}</p>
+              <p className="text-2xl text-brand uppercase">{tierName}</p>
             </div>
             <div>
               <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>

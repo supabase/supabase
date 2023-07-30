@@ -51,7 +51,7 @@ function radixColorKeys() {
 }
 
 function generateColorClasses() {
-  const brandColors = ['brand', 'scale', 'scaleA']
+  const brandColors = ['scale', 'scaleA']
   const colors = [...radixColorKeys(), ...brandColors]
 
   let mappedColors = {}
