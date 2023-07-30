@@ -114,7 +114,7 @@ const GlassPanel = ({
         </div>
 
         {children && <span className="text-sm text-scale-1100 flex-grow">{children}</span>}
-        {showLink && <span className="text-brand-900 justify-end text-sm">Learn more</span>}
+        {showLink && <span className="text-brand justify-end text-sm">Learn more</span>}
       </div>
     </div>
   )

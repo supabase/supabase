@@ -64,7 +64,7 @@ const FunctionLink = React.memo(function FunctionLink({
         className={cn(
           'cursor-pointer transition text-sm hover:text-scale-1200 gap-3 relative',
           isParent ? 'flex justify-between' : 'leading-3',
-          active ? 'text-brand-900' : 'text-scale-1000'
+          active ? 'text-brand' : 'text-scale-1000'
         )}
       >
         {icon && <Image width={16} height={16} alt={icon} src={`${router.basePath}${icon}`} />}

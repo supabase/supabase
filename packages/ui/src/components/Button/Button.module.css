@@ -51,7 +51,7 @@
 */
 /* .sbui-btn-primary {
   @apply text-white bg-brand-800 hover:bg-brand-600;
-  @apply dark:hover:bg-brand-900;
+  @apply dark:hover:bg-brand;
 } */
 .dark .sbui-btn-primary {
   text-shadow: 0px 0px 4px rgba(38 111 78 / 50%);
@@ -87,7 +87,7 @@
   @apply dark:text-white dark:border-dark-400 dark:hover:text-white dark:hover:border-white;
 } */
 /* .sbui-btn-link {
-  @apply bg-transparent text-brand-800 border-none hover:bg-brand-900 hover:bg-opacity-25;
+  @apply bg-transparent text-brand-800 border-none hover:bg-brand hover:bg-opacity-25;
   box-shadow: none;
 } */
 /* .sbui-btn-text {

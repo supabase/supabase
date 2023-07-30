@@ -85,7 +85,7 @@ const Nav = () => {
             <p className="mt-1 text-sm text-scale-1100 dark:text-dark-100">{description}</p>
           </div>
           {url && (
-            <p className="mt-2 text-sm font-medium text-brand-900 lg:mt-4">
+            <p className="mt-2 text-sm font-medium text-brand lg:mt-4">
               <TextLink label={label ? 'Get notified' : 'Learn more'} url={url} />
             </p>
           )}
@@ -120,7 +120,7 @@ const Nav = () => {
     >
       <button
         className={[
-          'text-scale-900 focus:ring-brand-900 dark:bg-scale-200 dark:hover:bg-scale-300 inline-flex items-center justify-center rounded-md bg-gray-50 p-2 hover:bg-white focus:outline-none focus:ring-2 focus:ring-inset',
+          'text-scale-900 focus:ring-brand dark:bg-scale-200 dark:hover:bg-scale-300 inline-flex items-center justify-center rounded-md bg-gray-50 p-2 hover:bg-white focus:outline-none focus:ring-2 focus:ring-inset',
           showLaunchWeekNavMode && '!bg-transparent border border-[#be9eea]',
         ].join(' ')}
         aria-expanded="false"
@@ -166,7 +166,7 @@ const Nav = () => {
     <div
       className={[
         `
-        text-scale-1200 hover:text-brand-900
+        text-scale-1200 hover:text-brand
         inline-flex cursor-pointer items-center
         border-b-2
         border-transparent
@@ -258,7 +258,7 @@ const Nav = () => {
                   <Link href="/pricing">
                     <a
                       className={[
-                        `text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                        `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
                         text-sm font-medium`,
                         showLaunchWeekNavMode && '!text-white',
@@ -270,7 +270,7 @@ const Nav = () => {
                   <Link href="/docs">
                     <a
                       className={[
-                        `text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                        `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
                         text-sm font-medium`,
                         showLaunchWeekNavMode && '!text-white',
@@ -282,7 +282,7 @@ const Nav = () => {
                   <Link href="/blog">
                     <a
                       className={[
-                        `text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                        `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
                         text-sm font-medium`,
                         showLaunchWeekNavMode && '!text-white',
@@ -376,7 +376,7 @@ const Nav = () => {
                   <button
                     onClick={() => setOpen(false)}
                     type="button"
-                    className="inline-flex items-center justify-center p-2 bg-white rounded-md text-scale-900 focus:ring-brand-900 dark:bg-scale-300 dark:hover:bg-scale-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset"
+                    className="inline-flex items-center justify-center p-2 bg-white rounded-md text-scale-900 focus:ring-brand dark:bg-scale-300 dark:hover:bg-scale-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset"
                   >
                     <span className="sr-only">Close menu</span>
                     <svg

@@ -270,7 +270,7 @@ export default {
       },
       success: {
         base: `bg-brand-300 dark:bg-brand-100 border-brand-700`,
-        icon: `text-brand-900`,
+        icon: `text-brand`,
         header: `text-brand-1200`,
         description: `text-brand-1100`,
       },
@@ -568,7 +568,7 @@ export default {
       bg-transparent
       ${defaults.focus}
       focus:ring-scale-400
-      text-brand-900
+      text-brand
       border-scale-700
       shadow-sm
       rounded
@@ -629,7 +629,7 @@ export default {
       focus:ring-brand-400
       border-scale-700
 
-      text-brand-900
+      text-brand
       shadow-sm
       cursor-pointer
       peer
@@ -934,8 +934,8 @@ export default {
       hover:bg-scale-700
     `,
     active: `
-      !bg-brand-900
-      !hover:bg-brand-900
+      !bg-brand
+      !hover:bg-brand
     `,
     handle_container: {
       tiny: 'h-4 w-7',
@@ -1268,8 +1268,8 @@ export default {
             z-10
 
             border-l
-            border-brand-900
-            group-hover:border-brand-900
+            border-brand
+            group-hover:border-brand
           `,
           rounded: `rounded-md`,
         },
@@ -1455,8 +1455,8 @@ export default {
     option_active: `text-scale-1200 bg-scale-600`,
     option_disabled: `cursor-not-allowed opacity-50`,
     option_inner: `flex items-center space-x-3`,
-    option_check: `absolute inset-y-0 right-0 flex items-center pr-3 text-brand-900`,
-    option_check_active: `text-brand-900`,
+    option_check: `absolute inset-y-0 right-0 flex items-center pr-3 text-brand`,
+    option_check_active: `text-brand`,
     option_check_icon: `h-5 w-5`,
   },
 
@@ -1500,7 +1500,7 @@ export default {
     },
     spinner: `
       absolute
-      text-brand-900 animate-spin
+      text-brand animate-spin
       inset-0
       m-auto
     `,

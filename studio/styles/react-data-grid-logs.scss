@@ -15,7 +15,7 @@
 
   .rdg-row {
     &.rdg-row--focused {
-      @apply border-r border-brand-900;
+      @apply border-r border-brand;
       border-right-width: 4px;
     }
 
@@ -43,7 +43,7 @@
 
   .rdg-row {
     &.rdg-row--focused {
-      @apply border-r border-brand-900;
+      @apply border-r border-brand;
       border-right-width: 4px;
     }
 

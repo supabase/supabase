@@ -122,9 +122,7 @@ function CaseStudyPage(props: any) {
                 <article className="flex flex-col gap-8">
                   <div className="flex flex-col gap-8 max-w-xxl">
                     <Link passHref href="/customers">
-                      <a className="text-brand-900 hover:text-brand-1000 mb-2 mt-0">
-                        Customer Stories
-                      </a>
+                      <a className="text-brand hover:text-brand-1000 mb-2 mt-0">Customer Stories</a>
                     </Link>
                     <h1 className="text-scale-1200 text-4xl font-semibold xl:text-5xl">
                       {props.blog.title}

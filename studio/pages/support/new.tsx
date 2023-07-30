@@ -50,7 +50,7 @@ const SupportPage = () => {
                           isLoading ? (
                             <IconLoader className="animate-spin" />
                           ) : isHealthy ? (
-                            <div className="h-2 w-2 bg-brand-900 rounded-full" />
+                            <div className="h-2 w-2 bg-brand rounded-full" />
                           ) : (
                             <div className="h-2 w-2 bg-yellow-900 rounded-full" />
                           )

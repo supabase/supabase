@@ -40,7 +40,7 @@ const DocsButton = () => {
                 transition
               "
     >
-      <div className="bg-brand-900 h-10 w-10 rounded p-1 transition duration-500 group-hover:-rotate-3 group-hover:scale-110">
+      <div className="bg-brand h-10 w-10 rounded p-1 transition duration-500 group-hover:-rotate-3 group-hover:scale-110">
         {/* <img
             className="text-white w-12 h-12"
             src="/icons/docs-illustration.svg"
@@ -51,7 +51,7 @@ const DocsButton = () => {
         <p className="text-scale-900 text-xs">
           Learn how to use Supabase Auth with Auth Policies to pick and choose what users see what.
         </p>
-        <p className="text-brand-900 mt-2 flex items-center gap-1 text-xs">
+        <p className="text-brand mt-2 flex items-center gap-1 text-xs">
           See Documenation
           <span className="transition group-hover:translate-x-1">
             <IconArrowRight strokeWidth={2} width={12} />
@@ -338,8 +338,8 @@ const AuthForm = () => {
             </div>
             <div className="flex items-center gap-3">
               {active ? (
-                <div className="bg-brand-200 border-brand-700 text-brand-900 flex items-center gap-1 rounded-full border py-1 px-1 text-xs">
-                  <span className="bg-brand-900 text-brand-200 rounded-full p-0.5 text-xs">
+                <div className="bg-brand-200 border-brand-700 text-brand flex items-center gap-1 rounded-full border py-1 px-1 text-xs">
+                  <span className="bg-brand text-brand-200 rounded-full p-0.5 text-xs">
                     <IconCheck strokeWidth={2} size={12} />
                   </span>
                   <span className="px-1">Enabled</span>
@@ -1114,7 +1114,7 @@ export function WholeForm() {
                 transition
               "
             >
-              <div className="bg-brand-900 h-10 w-10 rounded p-1 transition duration-500 group-hover:-rotate-3 group-hover:scale-110">
+              <div className="bg-brand h-10 w-10 rounded p-1 transition duration-500 group-hover:-rotate-3 group-hover:scale-110">
                 {/* <img
             className="text-white w-12 h-12"
             src="/icons/docs-illustration.svg"
@@ -1126,7 +1126,7 @@ export function WholeForm() {
                   Learn how to use Supabase Auth with Auth Policies to pick and choose what users
                   see what.
                 </p>
-                <p className="text-brand-900 mt-2 flex items-center gap-1 text-xs">
+                <p className="text-brand mt-2 flex items-center gap-1 text-xs">
                   See Documenation
                   <span className="transition group-hover:translate-x-1">
                     <IconArrowRight strokeWidth={2} width={12} />

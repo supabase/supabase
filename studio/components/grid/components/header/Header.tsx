@@ -142,7 +142,7 @@ const DefaultHeader = ({
                               <div
                                 className={[
                                   'border border-scale-1100 w-[15px] h-[4px] translate-x-0.5',
-                                  'transition duration-200 group-data-[highlighted]:border-brand-900 group-data-[highlighted]:translate-x-0',
+                                  'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-x-0',
                                 ].join(' ')}
                               />
                             </div>
@@ -168,7 +168,7 @@ const DefaultHeader = ({
                               <div
                                 className={[
                                   'border border-scale-1100 w-[4px] h-[15px] -translate-y-0.5',
-                                  'transition duration-200 group-data-[highlighted]:border-brand-900 group-data-[highlighted]:translate-y-0',
+                                  'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-y-0',
                                 ].join(' ')}
                               />
                             </div>
@@ -193,7 +193,7 @@ const DefaultHeader = ({
                               <IconArrowUp
                                 className={clsx(
                                   'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-700 rounded-full',
-                                  'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand-900 group-data-[highlighted]:opacity-100'
+                                  'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand group-data-[highlighted]:opacity-100'
                                 )}
                                 strokeWidth={3}
                                 size={12}

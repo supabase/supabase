@@ -20,7 +20,7 @@ const ProjectBilling: NextPageWithLayout = () => {
         >
           Subscription management can be found on the{' '}
           <Link href={`/org/${organization?.slug}/billing`}>
-            <a className="text-brand-900">organization's billing</a>
+            <a className="text-brand">organization's billing</a>
           </Link>{' '}
           page instead.
         </Alert>
