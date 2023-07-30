@@ -77,8 +77,8 @@
   background: linear-gradient(
     to right,
     var(--colors-scale2) 0%,
-    var(--colors-brand9) 25%,
-    var(--colors-brand4) 35%,
+    hsl(var(--brand-default)) 25%,
+    hsl(var(--brand-300)) 35%,
     var(--colors-scale2) 45%,
     var(--colors-scale3) 75%
   );
