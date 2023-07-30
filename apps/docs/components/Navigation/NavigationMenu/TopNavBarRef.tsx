@@ -56,7 +56,7 @@ const TopNavBarRef: FC = () => {
   }
 
   return (
-    <nav className="h-[60px] border-b backdrop-blur backdrop-filter bg-white-1200 dark:bg-scale-200/90">
+    <nav className="h-[60px] border-b backdrop-blur backdrop-filter bg bg-opacity-75">
       <div className="px-5 max-w-7xl mx-auto flex gap-3 justify-between items-center h-full">
         <div className={['lg:hidden'].join(' ')}>
           <Link href="/">
@@ -82,21 +82,20 @@ const TopNavBarRef: FC = () => {
               group
               items-center
               justify-between
-              bg-scaleA-200
+              bg-surface-100/75
+              hover:bg-surface-200
               border
               transition
-              hover:border-scale-600
-              hover:bg-scaleA-300
-              border-scale-500 pl-1.5 md:pl-3 pr-1.5 w-full h-[32px] rounded"
+              border-scale-500 pl-1.5 md:pl-3 pr-1.5 w-full h-[32px] rounded
+              text-lighter
+              "
             >
               <div className="flex items-center space-x-2">
-                <IconSearch className="text-scale-1100" size={18} strokeWidth={2} />
-                <p className="hidden md:flex text-scale-1100 text-sm group-hover:text-scale-1200 transition">
-                  Search docs...
-                </p>
+                <IconSearch className="" size={18} strokeWidth={2} />
+                <p className="hidden md:flex text-sm">Search docs...</p>
               </div>
               <div className="hidden md:flex items-center space-x-1">
-                <div className="text-scale-1200 md:flex items-center justify-center h-5 w-10 border rounded bg-scale-500 border-scale-700 gap-1">
+                <div className="md:flex items-center justify-center h-5 w-10 border rounded bg-surface-300 gap-1">
                   <IconCommand size={12} strokeWidth={1.5} />
                   <span className="text-[12px]">K</span>
                 </div>
