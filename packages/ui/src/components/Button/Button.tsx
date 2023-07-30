@@ -51,7 +51,7 @@ const buttonVariants = cva(
             focus-visible:outline-brand-600
             shadow-sm`,
         alternative: `
-            text-brand-1100
+            text-brand-600
             bg-brand-200 hover:bg-brand-400
             border-brand-600 hover:border-brand-300
             dark:border-brand-400 hover:dark:border-brand-300
@@ -73,7 +73,7 @@ const buttonVariants = cva(
             focus-visible:outline-scale-700
             shadow-sm`,
         link: `
-            text-brand-1100
+            text-brand-600
             border
             border-transparent
             hover:bg-brand-400

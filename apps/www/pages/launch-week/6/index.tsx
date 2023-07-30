@@ -1177,7 +1177,7 @@ export default function launchweek() {
                   }}
                 >
                   <div className="relative group">
-                    <div className="absolute -inset-0.5 bg-brand-1100 rounded-full opacity-75 group-hover:opacity-100 group-hover:blur-sm transition duration-500"></div>
+                    <div className="absolute -inset-0.5 bg-brand-600 rounded-full opacity-75 group-hover:opacity-100 group-hover:blur-sm transition duration-500"></div>
                     <a href={creator.link} target="_blank" rel="noopener">
                       <img
                         className="relative rounded-full w-12 h-12 border border-[#2E2E2E] border-brand hover:shadow-md"

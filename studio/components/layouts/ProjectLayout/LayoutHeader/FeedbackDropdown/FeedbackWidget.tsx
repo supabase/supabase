@@ -222,14 +222,14 @@ const FeedbackWidget: FC<Props> = ({
           Have a technical issue? Contact{' '}
           <Link href="/support/new">
             <a>
-              <span className="cursor-pointer text-brand transition-colors hover:text-brand-1200">
+              <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
                 Supabase support
               </span>
             </a>
           </Link>{' '}
           or{' '}
           <a href="https://supabase.com/docs" target="_blank" rel="noreferrer">
-            <span className="cursor-pointer text-brand transition-colors hover:text-brand-1200">
+            <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
               browse our docs
             </span>
           </a>

@@ -62,7 +62,7 @@ const PolicySelection: FC<Props> = ({
           <a
             target="_blank"
             rel="noreferrer"
-            className="text-brand transition-colors hover:text-brand-1200"
+            className="text-brand transition-colors hover:text-brand-600"
             href="https://supabase.com/docs/guides/auth#policies"
           >
             here

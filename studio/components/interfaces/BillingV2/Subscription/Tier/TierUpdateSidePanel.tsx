@@ -180,7 +180,7 @@ const TierUpdateSidePanel = () => {
                       <p className="text-scale-1000 text-sm">{tierMeta?.costUnit}</p>
                     </div>
                     <div className={clsx('flex mt-1 mb-4', !tierMeta?.warning && 'opacity-0')}>
-                      <div className="bg-scale-200 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
+                      <div className="bg-scale-200 text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
                         {tierMeta?.warning}
                       </div>
                     </div>

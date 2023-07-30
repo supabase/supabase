@@ -16,7 +16,7 @@ import { deepFilterSections } from './NavigationMenu.utils'
 
 const HeaderLink = React.memo(function HeaderLink(props: any) {
   return (
-    <span className={['text-base text-brand-1200 ', !props.title && 'capitalize'].join(' ')}>
+    <span className={['text-base text-brand-600 ', !props.title && 'capitalize'].join(' ')}>
       {props.title ?? props.id}
     </span>
   )
@@ -180,7 +180,7 @@ const NavigationMenuRefListItems = ({
         <a
           className={[
             'flex items-center gap-1 text-xs group mb-3',
-            'text-base transition-all duration-200 text-scale-1100 hover:text-brand-1200 hover:cursor-pointer ',
+            'text-base transition-all duration-200 text-scale-1100 hover:text-brand-600 hover:cursor-pointer ',
           ].join(' ')}
         >
           <div className="relative w-2">
