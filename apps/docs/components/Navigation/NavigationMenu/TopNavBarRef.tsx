@@ -82,8 +82,10 @@ const TopNavBarRef: FC = () => {
               group
               items-center
               justify-between
-              bg-surface-100/75
+              bg-surface-100
+              bg-opacity-75
               hover:bg-surface-200
+              hover:bg-opacity-100
               border
               transition
               border-scale-500 pl-1.5 md:pl-3 pr-1.5 w-full h-[32px] rounded
