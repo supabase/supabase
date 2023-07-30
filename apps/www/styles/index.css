@@ -95,7 +95,7 @@ h6:not(.overwrite) {
 }
 
 .heading-gradient-brand {
-  @apply text-[#3ECF8E00] bg-clip-text bg-gradient-to-b from-brand-1000 to-brand dark:to-brand-500;
+  @apply text-[#3ECF8E00] bg-clip-text bg-gradient-to-b from-brand-1000 to-brand dark:to-brand-300;
 }
 
 .toc-animate {
@@ -683,7 +683,7 @@ launch week
   .gradient-text-brand-100 {
     background-image: linear-gradient(45deg, var(--colors-brand8) 0%, var(--colors-brand9) 100%);
   }
-  .gradient-text-brand-500 {
+  .gradient-text-brand-300 {
     background-image: linear-gradient(45deg, var(--colors-brand8) 0%, var(--colors-brand9) 100%);
   }
 

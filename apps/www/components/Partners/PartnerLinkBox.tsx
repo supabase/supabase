@@ -19,7 +19,7 @@ const PartnerLinkBox = ({
       'bg-amber-400 dark:bg-scale-100 group-hover:bg-amber-500 dark:group-hover:bg-amber-300 text-amber-900',
     blue: 'bg-blue-400 dark:bg-scale-100 group-hover:bg-blue-500 dark:group-hover:bg-blue-300 text-blue-900',
     brand:
-      'bg-brand-400 dark:bg-scale-100 group-hover:bg-brand-500 dark:group-hover:bg-brand-300 text-brand',
+      'bg-brand-400 dark:bg-scale-100 group-hover:bg-brand-300 dark:group-hover:bg-brand-300 text-brand',
   }
 
   const content = (

@@ -107,7 +107,7 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
   return (
     <div className={['flex items-center gap-3 not-prose', icon && 'mb-8'].join(' ')}>
       {icon && (
-        <div className="w-8 h-8 bg-brand-500 rounded flex items-center justify-center">
+        <div className="w-8 h-8 bg-brand-300 rounded flex items-center justify-center">
           <Image width={16} height={16} alt={icon} src={`${icon}.svg`} />
         </div>
       )}

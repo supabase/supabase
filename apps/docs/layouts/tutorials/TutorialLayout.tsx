@@ -64,7 +64,7 @@ const Layout: FC<Props> = (props: Props) => {
           <p className="text-brand tracking-wider">Tutorials</p>
           <article className={['prose dark:prose-dark ', 'max-w-none'].join(' ')}>
             <h1>{props.meta.title}</h1>
-            <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-500 to-brand my-16"></div>
+            <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-300 to-brand my-16"></div>
 
             <MDXProvider components={components} children={props.children} />
           </article>

@@ -21,7 +21,7 @@ export const Admonition = ({
             : type === 'info'
             ? 'bg-scale-500 border-scale-800'
             : type === 'tip'
-            ? 'bg-brand-300 border-brand-500'
+            ? 'bg-brand-300 border-brand-300'
             : type === 'caution'
             ? 'bg-yellow-400 border-yellow-800'
             : type === 'danger'

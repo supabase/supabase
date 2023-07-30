@@ -85,7 +85,7 @@
 }
 
 .react-datepicker__day--in-range {
-  @apply bg-brand-500 text-scale-fixed-100 border-brand-500;
+  @apply bg-brand-300 text-scale-fixed-100 border-brand-300;
 }
 
 .react-datepicker__day--in-selecting-range {
@@ -101,7 +101,7 @@
 }
 
 .react-datepicker__day--selected {
-  @apply bg-brand-500 text-white;
+  @apply bg-brand-300 text-white;
 }
 
 .react-datepicker__day--range-start {
