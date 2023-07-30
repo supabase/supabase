@@ -122,7 +122,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                   forceMount
                 >
                   <AiIcon />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-900 to-brand-1100">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand to-brand-1100">
                     Ask Supabase AI
                     {search ? (
                       <>

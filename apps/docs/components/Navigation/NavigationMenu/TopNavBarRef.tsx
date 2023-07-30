@@ -68,7 +68,7 @@ const TopNavBarRef: FC = () => {
                 height={24}
                 alt="Supabase Logo"
               />
-              <span className="font-mono text-sm font-medium text-brand-900">DOCS</span>
+              <span className="font-mono text-sm font-medium text-brand">DOCS</span>
             </a>
           </Link>
           {/* {router.asPath.includes('/reference/') && <RefSwitcher />} */}

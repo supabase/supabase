@@ -367,7 +367,7 @@ const ColumnEditor = ({
                       <p>
                         You will need to{' '}
                         <Link href={`/project/${ref}/database/extensions?filter=pgsodium`}>
-                          <a className="text-brand-800 hover:text-brand-900 transition">install</a>
+                          <a className="text-brand-800 hover:text-brand transition">install</a>
                         </Link>{' '}
                         the extension <code className="text-xs">pgsodium</code> first before being
                         able to encrypt your column.

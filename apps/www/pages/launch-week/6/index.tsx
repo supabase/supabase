@@ -1018,7 +1018,7 @@ export default function launchweek() {
                 href="https://supabase.com/blog/launch-week-6-hackathon"
                 target="_blank"
                 rel="nooper noreferrer"
-                className="text-brand-900"
+                className="text-brand"
               >
                 blog post
               </a>
@@ -1052,7 +1052,7 @@ export default function launchweek() {
                   <a
                     href="https://discord.supabase.com/"
                     rel="noopener noreferrer"
-                    className="text-brand-900 flex items-center"
+                    className="text-brand flex items-center"
                     target="_blank"
                   >
                     Join our Discord <IconExternalLink size="small" className="inline-block ml-2" />
@@ -1064,7 +1064,7 @@ export default function launchweek() {
                 <p className="text-slate-900 w-[90%] lg:w-[80%]">
                   Submit your project through{' '}
                   <a
-                    className="text-brand-900"
+                    className="text-brand"
                     href="https://www.madewithsupabase.com/launch-week-6"
                     target="_blank"
                   >
@@ -1091,7 +1091,7 @@ export default function launchweek() {
                 <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-[#121212] w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
-                    className="absolute top-[16px] right-[10px] text-brand-900"
+                    className="absolute top-[16px] right-[10px] text-brand"
                   ></img>
                   <h3 className="text-white">Supabase Cache Helpers</h3>
                   <p className="text-slate-1000 text-xs">Previous Best Overall Project Winner</p>
@@ -1105,7 +1105,7 @@ export default function launchweek() {
                 <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-[#121212] w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
-                    className="absolute top-[16px] right-[10px] text-brand-900"
+                    className="absolute top-[16px] right-[10px] text-brand"
                   ></img>
                   <h3 className="text-white">Super UI</h3>
                   <p className="text-slate-1000 text-xs">Previous Best Overall Project Runner Up</p>
@@ -1120,7 +1120,7 @@ export default function launchweek() {
                 <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-[#121212] w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
-                    className="absolute top-[16px] right-[10px] text-brand-900"
+                    className="absolute top-[16px] right-[10px] text-brand"
                   ></img>
                   <h3 className="text-white">Quid Faciam Hodie?</h3>
                   <p className="text-slate-1000 text-xs">Winner Best Flutter Project</p>
@@ -1130,7 +1130,7 @@ export default function launchweek() {
                 <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 mb-4 bg-[#121212] w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
-                    className="absolute top-[16px] right-[10px] text-brand-900"
+                    className="absolute top-[16px] right-[10px] text-brand"
                   ></img>
                   <h3 className="text-white">That Hot Dog Game</h3>
                   <p className="text-slate-1000 text-xs">Previous Winner: Most Fun/Interesting</p>
@@ -1145,7 +1145,7 @@ export default function launchweek() {
                 <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-[#121212] w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
-                    className="absolute top-[16px] right-[10px] text-brand-900"
+                    className="absolute top-[16px] right-[10px] text-brand"
                   ></img>
                   <h3 className="text-white">RepoWatch</h3>
                   <p className="text-slate-1000 text-xs">Previous Winner Best Realtime Project</p>
@@ -1180,7 +1180,7 @@ export default function launchweek() {
                     <div className="absolute -inset-0.5 bg-brand-1100 rounded-full opacity-75 group-hover:opacity-100 group-hover:blur-sm transition duration-500"></div>
                     <a href={creator.link} target="_blank" rel="noopener">
                       <img
-                        className="relative rounded-full w-12 h-12 border border-[#2E2E2E] border-brand-900 hover:shadow-md"
+                        className="relative rounded-full w-12 h-12 border border-[#2E2E2E] border-brand hover:shadow-md"
                         src={creator.profile_picture}
                       />
                     </a>
@@ -1204,7 +1204,7 @@ export default function launchweek() {
               We worked with more than 30 content creators from around the world to drop a mountain
               of content simultaneously!
               <a rel="noopener" target="_blank" href="/blog/the-supabase-content-storm">
-                <div className="text-brand-900 flex items-center mt-2">
+                <div className="text-brand flex items-center mt-2">
                   See all the content
                   <IconExternalLink size="small" className="inline-block ml-1" />
                 </div>
@@ -1220,7 +1220,7 @@ export default function launchweek() {
                 {activeCreator !== null && (
                   <p className="text-slate-900 ">{creators[activeCreator].description}</p>
                 )}
-                <p className="text-brand-900 mt-1">
+                <p className="text-brand mt-1">
                   <a rel="noopener" target="_blank" href={creators[activeCreator].link}>
                     <span>
                       {creators[activeCreator].link_title}

@@ -54,9 +54,7 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
             Connected account
           </span>
         )}
-        {IS_SAVED && (
-          <span className="opacity-0 animate-fade-in text-xs text-brand-900">Saved</span>
-        )}
+        {IS_SAVED && <span className="opacity-0 animate-fade-in text-xs text-brand">Saved</span>}
         {HAS_ERROR && (
           <span className="opacity-0 animate-fade-in text-xs text-tomato-900">
             Something went wrong
@@ -72,7 +70,7 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
         disabled
         placeholder="name"
         value={user.name}
-        icon={<IconCheck strokeWidth={2} className="w-3 text-brand-900" />}
+        icon={<IconCheck strokeWidth={2} className="w-3 text-brand" />}
       />
       <Input
         className="[&_input]:border-scale-200"
@@ -91,7 +89,7 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
             className={[
               'w-3',
               IS_SAVING && 'text-scale-300',
-              !!formData.role ? 'text-brand-900' : 'text-scale-300',
+              !!formData.role ? 'text-brand' : 'text-scale-300',
             ].join(' ')}
           />
         }
@@ -113,7 +111,7 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
             className={[
               'w-3',
               IS_SAVING && 'text-scale-300',
-              !!formData.company ? 'text-brand-900' : 'text-scale-300',
+              !!formData.company ? 'text-brand' : 'text-scale-300',
             ].join(' ')}
           />
         }
@@ -135,7 +133,7 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
             className={[
               'w-3 flex spin',
               IS_SAVING && 'text-scale-300',
-              !!formData.location ? 'text-brand-900' : 'text-scale-300',
+              !!formData.location ? 'text-brand' : 'text-scale-300',
             ].join(' ')}
           />
         }

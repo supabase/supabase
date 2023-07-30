@@ -289,7 +289,7 @@
     }
 
     .is-highlighted {
-      @apply text-brand-900;
+      @apply text-brand;
     }
   }
   .codeblock-container + .codeblock-container {
@@ -299,7 +299,7 @@
 
 ::-moz-selection {
   /* Code for Firefox */
-  @apply bg-brand-900;
+  @apply bg-brand;
   color: #333 !important;
 }
 
@@ -408,7 +408,7 @@
 
 .form-field-markdown {
   a {
-    @apply text-brand-900 transition opacity-75 hover:opacity-100 underline;
+    @apply text-brand transition opacity-75 hover:opacity-100 underline;
   }
 }
 

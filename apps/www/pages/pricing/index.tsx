@@ -150,7 +150,7 @@ export default function IndexPage() {
         <div className="relative z-10 py-16 lg:py-28">
           <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
-              <h1 className="text-brand-900 text-base">Pricing</h1>
+              <h1 className="text-brand text-base">Pricing</h1>
               <h2 className="h1">Predictable pricing, no surprises</h2>
               <p className="p text-lg">
                 Start building for free, collaborate with a team, then scale to millions of users
@@ -174,7 +174,7 @@ export default function IndexPage() {
                   key={`row-${plan.name}`}
                   className={[
                     plan.name === 'Pro'
-                      ? 'bg-brand-1100 dark:bg-brand-900 border px-0.5 -mt-8 rounded-[6px]'
+                      ? 'bg-brand-1100 dark:bg-brand border px-0.5 -mt-8 rounded-[6px]'
                       : '',
                   ].join(' ')}
                 >
@@ -273,7 +273,7 @@ export default function IndexPage() {
                         {plan.features.map((feature) => (
                           <li key={feature} className="flex items-center py-2 first:mt-0">
                             <IconCheck
-                              className="text-brand-900 h-4 w-4"
+                              className="text-brand h-4 w-4"
                               aria-hidden="true"
                               strokeWidth={3}
                             />
@@ -331,11 +331,7 @@ export default function IndexPage() {
               >
                 {planEnterprise.features.map((feature) => (
                   <li key={feature} className="flex items-center py-2 first:mt-0">
-                    <IconCheck
-                      className="text-brand-900 h-4 w-4 "
-                      aria-hidden="true"
-                      strokeWidth={3}
-                    />
+                    <IconCheck className="text-brand h-4 w-4 " aria-hidden="true" strokeWidth={3} />
                     <span className="dark:text-scale-1200 mb-0 ml-3 ">{feature}</span>
                   </li>
                 ))}
@@ -953,7 +949,7 @@ export default function IndexPage() {
                 <a
                   target="_blank"
                   href="https://supabase.com/dashboard/support/new"
-                  className="transition text-brand-900 hover:text-brand-1000"
+                  className="transition text-brand hover:text-brand-1000"
                 >
                   open a support ticket
                 </a>{' '}
@@ -964,7 +960,7 @@ export default function IndexPage() {
                 <a
                   target="_blank"
                   href="https://supabase.com/dashboard/support/new"
-                  className="transition text-brand-900 hover:text-brand-1000"
+                  className="transition text-brand hover:text-brand-1000"
                 >
                   you can contact the team here
                 </a>

@@ -146,9 +146,9 @@ function AuthWidgetSection() {
                       })
                     }
                     className={[
-                      'bg-brand-300 border-brand-900 h-10 w-10 rounded-full border-2 transition hover:scale-105',
+                      'bg-brand-300 border-brand h-10 w-10 rounded-full border-2 transition hover:scale-105',
                       brandColor.brand === 'var(--colors-brand9)'
-                        ? ' !bg-brand-900 ring-scale-400 border-scale-800 ring-2 drop-shadow-lg dark:ring-white'
+                        ? ' !bg-brand ring-scale-400 border-scale-800 ring-2 drop-shadow-lg dark:ring-white'
                         : '',
                     ].join(' ')}
                   ></button>

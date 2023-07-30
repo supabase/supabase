@@ -104,8 +104,8 @@ const ProviderForm = ({ provider }: ProviderFormProps) => {
           </div>
           <div className="flex items-center gap-3">
             {isActive ? (
-              <div className="flex items-center gap-1 rounded-full border border-brand-700 bg-brand-200 py-1 px-1 text-xs text-brand-900">
-                <span className="rounded-full bg-brand-900 p-0.5 text-xs text-brand-200">
+              <div className="flex items-center gap-1 rounded-full border border-brand-700 bg-brand-200 py-1 px-1 text-xs text-brand">
+                <span className="rounded-full bg-brand p-0.5 text-xs text-brand-200">
                   <IconCheck strokeWidth={2} size={12} />
                 </span>
                 <span className="px-1">Enabled</span>
