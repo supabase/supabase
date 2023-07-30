@@ -13,7 +13,7 @@ const FileExplorerHeaderSelection = () => {
   } = storageExplorerStore
 
   return (
-    <div className="z-10 flex h-[40px] items-center rounded-t-md bg-brand-700 px-2 py-1 shadow dark:bg-brand-600">
+    <div className="z-10 flex h-[40px] items-center rounded-t-md bg-brand-400 px-2 py-1 shadow dark:bg-brand-600">
       <Button
         icon={<IconX size={16} strokeWidth={2} />}
         type="text"

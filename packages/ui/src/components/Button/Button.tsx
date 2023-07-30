@@ -54,7 +54,7 @@ const buttonVariants = cva(
             text-brand-1100
             bg-brand-200 hover:bg-brand-400
             border-brand-600 hover:border-brand-300
-            dark:border-brand-700 hover:dark:border-brand-300
+            dark:border-brand-400 hover:dark:border-brand-300
             focus-visible:border-brand-300
             focus-visible:outline-brand-600
             shadow-sm`,
