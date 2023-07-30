@@ -486,7 +486,8 @@
   border-radius: 100%;
 }
 
-.ai-icon__container--allow-hover-effect:hover .ai-icon__grid__square--static:nth-child(1) {
+.ai-icon__container--allow-hover-effect:hover .ai-icon__grid__square--static:nth-child(1),
+[data-selected='true'] .ai-icon__grid__square--static:nth-child(1) {
   transform: rotate(45deg);
   top: 8px;
   left: 8px;
@@ -494,7 +495,8 @@
   height: 8px;
   border-radius: 0%;
 }
-.ai-icon__container--allow-hover-effect:hover .ai-icon__grid__square--static:nth-child(2) {
+.ai-icon__container--allow-hover-effect:hover .ai-icon__grid__square--static:nth-child(2),
+[data-selected='true'] .ai-icon__grid__square--static:nth-child(2) {
   transform: rotate(45deg);
   top: 0;
   left: 0;
@@ -502,7 +504,8 @@
   height: 24px;
   border-radius: 100%;
 }
-.ai-icon__container--allow-hover-effect:hover .ai-icon__grid__square--static:nth-child(3) {
+.ai-icon__container--allow-hover-effect:hover .ai-icon__grid__square--static:nth-child(3),
+[data-selected='true'] .ai-icon__grid__square--static:nth-child(3) {
   transform: rotate(45deg);
   top: 0;
   left: 0;
@@ -510,7 +513,8 @@
   height: 24px;
   border-radius: 100%;
 }
-.ai-icon__container--allow-hover-effect:hover .ai-icon__grid__square--static:nth-child(4) {
+.ai-icon__container--allow-hover-effect:hover .ai-icon__grid__square--static:nth-child(4),
+[data-selected='true'] .ai-icon__grid__square--static:nth-child(4) {
   transform: rotate(45deg);
   top: 0;
   left: 0;
