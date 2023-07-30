@@ -473,7 +473,7 @@ export const CardForm = () => {
                   descriptionText={
                     <span>
                       This can be found in{' '}
-                      <span className="text-brand underline cursor-pointer transition hover:text-brand-800">
+                      <span className="text-brand underline cursor-pointer transition hover:text-brand-500">
                         the developer settings
                       </span>
                     </span>

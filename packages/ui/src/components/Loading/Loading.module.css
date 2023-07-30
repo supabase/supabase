@@ -10,7 +10,7 @@
 }
 
 .sbui-loading-spinner {
-  @apply text-brand-800 animate-spin;
+  @apply text-brand-500 animate-spin;
   margin: auto;
   position: absolute;
   top: 0;

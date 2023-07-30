@@ -39,7 +39,7 @@ const PasswordStrengthBar = ({
           ? passwordStrengthMessage
           : 'This is the password to your postgres database, so it must be strong and hard to guess.'}{' '}
         <span
-          className="text-brand-800 underline hover:text-brand transition cursor-pointer"
+          className="text-brand-500 underline hover:text-brand transition cursor-pointer"
           onClick={generateStrongPassword}
         >
           Generate a password

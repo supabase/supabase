@@ -29,7 +29,7 @@ export default function Config() {
         <div className="relative col-span-12 md:col-span-9 transition-all ease-out duration-100">
           <div className="w-full prose">
             <h1 className="">CLI configuration</h1>
-            <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-800 to-brand my-8"></div>
+            <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-500 to-brand my-8"></div>
             <ReactMarkdown>{specFile.info.description}</ReactMarkdown>
             <div>
               {TAGS.map((tag) =>
