@@ -50,7 +50,7 @@
   Button varients
 */
 /* .sbui-btn-primary {
-  @apply text-white bg-brand-500 hover:bg-brand-600;
+  @apply text-white bg-brand-300 hover:bg-brand-600;
   @apply dark:hover:bg-brand;
 } */
 .dark .sbui-btn-primary {
@@ -87,7 +87,7 @@
   @apply dark:text-white dark:border-dark-400 dark:hover:text-white dark:hover:border-white;
 } */
 /* .sbui-btn-link {
-  @apply bg-transparent text-brand-500 border-none hover:bg-brand hover:bg-opacity-25;
+  @apply bg-transparent text-brand-300 border-none hover:bg-brand hover:bg-opacity-25;
   box-shadow: none;
 } */
 /* .sbui-btn-text {

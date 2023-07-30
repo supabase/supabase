@@ -82,8 +82,8 @@ const OpenSource = () => {
                   {maintainerPills.map((x) => (
                     <li
                       key={x}
-                      className={`mx-4 rounded-t-lg inline-block p-2 cursor-pointer hover:text-brand-500 ${
-                        activePill == x ? 'bg-gray-200 dark:bg-gray-400 text-brand-500' : ''
+                      className={`mx-4 rounded-t-lg inline-block p-2 cursor-pointer hover:text-brand-300 ${
+                        activePill == x ? 'bg-gray-200 dark:bg-gray-400 text-brand-300' : ''
                       }`}
                       onClick={() => setActivePill(x)}
                     >

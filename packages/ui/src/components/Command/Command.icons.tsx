@@ -30,7 +30,7 @@ export const AiIcon = ({ className = 'text-brand' }: AiIconProps) => (
 export const AiIconChat = () => (
   <div
     className="w-7 h-7
-    bg-gradient-to-r from-brand to-brand-500
+    bg-gradient-to-r from-brand to-brand-300
 
     ring-brand-600
     ring-1

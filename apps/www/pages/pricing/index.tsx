@@ -104,7 +104,7 @@ export default function IndexPage() {
   }) => {
     return (
       <div className="mt-8 px-4 mobile-header">
-        <h2 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-3xl font-medium uppercase font-mono">
+        <h2 className="gradient-text-brand-300 dark:gradient-text-brand-100 text-3xl font-medium uppercase font-mono">
           {plan}
         </h2>
         <div className="flex items-baseline gap-2">
@@ -198,13 +198,13 @@ export default function IndexPage() {
                       <div className="mb-2 flex items-center gap-2">
                         <div className="flex items-center gap-2">
                           <h3
-                            className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-normal
+                            className="gradient-text-brand-300 dark:gradient-text-brand-100 text-2xl font-normal
                            uppercase flex items-center gap-4 font-mono"
                           >
                             {plan.name}
                           </h3>
                           {plan.nameBadge && (
-                            <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
+                            <span className="bg-brand-300 text-brand-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
                               {plan.nameBadge}
                             </span>
                           )}
@@ -308,7 +308,7 @@ export default function IndexPage() {
             <div className="flex flex-col justify-center lg:px-8">
               <div>
                 <h3
-                  className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-normal
+                  className="gradient-text-brand-300 dark:gradient-text-brand-100 text-2xl font-normal
                            uppercase flex items-center gap-4 font-mono"
                 >
                   {planEnterprise.name}
@@ -436,7 +436,7 @@ export default function IndexPage() {
           className="grid lg:grid-cols-2 gap-8 items-center mt-12 lg:mt-8 max-w-6xl mx-auto"
         >
           <div>
-            <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 inline-block  dark:bg-scale-400 dark:text-scale-1100 py-0.5 px-2 text-[13px] leading-4 mt-2">
+            <span className="bg-brand-300 text-brand-1100 rounded-md bg-opacity-30 inline-block  dark:bg-scale-400 dark:text-scale-1100 py-0.5 px-2 text-[13px] leading-4 mt-2">
               Available for Pro plan
             </span>
             <h2 className="text-scale-1200 text-4xl mt-4">Cost control with spend caps</h2>
@@ -731,7 +731,7 @@ export default function IndexPage() {
                         scope="col"
                         key={plan.name}
                       >
-                        <h3 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-mono font-normal uppercase flex items-center gap-4">
+                        <h3 className="gradient-text-brand-300 dark:gradient-text-brand-100 text-2xl font-mono font-normal uppercase flex items-center gap-4">
                           {plan.name}
                         </h3>
                         <div

@@ -313,7 +313,7 @@ const Performance = () => {
                       <Bar
                         color={
                           stat.name === 'Supabase'
-                            ? 'bg-brand dark:bg-brand-500'
+                            ? 'bg-brand dark:bg-brand-300'
                             : 'bg-brand-300 dark:bg-brand-400'
                         }
                         finalPercentage={Math.ceil((stat.value / maxValue) * 100)}

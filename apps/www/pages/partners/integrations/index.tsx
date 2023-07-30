@@ -200,10 +200,10 @@ function IntegrationPartnersPage(props: Props) {
                     <a className="text-scale-1200">INTEGRATIONS</a>
                   </Link>
                   <Link href={`/partners/experts`}>
-                    <a className="transition-colors text-brand hover:text-brand-500">EXPERTS</a>
+                    <a className="transition-colors text-brand hover:text-brand-300">EXPERTS</a>
                   </Link>
                   <Link href={`/partners/integrations#become-a-partner`}>
-                    <a className="flex items-center space-x-1 transition-colors text-brand hover:text-brand-500">
+                    <a className="flex items-center space-x-1 transition-colors text-brand hover:text-brand-300">
                       BECOME A PARTNER <IconArrowRight />
                     </a>
                   </Link>

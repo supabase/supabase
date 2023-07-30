@@ -39,10 +39,10 @@
   @apply border border-solid rounded;
 
   @apply text-brand-700 border-gray-300 transition-all;
-  @apply hover:border-brand-500 focus:ring-brand-500 focus:outline-none;
+  @apply hover:border-brand-300 focus:ring-brand-300 focus:outline-none;
 
   @apply dark:bg-transparent dark:border-dark-400 dark:text-white;
-  @apply dark:hover:border-brand-500;
+  @apply dark:hover:border-brand-300;
 
   margin-top: 2px;
 } */
