@@ -174,7 +174,7 @@ export default function IndexPage() {
                   key={`row-${plan.name}`}
                   className={[
                     plan.name === 'Pro'
-                      ? 'bg-brand-1100 dark:bg-brand border px-0.5 -mt-8 rounded-[6px]'
+                      ? 'bg-brand-600 dark:bg-brand border px-0.5 -mt-8 rounded-[6px]'
                       : '',
                   ].join(' ')}
                 >
@@ -204,7 +204,7 @@ export default function IndexPage() {
                             {plan.name}
                           </h3>
                           {plan.nameBadge && (
-                            <span className="bg-brand-300 text-brand-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
+                            <span className="bg-brand-300 text-brand-600 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
                               {plan.nameBadge}
                             </span>
                           )}
@@ -249,7 +249,7 @@ export default function IndexPage() {
 
                               {plan.warning && (
                                 <p className="-mt-2">
-                                  <span className="bg-scale-200 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
+                                  <span className="bg-scale-200 text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
                                     {plan.warning}
                                   </span>
                                 </p>
@@ -436,7 +436,7 @@ export default function IndexPage() {
           className="grid lg:grid-cols-2 gap-8 items-center mt-12 lg:mt-8 max-w-6xl mx-auto"
         >
           <div>
-            <span className="bg-brand-300 text-brand-1100 rounded-md bg-opacity-30 inline-block  dark:bg-scale-400 dark:text-scale-1100 py-0.5 px-2 text-[13px] leading-4 mt-2">
+            <span className="bg-brand-300 text-brand-600 rounded-md bg-opacity-30 inline-block  dark:bg-scale-400 dark:text-scale-1100 py-0.5 px-2 text-[13px] leading-4 mt-2">
               Available for Pro plan
             </span>
             <h2 className="text-scale-1200 text-4xl mt-4">Cost control with spend caps</h2>
@@ -792,7 +792,7 @@ export default function IndexPage() {
 
                             {plan.warning && (
                               <p className="-mt-2">
-                                <span className="bg-scale-100 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
+                                <span className="bg-scale-100 text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
                                   {plan.warning}
                                 </span>
                               </p>

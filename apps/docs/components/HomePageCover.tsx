@@ -69,7 +69,7 @@ const HomePageCover = (props) => {
         <div className="md:max-w-xs xl:max-w-none">
           <div className="flex items-center gap-3 mb-3">
             <IconBackground>
-              <IconPlay className="text-brand-1100 dark:text-brand w-4" />
+              <IconPlay className="text-brand-600 dark:text-brand w-4" />
             </IconBackground>
             <h3 className="text-2xl m-0">Getting Started</h3>
           </div>

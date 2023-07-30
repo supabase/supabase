@@ -152,7 +152,7 @@ const Content = (props) => {
         <a
           className={[
             'flex items-center gap-1 text-xs group mb-3',
-            'text-base transition-all duration-200 text-brand hover:text-brand-1200 hover:cursor-pointer ',
+            'text-base transition-all duration-200 text-brand hover:text-brand-600 hover:cursor-pointer ',
           ].join(' ')}
         >
           <div className="relative w-2">

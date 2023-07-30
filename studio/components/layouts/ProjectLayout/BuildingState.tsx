@@ -82,7 +82,7 @@ const BuildingState = ({ project }: BuildingStateProps) => {
                       Browse the Supabase{' '}
                       <Link href="https://supabase.com/docs">
                         <a
-                          className="mb-0 text-brand transition-colors hover:text-brand-1200"
+                          className="mb-0 text-brand transition-colors hover:text-brand-600"
                           target="_blank"
                           rel="noreferrer"
                         >

@@ -64,7 +64,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
                   needed, as PITR supports a superset of functionality, in terms of the granular
                   recovery that can be performed.{' '}
                   <a
-                    className="text-brand transition-colors hover:text-brand-1200"
+                    className="text-brand transition-colors hover:text-brand-600"
                     href="https://supabase.com/docs/guides/platform/backups"
                   >
                     Learn more

@@ -8,7 +8,7 @@ export const ProductButtonListItem = (props: Article) => {
       <div className="inline-block">
         <button
           className=" 
-          text-brand-1200 
+          text-brand-600 
           group
           flex items-start gap-3 bg-transparent
           transition
