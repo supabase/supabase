@@ -24,7 +24,6 @@ export async function declineApiAuthorization({ id }: ApiAuthorizationDeclineVar
 type ApiAuthorizationDeclineData = Awaited<ReturnType<typeof declineApiAuthorization>>
 
 export const useApiAuthorizationDeclineMutation = ({
-  onSuccess,
   onError,
   ...options
 }: Omit<

@@ -15,7 +15,11 @@ export function doPermissionsCheck(
   data?: object,
   organizationId?: number
 ) {
-  return (permissions ?? [])
+  if (!permissions || !Array.isArray(permissions)) {
+    return false
+  }
+
+  return permissions
     .filter(
       (permission) =>
         permission.organization_id === organizationId &&

@@ -9,8 +9,11 @@ export async function getOrganizations(signal?: AbortSignal): Promise<Organizati
   const data = await get(`${API_URL}/organizations`, { signal })
   if (data.error) throw data.error
 
-  const sorted = (data as Organization[]).sort((a, b) => a.name.localeCompare(b.name))
+  if (!Array.isArray(data)) {
+    return []
+  }
 
+  const sorted = (data as Organization[]).sort((a, b) => a.name.localeCompare(b.name))
   return sorted
 }
 
