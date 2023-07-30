@@ -51,7 +51,7 @@ const RefreshButton = ({ table, isRefetching }: RefreshButtonProps) => {
         !status ? (
           <IconRefreshCw className="text-scale-1000" strokeWidth={1.5} />
         ) : status === 'saved' ? (
-          <IconCheck className="text-brand-900" strokeWidth={3} />
+          <IconCheck className="text-brand" strokeWidth={3} />
         ) : (
           <></>
         )
