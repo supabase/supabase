@@ -403,7 +403,7 @@ export default function IndexPage() {
                     </Link>
                     {addon.name === 'Optimized Compute' ? (
                       <button
-                        className="text-brand-1000 text-[13px] leading-4 hover:underline "
+                        className="text-brand-600 text-[13px] leading-4 hover:underline "
                         onClick={() => setShowComputeModal(true)}
                       >
                         {addon.rightCtaText}
@@ -949,7 +949,7 @@ export default function IndexPage() {
                 <a
                   target="_blank"
                   href="https://supabase.com/dashboard/support/new"
-                  className="transition text-brand hover:text-brand-1000"
+                  className="transition text-brand hover:text-brand-600"
                 >
                   open a support ticket
                 </a>{' '}
@@ -960,7 +960,7 @@ export default function IndexPage() {
                 <a
                   target="_blank"
                   href="https://supabase.com/dashboard/support/new"
-                  className="transition text-brand hover:text-brand-1000"
+                  className="transition text-brand hover:text-brand-600"
                 >
                   you can contact the team here
                 </a>

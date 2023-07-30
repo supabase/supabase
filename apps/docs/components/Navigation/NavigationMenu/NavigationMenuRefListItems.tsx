@@ -72,7 +72,7 @@ const FunctionLink = React.memo(function FunctionLink({
         {active && !isSubItem && (
           <div
             aria-hidden="true"
-            className="absolute -left-[13px] top-0 bottom-0 w-[1px] bg-brand-1000"
+            className="absolute -left-[13px] top-0 bottom-0 w-[1px] bg-brand-600"
           ></div>
         )}
         {isParent && (
