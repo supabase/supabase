@@ -338,7 +338,7 @@ const AuthForm = () => {
             </div>
             <div className="flex items-center gap-3">
               {active ? (
-                <div className="bg-brand-200 border-brand-700 text-brand flex items-center gap-1 rounded-full border py-1 px-1 text-xs">
+                <div className="bg-brand-200 border-brand-400 text-brand flex items-center gap-1 rounded-full border py-1 px-1 text-xs">
                   <span className="bg-brand text-brand-200 rounded-full p-0.5 text-xs">
                     <IconCheck strokeWidth={2} size={12} />
                   </span>

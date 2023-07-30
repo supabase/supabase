@@ -216,7 +216,7 @@ export default {
     },
     dot: '-ml-0.5 mr-1.5 h-2 w-2 rounded-full',
     color: {
-      brand: 'bg-brand-200 text-brand-1100 border border-brand-700',
+      brand: 'bg-brand-200 text-brand-1100 border border-brand-400',
       scale: 'bg-scale-200 text-scale-1100 border border-scale-700',
       tomato: `bg-tomato-200 text-tomato-1100 border border-tomato-700`,
       red: `bg-red-200 text-red-1100 border border-red-700`,
@@ -269,7 +269,7 @@ export default {
         description: `text-scale-1100`,
       },
       success: {
-        base: `bg-brand-300 dark:bg-brand-100 border-brand-700`,
+        base: `bg-brand-300 dark:bg-brand-100 border-brand-400`,
         icon: `text-brand`,
         header: `text-brand-1200`,
         description: `text-brand-1100`,
