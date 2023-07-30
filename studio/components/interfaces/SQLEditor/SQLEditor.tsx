@@ -47,6 +47,7 @@ import {
   Input,
   Input_Shadcn_,
   cn,
+  AiIconAnimation,
 } from 'ui'
 import AISettingsModal from './AISettingsModal'
 import {
@@ -57,7 +58,6 @@ import {
 import { IStandaloneCodeEditor, IStandaloneDiffEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeleton } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
-import { AiIconAnimation } from 'components/animations/ai-icon'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
