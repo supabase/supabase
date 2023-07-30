@@ -38,8 +38,44 @@ After all the services have started you should be able to see them running in th
 ```sh
 docker compose ps
 ```
+Please secure your services as soon as possible using the instructions below.
 
-Now visit [localhost:8000](http://localhost:8000) to start using Supabase Studio. You will be prompted for a username and password. By default, the username is `supabase` and the password is `this_password_is_insecure_and_should_be_updated`. Please secure your services as soon as possible using the instructions below.
+### Accessing Supabase Studio
+
+You can access the Supabase Dashboard through the API gateway on port `8000`. For example: `http://<your-ip>:8000`, or [localhost:8000](http://localhost:8000) if you are running Docker locally.
+
+You will be prompted for a username and password. By default, the credentials are:
+
+- Username: `supabase` 
+- Password: `this_password_is_insecure_and_should_be_updated`
+
+You should change these credentials as soon as possible using the instructions below.
+
+### Accessing the APIs 
+
+Each of the APIs are available through the the same API gateway:
+
+- REST: `http://<your-ip>:8000/rest/v1/`
+- Auth: `http://<your-domain>:8000/auth/v1/`
+- Storage: `http://<your-domain>:8000/storage/v1/`
+- Realtime: `http://<your-domain>:8000/realtime/v1/`
+
+### Accessing your Edge Functions 
+
+Edge Functions are stored in `volumes/functions`. The default setup has a `hello` Function that you can invoke on `http://<your-domain>:8000/functions/v1/hello`. 
+
+You can add new Functions as `volumes/functions/<FUNCTION_NAME>/index.ts`. Restart the `functions` service to pick up the changes: `docker compose restart functions --no-deps`
+
+### Accessing Postgres
+
+You can connect to the Postgres database on port `5432`, from any Postgres client. For example, you can use the `psql` command line tool from a remote machine, using your server's IP address:
+
+```bash
+psql -h your_ip -p 5432 -d postgres -U postgres
+```
+
+The default password is `your-super-secret-and-long-postgres-password`. You should change this as soon as possible using the instructions below. 
+
 
 ## Securing your services
 
@@ -60,7 +96,7 @@ Replace the values the `.env` file:
   - `ANON_KEY` - replace with an `anon` key
   - `SERVICE_ROLE_KEY` - replace with a `service` key
 
-You will need to restart the services for the changes to take effect.
+You will need to [restart](#restarting-all-services) the services for the changes to take effect.
 
 ### Update Secrets
 
@@ -71,13 +107,13 @@ Update the `.env` file with your own secrets. In particular, these are required:
 - `SITE_URL`: the base URL of your site.
 - `SMTP_*`: mail server credentials. You can use any SMTP server.
 
-You will need to restart the services for the changes to take effect.
+You will need to [restart](#restarting-all-services) the services for the changes to take effect.
 
 ### Dashboard Authentication
 
 The dashboard is protected with Basic Authentication. The default user and password MUST be updated before using Supabase in production. You can update the `./docker/volumes/api/kong.yml` file with your own credentials. For example:
 
-```yaml
+```yaml docker/volumes/api/kong.yml
 basicauth_credentials:
 - consumer: DASHBOARD
   username: user_one
@@ -87,7 +123,7 @@ basicauth_credentials:
   password: password_two
 ```
 
-You will need to restart the services for the changes to take effect.
+You will need to [restart](#restarting-all-services) the services for the changes to take effect.
 
 ## Restarting all services
 
@@ -107,17 +143,38 @@ You can stop Supabase by running `docker compose stop` in same directory as your
 
 You can stop Supabase by running `docker compose down -v` in same directory as your `docker-compose.yml` file. This will destroy all data in the database and storage volumes, so be careful!
 
-## Advanced configuration
+## Common configuration
 
-Each system can be [configured](../self-hosting#configuration) independently. Some of the most important configuration options are:
+Each system can be [configured](../self-hosting#configuration) independently. Some of the most common configuration options are listed below.
 
-- Consider deploying the database to a different server than the rest of the services
-- Update Storage to use S3 instead of the filesystem backend
-- Configure Auth with a production-ready SMTP server
+### Configuring an email server 
 
-### Deploying Edge Functions
+You will need to use a production-ready SMTP server for sending emails. You can configure the SMTP server by updating the the following environment variables:
 
-Edge Functions are stored in `volumes/functions`. The default setup has a `hello` Function that you can invoke on `http://localhost:8000/functions/v1/hello`. You can add new Functions as `volumes/functions/<FUNCTION_NAME>/index.ts`.
+```sh .env
+SMTP_ADMIN_EMAIL=
+SMTP_HOST=
+SMTP_PORT=
+SMTP_USER=
+SMTP_PASS=
+SMTP_SENDER_NAME=
+```
+
+We recommend using [AWS SES](https://aws.amazon.com/ses/). It's extremely cheap and reliable. Restart all services to pick up the new configuration.
+
+### Configuring S3 Storage 
+
+By default all files are stored locally on the server. You can connfigure the Storage service to use S3 by updating the following environment variables:
+
+```yaml docker-compose.yml
+  storage:
+    environment:
+      STORAGE_BACKEND=s3
+      GLOBAL_S3_BUCKET=name-of-your-s3-bucket
+      REGION=region-of-your-s3-bucket
+```
+
+You can find all the available options in the [storage repository](https://github.com/supabase/storage-api/blob/master/.env.sample). Restart the `storage` service to pick up the changes: `docker compose restart storage --no-deps`
 
 ### Setting database's `log_min_messages`
 
