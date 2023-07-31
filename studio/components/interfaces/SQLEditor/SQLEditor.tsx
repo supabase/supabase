@@ -304,7 +304,7 @@ const SQLEditor = () => {
       Telemetry.sendEvent(
         {
           category: 'sql_editor',
-          action: 'ai_suggestion_accept',
+          action: 'ai_suggestion_accepted',
           label: debugSolution ? 'debug_snippet' : 'edit_snippet',
         },
         telemetryProps,
@@ -327,7 +327,7 @@ const SQLEditor = () => {
     Telemetry.sendEvent(
       {
         category: 'sql_editor',
-        action: 'ai_suggestion_reject',
+        action: 'ai_suggestion_rejected',
         label: debugSolution ? 'debug_snippet' : 'edit_snippet',
       },
       telemetryProps,
