@@ -3,53 +3,15 @@ import { Canvas } from '@react-three/fiber'
 import { AdditiveBlending } from 'three'
 import Particle from './Particle'
 import useParticlesConfig from './hooks/useParticlesConfig'
-import { SupabaseClient } from '@supabase/supabase-js'
 
-const ParticlesCanvas = ({ supabase, users }: { supabase?: SupabaseClient; users: any }) => {
+const ParticlesCanvas = () => {
   const isWindowUndefined = typeof window === 'undefined'
   if (isWindowUndefined) return null
 
   const canvasRef = React.useRef(null)
 
   const [animate, setAnimate] = useState<boolean>(true)
-  const { config, handleSetConfig, particles, setParticles, isDebugMode } =
-    useParticlesConfig(users)
-  const [realtimeChannel, setRealtimeChannel] = useState<ReturnType<
-    (typeof supabase | any)['channel']
-  > | null>(null)
-
-  const loadUsers = async () => {
-    return await supabase!.from('lw8_tickets_golden').select('username, golden', { count: 'exact' })
-  }
-
-  // Update particles live when new tickets are generated
-  useEffect(() => {
-    if (!!supabase) {
-      const channel = supabase
-        .channel('lw8_tickets_changes')
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'lw8_tickets_golden',
-          },
-          async () => {
-            const { data: users } = await loadUsers()
-
-            handleSetConfig('particles', users?.length)
-            setParticles((prev: any) => users! ?? prev)
-          }
-        )
-        .subscribe()
-      setRealtimeChannel(channel)
-    }
-
-    return () => {
-      // Cleanup realtime subscription on unmount
-      realtimeChannel?.unsubscribe()
-    }
-  }, [])
+  const { config, particles } = useParticlesConfig()
 
   // stop animation if canvas if is not in viewport
   // to avoid unnecessary computations
@@ -83,7 +45,7 @@ const ParticlesCanvas = ({ supabase, users }: { supabase?: SupabaseClient; users
   const Material = () =>
     useMemo(
       () => (
-        <meshStandardMaterial
+        <meshPhysicalMaterial
           color={config.color}
           blending={config.particlesBlending ? AdditiveBlending : undefined}
         />
@@ -110,7 +72,7 @@ const ParticlesCanvas = ({ supabase, users }: { supabase?: SupabaseClient; users
       className="relative z-30"
     >
       <ambientLight intensity={config.lightIntensity} />
-      <group position={[0, 70, 0]} scale={[0.9, 0.9, 0.9]}>
+      <group position={[0, 70, 0]} scale={[0.75, 0.75, 0.75]}>
         {/* Animated 8 shape particles */}
         {particles?.map((user: any, index: number) => (
           <Particle
