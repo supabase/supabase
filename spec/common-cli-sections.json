@@ -208,6 +208,27 @@
   {
     "type": "category",
     "title": "Inspect",
+    "excludes": [
+      "supabase-inspect-db-calls",
+      "supabase-inspect-db-long-running-queries",
+      "supabase-inspect-db-outliers",
+      "supabase-inspect-db-blocking",
+      "supabase-inspect-db-locks",
+      "supabase-inspect-db-total-index-size",
+      "supabase-inspect-db-index-sizes",
+      "supabase-inspect-db-index-usage",
+      "supabase-inspect-db-unused-indexes",
+      "supabase-inspect-db-total-table-sizes",
+      "supabase-inspect-db-table-sizes",
+      "supabase-inspect-db-table-index-sizes",
+      "supabase-inspect-db-cache-hit",
+      "supabase-inspect-db-table-record-counts",
+      "supabase-inspect-db-seq-scans",
+      "supabase-inspect-db-replication-slots",
+      "supabase-inspect-db-role-connections",
+      "supabase-inspect-db-bloat",
+      "supabase-inspect-db-vacuum-stats"
+    ],
     "items": [
       {
         "id": "supabase-inspect-db",
@@ -355,7 +376,7 @@
       },
       {
         "id": "supabase-projects-api-keys",
-        "title": "Show API keys for a Supabase project",
+        "title": "Show API keys for a project",
         "slug": "supabase-projects-api-keys",
         "type": "cli-command"
       }
@@ -385,7 +406,7 @@
       },
       {
         "id": "supabase-branches-get",
-        "title": "Retrieve connection details of a preview branch",
+        "title": "Show connection details for a preview branch",
         "slug": "supabase-branches-get",
         "type": "cli-command"
       },

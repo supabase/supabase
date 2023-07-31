@@ -204,9 +204,11 @@ const NavigationMenuRefListItems = ({
                 <>
                   <Divider />
                   <SideMenuTitle title={section.title} />
-                  {section.items.map((item) => (
-                    <RenderLink key={item.id} section={item} basePath={basePath} />
-                  ))}
+                  {section.items
+                    .filter((item) => !section.excludes?.includes(item.id))
+                    .map((item) => (
+                      <RenderLink key={item.id} section={item} basePath={basePath} />
+                    ))}
                 </>
               ) : (
                 <RenderLink section={section} basePath={basePath} />
