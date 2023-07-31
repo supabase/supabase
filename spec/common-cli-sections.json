@@ -208,147 +208,128 @@
   {
     "type": "category",
     "title": "Inspect",
-    "excludes": [
-      "supabase-inspect-db-calls",
-      "supabase-inspect-db-long-running-queries",
-      "supabase-inspect-db-outliers",
-      "supabase-inspect-db-blocking",
-      "supabase-inspect-db-locks",
-      "supabase-inspect-db-total-index-size",
-      "supabase-inspect-db-index-sizes",
-      "supabase-inspect-db-index-usage",
-      "supabase-inspect-db-unused-indexes",
-      "supabase-inspect-db-total-table-sizes",
-      "supabase-inspect-db-table-sizes",
-      "supabase-inspect-db-table-index-sizes",
-      "supabase-inspect-db-cache-hit",
-      "supabase-inspect-db-table-record-counts",
-      "supabase-inspect-db-seq-scans",
-      "supabase-inspect-db-replication-slots",
-      "supabase-inspect-db-role-connections",
-      "supabase-inspect-db-bloat",
-      "supabase-inspect-db-vacuum-stats"
-    ],
     "items": [
       {
         "id": "supabase-inspect-db",
         "title": "Inspect database statistics",
         "slug": "supabase-inspect-db",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-inspect-db-calls",
-        "title": "Show most frequently run queries",
-        "slug": "supabase-inspect-db-calls",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-inspect-db-long-running-queries",
-        "title": "Show long running queries",
-        "slug": "supabase-inspect-db-long-running-queries",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-inspect-db-outliers",
-        "title": "Show queries ordered by total execution time",
-        "slug": "supabase-inspect-db-outliers",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-inspect-db-blocking",
-        "title": "Show queries waiting and holding locks",
-        "slug": "supabase-inspect-db-blocking",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-inspect-db-locks",
-        "title": "Show queries taking exclusive locks",
-        "slug": "supabase-inspect-db-locks",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-inspect-db-total-index-size",
-        "title": "Show total size of all indexes",
-        "slug": "supabase-inspect-db-total-index-size",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-inspect-db-index-sizes",
-        "title": "Show sizes of individual indexes",
-        "slug": "supabase-inspect-db-index-sizes",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-inspect-db-index-usage",
-        "title": "Show information about index efficiency",
-        "slug": "supabase-inspect-db-index-usage",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-inspect-db-unused-indexes",
-        "title": "Show indexes with low usage",
-        "slug": "supabase-inspect-db-unused-indexes",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-inspect-db-total-table-sizes",
-        "title": "Show total size of all tables",
-        "slug": "supabase-inspect-db-total-table-sizes",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-inspect-db-table-sizes",
-        "title": "Show sizes of individual tables",
-        "slug": "supabase-inspect-db-table-sizes",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-inspect-db-table-index-sizes",
-        "title": "Show index sizes of individual tables",
-        "slug": "supabase-inspect-db-table-index-sizes",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-inspect-db-cache-hit",
-        "title": "Show cache hit rates for tables and indices",
-        "slug": "supabase-inspect-db-cache-hit",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-inspect-db-table-record-counts",
-        "title": "Show estimated number of rows per table",
-        "slug": "supabase-inspect-db-table-record-counts",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-inspect-db-seq-scans",
-        "title": "Show number of sequential scans for all tables",
-        "slug": "supabase-inspect-db-seq-scans",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-inspect-db-replication-slots",
-        "title": "Show information about replication slots",
-        "slug": "supabase-inspect-db-replication-slots",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-inspect-db-role-connections",
-        "title": "Show number of active connections",
-        "slug": "supabase-inspect-db-role-connections",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-inspect-db-bloat",
-        "title": "Show estimated database bloat",
-        "slug": "supabase-inspect-db-bloat",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-inspect-db-vacuum-stats",
-        "title": "Show statistics related to vacuum operations",
-        "slug": "supabase-inspect-db-vacuum-stats",
-        "type": "cli-command"
+        "type": "cli-command",
+        "items": [
+          {
+            "id": "supabase-inspect-db-calls",
+            "title": "Show most frequently run queries",
+            "slug": "supabase-inspect-db-calls",
+            "type": "cli-command"
+          },
+          {
+            "id": "supabase-inspect-db-long-running-queries",
+            "title": "Show long running queries",
+            "slug": "supabase-inspect-db-long-running-queries",
+            "type": "cli-command"
+          },
+          {
+            "id": "supabase-inspect-db-outliers",
+            "title": "Show queries ordered by total execution time",
+            "slug": "supabase-inspect-db-outliers",
+            "type": "cli-command"
+          },
+          {
+            "id": "supabase-inspect-db-blocking",
+            "title": "Show queries waiting and holding locks",
+            "slug": "supabase-inspect-db-blocking",
+            "type": "cli-command"
+          },
+          {
+            "id": "supabase-inspect-db-locks",
+            "title": "Show queries taking exclusive locks",
+            "slug": "supabase-inspect-db-locks",
+            "type": "cli-command"
+          },
+          {
+            "id": "supabase-inspect-db-total-index-size",
+            "title": "Show total size of all indexes",
+            "slug": "supabase-inspect-db-total-index-size",
+            "type": "cli-command"
+          },
+          {
+            "id": "supabase-inspect-db-index-sizes",
+            "title": "Show sizes of individual indexes",
+            "slug": "supabase-inspect-db-index-sizes",
+            "type": "cli-command"
+          },
+          {
+            "id": "supabase-inspect-db-index-usage",
+            "title": "Show information about index efficiency",
+            "slug": "supabase-inspect-db-index-usage",
+            "type": "cli-command"
+          },
+          {
+            "id": "supabase-inspect-db-unused-indexes",
+            "title": "Show indexes with low usage",
+            "slug": "supabase-inspect-db-unused-indexes",
+            "type": "cli-command"
+          },
+          {
+            "id": "supabase-inspect-db-total-table-sizes",
+            "title": "Show total size of all tables",
+            "slug": "supabase-inspect-db-total-table-sizes",
+            "type": "cli-command"
+          },
+          {
+            "id": "supabase-inspect-db-table-sizes",
+            "title": "Show sizes of individual tables",
+            "slug": "supabase-inspect-db-table-sizes",
+            "type": "cli-command"
+          },
+          {
+            "id": "supabase-inspect-db-table-index-sizes",
+            "title": "Show index sizes of individual tables",
+            "slug": "supabase-inspect-db-table-index-sizes",
+            "type": "cli-command"
+          },
+          {
+            "id": "supabase-inspect-db-cache-hit",
+            "title": "Show cache hit rates for tables and indices",
+            "slug": "supabase-inspect-db-cache-hit",
+            "type": "cli-command"
+          },
+          {
+            "id": "supabase-inspect-db-table-record-counts",
+            "title": "Show estimated number of rows per table",
+            "slug": "supabase-inspect-db-table-record-counts",
+            "type": "cli-command"
+          },
+          {
+            "id": "supabase-inspect-db-seq-scans",
+            "title": "Show number of sequential scans for all tables",
+            "slug": "supabase-inspect-db-seq-scans",
+            "type": "cli-command"
+          },
+          {
+            "id": "supabase-inspect-db-replication-slots",
+            "title": "Show information about replication slots",
+            "slug": "supabase-inspect-db-replication-slots",
+            "type": "cli-command"
+          },
+          {
+            "id": "supabase-inspect-db-role-connections",
+            "title": "Show number of active connections",
+            "slug": "supabase-inspect-db-role-connections",
+            "type": "cli-command"
+          },
+          {
+            "id": "supabase-inspect-db-bloat",
+            "title": "Show estimated database bloat",
+            "slug": "supabase-inspect-db-bloat",
+            "type": "cli-command"
+          },
+          {
+            "id": "supabase-inspect-db-vacuum-stats",
+            "title": "Show statistics related to vacuum operations",
+            "slug": "supabase-inspect-db-vacuum-stats",
+            "type": "cli-command"
+          }
+        ]
       }
     ]
   },
