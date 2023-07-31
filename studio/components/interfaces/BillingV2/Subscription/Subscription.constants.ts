@@ -102,4 +102,4 @@ export const BILLING_BREAKDOWN_METRICS = [
     category: 'Edge Functions',
     unitName: 'function'
   },
-]
+] as const

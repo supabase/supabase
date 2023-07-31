@@ -31,7 +31,7 @@
         "url": "/pricing"
       },
       {
-        "text": "Launch Week 7",
+        "text": "Launch Week 8",
         "url": "/launch-week"
       }
     ]
@@ -46,6 +46,10 @@
       {
         "text": "System Status",
         "url": "https://status.supabase.com/"
+      },
+      {
+        "text": "Become a Partner",
+        "url": "/partners"
       },
       {
         "text": "Integrations",
