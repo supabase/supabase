@@ -182,6 +182,16 @@ const SQLTemplates = observer(() => {
                           })
 
                         await handleNewQuery(formattedSql, title)
+
+                        Telemetry.sendEvent(
+                          {
+                            category: 'sql_editor',
+                            action: 'ai_suggestion_created',
+                            label: 'create_snippet',
+                          },
+                          telemetryProps,
+                          router
+                        )
                       } catch (error: unknown) {
                         if (isError(error)) {
                           ui.setNotification({
