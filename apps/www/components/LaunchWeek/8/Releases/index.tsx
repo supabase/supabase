@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { Accordion } from 'ui'
+import { Accordion, Badge } from 'ui'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
 
 import days, { WeekDayProps, endOfLW8 } from './lw8_data'
@@ -14,6 +14,7 @@ import {
   SmallCard,
   StyledArticleBadge,
 } from './components'
+import Link from 'next/link'
 
 export const defaultEase = [0.25, 0.25, 0, 1]
 export const defaultDuratonIn = 0.25
@@ -149,7 +150,8 @@ export default function LW8Releases() {
       )
       .map((day: WeekDayProps) => day.d.toString()) ?? []
 
-  const prereleaseShipped = Date.parse(preRelease.publishedAt) <= Date.now()
+  // const prereleaseShipped = Date.parse(preRelease.publishedAt) <= Date.now()
+  const prereleaseShipped = true
   const day1Shipped = Date.parse(day1.publishedAt) <= Date.now()
   const day2Shipped = Date.parse(day2.publishedAt) <= Date.now()
   const day3Shipped = Date.parse(day3.publishedAt) <= Date.now()
@@ -201,7 +203,7 @@ export default function LW8Releases() {
             )}
           </SmallCard> */}
           <SmallCard>
-            <div className="relative flex-shrink flex items-center px-4 w-1/2 md:w-auto">
+            <div className="relative flex-shrink flex items-center p-2 w-1/2 md:w-auto">
               <div className="flex flex-col gap-1">
                 <span className="text-white">Twitter</span>
                 <span className="">Follow along and join daily Twitter Spaces</span>
@@ -215,20 +217,34 @@ export default function LW8Releases() {
               />
             </div>
           </SmallCard>
-          <SmallCard>
-            <div className="relative flex-shrink flex items-center px-4 w-1/2 md:w-auto">
-              <div className="flex flex-col gap-1">
-                <span className="text-white">LW8 Hackathon</span>
-                {/* <span className="">Follow along and join daily Twitter Spaces</span> */}
-              </div>
-            </div>
-            <div className="relative flex !aspect-video h-[80px] md:h-[100px] gap-2 z-10 rounded overflow-hidden">
-              <Image
-                src="/images/launchweek/8/twitter-spaces-preview.png"
-                layout="fill"
-                objectFit="cover"
-              />
-            </div>
+          <SmallCard className="hover:from-[#1C1C1C] hover:to-[#1C1C1C]">
+            <Link href="/blog/supabase-lw8-hackathon">
+              <a className="flex flex-row justify-between items-center w-full h-full">
+                <div className="relative h-full flex-shrink flex flex-col md:flex-row md:items-center p-2 w-1/2 md:w-auto gap-1 md:gap-4">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-white">LW8 Hackathon</span>
+                    {/* <span className="">Follow along and join daily Twitter Spaces</span> */}
+                  </div>
+                </div>
+                <div className="relative flex !aspect-video h-[80px] md:h-[100px] gap-2 z-10 rounded overflow-hidden">
+                  <Image
+                    src="/images/launchweek/8/twitter-spaces-preview.png"
+                    layout="fill"
+                    objectFit="cover"
+                  />
+                </div>
+                {/* <div
+                  className={[
+                    'flex min-w-[20px] opacity-50 h-full items-center',
+                    isHackathonLive && 'opacity-pulse',
+                  ].join(' ')}
+                >
+                  <Badge color="purple" size="small">
+                    Started
+                  </Badge>
+                </div> */}
+              </a>
+            </Link>
           </SmallCard>
         </div>
       </SectionContainer>
