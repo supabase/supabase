@@ -1,29 +1,26 @@
-import { useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Command_Shadcn_,
-  Form,
-  IconCheck,
-  IconCode,
-  Listbox,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  IconExternalLink,
+  IconGitBranch,
+  IconSearch,
+  Input,
   SidePanel,
 } from 'ui'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import NoSearchResults from 'components/ui/NoSearchResults'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
+import { useBranchesQuery } from 'data/branches/branches-query'
 import { useGithubBranchesQuery } from 'data/integrations/integrations-github-branches-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
+import Link from 'next/link'
 
 interface CreateBranchSidePanelProps {
   visible: boolean
@@ -35,20 +32,23 @@ interface CreateBranchSidePanelProps {
 const CreateBranchSidePanel = ({ visible, onClose }: CreateBranchSidePanelProps) => {
   const { ui } = useStore()
   const { ref } = useParams()
-  const submitRef: any = useRef()
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
 
-  const [open, setOpen] = useState(false)
-  const [selectedBranch, setSelectedBranch] = useState('---')
+  const [searchValue, setSearchValue] = useState('')
+  const [selectedBranch, setSelectedBranch] = useState<string>()
+
+  useEffect(() => {
+    if (visible) {
+      setSelectedBranch(undefined)
+    }
+  }, [visible])
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const projectRef =
     projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
 
-  const formId = 'create-branch-form'
-  const initialValues = { gitBranch: 'no-selection' }
-
+  const { data: branches } = useBranchesQuery({ projectRef })
   const {
     data: integrations,
     error: integrationsError,
@@ -76,6 +76,10 @@ const CreateBranchSidePanel = ({ visible, onClose }: CreateBranchSidePanelProps)
     repoOwner,
     repoName,
   })
+  const branchOptions =
+    searchValue.length > 0
+      ? (githubBranches || [])?.filter((branch) => branch.name.includes(searchValue))
+      : githubBranches || []
 
   const { mutate: createBranch, isLoading: isCreating } = useBranchCreateMutation({
     onSuccess: () => {
@@ -84,183 +88,120 @@ const CreateBranchSidePanel = ({ visible, onClose }: CreateBranchSidePanelProps)
     },
   })
 
-  const validate = (values: any) => {
-    const errors: any = {}
-    if (values.gitBranch.length === 0 || values.gitBranch === 'no-selection')
-      errors.gitBranch = 'Please select a Git branch to link to this preview branch'
-    return errors
-  }
-
-  const onConfirmCreate = (values: any) => {
+  const onCreateBranch = (branch: string) => {
     if (!projectRef) return console.error('Project ref is required')
-    createBranch({ projectRef, ...values, branchName: values.gitBranch })
+    setSelectedBranch(branch)
+    createBranch({ projectRef, branchName: branch, gitBranch: branch })
   }
 
   return (
     <SidePanel
+      hideFooter
+      size="large"
       visible={visible}
       loading={isCreating}
       onCancel={onClose}
-      onConfirm={() => {}}
       header="Create a new database preview branch"
     >
-      <div className="py-6">
+      <div className="py-6 space-y-4 ">
         <SidePanel.Content>
-          {(isLoadingIntegrations || isLoadingBranches) && (
+          {isLoadingIntegrations && <GenericSkeletonLoader />}
+          {isSuccessIntegrations && (
             <div>
-              <p className="text-sm prose mb-2">
-                Select a Git branch to create a database preview from
+              <p className="text-sm text-scale-1100">
+                Your project is currently connected to the repository:
               </p>
-              <ShimmeringLoader className="py-4" />
+              <div className="flex items-center space-x-2">
+                <p>{repositoryMeta?.metadata.name}</p>
+                <Link passHref href={`https://github.com/${repoOwner}/${repoName}`}>
+                  <a target="_blank" rel="noreferrer">
+                    <IconExternalLink size={14} strokeWidth={1.5} />
+                  </a>
+                </Link>
+              </div>
             </div>
           )}
-          {(isErrorIntegrations || isErrorBranches) && (
-            <AlertError
-              error={integrationsError || githubBranchesError}
-              subject="Failed to retrieve Github branches"
-            />
-          )}
-          {isSuccessIntegrations && isSuccessBranches && (
-            <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-              <PopoverTrigger_Shadcn_ asChild>
-                <div className="space-y-2">
-                  <p className="text-sm prose mb-2">
-                    Select a Git branch to create a database preview from
-                  </p>
-                  <div className="bg-surface-200 border border-scale-700 w-full py-2 rounded-md h-[38px] flex items-center justify-between px-4">
-                    <p className="text-sm">{selectedBranch}</p>
-                    <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />
-                  </div>
-                </div>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
-                <Command_Shadcn_>
-                  <CommandInput_Shadcn_ placeholder="Find branch..." />
-                  <CommandList_Shadcn_>
-                    <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>
-                    <CommandGroup_Shadcn_>
-                      {githubBranches?.map((branch) => {
-                        return (
-                          <CommandItem_Shadcn_
-                            asChild
-                            key={branch.name}
-                            value={branch.name}
-                            className="cursor-pointer w-full flex items-center justify-between"
-                            onSelect={() => {
-                              setSelectedBranch(branch.name)
-                              setOpen(false)
-                            }}
-                            onClick={() => {
-                              setSelectedBranch(branch.name)
-                              setOpen(false)
-                            }}
-                          >
-                            <div className="w-full flex items-center justify-between">
-                              {branch.name}
-                              {branch.name === selectedBranch && <IconCheck />}
-                            </div>
-                          </CommandItem_Shadcn_>
-                        )
-                      })}
-                    </CommandGroup_Shadcn_>
-                  </CommandList_Shadcn_>
-                </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
-          )}
         </SidePanel.Content>
-      </div>
-    </SidePanel>
-  )
 
-  return (
-    <SidePanel
-      visible={visible}
-      loading={isCreating}
-      onCancel={onClose}
-      header="Create a new database preview branch"
-      customFooter={
-        <div className="flex w-full justify-end space-x-3 border-t border-scale-500 px-3 py-4">
-          <Button
-            size="tiny"
-            type="default"
-            htmlType="button"
-            onClick={onClose}
-            disabled={isCreating}
-          >
-            Cancel
-          </Button>
-          <Button
-            size="tiny"
-            type="primary"
-            htmlType="button"
-            disabled={isCreating}
-            loading={isCreating}
-            onClick={() => submitRef?.current?.click()}
-          >
-            Confirm
-          </Button>
-        </div>
-      }
-    >
-      <div className="py-6">
+        <SidePanel.Separator />
+
         <SidePanel.Content>
-          <Form
-            validateOnBlur
-            id={formId}
-            initialValues={initialValues}
-            validate={validate}
-            onSubmit={onConfirmCreate}
-          >
-            {() => {
-              return (
-                <div className="space-y-6">
-                  {(isLoadingIntegrations || isLoadingBranches) && (
-                    <div>
-                      <p className="text-sm prose mb-2">
-                        Select a Git branch to create a database preview from
-                      </p>
-                      <ShimmeringLoader className="py-4" />
-                    </div>
-                  )}
-                  {(isErrorIntegrations || isErrorBranches) && (
-                    <AlertError
-                      error={integrationsError || githubBranchesError}
-                      subject="Failed to retrieve Github branches"
-                    />
-                  )}
-                  {isSuccessIntegrations && isSuccessBranches && (
-                    <Listbox
-                      size="medium"
-                      id="gitBranch"
-                      name="gitBranch"
-                      label="Select a Git branch to create a database preview from"
-                    >
-                      <Listbox.Option
-                        label="---"
-                        key="no-selection"
-                        id="no-selection"
-                        value="no-selection"
+          <div>
+            <p className="text-sm prose mb-2">
+              Select a Git branch to create a database preview from
+            </p>
+            {(isLoadingIntegrations || isLoadingBranches) && <GenericSkeletonLoader />}
+            {(isErrorIntegrations || isErrorBranches) && (
+              <AlertError
+                error={integrationsError || githubBranchesError}
+                subject="Failed to retrieve Github branches"
+              />
+            )}
+            {isSuccessIntegrations && isSuccessBranches && (
+              <>
+                <Input
+                  placeholder="Search branch..."
+                  className="mb-3"
+                  value={searchValue}
+                  icon={<IconSearch />}
+                  onChange={(event) => setSearchValue(event.target.value)}
+                />
+                {branchOptions.length === 0 && searchValue.length === 0 && (
+                  <Alert_Shadcn_ variant="default" className="!pl-4">
+                    <AlertTitle_Shadcn_>No branches available in repository</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      <p>Create a branch in the {repoName} repository on Github first</p>
+                      <Link passHref href={`https://github.com/${repoOwner}/${repoName}`}>
+                        <a target="_blank" rel="noreferrer">
+                          <Button type="default" iconRight={<IconExternalLink />} className="mt-2">
+                            Create a new branch on Github
+                          </Button>
+                        </a>
+                      </Link>
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
+                {branchOptions.length === 0 && searchValue.length > 0 && (
+                  <NoSearchResults
+                    searchString={searchValue}
+                    onResetFilter={() => setSearchValue('')}
+                  />
+                )}
+                <div className="[&>*:first-child]:rounded-t-md">
+                  {branchOptions?.map((branch) => {
+                    const alreadyHasDatabaseBranch =
+                      branches?.some((b) => b.git_branch === branch.name) ?? false
+                    return (
+                      <div
+                        key={branch.name}
+                        className="px-6 py-4 bg-surface-200 last:rounded-b-md border border-b-0 last:border-b"
                       >
-                        ---
-                      </Listbox.Option>
-                      {githubBranches?.map((branch) => (
-                        <Listbox.Option
-                          key={branch.name}
-                          id={branch.name}
-                          value={branch.name}
-                          label={branch.name}
-                        >
-                          <p className="text-scale-1200">{branch.name}</p>
-                        </Listbox.Option>
-                      ))}
-                    </Listbox>
-                  )}
-                  <button ref={submitRef} type="submit" className="hidden" />
+                        <div className="w-full flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <IconGitBranch size={14} strokeWidth={1.5} />
+                            <p className="text-sm">{branch.name}</p>
+                          </div>
+                          <Button
+                            type="default"
+                            loading={isCreating}
+                            disabled={isCreating || alreadyHasDatabaseBranch}
+                            onClick={() => onCreateBranch(branch.name)}
+                            className={
+                              selectedBranch !== undefined && selectedBranch !== branch.name
+                                ? 'opacity-0'
+                                : ''
+                            }
+                          >
+                            {alreadyHasDatabaseBranch ? 'Branch already created' : 'Create branch'}
+                          </Button>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
-              )
-            }}
-          </Form>
+              </>
+            )}
+          </div>
         </SidePanel.Content>
       </div>
     </SidePanel>

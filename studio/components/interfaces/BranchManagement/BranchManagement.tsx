@@ -100,7 +100,7 @@ const BranchManagement = () => {
         confirmLabel={`Delete branch`}
         confirmPlaceholder="Type in name of branch"
         confirmString={selectedBranchToDelete?.name ?? ''}
-        text={`This will delete your branch "${selectedBranchToDelete?.name}"`}
+        text={`This will delete your database preview branch "${selectedBranchToDelete?.name}"`}
         alert="You cannot recover this branch once it is deleted!"
       />
 
