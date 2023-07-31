@@ -5,10 +5,11 @@ import CostControl from './CostControl/CostControl'
 import SubscriptionTier from './Tier/SubscriptionTier'
 import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { useSelectedOrganization } from 'hooks'
+import { useEffect } from 'react'
 
-export interface SubscriptionProps {}
+export interface SubscriptionProps { }
 
-const Subscription = ({}: SubscriptionProps) => {
+const Subscription = ({ }: SubscriptionProps) => {
   const router = useRouter()
   const organization = useSelectedOrganization()
   const snap = useSubscriptionPageStateSnapshot()
@@ -23,12 +24,14 @@ const Subscription = ({}: SubscriptionProps) => {
   const panel = router.query.panel
   const isOrgBilling = !!organization?.subscription_id
 
+  useEffect(() => {
+    if (panel && typeof panel === 'string' && allowedValues.includes(panel)) {
+      snap.setPanelKey(panel as SUBSCRIPTION_PANEL_KEYS)
+    }
+  }, [panel])
+
   // No need to bother rendering, we'll redirect anyway
   if (isOrgBilling) return null
-
-  if (panel && typeof panel === 'string' && allowedValues.includes(panel)) {
-    snap.setPanelKey(panel as SUBSCRIPTION_PANEL_KEYS)
-  }
 
   return (
     <>
