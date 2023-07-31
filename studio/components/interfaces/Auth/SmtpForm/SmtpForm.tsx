@@ -217,6 +217,7 @@ const SmtpForm = () => {
                       <a
                         href="https://supabase.com/docs/guides/platform/going-into-prod#auth-rate-limits"
                         className="underline"
+                        target="_blank"                 
                       >
                         documentation
                       </a>{' '}
