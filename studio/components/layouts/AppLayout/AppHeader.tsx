@@ -19,8 +19,6 @@ const AppHeader = () => {
   const organization = useSelectedOrganization()
   const enableBranchManagement = useFlag('branchManagement')
 
-  console.log(activeRoute)
-
   return (
     <div className="px-8 py-1 bg-scale-200 border-b">
       <div className="flex items-center justify-between">
