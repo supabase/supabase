@@ -49,7 +49,7 @@ export async function getStaticProps() {
     },
     {
       login: 'lyqht',
-      avatar_url: 'https://pbs.twimg.com/profile_images/1589662526941253632/s1cu3vuD_400x400.jpg',
+      avatar_url: 'https://pbs.twimg.com/profile_images/1665778877837504514/4SWgLpjA_400x400.png',
       html_url: 'https://twitter.com/estee_tey',
     },
     {

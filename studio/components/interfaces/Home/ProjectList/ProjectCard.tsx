@@ -24,7 +24,7 @@ const ProjectCard = ({ project, rewriteHref }: ProjectCardProps) => {
   const isRestoring = project.status === PROJECT_STATUS.RESTORING
 
   return (
-    <li className="col-span-1">
+    <li className="col-span-1 list-none">
       <CardButton
         linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
         title={

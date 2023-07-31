@@ -1,25 +1,24 @@
 import { keyBy } from 'lodash'
 import { useCallback, useMemo } from 'react'
+import { toast } from 'react-hot-toast'
 
 import { useParams } from 'common'
+import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
 import ProjectLinker, { ForeignProject } from 'components/interfaces/Integrations/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
 import { VercelIntegrationLayout } from 'components/layouts'
-import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import { ScaffoldColumn, ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import { vercelIcon } from 'components/to-be-cleaned/ListIcons'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
-
 import { NextPageWithLayout, Organization } from 'types'
 import { IconBook, IconLifeBuoy, LoadingLine } from 'ui'
-import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
-import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
-import { toast } from 'react-hot-toast'
 
 const VERCEL_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 512 512" className="w-6">
@@ -52,9 +51,11 @@ const VercelIntegration: NextPageWithLayout = () => {
       x.metadata?.configuration_id === configurationId
   )
 
-  const { data: supabaseProjectsData } = useProjectsQuery({
-    enabled: integration?.id !== undefined,
-  })
+  const { data: supabaseProjectsData, isLoading: isLoadingSupabaseProjectsData } = useProjectsQuery(
+    {
+      enabled: integration?.id !== undefined,
+    }
+  )
 
   const supabaseProjects = useMemo(
     () =>
@@ -65,12 +66,13 @@ const VercelIntegration: NextPageWithLayout = () => {
     [organization?.id, supabaseProjectsData]
   )
 
-  const { data: vercelProjectsData } = useVercelProjectsQuery(
-    {
-      organization_integration_id: integration?.id,
-    },
-    { enabled: integration?.id !== undefined }
-  )
+  const { data: vercelProjectsData, isLoading: isLoadingVercelProjectsData } =
+    useVercelProjectsQuery(
+      {
+        organization_integration_id: integration?.id,
+      },
+      { enabled: integration?.id !== undefined }
+    )
 
   const vercelProjects = useMemo(() => vercelProjectsData ?? EMPTY_ARR, [vercelProjectsData])
   const vercelProjectsById = useMemo(() => keyBy(vercelProjects, 'id'), [vercelProjects])
@@ -131,39 +133,43 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   return (
     <>
+      <LoadingLine loading={isCreatingConnection} />
       <main className="overflow-auto flex flex-col h-full">
-        <LoadingLine loading={isCreatingConnection} />
         <>
           <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
-            <header>
-              <h1 className="text-xl text-scale-1200">
-                Link a Supabase project to a Vercel project
-              </h1>
-              <Markdown
-                className="text-scale-900"
-                content={`
+            <ScaffoldColumn className="!max-w-[900px] mx-auto w-full">
+              <header>
+                <h1 className="text-xl text-scale-1200">
+                  Link a Supabase project to a Vercel project
+                </h1>
+                <Markdown
+                  className="text-scale-900"
+                  content={`
 This Supabase integration manages your environment variables automatically to provide the latest keys in the unlikely event that you will need to refresh your JWT token.
 `}
+                />
+              </header>
+
+              <ProjectLinker
+                organizationIntegrationId={integration?.id}
+                foreignProjects={vercelProjects}
+                supabaseProjects={supabaseProjects}
+                onCreateConnections={onCreateConnections}
+                installedConnections={integration?.connections}
+                isLoading={isCreatingConnection}
+                integrationIcon={VERCEL_ICON}
+                getForeignProjectIcon={getForeignProjectIcon}
+                choosePrompt="Choose Vercel Project"
+                onSkip={() => {
+                  if (next) {
+                    window.location.href = next
+                  }
+                }}
+                loadingForeignProjects={isLoadingVercelProjectsData}
+                loadingSupabaseProjects={isLoadingSupabaseProjectsData}
               />
-            </header>
-            <ProjectLinker
-              organizationIntegrationId={integration?.id}
-              foreignProjects={vercelProjects}
-              supabaseProjects={supabaseProjects}
-              onCreateConnections={onCreateConnections}
-              installedConnections={integration?.connections}
-              isLoading={isCreatingConnection}
-              integrationIcon={VERCEL_ICON}
-              getForeignProjectIcon={getForeignProjectIcon}
-              choosePrompt="Choose Vercel Project"
-              onSkip={() => {
-                if (next) {
-                  window.location.href = next
-                }
-              }}
-            />
-            <Markdown
-              content={`
+              <Markdown
+                content={`
 The following environment variables will be added:
 
 ${ENV_VAR_RAW_KEYS.map((x) => {
@@ -173,7 +179,8 @@ ${ENV_VAR_RAW_KEYS.map((x) => {
 `
 })}
 `}
-            />
+              />
+            </ScaffoldColumn>
           </ScaffoldContainer>
         </>
 

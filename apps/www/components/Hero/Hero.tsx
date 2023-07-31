@@ -3,21 +3,17 @@ import { useRouter } from 'next/router'
 import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import gaEvents from '~/lib/gaEvents'
-import { Badge, Button, IconArrowRight, IconBookOpen } from 'ui'
+import { Button, IconArrowRight, IconBookOpen } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import HeroFrameworks from './HeroFrameworks'
 import styles from './hero.module.css'
 import Image from 'next/image'
-import { range } from 'lodash'
-import ParticlesCanvas from '../LaunchWeek/8/AnimatedParticles/ParticlesCanvas'
-import { useBreakpoint } from 'common'
 import { useEffect, useState } from 'react'
 
 const Hero = () => {
   const router = useRouter()
   const [showAnnouncement, setShowAnnouncement] = useState(false)
   const telemetryProps = useTelemetryProps()
-  const isMobile = useBreakpoint()
   const sendTelemetryEvent = async (event: TelemetryEvent) => {
     await Telemetry.sendEvent(event, telemetryProps, router)
   }
@@ -46,9 +42,9 @@ const Hero = () => {
                     <Link href="/launch-week">
                       <a className="group w-auto rounded-full p-1 mb-6 mt-8 md:mb-10 bg-gradient-to-b from-[#1b1f2124] to-[#02040550] hover:from-[#ffffff15] hover:to-[#ffffff05] transition-all backdrop-blur-lg border flex items-center justify-between gap-2 md:gap-4 text-scale-1100 hover:text-scale-1200 text-sm">
                         <div className="text-scale-200 rounded-full bg-brand-900 px-3 py-1 flex items-center justify-center">
-                          Get you ticket
+                          Get your ticket
                         </div>
-                        <span>Launch Week 8 - August 7th</span>
+                        <span>Launch Week 8 - August 7-11</span>
                         <IconArrowRight
                           size={16}
                           className="transform mr-2 transition-transform translate-x-0 sm:-translate-x-1 group-hover:translate-x-0"
@@ -97,23 +93,34 @@ const Hero = () => {
             </div>
           </div>
         </div>
-        <div className="absolute -top-2 md:top-0 -left-10 -right-10 md:left-0 md:right-0 h-[500px] lg:h-[550px] z-0">
-          <ParticlesCanvas users={range(0, 60)} />
-          <Image
-            src="/images/launchweek/8/stars.svg"
-            alt="starts background"
-            layout="fill"
-            objectFit="cover"
-            className="opacity-70"
-            draggable={false}
-          />
+        <div className="absolute -top-2 md:top-0 -left-10 -right-10 md:left-0 md:right-0 h-[500px] lg:h-[550px] z-0 flex items-center justify-center">
+          <div className="relative w-full aspect-[1.65/1] mb-14 max-w-sm md:max-w-md opacity-0 !animate-[fadeIn_0.5s_cubic-bezier(0.25,0.25,0,1)_0.5s_both]">
+            <Image
+              src="/images/launchweek/8/lw8-visual.png"
+              alt="launch week 8 shape"
+              layout="fill"
+              objectFit="contain"
+              quality={100}
+              draggable={false}
+            />
+          </div>
+          <div className="absolute inset-0">
+            <Image
+              src="/images/launchweek/8/stars.svg"
+              alt="stars background"
+              layout="fill"
+              objectFit="cover"
+              className="opacity-70"
+              draggable={false}
+            />
+          </div>
         </div>
       </SectionContainer>
-      <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0">
+      <div className="absolute w-full max-w-[1600px] mx-auto h-[500px] lg:h-[750px] inset-0 z-0">
         <Image
           src="/images/launchweek/8/LW8-gradient.png"
           layout="fill"
-          objectFit={isMobile ? 'cover' : 'contain'}
+          objectFit="cover"
           objectPosition="top"
           priority
           draggable={false}
