@@ -3098,9 +3098,10 @@ functions:
           function()
           //invoke it with a body:
           function(body)
-          //invoke it with custom headers:
+          //invoke it with custom http options:
           function(body) {
-              set("Header", "Value")
+              header("Header", "Value")
+              parameter("Key", "Value") //url parameter
           }
           ```
   - id: subscribe
