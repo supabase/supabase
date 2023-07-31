@@ -35,6 +35,7 @@ const ConnectionPooling = () => {
     'pool_mode',
     'pgbouncer_enabled',
     'max_client_conn',
+    'connectionString',
   ]
   const bouncerInfo = isSuccess ? pluckObjectFields(formModel, BOUNCER_FIELDS) : {}
 
@@ -107,6 +108,7 @@ interface ConfigProps {
     pool_mode: string
     pgbouncer_enabled: boolean
     max_client_conn: number
+    connectionString: string
   }
   connectionInfo: {
     db_host: string
@@ -256,11 +258,7 @@ export const PgbouncerConfig: FC<ConfigProps> = ({ projectRef, bouncerInfo, conn
             copy
             disabled
             label="Connection string"
-            value={
-              `postgres://${connectionInfo.db_user}:[YOUR-PASSWORD]@` +
-              `${connectionInfo.db_host}:${connectionInfo.db_port}` +
-              `/${connectionInfo.db_name}`
-            }
+            value={bouncerInfo.connectionString}
           />
         </div>
       </SchemaFormPanel>
