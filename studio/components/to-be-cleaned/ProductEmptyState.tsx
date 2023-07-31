@@ -39,7 +39,7 @@ const ProductEmptyState: FC<Props> = ({
               <div className="flex items-center space-x-2">
                 {ctaButtonLabel && onClickCta && (
                   <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger>
+                    <Tooltip.Trigger asChild>
                       <Button type="primary" onClick={onClickCta} disabled={disabled}>
                         {ctaButtonLabel}
                       </Button>

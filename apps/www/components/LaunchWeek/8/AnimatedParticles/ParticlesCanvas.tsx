@@ -19,7 +19,7 @@ const ParticlesCanvas = ({ supabase, users }: { supabase?: SupabaseClient; users
   > | null>(null)
 
   const loadUsers = async () => {
-    return await supabase!.from('lw8_tickets_golden').select('id, golden', { count: 'exact' })
+    return await supabase!.from('lw8_tickets_golden').select('username, golden', { count: 'exact' })
   }
 
   // Update particles live when new tickets are generated
@@ -119,7 +119,7 @@ const ParticlesCanvas = ({ supabase, users }: { supabase?: SupabaseClient; users
             config={config}
             animate={animate}
           >
-            {(!!user.id && user.golden) || (config.showGold && Math.random() <= 0.5) ? (
+            {config.showGold && Math.random() <= 0.5 ? (
               <>
                 <GoldGeometry />
                 <GoldMaterial />

@@ -35,7 +35,7 @@ const HandleIcon = ({ type, className }: { type: HandleIconType; className?: str
           viewBox="0 0 512 512"
           className={cn('w-3.5', className)}
         >
-          <path fill-rule="evenodd" d="M256,48,496,464H16Z" />
+          <path fillRule="evenodd" d="M256,48,496,464H16Z" />
         </svg>
       )
 
@@ -79,7 +79,7 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
       <li
         ref={ref}
         key={integration.id}
-        className="bg border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg"
+        className="bg-surface-100 border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg"
         {...props}
       >
         <div className="flex gap-6 items-center">
@@ -146,7 +146,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
         className={cn('ml-6 pl-8 pb-2 border-l border-scale-600 dark:border-scale-400', 'relative')}
       >
         <div className="absolute w-8 rounded-bl-full border-b border-l border-scale-600 dark:border-scale-400 h-10 -left-px"></div>
-        <div className="bg border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg">
+        <div className="bg-surface-100 border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg">
           <div className="flex flex-col gap-1">
             <div className="flex gap-2 items-center">
               <HandleIcon type={'Supabase'} />
@@ -194,7 +194,9 @@ const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationC
         ref={ref}
         key={connection.id}
         {...props}
-        className={cn('bg border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg')}
+        className={cn(
+          'bg-surface-100 border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg'
+        )}
       >
         <div className="flex flex-col gap-1">
           <div className="flex gap-2 items-center">

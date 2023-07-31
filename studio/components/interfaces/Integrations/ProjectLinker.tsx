@@ -1,10 +1,23 @@
-import { ReactNode, useState } from 'react'
+import { ReactNode, useRef, useState } from 'react'
 
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { IntegrationConnectionsCreateVariables } from 'data/integrations/types'
 import { useSelectedOrganization } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import { Button, Listbox, cn } from 'ui'
+import {
+  Button,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  Command_Shadcn_,
+  IconChevronDown,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  cn,
+} from 'ui'
 
 export interface Project {
   id: string
@@ -28,9 +41,9 @@ export interface ProjectLinkerProps {
   getForeignProjectIcon?: (project: ForeignProject) => ReactNode
   choosePrompt?: string
   onSkip?: () => void
+  loadingForeignProjects?: boolean
+  loadingSupabaseProjects?: boolean
 }
-
-const UNDEFINED_SELECT_VALUE = 'undefined'
 
 const ProjectLinker = ({
   organizationIntegrationId,
@@ -43,25 +56,47 @@ const ProjectLinker = ({
   getForeignProjectIcon,
   choosePrompt = 'Choose a project',
   onSkip,
+  loadingForeignProjects,
+  loadingSupabaseProjects,
 }: ProjectLinkerProps) => {
+  const [supabaseProjectsComboBoxOpen, setSupabaseProjectsComboboxOpen] = useState(false)
+  const [foreignProjectsComboBoxOpen, setForeignProjectsComboboxOpen] = useState(false)
+  const supabaseProjectsComboBoxRef = useRef<HTMLButtonElement>(null)
+  const foreignProjectsComboBoxRef = useRef<HTMLButtonElement>(null)
+
   const selectedOrganization = useSelectedOrganization()
 
-  const [supabaseProjectRef, setSupabaseProjectRef] = useState(UNDEFINED_SELECT_VALUE)
-  const [foreignProjectId, setForeignProjectId] = useState(UNDEFINED_SELECT_VALUE)
+  const [supabaseProjectRef, setSupabaseProjectRef] = useState<string | undefined>(undefined)
+  const [foreignProjectId, setForeignProjectId] = useState<string | undefined>(undefined)
+
+  // create a flat array of foreign project ids. ie, ["prj_MlkO6AiLG5ofS9ojKrkS3PhhlY3f", ..]
+  const flatInstalledConnectionsIds = new Set(installedConnections.map((x) => x.foreign_project_id))
+
+  // check that foreign project is not already installed
+  const filteredForeignProjects = foreignProjects.filter((foreignProject) => {
+    return !flatInstalledConnectionsIds.has(foreignProject.id)
+  })
+
+  const selectedSupabaseProject = supabaseProjectRef
+    ? supabaseProjects.find((x) => x.ref?.toLowerCase() === supabaseProjectRef?.toLowerCase())
+    : undefined
+
+  const selectedForeignProject = foreignProjectId
+    ? filteredForeignProjects.find((x) => x.id?.toLowerCase() === foreignProjectId?.toLowerCase())
+    : undefined
 
   function onCreateConnections() {
-    const projectDetails = foreignProjects.filter((x) => x.id === foreignProjectId)[0]
+    const projectDetails = selectedForeignProject
 
-    if (!organizationIntegrationId) {
-      console.error('No integration ID set')
-      return
-    }
+    if (!organizationIntegrationId) return console.error('No integration ID set')
+    if (!selectedForeignProject?.id) return console.error('No Foreign project ID set')
+    if (!selectedSupabaseProject?.ref) return console.error('No Supabase project ref set')
 
     _onCreateConnections({
       organizationIntegrationId,
       connection: {
-        foreign_project_id: foreignProjectId,
-        supabase_project_ref: supabaseProjectRef,
+        foreign_project_id: selectedForeignProject?.id,
+        supabase_project_ref: selectedSupabaseProject?.ref,
         metadata: {
           ...projectDetails,
         },
@@ -74,7 +109,7 @@ const ProjectLinker = ({
     return (
       <div
         className={cn(
-          'flex flex-col gap-6 px-5 mx-auto w-full justify-center items-center',
+          'flex flex-col grow gap-6 px-5 mx-auto w-full justify-center items-center',
           className
         )}
         {...props}
@@ -83,14 +118,6 @@ const ProjectLinker = ({
       </div>
     )
   }
-
-  // create a flat array of foreign project ids. ie, ["prj_MlkO6AiLG5ofS9ojKrkS3PhhlY3f", ..]
-  const flatInstalledConnectionsIds = new Set(installedConnections.map((x) => x.foreign_project_id))
-
-  // check that foreign project is not already installed
-  const filteredForeignProjects = foreignProjects.filter((foreignProject) => {
-    return !flatInstalledConnectionsIds.has(foreignProject.id)
-  })
 
   return (
     <div className="flex flex-col gap-4">
@@ -104,66 +131,149 @@ const ProjectLinker = ({
             <div className="bg-white shadow border rounded p-1 w-12 h-12 flex justify-center items-center">
               <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" className="w-6" />
             </div>
-            <Listbox
-              className="w-full"
-              value={supabaseProjectRef ?? UNDEFINED_SELECT_VALUE}
-              onChange={(e) => setSupabaseProjectRef(e)}
+
+            <Popover_Shadcn_
+              open={supabaseProjectsComboBoxOpen}
+              onOpenChange={setSupabaseProjectsComboboxOpen}
             >
-              <Listbox.Option value={UNDEFINED_SELECT_VALUE} label="Choose a project" disabled>
-                Choose project
-              </Listbox.Option>
-              {supabaseProjects.map((project) => (
-                <Listbox.Option
-                  key={project.id}
-                  value={project.ref}
-                  label={project.name}
-                  addOnBefore={() => {
-                    return (
-                      <>
-                        <div className="bg-white shadow border rounded p-1 w-6 h-6 flex justify-center items-center">
-                          <img
-                            src={`${BASE_PATH}/img/supabase-logo.svg`}
-                            alt="Supabase"
-                            className="w-4"
-                          />
-                        </div>
-                      </>
-                    )
-                  }}
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button
+                  ref={supabaseProjectsComboBoxRef}
+                  type="default"
+                  size="medium"
+                  block
+                  disabled={loadingSupabaseProjects}
+                  loading={loadingSupabaseProjects}
+                  className="justify-start"
+                  icon={
+                    <div className="bg-white shadow border rounded p-1 w-6 h-6 flex justify-center items-center">
+                      <img
+                        src={`${BASE_PATH}/img/supabase-logo.svg`}
+                        alt="Supabase"
+                        className="w-4"
+                      />
+                    </div>
+                  }
+                  iconRight={
+                    <span className="grow flex justify-end">
+                      <IconChevronDown className={''} />
+                    </span>
+                  }
                 >
-                  {project.name}
-                </Listbox.Option>
-              ))}
-            </Listbox>
+                  {selectedSupabaseProject ? selectedSupabaseProject.name : 'Choose Project'}
+                </Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_
+                className="p-0 w-full"
+                side="bottom"
+                align="center"
+                style={{ width: supabaseProjectsComboBoxRef.current?.offsetWidth }}
+              >
+                <Command_Shadcn_>
+                  <CommandInput_Shadcn_ placeholder="Search organization..." />
+                  <CommandList_Shadcn_ className="!max-h-[170px]">
+                    <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
+                    <CommandGroup_Shadcn_>
+                      {supabaseProjects.map((project) => {
+                        return (
+                          <CommandItem_Shadcn_
+                            value={project.ref}
+                            key={project.ref}
+                            className="flex gap-2 items-center"
+                            onSelect={(ref) => {
+                              if (ref) setSupabaseProjectRef(ref)
+                              setSupabaseProjectsComboboxOpen(false)
+                            }}
+                          >
+                            <div className="bg-white shadow border rounded p-1 w-6 h-6 flex justify-center items-center">
+                              <img
+                                src={`${BASE_PATH}/img/supabase-logo.svg`}
+                                alt="Supabase"
+                                className="w-4"
+                              />
+                            </div>
+                            <span>{project.name}</span>
+                          </CommandItem_Shadcn_>
+                        )
+                      })}
+                    </CommandGroup_Shadcn_>
+                  </CommandList_Shadcn_>
+                </Command_Shadcn_>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
           </Panel>
           <div className="border border-scale-1000 h-px w-16 border-dashed self-end mb-5"></div>
           <Panel>
             <div className="bg-black shadow rounded p-1 w-12 h-12 flex justify-center items-center">
-              {integrationIcon}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="white"
+                viewBox="0 0 512 512"
+                className="w-6"
+              >
+                <path fillRule="evenodd" d="M256,48,496,464H16Z" />
+              </svg>
             </div>
-            <Listbox
-              className="w-full"
-              value={foreignProjectId ?? UNDEFINED_SELECT_VALUE}
-              onChange={(e) => setForeignProjectId(e)}
+
+            <Popover_Shadcn_
+              open={foreignProjectsComboBoxOpen}
+              onOpenChange={setForeignProjectsComboboxOpen}
             >
-              <Listbox.Option value={UNDEFINED_SELECT_VALUE} label={choosePrompt} disabled>
-                {choosePrompt}
-              </Listbox.Option>
-              {filteredForeignProjects.map((project) => {
-                return (
-                  <Listbox.Option
-                    key={project.id}
-                    value={project.id}
-                    label={project.name}
-                    addOnBefore={() => {
-                      return getForeignProjectIcon?.(project) ?? null
-                    }}
-                  >
-                    {project.name}
-                  </Listbox.Option>
-                )
-              })}
-            </Listbox>
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button
+                  ref={foreignProjectsComboBoxRef}
+                  type="default"
+                  size="medium"
+                  block
+                  disabled={loadingForeignProjects}
+                  loading={loadingForeignProjects}
+                  className="justify-start"
+                  icon={
+                    selectedForeignProject
+                      ? getForeignProjectIcon?.(selectedForeignProject)
+                      : integrationIcon
+                  }
+                  iconRight={
+                    <span className="grow flex justify-end">
+                      <IconChevronDown className={''} />
+                    </span>
+                  }
+                >
+                  {(selectedForeignProject && selectedForeignProject.name) ?? choosePrompt}
+                </Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_
+                className="p-0 w-full"
+                side="bottom"
+                align="center"
+                style={{ width: foreignProjectsComboBoxRef.current?.offsetWidth }}
+              >
+                <Command_Shadcn_>
+                  <CommandInput_Shadcn_ placeholder="Search organization..." />
+                  <CommandList_Shadcn_ className="!max-h-[170px]">
+                    <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
+                    <CommandGroup_Shadcn_>
+                      {filteredForeignProjects.map((project) => {
+                        return (
+                          <CommandItem_Shadcn_
+                            value={project.id}
+                            key={project.id}
+                            className="flex gap-2 items-center"
+                            onSelect={(id) => {
+                              if (id) setForeignProjectId(id)
+                              setForeignProjectsComboboxOpen(false)
+                            }}
+                          >
+                            {getForeignProjectIcon?.(project) ?? integrationIcon}
+                            <span>{project.name}</span>
+                          </CommandItem_Shadcn_>
+                        )
+                      })}
+                    </CommandGroup_Shadcn_>
+                  </CommandList_Shadcn_>
+                </Command_Shadcn_>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
           </Panel>
         </div>
       </div>
@@ -184,7 +294,15 @@ const ProjectLinker = ({
           className="self-end"
           onClick={onCreateConnections}
           loading={isLoading}
-          disabled={isLoading}
+          disabled={
+            // data loading states
+            loadingForeignProjects ||
+            loadingSupabaseProjects ||
+            isLoading ||
+            // check wether both project types are not undefined
+            !selectedSupabaseProject ||
+            !selectedForeignProject
+          }
         >
           Connect project
         </Button>
