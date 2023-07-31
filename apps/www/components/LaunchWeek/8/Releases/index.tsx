@@ -161,7 +161,7 @@ export default function LW8Releases() {
     <>
       <SectionContainer className="!py-0 w-full !px-0 !max-w-none">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 scroll-mt-[105px]" id="hackathon">
-          <SmallCard className={[isHackathonLive && '!from-[#6F13A4] !to-[#A69DC920]'].join(' ')}>
+          {/* <SmallCard className={[isHackathonLive && '!from-[#6F13A4] !to-[#A69DC920]'].join(' ')}>
             <div className="relative z-10 flex items-center mb-4 sm:mb-0">
               <div
                 className={[
@@ -185,7 +185,7 @@ export default function LW8Releases() {
                 </svg>
               </div>
               <div className="flex flex-col lg:flex-row ml-2 sm:ml-4">
-                <span className="text-white mr-2">Supabase AI Hackathon</span>
+                <span className="text-white mr-2">Day 1</span>
               </div>
             </div>
             <div className="flex w-full sm:w-auto justify-center gap-2 z-10">
@@ -199,39 +199,35 @@ export default function LW8Releases() {
             {isHackathonLive && (
               <div className="absolute opacity-pulse inset-0 w-full h-full bg-gradient-to-b from-[#1C1C1C80] to-[#1C1C1C] rounded-2xl overflow-hidden shadow-lg pointer-events-none" />
             )}
-          </SmallCard>
+          </SmallCard> */}
           <SmallCard>
-            <div className="relative flex items-center mb-4 sm:mb-0">
-              <div className="flex min-w-[20px]">
-                <svg
-                  width="21"
-                  height="21"
-                  viewBox="0 0 21 21"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M5.91406 2.17188C6.46635 2.17188 6.91406 2.61959 6.91406 3.17188V4.17188H7.91406C8.46635 4.17188 8.91406 4.61959 8.91406 5.17188C8.91406 5.72416 8.46635 6.17188 7.91406 6.17188H6.91406V7.17188C6.91406 7.72416 6.46635 8.17188 5.91406 8.17188C5.36178 8.17188 4.91406 7.72416 4.91406 7.17188V6.17188H3.91406C3.36178 6.17188 2.91406 5.72416 2.91406 5.17188C2.91406 4.61959 3.36178 4.17188 3.91406 4.17188H4.91406V3.17188C4.91406 2.61959 5.36178 2.17188 5.91406 2.17188ZM5.91406 12.1719C6.46635 12.1719 6.91406 12.6196 6.91406 13.1719V14.1719H7.91406C8.46635 14.1719 8.91406 14.6196 8.91406 15.1719C8.91406 15.7242 8.46635 16.1719 7.91406 16.1719H6.91406V17.1719C6.91406 17.7242 6.46635 18.1719 5.91406 18.1719C5.36178 18.1719 4.91406 17.7242 4.91406 17.1719V16.1719H3.91406C3.36178 16.1719 2.91406 15.7242 2.91406 15.1719C2.91406 14.6196 3.36178 14.1719 3.91406 14.1719H4.91406V13.1719C4.91406 12.6196 5.36178 12.1719 5.91406 12.1719Z"
-                    fill="#F2F2F2"
-                  />
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M12.914 2.17188C13.3677 2.17188 13.7646 2.47736 13.8807 2.91598L15.0599 7.37081L18.4137 9.30569C18.7233 9.48428 18.914 9.8145 18.914 10.1719C18.914 10.5293 18.7233 10.8595 18.4137 11.0381L15.0599 12.9729L13.8807 17.4278C13.7646 17.8664 13.3677 18.1719 12.914 18.1719C12.4603 18.1719 12.0634 17.8664 11.9473 17.4278L10.7681 12.9729L7.41433 11.0381C7.10478 10.8595 6.91406 10.5293 6.91406 10.1719C6.91406 9.8145 7.10478 9.48428 7.41433 9.30569L10.7681 7.37081L11.9473 2.91598C12.0634 2.47736 12.4603 2.17188 12.914 2.17188Z"
-                    fill="#F2F2F2"
-                  />
-                </svg>
-              </div>
-              <div className="flex flex-col lg:flex-row ml-2 sm:ml-4">
-                <span className="text-white mr-2">Join the prize draw</span>
+            <div className="relative flex-shrink flex items-center px-4 w-1/2 md:w-auto">
+              <div className="flex flex-col gap-1">
+                <span className="text-white">Twitter</span>
+                <span className="">Follow along and join daily Twitter Spaces</span>
               </div>
             </div>
-            <div className="flex w-full sm:w-auto justify-center gap-2 z-10">
-              <ChipLink href="#lw-7-prizes" className="!pr-3 !justify-center">
-                More info
-              </ChipLink>
+            <div className="relative flex !aspect-video h-[80px] md:h-[100px] gap-2 z-10 rounded overflow-hidden">
+              <Image
+                src="/images/launchweek/8/twitter-spaces-preview.png"
+                layout="fill"
+                objectFit="cover"
+              />
+            </div>
+          </SmallCard>
+          <SmallCard>
+            <div className="relative flex-shrink flex items-center px-4 w-1/2 md:w-auto">
+              <div className="flex flex-col gap-1">
+                <span className="text-white">LW8 Hackathon</span>
+                {/* <span className="">Follow along and join daily Twitter Spaces</span> */}
+              </div>
+            </div>
+            <div className="relative flex !aspect-video h-[80px] md:h-[100px] gap-2 z-10 rounded overflow-hidden">
+              <Image
+                src="/images/launchweek/8/twitter-spaces-preview.png"
+                layout="fill"
+                objectFit="cover"
+              />
             </div>
           </SmallCard>
         </div>
@@ -265,7 +261,7 @@ export default function LW8Releases() {
               id={preRelease.d.toString()}
             >
               {preRelease.steps.length > 0 && (
-                <div className="h-[800px] lg:h-[400px] flex flex-col gap-5 lg:flex-row">
+                <div className="h-[800px] lg:h-[400px] flex flex-col gap-5 lg:flex-row pb-4">
                   <motion.div
                     className={`
                       relative overflow-hidden group/3 flex-1 flex flex-col items-center justify-between
@@ -418,7 +414,7 @@ export default function LW8Releases() {
               id={day1.d.toString()}
             >
               {day1.steps.length > 0 && (
-                <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
+                <div className="h-[400px] flex flex-col gap-5 lg:flex-row pb-8">
                   <motion.div
                     className={`
                       relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
@@ -492,7 +488,7 @@ export default function LW8Releases() {
               id={day2.d.toString()}
             >
               {day2.steps.length > 0 && (
-                <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
+                <div className="h-[400px] flex flex-col gap-5 lg:flex-row pb-8">
                   <motion.div
                     className={`
                       relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
@@ -566,7 +562,7 @@ export default function LW8Releases() {
               id={day3.d.toString()}
             >
               {day3.steps.length > 0 && (
-                <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
+                <div className="h-[400px] flex flex-col gap-5 lg:flex-row pb-8">
                   <motion.div
                     className={`
                       relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
@@ -640,7 +636,7 @@ export default function LW8Releases() {
               id={day4.d.toString()}
             >
               {day4.steps.length > 0 && (
-                <div className="h-[400px] flex flex-col gap-5 lg:flex-row">
+                <div className="h-[400px] flex flex-col gap-5 lg:flex-row pb-8">
                   <motion.div
                     className={`
                       relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
