@@ -4,11 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { useParams } from 'common/hooks'
 import { useStore } from 'hooks'
-import {
-  PRICING_TIER_PRODUCT_IDS,
-  TIME_PERIODS_INFRA,
-  USAGE_APPROACHING_THRESHOLD,
-} from 'lib/constants'
+import { TIME_PERIODS_INFRA, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { NextPageWithLayout } from 'types'
 import { Badge, Button, IconArrowRight, IconExternalLink } from 'ui'
@@ -20,6 +16,7 @@ import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import Panel from 'components/ui/Panel'
 import SparkBar from 'components/ui/SparkBar'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -45,6 +42,7 @@ const DatabaseUsage = observer(() => {
 
   const { ref: projectRef } = useParams()
   const { data: usage } = useProjectUsageQuery({ projectRef })
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
 
   const databaseSizeLimit = usage?.db_size?.limit ?? 0
   const databaseEgressLimit = usage?.db_egress?.limit ?? 0
@@ -75,9 +73,9 @@ const DatabaseUsage = observer(() => {
   const egressIsApproaching = databaseSizeUsageRatio >= USAGE_APPROACHING_THRESHOLD
   const egressIsExceeded = databaseSizeUsageRatio >= 1
 
-  const subscriptionTier = project?.subscription_tier
+  const subscriptionPlan = subscription?.plan?.id
 
-  const isPaidTier = subscriptionTier !== PRICING_TIER_PRODUCT_IDS.FREE
+  const isPaidTier = subscriptionPlan !== 'free'
 
   return (
     <>

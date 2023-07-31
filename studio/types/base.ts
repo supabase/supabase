@@ -22,6 +22,7 @@ export interface ProjectBase {
   region: string
   inserted_at: string
   subscription_id: string
+  preview_branch_refs: string[]
 }
 
 export interface Project extends ProjectBase {
@@ -30,8 +31,9 @@ export interface Project extends ProjectBase {
   dbVersion?: string
   kpsVersion?: string
   restUrl?: string
-  // store subscription tier products.metadata.supabase_prod_id
-  subscription_tier?: string
+  lastDatabaseResizeAt?: string | null
+  maxDatabasePreprovisionGb?: string | null
+  parent_project_ref?: string
 
   /**
    * postgrestStatus is available on client side only.
@@ -83,13 +85,10 @@ export interface ResponseFailure {
   error: ResponseError
 }
 
-// [Joshen] This should ideally be | but not changing now as its gonna cause a lot of build errors
-export type SupaResponse<T> = T & ResponseFailure
-// [Joshen] Use this for now, eventually deprecate SupaResponse<T> above
-export type SupaResponseV2<T> = T | ResponseFailure
+export type SupaResponse<T> = T | ResponseFailure
 
 export interface ResponseError {
-  code: number
+  code?: number
   message: string
-  requestId: string
+  requestId?: string
 }

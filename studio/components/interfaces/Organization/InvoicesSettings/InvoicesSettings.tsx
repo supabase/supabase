@@ -2,8 +2,8 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-import InvoiceStatusBadge from 'components/interfaces/Billing/InvoiceStatusBadge'
-import { Invoice, InvoiceStatus } from 'components/interfaces/Billing/Invoices.types'
+import { InvoiceStatusBadge } from 'components/interfaces/BillingV2'
+import { Invoice, InvoiceStatus } from 'components/interfaces/BillingV2/Invoices.types'
 import Table from 'components/to-be-cleaned/Table'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
@@ -69,7 +69,11 @@ const InvoicesSettings = () => {
     )
 
     if (invoices.error) {
-      ui.setNotification({ category: 'error', message: invoices.error.message })
+      ui.setNotification({
+        error: invoices.error,
+        category: 'error',
+        message: `Failed to fetch invoices: ${invoices.error.message}`,
+      })
     } else {
       setInvoices(invoices)
     }
@@ -83,8 +87,9 @@ const InvoicesSettings = () => {
       window.open(invoice.invoice_pdf, '_blank')
     } else {
       ui.setNotification({
+        error: invoice.error,
         category: 'info',
-        message: 'Unable to fetch the selected invoice',
+        message: `Unable to fetch the selected invoice: ${invoice.error.message}`,
       })
     }
   }

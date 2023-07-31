@@ -15,26 +15,24 @@ const DeletePaymentMethodModal = ({
 }: DeletePaymentMethodModalProps) => {
   const { ui } = useStore()
   const { slug } = useParams()
-  const { mutateAsync: deletePayment, isLoading: isDeleting } =
-    useOrganizationPaymentMethodDeleteMutation()
+
+  const { mutate: deletePayment, isLoading: isDeleting } =
+    useOrganizationPaymentMethodDeleteMutation({
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully removed payment method ending with ${
+            selectedPaymentMethod!.card.last4
+          }`,
+        })
+        onClose()
+      },
+    })
 
   const onConfirmDelete = async () => {
     if (!slug) return console.error('Slug is required')
     if (!selectedPaymentMethod) return console.error('Card ID is required')
-
-    try {
-      await deletePayment({ slug, cardId: selectedPaymentMethod.id })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully removed payment method ending with ${selectedPaymentMethod.card.last4}`,
-      })
-      onClose()
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete payment method: ${error.message}`,
-      })
-    }
+    deletePayment({ slug, cardId: selectedPaymentMethod.id })
   }
 
   return (
@@ -61,15 +59,8 @@ const DeletePaymentMethodModal = ({
     >
       <div className="py-4">
         <Modal.Content>
-          <Alert
-            withIcon
-            variant="warning"
-            title="This will permanently delete your payment method."
-          >
-            <p className="">
-              Any subscription currently charging this payment method will start charging your
-              default payment method.
-            </p>
+          <Alert withIcon variant="info" title="This will permanently delete your payment method.">
+            <p>You can re-add the payment method any time.</p>
           </Alert>
         </Modal.Content>
       </div>

@@ -81,6 +81,7 @@ const PROVIDER_PHONE = {
         { label: 'Messagebird', value: 'messagebird', icon: 'messagebird-icon.svg' },
         { label: 'Textlocal', value: 'textlocal', icon: 'textlocal-icon.png' },
         { label: 'Vonage', value: 'vonage', icon: 'vonage-icon.svg' },
+        { label: 'Twilio Verify', value: 'twilio_verify', icon: 'twilio-icon.svg' },
       ],
     },
     RATE_LIMIT_SMS_SENT: {
@@ -122,7 +123,7 @@ const PROVIDER_PHONE = {
       title: 'Twilio Account Sid',
       show: {
         key: 'SMS_PROVIDER',
-        matches: ['twilio-verify'],
+        matches: ['twilio_verify'],
       },
     },
     SMS_TWILIO_VERIFY_AUTH_TOKEN: {
@@ -131,15 +132,15 @@ const PROVIDER_PHONE = {
       isSecret: true,
       show: {
         key: 'SMS_PROVIDER',
-        matches: ['twilio-verify'],
+        matches: ['twilio_verify'],
       },
     },
     SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: {
       type: 'string',
-      title: 'Twilio Message Service Sid',
+      title: 'Twilio Verify Service Sid',
       show: {
         key: 'SMS_PROVIDER',
-        matches: ['twilio-verify'],
+        matches: ['twilio_verify'],
       },
     },
 
@@ -661,6 +662,44 @@ const EXTERNAL_PROVIDER_FACEBOOK = {
   }),
   misc: {
     iconKey: 'facebook-icon',
+    requiresRedirect: true,
+  },
+}
+
+const EXTERNAL_PROVIDER_FIGMA = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'Figma',
+  properties: {
+    EXTERNAL_FIGMA_ENABLED: {
+      title: 'Figma enabled',
+      type: 'boolean',
+    },
+    EXTERNAL_FIGMA_CLIENT_ID: {
+      title: 'Client ID',
+      type: 'string',
+    },
+    EXTERNAL_FIGMA_SECRET: {
+      title: 'Client Secret',
+      type: 'string',
+      isSecret: true,
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_FIGMA_ENABLED: boolean().required(),
+    EXTERNAL_FIGMA_CLIENT_ID: string().when('EXTERNAL_FIGMA_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client ID is required'),
+      otherwise: (schema) => schema,
+    }),
+    EXTERNAL_FIGMA_SECRET: string().when('EXTERNAL_FIGMA_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client Secret is required'),
+      otherwise: (schema) => schema,
+    }),
+  }),
+  misc: {
+    iconKey: 'figma-icon',
     requiresRedirect: true,
   },
 }
@@ -1282,6 +1321,7 @@ export const PROVIDERS_SCHEMAS = [
   EXTERNAL_PROVIDER_BITBUCKET,
   EXTERNAL_PROVIDER_DISCORD,
   EXTERNAL_PROVIDER_FACEBOOK,
+  EXTERNAL_PROVIDER_FIGMA,
   EXTERNAL_PROVIDER_GITHUB,
   EXTERNAL_PROVIDER_GITLAB,
   EXTERNAL_PROVIDER_GOOGLE,

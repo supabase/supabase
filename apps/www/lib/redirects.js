@@ -592,11 +592,6 @@ module.exports = [
   },
   {
     permanent: false,
-    source: '/partners',
-    destination: '/partners/integrations',
-  },
-  {
-    permanent: false,
     source: '/learn-more',
     destination: '/?utm_source=event&utm_medium=billboard&utm_campaign=aws-atlanta',
   },
@@ -1714,6 +1709,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/with-kotlin',
+    destination: '/docs/guides/getting-started/tutorials/with-kotlin',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/with-ionic-react',
     destination: '/docs/guides/getting-started/tutorials/with-ionic-react',
   },
@@ -1923,11 +1923,6 @@ module.exports = [
     source: '/docs/support',
     destination: '/support',
   },
-  {
-    permanent: true,
-    source: '/docs/guides/cli/local-development',
-    destination: '/docs/guides/getting-started/local-development',
-  },
 
   // old case studies moved to /customers
 
@@ -2060,5 +2055,195 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/database/extensions/pgrepack',
     destination: '/docs/guides/database/extensions/pg_repack',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/ai/structured-unstructured-embeddings',
+    destination: '/docs/guides/ai/structured-unstructured',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/ai/choosing-instance-type',
+    destination: '/docs/guides/ai/choosing-compute-addon',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/using-environment-variables-in-config',
+    destination: '/docs/guides/cli/managing-config',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/local-development',
+    destination: '/docs/guides/cli/local-development',
+  },
+  {
+    permanent: true,
+    source: '/blog/flutter-authentication-and-authorization-with-rls',
+    destination: '/blog/flutter-authorization-with-rls',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations',
+    destination: '/docs/guides/platform/marketplace',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/appsmith',
+    destination: '/partners/integrations/appsmith',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/auth0',
+    destination: '/partners/integrations/auth0',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/authsignal',
+    destination: '/partners/integrations/authsignal',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/bracket',
+    destination: '/partners/integrations/bracket',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/clerk',
+    destination: '/partners/integrations/clerk',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/cloudflare-workers',
+    destination: '/partners/integrations/cloudflare-workers',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/dhiwise',
+    destination: '/partners/integrations/dhiwise',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/directus',
+    destination: '/partners/integrations/directus',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/draftbit',
+    destination: '/partners/integrations/draftbit',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/estuary',
+    destination: '/partners/integrations/estuary',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/fezto',
+    destination: '/partners/integrations/fezto',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/flutterflow',
+    destination: '/partners/integrations/flutterflow',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/forestadmin',
+    destination: '/partners/integrations/forestadmin',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/illa',
+    destination: '/partners/integrations/illa',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/integrations',
+    destination: '/partners/integrations',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/keyri',
+    destination: '/partners/integrations/keyri',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/oauth-apps/authorize-an-oauth-app',
+    destination: '/docs/guides/platform/oauth-apps/authorize-an-oauth-app',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/oauth-apps/publish-an-oauth-app',
+    destination: '/docs/guides/platform/oauth-apps/publish-an-oauth-app',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/onesignal',
+    destination: '/partners/integrations/onesignal',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/passage',
+    destination: '/partners/integrations/passage',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/pgmustard',
+    destination: '/partners/integrations/pgmustard',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/picket',
+    destination: '/partners/integrations/picket',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/plasmic',
+    destination: '/partners/integrations/plasmic',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/polyscale',
+    destination: '/partners/integrations/polyscale',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/prisma',
+    destination: '/partners/integrations/prisma',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/sequin',
+    destination: '/partners/integrations/sequin',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/snaplet',
+    destination: '/partners/integrations/snaplet',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/stytch',
+    destination: '/partners/integrations/stytch',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/supertokens',
+    destination: '/partners/integrations/supertokens',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/vercel',
+    destination: '/partners/integrations/vercel',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/weweb',
+    destination: '/partners/integrations/weweb',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/zuplo',
+    destination: '/partners/integrations/zuplo',
   },
 ]

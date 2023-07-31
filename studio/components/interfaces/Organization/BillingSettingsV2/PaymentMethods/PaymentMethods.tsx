@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { AddNewPaymentMethodModal } from 'components/interfaces/Billing'
+import { AddNewPaymentMethodModal } from 'components/interfaces/BillingV2'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -57,10 +57,9 @@ const PaymentMethods = () => {
           <div className="sticky space-y-6 top-16">
             <div>
               <p className="text-base">Payment methods</p>
-              <p className="text-sm text-scale-1000 mb-2">
-                This copy might need to change, when adding a new payment method, either remove the
-                old one or go to your projects' subscription to explicitly update the payment
-                method.
+              <p className="text-sm text-scale-1000 mb-2 pr-4">
+                After adding a payment method, make sure to mark it as active to use it for billing.
+                You can remove unused cards.
               </p>
             </div>
           </div>

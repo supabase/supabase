@@ -1,5 +1,6 @@
 import React from 'react'
 import { useRouter } from 'next/router'
+import Image from 'next/image'
 
 const BackedBy = ({
   className,
@@ -23,26 +24,42 @@ const BackedBy = ({
       <small className="small text-xs">backed by</small>
       <div className="w-full sm:max-w-lg lg:ml-0">
         <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 sm:flex-nowrap">
-          <img
-            className="h-6 w-auto sm:h-8"
-            src={`${basePath}/images/logos/yc--grey.png`}
-            alt="Y Combinator"
-          />
-          <img
-            className="relative w-auto h-4 sm:h-5"
-            src={`${basePath}/images/logos/mozilla--grey.png`}
-            alt="Mozilla"
-          />
-          <img
-            className="relative w-auto h-4 sm:h-5"
-            src={`${basePath}/images/logos/coatue.png`}
-            alt="Coatue"
-          />
-          <img
-            className="relative w-auto h-5 sm:h-6"
-            src={`${basePath}/images/logos/felicis.png`}
-            alt="Felicis"
-          />
+          <div className="relative h-6 w-6 sm:h-8">
+            <Image
+              className=""
+              src={`${basePath}/images/logos/yc--grey.png`}
+              alt="Y Combinator"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          <div className="relative w-20 h-4 sm:h-5">
+            <Image
+              className=""
+              src={`${basePath}/images/logos/mozilla--grey.png`}
+              alt="Mozilla"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          <div className="relative w-20 h-4 sm:h-5">
+            <Image
+              className=""
+              src={`${basePath}/images/logos/coatue.png`}
+              alt="Coatue"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          <div className="relative w-20 h-5 sm:h-6">
+            <Image
+              className=""
+              src={`${basePath}/images/logos/felicis.png`}
+              alt="Felicis"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -1,7 +1,9 @@
+import { Badge, IconAlertTriangle, IconLoader, IconPauseCircle } from 'ui'
+
 import CardButton from 'components/ui/CardButton'
+import { useProjectReadOnlyStatus } from 'hooks/misc/useProjectReadOnlyStatus'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Project } from 'types'
-import { Badge, IconLoader, IconPauseCircle } from 'ui'
 
 export interface ProjectCardProps {
   project: Project
@@ -12,13 +14,17 @@ const ProjectCard = ({ project, rewriteHref }: ProjectCardProps) => {
   const { name, ref: projectRef } = project
   const desc = `${project.cloud_provider} | ${project.region}`
 
+  const isReadonly = useProjectReadOnlyStatus(projectRef)
+
+  // Project status should supersede is read only status
+  const isHealthy = project.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const isPausing =
     project.status === PROJECT_STATUS.GOING_DOWN || project.status === PROJECT_STATUS.PAUSING
   const isPaused = project.status === PROJECT_STATUS.INACTIVE
   const isRestoring = project.status === PROJECT_STATUS.RESTORING
 
   return (
-    <li className="col-span-1">
+    <li className="col-span-1 list-none">
       <CardButton
         linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
         title={
@@ -29,7 +35,19 @@ const ProjectCard = ({ project, rewriteHref }: ProjectCardProps) => {
         footer={
           <div className="flex items-end justify-between">
             <span className="text-sm lowercase text-scale-1000">{desc}</span>
-            {isRestoring ? (
+
+            {isHealthy && isReadonly && (
+              <div className="grow text-right">
+                <Badge color="yellow">
+                  <div className="flex items-center gap-2">
+                    <IconAlertTriangle size={14} strokeWidth={2} />
+                    <span className="truncate">Read-only mode</span>
+                  </div>
+                </Badge>
+              </div>
+            )}
+
+            {isRestoring && (
               <div className="grow text-right">
                 <Badge color="brand">
                   <div className="flex items-center gap-2">
@@ -38,7 +56,9 @@ const ProjectCard = ({ project, rewriteHref }: ProjectCardProps) => {
                   </div>
                 </Badge>
               </div>
-            ) : isPausing ? (
+            )}
+
+            {isPausing && (
               <div className="grow text-right">
                 <Badge color="scale">
                   <div className="flex items-center gap-2">
@@ -47,7 +67,9 @@ const ProjectCard = ({ project, rewriteHref }: ProjectCardProps) => {
                   </div>
                 </Badge>
               </div>
-            ) : isPaused ? (
+            )}
+
+            {isPaused && (
               <div className="grow text-right">
                 <Badge color="scale">
                   <div className="flex items-center gap-2">
@@ -56,8 +78,6 @@ const ProjectCard = ({ project, rewriteHref }: ProjectCardProps) => {
                   </div>
                 </Badge>
               </div>
-            ) : (
-              <></>
             )}
           </div>
         }

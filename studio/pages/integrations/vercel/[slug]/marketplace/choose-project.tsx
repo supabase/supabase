@@ -4,7 +4,7 @@ import { useParams } from 'common'
 import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
 import IntegrationWindowLayout from 'components/layouts/IntegrationWindowLayout'
-import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import { ScaffoldColumn, ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -35,9 +35,11 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   const integration = integrationData?.find((x) => x.metadata?.configuration_id === configurationId)
 
-  const { data: supabaseProjectsData } = useProjectsQuery({
-    enabled: integration?.id !== undefined,
-  })
+  const { data: supabaseProjectsData, isLoading: isLoadingSupabaseProjectsData } = useProjectsQuery(
+    {
+      enabled: integration?.id !== undefined,
+    }
+  )
 
   const supabaseProjects = useMemo(
     () =>
@@ -48,44 +50,50 @@ const VercelIntegration: NextPageWithLayout = () => {
     [organizationSlug, supabaseProjectsData]
   )
 
-  const { data: vercelProjectsData } = useVercelProjectsQuery(
-    {
-      organization_integration_id: integration?.id,
-    },
-    { enabled: integration?.id !== undefined }
-  )
+  const { data: vercelProjectsData, isLoading: isLoadingVercelProjectsData } =
+    useVercelProjectsQuery(
+      {
+        organization_integration_id: integration?.id,
+      },
+      { enabled: integration?.id !== undefined }
+    )
 
   const vercelProjects = useMemo(() => vercelProjectsData ?? EMPTY_ARR, [vercelProjectsData])
 
   return (
     <>
+      <LoadingLine loading={loading} />
       <main className="overflow-auto flex flex-col h-full">
-        <LoadingLine loading={loading} />
         <>
           <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
-            <header>
-              <h1 className="text-xl text-scale-1200">
-                Link a Supabase project to a Vercel project
-              </h1>
-              <Markdown
-                className="text-scale-900"
-                content={`
-This Supabase integration manages your envioemnt variables automatically to provide the latest keys in the unlikely event that you will need to refresh your JWT token.
+            <ScaffoldColumn className="!max-w-[900px] mx-auto w-full">
+              <header>
+                <h1 className="text-xl text-scale-1200">
+                  Link a Supabase project to a Vercel project
+                </h1>
+                <Markdown
+                  className="text-scale-900"
+                  content={`
+This Supabase integration manages your environment variables automatically to provide the latest keys in the unlikely event that you will need to refresh your JWT token.
 `}
+                />
+              </header>
+              <ProjectLinker
+                organizationIntegrationId={integration?.id}
+                foreignProjects={vercelProjects}
+                supabaseProjects={supabaseProjects}
+                onCreateConnections={() => {
+                  if (next) {
+                    window.location.href = next
+                  }
+                }}
+                installedConnections={integration?.connections}
+                setLoading={setLoading}
+                showSkip={true}
+                loadingForeignProjects={isLoadingVercelProjectsData}
+                loadingSupabaseProjects={isLoadingSupabaseProjectsData}
               />
-            </header>
-            <ProjectLinker
-              organizationIntegrationId={integration?.id}
-              foreignProjects={vercelProjects}
-              supabaseProjects={supabaseProjects}
-              onCreateConnections={() => {
-                if (next) {
-                  window.location.href = next
-                }
-              }}
-              installedConnections={integration?.connections}
-              setLoading={setLoading}
-            />
+            </ScaffoldColumn>
           </ScaffoldContainer>
         </>
 

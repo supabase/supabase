@@ -5,7 +5,7 @@ import { useCallback } from 'react'
 import { invoicesKeys } from './keys'
 import { ResponseError } from 'types'
 
-// [Joshen] This can eventually superceded and overwrite invoice-upcoming-query once we completely move to org billing
+// [Joshen] This can eventually superseded and overwrite invoice-upcoming-query once we completely move to org billing
 
 export type UpcomingInvoiceVariables = {
   orgSlug?: string

@@ -1,31 +1,32 @@
-import { FC, useState } from 'react'
-import { Address4 } from 'ip-address'
-import { Button, Form, IconHelpCircle, Input, Modal } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { Address4 } from 'ip-address'
+import { useState } from 'react'
+import { Button, Form, IconHelpCircle, Input, Modal } from 'ui'
 
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import InformationBox from 'components/ui/InformationBox'
-import { checkIfPrivate, getAddressEndRange } from './NetworkRestrictions.utils'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
+import { useStore } from 'hooks'
+import { checkIfPrivate, getAddressEndRange } from './NetworkRestrictions.utils'
 
-interface Props {
+interface AddRestrictionModalProps {
   restrictedIps: string[]
   visible: boolean
   hasOverachingRestriction: boolean
   onClose: () => void
 }
 
-const AddRestrictionModal: FC<Props> = ({
+const AddRestrictionModal = ({
   restrictedIps,
   visible,
   hasOverachingRestriction,
   onClose,
-}) => {
+}: AddRestrictionModalProps) => {
   const formId = 'add-restriction-form'
   const { ui } = useStore()
   const { ref } = useParams()
-  const { mutateAsync: applyNetworkRestrictions } = useNetworkRestrictionsApplyMutation()
+  const { mutate: applyNetworkRestrictions, isLoading: isApplying } =
+    useNetworkRestrictionsApplyMutation({ onSuccess: () => onClose() })
 
   const validate = (values: any) => {
     const errors: any = {}
@@ -48,10 +49,9 @@ const AddRestrictionModal: FC<Props> = ({
     return errors
   }
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
+  const onSubmit = async (values: any) => {
     if (!ref) return console.error('Project ref is required')
 
-    setSubmitting(true)
     const cidr = `${values.ipAddress}/${values.cidrBlockSize}`
     const alreadyExists = restrictedIps.includes(cidr)
     if (alreadyExists) {
@@ -62,18 +62,7 @@ const AddRestrictionModal: FC<Props> = ({
     }
 
     const dbAllowedCidrs = hasOverachingRestriction ? [cidr] : [...restrictedIps, cidr]
-
-    try {
-      await applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs })
-      onClose()
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to add restriction: ${error.message}`,
-      })
-    } finally {
-      setSubmitting(false)
-    }
+    applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs })
   }
 
   return (
@@ -93,7 +82,7 @@ const AddRestrictionModal: FC<Props> = ({
         validate={validate}
         onSubmit={onSubmit}
       >
-        {({ isSubmitting, values, resetForm }: any) => {
+        {({ values, resetForm }: any) => {
           const isPrivate = Address4.isValid(values.ipAddress)
             ? checkIfPrivate(values.ipAddress)
             : false
@@ -231,10 +220,10 @@ const AddRestrictionModal: FC<Props> = ({
                 </Modal.Content>
               )}
               <div className="flex items-center justify-end px-6 py-4 border-t space-x-2">
-                <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
+                <Button type="default" disabled={isApplying} onClick={() => onClose()}>
                   Cancel
                 </Button>
-                <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
+                <Button htmlType="submit" loading={isApplying} disabled={isApplying}>
                   Save restriction
                 </Button>
               </div>
