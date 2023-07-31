@@ -846,6 +846,254 @@ TypeScript types can be [generated with the Supabase CLI](/docs/reference/javasc
 
 See [refreshing session example](/docs/guides/auth/auth-helpers/nextjs#managing-session-with-middleware) above.
 
+### Edge Runtime
+
+The Next.js Edge Runtime allows you to host Server Components and Route Handlers from Edge nodes, serving the routes as close as possible to your user's location.
+
+A route can be configured to use the Edge Runtime by exporting a `runtime` variable set to `edge`. Additionally, the `cookies()` function must be called from the Edge route, before creating a Supabase Client.
+
+#### Server Components
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx app/page.jsx
+import { cookies } from 'next/headers'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+
+export const runtime = 'edge'
+export const dynamic = 'force-dynamic'
+
+export default async function Home() {
+  const cookieStore = cookies()
+
+  const supabase = createServerComponentClient({
+    cookies: () => cookieStore,
+  })
+
+  const { data } = await supabase.from('todos').select()
+  return <pre>{JSON.stringify(data, null, 2)}</pre>
+}
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```tsx app/page.tsx
+import { cookies } from 'next/headers'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+
+import type { Database } from '@/lib/database.types'
+
+export const runtime = 'edge'
+export const dynamic = 'force-dynamic'
+
+export default async function ServerComponent() {
+  const cookieStore = cookies()
+
+  const supabase = createServerComponentClient({
+    cookies: () => cookieStore,
+  })
+
+  const { data } = await supabase.from('todos').select()
+  return <pre>{JSON.stringify(data, null, 2)}</pre>
+}
+```
+
+<Admonition type="note">
+
+TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createServerComponentClient` to add type support to the Supabase client.
+
+</Admonition>
+
+</TabPanel>
+</Tabs>
+
+#### Route Handlers
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx app/api/todos/route.jsx
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
+
+export const runtime = 'edge'
+export const dynamic = 'force-dynamic'
+
+export async function POST(request) {
+  const { title } = await request.json()
+  const cookieStore = cookies()
+
+  const supabase = createRouteHandlerClient({
+    cookies: () => cookieStore,
+  })
+
+  const { data } = await supabase.from('todos').insert({ title }).select()
+  return NextResponse.json(data)
+}
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```tsx app/api/todos/route.tsx
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
+
+import type { Database } from '@/lib/database.types'
+
+export const runtime = 'edge'
+export const dynamic = 'force-dynamic'
+
+export async function POST(request: Request) {
+  const { title } = await request.json()
+  const cookieStore = cookies()
+
+  const supabase = createRouteHandlerClient({
+    cookies: () => cookieStore,
+  })
+
+  const { data } = await supabase.from('todos').insert({ title }).select()
+  return NextResponse.json(data)
+}
+```
+
+<Admonition type="note">
+
+TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createRouteHandlerClient` to add type support to the Supabase client.
+
+</Admonition>
+
+</TabPanel>
+</Tabs>
+
+### Static Routes
+
+Server Components and Route Handlers are static by default - data is fetched once at build time and the value is cached. Since the request to Supabase now happens at build time, there is no user, session or cookie to pass along with the request to Supabase. Therefore, the `createClient` function from `supabase-js` can be used to fetch data for static routes.
+
+#### Server Components
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx app/page.jsx
+import { createClient } from '@supabase/supabase-js'
+
+export default async function Home() {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  )
+
+  const { data } = await supabase.from('todos').select()
+  return <pre>{JSON.stringify(data, null, 2)}</pre>
+}
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```tsx app/page.tsx
+import { createClient } from '@supabase/supabase-js'
+
+export default async function Home() {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
+  const { data } = await supabase.from('todos').select()
+  return <pre>{JSON.stringify(data, null, 2)}</pre>
+}
+```
+
+<Admonition type="note">
+
+TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createServerComponentClient` to add type support to the Supabase client.
+
+</Admonition>
+
+</TabPanel>
+</Tabs>
+
+#### Route Handlers
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx app/api/todos/route.jsx
+import { createClient } from '@supabase/supabase-js'
+import { NextResponse } from 'next/server'
+
+export async function POST(request) {
+  const { title } = await request.json()
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  )
+
+  const { data } = await supabase.from('todos').insert({ title }).select()
+  return NextResponse.json(data)
+}
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```tsx app/api/todos/route.tsx
+import { createClient } from '@supabase/supabase-js'
+import { NextResponse } from 'next/server'
+
+export async function POST(request: Request) {
+  const { title } = await request.json()
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
+  const { data } = await supabase.from('todos').insert({ title }).select()
+  return NextResponse.json(data)
+}
+```
+
+<Admonition type="note">
+
+TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createRouteHandlerClient` to add type support to the Supabase client.
+
+</Admonition>
+
+</TabPanel>
+</Tabs>
+
 ## More examples
 
 - [Build a Twitter Clone with the Next.js App Router and Supabase - free egghead course](https://egghead.io/courses/build-a-twitter-clone-with-the-next-js-app-router-and-supabase-19bebadb)
