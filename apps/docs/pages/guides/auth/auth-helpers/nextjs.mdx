@@ -559,7 +559,7 @@ This allows for the Supabase client to be easily instantiated in the correct con
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useEffect, useState } from 'react'
 
-export default function Home() {
+export default function Page() {
   const [todos, setTodos] = useState()
   const supabase = createClientComponentClient()
 
@@ -590,7 +590,7 @@ import type { Database } from '@/lib/database.types'
 
 type Todo = Database['public']['Tables']['todos']['Row']
 
-export default function Home() {
+export default function Page() {
   const [todos, setTodos] = useState<Todo[] | null>(null)
   const supabase = createClientComponentClient<Database>()
 
@@ -663,7 +663,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export const dynamic = 'force-dynamic'
 
-export default async function Home() {
+export default async function Page() {
   const supabase = createServerComponentClient({ cookies })
   const { data } = await supabase.from('todos').select()
   return <pre>{JSON.stringify(data, null, 2)}</pre>
@@ -889,7 +889,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
-export default async function Home() {
+export default async function Page() {
   const cookieStore = cookies()
 
   const supabase = createServerComponentClient({
@@ -1019,7 +1019,7 @@ Server Components and Route Handlers are static by default - data is fetched onc
 ```jsx app/page.jsx
 import { createClient } from '@supabase/supabase-js'
 
-export default async function Home() {
+export default async function Page() {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -1039,7 +1039,7 @@ import { createClient } from '@supabase/supabase-js'
 
 import type { Database } from '@/lib/database.types'
 
-export default async function Home() {
+export default async function Page() {
   const supabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
