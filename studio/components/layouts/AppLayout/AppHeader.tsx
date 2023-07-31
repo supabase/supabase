@@ -22,7 +22,7 @@ const AppHeader = () => {
   console.log(activeRoute)
 
   return (
-    <div className="px-4 py-1 bg-scale-200 border-b">
+    <div className="px-8 py-1 bg-scale-200 border-b">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link href={organization !== undefined ? `/org/${organization?.slug}` : '/'}>
