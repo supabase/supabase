@@ -4,29 +4,24 @@ export const TabPanel = Tabs.Panel
 
 export const meta = {
   id: 'ai-choosing-compute-addon',
-  title: 'Choosing Compute Add-on',
-  description: 'Choosing the right Compute Add-on for your workload.',
-  subtitle: 'Choosing the right Compute Add-on for your workload.',
+  title: 'Choosing your Compute Add-on',
+  description: 'Choosing the right Compute Add-on for your vector workload.',
+  subtitle: 'Choosing the right Compute Add-on for your vector workload.',
   sidebar_label: 'Choosing Compute Add-on',
 }
 
-This guide will help you choose the right Compute Add-on for your workload. We'll provide general guidance, as it is impossible to provide specific instructions for every possible use case. The goal is to give you a starting point from which you can make your own benchmarks and optimizations.
+You have two options for scaling your vector workload:
 
-Note that it is only useful for index searches, not for sequential scans. Sequential scans will result to significantly higher latencies and lower throughput, but will guarantee 100% precision and will not be RAM bound. Therefore it is possible to use a smaller plan for sequential scans.
+1. Increase the size of your database. This guide will help you choose the right size for your workload.
+2. Spread your workload across multiple databases. You can find more details about this approach in [Engineering for Scale](engineering-for-scale).
 
-For more information about engineering at scale, see our [Engineering for Scale](/docs/guides/ai/engineering-for-scale) guide.
+## Dimensionality
 
-## Simple workloads
+The number of dimensions in your embeddings is the most important factor in choosing the right Compute Add-on. In general, the lower the dimensionality the better the performance. We've provided guidance for some of the more common embedding dimensions below. For each benchmark, we used [Vecs](https://github.com/supabase/vecs) to create a collection, upload the embeddings to a single table, and create an `inner-product` index for the embedding column. We then ran a series of queries to measure the performance of different compute add-ons:
 
-We've run a set of benchmarks using
+### 1536 Dimensions
 
-- The [dbpedia-entities-openai-1M](https://huggingface.co/datasets/KShivendu/dbpedia-entities-openai-1M) dataset. This dataset contains 1,000,000 embeddings for text, with each embedding being 1536 dimensions made using OpenAI API.
-- The [gist-960-angular](http://corpus-texmex.irisa.fr/) dataset. This dataset contains 1,000,000 embeddings for images, with each embedding being 960 dimensions.
-- The [GloVe Reddit comments](https://nlp.stanford.edu/projects/glove/) dataset, which contains 1,623,397 embeddings for words, with each embedding being 512 dimensions.
-
-We used [Vecs](https://github.com/supabase/vecs) to create a collection, upload the embeddings to a single table, and create an `inner-product` index for the embedding column. We then ran a series of queries to measure the performance of different compute add-ons:
-
-### Results
+This benchmark uses the [dbpedia-entities-openai-1M](https://huggingface.co/datasets/KShivendu/dbpedia-entities-openai-1M) dataset, which contains 1,000,000 embeddings of text. Each embedding is 1536 dimensions created with the [OpenAI Embeddings API](https://platform.openai.com/docs/guides/embeddings).
 
 <Tabs
   scrollable
@@ -35,8 +30,6 @@ We used [Vecs](https://github.com/supabase/vecs) to create a collection, upload 
   defaultActiveId="dbpedia1536"
 >
 <TabPanel id="dbpedia1536" label="OpenAI-1536, probes = 10">
-
-Emdeddings of 1536 dimensions by OpenAI for dbpedia dataset with 1,000,000 vectors.
 
 | Plan   | Vectors   | Lists | RPS  | Latency Mean | Latency p95 | RAM Usage          | RAM    |
 | ------ | --------- | ----- | ---- | ------------ | ----------- | ------------------ | ------ |
@@ -56,8 +49,6 @@ For 1,000,000 vectors 10 probes results to precision of 0.91. And for 500,000 ve
 </TabPanel>
 <TabPanel id="dbpedia1536_40" label="OpenAI-1536, probes = 40">
 
-Emdeddings of 1536 dimensions by OpenAI for dbpedia dataset with 1,000,000 vectors.
-
 | Plan   | Vectors   | Lists | RPS | Latency Mean | Latency p95 | RAM Usage | RAM    |
 | ------ | --------- | ----- | --- | ------------ | ----------- | --------- | ------ |
 | Free   | 20,000    | 40    | -   | -            | -           | -         | 1 GB   |
@@ -74,9 +65,32 @@ Emdeddings of 1536 dimensions by OpenAI for dbpedia dataset with 1,000,000 vecto
 For 1,000,000 vectors 40 probes results to precision of 0.98. Note that exact values may vary depending on the dataset and queries, we recommend to run benchmarks with your own data to get precise results. Use this table as a reference.
 
 </TabPanel>
-<TabPanel id="gist960" label="gist-960, probes = 10">
+</Tabs>
 
-Emdeddings of 960 dimensions from gist-960 dataset with 1,000,000 vectors.
+<div>
+  <img
+    alt="multi database"
+    className="dark:hidden"
+    src="/docs/img/ai/going-prod/size-to-rps--light.png"
+  />
+  <img
+    alt="multi database"
+    className="hidden dark:block"
+    src="/docs/img/ai/going-prod/size-to-rps--dark.png"
+  />
+</div>
+
+### 960 Dimensions
+
+This benchmark uses the [gist-960-angular](http://corpus-texmex.irisa.fr/) dataset, which contains 1,000,000 embeddings of images. Each embedding is 960 dimensions.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="gist960"
+>
+<TabPanel id="gist960" label="gist-960, probes = 10">
 
 | Plan   | Vectors   | Lists | RPS  | Latency Mean | Latency p95 | RAM Usage          | RAM    |
 | ------ | --------- | ----- | ---- | ------------ | ----------- | ------------------ | ------ |
@@ -92,9 +106,19 @@ Emdeddings of 960 dimensions from gist-960 dataset with 1,000,000 vectors.
 | 16XL   | 1,000,000 | 1000  | 1345 | 0.072 sec    | 0.106 sec   | 17.5 GB            | 256 GB |
 
 </TabPanel>
-<TabPanel id="glove512" label="GloVe-512, probes = 10">
+</Tabs>
 
-Emdeddings of 512 dimensions from GloVe Reddit comments dataset with 1,623,397 vectors.
+### 512 Dimensions
+
+This benchmark uses the [GloVe Reddit comments](https://nlp.stanford.edu/projects/glove/) dataset, which contains 1,623,397 embeddings of text. Each embedding is 512 dimensions. Random vectors were generated for queries.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="glove512"
+>
+<TabPanel id="glove512" label="GloVe-512, probes = 10">
 
 | Plan   | Vectors   | Lists | RPS  | Latency Mean | Latency p95 | RAM Usage          | RAM    |
 | ------ | --------- | ----- | ---- | ------------ | ----------- | ------------------ | ------ |
@@ -109,12 +133,8 @@ Emdeddings of 512 dimensions from GloVe Reddit comments dataset with 1,623,397 v
 | 12XL   | 1,623,397 | 1275  | 3700 | 0.020 sec    | 0.036 sec   | 26 GB              | 192 GB |
 | 16XL   | 1,623,397 | 1275  | 3700 | 0.025 sec    | 0.042 sec   | 29 GB              | 256 GB |
 
-Random vectors were generated for queries.
-
 </TabPanel>
 <TabPanel id="glove512_60" label="GloVe-512, probes = 60">
-
-Emdeddings of 512 dimensions from GloVe Reddit comments dataset with 1,623,397 vectors.
 
 | Plan   | Vectors   | Lists | RPS | Latency Mean | Latency p95 | RAM Usage | RAM    |
 | ------ | --------- | ----- | --- | ------------ | ----------- | --------- | ------ |
@@ -130,8 +150,6 @@ Emdeddings of 512 dimensions from GloVe Reddit comments dataset with 1,623,397 v
 | 12XL   | 1,623,397 | 1275  | 840 | 0.093 sec    | 0.124 sec   | 26 GB     | 192 GB |
 | 16XL   | 1,623,397 | 1275  | 940 | 0.084 sec    | 0.108 sec   | 29 GB     | 256 GB |
 
-Random vectors were generated for queries.
-
 </TabPanel>
 </Tabs>
 
@@ -141,7 +159,34 @@ It is possible to upload more vectors to a single table if Memory allows it (for
 
 </Admonition>
 
-## Methodology
+## Performance tips
+
+There are various ways to improve your pgvector performance. Here are some tips:
+
+### Pre-warming your database
+
+It's useful to execute a few thousand “warm-up” queries before going into production. This helps help with RAM utilization. This can also help to determine that you've selected the right instance size for your workload.
+
+### Increase the number of lists
+
+You can increase the Requests per Second by increasing the number of `lists`. This also has an important caveat: building the index takes longer with more lists.
+
+<div>
+  <img
+    alt="multi database"
+    className="dark:hidden"
+    src="/docs/img/ai/instance-type/lists-for-1m--light.png"
+  />
+  <img
+    alt="multi database"
+    className="hidden dark:block"
+    src="/docs/img/ai/instance-type/lists-for-1m--dark.png"
+  />
+</div>
+
+Check out more tips and the complete step-by-step guide in [Going to Production for AI applications](going-to-prod).
+
+## Benchmark Methodology
 
 We follow techniques outlined in the [ANN Benchmarks](https://github.com/erikbern/ann-benchmarks) methodology. A Python test runner is responsible for uploading the data, creating the index, and running the queries. The pgvector engine is implemented using [vecs](https://github.com/supabase/vecs), a Python client for pgvector.
 

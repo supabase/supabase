@@ -32,7 +32,6 @@ export async function approveApiAuthorization({
 type ApiAuthorizationApproveData = Awaited<ReturnType<typeof approveApiAuthorization>>
 
 export const useApiAuthorizationApproveMutation = ({
-  onSuccess,
   onError,
   ...options
 }: Omit<

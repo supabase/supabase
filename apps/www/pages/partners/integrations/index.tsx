@@ -1,7 +1,7 @@
-import { IconLoader, IconSearch, Input } from 'ui'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { IconLoader, IconSearch, Input } from 'ui'
 import { useDebounce } from 'use-debounce'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -39,10 +39,6 @@ function IntegrationPartnersPage(props: Props) {
 
   const allCategories = Array.from(new Set(initialPartners.map((p) => p.category)))
 
-  const partnersByCategory: { [category: string]: Partner[] } = {}
-  partners.forEach(
-    (p) => (partnersByCategory[p.category] = [...(partnersByCategory[p.category] ?? []), p])
-  )
   const router = useRouter()
 
   const meta_title = 'Find an Integration'
@@ -90,6 +86,8 @@ function IntegrationPartnersPage(props: Props) {
     })
   }, [debouncedSearchTerm, router])
 
+  console.log(partners)
+
   return (
     <>
       <NextSeo
@@ -98,7 +96,7 @@ function IntegrationPartnersPage(props: Props) {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/partners`,
+          url: `https://supabase.com/partners/integrations`,
           images: [
             {
               url: `https://supabase.com${router.basePath}/images/og/integrations.png`, // TODO
@@ -106,7 +104,7 @@ function IntegrationPartnersPage(props: Props) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout className="bg-scale-400 dark:bg-scale-100">
         <SectionContainer className="space-y-16">
           <div>
             <h1 className="h1">{meta_title}</h1>
@@ -218,7 +216,7 @@ function IntegrationPartnersPage(props: Props) {
               {/* Partner Tiles */}
               <div className="grid space-y-10">
                 {partners.length ? (
-                  <TileGrid partnersByCategory={partnersByCategory} />
+                  <TileGrid partners={partners} />
                 ) : (
                   <h2 className="h2">No Partners Found</h2>
                 )}
