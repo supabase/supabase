@@ -178,14 +178,14 @@ export const PgbouncerConfig: FC<ConfigProps> = ({ projectRef, bouncerInfo, conn
       },
       max_client_conn: {
         title: 'Max Client Connections',
-        type: 'integer',
+        oneOf: [{ type: 'integer' }, { type: 'null' }],
         help: 'The maximum number of concurrent client connections allowed. Overrides default optimizations; refer to https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config',
       },
       default_pool_size: {
         title: 'Default Pool Size',
-        type: 'integer',
+        oneOf: [{ type: 'integer' }, { type: 'null' }],
         help: 'The maximum number of connections made to the underlying Postgres cluster, per user+db combination. Overrides default optimizations; refer to https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config',
-      }
+      },
     },
     required: ['pool_mode'],
     type: 'object',
