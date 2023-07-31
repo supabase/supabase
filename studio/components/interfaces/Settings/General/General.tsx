@@ -26,7 +26,6 @@ import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
 import { useCheckPermissions, useProjectByRef, useSelectedOrganization, useStore } from 'hooks'
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
-import { useProjectsQuery } from 'data/projects/projects-query'
 
 const General = () => {
   const { ui } = useStore()
