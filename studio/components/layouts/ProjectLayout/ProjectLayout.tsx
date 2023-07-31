@@ -29,6 +29,8 @@ const routesToIgnoreProjectDetailsRequest = [
   '/project/[ref]/settings/billing/invoices',
 ]
 
+const routesToIgnoreDBConnection = ['/project/[ref]/branches']
+
 const routesToIgnorePostgrestConnection = [
   '/project/[ref]/reports',
   '/project/[ref]/settings/general',
@@ -161,8 +163,9 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
   const router = useRouter()
 
   const requiresDbConnection: boolean =
-    !router.pathname.includes('/project/[ref]/settings') ||
-    router.pathname.includes('/project/[ref]/settings/vault')
+    (!router.pathname.includes('/project/[ref]/settings') &&
+      !routesToIgnoreDBConnection.includes(router.pathname)) ||
+    router.pathname === '/project/[ref]/settings/vault'
   const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
