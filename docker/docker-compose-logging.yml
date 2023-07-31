@@ -1,8 +1,9 @@
 # Usage
-#   Start:          docker compose -f docker-compose.yml -f docker-compose-logging.yml up
-#   With helpers:   docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml -f docker-compose-logging.yml up
-#   Stop:           docker compose down
-#   Destroy:        docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml -f docker-compose-logging.yml down -v --remove-orphans
+#   Start:                         docker compose -f docker-compose.yml -f docker-compose-logging.yml up
+#   Start with Postgres Ingestion: docker compose -f docker-compose.yml -f docker-compose-logging.yml -f docker-compose-postgres-logging.yml up
+#   With helpers:                  docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml -f docker-compose-logging.yml up
+#   Stop:                          docker compose down
+#   Destroy:                       docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml -f docker-compose-logging.yml -f docker-compose-postgres-logging.yml down -v --remove-orphans
 # Please refer to https://supabase.com/docs/reference/self-hosting-analytics/introduction
 version: "3.8"
 
@@ -106,6 +107,11 @@ services:
         condition: service_healthy
     ports:
       - ${LOGFLARE_HTTP_PORT}:4000/tcp
+    volumes:
+      - type: bind
+        source: ${PWD}/gcloud.json
+        target: /opt/app/rel/logflare/bin/gcloud.json
+        read_only: true
     environment:
       MY_POD_IP: 127.0.0.1
       LOGFLARE_NODE_HOST:  127.0.0.1
@@ -121,10 +127,7 @@ services:
       LOGFLARE_SINGLE_TENANT: true
       LOGFLARE_SUPABASE_MODE: true
       LOGFLARE_MIN_CLUSTER_SIZE: 1
-      POSTGRES_BACKEND_URL: postgresql://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
-      POSTGRES_BACKEND_SCHEMA: _analytics
       RELEASE_COOKIE: cookie
-      LOGFLARE_FEATURE_FLAG_OVERRIDE: multibackend=true
     entrypoint: |
                   sh -c `cat <<'EOF' > run.sh && sh run.sh
                   ./logflare eval Logflare.Release.migrate
