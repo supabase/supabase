@@ -1,14 +1,15 @@
-import { GetServerSideProps } from 'next'
-import { NextSeo } from 'next-seo'
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
+import { GetServerSideProps } from 'next'
 import dynamic from 'next/dynamic'
+import Head from 'next/head'
+import Image from 'next/image'
 import { useRouter } from 'next/router'
+import { NextSeo } from 'next-seo'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
 
-import { PageState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import DefaultLayout from '~/components/Layouts/Default'
+import { PageState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/8/LaunchWeekLogoHeader'
 import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
@@ -16,12 +17,16 @@ import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
 import { useTheme } from 'common/Providers'
 
 import 'swiper/swiper.min.css'
+<<<<<<< HEAD
 import Head from 'next/head'
 import LW8CalloutsSection from '../../components/LaunchWeek/8/LW8CalloutsSection'
+=======
+>>>>>>> 26b990905 (lw8: pre release page setup)
 
 const AnimatedParticles = dynamic(
   () => import('~/components/LaunchWeek/8/AnimatedParticles/ParticlesCanvas')
 )
+const LW8Releases = dynamic(() => import('~/components/LaunchWeek/8/Releases'))
 const TicketContainer = dynamic(() => import('~/components/LaunchWeek/8/Ticket/TicketContainer'))
 const LW8Meetups = dynamic(() => import('~/components/LaunchWeek/8/LW8Meetups'))
 const LaunchWeekPrizeSection = dynamic(
@@ -67,7 +72,7 @@ export default function TicketHome({ users, meetups }: Props) {
   }
 
   const [userData, setUserData] = useState<UserData>(defaultUserData)
-  const [pageState, setPageState] = useState<PageState>('ticket')
+  const [_, setPageState] = useState<PageState>('ticket')
 
   useEffect(() => {
     if (!supabase) {
@@ -142,7 +147,7 @@ export default function TicketHome({ users, meetups }: Props) {
                     <LaunchWeekLogoHeader />
                   </div>
                   <div className="absolute inset-0 z-0">
-                    {supabase && <AnimatedParticles supabase={supabase} users={users} />}
+                    {supabase && <AnimatedParticles />}
                     <Image
                       src="/images/launchweek/8/stars.svg"
                       alt="starts background"
@@ -176,6 +181,10 @@ export default function TicketHome({ users, meetups }: Props) {
               <LW8Meetups meetups={meetups} />
             </SectionContainer>
 
+            <div className="relative !w-full max-w-[100vw] !px-4 sm:max-w-xl md:max-w-4xl lg:max-w-7xl z-20 flex flex-col justify-around items-center pt-16 gap-2 md:gap-4 !mx-auto">
+              <LW8Releases />
+            </div>
+
             <div className="relative !w-full max-w-[100vw] min-h-[400px] !px-4 sm:max-w-xl md:max-w-4xl lg:max-w-7xl z-20 flex flex-col justify-around items-center !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !mx-auto">
               {supabase && (
                 <div className="w-full max-w-[100vw] px-4 flex justify-center py-8 md:py-20">
@@ -203,10 +212,15 @@ export const getServerSideProps: GetServerSideProps = async () => {
   // fetch users for the TicketBrickWall
   const { data: users } = await supabaseAdmin!
     .from('lw8_tickets_golden')
+<<<<<<< HEAD
     .select('username, golden')
     .limit(1000)
 
   const { data: meetups } = await supabaseAdmin!.from('lw8_meetups').select('*')
+=======
+    .select('username, golden', { count: 'exact' })
+    .limit(17)
+>>>>>>> 26b990905 (lw8: pre release page setup)
 
   return {
     props: {

@@ -38,7 +38,7 @@ export const TWITTER_USER_NAME = 'supabase'
 export const COOKIE = 'supa-lw8-ticket-user-id'
 export const LW7_DATE = 'April 10th 2023'
 export const LW8_DATE = 'August 7-11'
-export const LW8_LAUNCH_DATE = '2023-08-07T09:00:00.000-07:00'
+export const LW8_LAUNCH_DATE = '2023-08-07T09:00:00.000-08:00'
 export const TWEET_TEXT =
   '#SupaLaunchWeek 8 is coming August 7-11! Join the party and generate your custom ticket for a chance to win swag ✨'
 export const TWEET_TEXT_GOLDEN = `I turned my #SupaLaunchWeek 8 ticket GOLD! 🌟😎🌟\n\n`

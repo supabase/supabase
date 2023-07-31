@@ -60,7 +60,7 @@
     "shared-data": "*",
     "swiper": "^6.5.0",
     "swr": "^0.5.4",
-    "three": "^0.154.0",
+    "three": "^0.136.0",
     "typescript": "^5.0.4",
     "ui": "*",
     "use-debounce": "^7.0.1",
