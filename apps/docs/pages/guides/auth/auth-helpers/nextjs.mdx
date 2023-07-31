@@ -162,6 +162,8 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
@@ -189,6 +191,8 @@ import { NextResponse } from 'next/server'
 
 import type { NextRequest } from 'next/server'
 import type { Database } from '@/lib/database.types'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
@@ -390,6 +394,8 @@ import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
 import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
 
+export const dynamic = 'force-dynamic'
+
 export default async function Login() {
   const handleSignUp = async (formData) => {
     'use server'
@@ -451,6 +457,8 @@ import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
 
 import type { Database } from '@/lib/database.types'
+
+export const dynamic = 'force-dynamic'
 
 export default async function Login() {
   const handleSignUp = async (formData: FormData) => {
@@ -653,6 +661,8 @@ In order to use Supabase in Server Components, you need to have implemented the 
 import { cookies } from 'next/headers'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 
+export const dynamic = 'force-dynamic'
+
 export default async function Home() {
   const supabase = createServerComponentClient({ cookies })
   const { data } = await supabase.from('todos').select()
@@ -669,6 +679,8 @@ import { cookies } from 'next/headers'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 
 import type { Database } from '@/lib/database.types'
+
+export const dynamic = 'force-dynamic'
 
 export default async function ServerComponent() {
   const supabase = createServerComponentClient<Database>({ cookies })
@@ -724,6 +736,8 @@ import { cookies } from 'next/headers'
 import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
 import { revalidatePath } from 'next/cache'
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewTodo() {
   const addTodo = async (formData) => {
     'use server'
@@ -752,6 +766,8 @@ import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
 import { revalidatePath } from 'next/cache'
 
 import type { Database } from '@/lib/database.types'
+
+export const dynamic = 'force-dynamic'
 
 export default async function NewTodo() {
   const addTodo = async (formData: FormData) => {
@@ -806,6 +822,8 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request) {
   const { title } = await request.json()
   const supabase = createRouteHandlerClient({ cookies })
@@ -824,6 +842,8 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
 import type { Database } from '@/lib/database.types'
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request) {
   const { title } = await request.json()
@@ -894,7 +914,7 @@ import type { Database } from '@/lib/database.types'
 export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
-export default async function ServerComponent() {
+export default async function ServerComponent<Database>() {
   const cookieStore = cookies()
 
   const supabase = createServerComponentClient({
@@ -964,7 +984,7 @@ export async function POST(request: Request) {
   const { title } = await request.json()
   const cookieStore = cookies()
 
-  const supabase = createRouteHandlerClient({
+  const supabase = createRouteHandlerClient<Database>({
     cookies: () => cookieStore,
   })
 
@@ -1017,8 +1037,10 @@ export default async function Home() {
 ```tsx app/page.tsx
 import { createClient } from '@supabase/supabase-js'
 
+import type { Database } from '@/lib/database.types'
+
 export default async function Home() {
-  const supabase = createClient(
+  const supabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
@@ -1072,10 +1094,12 @@ export async function POST(request) {
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
+import type { Database } from '@/lib/database.types'
+
 export async function POST(request: Request) {
   const { title } = await request.json()
 
-  const supabase = createClient(
+  const supabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
