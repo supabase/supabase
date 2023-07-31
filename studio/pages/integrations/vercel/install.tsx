@@ -1,12 +1,13 @@
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
+import OrganizationPicker from 'components/interfaces/Integrations/OrganizationPicker'
 import { Markdown } from 'components/interfaces/Markdown'
+import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
 import { ScaffoldColumn, ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
-import { IntegrationName } from 'data/integrations/integrations.types'
 import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-integration-create-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useStore } from 'hooks'
@@ -15,32 +16,13 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
-  Badge,
   Button,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Command_Shadcn_,
   IconAlertTriangle,
   IconBook,
-  IconChevronDown,
-  IconHexagon,
   IconInfo,
   IconLifeBuoy,
   LoadingLine,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
 } from 'ui'
-
-/**
- * Organization type with `installationInstalled` added
- */
-interface OrganizationsResponseWithInstalledData extends Organization {
-  installationInstalled?: boolean
-}
 
 /**
  * Variations of the Vercel integration flow.
@@ -56,9 +38,7 @@ const VercelIntegration: NextPageWithLayout = () => {
   const router = useRouter()
   const { ui } = useStore()
   const { code, configurationId, teamId, source, externalId } = useParams()
-  const [selectedOrg, setSelectedOrg] = useState<OrganizationsResponseWithInstalledData | null>(
-    null
-  )
+  const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
   const [organizationIntegrationId, setOrganizationIntegrationId] = useState<string | null>(null)
 
   /**
@@ -73,7 +53,7 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (organizationsData !== undefined && integrationData !== undefined) {
-      const firstOrg = organizationsWithInstalls(organizationsData)?.[0]
+      const firstOrg = organizationsData[0]
 
       if (firstOrg && selectedOrg === null) {
         setSelectedOrg(firstOrg)
@@ -83,38 +63,23 @@ const VercelIntegration: NextPageWithLayout = () => {
   }, [organizationsData, integrationData])
 
   /**
-   * Find installedConnections
-   */
-  function organizationsWithInstalls(organizations?: OrganizationsResponseWithInstalledData[]) {
-    /**
-     * Flat array of org slugs that have integration installed
-     *
-     */
-    const flatInstalledConnectionsIds: string[] | [] =
-      integrationData && integrationData.length > 0
-        ? integrationData
-            .filter((x) => x.integration.name === 'Vercel')
-            .map((x) => x.organization.slug)
-        : []
-
-    return organizations
-      ? organizations?.map((org) => {
-          return {
-            ...org,
-            installationInstalled: flatInstalledConnectionsIds.includes(org.slug) ? true : false,
-          }
-        })
-      : []
-  }
-
-  /**
    * Organizations with extra `installationInstalled` attribute
    *
    * Used to show label/badge and allow/disallow installing
    *
    */
-  const organizationsWithInstalledData: OrganizationsResponseWithInstalledData[] =
-    organizationsWithInstalls(organizationsData)
+  const installed = useMemo(
+    () =>
+      integrationData && organizationsData
+        ? getHasInstalledObject({
+            integrationName: 'Vercel',
+            integrationData,
+            organizationsData,
+            installationId: configurationId,
+          })
+        : {},
+    [configurationId, integrationData, organizationsData]
+  )
 
   /**
    * Handle the correct route change based on whether the vercel integration
@@ -155,9 +120,7 @@ const VercelIntegration: NextPageWithLayout = () => {
   function onInstall() {
     const orgSlug = selectedOrg?.slug
 
-    const isIntegrationInstalled = organizationsWithInstalledData.some(
-      (x) => x.slug === orgSlug && x.installationInstalled
-    )
+    const isIntegrationInstalled = orgSlug ? installed[orgSlug] : false
 
     if (!orgSlug) {
       return ui.setNotification({ category: 'error', message: 'Please select an organization' })
@@ -200,7 +163,7 @@ const VercelIntegration: NextPageWithLayout = () => {
   const disableInstallationForm =
     (isLoadingVercelIntegrationCreateMutation && !dataLoading) ||
     // disables installation button if integration is already installed and it is Marketplace flow
-    (selectedOrg && selectedOrg?.installationInstalled && source === 'marketplace' && !dataLoading)
+    (selectedOrg && installed[selectedOrg.slug] && source === 'marketplace' && !dataLoading)
       ? true
       : false
 
@@ -217,17 +180,12 @@ const VercelIntegration: NextPageWithLayout = () => {
                   <Markdown content={`Choose the Supabase organization you wish to install in`} />
                   <OrganizationPicker
                     integrationName="Vercel"
-                    organizationsWithInstalledData={organizationsWithInstalledData}
-                    onSelectedOrgChange={(e: string) => {
-                      const org = organizationsWithInstalledData?.find((org) => org.slug === e)
-
-                      if (org) {
-                        setSelectedOrg(org)
-                        router.query.organizationSlug = org.slug
-                      }
-                    }}
                     selectedOrg={selectedOrg}
-                    dataLoading={dataLoading}
+                    onSelectedOrgChange={(org) => {
+                      setSelectedOrg(org)
+                      router.query.organizationSlug = org.slug
+                    }}
+                    configurationId={configurationId}
                   />
                   {disableInstallationForm && (
                     <Alert_Shadcn_ variant="warning">
@@ -285,92 +243,5 @@ const VercelIntegration: NextPageWithLayout = () => {
 VercelIntegration.getLayout = (page) => (
   <VercelIntegrationWindowLayout>{page}</VercelIntegrationWindowLayout>
 )
-
-export interface OrganizationPickerProps {
-  label?: string
-  onSelectedOrgChange: (slug: string) => void
-  integrationName: IntegrationName
-  dataLoading: boolean
-  organizationsWithInstalledData: OrganizationsResponseWithInstalledData[]
-  selectedOrg: OrganizationsResponseWithInstalledData | null
-}
-
-const OrganizationPicker = ({
-  label = 'Choose an organization',
-  onSelectedOrgChange,
-  selectedOrg,
-  dataLoading,
-  organizationsWithInstalledData,
-}: OrganizationPickerProps) => {
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLButtonElement>(null)
-
-  return (
-    <>
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
-          <Button
-            ref={ref}
-            type="default"
-            size="medium"
-            block
-            className="justify-start"
-            icon={<IconHexagon />}
-            loading={dataLoading}
-            disabled={dataLoading}
-            iconRight={
-              <span className="grow flex justify-end">
-                <IconChevronDown className={''} />
-              </span>
-            }
-          >
-            <span className="flex gap-2">
-              <span className="truncate">{selectedOrg?.name}</span>
-              {selectedOrg?.installationInstalled && (
-                <Badge color="scale">Integration Installed</Badge>
-              )}
-            </span>
-          </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_
-          className="p-0 w-full"
-          side="bottom"
-          align="center"
-          style={{ width: ref.current?.offsetWidth }}
-        >
-          <Command_Shadcn_>
-            <CommandInput_Shadcn_ placeholder="Search organization..." />
-            <CommandList_Shadcn_>
-              <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-              <CommandGroup_Shadcn_>
-                {organizationsWithInstalledData?.map((org) => {
-                  return (
-                    <CommandItem_Shadcn_
-                      value={org.slug}
-                      key={org.slug}
-                      className="flex gap-2 items-center"
-                      onSelect={(slug) => {
-                        if (slug) onSelectedOrgChange(slug)
-                        setOpen(false)
-                      }}
-                    >
-                      <IconHexagon />
-                      <span className="truncate">{org.name}</span>{' '}
-                      {org?.installationInstalled && (
-                        <Badge color="scale" className="!flex-none">
-                          Integration Installed
-                        </Badge>
-                      )}
-                    </CommandItem_Shadcn_>
-                  )
-                })}
-              </CommandGroup_Shadcn_>
-            </CommandList_Shadcn_>
-          </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
-    </>
-  )
-}
 
 export default VercelIntegration
