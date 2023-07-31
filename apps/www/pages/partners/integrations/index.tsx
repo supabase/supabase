@@ -1,7 +1,7 @@
-import { IconLoader, IconSearch, Input } from 'ui'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { IconLoader, IconSearch, Input } from 'ui'
 import { useDebounce } from 'use-debounce'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -39,10 +39,6 @@ function IntegrationPartnersPage(props: Props) {
 
   const allCategories = Array.from(new Set(initialPartners.map((p) => p.category)))
 
-  const partnersByCategory: { [category: string]: Partner[] } = {}
-  partners.forEach(
-    (p) => (partnersByCategory[p.category] = [...(partnersByCategory[p.category] ?? []), p])
-  )
   const router = useRouter()
 
   const meta_title = 'Find an Integration'
@@ -90,6 +86,8 @@ function IntegrationPartnersPage(props: Props) {
     })
   }, [debouncedSearchTerm, router])
 
+  console.log(partners)
+
   return (
     <>
       <NextSeo
@@ -98,7 +96,7 @@ function IntegrationPartnersPage(props: Props) {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/partners`,
+          url: `https://supabase.com/partners/integrations`,
           images: [
             {
               url: `https://supabase.com${router.basePath}/images/og/integrations.png`, // TODO
@@ -106,7 +104,7 @@ function IntegrationPartnersPage(props: Props) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout className="bg-scale-400 dark:bg-scale-100">
         <SectionContainer className="space-y-16">
           <div>
             <h1 className="h1">{meta_title}</h1>
@@ -164,11 +162,11 @@ function IntegrationPartnersPage(props: Props) {
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
-                          stroke-width="1"
+                          strokeWidth="1"
                         >
                           <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                             d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                           />
                         </svg>
@@ -187,11 +185,11 @@ function IntegrationPartnersPage(props: Props) {
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
-                          stroke-width="1"
+                          strokeWidth="1"
                         >
                           <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                             d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
                           />
                         </svg>
@@ -218,7 +216,7 @@ function IntegrationPartnersPage(props: Props) {
               {/* Partner Tiles */}
               <div className="grid space-y-10">
                 {partners.length ? (
-                  <TileGrid partnersByCategory={partnersByCategory} />
+                  <TileGrid partners={partners} />
                 ) : (
                   <h2 className="h2">No Partners Found</h2>
                 )}

@@ -190,7 +190,7 @@ export default {
         rotate-0
         group-state-open:rotate-180
         group-data-[state=open]:rotate-180
-        ease-[cubic-bezier(0.87,_0,_0.13,_1)]
+        ease-&lsqb;cubic-bezier(0.87,_0,_0.13,_1)&rsqb;
         transition-transform duration-300
         duration-200
       `,
@@ -1085,7 +1085,7 @@ export default {
     `,
     content: `
       z-40
-      bg
+      bg-overlay
       border
       rounded
       shadow-lg

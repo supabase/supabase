@@ -1,7 +1,8 @@
-import { SupaResponseV2 } from 'types'
+import { SupaResponse } from 'types'
 import { Integration } from 'data/integrations/integrations.types'
+import { isResponseOk } from './common/fetch'
 
-async function fetchGitHub<T = any>(url: string, responseJson = true): Promise<SupaResponseV2<T>> {
+async function fetchGitHub<T = any>(url: string, responseJson = true): Promise<SupaResponse<T>> {
   const response = await fetch(url)
   if (!response.ok) {
     return {
@@ -45,18 +46,20 @@ export async function getInitialMigrationSQLFromGitHubRepo(
   const baseGitHubUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`
   const supabaseFolderUrl = `${baseGitHubUrl}/supabase?ref=${branch}`
   const supabaseMigrationsPath = `supabase/migrations` // TODO: read this from the `supabase/config.toml` file
-  const migrationsFolderUrl = `${baseGitHubUrl}/${supabaseMigrationsPath}?ref=${branch}`
+  const migrationsFolderUrl = `${baseGitHubUrl}/${supabaseMigrationsPath}${
+    branch ? `?ref=${branch}` : ``
+  }`
 
   const [supabaseFilesResponse, migrationFilesResponse] = await Promise.all([
     fetchGitHub<File[]>(supabaseFolderUrl),
     fetchGitHub<File[]>(migrationsFolderUrl),
   ])
 
-  if ('error' in supabaseFilesResponse) {
+  if (!isResponseOk(supabaseFilesResponse)) {
     console.warn(`Failed to fetch supabase files from GitHub: ${supabaseFilesResponse.error}`)
     return null
   }
-  if ('error' in migrationFilesResponse) {
+  if (!isResponseOk(migrationFilesResponse)) {
     console.warn(`Failed to fetch migration files from GitHub: ${migrationFilesResponse.error}`)
     return null
   }
@@ -77,11 +80,8 @@ export async function getInitialMigrationSQLFromGitHubRepo(
     ...migrationFileDownloadUrlPromises,
   ])
 
-  const migrations = migrationFileResponses
-    .filter((response) => !(typeof response === 'object' && 'error' in response))
-    .join(';')
-  const seed =
-    typeof seedFileResponse === 'object' && 'error' in seedFileResponse ? '' : seedFileResponse
+  const migrations = migrationFileResponses.filter((response) => isResponseOk(response)).join(';')
+  const seed = isResponseOk(seedFileResponse) ? seedFileResponse : ''
 
   const migrationsTableSql = /* SQL */ `
     create schema if not exists supabase_migrations;
@@ -92,7 +92,7 @@ export async function getInitialMigrationSQLFromGitHubRepo(
     );
     ${sortedFiles.map((file, i) => {
       const migration = migrationFileResponses[i]
-      if (!migration || (typeof migration === 'object' && 'error' in migration)) return ''
+      if (!isResponseOk(migration)) return ''
 
       const version = file.name.split('_')[0]
       const statements = JSON.stringify(

@@ -38,7 +38,7 @@ Every Supabase project provides a full Postgres database. You can connect to the
 
 ## Connection Pooler
 
-Every Supabase project comes with PgBouncer for connection pooling. A connection pooler is useful for managing a large number of _temporary_ connections. For example, if you are using [Prisma](/docs/guides/integrations/prisma), Drizzle, Kysely, or anything deployed to a Serverless environment (AWS Lambdas or Edge Functions). You can find the connection pool config in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) inside the dashboard:
+Every Supabase project comes with PgBouncer for connection pooling. A connection pooler is useful for managing a large number of _temporary_ connections. For example, if you are using [Prisma](/partners/integrations/prisma), Drizzle, Kysely, or anything deployed to a Serverless environment (AWS Lambdas or Edge Functions). You can find the connection pool config in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) inside the dashboard:
 
 1. Go to the `Settings` section.
 2. Click `Database`.
@@ -267,7 +267,7 @@ psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-supabase.cer host=db.
 
     <StepHikeCompact.Details title="Install">
 
-    Install Drizzle and releated dependencies.
+    Install Postgres.js and releated dependencies.
 
     </StepHikeCompact.Details>
 
@@ -275,7 +275,6 @@ psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-supabase.cer host=db.
 
      ```shell
      npm i postgres
-     npm i -D drizzle-kit
      ```
 
     </StepHikeCompact.Code>

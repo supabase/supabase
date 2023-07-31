@@ -1,12 +1,34 @@
 import Link from 'next/link'
 
-import { Invoices } from 'components/interfaces/Billing'
+import { Invoices } from 'components/interfaces/BillingV2'
 import { SettingsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSelectedOrganization } from 'hooks'
 import { NextPageWithLayout } from 'types'
+import { Alert } from 'ui'
 
 const ProjectBilling: NextPageWithLayout = () => {
+  const organization = useSelectedOrganization()
+  const isOrgBilling = !!organization?.subscription_id
+
+  if (isOrgBilling) {
+    return (
+      <div className="p-4">
+        <Alert
+          withIcon
+          variant="info"
+          title="This page is only available for projects which are on their own subscription"
+        >
+          You might be looking for the{' '}
+          <Link href={`/org/${organization?.slug}/invoices`}>
+            <a className="text-brand-900">organization's invoices</a>
+          </Link>{' '}
+          page instead.
+        </Alert>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full h-full overflow-y-auto content">
       <div className="w-full mx-auto">

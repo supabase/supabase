@@ -70,12 +70,12 @@ test('datepicker onChange will return ISO string of selected dates', async () =>
   userEvent.clear(toHH)
   userEvent.type(toHH, '12')
 
-  userEvent.click(await screen.findByText('24'), { selector: '.react-datepicker__day' })
-  userEvent.click(await screen.findByText('25'), { selector: '.react-datepicker__day' })
+  userEvent.click(await screen.findByText('20'), { selector: '.react-datepicker__day' })
+  userEvent.click(await screen.findByText('21'), { selector: '.react-datepicker__day' })
   userEvent.click(await screen.findByText('Apply'))
   expect(mockFn).toBeCalled()
 
   const call = mockFn.mock.calls[0][0]
-  expect(call.to).toMatch(dayjs().date(25).hour(12).utc().format('YYYY-MM-DDTHH'))
-  expect(call.from).toMatch(dayjs().date(24).hour(0).utc().format('YYYY-MM-DDTHH'))
+  expect(call.to).toMatch(dayjs().date(21).hour(12).utc().format('YYYY-MM-DDTHH'))
+  expect(call.from).toMatch(dayjs().date(20).hour(0).utc().format('YYYY-MM-DDTHH'))
 })

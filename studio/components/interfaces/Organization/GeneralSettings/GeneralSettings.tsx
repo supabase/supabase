@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { Collapsible, Form, IconChevronRight, Input, Toggle } from 'ui'
 
 import { useParams } from 'common/hooks'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import {
   FormActions,
   FormPanel,
@@ -16,10 +17,10 @@ import {
 } from 'components/ui/Forms'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
-import { patch } from 'lib/common/fetch'
+import { isResponseOk, patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { Organization } from 'types'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
-import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 
 const GeneralSettings = () => {
   const queryClient = useQueryClient()
@@ -50,13 +51,13 @@ const GeneralSettings = () => {
 
     // [Joshen] Need to update this logic once we support multiple opt in tags
     const optInTags = values.isOptedIntoAi ? ['AI_SQL_GENERATOR_OPT_IN'] : []
-    const response = await patch(`${API_URL}/organizations/${slug}`, {
+    const response = await patch<Organization>(`${API_URL}/organizations/${slug}`, {
       name: values.name,
       billing_email: selectedOrganization?.billing_email ?? '',
       ...(allowCMDKDataOptIn && { opt_in_tags: optInTags }),
     })
 
-    if (response.error) {
+    if (!isResponseOk(response)) {
       ui.setNotification({
         category: 'error',
         message: `Failed to update organization: ${response.error.message}`,

@@ -30,7 +30,6 @@ const PlanUpdateSidePanel = () => {
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showExitSurvey, setShowExitSurvey] = useState(false)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [showDowngradeError, setShowDowngradeError] = useState(false)
@@ -48,11 +47,30 @@ const PlanUpdateSidePanel = () => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
   const { data: plans, isLoading: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
-  const { mutateAsync: updateOrgSubscription } = useOrgSubscriptionUpdateMutation()
+  const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
+    {
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully updated subscription to ${subscriptionPlanMeta?.name}!`,
+        })
+        setSelectedTier(undefined)
+        onClose()
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+      },
+      onError: (error) => {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Unable to update subscription: ${error.message}`,
+        })
+      },
+    }
+  )
 
   const availablePlans = plans ?? []
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
-  const selectedTierMeta = subscriptionsPlans.find((tier) => tier.id === selectedTier)
+  const subscriptionPlanMeta = subscriptionsPlans.find((tier) => tier.id === selectedTier)
   const selectedPlanMeta = availablePlans.find(
     (plan) => plan.id === selectedTier?.split('tier_')[1]
   )
@@ -68,6 +86,7 @@ const PlanUpdateSidePanel = () => {
             title: 'Change Subscription Plan',
             section: 'Subscription plan',
           },
+          ...(slug && { orgSlug: slug }),
         },
         router
       )
@@ -91,29 +110,7 @@ const PlanUpdateSidePanel = () => {
       return ui.setNotification({ category: 'error', message: 'Please select a payment method' })
     }
 
-    try {
-      setIsSubmitting(true)
-      await updateOrgSubscription({
-        slug,
-        tier: selectedTier,
-        paymentMethod: selectedPaymentMethod,
-      })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated subscription to ${selectedTierMeta?.name}!`,
-      })
-      setSelectedTier(undefined)
-      onClose()
-      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to update subscription: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+    updateOrgSubscription({ slug, tier: selectedTier, paymentMethod: selectedPaymentMethod })
   }
 
   return (
@@ -125,7 +122,7 @@ const PlanUpdateSidePanel = () => {
         onCancel={() => onClose()}
         header={
           <div className="flex items-center justify-between">
-            <h4>Change subscription plan</h4>
+            <h4>Change subscription plan for {selectedOrganization?.name}</h4>
             <Link href="https://supabase.com/pricing">
               <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
@@ -182,7 +179,7 @@ const PlanUpdateSidePanel = () => {
                       ) : (
                         <p className="text-scale-1200 text-lg">${price}</p>
                       )}
-                      <p className="text-scale-1000 text-sm">{tierMeta?.costUnit}</p>
+                      <p className="text-scale-1000 text-sm">{tierMeta?.costUnitOrg}</p>
                     </div>
                     <div className={clsx('flex mt-1 mb-4', !tierMeta?.warning && 'opacity-0')}>
                       <div className="bg-scale-200 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
@@ -200,10 +197,8 @@ const PlanUpdateSidePanel = () => {
                             <Button
                               block
                               disabled={
-                                // no self-serve downgrades from team plan right now
-                                (plan.id !== PRICING_TIER_PRODUCT_IDS.TEAM &&
-                                  ['enterprise'].includes(subscription?.plan?.id || '')) ||
-                                !canUpdateSubscription
+                                // No self-serve downgrades from Enterprise
+                                subscription?.plan?.id === 'enterprise' || !canUpdateSubscription
                               }
                               type={isDowngradeOption ? 'default' : 'primary'}
                               onClick={() => {
@@ -218,6 +213,7 @@ const PlanUpdateSidePanel = () => {
                                         : 'Upgrade' + ' to ' + plan.name,
                                       section: 'Subscription plan',
                                     },
+                                    ...(slug && { orgSlug: slug }),
                                   },
                                   router
                                 )
@@ -250,7 +246,7 @@ const PlanUpdateSidePanel = () => {
                     <div className="border-t my-6" />
 
                     <ul role="list">
-                      {plan.features.map((feature) => (
+                      {(plan.featuresOrg || plan.features).map((feature) => (
                         <li key={feature} className="flex py-2">
                           <div className="w-[12px]">
                             <IconCheck
@@ -279,20 +275,21 @@ const PlanUpdateSidePanel = () => {
 
       <DowngradeModal
         visible={selectedTier === 'tier_free'}
-        selectedTier={selectedTierMeta}
+        selectedPlan={subscriptionPlanMeta}
+        subscription={subscription}
         onClose={() => setSelectedTier(undefined)}
         onConfirm={onConfirmDowngrade}
       />
 
       <Modal
-        loading={isSubmitting}
+        loading={isUpdating}
         alignFooter="right"
         className="!w-[450px]"
         visible={selectedTier !== undefined && selectedTier !== 'tier_free'}
         onCancel={() => setSelectedTier(undefined)}
         onConfirm={onUpdateSubscription}
         overlayClassName="pointer-events-none"
-        header={`Confirm to upgrade to ${selectedTierMeta?.name}`}
+        header={`Confirm to upgrade to ${subscriptionPlanMeta?.name}`}
       >
         <Modal.Content>
           <div className="py-6 space-y-2">
@@ -322,6 +319,7 @@ const PlanUpdateSidePanel = () => {
 
       <ExitSurveyModal
         visible={showExitSurvey}
+        subscription={subscription}
         onClose={(success?: boolean) => {
           setShowExitSurvey(false)
           if (success) onClose()

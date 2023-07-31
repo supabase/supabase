@@ -20,8 +20,25 @@ const ChangePaymentMethodModal = ({
   const { ui } = useStore()
   const { slug } = useParams()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
-  const { mutateAsync: updateOrgSubscription, isLoading: isUpdating } =
-    useOrgSubscriptionUpdateMutation()
+  const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
+    {
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully changed payment method to the card ending with ${
+            selectedPaymentMethod!.card.last4
+          }`,
+        })
+        onClose()
+      },
+      onError: (error) => {
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to change payment method: ${error.message}`,
+        })
+      },
+    }
+  )
 
   const onConfirmUpdate = async () => {
     if (!slug) return console.error('Slug is required')
@@ -33,23 +50,11 @@ const ChangePaymentMethodModal = ({
         ? 'tier_payg'
         : `tier_${subscription.plan.id}`
 
-    try {
-      await updateOrgSubscription({
-        slug,
-        tier: selectedTier as SubscriptionTier,
-        paymentMethod: selectedPaymentMethod.id,
-      })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully changed payment method to the card ending with ${selectedPaymentMethod.card.last4}`,
-      })
-      onClose()
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to change payment method: ${error.message}`,
-      })
-    }
+    updateOrgSubscription({
+      slug,
+      tier: selectedTier as SubscriptionTier,
+      paymentMethod: selectedPaymentMethod.id,
+    })
   }
 
   return (

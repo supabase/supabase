@@ -8,6 +8,7 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useFlag } from 'hooks'
@@ -15,7 +16,6 @@ import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Alert, Button, IconExternalLink } from 'ui'
 import ProjectUpdateDisabledTooltip from '../../BillingSettings/ProjectUpdateDisabledTooltip'
 import PlanUpdateSidePanel from './PlanUpdateSidePanel'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 const Subscription = () => {
   const { slug } = useParams()
@@ -84,6 +84,7 @@ const Subscription = () => {
                 <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
                   <Button
                     type="default"
+                    className="pointer-events-auto"
                     disabled={!canChangeTier}
                     onClick={() => snap.setPanelKey('subscriptionPlan')}
                   >
@@ -141,7 +142,7 @@ const Subscription = () => {
                     )
                   }
                 >
-                  <p className="text-sm text-scale-1000 mr-2">
+                  <div className="text-sm text-scale-1000 mr-2">
                     When this organization exceeds its{' '}
                     <Link href="#breakdown">
                       <a className="text-sm text-green-900 transition hover:text-green-1000">
@@ -160,7 +161,7 @@ const Subscription = () => {
                         over-usage, you can adjust your Cost Control settings.
                       </p>
                     )}
-                  </p>
+                  </div>
                 </Alert>
               )}
 

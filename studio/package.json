@@ -13,9 +13,11 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "prettier:check": "prettier --check .",
-    "prettier:write": "prettier --write ."
+    "prettier:write": "prettier --write .",
+    "codegen": "openapi-typescript http://localhost:8080/api-json -o ./data/api.d.ts"
   },
   "dependencies": {
+    "@dagrejs/dagre": "^1.0.2",
     "@graphiql/react": "^0.15.0",
     "@graphiql/toolkit": "^0.8.0",
     "@hcaptcha/react-hcaptcha": "^1.4.4",
@@ -64,6 +66,7 @@
     "mobx-react-lite": "^3.2.0",
     "next": "^12.3.2",
     "next-transpile-modules": "^9.0.0",
+    "openapi-fetch": "^0.6.1",
     "openapi-types": "^12.0.2",
     "p-queue": "^6.6.2",
     "papaparse": "^5.3.1",
@@ -89,6 +92,7 @@
     "react-virtualized-auto-sizer": "^1.0.6",
     "react-window": "^1.8.6",
     "react-window-infinite-loader": "^1.0.7",
+    "reactflow": "^11.7.4",
     "recharts": "^2.1.15",
     "sass": "^1.55.0",
     "scheduler": "^0.20.2",
@@ -147,6 +151,7 @@
     "config": "*",
     "jest": "^27.4.7",
     "jest-canvas-mock": "^2.3.1",
+    "openapi-typescript": "^6.3.4",
     "postcss": "^8.4.22",
     "prettier": "^2.8.8",
     "storybook-dark-mode": "^3.0.0",

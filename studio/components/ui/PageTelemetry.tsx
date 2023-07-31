@@ -1,4 +1,5 @@
-import { useTelemetryProps } from 'common'
+import { useParams, useTelemetryProps } from 'common'
+import { useSelectedOrganization } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { observer } from 'mobx-react-lite'
@@ -7,7 +8,9 @@ import { FC, useEffect } from 'react'
 
 const PageTelemetry: FC = ({ children }) => {
   const router = useRouter()
+  const { ref } = useParams()
   const telemetryProps = useTelemetryProps()
+  const selectedOrganization = useSelectedOrganization()
 
   useEffect(() => {
     function handleRouteChange(url: string) {
@@ -56,6 +59,8 @@ const PageTelemetry: FC = ({ children }) => {
       })
 
       post(`${API_URL}/telemetry/pageview`, {
+        ...(ref && { projectRef: ref }),
+        ...(selectedOrganization && { orgSlug: selectedOrganization.slug }),
         referrer: referrer,
         title: document.title,
         path: router.route,

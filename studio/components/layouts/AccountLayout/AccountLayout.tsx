@@ -8,6 +8,7 @@ import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import { SidebarSection } from './AccountLayout.types'
 import WithSidebar from './WithSidebar'
+import SettingsLayout from '../SettingsLayout/SettingsLayout'
 
 export interface AccountLayoutProps {
   title: string
@@ -23,12 +24,12 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
   const selectedOrganization = useSelectedOrganization()
 
   const ongoingIncident = useFlag('ongoingIncident')
+  const navLayoutV2 = useFlag('navigationLayoutV2')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
   const signOut = useSignOut()
   const onClickLogout = async () => {
     await signOut()
-
     await router.push('/sign-in')
   }
 
@@ -36,7 +37,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
     .map((organization) => ({
       isActive:
         router.pathname.startsWith('/org/') && selectedOrganization?.slug === organization.slug,
-      label: organization.name + (organization.subscription_id ? ' (V2)' : ''),
+      label: organization.name,
       href: `/org/${organization.slug}/general`,
       key: organization.slug,
     }))
@@ -126,6 +127,10 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
       : []),
   ]
 
+  if (navLayoutV2) {
+    return <SettingsLayout>{children}</SettingsLayout>
+  }
+
   return (
     <>
       <Head>
@@ -137,7 +142,12 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
           style={{ height: maxHeight, maxHeight }}
           className="flex flex-col flex-1 w-full overflow-y-auto"
         >
-          <WithSidebar title={title} breadcrumbs={breadcrumbs} sections={sectionsWithHeaders}>
+          <WithSidebar
+            hideSidebar={navLayoutV2}
+            title={title}
+            breadcrumbs={breadcrumbs}
+            sections={sectionsWithHeaders}
+          >
             {children}
           </WithSidebar>
         </main>

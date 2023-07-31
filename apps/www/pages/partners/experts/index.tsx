@@ -31,10 +31,6 @@ interface Props {
 
 function ExpertPartnersPage(props: Props) {
   const { partners } = props
-  const partnersByCategory: { [category: string]: Partner[] } = {}
-  partners.map(
-    (p) => (partnersByCategory[p.category] = [...(partnersByCategory[p.category] ?? []), p])
-  )
   const router = useRouter()
 
   const meta_title = 'Find an expert'
@@ -56,7 +52,7 @@ function ExpertPartnersPage(props: Props) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout className="bg-scale-400 dark:bg-scale-100">
         <SectionContainer className="space-y-12">
           <div>
             <h1 className="h1">{meta_title}</h1>
@@ -122,7 +118,7 @@ function ExpertPartnersPage(props: Props) {
               {/* Partner Tiles */}
               <div className="grid">
                 {partners.length ? (
-                  <TileGrid partnersByCategory={partnersByCategory} hideCategories={true} />
+                  <TileGrid partners={partners} hideCategories={true} />
                 ) : (
                   <h2 className="h2">No Partners Found</h2>
                 )}

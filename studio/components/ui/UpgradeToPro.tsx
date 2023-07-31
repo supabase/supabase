@@ -3,11 +3,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { FC, ReactNode } from 'react'
 
-import { useParams } from 'common/hooks'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useCheckPermissions, useFlag } from 'hooks'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { Button } from 'ui'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 interface Props {
   icon?: ReactNode
@@ -17,9 +15,8 @@ interface Props {
 }
 
 const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText }) => {
-  const { ref } = useParams()
-  const { project } = useProjectContext()
-  const tier = project?.subscription_tier
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const plan = subscription?.plan?.id
 
   const canUpdateSubscription = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
@@ -48,13 +45,11 @@ const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText 
             <Tooltip.Trigger>
               <Button type="primary" disabled={!canUpdateSubscription || projectUpdateDisabled}>
                 <Link
-                  href={`/project/${ref}/settings/billing/subscription${
-                    tier === PRICING_TIER_PRODUCT_IDS.FREE ? '?panel=subscriptionPlan' : ''
+                  href={`/project/${projectRef}/settings/billing/subscription${
+                    plan === 'free' ? '?panel=subscriptionPlan' : ''
                   }`}
                 >
-                  <a>
-                    {tier === PRICING_TIER_PRODUCT_IDS.FREE ? 'Upgrade to Pro' : 'Enable Addon'}
-                  </a>
+                  <a>{plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon'}</a>
                 </Link>
               </Button>
             </Tooltip.Trigger>

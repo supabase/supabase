@@ -39,12 +39,12 @@ const BillingBreakdown = () => {
 
   const hasExceededAnyLimits =
     !isUsageBillingEnabled &&
-    usage?.usages
-      .map(
+    Boolean(
+      usage?.usages.find(
         (metric) =>
-          !metric.unlimited && !metric.capped && metric.usage > (metric?.pricing_free_units ?? 0)
+          !metric.unlimited && metric.capped && metric.usage > (metric?.pricing_free_units ?? 0)
       )
-      .includes(true)
+    )
 
   return (
     <ScaffoldSection>
@@ -75,15 +75,15 @@ const BillingBreakdown = () => {
             <p className="text-sm">Included usage summary</p>
             {isUsageBillingEnabled ? (
               <p className="text-sm text-scale-1000">
-                Your plan includes a limited amount of usage. If the usage on your project exceeds
-                these quotas, your subscription will be charged for the overages. It may take up to
-                24 hours for usage stats to update.
+                Your plan includes a limited amount of usage. If the usage on your organization
+                exceeds these quotas, your subscription will be charged for the overages. It may
+                take up to 24 hours for usage stats to update.
               </p>
             ) : (
               <p className="text-sm text-scale-1000">
-                Your plan includes a limited amount of usage. If the usage on your project exceeds
-                these quotas, you may experience restrictions, as you are currently not billed for
-                overages. It may take up to 24 hours for usage stats to update.
+                Your plan includes a limited amount of usage. If the usage on your organization
+                exceeds these quotas, you may experience restrictions, as you are currently not
+                billed for overages. It may take up to 24 hours for usage stats to update.
               </p>
             )}
 
@@ -91,17 +91,17 @@ const BillingBreakdown = () => {
               <Alert
                 withIcon
                 variant="danger"
-                title="Your project's usage has exceeded its included quota"
+                title="Your organization's usage has exceeded its included quota"
                 actions={[
                   <Button key="upgrade-button" type="default" className="ml-8" onClick={() => {}}>
                     {currentPlan?.id === 'free' ? 'Upgrade plan' : 'Change spend cap'}
                   </Button>,
                 ]}
               >
-                Your project can become unresponsive or enter read only mode.{' '}
+                Your projects can become unresponsive or enter read only mode.{' '}
                 {currentPlan?.id === 'free'
-                  ? 'Please upgrade to the Pro plan to ensure that your project remains available.'
-                  : 'Please disable spend cap to ensure that your project remains available.'}
+                  ? 'Please upgrade to the Pro plan to ensure that your projects remain available.'
+                  : 'Please disable spend cap to ensure that your projects remain available.'}
               </Alert>
             )}
 
