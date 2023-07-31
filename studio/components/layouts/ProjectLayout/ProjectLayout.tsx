@@ -93,7 +93,7 @@ const ProjectLayout = ({
         </Head>
         <div className="flex h-full">
           {/* Left-most navigation side bar to access products */}
-          {!hideIconBar && <NavigationBar />}
+          {/* {!hideIconBar && <NavigationBar />} */}
 
           {/* Product menu bar */}
           {!showPausedState && (
@@ -231,7 +231,7 @@ export const ProjectLayoutNonBlocking = ({
         </Head>
         <div className="flex h-full">
           {/* Left-most navigation side bar to access products */}
-          {!hideIconBar && <NavigationBar />}
+          {/* {!hideIconBar && <NavigationBar />} */}
 
           {/* Product menu bar */}
           {productMenu && !showPausedState && (
