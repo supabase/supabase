@@ -1,18 +1,18 @@
 import React from 'react'
-import { NextSeo } from 'next-seo'
-import { useRouter } from 'next/router'
-
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
-
-import pageData from '~/data/partners'
-import { Badge, Button, IconCode, TextLink } from 'ui'
 import Link from 'next/link'
 import Image from 'next/image'
-import InteractiveShimmerCard from '../../components/InteractiveShimmerCard'
+import { useRouter } from 'next/router'
+import { NextSeo } from 'next-seo'
 import { range } from 'lodash'
+
 import { useBreakpoint } from 'common'
+import { Badge, Button, IconCode, TextLink } from 'ui'
+import DefaultLayout from '~/components/Layouts/Default'
+import InteractiveShimmerCard from '~/components/InteractiveShimmerCard'
+import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+
+import pageData from '~/data/partners'
 
 const Partners = () => {
   const router = useRouter()
@@ -221,7 +221,7 @@ const Partners = () => {
                   label="Learn more"
                 />
               </div>
-              <div className="relative w-full lg:w-1/2 min-h-[300px] border bg-scale-300 flex items-center justify-center aspect-video rounded-xl overflow-hidden">
+              <div className="relative w-full lg:w-1/2 border bg-scale-300 flex items-center justify-center aspect-video rounded-xl overflow-hidden">
                 <Image
                   src="/images/partners/register-oauth-app.svg"
                   alt="Register app via API"
@@ -231,39 +231,6 @@ const Partners = () => {
                 />
               </div>
             </div>
-            {/* <div className="w-full col-span-full flex gap-4 lg:gap-8 xl:gap-10">
-              <div className="mt-16 md:ml-36 lg:flex lg:items-start lg:w-fit lg:mx-auto">
-                {pageData.oAuthApp.steps.map((step: { title: string; text: string }, i: number) => {
-                  return (
-                    <div
-                      key={i + 1}
-                      className="flex lg:block items-start space-x-6 lg:space-x-0 lg:w-full"
-                    >
-                      <div className="lg:flex items-center">
-                        <h3 className="bg-brand-600 border-[1px] border-brand-800 text-brand-900 text-md text-center w-full max-w-[40px] px-2 py-1.5 rounded-md">
-                          {i + 1}
-                        </h3>
-                        <div
-                          className={[
-                            i === pageData.oAuthApp.steps.length - 1
-                              ? 'hidden'
-                              : 'h-[100px] w-[1px] sm:h-[100px] mx-auto lg:h-[1px] lg:w-full bg-brand-800 lg:pr-6',
-                          ].join('')}
-                        ></div>
-                      </div>
-                      <div className="lg:mt-6">
-                        <h2 className="sm:text-lg max-w-[75%] xl:max-w-none xl:w-11/12 lg:max-w-none">
-                          {step.title}
-                        </h2>
-                        <p className="text-scale-1100 text-xs sm:text-sm mt-1 md:w-3/4 lg:w-11/12">
-                          {step.text}
-                        </p>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div> */}
           </SectionContainer>
         </div>
         <SectionContainer>
