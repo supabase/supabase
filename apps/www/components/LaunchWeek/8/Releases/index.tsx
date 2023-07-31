@@ -144,7 +144,9 @@ export default function LW8Releases() {
   const showAll = false
   const publishedSections =
     days
-      .filter((day: WeekDayProps) => Date.parse(day.publishedAt) <= Date.now() || showAll)
+      .filter(
+        (day: WeekDayProps) => day.d === 0 || Date.parse(day.publishedAt) <= Date.now() || showAll
+      )
       .map((day: WeekDayProps) => day.d.toString()) ?? []
 
   const prereleaseShipped = Date.parse(preRelease.publishedAt) <= Date.now()
@@ -253,6 +255,7 @@ export default function LW8Releases() {
                   day={preRelease.dd}
                   title={preRelease.title}
                   shipped={true}
+                  shippable={false}
                   publishedAt={preRelease.publishedAt}
                 />
               }
@@ -275,7 +278,7 @@ export default function LW8Releases() {
                     <div
                       className="top-0 absolute group-hover/3:scale-105 opacity-60 group-hover/3:opacity-100 w-full h-full -z-10 transition-all duration-500"
                       style={{
-                        background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, transparent)`,
+                        background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, #030A0C)`,
                       }}
                     />
                     <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -318,7 +321,7 @@ export default function LW8Releases() {
                     <div
                       className="top-0 absolute group-hover/3:scale-105 opacity-60 group-hover/3:opacity-100 w-full h-full -z-10 transition-all duration-500"
                       style={{
-                        background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, transparent)`,
+                        background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, #030A0C)`,
                       }}
                     />
                     <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -364,7 +367,7 @@ export default function LW8Releases() {
                     <div
                       className="top-0 absolute group-hover/3:scale-105 opacity-60 group-hover/3:opacity-100 w-full h-full -z-10 transition-all duration-500"
                       style={{
-                        background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, transparent)`,
+                        background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, #030A0C)`,
                       }}
                     />
                     <div className="flex flex-col items-center gap-2 min-w-[300px]">
