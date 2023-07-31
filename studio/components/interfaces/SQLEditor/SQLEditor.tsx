@@ -438,7 +438,7 @@ const SQLEditor = () => {
           >
             <div
               className={cn(
-                'w-full !border-brand-900 border-none !shadow-none  placeholder:text-scale-900',
+                'w-full !border-brand-900 border-none !shadow-none',
                 'flex items-center gap-3'
               )}
             >
@@ -478,12 +478,9 @@ const SQLEditor = () => {
                       disabled={isDiffOpen}
                       ref={inputRef}
                       className={cn(
-                        '!p-0 bg-transparent border-transparent text-sm text-brand placeholder:text-brand-500 focus:!ring-0',
+                        '!p-0 bg-transparent border-transparent text-sm text-brand-600 dark:text-brand placeholder:text-brand-500 focus:!ring-0',
                         'focus-visible:ring-0 focus-visible:ring-offset-0',
                         'appearance-none outline-none'
-                        // "after:content-['_↗']",
-                        // 'after:relative after:w-10 after:h-10',
-                        // 'after:placeholder:content-["hello"]'
                       )}
                       placeholder={!debugSolution ? 'Ask Supabase AI to modify your query' : ''}
                       onKeyDown={(e) => {
@@ -668,12 +665,12 @@ const SQLEditor = () => {
                     </div>
                     <button
                       onClick={() => setIsAISettingsOpen(true)}
-                      className="text-brand-500 hover:text-brand hover:text transition"
+                      className="text-brand-600 dark:text-brand hover:text-brand-600 transition"
                     >
                       <IconSettings className="cursor-pointer" />
                     </button>
                     <button
-                      className="text-brand hover:text-brand-600"
+                      className="text-brand-600 dark:text-brand hover:text-brand-600"
                       onClick={() => setAiOpen(false)}
                     >
                       <IconX size={21} />
