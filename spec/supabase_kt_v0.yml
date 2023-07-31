@@ -3098,7 +3098,7 @@ functions:
           function()
           //invoke it with a body:
           function(body)
-          //invoke it with custom http options:
+          //invoke it with custom request options:
           function(body) {
               header("Header", "Value")
               parameter("Key", "Value") //url parameter
