@@ -34,6 +34,7 @@ const ConnectionPooling = () => {
     'ignore_startup_parameters',
     'pool_mode',
     'pgbouncer_enabled',
+    'max_client_conn',
   ]
   const bouncerInfo = isSuccess ? pluckObjectFields(formModel, BOUNCER_FIELDS) : {}
 
@@ -124,7 +125,7 @@ export const PgbouncerConfig: FC<ConfigProps> = ({ projectRef, bouncerInfo, conn
     'projects'
   )
 
-  const [updates, setUpdates] = useState<any>({
+  const [updates, setUpdates] = useState({
     pool_mode: bouncerInfo.pool_mode || 'transaction',
     default_pool_size: bouncerInfo.default_pool_size || undefined,
     ignore_startup_parameters: bouncerInfo.ignore_startup_parameters || '',
