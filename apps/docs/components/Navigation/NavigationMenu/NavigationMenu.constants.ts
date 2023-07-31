@@ -660,6 +660,15 @@ export const database: NavMenuConstant = {
         {
           name: 'wrappers: 3rd Party Integrations',
           url: '/guides/database/extensions/wrappers',
+          items: [
+            { name: 'Airtable', url: '/guides/database/extensions/wrappers/airtable' },
+            { name: 'AWS S3', url: '/guides/database/extensions/wrappers/s3' },
+            { name: 'BigQuery', url: '/guides/database/extensions/wrappers/bigquery' },
+            { name: 'ClickHouse', url: '/guides/database/extensions/wrappers/clickhouse' },
+            { name: 'Firebase', url: '/guides/database/extensions/wrappers/firebase' },
+            { name: 'Logflare', url: '/guides/database/extensions/wrappers/logflare' },
+            { name: 'Stripe', url: '/guides/database/extensions/wrappers/stripe' },
+          ],
         },
       ],
     },
