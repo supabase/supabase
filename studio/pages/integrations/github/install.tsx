@@ -24,13 +24,6 @@ import {
   LoadingLine,
 } from 'ui'
 
-/**
- * Organization type with `installationInstalled` added
- */
-interface OrganizationsResponseWithInstalledData extends Organization {
-  installationInstalled?: boolean
-}
-
 const GitHubIntegration: NextPageWithLayout = () => {
   const router = useRouter()
   const { ui } = useStore()
