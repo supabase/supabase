@@ -135,7 +135,7 @@ const GitHubIntegration: NextPageWithLayout = () => {
 
   return (
     <>
-      <main className="overflow-auto flex flex-col h-full bg-scale-400">
+      <main className="overflow-auto flex flex-col h-full bg">
         <LoadingLine loading={isLoadingGitHubIntegrationCreateMutation} />
         {organizationIntegrationId === null && (
           <>
