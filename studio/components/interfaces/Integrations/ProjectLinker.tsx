@@ -205,14 +205,7 @@ const ProjectLinker = ({
           <div className="border border-scale-1000 h-px w-16 border-dashed self-end mb-5"></div>
           <Panel>
             <div className="bg-black shadow rounded p-1 w-12 h-12 flex justify-center items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="white"
-                viewBox="0 0 512 512"
-                className="w-6"
-              >
-                <path fillRule="evenodd" d="M256,48,496,464H16Z" />
-              </svg>
+              {integrationIcon}
             </div>
 
             <Popover_Shadcn_
