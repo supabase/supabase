@@ -9,6 +9,7 @@ import AlertError from 'components/ui/AlertError'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
 import { NextPageWithLayout } from 'types'
+import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const {
@@ -21,6 +22,10 @@ const ProjectsPage: NextPageWithLayout = () => {
 
   const organization = useSelectedOrganization()
   const projects = allProjects?.filter((project) => project.organization_id === organization?.id)
+  const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
+  const githubIntegrations = integrations?.find(
+    (integration) => integration.integration.name === 'GitHub'
+  )
 
   return (
     <ScaffoldContainer>
@@ -65,7 +70,13 @@ const ProjectsPage: NextPageWithLayout = () => {
                 ) : (
                   <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
                     {projects?.map((project) => (
-                      <ProjectCard key={project.ref} project={project} />
+                      <ProjectCard
+                        key={project.ref}
+                        project={project}
+                        githubIntegration={githubIntegrations?.connections.find(
+                          (connection) => connection.supabase_project_ref === project.ref
+                        )}
+                      />
                     ))}
                   </ul>
                 )}
