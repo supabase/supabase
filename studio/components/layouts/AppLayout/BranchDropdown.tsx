@@ -14,6 +14,7 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
+  IconAlertCircle,
   IconCheck,
   IconCode,
   IconGitBranch,
@@ -81,7 +82,12 @@ const BranchDropdown = () => {
     <>
       {isLoading && <ShimmeringLoader className="w-[90px]" />}
 
-      {isError && <div></div>}
+      {isError && (
+        <div className="flex items-center space-x-2 text-amber-900">
+          <IconAlertCircle size={16} strokeWidth={2} />
+          <p className="text-sm">Failed to load branches</p>
+        </div>
+      )}
 
       {isSuccess && branches.length > 0 && (
         <div className="flex items-center space-x-2 px-2">

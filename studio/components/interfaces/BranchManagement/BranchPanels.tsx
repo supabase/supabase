@@ -23,7 +23,7 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { Branch } from 'data/branches/branches-query'
 
 interface BranchPanelProps {
-  branch?: Branch
+  branch: Branch
   onSelectUpdate?: () => void
   onSelectDelete?: () => void
 }
@@ -31,7 +31,7 @@ interface BranchPanelProps {
 const MainBranchPanel = ({ branch, onSelectUpdate = noop }: BranchPanelProps) => {
   const { ref } = useParams()
   const [open, setOpen] = useState(false)
-  const isActive = ref === branch?.project_ref
+  const isActive = ref === branch.project_ref
 
   return (
     <div className="border rounded-lg">
@@ -48,7 +48,7 @@ const MainBranchPanel = ({ branch, onSelectUpdate = noop }: BranchPanelProps) =>
           <div className="w-8 h-8 bg-amber-300 rounded-md flex items-center justify-center">
             <IconShield size={18} strokeWidth={2} className="text-amber-900" />
           </div>
-          <p>{branch?.name}</p>
+          <p>{branch.name}</p>
           <Badge color="amber">Production</Badge>
           {isActive && <Badge color="green">Selected</Badge>}
         </div>
@@ -96,16 +96,16 @@ const BranchPanel = ({
   const { ref } = useParams()
   const [open, setOpen] = useState(false)
 
-  const isActive = ref === branch?.project_ref
-  const daysFromNow = dayjs().diff(dayjs(branch?.created_at), 'day')
-  const formattedTimeFromNow = dayjs(branch?.created_at).fromNow()
-  const formattedCreatedAt = dayjs(branch?.created_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
+  const isActive = ref === branch.project_ref
+  const daysFromNow = dayjs().diff(dayjs(branch.created_at), 'day')
+  const formattedTimeFromNow = dayjs(branch.created_at).fromNow()
+  const formattedCreatedAt = dayjs(branch.created_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
   return (
     <BranchContainer className="bg-surface-100">
       <div className="flex items-center space-x-4">
         <IconGitBranch className="text-brand-900" size={16} strokeWidth={2} />
-        <p>{branch?.name}</p>
+        <p>{branch.name}</p>
         {isActive && <Badge color="green">Selected</Badge>}
         <p className="text-scale-1000">
           {daysFromNow > 1 ? `Created on ${formattedCreatedAt}` : `Created ${formattedTimeFromNow}`}
