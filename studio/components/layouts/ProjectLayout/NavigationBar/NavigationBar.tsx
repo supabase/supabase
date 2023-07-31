@@ -49,7 +49,7 @@ const NavigationBar = ({}) => {
       ].join(' ')}
     >
       <ul className="flex flex-col space-y-2">
-        {!navLayoutV2 && (
+        {(!navLayoutV2 || IS_PLATFORM) && (
           <Link href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}>
             <a className="block">
               <img
