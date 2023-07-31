@@ -1,25 +1,28 @@
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
+import OrganizationPicker from 'components/interfaces/Integrations/OrganizationPicker'
 import { Markdown } from 'components/interfaces/Markdown'
 import GitHubIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/GitHubIntegrationWindowLayout'
+import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
 import { ScaffoldColumn, ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import { useGitHubIntegrationCreateMutation } from 'data/integrations/github-integration-create-mutation'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
-import { IntegrationName } from 'data/integrations/integrations.types'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useStore } from 'hooks'
-import { useGitHubIntegrationInstallationState } from 'state/github-integration-installation'
 import { NextPageWithLayout, Organization } from 'types'
-import { Alert, Badge, Button, IconBook, IconHexagon, IconLifeBuoy, Listbox, LoadingLine } from 'ui'
-
-/**
- * Organization type with `installationInstalled` added
- */
-interface OrganizationsResponseWithInstalledData extends Organization {
-  installationInstalled?: boolean
-}
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertTriangle,
+  IconBook,
+  IconLifeBuoy,
+  LoadingLine,
+} from 'ui'
 
 const GitHubIntegration: NextPageWithLayout = () => {
   const router = useRouter()
@@ -28,8 +31,6 @@ const GitHubIntegration: NextPageWithLayout = () => {
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
   const [organizationIntegrationId, setOrganizationIntegrationId] = useState<string | null>(null)
 
-  const snapshot = useGitHubIntegrationInstallationState()
-
   /**
    * Fetch the list of organization based integration installations for GitHub.
    *
@@ -37,44 +38,15 @@ const GitHubIntegration: NextPageWithLayout = () => {
    */
   const { data: integrationData } = useIntegrationsQuery()
 
-  const { data: organizationsData, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery(
-    {
-      onSuccess(organizations) {
-        const firstOrg = organizations?.[0]
-        if (firstOrg && selectedOrg === null) {
-          setSelectedOrg(firstOrg)
-          snapshot.setSelectedOrganizationSlug(firstOrg.slug)
-          router.query.organizationSlug = firstOrg.slug
-        }
-      },
-    }
-  )
-
-  /**
-   * Flat array of org slugs that have integration installed
-   *
-   */
-  const flatInstalledConnectionsIds: string[] | [] =
-    integrationData && integrationData.length > 0
-      ? integrationData
-          .filter((x) => x.integration.name === 'Vercel')
-          .map((x) => x.organization.slug)
-      : []
-
-  /**
-   * Organizations with extra `installationInstalled` attribute
-   *
-   * Used to show label/badge and allow/disallow installing
-   *
-   */
-  const organizationsWithInstalledData: OrganizationsResponseWithInstalledData[] = organizationsData
-    ? organizationsData.map((org) => {
-        return {
-          ...org,
-          installationInstalled: flatInstalledConnectionsIds.includes(org.slug) ? true : false,
-        }
-      })
-    : []
+  const { data: organizationsData } = useOrganizationsQuery({
+    onSuccess(organizations) {
+      const firstOrg = organizations?.[0]
+      if (firstOrg && selectedOrg === null) {
+        setSelectedOrg(firstOrg)
+        router.query.organizationSlug = firstOrg.slug
+      }
+    },
+  })
 
   const { mutate, isLoading: isLoadingGitHubIntegrationCreateMutation } =
     useGitHubIntegrationCreateMutation({
@@ -93,6 +65,19 @@ const GitHubIntegration: NextPageWithLayout = () => {
         })
       },
     })
+
+  const installed = useMemo(
+    () =>
+      integrationData && organizationsData
+        ? getHasInstalledObject({
+            integrationName: 'GitHub',
+            integrationData,
+            organizationsData,
+            installationId,
+          })
+        : {},
+    [installationId, integrationData, organizationsData]
+  )
 
   function onInstall() {
     const orgSlug = selectedOrg?.slug
@@ -131,7 +116,7 @@ const GitHubIntegration: NextPageWithLayout = () => {
     }
   }
 
-  const dataLoading = isLoadingGitHubIntegrationCreateMutation || isLoadingOrganizationsQuery
+  const disableInstallationForm = Boolean(selectedOrg && installed[selectedOrg.slug])
 
   return (
     <>
@@ -146,18 +131,29 @@ const GitHubIntegration: NextPageWithLayout = () => {
                   <Markdown content={`Choose the Supabase organization you wish to install in`} />
                   <OrganizationPicker
                     integrationName="GitHub"
-                    organizationsWithInstalledData={organizationsWithInstalledData}
-                    onSelectedOrgChange={(e) => {
-                      router.query.organizationSlug = e.slug
-                      setSelectedOrg(e)
+                    selectedOrg={selectedOrg}
+                    onSelectedOrgChange={(org) => {
+                      router.query.organizationSlug = org.slug
+                      setSelectedOrg(org)
                     }}
-                    dataLoading={dataLoading}
+                    configurationId={installationId}
                   />
+                  {disableInstallationForm && (
+                    <Alert_Shadcn_ variant="warning">
+                      <IconAlertTriangle className="h-4 w-4" strokeWidth={2} />
+                      <AlertTitle_Shadcn_>
+                        GitHub Integration is already installed.
+                      </AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        You will need to choose another organization to install the integration.
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  )}
                   <div className="flex flex-row w-full justify-end">
                     <Button
                       size="medium"
                       className="self-end"
-                      disabled={isLoadingGitHubIntegrationCreateMutation}
+                      disabled={isLoadingGitHubIntegrationCreateMutation || disableInstallationForm}
                       loading={isLoadingGitHubIntegrationCreateMutation}
                       onClick={onInstall}
                     >
@@ -198,75 +194,5 @@ const GitHubIntegration: NextPageWithLayout = () => {
 GitHubIntegration.getLayout = (page) => (
   <GitHubIntegrationWindowLayout>{page}</GitHubIntegrationWindowLayout>
 )
-
-export interface OrganizationPickerProps {
-  label?: string
-  onSelectedOrgChange?: (org: Organization) => void
-  integrationName: IntegrationName
-  dataLoading: boolean
-  organizationsWithInstalledData: OrganizationsResponseWithInstalledData[]
-}
-
-const OrganizationPicker = ({
-  label = 'Choose an organization',
-  onSelectedOrgChange,
-  dataLoading,
-  organizationsWithInstalledData,
-}: OrganizationPickerProps) => {
-  const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
-
-  const { data, isLoading } = useOrganizationsQuery({
-    onSuccess(organizations) {
-      const firstOrg = organizations?.[0]
-      if (firstOrg && selectedOrg === null) {
-        setSelectedOrg(firstOrg)
-        onSelectedOrgChange?.(firstOrg)
-      }
-    },
-  })
-
-  function _onSelectedOrgChange(slug: string) {
-    const org = data?.find((org) => org.slug === slug)
-
-    if (org) {
-      setSelectedOrg(org)
-      onSelectedOrgChange?.(org)
-    }
-  }
-
-  if (dataLoading) {
-    return (
-      <Listbox label={label} value="loading" disabled>
-        <Listbox.Option key="loading" value="loading" label="Loading...">
-          Loading...
-        </Listbox.Option>
-      </Listbox>
-    )
-  }
-
-  return (
-    <Listbox label={label} value={selectedOrg?.slug} onChange={_onSelectedOrgChange}>
-      {organizationsWithInstalledData?.map((org) => {
-        const label = (
-          <div className="flex gap-3 items-center">
-            {org.name}
-            {org.installationInstalled && <Badge color="scale">Integration Installed</Badge>}
-          </div>
-        )
-        return (
-          <Listbox.Option
-            key={org.id}
-            value={org.slug}
-            // @ts-expect-error
-            label={label}
-            addOnBefore={({ active, selected }: any) => <IconHexagon />}
-          >
-            {label}
-          </Listbox.Option>
-        )
-      })}
-    </Listbox>
-  )
-}
 
 export default GitHubIntegration

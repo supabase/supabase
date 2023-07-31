@@ -89,6 +89,9 @@ This Supabase integration will allow you to link a Supabase project to a GitHub 
               isLoading={isCreatingConnection}
               integrationIcon={GITHUB_ICON}
               choosePrompt="Choose GitHub Repo"
+              onSkip={() => {
+                router.push(`/org/${orgSlug}/integrations`)
+              }}
             />
           </ScaffoldContainer>
         </>
