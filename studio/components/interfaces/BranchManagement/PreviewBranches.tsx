@@ -1,18 +1,13 @@
 import { Branch } from 'data/branches/branches-query'
-import { BranchContainer, BranchHeader, BranchPanel } from './BranchPanels'
 import { Button, IconExternalLink, IconGitBranch } from 'ui'
+import { BranchContainer, BranchHeader, BranchPanel } from './BranchPanels'
 
 interface PreviewBranchesProps {
   previewBranches: Branch[]
-  onSelectUpdateBranch: (branch: Branch) => void
   onSelectDeleteBranch: (branch: Branch) => void
 }
 
-const PreviewBranches = ({
-  previewBranches,
-  onSelectUpdateBranch,
-  onSelectDeleteBranch,
-}: PreviewBranchesProps) => {
+const PreviewBranches = ({ previewBranches, onSelectDeleteBranch }: PreviewBranchesProps) => {
   return (
     <>
       <BranchHeader markdown={previewBranches.length > 0 ? `#### Preview branches` : undefined} />
@@ -49,7 +44,6 @@ const PreviewBranches = ({
           <BranchPanel
             key={branch.id}
             branch={branch}
-            onSelectUpdate={() => onSelectUpdateBranch(branch)}
             onSelectDelete={() => onSelectDeleteBranch(branch)}
           />
         ))

@@ -51,9 +51,7 @@ export const useBranchCreateMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
         await queryClient.invalidateQueries(branchKeys.list(projectRef))
-        // [Joshen] Need to refresh projects cause thats where we'll check if branching is enabled or not
-        // pending adding preview_project_refs to project details, then we can just check there instead
-        await queryClient.invalidateQueries(projectKeys.list())
+        await queryClient.invalidateQueries(projectKeys.detail(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
