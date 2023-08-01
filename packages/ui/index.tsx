@@ -127,8 +127,6 @@ export {
   AlertDescription as AlertDescription_Shadcn_,
 } from './src/components/shadcn/ui/alert'
 
-export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
-
 export {
   useFormField as useFormField_Shadcn_,
   Form as Form_Shadcn_,
@@ -160,6 +158,9 @@ export {
 } from './src/components/shadcn/ui/collapsible'
 
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
+export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
+export { Switch as Switch } from './src/components/shadcn/ui/switch'
+export { Checkbox as Checkbox_Shadcn_ } from './src/components/shadcn/ui/checkbox'
 
 // links
 

@@ -31,6 +31,12 @@ export const generateSettingsMenu = (
             items: [],
           },
           {
+            name: 'Integrations',
+            key: 'Integrations',
+            url: `/project/${ref}/settings/integrations`,
+            items: [],
+          },
+          {
             name: 'Add Ons',
             key: 'addons',
             url: `/project/${ref}/settings/addons`,
