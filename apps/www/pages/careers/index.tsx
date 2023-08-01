@@ -101,7 +101,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
       <DefaultLayout>
         <div className="text-scale-1200">
           <div className="container relative mx-auto px-6 py-10 lg:pt-12 lg:px-16 xl:px-20 text-center space-y-4">
-            <h1 className="text-sm text-brand-900 md:text-base">
+            <h1 className="text-sm text-brand md:text-base">
               <span className="sr-only">Supabase </span>Careers
             </h1>
             <h2 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-1.5px]">
@@ -121,9 +121,9 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                 return (
                   <div
                     key={i}
-                    className="border-t-[1px] mt-6 mx-2 md:mx-2 md:mt-0 md:border-0 border-brand-900 w-[134px] md:max-w-none"
+                    className="border-t-[1px] mt-6 mx-2 md:mx-2 md:mt-0 md:border-0 border-brand w-[134px] md:max-w-none"
                   >
-                    <div className="hidden md:block border-t-[1px] lg:border-t-2 border-brand-900 w-[60px] lg:w-[100px]"></div>
+                    <div className="hidden md:block border-t-[1px] lg:border-t-2 border-brand w-[60px] lg:w-[100px]"></div>
                     <h2 className="text-3xl lg:text-4xl pt-3 tracking-[-1.5px]">
                       {company.number}
                     </h2>
@@ -153,7 +153,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                       Discord to stay connected to our team, and our community.
                     </p>
                     <div className="max-w-[300px] sm:max-w-md lg:max-w-md mt-20">
-                      <div className="border-t-2 border-brand-900 w-4/12"></div>
+                      <div className="border-t-2 border-brand w-4/12"></div>
                       <h2 className="text-2xl sm:text-3xl lg:text-4xl pt-2 tracking-[-1.5px]">
                         We deeply believe in the efficacy of collaborative open source
                       </h2>
@@ -445,10 +445,10 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                     className="flex lg:block items-start space-x-6 lg:space-x-0 lg:w-full"
                   >
                     <div className="lg:flex items-center">
-                      <h3 className="bg-brand-600 border-[1px] border-brand-800 text-brand-900 text-md text-center w-[44px] px-2 py-1.5 rounded-md">
+                      <h3 className="bg-brand-600 border-[1px] border-brand-300 text-brand text-md text-center w-[44px] px-2 py-1.5 rounded-md">
                         {i + 1}
                       </h3>
-                      <div className="h-[100px] w-[1px] sm:h-[100px] mx-auto lg:h-[1px] lg:w-full bg-brand-800 lg:pr-6"></div>
+                      <div className="h-[100px] w-[1px] sm:h-[100px] mx-auto lg:h-[1px] lg:w-full bg-brand-300 lg:pr-6"></div>
                     </div>
                     <div className="lg:mt-6">
                       <h2 className="sm:text-lg max-w-[75%] xl:max-w-none xl:w-11/12 lg:max-w-none">
@@ -461,7 +461,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                   </div>
                 )
               })}
-              <h3 className="bg-brand-600 border-[1px] border-brand-800 text-brand-900 text-xl w-[44px] min-h-[40px] px-2 py-1 rounded-md grid justify-items-center items-center">
+              <h3 className="bg-brand-600 border-[1px] border-brand-300 text-brand text-xl w-[44px] min-h-[40px] px-2 py-1 rounded-md grid justify-items-center items-center">
                 <IconCheck />
               </h3>
             </div>
