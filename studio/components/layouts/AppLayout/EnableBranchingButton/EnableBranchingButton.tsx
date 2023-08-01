@@ -2,7 +2,10 @@ import { useParams } from 'common'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useSelectedOrganization } from 'hooks'
 import { useState } from 'react'
-import { Badge, Button, IconFileText, IconGitBranch, Modal } from 'ui'
+import { Button, IconFileText, IconGitBranch, Modal } from 'ui'
+import BranchingWaitlistPopover from './BranchingWaitlistPopover'
+import GithubRepositorySelection from './GithubRepositorySelection'
+import VercelProjectSelection from './VercelProjectSelection'
 
 const EnableBranchingButton = () => {
   const { ref } = useParams()
@@ -19,19 +22,25 @@ const EnableBranchingButton = () => {
     orgSlug: selectedOrg?.slug,
   })
 
+  // [Joshen] To be dynamic
+  const isBranchingAllowed = true
+
   const githubIntegration = integrations?.find(
     (integration) =>
       integration.integration.name === 'GitHub' &&
-      integration.connections.some((connection) => connection.supabase_project_ref === ref)
+      integration.organization.slug === selectedOrg?.slug
   )
-  const vercelIntegration = integrations?.find(
-    (integration) =>
-      integration.integration.name === 'Vercel' &&
-      integration.connections.some((connection) => connection.supabase_project_ref === ref)
-  )
-  const hasVercelIntegration = false
 
-  console.log({ githubIntegration, vercelIntegration })
+  const vercelIntegration = integrations?.find(
+    (integration) => integration.integration.name === 'Vercel'
+  )
+  const vercelProjectIntegration = vercelIntegration?.connections.find(
+    (connection) => connection.supabase_project_ref === ref
+  )
+
+  if (!isBranchingAllowed) {
+    return <BranchingWaitlistPopover />
+  }
 
   return (
     <>
@@ -53,54 +62,9 @@ const EnableBranchingButton = () => {
           </div>
         </Modal.Content>
 
-        {githubIntegration !== undefined ? (
-          <>
-            <Modal.Separator />
-            <Modal.Content>
-              <div className="flex items-center space-x-4 py-4">
-                <IconGitBranch strokeWidth={2} size={20} />
-                <div>
-                  <p className="text">Enable database branching</p>
-                  <p className="text-sm text-light">Management environments in Supabase</p>
-                </div>
-              </div>
-            </Modal.Content>
-            <Modal.Separator />
-          </>
-        ) : (
-          <div className="border-t border-b border-amber-300 bg-amber-100">
-            <Modal.Content>
-              <div className="space-y-1 py-6">
-                <div className="flex items-center space-x-2">
-                  <p>Git Connection</p>
-                  <Badge color="amber">Required</Badge>
-                </div>
-                <p className="text-sm text-light">
-                  Your database will make preview branches based on your branches in the Git
-                  repository that your project is connected with.
-                </p>
-                <Button type="default" className="!mt-3" onClick={() => {}}>
-                  Install Github Integration
-                </Button>
-              </div>
-            </Modal.Content>
-          </div>
-        )}
+        <GithubRepositorySelection integration={githubIntegration} />
 
-        {/* <Modal.Content>
-          <div className="space-y-1 py-6">
-            <div className="flex items-center space-x-2">
-              <p>Frontend Cloud Previews</p>
-              <Badge color="gray">Optional</Badge>
-            </div>
-            <p className="text-sm text-light">
-              Previews can be available by connecting your Supabase project to a Vercel project.
-            </p>
-            <Button type="default" className="!mt-3" onClick={() => {}}>
-              Install Vercel Integration
-            </Button>
-          </div>
-        </Modal.Content> */}
+        {/* <VercelProjectSelection integration={vercelIntegration} /> */}
 
         {/* <Modal.Separator /> */}
 
