@@ -1,6 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
 
 import { post } from 'data/fetchers'
+import { ResponseError } from 'types'
 import { integrationKeys } from './keys'
 
 export type GitHubIntegrationCreateVariables = {
@@ -30,13 +32,14 @@ type GitHubIntegrationCreateData = Awaited<ReturnType<typeof createGitHubIntegra
 
 export const useGitHubIntegrationCreateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<GitHubIntegrationCreateData, unknown, GitHubIntegrationCreateVariables>,
+  UseMutationOptions<GitHubIntegrationCreateData, ResponseError, GitHubIntegrationCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<GitHubIntegrationCreateData, unknown, GitHubIntegrationCreateVariables>(
+  return useMutation<GitHubIntegrationCreateData, ResponseError, GitHubIntegrationCreateVariables>(
     (vars) => createGitHubIntegration(vars),
     {
       async onSuccess(data, variables, context) {
@@ -46,6 +49,13 @@ export const useGitHubIntegrationCreateMutation = ({
           queryClient.invalidateQueries(integrationKeys.githubRepoList(data.id)),
         ])
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to mutate: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

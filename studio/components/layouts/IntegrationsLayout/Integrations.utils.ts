@@ -1,4 +1,4 @@
-import { IntegrationsResponse } from 'data/integrations/integrations-query'
+import { IntegrationsData } from 'data/integrations/integrations-query'
 import { IntegrationName } from 'data/integrations/integrations.types'
 import { Organization } from 'types'
 
@@ -9,7 +9,7 @@ export function getHasInstalledObject({
   installationId,
 }: {
   integrationName: IntegrationName
-  integrationData: IntegrationsResponse
+  integrationData: IntegrationsData
   organizationsData: Organization[]
   installationId?: string | number
 }): { [orgSlug: string]: boolean } {

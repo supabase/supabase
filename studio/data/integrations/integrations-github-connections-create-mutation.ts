@@ -1,6 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { toast } from 'react-hot-toast'
+
+import { post } from 'data/fetchers'
+import { ResponseError } from 'types'
 import { integrationKeys } from './keys'
 import { IntegrationConnectionsCreateVariables } from './types'
 
@@ -8,15 +10,17 @@ export async function createIntegrationGitHubConnections({
   organizationIntegrationId,
   connection,
 }: IntegrationConnectionsCreateVariables) {
-  const response = await post(`${API_URL}/integrations/github/connections`, {
-    organization_integration_id: organizationIntegrationId,
-    connection,
+  const { data, error } = await post('/platform/integrations/github/connections', {
+    body: {
+      organization_integration_id: organizationIntegrationId,
+      connection,
+    },
   })
-  if (response.error) {
-    throw response.error
+  if (error) {
+    throw error
   }
 
-  return response
+  return data
 }
 
 export type IntegrationGitHubConnectionsCreateData = Awaited<
@@ -25,11 +29,12 @@ export type IntegrationGitHubConnectionsCreateData = Awaited<
 
 export const useIntegrationGitHubConnectionsCreateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
   UseMutationOptions<
     IntegrationGitHubConnectionsCreateData,
-    unknown,
+    ResponseError,
     IntegrationConnectionsCreateVariables
   >,
   'mutationFn'
@@ -37,7 +42,7 @@ export const useIntegrationGitHubConnectionsCreateMutation = ({
   const queryClient = useQueryClient()
   return useMutation<
     IntegrationGitHubConnectionsCreateData,
-    unknown,
+    ResponseError,
     IntegrationConnectionsCreateVariables
   >((vars) => createIntegrationGitHubConnections(vars), {
     async onSuccess(data, variables, context) {
@@ -52,6 +57,13 @@ export const useIntegrationGitHubConnectionsCreateMutation = ({
         ),
       ])
       await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to mutate: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
     },
     ...options,
   })

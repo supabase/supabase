@@ -8,7 +8,7 @@ import GitHubIntegrationWindowLayout from 'components/layouts/IntegrationsLayout
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import { useIntegrationGitHubConnectionsCreateMutation } from 'data/integrations/integrations-github-connections-create-mutation'
 import { useGitHubReposQuery } from 'data/integrations/integrations-github-repos-query'
-import { useIntegrationsQuery } from 'data/integrations/integrations-query'
+import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
@@ -26,15 +26,17 @@ const GITHUB_ICON = (
 
 const ChooseProjectGitHubPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { integrationId } = useParams()
+  const { integrationId, slug, organizationSlug } = useParams()
+  const orgSlug = slug ?? organizationSlug
 
-  const { data: integrations } = useIntegrationsQuery()
+  const { data: integrations } = useOrgIntegrationsQuery({
+    orgSlug,
+  })
   const { data: organizations } = useOrganizationsQuery()
   const { data: allProjects } = useProjectsQuery()
   const { data: allRepos } = useGitHubReposQuery({ integrationId })
 
   const integration = integrations?.find((integration) => integration.id === integrationId)
-  const orgSlug = integration?.organization.slug
   const organization = organizations?.find((organization) => organization.slug === orgSlug)
   const projects = useMemo(
     () =>

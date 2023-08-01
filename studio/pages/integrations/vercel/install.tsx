@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'react-hot-toast'
 
 import { useParams } from 'common'
 import OrganizationPicker from 'components/interfaces/Integrations/OrganizationPicker'
@@ -109,11 +110,8 @@ const VercelIntegration: NextPageWithLayout = () => {
 
         handleRouteChange()
       },
-      onError(error: any) {
-        ui.setNotification({
-          category: 'error',
-          message: `Creating Vercel integration failed: ${error.message}`,
-        })
+      onError(error) {
+        toast.error(`Creating Vercel integration failed: ${error.message}`)
       },
     })
 
