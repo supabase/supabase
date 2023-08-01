@@ -48,6 +48,10 @@
         "url": "https://status.supabase.com/"
       },
       {
+        "text": "Become a Partner",
+        "url": "/partners"
+      },
+      {
         "text": "Integrations",
         "url": "/partners/integrations"
       },

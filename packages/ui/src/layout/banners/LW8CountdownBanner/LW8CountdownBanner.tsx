@@ -6,20 +6,13 @@ import _announcement from '../data/Announcement.json'
 import CountdownWidget from '../../../components/CountdownWidget/CountdownWidget'
 import Lw8BannerBg from './Lw8BannerBg'
 
-interface CountdownButtonProps {
-  dest: string
-}
-
 const announcement = _announcement as AnnouncementProps
 
-function CountdownButton({ children, dest }: PropsWithChildren<CountdownButtonProps>) {
+function CountdownButton({ children }: PropsWithChildren<{}>) {
   return (
-    <a
-      href={dest}
-      className="bg-white text-xs px-1.5 md:px-2.5 py-1 rounded-full text-black shadow-none hover:shadow-mg cursor-pointer"
-    >
+    <div className="bg-white text-xs px-1.5 md:px-2.5 py-1 rounded-full text-black shadow-none hover:shadow-mg cursor-pointer">
       {children}
-    </a>
+    </div>
   )
 }
 
@@ -37,7 +30,7 @@ export function LW8CountdownBanner() {
         <div className="w-full flex gap-3 md:gap-6 items-center justify-center">
           <p>Supabase Launch Week 8</p>
           <div>
-            <CountdownButton dest="https://supabase.com/launch-week">Live now</CountdownButton>
+            <CountdownButton>Live now</CountdownButton>
           </div>
         </div>
       )
@@ -58,9 +51,7 @@ export function LW8CountdownBanner() {
           </div>
           {!isLaunchWeekPage && (
             <div className="hidden md:block">
-              <CountdownButton dest="https://supabase.com/launch-week">
-                Get your ticket
-              </CountdownButton>
+              <CountdownButton>Get your ticket</CountdownButton>
             </div>
           )}
         </div>
