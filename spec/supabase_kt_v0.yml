@@ -2574,7 +2574,7 @@ functions:
       - The user gets redirected back to your app, assuming you setup [OTP handling](/docs/reference/kotlin/initializing)
       - After the user has been redirected successfully, prompt them for a new password and call `modifyUser()`:
         ```kotlin
-        client.gotrue.modifyUser(Email) {
+        client.gotrue.modifyUser {
             password = "1234567"
         }
         ```
