@@ -292,7 +292,7 @@ const ProjectLinker = ({
             loadingForeignProjects ||
             loadingSupabaseProjects ||
             isLoading ||
-            // check wether both project types are not undefined
+            // check whether both project types are not undefined
             !selectedSupabaseProject ||
             !selectedForeignProject
           }
