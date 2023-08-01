@@ -2,8 +2,9 @@ import { ReactNode, useRef, useState } from 'react'
 
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { IntegrationConnectionsCreateVariables } from 'data/integrations/types'
-import { useSelectedOrganization, useStore } from 'hooks'
+import { useSelectedOrganization } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import { toast } from 'react-hot-toast'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -18,7 +19,6 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
-import { toast } from 'react-hot-toast'
 
 export interface Project {
   id: string
@@ -189,14 +189,14 @@ const ProjectLinker = ({
                   <CommandList_Shadcn_ className="!max-h-[170px]">
                     <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
                     <CommandGroup_Shadcn_>
-                      {supabaseProjects.map((project) => {
+                      {supabaseProjects.map((project, i) => {
                         return (
                           <CommandItem_Shadcn_
-                            value={project.ref}
+                            value={`${project.name}-${i}`}
                             key={project.ref}
                             className="flex gap-2 items-center"
-                            onSelect={(ref) => {
-                              if (ref) setSupabaseProjectRef(ref)
+                            onSelect={() => {
+                              if (project.ref) setSupabaseProjectRef(project.ref)
                               setSupabaseProjectsComboboxOpen(false)
                             }}
                           >
@@ -261,14 +261,14 @@ const ProjectLinker = ({
                   <CommandList_Shadcn_ className="!max-h-[170px]">
                     <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
                     <CommandGroup_Shadcn_>
-                      {foreignProjects.map((project) => {
+                      {foreignProjects.map((project, i) => {
                         return (
                           <CommandItem_Shadcn_
-                            value={project.id}
                             key={project.id}
+                            value={`${project.name}-${i}`}
                             className="flex gap-2 items-center"
-                            onSelect={(id) => {
-                              if (id) setForeignProjectId(id)
+                            onSelect={() => {
+                              if (project.id) setForeignProjectId(project.id)
                               setForeignProjectsComboboxOpen(false)
                             }}
                           >

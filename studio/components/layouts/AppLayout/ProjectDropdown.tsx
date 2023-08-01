@@ -81,7 +81,7 @@ const ProjectLink = ({
       <CommandItem_Shadcn_
         asChild
         key={project.ref}
-        value={project.name}
+        value={`${project.name}-${project.ref}`}
         className="cursor-pointer w-full flex items-center justify-between"
         onSelect={() => {
           router.push(href)

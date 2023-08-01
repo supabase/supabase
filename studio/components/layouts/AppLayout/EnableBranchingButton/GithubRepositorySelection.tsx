@@ -24,6 +24,7 @@ import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useGithubBranchesQuery } from 'data/integrations/integrations-github-branches-query'
 import { Integration } from 'data/integrations/integrations.types'
+import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/IntegrationPanels'
 
 interface GithubRepositorySelectionProps {
   integration?: Integration
@@ -69,7 +70,7 @@ const GithubRepositorySelection = ({
             <p>Git Connection</p>
             <Badge color="amber">Required</Badge>
           </div>
-          <p className="text-sm text-light">
+          <p className="text-sm text-light !mb-4">
             {githubProjectIntegration !== undefined
               ? 'Your database preview branches will be based on the branches in the following repository that your project is connected with:'
               : 'Your database preview branches will be based on the branches in the Git repository that your project is connected with.'}
@@ -84,16 +85,11 @@ const GithubRepositorySelection = ({
             </Link>
           )}
           {integration && !githubProjectIntegration && (
-            <div className="bg border border-dashed rounded !mt-4 flex items-center justify-center py-6 space-x-4">
-              <IconGitHub strokeWidth={2} />
-              <Button type="default" onClick={() => onSelectConnectRepo()}>
-                Connect repository to project
-              </Button>
-            </div>
+            <EmptyIntegrationConnection onClick={() => onSelectConnectRepo()} />
           )}
           {integration && githubProjectIntegration && (
             <>
-              <div className="border bg-surface-200 rounded-md !mt-4 flex items-center justify-between py-4 px-4">
+              <div className="border bg-surface-200 rounded-md flex items-center justify-between py-4 px-4">
                 <div className="flex items-center space-x-4">
                   <div className="w-10 h-10 rounded-md flex items-center justify-center bg-scale-100">
                     <IconGitHub strokeWidth={2} />
