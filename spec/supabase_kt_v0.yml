@@ -2563,7 +2563,7 @@ functions:
           - `NotAuthenticated`, 
           - `LoadingFromStorage`, 
           - `NetworkError`, 
-          - `Authenticated(sesssion)`
+          - `Authenticated(session)`
   - id: reset-password-for-email
     title: 'Send a password reset request'
     notes: |
