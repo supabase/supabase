@@ -12,7 +12,7 @@ import SettingsButton from './SettingsButton'
 import UserSettingsDropdown from './UserSettingsDropdown'
 import BranchDropdown from './BranchDropdown'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import EnableBranchingButton from './EnableBranchingButton'
+import EnableBranchingButton from './EnableBranchingButton/EnableBranchingButton'
 
 const AppHeader = () => {
   const router = useRouter()
