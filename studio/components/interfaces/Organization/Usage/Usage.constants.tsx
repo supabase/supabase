@@ -103,10 +103,11 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
 
           const isApproachingLimit = hasLimit && usageRatio >= USAGE_APPROACHING_THRESHOLD
           const isExceededLimit = hasLimit && usageRatio >= 1
+          const isCapped = usageMeta?.capped
 
           return (
             <div>
-              {(isApproachingLimit || isExceededLimit) && (
+              {(isApproachingLimit || isExceededLimit) && isCapped && (
                 <Alert
                   withIcon
                   variant={isExceededLimit ? 'danger' : 'warning'}
