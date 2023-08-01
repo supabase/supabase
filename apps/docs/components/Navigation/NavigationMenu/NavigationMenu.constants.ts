@@ -660,7 +660,7 @@ export const database: NavMenuConstant = {
       ],
     },
     {
-      name: 'Wrappers',
+      name: 'Foreign Data Wrappers',
       url: undefined,
       items: [
         { name: 'Overview', url: '/guides/database/extensions/wrappers/overview' },
