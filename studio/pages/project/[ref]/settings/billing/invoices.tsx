@@ -5,29 +5,21 @@ import { SettingsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSelectedOrganization } from 'hooks'
 import { NextPageWithLayout } from 'types'
-import { Alert } from 'ui'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 const ProjectBilling: NextPageWithLayout = () => {
   const organization = useSelectedOrganization()
   const isOrgBilling = !!organization?.subscription_id
+  const router = useRouter()
 
-  if (isOrgBilling) {
-    return (
-      <div className="p-4">
-        <Alert
-          withIcon
-          variant="info"
-          title="This page is only available for projects which are on their own subscription"
-        >
-          You might be looking for the{' '}
-          <Link href={`/org/${organization?.slug}/invoices`}>
-            <a className="text-brand-900">organization's invoices</a>
-          </Link>{' '}
-          page instead.
-        </Alert>
-      </div>
-    )
-  }
+  useEffect(() => {
+    if (isOrgBilling) {
+      router.push(`/org/${organization.slug}/invoices`)
+    }
+  }, [router, organization?.slug, isOrgBilling])
+
+  if (isOrgBilling) return null
 
   return (
     <div className="w-full h-full overflow-y-auto content">
