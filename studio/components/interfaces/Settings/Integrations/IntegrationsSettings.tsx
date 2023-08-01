@@ -12,9 +12,9 @@ import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/int
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { IntegrationName, IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
-import { IntegrationConnectionItem } from './OrganizationIntegration'
-import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
-import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
+import { IntegrationConnectionItem } from './../../Organization/IntegrationSettings/OrganizationIntegration'
+import SidePanelGitHubRepoLinker from './../../Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
+import SidePanelVercelProjectLinker from './../../Organization/IntegrationSettings/SidePanelVercelProjectLinker'
 import { useSelectedOrganization } from 'hooks'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -25,6 +25,22 @@ import {
   IntegrationInstallation,
 } from 'components/interfaces/Integrations/IntegrationPanels'
 import { pluralize } from 'lib/helpers'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  Button,
+  FormControl_Shadcn_,
+  FormDescription_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  Form_Shadcn_,
+  Input,
+  Switch,
+  cn,
+} from 'ui'
+import * as z from 'zod'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -40,6 +56,8 @@ const IntegrationSettings = () => {
   const org = useSelectedOrganization()
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
+
+  const projectContext = useProjectContext()
 
   const vercelIntegrations = data
     ?.filter((integration) => integration.integration.name === 'Vercel')
@@ -154,46 +172,64 @@ You can change the scope of the access for Supabase by configuring
           <Markdown content={VercelContentSectionTop} />
           {vercelIntegrations &&
             vercelIntegrations.length > 0 &&
-            vercelIntegrations.map((integration, i) => {
-              const ConnectionHeaderTitle = `${integration.connections.length} project ${pluralize(
-                integration.connections.length,
-                'connection'
-              )} `
-
-              return (
-                <div key={integration.id}>
-                  <IntegrationInstallation title={'Vercel'} integration={integration} />
-                  {integration.connections.length > 0 ? (
-                    <>
-                      <IntegrationConnectionHeader
-                        title={ConnectionHeaderTitle}
-                        markdown={`Repository connections for Vercel`}
-                      />
-                      <ul className="flex flex-col">
-                        {integration.connections.map((connection) => (
-                          <IntegrationConnectionItem
-                            key={connection.id}
-                            connection={connection}
-                            type={'Vercel' as IntegrationName}
-                            onDeleteConnection={onDeleteVercelConnection}
-                          />
-                        ))}
-                      </ul>
-                    </>
-                  ) : (
-                    <IntegrationConnectionHeader
-                      markdown={`### ${integration.connections.length} project ${pluralize(
-                        integration.connections.length,
-                        'connection'
-                      )} Repository connections for Vercel`}
-                    />
-                  )}
-                  <EmptyIntegrationConnection onClick={() => onAddVercelConnection(integration.id)}>
-                    Add new project connection
-                  </EmptyIntegrationConnection>
-                </div>
+            vercelIntegrations
+              .filter((x) =>
+                x.connections.find((x) => x.supabase_project_ref === projectContext.project?.ref)
               )
-            })}
+              .map((integration, i) => {
+                const ConnectionHeaderTitle = `${
+                  integration.connections.length
+                } project ${pluralize(integration.connections.length, 'connection')} `
+
+                return (
+                  <div key={integration.id}>
+                    <IntegrationInstallation title={'Vercel'} integration={integration} />
+                    {integration.connections.length > 0 ? (
+                      <>
+                        <IntegrationConnectionHeader
+                          title={ConnectionHeaderTitle}
+                          markdown={`Repository connections for Vercel`}
+                        />
+                        <ul className="flex flex-col">
+                          {integration.connections.map((connection) => (
+                            <div
+                              key={connection.id}
+                              className="relative flex flex-col -gap-[1px] [&>li]:pb-0"
+                            >
+                              <IntegrationConnectionItem
+                                connection={connection}
+                                type={'Vercel' as IntegrationName}
+                                onDeleteConnection={onDeleteVercelConnection}
+                                className="!rounded-b-none !mb-0"
+                              />
+                              <div className="relative pl-8 ml-6 border-l border-scale-600 dark:border-scale-400 pb-3">
+                                <div className="border-b border-l border-r rounded-b-md px-8 py-4">
+                                  <FormThing />
+
+                                  {/* <label className="text-sm text-light">Production branch</label>
+                                  <Input /> */}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </ul>
+                      </>
+                    ) : (
+                      <IntegrationConnectionHeader
+                        markdown={`### ${integration.connections.length} project ${pluralize(
+                          integration.connections.length,
+                          'connection'
+                        )} Repository connections for Vercel`}
+                      />
+                    )}
+                    <EmptyIntegrationConnection
+                      onClick={() => onAddVercelConnection(integration.id)}
+                    >
+                      Add new project connection
+                    </EmptyIntegrationConnection>
+                  </div>
+                )
+              })}
           {VercelContentSectionBottom && (
             <Markdown content={VercelContentSectionBottom} className="text-lighter" />
           )}
@@ -201,6 +237,100 @@ You can change the scope of the access for Supabase by configuring
       </ScaffoldSection>
     </ScaffoldContainer>
   )
+
+  const FormThing = () => {
+    const FormSchema = z.object({
+      marketing_emails: z.boolean().default(false).optional(),
+      security_emails: z.boolean(),
+    })
+
+    const form = useForm<z.infer<typeof FormSchema>>({
+      resolver: zodResolver(FormSchema),
+      defaultValues: {
+        security_emails: true,
+      },
+    })
+
+    function onSubmit(data: z.infer<typeof FormSchema>) {
+      // toast({
+      //   title: 'You submitted the following values:',
+      //   description: (
+      //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+      //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+      //     </pre>
+      //   ),
+      // })
+    }
+
+    return (
+      <Form_Shadcn_ {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
+          <div>
+            <div className="flex flex-col gap-6">
+              <FormField_Shadcn_
+                control={form.control}
+                name="marketing_emails"
+                render={({ field }) => (
+                  <FormItem_Shadcn_ className="flex flex-row items-center justify-between">
+                    <div className="">
+                      <FormLabel_Shadcn_ className="!text">
+                        Auto sync environment variables for Production
+                      </FormLabel_Shadcn_>
+                      <FormDescription_Shadcn_ className="text-xs">
+                        Deploy Edge Functions when merged into Production Beanch
+                      </FormDescription_Shadcn_>
+                    </div>
+                    <FormControl_Shadcn_>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl_Shadcn_>
+                  </FormItem_Shadcn_>
+                )}
+              />
+              <FormField_Shadcn_
+                control={form.control}
+                name="security_emails"
+                render={({ field }) => (
+                  <FormItem_Shadcn_ className="flex flex-row items-center justify-between">
+                    <div className="">
+                      <FormLabel_Shadcn_ className="!text">
+                        Auto sync enviroment variables for Database Preview Branches
+                      </FormLabel_Shadcn_>
+                      <FormDescription_Shadcn_ className="text-xs">
+                        Deploy Edge Functions when merged into Production Beanch
+                      </FormDescription_Shadcn_>
+                    </div>
+                    <FormControl_Shadcn_>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl_Shadcn_>
+                  </FormItem_Shadcn_>
+                )}
+              />
+              <FormField_Shadcn_
+                control={form.control}
+                name="security_emails"
+                render={({ field }) => (
+                  <FormItem_Shadcn_ className="flex flex-row items-center justify-between">
+                    <div className="">
+                      <FormLabel_Shadcn_ className="!text">
+                        Auto manage Supabase Auth redirect URIs
+                      </FormLabel_Shadcn_>
+                      <FormDescription_Shadcn_ className="text-xs">
+                        Deploy Edge Functions when merged into Production Beanch
+                      </FormDescription_Shadcn_>
+                    </div>
+                    <FormControl_Shadcn_>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl_Shadcn_>
+                  </FormItem_Shadcn_>
+                )}
+              />
+            </div>
+          </div>
+          {/* <Button htmlType="submit">Submit</Button> */}
+        </form>
+      </Form_Shadcn_>
+    )
+  }
 
   /**
    * GitHub markdown content

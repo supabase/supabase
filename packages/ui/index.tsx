@@ -146,6 +146,10 @@ export {
   AccordionContent as AccordionContent_Shadcn_,
 } from './src/components/shadcn/ui/accordion'
 
+export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
+export { Switch as Switch } from './src/components/shadcn/ui/switch'
+export { Checkbox as Checkbox_Shadcn_ } from './src/components/shadcn/ui/checkbox'
+
 // links
 
 export * from './src/components/TextLink'
