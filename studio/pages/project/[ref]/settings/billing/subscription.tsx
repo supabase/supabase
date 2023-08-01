@@ -1,31 +1,44 @@
-import Link from 'next/link'
-
 import SubscriptionV2 from 'components/interfaces/BillingV2/Subscription/Subscription'
 import { SettingsLayout } from 'components/layouts'
 import { useSelectedOrganization } from 'hooks'
 import { NextPageWithLayout } from 'types'
-import { Alert } from 'ui'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 const ProjectBilling: NextPageWithLayout = () => {
   const organization = useSelectedOrganization()
   const isOrgBilling = !!organization?.subscription_id
+  const router = useRouter()
 
+  useEffect(() => {
+    if (isOrgBilling) {
+      const { ref, panel } = router.query
+      let redirectUri = `/org/${organization.slug}/billing`
+      switch (panel) {
+        case 'subscriptionPlan':
+          redirectUri = `/org/${organization.slug}/billing?panel=subscriptionPlan`
+          break
+        case 'costControl':
+          redirectUri = `/org/${organization.slug}/billing?panel=costControl`
+          break
+        case 'computeInstance':
+          redirectUri = `/project/${ref}/settings/addons?panel=computeInstance`
+          break
+        case 'pitr':
+          redirectUri = `/project/${ref}/settings/addons?panel=pitr`
+          break
+        case 'customDomain':
+          redirectUri = `/project/${ref}/settings/addons?panel=customDomain`
+          break
+      }
+
+      router.push(redirectUri)
+    }
+  }, [router, organization?.slug, isOrgBilling])
+
+  // No need to bother rendering, we'll redirect anyway
   if (isOrgBilling) {
-    return (
-      <div className="p-4">
-        <Alert
-          withIcon
-          variant="info"
-          title="This page is only available for projects which are on their own subscription"
-        >
-          Subscription management can be found on the{' '}
-          <Link href={`/org/${organization?.slug}/billing`}>
-            <a className="text-brand-900">organization's billing</a>
-          </Link>{' '}
-          page instead.
-        </Alert>
-      </div>
-    )
+    return null
   }
 
   return <SubscriptionV2 />
