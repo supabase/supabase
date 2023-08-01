@@ -23,6 +23,14 @@ services:
       timeout: 5s
       interval: 5s
       retries: 3
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:${VECTOR_PORT}"
+        tag: studio
+    depends_on:
+      analytics:
+        condition: service_healthy
     environment:
       STUDIO_PG_META_URL: http://meta:8080
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -35,6 +43,10 @@ services:
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
 
+      LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
+      LOGFLARE_URL: http://analytics:4000
+      NEXT_PUBLIC_ENABLE_LOGS: true
+
   kong:
     container_name: supabase-kong
     image: kong:2.8.1
@@ -44,6 +56,14 @@ services:
     ports:
       - ${KONG_HTTP_PORT}:8000/tcp
       - ${KONG_HTTPS_PORT}:8443/tcp
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:${VECTOR_PORT}"
+        tag: kong
+    depends_on:
+      analytics:
+        condition: service_healthy
     environment:
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /home/kong/kong.yml
@@ -65,6 +85,8 @@ services:
       db:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
+      analytics:
+        condition: service_healthy
     healthcheck:
       test:
         [
@@ -79,6 +101,11 @@ services:
       interval: 5s
       retries: 3
     restart: unless-stopped
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:${VECTOR_PORT}"
+        tag: auth
     environment:
       GOTRUE_API_HOST: 0.0.0.0
       GOTRUE_API_PORT: 9999
@@ -123,7 +150,14 @@ services:
       db:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
+      analytics:
+        condition: service_healthy
     restart: unless-stopped
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:${VECTOR_PORT}"
+        tag: rest
     environment:
       PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS}
@@ -138,6 +172,8 @@ services:
       db:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
+      analytics:
+        condition: service_healthy
     healthcheck:
       test:
         [
@@ -150,6 +186,11 @@ services:
       interval: 5s
       retries: 3
     restart: unless-stopped
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:${VECTOR_PORT}"
+        tag: realtime
     environment:
       PORT: 4000
       DB_HOST: ${POSTGRES_HOST}
@@ -235,7 +276,14 @@ services:
       db:
         # Disable this if you are using an external Postgres database
         condition: service_healthy
+      analytics:
+        condition: service_healthy
     restart: unless-stopped
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:${VECTOR_PORT}"
+        tag: meta
     environment:
       PG_META_PORT: 8080
       PG_META_DB_HOST: ${POSTGRES_HOST}
@@ -248,6 +296,14 @@ services:
     container_name: supabase-edge-functions
     image: supabase/edge-runtime:v1.6.6
     restart: unless-stopped
+    depends_on:
+      analytics:
+        condition: service_healthy
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:${VECTOR_PORT}"
+        tag: functions
     environment:
       JWT_SECRET: ${JWT_SECRET}
       SUPABASE_URL: http://kong:8000
@@ -263,6 +319,56 @@ services:
       - --main-service
       - /home/deno/functions/main
 
+  analytics:
+    container_name: supabase-analytics
+    image: supabase/logflare:1.3.26
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:4000/health" ]
+      timeout: 5s
+      interval: 5s
+      retries: 10
+    restart: unless-stopped
+    depends_on:
+      db:
+        # Disable this if you are using an external Postgres database
+        condition: service_healthy
+    ports:
+      - ${LOGFLARE_HTTP_PORT}:4000/tcp
+    # Uncomment to use Big Query backend for analytics
+    # volumes:
+    #   - type: bind
+    #     source: ${PWD}/gcloud.json
+    #     target: /opt/app/rel/logflare/bin/gcloud.json
+    #     read_only: true
+    environment:
+      LOGFLARE_NODE_HOST:  127.0.0.1
+      DB_USERNAME: supabase_admin
+      DB_DATABASE: ${POSTGRES_DB}
+      DB_HOSTNAME: ${POSTGRES_HOST}
+      DB_PORT: ${POSTGRES_PORT}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_SCHEMA: _analytics
+      LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
+      LOGFLARE_SINGLE_TENANT: true
+      LOGFLARE_SUPABASE_MODE: true
+      LOGFLARE_MIN_CLUSTER_SIZE: 1
+      RELEASE_COOKIE: cookie
+
+      # Comment variables to use Big Query backend for analytics
+      POSTGRES_BACKEND_URL: postgresql://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      POSTGRES_BACKEND_SCHEMA: _analytics
+      LOGFLARE_FEATURE_FLAG_OVERRIDE: multibackend=true
+
+      # Uncomment to use Big Query backend for analytics
+      # GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID}
+      # GOOGLE_PROJECT_NUMBER: ${GOOGLE_PROJECT_NUMBER}
+    entrypoint: |
+                  sh -c `cat <<'EOF' > run.sh && sh run.sh
+                  ./logflare eval Logflare.Release.migrate
+                  ./logflare start --sname logflare
+                  EOF
+                  `
+
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
@@ -272,6 +378,14 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    depends_on:
+      vector:
+        condition: service_healthy
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "tcp://localhost:${VECTOR_PORT}"
+        tag: db
     command:
       - postgres
       - -c
@@ -298,5 +412,29 @@ services:
       - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
       # PGDATA directory is persisted between restarts
       - ./volumes/db/data:/var/lib/postgresql/data:Z
+      # Changes required for Analytics support
+      - ./volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
 
-# If you want to use logging, please run with `docker compose -f docker-compose.yml -f docker-compose-logging.yml up`
+  vector:
+    container_name: supabase-vector
+    image: timberio/vector:0.28.1-alpine
+    healthcheck:
+      test:
+        [
+
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:${VECTOR_API_PORT}/health"
+        ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
+    ports:
+      - ${VECTOR_PORT}:${VECTOR_PORT}
+      - ${VECTOR_API_PORT}:${VECTOR_API_PORT}
+    volumes:
+      - ./volumes/logs/vector.yml:/etc/vector/vector.yml:ro
+    command: [ "--config", "etc/vector/vector.yml" ]
