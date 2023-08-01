@@ -667,9 +667,9 @@ export const database: NavMenuConstant = {
         { name: 'Connecting to Airtable', url: '/guides/database/extensions/wrappers/airtable' },
         { name: 'Connecting to AWS S3', url: '/guides/database/extensions/wrappers/s3' },
         { name: 'Connecting to BigQuery', url: '/guides/database/extensions/wrappers/bigquery' },
-        { 
-          name: 'Connecting to ClickHouse', 
-          url: '/guides/database/extensions/wrappers/clickhouse' 
+        {
+          name: 'Connecting to ClickHouse',
+          url: '/guides/database/extensions/wrappers/clickhouse',
         },
         { name: 'Connecting to Firebase', url: '/guides/database/extensions/wrappers/firebase' },
         { name: 'Connecting to Logflare', url: '/guides/database/extensions/wrappers/logflare' },
