@@ -44,7 +44,7 @@ const SidePanelGitHubRepoLinker = ({
   const githubIntegrations = integrationData?.filter(
     (integration) => integration.integration.name === 'GitHub'
   ) // github
-  const existingProjectGithubConnection = githubIntegrations?.[0].connections.find(
+  const existingProjectGithubConnection = githubIntegrations?.[0]?.connections.find(
     (connection) => connection.supabase_project_ref === projectRef
   )
 
