@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { useFlag, useSelectedOrganization } from 'hooks'
+import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import FeedbackDropdown from '../ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from '../ProjectLayout/LayoutHeader/HelpPopover'
 import NotificationsPopover from '../ProjectLayout/LayoutHeader/NotificationsPopover'
@@ -11,12 +11,19 @@ import ProjectDropdown from './ProjectDropdown'
 import SettingsButton from './SettingsButton'
 import UserSettingsDropdown from './UserSettingsDropdown'
 import BranchDropdown from './BranchDropdown'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import EnableBranchingButton from './EnableBranchingButton'
 
 const AppHeader = () => {
   const router = useRouter()
   const { ref } = useParams()
+  const { data: projects } = useProjectsQuery()
   const organization = useSelectedOrganization()
   const enableBranchManagement = useFlag('branchManagement')
+
+  const project = projects?.find((project) => project.ref === ref)
+  const isBranchingAllowed = project?.cloud_provider === 'FLY'
+  const isBranchingEnabled = (project?.preview_branch_refs ?? []).length > 0
 
   return (
     <div className="flex items-center justify-between px-4 py-1 bg-scale-200 border-b">
@@ -32,7 +39,9 @@ const AppHeader = () => {
         </Link>
         <OrganizationDropdown />
         {ref !== undefined && <ProjectDropdown />}
-        {ref !== undefined && enableBranchManagement && <BranchDropdown />}
+        {ref !== undefined && isBranchingAllowed && enableBranchManagement && (
+          <>{isBranchingEnabled ? <BranchDropdown /> : <EnableBranchingButton />}</>
+        )}
       </div>
 
       <div className="flex items-center gap-4">
