@@ -11,19 +11,18 @@ import ProjectDropdown from './ProjectDropdown'
 import SettingsButton from './SettingsButton'
 import UserSettingsDropdown from './UserSettingsDropdown'
 import BranchDropdown from './BranchDropdown'
-import { useProjectsQuery } from 'data/projects/projects-query'
 import EnableBranchingButton from './EnableBranchingButton/EnableBranchingButton'
 
 const AppHeader = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const { data: projects } = useProjectsQuery()
+  const project = useSelectedProject()
   const organization = useSelectedOrganization()
   const enableBranchManagement = useFlag('branchManagement')
 
-  const project = projects?.find((project) => project.ref === ref)
   const isBranchingAllowed = project?.cloud_provider === 'FLY'
-  const isBranchingEnabled = (project?.preview_branch_refs ?? []).length > 0
+  const isBranchingEnabled =
+    project?.has_branch_enabled === true || project?.parent_project_ref !== undefined
 
   return (
     <div className="flex items-center justify-between px-4 py-1 bg-scale-200 border-b">

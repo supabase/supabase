@@ -5,11 +5,11 @@ import { PropsWithChildren, forwardRef, useState } from 'react'
 import {
   Badge,
   Button,
+  Dropdown,
   DropdownMenuContent_Shadcn_,
   DropdownMenuItem_Shadcn_,
   DropdownMenuTrigger_Shadcn_,
   DropdownMenu_Shadcn_,
-  IconEdit,
   IconGitBranch,
   IconGitHub,
   IconMoreVertical,
@@ -26,9 +26,10 @@ interface BranchPanelProps {
   branch: Branch
   onSelectUpdate?: () => void
   onSelectDelete?: () => void
+  onSelectDisableBranching?: () => void
 }
 
-const MainBranchPanel = ({ branch, onSelectUpdate = noop }: BranchPanelProps) => {
+const MainBranchPanel = ({ branch, onSelectDisableBranching = noop }: BranchPanelProps) => {
   const { ref } = useParams()
   const [open, setOpen] = useState(false)
   const isActive = ref === branch.project_ref
@@ -60,9 +61,15 @@ const MainBranchPanel = ({ branch, onSelectUpdate = noop }: BranchPanelProps) =>
               </Button>
             </DropdownMenuTrigger_Shadcn_>
             <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-              <DropdownMenuItem_Shadcn_ className="flex gap-2" onSelect={() => onSelectUpdate()}>
-                <IconEdit size={14} />
-                Edit branch
+              <DropdownMenuItem_Shadcn_ className="flex gap-2" onSelect={() => {}}>
+                Change production branch
+              </DropdownMenuItem_Shadcn_>
+              <Dropdown.Separator />
+              <DropdownMenuItem_Shadcn_
+                className="flex gap-2"
+                onSelect={() => onSelectDisableBranching()}
+              >
+                Disable branching
               </DropdownMenuItem_Shadcn_>
             </DropdownMenuContent_Shadcn_>
           </DropdownMenu_Shadcn_>
@@ -88,11 +95,7 @@ const BranchContainer = ({ className, children }: PropsWithChildren<{ className?
   )
 }
 
-const BranchPanel = ({
-  branch,
-  onSelectUpdate = noop,
-  onSelectDelete = noop,
-}: BranchPanelProps) => {
+const BranchPanel = ({ branch, onSelectDelete = noop }: BranchPanelProps) => {
   const { ref } = useParams()
   const [open, setOpen] = useState(false)
 
@@ -119,10 +122,6 @@ const BranchPanel = ({
             </Button>
           </DropdownMenuTrigger_Shadcn_>
           <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-            <DropdownMenuItem_Shadcn_ className="flex gap-2" onSelect={() => onSelectUpdate()}>
-              <IconEdit size={14} />
-              Edit branch
-            </DropdownMenuItem_Shadcn_>
             <DropdownMenuItem_Shadcn_ className="flex gap-2" onSelect={() => onSelectDelete()}>
               <IconTrash size={14} />
               Delete branch
@@ -157,4 +156,4 @@ const BranchHeader = forwardRef<HTMLDivElement, BranchHeader>(
 )
 
 BranchHeader.displayName = 'BranchHeader'
-export { BranchHeader, BranchContainer, BranchPanel, MainBranchPanel }
+export { BranchContainer, BranchHeader, BranchPanel, MainBranchPanel }

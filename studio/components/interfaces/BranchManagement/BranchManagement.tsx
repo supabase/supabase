@@ -1,7 +1,16 @@
 import { partition } from 'lodash'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Button, IconSearch, Input } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertTriangle,
+  IconSearch,
+  Input,
+  Modal,
+} from 'ui'
 
 import { useParams } from 'common'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
@@ -15,7 +24,8 @@ import { MainBranchPanel } from './BranchPanels'
 import CreateBranchSidePanel from './CreateBranchSidePanel'
 import PreviewBranches from './PreviewBranches'
 import PullRequests from './PullRequests'
-import UpdateBranchSidePanel from './UpdateBranchSidePanel'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
 
 const BranchManagement = () => {
   const { ui } = useStore()
@@ -24,11 +34,12 @@ const BranchManagement = () => {
   const projectDetails = useSelectedProject()
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
+  const hasBranchEnabled = projectDetails?.has_branch_enabled
   const projectRef =
     projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
 
   const [showCreateBranch, setShowCreateBranch] = useState(false)
-  const [selectedBranchToUpdate, setSelectedBranchToUpdate] = useState<Branch>()
+  const [showDisableBranching, setShowDisableBranching] = useState(false)
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
 
   const { data: branches, error, isLoading, isError, isSuccess } = useBranchesQuery({ projectRef })
@@ -50,10 +61,31 @@ const BranchManagement = () => {
     },
   })
 
+  const { mutate: disableBranching, isLoading: isDisabling } = useBranchesDisableMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: 'Successfully disabled branching for project',
+      })
+      setShowDisableBranching(false)
+    },
+  })
+
   const onConfirmDeleteBranch = () => {
     if (selectedBranchToDelete == undefined) return console.error('No branch selected')
     if (projectRef == undefined) return console.error('Project ref is required')
     deleteBranch({ id: selectedBranchToDelete?.id, projectRef })
+  }
+
+  const onConfirmDisableBranching = () => {
+    if (projectRef == undefined) return console.error('Project ref is required')
+    if (!previewBranches) return console.error('No branches available')
+    disableBranching({ projectRef, branchIds: previewBranches?.map((branch) => branch.id) })
+  }
+
+  if (!hasBranchEnabled) {
+    // [Joshen] Some empty state here
+    return <div>Some disabled state</div>
   }
 
   return (
@@ -71,16 +103,15 @@ const BranchManagement = () => {
             <div className="">
               {isLoading && <GenericSkeletonLoader />}
               {isError && <AlertError error={error} subject="Failed to retrieve branches" />}
-              {isSuccess && (
+              {isSuccess && mainBranch !== undefined && (
                 <>
                   <MainBranchPanel
                     branch={mainBranch}
-                    onSelectUpdate={() => setSelectedBranchToUpdate(mainBranch)}
+                    onSelectDisableBranching={() => setShowDisableBranching(true)}
                   />
                   <PullRequests previewBranches={previewBranches} />
                   <PreviewBranches
                     previewBranches={previewBranches}
-                    onSelectUpdateBranch={setSelectedBranchToUpdate}
                     onSelectDeleteBranch={setSelectedBranchToDelete}
                   />
                 </>
@@ -95,23 +126,59 @@ const BranchManagement = () => {
         visible={selectedBranchToDelete !== undefined}
         onCancel={() => setSelectedBranchToDelete(undefined)}
         onConfirm={() => onConfirmDeleteBranch()}
-        title="Delete branch"
         loading={isDeleting}
-        confirmLabel={`Delete branch`}
+        title="Delete branch"
+        confirmLabel="Delete branch"
         confirmPlaceholder="Type in name of branch"
         confirmString={selectedBranchToDelete?.name ?? ''}
         text={`This will delete your database preview branch "${selectedBranchToDelete?.name}"`}
         alert="You cannot recover this branch once it is deleted!"
       />
 
+      <ConfirmationModal
+        danger
+        size="medium"
+        loading={isDisabling}
+        visible={showDisableBranching}
+        header="Confirm disable branching for project"
+        buttonLabel="Confirm disable branching"
+        buttonLoadingLabel="Disabling branching..."
+        onSelectConfirm={() => onConfirmDisableBranching()}
+        onSelectCancel={() => setShowDisableBranching(false)}
+      >
+        <Modal.Content>
+          <div className="py-6">
+            <Alert_Shadcn_ variant="warning">
+              <IconAlertTriangle strokeWidth={2} />
+              <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                All database preview branches will be removed upon disabling branching. You may
+                still re-enable branching again thereafter, but your existing preview branches will
+                not be restored.
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+            <ul className="mt-4 space-y-5">
+              <li className="flex gap-3">
+                <div>
+                  <strong className="text-sm">Before you disable branching, consider:</strong>
+                  <ul className="space-y-2 mt-2 text-sm text-light">
+                    <li className="list-disc ml-6">
+                      Your project no longer requires database previews.
+                    </li>
+                    <li className="list-disc ml-6">
+                      None of your database previews are currently being used in any app.
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </Modal.Content>
+      </ConfirmationModal>
+
       <CreateBranchSidePanel
         visible={showCreateBranch}
         onClose={() => setShowCreateBranch(false)}
-      />
-
-      <UpdateBranchSidePanel
-        selectedBranch={selectedBranchToUpdate}
-        onClose={() => setSelectedBranchToUpdate(undefined)}
       />
     </>
   )

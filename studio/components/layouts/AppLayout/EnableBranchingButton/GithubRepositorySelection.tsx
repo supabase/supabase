@@ -20,11 +20,11 @@ import {
 } from 'ui'
 
 import { useParams } from 'common'
+import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/IntegrationPanels'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useGithubBranchesQuery } from 'data/integrations/integrations-github-branches-query'
 import { Integration } from 'data/integrations/integrations.types'
-import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/IntegrationPanels'
 
 interface GithubRepositorySelectionProps {
   integration?: Integration
