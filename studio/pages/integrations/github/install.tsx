@@ -58,12 +58,6 @@ const GitHubIntegration: NextPageWithLayout = () => {
           query: { ...router.query, slug: selectedOrg?.slug },
         })
       },
-      onError(error: any) {
-        ui.setNotification({
-          category: 'error',
-          message: `Creating GitHub integration failed: ${error.message}`,
-        })
-      },
     })
 
   const installed = useMemo(

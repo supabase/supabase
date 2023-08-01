@@ -48,7 +48,7 @@ export const useIntegrationsGitHubInstalledConnectionDeleteMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to mutate: ${data.message}`)
+          toast.error(`Failed to delete Github connection: ${data.message}`)
         } else {
           onError(data, variables, context)
         }
