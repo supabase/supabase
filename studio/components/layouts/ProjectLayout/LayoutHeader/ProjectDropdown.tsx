@@ -3,11 +3,12 @@ import { useRouter } from 'next/router'
 import { ParsedUrlQuery } from 'querystring'
 import { Button, Dropdown, IconPlus, Popover } from 'ui'
 
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { Organization, Project } from 'types'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 
 // [Fran] the idea is to let users change projects without losing the current page,
 // but at the same time we need to redirect correctly between urls that might be
@@ -74,9 +75,13 @@ const ProjectLink = ({
 const ProjectDropdown = () => {
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
-  const { data: allProjects } = useProjectsQuery()
+  const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
   const { data: allOrganizations } = useOrganizationsQuery()
   const selectedOrganizationSlug = selectedOrganization?.slug
+
+  if (isLoadingProjects) {
+    return <ShimmeringLoader className="w-[90px]" />
+  }
 
   return IS_PLATFORM ? (
     <Dropdown
@@ -100,13 +105,13 @@ const ProjectDropdown = () => {
         </>
       }
     >
-      <Button asChild type="text" size="tiny" className="my-1">
-        <span>{selectedProject?.name}</span>
+      <Button type="text">
+        <span className="text-sm">{selectedProject?.name}</span>
       </Button>
     </Dropdown>
   ) : (
-    <Button asChild type="text" size="tiny">
-      <span>{selectedProject?.name}</span>
+    <Button type="text">
+      <span className="text-xs">{selectedProject?.name}</span>
     </Button>
   )
 }
