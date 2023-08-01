@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useSelectedOrganization } from 'hooks'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, IconFileText, IconGitBranch, Modal } from 'ui'
 import BranchingWaitlistPopover from './BranchingWaitlistPopover'
 import GithubRepositorySelection from './GithubRepositorySelection'
@@ -11,6 +11,12 @@ const EnableBranchingButton = () => {
   const { ref } = useParams()
   const [open, setOpen] = useState(false)
   const selectedOrg = useSelectedOrganization()
+
+  const [selectedBranch, setSelectedBranch] = useState<string>()
+
+  useEffect(() => {
+    if (open) setSelectedBranch(undefined)
+  }, [open])
 
   const {
     data: integrations,
@@ -62,7 +68,11 @@ const EnableBranchingButton = () => {
           </div>
         </Modal.Content>
 
-        <GithubRepositorySelection integration={githubIntegration} />
+        <GithubRepositorySelection
+          integration={githubIntegration}
+          selectedBranch={selectedBranch}
+          setSelectedBranch={setSelectedBranch}
+        />
 
         {/* <VercelProjectSelection integration={vercelIntegration} /> */}
 
@@ -99,7 +109,7 @@ const EnableBranchingButton = () => {
             <Button block type="default">
               Cancel
             </Button>
-            <Button block disabled type="primary">
+            <Button block disabled={selectedBranch === undefined} type="primary">
               I understand, enable branching
             </Button>
           </div>
