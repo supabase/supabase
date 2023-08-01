@@ -396,6 +396,8 @@ export interface paths {
   "/platform/projects/{ref}/content": {
     /** Gets project's content */
     get: operations["ContentController_getContent"];
+    /** Updates project's content */
+    put: operations["ContentController_updateWholeContent"];
     /** Creates project's content */
     post: operations["ContentController_createContent"];
     /** Deletes project's content */
@@ -712,6 +714,30 @@ export interface paths {
     /** Deletes vercel project connection */
     delete: operations["VercelConnectionsController_deleteVercelConnection"];
   };
+  "/platform/integrations/github": {
+    /** Create github integration */
+    post: operations["GitHubIntegrationController_createGitHubIntegration"];
+  };
+  "/platform/integrations/github/connections/{organization_integration_id}": {
+    /** Gets installed github project connections for the given organization integration */
+    get: operations["GitHubConnectionsController_getGitHubConnections"];
+  };
+  "/platform/integrations/github/connections": {
+    /** Connects a GitHub project to a supabase project */
+    post: operations["GitHubConnectionsController_createGitHubConnection"];
+  };
+  "/platform/integrations/github/connections/{connection_id}": {
+    /** Deletes github project connection */
+    delete: operations["GitHubConnectionsController_deleteGitHubConnection"];
+  };
+  "/platform/integrations/github/repos/{organization_integration_id}": {
+    /** Gets github repos for the given organization */
+    get: operations["GitHubRepoController_getRepos"];
+  };
+  "/platform/integrations/github/branches/{organization_integration_id}/{repo_owner}/{repo_name}": {
+    /** Gets github branches for a given repo */
+    get: operations["GitHubBranchController_getBranches"];
+  };
   "/system/auth/{ref}/templates/{template}": {
     /** Gets GoTrue template */
     get: operations["AuthTemplateController_getTemplate"];
@@ -791,6 +817,10 @@ export interface paths {
   "/system/integrations/vercel/webhooks": {
     /** Processes Vercel event */
     post: operations["VercelWebhooksController_processEvent"];
+  };
+  "/system/integrations/github/webhooks": {
+    /** Processes GitHub event */
+    post: operations["GitHubWebhooksController_processEvent"];
   };
   "/system/stripe/webhooks-v2": {
     /** Processes Stripe event */
@@ -1056,6 +1086,8 @@ export interface paths {
   "/v0/projects/{ref}/content": {
     /** Gets project's content */
     get: operations["ContentController_getContent"];
+    /** Updates project's content */
+    put: operations["ContentController_updateWholeContent"];
     /** Creates project's content */
     post: operations["ContentController_createContent"];
     /** Deletes project's content */
@@ -1247,7 +1279,7 @@ export interface paths {
     /** Deletes objects */
     delete: operations["StorageObjectsController_deleteObjects"];
   };
-  "/v1/branch/{branch_id}": {
+  "/v1/branches/{branch_id}": {
     /**
      * Get database branch config 
      * @description Fetches configurations of the specified database branch
@@ -1339,7 +1371,7 @@ export interface paths {
     /** Updates project's postgrest config */
     patch: operations["PostgrestConfigController_updatePostgRESTConfig"];
   };
-  "/v1/projects/{ref}/query": {
+  "/v1/projects/{ref}/database/query": {
     /** Run sql query */
     post: operations["QueryController_runQuery"];
   };
@@ -1485,7 +1517,6 @@ export interface paths {
     post: operations["OAuthAppsController_createOAuthApp"];
   };
   "/v1/organizations/{slug}/oauth/apps/{id}": {
-    get: operations["OAuthAppsController_getOAuthApp"];
     /** Update an oauth app */
     put: operations["OAuthAppsController_updateOAuthApp"];
     /** Remove a published oauth app */
@@ -1609,7 +1640,8 @@ export interface components {
       SMTP_HOST: string;
       SMTP_PORT: string;
       SMTP_USER: string;
-      SMTP_PASS: string;
+      SMTP_PASS?: string | null;
+      SMTP_PASS_ENCRYPTED?: string | null;
       SMTP_MAX_FREQUENCY: number;
       MAILER_AUTOCONFIRM: boolean;
       MAILER_URLPATHS_INVITE: string;
@@ -1684,7 +1716,6 @@ export interface components {
       EXTERNAL_SLACK_SECRET: string;
       SMS_MESSAGEBIRD_ACCESS_KEY: string;
       SMS_MESSAGEBIRD_ORIGINATOR: string;
-      SMTP_PASS_ENCRYPTED: string;
       REFRESH_TOKEN_ROTATION_ENABLED: boolean;
       EXTERNAL_LINKEDIN_ENABLED: boolean;
       EXTERNAL_LINKEDIN_CLIENT_ID: string;
@@ -1749,7 +1780,8 @@ export interface components {
       SMTP_HOST: string;
       SMTP_PORT: string;
       SMTP_USER: string;
-      SMTP_PASS: string;
+      SMTP_PASS?: string | null;
+      SMTP_PASS_ENCRYPTED?: string | null;
       SMTP_MAX_FREQUENCY: number;
       MAILER_AUTOCONFIRM: boolean;
       MAILER_URLPATHS_INVITE: string;
@@ -1824,7 +1856,6 @@ export interface components {
       EXTERNAL_SLACK_SECRET: string;
       SMS_MESSAGEBIRD_ACCESS_KEY: string;
       SMS_MESSAGEBIRD_ORIGINATOR: string;
-      SMTP_PASS_ENCRYPTED: string;
       REFRESH_TOKEN_ROTATION_ENABLED: boolean;
       EXTERNAL_LINKEDIN_ENABLED: boolean;
       EXTERNAL_LINKEDIN_CLIENT_ID: string;
@@ -1889,7 +1920,8 @@ export interface components {
       SMTP_HOST: string;
       SMTP_PORT: string;
       SMTP_USER: string;
-      SMTP_PASS: string;
+      SMTP_PASS?: string | null;
+      SMTP_PASS_ENCRYPTED?: string | null;
       SMTP_MAX_FREQUENCY: number;
       MAILER_AUTOCONFIRM: boolean;
       MAILER_URLPATHS_INVITE: string;
@@ -1964,7 +1996,6 @@ export interface components {
       EXTERNAL_SLACK_SECRET: string;
       SMS_MESSAGEBIRD_ACCESS_KEY: string;
       SMS_MESSAGEBIRD_ORIGINATOR: string;
-      SMTP_PASS_ENCRYPTED: string;
       REFRESH_TOKEN_ROTATION_ENABLED: boolean;
       EXTERNAL_LINKEDIN_ENABLED: boolean;
       EXTERNAL_LINKEDIN_CLIENT_ID: string;
@@ -2995,6 +3026,7 @@ export interface components {
       status: string;
       subscription_id: string;
       is_readonly_mode_enabled?: boolean;
+      preview_branch_refs: (string)[];
     };
     AmiSearchOptions: {
       search_tags?: Record<string, never>;
@@ -3034,9 +3066,33 @@ export interface components {
       status: string;
       subscription_id: string;
       is_readonly_mode_enabled?: boolean;
+      preview_branch_refs: (string)[];
       endpoint: string;
       anon_key: string;
       service_key: string;
+    };
+    GetUserContentObject: {
+      owner: {
+        id?: number;
+        username?: string;
+      };
+      updated_by: {
+        id?: number;
+        username?: string;
+      };
+      id: string;
+      inserted_at: string;
+      updated_at: string;
+      type: Record<string, never>;
+      visibility: Record<string, never>;
+      name: string;
+      description?: string;
+      project_id: number;
+      owner_id: number;
+      last_updated_by: number;
+    };
+    GetUserContentResponse: {
+      data: (components["schemas"]["GetUserContentObject"])[];
     };
     CreateContentParams: {
       id: string;
@@ -3048,6 +3104,30 @@ export interface components {
       visibility: "user" | "project" | "org" | "public";
       content?: Record<string, never>;
       owner_id?: number;
+    };
+    UserContentObject: {
+      id: string;
+      inserted_at: string;
+      updated_at: string;
+      type: Record<string, never>;
+      visibility: Record<string, never>;
+      name: string;
+      description?: string;
+      project_id: number;
+      owner_id: number;
+      last_updated_by: number;
+    };
+    UpsertContentParams: {
+      id: string;
+      name: string;
+      description: string;
+      /** @enum {string} */
+      type: "sql" | "report" | "log_sql";
+      /** @enum {string} */
+      visibility: "user" | "project" | "org" | "public";
+      content?: Record<string, never>;
+      owner_id?: number;
+      project_id: number;
     };
     UpdateContentParams: {
       id?: string;
@@ -3076,6 +3156,7 @@ export interface components {
       id: string;
       name: string;
       project_ref: string;
+      parent_project_ref: string;
       is_default: boolean;
       git_branch: string;
       created_at: string;
@@ -3102,6 +3183,7 @@ export interface components {
       maxDatabasePreprovisionGb?: number;
       lastDatabaseResizeAt?: string;
       preview_branches: (components["schemas"]["BranchResponse"])[];
+      parent_project_ref?: string;
     };
     ProjectRefResponse: {
       id: number;
@@ -3126,7 +3208,7 @@ export interface components {
       back_ups: (components["schemas"]["BackupId"])[];
     };
     RestartServiceRequest: {
-      services: ("adminapi" | "api-gateway" | "functions" | "gotrue" | "kong" | "pgbouncer" | "pgsodium" | "postgresql" | "postgrest" | "realtime" | "storage" | "walg")[];
+      services: ("adminapi" | "api-gateway" | "functions" | "gotrue" | "kong" | "pgbouncer" | "pgsodium" | "postgresql" | "postgrest" | "realtime" | "storage" | "walg" | "autoshutdown")[];
       source_notification_id?: string;
       region: string;
     };
@@ -3191,6 +3273,11 @@ export interface components {
       name: string;
       limit: number;
     };
+    PreviewTransferInvoiceItem: {
+      description: string;
+      quantity: number;
+      amount: number;
+    };
     PreviewProjectTransferResponse: {
       valid: boolean;
       warnings: (components["schemas"]["PreviewTransferInfo"])[];
@@ -3206,6 +3293,8 @@ export interface components {
       charge_on_target_organization: number;
       source_subscription_plan: Record<string, never>;
       target_subscription_plan: Record<string, unknown> | null;
+      source_invoice_items: (components["schemas"]["PreviewTransferInvoiceItem"])[];
+      target_invoice_items: (components["schemas"]["PreviewTransferInvoiceItem"])[];
     };
     AnalyticsResponse: {
       error?: OneOf<[{
@@ -3238,6 +3327,7 @@ export interface components {
       /** @enum {string} */
       pool_mode: "transaction" | "session" | "statement";
       max_client_conn?: number | null;
+      connectionString: string;
     };
     UpdatePgbouncerConfigBody: {
       default_pool_size?: number;
@@ -3792,6 +3882,34 @@ export interface components {
     DeleteVercelConnectionResponse: {
       id: string;
     };
+    CreateGitHubIntegrationBody: {
+      installation_id: number;
+      organization_slug: string;
+      metadata: Record<string, never>;
+    };
+    CreateGitHubIntegrationResponse: {
+      id: string;
+    };
+    GetGitHubConnections: {
+      id: string;
+      inserted_at: string;
+      updated_at: string;
+      organization_integration_id: string;
+      supabase_project_ref: string;
+      foreign_project_id: string;
+      metadata: Record<string, never>;
+    };
+    CreateGitHubConnectionsBody: {
+      organization_integration_id: string;
+      connection: components["schemas"]["IntegrationConnection"];
+    };
+    GetGithubRepo: {
+      id: number;
+      full_name: string;
+    };
+    GetGithubBranch: {
+      name: string;
+    };
     FunctionResponse: {
       id: string;
       slug: string;
@@ -4087,19 +4205,56 @@ export interface components {
       created_at?: string;
       updated_at?: string;
     };
+    OAuthAppResponse: {
+      id: string;
+      name: string;
+      website: string;
+      icon?: string;
+      authorized_at?: string;
+      created_at?: string;
+      client_id?: string;
+      client_secret_alias?: string;
+      redirect_uris?: (string)[];
+    };
     CreateOAuthAppBody: {
       name: string;
       website: string;
       icon?: string;
       redirect_uris: (string)[];
     };
-    UpdateOAuthAppBody: {
+    CreateOAuthAppResponse: {
+      id: string;
+      client_id: string;
+      client_secret: string;
+    };
+    PutOAuthAppResponse: {
+      id: string;
+      client_id: string;
+      client_secret_alias: string;
+      created_at: string;
       name: string;
       website: string;
-      redirect_uris: (string)[];
       icon?: string;
+      redirect_uris: (string)[];
     };
-    TokenDTO: {
+    RevokeAuthorizedOAuthAppResponse: {
+      id: string;
+      name: string;
+      website: string;
+      icon?: string;
+      authorized_at: string;
+    };
+    DeleteOAuthAppResponse: {
+      id: string;
+      name: string;
+      website: string;
+      icon?: string;
+      created_at: string;
+      client_id: string;
+      client_secret_alias: string;
+      redirect_uris: (string)[];
+    };
+    OAuthTokenBody: {
       /** @enum {string} */
       grant_type: "authorization_code" | "refresh_token";
       client_id: string;
@@ -4109,8 +4264,30 @@ export interface components {
       redirect_uri?: string;
       refresh_token?: string;
     };
+    OAuthTokenResponse: {
+      /** @enum {string} */
+      token_type: "Bearer";
+      access_token: string;
+      refresh_token: string;
+      expires_in: number;
+    };
+    GetAuthorizationResponse: {
+      name: string;
+      website: string;
+      icon?: string;
+      domain: string;
+      expires_at: string;
+      approved_at?: string;
+      approved_organization_slug?: string;
+    };
     AuthorizationsApproveBody: {
       organization_id: string;
+    };
+    ApproveAuthorizationResponse: {
+      url: string;
+    };
+    DeclineAuthorizationResponse: {
+      id: string;
     };
   };
   responses: never;
@@ -6738,8 +6915,35 @@ export interface operations {
       };
     };
     responses: {
-      200: never;
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetUserContentResponse"];
+        };
+      };
       /** @description Failed to retrieve project's content */
+      500: never;
+    };
+  };
+  /** Updates project's content */
+  ContentController_updateWholeContent: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpsertContentParams"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["UserContentObject"];
+        };
+      };
+      /** @description Failed to update project's content */
       500: never;
     };
   };
@@ -6759,7 +6963,7 @@ export interface operations {
     responses: {
       201: {
         content: {
-          "application/json": (Record<string, never>)[];
+          "application/json": (components["schemas"]["UserContentObject"])[];
         };
       };
       /** @description Failed to create project's content */
@@ -6776,7 +6980,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          "application/json": Record<string, never>;
+          "application/json": components["schemas"]["UserContentObject"];
         };
       };
       /** @description Failed to delete project's content */
@@ -6798,7 +7002,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          "application/json": (Record<string, never>)[];
+          "application/json": (components["schemas"]["UserContentObject"])[];
         };
       };
       /** @description Failed to update project's content */
@@ -8270,6 +8474,102 @@ export interface operations {
       500: never;
     };
   };
+  /** Create github integration */
+  GitHubIntegrationController_createGitHubIntegration: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateGitHubIntegrationBody"];
+      };
+    };
+    responses: {
+      201: {
+        content: {
+          "application/json": components["schemas"]["CreateGitHubIntegrationResponse"];
+        };
+      };
+      /** @description Failed to create github integration */
+      500: never;
+    };
+  };
+  /** Gets installed github project connections for the given organization integration */
+  GitHubConnectionsController_getGitHubConnections: {
+    parameters: {
+      path: {
+        organization_integration_id: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["GetGitHubConnections"])[];
+        };
+      };
+      /** @description Failed to get installed github connections for the given organization integration */
+      500: never;
+    };
+  };
+  /** Connects a GitHub project to a supabase project */
+  GitHubConnectionsController_createGitHubConnection: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateGitHubConnectionsBody"];
+      };
+    };
+    responses: {
+      201: never;
+      /** @description Failed to create project connections */
+      500: never;
+    };
+  };
+  /** Deletes github project connection */
+  GitHubConnectionsController_deleteGitHubConnection: {
+    parameters: {
+      path: {
+        connection_id: string;
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to delete github integration project connection */
+      500: never;
+    };
+  };
+  /** Gets github repos for the given organization */
+  GitHubRepoController_getRepos: {
+    parameters: {
+      path: {
+        organization_integration_id: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["GetGithubRepo"])[];
+        };
+      };
+      /** @description Failed to get github repos for the given organization */
+      500: never;
+    };
+  };
+  /** Gets github branches for a given repo */
+  GitHubBranchController_getBranches: {
+    parameters: {
+      path: {
+        organization_integration_id: string;
+        repo_owner: string;
+        repo_name: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["GetGithubBranch"])[];
+        };
+      };
+      /** @description Failed to get github branches for a given repo */
+      500: never;
+    };
+  };
   /** Gets GoTrue template */
   AuthTemplateController_getTemplate: {
     parameters: {
@@ -8628,6 +8928,25 @@ export interface operations {
     responses: {
       201: never;
       /** @description Failed to process Vercel event */
+      500: never;
+    };
+  };
+  /** Processes GitHub event */
+  GitHubWebhooksController_processEvent: {
+    parameters: {
+      header: {
+        "x-github-delivery": string;
+        "x-hub-signature-256": string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Buffer"];
+      };
+    };
+    responses: {
+      201: never;
+      /** @description Failed to process GitHub event */
       500: never;
     };
   };
@@ -9668,7 +9987,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          "application/json": Record<string, never>;
+          "application/json": (components["schemas"]["OAuthAppResponse"])[];
         };
       };
     };
@@ -9686,12 +10005,11 @@ export interface operations {
       };
     };
     responses: {
-      201: never;
-    };
-  };
-  OAuthAppsController_getOAuthApp: {
-    responses: {
-      200: never;
+      201: {
+        content: {
+          "application/json": components["schemas"]["CreateOAuthAppResponse"];
+        };
+      };
     };
   };
   /** Update an oauth app */
@@ -9704,11 +10022,15 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["UpdateOAuthAppBody"];
+        "application/json": components["schemas"]["CreateOAuthAppBody"];
       };
     };
     responses: {
-      200: never;
+      200: {
+        content: {
+          "application/json": components["schemas"]["PutOAuthAppResponse"];
+        };
+      };
     };
   };
   /** Remove a published oauth app */
@@ -9720,7 +10042,11 @@ export interface operations {
       };
     };
     responses: {
-      200: never;
+      200: {
+        content: {
+          "application/json": components["schemas"]["DeleteOAuthAppResponse"];
+        };
+      };
     };
   };
   /** Revoke an authorized oauth app */
@@ -9732,7 +10058,11 @@ export interface operations {
       };
     };
     responses: {
-      201: never;
+      201: {
+        content: {
+          "application/json": components["schemas"]["RevokeAuthorizedOAuthAppResponse"];
+        };
+      };
     };
   };
   /** Authorize user through oauth */
@@ -9750,18 +10080,22 @@ export interface operations {
       };
     };
     responses: {
-      200: never;
+      303: never;
     };
   };
   /** Exchange auth code for user's access and refresh token */
   OAuthController_token: {
     requestBody: {
       content: {
-        "application/x-www-form-urlencoded": components["schemas"]["TokenDTO"];
+        "application/x-www-form-urlencoded": components["schemas"]["OAuthTokenBody"];
       };
     };
     responses: {
-      201: never;
+      201: {
+        content: {
+          "application/json": components["schemas"]["OAuthTokenResponse"];
+        };
+      };
     };
   };
   AuthorizationsController_getAuthorizationRequest: {
@@ -9771,7 +10105,11 @@ export interface operations {
       };
     };
     responses: {
-      200: never;
+      200: {
+        content: {
+          "application/json": components["schemas"]["GetAuthorizationResponse"];
+        };
+      };
     };
   };
   /** Approve oauth app authorization request */
@@ -9787,7 +10125,11 @@ export interface operations {
       };
     };
     responses: {
-      201: never;
+      201: {
+        content: {
+          "application/json": components["schemas"]["ApproveAuthorizationResponse"];
+        };
+      };
     };
   };
   /** Decline oauth app authorization request */
@@ -9798,7 +10140,11 @@ export interface operations {
       };
     };
     responses: {
-      200: never;
+      200: {
+        content: {
+          "application/json": components["schemas"]["DeclineAuthorizationResponse"];
+        };
+      };
     };
   };
 }

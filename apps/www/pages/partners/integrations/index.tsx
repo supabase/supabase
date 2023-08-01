@@ -86,6 +86,8 @@ function IntegrationPartnersPage(props: Props) {
     })
   }, [debouncedSearchTerm, router])
 
+  console.log(partners)
+
   return (
     <>
       <NextSeo
@@ -94,7 +96,7 @@ function IntegrationPartnersPage(props: Props) {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/partners`,
+          url: `https://supabase.com/partners/integrations`,
           images: [
             {
               url: `https://supabase.com${router.basePath}/images/og/integrations.png`, // TODO
@@ -102,7 +104,7 @@ function IntegrationPartnersPage(props: Props) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout className="bg-scale-400 dark:bg-scale-100">
         <SectionContainer className="space-y-16">
           <div>
             <h1 className="h1">{meta_title}</h1>

@@ -25,11 +25,16 @@ module.exports = config({
         spin: {
           '0%, 100%': { transform: 'rotate(360deg)' },
         },
+        marquee: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-100%)' },
+        },
       },
       animation: {
         'flash-code': 'flash-code 1s forwards',
         'flash-code-slow': 'flash-code 2s forwards',
         spin: 'spin 1s both infinite',
+        marquee: 'marquee 35s linear infinite',
       },
     },
   },

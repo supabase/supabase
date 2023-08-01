@@ -5,15 +5,14 @@ import { ChangeEvent, useRef, useState } from 'react'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
-import IntegrationWindowLayout from 'components/layouts/IntegrationWindowLayout'
+import { VercelIntegrationLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useIntegrationConnectionsCreateMutation } from 'data/integrations/integration-connections-create-mutation'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
+import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
-import { Integration } from 'data/integrations/integrations.types'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
 import { useSelectedOrganization, useStore } from 'hooks'
@@ -62,7 +61,7 @@ const VercelIntegration: NextPageWithLayout = () => {
   )
 }
 
-VercelIntegration.getLayout = (page) => <IntegrationWindowLayout>{page}</IntegrationWindowLayout>
+VercelIntegration.getLayout = (page) => <VercelIntegrationLayout>{page}</VercelIntegrationLayout>
 
 const CreateProject = ({
   loading,
@@ -94,7 +93,7 @@ const CreateProject = ({
   } = useParams()
 
   const { mutateAsync: createConnections, isLoading: isLoadingCreateConnections } =
-    useIntegrationConnectionsCreateMutation()
+    useIntegrationVercelConnectionsCreateMutation()
   const { mutateAsync: syncEnvs } = useIntegrationsVercelConnectionSyncEnvsMutation()
 
   const { data: organizationData, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery()
@@ -108,9 +107,7 @@ const CreateProject = ({
   /**
    * the vercel integration installed for organization chosen
    */
-  const organizationIntegration: Integration | undefined = integrationData?.find(
-    (x) => x.organization.slug === slug
-  )
+  const organizationIntegration = integrationData?.find((x) => x.organization.slug === slug)
 
   /**
    * Vercel projects available for this integration
