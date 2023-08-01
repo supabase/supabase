@@ -1,9 +1,9 @@
 ---
-title: 'React Native File Upload with Supabase Storage'
-description: WIP
+title: 'React Native file upload with Supabase Storage'
+description: Learn how to implement authentication and file upload in a React Native app.
 author: simon_grimm
-image: WIP
-thumb: WIP
+image: 2023-08-01-react-native-storage/react-native-storage.png
+thumb: 2023-08-01-react-native-storage/react-native-storage.png
 tags:
   - react-native
   - storage
@@ -11,11 +11,11 @@ date: '2023-08-01'
 toc_depth: 2
 ---
 
-If you want to upload files from your React Native app, you need a backend to store the files. [Supabase Storage](https://supabase.com/docs/guides/storage) is a great choice for this as it provides a simple API to upload files, and we can easily combine this with authentication to build a powerful app.
+If you want to upload files from your React Native app, you need a backend to store the files, [Supabase Storage](https://supabase.com/docs/guides/storage) is a great choice for this as it provides a simple API to upload files, and we can easily combine this with authentication to build a powerful app.
 
 This means you can quickly build your own image-sharing app, a file-sharing app, or any other app that needs to upload files to a backend!
 
-![Supabase File Upload React Native](./supabase-file-upload-react-native.gif)
+![Supabase File Upload React Native](/images/blog/2023-08-01-react-native-storage/supabase-file-upload-react-native.gif)
 
 In this tutorial you will learn to:
 
@@ -26,35 +26,35 @@ In this tutorial you will learn to:
 
 You can also directly check out the [full source code on Github](https://github.com/saimon24/react-native-resumable-upload-supabase) so you can get started with Supabase fast!
 
-Before we get into the app, let's quickly [start a new Supabase project](https://supabase.com/).
+Before we get into the app, let's quickly [start a new Supabase project](https://supabase.com/dashboard).
 
 ## Creating the Supabase Project
 
-To use authentication and storage we need a new Supabase project. If you don't have a Supabase account yet, you can [get started for free](https://supabase.com/)!
+To use authentication and storage we need a new Supabase project. If you don't have a Supabase account yet, you can [get started for free](https://supabase.com/dashboard)!
 
 In your dashboard, click "New Project" and leave it to the default settings, but make sure you keep a copy o your Database password!
 
-![Supabase new project](./new-project.png)
+![Supabase new project](/images/blog/2023-08-01-react-native-storage/new-project.png)
 
 After a minute your project should be ready, and we can configure the authentication and storage.
 
-### Setting up Authentication
+## Setting up Authentication
 
 Authentication will be enabled by default, but we want to turn off email confirmation for this tutorial.
 
 Select **Authentication** from the menu, go to the **Providers** section, and expand Email. 
 
-![Email Authentication settings](./email-auth.png)
+![Email Authentication settings](/images/blog/2023-08-01-react-native-storage/email-auth.png)
 
 Here you can disable the confirmation email, and apply other changes later if you want to!
 
-### Setting up Storage
+## Setting up Storage
 
 Now we want to create a **bucket** under storage where we will upload our files, and also add some security rules to protect the files of a user.
 
 First, select **Storage** from the menu, then click **New bucket** and call it `files`.
 
-![Supabase new bucket](./new-bucket.png)
+![Supabase new bucket](/images/blog/2023-08-01-react-native-storage/new-bucket.png)
 
 Make sure that this is not a public bucket, otherwise, even unauthenticated users can upload or read the files!
 
@@ -245,7 +245,7 @@ export default Login;
 
 There's nothing fancy going on here, but this is all we need to use Supabase Authentication in our app!
 
-![Login page](./login-page.png)
+![Login page](/images/blog/2023-08-01-react-native-storage/login-page.png)
 
 You can try it out right now and create a new user account or sign in with an existing one and log the values to the console to see what's going on.
 
@@ -478,7 +478,7 @@ export default list;
 
 This should give us a nice and clean UI.
 
-![Files page](./files-page.png)
+![Files page](/images/blog/2023-08-01-react-native-storage/files-page.png)
 
 Now we can implement the image picker and upload the selected image to Supabase Storage.
 
@@ -554,7 +554,7 @@ Now let's use this component in our `list.tsx` file to render the list of images
 
 Don't forget to also include the import to the `ImageItem` component!
 
-![Supabase Storage Files List](./supabase-storage-files.png)
+![Supabase Storage Files List](/images/blog/2023-08-01-react-native-storage/supabase-storage-files.png)
 
 Finally, we can also include the delete functionality by adding the following code to the `list.tsx`:
 
