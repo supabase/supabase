@@ -24,7 +24,7 @@ export const DEFAULT_COLUMNS: ColumnField[] = [
     defaultValue: 'now()',
     check: null,
     foreignKey: undefined,
-    isNullable: true,
+    isNullable: false,
     isUnique: false,
     isArray: false,
     isPrimaryKey: false,
