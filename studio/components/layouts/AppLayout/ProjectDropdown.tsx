@@ -106,6 +106,11 @@ const ProjectDropdown = () => {
   const projectNameRef = useRef<HTMLAnchorElement>(null)
   const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
 
+  const isBranch = projectDetails?.parent_project_ref !== undefined
+  const parentProject = isBranch
+    ? allProjects?.find((project) => project.ref === projectDetails.parent_project_ref)
+    : undefined
+
   const isOrgBilling = !!selectedOrganization?.subscription_id
   const { data: subscription, isSuccess } = useProjectSubscriptionV2Query(
     { projectRef: ref },
@@ -115,7 +120,9 @@ const ProjectDropdown = () => {
     ?.filter((x) => x.status !== PROJECT_STATUS.INACTIVE)
     .filter((x) => x.organization_id === selectedOrganization?.id)
     .sort((a, b) => a.name.localeCompare(b.name))
-  const selectedProject = projectDetails || projects?.find((project) => project.ref === ref)
+  const selectedProject = isBranch
+    ? parentProject
+    : projectDetails || projects?.find((project) => project.ref === ref)
 
   const [open, setOpen] = useState(false)
   const popoverOffset = (projectNameRef.current?.offsetWidth ?? 0) + 12
@@ -126,7 +133,7 @@ const ProjectDropdown = () => {
 
   return IS_PLATFORM ? (
     <div className="flex items-center space-x-2 px-2">
-      <Link href={`/project/${selectedProject?.ref}`}>
+      <Link href={`/project/${ref}`}>
         <a ref={projectNameRef} className="flex items-center space-x-2">
           <p className="text-sm">{selectedProject?.name}</p>
           {isSuccess && !isOrgBilling && <Badge color="slate">{subscription?.plan.name}</Badge>}
