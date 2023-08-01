@@ -21,9 +21,7 @@ import { NextPageWithLayout, Organization } from 'types'
 import { IconBook, IconLifeBuoy, LoadingLine } from 'ui'
 
 const VERCEL_ICON = (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 512 512" className="w-6">
-    <path fill-rule="evenodd" d="M256,48,496,464H16Z" />
-  </svg>
+  <img src={`${BASE_PATH}/img/icons/vercel-icon.svg`} alt="Vercel Icon" className="w-4" />
 )
 
 const VercelIntegration: NextPageWithLayout = () => {
