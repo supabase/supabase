@@ -14,7 +14,7 @@ You need the following installed in your system: [Git](https://git-scm.com/downl
 
 ## Running Supabase
 
-Running a self-hosted Supabase project is simple. Follow the steps below:
+Follow these steps to start Supabase locally:
 
 ```sh
 # Get the code
@@ -29,16 +29,16 @@ cp .env.example .env
 # Pull the latest images
 docker compose pull
 
-## Start the services (in detached mode)
+# Start the services (in detached mode)
 docker compose up -d
 ```
 
-After all the services have started you should be able to see them running in the background:
+After all the services have started you can see them running in the background:
 
 ```sh
 docker compose ps
 ```
-Please secure your services as soon as possible using the instructions below.
+Please [secure your services](#securing-your-services) as soon as possible using the instructions below.
 
 ### Accessing Supabase Studio
 
@@ -49,7 +49,7 @@ You will be prompted for a username and password. By default, the credentials ar
 - Username: `supabase` 
 - Password: `this_password_is_insecure_and_should_be_updated`
 
-You should change these credentials as soon as possible using the instructions below.
+You should change these credentials as soon as possible using the [instructions](#dashboard-authentication) below.
 
 ### Accessing the APIs 
 
@@ -74,12 +74,12 @@ You can connect to the Postgres database locally on port `5432`. For example, if
 psql -h localhost -p 5432 -d postgres -U postgres
 ```
 
-The default password is `your-super-secret-and-long-postgres-password`. You should change this as soon as possible using the instructions below. 
+The default password is `your-super-secret-and-long-postgres-password`. You should change this as soon as possible using the [instructions below](#update-secrets). By default the database is not accessible from outside the local machine. You can [change this](#exposing-your-postgres-database) by updating the `docker-compose.yml` file.
 
 
 ## Securing your services
 
-While we provided you with some example secrets for getting started, you should NEVER deploy your Supabase setup using the defaults we have provided.
+While we provided you with some example secrets for getting started, you should NEVER deploy your Supabase setup using the defaults we have provided. Please follow all of the steps in this section to ensure you have a secure setup, and then [restart all services](#restarting-all-services) to pick up the changes.
 
 ### Generate API Keys
 
@@ -141,7 +141,17 @@ You can stop Supabase by running `docker compose stop` in same directory as your
 
 ## Uninstalling
 
-You can stop Supabase by running `docker compose down -v` in same directory as your `docker-compose.yml` file. This will destroy all data in the database and storage volumes, so be careful!
+You can stop Supabase by running the following in same directory as your `docker-compose.yml` file:
+
+```sh 
+# Stop docker and remove volumes:
+docker compose down -v
+
+# Remove Postgres data:
+rm -rf volumes/db/data/
+``` 
+
+This will destroy all data in the database and storage volumes, so be careful!
 
 ## Common configuration
 
