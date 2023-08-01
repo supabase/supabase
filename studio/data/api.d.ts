@@ -3026,6 +3026,7 @@ export interface components {
       status: string;
       subscription_id: string;
       is_readonly_mode_enabled?: boolean;
+      preview_branch_refs: (string)[];
     };
     AmiSearchOptions: {
       search_tags?: Record<string, never>;
@@ -3065,6 +3066,7 @@ export interface components {
       status: string;
       subscription_id: string;
       is_readonly_mode_enabled?: boolean;
+      preview_branch_refs: (string)[];
       endpoint: string;
       anon_key: string;
       service_key: string;
@@ -3323,6 +3325,7 @@ export interface components {
       /** @enum {string} */
       pool_mode: "transaction" | "session" | "statement";
       max_client_conn?: number | null;
+      connectionString: string;
     };
     UpdatePgbouncerConfigBody: {
       default_pool_size?: number;
