@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization, useStore } from 'hooks'
 import { useEffect, useState } from 'react'
 import { Button, IconFileText, IconGitBranch, Modal } from 'ui'
 import BranchingWaitlistPopover from './BranchingWaitlistPopover'
@@ -8,8 +8,12 @@ import GithubRepositorySelection from './GithubRepositorySelection'
 import VercelProjectSelection from './VercelProjectSelection'
 import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import { IntegrationName } from 'data/integrations/integrations.types'
+import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import AlertError from 'components/ui/AlertError'
 
 const EnableBranchingButton = () => {
+  const { ui } = useStore()
   const { ref } = useParams()
   const [open, setOpen] = useState(false)
   const selectedOrg = useSelectedOrganization()
@@ -31,6 +35,13 @@ const EnableBranchingButton = () => {
     orgSlug: selectedOrg?.slug,
   })
 
+  const { mutate: createBranch, isLoading: isCreating } = useBranchCreateMutation({
+    onSuccess: () => {
+      ui.setNotification({ category: 'success', message: `Successfully created new branch` })
+      setOpen(false)
+    },
+  })
+
   // [Joshen] To be dynamic
   const isBranchingAllowed = true
 
@@ -40,12 +51,19 @@ const EnableBranchingButton = () => {
       integration.organization.slug === selectedOrg?.slug
   )
 
-  const vercelIntegration = integrations?.find(
-    (integration) => integration.integration.name === 'Vercel'
-  )
-  const vercelProjectIntegration = vercelIntegration?.connections.find(
-    (connection) => connection.supabase_project_ref === ref
-  )
+  // [Joshen] Leaving this out first as not clear yet branching x vercel implementation
+  // const vercelIntegration = integrations?.find(
+  //   (integration) => integration.integration.name === 'Vercel'
+  // )
+  // const vercelProjectIntegration = vercelIntegration?.connections.find(
+  //   (connection) => connection.supabase_project_ref === ref
+  // )
+
+  const onEnableBranching = () => {
+    if (!ref) return console.error('Project ref is required')
+    if (!selectedBranch) return console.error('No branch selected')
+    createBranch({ projectRef: ref, branchName: selectedBranch, gitBranch: selectedBranch })
+  }
 
   if (!isBranchingAllowed) {
     return <BranchingWaitlistPopover />
@@ -71,16 +89,44 @@ const EnableBranchingButton = () => {
           </div>
         </Modal.Content>
 
-        <GithubRepositorySelection
-          integration={githubIntegration}
-          selectedBranch={selectedBranch}
-          setSelectedBranch={setSelectedBranch}
-          onSelectConnectRepo={() => setAddConnectionType('GitHub')}
-        />
+        {isLoadingIntegrations && (
+          <>
+            <Modal.Separator />
+            <Modal.Content>
+              <div className="py-6">
+                <GenericSkeletonLoader />
+              </div>
+            </Modal.Content>
+            <Modal.Separator />
+          </>
+        )}
 
-        {/* <VercelProjectSelection integration={vercelIntegration} /> */}
+        {isErrorIntegrations && (
+          <>
+            <Modal.Separator />
+            <Modal.Content>
+              <div className="py-6">
+                <AlertError error={integrationsError} subject="Failed to retrieve integrations" />
+              </div>
+            </Modal.Content>
+            <Modal.Separator />
+          </>
+        )}
 
-        {/* <Modal.Separator /> */}
+        {isSuccessIntegrations && (
+          <>
+            <GithubRepositorySelection
+              integration={githubIntegration}
+              selectedBranch={selectedBranch}
+              setSelectedBranch={setSelectedBranch}
+              onSelectConnectRepo={() => setAddConnectionType('GitHub')}
+            />
+
+            {/* <VercelProjectSelection integration={vercelIntegration} /> */}
+
+            {/* <Modal.Separator /> */}
+          </>
+        )}
 
         {/* [Joshen TODO] Feels like this copy writing needs some relooking before we ship, make sure they are factual too */}
         <Modal.Content>
@@ -110,10 +156,16 @@ const EnableBranchingButton = () => {
 
         <Modal.Content>
           <div className="flex items-center space-x-2 py-2 pb-4">
-            <Button block type="default">
+            <Button block disabled={isCreating} type="default">
               Cancel
             </Button>
-            <Button block disabled={selectedBranch === undefined} type="primary">
+            <Button
+              block
+              disabled={selectedBranch === undefined || isCreating}
+              loading={isCreating}
+              type="primary"
+              onClick={() => onEnableBranching()}
+            >
               I understand, enable branching
             </Button>
           </div>
