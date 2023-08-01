@@ -1,6 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
 
 import { del } from 'data/fetchers'
+import { ResponseError } from 'types'
 import { integrationKeys } from './keys'
 
 type DeleteVariables = {
@@ -23,10 +25,14 @@ type DeleteContentData = Awaited<ReturnType<typeof deleteConnection>>
 
 export const useIntegrationsGitHubInstalledConnectionDeleteMutation = ({
   onSuccess,
+  onError,
   ...options
-}: Omit<UseMutationOptions<DeleteContentData, unknown, DeleteVariables>, 'mutationFn'> = {}) => {
+}: Omit<
+  UseMutationOptions<DeleteContentData, ResponseError, DeleteVariables>,
+  'mutationFn'
+> = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<DeleteContentData, unknown, DeleteVariables>(
+  return useMutation<DeleteContentData, ResponseError, DeleteVariables>(
     (args) => deleteConnection(args),
     {
       async onSuccess(data, variables, context) {
@@ -39,6 +45,13 @@ export const useIntegrationsGitHubInstalledConnectionDeleteMutation = ({
           ),
         ])
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to mutate: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

@@ -13,7 +13,6 @@ import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
-import { Integration } from 'data/integrations/integrations.types'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
 import { useSelectedOrganization, useStore } from 'hooks'
@@ -108,9 +107,7 @@ const CreateProject = ({
   /**
    * the vercel integration installed for organization chosen
    */
-  const organizationIntegration: Integration | undefined = integrationData?.find(
-    (x) => x.organization.slug === slug
-  )
+  const organizationIntegration = integrationData?.find((x) => x.organization.slug === slug)
 
   /**
    * Vercel projects available for this integration

@@ -55,7 +55,7 @@ const GitHubIntegration: NextPageWithLayout = () => {
 
         router.push({
           pathname: `/integrations/github/${id}/choose-project`,
-          query: router.query,
+          query: { ...router.query, slug: selectedOrg?.slug },
         })
       },
       onError(error: any) {

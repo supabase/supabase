@@ -1,15 +1,11 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+
+import { get } from 'data/fetchers'
+import { ResponseError } from 'types'
 import { integrationKeys } from './keys'
 
 export type GitHubReposVariables = {
   integrationId: string | undefined
-}
-
-export type GitHubReposResponse = {
-  id: number
-  full_name: string
 }
 
 export async function getGitHubRepos(
@@ -20,18 +16,26 @@ export async function getGitHubRepos(
     throw new Error('integrationId is required')
   }
 
-  const response = await get(`${API_URL}/integrations/github/repos/${integrationId}`, {
-    signal,
-  })
-  if (response.error) {
-    throw response.error
+  const { data, error } = await get(
+    '/platform/integrations/github/repos/{organization_integration_id}',
+    {
+      params: {
+        path: {
+          organization_integration_id: integrationId,
+        },
+      },
+      signal,
+    }
+  )
+  if (error) {
+    throw error
   }
 
-  return response as GitHubReposResponse[]
+  return data
 }
 
 export type GitHubReposData = Awaited<ReturnType<typeof getGitHubRepos>>
-export type GitHubReposError = unknown
+export type GitHubReposError = ResponseError
 
 export const useGitHubReposQuery = <TData = GitHubReposData>(
   { integrationId }: GitHubReposVariables,
