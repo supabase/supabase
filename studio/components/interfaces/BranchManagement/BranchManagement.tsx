@@ -26,6 +26,7 @@ import PreviewBranches from './PreviewBranches'
 import PullRequests from './PullRequests'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 
 const BranchManagement = () => {
   const { ui } = useStore()
@@ -85,7 +86,7 @@ const BranchManagement = () => {
 
   if (!hasBranchEnabled) {
     // [Joshen] Some empty state here
-    return <div>Some disabled state</div>
+    return <ProductEmptyState title="Hello">World</ProductEmptyState>
   }
 
   return (
