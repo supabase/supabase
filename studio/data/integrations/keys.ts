@@ -4,6 +4,8 @@ export const integrationKeys = {
   integrationsList: () => ['organizations', 'integrations'] as const,
   vercelProjectList: (organization_integration_id: string | undefined) =>
     ['organizations', organization_integration_id, 'vercel-projects'] as const,
+  githubRepoList: (organization_integration_id: string | undefined) =>
+    ['organizations', organization_integration_id, 'github-repos'] as const,
   vercelConnectionsList: (organization_integration_id: string | undefined) =>
     ['organizations', organization_integration_id, 'vercel-connections'] as const,
   githubBranchesList: (
@@ -11,4 +13,6 @@ export const integrationKeys = {
     repo_owner: string,
     repo_name: string
   ) => ['organizations', organization_integration_id, 'branches', repo_owner, repo_name],
+  githubConnectionsList: (organization_integration_id: string | undefined) =>
+    ['organizations', organization_integration_id, 'github-connections'] as const,
 }

@@ -1,9 +1,10 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { integrationKeys } from './keys'
-import { IntegrationsVariables, Integration } from './integrations.types'
 import { ResponseError } from 'types'
+import { Integration, IntegrationsVariables } from './integrations.types'
+import { integrationKeys } from './keys'
 
 export type IntegrationsResponse = Integration[]
 

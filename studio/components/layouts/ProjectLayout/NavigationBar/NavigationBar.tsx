@@ -49,8 +49,8 @@ const NavigationBar = ({}) => {
       ].join(' ')}
     >
       <ul className="flex flex-col space-y-2">
-        {!navLayoutV2 && (
-          <Link href="/projects">
+        {(!navLayoutV2 || !IS_PLATFORM) && (
+          <Link href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}>
             <a className="block">
               <img
                 src={`${router.basePath}/img/supabase-logo.svg`}

@@ -1,7 +1,7 @@
 import { useFlag } from 'hooks'
 import { isUndefined } from 'lodash'
 import Link from 'next/link'
-import { FC, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
 import LayoutHeader from '../ProjectLayout/LayoutHeader'
 import { SidebarLink, SidebarSection } from './AccountLayout.types'
@@ -104,11 +104,7 @@ interface SectionWithHeadersProps {
   subitemsParentKey?: number
 }
 
-const SectionWithHeaders: FC<SectionWithHeadersProps> = ({
-  section,
-  subitems,
-  subitemsParentKey,
-}) => (
+const SectionWithHeaders = ({ section, subitems, subitemsParentKey }: SectionWithHeadersProps) => (
   <div key={section.heading} className="border-b py-5 px-6 border-scale-500">
     {section.heading && <Menu.Group title={section.heading} />}
     {section.versionLabel && (
@@ -131,7 +127,7 @@ interface SidebarItemProps {
   subitemsParentKey?: number
 }
 
-const SidebarItem: FC<SidebarItemProps> = ({ links, subitems, subitemsParentKey }) => {
+const SidebarItem = ({ links, subitems, subitemsParentKey }: SidebarItemProps) => {
   return (
     <ul className="space-y-1">
       {links.map((link, i: number) => {
@@ -174,7 +170,7 @@ interface SidebarLinkProps extends SidebarLink {
   isSubitem?: boolean
 }
 
-const SidebarLinkItem: FC<SidebarLinkProps> = ({
+const SidebarLinkItem = ({
   id,
   label,
   href,
@@ -182,7 +178,7 @@ const SidebarLinkItem: FC<SidebarLinkProps> = ({
   isSubitem,
   isExternal,
   onClick,
-}) => {
+}: SidebarLinkProps) => {
   if (isUndefined(href)) {
     let icon
     if (isExternal) {
