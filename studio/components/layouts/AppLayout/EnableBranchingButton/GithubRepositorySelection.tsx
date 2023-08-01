@@ -17,10 +17,15 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  cn,
 } from 'ui'
 
 import { useParams } from 'common'
-import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/IntegrationPanels'
+import {
+  EmptyIntegrationConnection,
+  IntegrationConnection,
+  IntegrationConnectionOption,
+} from 'components/interfaces/Integrations/IntegrationPanels'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useGithubBranchesQuery } from 'data/integrations/integrations-github-branches-query'
@@ -63,9 +68,11 @@ const GithubRepositorySelection = ({
   })
 
   return (
-    <div className={clsx('border-t border-b', !integration ? 'border-amber-300 bg-amber-100' : '')}>
-      <Modal.Content>
-        <div className="space-y-1 py-6">
+    <div
+      className={clsx('border-t border-b', !integration ? 'border-warning-300 bg-warning-200' : '')}
+    >
+      <Modal.Content className="px-7">
+        <div className="py-6">
           <div className="flex items-center space-x-2">
             <p>Git Connection</p>
             <Badge color="amber">Required</Badge>
@@ -85,26 +92,28 @@ const GithubRepositorySelection = ({
             </Link>
           )}
           {integration && !githubProjectIntegration && (
-            <EmptyIntegrationConnection onClick={() => onSelectConnectRepo()} />
+            <EmptyIntegrationConnection showNode={false} onClick={() => onSelectConnectRepo()} />
           )}
           {integration && githubProjectIntegration && (
             <>
-              <div className="border bg-surface-200 rounded-md flex items-center justify-between py-4 px-4">
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 rounded-md flex items-center justify-center bg-scale-100">
-                    <IconGitHub strokeWidth={2} />
-                  </div>
-                  <div>
-                    <p className="text-sm text-light">@{repoOwner}</p>
-                    <p className="text-sm">{repoName}</p>
-                  </div>
-                </div>
-                <Button type="default" onClick={() => onSelectConnectRepo()}>
-                  Configure
-                </Button>
-              </div>
-              <div className="!mt-4">
-                <p className="text-sm text-light mb-2">Select your production branch:</p>
+              <ul className="mb-3">
+                <IntegrationConnection
+                  type={'GitHub'}
+                  connection={githubProjectIntegration}
+                  showNode={false}
+                  actions={
+                    <Button type="default" onClick={() => onSelectConnectRepo()}>
+                      Configure connection
+                    </Button>
+                  }
+                  orientation="vertical"
+                />
+              </ul>
+
+              <div>
+                <label className="block text-sm text-light mb-2" htmlFor="branch-selector">
+                  Select your production branch:
+                </label>
                 {isLoadingBranches && <ShimmeringLoader />}
                 {isErrorBranches && (
                   <AlertError
@@ -114,22 +123,23 @@ const GithubRepositorySelection = ({
                 )}
                 {isSuccessBranches && (
                   <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-                    <PopoverTrigger_Shadcn_ asChild>
+                    <PopoverTrigger_Shadcn_ asChild name="branch-selector">
                       <Button
                         block
                         type="default"
                         size="medium"
                         ref={comboBoxRef}
-                        className="justify-start"
+                        className={cn(
+                          'justify-start w-64',
+                          selectedBranch === undefined ? 'text-light' : 'text'
+                        )}
                         iconRight={
                           <span className="grow flex justify-end">
                             <IconChevronDown className={''} />
                           </span>
                         }
                       >
-                        <p className={selectedBranch === undefined ? 'text-light' : 'text'}>
-                          {selectedBranch || 'Select a branch'}
-                        </p>
+                        {selectedBranch || 'Select a branch'}
                       </Button>
                     </PopoverTrigger_Shadcn_>
                     <PopoverContent_Shadcn_
