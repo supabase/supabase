@@ -6,6 +6,8 @@ import { Button, IconFileText, IconGitBranch, Modal } from 'ui'
 import BranchingWaitlistPopover from './BranchingWaitlistPopover'
 import GithubRepositorySelection from './GithubRepositorySelection'
 import VercelProjectSelection from './VercelProjectSelection'
+import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
+import { IntegrationName } from 'data/integrations/integrations.types'
 
 const EnableBranchingButton = () => {
   const { ref } = useParams()
@@ -13,6 +15,7 @@ const EnableBranchingButton = () => {
   const selectedOrg = useSelectedOrganization()
 
   const [selectedBranch, setSelectedBranch] = useState<string>()
+  const [addConnectionType, setAddConnectionType] = useState<IntegrationName>()
 
   useEffect(() => {
     if (open) setSelectedBranch(undefined)
@@ -72,6 +75,7 @@ const EnableBranchingButton = () => {
           integration={githubIntegration}
           selectedBranch={selectedBranch}
           setSelectedBranch={setSelectedBranch}
+          onSelectConnectRepo={() => setAddConnectionType('GitHub')}
         />
 
         {/* <VercelProjectSelection integration={vercelIntegration} /> */}
@@ -115,6 +119,13 @@ const EnableBranchingButton = () => {
           </div>
         </Modal.Content>
       </Modal>
+
+      <SidePanelGitHubRepoLinker
+        isOpen={addConnectionType === 'GitHub'}
+        projectRef={ref}
+        organizationIntegrationId={githubIntegration?.id}
+        onClose={() => setAddConnectionType(undefined)}
+      />
     </>
   )
 }

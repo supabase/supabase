@@ -2,7 +2,7 @@ import { ReactNode, useRef, useState } from 'react'
 
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { IntegrationConnectionsCreateVariables } from 'data/integrations/types'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import {
   Button,
@@ -18,6 +18,7 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
+import { toast } from 'react-hot-toast'
 
 export interface Project {
   id: string
@@ -43,6 +44,9 @@ export interface ProjectLinkerProps {
   onSkip?: () => void
   loadingForeignProjects?: boolean
   loadingSupabaseProjects?: boolean
+
+  defaultSupabaseProjectRef?: string
+  defaultForeignProjectId?: string
 }
 
 const ProjectLinker = ({
@@ -58,6 +62,9 @@ const ProjectLinker = ({
   onSkip,
   loadingForeignProjects,
   loadingSupabaseProjects,
+
+  defaultSupabaseProjectRef,
+  defaultForeignProjectId,
 }: ProjectLinkerProps) => {
   const [supabaseProjectsComboBoxOpen, setSupabaseProjectsComboboxOpen] = useState(false)
   const [foreignProjectsComboBoxOpen, setForeignProjectsComboboxOpen] = useState(false)
@@ -66,23 +73,22 @@ const ProjectLinker = ({
 
   const selectedOrganization = useSelectedOrganization()
 
-  const [supabaseProjectRef, setSupabaseProjectRef] = useState<string | undefined>(undefined)
-  const [foreignProjectId, setForeignProjectId] = useState<string | undefined>(undefined)
+  const [supabaseProjectRef, setSupabaseProjectRef] = useState<string | undefined>(
+    defaultSupabaseProjectRef
+  )
+  const [foreignProjectId, setForeignProjectId] = useState<string | undefined>(
+    defaultForeignProjectId
+  )
 
   // create a flat array of foreign project ids. ie, ["prj_MlkO6AiLG5ofS9ojKrkS3PhhlY3f", ..]
   const flatInstalledConnectionsIds = new Set(installedConnections.map((x) => x.foreign_project_id))
-
-  // check that foreign project is not already installed
-  const filteredForeignProjects = foreignProjects.filter((foreignProject) => {
-    return !flatInstalledConnectionsIds.has(foreignProject.id)
-  })
 
   const selectedSupabaseProject = supabaseProjectRef
     ? supabaseProjects.find((x) => x.ref?.toLowerCase() === supabaseProjectRef?.toLowerCase())
     : undefined
 
   const selectedForeignProject = foreignProjectId
-    ? filteredForeignProjects.find((x) => x.id?.toLowerCase() === foreignProjectId?.toLowerCase())
+    ? foreignProjects.find((x) => x.id?.toLowerCase() === foreignProjectId?.toLowerCase())
     : undefined
 
   function onCreateConnections() {
@@ -91,6 +97,13 @@ const ProjectLinker = ({
     if (!organizationIntegrationId) return console.error('No integration ID set')
     if (!selectedForeignProject?.id) return console.error('No Foreign project ID set')
     if (!selectedSupabaseProject?.ref) return console.error('No Supabase project ref set')
+
+    const alreadyInstalled = flatInstalledConnectionsIds.has(foreignProjectId ?? '')
+    if (alreadyInstalled) {
+      return toast.error(
+        `Unable to connect to ${selectedForeignProject.name}: Selected repository already has an installed connection to a project`
+      )
+    }
 
     _onCreateConnections({
       organizationIntegrationId,
@@ -142,7 +155,7 @@ const ProjectLinker = ({
                   type="default"
                   size="medium"
                   block
-                  disabled={loadingSupabaseProjects}
+                  disabled={defaultSupabaseProjectRef !== undefined || loadingSupabaseProjects}
                   loading={loadingSupabaseProjects}
                   className="justify-start"
                   icon={
@@ -155,9 +168,11 @@ const ProjectLinker = ({
                     </div>
                   }
                   iconRight={
-                    <span className="grow flex justify-end">
-                      <IconChevronDown className={''} />
-                    </span>
+                    defaultSupabaseProjectRef === undefined ? (
+                      <span className="grow flex justify-end">
+                        <IconChevronDown className={''} />
+                      </span>
+                    ) : null
                   }
                 >
                   {selectedSupabaseProject ? selectedSupabaseProject.name : 'Choose Project'}
@@ -246,7 +261,7 @@ const ProjectLinker = ({
                   <CommandList_Shadcn_ className="!max-h-[170px]">
                     <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
                     <CommandGroup_Shadcn_>
-                      {filteredForeignProjects.map((project) => {
+                      {foreignProjects.map((project) => {
                         return (
                           <CommandItem_Shadcn_
                             value={project.id}

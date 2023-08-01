@@ -29,6 +29,7 @@ interface GithubRepositorySelectionProps {
   integration?: Integration
   selectedBranch?: string
   setSelectedBranch: (name: string) => void
+  onSelectConnectRepo: () => void
 }
 
 // [Joshen TODO] Integrate the Github repo selector
@@ -37,6 +38,7 @@ const GithubRepositorySelection = ({
   integration,
   selectedBranch,
   setSelectedBranch,
+  onSelectConnectRepo,
 }: GithubRepositorySelectionProps) => {
   const { ref } = useParams()
   const [open, setOpen] = useState(false)
@@ -82,10 +84,10 @@ const GithubRepositorySelection = ({
             </Link>
           )}
           {integration && !githubProjectIntegration && (
-            <div className="border border-dashed rounded !mt-4 flex items-center justify-center py-4 space-x-4">
+            <div className="bg border border-dashed rounded !mt-4 flex items-center justify-center py-6 space-x-4">
               <IconGitHub strokeWidth={2} />
-              <Button type="default" onClick={() => {}}>
-                Connect repo
+              <Button type="default" onClick={() => onSelectConnectRepo()}>
+                Connect repository to project
               </Button>
             </div>
           )}
@@ -101,7 +103,9 @@ const GithubRepositorySelection = ({
                     <p className="text-sm">{repoName}</p>
                   </div>
                 </div>
-                <Button type="default">Configure</Button>
+                <Button type="default" onClick={() => onSelectConnectRepo()}>
+                  Configure
+                </Button>
               </div>
               <div className="!mt-4">
                 <p className="text-sm text-light mb-2">Select your production branch:</p>
