@@ -104,6 +104,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
         orgSlug: selectedOrganization.slug,
       })
     }
+
     createConnections(variables)
   }
 

@@ -22,11 +22,11 @@ import {
   IntegrationProjectConnection,
   Integration,
 } from 'data/integrations/integrations.types'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import {
@@ -46,6 +46,7 @@ import {
   IconCheck,
   IconChevronDown,
   Input_Shadcn_,
+  Label_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -56,7 +57,13 @@ import * as z from 'zod'
 import { IntegrationConnectionItem } from '../../Integrations/IntegrationConnection'
 import SidePanelGitHubRepoLinker from './../../Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './../../Organization/IntegrationSettings/SidePanelVercelProjectLinker'
+import { useGithubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutate'
 import { useGithubBranchesQuery } from 'data/integrations/integrations-github-branches-query'
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
+import { useBranchQuery } from 'data/branches/branch-query'
+import { useBranchesQuery } from 'data/branches/branches-query'
+import { GitBranch, Shield, RotateCcw, GitCompare } from 'lucide-react'
+import { useVercelConnectionUpdateMutation } from 'data/integrations/vercel-connection-update-mutate'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -203,8 +210,8 @@ You can change the scope of the access for Supabase by configuring
                     {integration.connections.length > 0 ? (
                       <>
                         <IntegrationConnectionHeader
-                          title={ConnectionHeaderTitle}
-                          markdown={`Repository connections for Vercel`}
+                        // title={ConnectionHeaderTitle}
+                        // markdown={`Repository connections for Vercel`}
                         />
                         <ul className="flex flex-col">
                           {integration.connections.map((connection) => (
@@ -218,9 +225,12 @@ You can change the scope of the access for Supabase by configuring
                                 onDeleteConnection={onDeleteVercelConnection}
                                 className="!rounded-b-none !mb-0"
                               />
-                              <div className="relative pl-8 ml-6 border-l border-scale-600 dark:border-scale-400 pb-3">
-                                <div className="border-b border-l border-r rounded-b-md">
-                                  <VercelIntegrationConnectionForm connection={connection} />
+                              <div className="relative pl-8 ml-6 border-l border-scale-600 dark:border-scale-400 pb-6">
+                                <div className="border-b border-l border-r rounded-b-lg">
+                                  <VercelIntegrationConnectionForm
+                                    connection={connection}
+                                    integration={integration}
+                                  />
                                 </div>
                               </div>
                             </div>
@@ -253,17 +263,26 @@ You can change the scope of the access for Supabase by configuring
 
   const VercelIntegrationConnectionForm = ({
     connection,
+    integration,
   }: {
     connection: IntegrationProjectConnection
+    integration: Integration
   }) => {
-    const FormSchema = z.object({
-      environmentVariablesProduction: z.boolean().default(false),
-      environmentVariablesPreview: z.boolean().default(false),
-      authRedirectUrisProduction: z.boolean().default(false),
-      authRedirectUrisPreview: z.boolean().default(false),
-    })
-
+    const { ui } = useStore()
     const config = connection.metadata.supabaseConfig
+
+    const FormSchema = z.object({
+      environmentVariablesProduction: z
+        .boolean()
+        .default(config?.environmentVariables?.production ?? false),
+      authRedirectUrisProduction: z
+        .boolean()
+        .default(config?.authRedirectUris?.production ?? false),
+      environmentVariablesPreview: z
+        .boolean()
+        .default(config?.environmentVariables?.preview ?? false),
+      authRedirectUrisPreview: z.boolean().default(config?.authRedirectUris?.preview ?? false),
+    })
 
     const form = useForm<z.infer<typeof FormSchema>>({
       resolver: zodResolver(FormSchema),
@@ -275,21 +294,45 @@ You can change the scope of the access for Supabase by configuring
       },
     })
 
+    const { mutate: updateVercelConnection, isLoading: isUpdatingVercelConnection } =
+      useVercelConnectionUpdateMutation({
+        onSuccess: (data) => {
+          ui.setNotification({
+            category: 'success',
+            message: `Updated Supabase directory`,
+          })
+        },
+      })
+
     function onSubmit(data: z.infer<typeof FormSchema>) {
-      // toast({
-      //   title: 'You submitted the following values:',
-      //   description: (
-      //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-      //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-      //     </pre>
-      //   ),
-      // })
+      console.log('submitting')
+      const metadata = {
+        ...connection.metadata,
+      }
+
+      metadata.supabaseConfig = {
+        environmentVariables: {
+          production: data.environmentVariablesProduction,
+          preview: data.environmentVariablesPreview,
+        },
+        authRedirectUris: {
+          production: data.authRedirectUrisProduction,
+          preview: data.authRedirectUrisPreview,
+        },
+      }
+
+      updateVercelConnection({
+        id: connection.id,
+        metadata,
+        organizationIntegrationId: integration.id,
+      })
     }
 
     return (
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
           <div>
+            {/* {isUpdatingVercelConnection && 'isUpdatingVercelConnection'} */}
             <div className="flex flex-col gap-6 px-8 py-8">
               <FormField_Shadcn_
                 control={form.control}
@@ -298,18 +341,25 @@ You can change the scope of the access for Supabase by configuring
                   <FormItem_Shadcn_ className="flex flex-row items-center justify-between">
                     <div className="">
                       <FormLabel_Shadcn_ className="!text">
-                        Auto sync environment variables for Production
+                        Sync environment variables for Vercel Production deployments
                       </FormLabel_Shadcn_>
-                      <FormDescription_Shadcn_ className="text-xs">
+                      <FormDescription_Shadcn_ className="text-xs text-lighter">
                         Deploy Edge Functions when merged into Production Beanch
                       </FormDescription_Shadcn_>
                     </div>
                     <FormControl_Shadcn_>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={(e) => {
+                          field.onChange(e)
+                          form.handleSubmit(onSubmit)()
+                        }}
+                      />
                     </FormControl_Shadcn_>
                   </FormItem_Shadcn_>
                 )}
               />
+              {/* <Button htmlType="submit">Submit</Button> */}
               <FormField_Shadcn_
                 control={form.control}
                 name="authRedirectUrisProduction"
@@ -317,14 +367,20 @@ You can change the scope of the access for Supabase by configuring
                   <FormItem_Shadcn_ className="flex flex-row items-center justify-between">
                     <div className="">
                       <FormLabel_Shadcn_ className="!text">
-                        Auto manage Supabase Auth redirect URIs
+                        Auto update Auth Redirect URIs for Vercel Production Deployments
                       </FormLabel_Shadcn_>
-                      <FormDescription_Shadcn_ className="text-xs">
+                      <FormDescription_Shadcn_ className="text-xs text-lighter">
                         Deploy Edge Functions when merged into Production Beanch
                       </FormDescription_Shadcn_>
                     </div>
                     <FormControl_Shadcn_>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={(e) => {
+                          field.onChange(e)
+                          form.handleSubmit(onSubmit)()
+                        }}
+                      />
                     </FormControl_Shadcn_>
                   </FormItem_Shadcn_>
                 )}
@@ -332,7 +388,10 @@ You can change the scope of the access for Supabase by configuring
             </div>
             <ScaffoldDivider />
             <div className="flex flex-col gap-6 px-8 py-8">
-              <h5 className="text-sm">Database Branching configuration </h5>
+              <div className="flex items-center gap-3">
+                <GitCompare className="text-light w-4 h-4" strokeWidth={1} />
+                <h5 className="text-sm">Database Branching configuration </h5>
+              </div>
               <FormField_Shadcn_
                 control={form.control}
                 name="environmentVariablesPreview"
@@ -340,14 +399,21 @@ You can change the scope of the access for Supabase by configuring
                   <FormItem_Shadcn_ className="flex flex-row items-center justify-between">
                     <div className="">
                       <FormLabel_Shadcn_ className="!text">
-                        Auto sync enviroment variables for Database Preview Branches
+                        Sync environment variables for Vercel Preview Deployments
                       </FormLabel_Shadcn_>
-                      <FormDescription_Shadcn_ className="text-xs">
-                        Deploy Edge Functions when merged into Production Beanch
+                      <FormDescription_Shadcn_ className="text-xs text-lighter">
+                        Preview deployments will be able to connect to Supabase Database Preview
+                        branches
                       </FormDescription_Shadcn_>
                     </div>
                     <FormControl_Shadcn_>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={(e) => {
+                          field.onChange(e)
+                          form.handleSubmit(onSubmit)()
+                        }}
+                      />
                     </FormControl_Shadcn_>
                   </FormItem_Shadcn_>
                 )}
@@ -359,14 +425,20 @@ You can change the scope of the access for Supabase by configuring
                   <FormItem_Shadcn_ className="flex flex-row items-center justify-between">
                     <div className="">
                       <FormLabel_Shadcn_ className="!text">
-                        Auto manage Supabase Auth redirect URIs for Preview deployments
+                        Auto update Auth Redirect URIs for Vercel Preview Deployments
                       </FormLabel_Shadcn_>
-                      <FormDescription_Shadcn_ className="text-xs">
+                      <FormDescription_Shadcn_ className="text-xs text-lighter">
                         Deploy Edge Functions when merged into Production Beanch
                       </FormDescription_Shadcn_>
                     </div>
                     <FormControl_Shadcn_>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={(e) => {
+                          field.onChange(e)
+                          form.handleSubmit(onSubmit)()
+                        }}
+                      />
                     </FormControl_Shadcn_>
                   </FormItem_Shadcn_>
                 )}
@@ -440,7 +512,7 @@ These connections will be part of a GitHub workflow that is currently in develop
                               className="!rounded-b-none !mb-0"
                             />
 
-                            <div className="border-b border-l border-r">
+                            <div className="border-b border-l border-r rounded-b-lg">
                               <GitHubIntegrationConnectionForm
                                 connection={connection}
                                 integration={integration}
@@ -484,35 +556,12 @@ These connections will be part of a GitHub workflow that is currently in develop
   }) => {
     const [open, setOpen] = useState(false)
     const comboBoxRef = useRef<HTMLButtonElement>(null)
-    const [selectedBranch, setSelectedBranch] = useState<string>()
-
-    const FormSchema = z.object({
-      productionBranch: z.boolean().default(false),
-      supabaseDirectory: z.boolean().default(false),
-    })
-
     const projectContext = useProjectContext()
 
-    const config = connection.metadata.supabaseConfig ?? {}
-
-    const form = useForm<z.infer<typeof FormSchema>>({
-      resolver: zodResolver(FormSchema),
-      defaultValues: {
-        productionBranch: config.environmentVariables?.production ?? false,
-        supabaseDirectory: config.environmentVariables?.preview ?? false,
-      },
-    })
-
-    function onSubmit(data: z.infer<typeof FormSchema>) {
-      // toast({
-      //   title: 'You submitted the following values:',
-      //   description: (
-      //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-      //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-      //     </pre>
-      //   ),
-      // })
-    }
+    console.log(
+      'connection.metadata.supabaseConfig?.supabaseDirectory',
+      connection.metadata.supabaseConfig?.supabaseDirectory
+    )
 
     const githubProjectIntegration = integration?.connections.find(
       (connection) => connection.supabase_project_ref === projectContext.project?.ref
@@ -520,122 +569,222 @@ These connections will be part of a GitHub workflow that is currently in develop
 
     const [repoOwner, repoName] = githubProjectIntegration?.metadata.name.split('/') ?? []
 
+    const { ui } = useStore()
+
     const {
       data: githubBranches,
       error: githubBranchesError,
       isLoading: isLoadingBranches,
       isSuccess: isSuccessBranches,
-      isError: isErrorBranches,
     } = useGithubBranchesQuery({
       organizationIntegrationId: integration?.id,
       repoOwner,
       repoName,
     })
 
+    const { mutate: updateBranch, isLoading: isUpdatingProdBranch } = useBranchUpdateMutation({
+      onSuccess: (data) => {
+        ui.setNotification({
+          category: 'success',
+          message: `Changed Production Branch to ${data.git_branch}`,
+        })
+        setOpen(false)
+      },
+    })
+
+    const { data: previewBranches, isLoading: isLoadingPreviewBranches } = useBranchesQuery(
+      {
+        projectRef: projectContext.project?.ref,
+      },
+      {
+        enabled: projectContext !== undefined,
+      }
+    )
+
+    const productionPreviewBranch = previewBranches?.find((branch) => branch.is_default)
+
+    function onUpdateProductionBranch(branchName: string) {
+      if (!projectContext.project?.ref) return
+      if (!productionPreviewBranch) return
+      updateBranch({
+        id: productionPreviewBranch.id,
+        projectRef: projectContext.project.ref,
+        branchName: branchName,
+        gitBranch: branchName,
+      })
+    }
+
+    const FormSchema = z.object({
+      supabaseDirectory: z.string().default(connection.metadata.supabaseConfig.supabaseDirectory),
+    })
+    const form = useForm<z.infer<typeof FormSchema>>({
+      resolver: zodResolver(FormSchema),
+      defaultValues: {
+        supabaseDirectory: connection.metadata.supabaseConfig.supabaseDirectory,
+      },
+    })
+
+    // useEffect(() => {
+    //   form.reset()
+    // }, [form, connection])
+
+    const { mutate: updateGithubConnection, isLoading: isUpdatingGithubConnection } =
+      useGithubConnectionUpdateMutation({
+        onSuccess: (data) => {
+          ui.setNotification({
+            category: 'success',
+            message: `Updated Supabase directory`,
+          })
+          setOpen(false)
+        },
+      })
+
+    function onSubmit(data: z.infer<typeof FormSchema>) {
+      const metadata = {
+        ...connection.metadata,
+      }
+      metadata.supabaseConfig.supabaseDirectory = data.supabaseDirectory
+
+      updateGithubConnection({
+        id: connection.id,
+        metadata,
+        organizationIntegrationId: integration.id,
+      })
+    }
+
     return (
-      <Form_Shadcn_ {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
-          <div className="flex flex-col gap-6 px-8 py-8">
+      <div className="flex flex-col gap-6 px-8 py-8">
+        <div>
+          <Label_Shadcn_ className="text">Production branch</Label_Shadcn_>
+          <p className="text-xs text-light mb-3">
+            Deploy Edge Functions when merged into Production branch
+          </p>
+          {/* <pre>! This should only work if branching is turned on !</pre> */}
+          <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+            <PopoverTrigger_Shadcn_ asChild name="branch-selector">
+              <Button
+                disabled={isUpdatingProdBranch}
+                type="default"
+                size="medium"
+                ref={comboBoxRef}
+                className={cn(
+                  'justify-start w-64',
+                  productionPreviewBranch?.git_branch === undefined ? 'text-light' : 'text'
+                )}
+                icon={
+                  productionPreviewBranch?.git_branch && (
+                    <Shield className="w-4 h-4 text-warning" strokeWidth={1} />
+                  )
+                }
+                loading={isUpdatingProdBranch || isLoadingBranches}
+                iconRight={
+                  <span className="grow flex justify-end">
+                    <IconChevronDown className={''} />
+                  </span>
+                }
+              >
+                {productionPreviewBranch?.git_branch || 'Select a branch'}
+              </Button>
+            </PopoverTrigger_Shadcn_>
+            <PopoverContent_Shadcn_
+              className="p-0"
+              side="bottom"
+              align="start"
+              style={{ width: comboBoxRef.current?.offsetWidth }}
+            >
+              <Command_Shadcn_>
+                <CommandInput_Shadcn_ placeholder="Find branch..." />
+                <CommandList_Shadcn_>
+                  <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>
+                  <CommandGroup_Shadcn_>
+                    {githubBranches?.map((branch) => {
+                      const active = branch.name === productionPreviewBranch?.git_branch
+                      return (
+                        <CommandItem_Shadcn_
+                          key={branch.name}
+                          value={branch.name}
+                          className="cursor-pointer w-full flex items-center justify-between"
+                          onSelect={() => {
+                            setOpen(false)
+                            onUpdateProductionBranch(branch.name)
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            {active ? (
+                              <Shield className="w-4 h-4 text-warning" strokeWidth={1} />
+                            ) : (
+                              <GitBranch className="w-4 h-4" strokeWidth={1} />
+                            )}
+                            {branch.name}
+                          </div>
+                          {branch.name === productionPreviewBranch?.git_branch && <IconCheck />}
+                        </CommandItem_Shadcn_>
+                      )
+                    })}
+                  </CommandGroup_Shadcn_>
+                </CommandList_Shadcn_>
+              </Command_Shadcn_>
+            </PopoverContent_Shadcn_>
+          </Popover_Shadcn_>
+        </div>
+
+        <Form_Shadcn_ {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <FormLabel_Shadcn_ className="!text">Supabase directory</FormLabel_Shadcn_>
+            <FormDescription_Shadcn_ className="text-xs text-lighter mb-3">
+              Migrations and seed.sql file will be run from this directory.
+            </FormDescription_Shadcn_>
             <FormField_Shadcn_
               control={form.control}
               name="supabaseDirectory"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex flex-col">
-                  <>
-                    {isSuccessBranches && (
-                      <>
-                        <FormLabel_Shadcn_ className="!text">Production branch</FormLabel_Shadcn_>
-                        <FormDescription_Shadcn_ className="text-xs">
-                          Deploy Edge Functions when merged into Production branch
-                        </FormDescription_Shadcn_>
-                        <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-                          <PopoverTrigger_Shadcn_ asChild name="branch-selector">
-                            <Button
-                              block
-                              type="default"
-                              size="medium"
-                              ref={comboBoxRef}
-                              className={cn(
-                                'justify-start w-64',
-                                selectedBranch === undefined ? 'text-light' : 'text'
-                              )}
-                              iconRight={
-                                <span className="grow flex justify-end">
-                                  <IconChevronDown className={''} />
-                                </span>
-                              }
-                            >
-                              {selectedBranch || 'Select a branch'}
-                            </Button>
-                          </PopoverTrigger_Shadcn_>
-                          <PopoverContent_Shadcn_
-                            className="p-0"
-                            side="bottom"
-                            align="start"
-                            style={{ width: comboBoxRef.current?.offsetWidth }}
-                          >
-                            <Command_Shadcn_>
-                              <CommandInput_Shadcn_ placeholder="Find branch..." />
-                              <CommandList_Shadcn_>
-                                <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>
-                                <CommandGroup_Shadcn_>
-                                  {githubBranches?.map((branch) => (
-                                    <CommandItem_Shadcn_
-                                      asChild
-                                      key={branch.name}
-                                      value={branch.name}
-                                      className="cursor-pointer w-full flex items-center justify-between"
-                                      onSelect={() => {
-                                        setOpen(false)
-                                        setSelectedBranch(branch.name)
-                                      }}
-                                      onClick={() => {
-                                        setOpen(false)
-                                        setSelectedBranch(branch.name)
-                                      }}
-                                    >
-                                      <a>
-                                        {branch.name}
-                                        {branch.name === selectedBranch && <IconCheck />}
-                                      </a>
-                                    </CommandItem_Shadcn_>
-                                  ))}
-                                </CommandGroup_Shadcn_>
-                              </CommandList_Shadcn_>
-                            </Command_Shadcn_>
-                          </PopoverContent_Shadcn_>
-                        </Popover_Shadcn_>
-                      </>
-                    )}
-                  </>
-                </FormItem_Shadcn_>
-              )}
-            />
-            <FormField_Shadcn_
-              control={form.control}
-              name="productionBranch"
-              render={({ field }) => (
-                <FormItem_Shadcn_ className="flex flex-col">
-                  <>
-                    <FormLabel_Shadcn_ className="!text">Supabase directory</FormLabel_Shadcn_>
-                    <FormDescription_Shadcn_ className="text-xs">
-                      Deploy Edge Functions when merged into Production branch
-                    </FormDescription_Shadcn_>
-                    <div className="flex flex-row gap-3">
-                      <FormControl_Shadcn_ className="xl:w-96">
-                        <Input_Shadcn_ onChange={field.onChange} />
-                      </FormControl_Shadcn_>
-                      <Button type="default" size={'small'}>
-                        Update
-                      </Button>
+                <FormItem_Shadcn_ className="flex flex-row items-center gap-3 !space-y-0">
+                  <FormControl_Shadcn_ className="xl:w-96">
+                    <div className="relative">
+                      <Input_Shadcn_
+                        {...field}
+                        onKeyPress={(event) => {
+                          if (event.key === 'Escape') {
+                            form.reset()
+                          }
+                        }}
+                      />
+                      <RotateCcw
+                        className={cn(
+                          'text-lighter transition hover:text cursor-pointer',
+                          'w-4 h-4 absolute right-3 top-3',
+                          'duration-150',
+                          isUpdatingGithubConnection ||
+                            field.value !== connection.metadata?.supabaseConfig?.supabaseDirectory
+                            ? 'opacity-100 transition'
+                            : 'opacity-0'
+                        )}
+                        onClick={() => form.reset()}
+                      />
                     </div>
-                  </>
+                  </FormControl_Shadcn_>
+                  <Button
+                    className={cn(
+                      'duration-150',
+                      isUpdatingGithubConnection ||
+                        field.value !== connection.metadata?.supabaseConfig?.supabaseDirectory
+                        ? 'opacity-100 transition'
+                        : 'opacity-0'
+                    )}
+                    htmlType="submit"
+                    type="secondary"
+                    size="medium"
+                    loading={isUpdatingGithubConnection}
+                    disabled={isUpdatingGithubConnection}
+                  >
+                    Update
+                  </Button>
                 </FormItem_Shadcn_>
               )}
             />
-          </div>
-        </form>
-      </Form_Shadcn_>
+          </form>
+        </Form_Shadcn_>
+      </div>
     )
   }
 
