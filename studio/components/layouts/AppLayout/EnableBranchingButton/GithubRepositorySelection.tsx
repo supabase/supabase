@@ -127,7 +127,7 @@ const GithubRepositorySelection = ({
                         size="medium"
                         ref={comboBoxRef}
                         className={clsx(
-                          'justify-start w-64',
+                          'justify-start',
                           selectedBranch === undefined ? 'text-light' : 'text'
                         )}
                         iconRight={

@@ -155,7 +155,13 @@ const EnableBranchingButton = () => {
 
         <Modal.Content className="px-7">
           <div className="flex items-center space-x-2 py-2 pb-4">
-            <Button size="medium" block disabled={isCreating} type="default">
+            <Button
+              size="medium"
+              block
+              disabled={isCreating}
+              type="default"
+              onClick={() => snap.setShowEnableBranchingModal(false)}
+            >
               Cancel
             </Button>
             <Button
