@@ -19,7 +19,7 @@ const LW8CalloutsSection = () => {
               </div>
               <div className="relative flex !aspect-video h-[80px] md:h-[100px] gap-2 z-10 rounded overflow-hidden">
                 <Image
-                  src="/images/launchweek/8/twitter-spaces-preview.png"
+                  src="/images/launchweek/8/twitter-spaces-thumb.svg"
                   layout="fill"
                   objectFit="cover"
                 />
