@@ -13,6 +13,7 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import {
   IntegrationName,
   IntegrationProjectConnection,
@@ -22,7 +23,7 @@ import { BASE_PATH } from 'lib/constants'
 import { pluralize } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
 import React, { forwardRef, useCallback, useState } from 'react'
-import { Button, Dropdown, IconChevronDown, IconTrash, Modal } from 'ui'
+import { Button, Dropdown, IconChevronDown, IconTrash, Modal, IconLoader, IconRefreshCw } from 'ui'
 
 export interface IntegrationProps {
   title: string
@@ -117,6 +118,7 @@ interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
 const IntegrationConnectionItem = React.forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
   ({ onDeleteConnection, ...props }, ref) => {
     const [isOpen, setIsOpen] = useState(false)
+    const [dropdownVisible, setDropdownVisible] = useState(false)
 
     const onConfirm = useCallback(async () => {
       try {
@@ -130,19 +132,55 @@ const IntegrationConnectionItem = React.forwardRef<HTMLLIElement, IntegrationCon
       setIsOpen(false)
     }, [])
 
+    const { mutateAsync: syncEnvs, isLoading: isSyncEnvLoading } =
+      useIntegrationsVercelConnectionSyncEnvsMutation()
+
+    const onReSyncEnvVars = useCallback(async () => {
+      try {
+        await syncEnvs({ connectionId: props.connection.id })
+      } finally {
+        setDropdownVisible(false)
+      }
+    }, [props.connection, syncEnvs])
+
     return (
       <>
         <IntegrationConnection
-          ref={ref}
+          connection={props.connection}
+          type={props.type}
           actions={
             <Dropdown
+              open={dropdownVisible}
+              onOpenChange={() => setDropdownVisible(!dropdownVisible)}
+              modal={false}
               side="bottom"
               align="end"
-              size="large"
+              size="medium"
               overlay={
                 <>
+                  {props.type === 'Vercel' && (
+                    <>
+                      <Dropdown.Item
+                        icon={
+                          isSyncEnvLoading ? (
+                            <IconLoader className="animate-spin" size={14} />
+                          ) : (
+                            <IconRefreshCw size={14} />
+                          )
+                        }
+                        onSelect={(event) => {
+                          event.preventDefault()
+                          onReSyncEnvVars()
+                        }}
+                        disabled={isSyncEnvLoading}
+                      >
+                        Resync environment variables
+                      </Dropdown.Item>
+                      <Dropdown.Separator />
+                    </>
+                  )}
                   <Dropdown.Item icon={<IconTrash size={14} />} onSelect={() => setIsOpen(true)}>
-                    Delete
+                    Delete connection
                   </Dropdown.Item>
                 </>
               }
@@ -152,8 +190,8 @@ const IntegrationConnectionItem = React.forwardRef<HTMLLIElement, IntegrationCon
               </Button>
             </Dropdown>
           }
-          {...props}
         />
+
         <ConfirmationModal
           visible={isOpen}
           danger={true}
