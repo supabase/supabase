@@ -1,3 +1,4 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { useParams } from 'common'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
@@ -5,7 +6,7 @@ import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEdi
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -107,6 +108,11 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const isActive = id === activeId
 
+  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
+    resource: { type: 'sql', owner_id: profile?.id },
+    subject: { id: profile?.id },
+  })
+
   const onCloseRenameModal = () => {
     setRenameModalOpen(false)
   }
@@ -174,13 +180,12 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
               <Dropdown.Item onClick={onClickRename} icon={<IconEdit2 size="tiny" />}>
                 Rename query
               </Dropdown.Item>
-              {visibility === 'user' && (
+              {visibility === 'user' && canCreateSQLSnippet && (
                 <Dropdown.Item onClick={onClickShare} icon={<IconShare size="tiny" />}>
                   Share query
                 </Dropdown.Item>
               )}
-
-              {visibility === 'project' && (
+              {visibility === 'project' && canCreateSQLSnippet && (
                 <Dropdown.Item onClick={createPersonalCopy} icon={<IconCopy size="tiny" />}>
                   Create a personal copy
                 </Dropdown.Item>
