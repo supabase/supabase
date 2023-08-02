@@ -5,6 +5,7 @@ import { serialize } from 'next-mdx-remote/serialize'
 import { relative } from 'path'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
+import emoji from 'remark-emoji'
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 import components from '~/components'
 import Layout from '~/layouts/DefaultGuideLayout'
@@ -15,33 +16,65 @@ import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
-const repo = 'setup-cli'
-const branch = 'gh-pages'
+const repo = 'wrappers'
+const branch = 'main'
 const docsDir = 'docs'
-const externalSite = 'https://supabase.github.io/setup-cli'
+const externalSite = 'https://supabase.github.io/wrappers'
 
 // Each external docs page is mapped to a local page
 const pageMap = [
   {
-    slug: 'generating-types',
+    slug: 'airtable',
     meta: {
-      title: 'Generate types from your database',
-      description: 'End-to-end type safety across client, server, and database.',
-      subtitle: 'End-to-end type safety across client, server, and database.',
-      tocVideo: 'VSNgAIObBdw',
+      title: 'Airtable',
     },
-    remoteFile: 'generating-types.md',
+    remoteFile: 'airtable.md',
   },
   {
-    slug: 'api',
+    slug: 's3',
     meta: {
-      title: 'GraphQL API',
+      title: 'AWS S3',
     },
-    remoteFile: 'api.md',
+    remoteFile: 's3.md',
+  },
+  {
+    slug: 'bigquery',
+    meta: {
+      title: 'BigQuery',
+    },
+    remoteFile: 'bigquery.md',
+  },
+  {
+    slug: 'clickhouse',
+    meta: {
+      title: 'ClickHouse',
+    },
+    remoteFile: 'clickhouse.md',
+  },
+  {
+    slug: 'firebase',
+    meta: {
+      title: 'Firebase',
+    },
+    remoteFile: 'firebase.md',
+  },
+  {
+    slug: 'logflare',
+    meta: {
+      title: 'Logflare',
+    },
+    remoteFile: 'logflare.md',
+  },
+  {
+    slug: 'stripe',
+    meta: {
+      title: 'Stripe',
+    },
+    remoteFile: 'stripe.md',
   },
 ]
 
-interface ActionDocsProps {
+interface WrappersDocsProps {
   source: MDXRemoteSerializeResult
   meta: {
     title: string
@@ -49,7 +82,7 @@ interface ActionDocsProps {
   }
 }
 
-export default function ActionDocs({ source, meta }: ActionDocsProps) {
+export default function WrappersDocs({ source, meta }: WrappersDocsProps) {
   return (
     <Layout meta={meta}>
       <MDXRemote {...source} components={components} />
@@ -60,7 +93,7 @@ export default function ActionDocs({ source, meta }: ActionDocsProps) {
 /**
  * Fetch markdown from external repo and transform links
  */
-export const getStaticProps: GetStaticProps<ActionDocsProps> = async ({ params }) => {
+export const getStaticProps: GetStaticProps<WrappersDocsProps> = async ({ params }) => {
   const page = pageMap.find(({ slug }) => slug === params.slug)
 
   if (!page) {
@@ -124,6 +157,7 @@ export const getStaticProps: GetStaticProps<ActionDocsProps> = async ({ params }
       remarkPlugins: [
         remarkGfm,
         remarkMkDocsAdmonition,
+        emoji,
         remarkPyMdownTabs,
         [removeTitle, meta.title],
         [remarkCodeHike, codeHikeOptions],
