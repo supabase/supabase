@@ -11,42 +11,38 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import {
+  IntegrationName,
   IntegrationProjectConnection,
   Integration as TIntegration,
 } from 'data/integrations/integrations.types'
-import { useSelectedOrganization } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { pluralize } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
-import { useGithubConnectionConfigPanelSnapshot } from 'state/github-connection-config-panel'
-import { Button, Dropdown, IconChevronDown, IconTrash } from 'ui'
+import { useCallback, useState } from 'react'
+import { Button, Dropdown, IconChevronDown, IconLoader, IconRefreshCw, IconTrash, Modal } from 'ui'
 
 export interface IntegrationProps {
   title: string
-  orgName?: string
   description?: string
   note?: string
   detail?: string
   integrations?: TIntegration[]
+  onAddConnection: (integrationId: string) => void
+  onDeleteConnection: (connection: IntegrationProjectConnection) => void | Promise<void>
 }
 
 const Integration = ({
   title,
-  orgName,
   description,
   note,
   detail,
   integrations = EMPTY_ARR,
+  onAddConnection,
+  onDeleteConnection,
 }: IntegrationProps) => {
-  const snapshot = useGithubConnectionConfigPanelSnapshot()
-
-  const selectedOrganization = useSelectedOrganization()
-
-  const { mutate: deleteMutate, isLoading: isDeleteLoading } =
-    useIntegrationsVercelInstalledConnectionDeleteMutation()
-
   const ConnectionHeading = ({ integration }: { integration: TIntegration }) => {
     return (
       <IntegrationConnectionHeader
@@ -58,17 +54,6 @@ Repository connections for ${title?.toLowerCase()}
       `}
       />
     )
-  }
-
-  // Call the mutation when needed
-  const handleDelete = (organizationIntegrationId: string, projectIntegrationId: string) => {
-    const variables = {
-      organization_integration_id: organizationIntegrationId,
-      id: projectIntegrationId,
-      orgSlug: selectedOrganization?.slug,
-    }
-
-    deleteMutate(variables)
   }
 
   return (
@@ -89,60 +74,28 @@ Repository connections for ${title?.toLowerCase()}
               {integrations.length > 0 &&
                 integrations.map((integration, i) => {
                   return (
-                    <div key={i}>
-                      <IntegrationInstallation title={title} key={i} integration={integration} />
+                    <div key={integration.id}>
+                      <IntegrationInstallation title={title} integration={integration} />
+
                       {integration.connections.length > 0 ? (
                         <>
                           <ConnectionHeading integration={integration} />
 
                           <ul className="flex flex-col">
-                            {integration.connections.map(
-                              (connection: IntegrationProjectConnection, i) => (
-                                <IntegrationConnection
-                                  key={i}
-                                  connection={connection}
-                                  type={integration.integration.name}
-                                  actions={
-                                    <Dropdown
-                                      side="bottom"
-                                      align="end"
-                                      size="large"
-                                      overlay={
-                                        <>
-                                          <Dropdown.Item
-                                            icon={<IconTrash size={14} />}
-                                            onSelect={() =>
-                                              handleDelete(integration.id, connection.id)
-                                            }
-                                          >
-                                            Delete
-                                          </Dropdown.Item>
-                                        </>
-                                      }
-                                    >
-                                      <Button
-                                        asChild
-                                        iconRight={<IconChevronDown />}
-                                        type="default"
-                                      >
-                                        <span>Manage</span>
-                                      </Button>
-                                    </Dropdown>
-                                  }
-                                />
-                              )
-                            )}
+                            {integration.connections.map((connection) => (
+                              <IntegrationConnectionItem
+                                key={connection.id}
+                                connection={connection}
+                                type={title as IntegrationName}
+                                onDeleteConnection={onDeleteConnection}
+                              />
+                            ))}
                           </ul>
                         </>
                       ) : (
                         <ConnectionHeading integration={integration} />
                       )}
-                      <EmptyIntegrationConnection
-                        onClick={() => {
-                          snapshot.setOrganizationIntegrationId(integration.id)
-                          snapshot.setOpen(true)
-                        }}
-                      >
+                      <EmptyIntegrationConnection onClick={() => onAddConnection(integration.id)}>
                         Add new project connection
                       </EmptyIntegrationConnection>
                     </div>
@@ -158,3 +111,107 @@ Repository connections for ${title?.toLowerCase()}
 }
 
 export default Integration
+
+type IntegrationConnectionItemProps = {
+  connection: IntegrationProjectConnection
+  type: IntegrationName
+  onDeleteConnection: (connection: IntegrationProjectConnection) => void | Promise<void>
+}
+
+const IntegrationConnectionItem = ({
+  connection,
+  type,
+  onDeleteConnection,
+}: IntegrationConnectionItemProps) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [dropdownVisible, setDropdownVisible] = useState(false)
+
+  const onConfirm = useCallback(async () => {
+    try {
+      await onDeleteConnection(connection)
+    } finally {
+      setIsOpen(false)
+    }
+  }, [connection, onDeleteConnection])
+
+  const onCancel = useCallback(() => {
+    setIsOpen(false)
+  }, [])
+
+  const { mutateAsync: syncEnvs, isLoading: isSyncEnvLoading } =
+    useIntegrationsVercelConnectionSyncEnvsMutation()
+
+  const onReSyncEnvVars = useCallback(async () => {
+    try {
+      await syncEnvs({ connectionId: connection.id })
+    } finally {
+      setDropdownVisible(false)
+    }
+  }, [connection, syncEnvs])
+
+  return (
+    <>
+      <IntegrationConnection
+        connection={connection}
+        type={type}
+        actions={
+          <Dropdown
+            open={dropdownVisible}
+            onOpenChange={() => setDropdownVisible(!dropdownVisible)}
+            modal={false}
+            side="bottom"
+            align="end"
+            size="medium"
+            overlay={
+              <>
+                {type === 'Vercel' && (
+                  <>
+                    <Dropdown.Item
+                      icon={
+                        isSyncEnvLoading ? (
+                          <IconLoader className="animate-spin" size={14} />
+                        ) : (
+                          <IconRefreshCw size={14} />
+                        )
+                      }
+                      onSelect={(event) => {
+                        event.preventDefault()
+                        onReSyncEnvVars()
+                      }}
+                      disabled={isSyncEnvLoading}
+                    >
+                      Resync environment variables
+                    </Dropdown.Item>
+                    <Dropdown.Separator />
+                  </>
+                )}
+                <Dropdown.Item icon={<IconTrash size={14} />} onSelect={() => setIsOpen(true)}>
+                  Delete connection
+                </Dropdown.Item>
+              </>
+            }
+          >
+            <Button asChild iconRight={<IconChevronDown />} type="default">
+              <span>Manage</span>
+            </Button>
+          </Dropdown>
+        }
+      />
+
+      <ConfirmationModal
+        visible={isOpen}
+        danger={true}
+        header="Confirm to delete"
+        buttonLabel="Delete"
+        onSelectCancel={onCancel}
+        onSelectConfirm={onConfirm}
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-light">
+            {`This action cannot be undone. Are you sure you want to delete this connection?`}
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
+    </>
+  )
+}

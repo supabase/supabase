@@ -1,20 +1,27 @@
-import { FC } from 'react'
-import Link from 'next/link'
-import { IconChevronRight, IconX, cn } from 'ui'
-import { withAuth, useFlag } from 'hooks'
-import { observer } from 'mobx-react-lite'
-import { BASE_PATH } from 'lib/constants'
-import React from 'react'
-import { ScaffoldContainer } from './Scaffold'
 import { useParams } from 'common'
+import { useFlag, withAuth } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
+import { PropsWithChildren, ReactNode, forwardRef } from 'react'
+import { IconX, cn } from 'ui'
+import { ScaffoldContainer } from '../Scaffold'
 
-const IntegrationWindowLayout: FC<any> = ({ organization, project, children }) => {
+export type IntegrationWindowLayoutProps = {
+  title: string
+  integrationIcon: ReactNode
+}
+
+const IntegrationWindowLayout = ({
+  title,
+  integrationIcon,
+  children,
+}: PropsWithChildren<IntegrationWindowLayoutProps>) => {
   const ongoingIncident = useFlag('ongoingIncident')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
   return (
     <div className="flex w-full flex-col" style={{ height: maxHeight, maxHeight }}>
-      <Header organization={organization} project={project} />
+      <Header title={title} integrationIcon={integrationIcon} />
+
       {children}
     </div>
   )
@@ -22,18 +29,16 @@ const IntegrationWindowLayout: FC<any> = ({ organization, project, children }) =
 
 const INTEGRATION_LAYOUT_MAX_WIDTH = '' // 'max-w-[720px]'
 
-export default withAuth(observer(IntegrationWindowLayout))
+export default withAuth(IntegrationWindowLayout)
 
-export const IntegrationWindowLayoutWithoutAuth = observer(IntegrationWindowLayout)
+export const IntegrationWindowLayoutWithoutAuth = IntegrationWindowLayout
 
-const Header: FC<any> = ({ organization, project }) => {
-  let stepNumber = organization ? 1 : project ? 2 : 0
-  const { externalId } = useParams()
+export type HeaderProps = {
+  title: string
+  integrationIcon: ReactNode
+}
 
-  const title = externalId
-    ? 'Supabase + Vercel Deploy Button'
-    : 'Supabase + Vercel Integration Marketplace Connector'
-
+const Header = ({ title, integrationIcon }: HeaderProps) => {
   return (
     <div className="bg">
       <ScaffoldContainer className={cn('py-3', INTEGRATION_LAYOUT_MAX_WIDTH)}>
@@ -43,16 +48,7 @@ const Header: FC<any> = ({ organization, project }) => {
               <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" className="w-4" />
             </div>
             <IconX className="text-scale-800" strokeWidth={2} size={16} />
-            <div className="bg-black shadow rounded p-1 w-8 h-8 flex justify-center items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="white"
-                viewBox="0 0 512 512"
-                className="w-4"
-              >
-                <path fillRule="evenodd" d="M256,48,496,464H16Z" />
-              </svg>
-            </div>
+            {integrationIcon}
           </div>
           <span className="text-sm" title={title}>
             {title}
@@ -66,7 +62,7 @@ const Header: FC<any> = ({ organization, project }) => {
 const maxWidthClasses = 'mx-auto w-full max-w-[1600px]'
 const paddingClasses = 'px-6 lg:px-14 xl:px-28 2xl:px-32'
 
-const IntegrationScaffoldContainer = React.forwardRef<
+const IntegrationScaffoldContainer = forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {

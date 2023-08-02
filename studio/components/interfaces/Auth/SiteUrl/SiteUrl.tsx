@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Form, Input } from 'ui'
 import { boolean, number, object, string } from 'yup'
 
@@ -10,17 +10,14 @@ import {
   FormPanel,
   FormSection,
   FormSectionContent,
-  FormSectionLabel,
 } from 'components/ui/Forms'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
 
 const SiteUrl = observer(() => {
   const { authConfig, ui } = useStore()
   const { isLoaded } = authConfig
 
   const formId = 'auth-config-general-form'
-  const [hidden, setHidden] = useState(true)
-
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const INITIAL_VALUES = {
