@@ -4,6 +4,7 @@ import { editor } from 'monaco-editor'
 import { MutableRefObject, useRef, useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { IStandaloneCodeEditor } from './SQLEditor.types'
+import { cn } from 'ui'
 
 export type MonacoEditorProps = {
   id: string
@@ -11,6 +12,7 @@ export type MonacoEditorProps = {
   isExecuting: boolean
   autoFocus?: boolean
   executeQuery: () => void
+  className?: string
 }
 
 const MonacoEditor = ({
@@ -18,6 +20,7 @@ const MonacoEditor = ({
   editorRef,
   isExecuting,
   autoFocus = true,
+  className,
   executeQuery,
 }: MonacoEditorProps) => {
   const snap = useSqlEditorStateSnapshot({ sync: true })
@@ -73,7 +76,7 @@ const MonacoEditor = ({
   return (
     <>
       <Editor
-        className="monaco-editor"
+        className={cn(className, 'monaco-editor')}
         theme={'supabase'}
         onMount={handleEditorOnMount}
         onChange={handleEditorChange}
