@@ -1,6 +1,6 @@
-x---
+---
 title: Supabase Beta July 2023
-description: WIP
+description: Launch Week 8 is coming, but we still shipped some goodies during July!
 author: ant_wilson
 image: /storage/v1/object/public/images/marketing-emails/beta-update-july.png
 thumb: /storage/v1/object/public/images/marketing-emails/beta-update-july.png
