@@ -32,9 +32,7 @@ const LW8Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
             table: 'lw8_meetups',
           },
           async () => {
-            const { data: newMeets, error } = await supabase.from('lw8_meetups').select('*')
-            console.log('newMeets error', error)
-            console.log('newMeets', newMeets)
+            const { data: newMeets } = await supabase.from('lw8_meetups').select('*')
             setMeets(newMeets)
           }
         )
@@ -47,10 +45,6 @@ const LW8Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
       realtimeChannel?.unsubscribe()
     }
   }, [])
-
-  useEffect(() => {
-    console.log('meetups', meets)
-  }, [meets])
 
   return (
     <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8">

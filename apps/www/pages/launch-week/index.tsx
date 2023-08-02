@@ -192,11 +192,12 @@ export default function TicketHome({ users, meetups }: Props) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async () => {
   // fetch users for the TicketBrickWall
   const { data: users } = await supabaseAdmin!
     .from('lw8_tickets_golden')
-    .select('username, golden', { count: 'exact' })
+    .select('username, golden')
+    .limit(1000)
 
   const { data: meetups } = await supabaseAdmin!.from('lw8_meetups').select('*')
 
