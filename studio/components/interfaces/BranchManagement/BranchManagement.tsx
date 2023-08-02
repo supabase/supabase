@@ -24,18 +24,20 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { useSelectedProject, useStore } from 'hooks'
+import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
+import { useAppUiStateSnapshot } from 'state/app'
 import { MainBranchPanel } from './BranchPanels'
 import CreateBranchSidePanel from './CreateBranchSidePanel'
 import PreviewBranches from './PreviewBranches'
 import PullRequests from './PullRequests'
-import { useAppUiStateSnapshot } from 'state/app'
 
 const BranchManagement = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
+  const selectedOrg = useSelectedOrganization()
 
   // [Joshen TODO] To be dynamic
   const isBranchingAllowed = true
@@ -49,6 +51,18 @@ const BranchManagement = () => {
   const [showCreateBranch, setShowCreateBranch] = useState(false)
   const [showDisableBranching, setShowDisableBranching] = useState(false)
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
+
+  const { data: integrations, isLoading: isLoadingIntegrations } = useOrgIntegrationsQuery({
+    orgSlug: selectedOrg?.slug,
+  })
+  const githubIntegration = integrations?.find(
+    (integration) =>
+      integration.integration.name === 'GitHub' &&
+      integration.organization.slug === selectedOrg?.slug
+  )
+  const githubConnection = githubIntegration?.connections.find(
+    (connection) => connection.supabase_project_ref === ref
+  )
 
   const { data: branches, error, isLoading, isError, isSuccess } = useBranchesQuery({ projectRef })
   const [[mainBranch], previewBranches] = partition(branches, (branch) => branch.is_default)
@@ -78,6 +92,14 @@ const BranchManagement = () => {
       setShowDisableBranching(false)
     },
   })
+
+  const generatePullRequestURL = (branch?: string) => {
+    if (githubConnection === undefined) return 'https://github.com'
+
+    return branch !== undefined
+      ? `https://github.com/${githubConnection.metadata.name}/compare/${mainBranch.git_branch}...${branch}`
+      : `https://github.com/${githubConnection.metadata.name}/compare`
+  }
 
   const onConfirmDeleteBranch = () => {
     if (selectedBranchToDelete == undefined) return console.error('No branch selected')
@@ -146,12 +168,18 @@ const BranchManagement = () => {
               {isSuccess && mainBranch !== undefined && (
                 <>
                   <MainBranchPanel
+                    repo={githubConnection?.metadata.name}
                     branch={mainBranch}
                     onSelectDisableBranching={() => setShowDisableBranching(true)}
                   />
-                  <PullRequests previewBranches={previewBranches} />
+                  <PullRequests
+                    previewBranches={previewBranches}
+                    generatePullRequestURL={generatePullRequestURL}
+                  />
                   <PreviewBranches
                     previewBranches={previewBranches}
+                    generatePullRequestURL={generatePullRequestURL}
+                    onSelectCreateBranch={() => setShowCreateBranch(true)}
                     onSelectDeleteBranch={setSelectedBranchToDelete}
                   />
                 </>
