@@ -65,8 +65,8 @@ const LW8Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
                   target="_blank"
                   className={[
                     'w-full group py-0 flex items-center gap-2 md:gap-4 text-lg sm:text-2xl lg:text-4xl border-b border-[#111718]',
-                    'hover:text-brand',
-                    isLive ? 'text-scale-1100' : 'text-scale-800',
+                    'hover:text-scale-1200',
+                    isLive ? 'text-scale-1100' : 'text-[#56646B]',
                     !link && 'pointer-events-none',
                   ].join(' ')}
                 >
