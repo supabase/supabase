@@ -249,7 +249,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
                 <Alert
                   variant="warning"
                   className="!px-4 !py-3"
-                  title="Are you sure you want to share this query?"
+                  title="This SQL query will become public to all team members"
                   withIcon
                 >
                   <p>Anyone with access to the project can edit or delete this query.</p>
