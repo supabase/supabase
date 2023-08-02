@@ -43,8 +43,8 @@ const EnableBranchingButton = () => {
     },
   })
 
-  // [Joshen TODO] To be dynamic
-  const isBranchingAllowed = true
+  const hasAccessToBranching =
+    selectedOrg?.opt_in_tags?.includes('PREVIEW_BRANCHES_OPT_IN') ?? false
 
   const githubIntegration = integrations?.find(
     (integration) =>
@@ -66,7 +66,7 @@ const EnableBranchingButton = () => {
     createBranch({ projectRef: ref, branchName: selectedBranch, gitBranch: selectedBranch })
   }
 
-  if (!isBranchingAllowed) {
+  if (!hasAccessToBranching) {
     return <BranchingWaitlistPopover />
   }
 
