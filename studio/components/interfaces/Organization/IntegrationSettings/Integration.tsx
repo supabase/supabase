@@ -175,7 +175,6 @@ const IntegrationConnectionItem = ({
                         )
                       }
                       onSelect={(event) => {
-                        event.stopPropagation()
                         event.preventDefault()
                         onReSyncEnvVars()
                       }}
