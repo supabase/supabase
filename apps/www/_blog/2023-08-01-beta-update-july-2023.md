@@ -78,6 +78,9 @@ After Monday's announcement, we are kicking off LW8 with a very cool Twitter Spa
 - Building an MVP app using Supabase. [Blog post](https://www.antstack.com/blog/building-an-mvp-app-using-supabase/)
 - Fortify Your Application With Supabase: Exploring Fine-Grained Control with Row-Level Security and OAuth Sign-in. [Article](https://techconative.com/blog/supabase-rls-security-oauth-authentication/)
 - Using Supabase authentication in NestJs. [Tutorial](https://blog.iamstarcode.com/using-supabase-authentication-in-nestjs)
+- React Native file upload with Supabase Storage. [Tutorial](https://supabase.com/blog/react-native-storage) | [Video](https://www.youtube.com/watch?v=am6w5zEDk_g)
+- Safeguarding Data Integrity with pg_safeupdate in PostgreSQL and Supabase. [Blog Post](https://blog.mansueli.com/safeguarding-data-integrity-with-pg-safeupdate-in-postgresql-and-supabase)
+- Supabase almost SHUT ME DOWN. [Video](https://www.youtube.com/watch?v=2WHTZa4ENfc)
 
 ## Supabase in Times Square
 
