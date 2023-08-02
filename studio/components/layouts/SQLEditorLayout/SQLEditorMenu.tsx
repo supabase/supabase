@@ -206,7 +206,7 @@ const SideBarContent = observer(() => {
               {projectSnippets.length >= 1 && (
                 <div className="editor-product-menu">
                   <div className="flex flex-row justify-between">
-                    <Menu.Group title="Project snippets" />
+                    <Menu.Group title="Project queries" />
                     <button
                       className="flex items-center w-4 h-4 cursor-pointer mr-3"
                       onClick={() => {
@@ -272,7 +272,7 @@ const SideBarContent = observer(() => {
 
               <div className="editor-product-menu">
                 <div className="flex flex-row justify-between">
-                  <Menu.Group title="Personal SQL snippets" />
+                  <Menu.Group title="Your queries" />
                   <button
                     className="flex items-center w-4 h-4 cursor-pointer mr-3"
                     onClick={() => {
