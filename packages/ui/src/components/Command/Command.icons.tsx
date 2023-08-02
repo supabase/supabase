@@ -6,7 +6,7 @@ interface AiIconProps {
 }
 
 export const AiIcon = ({ className }: AiIconProps) => (
-  <AiIconAnimation className={cn('mr-2', className)} allowHoverEffect />
+  <AiIconAnimation className={className} allowHoverEffect />
 )
 
 export const AiIconChat = ({ loading = false }) => (
