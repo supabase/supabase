@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useParams, useTelemetryProps } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
@@ -19,6 +19,7 @@ import useLatest from 'hooks/misc/useLatest'
 import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import Telemetry from 'lib/telemetry'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import {
@@ -128,6 +129,7 @@ const SQLEditor = () => {
   const { ui } = useStore()
   const { ref, id } = useParams()
   const router = useRouter()
+  const telemetryProps = useTelemetryProps()
   const { profile } = useProfile()
   const { project } = useProjectContext()
   const snap = useSqlEditorStateSnapshot()
@@ -306,6 +308,16 @@ const SQLEditor = () => {
         ])
       }
 
+      Telemetry.sendEvent(
+        {
+          category: 'sql_editor',
+          action: 'ai_suggestion_accepted',
+          label: debugSolution ? 'debug_snippet' : 'edit_snippet',
+        },
+        telemetryProps,
+        router
+      )
+
       setAiInput('')
       setSelectedDiffType(DiffType.Modification)
       setDebugSolution(undefined)
@@ -316,15 +328,25 @@ const SQLEditor = () => {
     } finally {
       setIsAcceptDiffLoading(false)
     }
-  }, [sqlDiff, selectedDiffType, handleNewQuery, titleSql])
+  }, [sqlDiff, selectedDiffType, handleNewQuery, titleSql, debugSolution, telemetryProps, router])
 
   const discardAiHandler = useCallback(() => {
+    Telemetry.sendEvent(
+      {
+        category: 'sql_editor',
+        action: 'ai_suggestion_rejected',
+        label: debugSolution ? 'debug_snippet' : 'edit_snippet',
+      },
+      telemetryProps,
+      router
+    )
+
     setDebugSolution(undefined)
     setSqlDiff(undefined)
     setTimeout(() => {
       inputRef.current?.focus()
     }, 0)
-  }, [])
+  }, [debugSolution, telemetryProps, router])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
