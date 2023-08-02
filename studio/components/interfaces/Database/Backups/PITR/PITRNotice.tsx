@@ -67,7 +67,7 @@ const PITRNotice = ({}) => {
           <p className="text-sm text-scale-1100">
             Database changes are logged every <span className="text-scale-1200">2 minutes</span>,
             with a total recovery period of up to{' '}
-            <span className="text-brand-900">{retentionPeriod} days</span>.
+            <span className="text-brand">{retentionPeriod} days</span>.
           </p>
         </div>
       </div>

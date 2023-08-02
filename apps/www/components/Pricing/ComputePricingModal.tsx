@@ -119,7 +119,7 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                     </th>
                     <td
                       className={`px-4 py-3 ${
-                        column.key === 'plan' ? 'text-brand-900 pt-16 lg:pt-3' : ''
+                        column.key === 'plan' ? 'text-brand pt-16 lg:pt-3' : ''
                       }`}
                     >
                       {column.key === 'dedicated' ? (
