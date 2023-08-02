@@ -13,7 +13,7 @@ const AISettingsModal = (props: ModalProps) => {
   const isOptedInToAI =
     selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
   const [isOptedInToAISchema, setIsOptedInToAISchema] = useLocalStorageQuery(
-    'supabase_sql-editor-ai-schema',
+    'supabase_sql-editor-ai-schema-enabled',
     false
   )
 

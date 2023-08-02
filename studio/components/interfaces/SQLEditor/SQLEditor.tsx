@@ -141,7 +141,7 @@ const SQLEditor = () => {
   const [sqlDiff, setSqlDiff] = useState<ContentDiff>()
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const [aiOpen, setAiOpen] = useState(false)
+  const [isAiOpen, setIsAiOpen] = useLocalStorageQuery('supabase_sql-editor-ai-open', true)
 
   const [isAISettingsOpen, setIsAISettingsOpen] = useState(false)
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
@@ -150,12 +150,17 @@ const SQLEditor = () => {
   const selectedProject = useSelectedProject()
   const isOptedInToAI =
     selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
-  const [isOptedInToAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema', false)
+  const [isOptedInToAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema-enabled', false)
   const [isAcceptDiffLoading, setIsAcceptDiffLoading] = useState(false)
 
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && isOptedInToAISchema
 
   const [selectedDiffType, setSelectedDiffType] = useState(DiffType.Modification)
+  const [isFirstRender, setIsFirstRender] = useState(true)
+
+  useEffect(() => {
+    setIsFirstRender(false)
+  }, [])
 
   const { data } = useEntityDefinitionsQuery(
     {
@@ -445,16 +450,20 @@ const SQLEditor = () => {
         }}
       />
       <div className="flex h-full flex-col relative">
-        {aiOpen && (
+        {isAiOpen && (
           <motion.div
             key="ask-ai-input-container"
             layoutId="ask-ai-input-container"
             variants={{
               visible: {
                 borderRadius: 0,
+                x: 0,
+              },
+              hidden: {
+                x: 100,
               },
             }}
-            initial="visible"
+            initial={isFirstRender ? 'visible' : 'hidden'}
             animate="visible"
             className="w-full flex justify-center z-10 h-[60px] bg-brand-300 border-b border-brand-400 px-5"
           >
@@ -464,7 +473,9 @@ const SQLEditor = () => {
                 'flex items-center gap-3'
               )}
             >
-              <AiIconAnimation loading={isEditSqlLoading} />
+              <motion.div layoutId="ask-ai-input-icon" transition={{ duration: 0.1 }}>
+                <AiIconAnimation loading={isEditSqlLoading} />
+              </motion.div>
 
               <AnimatePresence initial={false} exitBeforeEnter>
                 {debugSolution && (
@@ -507,7 +518,7 @@ const SQLEditor = () => {
                       placeholder={!debugSolution ? 'Ask Supabase AI to modify your query' : ''}
                       onKeyDown={(e) => {
                         if (e.key === 'Escape' && !aiInput) {
-                          setAiOpen(false)
+                          setIsAiOpen(false)
                         }
                       }}
                       onKeyPress={async (e) => {
@@ -570,9 +581,6 @@ const SQLEditor = () => {
                         }
                       }}
                     />
-                    {/* <div className="opacity-30">
-                      <IconCornerDownLeft size={12} strokeWidth={1.5} />
-                    </div> */}
                   </motion.div>
                 ) : (
                   <motion.div
@@ -611,7 +619,7 @@ const SQLEditor = () => {
                   </motion.div>
                 )}
               </AnimatePresence>
-              <div className="flex flex-row items-center gap-2">
+              <div className="flex flex-row items-center gap-3 mr-1">
                 {isDiffOpen ? (
                   <>
                     <div className="flex items-center">
@@ -693,7 +701,7 @@ const SQLEditor = () => {
                     </button>
                     <button
                       className="text-brand-600 dark:text-brand hover:text-brand-600"
-                      onClick={() => setAiOpen(false)}
+                      onClick={() => setIsAiOpen(false)}
                     >
                       <IconX size={21} />
                     </button>
@@ -717,20 +725,22 @@ const SQLEditor = () => {
           onDragEnd={onDragEnd}
         >
           <div className="flex-grow overflow-y-auto border-b">
-            {!aiOpen && (
-              <button
-                onClick={() => setAiOpen(!aiOpen)}
+            {!isAiOpen && (
+              <motion.button
+                layoutId="ask-ai-input-icon"
+                transition={{ duration: 0.1 }}
+                onClick={() => setIsAiOpen(!isAiOpen)}
                 className={cn(
                   'group',
                   'absolute z-10',
                   'rounded-lg',
-                  'right-[18px] top-4',
+                  'right-[24px] top-4',
                   'transition-all duration-200',
                   'ease-out'
                 )}
               >
                 <AiIconAnimation loading={false} allowHoverEffect />
-              </button>
+              </motion.button>
             )}
 
             {isLoading ? (
