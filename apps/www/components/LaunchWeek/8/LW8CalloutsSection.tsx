@@ -9,10 +9,10 @@ const LW8CalloutsSection = () => {
     <SectionContainer className="!py-0 w-full !px-0 !max-w-none">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 scroll-mt-[105px]" id="hackathon">
         <SmallCard className="hover:from-background-surface-300 hover:to-background-surface-300">
-          <Link href="/blog/supabase-lw8-hackathon">
-            <a className="flex flex-row justify-between items-center w-full h-full">
-              <div className="relative flex-shrink flex items-center p-2 w-1/2 md:w-auto">
-                <div className="flex flex-col gap-1 pl-4">
+          <Link href="https://twitter.com/i/spaces/1DXGyvjkeEeJM">
+            <a target="_blank" className="flex flex-row justify-between items-center w-full h-full">
+              <div className="relative flex-shrink flex items-center p-2 w-2/3 lg:w-1/2 md:w-auto">
+                <div className="flex flex-col gap-1 sm:pl-4">
                   <span className="text-white">Join us daily at Twitter Spaces </span>
                   <span className="">Next up: Monday – Opening Day</span>
                 </div>
@@ -29,16 +29,16 @@ const LW8CalloutsSection = () => {
         </SmallCard>
         <SmallCard className="hover:from-background-surface-300 hover:to-background-surface-300">
           <Link href="/blog/supabase-lw8-hackathon">
-            <a className="flex flex-row justify-between items-center w-full h-full">
-              <div className="relative h-full flex-shrink flex flex-col md:flex-row md:items-center p-2 w-1/2 md:w-auto gap-1 md:gap-4">
-                <div className="flex flex-col gap-1 pl-4">
+            <a target="_blank" className="flex flex-row justify-between items-center w-full h-full">
+              <div className="relative h-full flex-shrink flex flex-col md:flex-row md:items-center p-2 w-2/3 lg:w-1/2 md:w-auto gap-1 md:gap-4">
+                <div className="flex flex-col gap-1 sm:pl-4">
                   <span className="text-white">LW8 Hackathon Aug 4 – Aug 13</span>
                   <span className="">Read more about rules and prizes on the blog</span>
                 </div>
               </div>
               <div className="relative flex !aspect-video h-[80px] md:h-[100px] gap-2 z-10 rounded overflow-hidden">
                 <Image
-                  src="/images/launchweek/8/twitter-spaces-preview.png"
+                  src="/images/launchweek/8/lw8-hackathon-thumb.svg"
                   layout="fill"
                   objectFit="cover"
                 />
