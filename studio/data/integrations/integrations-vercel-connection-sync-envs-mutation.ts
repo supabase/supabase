@@ -1,5 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { post } from 'data/fetchers'
+import { ResponseError } from 'types'
 
 export type IntegrationsVercelConnectionSyncEnvsVariables = {
   connectionId: string
@@ -29,24 +32,30 @@ type IntegrationsVercelConnectionSyncEnvsData = Awaited<
 
 export const useIntegrationsVercelConnectionSyncEnvsMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
   UseMutationOptions<
     IntegrationsVercelConnectionSyncEnvsData,
-    unknown,
+    ResponseError,
     IntegrationsVercelConnectionSyncEnvsVariables
   >,
   'mutationFn'
 > = {}) => {
-  const queryClient = useQueryClient()
-
   return useMutation<
     IntegrationsVercelConnectionSyncEnvsData,
-    unknown,
+    ResponseError,
     IntegrationsVercelConnectionSyncEnvsVariables
   >((vars) => syncEnvsIntegrationsVercelConnection(vars), {
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to sync environment variables: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
     },
     ...options,
   })
