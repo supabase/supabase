@@ -1,4 +1,5 @@
 import { partition } from 'lodash'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
@@ -7,6 +8,7 @@ import {
   Alert_Shadcn_,
   Button,
   IconAlertTriangle,
+  IconGitBranch,
   IconSearch,
   Input,
   Modal,
@@ -14,19 +16,20 @@ import {
 
 import { useParams } from 'common'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
+import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useSelectedProject, useStore } from 'hooks'
 import { MainBranchPanel } from './BranchPanels'
 import CreateBranchSidePanel from './CreateBranchSidePanel'
 import PreviewBranches from './PreviewBranches'
 import PullRequests from './PullRequests'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { useAppUiStateSnapshot } from 'state/app'
 
 const BranchManagement = () => {
   const { ui } = useStore()
@@ -34,11 +37,15 @@ const BranchManagement = () => {
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
 
+  // [Joshen TODO] To be dynamic
+  const isBranchingAllowed = true
+
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const hasBranchEnabled = projectDetails?.has_branch_enabled
   const projectRef =
     projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
 
+  const snap = useAppUiStateSnapshot()
   const [showCreateBranch, setShowCreateBranch] = useState(false)
   const [showDisableBranching, setShowDisableBranching] = useState(false)
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
@@ -86,7 +93,39 @@ const BranchManagement = () => {
 
   if (!hasBranchEnabled) {
     // [Joshen] Some empty state here
-    return <ProductEmptyState title="Hello">World</ProductEmptyState>
+    return (
+      <ProductEmptyState title="Database Branching">
+        <p className="text-sm text-light">
+          {isBranchingAllowed
+            ? 'Create preview branches to experiment changes to your database schema in a safe, non-destructible environment.'
+            : "Register for early access and you'll be contacted by email when your organization is enrolled in database branching."}
+        </p>
+        {isBranchingAllowed ? (
+          <div className="!mt-4">
+            <Button
+              type="default"
+              icon={<IconGitBranch strokeWidth={1.5} />}
+              onClick={() => snap.setShowEnableBranchingModal(true)}
+            >
+              Enable branching
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center space-x-2 !mt-4">
+            <Link passHref href={'/'}>
+              <a rel="noreferrer" target="_blank">
+                <Button>Join waitlist</Button>
+              </a>
+            </Link>
+            <Link passHref href={'/'}>
+              <a rel="noreferrer" target="_blank">
+                <Button type="default">View the docs</Button>
+              </a>
+            </Link>
+          </div>
+        )}
+      </ProductEmptyState>
+    )
   }
 
   return (
