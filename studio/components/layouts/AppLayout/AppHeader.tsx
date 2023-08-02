@@ -22,7 +22,7 @@ const AppHeader = () => {
 
   const isBranchingAllowed = project?.cloud_provider === 'FLY'
   const isBranchingEnabled =
-    project?.has_branch_enabled === true || project?.parent_project_ref !== undefined
+    project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
 
   return (
     <div className="flex items-center justify-between px-4 py-1 bg-scale-200 border-b">
