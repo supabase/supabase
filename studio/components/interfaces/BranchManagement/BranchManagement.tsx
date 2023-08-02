@@ -39,8 +39,8 @@ const BranchManagement = () => {
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
 
-  // [Joshen TODO] To be dynamic
-  const isBranchingAllowed = true
+  const hasAccessToBranching =
+    selectedOrg?.opt_in_tags?.includes('PREVIEW_BRANCHES_OPT_IN') ?? false
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const hasBranchEnabled = projectDetails?.is_branch_enabled
@@ -122,11 +122,11 @@ const BranchManagement = () => {
     return (
       <ProductEmptyState title="Database Branching">
         <p className="text-sm text-light">
-          {isBranchingAllowed
+          {hasAccessToBranching
             ? 'Create preview branches to experiment changes to your database schema in a safe, non-destructible environment.'
             : "Register for early access and you'll be contacted by email when your organization is enrolled in database branching."}
         </p>
-        {isBranchingAllowed ? (
+        {hasAccessToBranching ? (
           <div className="!mt-4">
             <Button
               icon={<IconGitBranch strokeWidth={1.5} />}
