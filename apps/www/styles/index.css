@@ -95,11 +95,11 @@ h6:not(.overwrite) {
 }
 
 .heading-gradient-brand {
-  @apply text-[#3ECF8E00] bg-clip-text bg-gradient-to-b from-brand-1000 to-brand-900 dark:to-brand-800;
+  @apply text-[#3ECF8E00] bg-clip-text bg-gradient-to-b from-brand-600 to-brand dark:to-brand-300;
 }
 
 .toc-animate {
-  @apply !translate-x-1 !text-brand-900;
+  @apply !translate-x-1 !text-brand;
 }
 
 .prose-toc a {
@@ -328,7 +328,7 @@ launch week
 */
 
 .launch-week-timeline-border--approaching {
-  border-image: linear-gradient(to bottom, var(--colors-brand9), var(--colors-purple7)) 1 100%;
+  border-image: linear-gradient(to bottom, hsl(var(--brand-default)), var(--colors-purple7)) 1 100%;
 }
 
 .launch-week-gradientBg {
@@ -472,9 +472,9 @@ launch week
   filter: blur(calc(var(--auth-ui-card-height) / 6));
   background-image: linear-gradient(
     var(--rotate),
-    var(--colors-brand),
+    hsl(var(--brand-default)),
     #3c67e3 43%,
-    var(--colors-brand)
+    hsl(var(--brand-default))
   );
   opacity: 1;
   transition: opacity 0.5s;
@@ -683,19 +683,26 @@ launch week
 }
 
 [class*='gradient-text-']::selection {
-  background-color: var(--colors-brand9);
+  background-color: hsl(var(--brand-default));
   background-clip: unset;
   -webkit-text-fill-color: white;
 }
 
 @layer utilities {
   .gradient-text-brand-100 {
-    background-image: linear-gradient(45deg, var(--colors-brand8) 0%, var(--colors-brand9) 100%);
+    background-image: linear-gradient(
+      45deg,
+      hsl(var(--brand-500)) 0%,
+      hsl(var(--brand-default)) 100%
+    );
   }
-  .gradient-text-brand-500 {
-    background-image: linear-gradient(45deg, var(--colors-brand8) 0%, var(--colors-brand9) 100%);
+  .gradient-text-brand-300 {
+    background-image: linear-gradient(
+      45deg,
+      hsl(var(--brand-500)) 0%,
+      hsl(var(--brand-default)) 100%
+    );
   }
-
   .gradient-text-scale-100 {
     background-image: -webkit-linear-gradient(45deg, #fff 0%, var(--colors-green12) 100%);
   }

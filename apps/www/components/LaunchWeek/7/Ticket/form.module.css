@@ -130,8 +130,8 @@
   height: 56px;
   margin-top: var(--space-4x);
   border-radius: var(--space-2x);
-  border: 1px solid var(--brand);
-  background: var(--brand);
+  border: 1px solid hsl(var(--brand-default));
+  background: hsl(var(--brand-default));
   cursor: pointer;
   font-family: inherit;
   font-size: var(--text-md);
@@ -170,7 +170,7 @@
 .submit.default:hover,
 .submit.default:focus {
   background: black;
-  color: var(--brand);
+  color: hsl(var(--brand-default));
 }
 
 .submit.default.generate-with-github:hover path,
