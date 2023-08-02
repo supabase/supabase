@@ -35,7 +35,7 @@ IVF [indexes](https://supabase.com/docs/guides/ai/managing-indexes) work by clus
 
 First, vectors are large. A 1536 dimensional vector is ~12.3 kilobytes. Scaling that up to 1M vectors, the raw data tops 11 gigabytes. Experienced SQL users know that for best performance, indexes should fit within system memory. Moreover unlike traditional workloads, there is a significant compute component when performing vector similarity queries.
 
-In the real-world it's common for an index to reduce the number of distance computations needed to estimate nearest neighbors from 100% of the dataset to 5-20%. At 1M records, that's still 50k-200k distance calculations being performed for a single query. Given how different the resource requirements are to support heavy vector workloads, it's not surprising that one of the most common issues we see is significant under provisioning of hardware.
+In the real-world it's common for an index to reduce the number of distance computations needed to estimate nearest neighbors from 100% of the dataset to 5-20%. At 1M records, that's still 50k-200k distance calculations being performed for a single query. Given how different the [resource requirements](https://supabase.com/docs/guides/ai/choosing-compute-addon) are to support heavy vector workloads, it's not surprising that one of the most common issues we see is significant under provisioning of hardware.
 
 ## Massive Text Embedding Benchmark (MTEB)
 
