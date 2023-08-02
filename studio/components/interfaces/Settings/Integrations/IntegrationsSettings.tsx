@@ -12,7 +12,7 @@ import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/int
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { IntegrationName, IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
-import { IntegrationConnectionItem } from './../../Organization/IntegrationSettings/OrganizationIntegration'
+import { IntegrationConnectionItem } from '../../Integrations/IntegrationConnection'
 import SidePanelGitHubRepoLinker from './../../Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './../../Organization/IntegrationSettings/SidePanelVercelProjectLinker'
 import { useSelectedOrganization } from 'hooks'
