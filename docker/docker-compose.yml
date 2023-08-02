@@ -61,7 +61,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.62.1
+    image: supabase/gotrue:v2.82.4
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -247,7 +247,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.6.6
+    image: supabase/edge-runtime:v1.8.1
     restart: unless-stopped
     environment:
       JWT_SECRET: ${JWT_SECRET}
@@ -267,7 +267,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.1.0.90
+    image: supabase/postgres:15.1.0.103
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s
