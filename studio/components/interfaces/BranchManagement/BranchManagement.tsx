@@ -125,7 +125,6 @@ const BranchManagement = () => {
         {isBranchingAllowed ? (
           <div className="!mt-4">
             <Button
-              type="default"
               icon={<IconGitBranch strokeWidth={1.5} />}
               onClick={() => snap.setShowEnableBranchingModal(true)}
             >

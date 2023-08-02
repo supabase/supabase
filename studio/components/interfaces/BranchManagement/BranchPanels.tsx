@@ -33,7 +33,12 @@ interface BranchPanelProps {
   generatePullRequestURL?: (branch?: string) => string
 }
 
-const MainBranchPanel = ({ repo, branch, onSelectDisableBranching = noop }: BranchPanelProps) => {
+const MainBranchPanel = ({
+  repo,
+  branch,
+  onSelectUpdate = noop,
+  onSelectDisableBranching = noop,
+}: BranchPanelProps) => {
   const { ref } = useParams()
   const [open, setOpen] = useState(false)
   const isActive = ref === branch.project_ref
@@ -77,9 +82,15 @@ const MainBranchPanel = ({ repo, branch, onSelectDisableBranching = noop }: Bran
               </Button>
             </DropdownMenuTrigger_Shadcn_>
             <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-              <DropdownMenuItem_Shadcn_ className="flex gap-2" onSelect={() => {}}>
-                Change production branch
-              </DropdownMenuItem_Shadcn_>
+              <Link passHref href={`/project/${ref}/settings/general`}>
+                <DropdownMenuItem_Shadcn_
+                  asChild
+                  className="flex gap-2"
+                  onSelect={() => onSelectUpdate()}
+                >
+                  <a>Change production branch</a>
+                </DropdownMenuItem_Shadcn_>
+              </Link>
               <Dropdown.Separator />
               <DropdownMenuItem_Shadcn_
                 className="flex gap-2"

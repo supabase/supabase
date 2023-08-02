@@ -61,9 +61,12 @@ const CreateBranchSidePanel = ({ visible, onClose }: CreateBranchSidePanelProps)
   const githubIntegration = integrations?.find(
     (integration) =>
       integration.integration.name === 'GitHub' &&
-      integration.connections.some((connection) => connection.supabase_project_ref === projectRef)
+      integration.organization.slug === selectedOrg?.slug
   )
-  const repositoryMeta = githubIntegration?.connections?.[0]
+
+  const repositoryMeta = githubIntegration?.connections?.find(
+    (connection) => connection.supabase_project_ref === ref
+  )
   const [repoOwner, repoName] = repositoryMeta?.metadata.name.split('/') || []
   const {
     data: githubBranches,
@@ -169,6 +172,9 @@ const CreateBranchSidePanel = ({ visible, onClose }: CreateBranchSidePanelProps)
                 )}
                 <div className="[&>*:first-child]:rounded-t-md">
                   {branchOptions?.map((branch) => {
+                    const isProductionBranch = branches?.find(
+                      (b) => b.git_branch === branch.name && b.is_default
+                    )
                     const alreadyHasDatabaseBranch =
                       branches?.some((b) => b.git_branch === branch.name) ?? false
                     return (
@@ -182,7 +188,7 @@ const CreateBranchSidePanel = ({ visible, onClose }: CreateBranchSidePanelProps)
                             <p className="text-sm">{branch.name}</p>
                           </div>
                           <Button
-                            type="default"
+                            type={isProductionBranch ? 'warning' : 'default'}
                             loading={isCreating}
                             disabled={isCreating || alreadyHasDatabaseBranch}
                             onClick={() => onCreateBranch(branch.name)}
@@ -192,7 +198,11 @@ const CreateBranchSidePanel = ({ visible, onClose }: CreateBranchSidePanelProps)
                                 : ''
                             }
                           >
-                            {alreadyHasDatabaseBranch ? 'Branch already created' : 'Create branch'}
+                            {isProductionBranch
+                              ? 'Production branch'
+                              : alreadyHasDatabaseBranch
+                              ? 'Branch already created'
+                              : 'Create branch'}
                           </Button>
                         </div>
                       </div>
