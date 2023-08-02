@@ -1,17 +1,17 @@
 import { useParams } from 'common'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useSelectedOrganization, useStore } from 'hooks'
 import { useEffect, useState } from 'react'
 import { Button, IconFileText, IconGitBranch, Modal } from 'ui'
+
+import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
+import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
+import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { IntegrationName } from 'data/integrations/integrations.types'
+import { useSelectedOrganization, useStore } from 'hooks'
+import { useAppUiStateSnapshot } from 'state/app'
 import BranchingWaitlistPopover from './BranchingWaitlistPopover'
 import GithubRepositorySelection from './GithubRepositorySelection'
-import VercelProjectSelection from './VercelProjectSelection'
-import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
-import { IntegrationName } from 'data/integrations/integrations.types'
-import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import AlertError from 'components/ui/AlertError'
-import { useAppUiStateSnapshot } from 'state/app'
 
 const EnableBranchingButton = () => {
   const { ui } = useStore()

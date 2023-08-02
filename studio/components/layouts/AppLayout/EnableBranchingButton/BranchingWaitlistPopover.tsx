@@ -1,12 +1,12 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import {
-  Popover_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Badge,
   Button,
   IconGitBranch,
   PopoverContent_Shadcn_,
-  Badge,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
 } from 'ui'
 
 const BranchingWaitlistPopover = () => {

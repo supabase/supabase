@@ -1,6 +1,7 @@
 import { useParams } from 'common'
-import { Integration } from 'data/integrations/integrations.types'
 import { Badge, Button, Modal } from 'ui'
+
+import { Integration } from 'data/integrations/integrations.types'
 
 interface VercelProjectSelectionProps {
   integration?: Integration
