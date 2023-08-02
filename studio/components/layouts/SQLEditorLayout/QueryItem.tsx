@@ -1,17 +1,17 @@
-import { useState, useEffect, useRef } from 'react'
+import clsx from 'clsx'
 import { useParams } from 'common'
+import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
+import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { observer } from 'mobx-react-lite'
-import { Dropdown, IconEdit2, IconTrash, Button, IconChevronDown, Modal } from 'ui'
-import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
-import clsx from 'clsx'
 import Link from 'next/link'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useRouter } from 'next/router'
-import { SqlSnippet } from 'data/content/sql-snippets-query'
+import { useEffect, useRef, useState } from 'react'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { Button, Dropdown, IconChevronDown, IconEdit2, IconTrash, Modal } from 'ui'
 
 export interface QueryItemProps {
   tabInfo: SqlSnippet
@@ -85,8 +85,9 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
     },
   })
 
-  const { id, name } = tabInfo || {}
+  const { id, name, visibility } = tabInfo || {}
   const [renameModalOpen, setRenameModalOpen] = useState(false)
+  const [shareModalOpen, setShareModalOpen] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const isActive = id === activeId
 
@@ -99,9 +100,29 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
     setRenameModalOpen(true)
   }
 
+  const onClickShare = (e: any) => {
+    e.stopPropagation()
+    setShareModalOpen(true)
+  }
+
   const onClickDelete = (e: any) => {
     e.stopPropagation()
     setDeleteModalOpen(true)
+  }
+
+  const onConfirmShare = async () => {
+    if (id) {
+      try {
+        snap.shareSnippet(id, 'project')
+        return Promise.resolve()
+      } catch (error: any) {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to share query: ${error.message}`,
+        })
+      }
+    }
   }
 
   const onConfirmDelete = async () => {
@@ -121,10 +142,17 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
               <Dropdown.Item onClick={onClickRename} icon={<IconEdit2 size="tiny" />}>
                 Rename query
               </Dropdown.Item>
-              <Dropdown.Separator />
-              <Dropdown.Item onClick={onClickDelete} icon={<IconTrash size="tiny" />}>
-                Delete query
-              </Dropdown.Item>
+              {visibility === 'user' && (
+                <Dropdown.Item onClick={onClickShare} icon={<IconEdit2 size="tiny" />}>
+                  Share query with project
+                </Dropdown.Item>
+              )}
+              <>
+                <Dropdown.Separator />
+                <Dropdown.Item onClick={onClickDelete} icon={<IconTrash size="tiny" />}>
+                  Delete query
+                </Dropdown.Item>
+              </>
             </>
           }
         >
@@ -160,6 +188,18 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
       >
         <Modal.Content>
           <p className="py-4 text-sm text-scale-1100">{`Are you sure you want to delete '${name}' ?`}</p>
+        </Modal.Content>
+      </ConfirmationModal>
+      <ConfirmationModal
+        header="Confirm to share"
+        buttonLabel="Share query"
+        buttonLoadingLabel="Sharing query"
+        visible={shareModalOpen}
+        onSelectConfirm={onConfirmShare}
+        onSelectCancel={() => setShareModalOpen(false)}
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-scale-1100">{`Are you sure you want to share '${name}' with the project ?`}</p>
         </Modal.Content>
       </ConfirmationModal>
     </div>
