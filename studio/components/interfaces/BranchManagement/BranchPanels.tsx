@@ -1,6 +1,8 @@
 import clsx from 'clsx'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { noop } from 'lodash'
+import Link from 'next/link'
 import { PropsWithChildren, forwardRef, useState } from 'react'
 import {
   Badge,
@@ -10,6 +12,7 @@ import {
   DropdownMenuItem_Shadcn_,
   DropdownMenuTrigger_Shadcn_,
   DropdownMenu_Shadcn_,
+  IconExternalLink,
   IconGitBranch,
   IconGitHub,
   IconMoreVertical,
@@ -18,18 +21,24 @@ import {
   cn,
 } from 'ui'
 
-import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { Branch } from 'data/branches/branches-query'
 
 interface BranchPanelProps {
+  repo?: string
   branch: Branch
   onSelectUpdate?: () => void
   onSelectDelete?: () => void
   onSelectDisableBranching?: () => void
+  generatePullRequestURL?: (branch?: string) => string
 }
 
-const MainBranchPanel = ({ branch, onSelectDisableBranching = noop }: BranchPanelProps) => {
+const MainBranchPanel = ({
+  repo,
+  branch,
+  onSelectUpdate = noop,
+  onSelectDisableBranching = noop,
+}: BranchPanelProps) => {
   const { ref } = useParams()
   const [open, setOpen] = useState(false)
   const isActive = ref === branch.project_ref
@@ -42,6 +51,18 @@ const MainBranchPanel = ({ branch, onSelectDisableBranching = noop }: BranchPane
             <IconGitHub size={18} strokeWidth={2} />
           </div>
           <p>Github branch workflow</p>
+          <Link passHref href={`https://github.com/${repo}`}>
+            <a target="_blank" rel="noreferrer">
+              <Button
+                type="text"
+                size="small"
+                className="text-light hover:text py-1 px-1.5"
+                iconRight={<IconExternalLink size={14} strokeWidth={1.5} />}
+              >
+                {repo}
+              </Button>
+            </a>
+          </Link>
         </div>
       </div>
       <div className="bg-surface-100 border-t shadow-sm flex justify-between items-center pl-8 pr-6 py-3 rounded-b-lg text-sm">
@@ -61,9 +82,15 @@ const MainBranchPanel = ({ branch, onSelectDisableBranching = noop }: BranchPane
               </Button>
             </DropdownMenuTrigger_Shadcn_>
             <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-              <DropdownMenuItem_Shadcn_ className="flex gap-2" onSelect={() => {}}>
-                Change production branch
-              </DropdownMenuItem_Shadcn_>
+              <Link passHref href={`/project/${ref}/settings/general`}>
+                <DropdownMenuItem_Shadcn_
+                  asChild
+                  className="flex gap-2"
+                  onSelect={() => onSelectUpdate()}
+                >
+                  <a>Change production branch</a>
+                </DropdownMenuItem_Shadcn_>
+              </Link>
               <Dropdown.Separator />
               <DropdownMenuItem_Shadcn_
                 className="flex gap-2"
@@ -95,7 +122,11 @@ const BranchContainer = ({ className, children }: PropsWithChildren<{ className?
   )
 }
 
-const BranchPanel = ({ branch, onSelectDelete = noop }: BranchPanelProps) => {
+const BranchPanel = ({
+  branch,
+  generatePullRequestURL,
+  onSelectDelete = noop,
+}: BranchPanelProps) => {
   const { ref } = useParams()
   const [open, setOpen] = useState(false)
 
@@ -103,6 +134,8 @@ const BranchPanel = ({ branch, onSelectDelete = noop }: BranchPanelProps) => {
   const daysFromNow = dayjs().diff(dayjs(branch.created_at), 'day')
   const formattedTimeFromNow = dayjs(branch.created_at).fromNow()
   const formattedCreatedAt = dayjs(branch.created_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
+
+  const pullRequestURL = generatePullRequestURL?.(branch.name) ?? 'https://github.com'
 
   return (
     <BranchContainer className="bg-surface-100">
@@ -114,7 +147,12 @@ const BranchPanel = ({ branch, onSelectDelete = noop }: BranchPanelProps) => {
           {daysFromNow > 1 ? `Created on ${formattedCreatedAt}` : `Created ${formattedTimeFromNow}`}
         </p>
       </div>
-      <div>
+      <div className="flex items-center space-x-4">
+        <Link passHref href={pullRequestURL}>
+          <a target="_blank" rel="noreferrer">
+            <Button>Create pull request</Button>
+          </a>
+        </Link>
         <DropdownMenu_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
           <DropdownMenuTrigger_Shadcn_>
             <Button asChild type="text" className="px-1" icon={<IconMoreVertical size={14} />}>
