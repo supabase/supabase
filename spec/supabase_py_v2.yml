@@ -257,7 +257,7 @@ functions:
         description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
         code: |
           ```
-          res = supabase.auth.set_session({"access_token": access_token, "refresh_token": refresh_token})
+          res = supabase.auth.set_session(access_token, refresh_token)
           ```
   - id: refresh-session
     title: 'refresh_session()'
