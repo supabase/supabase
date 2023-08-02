@@ -11,7 +11,18 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { Button, Dropdown, IconChevronDown, IconEdit2, IconTrash, Modal } from 'ui'
+import {
+  Alert,
+  Button,
+  Dropdown,
+  IconChevronDown,
+  IconEdit2,
+  IconEye,
+  IconShare,
+  IconTrash,
+  IconUnlock,
+  Modal,
+} from 'ui'
 
 export interface QueryItemProps {
   tabInfo: SqlSnippet
@@ -143,8 +154,8 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
                 Rename query
               </Dropdown.Item>
               {visibility === 'user' && (
-                <Dropdown.Item onClick={onClickShare} icon={<IconEdit2 size="tiny" />}>
-                  Share query with project
+                <Dropdown.Item onClick={onClickShare} icon={<IconShare size="tiny" />}>
+                  Share query
                 </Dropdown.Item>
               )}
               <>
@@ -187,11 +198,12 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
         onSelectCancel={() => setDeleteModalOpen(false)}
       >
         <Modal.Content>
-          <p className="py-4 text-sm text-scale-1100">{`Are you sure you want to delete '${name}' ?`}</p>
+          <p className="py-4 text-sm text-scale-1100">{`Are you sure you want to delete '${name}'?`}</p>
         </Modal.Content>
       </ConfirmationModal>
       <ConfirmationModal
-        header="Confirm to share"
+        header="Confirm sharing query"
+        size="medium"
         buttonLabel="Share query"
         buttonLoadingLabel="Sharing query"
         visible={shareModalOpen}
@@ -199,7 +211,30 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
         onSelectCancel={() => setShareModalOpen(false)}
       >
         <Modal.Content>
-          <p className="py-4 text-sm text-scale-1100">{`Are you sure you want to share '${name}' with the project ?`}</p>
+          <div className="my-6">
+            <div className="text-sm text-scale-1100 grid gap-4">
+              <div className="grid gap-1">
+                <Alert
+                  variant="warning"
+                  className="!px-4 !py-3"
+                  title="Are you sure you want to share this query?"
+                  withIcon
+                >
+                  <p>Anyone with access to the project can edit or delete this query.</p>
+                </Alert>
+                <ul className="mt-4 space-y-5">
+                  <li className="flex gap-3">
+                    <IconEye />
+                    <span>Anyone with access to this project will be able to view it.</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <IconUnlock />
+                    <span>Anyone will be able to modify or delete it.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </Modal.Content>
       </ConfirmationModal>
     </div>
