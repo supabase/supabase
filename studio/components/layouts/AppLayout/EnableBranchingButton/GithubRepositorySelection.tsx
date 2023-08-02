@@ -1,4 +1,5 @@
 import clsx from 'clsx'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useRef, useState } from 'react'
 import {
@@ -12,19 +13,15 @@ import {
   Command_Shadcn_,
   IconCheck,
   IconChevronDown,
-  IconGitHub,
   Modal,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  cn,
 } from 'ui'
 
-import { useParams } from 'common'
 import {
   EmptyIntegrationConnection,
   IntegrationConnection,
-  IntegrationConnectionOption,
 } from 'components/interfaces/Integrations/IntegrationPanels'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -129,8 +126,8 @@ const GithubRepositorySelection = ({
                         type="default"
                         size="medium"
                         ref={comboBoxRef}
-                        className={cn(
-                          'justify-start w-64',
+                        className={clsx(
+                          'justify-start',
                           selectedBranch === undefined ? 'text-light' : 'text'
                         )}
                         iconRight={

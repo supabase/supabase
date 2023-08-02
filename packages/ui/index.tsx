@@ -148,8 +148,9 @@ export {
 
 export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
 export { Label as Label_Shadcn_ } from './src/components/shadcn/ui/label'
-export { Switch as Switch } from './src/components/shadcn/ui/switch'
+export * from './src/components/shadcn/ui/switch'
 export { Checkbox as Checkbox_Shadcn_ } from './src/components/shadcn/ui/checkbox'
+export * from './src/components/shadcn/ui/scroll-area'
 
 // links
 

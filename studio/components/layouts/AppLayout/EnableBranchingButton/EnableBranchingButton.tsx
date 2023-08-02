@@ -1,29 +1,30 @@
 import { useParams } from 'common'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useSelectedOrganization, useStore } from 'hooks'
 import { useEffect, useState } from 'react'
 import { Button, IconFileText, IconGitBranch, Modal } from 'ui'
+
+import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
+import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
+import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { IntegrationName } from 'data/integrations/integrations.types'
+import { useSelectedOrganization, useStore } from 'hooks'
+import { useAppUiStateSnapshot } from 'state/app'
 import BranchingWaitlistPopover from './BranchingWaitlistPopover'
 import GithubRepositorySelection from './GithubRepositorySelection'
-import VercelProjectSelection from './VercelProjectSelection'
-import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
-import { IntegrationName } from 'data/integrations/integrations.types'
-import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import AlertError from 'components/ui/AlertError'
 
 const EnableBranchingButton = () => {
   const { ui } = useStore()
   const { ref } = useParams()
-  const [open, setOpen] = useState(false)
   const selectedOrg = useSelectedOrganization()
 
+  const snap = useAppUiStateSnapshot()
   const [selectedBranch, setSelectedBranch] = useState<string>()
   const [addConnectionType, setAddConnectionType] = useState<IntegrationName>()
 
   useEffect(() => {
-    if (open) setSelectedBranch(undefined)
-  }, [open])
+    if (snap.showEnableBranchingModal) setSelectedBranch(undefined)
+  }, [snap.showEnableBranchingModal])
 
   const {
     data: integrations,
@@ -38,11 +39,11 @@ const EnableBranchingButton = () => {
   const { mutate: createBranch, isLoading: isCreating } = useBranchCreateMutation({
     onSuccess: () => {
       ui.setNotification({ category: 'success', message: `Successfully created new branch` })
-      setOpen(false)
+      snap.setShowEnableBranchingModal(false)
     },
   })
 
-  // [Joshen] To be dynamic
+  // [Joshen TODO] To be dynamic
   const isBranchingAllowed = true
 
   const githubIntegration = integrations?.find(
@@ -74,14 +75,14 @@ const EnableBranchingButton = () => {
       <Button
         icon={<IconGitBranch strokeWidth={1.5} />}
         type="default"
-        onClick={() => setOpen(true)}
+        onClick={() => snap.setShowEnableBranchingModal(true)}
       >
         Enable branching
       </Button>
       <Modal
         hideFooter
-        visible={open}
-        onCancel={() => setOpen(false)}
+        visible={snap.showEnableBranchingModal}
+        onCancel={() => snap.setShowEnableBranchingModal(false)}
         className="!bg"
         size="medium"
       >
@@ -154,7 +155,13 @@ const EnableBranchingButton = () => {
 
         <Modal.Content className="px-7">
           <div className="flex items-center space-x-2 py-2 pb-4">
-            <Button size="medium" block disabled={isCreating} type="default">
+            <Button
+              size="medium"
+              block
+              disabled={isCreating}
+              type="default"
+              onClick={() => snap.setShowEnableBranchingModal(false)}
+            >
               Cancel
             </Button>
             <Button

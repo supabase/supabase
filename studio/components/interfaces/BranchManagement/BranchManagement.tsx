@@ -1,4 +1,5 @@
 import { partition } from 'lodash'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
@@ -7,6 +8,7 @@ import {
   Alert_Shadcn_,
   Button,
   IconAlertTriangle,
+  IconGitBranch,
   IconSearch,
   Input,
   Modal,
@@ -14,33 +16,53 @@ import {
 
 import { useParams } from 'common'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
+import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { useSelectedProject, useStore } from 'hooks'
+import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
+import { useAppUiStateSnapshot } from 'state/app'
 import { MainBranchPanel } from './BranchPanels'
 import CreateBranchSidePanel from './CreateBranchSidePanel'
 import PreviewBranches from './PreviewBranches'
 import PullRequests from './PullRequests'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
 
 const BranchManagement = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
+  const selectedOrg = useSelectedOrganization()
+
+  // [Joshen TODO] To be dynamic
+  const isBranchingAllowed = true
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const hasBranchEnabled = projectDetails?.has_branch_enabled
   const projectRef =
     projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
 
+  const snap = useAppUiStateSnapshot()
   const [showCreateBranch, setShowCreateBranch] = useState(false)
   const [showDisableBranching, setShowDisableBranching] = useState(false)
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
+
+  const { data: integrations, isLoading: isLoadingIntegrations } = useOrgIntegrationsQuery({
+    orgSlug: selectedOrg?.slug,
+  })
+  const githubIntegration = integrations?.find(
+    (integration) =>
+      integration.integration.name === 'GitHub' &&
+      integration.organization.slug === selectedOrg?.slug
+  )
+  const githubConnection = githubIntegration?.connections.find(
+    (connection) => connection.supabase_project_ref === ref
+  )
 
   const { data: branches, error, isLoading, isError, isSuccess } = useBranchesQuery({ projectRef })
   const [[mainBranch], previewBranches] = partition(branches, (branch) => branch.is_default)
@@ -71,6 +93,14 @@ const BranchManagement = () => {
     },
   })
 
+  const generatePullRequestURL = (branch?: string) => {
+    if (githubConnection === undefined) return 'https://github.com'
+
+    return branch !== undefined
+      ? `https://github.com/${githubConnection.metadata.name}/compare/${mainBranch.git_branch}...${branch}`
+      : `https://github.com/${githubConnection.metadata.name}/compare`
+  }
+
   const onConfirmDeleteBranch = () => {
     if (selectedBranchToDelete == undefined) return console.error('No branch selected')
     if (projectRef == undefined) return console.error('Project ref is required')
@@ -85,7 +115,38 @@ const BranchManagement = () => {
 
   if (!hasBranchEnabled) {
     // [Joshen] Some empty state here
-    return <div>Some disabled state</div>
+    return (
+      <ProductEmptyState title="Database Branching">
+        <p className="text-sm text-light">
+          {isBranchingAllowed
+            ? 'Create preview branches to experiment changes to your database schema in a safe, non-destructible environment.'
+            : "Register for early access and you'll be contacted by email when your organization is enrolled in database branching."}
+        </p>
+        {isBranchingAllowed ? (
+          <div className="!mt-4">
+            <Button
+              icon={<IconGitBranch strokeWidth={1.5} />}
+              onClick={() => snap.setShowEnableBranchingModal(true)}
+            >
+              Enable branching
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center space-x-2 !mt-4">
+            <Link passHref href={'/'}>
+              <a rel="noreferrer" target="_blank">
+                <Button>Join waitlist</Button>
+              </a>
+            </Link>
+            <Link passHref href={'/'}>
+              <a rel="noreferrer" target="_blank">
+                <Button type="default">View the docs</Button>
+              </a>
+            </Link>
+          </div>
+        )}
+      </ProductEmptyState>
+    )
   }
 
   return (
@@ -106,12 +167,18 @@ const BranchManagement = () => {
               {isSuccess && mainBranch !== undefined && (
                 <>
                   <MainBranchPanel
+                    repo={githubConnection?.metadata.name}
                     branch={mainBranch}
                     onSelectDisableBranching={() => setShowDisableBranching(true)}
                   />
-                  <PullRequests previewBranches={previewBranches} />
+                  <PullRequests
+                    previewBranches={previewBranches}
+                    generatePullRequestURL={generatePullRequestURL}
+                  />
                   <PreviewBranches
                     previewBranches={previewBranches}
+                    generatePullRequestURL={generatePullRequestURL}
+                    onSelectCreateBranch={() => setShowCreateBranch(true)}
                     onSelectDeleteBranch={setSelectedBranchToDelete}
                   />
                 </>

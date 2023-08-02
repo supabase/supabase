@@ -24,7 +24,7 @@ export async function disableBranching({ branchIds, projectRef }: BranchesDisabl
         }
       })
     )
-    const hasError = res.some((item: any) => item.message !== undefined)
+    const hasError = res.some((item: any) => item.message !== 'ok')
     if (hasError) throw new Error('Failed to disable branching: Unable to delete all branches')
   }
 
