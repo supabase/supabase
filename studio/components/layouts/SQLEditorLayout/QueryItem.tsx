@@ -1,11 +1,14 @@
 import clsx from 'clsx'
 import { useParams } from 'common'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
+import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -16,6 +19,7 @@ import {
   Button,
   Dropdown,
   IconChevronDown,
+  IconCopy,
   IconEdit2,
   IconEye,
   IconShare,
@@ -80,6 +84,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
   const { ref } = useParams()
   const router = useRouter()
   const snap = useSqlEditorStateSnapshot()
+  const { profile } = useProfile()
   const { mutate: deleteContent } = useContentDeleteMutation({
     onSuccess(data) {
       if (data.id) snap.removeSnippet(data.id)
@@ -96,7 +101,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
     },
   })
 
-  const { id, name, visibility } = tabInfo || {}
+  const { id, name, visibility, content } = tabInfo || {}
   const [renameModalOpen, setRenameModalOpen] = useState(false)
   const [shareModalOpen, setShareModalOpen] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
@@ -142,6 +147,22 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
     deleteContent({ projectRef: ref, id })
   }
 
+  const createPersonalCopy = async () => {
+    if (!ref) return console.error('Project ref is required')
+    if (!id) return console.error('Snippet ID is required')
+    try {
+      const snippet = createSqlSnippetSkeleton({ name, sql: content.sql, owner_id: profile?.id })
+      const data = { ...snippet, id: uuidv4() }
+      snap.addSnippet(data as SqlSnippet, ref, true)
+      router.push(`/project/${ref}/sql/${data.id}`)
+    } catch (error: any) {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to create a personal copy of this query: ${error.message}`,
+      })
+    }
+  }
+
   return (
     <div className="group [div&>button[data-state='open']>span]:text-scale-900">
       {IS_PLATFORM ? (
@@ -156,6 +177,12 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
               {visibility === 'user' && (
                 <Dropdown.Item onClick={onClickShare} icon={<IconShare size="tiny" />}>
                   Share query
+                </Dropdown.Item>
+              )}
+
+              {visibility === 'project' && (
+                <Dropdown.Item onClick={createPersonalCopy} icon={<IconCopy size="tiny" />}>
+                  Create a personal copy
                 </Dropdown.Item>
               )}
               <>
