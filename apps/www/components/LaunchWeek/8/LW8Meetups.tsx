@@ -70,7 +70,7 @@ const LW8Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
                     !link && 'pointer-events-none',
                   ].join(' ')}
                 >
-                  <div className="flex items-center gap-2 md:gap-4">
+                  <div className="flex items-center gap-2 md:gap-4 py-2 md:py-0">
                     <span>{title}</span>
                     {isLive && <Badge>Live now</Badge>}
                     <span className="hidden md:inline opacity-0 -translate-x-2 transition-all md:group-hover:opacity-100 group-hover:translate-x-0">
