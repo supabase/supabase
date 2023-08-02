@@ -117,8 +117,13 @@ export type VercelGitLink =
 export type Imetadata = {
   id: string
   supabaseConfig: {
-    projectEnvVars: {
-      write: boolean
+    environmentVariables: {
+      production: boolean
+      preview: boolean
+    }
+    authRedirectUris: {
+      production: boolean
+      preview: boolean
     }
   }
   link?: VercelGitLink
