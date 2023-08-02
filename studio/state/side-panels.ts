@@ -1,6 +1,30 @@
+import types from 'pages/api/pg-meta/[ref]/types'
 import { proxy, snapshot, useSnapshot } from 'valtio'
 
+export type SidePanelTypeProps = 'VERCEL_CONNECTIONS' | 'GITHUB_CONNECTIONS'
+
+// export type OpenProps =
+//   | { type: 'VERCEL_CONNECTIONS'; integrationId: string }
+//   | { type: 'GITHUB_CONNECTIONS'; integrationId: string }
+
 export const sidePanelsState = proxy({
+  // setOpen: (type: SidePanelTypeProps, integrationId: string) => {
+  //   sidePanelsState.integrationConnections = type
+  //   switch (type) {
+  //     case 'VERCEL_CONNECTIONS':
+  //       sidePanelsState.vercelConnectionsIntegrationId = integrationId
+  //       break
+  //     case 'GITHUB_CONNECTIONS':
+  //       sidePanelsState.githubConnectionsIntegrationId = integrationId
+  //       break
+  //   }
+  // },
+  // setClosed: () => {
+  //   sidePanelsState.integrationConnections = false
+  // },
+
+  // integrationConnections: false as SidePanelTypeProps | false,
+
   /**
    * Vercel connections
    */
