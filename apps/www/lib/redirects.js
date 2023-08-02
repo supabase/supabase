@@ -2246,4 +2246,14 @@ module.exports = [
     source: '/docs/guides/integrations/zuplo',
     destination: '/partners/integrations/zuplo',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/oauth-apps/publish-an-oauth-app',
+    destination: '/docs/guides/platform/oauth-apps/build-a-supabase-integration#',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/oauth-apps/authorize-an-oauth-app',
+    destination: '/docs/guides/platform/oauth-apps/build-a-supabase-integration',
+  },
 ]
