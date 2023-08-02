@@ -174,10 +174,6 @@ const IntegrationConnectionItem = ({
                           <IconRefreshCw size={14} />
                         )
                       }
-                      onClick={(event) => {
-                        // event.stopPropagation()
-                        // event.preventDefault()
-                      }}
                       onSelect={(event) => {
                         event.stopPropagation()
                         event.preventDefault()
@@ -185,7 +181,7 @@ const IntegrationConnectionItem = ({
                       }}
                       disabled={isSyncEnvLoading}
                     >
-                      Re-sync environment variables
+                      Resync environment variables
                     </Dropdown.Item>
                     <Dropdown.Separator />
                   </>
