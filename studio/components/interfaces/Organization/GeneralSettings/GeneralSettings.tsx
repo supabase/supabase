@@ -172,7 +172,7 @@ const GeneralSettings = () => {
                                 <a
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="text-brand-900 border-b border-brand-900"
+                                  className="text-brand border-b border-brand"
                                 >
                                   privacy policy
                                 </a>

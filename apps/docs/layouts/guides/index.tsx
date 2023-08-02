@@ -115,7 +115,7 @@ const Layout: FC<Props> = (props) => {
             ].join(' ')}
           >
             {props.meta.breadcrumb && (
-              <p className="text-brand-900 tracking-wider mb-3">{props.meta.breadcrumb}</p>
+              <p className="text-brand tracking-wider mb-3">{props.meta.breadcrumb}</p>
             )}
             <article
               ref={articleRef}

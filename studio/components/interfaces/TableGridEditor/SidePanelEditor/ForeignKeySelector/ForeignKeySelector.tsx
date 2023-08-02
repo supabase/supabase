@@ -330,7 +330,7 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
                         href="https://supabase.com/docs/guides/database/postgres/cascade-deletes"
                         target="_blank"
                         rel="noreferrer"
-                        className="text-brand-900 opacity-75"
+                        className="text-brand opacity-75"
                       >
                         Learn more about cascade deletes
                       </a>
