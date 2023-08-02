@@ -1,9 +1,8 @@
 import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useParams } from 'common/hooks'
-import { useStore } from 'hooks'
 import { TIME_PERIODS_INFRA, USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { NextPageWithLayout } from 'types'
@@ -15,8 +14,9 @@ import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import Panel from 'components/ui/Panel'
 import SparkBar from 'components/ui/SparkBar'
-import { useProjectUsageQuery } from 'data/usage/project-usage-query'
+import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -35,36 +35,21 @@ DatabaseReport.getLayout = (page) => <ReportsLayout title="Database">{page}</Rep
 export default DatabaseReport
 
 const DatabaseUsage = observer(() => {
-  const { meta, ui } = useStore()
-  const { project } = useProjectContext()
-  const [databaseSize, setDatabaseSize] = useState<any>(0)
-  const [dateRange, setDateRange] = useState<any>(undefined)
-
   const { ref: projectRef } = useParams()
+  const { project } = useProjectContext()
   const { data: usage } = useProjectUsageQuery({ projectRef })
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+
+  const [dateRange, setDateRange] = useState<any>(undefined)
 
   const databaseSizeLimit = usage?.db_size?.limit ?? 0
   const databaseEgressLimit = usage?.db_egress?.limit ?? 0
 
-  useEffect(() => {
-    let cancel = false
-    const getDatabaseSize = async () => {
-      const res = await meta.query(
-        'select sum(pg_database_size(pg_database.datname))::bigint as db_size from pg_database;'
-      )
-      if (!res.error && !cancel) {
-        setDatabaseSize(res[0].db_size)
-      } else {
-        ui.setNotification({ category: 'error', message: 'Failed to retrieve database size' })
-      }
-    }
-    getDatabaseSize()
-
-    return () => {
-      cancel = true
-    }
-  }, [])
+  const { data } = useDatabaseSizeQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const databaseSize = data?.result[0].db_size ?? 0
 
   const databaseSizeUsageRatio = databaseSize / databaseSizeLimit
   const sizeIsApproaching = databaseSizeUsageRatio >= USAGE_APPROACHING_THRESHOLD

@@ -33,7 +33,7 @@ export default function TileGrid({
                     className="
                 bg-scale-100 dark:bg-scale-300
                 hover:bg-scale-200 hover:dark:bg-scale-400
-                group flex h-full w-full flex-col rounded border px-6 
+                group flex h-full w-full flex-col rounded-xl border px-6 
                 py-6 shadow 
                 transition-all 
                 hover:shadow-lg"
@@ -79,7 +79,7 @@ export default function TileGrid({
                     className="
                 bg-scale-100 dark:bg-scale-300
                 hover:bg-scale-200 hover:dark:bg-scale-400
-                group flex h-full w-full flex-col rounded border px-6 
+                group flex h-full w-full flex-col rounded-xl border px-6 
                 py-6 shadow 
                 transition-all 
                 hover:shadow-lg"
