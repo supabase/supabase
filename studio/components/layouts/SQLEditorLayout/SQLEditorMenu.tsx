@@ -14,7 +14,7 @@ import { useCheckPermissions, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { IconSearch, IconX, Input, Menu, cn } from 'ui'
+import { Button, IconPlus, IconSearch, IconX, Input, Menu, cn } from 'ui'
 import QueryItem from './QueryItem'
 
 const SideBarContent = observer(() => {
@@ -100,38 +100,55 @@ const SideBarContent = observer(() => {
         ) : isSuccess ? (
           <div className="space-y-6">
             <div className="px-3 flex flex-col gap-2">
-              <ProductMenuItem
-                name="Build a query"
-                isActive={id === undefined}
-                url={`/project/${ref}/sql`}
-              />
-              <ProductMenuItem
-                name="New empty query"
-                isActive={false}
+              <Button
+                type="default"
+                className="mx-3 justify-start"
                 onClick={() => {
                   handleNewQuery()
                 }}
-              />
+                icon={<IconPlus size="tiny" />}
+              >
+                New query
+              </Button>
             </div>
             <div className="space-y-6 px-3">
+              <div>
+                <ProductMenuItem
+                  name="Templates"
+                  isActive={router.asPath === `/project/${ref}/sql`}
+                  url={`/project/${ref}/sql`}
+                />
+                <ProductMenuItem
+                  name="Quickstarts"
+                  isActive={router.asPath === `/project/${ref}/sql/quickstarts`}
+                  url={`/project/${ref}/sql/quickstarts`}
+                />
+              </div>
               {favorites.length >= 1 && (
                 <div className="editor-product-menu">
                   <div className="flex flex-row justify-between">
                     <Menu.Group title="Favorites" />
-                    <IconSearch
-                      className={cn(
-                        'w-4',
-                        'h-4',
-                        'cursor-pointer',
-                        isFavoritesFilterOpen ? 'text-scale-1200' : 'text-scale-900'
-                      )}
+                    <button
+                      className="flex items-center w-4 h-4 cursor-pointer mr-3"
                       onClick={() => {
-                        setIsFavoritesFilterOpen((state) => !state)
+                        setIsFavoritesFilterOpen(!isFavoritesFilterOpen)
                       }}
-                    />
+                    >
+                      <IconSearch
+                        className={cn(
+                          'w-4',
+                          'h-4',
+                          'cursor-pointer',
+                          isFavoritesFilterOpen ? 'text-scale-1200' : 'text-scale-900'
+                        )}
+                        onClick={() => {
+                          setIsFavoritesFilterOpen((state) => !state)
+                        }}
+                      />
+                    </button>
                   </div>
                   {isFavoritesFilterOpen && (
-                    <div className="pl-3 mb-2">
+                    <div className="pl-3 mb-2 mr-3">
                       <Input
                         autoFocus
                         size="tiny"
@@ -140,6 +157,12 @@ const SideBarContent = observer(() => {
                         disabled={isLoading}
                         onChange={(e) => setFavoritesFilterString(e.target.value)}
                         value={favoritesFilterString}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') {
+                            setIsFavoritesFilterOpen(false)
+                            setFavoritesFilterString('')
+                          }
+                        }}
                         actions={
                           favoritesFilterString && (
                             <IconX
@@ -160,52 +183,64 @@ const SideBarContent = observer(() => {
                   </div>
                 </div>
               )}
-              {queries.length >= 1 && (
-                <div className="editor-product-menu">
-                  <div className="flex flex-row justify-between">
-                    <Menu.Group title="SQL snippets" />
+
+              <div className="editor-product-menu">
+                <div className="flex flex-row justify-between">
+                  <Menu.Group title="SQL snippets" />
+                  <button
+                    className="flex items-center w-4 h-4 cursor-pointer mr-3"
+                    onClick={() => {
+                      setIsSnippetsFilterOpen((state) => !state)
+                    }}
+                  >
                     <IconSearch
-                      className={cn(
-                        'w-4',
-                        'h-4',
-                        'cursor-pointer',
-                        isSnippetsFilterOpen ? 'text-scale-1200' : 'text-scale-900'
-                      )}
-                      onClick={() => {
-                        setIsSnippetsFilterOpen((state) => !state)
+                      className={cn(isSnippetsFilterOpen ? 'text-scale-1200' : 'text-scale-900')}
+                    />
+                  </button>
+                </div>
+                {isSnippetsFilterOpen && (
+                  <div className="pl-3 mb-2 mr-3">
+                    <Input
+                      autoFocus
+                      size="tiny"
+                      icon={<IconSearch size="tiny" />}
+                      placeholder="Filter"
+                      disabled={isLoading}
+                      onChange={(e) => setSnippetsFilterString(e.target.value)}
+                      value={snippetsFilterString}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Escape') {
+                          setIsSnippetsFilterOpen(false)
+                          setSnippetsFilterString('')
+                        }
                       }}
+                      actions={
+                        snippetsFilterString && (
+                          <IconX
+                            size={'tiny'}
+                            className="mr-2 cursor-pointer"
+                            onClick={() => setSnippetsFilterString('')}
+                          />
+                        )
+                      }
                     />
                   </div>
-                  {isSnippetsFilterOpen && (
-                    <div className="pl-3 mb-2">
-                      <Input
-                        autoFocus
-                        size="tiny"
-                        icon={<IconSearch size="tiny" />}
-                        placeholder="Filter"
-                        disabled={isLoading}
-                        onChange={(e) => setSnippetsFilterString(e.target.value)}
-                        value={snippetsFilterString}
-                        actions={
-                          snippetsFilterString && (
-                            <IconX
-                              size={'tiny'}
-                              className="mr-2 cursor-pointer"
-                              onClick={() => setSnippetsFilterString('')}
-                            />
-                          )
-                        }
-                      />
-                    </div>
-                  )}
+                )}
+                {snippetsTabs.length > 0 ? (
                   <div className="space-y-1 pb-8">
                     {snippetsTabs.map((tabInfo) => {
                       const { id } = tabInfo || {}
                       return <QueryItem key={id} tabInfo={tabInfo} />
                     })}
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div className="text text-sm h-32 border border-dashed flex flex-col gap-3 items-center justify-center px-3 mx-3 rounded">
+                    <span className="text-lighter">No queries found</span>
+                    <Button type="default">New Query</Button>
+                  </div>
+                )}
+              </div>
+
               {snippetsFilterString.length > 0 &&
                 favouriteTabs.length === 0 &&
                 snippetsTabs.length === 0 && (
