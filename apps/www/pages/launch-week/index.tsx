@@ -166,11 +166,13 @@ export default function TicketHome({ users, meetups }: Props) {
               </div>
             </div>
 
-            <SectionContainer className="!pb-0">
-              <LW8CalloutsSection />
-            </SectionContainer>
+            <div id="twitter-spaces">
+              <SectionContainer className="!pb-0" id="hackathon">
+                <LW8CalloutsSection />
+              </SectionContainer>
+            </div>
 
-            <SectionContainer>
+            <SectionContainer id="meetups">
               <LW8Meetups meetups={meetups} />
             </SectionContainer>
 
