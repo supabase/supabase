@@ -1009,6 +1009,10 @@ export const supabase_cli: NavMenuConstant = {
           url: '/guides/cli/managing-config',
         },
         {
+          name: 'Seeding your database',
+          url: '/guides/cli/seeding-your-database',
+        },
+        {
           name: 'Testing emails locally',
           url: '/guides/cli/testing-emails',
         },
