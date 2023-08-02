@@ -242,7 +242,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
             <p className="text-base text-scale-1100 lg:max-w-sm">
               Interact with your database through the{' '}
               <Link href="https://supabase.com/docs/reference">
-                <a className="text-brand-900">Supabase client libraries</a>
+                <a className="text-brand">Supabase client libraries</a>
               </Link>{' '}
               with your API keys.
             </p>

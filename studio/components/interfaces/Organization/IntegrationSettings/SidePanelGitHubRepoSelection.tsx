@@ -3,7 +3,6 @@ import { Markdown } from 'components/interfaces/Markdown'
 // import { useIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
-import { useGithubConnectionConfigPanelSnapshot } from 'state/github-connection-config-panel'
 import { IconGitHub, IconSearch, Input, Select, SidePanel } from 'ui'
 
 // TO DO
@@ -12,8 +11,6 @@ const GitHubRepoSelection = () => {
   const { ui } = useStore()
   const { slug } = useParams()
   // const { data } = useIntegrationsQuery({ orgSlug: slug })
-
-  const githubConnectionConfigPanelSnapshot = useGithubConnectionConfigPanelSnapshot()
 
   return (
     <SidePanel

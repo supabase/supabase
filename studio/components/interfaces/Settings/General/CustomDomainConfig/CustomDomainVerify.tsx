@@ -84,7 +84,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
                     <p>
                       You may also visit{' '}
                       <Link href={`https://whatsmydns.net/#TXT/${customDomain.hostname}`}>
-                        <a className="text-brand-900">here</a>
+                        <a className="text-brand">here</a>
                       </Link>{' '}
                       to check if your DNS has been propagated successfully before clicking verify.
                     </p>
@@ -93,7 +93,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
                   <p>
                     You may also visit{' '}
                     <Link href={`https://whatsmydns.net/#TXT/${customDomain.hostname}`}>
-                      <a className="text-brand-900">here</a>
+                      <a className="text-brand">here</a>
                     </Link>{' '}
                     to check if your DNS has been propagated successfully before clicking verify.
                   </p>

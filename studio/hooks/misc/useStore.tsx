@@ -55,7 +55,7 @@ export const StoreProvider: FC<StoreProvider> = ({ children, rootStore }) => {
                     value={progress}
                     max={100}
                     type="horizontal"
-                    barClass="bg-brand-900"
+                    barClass="bg-brand"
                     labelBottom={message}
                     labelTop={`${progress.toFixed(2)}%`}
                   />
