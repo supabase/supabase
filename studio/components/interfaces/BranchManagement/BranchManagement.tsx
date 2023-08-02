@@ -1,4 +1,4 @@
-import { partition } from 'lodash'
+import { isError, partition } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -43,7 +43,7 @@ const BranchManagement = () => {
   const isBranchingAllowed = true
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
-  const hasBranchEnabled = projectDetails?.has_branch_enabled
+  const hasBranchEnabled = projectDetails?.is_branch_enabled
   const projectRef =
     projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
 
@@ -52,9 +52,13 @@ const BranchManagement = () => {
   const [showDisableBranching, setShowDisableBranching] = useState(false)
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
 
-  const { data: integrations, isLoading: isLoadingIntegrations } = useOrgIntegrationsQuery({
-    orgSlug: selectedOrg?.slug,
-  })
+  const {
+    data: integrations,
+    error: integrationsError,
+    isLoading: isLoadingIntegrations,
+    isError: isErrorIntegrations,
+    isSuccess: isSuccessIntegrations,
+  } = useOrgIntegrationsQuery({ orgSlug: selectedOrg?.slug })
   const githubIntegration = integrations?.find(
     (integration) =>
       integration.integration.name === 'GitHub' &&
@@ -64,7 +68,7 @@ const BranchManagement = () => {
     (connection) => connection.supabase_project_ref === ref
   )
 
-  const { data: branches, error, isLoading, isError, isSuccess } = useBranchesQuery({ projectRef })
+  const { data: branches } = useBranchesQuery({ projectRef })
   const [[mainBranch], previewBranches] = partition(branches, (branch) => branch.is_default)
 
   const { mutate: deleteBranch, isLoading: isDeleting } = useBranchDeleteMutation({
@@ -93,11 +97,11 @@ const BranchManagement = () => {
     },
   })
 
-  const generatePullRequestURL = (branch?: string) => {
+  const generateCreatePullRequestURL = (branch?: string) => {
     if (githubConnection === undefined) return 'https://github.com'
 
     return branch !== undefined
-      ? `https://github.com/${githubConnection.metadata.name}/compare/${mainBranch.git_branch}...${branch}`
+      ? `https://github.com/${githubConnection.metadata.name}/compare/${mainBranch?.git_branch}...${branch}`
       : `https://github.com/${githubConnection.metadata.name}/compare`
   }
 
@@ -162,9 +166,14 @@ const BranchManagement = () => {
               <Button onClick={() => setShowCreateBranch(true)}>Create preview branch</Button>
             </div>
             <div className="">
-              {isLoading && <GenericSkeletonLoader />}
-              {isError && <AlertError error={error} subject="Failed to retrieve branches" />}
-              {isSuccess && mainBranch !== undefined && (
+              {isLoadingIntegrations && <GenericSkeletonLoader />}
+              {isErrorIntegrations && (
+                <AlertError
+                  error={integrationsError}
+                  subject="Failed to retrieve GitHub integration connection"
+                />
+              )}
+              {isSuccessIntegrations && (
                 <>
                   <MainBranchPanel
                     repo={githubConnection?.metadata.name}
@@ -173,11 +182,10 @@ const BranchManagement = () => {
                   />
                   <PullRequests
                     previewBranches={previewBranches}
-                    generatePullRequestURL={generatePullRequestURL}
+                    generateCreatePullRequestURL={generateCreatePullRequestURL}
                   />
                   <PreviewBranches
-                    previewBranches={previewBranches}
-                    generatePullRequestURL={generatePullRequestURL}
+                    generateCreatePullRequestURL={generateCreatePullRequestURL}
                     onSelectCreateBranch={() => setShowCreateBranch(true)}
                     onSelectDeleteBranch={setSelectedBranchToDelete}
                   />

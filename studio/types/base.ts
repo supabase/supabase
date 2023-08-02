@@ -34,7 +34,7 @@ export interface Project extends ProjectBase {
   lastDatabaseResizeAt?: string | null
   maxDatabasePreprovisionGb?: string | null
   parent_project_ref?: string
-  has_branch_enabled?: boolean
+  is_branch_enabled?: boolean
 
   /**
    * postgrestStatus is available on client side only.
