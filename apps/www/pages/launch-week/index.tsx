@@ -11,6 +11,7 @@ import { PageState, ConfDataContext, UserData } from '~/components/LaunchWeek/ho
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/8/LaunchWeekLogoHeader'
+import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
 
 import { useTheme } from 'common/Providers'
 
@@ -21,6 +22,7 @@ const AnimatedParticles = dynamic(
   () => import('~/components/LaunchWeek/8/AnimatedParticles/ParticlesCanvas')
 )
 const TicketContainer = dynamic(() => import('~/components/LaunchWeek/8/Ticket/TicketContainer'))
+const LW8Meetups = dynamic(() => import('~/components/LaunchWeek/8/LW8Meetups'))
 const LaunchWeekPrizeSection = dynamic(
   () => import('~/components/LaunchWeek/8/LaunchWeekPrizeSection')
 )
@@ -29,6 +31,7 @@ const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
 interface Props {
   users?: UserData[]
+  meetups?: Meetup[]
 }
 
 const supabaseAdmin = createClient(
@@ -39,7 +42,7 @@ const supabaseAdmin = createClient(
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk3MjcwMTIsImV4cCI6MTk4NTMwMzAxMn0.SZLqryz_-stF8dgzeVXmzZWPOqdOrBwqJROlFES8v3I'
 )
 
-export default function TicketHome({ users }: Props) {
+export default function TicketHome({ users, meetups }: Props) {
   const { query } = useRouter()
 
   const TITLE = 'Supabase LaunchWeek 8'
@@ -149,7 +152,7 @@ export default function TicketHome({ users }: Props) {
                     />
                   </div>
                 </SectionContainer>
-                <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0">
+                <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0 pointer-events-none">
                   <Image
                     src="/images/launchweek/8/LW8-gradient.png"
                     layout="fill"
@@ -161,6 +164,10 @@ export default function TicketHome({ users }: Props) {
                 </div>
               </div>
             </div>
+
+            <SectionContainer>
+              <LW8Meetups meetups={meetups} />
+            </SectionContainer>
 
             <div className="relative !w-full max-w-[100vw] min-h-[400px] !px-4 sm:max-w-xl md:max-w-4xl lg:max-w-7xl z-20 flex flex-col justify-around items-center !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !mx-auto">
               {supabase && (
@@ -191,9 +198,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     .from('lw8_tickets_golden')
     .select('username, golden', { count: 'exact' })
 
+  const { data: meetups } = await supabaseAdmin!.from('lw8_meetups').select('*')
+
   return {
     props: {
       users,
+      meetups,
     },
   }
 }
