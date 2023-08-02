@@ -47,15 +47,15 @@ const LW8Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
   }, [])
 
   return (
-    <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8">
-      <div className="col-span-1 lg:col-span-4 flex flex-col justify-center">
-        <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-.5px]">Join us live</h2>
-        <p className="text-scale-1000 text-xs sm:text-sm lg:text-base py-3 lg:max-w-md">
-          Celebrate LW8 with us at our first-ever live meetups across various locations. Join the
-          fun, grab some swag, and be a part of the Supabase community.
+    <div className="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-8">
+      <div className="col-span-1 xl:col-span-4 flex flex-col justify-center max-w-lg">
+        <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-.5px]">Join the community</h2>
+        <p className="text-scale-1000 text-xs sm:text-sm xl:text-base py-3 xl:max-w-md">
+          Celebrate LW8 at our first-ever live community meetups across various locations. Join the
+          fun, grab some swag, and meet the Supabase community.
         </p>
       </div>
-      <div className="col-span-1 lg:col-span-7 lg:col-start-6 w-full max-w-4xl flex flex-col justify-between items-stretch">
+      <div className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl flex flex-col justify-between items-stretch">
         {meets &&
           meets
             ?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1))
@@ -64,7 +64,7 @@ const LW8Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
                 <a
                   target="_blank"
                   className={[
-                    'w-full group py-0 flex items-center gap-2 md:gap-4 text-lg sm:text-2xl lg:text-4xl border-b border-[#111718]',
+                    'w-full group py-0 flex items-center gap-2 md:gap-4 text-lg sm:text-2xl xl:text-4xl border-b border-[#111718]',
                     'hover:text-scale-1200',
                     isLive ? 'text-scale-1100' : 'text-[#56646B]',
                     !link && 'pointer-events-none',
@@ -73,7 +73,7 @@ const LW8Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
                   <div className="flex items-center gap-2 md:gap-4">
                     <span>{title}</span>
                     {isLive && <Badge>Live now</Badge>}
-                    <span className="opacity-0 -translate-x-2 transition-all md:group-hover:opacity-100 group-hover:translate-x-0">
+                    <span className="hidden md:inline opacity-0 -translate-x-2 transition-all md:group-hover:opacity-100 group-hover:translate-x-0">
                       <svg
                         width="47"
                         height="47"
