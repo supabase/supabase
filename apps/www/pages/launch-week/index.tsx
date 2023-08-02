@@ -17,6 +17,7 @@ import { useTheme } from 'common/Providers'
 
 import 'swiper/swiper.min.css'
 import Head from 'next/head'
+import LW8CalloutsSection from '../../components/LaunchWeek/8/LW8CalloutsSection'
 
 const AnimatedParticles = dynamic(
   () => import('~/components/LaunchWeek/8/AnimatedParticles/ParticlesCanvas')
@@ -164,6 +165,10 @@ export default function TicketHome({ users, meetups }: Props) {
                 </div>
               </div>
             </div>
+
+            <SectionContainer className="!pb-0">
+              <LW8CalloutsSection />
+            </SectionContainer>
 
             <SectionContainer>
               <LW8Meetups meetups={meetups} />
