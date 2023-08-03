@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ParsedUrlQuery } from 'querystring'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import {
   Badge,
   Button,
@@ -19,13 +19,13 @@ import {
   Popover_Shadcn_,
 } from 'ui'
 
+import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import { Organization, Project } from 'types'
-import { useParams } from 'common'
 
 // [Fran] the idea is to let users change projects without losing the current page,
 // but at the same time we need to redirect correctly between urls that might be
@@ -103,7 +103,6 @@ const ProjectDropdown = () => {
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
-  const projectNameRef = useRef<HTMLAnchorElement>(null)
   const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
@@ -117,43 +116,33 @@ const ProjectDropdown = () => {
     { enabled: !isOrgBilling }
   )
   const projects = allProjects
-    ?.filter((x) => x.status !== PROJECT_STATUS.INACTIVE)
-    .filter((x) => x.organization_id === selectedOrganization?.id)
+    ?.filter((x) => x.organization_id === selectedOrganization?.id)
     .sort((a, b) => a.name.localeCompare(b.name))
   const selectedProject = isBranch
     ? parentProject
     : projectDetails || projects?.find((project) => project.ref === ref)
 
   const [open, setOpen] = useState(false)
-  const popoverOffset = (projectNameRef.current?.offsetWidth ?? 0) + 12
 
   if (isLoadingProjects) {
     return <ShimmeringLoader className="w-[90px]" />
   }
 
   return IS_PLATFORM ? (
-    <div className="flex items-center space-x-2 px-2">
-      <Link href={`/project/${ref}`}>
-        <a ref={projectNameRef} className="flex items-center space-x-2">
-          <p className="text-sm">{selectedProject?.name}</p>
-          {isSuccess && !isOrgBilling && <Badge color="slate">{subscription?.plan.name}</Badge>}
-        </a>
-      </Link>
-
+    <div className="flex items-center px-2">
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
           <Button
             type="text"
-            className="px-1"
-            icon={<IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />}
-          />
+            iconRight={<IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />}
+          >
+            <div className="flex items-center space-x-2">
+              <p className="text-sm">{selectedProject?.name}</p>
+              {isSuccess && !isOrgBilling && <Badge color="slate">{subscription?.plan.name}</Badge>}
+            </div>
+          </Button>
         </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_
-          className="p-0"
-          side="bottom"
-          align="start"
-          style={{ marginLeft: `-${popoverOffset}px` }}
-        >
+        <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
           <Command_Shadcn_>
             <CommandInput_Shadcn_ placeholder="Find project..." />
             <CommandList_Shadcn_>
