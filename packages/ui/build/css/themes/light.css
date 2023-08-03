@@ -1,13 +1,15 @@
 /**
  * Do not edit directly
- * Generated on Mon, 17 Jul 2023 15:59:23 GMT
+ * Generated on Sun, 30 Jul 2023 09:03:47 GMT
  */
 
 .light {
-  --brand-primary: 152.9deg 60% 52.9%;
-  --brand-400: 153.7deg 68.7% 83.7%;
-  --brand-300: 153deg 46% 65.9%;
-  --brand-200: 148.5deg 43.5% 82%;
+  --brand-default: 152.9deg 60% 52.9%;
+  --brand-600: 153.2deg 49.7% 33.5%;
+  --brand-500: 148.7deg 42.7% 69.2%;
+  --brand-400: 149.1deg 59.3% 88.4%;
+  --brand-300: 148.6deg 77.8% 94.7%;
+  --brand-200: 156deg 71.4% 98.6%;
   --warning-default: 38.9deg 100% 57.1%;
   --warning-600: 30.2deg 100% 33.9%;
   --warning-500: 36.3deg 85.7% 67.1%;

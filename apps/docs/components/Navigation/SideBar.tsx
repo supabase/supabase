@@ -83,7 +83,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                     'py-1.5 px-5 rounded text-sm transition',
                     `${
                       item.url === asPath
-                        ? 'bg-scale-200 text-brand-900'
+                        ? 'bg-scale-200 text-brand'
                         : 'text-scale-1100 hover:text-scale-1200'
                     }`,
                   ].join(' ')}
@@ -109,7 +109,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                   size={14}
                   strokeWidth={2}
                 />
-                <span className="text-scale-1200 text-sm group-hover:text-brand-900 transition">
+                <span className="text-scale-1200 text-sm group-hover:text-brand transition">
                   {group.label}
                 </span>
               </Accordion.Trigger>
@@ -124,7 +124,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                               'py-1.5 px-5 rounded text-sm transition',
                               `${
                                 section.url === asPath
-                                  ? 'bg-scale-200 text-brand-900'
+                                  ? 'bg-scale-200 text-brand'
                                   : 'text-scale-1100 hover:text-scale-1200'
                               }`,
                             ].join(' ')}
@@ -150,7 +150,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                               size={14}
                               strokeWidth={2}
                             />
-                            <span className="text-scale-1200 text-sm group-hover:text-brand-900 transition">
+                            <span className="text-scale-1200 text-sm group-hover:text-brand transition">
                               {section.name}
                             </span>
                           </Accordion.Trigger>
@@ -164,7 +164,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                                       'py-1.5 ml-4 px-5 rounded text-sm transition',
                                       `${
                                         item.url === asPath
-                                          ? 'bg-scale-200 text-brand-900'
+                                          ? 'bg-scale-200 text-brand'
                                           : 'text-scale-1100 hover:text-scale-1200'
                                       }`,
                                     ].join(' ')}

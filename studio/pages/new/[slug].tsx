@@ -483,7 +483,7 @@ const Wizard: NextPageWithLayout = () => {
                     <div className="space-y-3">
                       <p className="text-sm leading-normal">
                         This organization uses organization level billing and is on the{' '}
-                        <span className="text-brand-900">{orgSubscription?.plan?.name} plan</span>.
+                        <span className="text-brand">{orgSubscription?.plan?.name} plan</span>.
                       </p>
 
                       {orgSubscription?.plan?.id !== 'free' && (
