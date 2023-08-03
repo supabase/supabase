@@ -39,7 +39,7 @@ const TerminalInstructions: FC<Props> = ({ closable = false, removeBorder = fals
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">supabase</span> functions new hello-world
+            <span className="text-brand-600">supabase</span> functions new hello-world
           </>
         )
       },
@@ -51,7 +51,7 @@ const TerminalInstructions: FC<Props> = ({ closable = false, removeBorder = fals
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">supabase</span> functions deploy hello-world
+            <span className="text-brand-600">supabase</span> functions deploy hello-world
             --project-ref {projectRef}
           </>
         )
@@ -66,7 +66,7 @@ const TerminalInstructions: FC<Props> = ({ closable = false, removeBorder = fals
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">curl</span> -L -X POST 'https://{functionsEndpoint}
+            <span className="text-brand-600">curl</span> -L -X POST 'https://{functionsEndpoint}
             /hello-world' -H 'Authorization: Bearer [YOUR ANON KEY]'{' '}
             {`--data '{"name":"Functions"}'`}
           </>

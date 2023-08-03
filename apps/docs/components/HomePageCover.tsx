@@ -29,6 +29,11 @@ const HomePageCover = (props) => {
       href: '/guides/getting-started/quickstarts/flutter',
     },
     {
+      tooltip: 'Android Kotlin',
+      icon: '/docs/img/icons/kotlin-icon',
+      href: '/guides/getting-started/quickstarts/kotlin',
+    },
+    {
       tooltip: 'SvelteKit',
       icon: '/docs/img/icons/svelte-icon',
       href: '/guides/getting-started/quickstarts/sveltekit',
@@ -69,7 +74,7 @@ const HomePageCover = (props) => {
         <div className="md:max-w-xs xl:max-w-none">
           <div className="flex items-center gap-3 mb-3">
             <IconBackground>
-              <IconPlay className="text-brand-1100 dark:text-brand-900 w-4" />
+              <IconPlay className="text-brand-600 dark:text-brand w-4" strokeWidth={2} />
             </IconBackground>
             <h3 className="text-2xl m-0">Getting Started</h3>
           </div>
