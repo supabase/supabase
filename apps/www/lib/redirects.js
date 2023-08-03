@@ -2249,7 +2249,8 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/oauth-apps/publish-an-oauth-app',
-    destination: '/docs/guides/platform/oauth-apps/build-a-supabase-integration#',
+    destination:
+      '/docs/guides/platform/oauth-apps/build-a-supabase-integration#create-an-oauth-app',
   },
   {
     permanent: true,
