@@ -141,8 +141,6 @@ export default function LW8Releases() {
       )
       .map((day: WeekDayProps) => day.d.toString()) ?? []
 
-  // const prereleaseShipped = Date.parse(preRelease.publishedAt) <= Date.now()
-  const prereleaseShipped = true
   const day1Shipped = Date.parse(day1.publishedAt) <= Date.now()
   const day2Shipped = Date.parse(day2.publishedAt) <= Date.now()
   const day3Shipped = Date.parse(day3.publishedAt) <= Date.now()
@@ -179,7 +177,7 @@ export default function LW8Releases() {
               id={preRelease.d.toString()}
             >
               {preRelease.steps.length > 0 && (
-                <div className="h-[800px] lg:h-[400px] flex flex-col gap-5 lg:flex-row pb-4">
+                <div className="h-[400px] flex flex-col gap-5 lg:flex-row pb-4">
                   <motion.div
                     className={`
                       relative overflow-hidden group/3 flex-1 flex flex-col items-start justify-between
@@ -195,7 +193,7 @@ export default function LW8Releases() {
                         background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, #030A0C)`,
                       }}
                     />
-                    <div className="flex flex-col items-start gap-2 min-w-[300px] w-full">
+                    <div className="flex flex-col items-center md:items-start gap-2 min-w-[300px] w-full">
                       <CartTitle>{preRelease.steps[0]?.title}</CartTitle>
                       <p className="text-sm text-slate-900">{preRelease.steps[0]?.description}</p>
                     </div>
@@ -241,65 +239,7 @@ export default function LW8Releases() {
               disabled={!day1Shipped}
               className="h-[79px]"
               id={day1.d.toString()}
-            >
-              {day1.steps.length > 0 && (
-                <div className="h-[400px] flex flex-col gap-5 lg:flex-row pb-8">
-                  <motion.div
-                    className={`
-                      relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      w-full border border-[#111718] rounded-xl h-full px-4 sm:px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
-                    `}
-                    initial="default"
-                    animate="default"
-                    whileHover="hover"
-                  >
-                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-white">
-                      <CartTitle>{day1.steps[0]?.title}</CartTitle>
-                      <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
-                    </div>
-                    <SectionButtons
-                      blog={day1.steps[0]?.blog}
-                      video={day1.steps[0]?.video}
-                      hackernews={day1.steps[0]?.hackernews}
-                    />
-                    {day1.steps[0]?.bg_layers &&
-                      day1.steps[0]?.bg_layers?.map(
-                        (layer, i) =>
-                          !!layer.img && (
-                            <motion.div
-                              className={[
-                                'absolute inset-0 w-full h-full -z-10',
-                                i === 3 && '!mix-blend-overlay blur-2xl',
-                              ].join(' ')}
-                              variants={getDay1Motion(i)}
-                            >
-                              <Image
-                                src={
-                                  !!layer.mobileImg && isTablet
-                                    ? (layer.mobileImg as any)
-                                    : layer.img
-                                }
-                                className={[
-                                  `
-                                  absolute
-                                  w-full h-full -z-10 transition-all duration-300
-                                `,
-                                  i === 5 && '',
-                                ].join(' ')}
-                                layout="fill"
-                                objectPosition={
-                                  !!layer.mobileImg && isTablet ? '25% 80%' : '80% 50%'
-                                }
-                                objectFit="cover"
-                                quality={100}
-                              />
-                            </motion.div>
-                          )
-                      )}
-                  </motion.div>
-                </div>
-              )}
-            </Accordion.Item>
+            ></Accordion.Item>
           </div>
           <div className="border-b border-[#111718]">
             <Accordion.Item
@@ -316,65 +256,7 @@ export default function LW8Releases() {
               disabled={!day2Shipped}
               className="h-[79px]"
               id={day2.d.toString()}
-            >
-              {day2.steps.length > 0 && (
-                <div className="h-[400px] flex flex-col gap-5 lg:flex-row pb-8">
-                  <motion.div
-                    className={`
-                      relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      w-full border rounded-xl h-full px-4 sm:px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
-                    `}
-                    initial="default"
-                    animate="default"
-                    whileHover="hover"
-                  >
-                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
-                      <CartTitle>{day2.steps[0]?.title}</CartTitle>
-                      <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
-                    </div>
-                    <SectionButtons
-                      blog={day2.steps[0]?.blog}
-                      video={day2.steps[0]?.video}
-                      hackernews={day2.steps[0]?.hackernews}
-                    />
-                    {day2.steps[0]?.bg_layers &&
-                      day2.steps[0]?.bg_layers?.map(
-                        (layer, i) =>
-                          !!layer.img && (
-                            <motion.div
-                              className={[
-                                'absolute inset-0 w-full h-full -z-10',
-                                i === 3 && '!mix-blend-overlay blur-2xl',
-                              ].join(' ')}
-                              variants={getDay2Motion(i)}
-                            >
-                              <Image
-                                src={
-                                  !!layer.mobileImg && isTablet
-                                    ? (layer.mobileImg as any)
-                                    : layer.img
-                                }
-                                className={[
-                                  `
-                                  absolute
-                                  w-full h-full -z-10 transition-all duration-300
-                                `,
-                                  i === 5 && '',
-                                ].join(' ')}
-                                layout="fill"
-                                objectPosition={
-                                  !!layer.mobileImg && isTablet ? '25% 80%' : '80% 50%'
-                                }
-                                objectFit="cover"
-                                quality={100}
-                              />
-                            </motion.div>
-                          )
-                      )}
-                  </motion.div>
-                </div>
-              )}
-            </Accordion.Item>
+            ></Accordion.Item>
           </div>
           <div className="border-b border-[#111718]">
             <Accordion.Item
@@ -391,65 +273,7 @@ export default function LW8Releases() {
               disabled={!day3Shipped}
               className="h-[79px]"
               id={day3.d.toString()}
-            >
-              {day3.steps.length > 0 && (
-                <div className="h-[400px] flex flex-col gap-5 lg:flex-row pb-8">
-                  <motion.div
-                    className={`
-                      relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      w-full border rounded-xl h-full px-4 sm:px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
-                    `}
-                    initial="default"
-                    animate="default"
-                    whileHover="hover"
-                  >
-                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
-                      <CartTitle>{day3.steps[0]?.title}</CartTitle>
-                      <StyledArticleBadge className="lg:ml-2">Updated</StyledArticleBadge>
-                    </div>
-                    <SectionButtons
-                      docs={day3.steps[0]?.docs}
-                      blog={day3.steps[0]?.blog}
-                      video={day3.steps[0]?.video}
-                    />
-                    {day3.steps[0]?.bg_layers &&
-                      day3.steps[0]?.bg_layers?.map(
-                        (layer, i) =>
-                          !!layer.img && (
-                            <motion.div
-                              className={[
-                                'absolute inset-0 w-full h-full -z-10',
-                                i === 2 && '!mix-blend-overlay blur-2xl',
-                              ].join(' ')}
-                              variants={getDay3Motion(i)}
-                            >
-                              <Image
-                                src={
-                                  !!layer.mobileImg && isTablet
-                                    ? (layer.mobileImg as any)
-                                    : layer.img
-                                }
-                                className={[
-                                  `
-                                  absolute
-                                  w-full h-full -z-10 transition-all duration-300
-                                `,
-                                  i === 5 && '',
-                                ].join(' ')}
-                                layout="fill"
-                                objectPosition={
-                                  !!layer.mobileImg && isTablet ? '50% 65%' : '80% 50%'
-                                }
-                                objectFit={!!layer.mobileImg && isTablet ? 'contain' : 'cover'}
-                                quality={100}
-                              />
-                            </motion.div>
-                          )
-                      )}
-                  </motion.div>
-                </div>
-              )}
-            </Accordion.Item>
+            ></Accordion.Item>
           </div>
           <div className="border-b border-[#111718]">
             <Accordion.Item
@@ -466,63 +290,7 @@ export default function LW8Releases() {
               disabled={!day4Shipped}
               className="h-[79px]"
               id={day4.d.toString()}
-            >
-              {day4.steps.length > 0 && (
-                <div className="h-[400px] flex flex-col gap-5 lg:flex-row pb-8">
-                  <motion.div
-                    className={`
-                      relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      w-full border rounded-xl h-full px-4 sm:px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
-                    `}
-                    initial="default"
-                    animate="default"
-                    whileHover="hover"
-                  >
-                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
-                      <CartTitle>{day4.steps[0]?.title}</CartTitle>
-                      <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
-                    </div>
-                    <SectionButtons
-                      docs={day4.steps[0]?.docs}
-                      blog={day4.steps[0]?.blog}
-                      video={day4.steps[0]?.video}
-                      hackernews={day4.steps[0]?.hackernews}
-                      mobileGrid
-                    />
-                    {day4.steps[0]?.bg_layers &&
-                      day4.steps[0]?.bg_layers?.map(
-                        (layer, i) =>
-                          !!layer.img && (
-                            <motion.div
-                              className={['absolute inset-0 w-full h-full -z-10'].join(' ')}
-                              variants={getDay4Motion(i)}
-                            >
-                              <Image
-                                src={
-                                  !!layer.mobileImg && isTablet
-                                    ? (layer.mobileImg as any)
-                                    : layer.img
-                                }
-                                className={[
-                                  `
-                                  absolute
-                                  w-full h-full -z-10 transition-all duration-300
-                                `,
-                                ].join(' ')}
-                                layout="fill"
-                                objectPosition={
-                                  !!layer.mobileImg && isTablet ? '50% 65%' : '80% 50%'
-                                }
-                                objectFit="cover"
-                                quality={100}
-                              />
-                            </motion.div>
-                          )
-                      )}
-                  </motion.div>
-                </div>
-              )}
-            </Accordion.Item>
+            ></Accordion.Item>
           </div>
           <div className="border-b border-[#111718]">
             <Accordion.Item
@@ -539,63 +307,7 @@ export default function LW8Releases() {
               disabled={!day5Shipped}
               className="h-[79px]"
               id={day5.d.toString()}
-            >
-              {day5.steps.length > 0 && (
-                <div className="h-[400px] flex flex-col gap-5 lg:flex-row pb-8">
-                  <motion.div
-                    className={`
-                      relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                      w-full border rounded-xl h-full px-4 sm:px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
-                    `}
-                    initial="default"
-                    animate="default"
-                    whileHover="hover"
-                  >
-                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
-                      <CartTitle>{day5.steps[0]?.title}</CartTitle>
-                      <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
-                    </div>
-                    <SectionButtons
-                      docs={day5.steps[0]?.docs}
-                      blog={day5.steps[0]?.blog}
-                      video={day5.steps[0]?.video}
-                      hackernews={day5.steps[0]?.hackernews}
-                      mobileGrid
-                    />
-                    {day5.steps[0]?.bg_layers &&
-                      day5.steps[0]?.bg_layers?.map(
-                        (layer, i) =>
-                          !!layer.img && (
-                            <motion.div
-                              className={['absolute inset-0 w-full h-full -z-10'].join(' ')}
-                              variants={getDay4Motion(i)}
-                            >
-                              <Image
-                                src={
-                                  !!layer.mobileImg && isTablet
-                                    ? (layer.mobileImg as any)
-                                    : layer.img
-                                }
-                                className={[
-                                  `
-                                  absolute
-                                  w-full h-full -z-10 transition-all duration-300
-                                `,
-                                ].join(' ')}
-                                layout="fill"
-                                objectPosition={
-                                  !!layer.mobileImg && isTablet ? '50% 65%' : '80% 50%'
-                                }
-                                objectFit="cover"
-                                quality={100}
-                              />
-                            </motion.div>
-                          )
-                      )}
-                  </motion.div>
-                </div>
-              )}
-            </Accordion.Item>
+            ></Accordion.Item>
           </div>
         </Accordion>
       </SectionContainer>
