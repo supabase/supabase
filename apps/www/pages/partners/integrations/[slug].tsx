@@ -11,7 +11,7 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import remarkGfm from 'remark-gfm'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/swiper.min.css'
-import { Admonition, IconChevronLeft, IconExternalLink } from 'ui'
+import { Admonition, Button, ExpandableVideo, IconChevronLeft, IconExternalLink } from 'ui'
 import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -60,7 +60,7 @@ function Partner({
           url: `https://supabase.com/partners/integrations/${partner.slug}`,
           images: [
             {
-              url: partner.images[0] ?? partner.logo,
+              url: partner.images ? partner.images[0] : partner.logo,
             },
           ],
         }}
@@ -137,7 +137,7 @@ function Partner({
                   },
                 }}
               >
-                {partner.images.map((image: any, i: number) => {
+                {partner.images?.map((image: any, i: number) => {
                   return (
                     <SwiperSlide key={i}>
                       <div className="relative ml-3 mr-3 block cursor-move overflow-hidden rounded-md">
@@ -157,8 +157,8 @@ function Partner({
               </Swiper>
             </div>
 
-            <div className="grid gap-3 space-y-16 lg:grid-cols-4 lg:space-y-0 lg:space-x-3">
-              <div className="lg:col-span-3">
+            <div className="grid lg:grid-cols-8 lg:space-x-12">
+              <div className="lg:col-span-5">
                 <h2
                   className="text-scale-1200"
                   style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
@@ -166,83 +166,93 @@ function Partner({
                   Overview
                 </h2>
 
-                {partner.video && (
-                  <div
-                    className="bg-scale-1000 relative w-full rounded-md shadow-lg"
-                    style={{ padding: '56.25% 0 0 0', marginBottom: '1rem' }}
-                  >
-                    <iframe
-                      title="Demo video showcasing Supabase"
-                      className="absolute h-full w-full rounded-md"
-                      src={`https://www.youtube-nocookie.com/embed/${partner.video}?autoplay=0&loop=0&controls=1&modestbranding=1&rel=0&disablekb=1`}
-                      style={{ top: 0, left: 0 }}
-                      frameBorder="0"
-                      allow="autoplay; modestbranding; encrypted-media"
-                    />
-                  </div>
-                )}
-
                 <div className="prose">
                   <MDXRemote {...overview} components={mdxComponents(setFocusedImage)} />
                 </div>
               </div>
 
-              <div>
-                <h2
-                  className="text-scale-1200"
-                  style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
-                >
-                  Details
-                </h2>
+              <div className="lg:col-span-3 order-first lg:order-last pt-16 lg:pt-0">
+                <div className="sticky top-20">
+                  <h2
+                    className="text-scale-1200"
+                    style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
+                  >
+                    Details
+                  </h2>
 
-                <div className="text-scale-1200 divide-y">
-                  {partner.type === 'technology' && (
-                    <div className="flex items-center justify-between py-2">
-                      <span className="text-scale-900">Developer</span>
-                      <span className="text-scale-1200">{partner.developer}</span>
+                  {partner.video && (
+                    <div className="mb-6">
+                      <ExpandableVideo
+                        imgUrl=""
+                        videoId={partner.video}
+                        imgOverlayText="Watch an introductory video"
+                      />
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-scale-900">Category</span>
-                    <Link href={`/partners/integrations#${partner.category.toLowerCase()}`}>
-                      <a className="text-brand-900 hover:text-brand-800 transition-colors">
-                        {partner.category}
-                      </a>
-                    </Link>
-                  </div>
+                  <div className="text-scale-1200 divide-y">
+                    {partner.type === 'technology' && (
+                      <div className="flex items-center justify-between py-2">
+                        <span className="text-scale-900">Developer</span>
+                        <span className="text-scale-1200">{partner.developer}</span>
+                      </div>
+                    )}
 
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-scale-900">Website</span>
-                    <a
-                      href={partner.website}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-brand-900 hover:text-brand-800 transition-colors"
-                    >
-                      {new URL(partner.website).host}
-                    </a>
-                  </div>
-
-                  {partner.type === 'technology' && partner.docs && (
                     <div className="flex items-center justify-between py-2">
-                      <span className="text-scale-900">Documentation</span>
+                      <span className="text-scale-900">Category</span>
+                      <Link href={`/partners/integrations#${partner.category.toLowerCase()}`}>
+                        <a className="text-brand hover:text-brand-300 transition-colors">
+                          {partner.category}
+                        </a>
+                      </Link>
+                    </div>
+
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-scale-900">Website</span>
                       <a
-                        href={partner.docs}
+                        href={partner.website}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-brand-900 hover:text-brand-800 transition-colors"
+                        className="text-brand hover:text-brand-300 transition-colors"
                       >
-                        <span className="flex items-center space-x-1">
-                          <span>Learn</span>
-                          <IconExternalLink size="small" />
-                        </span>
+                        {new URL(partner.website).host}
                       </a>
                     </div>
-                  )}
+
+                    {partner.type === 'technology' && partner.docs && (
+                      <div className="flex items-center justify-between py-2">
+                        <span className="text-scale-900">Documentation</span>
+                        <a
+                          href={partner.docs}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-brand hover:text-brand-300 transition-colors"
+                        >
+                          <span className="flex items-center space-x-1">
+                            <span>Learn</span>
+                            <IconExternalLink size="small" />
+                          </span>
+                        </a>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
+            {partner.call_to_action_link && (
+              <div className="bg-scale-100 dark:bg-scale-300 hover:border-scale-600 hover:dark:border-scale-700 border-scale-300 dark:border-scale-400 rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
+                <div className="flex flex-row justify-between">
+                  <h1 className="text-2xl font-medium self-center">
+                    Get started with {partner.title} and Supabase.
+                  </h1>
+                  <a href={partner.call_to_action_link} target="_blank" rel="noreferrer">
+                    <Button size="medium" type="secondary">
+                      Add integration
+                    </Button>
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
         </SectionContainer>
       </DefaultLayout>

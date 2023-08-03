@@ -1,5 +1,6 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { isResponseOk, post } from 'lib/common/fetch'
+import { BASE_PATH } from 'lib/constants'
 
 export type SqlTitleGenerateResponse = {
   title: string
@@ -11,7 +12,7 @@ export type SqlTitleGenerateVariables = {
 }
 
 export async function generateSqlTitle({ sql }: SqlTitleGenerateVariables) {
-  const response = await post<SqlTitleGenerateResponse>('/api/ai/sql/title', { sql })
+  const response = await post<SqlTitleGenerateResponse>(BASE_PATH + '/api/ai/sql/title', { sql })
 
   if (!isResponseOk(response)) {
     throw response.error

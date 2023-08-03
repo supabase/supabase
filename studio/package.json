@@ -17,6 +17,7 @@
     "codegen": "openapi-typescript http://localhost:8080/api-json -o ./data/api.d.ts"
   },
   "dependencies": {
+    "@dagrejs/dagre": "^1.0.2",
     "@graphiql/react": "^0.15.0",
     "@graphiql/toolkit": "^0.8.0",
     "@hcaptcha/react-hcaptcha": "^1.4.4",
@@ -95,6 +96,7 @@
     "react-virtualized-auto-sizer": "^1.0.6",
     "react-window": "^1.8.6",
     "react-window-infinite-loader": "^1.0.7",
+    "reactflow": "^11.7.4",
     "recharts": "^2.1.15",
     "sass": "^1.55.0",
     "scheduler": "^0.20.2",
