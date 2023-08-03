@@ -28,7 +28,7 @@ const ProjectsPage: NextPageWithLayout = () => {
     .flatMap((integration) => integration.connections)
 
   return (
-    <ScaffoldContainer>
+    <ScaffoldContainer className="h-full overflow-y-auto">
       <ScaffoldSection>
         <div className="col-span-12 space-y-8">
           <Link href={`/new/${organization?.slug}`}>

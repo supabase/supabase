@@ -262,7 +262,7 @@ const TransferProjectButton = () => {
                         <span>
                           {' '}
                           Your current organization will be granted{' '}
-                          <span className="text-brand-900">
+                          <span className="text-brand">
                             ${transferPreviewData.credits_on_source_organization}
                           </span>{' '}
                           in credits as proration.
@@ -277,7 +277,7 @@ const TransferProjectButton = () => {
                         <span>
                           {' '}
                           The target organization will be billed{' '}
-                          <span className="text-brand-900">
+                          <span className="text-brand">
                             ${transferPreviewData.costs_on_target_organization}
                           </span>{' '}
                           immediately to prorate for the remainder of the billing period.
