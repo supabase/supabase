@@ -9,7 +9,7 @@ import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEdi
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
@@ -21,6 +21,7 @@ const SideBarContent = observer(() => {
   const { ref, id } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
+  const sharedSnippetsFeature = useFlag<boolean>('sharedSnippets')
 
   const [personalSnippetsFilterString, setPersonalSnippetsFilterString] = useState('')
   const [projectSnippetsFilterString, setProjectSnippetsFilterString] = useState('')
@@ -224,7 +225,7 @@ const SideBarContent = observer(() => {
                 </div>
               )}
 
-              {projectSnippets.length >= 1 && (
+              {sharedSnippetsFeature && projectSnippets.length >= 1 && (
                 <div className="editor-product-menu">
                   <div className="flex flex-row justify-between">
                     <Menu.Group title="Project queries" />

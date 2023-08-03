@@ -6,7 +6,7 @@ import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEdi
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -16,9 +16,13 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import {
-  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   Dropdown,
+  IconAlertCircle,
+  IconAlertTriangle,
   IconChevronDown,
   IconCopy,
   IconEdit2,
@@ -86,6 +90,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
   const router = useRouter()
   const snap = useSqlEditorStateSnapshot()
   const { profile } = useProfile()
+  const sharedSnippetsFeature = useFlag<boolean>('sharedSnippets')
   const { mutate: deleteContent } = useContentDeleteMutation({
     onSuccess(data) {
       if (data.id) snap.removeSnippet(data.id)
@@ -180,12 +185,12 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
               <Dropdown.Item onClick={onClickRename} icon={<IconEdit2 size="tiny" />}>
                 Rename query
               </Dropdown.Item>
-              {visibility === 'user' && canCreateSQLSnippet && (
+              {sharedSnippetsFeature && visibility === 'user' && canCreateSQLSnippet && (
                 <Dropdown.Item onClick={onClickShare} icon={<IconShare size="tiny" />}>
                   Share query
                 </Dropdown.Item>
               )}
-              {visibility === 'project' && canCreateSQLSnippet && (
+              {sharedSnippetsFeature && visibility === 'project' && canCreateSQLSnippet && (
                 <Dropdown.Item onClick={createPersonalCopy} icon={<IconCopy size="tiny" />}>
                   Create a personal copy
                 </Dropdown.Item>
@@ -222,15 +227,33 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
         onComplete={onCloseRenameModal}
       />
       <ConfirmationModal
-        header="Confirm to delete"
+        header="Confirm to delete query"
         buttonLabel="Delete query"
         buttonLoadingLabel="Deleting query"
+        size="medium"
         visible={deleteModalOpen}
         onSelectConfirm={onConfirmDelete}
         onSelectCancel={() => setDeleteModalOpen(false)}
       >
         <Modal.Content>
-          <p className="py-4 text-sm text-scale-1100">{`Are you sure you want to delete '${name}'?`}</p>
+          <div className="my-6">
+            <div className="text-sm text-scale-1100 grid gap-4">
+              <div className="grid gap-1">
+                {sharedSnippetsFeature && visibility === 'project' && (
+                  <Alert_Shadcn_ variant="destructive" className="">
+                    <IconAlertCircle strokeWidth={2} />
+                    <AlertTitle_Shadcn_>
+                      This query will be deleted for all team members
+                    </AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      Deleting this query will remove it for all members of the project team.
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
+                <p className="mt-4">{`Are you sure you want to delete '${name}'?`}</p>
+              </div>
+            </div>
+          </div>
         </Modal.Content>
       </ConfirmationModal>
       <ConfirmationModal
@@ -246,14 +269,15 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
           <div className="my-6">
             <div className="text-sm text-scale-1100 grid gap-4">
               <div className="grid gap-1">
-                <Alert
-                  variant="warning"
-                  className="!px-4 !py-3"
-                  title="This SQL query will become public to all team members"
-                  withIcon
-                >
-                  <p>Anyone with access to the project can edit or delete this query.</p>
-                </Alert>
+                <Alert_Shadcn_ variant="warning">
+                  <IconAlertTriangle strokeWidth={2} />
+                  <AlertTitle_Shadcn_>
+                    This SQL query will become public to all team members
+                  </AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    Anyone with access to the project can edit or delete this query.
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
                 <ul className="mt-4 space-y-5">
                   <li className="flex gap-3">
                     <IconEye />
