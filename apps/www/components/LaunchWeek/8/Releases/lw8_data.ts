@@ -54,23 +54,16 @@ const days: WeekDayProps[] = [
     docs: '',
     steps: [
       {
-        title: 'How we made LW8',
+        title: 'Launch Week 8 constellation breakdown',
         blog: '/blog/launch-week-8-constellation-breakdown',
         bg_layers: [{ img: images['00-constellation'] }],
-        steps: [],
-      },
-      {
-        title: 'Postgres Language Server',
-        github: 'https://github.com/supabase/...',
-        hackernews: 'https://news.ycombinator.com/item?id=...',
-        // bg_layers: [{ img: images['0-supavisor-01'] }],
         steps: [],
       },
     ],
   },
   {
     title: '',
-    shipped: true,
+    shipped: false,
     date: '07 Aug',
     publishedAt: '2023-08-07T09:00:00.000-07:00',
     description: '',
@@ -83,7 +76,7 @@ const days: WeekDayProps[] = [
   },
   {
     title: '',
-    shipped: true,
+    shipped: false,
     date: '08 Aug',
     publishedAt: '2023-08-08T09:00:00.000-07:00',
     description: '',
@@ -96,7 +89,7 @@ const days: WeekDayProps[] = [
   },
   {
     title: '',
-    shipped: true,
+    shipped: false,
     date: '09 Aug',
     publishedAt: '2023-08-09T09:00:00.000-07:00',
     description: '',
@@ -109,7 +102,7 @@ const days: WeekDayProps[] = [
   },
   {
     title: '',
-    shipped: true,
+    shipped: false,
     date: '10 Aug',
     publishedAt: '2023-08-10T09:00:00.000-07:00',
     description: '',
@@ -122,7 +115,7 @@ const days: WeekDayProps[] = [
   },
   {
     title: '',
-    shipped: true,
+    shipped: false,
     date: '11 Aug',
     publishedAt: '2023-08-11T00:00:00.000-07:00',
     description: '',
