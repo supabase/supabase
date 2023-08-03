@@ -3,16 +3,20 @@ import { PropsWithChildren } from 'react'
 
 export interface ProjectUpdateDisabledTooltipProps {
   projectUpdateDisabled: boolean
+  projectNotActive?: boolean
 }
 
 const ProjectUpdateDisabledTooltip = ({
   projectUpdateDisabled,
+  projectNotActive = false,
   children,
 }: PropsWithChildren<ProjectUpdateDisabledTooltipProps>) => {
+  const showTooltip = projectUpdateDisabled || projectNotActive
+
   return (
     <Tooltip.Root delayDuration={0}>
       <Tooltip.Trigger asChild>{children}</Tooltip.Trigger>
-      {projectUpdateDisabled ? (
+      {showTooltip ? (
         <Tooltip.Portal>
           <Tooltip.Content side="bottom">
             <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -23,7 +27,11 @@ const ProjectUpdateDisabledTooltip = ({
               ].join(' ')}
             >
               <span className="text-xs text-scale-1200">
-                Subscription changes are currently disabled. Our engineers are working on a fix.
+                {projectUpdateDisabled
+                  ? 'Subscription changes are currently disabled. Our engineers are working on a fix.'
+                  : projectNotActive
+                  ? 'Unable to update subscription as project is currently not active'
+                  : ''}
               </span>
             </div>
           </Tooltip.Content>

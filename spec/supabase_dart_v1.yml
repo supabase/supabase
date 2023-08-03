@@ -1768,13 +1768,22 @@ functions:
       - id: conditional-chaining
         name: Conditional Chaining
         description: |
-          Filters can be built up one step at a time and then executed. For example:
+          Filters can be built up one step at a time and then executed as shown in the example code.
         code: |
           ```dart
-          final data = await supabase
-            .from('users')
-            .select()
-            .eq('address->postcode', 90210);
+          final filterByName = null;
+          final filterPopLow = 1000;
+          final filterPopHigh = 10000;
+
+          var query = supabase
+            .from('cities')
+            .select('name, country_id');
+
+          if (filterByName != null)  { query = query.eq('name', filterByName); }
+          if (filterPopLow != null)  { query = query.gte('population', filterPopLow); }
+          if (filterPopHigh != null) { query = query.lt('population', filterPopHigh); }
+
+          final data = await query;
           ```
       - id: filter-by-value-within-json-column
         name: Filter by values within a JSON column

@@ -13,9 +13,9 @@ import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
-import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, IconInfo, Modal, Radio, SidePanel } from 'ui'
 
@@ -356,8 +356,8 @@ const ComputeInstanceSidePanel = () => {
 
             {selectedCategory === 'micro' && (
               <p className="text-sm text-scale-1100">
-                Your database will use the standard Micro size instance of 2-core {cpuArchitecture} CPU (Shared)
-                with 1GB of memory.
+                Your database will use the standard Micro size instance of 2-core {cpuArchitecture}{' '}
+                CPU (Shared) with 1GB of memory.
               </p>
             )}
 

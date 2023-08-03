@@ -19,8 +19,5 @@ export const gotrueClient = new GoTrueClient({
   storageKey: STORAGE_KEY,
   detectSessionInUrl: true,
   debug,
-  lock:
-    (debug || navigatorLockEnabled) && globalThis.navigator && globalThis.navigator.locks
-      ? navigatorLock
-      : undefined,
+  lock: navigatorLockEnabled ? navigatorLock : undefined,
 })
