@@ -5,8 +5,8 @@
 export const CHART_COLORS = {
   TICK: 'var(--colors-scale6)',
   AXIS: 'var(--colors-scale6)',
-  GREEN_1: 'var(--colors-brand9)', // #3ECF8E
-  GREEN_2: 'var(--colors-brand6)',
+  GREEN_1: 'hsl(var(--brand-default))', // #3ECF8E
+  GREEN_2: 'hsl(var(--brand-500))',
 }
 
 // refer to packages/ui/radix-colors.js for full list of colors
@@ -25,8 +25,8 @@ export const STACK_COLORS = [
 }))
 
 export const USAGE_COLORS = {
-  200: 'var(--colors-brand9)',
-  201: 'var(--colors-brand8)',
+  200: 'hsl(var(--brand-default))',
+  201: 'hsl(var(--brand-500))',
   400: 'var(--colors-amber9)',
   401: 'var(--colors-amber8)',
   404: 'var(--colors-amber7)',

@@ -2,8 +2,8 @@ import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
-import { databaseKeys } from './keys'
 import { ResponseError } from 'types'
+import { databaseKeys } from './keys'
 
 export type PoolingConfigurationVariables = {
   projectRef: string
@@ -23,6 +23,7 @@ export type PoolingConfiguration = {
   pgbouncer_enabled: boolean
   pgbouncer_status: string
   pool_mode: string
+  connectionString: string
 }
 
 export async function getPoolingConfiguration(

@@ -6,8 +6,8 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
-import { getVercelConfigurationUrl } from 'lib/integration-utils'
 import { Badge, Button, IconArrowRight, IconExternalLink, IconGitHub, IconSquare, cn } from 'ui'
+import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
@@ -24,9 +24,9 @@ const HandleIcon = ({ type, className }: { type: HandleIconType; className?: str
     case 'GitHub':
       return <IconGitHub strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
       break
-    case 'Netlify':
-      return <IconSquare strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
-      break
+    // case 'Netlify':
+    //   return <IconSquare strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
+    //   break
     case 'Vercel':
       return (
         <svg
@@ -35,7 +35,7 @@ const HandleIcon = ({ type, className }: { type: HandleIconType; className?: str
           viewBox="0 0 512 512"
           className={cn('w-3.5', className)}
         >
-          <path fill-rule="evenodd" d="M256,48,496,464H16Z" />
+          <path fillRule="evenodd" d="M256,48,496,464H16Z" />
         </svg>
       )
 
@@ -79,7 +79,7 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
       <li
         ref={ref}
         key={integration.id}
-        className="bg border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg"
+        className="bg-surface-100 border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg"
         {...props}
       >
         <div className="flex gap-6 items-center">
@@ -92,8 +92,10 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
           <div className="flex flex-col gap-0">
             <div className="flex items-center gap-2">
               <span className="text-scale-1200 font-medium">
-                {/* {title} integration connection •{' '} */}
-                {integration.metadata?.account.name || integration.metadata?.gitHubConnectionOwner}
+                {integration.metadata?.account.name ||
+                  (integration.metadata !== undefined &&
+                    'gitHubConnectionOwner' in integration.metadata &&
+                    integration.metadata?.gitHubConnectionOwner)}
               </span>
 
               <Badge color="scale" className="capitalize">
@@ -112,9 +114,8 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
         </div>
 
         <Button type="default" asChild iconRight={<IconExternalLink />}>
-          {/* hard coded to vercel for now, TODO: move to a prop */}
           <a
-            href={getVercelConfigurationUrl(integration)}
+            href={getIntegrationConfigurationUrl(integration)}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -145,7 +146,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
         className={cn('ml-6 pl-8 pb-2 border-l border-scale-600 dark:border-scale-400', 'relative')}
       >
         <div className="absolute w-8 rounded-bl-full border-b border-l border-scale-600 dark:border-scale-400 h-10 -left-px"></div>
-        <div className="bg border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg">
+        <div className="bg-surface-100 border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg">
           <div className="flex flex-col gap-1">
             <div className="flex gap-2 items-center">
               <HandleIcon type={'Supabase'} />
@@ -153,7 +154,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
               <IconArrowRight size={14} className="text-scale-900" strokeWidth={1.5} />
               {!connection?.metadata?.framework ? (
                 <div className="bg-black text-white w-4 h-4 rounded flex items-center justify-center">
-                  <HandleIcon type={'Vercel'} className={'!w-2.5'} />
+                  <HandleIcon type={type} className={'!w-2.5'} />
                 </div>
               ) : (
                 <img
@@ -193,7 +194,9 @@ const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationC
         ref={ref}
         key={connection.id}
         {...props}
-        className={cn('bg border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg')}
+        className={cn(
+          'bg-surface-100 border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg'
+        )}
       >
         <div className="flex flex-col gap-1">
           <div className="flex gap-2 items-center">

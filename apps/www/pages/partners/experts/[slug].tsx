@@ -32,7 +32,7 @@ function Partner({
           url: `https://supabase.com/partners/experts/${partner.slug}`,
           images: [
             {
-              url: partner.images[0] ?? partner.logo,
+              url: partner.images ? partner.images[0] : partner.logo,
             },
           ],
         }}
@@ -92,7 +92,7 @@ function Partner({
                   },
                 }}
               >
-                {partner.images.map((image: any, i: number) => {
+                {partner.images?.map((image: any, i: number) => {
                   return (
                     <SwiperSlide key={i}>
                       <div className="relative ml-3 mr-3 block cursor-move overflow-hidden rounded-md">
@@ -160,7 +160,7 @@ function Partner({
                   <div className="flex items-center justify-between py-2">
                     <span className="text-scale-900">Category</span>
                     <Link href={`/partners/experts#${partner.category.toLowerCase()}`}>
-                      <a className="text-brand-900 hover:text-brand-800 transition-colors">
+                      <a className="text-brand hover:text-brand-300 transition-colors">
                         {partner.category}
                       </a>
                     </Link>
@@ -172,20 +172,20 @@ function Partner({
                       href={partner.website}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-brand-900 hover:text-brand-800 transition-colors"
+                      className="text-brand hover:text-brand-300 transition-colors"
                     >
                       {new URL(partner.website).host}
                     </a>
                   </div>
 
-                  {partner.type === 'technology' && (
+                  {partner.type === 'technology' && partner.docs && (
                     <div className="flex items-center justify-between py-2">
                       <span className="text-scale-900">Documentation</span>
                       <a
                         href={partner.docs}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-brand-900 hover:text-brand-800 transition-colors"
+                        className="text-brand hover:text-brand-300 transition-colors"
                       >
                         <span className="flex items-center space-x-1">
                           <span>Learn</span>

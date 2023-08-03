@@ -5,7 +5,10 @@ import { useMemo } from 'react'
 import { useParams, useTheme } from 'common'
 import { getAddons } from 'components/interfaces/BillingV2/Subscription/Subscription.utils'
 import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  useIsProjectActive,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -17,21 +20,32 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useFlag } from 'hooks'
+import { useFlag, useProjectByRef } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH } from 'lib/constants'
 import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { Alert, Button, IconChevronRight, IconExternalLink } from 'ui'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertCircle,
+  IconChevronRight,
+  IconExternalLink,
+} from 'ui'
 import { ComputeInstanceSidePanel, CustomDomainSidePanel, PITRSidePanel } from './'
 
 const Addons = () => {
   const { isDarkMode } = useTheme()
-  const { ref: projectRef } = useParams()
+  const { ref: projectRef, panel } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { project: selectedProject } = useProjectContext()
-  const { panel } = useParams()
 
+  const parentProject = useProjectByRef(selectedProject?.parent_project_ref)
+  const isBranch = parentProject !== undefined
+  const isProjectActive = useIsProjectActive()
   const allowedPanelValues = ['computeInstance', 'pitr', 'customDomain']
   if (panel && typeof panel === 'string' && allowedPanelValues.includes(panel)) {
     snap.setPanelKey(panel as SUBSCRIPTION_PANEL_KEYS)
@@ -74,6 +88,25 @@ const Addons = () => {
       </ScaffoldContainer>
 
       <ScaffoldDivider />
+
+      {isBranch && (
+        <ScaffoldContainer>
+          <Alert_Shadcn_ variant="default" className="mt-6">
+            <IconAlertCircle strokeWidth={2} />
+            <AlertTitle_Shadcn_>
+              You are currently on a preview branch of your project
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Updating addons are not available while you're on a preview branch. To manage your
+              addons, you may return to your{' '}
+              <Link passHref href={`/project/${parentProject.ref}/settings/general`}>
+                <a className="text-brand-900">main branch</a>
+              </Link>
+              .
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        </ScaffoldContainer>
+      )}
 
       {isLoading && (
         <ScaffoldContainer>
@@ -150,12 +183,15 @@ const Addons = () => {
                   <div className="flex-grow">
                     <p className="text-sm text-scale-1000">Current option:</p>
                     <p className="">{computeInstance?.variant.name ?? 'Micro'}</p>
-                    <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
+                    <ProjectUpdateDisabledTooltip
+                      projectUpdateDisabled={projectUpdateDisabled}
+                      projectNotActive={!isProjectActive}
+                    >
                       <Button
                         type="default"
-                        className="mt-2"
+                        className="mt-2 pointer-events-auto"
                         onClick={() => snap.setPanelKey('computeInstance')}
-                        disabled={projectUpdateDisabled}
+                        disabled={isBranch || !isProjectActive || projectUpdateDisabled}
                       >
                         Change optimized compute
                       </Button>
@@ -342,12 +378,15 @@ const Addons = () => {
                         ? `Point in time recovery of ${pitr.variant.meta?.backup_duration_days} days is enabled`
                         : 'Point in time recovery is not enabled'}
                     </p>
-                    <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
+                    <ProjectUpdateDisabledTooltip
+                      projectUpdateDisabled={projectUpdateDisabled}
+                      projectNotActive={!isProjectActive}
+                    >
                       <Button
                         type="default"
-                        className="mt-2"
+                        className="mt-2 pointer-events-auto"
                         onClick={() => snap.setPanelKey('pitr')}
-                        disabled={projectUpdateDisabled}
+                        disabled={isBranch || !isProjectActive || projectUpdateDisabled}
                       >
                         Change point in time recovery
                       </Button>
@@ -403,12 +442,15 @@ const Addons = () => {
                         ? 'Custom domain is enabled'
                         : 'Custom domain is not enabled'}
                     </p>
-                    <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
+                    <ProjectUpdateDisabledTooltip
+                      projectUpdateDisabled={projectUpdateDisabled}
+                      projectNotActive={!isProjectActive}
+                    >
                       <Button
                         type="default"
-                        className="mt-2"
+                        className="mt-2 pointer-events-auto"
                         onClick={() => snap.setPanelKey('customDomain')}
-                        disabled={projectUpdateDisabled}
+                        disabled={isBranch || !isProjectActive || projectUpdateDisabled}
                       >
                         Change custom domain
                       </Button>

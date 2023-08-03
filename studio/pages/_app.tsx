@@ -62,6 +62,11 @@ dayjs.extend(relativeTime)
 
 dart(Prism)
 
+// [Joshen TODO] Once we settle on the new nav layout - we'll need a lot of clean up in terms of our layout components
+// a lot of them are unnecessary and introduce way too many cluttered CSS especially with the height styles that make
+// debugging way too difficult. Ideal scenario is we just have one AppLayout to control the height and scroll areas of
+// the dashboard, all other layout components should not be doing that
+
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const queryClient = useRootQueryClient()
   const [rootStore] = useState(() => new RootStore())

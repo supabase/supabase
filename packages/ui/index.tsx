@@ -62,14 +62,22 @@ export * from './src/components/Form'
 // CMD+K
 export * from './src/components/Command'
 
+// Widgets
+export * from './src/components/CountdownWidget'
+
 // layout
 export * from './src/components/LoadingLine'
 
 // banners
 export * from './src/layout/banners'
 
+// ai icon
+export * from './src/layout/ai-icon-animation'
+
 // utilities
 export * from './src/lib/utils'
+
+// animated ui
 
 // shadcn
 
@@ -119,6 +127,8 @@ export {
   AlertDescription as AlertDescription_Shadcn_,
 } from './src/components/shadcn/ui/alert'
 
+export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
+
 export {
   useFormField as useFormField_Shadcn_,
   Form as Form_Shadcn_,
@@ -135,6 +145,13 @@ export {
   PopoverTrigger as PopoverTrigger_Shadcn_,
   PopoverContent as PopoverContent_Shadcn_,
 } from './src/components/shadcn/ui/popover'
+
+export {
+  Accordion as Accordion_Shadcn_,
+  AccordionItem as AccordionItem_Shadcn_,
+  AccordionTrigger as AccordionTrigger_Shadcn_,
+  AccordionContent as AccordionContent_Shadcn_,
+} from './src/components/shadcn/ui/accordion'
 
 // links
 

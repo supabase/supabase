@@ -592,11 +592,6 @@ module.exports = [
   },
   {
     permanent: false,
-    source: '/partners',
-    destination: '/partners/integrations',
-  },
-  {
-    permanent: false,
     source: '/learn-more',
     destination: '/?utm_source=event&utm_medium=billboard&utm_campaign=aws-atlanta',
   },
@@ -1714,6 +1709,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/with-kotlin',
+    destination: '/docs/guides/getting-started/tutorials/with-kotlin',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/with-ionic-react',
     destination: '/docs/guides/getting-started/tutorials/with-ionic-react',
   },
@@ -1923,11 +1923,6 @@ module.exports = [
     source: '/docs/support',
     destination: '/support',
   },
-  {
-    permanent: true,
-    source: '/docs/guides/cli/local-development',
-    destination: '/docs/guides/getting-started/local-development',
-  },
 
   // old case studies moved to /customers
 
@@ -2070,6 +2065,16 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/ai/choosing-instance-type',
     destination: '/docs/guides/ai/choosing-compute-addon',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/using-environment-variables-in-config',
+    destination: '/docs/guides/cli/managing-config',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/local-development',
+    destination: '/docs/guides/cli/local-development',
   },
   {
     permanent: true,
