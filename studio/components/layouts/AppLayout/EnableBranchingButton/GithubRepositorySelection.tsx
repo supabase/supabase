@@ -31,15 +31,15 @@ import { Integration } from 'data/integrations/integrations.types'
 interface GithubRepositorySelectionProps {
   integration?: Integration
   selectedBranch?: string
+  hasGithubIntegrationInstalled: boolean
   setSelectedBranch: (name: string) => void
   onSelectConnectRepo: () => void
 }
 
-// [Joshen TODO] Integrate the Github repo selector
-
 const GithubRepositorySelection = ({
   integration,
   selectedBranch,
+  hasGithubIntegrationInstalled,
   setSelectedBranch,
   onSelectConnectRepo,
 }: GithubRepositorySelectionProps) => {
@@ -66,7 +66,10 @@ const GithubRepositorySelection = ({
 
   return (
     <div
-      className={clsx('border-t border-b', !integration ? 'border-warning-300 bg-warning-200' : '')}
+      className={clsx(
+        'border-t border-b',
+        !hasGithubIntegrationInstalled ? 'border-warning-300 bg-warning-200' : ''
+      )}
     >
       <Modal.Content className="px-7">
         <div className="py-6">
@@ -79,7 +82,7 @@ const GithubRepositorySelection = ({
               ? 'Your database preview branches will be based on the branches in the following repository that your project is connected with:'
               : 'Your database preview branches will be based on the branches in the Git repository that your project is connected with.'}
           </p>
-          {!integration && (
+          {!hasGithubIntegrationInstalled && (
             <Link passHref href="/">
               <a target="_blank" rel="noreferrer">
                 <Button type="default" className="!mt-3">
@@ -88,7 +91,7 @@ const GithubRepositorySelection = ({
               </a>
             </Link>
           )}
-          {integration && !githubConnection && (
+          {hasGithubIntegrationInstalled && !githubConnection && (
             <EmptyIntegrationConnection showNode={false} onClick={() => onSelectConnectRepo()} />
           )}
           {integration && githubConnection && (

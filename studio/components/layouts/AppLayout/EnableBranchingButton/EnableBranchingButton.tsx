@@ -46,6 +46,8 @@ const EnableBranchingButton = () => {
   const hasAccessToBranching =
     selectedOrg?.opt_in_tags?.includes('PREVIEW_BRANCHES_OPT_IN') ?? false
 
+  const hasGithubIntegrationInstalled =
+    integrations?.some((integration) => integration.integration.name === 'GitHub') ?? false
   const githubIntegration = integrations?.find(
     (integration) =>
       integration.integration.name === 'GitHub' &&
@@ -119,6 +121,7 @@ const EnableBranchingButton = () => {
             <GithubRepositorySelection
               integration={githubIntegration}
               selectedBranch={selectedBranch}
+              hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
               setSelectedBranch={setSelectedBranch}
               onSelectConnectRepo={() => setAddConnectionType('GitHub')}
             />
