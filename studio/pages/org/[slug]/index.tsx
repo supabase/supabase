@@ -20,7 +20,9 @@ const ProjectsPage: NextPageWithLayout = () => {
   } = useProjectsQuery()
 
   const organization = useSelectedOrganization()
-  const projects = allProjects?.filter((project) => project.organization_id === organization?.id)
+  const projects = allProjects
+    ?.filter((project) => project.organization_id === organization?.id)
+    .sort((a, b) => a.name.localeCompare(b.name))
 
   return (
     <ScaffoldContainer className="h-full overflow-y-auto">

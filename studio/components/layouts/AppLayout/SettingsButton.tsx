@@ -25,7 +25,7 @@ const SettingsButton = () => {
               'border border-scale-200',
             ].join(' ')}
           >
-            <span className="text-xs text-scale-1200">Settings</span>
+            <span className="text-xs text-scale-1200">Organization settings</span>
           </div>
         </Tooltip.Content>
       </Tooltip.Portal>
