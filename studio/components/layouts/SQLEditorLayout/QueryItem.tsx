@@ -240,11 +240,9 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
             <div className="text-sm text-scale-1100 grid gap-4">
               <div className="grid gap-1">
                 {sharedSnippetsFeature && visibility === 'project' && (
-                  <Alert_Shadcn_ variant="destructive" className="">
+                  <Alert_Shadcn_ variant="destructive">
                     <IconAlertCircle strokeWidth={2} />
-                    <AlertTitle_Shadcn_>
-                      This query will be deleted for all team members
-                    </AlertTitle_Shadcn_>
+                    <AlertTitle_Shadcn_>This SQL snippet will be lost forever</AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_>
                       Deleting this query will remove it for all members of the project team.
                     </AlertDescription_Shadcn_>
