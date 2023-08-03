@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import {
   Badge,
   Button,
@@ -26,7 +26,6 @@ import { useFlag, useSelectedOrganization } from 'hooks'
 const OrganizationDropdown = () => {
   const router = useRouter()
   const orgCreationV2 = useFlag('orgcreationv2')
-  const orgNameRef = useRef<HTMLAnchorElement>(null)
   const selectedOrganization = useSelectedOrganization()
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
 
@@ -39,35 +38,30 @@ const OrganizationDropdown = () => {
   )
 
   const [open, setOpen] = useState(false)
-  const popoverOffset = (orgNameRef.current?.offsetWidth ?? 0) + 12
 
   if (isLoadingOrganizations) {
     return <ShimmeringLoader className="w-[90px]" />
   }
 
   return (
-    <div className="flex items-center space-x-2 px-2">
-      <Link passHref href={slug ? `/org/${slug}` : '/'}>
-        <a ref={orgNameRef} className="flex items-center space-x-2">
-          <p className="text-sm">{orgName}</p>
-          {isSuccess && <Badge color="scale">{subscription?.plan.name}</Badge>}
-        </a>
-      </Link>
-
+    <div className="flex items-center px-2">
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
-          <Button
-            type="text"
-            className="px-1"
-            icon={<IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />}
-          />
+          <div className="flex items-center space-x-2 cursor-pointer">
+            <Button
+              type="text"
+              iconRight={
+                <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />
+              }
+            >
+              <div className="flex items-center space-x-2">
+                <p className="text-sm">{orgName}</p>
+                {isSuccess && <Badge color="scale">{subscription?.plan.name}</Badge>}
+              </div>
+            </Button>
+          </div>
         </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_
-          className="p-0"
-          side="bottom"
-          align="start"
-          style={{ marginLeft: `-${popoverOffset}px` }}
-        >
+        <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
           <Command_Shadcn_>
             <CommandInput_Shadcn_ placeholder="Find organization..." />
             <CommandList_Shadcn_>
