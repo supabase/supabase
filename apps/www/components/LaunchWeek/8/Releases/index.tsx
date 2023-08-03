@@ -90,49 +90,10 @@ export const moveX10 = {
   },
 }
 
-const getDay1Motion = (index: number) => {
-  switch (index) {
-    case 1:
-    case 2:
-      return moveX10
-    case 3:
-      return opacityVariant2
-    default:
-      return undefined
-  }
-}
-const getDay2Motion = (index: number) => {
-  switch (index) {
-    case 1:
-      return opacityVariant3
-    default:
-      return undefined
-  }
-}
-const getDay3Motion = (index: number) => {
-  switch (index) {
-    case 1:
-      return scaleOpacityVariant
-    case 2:
-      return opacityVariant3
-    default:
-      return undefined
-  }
-}
-const getDay4Motion = (index: number) => {
-  switch (index) {
-    case 0:
-      return opacityVariant4
-    // case 2:
-    //   return opacityVariant3
-    default:
-      return undefined
-  }
-}
-
 export default function LW8Releases() {
   const [preRelease, day1, day2, day3, day4, day5] = days
   const isTablet = useBreakpoint(1023)
+  const isDesktop = useBreakpoint(1280)
   const showAll = false
   const publishedSections =
     days
@@ -180,8 +141,8 @@ export default function LW8Releases() {
                 <div className="h-[400px] flex flex-col gap-5 lg:flex-row pb-4">
                   <motion.div
                     className={`
-                      relative overflow-hidden group/3 flex-1 flex flex-col items-start justify-between
-                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl h-full bg-no-repeat py-10 sm:py-14 px-8 lg:px-10 text-2xl bg-contain shadow-lg
+                      relative overflow-hidden group/3 flex-1 flex flex-col items-center lg:items-start justify-between
+                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl h-full bg-no-repeat py-10 lg:py-14 px-8 lg:px-10 text-2xl bg-contain shadow-lg
                       `}
                     initial="default"
                     animate="default"
@@ -193,8 +154,10 @@ export default function LW8Releases() {
                         background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, #030A0C)`,
                       }}
                     />
-                    <div className="flex flex-col items-center md:items-start gap-2 min-w-[300px] w-full">
-                      <CartTitle>{preRelease.steps[0]?.title}</CartTitle>
+                    <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
+                      <CartTitle>
+                        Launch Week 8<br /> constellation breakdown
+                      </CartTitle>
                       <p className="text-sm text-slate-900">{preRelease.steps[0]?.description}</p>
                     </div>
                     <SectionButtons blog={preRelease.steps[0].blog} />
@@ -207,13 +170,19 @@ export default function LW8Releases() {
                               variants={i === 1 ? scaleOpacityVariant : undefined}
                             >
                               <Image
-                                src={layer.img}
+                                src={
+                                  !!layer.mobileImg && isTablet
+                                    ? (layer.mobileImg as any)
+                                    : layer.img
+                                }
                                 className={`
                                   absolute opacity-90
                                   w-full h-full -z-10 transition-all duration-300
                                 `}
                                 layout="fill"
-                                objectPosition="80% 50%"
+                                objectPosition={
+                                  isTablet ? '50%' : isDesktop ? '200% 50%' : '100% 50%'
+                                }
                                 objectFit="contain"
                               />
                             </motion.div>

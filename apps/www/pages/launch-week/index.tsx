@@ -24,7 +24,6 @@ const AnimatedParticles = dynamic(
 )
 const LW8Releases = dynamic(() => import('~/components/LaunchWeek/8/Releases'))
 const LW8Meetups = dynamic(() => import('~/components/LaunchWeek/8/LW8Meetups'))
-const LWArchive = dynamic(() => import('~/components/LaunchWeek/8/LWArchive'))
 const TicketContainer = dynamic(() => import('~/components/LaunchWeek/8/Ticket/TicketContainer'))
 const LaunchWeekPrizeSection = dynamic(
   () => import('~/components/LaunchWeek/8/LaunchWeekPrizeSection')
@@ -144,7 +143,7 @@ export default function TicketHome({ users, meetups }: Props) {
                     <LaunchWeekLogoHeader />
                   </div>
                   <div className="absolute inset-0 z-0">
-                    {supabase && <AnimatedParticles />}
+                    <AnimatedParticles />
                     <Image
                       src="/images/launchweek/8/stars.svg"
                       alt="starts background"
@@ -192,10 +191,6 @@ export default function TicketHome({ users, meetups }: Props) {
               <LW8Meetups meetups={meetups} />
             </SectionContainer>
 
-            {/* <SectionContainer id="archive">
-              <LWArchive />
-            </SectionContainer> */}
-
             <div
               id="ticket"
               className="relative !w-full max-w-[100vw] min-h-[400px] !px-4 sm:max-w-xl md:max-w-4xl lg:max-w-7xl z-20 flex flex-col justify-around items-center !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !mx-auto"
@@ -227,7 +222,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const { data: users } = await supabaseAdmin!
     .from('lw8_tickets_golden')
     .select('username, golden')
-    .limit(1000)
+    .limit(17)
 
   const { data: meetups } = await supabaseAdmin!.from('lw8_meetups').select('*')
 

@@ -1,5 +1,6 @@
 const images = {
-  '00-constellation': '/images/launchweek/8/day0/constellation.svg',
+  '00-constellation': '/images/launchweek/8/day0/constellation-pre.svg',
+  '00-constellation-mobile': '/images/launchweek/8/day0/constellation.svg',
 }
 
 export interface StepProps {
@@ -56,7 +57,9 @@ const days: WeekDayProps[] = [
       {
         title: 'Launch Week 8 constellation breakdown',
         blog: '/blog/launch-week-8-constellation-breakdown',
-        bg_layers: [{ img: images['00-constellation'] }],
+        bg_layers: [
+          { img: images['00-constellation'], mobileImg: images['00-constellation-mobile'] },
+        ],
         steps: [],
       },
     ],
