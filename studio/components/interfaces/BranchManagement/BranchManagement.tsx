@@ -43,7 +43,7 @@ const BranchManagement = () => {
   const isBranchingAllowed = true
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
-  const hasBranchEnabled = projectDetails?.has_branch_enabled
+  const hasBranchEnabled = projectDetails?.is_branch_enabled
   const projectRef =
     projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
 
@@ -55,12 +55,10 @@ const BranchManagement = () => {
   const { data: integrations, isLoading: isLoadingIntegrations } = useOrgIntegrationsQuery({
     orgSlug: selectedOrg?.slug,
   })
-  const githubIntegration = integrations?.find(
-    (integration) =>
-      integration.integration.name === 'GitHub' &&
-      integration.organization.slug === selectedOrg?.slug
-  )
-  const githubConnection = githubIntegration?.connections.find(
+  const githubConnections = integrations
+    ?.filter((integration) => integration.integration.name === 'GitHub')
+    .flatMap((integration) => integration.connections)
+  const githubConnection = githubConnections?.find(
     (connection) => connection.supabase_project_ref === ref
   )
 

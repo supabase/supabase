@@ -42,6 +42,13 @@ export interface paths {
     /** Get infrastructure status */
     get: operations["StatusController_getStatus"];
   };
+  "/platform/projects-resource-warnings": {
+    /**
+     * Gets resource warnings for all projects accessible by the user 
+     * @description Only returns the minimal project info
+     */
+    get: operations["ProjectsResourceWarningsController_getProjectsResourceWarnings"];
+  };
   "/platform/auth/{ref}/config": {
     /** Gets GoTrue config */
     get: operations["GoTrueConfigController_getGoTrueConfig"];
@@ -99,7 +106,7 @@ export interface paths {
     get: operations["HooksController_getHookLogs"];
   };
   "/platform/database/{ref}/hook-enable": {
-    /** Enables hooks on the project */
+    /** Enables Database Webhooks on the project */
     post: operations["HooksController_enableHooks"];
   };
   "/platform/database/{ref}/owner-reassign": {
@@ -713,6 +720,8 @@ export interface paths {
   "/platform/integrations/vercel/connections/{connection_id}": {
     /** Deletes vercel project connection */
     delete: operations["VercelConnectionsController_deleteVercelConnection"];
+    /** Updates a Vercel connection for a supabase project */
+    patch: operations["VercelConnectionsController_updateVercelConnection"];
   };
   "/platform/integrations/github": {
     /** Create github integration */
@@ -729,6 +738,8 @@ export interface paths {
   "/platform/integrations/github/connections/{connection_id}": {
     /** Deletes github project connection */
     delete: operations["GitHubConnectionsController_deleteGitHubConnection"];
+    /** Updates a GitHub connection for a supabase project */
+    patch: operations["GitHubConnectionsController_updateGitHubConnection"];
   };
   "/platform/integrations/github/repos/{organization_integration_id}": {
     /** Gets github repos for the given organization */
@@ -737,6 +748,10 @@ export interface paths {
   "/platform/integrations/github/branches/{organization_integration_id}/{repo_owner}/{repo_name}": {
     /** Gets github branches for a given repo */
     get: operations["GitHubBranchController_getBranches"];
+  };
+  "/platform/integrations/github/pull-requests/{organization_integration_id}/{repo_owner}/{repo_name}/{target}": {
+    /** Gets github pull requests for a given repo */
+    get: operations["GitHubPullRequestController_getPullRequests"];
   };
   "/system/auth/{ref}/templates/{template}": {
     /** Gets GoTrue template */
@@ -813,6 +828,10 @@ export interface paths {
   "/system/billing/migrate/org-level-billing-preview": {
     /** Previews the migration of the organization to the new org level billing. */
     post: operations["BillingMigrationController_preview"];
+  };
+  "/system/projects/{ref}/config/update-jwt/complete": {
+    /** Handle update project jwt on completion */
+    post: operations["ProjectUpdateJwtController_completeUpdateJwt"];
   };
   "/system/integrations/vercel/webhooks": {
     /** Processes Vercel event */
@@ -899,7 +918,7 @@ export interface paths {
     get: operations["HooksController_getHookLogs"];
   };
   "/v0/database/{ref}/hook-enable": {
-    /** Enables hooks on the project */
+    /** Enables Database Webhooks on the project */
     post: operations["HooksController_enableHooks"];
   };
   "/v0/organizations": {
@@ -1371,10 +1390,6 @@ export interface paths {
     /** Updates project's postgrest config */
     patch: operations["PostgrestConfigController_updatePostgRESTConfig"];
   };
-  "/v1/projects/{ref}/database/query": {
-    /** Run sql query */
-    post: operations["QueryController_runQuery"];
-  };
   "/v1/projects/{ref}/secrets": {
     /**
      * List all secrets 
@@ -1457,6 +1472,28 @@ export interface paths {
     /** Updates a project's auth config */
     patch: operations["V1AuthConfigController_updateV1AuthConfig"];
   };
+  "/v1/projects/{ref}/config/auth/sso/providers": {
+    /** Lists all SSO providers */
+    get: operations["ProvidersController_listAllProviders"];
+    /** Creates a new SSO provider */
+    post: operations["ProvidersController_createProviderForProject"];
+  };
+  "/v1/projects/{ref}/config/auth/sso/providers/{provider_id}": {
+    /** Gets a SSO provider by its UUID */
+    get: operations["ProvidersController_getProviderById"];
+    /** Updates a SSO provider by its UUID */
+    put: operations["ProvidersController_updateProviderById"];
+    /** Removes a SSO provider by its UUID */
+    delete: operations["ProvidersController_removeProviderById"];
+  };
+  "/v1/projects/{ref}/database/query": {
+    /** Run sql query */
+    post: operations["V1QueryController_v1RunQuery"];
+  };
+  "/v1/projects/{ref}/database/webhooks/enable": {
+    /** Enables Database Webhooks on the project */
+    post: operations["V1DatabaseWebhooksController_v1EnableDatabaseWebhooks"];
+  };
   "/v1/projects/{ref}/functions": {
     /**
      * List all functions 
@@ -1492,20 +1529,6 @@ export interface paths {
      * @description Retrieves a function body for the specified slug and project.
      */
     get: operations["FunctionSlugController_getFunctionBody"];
-  };
-  "/v1/projects/{ref}/config/auth/sso/providers": {
-    /** Lists all SSO providers */
-    get: operations["ProvidersController_listAllProviders"];
-    /** Creates a new SSO provider */
-    post: operations["ProvidersController_createProviderForProject"];
-  };
-  "/v1/projects/{ref}/config/auth/sso/providers/{provider_id}": {
-    /** Gets a SSO provider by its UUID */
-    get: operations["ProvidersController_getProviderById"];
-    /** Updates a SSO provider by its UUID */
-    put: operations["ProvidersController_updateProviderById"];
-    /** Removes a SSO provider by its UUID */
-    delete: operations["ProvidersController_removeProviderById"];
   };
   "/v1/organizations": {
     /**
@@ -1611,6 +1634,14 @@ export interface components {
       email: string;
       password: string;
       redirectTo?: string;
+    };
+    ProjectResourceWarningsResponse: {
+      project: string;
+      is_readonly_mode_enabled: boolean;
+      is_disk_io_budget_below_threshold: boolean;
+      is_disk_space_usage_beyond_threshold: boolean;
+      is_cpu_load_beyond_threshold: boolean;
+      is_memory_and_swap_usage_beyond_threshold: boolean;
     };
     GetGoTrueConfigResponse: {
       SITE_URL: string;
@@ -2227,7 +2258,7 @@ export interface components {
       unlimited: boolean;
       capped: boolean;
       /** @enum {string} */
-      metric: "EGRESS" | "DATABASE_EGRESS" | "DATABASE_SIZE" | "STORAGE_EGRESS" | "STORAGE_SIZE" | "MONTHLY_ACTIVE_USERS" | "MONTHLY_ACTIVE_SSO_USERS" | "FUNCTION_INVOCATIONS" | "FUNCTION_COUNT" | "STORAGE_IMAGES_TRANSFORMED" | "REALTIME_MESSAGE_COUNT" | "REALTIME_PEAK_CONNECTIONS" | "COMPUTE_HOURS_XS" | "COMPUTE_HOURS_SM" | "COMPUTE_HOURS_MD" | "COMPUTE_HOURS_L" | "COMPUTE_HOURS_XL" | "COMPUTE_HOURS_2XL" | "COMPUTE_HOURS_4XL" | "COMPUTE_HOURS_8XL" | "COMPUTE_HOURS_12XL" | "COMPUTE_HOURS_16XL";
+      metric: "EGRESS" | "DATABASE_EGRESS" | "DATABASE_SIZE" | "STORAGE_EGRESS" | "STORAGE_SIZE" | "MONTHLY_ACTIVE_USERS" | "MONTHLY_ACTIVE_SSO_USERS" | "FUNCTION_INVOCATIONS" | "FUNCTION_COUNT" | "STORAGE_IMAGES_TRANSFORMED" | "REALTIME_MESSAGE_COUNT" | "REALTIME_PEAK_CONNECTIONS" | "COMPUTE_HOURS_BRANCH" | "COMPUTE_HOURS_XS" | "COMPUTE_HOURS_SM" | "COMPUTE_HOURS_MD" | "COMPUTE_HOURS_L" | "COMPUTE_HOURS_XL" | "COMPUTE_HOURS_2XL" | "COMPUTE_HOURS_4XL" | "COMPUTE_HOURS_8XL" | "COMPUTE_HOURS_12XL" | "COMPUTE_HOURS_16XL";
       /** @enum {string} */
       pricing_strategy: "UNIT" | "PACKAGE" | "NONE";
       pricing_free_units?: number;
@@ -2473,7 +2504,7 @@ export interface components {
     };
     BillingUsageBasedPrice: {
       /** @enum {string} */
-      metric: "EGRESS" | "DATABASE_EGRESS" | "DATABASE_SIZE" | "STORAGE_EGRESS" | "STORAGE_SIZE" | "MONTHLY_ACTIVE_USERS" | "MONTHLY_ACTIVE_SSO_USERS" | "FUNCTION_INVOCATIONS" | "FUNCTION_COUNT" | "STORAGE_IMAGES_TRANSFORMED" | "REALTIME_MESSAGE_COUNT" | "REALTIME_PEAK_CONNECTIONS" | "COMPUTE_HOURS_XS" | "COMPUTE_HOURS_SM" | "COMPUTE_HOURS_MD" | "COMPUTE_HOURS_L" | "COMPUTE_HOURS_XL" | "COMPUTE_HOURS_2XL" | "COMPUTE_HOURS_4XL" | "COMPUTE_HOURS_8XL" | "COMPUTE_HOURS_12XL" | "COMPUTE_HOURS_16XL";
+      metric: "EGRESS" | "DATABASE_EGRESS" | "DATABASE_SIZE" | "STORAGE_EGRESS" | "STORAGE_SIZE" | "MONTHLY_ACTIVE_USERS" | "MONTHLY_ACTIVE_SSO_USERS" | "FUNCTION_INVOCATIONS" | "FUNCTION_COUNT" | "STORAGE_IMAGES_TRANSFORMED" | "REALTIME_MESSAGE_COUNT" | "REALTIME_PEAK_CONNECTIONS" | "COMPUTE_HOURS_BRANCH" | "COMPUTE_HOURS_XS" | "COMPUTE_HOURS_SM" | "COMPUTE_HOURS_MD" | "COMPUTE_HOURS_L" | "COMPUTE_HOURS_XL" | "COMPUTE_HOURS_2XL" | "COMPUTE_HOURS_4XL" | "COMPUTE_HOURS_8XL" | "COMPUTE_HOURS_12XL" | "COMPUTE_HOURS_16XL";
       /** @enum {string} */
       pricingStrategy: "UNIT" | "PACKAGE" | "NONE";
       pricingOptions: components["schemas"]["BillingPricingOptionsUnit"] | components["schemas"]["BillingPricingOptionsPackage"] | components["schemas"]["BillingPricingOptionsNone"];
@@ -2968,7 +2999,7 @@ export interface components {
       status: string;
       subscription_id: string;
       is_readonly_mode_enabled?: boolean;
-      is_branch_enabled?: boolean;
+      is_branch_enabled: boolean;
       preview_branch_refs: (string)[];
     };
     AmiSearchOptions: {
@@ -3009,7 +3040,7 @@ export interface components {
       status: string;
       subscription_id: string;
       is_readonly_mode_enabled?: boolean;
-      is_branch_enabled?: boolean;
+      is_branch_enabled: boolean;
       preview_branch_refs: (string)[];
       endpoint: string;
       anon_key: string;
@@ -3096,16 +3127,6 @@ export interface components {
       postgrest: string;
       "supabase-postgres": string;
     };
-    BranchResponse: {
-      id: string;
-      name: string;
-      project_ref: string;
-      parent_project_ref: string;
-      is_default: boolean;
-      git_branch: string;
-      created_at: string;
-      updated_at: string;
-    };
     ProjectDetailResponse: {
       cloud_provider: string;
       db_host: string;
@@ -3126,9 +3147,8 @@ export interface components {
       volumeSizeGb?: number;
       maxDatabasePreprovisionGb?: number;
       lastDatabaseResizeAt?: string;
-      preview_branches: (components["schemas"]["BranchResponse"])[];
+      is_branch_enabled: boolean;
       parent_project_ref?: string;
-      has_branch_enabled?: boolean;
     };
     ProjectRefResponse: {
       id: number;
@@ -3824,6 +3844,9 @@ export interface components {
     CreateVercelConnectionResponse: {
       id: string;
     };
+    UpdateVercelConnectionsBody: {
+      metadata: Record<string, never>;
+    };
     DeleteVercelConnectionResponse: {
       id: string;
     };
@@ -3848,12 +3871,23 @@ export interface components {
       organization_integration_id: string;
       connection: components["schemas"]["IntegrationConnection"];
     };
+    UpdateGitHubConnectionsBody: {
+      metadata: Record<string, never>;
+    };
     GetGithubRepo: {
       id: number;
       full_name: string;
     };
     GetGithubBranch: {
       name: string;
+    };
+    GetGithubPullRequest: {
+      id: number;
+      url: string;
+      title: string;
+      branch: string;
+      created_at: string;
+      created_by?: string;
     };
     FunctionResponse: {
       id: string;
@@ -3944,6 +3978,16 @@ export interface components {
     UpdateBranchBody: {
       branch_name?: string;
       git_branch?: string;
+    };
+    BranchResponse: {
+      id: string;
+      name: string;
+      project_ref: string;
+      parent_project_ref: string;
+      is_default: boolean;
+      git_branch: string;
+      created_at: string;
+      updated_at: string;
     };
     DatabaseResponse: {
       /** @description Database host */
@@ -4078,20 +4122,6 @@ export interface components {
       smtp_sender_name?: string;
       rate_limit_email_sent?: number;
     };
-    FunctionSlugResponse: {
-      id: string;
-      slug: string;
-      name: string;
-      /** @enum {string} */
-      status: "ACTIVE" | "REMOVED" | "THROTTLED";
-      version: number;
-      created_at: number;
-      updated_at: number;
-      verify_jwt?: boolean;
-      import_map?: boolean;
-      entrypoint_path?: string;
-      import_map_path?: string;
-    };
     AttributeValue: {
       default?: Record<string, never> | number | string | boolean;
       name?: string;
@@ -4169,6 +4199,20 @@ export interface components {
       domains?: (components["schemas"]["Domain"])[];
       created_at?: string;
       updated_at?: string;
+    };
+    FunctionSlugResponse: {
+      id: string;
+      slug: string;
+      name: string;
+      /** @enum {string} */
+      status: "ACTIVE" | "REMOVED" | "THROTTLED";
+      version: number;
+      created_at: number;
+      updated_at: number;
+      verify_jwt?: boolean;
+      import_map?: boolean;
+      entrypoint_path?: string;
+      import_map_path?: string;
     };
     OAuthAppResponse: {
       id: string;
@@ -4393,6 +4437,19 @@ export interface operations {
       200: never;
       /** @description Failed to get project's status */
       500: never;
+    };
+  };
+  /**
+   * Gets resource warnings for all projects accessible by the user 
+   * @description Only returns the minimal project info
+   */
+  ProjectsResourceWarningsController_getProjectsResourceWarnings: {
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["ProjectResourceWarningsResponse"])[];
+        };
+      };
     };
   };
   /** Gets GoTrue config */
@@ -4733,25 +4790,18 @@ export interface operations {
       500: never;
     };
   };
-  /** Enables hooks on the project */
+  /** Enables Database Webhooks on the project */
   HooksController_enableHooks: {
     parameters: {
-      header: {
-        "x-connection-encrypted": string;
-      };
       path: {
         /** @description Project ref */
         ref: string;
       };
     };
     responses: {
-      201: {
-        content: {
-          "application/json": Record<string, never>;
-        };
-      };
+      201: never;
       403: never;
-      /** @description Failed to enable hooks on the project */
+      /** @description Failed to enable Database Webhooks on the project */
       500: never;
     };
   };
@@ -5048,7 +5098,7 @@ export interface operations {
   OrgDailyStatsController_getDailyStats: {
     parameters: {
       query: {
-        metric: "EGRESS" | "DATABASE_EGRESS" | "DATABASE_SIZE" | "STORAGE_EGRESS" | "STORAGE_SIZE" | "MONTHLY_ACTIVE_USERS" | "MONTHLY_ACTIVE_SSO_USERS" | "FUNCTION_INVOCATIONS" | "FUNCTION_COUNT" | "STORAGE_IMAGES_TRANSFORMED" | "REALTIME_MESSAGE_COUNT" | "REALTIME_PEAK_CONNECTIONS" | "COMPUTE_HOURS_XS" | "COMPUTE_HOURS_SM" | "COMPUTE_HOURS_MD" | "COMPUTE_HOURS_L" | "COMPUTE_HOURS_XL" | "COMPUTE_HOURS_2XL" | "COMPUTE_HOURS_4XL" | "COMPUTE_HOURS_8XL" | "COMPUTE_HOURS_12XL" | "COMPUTE_HOURS_16XL";
+        metric: "EGRESS" | "DATABASE_EGRESS" | "DATABASE_SIZE" | "STORAGE_EGRESS" | "STORAGE_SIZE" | "MONTHLY_ACTIVE_USERS" | "MONTHLY_ACTIVE_SSO_USERS" | "FUNCTION_INVOCATIONS" | "FUNCTION_COUNT" | "STORAGE_IMAGES_TRANSFORMED" | "REALTIME_MESSAGE_COUNT" | "REALTIME_PEAK_CONNECTIONS" | "COMPUTE_HOURS_BRANCH" | "COMPUTE_HOURS_XS" | "COMPUTE_HOURS_SM" | "COMPUTE_HOURS_MD" | "COMPUTE_HOURS_L" | "COMPUTE_HOURS_XL" | "COMPUTE_HOURS_2XL" | "COMPUTE_HOURS_4XL" | "COMPUTE_HOURS_8XL" | "COMPUTE_HOURS_12XL" | "COMPUTE_HOURS_16XL";
         interval: string;
         endDate: string;
         startDate: string;
@@ -6027,6 +6077,9 @@ export interface operations {
   /** Run sql query */
   QueryController_runQuery: {
     parameters: {
+      header: {
+        "x-connection-encrypted": string;
+      };
       path: {
         /** @description Project ref */
         ref: string;
@@ -8439,6 +8492,24 @@ export interface operations {
       500: never;
     };
   };
+  /** Updates a Vercel connection for a supabase project */
+  VercelConnectionsController_updateVercelConnection: {
+    parameters: {
+      path: {
+        connection_id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateVercelConnectionsBody"];
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to update Vercel connection */
+      500: never;
+    };
+  };
   /** Create github integration */
   GitHubIntegrationController_createGitHubIntegration: {
     requestBody: {
@@ -8499,6 +8570,24 @@ export interface operations {
       500: never;
     };
   };
+  /** Updates a GitHub connection for a supabase project */
+  GitHubConnectionsController_updateGitHubConnection: {
+    parameters: {
+      path: {
+        connection_id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateGitHubConnectionsBody"];
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to update GitHub connection */
+      500: never;
+    };
+  };
   /** Gets github repos for the given organization */
   GitHubRepoController_getRepos: {
     parameters: {
@@ -8532,6 +8621,26 @@ export interface operations {
         };
       };
       /** @description Failed to get github branches for a given repo */
+      500: never;
+    };
+  };
+  /** Gets github pull requests for a given repo */
+  GitHubPullRequestController_getPullRequests: {
+    parameters: {
+      path: {
+        organization_integration_id: string;
+        repo_owner: string;
+        repo_name: string;
+        target: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["GetGithubPullRequest"])[];
+        };
+      };
+      /** @description Failed to get github pull requests for a given repo */
       500: never;
     };
   };
@@ -8876,6 +8985,18 @@ export interface operations {
       201: never;
       /** @description Failed to preview org billing organization */
       500: never;
+    };
+  };
+  /** Handle update project jwt on completion */
+  ProjectUpdateJwtController_completeUpdateJwt: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    responses: {
+      201: never;
     };
   };
   /** Processes Vercel event */
@@ -9755,108 +9876,6 @@ export interface operations {
       500: never;
     };
   };
-  /**
-   * Retrieve a function 
-   * @description Retrieves a function with the specified slug and project.
-   */
-  FunctionSlugController_getFunction: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string;
-        /** @description Function slug */
-        function_slug: string;
-      };
-    };
-    responses: {
-      200: {
-        content: {
-          "application/json": components["schemas"]["FunctionSlugResponse"];
-        };
-      };
-      403: never;
-      /** @description Failed to retrieve function with given slug */
-      500: never;
-    };
-  };
-  /**
-   * Delete a function 
-   * @description Deletes a function with the specified slug from the specified project.
-   */
-  FunctionSlugController_deleteFunction: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string;
-        /** @description Function slug */
-        function_slug: string;
-      };
-    };
-    responses: {
-      200: never;
-      403: never;
-      /** @description Failed to delete function with given slug */
-      500: never;
-    };
-  };
-  /**
-   * Update a function 
-   * @description Updates a function with the specified slug and project.
-   */
-  FunctionSlugController_updateFunction: {
-    parameters: {
-      query?: {
-        slug?: string;
-        name?: string;
-        verify_jwt?: boolean;
-        import_map?: boolean;
-        entrypoint_path?: string;
-        import_map_path?: string;
-      };
-      path: {
-        /** @description Project ref */
-        ref: string;
-        /** @description Function slug */
-        function_slug: string;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["UpdateFunctionBody"];
-        "application/vnd.denoland.eszip": components["schemas"]["UpdateFunctionBody"];
-      };
-    };
-    responses: {
-      200: {
-        content: {
-          "application/json": components["schemas"]["FunctionResponse"];
-        };
-      };
-      403: never;
-      /** @description Failed to update function with given slug */
-      500: never;
-    };
-  };
-  /**
-   * Retrieve a function body 
-   * @description Retrieves a function body for the specified slug and project.
-   */
-  FunctionSlugController_getFunctionBody: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string;
-        /** @description Function slug */
-        function_slug: string;
-      };
-    };
-    responses: {
-      200: never;
-      403: never;
-      /** @description Failed to retrieve function body with given slug */
-      500: never;
-    };
-  };
   /** Lists all SSO providers */
   ProvidersController_listAllProviders: {
     parameters: {
@@ -9963,6 +9982,147 @@ export interface operations {
       403: never;
       /** @description Either SAML 2.0 was not enabled for this project, or the provider does not exist */
       404: never;
+    };
+  };
+  /** Run sql query */
+  V1QueryController_v1RunQuery: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RunQueryBody"];
+      };
+    };
+    responses: {
+      201: {
+        content: {
+          "application/json": Record<string, never>;
+        };
+      };
+      403: never;
+      /** @description Failed to run sql query */
+      500: never;
+    };
+  };
+  /** Enables Database Webhooks on the project */
+  V1DatabaseWebhooksController_v1EnableDatabaseWebhooks: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    responses: {
+      201: never;
+      403: never;
+      /** @description Failed to enable Database Webhooks on the project */
+      500: never;
+    };
+  };
+  /**
+   * Retrieve a function 
+   * @description Retrieves a function with the specified slug and project.
+   */
+  FunctionSlugController_getFunction: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+        /** @description Function slug */
+        function_slug: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["FunctionSlugResponse"];
+        };
+      };
+      403: never;
+      /** @description Failed to retrieve function with given slug */
+      500: never;
+    };
+  };
+  /**
+   * Delete a function 
+   * @description Deletes a function with the specified slug from the specified project.
+   */
+  FunctionSlugController_deleteFunction: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+        /** @description Function slug */
+        function_slug: string;
+      };
+    };
+    responses: {
+      200: never;
+      403: never;
+      /** @description Failed to delete function with given slug */
+      500: never;
+    };
+  };
+  /**
+   * Update a function 
+   * @description Updates a function with the specified slug and project.
+   */
+  FunctionSlugController_updateFunction: {
+    parameters: {
+      query?: {
+        slug?: string;
+        name?: string;
+        verify_jwt?: boolean;
+        import_map?: boolean;
+        entrypoint_path?: string;
+        import_map_path?: string;
+      };
+      path: {
+        /** @description Project ref */
+        ref: string;
+        /** @description Function slug */
+        function_slug: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateFunctionBody"];
+        "application/vnd.denoland.eszip": components["schemas"]["UpdateFunctionBody"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["FunctionResponse"];
+        };
+      };
+      403: never;
+      /** @description Failed to update function with given slug */
+      500: never;
+    };
+  };
+  /**
+   * Retrieve a function body 
+   * @description Retrieves a function body for the specified slug and project.
+   */
+  FunctionSlugController_getFunctionBody: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+        /** @description Function slug */
+        function_slug: string;
+      };
+    };
+    responses: {
+      200: never;
+      403: never;
+      /** @description Failed to retrieve function body with given slug */
+      500: never;
     };
   };
   /** Create an organization */
