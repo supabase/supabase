@@ -28,23 +28,83 @@ Once you've published your OAuth App on Supabase, you can use the OAuth 2.0 prot
 
 You can use your preferred OAuth2 client or follow the steps below. You can see an example implementation in TypeScript using Supabase Edge Functions [on our GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/connect-supabase).
 
-1. Within your app's UI, redirect the user to [`https://api.supabase.com/v1/oauth/authorize`](<https://api.supabase.com/api/v1#/oauth%20(beta)/authorize>). Make sure to include all required query parameters such as:
-   - `client_id` A UUID uniquely identifying your OAuth app in Supabase.
-   - `redirect_uri` The URL where Supabase will redirect the user after providing consent.
-   - `scope` The only scope supported is `all`. Scoped access is not available at this time.
-   - `response_type` The value `code`.
-   - `state` Information about the state of your app. Note that `redirect_uri` and `state` cannot both exceed 4kB in size.
-   - We strongly recommend using the PKCE flow for increased security. Generate a random value before taking the user to the authorize endpoint. This value is called code verifier. Hash it with SHA256 and include it as the `code_challenge` parameter, while setting `code_challenge_method` to `S256`. In the next step, you would need to provide the code verifier to get the first access and refresh token.
-2. Once the user consents to providing API access to your OAuth App, Supabase will redirect the user to the `redirect_uri` endpoint you provided in the previous step. The URL will contain these query parameters:
-   - `code` An authorization code you should exchange with Supabase to get the access and refresh token.
-   - `state` The value you provided in the previous step, to help you associate the request with the user. The `state` property returned here should be compared to the `state` you sent previously.
-3. Exchange the authorization code for an access and refresh token by calling `POST https://api.supabase.com/v1/oauth/token` and including the following query parameters:
-   - `grant_type` The value `authorization_code`.
-   - `code` The `code` returned in the previous step.
-   - `client_id` The unique client ID identifying your OAuth App.
-   - `client_secret` The secret that authenticates your OAuth App to Supabase.
-   - `redirect_uri` This must be exactly the same URL used in the first step.
-   - If you used the PKCE flow in the first step, include the code verifier as `code_verifier`.
+### Redirect to the authorize URL
+
+Within your app's UI, redirect the user to [`https://api.supabase.com/v1/oauth/authorize`](<https://api.supabase.com/api/v1#/oauth%20(beta)/authorize>). Make sure to include all required query parameters such as:
+
+- `client_id` Your client id from the app creation above.
+- `redirect_uri` The URL where Supabase will redirect the user to after providing consent.
+- `scope` Currently only `all` is supported. More fine grained scopes coming soon.
+- `response_type` Set this to `code`.
+- `state` Information about the state of your app. Note that `redirect_uri` and `state` together cannot exceed 4kB in size.
+- We strongly recommend using the PKCE flow for increased security. Generate a random value before taking the user to the authorize endpoint. This value is called code verifier. Hash it with SHA256 and include it as the `code_challenge` parameter, while setting `code_challenge_method` to `S256`. In the next step, you would need to provide the code verifier to get the first access and refresh token.
+
+```ts
+router.get('/connect-supabase/login', async (ctx) => {
+  // Construct the URL for the authorization redirect and get a PKCE codeVerifier.
+  const { uri, codeVerifier } = await oauth2Client.code.getAuthorizationUri()
+  console.log(uri.toString())
+  // console.log: https://api.supabase.com/v1/oauth/authorize?response_type=code&client_id=7673bde9-be72-4d75-bd5e-b0dba2c49b38&redirect_uri=http%3A%2F%2Flocalhost%3A54321%2Ffunctions%2Fv1%2Fconnect-supabase%2Foauth2%2Fcallback&scope=all&code_challenge=jk06R69S1bH9dD4td8mS5kAEFmEbMP5P0YrmGNAUVE0&code_challenge_method=S256
+
+  // Store the codeVerifier in the user session (cookie).
+  ctx.state.session.flash('codeVerifier', codeVerifier)
+
+  // Redirect the user to the authorization endpoint.
+  ctx.response.redirect(uri)
+})
+```
+
+Find the full example on [GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/connect-supabase).
+
+### Handle the callback
+
+Once the user consents to providing API access to your OAuth App, Supabase will redirect the user to the `redirect_uri` endpoint you provided in the previous step. The URL will contain these query parameters:
+
+- `code` An authorization code you should exchange with Supabase to get the access and refresh token.
+- `state` The value you provided in the previous step, to help you associate the request with the user. The `state` property returned here should be compared to the `state` you sent previously.
+
+Exchange the authorization code for an access and refresh token by calling [`POST https://api.supabase.com/v1/oauth/token`](<https://api.supabase.com/api/v1#/oauth%20(beta)/token>) and including the following query parameters as content-type `application/x-www-form-urlencoded`:
+
+- `grant_type` The value `authorization_code`.
+- `code` The `code` returned in the previous step.
+- `redirect_uri` This must be exactly the same URL used in the first step.
+- If you used the PKCE flow in the first step, include the code verifier as `code_verifier`.
+
+As per OAuth2 spec, provide the client id and client secret as basic auth headers:
+
+- `client_id` The unique client ID identifying your OAuth App.
+- `client_secret` The secret that authenticates your OAuth App to Supabase.
+
+```ts
+router.get('/connect-supabase/oauth2/callback', async (ctx) => {
+  // Make sure the codeVerifier is present for the user's session.
+  const codeVerifier = ctx.state.session.get('codeVerifier') as string
+  if (!codeVerifier) throw new Error('No codeVerifier!')
+
+  // Exchange the authorization code for an access token.
+  const tokens = await fetch(config.tokenUri, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Accept: 'application/json',
+      Authorization: `Basic ${btoa(`${config.clientId}:${config.clientSecret}`)}`,
+    },
+    body: new URLSearchParams({
+      grant_type: 'authorization_code',
+      code: ctx.request.url.searchParams.get('code') || '',
+      redirect_uri: config.redirectUri,
+      code_verifier: codeVerifier,
+    }),
+  }).then((res) => res.json())
+  console.log('tokens', tokens)
+
+  // Store the tokens in your DB for future use.
+
+  ctx.response.body = 'Success'
+})
+```
+
+Find the full example on [GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/connect-supabase).
 
 ## Refresh an access token
 
