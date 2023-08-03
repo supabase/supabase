@@ -27,7 +27,7 @@ const AISettingsModal = (props: ModalProps) => {
             <p className="text-sm">Include database metadata in AI requests</p>
             <p className="text-sm text-scale-1000">
               Includes table names, column names and their corresponding data types in the request.
-              This will generate snippets that are more relevant to your project.
+              This will generate queries that are more relevant to your project.
             </p>
           </div>
           <Toggle
