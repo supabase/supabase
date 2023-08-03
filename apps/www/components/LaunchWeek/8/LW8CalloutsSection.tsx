@@ -20,6 +20,7 @@ const LW8CalloutsSection = () => {
               <div className="relative flex !aspect-video h-[80px] md:h-[100px] gap-2 z-10 rounded overflow-hidden">
                 <Image
                   src="/images/launchweek/8/twitter-spaces-thumb.svg"
+                  alt="twitter spaces thumbnail"
                   layout="fill"
                   objectFit="cover"
                 />
@@ -39,6 +40,7 @@ const LW8CalloutsSection = () => {
               <div className="relative flex !aspect-video h-[80px] md:h-[100px] gap-2 z-10 rounded overflow-hidden">
                 <Image
                   src="/images/launchweek/8/lw8-hackathon-thumb.svg"
+                  alt="hackathon thumbnail"
                   layout="fill"
                   objectFit="cover"
                 />
