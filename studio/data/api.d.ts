@@ -720,6 +720,8 @@ export interface paths {
   "/platform/integrations/vercel/connections/{connection_id}": {
     /** Deletes vercel project connection */
     delete: operations["VercelConnectionsController_deleteVercelConnection"];
+    /** Updates a Vercel connection for a supabase project */
+    patch: operations["VercelConnectionsController_updateVercelConnection"];
   };
   "/platform/integrations/github": {
     /** Create github integration */
@@ -736,6 +738,8 @@ export interface paths {
   "/platform/integrations/github/connections/{connection_id}": {
     /** Deletes github project connection */
     delete: operations["GitHubConnectionsController_deleteGitHubConnection"];
+    /** Updates a GitHub connection for a supabase project */
+    patch: operations["GitHubConnectionsController_updateGitHubConnection"];
   };
   "/platform/integrations/github/repos/{organization_integration_id}": {
     /** Gets github repos for the given organization */
@@ -824,6 +828,10 @@ export interface paths {
   "/system/billing/migrate/org-level-billing-preview": {
     /** Previews the migration of the organization to the new org level billing. */
     post: operations["BillingMigrationController_preview"];
+  };
+  "/system/projects/{ref}/config/update-jwt/complete": {
+    /** Handle update project jwt on completion */
+    post: operations["ProjectUpdateJwtController_completeUpdateJwt"];
   };
   "/system/integrations/vercel/webhooks": {
     /** Processes Vercel event */
@@ -3836,6 +3844,9 @@ export interface components {
     CreateVercelConnectionResponse: {
       id: string;
     };
+    UpdateVercelConnectionsBody: {
+      metadata: Record<string, never>;
+    };
     DeleteVercelConnectionResponse: {
       id: string;
     };
@@ -3859,6 +3870,9 @@ export interface components {
     CreateGitHubConnectionsBody: {
       organization_integration_id: string;
       connection: components["schemas"]["IntegrationConnection"];
+    };
+    UpdateGitHubConnectionsBody: {
+      metadata: Record<string, never>;
     };
     GetGithubRepo: {
       id: number;
@@ -8478,6 +8492,24 @@ export interface operations {
       500: never;
     };
   };
+  /** Updates a Vercel connection for a supabase project */
+  VercelConnectionsController_updateVercelConnection: {
+    parameters: {
+      path: {
+        connection_id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateVercelConnectionsBody"];
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to update Vercel connection */
+      500: never;
+    };
+  };
   /** Create github integration */
   GitHubIntegrationController_createGitHubIntegration: {
     requestBody: {
@@ -8535,6 +8567,24 @@ export interface operations {
     responses: {
       200: never;
       /** @description Failed to delete github integration project connection */
+      500: never;
+    };
+  };
+  /** Updates a GitHub connection for a supabase project */
+  GitHubConnectionsController_updateGitHubConnection: {
+    parameters: {
+      path: {
+        connection_id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateGitHubConnectionsBody"];
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to update GitHub connection */
       500: never;
     };
   };
@@ -8935,6 +8985,18 @@ export interface operations {
       201: never;
       /** @description Failed to preview org billing organization */
       500: never;
+    };
+  };
+  /** Handle update project jwt on completion */
+  ProjectUpdateJwtController_completeUpdateJwt: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    responses: {
+      201: never;
     };
   };
   /** Processes Vercel event */

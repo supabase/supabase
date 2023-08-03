@@ -49,7 +49,7 @@ const EnableBranchingButton = () => {
   const githubIntegration = integrations?.find(
     (integration) =>
       integration.integration.name === 'GitHub' &&
-      integration.organization.slug === selectedOrg?.slug
+      integration.connections.some((connection) => connection.supabase_project_ref === ref)
   )
 
   // [Joshen] Leaving this out first as not clear yet branching x vercel implementation

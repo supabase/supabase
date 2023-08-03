@@ -59,12 +59,11 @@ const BranchManagement = () => {
     isError: isErrorIntegrations,
     isSuccess: isSuccessIntegrations,
   } = useOrgIntegrationsQuery({ orgSlug: selectedOrg?.slug })
-  const githubIntegration = integrations?.find(
-    (integration) =>
-      integration.integration.name === 'GitHub' &&
-      integration.organization.slug === selectedOrg?.slug
-  )
-  const githubConnection = githubIntegration?.connections.find(
+
+  const githubConnections = integrations
+    ?.filter((integration) => integration.integration.name === 'GitHub')
+    .flatMap((integration) => integration.connections)
+  const githubConnection = githubConnections?.find(
     (connection) => connection.supabase_project_ref === ref
   )
 
