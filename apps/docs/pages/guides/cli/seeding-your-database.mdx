@@ -17,7 +17,7 @@ Seeding is the process of populating a database with initial data, typically use
 
 The `seed.sql` file is run every time you run `supabase start` or `supabase db reset`. Seeding is done _after_ all the database migrations have been run. As a general rule, you should not add schema statements to your seed file, only data.
 
-You can add any SQL statements to this file. For example.
+You can add any SQL statements to this file. For example:
 
 ```sql supabase/seed.sql
 insert into countries
