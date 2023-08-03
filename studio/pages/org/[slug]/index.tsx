@@ -23,9 +23,9 @@ const ProjectsPage: NextPageWithLayout = () => {
   const organization = useSelectedOrganization()
   const projects = allProjects?.filter((project) => project.organization_id === organization?.id)
   const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
-  const githubIntegrations = integrations?.find(
-    (integration) => integration.integration.name === 'GitHub'
-  )
+  const githubConnections = integrations
+    ?.filter((integration) => integration.integration.name === 'GitHub')
+    .flatMap((integration) => integration.connections)
 
   return (
     <ScaffoldContainer>
@@ -73,7 +73,7 @@ const ProjectsPage: NextPageWithLayout = () => {
                       <ProjectCard
                         key={project.ref}
                         project={project}
-                        githubIntegration={githubIntegrations?.connections.find(
+                        githubIntegration={githubConnections?.find(
                           (connection) => connection.supabase_project_ref === project.ref
                         )}
                       />
