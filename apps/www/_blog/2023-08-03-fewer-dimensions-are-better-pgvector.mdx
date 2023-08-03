@@ -89,7 +89,7 @@ We compared the performance of `text-embedding-ada-002` from OpenAI (1536 dimens
 
 - **Database size:** with 2vCPU (ARM) and 8GB RAM - `large` add-on for Supabase project.
 - **Version:** Postgres v15 and pgvector v0.4.0
-- **Dataset:** 224,482 embeddings from [Wikipedia articles](https://www.kaggle.com/datasets/stephanst/wikipedia-simple-openai-embeddings).
+- **Dataset:** 224,482 embeddings from [Wikipedia articles](https://huggingface.co/datasets/Supabase/wikipedia-en-embeddings).
 - **Index:** The index was generated for `inner-product` (dot product) distance function with `lists=1000`.
 - **Process:** We followed [our optimization guide and tips](https://supabase.com/docs/guides/ai/going-to-prod#performance-tips-when-using-indexes).
 
