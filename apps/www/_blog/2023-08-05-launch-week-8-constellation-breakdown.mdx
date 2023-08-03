@@ -100,24 +100,24 @@ const Material = () =>
     )
 
 return (
-	<div style={{ width: 100vw, height: 100vh, background: "#000000" }}>
-	  <Canvas
-	    dpr={[1, 2]}
-	    camera={{ fov: 75, position: [0, 0, 500] }}
-	  >
-	    <ambientLight intensity={0.3} />
-	    <group>
-	      {particles?.map((particle, index) => (
-	        <mesh
-	          key={particle.username}
-	        >
-	          <Geometry />
-	          <Material />
-	        </mesh>
-	      ))}
-	    </group>
-	  </Canvas>
-	</div>
+  <div style={{ width: 100vw, height: 100vh, background: "#000000" }}>
+    <Canvas
+      dpr={[1, 2]}
+      camera={{ fov: 75, position: [0, 0, 500] }}
+    >
+      <ambientLight intensity={0.3} />
+      <group>
+        {particles?.map((particle, index) => (
+          <mesh
+            key={particle.username}
+          >
+            <Geometry />
+            <Material />
+          </mesh>
+        ))}
+      </group>
+    </Canvas>
+  </div>
 )
 ```
 
@@ -179,7 +179,7 @@ const heightRadius = 100
 useFrame(({ clock }) => {
     const timer = clock.getElapsedTime()
 
-		particle.current.position.x = Math.sin(timer) * widthRadius
+    particle.current.position.x = Math.sin(timer) * widthRadius
   }
 })
 
@@ -377,24 +377,24 @@ const ParticlesCanvas = () => {
     )
 
   return (
-		<div style={{ width: 100vw, height: 100vh, background: "#000000" }}>
-		  <Canvas
-		    dpr={[1, 2]}
-		    camera={{ fov: 75, position: [0, 0, 500] }}
-		  >
-		    <ambientLight intensity={config.lightIntensity} />
-		    <group>
-		      {particles?.map((particle, index) => (
-		        <Particle
-		          key={particle.username}
-		        >
-		          <Geometry />
-		          <Material />
-		        </Particle>
-		      ))}
-		    </group>
-		  </Canvas>
-		</div>
+    <div style={{ width: 100vw, height: 100vh, background: "#000000" }}>
+      <Canvas
+        dpr={[1, 2]}
+        camera={{ fov: 75, position: [0, 0, 500] }}
+      >
+        <ambientLight intensity={config.lightIntensity} />
+        <group>
+          {particles?.map((particle, index) => (
+            <Particle
+              key={particle.username}
+            >
+              <Geometry />
+              <Material />
+            </Particle>
+          ))}
+        </group>
+      </Canvas>
+    </div>
   )
 }
 
