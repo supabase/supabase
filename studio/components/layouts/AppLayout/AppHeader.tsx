@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Tabs } from 'ui'
+import { IconGitHub, Tabs } from 'ui'
 
 import { useParams } from 'common'
 import { useFlag, useSelectedOrganization } from 'hooks'
@@ -89,7 +89,7 @@ const AppHeader = () => {
           }}
         >
           {PROJECT_PAGES.map((page) => (
-            <Tabs.Panel key={page.key} id={page.key} label={page.name} />
+            <Tabs.Panel key={page.key} id={page.key} label={page.name} icon={page.icon} />
           ))}
         </Tabs>
       )}
