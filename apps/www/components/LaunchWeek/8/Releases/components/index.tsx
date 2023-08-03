@@ -160,7 +160,7 @@ export const AccordionHeader = ({
             : 'border-[#FFFFFF20]'
         }`}
       >
-        <span className="text-[#A0A0A0] text-sm font-normal bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
+        <span className="text-[#A0A0A080] text-sm font-normal bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
           Shipped
         </span>
       </Badge>
