@@ -20,7 +20,7 @@ import router from 'next/router'
 import { useState } from 'react'
 import { format } from 'sql-formatter'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { AiIcon, IconCornerDownLeft, IconSettings, Input } from 'ui'
+import { AiIcon, AiIconAnimation, IconCornerDownLeft, IconSettings, Input } from 'ui'
 import AISettingsModal from '../AISettingsModal'
 import { sqlAiDisclaimerComment } from '../SQLEditor.constants'
 import { createSqlSnippetSkeleton } from '../SQLEditor.utils'
@@ -236,7 +236,7 @@ const SQLAI = () => {
                   },
                 }}
               >
-                <AiIcon className="w-4 h-4" />
+                <AiIconAnimation loading />
               </motion.div>
             </motion.div>
           )}
