@@ -12,6 +12,7 @@ import { useSelectedOrganization, useStore } from 'hooks'
 import { useAppUiStateSnapshot } from 'state/app'
 import BranchingWaitlistPopover from './BranchingWaitlistPopover'
 import GithubRepositorySelection from './GithubRepositorySelection'
+import VercelProjectSelection from './VercelProjectSelection'
 
 const EnableBranchingButton = () => {
   const { ui } = useStore()
@@ -54,12 +55,13 @@ const EnableBranchingButton = () => {
       integration.connections.some((connection) => connection.supabase_project_ref === ref)
   )
 
-  // [Joshen] Leaving this out first as not clear yet branching x vercel implementation
+  // [Joshen] Leaving this out first
+  // const hasVercelIntegrationInstalled =
+  //   integrations?.some((integration) => integration.integration.name === 'Vercel') ?? false
   // const vercelIntegration = integrations?.find(
-  //   (integration) => integration.integration.name === 'Vercel'
-  // )
-  // const vercelProjectIntegration = vercelIntegration?.connections.find(
-  //   (connection) => connection.supabase_project_ref === ref
+  //   (integration) =>
+  //     integration.integration.name === 'Vercel' &&
+  //     integration.connections.some((connection) => connection.supabase_project_ref === ref)
   // )
 
   const onEnableBranching = () => {
@@ -88,7 +90,7 @@ const EnableBranchingButton = () => {
         className="!bg"
         size="medium"
       >
-        <Modal.Content className="p-7 flex items-center space-x-4">
+        <Modal.Content className="px-7 py-5 flex items-center space-x-4">
           <IconGitBranch strokeWidth={2} size={20} />
           <div>
             <p className="text">Enable database branching</p>
