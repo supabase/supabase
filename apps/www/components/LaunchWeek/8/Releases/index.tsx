@@ -1,20 +1,11 @@
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { Accordion, Badge } from 'ui'
+import { Accordion } from 'ui'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
 
-import days, { WeekDayProps, endOfLW8 } from './lw8_data'
+import days, { WeekDayProps } from './lw8_data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import {
-  AccordionHeader,
-  CartTitle,
-  ChipLink,
-  PencilSvg,
-  SectionButtons,
-  SmallCard,
-  StyledArticleBadge,
-} from './components'
-import Link from 'next/link'
+import { AccordionHeader, CartTitle, SectionButtons, StyledArticleBadge } from './components'
 
 export const defaultEase = [0.25, 0.25, 0, 1]
 export const defaultDuratonIn = 0.25
@@ -167,16 +158,16 @@ export default function LW8Releases() {
           size="large"
           className="text-white"
           justified={false}
-          // bordered={false}
           chevronAlign="right"
           defaultValue={publishedSections}
         >
-          <div className="border-b border-[#111718]">
+          <div className="border-b border-[#111718]" id="currentDay">
             <Accordion.Item
               header={
                 <AccordionHeader
                   date={preRelease.date}
-                  day={preRelease.dd}
+                  day={preRelease.d}
+                  weekDay={preRelease.dd}
                   title={preRelease.title}
                   shipped={true}
                   shippable={false}
@@ -184,7 +175,6 @@ export default function LW8Releases() {
                 />
               }
               key={preRelease.dd}
-              // disabled={!prereleaseShipped}
               className="h-[79px]"
               id={preRelease.d.toString()}
             >
@@ -232,51 +222,6 @@ export default function LW8Releases() {
                           )
                       )}
                   </motion.div>
-                  {/* <motion.div
-                    className={`
-                      relative overflow-hidden group/3 flex-1 flex flex-col items-center justify-between
-                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl h-full bg-no-repeat py-10 sm:py-14 px-8 lg:px-10 text-2xl bg-contain shadow-lg
-                      `}
-                    initial="default"
-                    animate="default"
-                    whileHover="hover"
-                  >
-                    <div
-                      className="top-0 absolute group-hover/3:scale-105 opacity-60 group-hover/3:opacity-100 w-full h-full -z-10 transition-all duration-500"
-                      style={{
-                        background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, #030A0C)`,
-                      }}
-                    />
-                    <div className="flex flex-col items-center gap-2 min-w-[300px]">
-                      <CartTitle>{preRelease.steps[1].title}</CartTitle>
-                      <p className="text-sm text-slate-900">{preRelease.steps[1].description}</p>
-                    </div>
-                    <SectionButtons
-                      github={preRelease.steps[1].github}
-                      blog={preRelease.steps[1].blog}
-                    />
-                    {preRelease.steps[1].bg_layers &&
-                      preRelease.steps[1].bg_layers?.map(
-                        (layer, i) =>
-                          !!layer.img && (
-                            <motion.div
-                              className="absolute opacity-90 inset-0 w-full h-full -z-10"
-                              variants={i === 1 ? scaleOpacityVariant : undefined}
-                            >
-                              <Image
-                                src={layer.img}
-                                className={`
-                                  absolute opacity-90
-                                  w-full h-full -z-10 transition-all duration-300
-                                `}
-                                layout="fill"
-                                objectPosition="50% 50%"
-                                objectFit="cover"
-                              />
-                            </motion.div>
-                          )
-                      )}
-                  </motion.div> */}
                 </div>
               )}
             </Accordion.Item>
@@ -286,7 +231,8 @@ export default function LW8Releases() {
               header={
                 <AccordionHeader
                   date={day1.date}
-                  day={day1.dd}
+                  day={day1.d}
+                  weekDay={day1.dd}
                   title={day1.title}
                   shipped={day1Shipped}
                   publishedAt={day1.publishedAt}
@@ -360,7 +306,8 @@ export default function LW8Releases() {
               header={
                 <AccordionHeader
                   date={day2.date}
-                  day={day2.dd}
+                  day={day2.d}
+                  weekDay={day2.dd}
                   title={day2.title}
                   shipped={day2Shipped}
                   publishedAt={day2.publishedAt}
@@ -434,7 +381,8 @@ export default function LW8Releases() {
               header={
                 <AccordionHeader
                   date={day3.date}
-                  day={day3.dd}
+                  day={day3.d}
+                  weekDay={day3.dd}
                   title={day3.title}
                   shipped={day3Shipped}
                   publishedAt={day3.publishedAt}
@@ -508,7 +456,8 @@ export default function LW8Releases() {
               header={
                 <AccordionHeader
                   date={day4.date}
-                  day={day4.dd}
+                  day={day4.d}
+                  weekDay={day4.dd}
                   title={day4.title}
                   shipped={day4Shipped}
                   publishedAt={day4.publishedAt}
@@ -575,12 +524,13 @@ export default function LW8Releases() {
               )}
             </Accordion.Item>
           </div>
-          <div className="border-b border-[#111718]" id="currentDay">
+          <div className="border-b border-[#111718]">
             <Accordion.Item
               header={
                 <AccordionHeader
                   date={day5.date}
-                  day={day5.dd}
+                  day={day5.d}
+                  weekDay={day5.dd}
                   title={day5.title}
                   shipped={day5Shipped}
                   publishedAt={day5.publishedAt}
@@ -589,7 +539,63 @@ export default function LW8Releases() {
               disabled={!day5Shipped}
               className="h-[79px]"
               id={day5.d.toString()}
-            ></Accordion.Item>
+            >
+              {day5.steps.length > 0 && (
+                <div className="h-[400px] flex flex-col gap-5 lg:flex-row pb-8">
+                  <motion.div
+                    className={`
+                      relative overflow-hidden group/2 flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
+                      w-full border rounded-xl h-full px-4 sm:px-8 lg:px-14 py-14 xs:text-2xl text-xl text-center shadow-lg
+                    `}
+                    initial="default"
+                    animate="default"
+                    whileHover="hover"
+                  >
+                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+                      <CartTitle>{day5.steps[0]?.title}</CartTitle>
+                      <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
+                    </div>
+                    <SectionButtons
+                      docs={day5.steps[0]?.docs}
+                      blog={day5.steps[0]?.blog}
+                      video={day5.steps[0]?.video}
+                      hackernews={day5.steps[0]?.hackernews}
+                      mobileGrid
+                    />
+                    {day5.steps[0]?.bg_layers &&
+                      day5.steps[0]?.bg_layers?.map(
+                        (layer, i) =>
+                          !!layer.img && (
+                            <motion.div
+                              className={['absolute inset-0 w-full h-full -z-10'].join(' ')}
+                              variants={getDay4Motion(i)}
+                            >
+                              <Image
+                                src={
+                                  !!layer.mobileImg && isTablet
+                                    ? (layer.mobileImg as any)
+                                    : layer.img
+                                }
+                                className={[
+                                  `
+                                  absolute
+                                  w-full h-full -z-10 transition-all duration-300
+                                `,
+                                ].join(' ')}
+                                layout="fill"
+                                objectPosition={
+                                  !!layer.mobileImg && isTablet ? '50% 65%' : '80% 50%'
+                                }
+                                objectFit="cover"
+                                quality={100}
+                              />
+                            </motion.div>
+                          )
+                      )}
+                  </motion.div>
+                </div>
+              )}
+            </Accordion.Item>
           </div>
         </Accordion>
       </SectionContainer>
