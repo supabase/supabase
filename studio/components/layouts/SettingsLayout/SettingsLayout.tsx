@@ -12,7 +12,7 @@ const SettingsLayout = ({ children }: PropsWithChildren<{}>) => {
   return (
     <AppLayout>
       <div className="flex h-full">
-        {router.pathname !== '/projects' && (
+        {/* {router.pathname !== '/projects' && (
           <div className="h-full overflow-y-auto min-w-[280px] border-r px-8 py-8">
             {slug === undefined && ref === undefined ? (
               <AccountSettingsMenu />
@@ -20,7 +20,7 @@ const SettingsLayout = ({ children }: PropsWithChildren<{}>) => {
               <OrganizationSettingsMenu />
             )}
           </div>
-        )}
+        )} */}
         <div className="h-full overflow-y-auto flex-grow">{children}</div>
       </div>
     </AppLayout>
