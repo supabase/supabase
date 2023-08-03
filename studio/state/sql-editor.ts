@@ -132,6 +132,16 @@ export const sqlEditorState = proxy({
       sqlEditorState.needsSaving.add(id)
     }
   },
+  shareSnippet: (id: string, visibility: 'user' | 'project' | 'org' | 'public') => {
+    if (sqlEditorState.snippets[id]) {
+      const { snippet, projectRef } = sqlEditorState.snippets[id]
+
+      snippet.visibility = visibility
+
+      sqlEditorState.reorderSnippets(projectRef)
+      sqlEditorState.needsSaving.add(id)
+    }
+  },
   addNeedsSaving: (id: string) => {
     sqlEditorState.needsSaving.add(id)
   },
@@ -232,6 +242,7 @@ if (typeof window !== 'undefined') {
             id,
             name: snippet.snippet.name,
             description: snippet.snippet.description,
+            visibility: snippet.snippet.visibility,
           })
 
           sqlEditorState.needsSaving.delete(id)
