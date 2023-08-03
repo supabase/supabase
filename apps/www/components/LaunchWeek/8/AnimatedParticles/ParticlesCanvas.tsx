@@ -14,7 +14,7 @@ const ParticlesCanvas = () => {
   const { config, particles } = useParticlesConfig()
 
   // stop animation if canvas if is not in viewport
-  // to avoid unnecessary computations
+  // to stop unnecessary computations
   const handleScroll = () => {
     if (canvasRef.current && typeof window !== 'undefined') {
       const rect = (canvasRef.current as HTMLDivElement)?.getBoundingClientRect()
@@ -73,7 +73,6 @@ const ParticlesCanvas = () => {
     >
       <ambientLight intensity={config.lightIntensity} />
       <group position={[0, 70, 0]} scale={[0.75, 0.75, 0.75]}>
-        {/* Animated 8 shape particles */}
         {particles?.map((user: any, index: number) => (
           <Particle
             key={`particle-${user.username ?? index}`}

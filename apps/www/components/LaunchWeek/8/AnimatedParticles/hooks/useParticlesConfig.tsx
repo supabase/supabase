@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { range } from 'lodash'
 
 let defaultConfig = {
-  particles: 1500,
+  particles: 700,
   particlesSize: 1.2,
   goldParticlesSize: 1.5,
   particlesSides: 5,
@@ -12,10 +12,6 @@ let defaultConfig = {
   widthRatio: 1.2,
   topHeightRadius: 80,
   bottomHeightRadius: 100,
-  trails: 0,
-  trailWidth: 40,
-  trailLength: 100,
-  trailDecay: 450,
   color: '#ffffff',
   colorGold: '#b89d18',
   xThickness: 7,
@@ -48,7 +44,7 @@ const useParticlesConfig = (): any => {
     const particlesFolder = gui.addFolder('Particles')
     const shapeFolder = gui.addFolder('Shape')
     const speedFolder = gui.addFolder('Speed')
-    // const trailFolder = gui.addFolder('Trail')
+
     gui.width = 500
     particlesFolder
       .add(config, 'particles')
