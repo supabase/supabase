@@ -30,6 +30,9 @@ values
   ('Mexico', 'MX');
 ```
 
+{/* prettier-ignore */}
+{/*
+
 ### Splitting up your seed file
 
 The seed file can grow quite large, so you can split it up into multiple files. For example, you can create a `seed` folder and add a `countries.sql` file. Then you can add the following to your `seed.sql` file.
@@ -50,6 +53,7 @@ COPY countries (name, code) FROM 'seed/countries.csv' WITH (FORMAT csv);
 ## Generating seed data from Production
 
 - Use snaplet
+  \*/}
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
