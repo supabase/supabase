@@ -550,6 +550,7 @@ export const database: NavMenuConstant = {
       name: 'Postgres Guides',
       url: undefined,
       items: [
+        { name: 'Inspecting your Postgres database', url: '/guides/database/inspect' },
         {
           name: 'JSON and unstructured data',
           url: '/guides/database/json',
