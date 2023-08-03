@@ -3,7 +3,8 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'json',
   title: 'Inspecting your Postgres database',
-  description: 'Inspecting your Postgres database for common issues around disk, query performance, index, locks, and more using the terminal.',
+  description:
+    'Inspecting your Postgres database for common issues around disk, query performance, index, locks, and more using the terminal.',
 }
 
 ## Inspect from the terminal
@@ -120,7 +121,7 @@ Below are the db inspection commands provided, grouped by different use cases.
 
 <Admonition type="note">
 
-Some commands might require pg_stats to be enabled or a specific Postgres version to be used.
+Some commands might require `pg_stat_statements` to be enabled or a specific Postgres version to be used.
 
 </Admonition>
 
@@ -156,6 +157,17 @@ The commands below are useful if your Postgres database consumes a lot of resour
 - role-connections - shows number of active connections for all database roles (Supabase-specific command)
 - replication-slots - shows information about replication slots on the database
 
+## Notes on `pg_stat_statements`
+
+Following commands require `pg_stat_statements` to be enabled: calls, locks, cache-hit, blocking, unused-indexes, index-usage, bloat, outliers, table-record-counts, replication-slots, seq-scans, vacuum-stats, long-running-queries.
+
+When using `pg_stat_statements` also take note that it only stores the latest 5,000 statements. Moreover, consider resetting the analysis after optimizing any queries by running `select pg_stat_statements_reset();`
+
+Learn more about pg_stats [here](https://supabase.com/docs/guides/database/extensions/pg_stat_statements).
+
+## Acknowledgements
+
+Supabase CLI's inspect commands are heavily inspired by the [pg-extras](https://github.com/heroku/heroku-pg-extras) tools.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
