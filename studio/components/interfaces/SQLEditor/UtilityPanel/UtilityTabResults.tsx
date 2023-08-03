@@ -5,7 +5,7 @@ import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject, useS
 import { IS_PLATFORM } from 'lib/constants'
 import { format } from 'sql-formatter'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { AiIcon, Button, IconLoader } from 'ui'
+import { AiIconAnimation, Button } from 'ui'
 import { useSqlEditor } from '../SQLEditor'
 import { sqlAiDisclaimerComment } from '../SQLEditor.constants'
 import Results from './Results'
@@ -57,11 +57,9 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
           <p className="m-0 border-0 px-6 py-4 font-mono">{result.error.message ?? result.error}</p>
           <Button
             icon={
-              !isDebugSqlLoading ? (
-                <AiIcon className="w-3 h-3" />
-              ) : (
-                <IconLoader className="animate-spin" size={14} />
-              )
+              <div className="scale-75">
+                <AiIconAnimation className="w-3 h-3" loading={isDebugSqlLoading} />
+              </div>
             }
             disabled={!!sqlDiff}
             onClick={async () => {
