@@ -23,7 +23,7 @@ const ProjectsPage: NextPageWithLayout = () => {
   const projects = allProjects?.filter((project) => project.organization_id === organization?.id)
 
   return (
-    <ScaffoldContainer>
+    <ScaffoldContainer className="h-full overflow-y-auto">
       <ScaffoldSection>
         <div className="col-span-12 space-y-8">
           <Link href={`/new/${organization?.slug}`}>
