@@ -13,9 +13,14 @@ import AlertError from 'components/ui/AlertError'
 interface PullRequestsProps {
   previewBranches: Branch[]
   generateCreatePullRequestURL: (branch?: string) => string
+  onSelectDeleteBranch: (branch: Branch) => void
 }
 
-const PullRequests = ({ previewBranches, generateCreatePullRequestURL }: PullRequestsProps) => {
+const PullRequests = ({
+  previewBranches,
+  generateCreatePullRequestURL,
+  onSelectDeleteBranch,
+}: PullRequestsProps) => {
   const { ref } = useParams()
   const selectedOrg = useSelectedOrganization()
   const pullRequestUrl = generateCreatePullRequestURL()
@@ -118,7 +123,18 @@ const PullRequests = ({ previewBranches, generateCreatePullRequestURL }: PullReq
               </div>
             </BranchContainer>
           ) : (
-            pullRequests?.map((pr) => <PullRequestPanel key={pr.id} pr={pr} />)
+            pullRequests?.map((pr) => {
+              const branch = branches?.find((branch) => branch.git_branch === pr.branch)
+              return (
+                <PullRequestPanel
+                  key={pr.id}
+                  pr={pr}
+                  onSelectDelete={() => {
+                    if (branch !== undefined) onSelectDeleteBranch(branch)
+                  }}
+                />
+              )
+            })
           )}
         </>
       )}
