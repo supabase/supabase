@@ -20,9 +20,9 @@ We could approach this animation in a few ways.
 
 For example, animating the `stroke-dashoffset` on an SVG path, similar to <Link children="this" href="https://css-tricks.com/svg-line-animation-works/" target="_blank" /> example, was a good option, but it would have been difficult to randomize and change the shape at a later stage. Other approaches included 2D animation libraries, like <Link children="Framer Motion" href="https://www.framer.com/motion/animation/" target="_blank" />, <Link children="gsap" href="https://greensock.com/gsap/" target="_blank" /> or <Link children="PixiJS" href="https://pixijs.com/" target="_blank" />.
 
-Ultimately we decided to take <Link href="https://threejs.org/" target="_blank" children="threeJS" /> for a spin using [React Three Fiber](https://docs.pmnd.rs/react-three-fiber/getting-started/introduction) (R3F) giving us a more powerful toolset to enable us to achieve the best possible result.
+Ultimately we decided to take <Link href="https://threejs.org/" target="_blank" children="Three.js" /> for a spin using [React Three Fiber](https://docs.pmnd.rs/react-three-fiber/getting-started/introduction) (R3F) giving us a more powerful toolset to enable us to achieve the best possible result.
 
-Learning three.js is not a walk in the park but R3F abstracted many of the other complexities such as cameras and renderers. If you’re new to R3F, some of the core primitives they provide for a basic scene include:
+Learning Three.js is not a walk in the park but R3F abstracted many of its complexities such as cameras and renderers, to name a few. If you're new to R3F, some of the core primitives they provide for a basic scene include:
 
 - `Geometries`: used to create and define shapes
 - `Materials`: manage the texture and color of objects
@@ -37,7 +37,7 @@ If you want to dive a little deeper, here are a few good resources we found to g
     target="_blank"
     children="I wish I knew this before using React Three Fiber"
   /> - from our very own <Link href="https://twitter.com/ggrdson" target="_blank" children="Greg" />
-- <Link href="https://threejs-journey.com/" target="_blank" children="ThreeJs Journey" /> - by <Link
+- <Link href="https://Ts-journey.com/" target="_blank" children="ThreeJs Journey" /> - by <Link
     href="https://bruno-simon.com/"
     target="_blank"
     children="Bruno Simon"
