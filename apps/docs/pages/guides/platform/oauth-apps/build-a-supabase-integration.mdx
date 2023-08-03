@@ -3,12 +3,10 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'build-a-supabase-integration',
   title: 'Build a Supabase Integration (Beta)',
+  subtitle:
+    "This guide steps through building a Supabase Integration using OAuth2 and the management API, allowing you to manage users' organizations and projects on their behalf.",
   description: 'Build a Supabase Integration using OAuth2 and the Management API.',
 }
-
-## Overview
-
-This guide steps through building a Supabase Integration using OAuth2 and the management API, allowing you to manage users' organizations and projects on their behalf.
 
 Using OAuth2.0 you can retrieve an access and refresh token that grant your application full access to the [Management API](https://supabase.com/docs/reference/api/introduction) on behalf of the user.
 
@@ -20,15 +18,15 @@ Using OAuth2.0 you can retrieve an access and refresh token that grant your appl
 
 ## Show a "Connect Supabase" button
 
-In your backend, add a "Connect Supabase" button to kick off the OAuth flow. Follow the design guidelines outlined in our [brand assets](/brand-assets).
+In your user interface, add a "Connect Supabase" button to kick off the OAuth flow. Follow the design guidelines outlined in our [brand assets](/brand-assets).
 
-## Implement the OAuth 2.0 flow
+## Implementing the OAuth 2.0 flow
 
 Once you've published your OAuth App on Supabase, you can use the OAuth 2.0 protocol get authorization from Supabase users to manage their organizations and projects.
 
 You can use your preferred OAuth2 client or follow the steps below. You can see an example implementation in TypeScript using Supabase Edge Functions [on our GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/connect-supabase).
 
-### Redirect to the authorize URL
+### Redirecting to the authorize URL
 
 Within your app's UI, redirect the user to [`https://api.supabase.com/v1/oauth/authorize`](<https://api.supabase.com/api/v1#/oauth%20(beta)/authorize>). Make sure to include all required query parameters such as:
 
@@ -56,7 +54,7 @@ router.get('/connect-supabase/login', async (ctx) => {
 
 Find the full example on [GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/connect-supabase).
 
-### Handle the callback
+### Handling the callback
 
 Once the user consents to providing API access to your OAuth App, Supabase will redirect the user to the `redirect_uri` provided in the previous step. The URL will contain these query parameters:
 
@@ -106,13 +104,13 @@ router.get('/connect-supabase/oauth2/callback', async (ctx) => {
 
 Find the full example on [GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/connect-supabase).
 
-## Refresh an access token
+## Refreshing an access token
 
 You can use the [`POST /v1/oauth/token`](<https://api.supabase.com/api/v1#/oauth%20(beta)/token>) endpoint to refresh an access token using the refresh token returned at the end of the previous section.
 
 If the user has revoked access to your application, you will not be able to refresh a token. Furthermore, access tokens will stop working. Make sure you handle HTTP Unauthorized errors when calling any Supabase API.
 
-## Call the Management API
+## Calling the Management API
 
 Refer to [the Management API reference](/docs/reference/api/introduction#authentication) to learn more about authentication with the Management API.
 
