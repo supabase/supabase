@@ -81,10 +81,18 @@ export const HackernewsSvg = () => (
   </svg>
 )
 
-export const SmallCard = ({ className, children }: { className?: string; children: any }) => (
+export const SmallCard = ({
+  className,
+  innerClassName,
+  children,
+}: {
+  className?: string
+  innerClassName?: string
+  children: any
+}) => (
   <div
     className={[
-      'relative p-[1px] bg-gradient-to-b from-[#111718] to-[#1C1C1C60] rounded-2xl overflow-hidden shadow-lg',
+      'group relative p-[1px] bg-gradient-to-b from-[#11171890] to-[#1C1C1C60] rounded-2xl overflow-hidden shadow-lg',
       className,
     ].join(' ')}
   >
@@ -92,6 +100,7 @@ export const SmallCard = ({ className, children }: { className?: string; childre
       className={[
         'rounded-2xl text-sm text-[#9296AA] p-2 flex flex-row justify-between items-center backdrop-blur-md h-full',
         'bg-[#030A0C]',
+        innerClassName,
       ].join(' ')}
     >
       {children}
