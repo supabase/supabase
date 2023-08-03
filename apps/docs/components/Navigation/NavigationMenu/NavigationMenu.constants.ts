@@ -1013,8 +1013,8 @@ export const supabase_cli: NavMenuConstant = {
           url: '/guides/cli/seeding-your-database',
         },
         {
-          name: 'Testing emails locally',
-          url: '/guides/cli/testing-emails',
+          name: 'Testing and linting',
+          url: '/guides/cli/testing-and-linting',
         },
       ],
     },
@@ -1025,6 +1025,14 @@ export const supabase_cli: NavMenuConstant = {
         {
           name: 'Generate types from your database',
           url: '/guides/cli/github-action/generating-types',
+        },
+        {
+          name: 'Automated testing',
+          url: '/guides/cli/github-action/testing',
+        },
+        {
+          name: 'Backup your database',
+          url: '/guides/cli/github-action/backups',
         },
       ],
     },
