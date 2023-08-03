@@ -61,13 +61,13 @@ const CreateBranchSidePanel = ({ visible, onClose }: CreateBranchSidePanelProps)
   const githubIntegration = integrations?.find(
     (integration) =>
       integration.integration.name === 'GitHub' &&
-      integration.organization.slug === selectedOrg?.slug
+      integration.connections.some((connection) => connection.supabase_project_ref === ref)
   )
 
-  const repositoryMeta = githubIntegration?.connections?.find(
+  const githubConnection = githubIntegration?.connections?.find(
     (connection) => connection.supabase_project_ref === ref
   )
-  const [repoOwner, repoName] = repositoryMeta?.metadata.name.split('/') || []
+  const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') || []
   const {
     data: githubBranches,
     error: githubBranchesError,
@@ -115,7 +115,7 @@ const CreateBranchSidePanel = ({ visible, onClose }: CreateBranchSidePanelProps)
                 Your project is currently connected to the repository:
               </p>
               <div className="flex items-center space-x-2">
-                <p>{repositoryMeta?.metadata.name}</p>
+                <p>{githubConnection?.metadata.name}</p>
                 <Link passHref href={`https://github.com/${repoOwner}/${repoName}`}>
                   <a target="_blank" rel="noreferrer">
                     <IconExternalLink size={14} strokeWidth={1.5} />

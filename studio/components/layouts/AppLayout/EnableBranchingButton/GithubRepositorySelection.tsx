@@ -47,10 +47,10 @@ const GithubRepositorySelection = ({
   const [open, setOpen] = useState(false)
   const comboBoxRef = useRef<HTMLButtonElement>(null)
 
-  const githubProjectIntegration = integration?.connections.find(
+  const githubConnection = integration?.connections.find(
     (connection) => connection.supabase_project_ref === ref
   )
-  const [repoOwner, repoName] = githubProjectIntegration?.metadata.name.split('/') ?? []
+  const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') ?? []
 
   const {
     data: githubBranches,
@@ -75,7 +75,7 @@ const GithubRepositorySelection = ({
             <Badge color="amber">Required</Badge>
           </div>
           <p className="text-sm text-light !mb-4">
-            {githubProjectIntegration !== undefined
+            {githubConnection !== undefined
               ? 'Your database preview branches will be based on the branches in the following repository that your project is connected with:'
               : 'Your database preview branches will be based on the branches in the Git repository that your project is connected with.'}
           </p>
@@ -88,15 +88,15 @@ const GithubRepositorySelection = ({
               </a>
             </Link>
           )}
-          {integration && !githubProjectIntegration && (
+          {integration && !githubConnection && (
             <EmptyIntegrationConnection showNode={false} onClick={() => onSelectConnectRepo()} />
           )}
-          {integration && githubProjectIntegration && (
+          {integration && githubConnection && (
             <>
               <ul className="mb-3">
                 <IntegrationConnection
                   type={'GitHub'}
-                  connection={githubProjectIntegration}
+                  connection={githubConnection}
                   showNode={false}
                   actions={
                     <Button type="default" onClick={() => onSelectConnectRepo()}>
