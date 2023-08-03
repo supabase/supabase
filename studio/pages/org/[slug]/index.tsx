@@ -21,7 +21,10 @@ const ProjectsPage: NextPageWithLayout = () => {
   } = useProjectsQuery()
 
   const organization = useSelectedOrganization()
-  const projects = allProjects?.filter((project) => project.organization_id === organization?.id)
+  const projects = allProjects
+    ?.filter((project) => project.organization_id === organization?.id)
+    .sort((a, b) => a.name.localeCompare(b.name))
+
   const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
   const githubConnections = integrations
     ?.filter((integration) => integration.integration.name === 'GitHub')
