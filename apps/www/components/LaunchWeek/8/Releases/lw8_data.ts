@@ -38,14 +38,14 @@ export interface WeekDayProps {
   steps: StepProps[] | []
 }
 
-export const endOfLW8 = '2023-08-11T23:59:59.999-08:00'
+export const endOfLW8 = '2023-08-11T23:59:59.999-07:00'
 
 const days: WeekDayProps[] = [
   {
     title: '',
     shipped: true,
     date: '04 Aug',
-    publishedAt: '2023-08-04T07:00:00.000-08:00',
+    publishedAt: '2023-08-04T09:00:00.000-07:00',
     description: '',
     d: 0,
     dd: 'Pre-release',
@@ -72,7 +72,7 @@ const days: WeekDayProps[] = [
     title: '',
     shipped: true,
     date: '07 Aug',
-    publishedAt: '2023-08-07T07:00:00.000-08:00',
+    publishedAt: '2023-08-07T09:00:00.000-07:00',
     description: '',
     d: 1,
     dd: 'Mon',
@@ -85,7 +85,7 @@ const days: WeekDayProps[] = [
     title: '',
     shipped: true,
     date: '08 Aug',
-    publishedAt: '2023-08-08T07:00:00.000-08:00',
+    publishedAt: '2023-08-08T09:00:00.000-07:00',
     description: '',
     d: 2,
     dd: 'Tue',
@@ -98,7 +98,7 @@ const days: WeekDayProps[] = [
     title: '',
     shipped: true,
     date: '09 Aug',
-    publishedAt: '2023-08-09T07:00:00.000-08:00',
+    publishedAt: '2023-08-09T09:00:00.000-07:00',
     description: '',
     d: 3,
     dd: 'Wed',
@@ -111,7 +111,7 @@ const days: WeekDayProps[] = [
     title: '',
     shipped: true,
     date: '10 Aug',
-    publishedAt: '2023-08-10T07:00:00.000-08:00',
+    publishedAt: '2023-08-10T09:00:00.000-07:00',
     description: '',
     d: 4,
     dd: 'Thu',
@@ -124,7 +124,7 @@ const days: WeekDayProps[] = [
     title: '',
     shipped: true,
     date: '11 Aug',
-    publishedAt: '2023-08-11T00:00:00.000-08:00',
+    publishedAt: '2023-08-11T00:00:00.000-07:00',
     description: '',
     d: 5,
     dd: 'Fri',

@@ -123,69 +123,70 @@ export const StyledArticleBadge = ({
 export const AccordionHeader = ({
   date,
   day,
+  weekDay,
   title,
   shipped,
   publishedAt,
   shippable = true,
 }: {
   date: string
-  day: string
+  day: number
+  weekDay: string
   title: string
   shipped?: boolean
   publishedAt: string
   shippable?: boolean
-}) => {
-  return (
-    <div className="flex flex-1 flex-col sm:flex-row">
-      <div className="flex gap-4 w-full sm:w-auto sm:min-w-[240px] md:min-w-[380px] items-center">
-        <span className="text-scale-900 text-sm">
-          <span className="inline sm:hidden md:inline">{day} </span>
-          {date && (
-            <span>
-              <span className="inline sm:hidden md:inline">・</span> {date}
-            </span>
-          )}
-        </span>
-      </div>
-      {shippable && shipped && (
-        <Badge
-          className={`relative inset-0 !bg-transparent !py-1 !px-4 h-fit backdrop-blur-md ${
-            shipped
-              ? 'bg-gradient-to-br from-[#05090B] to-[#05090B] !border-[#061517]'
-              : 'border-[#FFFFFF20]'
-          }`}
-        >
-          <span className="text-[#A0A0A0] text-sm font-normal bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
-            Shipped
+}) => (
+  <div className="flex flex-1 flex-col sm:flex-row">
+    <div className="flex gap-4 w-full sm:w-auto sm:min-w-[240px] md:min-w-[380px] items-center">
+      <span className="text-scale-900 text-sm">
+        <span className="inline sm:hidden md:inline">{weekDay} </span>
+        {date && (
+          <span>
+            <span className="inline sm:hidden md:inline">・</span> {date}
           </span>
-        </Badge>
-      )}
-      {shipped && <span className="text-scale-1200 text-lg mt-1 sm:mt-0">{title}</span>}
-      {shippable && !shipped && (
-        <span className="text-sm font-normal text-[#A0A0A0] mt-1 sm:mt-0 flex items-center gap-1 md:gap-4">
-          <svg
-            width="17"
-            height="17"
-            viewBox="0 0 17 17"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <g opacity="0.5">
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M4.32656 7.58047V5.98047C4.32656 3.77133 6.11742 1.98047 8.32656 1.98047C10.5357 1.98047 12.3266 3.77133 12.3266 5.98047V7.58047C13.2102 7.58047 13.9266 8.29681 13.9266 9.18047V13.1805C13.9266 14.0641 13.2102 14.7805 12.3266 14.7805H4.32656C3.44291 14.7805 2.72656 14.0641 2.72656 13.1805V9.18047C2.72656 8.29681 3.44291 7.58047 4.32656 7.58047ZM10.7266 5.98047V7.58047H5.92656V5.98047C5.92656 4.65499 7.00108 3.58047 8.32656 3.58047C9.65205 3.58047 10.7266 4.65499 10.7266 5.98047Z"
-                fill="#A0A0A0"
-              />
-            </g>
-          </svg>
-
-          <CountdownComponent date={publishedAt} showCard={false} />
-        </span>
-      )}
+        )}
+      </span>
     </div>
-  )
-}
+    {shippable && shipped && (
+      <Badge
+        className={`relative inset-0 !bg-transparent !py-1 !px-4 h-fit backdrop-blur-md ${
+          shipped
+            ? 'bg-gradient-to-br from-[#05090B] to-[#05090B] !border-[#061517]'
+            : 'border-[#FFFFFF20]'
+        }`}
+      >
+        <span className="text-[#A0A0A0] text-sm font-normal bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
+          Shipped
+        </span>
+      </Badge>
+    )}
+    {shipped && <span className="text-scale-1200 text-lg mt-1 sm:mt-0">{title}</span>}
+    {shippable && !shipped && (
+      <span className="text-sm font-normal text-[#A0A0A0] mt-1 sm:mt-0 flex items-center gap-1 md:gap-4">
+        <svg
+          width="17"
+          height="17"
+          viewBox="0 0 17 17"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g opacity="0.5">
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M4.32656 7.58047V5.98047C4.32656 3.77133 6.11742 1.98047 8.32656 1.98047C10.5357 1.98047 12.3266 3.77133 12.3266 5.98047V7.58047C13.2102 7.58047 13.9266 8.29681 13.9266 9.18047V13.1805C13.9266 14.0641 13.2102 14.7805 12.3266 14.7805H4.32656C3.44291 14.7805 2.72656 14.0641 2.72656 13.1805V9.18047C2.72656 8.29681 3.44291 7.58047 4.32656 7.58047ZM10.7266 5.98047V7.58047H5.92656V5.98047C5.92656 4.65499 7.00108 3.58047 8.32656 3.58047C9.65205 3.58047 10.7266 4.65499 10.7266 5.98047Z"
+              fill="#A0A0A0"
+            />
+          </g>
+        </svg>
+
+        {day === 1 && <CountdownComponent date={publishedAt} showCard={false} />}
+      </span>
+    )}
+  </div>
+)
+
 export const MultistepSectionHeader = ({ title, blog }: any) => {
   return (
     <div className="flex flex-1 flex-col sm:flex-row py-8">
