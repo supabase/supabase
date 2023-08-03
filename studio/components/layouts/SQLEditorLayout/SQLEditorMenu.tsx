@@ -13,7 +13,7 @@ import { useCheckPermissions, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { Button, cn, IconSearch, IconX, Input, Menu } from 'ui'
+import { Button, cn, IconPlus, IconSearch, IconX, Input, Menu } from 'ui'
 import QueryItem from './QueryItem'
 
 const SideBarContent = observer(() => {
@@ -128,20 +128,35 @@ const SideBarContent = observer(() => {
         ) : isSuccess ? (
           <div className="space-y-6">
             <div className="px-3 flex flex-col gap-2">
-              <ProductMenuItem
-                name="Build a query"
-                isActive={id === undefined}
-                url={`/project/${ref}/sql`}
-              />
-              <ProductMenuItem
-                name="New empty query"
-                isActive={false}
+              <Button
+                type="default"
+                className="mx-3 justify-start"
                 onClick={() => {
                   handleNewQuery()
                 }}
-              />
+                icon={<IconPlus size="tiny" />}
+              >
+                New query
+              </Button>
             </div>
             <div className="space-y-6 px-3">
+              <div>
+                <ProductMenuItem
+                  name="Build with AI"
+                  isActive={router.asPath === `/project/${ref}/sql`}
+                  url={`/project/${ref}/sql`}
+                />
+                <ProductMenuItem
+                  name="Templates"
+                  isActive={router.asPath === `/project/${ref}/sql/templates`}
+                  url={`/project/${ref}/sql/templates`}
+                />
+                <ProductMenuItem
+                  name="Quickstarts"
+                  isActive={router.asPath === `/project/${ref}/sql/quickstarts`}
+                  url={`/project/${ref}/sql/quickstarts`}
+                />
+              </div>
               {favoriteSnippets.length >= 1 && (
                 <div className="editor-product-menu">
                   <div className="flex flex-row justify-between">
@@ -167,7 +182,7 @@ const SideBarContent = observer(() => {
                     </button>
                   </div>
                   {isFavoritesFilterOpen && (
-                    <div className="pl-3 mb-2">
+                    <div className="pl-3 mb-2 mr-3">
                       <Input
                         autoFocus
                         size="tiny"
@@ -176,6 +191,12 @@ const SideBarContent = observer(() => {
                         disabled={isLoading}
                         onChange={(e) => setFavoritesFilterString(e.target.value)}
                         value={favoritesFilterString}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') {
+                            setIsFavoritesFilterOpen(false)
+                            setFavoritesFilterString('')
+                          }
+                        }}
                         actions={
                           favoritesFilterString && (
                             <IconX

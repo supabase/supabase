@@ -12,9 +12,10 @@ interface Props {
   primaryText: string
   projectRef: string
   secondaryText: string
+  addon?: 'pitr' | 'customDomain' | 'computeInstance'
 }
 
-const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText }) => {
+const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText, addon }) => {
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
   const plan = subscription?.plan?.id
 
@@ -45,8 +46,8 @@ const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText 
             <Tooltip.Trigger>
               <Button type="primary" disabled={!canUpdateSubscription || projectUpdateDisabled}>
                 <Link
-                  href={`/project/${projectRef}/settings/billing/subscription${
-                    plan === 'free' ? '?panel=subscriptionPlan' : ''
+                  href={`/project/${projectRef}/settings/billing/subscription?panel=${
+                    plan === 'free' ? 'subscriptionPlan' : addon || 'subscriptionPlan'
                   }`}
                 >
                   <a>{plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon'}</a>

@@ -714,6 +714,30 @@ export interface paths {
     /** Deletes vercel project connection */
     delete: operations["VercelConnectionsController_deleteVercelConnection"];
   };
+  "/platform/integrations/github": {
+    /** Create github integration */
+    post: operations["GitHubIntegrationController_createGitHubIntegration"];
+  };
+  "/platform/integrations/github/connections/{organization_integration_id}": {
+    /** Gets installed github project connections for the given organization integration */
+    get: operations["GitHubConnectionsController_getGitHubConnections"];
+  };
+  "/platform/integrations/github/connections": {
+    /** Connects a GitHub project to a supabase project */
+    post: operations["GitHubConnectionsController_createGitHubConnection"];
+  };
+  "/platform/integrations/github/connections/{connection_id}": {
+    /** Deletes github project connection */
+    delete: operations["GitHubConnectionsController_deleteGitHubConnection"];
+  };
+  "/platform/integrations/github/repos/{organization_integration_id}": {
+    /** Gets github repos for the given organization */
+    get: operations["GitHubRepoController_getRepos"];
+  };
+  "/platform/integrations/github/branches/{organization_integration_id}/{repo_owner}/{repo_name}": {
+    /** Gets github branches for a given repo */
+    get: operations["GitHubBranchController_getBranches"];
+  };
   "/system/auth/{ref}/templates/{template}": {
     /** Gets GoTrue template */
     get: operations["AuthTemplateController_getTemplate"];
@@ -793,6 +817,10 @@ export interface paths {
   "/system/integrations/vercel/webhooks": {
     /** Processes Vercel event */
     post: operations["VercelWebhooksController_processEvent"];
+  };
+  "/system/integrations/github/webhooks": {
+    /** Processes GitHub event */
+    post: operations["GitHubWebhooksController_processEvent"];
   };
   "/system/stripe/webhooks-v2": {
     /** Processes Stripe event */
@@ -2998,6 +3026,7 @@ export interface components {
       status: string;
       subscription_id: string;
       is_readonly_mode_enabled?: boolean;
+      preview_branch_refs: (string)[];
     };
     AmiSearchOptions: {
       search_tags?: Record<string, never>;
@@ -3037,6 +3066,7 @@ export interface components {
       status: string;
       subscription_id: string;
       is_readonly_mode_enabled?: boolean;
+      preview_branch_refs: (string)[];
       endpoint: string;
       anon_key: string;
       service_key: string;
@@ -3178,7 +3208,7 @@ export interface components {
       back_ups: (components["schemas"]["BackupId"])[];
     };
     RestartServiceRequest: {
-      services: ("adminapi" | "api-gateway" | "functions" | "gotrue" | "kong" | "pgbouncer" | "pgsodium" | "postgresql" | "postgrest" | "realtime" | "storage" | "walg")[];
+      services: ("adminapi" | "api-gateway" | "functions" | "gotrue" | "kong" | "pgbouncer" | "pgsodium" | "postgresql" | "postgrest" | "realtime" | "storage" | "walg" | "autoshutdown")[];
       source_notification_id?: string;
       region: string;
     };
@@ -3297,6 +3327,7 @@ export interface components {
       /** @enum {string} */
       pool_mode: "transaction" | "session" | "statement";
       max_client_conn?: number | null;
+      connectionString: string;
     };
     UpdatePgbouncerConfigBody: {
       default_pool_size?: number;
@@ -3850,6 +3881,34 @@ export interface components {
     };
     DeleteVercelConnectionResponse: {
       id: string;
+    };
+    CreateGitHubIntegrationBody: {
+      installation_id: number;
+      organization_slug: string;
+      metadata: Record<string, never>;
+    };
+    CreateGitHubIntegrationResponse: {
+      id: string;
+    };
+    GetGitHubConnections: {
+      id: string;
+      inserted_at: string;
+      updated_at: string;
+      organization_integration_id: string;
+      supabase_project_ref: string;
+      foreign_project_id: string;
+      metadata: Record<string, never>;
+    };
+    CreateGitHubConnectionsBody: {
+      organization_integration_id: string;
+      connection: components["schemas"]["IntegrationConnection"];
+    };
+    GetGithubRepo: {
+      id: number;
+      full_name: string;
+    };
+    GetGithubBranch: {
+      name: string;
     };
     FunctionResponse: {
       id: string;
@@ -8415,6 +8474,102 @@ export interface operations {
       500: never;
     };
   };
+  /** Create github integration */
+  GitHubIntegrationController_createGitHubIntegration: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateGitHubIntegrationBody"];
+      };
+    };
+    responses: {
+      201: {
+        content: {
+          "application/json": components["schemas"]["CreateGitHubIntegrationResponse"];
+        };
+      };
+      /** @description Failed to create github integration */
+      500: never;
+    };
+  };
+  /** Gets installed github project connections for the given organization integration */
+  GitHubConnectionsController_getGitHubConnections: {
+    parameters: {
+      path: {
+        organization_integration_id: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["GetGitHubConnections"])[];
+        };
+      };
+      /** @description Failed to get installed github connections for the given organization integration */
+      500: never;
+    };
+  };
+  /** Connects a GitHub project to a supabase project */
+  GitHubConnectionsController_createGitHubConnection: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateGitHubConnectionsBody"];
+      };
+    };
+    responses: {
+      201: never;
+      /** @description Failed to create project connections */
+      500: never;
+    };
+  };
+  /** Deletes github project connection */
+  GitHubConnectionsController_deleteGitHubConnection: {
+    parameters: {
+      path: {
+        connection_id: string;
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to delete github integration project connection */
+      500: never;
+    };
+  };
+  /** Gets github repos for the given organization */
+  GitHubRepoController_getRepos: {
+    parameters: {
+      path: {
+        organization_integration_id: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["GetGithubRepo"])[];
+        };
+      };
+      /** @description Failed to get github repos for the given organization */
+      500: never;
+    };
+  };
+  /** Gets github branches for a given repo */
+  GitHubBranchController_getBranches: {
+    parameters: {
+      path: {
+        organization_integration_id: string;
+        repo_owner: string;
+        repo_name: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["GetGithubBranch"])[];
+        };
+      };
+      /** @description Failed to get github branches for a given repo */
+      500: never;
+    };
+  };
   /** Gets GoTrue template */
   AuthTemplateController_getTemplate: {
     parameters: {
@@ -8773,6 +8928,25 @@ export interface operations {
     responses: {
       201: never;
       /** @description Failed to process Vercel event */
+      500: never;
+    };
+  };
+  /** Processes GitHub event */
+  GitHubWebhooksController_processEvent: {
+    parameters: {
+      header: {
+        "x-github-delivery": string;
+        "x-hub-signature-256": string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Buffer"];
+      };
+    };
+    responses: {
+      201: never;
+      /** @description Failed to process GitHub event */
       500: never;
     };
   };

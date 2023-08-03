@@ -132,7 +132,12 @@ const GenerateSQL = () => {
                 <div className="px-4 [overflow-anchor:none] mb-6">
                   <div className="flex gap-6 [overflow-anchor:none] mb-6">
                     <div>
-                      <AiIconChat />
+                      <AiIconChat
+                        loading={
+                          message.status === MessageStatus.Pending ||
+                          message.status === MessageStatus.InProgress
+                        }
+                      />
                     </div>
                     <>
                       {message.status === MessageStatus.Pending ? (
@@ -178,7 +183,6 @@ const GenerateSQL = () => {
               )
           }
         })}
-
         {messages.length === 0 && !hasError && (
           <div>
             <div className="px-4">
@@ -239,7 +243,6 @@ const GenerateSQL = () => {
             </div>
           </div>
         )}
-
         {hasError && (
           <div className="p-6 flex flex-col items-center gap-6 mt-4">
             <IconAlertTriangle className="text-amber-900" strokeWidth={1.5} size={21} />
@@ -252,7 +255,6 @@ const GenerateSQL = () => {
             </Button>
           </div>
         )}
-
         <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
 
