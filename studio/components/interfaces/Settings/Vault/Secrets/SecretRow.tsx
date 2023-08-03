@@ -66,11 +66,11 @@ const SecretRow: FC<Props> = ({ secret, onSelectEdit, onSelectRemove }) => {
           <IconKey
             size={14}
             strokeWidth={2}
-            className="text-scale-1000 transition group-hover:text-brand-900"
+            className="text-scale-1000 transition group-hover:text-brand"
           />
           <Link href={`/project/${ref}/settings/vault/keys?id=${secret.key_id}`}>
             <a
-              className="text-scale-1100 font-mono text-xs cursor-pointer transition group-hover:text-brand-900"
+              className="text-scale-1100 font-mono text-xs cursor-pointer transition group-hover:text-brand"
               title={secret.key_id}
             >
               {secret.key_id}

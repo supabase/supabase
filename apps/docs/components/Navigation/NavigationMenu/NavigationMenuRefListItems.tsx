@@ -16,7 +16,7 @@ import { deepFilterSections } from './NavigationMenu.utils'
 
 const HeaderLink = React.memo(function HeaderLink(props: any) {
   return (
-    <span className={['text-base text-brand-1200 ', !props.title && 'capitalize'].join(' ')}>
+    <span className={['text-base text-brand-600 ', !props.title && 'capitalize'].join(' ')}>
       {props.title ?? props.id}
     </span>
   )
@@ -64,7 +64,7 @@ const FunctionLink = React.memo(function FunctionLink({
         className={cn(
           'cursor-pointer transition text-sm hover:text-scale-1200 gap-3 relative',
           isParent ? 'flex justify-between' : 'leading-3',
-          active ? 'text-brand-900' : 'text-scale-1000'
+          active ? 'text-brand' : 'text-scale-1000'
         )}
       >
         {icon && <Image width={16} height={16} alt={icon} src={`${router.basePath}${icon}`} />}
@@ -72,7 +72,7 @@ const FunctionLink = React.memo(function FunctionLink({
         {active && !isSubItem && (
           <div
             aria-hidden="true"
-            className="absolute -left-[13px] top-0 bottom-0 w-[1px] bg-brand-1000"
+            className="absolute -left-[13px] top-0 bottom-0 w-[1px] bg-brand-600"
           ></div>
         )}
         {isParent && (
@@ -180,7 +180,7 @@ const NavigationMenuRefListItems = ({
         <a
           className={[
             'flex items-center gap-1 text-xs group mb-3',
-            'text-base transition-all duration-200 text-scale-1100 hover:text-brand-1200 hover:cursor-pointer ',
+            'text-base transition-all duration-200 text-scale-1100 hover:text-brand-600 hover:cursor-pointer ',
           ].join(' ')}
         >
           <div className="relative w-2">

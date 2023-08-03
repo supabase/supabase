@@ -1,10 +1,11 @@
 import { useParams } from 'common'
+
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useStore } from 'hooks'
 import { useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { AiIcon, Button, Form, IconLoader, Input, Modal, cn } from 'ui'
+import { AiIconAnimation, Button, Form, IconLoader, Input, Modal, cn } from 'ui'
 
 export interface RenameQueryModalProps {
   snippet: SqlSnippet
@@ -73,32 +74,33 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
                 name="name"
                 value={nameInput}
                 onChange={(e) => setNameInput(e.target.value)}
-                inputClassName={cn(isAiButtonVisible && 'pr-[6.5rem]')}
-                actions={
-                  isAiButtonVisible ? (
-                    <Button
-                      onClick={async () => {
-                        const { title, description } = await generateSqlTitle({
-                          sql: snippet.content.sql,
-                        })
-                        setNameInput(title)
-                        if (!descriptionInput) {
-                          setDescriptionInput(description)
-                        }
-                      }}
-                      icon={
-                        !isTitleGenerationLoading ? (
-                          <AiIcon className="w-3 h-3" />
-                        ) : (
-                          <IconLoader className="animate-spin" size={14} />
-                        )
-                      }
-                    >
-                      Generate
-                    </Button>
-                  ) : undefined
-                }
+                // inputClassName={cn(isAiButtonVisible && 'pr-[6.5rem]')}
+                // actions={}
               />
+              <div className="flex w-full justify-end mt-2">
+                {isAiButtonVisible && (
+                  <Button
+                    type="default"
+                    onClick={async () => {
+                      const { title, description } = await generateSqlTitle({
+                        sql: snippet.content.sql,
+                      })
+                      setNameInput(title)
+                      if (!descriptionInput) {
+                        setDescriptionInput(description)
+                      }
+                    }}
+                    size="tiny"
+                    disabled={isTitleGenerationLoading}
+                    // className="!px-2 !py-0.5 !pr-3"
+                  >
+                    <div className="flex items-center gap-1">
+                      <AiIconAnimation loading={isTitleGenerationLoading} className="scale-75" />
+                      <span>Rename with AI</span>
+                    </div>
+                  </Button>
+                )}
+              </div>
             </Modal.Content>
             <Modal.Content>
               <Input.TextArea

@@ -218,7 +218,7 @@ const ProjectLinksEmptyState = () => (
       then close this window and retry adding integration.
     </p>
     <Link href="https://supabase.com/dashboard">
-      <a className="text-brand-900">
+      <a className="text-brand">
         Start a new Supabase project<span aria-hidden="true"> &rarr;</span>
       </a>
     </Link>

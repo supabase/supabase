@@ -18,8 +18,8 @@ const Success: FC<Props> = ({ sentCategory = '' }) => {
   return (
     <div className="mt-10 w-[620px] flex flex-col items-center space-y-4">
       <div className="relative">
-        <IconMail strokeWidth={1.5} size={60} className="text-brand-900" />
-        <div className="h-6 w-6 rounded-full bg-brand-900 absolute bottom-1 -right-1.5 flex items-center justify-center">
+        <IconMail strokeWidth={1.5} size={60} className="text-brand" />
+        <div className="h-6 w-6 rounded-full bg-brand absolute bottom-1 -right-1.5 flex items-center justify-center">
           <IconCheck strokeWidth={4} size={18} />
         </div>
       </div>

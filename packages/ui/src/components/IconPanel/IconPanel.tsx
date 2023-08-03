@@ -70,7 +70,13 @@ const IconPanel = ({
                 <img
                   className={iconSize === 'lg' ? 'w-8' : 'w-5'}
                   src={`${icon}${hasLightIcon && !isDarkMode ? '-light' : ''}.svg`}
-                  alt={title !== undefined ? `${title} Icon` : tooltip !== undefined ? `${tooltip} Icon` : 'Icon'}
+                  alt={
+                    title !== undefined
+                      ? `${title} Icon`
+                      : tooltip !== undefined
+                      ? `${tooltip} Icon`
+                      : 'Icon'
+                  }
                 />
               </IconContainer>
             ) : (
@@ -92,7 +98,7 @@ const IconPanel = ({
                 )}
               </div>
               {children && <span className="text-sm text-scale-1100 not-prose">{children}</span>}
-              {showLink && <span className="text-brand-900 justify-end text-sm">Learn more</span>}
+              {showLink && <span className="text-brand justify-end text-sm">Learn more</span>}
             </div>
           </div>
         </div>

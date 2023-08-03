@@ -57,7 +57,7 @@ const SpreadSheetFileUpload: FC<Props> = ({
           onClick={() => (uploadButtonRef.current as any)?.click()}
         >
           <p className="text-sm">
-            Drag and drop, or <span className="text-brand-900">browse</span> your files
+            Drag and drop, or <span className="text-brand">browse</span> your files
           </p>
         </div>
       ) : (
