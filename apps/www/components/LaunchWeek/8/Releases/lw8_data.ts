@@ -1,6 +1,9 @@
 const images = {
+  '00-stay-remote': '/images/launchweek/8/day0/why-we-stay-remote.svg',
+  '00-pg-server': '/images/launchweek/8/day0/pg-server.svg',
   '00-constellation': '/images/launchweek/8/day0/constellation-pre.svg',
   '00-constellation-mobile': '/images/launchweek/8/day0/constellation.svg',
+  '01-hugging': '/images/launchweek/8/day1/hugging.svg',
 }
 
 export interface StepProps {
@@ -36,6 +39,7 @@ export interface WeekDayProps {
   youtube_id: string
   blogpost: string
   docs: string
+  twitter_space?: string
   steps: StepProps[] | []
 }
 
@@ -55,6 +59,18 @@ const days: WeekDayProps[] = [
     docs: '',
     steps: [
       {
+        title: "Why we'll stay remote",
+        blog: '/blog/',
+        bg_layers: [{ img: images['00-stay-remote'] }],
+        steps: [],
+      },
+      {
+        title: 'Postgres Language Server',
+        blog: '/blog/',
+        bg_layers: [{ img: images['00-pg-server'] }],
+        steps: [],
+      },
+      {
         title:
           'Coding the stars - an interactive constellation with Three.js and React Three Fiber',
         blog: '/blog/interactive-constellation-threejs-react-three-fiber',
@@ -67,7 +83,7 @@ const days: WeekDayProps[] = [
   },
   {
     title: '',
-    shipped: false,
+    shipped: true,
     date: '07 Aug',
     publishedAt: '2023-08-07T09:00:00.000-07:00',
     description: '',
@@ -76,7 +92,15 @@ const days: WeekDayProps[] = [
     youtube_id: '',
     blogpost: '',
     docs: '',
-    steps: [],
+    twitter_space: 'https://twitter.com/i/spaces/1DXGyvjkeEeJM',
+    steps: [
+      {
+        title: 'Huggingface now supported in Supabase',
+        blog: '/blog/',
+        bg_layers: [{ img: images['01-hugging'] }],
+        steps: [],
+      },
+    ],
   },
   {
     title: '',
