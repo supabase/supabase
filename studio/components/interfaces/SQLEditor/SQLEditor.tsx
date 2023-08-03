@@ -483,7 +483,7 @@ const SQLEditor = () => {
                     {debugSolution}
                   </div>
                 )}
-                {!isEditSqlLoading ? (
+                {!isEditSqlLoading && !debugSolution && (
                   <motion.div
                     key="ask-ai-input"
                     className="w-full h-full relative flex items-center"
@@ -582,7 +582,8 @@ const SQLEditor = () => {
                       }}
                     />
                   </motion.div>
-                ) : (
+                )}
+                {isEditSqlLoading && (
                   <motion.div
                     key="ask-ai-loading"
                     className="p-0 flex flex-row gap-2 items-center w-full"
