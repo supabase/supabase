@@ -117,8 +117,7 @@ const ProjectDropdown = () => {
     { enabled: !isOrgBilling }
   )
   const projects = allProjects
-    ?.filter((x) => x.status !== PROJECT_STATUS.INACTIVE)
-    .filter((x) => x.organization_id === selectedOrganization?.id)
+    ?.filter((x) => x.organization_id === selectedOrganization?.id)
     .sort((a, b) => a.name.localeCompare(b.name))
   const selectedProject = isBranch
     ? parentProject
