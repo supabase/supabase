@@ -12,6 +12,7 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import {
   IntegrationName,
   IntegrationProjectConnection,
@@ -21,7 +22,7 @@ import { BASE_PATH } from 'lib/constants'
 import { pluralize } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
 import { useCallback, useState } from 'react'
-import { Button, Dropdown, IconChevronDown, IconTrash, Modal } from 'ui'
+import { Button, Dropdown, IconChevronDown, IconLoader, IconRefreshCw, IconTrash, Modal } from 'ui'
 
 export interface IntegrationProps {
   title: string
@@ -123,6 +124,7 @@ const IntegrationConnectionItem = ({
   onDeleteConnection,
 }: IntegrationConnectionItemProps) => {
   const [isOpen, setIsOpen] = useState(false)
+  const [dropdownVisible, setDropdownVisible] = useState(false)
 
   const onConfirm = useCallback(async () => {
     try {
@@ -136,6 +138,17 @@ const IntegrationConnectionItem = ({
     setIsOpen(false)
   }, [])
 
+  const { mutateAsync: syncEnvs, isLoading: isSyncEnvLoading } =
+    useIntegrationsVercelConnectionSyncEnvsMutation()
+
+  const onReSyncEnvVars = useCallback(async () => {
+    try {
+      await syncEnvs({ connectionId: connection.id })
+    } finally {
+      setDropdownVisible(false)
+    }
+  }, [connection, syncEnvs])
+
   return (
     <>
       <IntegrationConnection
@@ -143,13 +156,37 @@ const IntegrationConnectionItem = ({
         type={type}
         actions={
           <Dropdown
+            open={dropdownVisible}
+            onOpenChange={() => setDropdownVisible(!dropdownVisible)}
+            modal={false}
             side="bottom"
             align="end"
-            size="large"
+            size="medium"
             overlay={
               <>
+                {type === 'Vercel' && (
+                  <>
+                    <Dropdown.Item
+                      icon={
+                        isSyncEnvLoading ? (
+                          <IconLoader className="animate-spin" size={14} />
+                        ) : (
+                          <IconRefreshCw size={14} />
+                        )
+                      }
+                      onSelect={(event) => {
+                        event.preventDefault()
+                        onReSyncEnvVars()
+                      }}
+                      disabled={isSyncEnvLoading}
+                    >
+                      Resync environment variables
+                    </Dropdown.Item>
+                    <Dropdown.Separator />
+                  </>
+                )}
                 <Dropdown.Item icon={<IconTrash size={14} />} onSelect={() => setIsOpen(true)}>
-                  Delete
+                  Delete connection
                 </Dropdown.Item>
               </>
             }

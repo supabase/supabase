@@ -11,6 +11,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
+import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -134,6 +135,7 @@ export const getStaticProps: GetStaticProps<ActionDocsProps> = async ({ params }
       remarkPlugins: [
         remarkGfm,
         remarkMkDocsAdmonition,
+        remarkPyMdownTabs,
         [removeTitle, meta.title],
         [remarkCodeHike, codeHikeOptions],
       ],
