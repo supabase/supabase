@@ -41,7 +41,7 @@ const Hero = () => {
                   {showAnnouncement && (
                     <Link href="/launch-week">
                       <a className="group w-auto rounded-full p-1 mb-6 mt-8 md:mb-10 bg-gradient-to-b from-[#1b1f2124] to-[#02040550] hover:from-[#ffffff15] hover:to-[#ffffff05] transition-all backdrop-blur-lg border flex items-center justify-between gap-2 md:gap-4 text-scale-1100 hover:text-scale-1200 text-sm">
-                        <div className="text-scale-200 rounded-full bg-brand-900 px-3 py-1 flex items-center justify-center">
+                        <div className="text-scale-200 rounded-full bg-brand px-3 py-1 flex items-center justify-center">
                           Get your ticket
                         </div>
                         <span>Launch Week 8 - August 7-11</span>
