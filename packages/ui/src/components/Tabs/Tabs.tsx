@@ -18,6 +18,7 @@ interface TabsProps {
   addOnBefore?: React.ReactNode
   addOnAfter?: React.ReactNode
   listClassNames?: string
+  className?: string
   children: PanelPropsProps[]
 }
 
@@ -37,6 +38,7 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
   addOnBefore,
   addOnAfter,
   listClassNames,
+  className,
   children: _children,
 }) => {
   // toArray is used here to filter out invalid children
@@ -75,7 +77,7 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
   if (listClassNames) listClasses.push(listClassNames)
 
   return (
-    <TabsPrimitive.Root value={active} className={__styles.base}>
+    <TabsPrimitive.Root value={active} className={`${__styles.base} ${className}`}>
       <TabsPrimitive.List className={listClasses.join(' ')}>
         {addOnBefore}
         {children.map((tab) => {
