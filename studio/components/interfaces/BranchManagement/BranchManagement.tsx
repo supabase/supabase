@@ -182,6 +182,7 @@ const BranchManagement = () => {
                   <PullRequests
                     previewBranches={previewBranches}
                     generateCreatePullRequestURL={generateCreatePullRequestURL}
+                    onSelectDeleteBranch={setSelectedBranchToDelete}
                   />
                   <PreviewBranches
                     generateCreatePullRequestURL={generateCreatePullRequestURL}

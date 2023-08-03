@@ -206,7 +206,13 @@ const BranchHeader = forwardRef<HTMLDivElement, BranchHeader>(
   }
 )
 
-const PullRequestPanel = ({ pr }: { pr: GitHubPullRequest }) => {
+const PullRequestPanel = ({
+  pr,
+  onSelectDelete = noop,
+}: {
+  pr: GitHubPullRequest
+  onSelectDelete: () => void
+}) => {
   const [open, setOpen] = useState(false)
   const daysFromNow = dayjs().diff(dayjs(pr.created_at), 'day')
   const formattedTimeFromNow = dayjs(pr.created_at).fromNow()
@@ -243,7 +249,7 @@ const PullRequestPanel = ({ pr }: { pr: GitHubPullRequest }) => {
                 </Button>
               </DropdownMenuTrigger_Shadcn_>
               <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-                <DropdownMenuItem_Shadcn_ className="flex gap-2" onSelect={() => {}}>
+                <DropdownMenuItem_Shadcn_ className="flex gap-2" onSelect={() => onSelectDelete()}>
                   <IconTrash size={14} />
                   Delete branch
                 </DropdownMenuItem_Shadcn_>

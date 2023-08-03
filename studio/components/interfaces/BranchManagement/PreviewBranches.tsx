@@ -59,7 +59,9 @@ const PreviewBranches = ({
 
   return (
     <>
-      <BranchHeader markdown={previewBranches.length > 0 ? `#### Preview branches` : undefined} />
+      {previewBranches.length > 0 && previewBranchesNotInPR.length > 0 && (
+        <BranchHeader markdown={previewBranches.length > 0 ? `#### Preview branches` : undefined} />
+      )}
 
       {isLoadingBranches && (
         <BranchContainer>
