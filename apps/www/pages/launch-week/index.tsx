@@ -14,6 +14,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/8/LaunchWeekLogoHeader'
 import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
 import LW8CalloutsSection from '~/components/LaunchWeek/8/LW8CalloutsSection'
+import DayHighlightWidget from '~/components/LaunchWeek/8/Releases/DayHighlightWidget'
 
 import { useTheme } from 'common/Providers'
 
@@ -142,7 +143,10 @@ export default function TicketHome({ users, meetups }: Props) {
                   <div className="absolute bottom-0 z-10 w-full justify-center flex items-end">
                     <LaunchWeekLogoHeader />
                   </div>
-                  <div className="absolute inset-0 z-0">
+                  <div className="absolute inset-0 z-0 flex items-center justify-center">
+                    <div className="absolute z-40 w-full flex justify-center -translate-y-6">
+                      <DayHighlightWidget />
+                    </div>
                     <AnimatedParticles />
                     <Image
                       src="/images/launchweek/8/stars.svg"
