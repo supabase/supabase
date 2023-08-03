@@ -34,7 +34,7 @@ Within your app's UI, redirect the user to [`https://api.supabase.com/v1/oauth/a
 
 - `client_id`: Your client id from the app creation above.
 - `redirect_uri`: The URL where Supabase will redirect the user to after providing consent.
-- `scope`: Currently only `all` is supported. More fine grained scopes coming soon.
+- `scope`: Currently only `all` is supported. More fine-grained access control coming soon.
 - `response_type`: Set this to `code`.
 - `state`: Information about the state of your app. Note that `redirect_uri` and `state` together cannot exceed 4kB in size.
 - (Recommended) PKCE: We strongly recommend using the PKCE flow for increased security. Generate a random value before taking the user to the authorize endpoint. This value is called code verifier. Hash it with SHA256 and include it as the `code_challenge` parameter, while setting `code_challenge_method` to `S256`. In the next step, you would need to provide the code verifier to get the first access and refresh token.
@@ -158,8 +158,7 @@ You can configure the user's [custom SMTP settings](https://supabase.com/docs/gu
 
 ## Current limitations
 
-- No scopes support yet. Scoped (e.g. read-only) access will be supported in the future.
-- We don't return database passwords via the API.
+Only some features are available until we roll out fine-grained access control. If you need full database access, you will need to prompt the user for their database password.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
