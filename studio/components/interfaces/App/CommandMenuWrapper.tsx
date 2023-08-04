@@ -75,12 +75,14 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
 
     try {
       const snippet = createSqlSnippetSkeleton({
+        id: uuidv4(),
         name: title || 'Generated query',
         owner_id: profile?.id,
+        project_id: selectedProject?.id,
         sql: formattedSql,
       })
-      const data = { ...snippet, id: uuidv4() }
-      snap.addSnippet(data as SqlSnippet, ref, true)
+
+      snap.addSnippet(snippet as SqlSnippet, ref)
       ui.setNotification({
         category: 'success',
         message: `Successfully saved snippet!`,
