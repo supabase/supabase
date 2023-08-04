@@ -289,6 +289,37 @@ async function handleSignInWithGoogle(response) {
 
 Use of nonce is recommended, though optional. Make sure each nonce is generated randomly and available both in the `data-nonce` attribute as well as in the `handleSignInWithGoogle` callback function; otherwise the ID token will not be accepted.
 
+
+### Important Note on Nonce Validation
+When implementing nonce validation there is a specific requirement to understand:
+
+Supabase's GoTrue expects the nonce to be hashed (specifically with SHA-256, and then converted to a hexadecimal string), however Google's ID token will contain the raw value of the provided nonce.
+
+To succeed with nonce validation, you will need to provide a hashed version of the nonce to Google and the non-hashed version to the Supabase client.
+
+The following code snippet provides an example of how to create both versions in a web application:
+
+```
+import crypto from 'crypto';
+
+...
+
+const nonce = crypto.randomBytes(16).toString('base64'); // Generate a random nonce
+const encoder = new TextEncoder();
+const encodedNonce = encoder.encode(nonce); // Encode the nonce
+const hash = await crypto.subtle.digest('SHA-256', encodedNonce); // Hash it with SHA-256
+const bytes = new Uint8Array(hash);
+const hashedNonce = Array.from(bytes)
+  .map((b) => b.toString(16).padStart(2, '0')) // Convert the hash to a hexadecimal string
+  .join('');
+
+// Use 'nonce' when passing to Supabase's client
+// Use 'hashedNonce' when passing to Google's authentication request
+```
+
+By following this approach, you'll ensure that the nonces are handled in a way that is compatible with both Google's and Supabase's expectations, allowing successful authentication.
+
+
 ### Configuration [#configuration-personalized-sign-in-button]
 
 1. Obtain OAuth credentials for your Google Cloud project in the [Credentials](https://console.developers.google.com/apis/credentials) page of the console. When creating a new credential, choose _Web application_. As you're using the Google sign in button, you should configure the _Authorized JavaScript origins_ and _Authorized redirect URIs_ to the website where the buttons appear. You should not use your Supabase project domain name. For this use case, the client secret provided is not needed and can be ignored.
