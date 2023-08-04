@@ -75,7 +75,7 @@ create table posts (
 In this example we'll generate a vector using Transformer.js, then store it in the database using the Supabase client.
 
 ```js
-import { pipeline } from 'transformers'
+import { pipeline } from '@xenova/transformers'
 const generateEmbedding = await pipeline('feature-extraction', 'Supabase/gte-small')
 
 const title = 'First post!'
