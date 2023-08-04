@@ -148,7 +148,7 @@ const BranchPanel = ({
   const formattedTimeFromNow = dayjs(branch?.created_at).fromNow()
   const formattedCreatedAt = dayjs(branch?.created_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
-  const pullRequestURL = generateCreatePullRequestURL?.(branch?.name) ?? 'https://github.com'
+  const pullRequestURL = generateCreatePullRequestURL?.(branch?.git_branch) ?? 'https://github.com'
 
   return (
     <BranchContainer className="bg-surface-100">
