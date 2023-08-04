@@ -154,9 +154,10 @@ export default function LW8Releases() {
                         background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, #030A0C)`,
                       }}
                     />
-                    <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
+                    <div className="flex flex-col items-center lg:items-start gap-2 max-w-[400px] w-full text-center lg:text-left">
                       <CartTitle>
-                        Launch Week 8<br /> constellation breakdown
+                        Coding the stars - an interactive constellation with Three.js and React
+                        Three Fiber
                       </CartTitle>
                       <p className="text-sm text-slate-900">{preRelease.steps[0]?.description}</p>
                     </div>
