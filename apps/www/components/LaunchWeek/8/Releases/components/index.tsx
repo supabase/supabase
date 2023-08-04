@@ -1,4 +1,4 @@
-import { ExpandableVideo } from 'ui'
+import { Badge, ExpandableVideo } from 'ui'
 
 import Link from 'next/link'
 import CountdownComponent from '../../Countdown'
@@ -176,20 +176,19 @@ export const AccordionHeader = ({
           )}
         </span>
       </div>
-      {/* {shippable && shipped && (
-        <Badge
-          className={`relative hidden sm:inline-flex inset-0 !bg-transparent !py-1 !px-4 h-fit backdrop-blur-md ${
-            shipped
-              ? 'bg-gradient-to-br from-[#05090B] to-[#05090B] !border-[#061517]'
-              : 'border-[#FFFFFF20]'
-          }`}
-        >
-          <span className="text-[#A0A0A080] text-sm font-normal bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
-            Shipped
-          </span>
-        </Badge>
-      )} */}
-      {/* {shipped && <span className="text-scale-1200 text-lg mt-1 sm:mt-0">{title}</span>} */}
+      {shippable && shipped && day === 1 && (
+        <Link href="https://twitter.com/i/spaces/1DXGyvjkeEeJM">
+          <a className="group/ts" target="_blank">
+            <Badge
+              className={`relative hidden sm:inline-flex inset-0 !bg-transparent border border-foreground-light group-hover/ts:border-foreground !py-1 !px-4 h-fit backdrop-blur-md`}
+            >
+              <span className="text-foreground-light group-hover/ts:text-foreground text-sm font-normal flex gap-2 items-center h-full">
+                Twitter Spaces <TwitterSpacesSvg />
+              </span>
+            </Badge>
+          </a>
+        </Link>
+      )}
       {shippable && !shipped && (
         <span className="text-sm font-normal text-[#A0A0A0] mt-1 sm:mt-0 flex items-center gap-1 md:gap-4">
           <svg
