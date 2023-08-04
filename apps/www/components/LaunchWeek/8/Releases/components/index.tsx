@@ -1,4 +1,4 @@
-import { Badge, ExpandableVideo, IconPlay } from 'ui'
+import { ExpandableVideo } from 'ui'
 
 import Link from 'next/link'
 import CountdownComponent from '../../Countdown'

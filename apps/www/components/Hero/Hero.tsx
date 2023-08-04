@@ -3,28 +3,19 @@ import { useRouter } from 'next/router'
 import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import gaEvents from '~/lib/gaEvents'
-import { Button, IconArrowRight, IconBookOpen } from 'ui'
+import { Button, IconBookOpen } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import HeroFrameworks from './HeroFrameworks'
 import styles from './hero.module.css'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
-import DayHighlightWidget from '../LaunchWeek/8/Releases/DayHighlightWidget'
+import LWAnnouncement from '../LaunchWeek/8/Releases/LWAnnouncement'
 
 const Hero = () => {
   const router = useRouter()
-  const [showAnnouncement, setShowAnnouncement] = useState(true)
   const telemetryProps = useTelemetryProps()
   const sendTelemetryEvent = async (event: TelemetryEvent) => {
     await Telemetry.sendEvent(event, telemetryProps, router)
   }
-
-  // useEffect(() => {
-  //   if (typeof window !== undefined) {
-  //     const lw8AnnouncementKey = window.localStorage.getItem('announcement_SupabaseLaunchWeek8')
-  //     setShowAnnouncement(!!lw8AnnouncementKey)
-  //   }
-  // }, [showAnnouncement])
 
   return (
     <div className="relative -mt-[65px]">
@@ -39,23 +30,9 @@ const Hero = () => {
                 ].join(' ')}
               >
                 <div className="flex flex-col items-center">
-                  {showAnnouncement && (
-                    // <Link href="/launch-week">
-                    //   <a className="group w-auto rounded-full p-1 mb-6 mt-8 md:mb-10 bg-gradient-to-b from-[#1b1f2124] to-[#02040550] hover:from-[#ffffff15] hover:to-[#ffffff05] transition-all backdrop-blur-lg border flex items-center justify-between gap-2 md:gap-4 text-scale-1100 hover:text-scale-1200 text-sm">
-                    //     <div className="text-scale-200 rounded-full bg-brand px-3 py-1 flex items-center justify-center">
-                    //       Get your ticket
-                    //     </div>
-                    //     <span>Launch Week 8 - August 7-11</span>
-                    //     <IconArrowRight
-                    //       size={16}
-                    //       className="transform mr-2 transition-transform translate-x-0 sm:-translate-x-1 group-hover:translate-x-0"
-                    //     />
-                    //   </a>
-                    // </Link>
-                    <div className="z-40 w-full flex justify-center mb-8 lg:mb-12">
-                      <DayHighlightWidget title="Launch Week 8: Day 1" />
-                    </div>
-                  )}
+                  <div className="z-40 w-full flex justify-center mb-8 lg:mb-12">
+                    <LWAnnouncement />
+                  </div>
                   <h1 className="text-scale-1200 text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
                     <span className="block text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-scale-1200 to-scale-1200 dark:to-scale-1100">
                       Build in a weekend

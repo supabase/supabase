@@ -11,10 +11,11 @@ const VideoPreview = () => (
       </svg>
     </div>
     <Image
-      src="/images/launchweek/8/lw8-yt-thumb.jpg"
+      src="https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw8/assets/lw8-yt-thumb.jpg?t=2023-08-04T16%3A04%3A08.632Z"
       alt="Video thumbnail"
       layout="fill"
       objectFit="cover"
+      // className="absolute inset-0 object-cover"
     />
   </div>
 )

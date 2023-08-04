@@ -14,7 +14,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/8/LaunchWeekLogoHeader'
 import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
 import LW8CalloutsSection from '~/components/LaunchWeek/8/LW8CalloutsSection'
-import DayHighlightWidget from '~/components/LaunchWeek/8/Releases/DayHighlightWidget'
+import DayHighlightWidget from '~/components/LaunchWeek/8/Releases/LWAnnouncement'
 
 import { useTheme } from 'common/Providers'
 
