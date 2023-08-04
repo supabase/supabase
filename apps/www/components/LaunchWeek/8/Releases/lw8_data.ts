@@ -1,6 +1,6 @@
 const images = {
-  '00-stay-remote': '/images/launchweek/8/day0/why-we-stay-remote.svg',
-  '00-pg-server': '/images/launchweek/8/day0/pg-server.svg',
+  '00-stay-remote': '/images/launchweek/8/day0/remote.png',
+  '00-pg-server': '/images/launchweek/8/day0/pg-server.png',
   '00-constellation': '/images/launchweek/8/day0/constellation-pre.svg',
   '00-constellation-mobile': '/images/launchweek/8/day0/constellation.svg',
   '01-hugging': '/images/launchweek/8/day1/hugging.svg',
@@ -19,6 +19,7 @@ export interface StepProps {
   thumb?: string
   url?: string
   video?: string
+  twitter_space?: string
   className?: string
   hideInBlog?: boolean
   bg_layers?: {
@@ -66,7 +67,8 @@ const days: WeekDayProps[] = [
       },
       {
         title: 'Postgres Language Server',
-        blog: '/blog/',
+        github: '/blog/',
+        hackernews: '/blog/',
         bg_layers: [{ img: images['00-pg-server'] }],
         steps: [],
       },
@@ -97,6 +99,8 @@ const days: WeekDayProps[] = [
       {
         title: 'Huggingface now supported in Supabase',
         blog: '/blog/',
+        hackernews: '/blog/',
+        twitter_space: 'https://twitter.com/blog/',
         bg_layers: [{ img: images['01-hugging'] }],
         steps: [],
       },
