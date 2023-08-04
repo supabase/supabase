@@ -316,7 +316,7 @@ export default function LW8Releases() {
                     <div
                       className="inset-0 absolute group-hover/d1:scale-105 opacity-60 group-hover/d1:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
                       style={{
-                        background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, #030A0C)`,
+                        background: `radial-gradient(100% 100% at 80% 80%, #6F13A450, #030A0C)`,
                       }}
                     />
                     <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
