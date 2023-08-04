@@ -103,11 +103,11 @@ Let's build our Edge Function. Edge Functions are server-side TypeScript functio
      Note the two arguments we pass to `pipeline()`:
 
       1. The first argument specifies the type of [inference task](https://huggingface.co/docs/transformers.js/index#tasks) to perform. `feature-extraction` is used for embedding generation.
-      2. The second argument specificies which Hugging Face model to use for the embedding generation. Supabase officially supports models available on the [Supabase org](https://huggingface.co/Supabase).
+      2. The second argument specifies which Hugging Face model to use for the embedding generation. Supabase officially supports models available on the [Supabase org](https://huggingface.co/Supabase).
 
       <Admonition>
 
-      We intentially construct the pipeline before the `serve()` function. This allows us to reuse the pre-loaded model in future warm-start requests, significantly speeding up future queries. Note that you'll only notice this speedup after deploying your function to Supabase - requests in local developement will always be a cold-start.
+      We intentially construct the pipeline before the `serve()` function. This allows us to reuse the pre-loaded model in future warm-start requests, significantly speeding up future queries. Note that you'll only notice this speedup after deploying your function to Supabase - requests in local development will always be a cold-start.
 
       </Admonition>
 
