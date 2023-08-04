@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { Badge, Button, Modal } from 'ui'
 
 import { Integration } from 'data/integrations/integrations.types'
+import Link from 'next/link'
 
 interface VercelProjectSelectionProps {
   integration?: Integration
@@ -24,9 +25,13 @@ const VercelProjectSelection = ({ integration }: VercelProjectSelectionProps) =>
           Previews can be available by connecting your Supabase project to a Vercel project.
         </p>
         {!integration && (
-          <Button type="default" className="!mt-3" onClick={() => {}}>
-            Install Vercel Integration
-          </Button>
+          <Link passHref href="https://vercel.com/integrations/supabase-v2-local">
+            <a target="_blank" rel="noreferrer">
+              <Button type="default" className="!mt-3">
+                Install Vercel Integration
+              </Button>
+            </a>
+          </Link>
         )}
         {integration && !vercelProjectIntegration && <div>Connect project</div>}
         {integration && vercelProjectIntegration && <div>Select project</div>}
