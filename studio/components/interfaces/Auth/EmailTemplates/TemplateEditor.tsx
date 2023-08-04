@@ -7,6 +7,10 @@ import { Form, Input } from 'ui'
 import CodeEditor from 'components/ui/CodeEditor'
 import { FormActions, FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import InformationBox from 'components/ui/InformationBox'
+
+import { useParams } from 'common'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
 import { FormSchema } from 'types'
 
@@ -15,11 +19,13 @@ interface TemplateEditorProps {
 }
 
 const TemplateEditor = ({ template }: TemplateEditorProps) => {
-  const { ui, authConfig } = useStore()
+  const { ui } = useStore()
+  const { ref: projectRef } = useParams()
+  const { data, isFetched: isLoaded } = useAuthConfigQuery({ projectRef })
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
   const [bodyValue, setBodyValue] = useState('')
-
-  const { isLoaded } = authConfig
   const { id, properties } = template
+  const config = data as Record<string, string> | undefined
 
   const formId = `auth-config-email-templates-${id}`
   const INITIAL_VALUES: { [x: string]: string } = {}
@@ -28,7 +34,7 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
   useEffect(() => {
     if (isLoaded) {
       Object.keys(properties).forEach((key) => {
-        INITIAL_VALUES[key] = authConfig.config[key] ?? ''
+        INITIAL_VALUES[key] = (config && config[key]) ?? ''
       })
     }
   }, [isLoaded])
@@ -36,7 +42,7 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT`
   const messageProperty = properties[messageSlug]
 
-  const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
+  const onSubmit = (values: any, { setSubmitting, resetForm }: any) => {
     const payload = { ...values }
 
     // Because the template content uses the code editor which is not a form component
@@ -45,20 +51,24 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
     if (messageProperty) payload[messageSlug] = bodyValue
 
     setSubmitting(true)
-    const { error } = await authConfig.update(payload)
-
-    if (!error) {
-      ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
-      resetForm({
-        values: values,
-        initialValues: values,
-      })
-      setBodyValue(authConfig?.config?.[messageSlug])
-    } else {
-      ui.setNotification({ category: 'error', message: 'Failed to update settings' })
-    }
-
-    setSubmitting(false)
+    updateAuthConfig(
+      { projectRef: projectRef!, config: payload },
+      {
+        onError: () => {
+          ui.setNotification({ category: 'error', message: 'Failed to update settings' })
+        },
+        onSuccess: () => {
+          ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
+          resetForm({
+            values: values,
+            initialValues: values,
+          })
+        },
+        onSettled: () => {
+          setSubmitting(false)
+        },
+      }
+    )
   }
 
   return (
@@ -73,10 +83,10 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
             values: INITIAL_VALUES,
             initialValues: INITIAL_VALUES,
           })
-          setBodyValue(authConfig?.config?.[messageSlug])
-        }, [authConfig.isLoaded])
+          setBodyValue((config && config[messageSlug]) ?? '')
+        }, [isLoaded])
 
-        const message = authConfig?.config?.[messageSlug]
+        const message = (config && config[messageSlug]) ?? ''
         const hasChanges =
           JSON.stringify(values) !== JSON.stringify(initialValues) || message !== bodyValue
 
@@ -157,10 +167,10 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                   <FormActions
                     handleReset={() => {
                       resetForm({
-                        values: authConfig.config,
-                        initialValues: authConfig.config,
+                        values: config,
+                        initialValues: config,
                       })
-                      setBodyValue(authConfig?.config?.[messageSlug])
+                      setBodyValue((config && config[messageSlug]) ?? '')
                     }}
                     form={formId}
                     isSubmitting={isSubmitting}

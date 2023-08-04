@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { Form, Input } from 'ui'
 import { boolean, number, object, string } from 'yup'
 
+import { useParams } from 'common'
 import {
   FormActions,
   FormHeader,
@@ -11,24 +12,28 @@ import {
   FormSection,
   FormSectionContent,
 } from 'components/ui/Forms'
-import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckPermissions, useStore } from 'hooks'
 
 const SiteUrl = observer(() => {
-  const { authConfig, ui } = useStore()
-  const { isLoaded } = authConfig
+  const { ui } = useStore()
+  const { ref: projectRef } = useParams()
+  const { data: config, isFetched: isLoaded } = useAuthConfigQuery({ projectRef })
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
   const formId = 'auth-config-general-form'
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const INITIAL_VALUES = {
-    DISABLE_SIGNUP: !authConfig.config.DISABLE_SIGNUP,
-    JWT_EXP: authConfig.config.JWT_EXP,
-    SITE_URL: authConfig.config.SITE_URL,
-    REFRESH_TOKEN_ROTATION_ENABLED: authConfig.config.REFRESH_TOKEN_ROTATION_ENABLED || false,
-    SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig.config.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
-    SECURITY_CAPTCHA_ENABLED: authConfig.config.SECURITY_CAPTCHA_ENABLED || false,
-    SECURITY_CAPTCHA_PROVIDER: authConfig.config.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
-    SECURITY_CAPTCHA_SECRET: authConfig.config.SECURITY_CAPTCHA_SECRET || '',
+    DISABLE_SIGNUP: config?.DISABLE_SIGNUP,
+    JWT_EXP: config?.JWT_EXP,
+    SITE_URL: config?.SITE_URL,
+    REFRESH_TOKEN_ROTATION_ENABLED: config?.REFRESH_TOKEN_ROTATION_ENABLED || false,
+    SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: config?.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
+    SECURITY_CAPTCHA_ENABLED: config?.SECURITY_CAPTCHA_ENABLED || false,
+    SECURITY_CAPTCHA_PROVIDER: config?.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
+    SECURITY_CAPTCHA_SECRET: config?.SECURITY_CAPTCHA_SECRET || '',
   }
 
   const schema = object({
@@ -48,27 +53,32 @@ const SiteUrl = observer(() => {
     }),
   })
 
-  const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
+  const onSubmit = (values: any, { setSubmitting, resetForm }: any) => {
     const payload = { ...values }
     payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
 
     setSubmitting(true)
-    const { error } = await authConfig.update(payload)
-
-    if (!error) {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated settings`,
-      })
-      resetForm({ values: values, initialValues: values })
-    } else {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to update settings`,
-      })
-    }
-
-    setSubmitting(false)
+    updateAuthConfig(
+      { projectRef: projectRef!, config: payload },
+      {
+        onError: () => {
+          ui.setNotification({
+            category: 'error',
+            message: `Failed to update settings`,
+          })
+        },
+        onSuccess: () => {
+          ui.setNotification({
+            category: 'success',
+            message: `Successfully updated settings`,
+          })
+          resetForm({ values: values, initialValues: values })
+        },
+        onSettled: () => {
+          setSubmitting(false)
+        },
+      }
+    )
   }
 
   return (
@@ -79,7 +89,7 @@ const SiteUrl = observer(() => {
         // Form is reset once remote data is loaded in store
         useEffect(() => {
           resetForm({ values: INITIAL_VALUES, initialValues: INITIAL_VALUES })
-        }, [authConfig.isLoaded])
+        }, [isLoaded])
 
         return (
           <>

@@ -2,9 +2,10 @@ import { noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { Button, IconGlobe, IconTrash } from 'ui'
 
+import { useParams } from 'common'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
 import { EmptyListState } from 'components/ui/States'
-import { useStore } from 'hooks'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import ValueContainer from './ValueContainer'
 
 interface RedirectUrlListProps {
@@ -13,15 +14,14 @@ interface RedirectUrlListProps {
 }
 
 const RedirectUrlList = ({ canUpdate, onSelectUrlToDelete = noop }: RedirectUrlListProps) => {
-  const { authConfig } = useStore()
+  const { ref: projectRef } = useParams()
+  const { data: config, isFetched: isLoaded } = useAuthConfigQuery({ projectRef })
 
-  const URI_ALLOW_LIST_ARRAY = authConfig.config.URI_ALLOW_LIST
-    ? authConfig.config.URI_ALLOW_LIST.split(',')
-    : []
+  const URI_ALLOW_LIST_ARRAY = config?.URI_ALLOW_LIST ? config.URI_ALLOW_LIST.split(',') : []
 
   return (
     <div className="-space-y-px">
-      {!authConfig.isLoaded ? (
+      {!isLoaded ? (
         <>
           <ValueContainer>
             <HorizontalShimmerWithIcon />
