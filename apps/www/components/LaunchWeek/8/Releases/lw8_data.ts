@@ -55,8 +55,9 @@ const days: WeekDayProps[] = [
     docs: '',
     steps: [
       {
-        title: 'Launch Week 8 constellation breakdown',
-        blog: '/blog/launch-week-8-constellation-breakdown',
+        title:
+          'Coding the stars - an interactive constellation with Three.js and React Three Fiber',
+        blog: '/blog/interactive-constellation-threejs-react-three-fiber',
         bg_layers: [
           { img: images['00-constellation'], mobileImg: images['00-constellation-mobile'] },
         ],
