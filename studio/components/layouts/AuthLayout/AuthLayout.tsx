@@ -5,6 +5,7 @@ import { PropsWithChildren, useEffect, useState } from 'react'
 import { useParams } from 'common'
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
+import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
 import { useStore, withAuth } from 'hooks'
 import ProjectLayout from '../'
 import { generateAuthMenu } from './AuthLayout.utils'
@@ -14,9 +15,10 @@ export interface AuthLayoutProps {
 }
 
 const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => {
-  const { ui, meta, authConfig } = useStore()
+  const { ui, meta } = useStore()
   const { isInitialized, isLoading, error } = meta.tables
   const { ref: projectRef = 'default' } = useParams()
+  useAuthConfigPrefetch({ projectRef })
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
@@ -29,7 +31,6 @@ const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => 
       meta.tables.load()
       meta.roles.load()
       meta.schemas.load()
-      authConfig.load()
     }
   }, [ui.selectedProjectRef])
 
