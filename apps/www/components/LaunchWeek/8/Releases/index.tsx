@@ -138,20 +138,20 @@ export default function LW8Releases() {
               id={preRelease.d.toString()}
             >
               {preRelease.steps.length > 0 && (
-                <div className="lg:h-[400px] flex flex-col gap-5 lg:flex-row pb-4">
+                <div className="flex flex-col gap-5 lg:flex-row pb-4">
                   <motion.div
                     className={`
-                      h-[400px] relative overflow-hidden group/pre0 flex-1 flex flex-col items-center justify-between
-                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-14 px-8 lg:px-10 text-2xl bg-contain shadow-lg
+                      min-h-[400px] relative overflow-hidden group/pre0 flex-1 flex flex-col items-center justify-between
+                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
                       `}
                     initial="default"
                     animate="default"
                     whileHover="hover"
                   >
                     <div
-                      className="inset-0 absolute group-hover/pre0:scale-105 opacity-60 group-hover/pre0:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
+                      className="inset-0 absolute group-hover/pre0:scale-105 opacity-10 group-hover/pre0:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
                       style={{
-                        background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, #030A0C)`,
+                        background: `radial-gradient(100% 100% at 80% 110%, #6F13A490, #030A0C)`,
                       }}
                     />
                     <div className="flex flex-col items-center gap-2 min-w-[300px] w-full text-center lg:text-left">
@@ -187,8 +187,8 @@ export default function LW8Releases() {
                   </motion.div>
                   <motion.div
                     className={`
-                      h-[400px] relative overflow-hidden group/pre1 flex-1 flex flex-col items-center justify-between
-                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-14 px-8 lg:px-10 text-2xl bg-cover shadow-lg
+                      min-h-[400px] relative overflow-hidden group/pre1 flex-1 flex flex-col items-center justify-between
+                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-cover shadow-lg
                       `}
                     initial="default"
                     animate="default"
@@ -204,7 +204,10 @@ export default function LW8Releases() {
                       <CartTitle>{preRelease.steps[1].title}</CartTitle>
                       <p className="text-sm text-slate-900">{preRelease.steps[1]?.description}</p>
                     </div>
-                    <SectionButtons blog={preRelease.steps[1].blog} />
+                    <SectionButtons
+                      github={preRelease.steps[1].github}
+                      hackernews={preRelease.steps[1].hackernews}
+                    />
                     {preRelease.steps[1]?.bg_layers &&
                       preRelease.steps[1]?.bg_layers?.map(
                         (layer, i) =>
@@ -233,8 +236,8 @@ export default function LW8Releases() {
                   </motion.div>
                   <motion.div
                     className={`
-                      h-[400px] relative overflow-hidden group/pre2 flex-1 flex flex-col items-center justify-between
-                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-14 px-8 lg:px-10 text-2xl bg-contain shadow-lg
+                      min-h-[400px] relative overflow-hidden group/pre2 flex-1 flex flex-col items-center justify-between
+                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
                       `}
                     initial="default"
                     animate="default"
@@ -296,15 +299,15 @@ export default function LW8Releases() {
                 />
               }
               disabled={true}
-              className="h-[79px]"
+              className="h-[79px] hover:cursor-default"
               id={day1.d.toString()}
             >
               {day1.steps.length > 0 && (
-                <div className="lg:h-[400px] flex flex-col gap-5 lg:flex-row pb-4">
+                <div className="flex flex-col gap-5 lg:flex-row pb-4">
                   <motion.div
                     className={`
-                      h-[400px] relative overflow-hidden group/d1 flex-1 flex flex-col items-center lg:items-start justify-between
-                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-14 px-8 lg:px-10 text-2xl bg-contain shadow-lg
+                      min-h-[400px] relative overflow-hidden group/d1 flex-1 flex flex-col items-center lg:items-start justify-between
+                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
                       `}
                     initial="default"
                     animate="default"
@@ -320,7 +323,11 @@ export default function LW8Releases() {
                       <CartTitle>{day1.steps[0].title}</CartTitle>
                       <p className="text-sm text-slate-900">{day1.steps[0]?.description}</p>
                     </div>
-                    <SectionButtons blog={day1.steps[0].blog} />
+                    <SectionButtons
+                      blog={day1.steps[0].blog}
+                      hackernews={day1.steps[0].hackernews}
+                      twitter_space={day1.steps[0].twitter_space}
+                    />
                     {day1.steps[0]?.bg_layers &&
                       day1.steps[0]?.bg_layers?.map(
                         (layer, i) =>
