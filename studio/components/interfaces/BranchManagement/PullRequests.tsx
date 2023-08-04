@@ -55,7 +55,7 @@ const PullRequests = ({
     target: mainBranch?.git_branch,
   })
   const pullRequests = allPullRequests?.filter((pr) =>
-    branches?.some((branch) => branch.name === pr.branch)
+    branches?.some((branch) => branch.git_branch === pr.branch)
   )
 
   const showEmptyState = previewBranches.length === 0 || (pullRequests || []).length === 0
