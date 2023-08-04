@@ -5,8 +5,7 @@ import * as configcat from 'configcat-js'
 import { IS_PLATFORM } from 'lib/constants'
 import FlagContext from './FlagContext'
 import { useUser } from 'lib/auth'
-
-let client: configcat.IConfigCatClient
+import { getFlags } from 'lib/configcat'
 
 const FlagProvider = ({ children }: PropsWithChildren<{}>) => {
   const user = useUser()
@@ -14,20 +13,10 @@ const FlagProvider = ({ children }: PropsWithChildren<{}>) => {
   const { Provider } = FlagContext
   const [store, setStore] = useState({})
 
-  const getFlags = async (user?: User) => {
-    if (!client) {
-      client = configcat.getClient(
-        process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY ?? '',
-        configcat.PollingMode.AutoPoll,
-        { pollIntervalSeconds: 600 }
-      )
-    }
-
+  const processFlags = async (user?: User) => {
     const flagStore: any = {}
-    const flagValues =
-      user?.email !== undefined
-        ? await client.getAllValuesAsync(new configcat.User(user.email))
-        : await client.getAllValuesAsync()
+    const flagValues = await getFlags(user)
+
     flagValues.forEach((item: any) => {
       flagStore[item.settingKey] = item.settingValue
     })
@@ -39,7 +28,7 @@ const FlagProvider = ({ children }: PropsWithChildren<{}>) => {
     // as per https://configcat.com/docs/sdk-reference/js/#polling-modes:
     // The polling downloads the config.json at the set interval and are stored in the internal cache
     // which subsequently all getValueAsync() calls are served from there
-    if (IS_PLATFORM) getFlags(user ?? undefined)
+    if (IS_PLATFORM) processFlags(user ?? undefined)
   }, [user])
 
   return <Provider value={store}>{children}</Provider>
