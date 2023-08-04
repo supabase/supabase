@@ -4,7 +4,7 @@ interface AiIconProps {
   className?: string
 }
 
-export const AiIcon = ({ className = 'text-brand-900' }: AiIconProps) => (
+export const AiIcon = ({ className = 'text-brand' }: AiIconProps) => (
   <svg
     className={`w-6 h-6 ${className}`}
     width="16"
@@ -30,7 +30,7 @@ export const AiIcon = ({ className = 'text-brand-900' }: AiIconProps) => (
 export const AiIconChat = () => (
   <div
     className="w-7 h-7
-    bg-gradient-to-r from-brand-900 to-brand-800
+    bg-gradient-to-r from-brand to-brand-300
 
     ring-brand-600
     ring-1

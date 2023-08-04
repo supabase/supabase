@@ -10,7 +10,7 @@ import {
 
 import CardButton from 'components/ui/CardButton'
 import { useProjectReadOnlyStatus } from 'hooks/misc/useProjectReadOnlyStatus'
-import { PROJECT_STATUS } from 'lib/constants'
+import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { Project } from 'types'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 
@@ -52,9 +52,12 @@ const ProjectCard = ({
             <p className="flex-shrink truncate">{name}</p>
             <div className="flex items-center space-x-1.5">
               {isVercelIntegrated && (
-                // [Joshen TODO] Need proper vercel's logo in SVG
                 <div className="w-fit p-1 border rounded-md flex items-center border-scale-600">
-                  <IconTriangle size={12} strokeWidth={1.5} className="fill-scale-1200" />
+                  <img
+                    src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
+                    alt="Vercel Icon"
+                    className="w-3"
+                  />
                 </div>
               )}
               {isBranchingEnabled && (
