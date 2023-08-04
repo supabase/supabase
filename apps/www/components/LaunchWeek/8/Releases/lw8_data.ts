@@ -19,7 +19,7 @@ export interface StepProps {
   thumb?: string
   url?: string
   video?: string
-  twitter_space?: string
+  twitter_spaces?: string
   className?: string
   hideInBlog?: boolean
   bg_layers?: {
@@ -40,7 +40,7 @@ export interface WeekDayProps {
   youtube_id: string
   blogpost: string
   docs: string
-  twitter_space?: string
+  twitter_spaces?: string
   steps: StepProps[] | []
 }
 
@@ -94,13 +94,13 @@ const days: WeekDayProps[] = [
     youtube_id: '',
     blogpost: '',
     docs: '',
-    twitter_space: 'https://twitter.com/i/spaces/1DXGyvjkeEeJM',
+    twitter_spaces: 'https://twitter.com/i/spaces/1DXGyvjkeEeJM',
     steps: [
       {
         title: 'Huggingface now supported in Supabase',
         blog: '/blog/',
         hackernews: '/blog/',
-        twitter_space: 'https://twitter.com/blog/',
+        twitter_spaces: 'https://twitter.com/i/spaces/1DXGyvjkeEeJM',
         bg_layers: [{ img: images['01-hugging'] }],
         steps: [],
       },
