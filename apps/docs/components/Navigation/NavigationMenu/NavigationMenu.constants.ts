@@ -916,6 +916,10 @@ export const ai: NavMenuConstant = {
       items: [
         { name: 'Developing locally with Vecs', url: '/guides/ai/vecs-python-client' },
         { name: 'Creating and managing collections', url: '/guides/ai/quickstarts/hello-world' },
+        {
+          name: 'Generate Embeddings',
+          url: '/guides/ai/quickstarts/generate-text-embeddings',
+        },
         { name: 'Text Deduplication', url: '/guides/ai/quickstarts/text-deduplication' },
         { name: 'Face similarity search', url: '/guides/ai/quickstarts/face-similarity' },
       ],
