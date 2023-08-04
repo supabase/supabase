@@ -20,7 +20,7 @@ const columnRender = (name: string, isPrimaryKey = false) => {
       {isPrimaryKey && (
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
-            <div className="text-brand-900">
+            <div className="text-brand">
               <IconKey size="tiny" strokeWidth={2} />
             </div>
           </Tooltip.Trigger>

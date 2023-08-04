@@ -19,9 +19,13 @@ export default function TileGrid({
   return (
     <>
       {featuredPartners.length > 0 ? (
-        <div key="featured" id="featured" className="space-y-8">
+        <div
+          key="featured"
+          id="featured"
+          className={`space-y-8 ${hideCategories ? `pb-8 border-b mb-8` : ''}`}
+        >
           <h2 className="h2">Featured</h2>
-          <div className="grid  grid-cols-1 gap-5 lg:max-w-none lg:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 lg:max-w-none lg:grid-cols-2 xl:grid-cols-3">
             {featuredPartners.map((p) => (
               <Link key={p.slug} href={`/partners/${p.slug}`}>
                 <a>
@@ -29,7 +33,7 @@ export default function TileGrid({
                     className="
                 bg-scale-100 dark:bg-scale-300
                 hover:bg-scale-200 hover:dark:bg-scale-400
-                group flex h-full w-full flex-col rounded border px-6 
+                group flex h-full w-full flex-col rounded-xl border px-6 
                 py-6 shadow 
                 transition-all 
                 hover:shadow-lg"
@@ -75,7 +79,7 @@ export default function TileGrid({
                     className="
                 bg-scale-100 dark:bg-scale-300
                 hover:bg-scale-200 hover:dark:bg-scale-400
-                group flex h-full w-full flex-col rounded border px-6 
+                group flex h-full w-full flex-col rounded-xl border px-6 
                 py-6 shadow 
                 transition-all 
                 hover:shadow-lg"

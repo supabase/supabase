@@ -4,7 +4,7 @@ import StepHikeCompact from '~/components/StepHikeCompact'
 export const meta = {
   title: 'Use Supabase with Android Kotlin',
   subtitle:
-    'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Android Kotlin app.',
+    'Learn how to create a Supabase project, add some sample data to your database, and query the data from an Android Kotlin app.',
   breadcrumb: 'Framework Quickstarts',
 }
 
@@ -45,8 +45,7 @@ export const meta = {
   <StepHikeCompact.Step step={2}>
 
     <StepHikeCompact.Details title="Create an Android app with Android Studio">
-      Setup environment for Android Development following official document.
-      Open Android Studio > New > New Android Project
+      Open Android Studio > New > New Android Project.
 
     </StepHikeCompact.Details>
 
@@ -55,16 +54,7 @@ export const meta = {
   <StepHikeCompact.Step step={3}>
 
     <StepHikeCompact.Details title="Install the Supabase client library">
-    Setup Supabase libraries requires some others libraries from ktor, so make sure all dependencies are added.
-    Replace the dependency version placeholders `$supabase_version` and `$ktor_version` with the latest versions as shown below.
-    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-      <a href="https://github.com/supabase-community/supabase-kt/releases" style={{ marginRight: '8px' }}>
-          <img src="https://img.shields.io/github/release/supabase-community/supabase-kt?label=supabase-kt stable" alt="latest stable supabase-kt version"/>
-      </a>
-      <a href="https://github.com/ktorio/ktor/releases">
-          <img src="https://img.shields.io/github/v/release/ktorio/ktor.svg?label=ktor" alt="latest ktor version"/>
-      </a>
-    </div>
+    Import Supabase and all required dependencies. Replace the version placeholders `$supabase_version` and `$ktor_version` with the respective latest versions.
 
     </StepHikeCompact.Details>
 
@@ -72,8 +62,6 @@ export const meta = {
       ```kotlin
         implementation "io.github.jan-tennert.supabase:postgrest-kt:$supabase_version"
         implementation "io.ktor:ktor-client-android:$ktor_version"
-        implementation "io.ktor:ktor-client-core:$ktor_version"
-        implementation "io.ktor:ktor-utils:$ktor_version"
       ```
 
     </StepHikeCompact.Code>
@@ -83,10 +71,7 @@ export const meta = {
   <StepHikeCompact.Step step={4}>
 
     <StepHikeCompact.Details title="Install the serializable plugin">
-    Open `build.gradle` (app), add serialization plugin to use annotation for data parsing. Please note that the plugin version should be the same with Kotlin version in your app.
-    <a href="https://github.com/JetBrains/kotlin" style={{ marginRight: '8px' }}>
-          <img src="https://img.shields.io/maven-central/v/org.jetbrains.kotlin/kotlin-maven-plugin.svg?label=kotlin_version" alt="latest stable supabase-kt version"/>
-    </a>
+    Open the `build.gradle` (app), add the serialization plugin to use annotation for data parsing. Please note that the plugin version should be the same as the Kotlin version in your app.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -105,22 +90,18 @@ export const meta = {
   <StepHikeCompact.Step step={5}>
 
     <StepHikeCompact.Details title="Initialize the Supabase client">
-    You can create a whenever you need to perform some API call.
-    However, it is recommended that we should provide this kind of instance by using dependency injection library like Hilt. So see the code below to provide them properly. This is better for testability and maintainability
+    You can create a Supabase client whenever you need to perform an API call. That being said, it is recommended to use a dependency injection library like [Hilt](https://developer.android.com/training/dependency-injection/hilt-android#kts).
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
       ```kotlin
-      // Handy create instance when need
       val client = createSupabaseClient(
           supabaseUrl = "https://xyzcompany.supabase.co",
           supabaseKey = "public-anon-key"
         ) {
-              install(GoTrue)
-              install(Postgrest)
-              install(Storage)
-          }
+          install(Postgrest)
+      }
       ```
 
     </StepHikeCompact.Code>
@@ -129,7 +110,7 @@ export const meta = {
 
   <StepHikeCompact.Step step={6}>
 
-    <StepHikeCompact.Details title="Create data transfer object">
+    <StepHikeCompact.Details title="Create a data transfer object">
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -161,8 +142,8 @@ export const meta = {
 
   <StepHikeCompact.Step step={7}>
 
-    <StepHikeCompact.Details title="Create domain object">
-      This kind of object will be consumed by the view
+    <StepHikeCompact.Details title="Create a domain object">
+      This kind of object will be consumed by the view.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -186,7 +167,7 @@ export const meta = {
   <StepHikeCompact.Step step={8}>
 
     <StepHikeCompact.Details title="Query data from the app">
-      Usually, we will put the code of interacting with data source in repository. Create a repository:
+      Create a repository to interact with the data source.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -212,7 +193,7 @@ export const meta = {
 
    <StepHikeCompact.Step step={9}>
     <StepHikeCompact.Details title="Create a module to provide repository">
-    For dependency injection, we will use Hilt. Learn more about [Dependency injection with Hilt](https://developer.android.com/training/dependency-injection/hilt-android).
+    Use [Hilt](https://developer.android.com/training/dependency-injection/hilt-android) for dependency injection.
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
       ```kotlin
@@ -229,7 +210,7 @@ export const meta = {
 
   <StepHikeCompact.Step step={10}>
     <StepHikeCompact.Details title="Get data from ViewModel inside a coroutine scope">
-    To use the repository in a ViewModel, use the `@Inject` annotation.
+    Add the `@Inject` annotation to use the repository in a ViewModel.
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
       ```kotlin
@@ -269,7 +250,7 @@ export const meta = {
   </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={11}>
-    <StepHikeCompact.Details title="Observe data in Composable">
+    <StepHikeCompact.Details title="Observe data in a Composable">
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
       ```kotlin

@@ -51,7 +51,7 @@ export function Default() {
   )
 }
 
-export function withSeperators() {
+export function withSeparators() {
   return (
     <Select>
       <SelectTrigger className="w-[180px]">

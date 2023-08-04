@@ -14,7 +14,7 @@ export interface AuthLayoutProps {
 }
 
 const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => {
-  const { ui, meta } = useStore()
+  const { ui, meta, authConfig } = useStore()
   const { isInitialized, isLoading, error } = meta.tables
   const { ref: projectRef = 'default' } = useParams()
 
@@ -29,6 +29,7 @@ const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => 
       meta.tables.load()
       meta.roles.load()
       meta.schemas.load()
+      authConfig.load()
     }
   }, [ui.selectedProjectRef])
 

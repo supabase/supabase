@@ -22,6 +22,7 @@ export interface ProjectBase {
   region: string
   inserted_at: string
   subscription_id: string
+  preview_branch_refs: string[]
 }
 
 export interface Project extends ProjectBase {
@@ -32,6 +33,8 @@ export interface Project extends ProjectBase {
   restUrl?: string
   lastDatabaseResizeAt?: string | null
   maxDatabasePreprovisionGb?: string | null
+  parent_project_ref?: string
+  is_branch_enabled?: boolean
 
   /**
    * postgrestStatus is available on client side only.

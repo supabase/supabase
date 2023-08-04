@@ -9,7 +9,11 @@ interface Props extends Omit<ReactMarkdownProps, 'children' | 'node'> {
 
 const Markdown = ({ className, content, ...props }: Props) => {
   return (
-    <ReactMarkdown {...props} className={cn('prose text-sm', className)}>
+    <ReactMarkdown
+      components={{ h3: ({ children }) => <h3 className="mb-1">{children}</h3> }}
+      {...props}
+      className={cn('prose text-sm', className)}
+    >
       {content}
     </ReactMarkdown>
   )

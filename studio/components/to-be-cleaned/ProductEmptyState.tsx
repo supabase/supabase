@@ -1,11 +1,10 @@
-import { Button, IconExternalLink } from 'ui'
-import { FC, ReactNode } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { PropsWithChildren } from 'react'
+import { Button, IconExternalLink } from 'ui'
 
-interface Props {
+interface ProductEmptyStateProps {
   title?: string
   size?: 'medium' | 'large'
-  children?: ReactNode
   ctaButtonLabel?: string
   infoButtonLabel?: string
   infoButtonUrl?: string
@@ -14,7 +13,7 @@ interface Props {
   disabledMessage?: string
 }
 
-const ProductEmptyState: FC<Props> = ({
+const ProductEmptyState = ({
   title = '',
   size = 'medium',
   children,
@@ -24,7 +23,7 @@ const ProductEmptyState: FC<Props> = ({
   onClickCta = () => {},
   disabled = false,
   disabledMessage = '',
-}) => {
+}: PropsWithChildren<ProductEmptyStateProps>) => {
   const hasAction = (ctaButtonLabel && onClickCta) || (infoButtonUrl && infoButtonLabel)
 
   return (
@@ -39,7 +38,7 @@ const ProductEmptyState: FC<Props> = ({
               <div className="flex items-center space-x-2">
                 {ctaButtonLabel && onClickCta && (
                   <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger>
+                    <Tooltip.Trigger asChild>
                       <Button type="primary" onClick={onClickCta} disabled={disabled}>
                         {ctaButtonLabel}
                       </Button>

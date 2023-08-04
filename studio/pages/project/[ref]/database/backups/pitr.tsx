@@ -83,6 +83,7 @@ const PITR = observer(() => {
             ? 'Upgrade to the Pro plan with the PITR add-on selected to enable point in time recovery for your project.'
             : 'Please enable the add-on to enable point in time recovery for your project.'
         }
+        addon="pitr"
       />
     )
   }

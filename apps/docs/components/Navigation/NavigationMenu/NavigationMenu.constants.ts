@@ -73,12 +73,6 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       level: 'platform',
     },
     {
-      label: 'Resources',
-      icon: 'resources',
-      href: '/guides/resources',
-      level: 'resources',
-    },
-    {
       label: 'Self-Hosting',
       icon: 'self-hosting',
       href: '/guides/self-hosting',
@@ -130,7 +124,25 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       community: true,
     },
     {
-      label: 'Tools',
+      label: 'Resources',
+    },
+    {
+      label: 'CLI Commands',
+      icon: 'reference-cli',
+      href: '/reference/cli/introduction',
+      level: 'reference_javascript',
+    },
+    {
+      label: 'Management API',
+      icon: 'reference-api',
+      href: '/reference/api/introduction',
+      level: 'reference_javascript',
+    },
+    {
+      label: 'Guides and Examples',
+      icon: 'resources',
+      href: '/guides/resources',
+      level: 'resources',
     },
     {
       label: 'Integrations',
@@ -138,12 +150,6 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       hasLightIcon: true,
       href: 'https://supabase.com/partners/integrations',
       level: 'integrations',
-    },
-    {
-      label: 'Management API',
-      icon: 'reference-api',
-      href: '/reference/api/introduction',
-      level: 'reference_javascript',
     },
   ],
   [
@@ -358,6 +364,11 @@ export const SocialLoginItems = [
     url: '/guides/auth/social-login/auth-discord',
   },
   {
+    name: 'Figma',
+    icon: '/docs/img/icons/figma-icon',
+    url: '/guides/auth/social-login/auth-figma',
+  },
+  {
     name: 'Kakao',
     icon: '/docs/img/icons/kakao-icon',
     url: '/guides/auth/social-login/auth-kakao',
@@ -477,6 +488,7 @@ export const auth = {
       url: undefined,
       items: [
         { name: 'Enable Captcha Protection', url: '/guides/auth/auth-captcha' },
+        { name: 'Configuring Custom SMTP', url: '/guides/auth/auth-smtp' },
         { name: 'Managing User Data', url: '/guides/auth/managing-user-data' },
         { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
         { name: 'Row Level Security', url: '/guides/auth/row-level-security' },
@@ -657,10 +669,23 @@ export const database: NavMenuConstant = {
           name: 'RUM: inverted index for full-text search',
           url: '/guides/database/extensions/rum',
         },
+      ],
+    },
+    {
+      name: 'Foreign Data Wrappers',
+      url: undefined,
+      items: [
+        { name: 'Overview', url: '/guides/database/extensions/wrappers/overview' },
+        { name: 'Connecting to Airtable', url: '/guides/database/extensions/wrappers/airtable' },
+        { name: 'Connecting to AWS S3', url: '/guides/database/extensions/wrappers/s3' },
+        { name: 'Connecting to BigQuery', url: '/guides/database/extensions/wrappers/bigquery' },
         {
-          name: 'wrappers: 3rd Party Integrations',
-          url: '/guides/database/extensions/wrappers',
+          name: 'Connecting to ClickHouse',
+          url: '/guides/database/extensions/wrappers/clickhouse',
         },
+        { name: 'Connecting to Firebase', url: '/guides/database/extensions/wrappers/firebase' },
+        { name: 'Connecting to Logflare', url: '/guides/database/extensions/wrappers/logflare' },
+        { name: 'Connecting to Stripe', url: '/guides/database/extensions/wrappers/stripe' },
       ],
     },
     {
@@ -977,16 +1002,34 @@ export const supabase_cli: NavMenuConstant = {
   title: 'Local Dev / CLI',
   url: '/guides/cli',
   items: [
-    { name: 'Getting started', url: '/guides/cli' },
-    { name: 'Local Development', url: '/guides/cli/local-development' },
-    { name: 'Managing environments', url: '/guides/cli/managing-environments' },
+    { name: 'Overview', url: '/guides/cli' },
     {
-      name: 'Managing config and secrets',
-      url: '/guides/cli/managing-config',
+      name: 'Using the CLI',
+      url: undefined,
+      items: [
+        { name: 'Getting started', url: '/guides/cli/getting-started' },
+        { name: 'CLI Configuration', url: '/guides/cli/config' },
+      ],
     },
     {
-      name: 'Testing emails locally',
-      url: '/guides/cli/testing-emails',
+      name: 'Developing with Supabase',
+      url: undefined,
+      items: [
+        { name: 'Local Development', url: '/guides/cli/local-development' },
+        { name: 'Managing environments', url: '/guides/cli/managing-environments' },
+        {
+          name: 'Managing config and secrets',
+          url: '/guides/cli/managing-config',
+        },
+        {
+          name: 'Seeding your database',
+          url: '/guides/cli/seeding-your-database',
+        },
+        {
+          name: 'Testing and linting',
+          url: '/guides/cli/testing-and-linting',
+        },
+      ],
     },
     {
       name: 'GitHub Action',
@@ -996,14 +1039,14 @@ export const supabase_cli: NavMenuConstant = {
           name: 'Generate types from your database',
           url: '/guides/cli/github-action/generating-types',
         },
-      ],
-    },
-    {
-      name: 'Reference',
-      url: undefined,
-      items: [
-        { name: 'Commands', url: '/reference/cli/introduction' },
-        { name: 'Configuration', url: '/reference/cli/config' },
+        {
+          name: 'Automated testing',
+          url: '/guides/cli/github-action/testing',
+        },
+        {
+          name: 'Backup your database',
+          url: '/guides/cli/github-action/backups',
+        },
       ],
     },
   ],
