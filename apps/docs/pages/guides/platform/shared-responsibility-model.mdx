@@ -46,6 +46,14 @@ You are responsible for using best-practices to optimize and manage your databas
 
 You are responsible of provisioning enough compute to run the workload that your application requires. The Supabase Dashboard provides [observability tooling](https://supabase.com/dashboard/project/_/reports/database) to help with this.
 
+## Managing Healthcare Data
+
+If you sign a BAA with Supabase, you can use Supabase to store and process PHI data. You are responsible for ensuring that your project is configured with these required best practices
+
+- Enabling [Point in Time Recovery](/docs/guides/platform/backups#point-in-tim.e-recovery)
+- Turning on [SSL Enforcement](/docs/guides/platform/ssl-enforcement).
+- Enabling [Network Restrictions](/docs/guides/platform/network-restrictions).
+
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page
