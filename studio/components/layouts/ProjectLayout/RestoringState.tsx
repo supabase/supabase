@@ -59,7 +59,7 @@ const RestoringState: FC<Props> = ({}) => {
           <div className="space-y-6 pt-6">
             <div className="flex px-8 space-x-8">
               <div className="mt-1">
-                <IconCheckCircle className="text-brand-900" size={18} strokeWidth={2} />
+                <IconCheckCircle className="text-brand" size={18} strokeWidth={2} />
               </div>
               <div className="space-y-1">
                 <p>Restoration complete!</p>

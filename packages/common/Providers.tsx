@@ -29,7 +29,7 @@ export const ThemeProvider = ({
   detectSystemColorPreference = true,
   children,
 }: ThemeProviderProps) => {
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(true)
 
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
@@ -37,11 +37,13 @@ export const ThemeProvider = ({
     // and detectSystemColorPreference is false
     // default to dark mode
     const hasNoKey = key === null
-    const isDarkMode = hasNoKey || key === 'true'
+    const shouldBeDarkMode = hasNoKey || key === 'true'
 
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
 
-    hasNoKey && detectSystemColorPreference ? toggleTheme(prefersDark) : toggleTheme(isDarkMode)
+    hasNoKey && detectSystemColorPreference
+      ? toggleTheme(prefersDark)
+      : toggleTheme(shouldBeDarkMode)
   }, [])
 
   const toggleTheme: UseThemeProps['toggleTheme'] = (darkMode) => {

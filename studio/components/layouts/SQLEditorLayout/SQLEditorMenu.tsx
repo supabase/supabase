@@ -31,6 +31,8 @@ const SideBarContent = observer(() => {
 
   const snap = useSqlEditorStateSnapshot()
   const { isLoading, isSuccess } = useSqlSnippetsQuery(ref, {
+    refetchOnWindowFocus: false,
+    staleTime: 300, // 5 minutes
     onSuccess(data) {
       if (ref) snap.setRemoteSnippets(data.snippets, ref)
     },

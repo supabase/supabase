@@ -9,7 +9,7 @@ const BackupsError = () => {
         <p className="text-sm">
           Failed to retrieve backups for this project. Please contact{' '}
           <Link href="/support/new">
-            <a className="text-brand-900">support</a>
+            <a className="text-brand">support</a>
           </Link>
           .
         </p>

@@ -75,9 +75,7 @@ const Subscription = () => {
             <div className="space-y-6">
               <div>
                 <p className="text-sm">This organization is currently on the plan:</p>
-                <p className="text-2xl text-brand-900 uppercase">
-                  {currentPlan?.name ?? 'Unknown'}
-                </p>
+                <p className="text-2xl text-brand uppercase">{currentPlan?.name ?? 'Unknown'}</p>
               </div>
 
               <div>

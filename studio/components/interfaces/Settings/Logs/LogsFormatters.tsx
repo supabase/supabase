@@ -276,7 +276,7 @@ export function jsonSyntaxHighlight(input: Object) {
         if (/:$/.test(match)) {
           cls = 'key text-scale-1200'
         } else {
-          cls = 'string text-brand-1100'
+          cls = 'string text-brand-600'
         }
       } else if (/true|false/.test(match)) {
         cls = 'boolean text-blue-900'

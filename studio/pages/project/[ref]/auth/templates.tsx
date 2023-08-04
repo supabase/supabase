@@ -12,12 +12,6 @@ import { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => {
   const { authConfig } = useStore()
-  const { project } = useProjectContext()
-
-  useEffect(() => {
-    authConfig.load()
-  }, [project?.ref])
-
   const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
 
   if (!canReadAuthSettings) {

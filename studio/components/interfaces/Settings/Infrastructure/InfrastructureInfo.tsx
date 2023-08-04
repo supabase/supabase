@@ -82,7 +82,7 @@ const InfrastructureInfo = () => {
                   label="Current version"
                   actions={[
                     isOnLatestVersion && (
-                      <Tooltip.Root delayDuration={0}>
+                      <Tooltip.Root key="tooltip-latest" delayDuration={0}>
                         <Tooltip.Trigger>
                           <Badge color="green" className="mr-1">
                             Latest

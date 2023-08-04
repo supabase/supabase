@@ -137,7 +137,7 @@ const JoinOrganizationPage = () => {
         <p className="text-scale-900">
           To accept this invitation, you will need to{' '}
           <a
-            className="cursor-pointer text-brand-900"
+            className="cursor-pointer text-brand"
             onClick={async () => {
               await signOut()
               router.reload()

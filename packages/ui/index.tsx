@@ -62,6 +62,9 @@ export * from './src/components/Form'
 // CMD+K
 export * from './src/components/Command'
 
+// Widgets
+export * from './src/components/CountdownWidget'
+
 // layout
 export * from './src/components/LoadingLine'
 
@@ -135,6 +138,15 @@ export {
   PopoverTrigger as PopoverTrigger_Shadcn_,
   PopoverContent as PopoverContent_Shadcn_,
 } from './src/components/shadcn/ui/popover'
+
+export {
+  Accordion as Accordion_Shadcn_,
+  AccordionItem as AccordionItem_Shadcn_,
+  AccordionTrigger as AccordionTrigger_Shadcn_,
+  AccordionContent as AccordionContent_Shadcn_,
+} from './src/components/shadcn/ui/accordion'
+
+export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
 // links
 
