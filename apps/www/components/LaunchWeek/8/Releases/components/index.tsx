@@ -215,33 +215,31 @@ export const AccordionHeader = ({
     </div>
     {day === 1 && (
       <div className="self-end hover:cursor-pointer">
-        <ExpandableVideo
-          videoId="OWhKVbg1p7Y"
-          trigger={
-            <div className="flex items-center h-full gap-3 text-xs group/vid text-scale-1100 hover:text-scale-1200 transition-colors">
-              <span>Watch: Day 1</span>
-              <div className="relative h-8 !aspect-video flex items-center justify-center rounded overflow-hidden border border-scale-800 opacity-80 group-hover/vid:opacity-100 transition-colors">
-                <div className="absolute z-10 w-2.5 h-2.5 text-scale-900 opacity-70 group-hover/vid:opacity-100 transition-opacity">
-                  <svg viewBox="0 0 81 91" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      d="M76.5621 37.998C82.3369 41.3321 82.3369 49.6673 76.5621 53.0014L13.2198 89.5721C7.44504 92.9062 0.226562 88.7386 0.226562 82.0704L0.226566 8.92901C0.226566 2.26085 7.44506 -1.90673 13.2199 1.42735L76.5621 37.998Z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </div>
-                <Image
-                  src="/images/launchweek/8/lw8-yt-thumb.jpg"
-                  alt="Video thumbnail"
-                  layout="fill"
-                  objectFit="cover"
-                  // className="blur-sm"
-                />
-              </div>
-            </div>
-          }
-        />
+        <ExpandableVideo videoId="OWhKVbg1p7Y" trigger={<VideoPreviewTrigger />} />
       </div>
     )}
+  </div>
+)
+
+export const VideoPreviewTrigger = () => (
+  <div className="flex items-center h-full gap-3 text-xs group/vid text-scale-1100 hover:text-scale-1200 transition-colors">
+    <span>Watch: Day 1</span>
+    <div className="relative h-8 !aspect-video flex items-center justify-center rounded overflow-hidden border border-scale-800 opacity-80 group-hover/vid:opacity-100 transition-colors">
+      <div className="absolute z-10 w-2.5 h-2.5 text-scale-900 opacity-70 group-hover/vid:opacity-100 transition-opacity">
+        <svg viewBox="0 0 81 91" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M76.5621 37.998C82.3369 41.3321 82.3369 49.6673 76.5621 53.0014L13.2198 89.5721C7.44504 92.9062 0.226562 88.7386 0.226562 82.0704L0.226566 8.92901C0.226566 2.26085 7.44506 -1.90673 13.2199 1.42735L76.5621 37.998Z"
+            fill="currentColor"
+          />
+        </svg>
+      </div>
+      <Image
+        src="/images/launchweek/8/lw8-yt-thumb.jpg"
+        alt="Video thumbnail"
+        layout="fill"
+        objectFit="cover"
+      />
+    </div>
   </div>
 )
 

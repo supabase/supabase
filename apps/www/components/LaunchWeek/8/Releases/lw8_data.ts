@@ -61,7 +61,7 @@ const days: WeekDayProps[] = [
     steps: [
       {
         title: "Why we'll stay remote",
-        blog: '/blog/',
+        blog: '/blog/why-we-will-stay-remote',
         bg_layers: [{ img: images['00-stay-remote'] }],
         steps: [],
       },
