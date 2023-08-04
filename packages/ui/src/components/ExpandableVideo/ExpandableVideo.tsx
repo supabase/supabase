@@ -1,13 +1,14 @@
 import { useBreakpoint } from 'common'
 import Image from 'next/image'
-import React from 'react'
+import React, { ReactNode } from 'react'
 import { IconPlay, Modal } from 'ui'
 
 interface ExpandableVideoProps {
-  imgUrl: string
   videoId: string
+  imgUrl?: string
   imgOverlayText?: string
   imgAltText?: string
+  trigger?: ReactNode
 }
 
 export function ExpandableVideo({
@@ -15,6 +16,7 @@ export function ExpandableVideo({
   videoId,
   imgOverlayText,
   imgAltText,
+  trigger,
 }: ExpandableVideoProps) {
   const [expandVideo, setExpandVideo] = React.useState(false)
   const isMobile = useBreakpoint(768)
@@ -38,6 +40,26 @@ export function ExpandableVideo({
   React.useEffect(() => {
     if (isMobile) setExpandVideo(false)
   }, [isMobile])
+
+  const CliccablePreview = () => (
+    <div className="video-container overflow-hidden rounded hover:cursor-pointer">
+      <div
+        className={`absolute inset-0 z-10 text-whiteA-1200 flex flex-col items-center justify-center gap-3 backdrop-blur-sm
+                before:content[''] before:-z-10 before:absolute before:inset-0 before:bg-black before:opacity-30 hover:before:opacity-50 before:transition-opacity
+              `}
+      >
+        <IconPlay strokeWidth={2} size="small" />
+        <p className="text-sm">{imgOverlayText ?? 'Watch video guide'}</p>
+      </div>
+      <Image
+        src={imgUrl ?? '/images/blur.png'}
+        alt={imgAltText ?? 'Video guide preview'}
+        layout="fill"
+        objectFit="cover"
+        className="absolute inset-0"
+      />
+    </div>
+  )
 
   return (
     <>
@@ -67,7 +89,7 @@ export function ExpandableVideo({
             >
               <p className="text-xs">Close</p>
             </button>
-            <div className="video-container overflow-hidden rounded-lg">
+            <div className="video-container !rounded overflow-hidden">
               <iframe
                 src={`https://www.youtube-nocookie.com/embed/${videoId}`}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -77,26 +99,7 @@ export function ExpandableVideo({
           </div>
         </div>
       </Modal>
-      <div
-        className="video-container overflow-hidden rounded hover:cursor-pointer"
-        onClick={() => setExpandVideo(true)}
-      >
-        <div
-          className={`absolute inset-0 z-10 text-whiteA-1200 flex flex-col items-center justify-center gap-3 backdrop-blur-sm
-                      before:content[''] before:-z-10 before:absolute before:inset-0 before:bg-black before:opacity-30 hover:before:opacity-50 before:transition-opacity
-                    `}
-        >
-          <IconPlay strokeWidth={2} size="small" />
-          <p className="text-sm">{imgOverlayText ?? 'Watch video guide'}</p>
-        </div>
-        <Image
-          src={imgUrl}
-          alt={imgAltText ?? 'Video guide preview'}
-          layout="fill"
-          objectFit="cover"
-          className="absolute inset-0"
-        />
-      </div>
+      <div onClick={() => setExpandVideo(true)}>{trigger ?? <CliccablePreview />}</div>
     </>
   )
 }

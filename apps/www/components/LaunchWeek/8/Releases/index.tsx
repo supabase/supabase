@@ -141,7 +141,7 @@ export default function LW8Releases() {
                 <div className="lg:h-[400px] flex flex-col gap-5 lg:flex-row pb-4">
                   <motion.div
                     className={`
-                      h-[400px] relative overflow-hidden group/3 flex-1 flex flex-col items-center justify-between
+                      h-[400px] relative overflow-hidden group/pre0 flex-1 flex flex-col items-center justify-between
                       basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-14 px-8 lg:px-10 text-2xl bg-contain shadow-lg
                       `}
                     initial="default"
@@ -149,7 +149,7 @@ export default function LW8Releases() {
                     whileHover="hover"
                   >
                     <div
-                      className="inset-0 absolute group-hover/3:scale-105 opacity-60 group-hover/3:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
+                      className="inset-0 absolute group-hover/pre0:scale-105 opacity-60 group-hover/pre0:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
                       style={{
                         background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, #030A0C)`,
                       }}
@@ -187,7 +187,7 @@ export default function LW8Releases() {
                   </motion.div>
                   <motion.div
                     className={`
-                      h-[400px] relative overflow-hidden group/3 flex-1 flex flex-col items-center justify-between
+                      h-[400px] relative overflow-hidden group/pre1 flex-1 flex flex-col items-center justify-between
                       basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-14 px-8 lg:px-10 text-2xl bg-cover shadow-lg
                       `}
                     initial="default"
@@ -195,7 +195,7 @@ export default function LW8Releases() {
                     whileHover="hover"
                   >
                     <div
-                      className="inset-0 absolute group-hover/3:scale-105 opacity-60 group-hover/3:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
+                      className="inset-0 absolute group-hover/pre1:scale-105 opacity-60 group-hover/pre1:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
                       style={{
                         background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, #030A0C)`,
                       }}
@@ -233,7 +233,7 @@ export default function LW8Releases() {
                   </motion.div>
                   <motion.div
                     className={`
-                      h-[400px] relative overflow-hidden group/3 flex-1 flex flex-col items-center justify-between
+                      h-[400px] relative overflow-hidden group/pre2 flex-1 flex flex-col items-center justify-between
                       basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-14 px-8 lg:px-10 text-2xl bg-contain shadow-lg
                       `}
                     initial="default"
@@ -241,7 +241,7 @@ export default function LW8Releases() {
                     whileHover="hover"
                   >
                     <div
-                      className="inset-0 absolute group-hover/3:scale-105 opacity-60 group-hover/3:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
+                      className="inset-0 absolute group-hover/pre2:scale-105 opacity-60 group-hover/pre2:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
                       style={{
                         background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, #030A0C)`,
                       }}
@@ -295,7 +295,7 @@ export default function LW8Releases() {
                   publishedAt={day1.publishedAt}
                 />
               }
-              disabled={!day1Shipped}
+              disabled={true}
               className="h-[79px]"
               id={day1.d.toString()}
             >
@@ -303,7 +303,7 @@ export default function LW8Releases() {
                 <div className="lg:h-[400px] flex flex-col gap-5 lg:flex-row pb-4">
                   <motion.div
                     className={`
-                      h-[400px] relative overflow-hidden group/3 flex-1 flex flex-col items-center lg:items-start justify-between
+                      h-[400px] relative overflow-hidden group/d1 flex-1 flex flex-col items-center lg:items-start justify-between
                       basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-14 px-8 lg:px-10 text-2xl bg-contain shadow-lg
                       `}
                     initial="default"
@@ -311,7 +311,7 @@ export default function LW8Releases() {
                     whileHover="hover"
                   >
                     <div
-                      className="inset-0 absolute group-hover/3:scale-105 opacity-60 group-hover/3:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
+                      className="inset-0 absolute group-hover/d1:scale-105 opacity-60 group-hover/d1:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
                       style={{
                         background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, #030A0C)`,
                       }}
