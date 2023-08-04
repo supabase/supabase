@@ -78,8 +78,6 @@ export const sqlEditorState = proxy({
         sqlEditorState.orders[projectRef].unshift(snippet.id)
         sqlEditorState.reorderSnippets(projectRef)
       }
-
-      sqlEditorState.needsSaving.add(snippet.id)
     }
     sqlEditorState.loaded[projectRef] = true
   },
