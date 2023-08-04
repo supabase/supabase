@@ -2,21 +2,21 @@ import React from 'react'
 import { SmallCard } from './components'
 import Link from 'next/link'
 import Image from 'next/image'
-import days, { WeekDayProps } from './lw8_data'
+import days from './lw8_data'
 
-const DayHighlightWidget = () => {
+const DayHighlightWidget = ({ title }: { title?: string }) => {
   const [_pre, d1, _d2, _d3, _d4, _d5] = days
 
   return (
-    <div className="w-full max-w-xl">
+    <div className="w-full max-w-xl opacity-0 !animate-[fadeIn_0.5s_cubic-bezier(0.25,0.25,0,1)_0.5s_both]">
       <SmallCard
         className="border hover:border-scale-800 transition-colors"
-        innerClassName="bg-opacity-20"
+        innerClassName="bg-opacity-70"
       >
-        <Link href="#currentDay">
-          <a className="flex flex-row justify-between items-center w-full h-full gap-2">
+        <Link href="/launch-week#today">
+          <a className="flex flex-row justify-between items-center w-full h-full gap-2 text-left">
             <div className="relative flex-shrink flex items-center p-2 w-2/3 md:w-auto">
-              <div className="flex flex-col gap-1 sm:pl-4">
+              <div className="flex flex-col gap-1 sm:pl-2">
                 <div className="flex items-center gap-2">
                   <div className={['flex min-w-[20px] opacity-50', 'opacity-pulse'].join(' ')}>
                     <svg
@@ -34,12 +34,12 @@ const DayHighlightWidget = () => {
                       />
                     </svg>
                   </div>
-                  <span className="text-white">Live now: Day 1</span>
+                  <span className="text-white">{title ?? 'Launch Week 8: Day 1'}</span>
                 </div>
                 <span className="">{d1.steps[0].title}</span>
               </div>
             </div>
-            <div className="relative flex !aspect-video h-[80px] md:h-[100px] gap-2 z-10 rounded overflow-hidden">
+            <div className="relative flex !aspect-video h-[80px] md:h-[80px] gap-2 z-10 rounded overflow-hidden">
               <Image
                 src="/images/launchweek/8/lw8-yt-thumb.jpg"
                 alt="Youtube video thumbnail"
