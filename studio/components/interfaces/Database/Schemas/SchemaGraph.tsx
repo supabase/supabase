@@ -237,7 +237,7 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
               className="text-[8px] leading-5 relative flex flex-row justify-items-start odd:bg-scale-300 even:bg-scale-400"
               key={column.id}
             >
-              <div className="gap-[0.16rem] flex mx-2 align-middle basis-1/4 items-center justifty-start">
+              <div className="gap-[0.24rem] flex mx-2 align-middle basis-1/5 items-center justifty-start">
                 {column.isPrimary && (
                   <IconKey
                     size={8}
