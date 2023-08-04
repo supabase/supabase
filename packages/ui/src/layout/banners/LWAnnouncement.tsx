@@ -79,7 +79,15 @@ const LWAnnouncement = ({
                 <span className="text-foreground-light">Huggingface now supported in Supabase</span>
               </div>
             </div>
-            <div className="relative flex !aspect-video h-[80px] md:h-[80px] gap-2 z-10 rounded overflow-hidden">
+            <div className="relative flex items-center justify-center !aspect-video h-[80px] md:h-[80px] gap-2 z-10 rounded overflow-hidden">
+              <div className="absolute z-20 w-4 h-4 text-white opacity-70">
+                <svg viewBox="0 0 81 91" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M76.5621 37.998C82.3369 41.3321 82.3369 49.6673 76.5621 53.0014L13.2198 89.5721C7.44504 92.9062 0.226562 88.7386 0.226562 82.0704L0.226566 8.92901C0.226566 2.26085 7.44506 -1.90673 13.2199 1.42735L76.5621 37.998Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </div>
               <Image
                 src="https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw8/assets/lw8-yt-thumb.jpg?t=2023-08-04T16%3A04%3A08.632Z"
                 alt="Youtube video thumbnail"
