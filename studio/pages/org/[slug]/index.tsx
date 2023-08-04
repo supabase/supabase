@@ -21,14 +21,17 @@ const ProjectsPage: NextPageWithLayout = () => {
   } = useProjectsQuery()
 
   const organization = useSelectedOrganization()
-  const projects = allProjects?.filter((project) => project.organization_id === organization?.id)
+  const projects = allProjects
+    ?.filter((project) => project.organization_id === organization?.id)
+    .sort((a, b) => a.name.localeCompare(b.name))
+
   const { data: integrations } = useOrgIntegrationsQuery({ orgSlug: organization?.slug })
-  const githubIntegrations = integrations?.find(
-    (integration) => integration.integration.name === 'GitHub'
-  )
+  const githubConnections = integrations
+    ?.filter((integration) => integration.integration.name === 'GitHub')
+    .flatMap((integration) => integration.connections)
 
   return (
-    <ScaffoldContainer>
+    <ScaffoldContainer className="h-full overflow-y-auto">
       <ScaffoldSection>
         <div className="col-span-12 space-y-8">
           <Link href={`/new/${organization?.slug}`}>
@@ -73,7 +76,7 @@ const ProjectsPage: NextPageWithLayout = () => {
                       <ProjectCard
                         key={project.ref}
                         project={project}
-                        githubIntegration={githubIntegrations?.connections.find(
+                        githubIntegration={githubConnections?.find(
                           (connection) => connection.supabase_project_ref === project.ref
                         )}
                       />

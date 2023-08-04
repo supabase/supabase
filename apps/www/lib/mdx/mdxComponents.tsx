@@ -75,6 +75,11 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
         )}
       </figure>
     ),
+    Link: (props: HTMLAnchorElement) => (
+      <a href={props.href} target={props.target}>
+        {props.children}
+      </a>
+    ),
     code: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
   }
 

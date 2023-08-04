@@ -31,15 +31,15 @@ import { Integration } from 'data/integrations/integrations.types'
 interface GithubRepositorySelectionProps {
   integration?: Integration
   selectedBranch?: string
+  hasGithubIntegrationInstalled: boolean
   setSelectedBranch: (name: string) => void
   onSelectConnectRepo: () => void
 }
 
-// [Joshen TODO] Integrate the Github repo selector
-
 const GithubRepositorySelection = ({
   integration,
   selectedBranch,
+  hasGithubIntegrationInstalled,
   setSelectedBranch,
   onSelectConnectRepo,
 }: GithubRepositorySelectionProps) => {
@@ -47,10 +47,10 @@ const GithubRepositorySelection = ({
   const [open, setOpen] = useState(false)
   const comboBoxRef = useRef<HTMLButtonElement>(null)
 
-  const githubProjectIntegration = integration?.connections.find(
+  const githubConnection = integration?.connections.find(
     (connection) => connection.supabase_project_ref === ref
   )
-  const [repoOwner, repoName] = githubProjectIntegration?.metadata.name.split('/') ?? []
+  const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') ?? []
 
   const {
     data: githubBranches,
@@ -66,7 +66,10 @@ const GithubRepositorySelection = ({
 
   return (
     <div
-      className={clsx('border-t border-b', !integration ? 'border-warning-300 bg-warning-200' : '')}
+      className={clsx(
+        'border-t border-b',
+        !hasGithubIntegrationInstalled ? 'border-warning-300 bg-warning-200' : ''
+      )}
     >
       <Modal.Content className="px-7">
         <div className="py-6">
@@ -75,11 +78,11 @@ const GithubRepositorySelection = ({
             <Badge color="amber">Required</Badge>
           </div>
           <p className="text-sm text-light !mb-4">
-            {githubProjectIntegration !== undefined
+            {githubConnection !== undefined
               ? 'Your database preview branches will be based on the branches in the following repository that your project is connected with:'
               : 'Your database preview branches will be based on the branches in the Git repository that your project is connected with.'}
           </p>
-          {!integration && (
+          {!hasGithubIntegrationInstalled && (
             <Link passHref href="/">
               <a target="_blank" rel="noreferrer">
                 <Button type="default" className="!mt-3">
@@ -88,15 +91,15 @@ const GithubRepositorySelection = ({
               </a>
             </Link>
           )}
-          {integration && !githubProjectIntegration && (
+          {hasGithubIntegrationInstalled && !githubConnection && (
             <EmptyIntegrationConnection showNode={false} onClick={() => onSelectConnectRepo()} />
           )}
-          {integration && githubProjectIntegration && (
+          {integration && githubConnection && (
             <>
               <ul className="mb-3">
                 <IntegrationConnection
                   type={'GitHub'}
-                  connection={githubProjectIntegration}
+                  connection={githubConnection}
                   showNode={false}
                   actions={
                     <Button type="default" onClick={() => onSelectConnectRepo()}>
