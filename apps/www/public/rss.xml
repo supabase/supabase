@@ -5,14 +5,21 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Fri, 04 Aug 2023 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Thu, 03 Aug 2023 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
-  <guid>https://supabase.com/blog/launch-week-8-constellation-breakdown</guid>
-  <title>Launch Week 8 constellation breakdown</title>
-  <link>https://supabase.com/blog/launch-week-8-constellation-breakdown</link>
-  <description>Launch Week 8 constellation breakdown</description>
-  <pubDate>Fri, 04 Aug 2023 22:00:00 GMT</pubDate>
+  <guid>https://supabase.com/blog/interactive-constellation-threejs-react-three-fiber</guid>
+  <title>Coding the stars - an interactive constellation with Three.js and React Three Fiber</title>
+  <link>https://supabase.com/blog/interactive-constellation-threejs-react-three-fiber</link>
+  <description>How we built a constellation of stars with Three.js and React Three Fiber.</description>
+  <pubDate>Thu, 03 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/fewer-dimensions-are-better-pgvector</guid>
+  <title>pgvector: Fewer dimensions are better</title>
+  <link>https://supabase.com/blog/fewer-dimensions-are-better-pgvector</link>
+  <description>Increase performance in pgvector by using embedding vectors with fewer dimensions</description>
+  <pubDate>Wed, 02 Aug 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/beta-update-july-2023</guid>
