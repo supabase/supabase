@@ -94,11 +94,11 @@ export default function LW8Releases() {
   const [preRelease, day1, day2, day3, day4, day5] = days
   const isTablet = useBreakpoint(1023)
   const isDesktop = useBreakpoint(1280)
-  const showAll = true
+  const showAll = false
   const publishedSections =
     days
       .filter(
-        (day: WeekDayProps) => day.d === 0 || Date.parse(day.publishedAt) <= Date.now() || showAll
+        (day: WeekDayProps) => Date.parse(day.publishedAt) <= Date.now() || day.shipped || showAll
       )
       .map((day: WeekDayProps) => day.d.toString()) ?? []
 
@@ -283,7 +283,7 @@ export default function LW8Releases() {
               )}
             </Accordion.Item>
           </div>
-          <div className="border-b border-[#111718]" id="currentDay">
+          <div className="border-b border-[#111718] scroll-mt-16" id="currentDay">
             <Accordion.Item
               header={
                 <AccordionHeader
