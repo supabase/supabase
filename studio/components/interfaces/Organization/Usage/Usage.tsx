@@ -164,7 +164,7 @@ const Usage = () => {
                 <p>
                   You are currently viewing usage for a specific project. Since your organization is
                   using the new organization-level billing, the included quota is for your whole
-                  organization and not per-project. For billing purposes, we sum up usage from all
+                  organization and not just this project. For billing purposes, we sum up usage from all
                   your projects. To view your usage quota, remove the project filter.
                 </p>
                 <div>
