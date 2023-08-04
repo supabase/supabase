@@ -2,14 +2,12 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'json',
-  title: 'Inspecting your Postgres database',
+  title: 'Analyzing efficiency and performance from the terminal',
   description:
     'Inspecting your Postgres database for common issues around disk, query performance, index, locks, and more using the terminal.',
 }
 
-## Inspect from the terminal
-
-The Supabase CLI comes with a range of tools to help inspect your Postgres instances for potential issues. Most tools are compatible with any Postgres databases regardless if they are a Supabase project or not.
+The Supabase CLI comes with a range of tools to help inspect your Postgres instances for potential issues. The CLI gets the information from [Postgres internals](https://www.postgresql.org/docs/current/internals.html). Therefore, most tools provided are compatible with any Postgres databases regardless if they are a Supabase project or not.
 
 ### Installing the Supabase CLI
 
