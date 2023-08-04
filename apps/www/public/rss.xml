@@ -5,9 +5,37 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Mon, 17 Jul 2023 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Fri, 04 Aug 2023 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/launch-week-8-constellation-breakdown</guid>
+  <title>Launch Week 8 constellation breakdown</title>
+  <link>https://supabase.com/blog/launch-week-8-constellation-breakdown</link>
+  <description>Launch Week 8 constellation breakdown</description>
+  <pubDate>Fri, 04 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/beta-update-july-2023</guid>
+  <title>Supabase Beta July 2023</title>
+  <link>https://supabase.com/blog/beta-update-july-2023</link>
+  <description>Launch Week 8 is coming - but we still shipped some goodies during July</description>
+  <pubDate>Tue, 01 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/react-native-storage</guid>
+  <title>React Native file upload with Supabase Storage</title>
+  <link>https://supabase.com/blog/react-native-storage</link>
+  <description>Learn how to implement authentication and file upload in a React Native app.</description>
+  <pubDate>Mon, 31 Jul 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-lw8-hackathon</guid>
+  <title>Supabase Launch Week 8 Hackathon</title>
+  <link>https://supabase.com/blog/supabase-lw8-hackathon</link>
+  <description>Build an Open Source Project over 10 days. 5 prize categories.</description>
+  <pubDate>Mon, 24 Jul 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/flutter-authentication</guid>
   <title>Getting started with Flutter authentication</title>
   <link>https://supabase.com/blog/flutter-authentication</link>
