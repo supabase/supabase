@@ -17,6 +17,7 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  ScrollArea,
 } from 'ui'
 
 import { useParams } from 'common'
@@ -81,7 +82,7 @@ const ProjectLink = ({
       <CommandItem_Shadcn_
         asChild
         key={project.ref}
-        value={project.name}
+        value={`${project.name}-${project.ref}`}
         className="cursor-pointer w-full flex items-center justify-between"
         onSelect={() => {
           router.push(href)
@@ -148,14 +149,16 @@ const ProjectDropdown = () => {
             <CommandList_Shadcn_>
               <CommandEmpty_Shadcn_>No projects found</CommandEmpty_Shadcn_>
               <CommandGroup_Shadcn_>
-                {projects?.map((project) => (
-                  <ProjectLink
-                    key={project.ref}
-                    project={project}
-                    organization={selectedOrganization}
-                    setOpen={setOpen}
-                  />
-                ))}
+                <ScrollArea className={(projects || []).length > 7 ? 'h-[210px]' : ''}>
+                  {projects?.map((project) => (
+                    <ProjectLink
+                      key={project.ref}
+                      project={project}
+                      organization={selectedOrganization}
+                      setOpen={setOpen}
+                    />
+                  ))}
+                </ScrollArea>
               </CommandGroup_Shadcn_>
               <CommandGroup_Shadcn_ className="border-t">
                 <Link

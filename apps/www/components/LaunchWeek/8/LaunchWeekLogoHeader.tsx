@@ -1,12 +1,13 @@
 import Link from 'next/link'
 import CountdownComponent from './Countdown'
+import { LW8_LAUNCH_DATE } from '../../../lib/constants'
 
 export function LaunchWeekLogoHeader() {
   return (
     <div className="flex flex-col gap-1 md:gap-2 items-center justify-end">
       <div className="opacity-0 !animate-[fadeIn_0.5s_cubic-bezier(0.25,0.25,0,1)_0.5s_both] px-2 flex flex-col items-center text-center gap-3">
         <div className="">
-          <CountdownComponent />
+          <CountdownComponent date={LW8_LAUNCH_DATE} />
         </div>
         <h1 className="sr-only font-normal uppercase text-[28px] sm:text-[32px]">Launch week 8</h1>
         <p className="text-white radial-gradient-text-scale-600 text-lg sm:text-2xl">

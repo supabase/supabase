@@ -562,6 +562,10 @@ export const database: NavMenuConstant = {
       url: undefined,
       items: [
         {
+          name: 'Analyzing efficiency and performance',
+          url: '/guides/database/inspect',
+        },
+        {
           name: 'JSON and unstructured data',
           url: '/guides/database/json',
         },
