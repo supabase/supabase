@@ -326,8 +326,8 @@ export default function LW8Releases() {
                     <SectionButtons
                       blog={day1.steps[0].blog}
                       hackernews={day1.steps[0].hackernews}
-                      twitter_spaces={day1.steps[0].twitter_spaces}
-                      mobileGrid
+                      // twitter_spaces={day1.steps[0].twitter_spaces}
+                      // mobileGrid
                     />
                     {day1.steps[0]?.bg_layers &&
                       day1.steps[0]?.bg_layers?.map(
