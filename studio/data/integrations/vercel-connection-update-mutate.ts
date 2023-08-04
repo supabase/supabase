@@ -3,19 +3,20 @@ import { toast } from 'react-hot-toast'
 
 import { patch } from 'data/fetchers'
 import { ResponseError } from 'types'
-import { UpdateConnection } from './integrations.types'
+import { UpdateConnectionPayload } from './integrations.types'
 import { integrationKeys } from './keys'
 
 export async function updateVercelConnection({
   id,
   metadata,
   organizationIntegrationId,
-}: UpdateConnection) {
+}: UpdateConnectionPayload) {
   const { data, error } = await patch('/platform/integrations/vercel/connections/{connection_id}', {
     params: {
       path: { connection_id: id },
     },
     body: {
+      // @ts-expect-error
       metadata,
     },
   })
@@ -31,11 +32,11 @@ export const useVercelConnectionUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<UpdateVercelConnectionData, ResponseError, UpdateConnection>,
+  UseMutationOptions<UpdateVercelConnectionData, ResponseError, UpdateConnectionPayload>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<UpdateVercelConnectionData, ResponseError, UpdateConnection>(
+  return useMutation<UpdateVercelConnectionData, ResponseError, UpdateConnectionPayload>(
     (vars) => updateVercelConnection(vars),
     {
       async onSuccess(data, variables, context) {

@@ -127,16 +127,16 @@ export type SupabaseConfigVercel = {
 
 export type Imetadata = {
   id: string
-  supabaseConfig: {
-    environmentVariables: {
+  supabaseConfig?: {
+    environmentVariables?: {
       production: boolean
       preview: boolean
     }
-    authRedirectUris: {
+    authRedirectUris?: {
       production: boolean
       preview: boolean
     }
-    supabaseDirectory: string
+    supabaseDirectory?: string
   }
   link?: VercelGitLink
   name: string
@@ -250,7 +250,7 @@ export type IntegrationConnectionsCreateVariables = {
   orgSlug: string | undefined
 }
 
-export type UpdateConnection = {
+export type UpdateConnectionPayload = {
   id: string
   organizationIntegrationId: string
   metadata: Imetadata
