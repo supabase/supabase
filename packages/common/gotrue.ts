@@ -10,9 +10,11 @@ const debug =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' &&
   globalThis?.localStorage?.getItem(AUTH_DEBUG_KEY) === 'true'
 
-const navigatorLockEnabled =
+const navigatorLockEnabled = !!(
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' &&
-  globalThis?.localStorage?.getItem(AUTH_NAVIGATOR_LOCK_KEY) === 'true'
+  globalThis?.localStorage?.getItem(AUTH_NAVIGATOR_LOCK_KEY) === 'true' &&
+  globalThis?.navigator?.locks
+)
 
 export const gotrueClient = new GoTrueClient({
   url: process.env.NEXT_PUBLIC_GOTRUE_URL,

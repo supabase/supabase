@@ -6,6 +6,8 @@ export const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   'supabaseDarkMode',
   'supabase.dashboard.sign_in_clicks',
   'supabase.dashboard.auth.debug',
+  'supabase.dashboard.auth.navigatorLock.enabled',
+  'supabase.dashboard.auth.ff.threshold.navigatorLock',
 ]
 
 export function clearLocalStorage() {
@@ -55,7 +57,31 @@ export function resetSignInClicks(): number {
   return clicks
 }
 
+export function getNavigatorLockFeatureFlagThreshold() {
+  const str = localStorage.getItem('supabase.dashboard.auth.ff.threshold.navigatorLock')
+
+  return str ? parseInt(str) : null
+}
+
+function determineNavigatorLockFeatureFlagThreshold() {
+  if (getNavigatorLockFeatureFlagThreshold()) {
+    return
+  }
+
+  localStorage.setItem(
+    'supabase.dashboard.auth.ff.threshold.navigatorLock',
+    `${Math.floor(Math.random() * 100)}`
+  )
+}
+
+export function setNavigatorLockEnabled(enabled: boolean) {
+  localStorage.setItem('supabase.dashboard.auth.navigatorLock.enabled', enabled ? 'true' : 'false')
+}
+
 if (globalThis && globalThis.localStorage && IS_PLATFORM) {
   // populate the value based on the current local storage state
   inferSignInClicks()
+
+  // setup the navigator lock group on initial load
+  determineNavigatorLockFeatureFlagThreshold()
 }
