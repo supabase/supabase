@@ -208,6 +208,7 @@ const nextConfig = {
       'avatars.githubusercontent.com',
       'api-frameworks.vercel.sh',
       'vercel.com',
+      'obuldanrptloktxcffvn.supabase.co',
     ],
   },
   // Ref: https://nextjs.org/docs/advanced-features/output-file-tracing#caveats

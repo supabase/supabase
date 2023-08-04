@@ -11,6 +11,7 @@ import { useProfile } from 'lib/profile'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { NextPageWithLayout } from 'types'
+import { LWAnnouncement } from 'ui'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const router = useRouter()

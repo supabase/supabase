@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { LW_SITE_URL } from './data/constants'
+import { LW_SITE_URL, LW8_END_DATE } from './data/constants'
 
-const SmallCard = ({
+const Card = ({
   className,
   innerClassName,
   children,
@@ -13,7 +13,7 @@ const SmallCard = ({
 }) => (
   <div
     className={[
-      'group relative p-[1px] bg-gradient-to-b from-scale-100/90 to-scale-100/60 rounded-xl overflow-hidden shadow-lg',
+      'group relative p-[1px] bg-gradient-to-b from-scale-100/90 to-scale-100/60 rounded-xl overflow-hidden shadow-sm',
       className,
     ].join(' ')}
   >
@@ -31,17 +31,27 @@ const SmallCard = ({
 const LWAnnouncement = ({
   title,
   className,
-  innerClassName,
+  cardClassName,
+  cardInnerClassName,
 }: {
   title?: string
   className?: string
-  innerClassName?: string
+  cardClassName?: string
+  cardInnerClassName?: string
 }) => {
+  const isLw8Finished = Date.parse(LW8_END_DATE) < Date.now()
+  if (isLw8Finished) return null
+
   return (
-    <div className="w-full opacity-0 !animate-[fadeIn_0.5s_cubic-bezier(0.25,0.25,0,1)_0.5s_both]">
-      <SmallCard
-        className="border hover:border-scale-800 transition-colors"
-        innerClassName={['!bg-opacity-70', innerClassName].join(' ')}
+    <div
+      className={[
+        'w-full opacity-0 !animate-[fadeIn_0.5s_cubic-bezier(0.25,0.25,0,1)_0.5s_both]',
+        className,
+      ].join(' ')}
+    >
+      <Card
+        className={['border hover:border-scale-800 transition-colors', cardClassName].join(' ')}
+        innerClassName={['!bg-opacity-70', cardInnerClassName].join(' ')}
       >
         <Link href={`${LW_SITE_URL}#today`}>
           <a className="flex flex-row justify-between items-center w-full h-full gap-2 text-left no-underline">
@@ -79,7 +89,7 @@ const LWAnnouncement = ({
             </div>
           </a>
         </Link>
-      </SmallCard>
+      </Card>
     </div>
   )
 }

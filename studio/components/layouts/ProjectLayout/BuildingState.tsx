@@ -4,7 +4,7 @@ import ExampleProject from 'components/interfaces/Home/ExampleProject'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
-import { Badge, Button, IconArrowRight, IconLoader } from 'ui'
+import { Badge, Button, IconArrowRight, IconLoader, LWAnnouncement } from 'ui'
 
 import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
@@ -47,6 +47,9 @@ const BuildingState = ({ project }: BuildingStateProps) => {
 
   return (
     <div className="mx-auto my-16 w-full max-w-6xl items-center justify-center">
+      <div className="mx-6 mb-8 -mt-4">
+        <LWAnnouncement />
+      </div>
       <div className="mx-6 flex flex-col space-y-16">
         <div className=" flex flex-col gap-4">
           <div className="flex items-center space-x-3">
