@@ -1,7 +1,8 @@
-import { Badge } from 'ui'
+import { Badge, ExpandableVideo, IconPlay } from 'ui'
 
 import Link from 'next/link'
 import CountdownComponent from '../../Countdown'
+import Image from 'next/image'
 
 export const PencilSvg = () => (
   <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -147,56 +148,89 @@ export const AccordionHeader = ({
   shippable?: boolean
 }) => (
   <div
-    className={[
-      'flex flex-1 scroll-mt-20',
-      shippable && shipped ? 'flex-col sm:flex-row' : 'flex-row',
-    ].join(' ')}
+    className={['flex flex-1 justify-between items-stretch scroll-mt-20 text-scale-900'].join(' ')}
   >
-    <div className="flex gap-4 w-full sm:w-auto sm:min-w-[240px] md:min-w-[380px] items-center">
-      <span className="text-scale-900 text-sm">
-        <span className="inline sm:hidden md:inline">{weekDay} </span>
-        {date && (
-          <span>
-            <span className="inline sm:hidden md:inline">・</span> {date}
-          </span>
-        )}
-      </span>
-    </div>
-    {shippable && shipped && (
-      <Badge
-        className={`relative inset-0 !bg-transparent !py-1 !px-4 h-fit backdrop-blur-md ${
-          shipped
-            ? 'bg-gradient-to-br from-[#05090B] to-[#05090B] !border-[#061517]'
-            : 'border-[#FFFFFF20]'
-        }`}
-      >
-        <span className="text-[#A0A0A080] text-sm font-normal bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
-          Shipped
+    <div
+      className={[
+        'flex',
+        shippable && shipped ? 'flex-col sm:flex-row items-stretch' : 'flex-row',
+      ].join(' ')}
+    >
+      <div className="flex gap-4 w-full sm:w-auto sm:min-w-[240px] md:min-w-[380px] items-center">
+        <span className="text-sm">
+          <span className="inline sm:hidden md:inline">{weekDay} </span>
+          {date && (
+            <span>
+              <span className="inline sm:hidden md:inline">・</span> {date}
+            </span>
+          )}
         </span>
-      </Badge>
-    )}
-    {shipped && <span className="text-scale-1200 text-lg mt-1 sm:mt-0">{title}</span>}
-    {shippable && !shipped && (
-      <span className="text-sm font-normal text-[#A0A0A0] mt-1 sm:mt-0 flex items-center gap-1 md:gap-4">
-        <svg
-          width="17"
-          height="17"
-          viewBox="0 0 17 17"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+      </div>
+      {shippable && shipped && (
+        <Badge
+          className={`relative inset-0 !bg-transparent !py-1 !px-4 h-fit backdrop-blur-md ${
+            shipped
+              ? 'bg-gradient-to-br from-[#05090B] to-[#05090B] !border-[#061517]'
+              : 'border-[#FFFFFF20]'
+          }`}
         >
-          <g opacity="0.5">
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M4.32656 7.58047V5.98047C4.32656 3.77133 6.11742 1.98047 8.32656 1.98047C10.5357 1.98047 12.3266 3.77133 12.3266 5.98047V7.58047C13.2102 7.58047 13.9266 8.29681 13.9266 9.18047V13.1805C13.9266 14.0641 13.2102 14.7805 12.3266 14.7805H4.32656C3.44291 14.7805 2.72656 14.0641 2.72656 13.1805V9.18047C2.72656 8.29681 3.44291 7.58047 4.32656 7.58047ZM10.7266 5.98047V7.58047H5.92656V5.98047C5.92656 4.65499 7.00108 3.58047 8.32656 3.58047C9.65205 3.58047 10.7266 4.65499 10.7266 5.98047Z"
-              fill="#A0A0A0"
-            />
-          </g>
-        </svg>
+          <span className="text-[#A0A0A080] text-sm font-normal bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
+            Shipped
+          </span>
+        </Badge>
+      )}
+      {shipped && <span className="text-scale-1200 text-lg mt-1 sm:mt-0">{title}</span>}
+      {shippable && !shipped && (
+        <span className="text-sm font-normal text-[#A0A0A0] mt-1 sm:mt-0 flex items-center gap-1 md:gap-4">
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 17 17"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g opacity="0.5">
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M4.32656 7.58047V5.98047C4.32656 3.77133 6.11742 1.98047 8.32656 1.98047C10.5357 1.98047 12.3266 3.77133 12.3266 5.98047V7.58047C13.2102 7.58047 13.9266 8.29681 13.9266 9.18047V13.1805C13.9266 14.0641 13.2102 14.7805 12.3266 14.7805H4.32656C3.44291 14.7805 2.72656 14.0641 2.72656 13.1805V9.18047C2.72656 8.29681 3.44291 7.58047 4.32656 7.58047ZM10.7266 5.98047V7.58047H5.92656V5.98047C5.92656 4.65499 7.00108 3.58047 8.32656 3.58047C9.65205 3.58047 10.7266 4.65499 10.7266 5.98047Z"
+                fill="#A0A0A0"
+              />
+            </g>
+          </svg>
 
-        {day === 2 && <CountdownComponent date={publishedAt} showCard={false} />}
-      </span>
+          {day === 2 && <CountdownComponent date={publishedAt} showCard={false} />}
+        </span>
+      )}
+    </div>
+    {day === 1 && (
+      <div className="self-end">
+        <ExpandableVideo
+          videoId="OWhKVbg1p7Y"
+          trigger={
+            <div className="flex items-center h-full gap-3 text-xs group/vid text-scale-1100 hover:text-scale-1200 transition-colors">
+              <span>Watch: Day 1</span>
+              <div className="relative h-8 !aspect-video flex items-center justify-center rounded overflow-hidden border group-hover/vid:border-scale-800 transition-colors">
+                <div className="absolute z-10 w-2.5 h-2.5 text-scale-900 opacity-70 group-hover/vid:opacity-100 transition-opacity">
+                  <svg viewBox="0 0 81 91" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M76.5621 37.998C82.3369 41.3321 82.3369 49.6673 76.5621 53.0014L13.2198 89.5721C7.44504 92.9062 0.226562 88.7386 0.226562 82.0704L0.226566 8.92901C0.226566 2.26085 7.44506 -1.90673 13.2199 1.42735L76.5621 37.998Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </div>
+                <Image
+                  src="/images/launchweek/8/twitter-spaces-thumb.svg"
+                  alt="Video thumbnail"
+                  layout="fill"
+                  objectFit="cover"
+                  className="blur-sm"
+                />
+              </div>
+            </div>
+          }
+        />
+      </div>
     )}
   </div>
 )
