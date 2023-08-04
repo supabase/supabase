@@ -327,6 +327,7 @@ export default function LW8Releases() {
                       blog={day1.steps[0].blog}
                       hackernews={day1.steps[0].hackernews}
                       twitter_spaces={day1.steps[0].twitter_spaces}
+                      mobileGrid
                     />
                     {day1.steps[0]?.bg_layers &&
                       day1.steps[0]?.bg_layers?.map(
@@ -347,9 +348,7 @@ export default function LW8Releases() {
                                   w-full h-full -z-10 transition-all duration-300
                                 `}
                                 layout="fill"
-                                objectPosition={
-                                  isTablet ? '50%' : isDesktop ? '200% 50%' : '100% 50%'
-                                }
+                                objectPosition={isTablet ? '50%' : '90% 50%'}
                                 objectFit="contain"
                               />
                             </motion.div>
