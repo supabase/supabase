@@ -142,7 +142,7 @@ Let's build our Edge Function. Edge Functions are server-side TypeScript functio
           normalize: true,
         });
 
-        // Get the embedding output
+        // Extract the embedding output
         const embedding = Array.from(output.data);
 
         // Return the embedding
@@ -203,7 +203,8 @@ Let's build our Edge Function. Edge Functions are server-side TypeScript functio
 
 ## Next steps
 
-TBD
+- Learn more about [embedding concepts](/docs/guides/ai/concepts)
+- [Store your embeddings](/docs/guides/ai/vector-columns) in a database
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
