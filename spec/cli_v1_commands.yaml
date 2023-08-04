@@ -1575,9 +1575,9 @@ commands:
   - id: supabase-inspect-db-table-index-sizes
     title: supabase inspect db table-index-sizes
     summary: Show index sizes of individual tables
-    description: |2-
+    description: |2
 
-      This command displays the total size of indexes for each table. It is calcualtes by using the system administration function `pg_indexes_size()`.
+      This command displays the total size of indexes for each table. It is calculated by using the system administration function `pg_indexes_size()`.
 
       ```
                        TABLE               │ INDEX SIZE
@@ -1634,7 +1634,7 @@ commands:
       This is a Supabase specific command. You can see this breakdown on the dashboard as well:
       https://app.supabase.com/project/_/database/roles
 
-      The maximum number of active connections depends [on your instance size](https://supabase.com/docs/guides/platform/compute-add-ons).
+      The maximum number of active connections depends [on your instance size](https://supabase.com/docs/guides/platform/compute-add-ons). You can [manually overwrite](https://supabase.com/docs/guides/platform/performance#allowing-higher-number-of-connections) the allowed number of connection but it is not advised.
 
       ```
 
@@ -1700,7 +1700,7 @@ commands:
       Show queries from pg_stat_statements ordered by total execution time
     description: |2
 
-      This command displays statements, obtained from `pg_stat_statements`, ordered by the amount of time to execute in aggregate. This includes the statement itself, the total execution time for that statement, the proportion of total execution time for all statements that statement has taken up, the number of times that statement has been called, and the amount of time that statement spent on synchronous I/O (reading/writing from the filesystem).
+      This command displays statements, obtained from `pg_stat_statements`, ordered by the amount of time to execute in aggregate. This includes the statement itself, the total execution time for that statement, the proportion of total execution time for all statements that statement has taken up, the number of times that statement has been called, and the amount of time that statement spent on synchronous I/O (reading/writing from the file system).
 
       Typically, an efficient query will have an appropriate ratio of calls to total execution time, with as little time spent on I/O as possible. Queries that have a high total execution time but low call count should be investigated to improve their performance. Queries that have a high proportion of execution time being spent on synchronous I/O should also be investigated.
 
@@ -1753,10 +1753,9 @@ commands:
       Show queries which have taken out an exclusive lock on a relation
     description: |2
 
-      This command displays queries that have taken out an exlusive lock on a relation. Exclusive locks typically prevent other operations on that relation from taking place, and can be a cause of "hung" queries that are waiting for a lock to be granted.
+      This command displays queries that have taken out an exclusive lock on a relation. Exclusive locks typically prevent other operations on that relation from taking place, and can be a cause of "hung" queries that are waiting for a lock to be granted.
 
       If you see a query that is hanging for a very long time or causing blocking issues you may consider killing the query by connecting to the database and running `SELECT pg_cancel_backend(PID);` to cancel the query. If the query still does not stop you can force a hard stop by running `SELECT pg_terminate_backend(PID);`
-
 
       ```
            PID   │ RELNAME │ TRANSACTION ID │ GRANTED │                  QUERY                  │   AGE
@@ -1815,11 +1814,11 @@ commands:
     title: supabase inspect db calls
     summary: |
       Show queries from pg_stat_statements ordered by total times called
-    description: |2-
+    description: |2
 
       This command is much like the `supabase inspect db outliers` command, but ordered by the number of times a statement has been called.
 
-      You can use this information to see which queries are called most often, which can potentially be good candiates for optimisation.
+      You can use this information to see which queries are called most often, which can potentially be good candidates for optimisation.
 
       ```
 
@@ -1869,9 +1868,9 @@ commands:
     title: supabase inspect db blocking
     summary: |
       Show queries that are holding locks and the queries that are waiting for them to be released
-    description: |2-
+    description: |2
 
-      This command shows you staements that are currently holding locks and blocking, as well as the statement that is being blocked. This can be used in conjunction with `inspect db locks` to determine which statements need to be terminated in order to resolve lock contention.
+      This command shows you statements that are currently holding locks and blocking, as well as the statement that is being blocked. This can be used in conjunction with `inspect db locks` to determine which statements need to be terminated in order to resolve lock contention.
 
       ```
           BLOCKED PID │ BLOCKING STATEMENT           │ BLOCKING DURATION │ BLOCKING PID │ BLOCKED STATEMENT                                                                      │ BLOCKED DURATION
@@ -1893,7 +1892,7 @@ commands:
       Estimates space allocated to a relation that is full of dead tuples
     description: |2
 
-      This command displays an estimation of table "bloat" - Due to Postgres' [MVCC](https://www.postgresql.org/docs/current/mvcc.html) when data is updated or deleted new rows are created and old rows are made invisible and marked as "dead tuples". Usually the [autovaccum](https://supabase.com/docs/guides/platform/database-size#vacuum-operations) process will aysnchronously clean the dead tuples. Sometimes the autovaccum is unable to work fast enough to reduce or prevent tables from becoming bloated. High bloat can slow down queries, cause excessive IOPS and waste space in your database.
+      This command displays an estimation of table "bloat" - Due to Postgres' [MVCC](https://www.postgresql.org/docs/current/mvcc.html) when data is updated or deleted new rows are created and old rows are made invisible and marked as "dead tuples". Usually the [autovaccum](https://supabase.com/docs/guides/platform/database-size#vacuum-operations) process will asynchronously clean the dead tuples. Sometimes the autovaccum is unable to work fast enough to reduce or prevent tables from becoming bloated. High bloat can slow down queries, cause excessive IOPS and waste space in your database.
 
       Tables with a high bloat ratio should be investigated to see if there are vacuuming is not quick enough or there are other issues.
 
