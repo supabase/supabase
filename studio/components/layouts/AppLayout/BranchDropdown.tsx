@@ -1,10 +1,11 @@
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
-import Link from 'next/link'
 
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
+import { useSelectedProject } from 'hooks'
 import {
   Badge,
   Button,
@@ -18,12 +19,11 @@ import {
   IconCheck,
   IconCode,
   IconGitBranch,
-  IconPlus,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  ScrollArea,
 } from 'ui'
-import { useSelectedProject } from 'hooks'
 import { sanitizeRoute } from './ProjectDropdown'
 
 const BranchLink = ({
@@ -126,14 +126,16 @@ const BranchDropdown = () => {
                 <CommandList_Shadcn_>
                   <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>
                   <CommandGroup_Shadcn_>
-                    {branches?.map((branch) => (
-                      <BranchLink
-                        key={branch.id}
-                        branch={branch}
-                        isSelected={branch.id === selectedBranch?.id}
-                        setOpen={setOpen}
-                      />
-                    ))}
+                    <ScrollArea className={(branches || []).length > 7 ? 'h-[210px]' : ''}>
+                      {branches?.map((branch) => (
+                        <BranchLink
+                          key={branch.id}
+                          branch={branch}
+                          isSelected={branch.id === selectedBranch?.id}
+                          setOpen={setOpen}
+                        />
+                      ))}
+                    </ScrollArea>
                   </CommandGroup_Shadcn_>
                   <CommandGroup_Shadcn_ className="border-t">
                     <Link passHref href={`/project/${ref}/branches`}>

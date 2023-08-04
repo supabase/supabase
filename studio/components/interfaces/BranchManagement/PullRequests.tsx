@@ -1,13 +1,17 @@
+import Link from 'next/link'
+import { Button, IconExternalLink, IconGitBranch } from 'ui'
+
 import { Branch } from 'data/branches/branches-query'
 import { BranchContainer, BranchHeader } from './BranchPanels'
-import { Button, IconExternalLink, IconGitBranch } from 'ui'
 
 interface PullRequestsProps {
   previewBranches: Branch[]
+  generatePullRequestURL: (branch?: string) => string
 }
 
-const PullRequests = ({ previewBranches }: PullRequestsProps) => {
+const PullRequests = ({ previewBranches, generatePullRequestURL }: PullRequestsProps) => {
   const pullRequests = []
+  const pullRequestUrl = generatePullRequestURL()
 
   return (
     <>
@@ -32,9 +36,13 @@ const PullRequests = ({ previewBranches }: PullRequestsProps) => {
                     <IconGitBranch strokeWidth={2} className="text-scale-1100" />
                     <p>Create a pull request</p>
                   </div>
-                  <Button type="default" iconRight={<IconExternalLink />}>
-                    Github
-                  </Button>
+                  <Link passHref href={pullRequestUrl}>
+                    <a target="_blank" rel="noreferrer">
+                      <Button type="default" iconRight={<IconExternalLink />}>
+                        Github
+                      </Button>
+                    </a>
+                  </Link>
                 </div>
                 <div className="px-5 py-3 border-t flex items-center justify-between">
                   <div>
