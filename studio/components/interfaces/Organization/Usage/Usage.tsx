@@ -11,10 +11,12 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
-import { Listbox } from 'ui'
+import { Button, IconExternalLink, IconInfo, Listbox } from 'ui'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
 import SizeAndCounts from './SizeAndCounts'
+import InformationBox from 'components/ui/InformationBox'
+import Link from 'next/link'
 
 const Usage = () => {
   const { slug, projectRef } = useParams()
@@ -122,8 +124,8 @@ const Usage = () => {
                 <Listbox.Option
                   key="all-projects"
                   id="all-projects"
-                  value="all-projects"
                   label="All projects"
+                  value="all-projects"
                 >
                   All projects
                 </Listbox.Option>
@@ -152,6 +154,36 @@ const Usage = () => {
           )}
         </div>
       </ScaffoldContainer>
+
+      {selectedProjectRef && (
+        <ScaffoldContainer className="mt-5">
+          <InformationBox
+            title="Usage filtered by project"
+            description={
+              <div className="space-y-3">
+                <p>
+                  You are currently viewing usage for a specific project. Since your organization is
+                  using the new organization-level-billing, the included quota is for your whole
+                  organization and not per-project. For billing purposes, we sum up usage from all
+                  your projects. To view your usage quota, remove the project filter.
+                </p>
+                <div>
+                  <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
+                    <a target="_blank" rel="noreferrer">
+                      <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                        Documentation
+                      </Button>
+                    </a>
+                  </Link>
+                </div>
+              </div>
+            }
+            defaultVisibility
+            hideCollapse
+            icon={<IconInfo />}
+          />
+        </ScaffoldContainer>
+      )}
 
       <Bandwidth
         orgSlug={slug as string}
