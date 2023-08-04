@@ -1,7 +1,7 @@
-clispec: '001'
+clispec: "001"
 info:
   id: cli
-  version: latest
+  version: 1.82.2
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -20,7 +20,7 @@ flags:
   - id: debug
     name: --debug
     description: output debug logs to stderr
-    default_value: 'false'
+    default_value: "false"
   - id: dns-resolver
     name: --dns-resolver <[ native | https ]>
     description: lookup domain names using the specified resolver
@@ -28,22 +28,22 @@ flags:
     accepted_values:
       - id: native
         name: native
-        type: '[ native | https ]'
+        type: "[ native | https ]"
       - id: https
         name: https
-        type: '[ native | https ]'
+        type: "[ native | https ]"
   - id: experimental
     name: --experimental
     description: enable experimental features
-    default_value: 'false'
+    default_value: "false"
   - id: help
     name: -h, --help
     description: help for supabase
-    default_value: 'false'
+    default_value: "false"
   - id: workdir
     name: --workdir <string>
     description: path to a Supabase project directory
-    default_value: ''
+    default_value: ""
 commands:
   - id: supabase-vanity-subdomains
     title: supabase vanity-subdomains
@@ -73,11 +73,11 @@ commands:
         name: --experimental
         description: enable experimental features
         required: true
-        default_value: 'false'
+        default_value: "false"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-vanity-subdomains-delete
     title: supabase vanity-subdomains delete
     summary: Deletes a project's vanity subdomain
@@ -92,11 +92,11 @@ commands:
         name: --experimental
         description: enable experimental features
         required: true
-        default_value: 'false'
+        default_value: "false"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-vanity-subdomains-check-availability
     title: supabase vanity-subdomains check-availability
     summary: Checks if a desired subdomain is available for use
@@ -109,16 +109,16 @@ commands:
         name: --desired-subdomain <string>
         description: |
           The desired vanity subdomain to use for your Supabase project.
-        default_value: ''
+        default_value: ""
       - id: experimental
         name: --experimental
         description: enable experimental features
         required: true
-        default_value: 'false'
+        default_value: "false"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-vanity-subdomains-activate
     title: supabase vanity-subdomains activate
     summary: Activate a vanity subdomain
@@ -136,16 +136,16 @@ commands:
         name: --desired-subdomain <string>
         description: |
           The desired vanity subdomain to use for your Supabase project.
-        default_value: ''
+        default_value: ""
       - id: experimental
         name: --experimental
         description: enable experimental features
         required: true
-        default_value: 'false'
+        default_value: "false"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-test
     title: supabase test
     summary: Run tests on local Supabase containers
@@ -171,7 +171,7 @@ commands:
         accepted_values:
           - id: pgtap
             name: pgtap
-            type: '[ pgtap ]'
+            type: "[ pgtap ]"
   - id: supabase-test-db
     title: supabase test db
     summary: Tests local database with pgTAP
@@ -231,7 +231,7 @@ commands:
       - id: no-backup
         name: --no-backup
         description: Deletes all data volumes after stopping.
-        default_value: 'false'
+        default_value: "false"
   - id: supabase-status
     title: supabase status
     summary: Show status of local Supabase containers
@@ -292,23 +292,23 @@ commands:
         accepted_values:
           - id: env
             name: env
-            type: '[ env | pretty | json | toml | yaml ]'
+            type: "[ env | pretty | json | toml | yaml ]"
           - id: pretty
             name: pretty
-            type: '[ env | pretty | json | toml | yaml ]'
+            type: "[ env | pretty | json | toml | yaml ]"
           - id: json
             name: json
-            type: '[ env | pretty | json | toml | yaml ]'
+            type: "[ env | pretty | json | toml | yaml ]"
           - id: toml
             name: toml
-            type: '[ env | pretty | json | toml | yaml ]'
+            type: "[ env | pretty | json | toml | yaml ]"
           - id: yaml
             name: yaml
-            type: '[ env | pretty | json | toml | yaml ]'
+            type: "[ env | pretty | json | toml | yaml ]"
       - id: override-name
         name: --override-name <strings>
         description: Override specific variable names.
-        default_value: '[]'
+        default_value: "[]"
   - id: supabase-start
     title: supabase start
     summary: Start containers for Supabase local development
@@ -355,11 +355,11 @@ commands:
         name: -x, --exclude <strings>
         description: |
           Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,inbucket,postgrest,pgadmin-schema-diff,migra,postgres-meta,studio,edge-runtime,logflare,vector]
-        default_value: '[]'
+        default_value: "[]"
       - id: ignore-health-check
         name: --ignore-health-check
         description: Ignore unhealthy services and exit 0
-        default_value: 'false'
+        default_value: "false"
   - id: supabase-sso
     title: supabase sso
     summary: Manage Single Sign-On (SSO) authentication for projects
@@ -410,37 +410,37 @@ commands:
         name: --add-domains <strings>
         description: |
           Add this comma separated list of email domains to the identity provider.
-        default_value: '[]'
+        default_value: "[]"
       - id: attribute-mapping-file
         name: --attribute-mapping-file <string>
         description: |
           File containing a JSON mapping between SAML attributes to custom JWT claims.
-        default_value: ''
+        default_value: ""
       - id: domains
         name: --domains <strings>
         description: |
           Replace domains with this comma separated list of email domains.
-        default_value: '[]'
+        default_value: "[]"
       - id: metadata-file
         name: --metadata-file <string>
         description: |
           File containing a SAML 2.0 Metadata XML document describing the identity provider.
-        default_value: ''
+        default_value: ""
       - id: metadata-url
         name: --metadata-url <string>
         description: |
           URL pointing to a SAML 2.0 Metadata XML document describing the identity provider.
-        default_value: ''
+        default_value: ""
       - id: remove-domains
         name: --remove-domains <strings>
         description: |
           Remove this comma separated list of email domains from the identity provider.
-        default_value: '[]'
+        default_value: "[]"
       - id: skip-url-validation
         name: --skip-url-validation
         description: |
           Whether local validation of the SAML 2.0 Metadata URL should not be performed.
-        default_value: 'false'
+        default_value: "false"
       - id: output
         name: -o, --output <[ pretty | json | toml | yaml ]>
         description: Output format
@@ -448,20 +448,20 @@ commands:
         accepted_values:
           - id: pretty
             name: pretty
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
           - id: json
             name: json
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
           - id: toml
             name: toml
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
           - id: yaml
             name: yaml
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-sso-show
     title: supabase sso show
     summary: Show information about an SSO identity provider
@@ -493,7 +493,7 @@ commands:
       - id: metadata
         name: --metadata
         description: Show SAML 2.0 XML Metadata only
-        default_value: 'false'
+        default_value: "false"
       - id: output
         name: -o, --output <[ pretty | json | toml | yaml ]>
         description: Output format
@@ -501,20 +501,20 @@ commands:
         accepted_values:
           - id: pretty
             name: pretty
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
           - id: json
             name: json
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
           - id: toml
             name: toml
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
           - id: yaml
             name: yaml
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-sso-remove
     title: supabase sso remove
     summary: Remove an existing SSO identity provider
@@ -541,20 +541,20 @@ commands:
         accepted_values:
           - id: pretty
             name: pretty
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
           - id: json
             name: json
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
           - id: toml
             name: toml
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
           - id: yaml
             name: yaml
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-sso-list
     title: supabase sso list
     summary: List all SSO identity providers for a project
@@ -572,20 +572,20 @@ commands:
         accepted_values:
           - id: pretty
             name: pretty
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
           - id: json
             name: json
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
           - id: toml
             name: toml
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
           - id: yaml
             name: yaml
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-sso-info
     title: supabase sso info
     summary: |
@@ -609,20 +609,20 @@ commands:
         accepted_values:
           - id: pretty
             name: pretty
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
           - id: json
             name: json
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
           - id: toml
             name: toml
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
           - id: yaml
             name: yaml
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-sso-add
     title: supabase sso add
     summary: Add a new SSO identity provider
@@ -662,36 +662,36 @@ commands:
         name: --attribute-mapping-file <string>
         description: |
           File containing a JSON mapping between SAML attributes to custom JWT claims.
-        default_value: ''
+        default_value: ""
       - id: domains
         name: --domains <strings>
         description: |
           Comma separated list of email domains to associate with the added identity provider.
-        default_value: '[]'
+        default_value: "[]"
       - id: metadata-file
         name: --metadata-file <string>
         description: |
           File containing a SAML 2.0 Metadata XML document describing the identity provider.
-        default_value: ''
+        default_value: ""
       - id: metadata-url
         name: --metadata-url <string>
         description: |
           URL pointing to a SAML 2.0 Metadata XML document describing the identity provider.
-        default_value: ''
+        default_value: ""
       - id: skip-url-validation
         name: --skip-url-validation
         description: |
           Whether local validation of the SAML 2.0 Metadata URL should not be performed.
-        default_value: 'false'
+        default_value: "false"
       - id: type
         name: -t, --type <[ saml ]>
         description: Type of identity provider (according to supported protocol).
         required: true
-        default_value: ''
+        default_value: ""
         accepted_values:
           - id: saml
             name: saml
-            type: '[ saml ]'
+            type: "[ saml ]"
       - id: output
         name: -o, --output <[ pretty | json | toml | yaml ]>
         description: Output format
@@ -699,20 +699,20 @@ commands:
         accepted_values:
           - id: pretty
             name: pretty
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
           - id: json
             name: json
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
           - id: toml
             name: toml
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
           - id: yaml
             name: yaml
-            type: '[ pretty | json | toml | yaml ]'
+            type: "[ pretty | json | toml | yaml ]"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-ssl-enforcement
     title: supabase ssl-enforcement
     summary: Manage SSL enforcement configuration
@@ -735,21 +735,21 @@ commands:
         name: --disable-db-ssl-enforcement
         description: |
           Whether the DB should disable SSL enforcement for all external connections.
-        default_value: 'false'
+        default_value: "false"
       - id: enable-db-ssl-enforcement
         name: --enable-db-ssl-enforcement
         description: |
           Whether the DB should enable SSL enforcement for all external connections.
-        default_value: 'false'
+        default_value: "false"
       - id: experimental
         name: --experimental
         description: enable experimental features
         required: true
-        default_value: 'false'
+        default_value: "false"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-ssl-enforcement-get
     title: supabase ssl-enforcement get
     summary: Get the current SSL enforcement configuration
@@ -762,11 +762,11 @@ commands:
         name: --experimental
         description: enable experimental features
         required: true
-        default_value: 'false'
+        default_value: "false"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-secrets
     title: supabase secrets
     summary: Manage Supabase secrets
@@ -790,7 +790,7 @@ commands:
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-secrets-set
     title: supabase secrets set
     summary: Set a secret(s) on Supabase
@@ -803,11 +803,11 @@ commands:
       - id: env-file
         name: --env-file <string>
         description: Read secrets from a .env file.
-        default_value: ''
+        default_value: ""
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-secrets-list
     title: supabase secrets list
     summary: List all secrets on Supabase
@@ -820,7 +820,7 @@ commands:
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-projects
     title: supabase projects
     summary: Manage Supabase projects
@@ -852,15 +852,15 @@ commands:
       - id: db-password
         name: --db-password <string>
         description: Database password of the project.
-        default_value: ''
+        default_value: ""
       - id: interactive
         name: -i, --interactive
         description: Enables interactive mode.
-        default_value: 'false'
+        default_value: "false"
       - id: org-id
         name: --org-id <string>
         description: Organization ID to create the project in.
-        default_value: ''
+        default_value: ""
       - id: plan
         name: --plan <[ free | pro ]>
         description: Select a plan that suits your needs.
@@ -868,14 +868,14 @@ commands:
         accepted_values:
           - id: free
             name: free
-            type: '[ free | pro ]'
+            type: "[ free | pro ]"
           - id: pro
             name: pro
-            type: '[ free | pro ]'
+            type: "[ free | pro ]"
       - id: region
         name: --region <string>
         description: Select a region close to you for the best performance.
-        default_value: ''
+        default_value: ""
         accepted_values:
           - id: ap-northeast-1
             name: ap-northeast-1
@@ -930,7 +930,7 @@ commands:
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-postgres-config
     title: supabase postgres-config
     summary: Manage Postgres database config
@@ -955,21 +955,21 @@ commands:
       - id: config
         name: --config <strings>
         description: Config overrides specified as a 'key=value' pair
-        default_value: '[]'
+        default_value: "[]"
       - id: replace-existing-overrides
         name: --replace-existing-overrides
         description: |
           If true, replaces all existing overrides with the ones provided. If false (default), merges existing overrides with the ones provided.
-        default_value: 'false'
+        default_value: "false"
       - id: experimental
         name: --experimental
         description: enable experimental features
         required: true
-        default_value: 'false'
+        default_value: "false"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-postgres-config-get
     title: supabase postgres-config get
     summary: Get the current Postgres database config overrides
@@ -982,11 +982,11 @@ commands:
         name: --experimental
         description: enable experimental features
         required: true
-        default_value: 'false'
+        default_value: "false"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-orgs
     title: supabase orgs
     summary: Manage Supabase organizations
@@ -1036,20 +1036,20 @@ commands:
       - id: bypass-cidr-checks
         name: --bypass-cidr-checks
         description: Bypass some of the CIDR validation checks.
-        default_value: 'false'
+        default_value: "false"
       - id: db-allow-cidr
         name: --db-allow-cidr <strings>
         description: CIDR to allow DB connections from.
-        default_value: '[]'
+        default_value: "[]"
       - id: experimental
         name: --experimental
         description: enable experimental features
         required: true
-        default_value: 'false'
+        default_value: "false"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-network-restrictions-get
     title: supabase network-restrictions get
     summary: Get the current network restrictions
@@ -1062,11 +1062,11 @@ commands:
         name: --experimental
         description: enable experimental features
         required: true
-        default_value: 'false'
+        default_value: "false"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-network-bans
     title: supabase network-bans
     summary: Manage network bans
@@ -1092,16 +1092,16 @@ commands:
       - id: db-unban-ip
         name: --db-unban-ip <strings>
         description: IP to allow DB connections from.
-        default_value: '[]'
+        default_value: "[]"
       - id: experimental
         name: --experimental
         description: enable experimental features
         required: true
-        default_value: 'false'
+        default_value: "false"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-network-bans-get
     title: supabase network-bans get
     summary: Get the current network bans
@@ -1114,11 +1114,11 @@ commands:
         name: --experimental
         description: enable experimental features
         required: true
-        default_value: 'false'
+        default_value: "false"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-migration
     title: supabase migration
     summary: Manage database migration scripts
@@ -1143,7 +1143,7 @@ commands:
       - id: include-all
         name: --include-all
         description: Include all migrations not found on remote history table.
-        default_value: 'false'
+        default_value: "false"
   - id: supabase-migration-squash
     title: supabase migration squash
     summary: Squash migrations to a single file
@@ -1155,19 +1155,19 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
       - id: linked
         name: --linked
         description: Update migration history of the linked project.
-        default_value: 'false'
+        default_value: "false"
       - id: password
         name: -p, --password <string>
         description: Password to your remote Postgres database.
-        default_value: ''
+        default_value: ""
       - id: version
         name: --version <string>
         description: Squash up to the specified version.
-        default_value: ''
+        default_value: ""
   - id: supabase-migration-repair
     title: supabase migration repair
     summary: Repair the migration history table
@@ -1228,23 +1228,23 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
       - id: password
         name: -p, --password <string>
         description: Password to your remote Postgres database.
-        default_value: ''
+        default_value: ""
       - id: status
         name: --status <[ applied | reverted ]>
         description: Version status to update.
         required: true
-        default_value: ''
+        default_value: ""
         accepted_values:
           - id: applied
             name: applied
-            type: '[ applied | reverted ]'
+            type: "[ applied | reverted ]"
           - id: reverted
             name: reverted
-            type: '[ applied | reverted ]'
+            type: "[ applied | reverted ]"
   - id: supabase-migration-new
     title: supabase migration new
     summary: Create an empty migration script
@@ -1311,11 +1311,11 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
       - id: password
         name: -p, --password <string>
         description: Password to your remote Postgres database.
-        default_value: ''
+        default_value: ""
   - id: supabase-login
     title: supabase login
     summary: Authenticate using an access token
@@ -1384,12 +1384,12 @@ commands:
       - id: password
         name: -p, --password <string>
         description: Password to your remote Postgres database.
-        default_value: ''
+        default_value: ""
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
         required: true
-        default_value: ''
+        default_value: ""
   - id: supabase-inspect
     title: supabase inspect
     summary: Tools to inspect your Supabase project
@@ -1454,7 +1454,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-inspect-db-unused-indexes
     title: supabase inspect db unused-indexes
     summary: Show indexes with low usage
@@ -1475,7 +1475,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-inspect-db-total-table-sizes
     title: supabase inspect db total-table-sizes
     summary: Show total table sizes, including table index sizes
@@ -1498,7 +1498,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-inspect-db-total-index-size
     title: supabase inspect db total-index-size
     summary: Show total size of all indexes
@@ -1519,7 +1519,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-inspect-db-table-sizes
     title: supabase inspect db table-sizes
     summary: |
@@ -1546,7 +1546,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-inspect-db-table-record-counts
     title: supabase inspect db table-record-counts
     summary: Show estimated number of rows per table
@@ -1571,7 +1571,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-inspect-db-table-index-sizes
     title: supabase inspect db table-index-sizes
     summary: Show index sizes of individual tables
@@ -1596,7 +1596,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-inspect-db-seq-scans
     title: supabase inspect db seq-scans
     summary: Show number of sequential scans recorded against all tables
@@ -1623,7 +1623,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-inspect-db-role-connections
     title: supabase inspect db role-connections
     summary: Show number of active connections for all database roles
@@ -1668,7 +1668,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-inspect-db-replication-slots
     title: supabase inspect db replication-slots
     summary: Show information about replication slots on the database
@@ -1693,7 +1693,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-inspect-db-outliers
     title: supabase inspect db outliers
     summary: |
@@ -1722,7 +1722,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-inspect-db-long-running-queries
     title: supabase inspect db long-running-queries
     summary: |
@@ -1746,7 +1746,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-inspect-db-locks
     title: supabase inspect db locks
     summary: |
@@ -1770,7 +1770,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-inspect-db-index-usage
     title: supabase inspect db index-usage
     summary: Show information about the efficiency of indexes
@@ -1783,7 +1783,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-inspect-db-index-sizes
     title: supabase inspect db index-sizes
     summary: Show index sizes of individual indexes
@@ -1809,7 +1809,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-inspect-db-calls
     title: supabase inspect db calls
     summary: |
@@ -1837,7 +1837,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-inspect-db-cache-hit
     title: supabase inspect db cache-hit
     summary: Show cache hit rates for tables and indices
@@ -1863,7 +1863,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-inspect-db-blocking
     title: supabase inspect db blocking
     summary: |
@@ -1885,7 +1885,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-inspect-db-bloat
     title: supabase inspect db bloat
     summary: |
@@ -1912,7 +1912,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-init
     title: supabase init
     summary: Initialize a local project
@@ -1943,7 +1943,7 @@ commands:
       - id: with-vscode-workspace
         name: --with-vscode-workspace
         description: Generate VS Code workspace.
-        default_value: 'false'
+        default_value: "false"
   - id: supabase-gen
     title: supabase gen
     summary: Run code generation tools
@@ -1975,23 +1975,23 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: Generate types from a database url.
-        default_value: ''
+        default_value: ""
       - id: linked
         name: --linked
         description: Generate types from the linked project.
-        default_value: 'false'
+        default_value: "false"
       - id: local
         name: --local
         description: Generate types from the local dev database.
-        default_value: 'false'
+        default_value: "false"
       - id: project-id
         name: --project-id <string>
         description: Generate types from a project ID.
-        default_value: ''
+        default_value: ""
       - id: schema
         name: --schema <stringArray>
         description: Schemas to generate types for.
-        default_value: '[]'
+        default_value: "[]"
   - id: supabase-gen-keys
     title: supabase gen keys
     summary: Generate keys for preview branch
@@ -2007,29 +2007,29 @@ commands:
         accepted_values:
           - id: env
             name: env
-            type: '[ env | json | toml | yaml ]'
+            type: "[ env | json | toml | yaml ]"
           - id: json
             name: json
-            type: '[ env | json | toml | yaml ]'
+            type: "[ env | json | toml | yaml ]"
           - id: toml
             name: toml
-            type: '[ env | json | toml | yaml ]'
+            type: "[ env | json | toml | yaml ]"
           - id: yaml
             name: yaml
-            type: '[ env | json | toml | yaml ]'
+            type: "[ env | json | toml | yaml ]"
       - id: override-name
         name: --override-name <strings>
         description: Override specific variable names.
-        default_value: '[]'
+        default_value: "[]"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
       - id: experimental
         name: --experimental
         description: enable experimental features
         required: true
-        default_value: 'false'
+        default_value: "false"
   - id: supabase-functions
     title: supabase functions
     summary: Manage Supabase Edge functions
@@ -2056,15 +2056,15 @@ commands:
         name: --env-file <string>
         description: |
           Path to an env file to be populated to the Function environment.
-        default_value: ''
+        default_value: ""
       - id: import-map
         name: --import-map <string>
         description: Path to import map file.
-        default_value: ''
+        default_value: ""
       - id: no-verify-jwt
         name: --no-verify-jwt
         description: Disable JWT verification for the Function.
-        default_value: 'false'
+        default_value: "false"
   - id: supabase-functions-new
     title: supabase functions new
     summary: Create a new Function locally
@@ -2085,7 +2085,7 @@ commands:
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-functions-download
     title: supabase functions download
     summary: Download a Function from Supabase
@@ -2099,7 +2099,7 @@ commands:
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-functions-deploy
     title: supabase functions deploy
     summary: Deploy a Function to Supabase
@@ -2112,15 +2112,15 @@ commands:
       - id: import-map
         name: --import-map <string>
         description: Path to import map file.
-        default_value: ''
+        default_value: ""
       - id: no-verify-jwt
         name: --no-verify-jwt
         description: Disable JWT verification for the Function.
-        default_value: 'false'
+        default_value: "false"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-functions-delete
     title: supabase functions delete
     summary: Delete a Function from Supabase
@@ -2134,7 +2134,7 @@ commands:
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-domains
     title: supabase domains
     summary: Manage custom domain names for Supabase projects
@@ -2163,11 +2163,11 @@ commands:
       - id: include-raw-output
         name: --include-raw-output
         description: Include raw output (useful for debugging).
-        default_value: 'false'
+        default_value: "false"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-domains-get
     title: supabase domains get
     summary: Get the current custom hostname config
@@ -2181,11 +2181,11 @@ commands:
       - id: include-raw-output
         name: --include-raw-output
         description: Include raw output (useful for debugging).
-        default_value: 'false'
+        default_value: "false"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-domains-delete
     title: supabase domains delete
     summary: Deletes the custom hostname config for your project
@@ -2197,11 +2197,11 @@ commands:
       - id: include-raw-output
         name: --include-raw-output
         description: Include raw output (useful for debugging).
-        default_value: 'false'
+        default_value: "false"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-domains-create
     title: supabase domains create
     summary: Create a custom hostname
@@ -2217,15 +2217,15 @@ commands:
       - id: custom-hostname
         name: --custom-hostname <string>
         description: The custom hostname to use for your Supabase project.
-        default_value: ''
+        default_value: ""
       - id: include-raw-output
         name: --include-raw-output
         description: Include raw output (useful for debugging).
-        default_value: 'false'
+        default_value: "false"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-domains-activate
     title: supabase domains activate
     summary: Activate the custom hostname for a project
@@ -2242,11 +2242,11 @@ commands:
       - id: include-raw-output
         name: --include-raw-output
         description: Include raw output (useful for debugging).
-        default_value: 'false'
+        default_value: "false"
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
-        default_value: ''
+        default_value: ""
   - id: supabase-db
     title: supabase db
     summary: Manage local Postgres databases
@@ -2273,7 +2273,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-db-reset
     title: supabase db reset
     summary: Resets the local database to current migrations
@@ -2304,11 +2304,11 @@ commands:
       - id: linked
         name: --linked
         description: Resets the linked project to current migrations.
-        default_value: 'false'
+        default_value: "false"
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-db-remote
     title: supabase db remote
     summary: Manage remote databases
@@ -2335,11 +2335,11 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
       - id: password
         name: -p, --password <string>
         description: Password to your remote Postgres database.
-        default_value: ''
+        default_value: ""
       - id: schema
         name: -s, --schema <strings>
         description: List of schema to include.
@@ -2387,27 +2387,27 @@ commands:
         name: --dry-run
         description: |
           Print the migrations that would be applied, but don't actually apply them.
-        default_value: 'false'
+        default_value: "false"
       - id: include-all
         name: --include-all
         description: Include all migrations not found on remote history table.
-        default_value: 'false'
+        default_value: "false"
       - id: include-roles
         name: --include-roles
         description: Include custom roles from supabase/roles.sql.
-        default_value: 'false'
+        default_value: "false"
       - id: include-seed
         name: --include-seed
         description: Include seed data from supabase/seed.sql.
-        default_value: 'false'
+        default_value: "false"
       - id: password
         name: -p, --password <string>
         description: Password to your remote Postgres database.
-        default_value: ''
+        default_value: ""
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-db-lint
     title: supabase db lint
     summary: Checks local database for typing error
@@ -2457,14 +2457,14 @@ commands:
         accepted_values:
           - id: warning
             name: warning
-            type: '[ warning | error ]'
+            type: "[ warning | error ]"
           - id: error
             name: error
-            type: '[ warning | error ]'
+            type: "[ warning | error ]"
       - id: linked
         name: --linked
         description: Lints the linked project for schema errors.
-        default_value: 'false'
+        default_value: "false"
       - id: schema
         name: -s, --schema <strings>
         description: List of schema to include.
@@ -2472,7 +2472,7 @@ commands:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-db-dump
     title: supabase db dump
     summary: Dumps data or schemas from the remote database
@@ -2512,27 +2512,27 @@ commands:
       - id: data-only
         name: --data-only
         description: Dumps only data records.
-        default_value: 'false'
+        default_value: "false"
       - id: dry-run
         name: --dry-run
         description: Print the pg_dump script that would be executed.
-        default_value: 'false'
+        default_value: "false"
       - id: file
         name: -f, --file <string>
         description: File path to save the dumped contents.
-        default_value: ''
+        default_value: ""
       - id: keep-comments
         name: --keep-comments
         description: Keeps commented lines from pg_dump output.
-        default_value: 'false'
+        default_value: "false"
       - id: password
         name: -p, --password <string>
         description: Password to your remote Postgres database.
-        default_value: ''
+        default_value: ""
       - id: role-only
         name: --role-only
         description: Dumps only cluster roles.
-        default_value: 'false'
+        default_value: "false"
       - id: schema
         name: -s, --schema <strings>
         description: List of schema to include.
@@ -2540,11 +2540,11 @@ commands:
       - id: use-copy
         name: --use-copy
         description: Uses copy statements in place of inserts.
-        default_value: 'false'
+        default_value: "false"
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
-        default_value: ''
+        default_value: ""
   - id: supabase-db-diff
     title: supabase db diff
     summary: Diffs the local database for schema changes
@@ -2605,19 +2605,19 @@ commands:
         name: --db-url <string>
         description: |
           Diffs local migration files against the database specified by the connection string (must be percent-encoded).
-        default_value: ''
+        default_value: ""
       - id: file
         name: -f, --file <string>
         description: Saves schema diff to a new migration file.
-        default_value: ''
+        default_value: ""
       - id: linked
         name: --linked
         description: Diffs local migration files against the linked project.
-        default_value: 'false'
+        default_value: "false"
       - id: local
         name: --local
         description: Diffs local migration files against the local database.
-        default_value: 'true'
+        default_value: "true"
       - id: schema
         name: -s, --schema <strings>
         description: List of schema to include.
@@ -2625,11 +2625,11 @@ commands:
       - id: use-migra
         name: --use-migra
         description: Use migra to generate schema diff.
-        default_value: 'true'
+        default_value: "true"
       - id: use-pgadmin
         name: --use-pgadmin
         description: Use pgAdmin to generate schema diff.
-        default_value: 'false'
+        default_value: "false"
   - id: supabase-completion
     title: supabase completion
     summary: Generate the autocompletion script for the specified shell
@@ -2679,7 +2679,7 @@ commands:
       - id: no-descriptions
         name: --no-descriptions
         description: disable completion descriptions
-        default_value: 'false'
+        default_value: "false"
   - id: supabase-completion-powershell
     title: supabase completion powershell
     summary: Generate the autocompletion script for powershell
@@ -2700,7 +2700,7 @@ commands:
       - id: no-descriptions
         name: --no-descriptions
         description: disable completion descriptions
-        default_value: 'false'
+        default_value: "false"
   - id: supabase-completion-fish
     title: supabase completion fish
     summary: Generate the autocompletion script for fish
@@ -2724,7 +2724,7 @@ commands:
       - id: no-descriptions
         name: --no-descriptions
         description: disable completion descriptions
-        default_value: 'false'
+        default_value: "false"
   - id: supabase-completion-bash
     title: supabase completion bash
     summary: Generate the autocompletion script for bash
@@ -2757,7 +2757,7 @@ commands:
       - id: no-descriptions
         name: --no-descriptions
         description: disable completion descriptions
-        default_value: 'false'
+        default_value: "false"
   - id: supabase-branches
     title: supabase branches
     summary: Manage Supabase preview branches
@@ -2784,16 +2784,16 @@ commands:
       - id: git-branch
         name: --git-branch <string>
         description: Change the associated git branch.
-        default_value: ''
+        default_value: ""
       - id: name
         name: --name <string>
         description: Rename the preview branch.
-        default_value: ''
+        default_value: ""
       - id: experimental
         name: --experimental
         description: enable experimental features
         required: true
-        default_value: 'false'
+        default_value: "false"
   - id: supabase-branches-list
     title: supabase branches list
     summary: List all preview branches
@@ -2807,7 +2807,7 @@ commands:
         name: --experimental
         description: enable experimental features
         required: true
-        default_value: 'false'
+        default_value: "false"
   - id: supabase-branches-get
     title: supabase branches get
     summary: Retrieve details of a preview branch
@@ -2821,7 +2821,7 @@ commands:
         name: --experimental
         description: enable experimental features
         required: true
-        default_value: 'false'
+        default_value: "false"
   - id: supabase-branches-disable
     title: supabase branches disable
     summary: Disable preview branching
@@ -2835,7 +2835,7 @@ commands:
         name: --experimental
         description: enable experimental features
         required: true
-        default_value: 'false'
+        default_value: "false"
   - id: supabase-branches-delete
     title: supabase branches delete
     summary: Delete a preview branch
@@ -2849,7 +2849,7 @@ commands:
         name: --experimental
         description: enable experimental features
         required: true
-        default_value: 'false'
+        default_value: "false"
   - id: supabase-branches-create
     title: supabase branches create
     summary: Create a preview branch
@@ -2862,7 +2862,7 @@ commands:
       - id: region
         name: --region <string>
         description: Select a region to deploy the branch database.
-        default_value: ''
+        default_value: ""
         accepted_values:
           - id: ams
             name: ams
@@ -2964,4 +2964,4 @@ commands:
         name: --experimental
         description: enable experimental features
         required: true
-        default_value: 'false'
+        default_value: "false"
