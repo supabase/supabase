@@ -1,4 +1,4 @@
-import { UpsertContentPayload, upsertContent } from 'data/content/content-upsert-mutation'
+import { upsertContent, UpsertContentPayload } from 'data/content/content-upsert-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { debounce, memoize } from 'lodash'
 import { useMemo } from 'react'
@@ -201,6 +201,7 @@ if (typeof window !== 'undefined') {
   subscribe(sqlEditorState.needsSaving, () => {
     const state = getSqlEditorStateSnapshot()
 
+    console.log('SUBSCRIPTION')
     Array.from(state.needsSaving).forEach((id) => {
       const snippet = state.snippets[id]
 

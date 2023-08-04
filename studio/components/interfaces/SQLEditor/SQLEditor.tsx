@@ -1,4 +1,24 @@
 import { useParams, useTelemetryProps } from 'common'
+import { AnimatePresence, motion } from 'framer-motion'
+import dynamic from 'next/dynamic'
+import { useRouter } from 'next/router'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import Split from 'react-split'
+import { format } from 'sql-formatter'
+import {
+  AiIconAnimation,
+  Button,
+  cn,
+  Dropdown,
+  IconCheck,
+  IconChevronDown,
+  IconCornerDownLeft,
+  IconLoader,
+  IconSettings,
+  IconX,
+  Input_Shadcn_,
+} from 'ui'
+
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
@@ -7,8 +27,6 @@ import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { isError } from 'data/utils/error-check'
-import { AnimatePresence, motion } from 'framer-motion'
 import {
   useLocalStorage,
   useLocalStorageQuery,
@@ -21,34 +39,8 @@ import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import Telemetry from 'lib/telemetry'
-import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
-import {
-  Dispatch,
-  SetStateAction,
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
-import Split from 'react-split'
-import { format } from 'sql-formatter'
+import { isError } from 'lodash'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import {
-  AiIconAnimation,
-  Button,
-  Dropdown,
-  IconCheck,
-  IconChevronDown,
-  IconCornerDownLeft,
-  IconLoader,
-  IconSettings,
-  IconX,
-  Input_Shadcn_,
-  cn,
-} from 'ui'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import AISettingsModal from './AISettingsModal'
 import {
@@ -56,8 +48,18 @@ import {
   sqlAiDisclaimerComment,
   untitledSnippetTitle,
 } from './SQLEditor.constants'
-import { IStandaloneCodeEditor, IStandaloneDiffEditor } from './SQLEditor.types'
-import { createSqlSnippetSkeleton } from './SQLEditor.utils'
+import {
+  ContentDiff,
+  DiffType,
+  IStandaloneCodeEditor,
+  IStandaloneDiffEditor,
+  SQLEditorContextValues,
+} from './SQLEditor.types'
+import {
+  createSqlSnippetSkeleton,
+  getDiffTypeButtonLabel,
+  getDiffTypeDropdownLabel,
+} from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
 
 // Load the monaco editor client-side only (does not behave well server-side)
@@ -66,20 +68,6 @@ const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
   { ssr: false }
 )
-
-type ContentDiff = {
-  original: string
-  modified: string
-}
-
-type SQLEditorContextValues = {
-  aiInput: string
-  setAiInput: Dispatch<SetStateAction<string>>
-  sqlDiff?: ContentDiff
-  setSqlDiff: Dispatch<SetStateAction<ContentDiff | undefined>>
-  debugSolution?: string
-  setDebugSolution: Dispatch<SetStateAction<string | undefined>>
-}
 
 const SQLEditorContext = createContext<SQLEditorContextValues | undefined>(undefined)
 
@@ -93,66 +81,42 @@ export function useSqlEditor() {
   return values
 }
 
-enum DiffType {
-  Modification = 'modification',
-  Addition = 'addition',
-  NewSnippet = 'new-snippet',
-}
-
-function getDiffTypeButtonLabel(diffType: DiffType) {
-  switch (diffType) {
-    case DiffType.Modification:
-      return 'Accept change'
-    case DiffType.Addition:
-      return 'Accept addition'
-    case DiffType.NewSnippet:
-      return 'Create new snippet'
-    default:
-      throw new Error(`Unknown diff type '${diffType}'`)
-  }
-}
-
-function getDiffTypeDropdownLabel(diffType: DiffType) {
-  switch (diffType) {
-    case DiffType.Modification:
-      return 'Compare as change'
-    case DiffType.Addition:
-      return 'Compare as addition'
-    case DiffType.NewSnippet:
-      return 'Compare as new snippet'
-    default:
-      throw new Error(`Unknown diff type '${diffType}'`)
-  }
-}
-
 const SQLEditor = () => {
   const { ui } = useStore()
-  const { ref, id } = useParams()
   const router = useRouter()
+  const { ref, id: urlId } = useParams()
   const telemetryProps = useTelemetryProps()
+
+  const id = urlId || uuidv4()
+
   const { profile } = useProfile()
   const { project } = useProjectContext()
   const snap = useSqlEditorStateSnapshot()
+  const selectedProject = useSelectedProject()
+  const selectedOrganization = useSelectedOrganization()
   const { mutateAsync: generateSql, isLoading: isGenerateSqlLoading } = useSqlGenerateMutation()
-  const { mutateAsync: editSql, isLoading: isEditSqlLoading } = useSqlEditMutation()
   const { mutateAsync: titleSql } = useSqlTitleGenerateMutation()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
-  const [aiInput, setAiInput] = useState('')
-  const [debugSolution, setDebugSolution] = useState<string>()
-  const [sqlDiff, setSqlDiff] = useState<ContentDiff>()
+  const { mutateAsync: editSql, isLoading: isEditSqlLoading } = useSqlEditMutation()
+
+  const idRef = useLatest(id)
   const inputRef = useRef<HTMLInputElement>(null)
+  const editorRef = useRef<IStandaloneCodeEditor | null>(null)
+  const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
 
-  const [isAiOpen, setIsAiOpen] = useLocalStorageQuery('supabase_sql-editor-ai-open', true)
-
+  const [aiInput, setAiInput] = useState('')
+  const [sqlDiff, setSqlDiff] = useState<ContentDiff>()
+  const [debugSolution, setDebugSolution] = useState<string>()
+  const [isFirstRender, setIsFirstRender] = useState(true)
   const [isAISettingsOpen, setIsAISettingsOpen] = useState(false)
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
+  const [isAcceptDiffLoading, setIsAcceptDiffLoading] = useState(false)
+  const [selectedDiffType, setSelectedDiffType] = useState(DiffType.Modification)
 
-  const selectedOrganization = useSelectedOrganization()
-  const selectedProject = useSelectedProject()
   const isOptedInToAI =
     selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
+  const [isAiOpen, setIsAiOpen] = useLocalStorageQuery('supabase_sql-editor-ai-open', true)
   const [isOptedInToAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema-enabled', false)
-  const [isAcceptDiffLoading, setIsAcceptDiffLoading] = useState(false)
   const [, setAiQueryCount] = useLocalStorageQuery('supabase_sql-editor-ai-query-count', 0)
   const [, setIsSchemaSuggestionDismissed] = useLocalStorageQuery(
     'supabase_sql-editor-ai-schema-suggestion-dismissed',
@@ -160,9 +124,6 @@ const SQLEditor = () => {
   )
 
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && isOptedInToAISchema
-
-  const [selectedDiffType, setSelectedDiffType] = useState(DiffType.Modification)
-  const [isFirstRender, setIsFirstRender] = useState(true)
 
   const isAiLoading = isGenerateSqlLoading || isEditSqlLoading
 
@@ -199,13 +160,11 @@ const SQLEditor = () => {
     },
   })
 
-  const idRef = useLatest(id)
-
   const minSize = 44
   const snippet = id ? snap.snippets[id] : null
   const snapOffset = 50
 
-  const isLoading = !(id && ref && snap.loaded[ref])
+  const isLoading = !((id && ref && snap.loaded[ref]) || id === undefined)
   const isUtilityPanelCollapsed = (snippet?.splitSizes?.[1] ?? 0) === 0
 
   const onDragEnd = useCallback((sizes: number[]) => {
@@ -213,9 +172,6 @@ const SQLEditor = () => {
     if (id) snap.setSplitSizes(id, sizes)
     setSavedSplitSize(JSON.stringify(sizes))
   }, [])
-
-  const editorRef = useRef<IStandaloneCodeEditor | null>(null)
-  const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
 
   /**
    * Sets the snippet title using AI.
@@ -231,19 +187,20 @@ const SQLEditor = () => {
 
   const executeQuery = useCallback(
     async (force: boolean = false) => {
-      if (isDiffOpen) {
-        return
-      }
+      if (isDiffOpen) return
 
       // use the latest state
       const state = getSqlEditorStateSnapshot()
-      const snippet = idRef.current && state.snippets[idRef.current]
+      const snippet = idRef.current ? state.snippets[idRef.current] : null
 
-      if (project && snippet && !isExecuting && editorRef.current !== null) {
+      if (editorRef.current !== null && !isExecuting && project !== undefined) {
         const editor = editorRef.current
         const selection = editor.getSelection()
         const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
-        const sql = (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
+
+        const sql = snippet
+          ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
+          : selectedValue || editorRef.current?.getValue()
 
         const containsDestructiveOperations = destructiveSqlRegex.some((regex) => regex.test(sql))
 
@@ -252,7 +209,7 @@ const SQLEditor = () => {
           return
         }
 
-        if (idRef.current && snippet.snippet.name === untitledSnippetTitle) {
+        if (idRef.current && snippet?.snippet.name === untitledSnippetTitle) {
           // Intentionally don't await title gen (lazy)
           setAiTitle(idRef.current, sql)
         }
@@ -334,9 +291,9 @@ const SQLEditor = () => {
       setSelectedDiffType(DiffType.Modification)
       setDebugSolution(undefined)
       setSqlDiff(undefined)
-      setTimeout(() => {
-        inputRef.current?.focus()
-      }, 0)
+      // setTimeout(() => {
+      //   inputRef.current?.focus()
+      // }, 0)
     } finally {
       setIsAcceptDiffLoading(false)
     }
@@ -355,9 +312,9 @@ const SQLEditor = () => {
 
     setDebugSolution(undefined)
     setSqlDiff(undefined)
-    setTimeout(() => {
-      inputRef.current?.focus()
-    }, 0)
+    // setTimeout(() => {
+    //   inputRef.current?.focus()
+    // }, 0)
   }, [debugSolution, telemetryProps, router])
 
   useEffect(() => {
@@ -520,7 +477,7 @@ const SQLEditor = () => {
                       }}
                     >
                       <Input_Shadcn_
-                        autoFocus
+                        // autoFocus
                         value={aiInput}
                         onChange={(e) => setAiInput(e.currentTarget.value)}
                         disabled={isDiffOpen}
@@ -875,7 +832,7 @@ const SQLEditor = () => {
                     id={id}
                     editorRef={editorRef}
                     isExecuting={isExecuting}
-                    autoFocus={false}
+                    autoFocus
                     executeQuery={executeQuery}
                   />
                 </motion.div>
