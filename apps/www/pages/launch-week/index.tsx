@@ -144,18 +144,16 @@ export default function TicketHome({ users, meetups }: Props) {
                   </div>
                   <div className="absolute inset-0 z-0">
                     <AnimatedParticles />
+                    <Image
+                      src="/images/launchweek/8/stars.svg"
+                      alt="starts background"
+                      layout="fill"
+                      objectFit="cover"
+                      className="opacity-70 pointer-events-none"
+                      draggable={false}
+                    />
                   </div>
                 </SectionContainer>
-                <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0 pointer-events-none">
-                  <Image
-                    src="/images/launchweek/8/stars.svg"
-                    alt="starts background"
-                    layout="fill"
-                    objectFit="cover"
-                    className="opacity-70"
-                    draggable={false}
-                  />
-                </div>
               </div>
               <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0">
                 <Image
