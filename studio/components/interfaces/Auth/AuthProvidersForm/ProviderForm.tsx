@@ -5,7 +5,8 @@ import ReactMarkdown from 'react-markdown'
 import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from 'ui'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
@@ -19,36 +20,40 @@ export interface ProviderFormProps {
 
 const ProviderForm = ({ provider }: ProviderFormProps) => {
   const [open, setOpen] = useState(false)
-  const { authConfig, ui } = useStore()
-  const { project: selectedProject } = useProjectContext()
-  const { ref } = useParams()
+  const { ui } = useStore()
+  const { ref: projectRef } = useParams()
+  const { data: config } = useAuthConfigQuery({ projectRef })
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
+
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 
   const generateInitialValues = () => {
     const initialValues: { [x: string]: string } = {}
+    // the config is already loaded through the parent component
+    if (!config) {
+      return
+    }
     Object.keys(provider.properties).forEach((key) => {
       // When the key is a 'double negative' key, we must reverse the boolean before adding it to the form
       const isDoubleNegative = doubleNegativeKeys.includes(key)
 
       if (provider.title === 'SAML 2.0') {
-        initialValues[key] = authConfig.config[key] ?? false
+        initialValues[key] = (config as any)[key] ?? false
       } else {
-        initialValues[key] = isDoubleNegative
-          ? !authConfig.config[key]
-          : authConfig.config[key] ?? ''
+        initialValues[key] = isDoubleNegative ? !(config as any)[key] : (config as any)[key] ?? ''
       }
     })
     return initialValues
   }
 
   // [Joshen] Doing this check as SAML doesn't follow the same naming structure as the other provider options
-  const isActive =
+  const isActive: boolean =
     provider.title === 'SAML 2.0'
-      ? authConfig.config['SAML_ENABLED'] || false
-      : authConfig.config[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
+      ? (config && (config as any)['SAML_ENABLED']) ?? false
+      : (config && (config as any)[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]) ?? false
   const INITIAL_VALUES = generateInitialValues()
 
   const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
@@ -61,21 +66,26 @@ const ProviderForm = ({ provider }: ProviderFormProps) => {
       }
     })
 
-    const { error } = await authConfig.update(payload)
-
-    if (!error) {
-      resetForm({ values: { ...values }, initialValues: { ...values } })
-      setOpen(false)
-      ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
-    } else {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to update settings:  ${error?.message}`,
-      })
-    }
-
-    setSubmitting(false)
+    updateAuthConfig(
+      { projectRef: projectRef!, config: payload },
+      {
+        onError: (error) => {
+          ui.setNotification({
+            error,
+            category: 'error',
+            message: `Failed to update settings:  ${error?.message}`,
+          })
+        },
+        onSuccess: () => {
+          resetForm({ values: { ...values }, initialValues: { ...values } })
+          setOpen(false)
+          ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
+        },
+        onSettled: () => {
+          setSubmitting(false)
+        },
+      }
+    )
   }
 
   return (
@@ -159,7 +169,7 @@ const ProviderForm = ({ provider }: ProviderFormProps) => {
                         value={
                           customDomainData?.customDomain?.status === 'active'
                             ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
-                            : `https://${selectedProject?.ref}.supabase.co/auth/v1/callback`
+                            : `https://${projectRef}.supabase.co/auth/v1/callback`
                         }
                         descriptionText={
                           <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>

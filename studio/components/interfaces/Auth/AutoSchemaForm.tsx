@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { boolean, number, object, string } from 'yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Button, Form, Input, IconEye, IconEyeOff, InputNumber, Toggle, Radio } from 'ui'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useState } from 'react'
+import { Button, Form, IconEye, IconEyeOff, Input, InputNumber, Radio, Toggle } from 'ui'
+import { boolean, number, object, string } from 'yup'
 
-import { useStore, useCheckPermissions } from 'hooks'
+import { useParams } from 'common'
 import {
   FormActions,
   FormHeader,
@@ -13,25 +13,30 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckPermissions, useStore } from 'hooks'
 
 const AutoSchemaForm = observer(() => {
-  const { authConfig, ui } = useStore()
-  const { isLoaded } = authConfig
+  const { ui } = useStore()
+  const { ref: projectRef } = useParams()
+  const { data: config, isFetched: isLoaded } = useAuthConfigQuery({ projectRef })
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
   const formId = 'auth-config-general-form'
   const [hidden, setHidden] = useState(true)
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const INITIAL_VALUES = {
-    DISABLE_SIGNUP: !authConfig.config.DISABLE_SIGNUP,
-    SITE_URL: authConfig.config.SITE_URL,
-    JWT_EXP: authConfig.config.JWT_EXP,
-    REFRESH_TOKEN_ROTATION_ENABLED: authConfig.config.REFRESH_TOKEN_ROTATION_ENABLED || false,
-    SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig.config.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
-    SECURITY_CAPTCHA_ENABLED: authConfig.config.SECURITY_CAPTCHA_ENABLED || false,
-    SECURITY_CAPTCHA_SECRET: authConfig.config.SECURITY_CAPTCHA_SECRET || '',
-    SECURITY_CAPTCHA_PROVIDER: authConfig.config.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
-    MFA_MAX_ENROLLED_FACTORS: authConfig.config.MFA_MAX_ENROLLED_FACTORS || 10,
+    DISABLE_SIGNUP: config?.DISABLE_SIGNUP,
+    SITE_URL: config?.SITE_URL,
+    JWT_EXP: config?.JWT_EXP,
+    REFRESH_TOKEN_ROTATION_ENABLED: config?.REFRESH_TOKEN_ROTATION_ENABLED || false,
+    SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: config?.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
+    SECURITY_CAPTCHA_ENABLED: config?.SECURITY_CAPTCHA_ENABLED || false,
+    SECURITY_CAPTCHA_SECRET: config?.SECURITY_CAPTCHA_SECRET || '',
+    SECURITY_CAPTCHA_PROVIDER: config?.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
+    MFA_MAX_ENROLLED_FACTORS: config?.MFA_MAX_ENROLLED_FACTORS || 10,
   }
 
   const schema = object({
@@ -65,22 +70,27 @@ const AutoSchemaForm = observer(() => {
     payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
 
     setSubmitting(true)
-    const { error } = await authConfig.update(payload)
-
-    if (!error) {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated settings`,
-      })
-      resetForm({ values: values, initialValues: values })
-    } else {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to update settings:  ${error?.message}`,
-      })
-    }
-
-    setSubmitting(false)
+    updateAuthConfig(
+      { projectRef: projectRef!, config: payload },
+      {
+        onError: (error) => {
+          ui.setNotification({
+            category: 'error',
+            message: `Failed to update settings:  ${error?.message}`,
+          })
+        },
+        onSuccess: () => {
+          ui.setNotification({
+            category: 'success',
+            message: `Successfully updated settings`,
+          })
+          resetForm({ values: values, initialValues: values })
+        },
+        onSettled: () => {
+          setSubmitting(false)
+        },
+      }
+    )
   }
 
   return (
@@ -91,7 +101,7 @@ const AutoSchemaForm = observer(() => {
         // Form is reset once remote data is loaded in store
         useEffect(() => {
           resetForm({ values: INITIAL_VALUES, initialValues: INITIAL_VALUES })
-        }, [authConfig.isLoaded])
+        }, [isLoaded])
 
         return (
           <>

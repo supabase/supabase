@@ -1,13 +1,16 @@
-import { observer } from 'mobx-react-lite'
-import { useStore, useFlag } from 'hooks'
-import { PROVIDERS_SCHEMAS, PROVIDER_SAML } from 'stores/authConfig/schema'
+import { useParams } from 'common'
 import { FormHeader } from 'components/ui/Forms'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
-import ProviderForm from './ProviderForm'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useFlag } from 'hooks'
+import { observer } from 'mobx-react-lite'
+import { PROVIDERS_SCHEMAS, PROVIDER_SAML } from 'stores/authConfig/schema'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
+import ProviderForm from './ProviderForm'
 
 const AuthProvidersForm = () => {
-  const { authConfig } = useStore()
+  const { ref: projectRef } = useParams()
+  const { isFetched } = useAuthConfigQuery({ projectRef })
   const isSamlEnabled = useFlag('isSamlEnabled')
   const providers = isSamlEnabled
     ? PROVIDERS_SCHEMAS
@@ -21,7 +24,7 @@ const AuthProvidersForm = () => {
       />
 
       <div className="-space-y-px">
-        {!authConfig.isLoaded
+        {!isFetched
           ? providers.map((provider) => (
               <div
                 key={`provider_${provider.title}`}

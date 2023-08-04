@@ -1,20 +1,26 @@
-import { useState } from 'react'
-import { object, string } from 'yup'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Form, Input, Modal } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
+import { Button, Form, Input, Modal } from 'ui'
+import { object, string } from 'yup'
 
-import { useCheckPermissions, useStore } from 'hooks'
+import { useParams } from 'common'
 import { FormHeader } from 'components/ui/Forms'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckPermissions, useStore } from 'hooks'
 import { urlRegex } from '../Auth.constants'
 import RedirectUrlList from './RedirectUrlList'
 
 const RedirectUrls = () => {
-  const { authConfig, ui } = useStore()
+  const { ui } = useStore()
+  const { ref: projectRef } = useParams()
+  const { data: config } = useAuthConfigQuery({ projectRef })
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
-  const URI_ALLOW_LIST_ARRAY = authConfig.config.URI_ALLOW_LIST
-    ? authConfig.config.URI_ALLOW_LIST.split(/\s*[,]+\s*/).filter((url: string) => url)
+  const URI_ALLOW_LIST_ARRAY = config?.URI_ALLOW_LIST
+    ? config.URI_ALLOW_LIST.split(/\s*[,]+\s*/).filter((url: string) => url)
     : []
 
   const [open, setOpen] = useState(false)
@@ -49,19 +55,25 @@ const RedirectUrls = () => {
       return
     }
 
-    const { error } = await authConfig.update({ URI_ALLOW_LIST: payloadString })
-    if (!error) {
-      setOpen(false)
-      ui.setNotification({ category: 'success', message: 'Successfully added URL' })
-    } else {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to update URL: ${error?.message}`,
-      })
-    }
-
-    setSubmitting(false)
+    updateAuthConfig(
+      { projectRef: projectRef!, config: { URI_ALLOW_LIST: payloadString } },
+      {
+        onError: (error) => {
+          ui.setNotification({
+            error,
+            category: 'error',
+            message: `Failed to update URL: ${error?.message}`,
+          })
+        },
+        onSuccess: () => {
+          setOpen(false)
+          ui.setNotification({ category: 'success', message: 'Successfully added URL' })
+        },
+        onSettled: () => {
+          setSubmitting(false)
+        },
+      }
+    )
   }
 
   const onConfirmDeleteUrl = async (url?: string) => {
@@ -72,20 +84,25 @@ const RedirectUrls = () => {
     // Remove selectedUrl from array and update
     const payload = URI_ALLOW_LIST_ARRAY.filter((e: string) => e !== url)
 
-    const { error } = await authConfig.update({ URI_ALLOW_LIST: payload.toString() })
-
-    if (!error) {
-      setSelectedUrlToDelete(undefined)
-      ui.setNotification({ category: 'success', message: 'Successfully removed URL' })
-    } else {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to remove URL: ${error?.message}`,
-      })
-    }
-
-    setIsDeleting(false)
+    updateAuthConfig(
+      { projectRef: projectRef!, config: { URI_ALLOW_LIST: payload.toString() } },
+      {
+        onError: (error) => {
+          ui.setNotification({
+            error,
+            category: 'error',
+            message: `Failed to remove URL: ${error?.message}`,
+          })
+        },
+        onSuccess: () => {
+          setSelectedUrlToDelete(undefined)
+          ui.setNotification({ category: 'success', message: 'Successfully removed URL' })
+        },
+        onSettled: () => {
+          setIsDeleting(false)
+        },
+      }
+    )
   }
 
   return (

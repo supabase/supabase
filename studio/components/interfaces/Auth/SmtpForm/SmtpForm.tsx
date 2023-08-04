@@ -17,6 +17,7 @@ import {
 } from 'ui'
 import { number, object, string } from 'yup'
 
+import { useParams } from 'common'
 import {
   FormActions,
   FormHeader,
@@ -25,20 +26,24 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
 import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
 
 const SmtpForm = () => {
-  const { authConfig, ui } = useStore()
-  const { config, isLoaded } = authConfig
+  const { ui } = useStore()
+  const { ref: projectRef } = useParams()
+  const { data: config, isLoading, isFetched: isLoaded } = useAuthConfigQuery({ projectRef })
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
   const [enableSmtp, setEnableSmtp] = useState(false)
   const [hidden, setHidden] = useState(true)
 
   const formId = 'auth-config-smtp-form'
-  const initialValues = generateFormValues(authConfig.config)
+  const initialValues = generateFormValues(config)
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   useEffect(() => {
@@ -110,7 +115,7 @@ const SmtpForm = () => {
     }),
   })
 
-  const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
+  const onSubmit = (values: any, { setSubmitting, resetForm }: any) => {
     const payload = enableSmtp ? values : defaultDisabledSmtpFormValues
 
     // Format payload: Remove redundant value + convert port to string
@@ -118,18 +123,23 @@ const SmtpForm = () => {
     payload.SMTP_PORT = payload.SMTP_PORT ? payload.SMTP_PORT.toString() : payload.SMTP_PORT
 
     setSubmitting(true)
-    const { error } = await authConfig.update(payload)
-
-    if (!error) {
-      setHidden(true)
-      const updatedFormValues = generateFormValues(payload)
-      resetForm({ values: updatedFormValues, initialValues: updatedFormValues })
-      ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
-    } else {
-      ui.setNotification({ category: 'error', message: 'Failed to update settings', error })
-    }
-
-    setSubmitting(false)
+    updateAuthConfig(
+      { projectRef: projectRef!, config: payload },
+      {
+        onError: (error) => {
+          ui.setNotification({ category: 'error', message: 'Failed to update settings', error })
+        },
+        onSuccess: () => {
+          setHidden(true)
+          const updatedFormValues = generateFormValues(payload)
+          resetForm({ values: updatedFormValues, initialValues: updatedFormValues })
+          ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
+        },
+        onSettled: () => {
+          setSubmitting(false)
+        },
+      }
+    )
   }
 
   return (
@@ -178,7 +188,7 @@ const SmtpForm = () => {
               }
             >
               <FormSection>
-                <FormSectionContent loading={!isLoaded}>
+                <FormSectionContent loading={isLoading}>
                   <Toggle
                     name="ENABLE_SMTP"
                     size="small"
@@ -217,7 +227,7 @@ const SmtpForm = () => {
                       <a
                         href="https://supabase.com/docs/guides/platform/going-into-prod#auth-rate-limits"
                         className="underline"
-                        target="_blank"                 
+                        target="_blank"
                       >
                         documentation
                       </a>{' '}
@@ -233,7 +243,7 @@ const SmtpForm = () => {
                 header={<FormSectionLabel>Sender details</FormSectionLabel>}
                 disabled={!enableSmtp}
               >
-                <FormSectionContent loading={!isLoaded}>
+                <FormSectionContent loading={isLoading}>
                   <Input
                     name="SMTP_ADMIN_EMAIL"
                     id="SMTP_ADMIN_EMAIL"
@@ -265,7 +275,7 @@ const SmtpForm = () => {
                   </FormSectionLabel>
                 }
               >
-                <FormSectionContent loading={!isLoaded}>
+                <FormSectionContent loading={isLoading}>
                   <Input
                     name="SMTP_HOST"
                     placeholder="your.smtp.host.com"
