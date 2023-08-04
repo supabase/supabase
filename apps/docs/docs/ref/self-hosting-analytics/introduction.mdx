@@ -103,6 +103,8 @@ docker compose -f docker-compose.yml up
 
 > ⚠️ WARNING: Please be aware of the heavy consumption of analytics. For heavy usage you might want to consider the usage of a different database for analytics only by updating the `POSTGRES_BACKEND_URL` in the `analytics` service on the `docker-compose.yml` file.
 
+Also be aware that you won't be able to use [Log Explorer](https://supabase.com/docs/guides/platform/logs#logs-explorer) when using the Postgres Backend as some of the querying features are still not supported by our translation layer.
+
 #### Using the Big Query Backend
 
 Using the example [self-hosting stack based on docker-compose](https://github.com/supabase/supabase/tree/master/docker), you include the logging related services using the following command
@@ -113,7 +115,6 @@ Using the example [self-hosting stack based on docker-compose](https://github.co
 - `GOOGLE_PROJECT_NUMBER`
 
 2. Place your Service Account key in your present working directory with the filename `gcloud.json`.
-
 3. On `docker-compose.yml`, uncomment the block section below the commentary `# Uncomment to use Big Query backend for analytics`
 4. On `docker-compose.yml`, comment the block section below the commentary `# Comment variables to use Big Query backend for analytics`
 
