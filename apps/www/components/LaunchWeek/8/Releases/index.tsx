@@ -227,7 +227,7 @@ export default function LW8Releases() {
                                   w-full h-full -z-10 transition-all duration-300
                                 `}
                                 layout="fill"
-                                objectPosition={'50%'}
+                                objectPosition="20% 50%"
                                 objectFit="cover"
                               />
                             </motion.div>
@@ -249,7 +249,7 @@ export default function LW8Releases() {
                         background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, #030A0C)`,
                       }}
                     />
-                    <div className="flex flex-col items-center gap-2 min-w-[300px] w-full text-center lg:text-left">
+                    <div className="flex flex-col items-center gap-2 w-full text-center">
                       <CartTitle>{preRelease.steps[2].title}</CartTitle>
                       <p className="text-sm text-slate-900">{preRelease.steps[2]?.description}</p>
                     </div>
