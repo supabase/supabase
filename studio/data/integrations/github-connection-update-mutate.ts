@@ -3,20 +3,23 @@ import { toast } from 'react-hot-toast'
 
 import { patch } from 'data/fetchers'
 import { ResponseError } from 'types'
-import { UpdateConnection } from './integrations.types'
+import { UpdateConnectionPayload } from './integrations.types'
 import { integrationKeys } from './keys'
 
 export async function updateGithubConnection({
   id,
   metadata,
   organizationIntegrationId,
-}: UpdateConnection) {
+}: UpdateConnectionPayload) {
   const { data, error } = await patch('/platform/integrations/github/connections/{connection_id}', {
     params: {
       path: { connection_id: id },
     },
     body: {
-      metadata,
+      // @ts-expect-error
+      metadata: {
+        ...metadata,
+      },
     },
   })
 
@@ -31,11 +34,11 @@ export const useGithubConnectionUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<UpdateGithubConnectionData, ResponseError, UpdateConnection>,
+  UseMutationOptions<UpdateGithubConnectionData, ResponseError, UpdateConnectionPayload>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<UpdateGithubConnectionData, ResponseError, UpdateConnection>(
+  return useMutation<UpdateGithubConnectionData, ResponseError, UpdateConnectionPayload>(
     (vars) => updateGithubConnection(vars),
     {
       async onSuccess(data, variables, context) {

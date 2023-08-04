@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast'
 import { post } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { integrationKeys } from './keys'
-import { IntegrationConnectionsCreateVariables } from './types'
+import { IntegrationConnectionsCreateVariables } from './integrations.types'
 
 export async function createIntegrationVercelConnections({
   organizationIntegrationId,

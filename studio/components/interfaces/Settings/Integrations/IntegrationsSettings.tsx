@@ -287,10 +287,10 @@ You can change the scope of the access for Supabase by configuring
     const form = useForm<z.infer<typeof FormSchema>>({
       resolver: zodResolver(FormSchema),
       defaultValues: {
-        environmentVariablesProduction: config.environmentVariables?.production ?? false,
-        environmentVariablesPreview: config.environmentVariables?.preview ?? false,
-        authRedirectUrisProduction: config.authRedirectUris?.production ?? false,
-        authRedirectUrisPreview: config.authRedirectUris?.preview ?? false,
+        environmentVariablesProduction: config?.environmentVariables?.production ?? false,
+        environmentVariablesPreview: config?.environmentVariables?.preview ?? false,
+        authRedirectUrisProduction: config?.authRedirectUris?.production ?? false,
+        authRedirectUrisPreview: config?.authRedirectUris?.preview ?? false,
       },
     })
 
@@ -305,7 +305,6 @@ You can change the scope of the access for Supabase by configuring
       })
 
     function onSubmit(data: z.infer<typeof FormSchema>) {
-      console.log('submitting')
       const metadata = {
         ...connection.metadata,
       }
@@ -518,15 +517,6 @@ These connections will be part of a GitHub workflow that is currently in develop
                                 integration={integration}
                               />
                             </div>
-                            {/* <Alert_Shadcn_ className="!border-t-transparent rounded-t-none [&>svg]:left-8 !px-10">
-                              <AlertTitle_Shadcn_>
-                                Only 1 GitHub connection per project
-                              </AlertTitle_Shadcn_>
-                              <AlertDescription_Shadcn_>
-                                Due to the nature of how GitHub connections work, only 1 connection
-                                can be made per project to avoid migration conflicts.
-                              </AlertDescription_Shadcn_>
-                            </Alert_Shadcn_> */}
                           </div>
                         ))}
                       </ul>
@@ -557,11 +547,6 @@ These connections will be part of a GitHub workflow that is currently in develop
     const [open, setOpen] = useState(false)
     const comboBoxRef = useRef<HTMLButtonElement>(null)
     const projectContext = useProjectContext()
-
-    console.log(
-      'connection.metadata.supabaseConfig?.supabaseDirectory',
-      connection.metadata.supabaseConfig?.supabaseDirectory
-    )
 
     const githubProjectIntegration = integration?.connections.find(
       (connection) => connection.supabase_project_ref === projectContext.project?.ref
@@ -615,12 +600,14 @@ These connections will be part of a GitHub workflow that is currently in develop
     }
 
     const FormSchema = z.object({
-      supabaseDirectory: z.string().default(connection.metadata.supabaseConfig.supabaseDirectory),
+      supabaseDirectory: z
+        .string()
+        .default(connection.metadata?.supabaseConfig?.supabaseDirectory ?? ''),
     })
     const form = useForm<z.infer<typeof FormSchema>>({
       resolver: zodResolver(FormSchema),
       defaultValues: {
-        supabaseDirectory: connection.metadata.supabaseConfig.supabaseDirectory,
+        supabaseDirectory: connection?.metadata?.supabaseConfig?.supabaseDirectory,
       },
     })
 
@@ -642,8 +629,11 @@ These connections will be part of a GitHub workflow that is currently in develop
     function onSubmit(data: z.infer<typeof FormSchema>) {
       const metadata = {
         ...connection.metadata,
+        supabaseConfig: {
+          ...connection.metadata?.supabaseConfig,
+          supabaseDirectory: data.supabaseDirectory,
+        },
       }
-      metadata.supabaseConfig.supabaseDirectory = data.supabaseDirectory
 
       updateGithubConnection({
         id: connection.id,
