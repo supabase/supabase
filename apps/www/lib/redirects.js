@@ -1574,6 +1574,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/auth/auth-beyondidentity',
+    destination: '/docs/guides/auth/social-login/auth-beyondidentity',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/auth-twitter',
     destination: '/docs/guides/auth/social-login/auth-twitter',
   },

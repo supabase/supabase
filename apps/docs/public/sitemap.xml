@@ -1117,6 +1117,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/docs/guides/auth/social-login/auth-beyondidentity</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
     <loc>https://supabase.com/docs/guides/auth/social-login/auth-bitbucket</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>

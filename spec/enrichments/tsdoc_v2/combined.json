@@ -17684,6 +17684,10 @@
                                           },
                                           {
                                             "type": "literal",
+                                            "value": "beyondidentity"
+                                          },
+                                          {
+                                            "type": "literal",
                                             "value": "bitbucket"
                                           },
                                           {
@@ -30328,6 +30332,10 @@
               },
               {
                 "type": "literal",
+                "value": "beyondidentity"
+              },
+              {
+                "type": "literal",
                 "value": "bitbucket"
               },
               {
@@ -31343,6 +31351,10 @@
                           {
                             "type": "literal",
                             "value": "azure"
+                          },
+                          {
+                            "type": "literal",
+                            "value": "beyondidentity"
                           },
                           {
                             "type": "literal",

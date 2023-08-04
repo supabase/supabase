@@ -1257,6 +1257,10 @@
                       "type": "boolean",
                       "x-go-name": "Azure"
                     },
+                    "beyondidentity": {
+                      "type": "boolean",
+                      "x-go-name": "BeyondIdentity"
+                    },
                     "bitbucket": {
                       "type": "boolean",
                       "x-go-name": "Bitbucket"
@@ -3175,6 +3179,10 @@
           "type": "boolean",
           "x-go-name": "Azure"
         },
+        "beyondidentity": {
+          "type": "boolean",
+          "x-go-name": "BeyondIdentity"
+        },
         "bitbucket": {
           "type": "boolean",
           "x-go-name": "Bitbucket"
@@ -3289,6 +3297,10 @@
             "azure": {
               "type": "boolean",
               "x-go-name": "Azure"
+            },
+            "beyondidentity": {
+              "type": "boolean",
+              "x-go-name": "BeyondIdentity"
             },
             "bitbucket": {
               "type": "boolean",
@@ -4031,6 +4043,10 @@
               "azure": {
                 "type": "boolean",
                 "x-go-name": "Azure"
+              },
+              "beyondidentity": {
+                "type": "boolean",
+                "x-go-name": "BeyondIdentity"
               },
               "bitbucket": {
                 "type": "boolean",

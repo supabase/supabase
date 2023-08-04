@@ -11298,6 +11298,10 @@
           },
           {
             "type": "literal",
+            "value": "beyondidentity"
+          },
+          {
+            "type": "literal",
             "value": "bitbucket"
           },
           {

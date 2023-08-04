@@ -1,0 +1,109 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'auth-beyondidentity',
+  title: 'Beyond Identity Passwordless Authentication',
+  description: 'Add Beyond Identity OAuth to your Supabase project',
+}
+
+Beyond Identity's hosted web app handles passkey registration and authentication for you, including generating new passkeys, presenting users with authenticator choice options as needed, and validating passkey assertions. With this model, your app simply needs to redirect to Beyond Identity's hosted web authenticator, and we do the rest.
+
+To enable passwordless with Beyond Identity for your project, you need to set up a Beyond Identity application and add the application credentials to your Supabase Dashboard.
+
+## Overview
+
+Setting up Beyond Identity consists of four steps:
+
+1. Create a [developer account](https://www.beyondidentity.com/developers) with Beyond Identity.
+1. Create an application in your Beyond Identity console.
+1. Add the callback URL of your Supabase application to the Beyond Identity application's `Redirect URIs`.
+1. Obtain a `Client ID`, `Client Secret`, and `Issuer` URL.
+1. Configure Supabase with the `Client ID`, `Client Secret`, and `Issuer` URL.
+
+## Access your Beyond Identity Developer account
+
+- [Create a free developer account](https://www.beyondidentity.com/developers), if you don't already have one.
+- If you already have an account, log into your admin console. For example: https://console-us.beyondidentity.com/login 
+
+## Create an application in your Beyond Identity console
+
+When you first create an account, a Beyond Identity Admin realm will be created for you. However you want to do all of your application developerment in a separate realm. Creating a realm from the Beyond Identity Admin Console is easy.
+
+### Create a new realm
+
+- In the Admin Console, under **Tenant Management**, select **Go to realm > Create new realm**.
+- Enter a name for your realm and click **Create realm**.
+- In the confirmation dialog, switch to the new realm.
+
+![Create a new realm](/docs/img/guides/auth-beyondidentity/go-to-realm-create-new-realm.png)
+
+![Realm success](/docs/img/guides/auth-beyondidentity/create-new-realm-confirmation-success.png)
+
+### Create an application
+
+In this step, you'll create a new application containing the configuration for your users.
+
+- From the Admin Console, under **Authentication**, select **Apps > Add new app**.
+- Give your application a name.
+
+![Add new app](/docs/img/guides/auth-beyondidentity/app-new-app.png)
+
+![new app display name](/docs/img/guides/auth-beyondidentity/add-new-app-display-name.png)
+
+- On the **External Protocol** tab, use the following values to complete this tab.
+
+  | Property | Value |
+  | --- | --- |
+  | **Display Name** | Descriptive name you choose |
+  | **Protocol** | OIDC |
+  | **Client Type** | Confidential |
+  | **PKCE** | Disabled |
+  | **Redirect URIs** | The callback URL found in your Supabase dashboard under Auth Providers. It should look like this: `https://<project-ref>.supabase.co/auth/v1/callback` |
+  | **Token Endpoint Auth Method** | Client Secret Basic |
+  | **Grant Type** | Authorization Code |
+  | **All other options** | Use the default values for the remaining options |
+
+- Click the **Authenticator Config** tab and select **Hosted Web** as the Configuration Type. Use the default values for the **Authentication Profile**.
+
+- Click **Submit** to save the new app.
+
+## Configure Supabase with Beyond Identity values
+
+Now that you have an application in your Beyond Identity console, you are ready to configure the Auth Provider in Supabase. 
+
+- Under the **External Protocol** tab, grab the `Issuer` URL, `Client ID` and `Client Secret` and add these to your Supabase dashboard.
+
+![client id, client secret, issuer url](/docs/img/guides/auth-beyondidentity/client-id-client-secret-issuer.png)
+
+## Add login code to your client app
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `beyondidentity` as the `provider`:
+
+```js
+async function signInWithKeycloak() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'beyondidentity',
+    options: {
+      scopes: 'openid',
+    },
+  })
+}
+```
+
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```js
+async function signout() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+## Resources
+
+- [Beyond Identity Developer Docs](https://developer.beyondidentity.com)
+- [passkeys.dev](https://passkeys.dev/docs/intro/what-are-passkeys/)
+- [FIDO](https://fidoalliance.org)
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

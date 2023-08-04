@@ -338,6 +338,11 @@ export const SocialLoginItems = [
     url: '/guides/auth/social-login/auth-azure',
   },
   {
+    name: 'Beyond Identity',
+    icon: '/docs/img/icons/beyondidentity-icon',
+    url: '/guides/auth/social-login/auth-beyondidentity',
+  },
+  {
     name: 'Twitter',
     icon: '/docs/img/icons/twitter-icon',
     url: '/guides/auth/social-login/auth-twitter',

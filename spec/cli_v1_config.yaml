@@ -312,9 +312,11 @@ parameters:
     default: '""'
     description: |
       The base URL used for constructing the URLs to request authorization and
-      access tokens. Used by gitlab and keycloak. For gitlab it defaults to
+      access tokens. Used by gitlab, keycloak and beyondidentity. For gitlab it defaults to
       https://gitlab.com. For keycloak you need to set this to your instance,
-      for example: https://keycloak.example.com/realms/myrealm .
+      for example: https://keycloak.example.com/realms/myrealm. 
+      For beyondidentity, set the Issuer from the beyond identity admin console. 
+      This will look like: https://auth-{region}.beyondidentity.com/authenticator/v1/tenants/{tenantId}/realms/{realmId}/applications/{applicationId}. 
     links:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'

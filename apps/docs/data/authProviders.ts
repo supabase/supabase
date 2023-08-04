@@ -20,6 +20,16 @@ const authProviders = [
     authType: 'social',
   },
   {
+    name: 'Beyond Identity',
+    logo: '/docs/img/icons/beyondidentity-icon',
+    href: '/guides/auth/social-login/auth-beyondidentity',
+    official: true,
+    supporter: 'Supabase',
+    platform: true,
+    selfHosted: true,
+    authType: 'social',
+  },
+  {
     name: 'Bitbucket',
     logo: '/docs/img/icons/bitbucket-icon',
     href: '/guides/auth/social-login/auth-bitbucket',

@@ -552,6 +552,57 @@ const EXTERNAL_PROVIDER_AZURE = {
   },
 }
 
+const EXTERNAL_PROVIDER_BEYONDIDENTITY = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'Beyond Identity',
+  properties: {
+    EXTERNAL_BEYONDIDENTITY_ENABLED: {
+      title: 'Beyond Identity enabled',
+      type: 'boolean',
+    },
+    EXTERNAL_BEYONDIDENTITY_CLIENT_ID: {
+      title: 'Client ID',
+      type: 'string',
+      description: 'The Client ID from your Beyond Identity application'
+    },
+    EXTERNAL_BEYONDIDENTITY_SECRET: {
+      title: 'Client Secret',
+      type: 'string',
+      isSecret: true,
+      description: 'The Client Secret from your Beyond Identity application'
+    },
+    EXTERNAL_BEYONDIDENTITY_URL: {
+      title: 'Issuer URL',
+      type: 'string',
+      description: 'The Issuer URL from your Beyond Identity application'
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_BEYONDIDENTITY_ENABLED: boolean().required(),
+    EXTERNAL_BEYONDIDENTITY_CLIENT_ID: string().when('EXTERNAL_BEYONDIDENTITY_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client ID is required'),
+      otherwise: (schema) => schema,
+    }),
+    EXTERNAL_BEYONDIDENTITY_SECRET: string().when('EXTERNAL_BEYONDIDENTITY_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client Secret is required'),
+      otherwise: (schema) => schema,
+    }),
+    EXTERNAL_BEYONDIDENTITY_URL: string().when('EXTERNAL_BEYONDIDENTITY_ENABLED', {
+      is: true,
+      then: (schema) =>
+        schema.matches(urlRegex, 'Must be a valid URL').required('Issuer URL is required'),
+      otherwise: (schema) => schema.matches(urlRegex, 'Must be a valid URL'),
+    }),
+  }),
+  misc: {
+    iconKey: 'beyondidentity-icon',
+    requiresRedirect: true,
+  },
+}
+
 const EXTERNAL_PROVIDER_BITBUCKET = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
@@ -1318,6 +1369,7 @@ export const PROVIDERS_SCHEMAS = [
   PROVIDER_SAML,
   EXTERNAL_PROVIDER_APPLE,
   EXTERNAL_PROVIDER_AZURE,
+  EXTERNAL_PROVIDER_BEYONDIDENTITY,
   EXTERNAL_PROVIDER_BITBUCKET,
   EXTERNAL_PROVIDER_DISCORD,
   EXTERNAL_PROVIDER_FACEBOOK,

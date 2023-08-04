@@ -11,6 +11,7 @@
     "EXTERNAL_PHONE_ENABLED",
     "EXTERNAL_APPLE_ENABLED",
     "EXTERNAL_AZURE_ENABLED",
+    "EXTERNAL_BEYONDIDENTITY_ENABLED",
     "EXTERNAL_BITBUCKET_ENABLED",
     "EXTERNAL_DISCORD_ENABLED",
     "EXTERNAL_FACEBOOK_ENABLED",
@@ -119,6 +120,22 @@
     },
     "EXTERNAL_AZURE_URL": {
       "title": "Azure tenant URL",
+      "type": "string"
+    },
+    "EXTERNAL_BEYONDIDENTITY_ENABLED": {
+      "title": "Beyond Identity enabled",
+      "type": "boolean"
+    },
+    "EXTERNAL_BEYONDIDENTITY_CLIENT_ID": {
+      "title": "Client ID",
+      "type": "string"
+    },
+    "EXTERNAL_BEYONDIDENTITY_SECRET": {
+      "title": "Client Secret",
+      "type": "string"
+    },
+    "EXTERNAL_BEYONDIDENTITY_URL": {
+      "title": "Issuer URL",
       "type": "string"
     },
     "EXTERNAL_BITBUCKET_ENABLED": {
@@ -471,7 +488,7 @@
     "MFA_MAX_ENROLLED_FACTORS": {
       "title": "Maximum enrolled factors",
       "type": "integer"
-    }
+    },
     "PASSWORD_MIN_LENGTH": {
       "title": "Minimum password length",
       "type": "integer"
