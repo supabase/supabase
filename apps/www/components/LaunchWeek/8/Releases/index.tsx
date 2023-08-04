@@ -155,10 +155,7 @@ export default function LW8Releases() {
                       }}
                     />
                     <div className="flex flex-col items-center lg:items-start gap-2 max-w-[400px] w-full text-center lg:text-left">
-                      <CartTitle>
-                        Coding the stars - an interactive constellation with Three.js and React
-                        Three Fiber
-                      </CartTitle>
+                      <CartTitle>{preRelease.steps[0]?.title}</CartTitle>
                       <p className="text-sm text-slate-900">{preRelease.steps[0]?.description}</p>
                     </div>
                     <SectionButtons blog={preRelease.steps[0].blog} />
