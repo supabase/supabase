@@ -10,7 +10,7 @@ import { useSelectedOrganization } from 'hooks'
 import { EMPTY_ARR } from 'lib/void'
 import { SidePanel } from 'ui'
 import { useIntegrationsGitHubInstalledConnectionDeleteMutation } from 'data/integrations/integrations-github-connection-delete-mutation'
-import { IntegrationConnectionsCreateVariables } from 'data/integrations/types'
+import { IntegrationConnectionsCreateVariables } from 'data/integrations/integrations.types'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 
 const GITHUB_ICON = (
