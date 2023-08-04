@@ -15,11 +15,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           .status(400)
           .json({ error: { message: '[analytics] is not enabled in supabase/config.toml' } })
       }
-      if (process.env.NEXT_ANALYTICS_BACKEND_PROVIDER !== 'big_query') {
-        return res
-          .status(400)
-          .json({ error: { message: 'Log Explorer is only supported by the [analytics] Big Query backend, please refer to the documentation to set it up' } })
-      }
       const missingEnvVars = [
         process.env.LOGFLARE_API_KEY ? null : 'LOGFLARE_API_KEY',
         process.env.LOGFLARE_URL ? null : 'LOGFLARE_URL',
