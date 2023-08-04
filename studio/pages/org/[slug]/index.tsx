@@ -10,6 +10,7 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import NoProjectsOnPaidOrgInfo from 'components/interfaces/BillingV2/NoProjectsOnPaidOrgInfo'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const {
@@ -34,13 +35,17 @@ const ProjectsPage: NextPageWithLayout = () => {
     <ScaffoldContainer className="h-full overflow-y-auto">
       <ScaffoldSection>
         <div className="col-span-12 space-y-8">
-          <Link href={`/new/${organization?.slug}`}>
-            <a>
-              <Button size="medium" type="default" iconRight={<IconPlus />}>
-                New project
-              </Button>
-            </a>
-          </Link>
+          <NoProjectsOnPaidOrgInfo organization={organization} />
+
+          <div>
+            <Link href={`/new/${organization?.slug}`}>
+              <a>
+                <Button size="medium" type="default" iconRight={<IconPlus />}>
+                  New project
+                </Button>
+              </a>
+            </Link>
+          </div>
           <div className="space-y-4">
             <h4 className="text-lg">Projects</h4>
             {isLoadingProjects && (
