@@ -144,7 +144,7 @@ export default function TicketHome({ users, meetups }: Props) {
                     <LaunchWeekLogoHeader />
                   </div>
                   <div className="absolute inset-0 z-0 flex items-center justify-center">
-                    <div className="absolute z-40 w-full flex justify-center -translate-y-6">
+                    <div className="absolute z-40 w-full flex justify-center -translate-y-8">
                       <DayHighlightWidget />
                     </div>
                     <AnimatedParticles />

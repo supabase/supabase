@@ -147,9 +147,10 @@ export const AccordionHeader = ({
   shippable?: boolean
 }) => (
   <div
-    className={['flex flex-1', shippable && shipped ? 'flex-col sm:flex-row' : 'flex-row'].join(
-      ' '
-    )}
+    className={[
+      'flex flex-1 scroll-mt-20',
+      shippable && shipped ? 'flex-col sm:flex-row' : 'flex-row',
+    ].join(' ')}
   >
     <div className="flex gap-4 w-full sm:w-auto sm:min-w-[240px] md:min-w-[380px] items-center">
       <span className="text-scale-900 text-sm">
@@ -194,7 +195,7 @@ export const AccordionHeader = ({
           </g>
         </svg>
 
-        {day === 1 && <CountdownComponent date={publishedAt} showCard={false} />}
+        {day === 2 && <CountdownComponent date={publishedAt} showCard={false} />}
       </span>
     )}
   </div>
