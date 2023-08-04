@@ -230,11 +230,11 @@ export const AccordionHeader = ({
                   </svg>
                 </div>
                 <Image
-                  src="/images/launchweek/8/twitter-spaces-thumb.svg"
+                  src="/images/launchweek/8/lw8-yt-thumb.jpg"
                   alt="Video thumbnail"
                   layout="fill"
                   objectFit="cover"
-                  className="blur-sm"
+                  // className="blur-sm"
                 />
               </div>
             </div>

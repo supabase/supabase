@@ -9,7 +9,10 @@ const DayHighlightWidget = () => {
 
   return (
     <div className="w-full max-w-xl">
-      <SmallCard className="border hover:border-scale-800" innerClassName="bg-opacity-20">
+      <SmallCard
+        className="border hover:border-scale-800 transition-colors"
+        innerClassName="bg-opacity-20"
+      >
         <Link href="#currentDay">
           <a className="flex flex-row justify-between items-center w-full h-full gap-2">
             <div className="relative flex-shrink flex items-center p-2 w-2/3 md:w-auto">
@@ -38,11 +41,10 @@ const DayHighlightWidget = () => {
             </div>
             <div className="relative flex !aspect-video h-[80px] md:h-[100px] gap-2 z-10 rounded overflow-hidden">
               <Image
-                src="/images/launchweek/8/twitter-spaces-thumb.svg"
-                alt="twitter spaces thumbnail"
+                src="/images/launchweek/8/lw8-yt-thumb.jpg"
+                alt="Youtube video thumbnail"
                 layout="fill"
                 objectFit="cover"
-                className="group-hover:scale-105 transition-transform"
               />
             </div>
           </a>
