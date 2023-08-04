@@ -90,7 +90,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   {product !== undefined ? (
                     <>
                       Restore this project to access the{' '}
-                      <span className="text-brand-900">{product}</span> page
+                      <span className="text-brand">{product}</span> page
                     </>
                   ) : (
                     'Restore this project and get back to building the next big thing!'

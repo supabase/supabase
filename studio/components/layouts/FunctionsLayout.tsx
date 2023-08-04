@@ -75,7 +75,7 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
                 <div
                   className={[
                     'h-6 w-6 rounded border border-brand-600 bg-brand-300',
-                    'flex items-center justify-center text-brand-900',
+                    'flex items-center justify-center text-brand',
                   ].join(' ')}
                 >
                   <IconCode size={14} strokeWidth={3} />

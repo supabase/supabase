@@ -26,9 +26,9 @@ const AppHeader = () => {
 
   return (
     <div className="flex items-center justify-between px-4 py-1 bg-scale-200 border-b">
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-1">
         <Link href={organization !== undefined ? `/org/${organization?.slug}` : '/'}>
-          <a className="block">
+          <a className="block mr-3">
             <img
               src={`${router.basePath}/img/supabase-logo.svg`}
               alt="Supabase"
