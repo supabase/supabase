@@ -373,7 +373,7 @@ export const SectionButtons = ({
         </ChipLink>
       )}
       {twitter_spaces && (
-        <ChipLink href={twitter_spaces} target="_blank">
+        <ChipLink href={twitter_spaces} target="_blank" className="col-span-full">
           Twitter Spaces
           <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <TwitterSpacesSvg />
