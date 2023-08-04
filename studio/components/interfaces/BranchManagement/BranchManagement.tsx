@@ -1,4 +1,4 @@
-import { partition } from 'lodash'
+import { isError, partition } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -39,11 +39,11 @@ const BranchManagement = () => {
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
 
-  // [Joshen TODO] To be dynamic
-  const isBranchingAllowed = true
+  const hasAccessToBranching =
+    selectedOrg?.opt_in_tags?.includes('PREVIEW_BRANCHES_OPT_IN') ?? false
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
-  const hasBranchEnabled = projectDetails?.has_branch_enabled
+  const hasBranchEnabled = projectDetails?.is_branch_enabled
   const projectRef =
     projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
 
@@ -52,19 +52,22 @@ const BranchManagement = () => {
   const [showDisableBranching, setShowDisableBranching] = useState(false)
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
 
-  const { data: integrations, isLoading: isLoadingIntegrations } = useOrgIntegrationsQuery({
-    orgSlug: selectedOrg?.slug,
-  })
-  const githubIntegration = integrations?.find(
-    (integration) =>
-      integration.integration.name === 'GitHub' &&
-      integration.organization.slug === selectedOrg?.slug
-  )
-  const githubConnection = githubIntegration?.connections.find(
+  const {
+    data: integrations,
+    error: integrationsError,
+    isLoading: isLoadingIntegrations,
+    isError: isErrorIntegrations,
+    isSuccess: isSuccessIntegrations,
+  } = useOrgIntegrationsQuery({ orgSlug: selectedOrg?.slug })
+
+  const githubConnections = integrations
+    ?.filter((integration) => integration.integration.name === 'GitHub')
+    .flatMap((integration) => integration.connections)
+  const githubConnection = githubConnections?.find(
     (connection) => connection.supabase_project_ref === ref
   )
 
-  const { data: branches, error, isLoading, isError, isSuccess } = useBranchesQuery({ projectRef })
+  const { data: branches } = useBranchesQuery({ projectRef })
   const [[mainBranch], previewBranches] = partition(branches, (branch) => branch.is_default)
 
   const { mutate: deleteBranch, isLoading: isDeleting } = useBranchDeleteMutation({
@@ -93,11 +96,11 @@ const BranchManagement = () => {
     },
   })
 
-  const generatePullRequestURL = (branch?: string) => {
+  const generateCreatePullRequestURL = (branch?: string) => {
     if (githubConnection === undefined) return 'https://github.com'
 
     return branch !== undefined
-      ? `https://github.com/${githubConnection.metadata.name}/compare/${mainBranch.git_branch}...${branch}`
+      ? `https://github.com/${githubConnection.metadata.name}/compare/${mainBranch?.git_branch}...${branch}`
       : `https://github.com/${githubConnection.metadata.name}/compare`
   }
 
@@ -118,11 +121,11 @@ const BranchManagement = () => {
     return (
       <ProductEmptyState title="Database Branching">
         <p className="text-sm text-light">
-          {isBranchingAllowed
+          {hasAccessToBranching
             ? 'Create preview branches to experiment changes to your database schema in a safe, non-destructible environment.'
             : "Register for early access and you'll be contacted by email when your organization is enrolled in database branching."}
         </p>
-        {isBranchingAllowed ? (
+        {hasAccessToBranching ? (
           <div className="!mt-4">
             <Button
               icon={<IconGitBranch strokeWidth={1.5} />}
@@ -162,9 +165,14 @@ const BranchManagement = () => {
               <Button onClick={() => setShowCreateBranch(true)}>Create preview branch</Button>
             </div>
             <div className="">
-              {isLoading && <GenericSkeletonLoader />}
-              {isError && <AlertError error={error} subject="Failed to retrieve branches" />}
-              {isSuccess && mainBranch !== undefined && (
+              {isLoadingIntegrations && <GenericSkeletonLoader />}
+              {isErrorIntegrations && (
+                <AlertError
+                  error={integrationsError}
+                  subject="Failed to retrieve GitHub integration connection"
+                />
+              )}
+              {isSuccessIntegrations && (
                 <>
                   <MainBranchPanel
                     repo={githubConnection?.metadata.name}
@@ -173,11 +181,11 @@ const BranchManagement = () => {
                   />
                   <PullRequests
                     previewBranches={previewBranches}
-                    generatePullRequestURL={generatePullRequestURL}
+                    generateCreatePullRequestURL={generateCreatePullRequestURL}
+                    onSelectDeleteBranch={setSelectedBranchToDelete}
                   />
                   <PreviewBranches
-                    previewBranches={previewBranches}
-                    generatePullRequestURL={generatePullRequestURL}
+                    generateCreatePullRequestURL={generateCreatePullRequestURL}
                     onSelectCreateBranch={() => setShowCreateBranch(true)}
                     onSelectDeleteBranch={setSelectedBranchToDelete}
                   />

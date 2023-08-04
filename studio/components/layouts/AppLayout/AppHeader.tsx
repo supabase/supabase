@@ -20,15 +20,15 @@ const AppHeader = () => {
   const organization = useSelectedOrganization()
   const enableBranchManagement = useFlag('branchManagement')
 
-  const isBranchingAllowed = project?.cloud_provider === 'FLY'
+  const isBranchingSupported = project?.cloud_provider === 'FLY'
   const isBranchingEnabled =
-    project?.has_branch_enabled === true || project?.parent_project_ref !== undefined
+    project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
 
   return (
     <div className="flex items-center justify-between px-4 py-1 bg-scale-200 border-b">
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-1">
         <Link href={organization !== undefined ? `/org/${organization?.slug}` : '/'}>
-          <a className="block">
+          <a className="block mr-3">
             <img
               src={`${router.basePath}/img/supabase-logo.svg`}
               alt="Supabase"
@@ -38,7 +38,7 @@ const AppHeader = () => {
         </Link>
         <OrganizationDropdown />
         {ref !== undefined && <ProjectDropdown />}
-        {ref !== undefined && isBranchingAllowed && enableBranchManagement && (
+        {ref !== undefined && isBranchingSupported && enableBranchManagement && (
           <>{isBranchingEnabled ? <BranchDropdown /> : <EnableBranchingButton />}</>
         )}
       </div>

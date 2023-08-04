@@ -15,21 +15,27 @@ export const getResultsMarkdown = (results: any[]) => {
 }
 
 export const createSqlSnippetSkeleton = ({
+  id,
   name,
   sql,
   owner_id,
+  project_id,
 }: {
+  id?: string
   name?: string
   sql?: string
   owner_id?: number
+  project_id?: number
 } = {}): UserContent<SqlSnippets.Content> => {
   return {
     ...NEW_SQL_SNIPPET_SKELETON,
+    id,
     ...(name && { name }),
     ...(owner_id && { owner_id }),
+    ...(project_id && { project_id }),
     content: {
       ...NEW_SQL_SNIPPET_SKELETON.content,
-      content_id: '',
+      content_id: id ?? '',
       sql: sql ?? '',
     },
   }
