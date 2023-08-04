@@ -19,19 +19,6 @@ const Home: NextPageWithLayout = () => {
 
   return (
     <div className="mx-auto my-16 w-full max-w-7xl space-y-16">
-      {/* <div className="mx-6 -mt-16 -mb-4">
-        <LWAnnouncement
-          cardClassName="rounded-t-none border-t-0"
-          cardInnerClassName="rounded-t-none"
-        />
-      </div> */}
-      <div className="mx-6 -mt-8 -mb-8">
-        <LWAnnouncement
-        // cardClassName="rounded-t-none border-t-0"
-        // cardInnerClassName="rounded-t-none"
-        />
-      </div>
-
       <div className="mx-6 flex items-center space-x-6">
         <h1 className="text-3xl">{projectName}</h1>
       </div>
