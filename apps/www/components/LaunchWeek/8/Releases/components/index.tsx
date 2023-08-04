@@ -220,7 +220,7 @@ export const AccordionHeader = ({
           trigger={
             <div className="flex items-center h-full gap-3 text-xs group/vid text-scale-1100 hover:text-scale-1200 transition-colors">
               <span>Watch: Day 1</span>
-              <div className="relative h-8 !aspect-video flex items-center justify-center rounded overflow-hidden border group-hover/vid:border-scale-800 transition-colors">
+              <div className="relative h-8 !aspect-video flex items-center justify-center rounded overflow-hidden border border-scale-800 opacity-80 group-hover/vid:opacity-100 transition-colors">
                 <div className="absolute z-10 w-2.5 h-2.5 text-scale-900 opacity-70 group-hover/vid:opacity-100 transition-opacity">
                   <svg viewBox="0 0 81 91" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -307,7 +307,7 @@ export const SectionButtons = ({
   github,
   url,
   hackernews,
-  twitter_space,
+  twitter_spaces,
   mobileGrid,
 }: {
   blog?: string
@@ -316,7 +316,7 @@ export const SectionButtons = ({
   github?: string
   url?: string
   hackernews?: string
-  twitter_space?: string
+  twitter_spaces?: string
   mobileGrid?: boolean
 }) => {
   return (
@@ -374,8 +374,8 @@ export const SectionButtons = ({
           </div>
         </ChipLink>
       )}
-      {twitter_space && (
-        <ChipLink href={twitter_space} target="_blank">
+      {twitter_spaces && (
+        <ChipLink href={twitter_spaces} target="_blank">
           Twitter Spaces
           <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <TwitterSpacesSvg />
