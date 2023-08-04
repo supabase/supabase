@@ -9,70 +9,8 @@ export const meta = {
 
 The Supabase CLI comes with a range of tools to help inspect your Postgres instances for potential issues. The CLI gets the information from <a href="https://www.postgresql.org/docs/current/internals.html" target="_blank">Postgres internals</a>. Therefore, most tools provided are compatible with any Postgres databases regardless if they are a Supabase project or not.
 
-### Installing the Supabase CLI
+You can find installation instructions for the the Supabase CLI <a href="/docs/guides/cli" target="_blank">here</a>.
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="npm"
->
-<TabPanel id="npm" label="npm">
-
-Install the CLI as dev dependency via [npm](https://www.npmjs.com/package/supabase):
-
-```sh
-npm install supabase --save-dev
-```
-
-Run the CLI by prefixing each command with `npx` (only applicable when installing through `npm`):
-
-```sh
-npx supabase <command>
-```
-
-</TabPanel>
-<TabPanel id="macos" label="macOS">
-
-Install the CLI with [Homebrew](https://brew.sh):
-
-```sh
-brew install supabase/tap/supabase
-```
-
-</TabPanel>
-<TabPanel id="windows" label="Windows">
-
-Install the CLI with [Scoop](https://scoop.sh):
-
-```powershell
-scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
-scoop install supabase
-```
-
-</TabPanel>
-<TabPanel id="linux" label="Linux">
-
-The CLI is available through [Homebrew](https://brew.sh) and Linux packages.
-
-#### Homebrew
-
-```sh
-brew install supabase/tap/supabase
-```
-
-#### Linux packages
-
-Linux packages are provided in [Releases](https://github.com/supabase/cli/releases).
-To install, download the `.apk`/`.deb`/`.rpm` file depending on your package manager
-and run one of the following:
-
-- `sudo apk add --allow-untrusted <...>.apk`
-- `sudo dpkg -i <...>.deb`
-- `sudo rpm -i <...>.rpm`
-
-</TabPanel>
-</Tabs>
 
 ### The `inspect db` command
 
