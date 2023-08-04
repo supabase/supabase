@@ -13,9 +13,9 @@ This guide will walk you through how to generate high quality text embeddings in
 
 [Transformers.js](https://huggingface.co/docs/transformers.js/index) is a library that allows you to perform inference using the JavaScript runtime. You can run Hugging Face embedding models through Transformers.js directly in Supabase [Edge Functions](/docs/guides/functions).
 
-## Build Edge Function
+## Build the Edge Function
 
-Let's build our Edge Function. Edge Functions are server-side TypeScript functions that run on-demand closest to your users.
+Let's build an Edge Function that will accept an input string and generate an embedding for it. Edge Functions are server-side TypeScript HTTP endpoints that run on-demand closest to your users.
 
 <StepHikeCompact>
 
