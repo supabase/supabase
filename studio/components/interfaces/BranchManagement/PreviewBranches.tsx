@@ -1,16 +1,19 @@
+import { Button, IconExternalLink, IconGitBranch } from 'ui'
+
 import { Branch } from 'data/branches/branches-query'
 import { BranchContainer, BranchHeader, BranchPanel } from './BranchPanels'
-import { Button, IconExternalLink, IconGitBranch } from 'ui'
 
 interface PreviewBranchesProps {
   previewBranches: Branch[]
-  onSelectUpdateBranch: (branch: Branch) => void
+  generatePullRequestURL: (branch?: string) => string
+  onSelectCreateBranch: () => void
   onSelectDeleteBranch: (branch: Branch) => void
 }
 
 const PreviewBranches = ({
   previewBranches,
-  onSelectUpdateBranch,
+  generatePullRequestURL,
+  onSelectCreateBranch,
   onSelectDeleteBranch,
 }: PreviewBranchesProps) => {
   return (
@@ -30,7 +33,9 @@ const PreviewBranches = ({
                     <p className="text-scale-1000">Start developing in preview</p>
                   </div>
                 </div>
-                <Button type="default">Create preview branch</Button>
+                <Button type="default" onClick={() => onSelectCreateBranch()}>
+                  Create preview branch
+                </Button>
               </div>
               <div className="px-5 py-3 border-t flex items-center justify-between">
                 <div>
@@ -49,7 +54,7 @@ const PreviewBranches = ({
           <BranchPanel
             key={branch.id}
             branch={branch}
-            onSelectUpdate={() => onSelectUpdateBranch(branch)}
+            generatePullRequestURL={generatePullRequestURL}
             onSelectDelete={() => onSelectDeleteBranch(branch)}
           />
         ))
