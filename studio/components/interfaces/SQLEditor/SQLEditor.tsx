@@ -2,6 +2,7 @@ import { useParams, useTelemetryProps } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
+import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
@@ -36,7 +37,7 @@ import Split from 'react-split'
 import { format } from 'sql-formatter'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import {
-  AiIcon,
+  AiIconAnimation,
   Button,
   Dropdown,
   IconCheck,
@@ -45,10 +46,8 @@ import {
   IconLoader,
   IconSettings,
   IconX,
-  Input,
   Input_Shadcn_,
   cn,
-  AiIconAnimation,
 } from 'ui'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import AISettingsModal from './AISettingsModal'
@@ -134,6 +133,7 @@ const SQLEditor = () => {
   const { profile } = useProfile()
   const { project } = useProjectContext()
   const snap = useSqlEditorStateSnapshot()
+  const { mutateAsync: generateSql, isLoading: isGenerateSqlLoading } = useSqlGenerateMutation()
   const { mutateAsync: editSql, isLoading: isEditSqlLoading } = useSqlEditMutation()
   const { mutateAsync: titleSql } = useSqlTitleGenerateMutation()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
@@ -163,6 +163,8 @@ const SQLEditor = () => {
 
   const [selectedDiffType, setSelectedDiffType] = useState(DiffType.Modification)
   const [isFirstRender, setIsFirstRender] = useState(true)
+
+  const isAiLoading = isGenerateSqlLoading || isEditSqlLoading
 
   // Used for cleaner framer motion transitions
   useEffect(() => {
@@ -408,7 +410,10 @@ const SQLEditor = () => {
     const formattedOriginal = sqlDiff.original.replace(sqlAiDisclaimerComment, '').trim()
     const formattedModified = sqlDiff.modified.replace(sqlAiDisclaimerComment, '').trim()
     const newModified =
-      sqlAiDisclaimerComment + '\n\n' + formattedOriginal + '\n\n' + formattedModified
+      sqlAiDisclaimerComment +
+      '\n\n' +
+      (formattedOriginal ? formattedOriginal + '\n\n' : '') +
+      formattedModified
 
     model.original.setValue(sqlDiff.original)
     model.modified.setValue(newModified)
@@ -484,7 +489,7 @@ const SQLEditor = () => {
                 )}
               >
                 <motion.div layoutId="ask-ai-input-icon" transition={{ duration: 0.1 }}>
-                  <AiIconAnimation loading={isEditSqlLoading} />
+                  <AiIconAnimation loading={isAiLoading} />
                 </motion.div>
 
                 <AnimatePresence initial={false} exitBeforeEnter>
@@ -493,7 +498,7 @@ const SQLEditor = () => {
                       {debugSolution}
                     </div>
                   )}
-                  {!isEditSqlLoading && !debugSolution && (
+                  {!isAiLoading && !debugSolution && (
                     <motion.div
                       key="ask-ai-input"
                       className="w-full h-full relative flex items-center"
@@ -533,7 +538,6 @@ const SQLEditor = () => {
                         }}
                         onKeyPress={async (e) => {
                           if (e.key === 'Enter') {
-                            console.log('entering')
                             try {
                               const prompt = e.currentTarget.value
 
@@ -541,30 +545,35 @@ const SQLEditor = () => {
                                 return
                               }
 
-                              const sql = editorRef.current?.getValue()
+                              const currentSql = editorRef.current?.getValue()
 
-                              if (!sql) {
-                                return
+                              let sql: string | undefined
+
+                              if (!currentSql) {
+                                ;({ sql } = await generateSql({
+                                  prompt,
+                                  entityDefinitions,
+                                }))
+                              } else {
+                                ;({ sql } = await editSql({
+                                  prompt,
+                                  sql: currentSql.replace(sqlAiDisclaimerComment, '').trim(),
+                                  entityDefinitions,
+                                }))
                               }
-
-                              const { sql: modifiedSql } = await editSql({
-                                prompt,
-                                sql: sql.replace(sqlAiDisclaimerComment, '').trim(),
-                                entityDefinitions,
-                              })
 
                               setAiQueryCount((count) => count + 1)
 
                               const formattedSql =
                                 sqlAiDisclaimerComment +
                                 '\n\n' +
-                                format(modifiedSql, {
+                                format(sql, {
                                   language: 'postgresql',
                                   keywordCase: 'lower',
                                 })
 
-                              // TODO: show error
-                              if (formattedSql.trim() === sql.trim()) {
+                              // If this was an edit and AI returned the same SQL as before
+                              if (currentSql && formattedSql.trim() === currentSql.trim()) {
                                 ui.setNotification({
                                   category: 'error',
                                   message:
@@ -574,16 +583,11 @@ const SQLEditor = () => {
                               }
 
                               setSqlDiff({
-                                original: sql,
+                                original: currentSql ?? '',
                                 modified: formattedSql,
                               })
                             } catch (error: unknown) {
-                              if (
-                                error &&
-                                typeof error === 'object' &&
-                                'message' in error &&
-                                typeof error.message === 'string'
-                              ) {
+                              if (isError(error)) {
                                 ui.setNotification({
                                   category: 'error',
                                   message: error.message,
@@ -595,7 +599,7 @@ const SQLEditor = () => {
                       />
                     </motion.div>
                   )}
-                  {isEditSqlLoading && (
+                  {isAiLoading && (
                     <motion.div
                       key="ask-ai-loading"
                       className="p-0 flex flex-row gap-2 items-center w-full"
