@@ -530,7 +530,13 @@ const SQLEditor = () => {
                           'focus-visible:ring-0 focus-visible:ring-offset-0',
                           'appearance-none outline-none'
                         )}
-                        placeholder={!debugSolution ? 'Ask Supabase AI to modify your query' : ''}
+                        placeholder={
+                          !debugSolution
+                            ? !snippet?.snippet.content.sql.trim()
+                              ? 'Ask Supabase AI to build a query'
+                              : 'Ask Supabase AI to modify your query'
+                            : ''
+                        }
                         onKeyDown={(e) => {
                           if (e.key === 'Escape' && !aiInput) {
                             setIsAiOpen(false)
