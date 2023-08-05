@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useMemo } from 'react'
 import { createContext } from 'react'
 import defaultTheme from './defaultTheme'
 
-import { mergeDeep } from '../../utils/mergeDeep'
+import { mergeDeep } from './../../lib/utils'
 // import useDarkMode from './utils/useDarkMode'
 
 interface ThemeContextInterface {

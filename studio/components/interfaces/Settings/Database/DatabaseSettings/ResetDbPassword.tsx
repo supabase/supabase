@@ -1,24 +1,27 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { FC, useState, useRef, useEffect } from 'react'
-import { debounce } from 'lodash'
-import generator from 'generate-password'
-import { Input, Button, Modal } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import generator from 'generate-password'
+import { debounce } from 'lodash'
+import { useEffect, useRef, useState } from 'react'
+import { Button, Input, Modal } from 'ui'
 
-import { checkPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { patch } from 'lib/common/fetch'
-import { passwordStrength } from 'lib/helpers'
 import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
+import { passwordStrength } from 'lib/helpers'
 
+import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { getProjectDetail } from 'data/projects/project-detail-query'
 
-const ResetDbPassword: FC<any> = ({ disabled = false }) => {
-  const { ui, app, meta } = useStore()
+const ResetDbPassword = ({ disabled = false }) => {
   const { ref } = useParams()
+  const { ui, meta } = useStore()
 
-  const canResetDbPassword = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const isProjectActive = useIsProjectActive()
+  const canResetDbPassword = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
   const [isUpdatingPassword, setIsUpdatingPassword] = useState<boolean>(false)
@@ -65,11 +68,18 @@ const ResetDbPassword: FC<any> = ({ disabled = false }) => {
       setIsUpdatingPassword(true)
       const res = await patch(`${API_URL}/projects/${ref}/db-password`, { password })
       if (!res.error) {
-        await app.projects.fetchDetail(ref, (project) => meta.setProjectDetails(project))
+        const project = await getProjectDetail({ ref })
+        if (project) {
+          meta.setProjectDetails(project)
+        }
+
         ui.setNotification({ category: 'success', message: res.message })
         setShowResetDbPass(false)
       } else {
-        ui.setNotification({ category: 'error', message: 'Failed to reset password' })
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to reset password: ${res.error.message}`,
+        })
       }
       setIsUpdatingPassword(false)
     }
@@ -101,13 +111,13 @@ const ResetDbPassword: FC<any> = ({ disabled = false }) => {
                 <Tooltip.Trigger>
                   <Button
                     type="default"
-                    disabled={!canResetDbPassword || disabled}
+                    disabled={!canResetDbPassword || !isProjectActive || disabled}
                     onClick={() => setShowResetDbPass(true)}
                   >
-                    Reset Database Password
+                    Reset database password
                   </Button>
                 </Tooltip.Trigger>
-                {!canResetDbPassword && (
+                {(!canResetDbPassword || !isProjectActive) && (
                   <Tooltip.Portal>
                     <Tooltip.Content side="bottom">
                       <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -118,7 +128,11 @@ const ResetDbPassword: FC<any> = ({ disabled = false }) => {
                         ].join(' ')}
                       >
                         <span className="text-xs text-scale-1200">
-                          You need additional permissions to reset the database password
+                          {!canResetDbPassword
+                            ? 'You need additional permissions to reset the database password'
+                            : !isProjectActive
+                            ? 'Unable to reset database password as project is not active'
+                            : ''}
                         </span>
                       </div>
                     </Tooltip.Content>

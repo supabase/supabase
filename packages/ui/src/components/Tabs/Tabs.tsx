@@ -1,13 +1,8 @@
-import * as React from 'react'
-import { TabsContext } from './TabsContext'
-
 import * as TabsPrimitive from '@radix-ui/react-tabs'
 import { useRouter } from 'next/router'
-
-// @ts-ignore
-// import TabsStyles from './Tabs.module.css'
-
+import * as React from 'react'
 import styleHandler from '../../lib/theme/styleHandler'
+import { useTabGroup } from './TabsProvider'
 
 interface TabsProps {
   type?: 'pills' | 'underlined' | 'cards' | 'rounded-pills'
@@ -42,15 +37,16 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
   addOnBefore,
   addOnAfter,
   listClassNames,
-  children,
+  children: _children,
 }) => {
+  // toArray is used here to filter out invalid children
+  // another method would be to use React.Children.map
+  const children = React.Children.toArray(_children) as PanelPropsProps[]
+
   const [activeTab, setActiveTab] = React.useState(
-    defaultActiveId
-      ? defaultActiveId
-      : // if no defaultActiveId is set use the first panel
-      children && children[0].props
-      ? children[0].props.id
-      : ''
+    defaultActiveId ??
+      // if no defaultActiveId is set use the first panel
+      children?.[0]?.props?.id
   )
 
   const router = useRouter()
@@ -58,40 +54,35 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
 
   let __styles = styleHandler('tabs')
 
-  // activeId state can be overriden externally with `active`
-  // defaults to the first panelif we have one or url hash if not
-  const active = activeId ? activeId : activeTab ? activeTab : hash
+  const tabIds = children.map((tab) => tab.props.id)
+
+  const { groupActiveId, setGroupActiveId } = useTabGroup(tabIds)
+
+  const active = activeId ?? groupActiveId ?? activeTab ?? hash
 
   function onTabClick(id: string) {
-    const newTabSelected = id !== active
     setActiveTab(id)
-    if (onClick) onClick(id)
-    if (onChange && newTabSelected) onChange(id)
-  }
+    setGroupActiveId?.(id)
 
-  // for styling the tabs for underline style
-  const underlined = type === 'underlined'
-  // for styling the tabs for cards style
+    onClick?.(id)
+    if (id !== active) {
+      onChange?.(id)
+    }
+  }
 
   const listClasses = [__styles[type].list]
   if (scrollable) listClasses.push(__styles.scrollable)
   if (listClassNames) listClasses.push(listClassNames)
 
-  // if only 1 react child, it needs to be converted to a list/array
-  // this is so 1 tab can be displayed
-  if (children && !Array.isArray(children)) {
-    children = [children]
-  }
-
   return (
-    <TabsPrimitive.Root defaultValue={defaultActiveId} value={active} className={__styles.base}>
+    <TabsPrimitive.Root value={active} className={__styles.base}>
       <TabsPrimitive.List className={listClasses.join(' ')}>
         {addOnBefore}
         {children.map((tab) => {
-          const activeMatch = active === tab.props.id
+          const isActive = active === tab.props.id
 
           const triggerClasses = [__styles[type].base, __styles.size[size]]
-          if (activeMatch) {
+          if (isActive) {
             triggerClasses.push(__styles[type].active)
           } else {
             triggerClasses.push(__styles[type].inactive)
@@ -118,10 +109,9 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
             </TabsPrimitive.Trigger>
           )
         })}
-        {/* </Space> */}
         {addOnAfter}
       </TabsPrimitive.List>
-      <TabsContext.Provider value={{ activeId: active }}>{children}</TabsContext.Provider>
+      {children}
     </TabsPrimitive.Root>
   )
 }
@@ -142,16 +132,9 @@ export const Panel: React.FC<PanelProps> = ({ children, id, className }) => {
   let __styles = styleHandler('tabs')
 
   return (
-    <TabsContext.Consumer>
-      {({ activeId }) => {
-        const active = activeId === id
-        return (
-          <TabsPrimitive.Content value={id} className={[__styles.content, className].join(' ')}>
-            {children}
-          </TabsPrimitive.Content>
-        )
-      }}
-    </TabsContext.Consumer>
+    <TabsPrimitive.Content value={id} className={[__styles.content, className].join(' ')}>
+      {children}
+    </TabsPrimitive.Content>
   )
 }
 

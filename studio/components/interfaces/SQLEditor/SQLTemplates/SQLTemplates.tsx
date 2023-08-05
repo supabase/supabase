@@ -1,37 +1,38 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import Telemetry from 'lib/telemetry'
-import { checkPermissions, useStore } from 'hooks'
-import useProfile from 'hooks/misc/useProfile'
+import { useParams, useTelemetryProps } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constants'
-import SQLCard from './SQLCard'
-import { createSqlSnippetSkeleton } from '../SQLEditor.utils'
-import { useTelemetryProps, useParams } from 'common'
-import { useRouter } from 'next/router'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useCheckPermissions, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { createSqlSnippetSkeleton } from '../SQLEditor.utils'
+import SQLCard from './SQLCard'
 
 const SQLTemplates = observer(() => {
   const { ui } = useStore()
   const { ref } = useParams()
   const router = useRouter()
-  const { data: profile } = useProfile()
+  const { profile } = useProfile()
+  const { project } = useProjectContext()
   const [sql, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
 
   const telemetryProps = useTelemetryProps()
   const snap = useSqlEditorStateSnapshot()
-  const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
+  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
 
-  // [Joshen TODO] Removed optimistic query creation logic for now, need to figure out
-  // how to do that after using ids as part of the URL
   const handleNewQuery = async (sql: string, name: string) => {
-    if (!ref) return console.error('Project ref is required')
+    if (!project) return console.error('Project is required')
+    if (!profile) return console.error('Profile is required')
     if (!canCreateSQLSnippet) {
       return ui.setNotification({
         category: 'info',
@@ -40,10 +41,16 @@ const SQLTemplates = observer(() => {
     }
 
     try {
-      const snippet = createSqlSnippetSkeleton({ name, sql, owner_id: profile?.id })
-      const data = { ...snippet, id: uuidv4() }
-      snap.addSnippet(data as SqlSnippet, ref, true)
-      router.push(`/project/${ref}/sql/${data.id}`)
+      const snippet = createSqlSnippetSkeleton({
+        id: uuidv4(),
+        name,
+        sql,
+        owner_id: profile.id,
+        project_id: project.id,
+      })
+
+      snap.addSnippet(snippet as SqlSnippet, project.ref)
+      router.push(`/project/${project.ref}/sql/${snippet.id}`)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',

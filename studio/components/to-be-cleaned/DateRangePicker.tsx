@@ -181,8 +181,8 @@ const DateRangePicker: FC<any> = ({
           </>
         }
       >
-        <Button as="span" type="default" iconRight={<IconChevronDown />}>
-          {timePeriod && options.find((x: any) => x.key == timePeriod).label}
+        <Button asChild type="default" iconRight={<IconChevronDown />}>
+          <span>{timePeriod && options.find((x: any) => x.key == timePeriod).label}</span>
         </Button>
       </Dropdown>
     </>

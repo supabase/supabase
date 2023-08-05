@@ -34,15 +34,31 @@ export const getIdentity = (gotrueUser: User) => {
   }
 }
 
-// NOTE: do not use any imports in this function,
-// as it is used standalone in the documents head
+// NOTE: do not use any imports in this function as it is used standalone in the documents head
+// [Joshen] Potentially can remove after full move over to /dashboard
 export const getReturnToPath = (fallback = '/projects') => {
   const searchParams = new URLSearchParams(location.search)
-  let returnTo = searchParams.get('returnTo') ?? fallback
+
+  // [Joshen] Remove base path value ("/dashboard") from returnTo
+  // because we're having this in the document's head, we won't have access
+  // to process.env, hardcoding the value as a workaround
+  const returnTo = (searchParams.get('returnTo') ?? fallback).replace('/dashboard', '')
 
   searchParams.delete('returnTo')
 
   const remainingSearchParams = searchParams.toString()
 
-  return returnTo + (remainingSearchParams ? `?${remainingSearchParams}` : '')
+  let validReturnTo
+
+  // only allow returning to internal pages. e.g. /dashboard
+  try {
+    // if returnTo is a relative path, this will throw an error
+    new URL(returnTo)
+    // if no error, returnTo is a valid URL and NOT an internal page
+    validReturnTo = fallback
+  } catch (_) {
+    validReturnTo = returnTo
+  }
+
+  return validReturnTo + (remainingSearchParams ? `?${remainingSearchParams}` : '')
 }

@@ -74,7 +74,7 @@ It can be challenging to authenticate your users in all these different environm
 Install the auth helpers for Next.js
 
 ```bash
-npm install @supabase/auth-helpers-nextjs
+npm install @supabase/auth-helpers-nextjs @supabase/supabase-js
 ```
 
 ### NextJS Middleware
@@ -241,7 +241,7 @@ export default function AuthForm() {
 
 </TabPanel>
 </Tabs>
-  
+
 <Admonition type="note">
 
 If you are using TypeScript for this project, see [generating types](/docs/guides/api/rest/generating-types) to automatically generate types from your database tables.
@@ -454,16 +454,12 @@ export default function AccountForm({ session }) {
     getProfile()
   }, [user, getProfile])
 
-  async function updateProfile({
-    username,
-    website,
-    avatar_url,
-  }) {
+  async function updateProfile({ username, website, avatar_url }) {
     try {
       setLoading(true)
 
       let { error } = await supabase.from('profiles').upsert({
-        id: user?.id as string,
+        id: user?.id,
         full_name: fullname,
         username,
         website,
@@ -982,7 +978,8 @@ At this stage you have a fully functional application!
 
 ## See also
 
-- See the complete [example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-ts-user-management) and deploy it to Vercel
+- See the complete [example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-user-management) and deploy it to Vercel
+- [Build a Twitter Clone with the Next.js App Router and Supabase - free egghead course](https://egghead.io/courses/build-a-twitter-clone-with-the-next-js-app-router-and-supabase-19bebadb)
 - Explore the [pre-built Auth UI for React](/docs/guides/auth/auth-helpers/auth-ui)
 - Explore the [Auth Helpers for Next.js](/docs/guides/auth/auth-helpers/nextjs)
 - Explore the [Supabase Cache Helpers](https://github.com/psteinroe/supabase-cache-helpers)

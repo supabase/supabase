@@ -5,13 +5,13 @@ import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { IconChevronLeft, IconChevronsLeft } from '~/../../packages/ui'
+import { IconChevronLeft } from 'ui'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
+import { SITE_ORIGIN } from '~/lib/constants'
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -59,13 +59,14 @@ export async function getStaticProps({ params }: any) {
 
 function CaseStudyPage(props: any) {
   const content = props.blog.content
-  const { basePath } = useRouter()
 
   const meta = {
     title: props.blog.meta_title ?? `${props.blog.name} | Supabase Customer Stories`,
     description: props.blog.meta_description ?? props.blog.description,
-    image: props.blog.og_image ?? `${basePath}/images/customers/og/customer-stories.jpg`,
-    url: `https://supabase.io/customers/${props.blog.slug}`,
+    image:
+      `${SITE_ORIGIN}${props.blog.og_image}` ??
+      `${SITE_ORIGIN}/images/customers/og/customer-stories.jpg`,
+    url: `${SITE_ORIGIN}/customers/${props.blog.slug}`,
   }
 
   return (
@@ -86,6 +87,7 @@ function CaseStudyPage(props: any) {
           images: [
             {
               url: meta.image,
+              alt: `${meta.title} thumbnail`,
             },
           ],
         }}
@@ -120,9 +122,7 @@ function CaseStudyPage(props: any) {
                 <article className="flex flex-col gap-8">
                   <div className="flex flex-col gap-8 max-w-xxl">
                     <Link passHref href="/customers">
-                      <a className="text-brand-900 hover:text-brand-1000 mb-2 mt-0">
-                        Customer Stories
-                      </a>
+                      <a className="text-brand hover:text-brand-600 mb-2 mt-0">Customer Stories</a>
                     </Link>
                     <h1 className="text-scale-1200 text-4xl font-semibold xl:text-5xl">
                       {props.blog.title}

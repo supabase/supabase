@@ -6,14 +6,26 @@ dayjs.extend(utc)
 dayjs.extend(advancedFormat)
 
 const generateRssItem = (post: any): string => {
-  // post.url = post.url.substring(11)
+  const xmlEncode = (str: string) => {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;')
+  }
+
+  const encodedTitle = xmlEncode(post.title)
+  const encodedPath = xmlEncode(post.path)
+  const encodedDescription = xmlEncode(post.description)
+  const formattedDate = dayjs(post.date).utc().format('ddd, DD MMM YYYY HH:mm:ss [GMT]')
 
   return `<item>
-  <guid>https://supabase.com${post.path}</guid>
-  <title>${post.title}</title>
-  <link>https://supabase.com${post.path}</link>
-  <description>${post.description}</description>
-  <pubDate>${dayjs(post.date).utc().format('ddd, DD MMM YYYY HH:mm:ss [GMT]')}</pubDate>
+  <guid>https://supabase.com${encodedPath}</guid>
+  <title>${encodedTitle}</title>
+  <link>https://supabase.com${encodedPath}</link>
+  <description>${encodedDescription}</description>
+  <pubDate>${formattedDate}</pubDate>
 </item>
 `
 }

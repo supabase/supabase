@@ -1,34 +1,47 @@
-import { useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { Button, Input, IconSearch } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { useState } from 'react'
+import { Button, IconSearch, Input } from 'ui'
 
-import { useStore } from 'hooks'
-import useProfile from 'hooks/misc/useProfile'
 import { useParams } from 'common/hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import InviteMemberButton from './InviteMemberButton'
-import MembersView from './MembersView'
-import { getRolesManagementPermissions, hasMultipleOwners } from './TeamSettings.utils'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useSelectedOrganization, useStore } from 'hooks'
+import { delete_, isResponseOk } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import { useProfile } from 'lib/profile'
+import InviteMemberButton from './InviteMemberButton'
+import MembersView from './MembersView'
+import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
+import {
+  ScaffoldActionsGroup,
+  ScaffoldContainerLegacy,
+  ScaffoldFilterAndContent,
+  ScaffoldActionsContainer,
+  ScaffoldSectionContent,
+} from 'components/layouts/Scaffold'
 
 const TeamSettings = () => {
   const { ui } = useStore()
   const { slug } = useParams()
 
-  const { data: profile } = useProfile()
-  const isOwner = ui.selectedOrganization?.is_owner
+  const { profile } = useProfile()
+  const selectedOrganization = useSelectedOrganization()
+  const isOwner = selectedOrganization?.is_owner
 
+  const { data: permissions } = usePermissionsQuery()
   const { data: detailData } = useOrganizationDetailQuery({ slug })
   const { data: rolesData } = useOrganizationRolesQuery({ slug })
 
   const members = detailData?.members ?? []
   const roles = rolesData?.roles ?? []
 
-  const { rolesAddable } = getRolesManagementPermissions(roles)
+  const { rolesAddable } = useGetRolesManagementPermissions(
+    selectedOrganization?.id,
+    roles,
+    permissions ?? []
+  )
 
   const [isLeaving, setIsLeaving] = useState(false)
   const [searchString, setSearchString] = useState('')
@@ -41,10 +54,12 @@ const TeamSettings = () => {
     try {
       confirmAlert({
         title: 'Are you sure?',
-        message: 'Are you sure you want to leave this team? This is permanent.',
+        message: 'Are you sure you want to leave this organization? This is permanent.',
         onAsyncConfirm: async () => {
-          const response = await post(`${API_URL}/organizations/${slug}/members/leave`, {})
-          if (response.error) {
+          const response = await delete_<void>(
+            `${API_URL}/organizations/${slug}/members/${profile!.gotrue_id}`
+          )
+          if (!isResponseOk(response)) {
             throw response.error
           } else {
             window?.location.replace('/') // Force reload to clear Store
@@ -54,7 +69,7 @@ const TeamSettings = () => {
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
-        message: `Error leaving: ${error?.message}`,
+        message: `Failed to leave organization: ${error?.message}`,
       })
     } finally {
       setIsLeaving(false)
@@ -62,9 +77,9 @@ const TeamSettings = () => {
   }
 
   return (
-    <>
-      <div className="container my-4 max-w-4xl space-y-8">
-        <div className="flex justify-between">
+    <ScaffoldContainerLegacy>
+      <ScaffoldFilterAndContent>
+        <ScaffoldActionsContainer className="justify-between">
           <Input
             icon={<IconSearch size="tiny" />}
             size="small"
@@ -74,10 +89,11 @@ const TeamSettings = () => {
             id="email"
             placeholder="Filter members"
           />
-          <div className="flex items-center space-x-4">
-            {canAddMembers && profile !== undefined && (
+          <ScaffoldActionsGroup>
+            {canAddMembers && profile !== undefined && selectedOrganization !== undefined && (
               <div>
                 <InviteMemberButton
+                  orgId={selectedOrganization.id}
                   userId={profile.id}
                   members={members}
                   roles={roles}
@@ -116,14 +132,14 @@ const TeamSettings = () => {
                 )}
               </Tooltip.Root>
             </div>
-          </div>
-        </div>
-      </div>
-      <div className="container my-4 max-w-4xl space-y-8">
-        <MembersView searchString={searchString} />
-      </div>
-    </>
+          </ScaffoldActionsGroup>
+        </ScaffoldActionsContainer>
+        <ScaffoldSectionContent className="w-full">
+          <MembersView searchString={searchString} />
+        </ScaffoldSectionContent>
+      </ScaffoldFilterAndContent>
+    </ScaffoldContainerLegacy>
   )
 }
 
-export default observer(TeamSettings)
+export default TeamSettings

@@ -12,9 +12,9 @@
 - [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
 - [x] Tunnistus ja valtuutus. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Automaattisesti luodut API:t.
-  - [x] REST. [Asiakirjat](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Asiakirjat](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Reaaliaikaiset tilaukset. [Asiakirjat](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Asiakirjat](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Asiakirjat](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Reaaliaikaiset tilaukset. [Asiakirjat](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funktiot.
   - [x] Tietokantafunktiot. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Reunatoiminnot [Docs](https://supabase.com/docs/guides/functions)
@@ -27,19 +27,19 @@
 
 Täydellinen dokumentaatio löytyy osoitteesta [supabase.com/docs](https://supabase.com/docs)
 
-Jos haluat nähdä, miten osallistuminen tapahtuu, käy osoitteessa [Getting Started](./DEVELOPERS.md)
+Jos haluat nähdä, miten osallistuminen tapahtuu, käy osoitteessa [Getting Started](../DEVELOPERS.md)
 
 ## Yhteisö ja tuki
 
-- [Yhteisön foorumi](https://github.com/supabase/supabase/discussions). Paras: Apua rakentamiseen, keskustelua tietokannan parhaista käytännöistä.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). Parasta: Supabasea käytettäessä kohdatut viat ja virheet.
-- [Sähköpostituki](https://supabase.com/docs/support#business-support). Paras: tietokantaan tai infrastruktuuriin liittyvät ongelmat.
-- [Discord](https://discord.supabase.com). Paras: sovellusten jakamiseen ja yhteisön kanssa hengailuun.
+- [Yhteisön foorumi](https://github.com/supabase/supabase/discussions). Sopii parhaiten: Apua rakentamiseen, keskustelua tietokannan parhaista käytännöistä.
+- [GitHub Issues](https://github.com/supabase/supabase/issues). Sopii parhaiten: Supabasea käytettäessä kohdatut viat ja virheet.
+- [Sähköpostituki](https://supabase.com/docs/support#business-support). Sopii parhaiten: Tietokantaan tai infrastruktuuriin liittyvät ongelmat.
+- [Discord](https://discord.supabase.com). Sopii parhaiten: Sovellusten jakamiseen ja yhteisön kanssa hengailuun.
 
 ## Status
 
 - [x] Alpha: Testaamme Supabasea suljetulla asiakasjoukolla
-- [x] Julkinen Alpha: Kuka tahansa voi rekisteröityä osoitteessa [app.supabase.com](https://app.supabase.com). Mutta olkaa varovaisia, sillä on vielä muutamia ongelmia
+- [x] Julkinen Alpha: Kuka tahansa voi rekisteröityä osoitteessa [supabase.com/dashboard](https://supabase.com/dashboard). Mutta olkaa varovaisia, sillä on vielä muutamia ongelmia
 - [x] Julkinen beta: Tarpeeksi vakaa useimpiin ei-yrityskäyttötapauksiin
 - [ ] Julkinen: Yleinen saatavuus [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabase on yhdistelmä avoimen lähdekoodin työkaluja. Rakennamme Firebasen om
 
 **Arkkitehtuuri**
 
-Supabase on [hosted platform](https://app.supabase.com). Voit rekisteröityä ja aloittaa Supabasen käytön asentamatta mitään.
+Supabase on [hosted platform](https://supabase.com/dashboard). Voit rekisteröityä ja aloittaa Supabasen käytön asentamatta mitään.
 Voit myös [itse isännöidä](https://supabase.com/docs/guides/hosting/overview) ja [kehittää paikallisesti](https://supabase.com/docs/guides/local-development).
 
 ![Arkkitehtuuri](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)

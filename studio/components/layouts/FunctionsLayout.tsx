@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { Button, IconExternalLink, IconCode, Modal, IconTerminal } from 'ui'
 
 import ProjectLayout from './'
-import { checkPermissions, withAuth } from 'hooks'
+import { useCheckPermissions, withAuth } from 'hooks'
 import { useParams } from 'common/hooks'
 import FunctionsNav from '../interfaces/Functions/FunctionsNav'
 import NoPermission from 'components/ui/NoPermission'
@@ -24,7 +24,7 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
   const { data: functions, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
 
-  const canReadFunctions = checkPermissions(PermissionAction.FUNCTIONS_READ, '*')
+  const canReadFunctions = useCheckPermissions(PermissionAction.FUNCTIONS_READ, '*')
   if (!canReadFunctions) {
     return (
       <ProjectLayout title={title || 'Edge Functions'} product="Edge Functions">
@@ -53,17 +53,8 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
             xl:flex-row"
             >
               <div className="flex items-center gap-3">
-                <div
-                  className={[
-                    'h-6 w-6 rounded border border-brand-600 bg-brand-300',
-                    'flex items-center justify-center text-brand-900',
-                  ].join(' ')}
-                >
-                  <IconCode size={14} strokeWidth={3} />
-                </div>
                 <div className="flex items-center space-x-4">
                   <h1 className="text-2xl text-scale-1200">Edge Functions</h1>
-                  <p className="mt-1 text-scale-1000">Beta</p>
                 </div>
               </div>
             </div>
@@ -84,7 +75,7 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
                 <div
                   className={[
                     'h-6 w-6 rounded border border-brand-600 bg-brand-300',
-                    'flex items-center justify-center text-brand-900',
+                    'flex items-center justify-center text-brand',
                   ].join(' ')}
                 >
                   <IconCode size={14} strokeWidth={3} />
@@ -97,7 +88,6 @@ const FunctionsLayout: FC<Props> = ({ title, children }) => {
                         Edge Functions
                       </h1>
                     </Link>
-                    <p className="mt-1 text-scale-1000">Beta</p>
                     {name && (
                       <div className="mt-1.5 flex items-center space-x-4">
                         <span className="text-scale-1000">

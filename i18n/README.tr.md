@@ -12,9 +12,9 @@
 - [x] Barındırılan Postgres Veritabanı. [Dokümanlar](https://supabase.com/docs/guides/database)
 - [x] Kimlik Doğrulama ve Yetkilendirme. [Dokümanlar](https://supabase.com/docs/guides/auth)
 - [x] Otomatik oluşturulan API'ler.
-  - [x] REST. [Dokümanlar](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Gerçek zamanlı abonelikler. [Dokümanlar](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Dokümanlar](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Gerçek zamanlı abonelikler. [Dokümanlar](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Fonksiyonlar.
   - [x] Veritabanı Fonksiyonları. [Dokümanlar](https://supabase.com/docs/guides/database/functions)
   - [x] Kenar İşlevleri [Dokümanlar](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Belgelerin tamamı için [supabase.com/docs](https://supabase.com/docs) adresini ziyaret edin
 
-Nasıl Katkıda bulunacağınızı görmek için [Başlarken](./DEVELOPERS.md) adresini ziyaret edin
+Nasıl Katkıda bulunacağınızı görmek için [Başlarken](../DEVELOPERS.md) adresini ziyaret edin
 
 ## Topluluk ve Destek
 
@@ -39,7 +39,7 @@ Nasıl Katkıda bulunacağınızı görmek için [Başlarken](./DEVELOPERS.md) a
 ## Durum
 
 - [Alfa: Supabase'i kapalı bir müşteri grubuyla test ediyoruz
-- [Halka Açık Alfa: Herkes [app.supabase.com](https://app.supabase.com) adresinden kaydolabilir. Ama bize karşı sakin olun, birkaç karışıklık var
+- [Halka Açık Alfa: Herkes [supabase.com/dashboard](https://supabase.com/dashboard) adresinden kaydolabilir. Ama bize karşı sakin olun, birkaç karışıklık var
 - [x] Genel Beta: Kurumsal olmayan kullanım durumlarının çoğu için yeterince kararlı
 - [ ] Genel: Genel Kullanılabilirlik [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabase açık kaynak araçlarının bir birleşimidir. Firebase'in özellikler
 
 **Mimari**
 
-Supabase [barındırılan bir platformdur](https://app.supabase.com). Supabase'e kaydolabilir ve hiçbir şey yüklemeden kullanmaya başlayabilirsiniz.
+Supabase [barındırılan bir platformdur](https://supabase.com/dashboard). Supabase'e kaydolabilir ve hiçbir şey yüklemeden kullanmaya başlayabilirsiniz.
 Ayrıca [self-host](https://supabase.com/docs/guides/hosting/overview) ve [yerel olarak geliştirebilirsiniz](https://supabase.com/docs/guides/local-development).
 
 ![Mimarlık](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)

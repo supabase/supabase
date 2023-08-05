@@ -38,7 +38,6 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
         <Button
           type="text"
           size="tiny"
-          shadow={false}
           icon={<IconRefreshCcw className="text-gray-1100" size="tiny" strokeWidth={2} />}
           onClick={retry}
         >
@@ -48,7 +47,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
       {showSavedText ? (
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
-            <IconCheck className="text-brand-800" size={14} strokeWidth={3} />
+            <IconCheck className="text-brand-300" size={14} strokeWidth={3} />
           </Tooltip.Trigger>
           <Tooltip.Content side="bottom">
             <Tooltip.Arrow className="radix-tooltip-arrow" />

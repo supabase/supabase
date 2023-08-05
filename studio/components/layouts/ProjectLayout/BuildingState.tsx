@@ -1,25 +1,26 @@
-import Link from 'next/link'
-import { FC, useEffect, useRef } from 'react'
-import { observer } from 'mobx-react-lite'
-import { Badge, IconArrowRight, IconLoader, Button } from 'ui'
-import ExampleProject from 'components/interfaces/Home/ExampleProject'
+import { useQueryClient } from '@tanstack/react-query'
 import ClientLibrary from 'components/interfaces/Home/ClientLibrary'
+import ExampleProject from 'components/interfaces/Home/ExampleProject'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
+import Link from 'next/link'
+import { useEffect, useRef } from 'react'
+import { Badge, Button, IconArrowRight, IconLoader } from 'ui'
 
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { useStore } from 'hooks'
-import { getWithTimeout } from 'lib/common/fetch'
-import { Project } from 'types'
 import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
+import { invalidateProjectsQuery } from 'data/projects/projects-query'
+import { getWithTimeout } from 'lib/common/fetch'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { Project } from 'types'
 
-interface Props {
+export interface BuildingStateProps {
   project: Project
 }
 
-const BuildingState: FC<Props> = ({ project }) => {
-  const { ui, app } = useStore()
+const BuildingState = ({ project }: BuildingStateProps) => {
+  const queryClient = useQueryClient()
   const checkServerInterval = useRef<number>()
 
+  // TODO: move to react-query
   async function checkServer() {
     if (!project) return
 
@@ -30,9 +31,8 @@ const BuildingState: FC<Props> = ({ project }) => {
       const { status } = projectStatus
       if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
         clearInterval(checkServerInterval.current)
-        // re-fetch project detail.
-        // This will also trigger UI state change to show project building completed
-        await app.projects.fetchDetail(project.ref)
+
+        await invalidateProjectsQuery(queryClient)
       }
     }
   }
@@ -55,8 +55,8 @@ const BuildingState: FC<Props> = ({ project }) => {
               <div className="flex items-center gap-2">
                 <IconLoader className="animate-spin" size={12} />
                 <span>
-                  {project.status === PROJECT_STATUS.RESTORING
-                    ? 'Restoring project'
+                  {project.status === PROJECT_STATUS.UNKNOWN
+                    ? 'Initiating project set up'
                     : 'Setting up project'}
                 </span>
               </div>
@@ -82,7 +82,7 @@ const BuildingState: FC<Props> = ({ project }) => {
                       Browse the Supabase{' '}
                       <Link href="https://supabase.com/docs">
                         <a
-                          className="mb-0 text-brand-900 transition-colors hover:text-brand-1200"
+                          className="mb-0 text-brand transition-colors hover:text-brand-600"
                           target="_blank"
                           rel="noreferrer"
                         >
@@ -156,7 +156,7 @@ const BuildingState: FC<Props> = ({ project }) => {
     </div>
   )
 }
-export default observer(BuildingState)
+export default BuildingState
 
 const ChecklistItem = ({ description }: any) => {
   return (

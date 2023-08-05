@@ -1,14 +1,28 @@
-import Link from 'next/link'
-import { useState, useEffect, useRef, FC, ChangeEvent } from 'react'
-import { useRouter } from 'next/router'
 import { toPng } from 'html-to-image'
-import { Button, Input, Popover, IconCamera, IconX, IconImage, Dropdown, IconUpload } from 'ui'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { ChangeEvent, FC, useEffect, useRef, useState } from 'react'
+import {
+  Button,
+  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconCamera,
+  IconImage,
+  IconUpload,
+  IconX,
+  Input,
+  Popover,
+} from 'ui'
 
+import { useParams } from 'common'
+import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
 import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
 import { timeout } from 'lib/helpers'
+import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
 
 interface Props {
   onClose: () => void
@@ -26,7 +40,7 @@ const FeedbackWidget: FC<Props> = ({
   setScreenshot,
 }) => {
   const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
 
   const { ui } = useStore()
   const inputRef = useRef<any>(null)
@@ -34,6 +48,7 @@ const FeedbackWidget: FC<Props> = ({
 
   const [isSending, setSending] = useState(false)
   const [isSavingScreenshot, setIsSavingScreenshot] = useState(false)
+  const { mutateAsync: submitFeedback } = useSendFeedbackMutation()
 
   useEffect(() => {
     inputRef?.current?.focus()
@@ -89,23 +104,26 @@ const FeedbackWidget: FC<Props> = ({
         message: 'Please include a message in your feedback.',
         duration: 4000,
       })
-    } else if (feedback.length > 0) {
+    } else if (feedback.length > 0 && ref !== undefined) {
       setSending(true)
+
       const attachmentUrl = screenshot
         ? await uploadAttachment(ref as string, screenshot)
         : undefined
       const formattedFeedback =
         attachmentUrl !== undefined ? `${feedback}\n\nAttachments:\n${attachmentUrl}` : feedback
-      await post(`${API_URL}/feedback/send`, {
-        message: formattedFeedback,
-        pathname: router.asPath,
-        category: 'Feedback',
-        projectRef: ref,
-        tags: ['dashboard-feedback'],
-      })
-      setSending(false)
-      setFeedback('')
-      ui.setNotification({ category: 'success', message: 'Feedback sent. Thank you!' })
+
+      try {
+        await submitFeedback({
+          projectRef: ref,
+          message: formattedFeedback,
+          pathname: router.asPath,
+        })
+        setFeedback('')
+        ui.setNotification({ category: 'success', message: 'Feedback sent. Thank you!' })
+      } finally {
+        setSending(false)
+      }
     }
 
     return onClose()
@@ -121,13 +139,12 @@ const FeedbackWidget: FC<Props> = ({
         value={feedback}
         onChange={onFeedbackChange}
       />
-      <Popover.Separator />
+      <div className="w-full h-px bg-border" />
       <div className="w-80 space-y-3 px-3 py-2 pb-4">
         <div className="flex justify-between space-x-2">
-          <Button type="default" onClick={onClose} className="hover:border-gray-500">
+          <Button type="default" onClick={onClose}>
             Cancel
           </Button>
-
           <div className="flex items-center space-x-2">
             {screenshot !== undefined ? (
               <div
@@ -139,7 +156,7 @@ const FeedbackWidget: FC<Props> = ({
                 }}
                 className="cursor-pointer rounded h-[26px] w-[30px] border border-scale-600 relative bg-cover bg-center bg-no-repeat"
               >
-                <div
+                <button
                   className={[
                     'cursor-pointer rounded-full bg-red-900 h-3 w-3',
                     'flex items-center justify-center absolute -top-1 -right-1',
@@ -150,40 +167,43 @@ const FeedbackWidget: FC<Props> = ({
                   }}
                 >
                   <IconX size={8} strokeWidth={3} />
-                </div>
+                </button>
               </div>
             ) : (
-              <Dropdown
-                className="feedback-dropdown"
-                size="small"
-                overlay={[
-                  <Dropdown.Item
+              <DropdownMenu_Shadcn_>
+                <DropdownMenuTrigger_Shadcn_>
+                  <Button
+                    asChild
+                    type="default"
+                    disabled={isSavingScreenshot}
+                    loading={isSavingScreenshot}
+                    className="px-2 py-1.5"
+                    icon={<IconImage size={14} />}
+                  >
+                    <span></span>
+                  </Button>
+                </DropdownMenuTrigger_Shadcn_>
+                <DropdownMenuContent_Shadcn_ side="bottom" align="end">
+                  <DropdownMenuItem_Shadcn_
+                    className="flex gap-2"
                     key="upload-screenshot"
-                    icon={<IconUpload size={14} />}
-                    onClick={() => {
+                    onSelect={() => {
                       if (uploadButtonRef.current) (uploadButtonRef.current as any).click()
                     }}
                   >
+                    <IconUpload size={14} />
                     Upload screenshot
-                  </Dropdown.Item>,
-                  <Dropdown.Item
+                  </DropdownMenuItem_Shadcn_>
+                  <DropdownMenuItem_Shadcn_
+                    className="flex gap-2"
                     key="capture-screenshot"
-                    icon={<IconCamera size={14} />}
-                    onClick={() => captureScreenshot()}
+                    onSelect={() => captureScreenshot()}
                   >
+                    <IconCamera size={14} />
                     Capture screenshot
-                  </Dropdown.Item>,
-                ]}
-              >
-                <Button
-                  as="span"
-                  type="default"
-                  disabled={isSavingScreenshot}
-                  loading={isSavingScreenshot}
-                  className="px-2 py-1.5"
-                  icon={<IconImage size={14} />}
-                />
-              </Dropdown>
+                  </DropdownMenuItem_Shadcn_>
+                </DropdownMenuContent_Shadcn_>
+              </DropdownMenu_Shadcn_>
             )}
             <input
               type="file"
@@ -202,14 +222,14 @@ const FeedbackWidget: FC<Props> = ({
           Have a technical issue? Contact{' '}
           <Link href="/support/new">
             <a>
-              <span className="cursor-pointer text-brand-900 transition-colors hover:text-brand-1200">
+              <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
                 Supabase support
               </span>
             </a>
           </Link>{' '}
           or{' '}
           <a href="https://supabase.com/docs" target="_blank" rel="noreferrer">
-            <span className="cursor-pointer text-brand-900 transition-colors hover:text-brand-1200">
+            <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
               browse our docs
             </span>
           </a>

@@ -8,13 +8,13 @@
   "workspaces": [
     "apps/www",
     "apps/docs",
-    "apps/new-docs",
     "studio",
     "tests",
     "packages/*"
   ],
   "scripts": {
     "build": "turbo run build",
+    "build:studio": "turbo run build --filter=studio",
     "dev": "turbo run dev --parallel",
     "dev:reference": "turbo run dev --filter=reference --parallel",
     "dev:studio": "turbo run dev --filter=studio --parallel",
@@ -48,7 +48,7 @@
     "prettier-plugin-sql-cst": "^0.5.0",
     "supabase": "^1.45.2",
     "ts-jest": "^27.1.3",
-    "turbo": "^1.4.7"
+    "turbo": "^1.10.3"
   },
   "repository": {
     "type": "git",

@@ -110,7 +110,7 @@ function BlogPostPage(props: any) {
     <div className="space-y-8 py-8 lg:py-0">
       <div>
         <div className="flex flex-wrap gap-2">
-          {props.blog.tags.map((tag: string) => {
+          {props.blog.tags?.map((tag: string) => {
             return (
               <a href={`/blog/tags/${tag}`} key={`category-badge-${tag}`}>
                 <Badge>{tag}</Badge>
@@ -164,7 +164,7 @@ function BlogPostPage(props: any) {
             // to do: author urls should be internal in future
             // currently we have external links to github profiles
             authors: [props.blog.author_url],
-            tags: props.blog.tags.map((cat: string) => {
+            tags: props.blog.tags?.map((cat: string) => {
               return cat
             }),
           },
@@ -202,7 +202,7 @@ function BlogPostPage(props: any) {
               {/* Title and description */}
               <div className="mb-16 max-w-5xl space-y-8">
                 <div className="space-y-4">
-                  <p className="text-brand-900">Blog post</p>
+                  <p className="text-brand">Blog post</p>
                   <h1 className="h1">{props.blog.title}</h1>
                   <div className="text-scale-900 flex space-x-3 text-sm">
                     <p>{props.blog.date}</p>

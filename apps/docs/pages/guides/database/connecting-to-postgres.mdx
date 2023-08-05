@@ -11,19 +11,19 @@ Supabase provides several options for programmatically connecting to your Postgr
 
 1. Direct connections using Postgres' standard connection system
 2. Connection pooling using PgBouncer
-3. Programmatic access uing the [Serverless APIs](/docs/guides/api)
+3. Programmatic access using the [Serverless APIs](/docs/guides/api)
 
 ## Serverless APIs
 
 Supabase provides auto-updating [APIs](/docs/guides/database/api). This is the easiest way to get started if you are managing data (fetching, inserting, updating). We provides several types of API to suit your preferences:
 
-- [REST](/docs/guides/database/api#rest-api): interact with your database through a REST interface.
-- [GraphQL](/docs/guides/database/api#graphql-api): interact with your database through a GraphQL interface.
-- [Realtime](/docs/guides/database/api#realtime-api): listen to database changes over websockets.
+- [REST](/docs/guides/api#rest-api-overview): interact with your database through a REST interface.
+- [GraphQL](/docs/guides/api#graphql-api-overview): interact with your database through a GraphQL interface.
+- [Realtime](/docs/guides/api#realtime-api-overview): listen to database changes over websockets.
 
 ## Direct connections
 
-Every Supabase project provides a full Postgres database. You can connect to the database using [any tool which supports Postgres](#integrations). You can find the connection string in the [Database settings](https://app.supabase.com/project/_/settings/database) inside the dashboard:
+Every Supabase project provides a full Postgres database. You can connect to the database using [any tool which supports Postgres](#integrations). You can find the connection string in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) inside the dashboard:
 
 1. Go to the `Settings` section.
 2. Click `Database`.
@@ -38,7 +38,7 @@ Every Supabase project provides a full Postgres database. You can connect to the
 
 ## Connection Pooler
 
-Every Supabase project comes with PgBouncer for connection pooling. A connection pooler is useful for managing a large number of _temporary_ connections. For example, if you are using [Prisma](/docs/guides/integrations/prisma), Drizzle, Kysely, or anything deployed to a Serverless environment (AWS Lambdas or Edge Functions). You can find the connection pool config in the [Database settings](https://app.supabase.com/project/_/settings/database) inside the dashboard:
+Every Supabase project comes with PgBouncer for connection pooling. A connection pooler is useful for managing a large number of _temporary_ connections. For example, if you are using [Prisma](/partners/integrations/prisma), Drizzle, Kysely, or anything deployed to a Serverless environment (AWS Lambdas or Edge Functions). You can find the connection pool config in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) inside the dashboard:
 
 1. Go to the `Settings` section.
 2. Click `Database`.
@@ -53,7 +53,7 @@ Every Supabase project comes with PgBouncer for connection pooling. A connection
 
 ## Choosing a connection method
 
-- The Serverless APIs provide programmatic access and have built-in connection pooling. You can use these for all browser and application interactions. We recommend using these wherever possible.
+- The Serverless APIs provide programmatic access and have [built-in connection pooling](https://postgrest.org/en/stable/references/connection_pool.html). You can use these for all browser and application interactions. We recommend using these wherever possible.
 - A "direct connection" is Postgres' native connection system. You should use this for tools which are always alive - usually installed on a long-running server, like Node.js, Ruby, Python, etc.
 - A "connection pooler" is a tool which keeps connections "alive". You should use this for serverless functions and tools which disconnect from the database frequently, like Prisma, Drizzle, Kysely, etc.
 
@@ -233,13 +233,13 @@ This is the most granular option. Connections are returned to the pool after eve
 
     <StepHikeCompact.Details title="SSL">
 
-    Navigate to the SSL tab and change the SSL mode to Require. Next navigate to the Root certificate input, it will open up a file-picker modal. Select the certificate you downloaded from your Supabase dashboard and save the server details. PgAdmin should now be able to connect to your Postgres via SSL.
+    Navigate to the Parameters tab and select connection parameter as Root Certificate. Next navigate to the Root certificate input, it will open up a file-picker modal. Select the certificate you downloaded from your Supabase dashboard and save the server details. PgAdmin should now be able to connect to your Postgres via SSL.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-     ![Add Connection Info.](/docs/img/guides/database/add-ssl-config.png)
+     ![Add Connection Info.](/docs/img/guides/database/add-ssl-config-parameter.png)
 
     </StepHikeCompact.Code>
 
@@ -267,7 +267,7 @@ psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-supabase.cer host=db.
 
     <StepHikeCompact.Details title="Install">
 
-    Install Drizzle and releated dependencies.
+    Install Postgres.js and releated dependencies.
 
     </StepHikeCompact.Details>
 
@@ -275,7 +275,6 @@ psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-supabase.cer host=db.
 
      ```shell
      npm i postgres
-     npm i -D drizzle-kit
      ```
 
     </StepHikeCompact.Code>

@@ -1,12 +1,12 @@
-import Link from 'next/link'
-import { FC, ReactNode } from 'react'
-import { isUndefined } from 'lodash'
-import { Menu, IconArrowUpRight, Badge, IconLogOut } from 'ui'
 import { useFlag } from 'hooks'
+import { isUndefined } from 'lodash'
+import Link from 'next/link'
+import { ReactNode } from 'react'
+import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
 import LayoutHeader from '../ProjectLayout/LayoutHeader'
 import { SidebarLink, SidebarSection } from './AccountLayout.types'
 
-interface Props {
+interface WithSidebarProps {
   title: string
   breadcrumbs: any[]
   sections: SidebarSection[]
@@ -27,7 +27,7 @@ The information hierarchy for WithSidebar is:
     SidebarItem
       SidebarLink
 */
-const WithSidebar: FC<Props> = ({
+const WithSidebar = ({
   title,
   header,
   breadcrumbs = [],
@@ -37,9 +37,10 @@ const WithSidebar: FC<Props> = ({
   subitemsParentKey,
   hideSidebar = false,
   customSidebarContent,
-}) => {
+}: WithSidebarProps) => {
   const noContent = !sections && !customSidebarContent
   const ongoingIncident = useFlag('ongoingIncident')
+  const navLayoutV2 = useFlag('navigationLayoutV2')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
   return (
@@ -89,7 +90,7 @@ const WithSidebar: FC<Props> = ({
         </div>
       )}
       <div className="flex flex-1 flex-col">
-        <LayoutHeader breadcrumbs={breadcrumbs} />
+        {!navLayoutV2 && <LayoutHeader breadcrumbs={breadcrumbs} />}
         <div className="flex-1 flex-grow overflow-auto">{children}</div>
       </div>
     </div>
@@ -103,11 +104,7 @@ interface SectionWithHeadersProps {
   subitemsParentKey?: number
 }
 
-const SectionWithHeaders: FC<SectionWithHeadersProps> = ({
-  section,
-  subitems,
-  subitemsParentKey,
-}) => (
+const SectionWithHeaders = ({ section, subitems, subitemsParentKey }: SectionWithHeadersProps) => (
   <div key={section.heading} className="border-b py-5 px-6 border-scale-500">
     {section.heading && <Menu.Group title={section.heading} />}
     {section.versionLabel && (
@@ -130,7 +127,7 @@ interface SidebarItemProps {
   subitemsParentKey?: number
 }
 
-const SidebarItem: FC<SidebarItemProps> = ({ links, subitems, subitemsParentKey }) => {
+const SidebarItem = ({ links, subitems, subitemsParentKey }: SidebarItemProps) => {
   return (
     <ul className="space-y-1">
       {links.map((link, i: number) => {
@@ -173,7 +170,7 @@ interface SidebarLinkProps extends SidebarLink {
   isSubitem?: boolean
 }
 
-const SidebarLinkItem: FC<SidebarLinkProps> = ({
+const SidebarLinkItem = ({
   id,
   label,
   href,
@@ -181,7 +178,7 @@ const SidebarLinkItem: FC<SidebarLinkProps> = ({
   isSubitem,
   isExternal,
   onClick,
-}) => {
+}: SidebarLinkProps) => {
   if (isUndefined(href)) {
     let icon
     if (isExternal) {
@@ -211,10 +208,7 @@ const SidebarLinkItem: FC<SidebarLinkProps> = ({
   return (
     <Link href={href || ''}>
       <a className="block" target={isExternal ? '_blank' : '_self'}>
-        <button
-          className="group flex max-w-full cursor-pointer items-center space-x-2 border-scale-500 py-1 font-normal outline-none ring-scale-1200 focus-visible:z-10 focus-visible:ring-1 group-hover:border-scale-900"
-          onClick={onClick || (() => {})}
-        >
+        <span className="group flex max-w-full cursor-pointer items-center space-x-2 border-scale-500 py-1 font-normal outline-none ring-scale-1200 focus-visible:z-10 focus-visible:ring-1 group-hover:border-scale-900">
           {isExternal && (
             <span className="truncate text-sm text-scale-900 transition group-hover:text-scale-1100">
               <IconArrowUpRight size={'tiny'} />
@@ -226,7 +220,7 @@ const SidebarLinkItem: FC<SidebarLinkProps> = ({
           >
             {isSubitem ? <p>{label}</p> : label}
           </span>
-        </button>
+        </span>
       </a>
     </Link>
   )

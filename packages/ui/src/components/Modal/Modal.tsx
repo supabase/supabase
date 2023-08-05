@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 // @ts-ignore
 import ModalStyles from './Modal.module.css'
 import { Button, IconX, Space } from './../../../index'
+import { cn } from '@ui/lib/utils'
 import { AnimationTailwindClasses } from '../../types'
 
 import * as Dialog from '@radix-ui/react-dialog'
@@ -129,7 +130,7 @@ const Modal = ({
         onClick={onConfirm}
         disabled={loading}
         loading={loading}
-        danger={variant === 'danger'}
+        type={variant === 'danger' ? 'danger' : 'primary'}
       >
         {confirmText}
       </Button>
@@ -188,9 +189,9 @@ const Modal = ({
   )
 }
 
-function Content({ children }: { children: React.ReactNode }) {
+function Content({ children, className }: { children: React.ReactNode; className?: string }) {
   const __styles = styleHandler('modal')
-  return <div className={__styles.content}>{children}</div>
+  return <div className={cn(__styles.content, className)}>{children}</div>
 }
 
 export function Separator() {

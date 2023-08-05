@@ -1,57 +1,78 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
-import { FC } from 'react'
-import { Button, Dropdown, IconMoreHorizontal, IconTrash } from 'ui'
 
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { checkPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { Member, Role } from 'types'
-
+import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { Member, Role } from 'types'
+import { Button, Dropdown, IconMoreHorizontal, IconTrash } from 'ui'
 import { isInviteExpired } from '../Organization.utils'
-import { getRolesManagementPermissions } from './TeamSettings.utils'
+import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 
-interface Props {
+interface MemberActionsProps {
   member: Member
   roles: Role[]
 }
 
-const MemberActions: FC<Props> = ({ member, roles }) => {
+const MemberActions = ({ member, roles }: MemberActionsProps) => {
   const { ui } = useStore()
   const { slug } = useParams()
-  const { rolesRemovable } = getRolesManagementPermissions(roles)
+  const selectedOrganization = useSelectedOrganization()
+  const { data: permissions } = usePermissionsQuery()
+  const { rolesRemovable } = useGetRolesManagementPermissions(
+    selectedOrganization?.id,
+    roles,
+    permissions ?? []
+  )
 
   const isExpired = isInviteExpired(member?.invited_at ?? '')
   const isPendingInviteAcceptance = member.invited_id
 
   const roleId = member.role_ids?.[0] ?? -1
   const canRemoveMember = rolesRemovable.includes((member?.role_ids ?? [-1])[0])
-  const canResendInvite = checkPermissions(PermissionAction.CREATE, 'user_invites', {
+  const canResendInvite = useCheckPermissions(PermissionAction.CREATE, 'user_invites', {
     resource: { role_id: roleId },
   })
-  const canRevokeInvite = checkPermissions(PermissionAction.DELETE, 'user_invites', {
+  const canRevokeInvite = useCheckPermissions(PermissionAction.DELETE, 'user_invites', {
     resource: { role_id: roleId },
   })
 
+  const { mutate: deleteOrganizationMember, isLoading: isOrganizationMemberDeleteLoading } =
+    useOrganizationMemberDeleteMutation({
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully removed ${member.primary_email}`,
+        })
+      },
+    })
+
   const {
-    mutateAsync: deleteOrganizationMemberAsync,
-    isLoading: isOrganizationMemberDeleteLoading,
-  } = useOrganizationMemberDeleteMutation({
-    onSuccess() {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully removed ${member.primary_email}`,
-      })
+    mutate: createOrganizationMemberInvite,
+    isLoading: isOrganizationMemberInviteCreateLoading,
+  } = useOrganizationMemberInviteCreateMutation({
+    onSuccess: () => {
+      ui.setNotification({ category: 'success', message: 'Resent the invitation.' })
     },
-    onError(error: any) {
+    onError: (error) => {
       ui.setNotification({
         category: 'error',
-        message: `Failed to delete user: ${error.message}`,
+        message: `Failed to resend invitation: ${error.message}`,
       })
+    },
+  })
+
+  const {
+    mutate: deleteOrganizationMemberInvite,
+    isLoading: isOrganizationMemberInviteDeleteLoading,
+  } = useOrganizationMemberInviteDeleteMutation({
+    onSuccess: () => {
+      ui.setNotification({ category: 'success', message: 'Successfully revoked the invitation.' })
     },
   })
 
@@ -60,39 +81,16 @@ const MemberActions: FC<Props> = ({ member, roles }) => {
       title: 'Confirm to remove',
       message: `This is permanent! Are you sure you want to remove ${member.primary_email}`,
       onAsyncConfirm: async () => {
-        if (!slug) {
-          throw new Error('slug is required')
-        }
-        if (!member.gotrue_id) {
-          throw new Error('gotrue_id is required')
-        }
-
-        await deleteOrganizationMemberAsync({
-          slug,
-          gotrueId: member.gotrue_id,
-        })
+        if (!slug) return console.error('slug is required')
+        if (!member.gotrue_id) return console.error('gotrue_id is required')
+        deleteOrganizationMember({ slug, gotrueId: member.gotrue_id })
       },
     })
   }
 
-  const {
-    mutate: createOrganizationMemberInvite,
-    isLoading: isOrganizationMemberInviteCreateLoading,
-  } = useOrganizationMemberInviteCreateMutation({
-    onSuccess() {
-      ui.setNotification({ category: 'success', message: 'Resent the invitation.' })
-    },
-    onError(error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to resend invitation: ${error.message}`,
-      })
-    },
-  })
-
-  async function handleResendInvite(member: Member) {
-    if (!member.invited_id || !slug) return
-
+  const handleResendInvite = async (member: Member) => {
+    if (!slug) return console.error('Slug is required')
+    if (!member.invited_id) return console.error('Member invited ID is required')
     const roleId = (member?.role_ids ?? [])[0]
     createOrganizationMemberInvite({
       slug,
@@ -102,37 +100,19 @@ const MemberActions: FC<Props> = ({ member, roles }) => {
     })
   }
 
-  const {
-    mutate: deleteOrganizationMemberInvite,
-    isLoading: isOrganizationMemberInviteDeleteLoading,
-  } = useOrganizationMemberInviteDeleteMutation({
-    onSuccess() {
-      ui.setNotification({ category: 'success', message: 'Successfully revoked the invitation.' })
-    },
-    onError(error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to revoke invitation: ${error.message}`,
-      })
-    },
-  })
-
-  function handleRevokeInvitation(member: Member) {
+  const handleRevokeInvitation = async (member: Member) => {
     const invitedId = member.invited_id
-    if (!invitedId || !slug) return
-
-    deleteOrganizationMemberInvite({
-      slug,
-      invitedId,
-    })
+    if (!slug) return console.error('Slug is required')
+    if (!invitedId) return console.error('Member invited ID is required')
+    deleteOrganizationMemberInvite({ slug, invitedId })
   }
 
   if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
     return (
       <div className="flex items-center justify-end">
         <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
-            <Button as="span" type="text" icon={<IconMoreHorizontal />} />
+          <Tooltip.Trigger asChild>
+            <Button type="text" icon={<IconMoreHorizontal />} />
           </Tooltip.Trigger>
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
@@ -198,12 +178,14 @@ const MemberActions: FC<Props> = ({ member, roles }) => {
         }
       >
         <Button
-          as="span"
+          asChild
           type="text"
           disabled={isLoading}
           loading={isLoading}
           icon={<IconMoreHorizontal />}
-        />
+        >
+          <span></span>
+        </Button>
       </Dropdown>
     </div>
   )

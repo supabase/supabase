@@ -1,4 +1,9 @@
+import dayjs from 'dayjs'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+
 import { useParams } from 'common'
+import AuthorizeRequesterDetails from 'components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
 import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
 import { FormPanel } from 'components/ui/Forms'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -6,10 +11,7 @@ import { useApiAuthorizationApproveMutation } from 'data/api-authorization/api-a
 import { useApiAuthorizationDeclineMutation } from 'data/api-authorization/api-authorization-decline-mutation'
 import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import dayjs from 'dayjs'
 import { useStore, withAuth } from 'hooks'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
 import { NextPageWithLayout } from 'types'
 import { Alert, Button, Listbox } from 'ui'
 
@@ -20,16 +22,25 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { auth_id } = useParams()
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedOrg, setSelectedOrg] = useState<string>()
 
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
   const { data: requester, isLoading, isError, error } = useApiAuthorizationQuery({ id: auth_id })
-  const isApproved = requester?.approved_at !== null
+  const isApproved = (requester?.approved_at ?? null) !== null
   const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
 
-  const { mutateAsync: approveRequest } = useApiAuthorizationApproveMutation()
-  const { mutateAsync: declineRequest } = useApiAuthorizationDeclineMutation()
+  const { mutate: approveRequest, isLoading: isApproving } = useApiAuthorizationApproveMutation({
+    onSuccess: (res) => {
+      window.location.href = res.url
+    },
+  })
+  const { mutate: declineRequest, isLoading: isDeclining } = useApiAuthorizationDeclineMutation({
+    onSuccess: () => {
+      ui.setNotification({ category: 'success', message: 'Declined API authorization request' })
+      router.push('/projects')
+    },
+  })
+  const isSubmitting = isApproving || isDeclining
 
   useEffect(() => {
     if (!isLoadingOrganizations) {
@@ -51,17 +62,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
       })
     }
 
-    try {
-      setIsSubmitting(true)
-      const res = await approveRequest({ id: auth_id, organization_id: selectedOrg })
-      router.push(res.url)
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to approve request: ${error.message}`,
-      })
-      setIsSubmitting(false)
-    }
+    approveRequest({ id: auth_id, organization_id: selectedOrg })
   }
 
   const onDeclineRequest = async () => {
@@ -71,18 +72,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
         message: 'Unable to decline request: auth_id is missing ',
       })
 
-    try {
-      setIsSubmitting(true)
-      await declineRequest({ id: auth_id })
-      ui.setNotification({ category: 'success', message: 'Declined API authorization request' })
-      router.push('/projects')
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to decline request: ${error.message}`,
-      })
-      setIsSubmitting(false)
-    }
+    declineRequest({ id: auth_id })
   }
 
   if (isLoading) {
@@ -170,30 +160,11 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     >
       <div className="w-full md:w-[500px] px-8 py-6 space-y-8">
         {/* API Authorization requester details */}
-
-        <div className="flex space-x-4">
-          <div>
-            <div className="rounded-md border border-scale-600 p-2.5 flex items-center">
-              <div
-                className="w-8 h-8 md:w-10 md:h-10 bg-center bg-no-repeat bg-cover flex items-center justify-center"
-                style={{
-                  backgroundImage: requester.icon !== null ? `url('${requester?.icon}')` : 'none',
-                }}
-              >
-                {requester?.icon === null && (
-                  <p className="text-scale-1000 text-lg">{requester?.name[0]}</p>
-                )}
-              </div>
-            </div>
-          </div>
-          <p className="text-sm text-scale-1100">
-            {requester?.name} ({requester?.domain}) is requesting API access to an organization. The
-            application will be able to{' '}
-            <span className="text-amber-1200">
-              read and write the organization's settings and all of its projects.
-            </span>
-          </p>
-        </div>
+        <AuthorizeRequesterDetails
+          icon={requester.icon}
+          name={requester.name}
+          domain={requester.domain}
+        />
 
         {/* Expiry warning */}
         {isExpired && (

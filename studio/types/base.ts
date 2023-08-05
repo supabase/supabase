@@ -22,6 +22,7 @@ export interface ProjectBase {
   region: string
   inserted_at: string
   subscription_id: string
+  preview_branch_refs: string[]
 }
 
 export interface Project extends ProjectBase {
@@ -30,8 +31,10 @@ export interface Project extends ProjectBase {
   dbVersion?: string
   kpsVersion?: string
   restUrl?: string
-  // store subscription tier products.metadata.supabase_prod_id
-  subscription_tier?: string
+  lastDatabaseResizeAt?: string | null
+  maxDatabasePreprovisionGb?: string | null
+  parent_project_ref?: string
+  is_branch_enabled?: boolean
 
   /**
    * postgrestStatus is available on client side only.
@@ -79,12 +82,14 @@ export interface Permission {
   resources: string[]
 }
 
-export interface ResponseError {
-  message: string
-}
-
 export interface ResponseFailure {
   error: ResponseError
 }
 
-export type SupaResponse<T> = T & ResponseFailure
+export type SupaResponse<T> = T | ResponseFailure
+
+export interface ResponseError {
+  code?: number
+  message: string
+  requestId?: string
+}

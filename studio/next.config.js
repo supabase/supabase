@@ -17,7 +17,9 @@ const path = require('path')
 const csp = [
   "frame-ancestors 'none';",
   // IS_PLATFORM
-  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? 'upgrade-insecure-requests;' : '',
+  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
+    ? 'upgrade-insecure-requests;'
+    : '',
 ]
   .filter(Boolean)
   .join(' ')
@@ -140,6 +142,31 @@ const nextConfig = {
         destination: '/org/:slug/general',
         permanent: true,
       },
+      {
+        source: '/project/:ref/settings/billing/update',
+        destination: '/project/:ref/settings/billing/subscription',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/update/free',
+        destination: '/project/:ref/settings/billing/subscription',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/update/pro',
+        destination: '/project/:ref/settings/billing/subscription',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/update/team',
+        destination: '/project/:ref/settings/billing/subscription',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/settings/billing/update/enterprise',
+        destination: '/project/:ref/settings/billing/subscription',
+        permanent: true,
+      },
     ]
   },
   async headers() {
@@ -176,7 +203,12 @@ const nextConfig = {
     ]
   },
   images: {
-    domains: ['github.com'],
+    domains: [
+      'github.com',
+      'avatars.githubusercontent.com',
+      'api-frameworks.vercel.sh',
+      'vercel.com',
+    ],
   },
   // Ref: https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
   experimental: {

@@ -1,17 +1,15 @@
 import { MDXProvider } from '@mdx-js/react'
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useRef, useState } from 'react'
-import { IconExternalLink } from 'ui'
+import { ExpandableVideo, IconExternalLink } from 'ui'
 import components from '~/components'
 import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import useHash from '~/hooks/useHash'
 import { LayoutMainContent } from '../DefaultLayout'
-import ExpandableVideo from 'ui/src/components/ExpandableVideo/ExpandableVideo'
 
 interface Props {
   meta: {
@@ -117,7 +115,7 @@ const Layout: FC<Props> = (props) => {
             ].join(' ')}
           >
             {props.meta.breadcrumb && (
-              <p className="text-brand-900 tracking-wider mb-3">{props.meta.breadcrumb}</p>
+              <p className="text-brand tracking-wider mb-3">{props.meta.breadcrumb}</p>
             )}
             <article
               ref={articleRef}
@@ -139,7 +137,7 @@ const Layout: FC<Props> = (props) => {
                   <div>
                     <a
                       href={`https://github.com/supabase/supabase/edit/master/apps/docs/pages${router.asPath}.mdx`}
-                      className="text-sm transition flex items-center gap-1 text-scale-1000 hover:text-scale-1200"
+                      className="text-sm transition flex items-center gap-1 text-scale-1000 hover:text-scale-1200 w-fit"
                     >
                       Edit this page on GitHub <IconExternalLink size={14} strokeWidth={1.5} />
                     </a>

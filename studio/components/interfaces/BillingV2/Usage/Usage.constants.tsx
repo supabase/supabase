@@ -1,7 +1,8 @@
 import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
 import { ProjectUsageData } from 'data/usage/project-usage-query'
 import Link from 'next/link'
-import { Badge, Button, IconExternalLink } from 'ui'
+import { Alert, Badge, Button, IconExternalLink } from 'ui'
+import { USAGE_APPROACHING_THRESHOLD } from '../Billing.constants'
 
 export const Y_DOMAIN_CEILING_MULTIPLIER = 4 / 3
 
@@ -25,6 +26,7 @@ export interface CategoryAttribute {
   description: string
   chartDescription: string
   additionalInfo?: (
+    ref: string,
     subscription?: ProjectSubscriptionResponse,
     usage?: ProjectUsageData
   ) => JSX.Element | null
@@ -47,11 +49,11 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
     attributes: [
       {
         anchor: 'cpu',
-        key: 'cpu_usage',
-        attribute: 'cpu_usage',
+        key: 'max_cpu_usage',
+        attribute: 'max_cpu_usage',
         name: 'CPU',
         unit: 'percentage',
-        description: 'CPU usage of your server',
+        description: 'Max CPU usage of your server',
         chartDescription: '',
         links: [
           {
@@ -59,6 +61,10 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
             url: 'https://supabase.com/docs/guides/platform/compute-add-ons',
           },
           { name: 'High CPU Usage', url: 'https://supabase.com/docs/guides/platform/exhaust-cpu' },
+          {
+            name: 'Metrics',
+            url: 'https://supabase.com/docs/guides/platform/metrics',
+          },
         ],
       },
       {
@@ -67,12 +73,18 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         attribute: 'ram_usage',
         name: 'Memory',
         unit: 'percentage',
-        description: 'Memory usage of your server',
+        description:
+          'Memory usage of your server.\nYou might observe elevated memory usage, even with little to no load. Besides Postgres, a wide range of services is running under the hood resulting in an elevated base memory usage.',
         chartDescription: '',
         links: [
           {
             name: 'Compute Add-Ons',
             url: 'https://supabase.com/docs/guides/platform/compute-add-ons',
+          },
+          { name: 'High RAM Usage', url: 'https://supabase.com/docs/guides/platform/exhaust-ram' },
+          {
+            name: 'Metrics',
+            url: 'https://supabase.com/docs/guides/platform/metrics',
           },
         ],
       },
@@ -84,8 +96,12 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         unit: 'percentage',
         links: [
           {
-            name: 'Documentation',
+            name: 'Disk Throughput and IOPS',
             url: 'https://supabase.com/docs/guides/platform/compute-add-ons#disk-throughput-and-iops',
+          },
+          {
+            name: 'Metrics',
+            url: 'https://supabase.com/docs/guides/platform/metrics',
           },
         ],
         description:
@@ -134,7 +150,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         chartPrefix: 'Average ',
         unit: 'bytes',
         description:
-          'Billing is based on the average daily database size in GB throughout the billing period.',
+          'Database size refers to the monthly average storage usage, as reported by Postgres. Paid plans use auto-scaling disks.\nBilling is based on the average daily database size used in GB throughout the billing period. Billing is independent of the provisioned disk size.',
         links: [
           {
             name: 'Documentation',
@@ -142,25 +158,71 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
           },
         ],
         chartDescription: 'The data refreshes every 24 hours.',
-        additionalInfo: (subscription?: ProjectSubscriptionResponse, usage?: ProjectUsageData) =>
-          subscription?.plan?.id !== 'free' ? (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <p className="text-sm">Disk size:</p>
-                <p className="text-sm">{usage?.disk_volume_size_gb} GB</p>
-                <Badge color="green" size="small">
-                  Auto-scaling
-                </Badge>
+        additionalInfo: (
+          ref: string,
+          subscription?: ProjectSubscriptionResponse,
+          usage?: ProjectUsageData
+        ) => {
+          const usageMeta = usage?.['db_size'] ?? undefined
+          const usageRatio =
+            typeof usageMeta !== 'number' ? (usageMeta?.usage ?? 0) / (usageMeta?.limit ?? 0) : 0
+          const hasLimit = usageMeta && usageMeta.limit > 0
+
+          const isApproachingLimit = hasLimit && usageRatio >= USAGE_APPROACHING_THRESHOLD
+          const isExceededLimit = hasLimit && usageRatio >= 1
+
+          return subscription?.plan?.id !== 'free' ? (
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <p className="text-sm">Disk size:</p>
+                  <p className="text-sm">{usage?.disk_volume_size_gb} GB</p>
+                  <Badge color="green" size="small">
+                    Auto-scaling
+                  </Badge>
+                </div>
+                <Link href="https://supabase.com/docs/guides/platform/database-usage#disk-management">
+                  <a>
+                    <Button size="tiny" type="default" icon={<IconExternalLink size={14} />}>
+                      What is disk size?
+                    </Button>
+                  </a>
+                </Link>
               </div>
-              <Link href="https://supabase.com/docs/guides/platform/database-usage#disk-management">
-                <a>
-                  <Button size="tiny" type="default" icon={<IconExternalLink size={14} />}>
-                    What is disk size?
-                  </Button>
-                </a>
-              </Link>
+              <p className="text-sm text-scale-1000 mt-3">
+                If you reach 95% of the disk space, your project will enter read-only mode. Your
+                disk storage expands automatically when the database reaches 90% of the disk size.
+                The disk is expanded to be 50% larger. Auto-scaling can only take place once every 6
+                hours. You can also{' '}
+                <Link passHref href={`/project/${ref}/settings/database#diskManagement`}>
+                  <a className="text-brand transition hover:text-brand-600">preprovision</a>
+                </Link>{' '}
+                disk for loading larger amounts of data.
+              </p>
             </div>
-          ) : null,
+          ) : (
+            <div>
+              {(isApproachingLimit || isExceededLimit) && (
+                <Alert
+                  withIcon
+                  variant={isExceededLimit ? 'danger' : 'warning'}
+                  title={
+                    isExceededLimit
+                      ? 'Exceeding database size limit'
+                      : 'Nearing database size limit'
+                  }
+                >
+                  <div className="flex w-full items-center flex-col justify-center space-y-2 md:flex-row md:justify-between">
+                    <div>
+                      When you reach your database size limit, your project can go into read-only
+                      mode. Please upgrade your plan.
+                    </div>
+                  </div>
+                </Alert>
+              )}
+            </div>
+          )
+        },
       },
       {
         anchor: 'storageSize',
@@ -170,8 +232,14 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         chartPrefix: 'Max ',
         unit: 'bytes',
         description:
-          'Sum of all objects in your storage buckets.\nBilling is based on the average size in GB throughout your billing period.',
+          'Sum of all objects in your storage buckets.\nBilling is based on the average daily size in GB throughout your billing period.',
         chartDescription: 'The data refreshes every 24 hours.',
+        links: [
+          {
+            name: 'Storage',
+            url: 'https://supabase.com/docs/guides/storage',
+          },
+        ],
       },
       {
         anchor: 'funcCount',
@@ -201,6 +269,12 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
           'Users who log in or refresh their token count towards MAU.\nBilling is based on the sum of distinct users requesting your API throughout the billing period. Resets every billing cycle.',
         chartDescription:
           'The data is refreshed over a period of 24 hours and resets at the beginning of every billing period.\nThe data points are relative to the beginning of your billing period.',
+        links: [
+          {
+            name: 'Auth',
+            url: 'https://supabase.com/docs/guides/auth',
+          },
+        ],
       },
       {
         anchor: 'mauSso',
@@ -212,6 +286,12 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
           'SSO users who log in or refresh their token count towards SSO MAU.\nBilling is based on the sum of distinct Single Sign-On users requesting your API throughout the billing period. Resets every billing cycle.',
         chartDescription:
           'The data refreshes over a period of 24 hours and resets at the beginning of every billing period.\nThe data points are relative to the beginning of your billing period.',
+        links: [
+          {
+            name: 'SSO with SAML 2.0',
+            url: 'https://supabase.com/docs/guides/auth/sso/auth-sso-saml',
+          },
+        ],
       },
       {
         anchor: 'storageImageTransformations',
@@ -220,9 +300,15 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         name: 'Storage Image Transformations',
         unit: 'absolute',
         description:
-          'We count all images that were transformed in the billing period, ignoring any transformations.\nUsage example: You transform one image with four different size transformations and another image with just a single transformations. It counts as two, as only two images were transformed.\nBilling is based on the count of (origin) images that used transformations throughout the billing period. Resets every billing cycle.',
+          'We count all images that were transformed in the billing period, ignoring any transformations.\nUsage example: You transform one image with four different size transformations and another image with just a single transformation. It counts as two, as only two images were transformed.\nBilling is based on the count of (origin) images that used transformations throughout the billing period. Resets every billing cycle.',
         chartDescription:
           'The data refreshes every 24 hours.\nThe data points are relative to the beginning of your billing period.',
+        links: [
+          {
+            name: 'Documentation',
+            url: 'https://supabase.com/docs/guides/storage/image-transformations',
+          },
+        ],
       },
       {
         anchor: 'functionInvocations',
@@ -233,6 +319,12 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         description:
           'Every serverless function invocation independent of response status is counted.\nBilling is based on the sum of all invocations throughout your billing period.',
         chartDescription: 'The data refreshes every 24 hours.',
+        links: [
+          {
+            name: 'Edge Functions',
+            url: 'https://supabase.com/docs/guides/functions',
+          },
+        ],
       },
       {
         anchor: 'realtimeMessageCount',
@@ -245,8 +337,8 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         chartDescription: 'The data refreshes every 24 hours.',
         links: [
           {
-            name: 'Realtime Rate Limits',
-            url: 'https://supabase.com/docs/guides/realtime/rate-limits',
+            name: 'Realtime Quotas',
+            url: 'https://supabase.com/docs/guides/realtime/quotas',
           },
         ],
       },
@@ -262,77 +354,11 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         chartDescription: 'The data refreshes every 24 hours.',
         links: [
           {
-            name: 'Realtime Rate Limits',
-            url: 'https://supabase.com/docs/guides/realtime/rate-limits',
+            name: 'Realtime Quotas',
+            url: 'https://supabase.com/docs/guides/realtime/quotas',
           },
         ],
       },
     ],
   },
 ]
-
-// [Joshen] Ideally live in common package for www as well
-export const COMPUTE_INSTANCE_SPECS: {
-  [key: string]: { maxBandwidth: number; baseBandwidth: number; memoryGb: number; cpuCores: number }
-} = {
-  addon_instance_micro: {
-    memoryGb: 1,
-    cpuCores: 2,
-    maxBandwidth: 2085,
-    baseBandwidth: 87,
-  },
-  addon_instance_small: {
-    memoryGb: 2,
-    cpuCores: 2,
-    maxBandwidth: 2085,
-    baseBandwidth: 174,
-  },
-  addon_instance_medium: {
-    memoryGb: 4,
-    cpuCores: 2,
-    maxBandwidth: 2085,
-    baseBandwidth: 347,
-  },
-  addon_instance_large: {
-    memoryGb: 8,
-    cpuCores: 2,
-    maxBandwidth: 4750,
-    baseBandwidth: 630,
-  },
-  addon_instance_xlarge: {
-    memoryGb: 16,
-    cpuCores: 4,
-    maxBandwidth: 4750,
-    baseBandwidth: 1188,
-  },
-  addon_instance_xxlarge: {
-    memoryGb: 32,
-    cpuCores: 8,
-    maxBandwidth: 4750,
-    baseBandwidth: 2375,
-  },
-  addon_instance_4xlarge: {
-    memoryGb: 64,
-    cpuCores: 16,
-    maxBandwidth: 4750,
-    baseBandwidth: 4750,
-  },
-  addon_instance_8xlarge: {
-    memoryGb: 128,
-    cpuCores: 32,
-    maxBandwidth: 9500,
-    baseBandwidth: 9500,
-  },
-  addon_instance_12xlarge: {
-    memoryGb: 192,
-    cpuCores: 48,
-    maxBandwidth: 14250,
-    baseBandwidth: 14250,
-  },
-  addon_instance_16xlarge: {
-    memoryGb: 256,
-    cpuCores: 64,
-    maxBandwidth: 19000,
-    baseBandwidth: 19000,
-  },
-}

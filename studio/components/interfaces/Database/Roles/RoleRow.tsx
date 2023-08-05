@@ -114,8 +114,8 @@ const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
                   {role.active_connections > 0 && (
                     <div className="relative h-2 w-2">
                       <span className="flex h-2 w-2">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-900 opacity-75"></span>
-                        <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-900 opacity-75"></span>
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75"></span>
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-brand opacity-75"></span>
                       </span>
                     </div>
                   )}
@@ -147,12 +147,9 @@ const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
                         </>
                       }
                     >
-                      <Button
-                        as="span"
-                        type="default"
-                        className="px-1"
-                        icon={<IconMoreVertical />}
-                      />
+                      <Button asChild type="default" className="px-1" icon={<IconMoreVertical />}>
+                        <span></span>
+                      </Button>
                     </Dropdown>
                   )}
                 </div>

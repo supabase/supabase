@@ -3,6 +3,7 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { subscriptionKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type ProjectAddonsVariables = {
   projectRef?: string
@@ -17,19 +18,18 @@ export type ProjectAddonVariant = {
   price_description: string
   price_interval: 'monthly' | 'hourly'
   price_type: 'fixed' | 'usage'
+  meta?: ProjectAddonVariantMeta
 }
 
-export interface ProjectAvailableAddonVariant extends ProjectAddonVariant {
-  meta?: {
-    cpu_cores?: number
-    cpu_dedicated?: boolean
-    baseline_disk_io_mbs?: number
-    max_disk_io_mbs?: number
-    memory_gb?: number
-    connections_direct?: number
-    connections_pooler?: number
-    backup_duration_days?: number
-  }
+export interface ProjectAddonVariantMeta {
+  cpu_cores?: number
+  cpu_dedicated?: boolean
+  baseline_disk_io_mbs?: number
+  max_disk_io_mbs?: number
+  memory_gb?: number
+  connections_direct?: number
+  connections_pooler?: number
+  backup_duration_days?: number
 }
 
 export type ProjectSelectedAddon = {
@@ -43,7 +43,7 @@ export type ProjectAddonsResponse = {
   available_addons: {
     name: string
     type: ProjectAddonType
-    variants: ProjectAvailableAddonVariant[]
+    variants: ProjectAddonVariant[]
   }[]
 }
 
@@ -60,7 +60,7 @@ export async function getProjectAddons(
 }
 
 export type ProjectAddonsData = Awaited<ReturnType<typeof getProjectAddons>>
-export type ProjectAddonsError = unknown
+export type ProjectAddonsError = ResponseError
 
 export const useProjectAddonsQuery = <TData = ProjectAddonsData>(
   { projectRef }: ProjectAddonsVariables,

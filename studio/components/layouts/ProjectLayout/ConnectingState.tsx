@@ -1,19 +1,19 @@
+import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
-import { FC, useEffect, useRef, useState } from 'react'
-import { observer } from 'mobx-react-lite'
+import { useEffect, useRef, useState } from 'react'
 import { Badge, Button, IconLoader, IconMonitor, IconServer, Modal } from 'ui'
 
-import { Project } from 'types'
-import { useStore } from 'hooks'
 import ShimmerLine from 'components/ui/ShimmerLine'
+import { setProjectPostgrestStatus } from 'data/projects/projects-query'
 import pingPostgrest from 'lib/pingPostgrest'
+import { Project } from 'types'
 
-interface Props {
+export interface ConnectingStateProps {
   project: Project
 }
 
-const ConnectingState: FC<Props> = ({ project }) => {
-  const { app } = useStore()
+const ConnectingState = ({ project }: ConnectingStateProps) => {
+  const queryClient = useQueryClient()
   const checkProjectConnectionIntervalRef = useRef<number>()
 
   const [showHelperButton, setShowHelperButton] = useState(false)
@@ -40,7 +40,7 @@ const ConnectingState: FC<Props> = ({ project }) => {
     const result = await pingPostgrest(project.ref, { kpsVersion: project.kpsVersion })
     if (result) {
       clearInterval(checkProjectConnectionIntervalRef.current)
-      app.onProjectPostgrestStatusUpdated(project.id, 'ONLINE')
+      setProjectPostgrestStatus(queryClient, project.ref, 'ONLINE')
     }
   }
 
@@ -106,13 +106,13 @@ const ConnectingState: FC<Props> = ({ project }) => {
               <p className="text-sm text-scale-1200">
                 Your project might be facing resource constraints and hence is having trouble
                 connecting. You can verify this by checking your{' '}
-                <span className="text-brand-1000">
+                <span className="text-brand-600">
                   <Link href={`/project/${project.ref}/settings/database`}>
                     <a>database's health</a>
                   </Link>
                 </span>{' '}
                 or your remaining daily disk IO budget via a{' '}
-                <span className="text-brand-1000">
+                <span className="text-brand-600">
                   <Link href={`/project/${project.ref}/reports`}>
                     <a>customizable project report</a>
                   </Link>
@@ -121,7 +121,7 @@ const ConnectingState: FC<Props> = ({ project }) => {
               </p>
               <p className="text-sm text-scale-1200">
                 If your project is facing resource constraints, you can{' '}
-                <span className="text-brand-1000">
+                <span className="text-brand-600">
                   <Link href={`/project/${project.ref}/reports`}>
                     <a>upgrade</a>
                   </Link>
@@ -131,7 +131,7 @@ const ConnectingState: FC<Props> = ({ project }) => {
               <p className="text-sm text-scale-1200">
                 However, if your project still fails to connect thereafter, you can open a support
                 ticket{' '}
-                <span className="text-brand-1000">
+                <span className="text-brand-600">
                   <Link href={`/support/new?ref=${project.ref}`}>here</Link>
                 </span>
                 .
@@ -144,4 +144,4 @@ const ConnectingState: FC<Props> = ({ project }) => {
   )
 }
 
-export default observer(ConnectingState)
+export default ConnectingState

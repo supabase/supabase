@@ -1,31 +1,37 @@
-import { FC, useState } from 'react'
-import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconPause } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
 
-import { checkPermissions, useStore } from 'hooks'
+import {
+  useIsProjectActive,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import { setProjectStatus } from 'data/projects/projects-query'
+import { useCheckPermissions, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import { Button, IconPause } from 'ui'
 
-interface Props {
-  projectId: number
-  projectRef: string
-}
+export interface PauseProjectButtonProps {}
 
-const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
-  const { ui, app } = useStore()
+const PauseProjectButton = () => {
+  const queryClient = useQueryClient()
+  const { ui } = useStore()
+  const { project } = useProjectContext()
   const router = useRouter()
+  const isProjectActive = useIsProjectActive()
   const [loading, setLoading] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const openModal = () => setIsModalOpen(true)
   const closeModal = () => setIsModalOpen(false)
 
-  const isPaused = ui?.selectedProject?.status === PROJECT_STATUS.INACTIVE
-  const canPauseProject = checkPermissions(
+  const projectRef = project?.ref ?? ''
+  const isPaused = project?.status === PROJECT_STATUS.INACTIVE
+  const canPauseProject = useCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_jobs.projects.pause'
   )
@@ -45,12 +51,11 @@ const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
       ui.setNotification({
         error: res.error,
         category: 'error',
-        message: 'Failed to pause project',
+        message: `Failed to pause project: ${res.error.message}`,
       })
       setLoading(false)
     } else {
-      app.onProjectPaused(projectId)
-      app.onProjectStatusUpdated(projectId, PROJECT_STATUS.GOING_DOWN)
+      setProjectStatus(queryClient, projectRef, PROJECT_STATUS.PAUSING)
 
       ui.setNotification({ category: 'success', message: 'Pausing project' })
       router.push(`/project/${projectRef}`)
@@ -67,26 +72,12 @@ const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
             icon={<IconPause />}
             onClick={openModal}
             loading={loading}
-            disabled={isPaused || !canPauseProject}
+            disabled={isPaused || !canPauseProject || !isProjectActive}
           >
             Pause Project
           </Button>
         </Tooltip.Trigger>
-        {isPaused ? (
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                  'border border-scale-200 ', //border
-                ].join(' ')}
-              >
-                <span className="text-xs text-scale-1200">Your project is already paused</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        ) : !canPauseProject ? (
+        {isPaused || !canPauseProject || !isProjectActive ? (
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -97,14 +88,18 @@ const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
                 ].join(' ')}
               >
                 <span className="text-xs text-scale-1200">
-                  You need additional permissions to pause this project
+                  {isPaused
+                    ? 'Your project is already paused'
+                    : !canPauseProject
+                    ? 'You need additional permissions to pause this project'
+                    : !isProjectActive
+                    ? 'Unable to pause project as project is not active'
+                    : ''}
                 </span>
               </div>
             </Tooltip.Content>
           </Tooltip.Portal>
-        ) : (
-          <></>
-        )}
+        ) : null}
       </Tooltip.Root>
       <ConfirmModal
         danger
@@ -118,6 +113,6 @@ const PauseProjectButton: FC<Props> = observer(({ projectRef, projectId }) => {
       />
     </>
   )
-})
+}
 
 export default PauseProjectButton

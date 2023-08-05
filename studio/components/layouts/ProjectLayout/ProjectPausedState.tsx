@@ -1,34 +1,38 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useState } from 'react'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { Modal, Button, IconPauseCircle } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore, useFlag } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { useParams } from 'common'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
-import { useParams } from 'common'
+import { setProjectStatus } from 'data/projects/projects-query'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { post } from 'lib/common/fetch'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { Button, IconPauseCircle, Modal } from 'ui'
+import { useProjectContext } from './ProjectContext'
 
 export interface ProjectPausedStateProps {
   product?: string
 }
 
 const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
-  const { ui, app } = useStore()
+  const queryClient = useQueryClient()
+  const { ui } = useStore()
   const { ref } = useParams()
-  const project = ui.selectedProject
-  const orgSlug = ui.selectedOrganization?.slug
+  const selectedOrganization = useSelectedOrganization()
+  const { project } = useProjectContext()
+  const orgSlug = selectedOrganization?.slug
 
-  const kpsEnabled = useFlag('initWithKps')
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug: orgSlug })
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
   const [showFreeProjectLimitWarning, setShowFreeProjectLimitWarning] = useState(false)
 
-  const canResumeProject = checkPermissions(
+  const canResumeProject = useCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_jobs.projects.initialize_or_resume'
   )
@@ -52,9 +56,18 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
       })
     }
 
-    await post(`${API_URL}/projects/${project.ref}/restore`, { kps_enabled: kpsEnabled })
-    app.onProjectUpdated({ ...project, status: PROJECT_STATUS.RESTORING })
-    ui.setNotification({ category: 'success', message: 'Restoring project' })
+    const { error } = await post(`${API_URL}/projects/${project.ref}/restore`, {})
+
+    if (error) {
+      ui.setNotification({
+        category: 'error',
+        error,
+        message: `Failed to restore project: ${error.message}`,
+      })
+    } else {
+      setProjectStatus(queryClient, project.ref, PROJECT_STATUS.RESTORING)
+      ui.setNotification({ category: 'success', message: 'Restoring project' })
+    }
   }
 
   return (
@@ -77,7 +90,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   {product !== undefined ? (
                     <>
                       Restore this project to access the{' '}
-                      <span className="text-brand-900">{product}</span> page
+                      <span className="text-brand">{product}</span> page
                     </>
                   ) : (
                     'Restore this project and get back to building the next big thing!'

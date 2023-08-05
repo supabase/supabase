@@ -592,11 +592,6 @@ module.exports = [
   },
   {
     permanent: false,
-    source: '/partners',
-    destination: '/partners/integrations',
-  },
-  {
-    permanent: false,
     source: '/learn-more',
     destination: '/?utm_source=event&utm_medium=billboard&utm_campaign=aws-atlanta',
   },
@@ -708,17 +703,17 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2020/12/02/case-study-monitoro',
-    destination: '/blog/case-study-monitoro',
+    destination: '/customers',
   },
   {
     permanent: true,
     source: '/blog/2020/12/02/case-study-tayfa',
-    destination: '/blog/case-study-tayfa',
+    destination: '/customers',
   },
   {
     permanent: true,
     source: '/blog/2020/12/02/case-study-xendit',
-    destination: '/blog/case-study-xendit',
+    destination: '/customers/xendit',
   },
   {
     permanent: true,
@@ -743,7 +738,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/02/09/case-study-roboflow',
-    destination: '/blog/case-study-roboflow',
+    destination: '/customers/roboflow',
   },
   {
     permanent: true,
@@ -763,7 +758,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/03/08/toad-a-link-shortener-with-simple-apis-for-low-coders',
-    destination: '/blog/toad-a-link-shortener-with-simple-apis-for-low-coders',
+    destination: '/customers',
   },
   {
     permanent: true,
@@ -853,7 +848,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/07/26/epsilon3-self-hosting',
-    destination: '/blog/epsilon3-self-hosting',
+    destination: '/customers/epsilon3',
   },
   {
     permanent: true,
@@ -868,7 +863,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/07/27/spot-flutter-with-postgres',
-    destination: '/blog/spot-flutter-with-postgres',
+    destination: '/customers',
   },
   {
     permanent: true,
@@ -878,7 +873,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/07/28/mobbin-supabase-200000-users',
-    destination: '/blog/mobbin-supabase-200000-users',
+    destination: '/customers/mobbin',
   },
   {
     permanent: true,
@@ -938,7 +933,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/10/19/replenysh-time-to-value-in-less-than-24-hours',
-    destination: '/blog/replenysh-time-to-value-in-less-than-24-hours',
+    destination: '/customers/replenysh',
   },
   {
     permanent: true,
@@ -1103,7 +1098,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2022/05/26/how-supabase-accelerates-development-of-all-pull-together',
-    destination: '/blog/how-supabase-accelerates-development-of-all-pull-together',
+    destination: '/customers',
   },
   {
     permanent: true,
@@ -1714,6 +1709,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/with-kotlin',
+    destination: '/docs/guides/getting-started/tutorials/with-kotlin',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/with-ionic-react',
     destination: '/docs/guides/getting-started/tutorials/with-ionic-react',
   },
@@ -1897,21 +1897,6 @@ module.exports = [
     source: '/docs/guides/resources/postgres/which-version-of-postgres',
     destination: '/docs/guides/database/postgres/which-version-of-postgres',
   },
-  {
-    permanent: true,
-    source: '/docs/guides/realtime/broadcast',
-    destination: '/docs/guides/realtime/extensions/broadcast',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/realtime/presence',
-    destination: '/docs/guides/realtime/extensions/presence',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/realtime/postgres-changes',
-    destination: '/docs/guides/realtime/extensions/postgres-changes',
-  },
   // Serverless APIs
   {
     permanent: true,
@@ -1938,14 +1923,14 @@ module.exports = [
     source: '/docs/support',
     destination: '/support',
   },
-  {
-    permanent: true,
-    source: '/docs/guides/cli/local-development',
-    destination: '/docs/guides/getting-started/local-development',
-  },
 
   // old case studies moved to /customers
 
+  {
+    permanent: true,
+    source: '/blog/tags/case-study',
+    destination: '/customers',
+  },
   {
     permanent: true,
     source: '/blog/case-study-monitoro',
@@ -1998,8 +1983,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/blog/how-supabase-accelerates-development-of-all-pull-together',
-    destination: '/customers',
+    source: '/blog/case-study-happyteams',
+    destination: '/customers/happyteams',
   },
   {
     permanent: true,
@@ -2020,5 +2005,250 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/functions/examples/openai',
     destination: '/docs/guides/ai/examples/openai',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/rate-limits',
+    destination: '/docs/guides/realtime/quotas',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/channels',
+    destination: '/docs/guides/realtime/concepts#channels',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/extensions',
+    destination: '/docs/guides/realtime/concepts',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/extensions/broadcast',
+    destination: '/docs/guides/realtime/broadcast',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/extensions/presence',
+    destination: '/docs/guides/realtime/presence',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/extensions/postgres-changes',
+    destination: '/docs/guides/realtime/postgres-changes',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/quickstart',
+    destination: '/docs/guides/realtime',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/extensions/pgcron',
+    destination: '/docs/guides/database/extensions/pg_cron',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/extensions/pgnet',
+    destination: '/docs/guides/database/extensions/pg_net',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/extensions/pgrepack',
+    destination: '/docs/guides/database/extensions/pg_repack',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/ai/structured-unstructured-embeddings',
+    destination: '/docs/guides/ai/structured-unstructured',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/ai/choosing-instance-type',
+    destination: '/docs/guides/ai/choosing-compute-addon',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/using-environment-variables-in-config',
+    destination: '/docs/guides/cli/managing-config',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/local-development',
+    destination: '/docs/guides/cli/local-development',
+  },
+  {
+    permanent: true,
+    source: '/blog/flutter-authentication-and-authorization-with-rls',
+    destination: '/blog/flutter-authorization-with-rls',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations',
+    destination: '/docs/guides/platform/marketplace',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/appsmith',
+    destination: '/partners/integrations/appsmith',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/auth0',
+    destination: '/partners/integrations/auth0',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/authsignal',
+    destination: '/partners/integrations/authsignal',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/bracket',
+    destination: '/partners/integrations/bracket',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/clerk',
+    destination: '/partners/integrations/clerk',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/cloudflare-workers',
+    destination: '/partners/integrations/cloudflare-workers',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/dhiwise',
+    destination: '/partners/integrations/dhiwise',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/directus',
+    destination: '/partners/integrations/directus',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/draftbit',
+    destination: '/partners/integrations/draftbit',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/estuary',
+    destination: '/partners/integrations/estuary',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/fezto',
+    destination: '/partners/integrations/fezto',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/flutterflow',
+    destination: '/partners/integrations/flutterflow',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/forestadmin',
+    destination: '/partners/integrations/forestadmin',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/illa',
+    destination: '/partners/integrations/illa',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/integrations',
+    destination: '/partners/integrations',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/keyri',
+    destination: '/partners/integrations/keyri',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/oauth-apps/authorize-an-oauth-app',
+    destination: '/docs/guides/platform/oauth-apps/authorize-an-oauth-app',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/oauth-apps/publish-an-oauth-app',
+    destination: '/docs/guides/platform/oauth-apps/publish-an-oauth-app',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/onesignal',
+    destination: '/partners/integrations/onesignal',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/passage',
+    destination: '/partners/integrations/passage',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/pgmustard',
+    destination: '/partners/integrations/pgmustard',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/picket',
+    destination: '/partners/integrations/picket',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/plasmic',
+    destination: '/partners/integrations/plasmic',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/polyscale',
+    destination: '/partners/integrations/polyscale',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/prisma',
+    destination: '/partners/integrations/prisma',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/sequin',
+    destination: '/partners/integrations/sequin',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/snaplet',
+    destination: '/partners/integrations/snaplet',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/stytch',
+    destination: '/partners/integrations/stytch',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/supertokens',
+    destination: '/partners/integrations/supertokens',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/vercel',
+    destination: '/partners/integrations/vercel',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/weweb',
+    destination: '/partners/integrations/weweb',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/zuplo',
+    destination: '/partners/integrations/zuplo',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/cli/config',
+    destination: '/docs/guides/cli/config',
   },
 ]

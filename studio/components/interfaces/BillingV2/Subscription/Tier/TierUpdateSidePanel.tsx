@@ -1,33 +1,44 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectPlansQuery } from 'data/subscriptions/project-plans-query'
 import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project-subscription-update-mutation'
-import { useStore } from 'hooks'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
+import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconCheck, IconExternalLink, Modal, SidePanel } from 'ui'
 import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
-import { plans as subscriptionsPlans } from 'shared-data/plans'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
 const TierUpdateSidePanel = () => {
   const { ui } = useStore()
-  const slug = ui.selectedOrganization?.slug
+  const router = useRouter()
+  const selectedOrganization = useSelectedOrganization()
+  const slug = selectedOrganization?.slug
   const { ref: projectRef } = useParams()
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showExitSurvey, setShowExitSurvey] = useState(false)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [showDowngradeError, setShowDowngradeError] = useState(false)
   const [selectedTier, setSelectedTier] = useState<'tier_free' | 'tier_pro' | 'tier_team'>()
+
+  const canUpdateSubscription = useCheckPermissions(
+    PermissionAction.BILLING_WRITE,
+    'stripe.subscriptions'
+  )
 
   const snap = useSubscriptionPageStateSnapshot()
   const visible = snap.panelKey === 'subscriptionPlan'
@@ -37,7 +48,18 @@ const TierUpdateSidePanel = () => {
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
-  const { mutateAsync: updateSubscriptionTier } = useProjectSubscriptionUpdateMutation()
+  const { mutate: updateSubscriptionTier, isLoading: isUpdating } =
+    useProjectSubscriptionUpdateMutation({
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully updated subscription to ${selectedTierMeta?.name}!`,
+        })
+        setSelectedTier(undefined)
+        onClose()
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+      },
+    })
 
   const availablePlans = plans ?? []
   const subscriptionAddons = addons?.selected_addons ?? []
@@ -51,6 +73,18 @@ const TierUpdateSidePanel = () => {
   useEffect(() => {
     if (visible) {
       setSelectedTier(undefined)
+      Telemetry.sendActivity(
+        {
+          activity: 'Side Panel Viewed',
+          source: 'Dashboard',
+          data: {
+            title: 'Change Subscription Plan',
+            section: 'Subscription plan',
+          },
+          projectRef,
+        },
+        router
+      )
     }
   }, [visible])
 
@@ -70,28 +104,11 @@ const TierUpdateSidePanel = () => {
       return ui.setNotification({ category: 'error', message: 'Please select a payment method' })
     }
 
-    try {
-      setIsSubmitting(true)
-      await updateSubscriptionTier({
-        projectRef,
-        tier: selectedTier,
-        paymentMethod: selectedPaymentMethod,
-      })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated subscription to ${selectedTierMeta?.name}!`,
-      })
-      setSelectedTier(undefined)
-      onClose()
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to update subscription: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+    updateSubscriptionTier({
+      projectRef,
+      tier: selectedTier,
+      paymentMethod: selectedPaymentMethod,
+    })
   }
 
   return (
@@ -107,7 +124,7 @@ const TierUpdateSidePanel = () => {
             <Link href="https://supabase.com/pricing">
               <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                  More information
+                  Pricing
                 </Button>
               </a>
             </Link>
@@ -121,7 +138,7 @@ const TierUpdateSidePanel = () => {
               const tierMeta = subscriptionsPlans.find((it) => it.id === plan.id)
               const price = planMeta?.price ?? 0
               const isDowngradeOption = planMeta?.change_type === 'downgrade'
-              const isCurrentPlan = planMeta?.is_current ?? false
+              const isCurrentPlan = planMeta?.id === subscription?.plan?.id
 
               if (plan.id === 'tier_enterprise') {
                 return <EnterpriseCard key={plan.id} plan={plan} isCurrentPlan={isCurrentPlan} />
@@ -138,13 +155,13 @@ const TierUpdateSidePanel = () => {
                 >
                   <div className="w-full">
                     <div className="flex items-center space-x-2">
-                      <p className={clsx('text-brand-900 text-sm uppercase')}>{plan.name}</p>
+                      <p className={clsx('text-brand text-sm uppercase')}>{plan.name}</p>
                       {isCurrentPlan ? (
                         <div className="text-xs bg-scale-500 text-scale-1000 rounded px-2 py-0.5">
                           Current plan
                         </div>
                       ) : plan.nameBadge ? (
-                        <div className="text-xs bg-brand-400 text-brand-900 rounded px-2 py-0.5">
+                        <div className="text-xs bg-brand-400 text-brand rounded px-2 py-0.5">
                           {plan.nameBadge}
                         </div>
                       ) : (
@@ -163,7 +180,7 @@ const TierUpdateSidePanel = () => {
                       <p className="text-scale-1000 text-sm">{tierMeta?.costUnit}</p>
                     </div>
                     <div className={clsx('flex mt-1 mb-4', !tierMeta?.warning && 'opacity-0')}>
-                      <div className="bg-scale-200 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
+                      <div className="bg-scale-200 text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
                         {tierMeta?.warning}
                       </div>
                     </div>
@@ -172,18 +189,58 @@ const TierUpdateSidePanel = () => {
                         Current plan
                       </Button>
                     ) : plan.id !== PRICING_TIER_PRODUCT_IDS.TEAM ? (
-                      <Button
-                        block
-                        // no self-serve downgrades from team plan right now
-                        disabled={
-                          plan.id !== PRICING_TIER_PRODUCT_IDS.TEAM &&
-                          ['team', 'enterprise'].includes(subscription?.plan?.id || '')
-                        }
-                        type={isDowngradeOption ? 'default' : 'primary'}
-                        onClick={() => setSelectedTier(plan.id as any)}
-                      >
-                        {isDowngradeOption ? 'Downgrade' : 'Upgrade'} to {plan.name}
-                      </Button>
+                      <Tooltip.Root delayDuration={0}>
+                        <Tooltip.Trigger asChild>
+                          <div>
+                            <Button
+                              block
+                              disabled={
+                                // no self-serve downgrades from team plan right now
+                                (plan.id !== PRICING_TIER_PRODUCT_IDS.TEAM &&
+                                  ['team', 'enterprise'].includes(subscription?.plan?.id || '')) ||
+                                !canUpdateSubscription
+                              }
+                              type={isDowngradeOption ? 'default' : 'primary'}
+                              onClick={() => {
+                                setSelectedTier(plan.id as any)
+                                Telemetry.sendActivity(
+                                  {
+                                    activity: 'Popup Viewed',
+                                    source: 'Dashboard',
+                                    data: {
+                                      title: isDowngradeOption
+                                        ? 'Downgrade'
+                                        : 'Upgrade' + ' to ' + plan.name,
+                                      section: 'Subscription plan',
+                                    },
+                                    projectRef,
+                                  },
+                                  router
+                                )
+                              }}
+                            >
+                              {isDowngradeOption ? 'Downgrade' : 'Upgrade'} to {plan.name}
+                            </Button>
+                          </div>
+                        </Tooltip.Trigger>
+                        {!canUpdateSubscription ? (
+                          <Tooltip.Portal>
+                            <Tooltip.Content side="bottom">
+                              <Tooltip.Arrow className="radix-tooltip-arrow" />
+                              <div
+                                className={[
+                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                  'border border-scale-200',
+                                ].join(' ')}
+                              >
+                                <span className="text-xs text-scale-1200">
+                                  You do not have permission to change the subscription plan.
+                                </span>
+                              </div>
+                            </Tooltip.Content>
+                          </Tooltip.Portal>
+                        ) : null}
+                      </Tooltip.Root>
                     ) : (
                       <Link href={plan.href} passHref className="hidden md:block">
                         <a target="_blank">
@@ -201,7 +258,7 @@ const TierUpdateSidePanel = () => {
                         <li key={feature} className="flex py-2">
                           <div className="w-[12px]">
                             <IconCheck
-                              className="h-3 w-3 text-brand-900 translate-y-[2.5px]"
+                              className="h-3 w-3 text-brand translate-y-[2.5px]"
                               aria-hidden="true"
                               strokeWidth={3}
                             />
@@ -269,7 +326,7 @@ const TierUpdateSidePanel = () => {
       </Modal>
 
       <Modal
-        loading={isSubmitting}
+        loading={isUpdating}
         alignFooter="right"
         className="!w-[450px]"
         visible={selectedTier !== undefined && selectedTier !== 'tier_free'}

@@ -16,7 +16,7 @@ import {
   UseAiChatOptions,
 } from 'ui'
 
-import { cn } from '../../../utils/cn'
+import { cn } from './../../../lib/utils'
 import { AiIcon, AiIconChat } from '../Command.icons'
 import { CommandItem, useAutoInputFocus, useHistoryKeys } from '../Command.utils'
 import { useCommandMenu } from '../CommandMenuProvider'

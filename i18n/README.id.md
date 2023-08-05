@@ -12,9 +12,9 @@
 - [x] Basis Data Postgres yang dihosting. [Dokumen](https://supabase.com/docs/guides/database)
 - [x] Otentikasi dan Otorisasi. [Dokumen](https://supabase.com/docs/guides/auth)
 - [x] API yang dibuat secara otomatis.
-  - [x] REST. [Documents](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Documents](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Langganan realtime. [Documents](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Documents](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Documents](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Langganan realtime. [Documents](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Fungsi-fungsi.
   - [x] Fungsi-fungsi Basis Data. [Documents](https://supabase.com/docs/guides/database/functions)
   - [x] Fungsi Tepi [Documents](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Untuk dokumentasi lengkap, kunjungi [supabase.com/docs](https://supabase.com/docs)
 
-Untuk melihat bagaimana cara berkontribusi, kunjungi [Memulai](./DEVELOPERS.md)
+Untuk melihat bagaimana cara berkontribusi, kunjungi [Memulai](../DEVELOPERS.md)
 
 ## Komunitas &amp; Dukungan
 
@@ -39,7 +39,7 @@ Untuk melihat bagaimana cara berkontribusi, kunjungi [Memulai](./DEVELOPERS.md)
 ## Status
 
 - [x] Alpha: Kami sedang menguji Supabase dengan sekumpulan pelanggan tertutup
-- [x] Alpha Publik: Siapa pun dapat mendaftar di [app.supabase.com](https://app.supabase.com). Tapi jangan khawatir, ada beberapa hal yang perlu diperhatikan
+- [x] Alpha Publik: Siapa pun dapat mendaftar di [supabase.com/dashboard](https://supabase.com/dashboard). Tapi jangan khawatir, ada beberapa hal yang perlu diperhatikan
 - [x] Public Beta: Cukup stabil untuk sebagian besar kasus penggunaan non-perusahaan
 - [Publik: Ketersediaan Umum [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabase adalah kombinasi dari alat sumber terbuka. Kami membangun fitur-fitur F
 
 **Arsitektur**
 
-Supabase adalah [platform yang di-host](https://app.supabase.com). Anda bisa mendaftar dan mulai menggunakan Supabase tanpa menginstal apa pun.
+Supabase adalah [platform yang di-host](https://supabase.com/dashboard). Anda bisa mendaftar dan mulai menggunakan Supabase tanpa menginstal apa pun.
 Anda juga bisa [menghosting sendiri](https://supabase.com/docs/guides/hosting/overview) dan [mengembangkan secara lokal](https://supabase.com/docs/guides/local-development).
 
 ![Arsitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)

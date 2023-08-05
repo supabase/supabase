@@ -16,7 +16,7 @@ import {
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { VaultSecret } from 'types'
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
 
 interface Props {
@@ -33,7 +33,7 @@ const SecretRow: FC<Props> = ({ secret, onSelectEdit, onSelectRemove }) => {
   const [revealedValue, setRevealedValue] = useState<string>()
   const name = secret?.name ?? 'No name provided'
 
-  const canManageSecrets = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canManageSecrets = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const revealSecret = async () => {
     setIsLoading(true)
@@ -66,11 +66,11 @@ const SecretRow: FC<Props> = ({ secret, onSelectEdit, onSelectRemove }) => {
           <IconKey
             size={14}
             strokeWidth={2}
-            className="text-scale-1000 transition group-hover:text-brand-900"
+            className="text-scale-1000 transition group-hover:text-brand"
           />
           <Link href={`/project/${ref}/settings/vault/keys?id=${secret.key_id}`}>
             <a
-              className="text-scale-1100 font-mono text-xs cursor-pointer transition group-hover:text-brand-900"
+              className="text-scale-1100 font-mono text-xs cursor-pointer transition group-hover:text-brand"
               title={secret.key_id}
             >
               {secret.key_id}
@@ -170,7 +170,9 @@ const SecretRow: FC<Props> = ({ secret, onSelectEdit, onSelectRemove }) => {
             </>
           }
         >
-          <Button as="span" type="text" className="px-1" icon={<IconMoreVertical />} />
+          <Button asChild type="text" className="px-1" icon={<IconMoreVertical />}>
+            <span></span>
+          </Button>
         </Dropdown>
       </div>
     </div>

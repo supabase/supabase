@@ -1,44 +1,42 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import clsx from 'clsx'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { FC, useState, useEffect } from 'react'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Alert,
-  IconTerminal,
-  IconMinimize2,
-  IconMaximize2,
   Button,
-  Modal,
   Form,
-  Toggle,
-  Input,
   IconExternalLink,
+  IconMaximize2,
+  IconMinimize2,
+  IconTerminal,
+  Input,
+  Modal,
+  Toggle,
 } from 'ui'
 
-import { useStore, checkPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
-import Panel from 'components/ui/Panel'
-import CommandRender from '../CommandRender'
-import { generateCLICommands } from './EdgeFunctionDetails.utils'
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
-import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import {
+  FormActions,
   FormHeader,
   FormPanel,
-  FormActions,
   FormSection,
-  FormSectionLabel,
   FormSectionContent,
+  FormSectionLabel,
 } from 'components/ui/Forms'
+import Panel from 'components/ui/Panel'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import clsx from 'clsx'
+import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
+import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
+import { useCheckPermissions, useStore } from 'hooks'
+import CommandRender from '../CommandRender'
+import { generateCLICommands } from './EdgeFunctionDetails.utils'
 
-interface Props {}
-
-const EdgeFunctionDetails: FC<Props> = () => {
+const EdgeFunctionDetails = () => {
   const router = useRouter()
   const { ui } = useStore()
   const { ref: projectRef, functionSlug } = useParams()
@@ -47,11 +45,19 @@ const EdgeFunctionDetails: FC<Props> = () => {
 
   const { data: settings } = useProjectApiQuery({ projectRef })
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
-  const { mutateAsync: updateEdgeFunction } = useEdgeFunctionUpdateMutation()
-  const { mutateAsync: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation()
+  const { mutateAsync: updateEdgeFunction, isLoading: isUpdating } = useEdgeFunctionUpdateMutation()
+  const { mutate: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully deleted "${selectedFunction?.name}"`,
+      })
+      router.push(`/project/${projectRef}/functions`)
+    },
+  })
 
   const formId = 'edge-function-update-form'
-  const canUpdateEdgeFunction = checkPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
+  const canUpdateEdgeFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
   // Get the API service
   const apiService = settings?.autoApiService
@@ -68,10 +74,9 @@ const EdgeFunctionDetails: FC<Props> = () => {
     anonKey
   )
 
-  const onUpdateFunction = async (values: any, { setSubmitting, resetForm }: any) => {
+  const onUpdateFunction = async (values: any, { resetForm }: any) => {
     if (!projectRef) return console.error('Project ref is required')
     if (selectedFunction === undefined) return console.error('No edge function selected')
-    setSubmitting(true)
 
     try {
       await updateEdgeFunction({
@@ -81,40 +86,25 @@ const EdgeFunctionDetails: FC<Props> = () => {
       })
       resetForm({ values, initialValues: values })
       ui.setNotification({ category: 'success', message: `Successfully updated edge function` })
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to update edge function: ${error.message}`,
-      })
-    } finally {
-      setSubmitting(false)
-    }
+    } catch (error) {}
   }
 
   const onConfirmDelete = async () => {
     if (!projectRef) return console.error('Project ref is required')
     if (selectedFunction === undefined) return console.error('No edge function selected')
-
-    try {
-      await deleteEdgeFunction({ projectRef, slug: selectedFunction.slug })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully deleted "${selectedFunction.name}"`,
-      })
-      router.push(`/project/${projectRef}/functions`)
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete function: ${error.message}`,
-      })
-    }
+    deleteEdgeFunction({ projectRef, slug: selectedFunction.slug })
   }
+
+  const hasImportMap = useMemo(
+    () => selectedFunction?.import_map || selectedFunction?.import_map_path,
+    [selectedFunction]
+  )
 
   return (
     <>
       <div className="space-y-4 pb-16">
         <Form id={formId} initialValues={{}} onSubmit={onUpdateFunction}>
-          {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
+          {({ handleReset, values, initialValues, resetForm }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
             // [Alaister] although this "technically" is breaking the rules of React hooks
@@ -138,7 +128,7 @@ const EdgeFunctionDetails: FC<Props> = () => {
                     <div className="flex py-4 px-8">
                       <FormActions
                         form={formId}
-                        isSubmitting={isSubmitting}
+                        isSubmitting={isUpdating}
                         hasChanges={hasChanges}
                         handleReset={handleReset}
                         helper={
@@ -191,19 +181,15 @@ const EdgeFunctionDetails: FC<Props> = () => {
                         <div className="flex items-center space-x-2">
                           <p className="text-sm">
                             Import maps are{' '}
-                            <span
-                              className={clsx(
-                                selectedFunction?.import_map ? 'text-brand-900' : 'text-amber-900'
-                              )}
-                            >
-                              {selectedFunction?.import_map ? 'allowed' : 'disallowed'}
+                            <span className={clsx(hasImportMap ? 'text-brand' : 'text-amber-900')}>
+                              {hasImportMap ? 'used' : 'not used'}
                             </span>{' '}
                             for this function
                           </p>
                         </div>
                         <p className="text-sm text-scale-1000">
-                          Import maps allow the use of bare specifiers without having to install the
-                          Node.js package locally
+                          Import maps allow the use of bare specifiers in functions instead of
+                          explicit import URLs
                         </p>
                         <div className="!mt-4">
                           <Link href="https://supabase.com/docs/guides/functions/import-maps">

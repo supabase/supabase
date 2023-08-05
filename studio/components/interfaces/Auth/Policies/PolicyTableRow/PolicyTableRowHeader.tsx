@@ -5,7 +5,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Badge, Button, IconLock } from 'ui'
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 
 interface Props {
   table: PostgresTable
@@ -22,8 +22,8 @@ const PolicyTableRowHeader: FC<Props> = ({
 }) => {
   const router = useRouter()
   const { ref } = router.query
-  const canToggleRLS = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-  const canCreatePolicies = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
+  const canToggleRLS = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
 
   return (
     <div id={table.id.toString()} className="flex w-full items-center justify-between">

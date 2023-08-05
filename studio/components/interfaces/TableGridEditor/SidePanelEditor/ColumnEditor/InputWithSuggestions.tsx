@@ -104,9 +104,8 @@ const InputWithSuggestions: FC<Props> = ({
               }
             >
               <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
+                <Tooltip.Trigger asChild>
                   <Button
-                    as="span"
                     type="default"
                     className="!px-1 mr-1"
                     icon={<IconList strokeWidth={1.5} />}

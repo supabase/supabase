@@ -3,17 +3,13 @@ import { Button, Modal } from 'ui'
 import { TIER_QUERY_LIMITS } from '.'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useFlag } from 'hooks'
-import { StripeSubscription } from 'components/interfaces/Billing'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 
 interface Props {
   show: boolean
   setShowUpgradePrompt: (value: boolean) => void
-  subscription: StripeSubscription | undefined
 }
 
-const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt, subscription }) => {
+const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
   const router = useRouter()
   const { ref } = router.query
 

@@ -114,7 +114,13 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                 >
                   {item.examples &&
                     item.examples.map((example, exampleIndex) => {
-                      const exampleString = ''
+                      const exampleString =
+                        '' +
+                        (example.code &&
+                          example.code
+                            .trim()
+                            .replace(/^```.*/, '')
+                            .replace(/```$/, ''))
 
                       const codeBlockLang = example?.code?.startsWith('```js')
                         ? 'js'
@@ -133,7 +139,6 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                       // // Create a single supabase client for interacting with your database
                       // const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
                       // `
-                      const currentExampleId = example.id
                       const staticExample = item.examples[exampleIndex]
 
                       const response = staticExample.response
@@ -152,15 +157,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                             language={codeBlockLang}
                             hideLineNumbers={true}
                           >
-                            {exampleString +
-                              (example.code &&
-                                example.code
-                                  .replace(/```/g, '')
-                                  .replace('js', '')
-                                  .replace('ts', '')
-                                  .replace('dart', '')
-                                  .replace('c#', '')
-                                  .replace('kotlin', ''))}
+                            {exampleString}
                           </CodeBlock>
 
                           {((tables && tables.length > 0) || sql) && (
@@ -177,7 +174,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                                       <div className="bg-scale-300 border rounded prose max-w-none">
                                         <div className="bg-scale-200 px-5 py-2">
                                           <div className="flex gap-2 items-center">
-                                            <div className="text-brand-900">
+                                            <div className="text-brand">
                                               <IconDatabase size={16} />
                                             </div>
                                             <h5 className="text-xs text-scale-1200">

@@ -1,16 +1,15 @@
-import { useState } from 'react'
-import { Input, Button, Modal, Form, Alert, IconChevronDown, Dropdown, IconExternalLink } from 'ui'
-import { useStore } from 'hooks'
-import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
+import { useState } from 'react'
+import { Alert, Button, Dropdown, Form, IconChevronDown, IconExternalLink, Input, Modal } from 'ui'
+
+import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 
 export interface NewAccessTokenButtonProps {
   onCreateToken: (token: any) => void
 }
 
 const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonProps) => {
-  const { ui } = useStore()
   const [isOpen, setIsOpen] = useState(false)
   const [tokenScope, setTokenScope] = useState<'V0' | undefined>(undefined)
 
@@ -20,23 +19,15 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
     return errors
   }
 
-  const { mutateAsync: createAccessToken } = useAccessTokenCreateMutation()
-
-  async function onFormSubmit(values: any, { setSubmitting }: any) {
-    setSubmitting(true)
-
-    try {
-      const response = await createAccessToken({ name: values.tokenName, scope: tokenScope })
-      onCreateToken(response)
-      setSubmitting(false)
+  const { mutate: createAccessToken, isLoading } = useAccessTokenCreateMutation({
+    onSuccess: (res) => {
+      onCreateToken(res)
       setIsOpen(false)
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create token: ${error.message}`,
-      })
-      setSubmitting(false)
-    }
+    },
+  })
+
+  const onFormSubmit = async (values: any) => {
+    createAccessToken({ name: values.tokenName, scope: tokenScope })
   }
 
   return (
@@ -71,10 +62,13 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
               ]}
             >
               <Button
+                asChild
                 type="primary"
                 className="rounded-l-none px-[4px] py-[5px]"
                 icon={<IconChevronDown />}
-              />
+              >
+                <span></span>
+              </Button>
             </Dropdown>
           </div>
         </div>
@@ -100,7 +94,7 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
           onSubmit={onFormSubmit}
           validate={validate}
         >
-          {({ isSubmitting }: { isSubmitting: boolean }) => (
+          {() => (
             <div className="py-3 space-y-4">
               {tokenScope === 'V0' && (
                 <Modal.Content>
@@ -136,10 +130,10 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
               <Modal.Separator />
               <Modal.Content>
                 <div className="flex items-center space-x-2 justify-end">
-                  <Button type="default" disabled={isSubmitting} onClick={() => setIsOpen(false)}>
+                  <Button type="default" disabled={isLoading} onClick={() => setIsOpen(false)}>
                     Cancel
                   </Button>
-                  <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
+                  <Button htmlType="submit" loading={isLoading} disabled={isLoading}>
                     Generate token
                   </Button>
                 </div>

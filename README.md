@@ -12,9 +12,9 @@
 - [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
 - [x] Authentication and Authorization. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Auto-generated APIs.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Functions.
   - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
@@ -40,7 +40,7 @@ To see how to Contribute, visit [Getting Started](./DEVELOPERS.md)
 ## Status
 
 - [x] Alpha: We are testing Supabase with a closed set of customers
-- [x] Public Alpha: Anyone can sign up over at [app.supabase.com](https://app.supabase.com). But go easy on us, there are a few kinks
+- [x] Public Alpha: Anyone can sign up over at [supabase.com/dashboard](https://supabase.com/dashboard). But go easy on us, there are a few kinks
 - [x] Public Beta: Stable enough for most non-enterprise use-cases
 - [ ] Public: General Availability [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -56,7 +56,7 @@ Supabase is a combination of open source tools. We’re building the features of
 
 **Architecture**
 
-Supabase is a [hosted platform](https://app.supabase.com). You can sign up and start using Supabase without installing anything.
+Supabase is a [hosted platform](https://supabase.com/dashboard). You can sign up and start using Supabase without installing anything.
 You can also [self-host](https://supabase.com/docs/guides/hosting/overview) and [develop locally](https://supabase.com/docs/guides/local-development).
 
 ![Architecture](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
@@ -67,7 +67,7 @@ You can also [self-host](https://supabase.com/docs/guides/hosting/overview) and 
 - [pg_graphql](http://github.com/supabase/pg_graphql/) a PostgreSQL extension that exposes a GraphQL API
 - [Storage](https://github.com/supabase/storage-api) provides a RESTful interface for managing Files stored in S3, using Postgres to manage permissions.
 - [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
-- [GoTrue](https://github.com/netlify/gotrue) is an SWT based API for managing users and issuing SWT tokens.
+- [GoTrue](https://github.com/supabase/gotrue) is an JWT based API for managing users and issuing JWT tokens.
 - [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
 
 #### Client libraries
@@ -260,4 +260,3 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 - [Ukrainian / Українська](/i18n/README.uk.md)
 - [Vietnamese / Tiếng Việt](/i18n/README.vi-vn.md)
 - [List of translations](/i18n/languages.md) <!--- Keep only this -->
-

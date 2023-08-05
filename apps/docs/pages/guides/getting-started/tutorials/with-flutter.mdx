@@ -3,6 +3,7 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   title: 'Build a User Management App with Flutter',
   description: 'Learn how to use Supabase in your Flutter App.',
+  tocVideo: 'r7ysVtZ5Row',
 }
 
 <QuickstartIntro />
@@ -34,49 +35,33 @@ Then let's install the only additional dependency: [`supabase_flutter`](https://
 Copy and paste the following line in your pubspec.yaml to install the package:
 
 ```yaml
-supabase_flutter: ^1.0.0
+supabase_flutter: ^1.10.3
 ```
 
 Run `flutter pub get` to install the dependencies.
 
 ### Setup deep links
 
-Now that we have the dependencies installed let's setup deep links so users who have logged in via magic link or OAuth can come back to the app.
+Now that we have the dependencies installed let's setup deep links.
+Setting up deep links is required to bring back the user to the app when they click on the magic link to sign in.
+We can setup deep links with just a minor tweak on our Flutter application.
 
-Add `io.supabase.flutterquickstart://login-callback/` as a new [redirect URL](https://app.supabase.com/project/_/auth/url-configuration) in the Dashboard.
+We will use `io.supabase.flutterquickstart` as the scheme, and `login-callback` as the host for our deep link in this example, but you can change it to whatever you would like.
+
+First, add `io.supabase.flutterquickstart://login-callback/` as a new [redirect URL](https://supabase.com/dashboard/project/_/auth/url-configuration) in the Dashboard.
 
 ![Supabase console deep link setting](/docs/img/deeplink-setting.png)
 
 That is it on Supabase's end and the rest are platform specific settings:
 
-For Android, edit the `android/app/src/main/AndroidManifest.xml` file.
-
-Add an intent-filter to enable deep linking:
-
-```xml android/app/src/main/AndroidManifest.xml
-<manifest ...>
-  <!-- ... other tags -->
-  <application ...>
-    <activity ...>
-      <!-- ... other tags -->
-
-      <!-- Add this intent-filter for Deep Links -->
-      <intent-filter>
-        <action android:name="android.intent.action.VIEW" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.BROWSABLE" />
-        <!-- Accepts URIs that begin with YOUR_SCHEME://YOUR_HOST -->
-        <data
-          android:scheme="io.supabase.flutterquickstart"
-          android:host="login-callback" />
-      </intent-filter>
-
-    </activity>
-  </application>
-</manifest>
-```
-
-For iOS, edit the ios/Runner/Info.plist file.
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="ios"
+>
+<TabPanel id="ios" label="iOS">
+Edit the `ios/Runner/Info.plist` file.
 
 Add CFBundleURLTypes to enable deep linking:
 
@@ -103,9 +88,40 @@ Add CFBundleURLTypes to enable deep linking:
 </plist>
 ```
 
-For web:
+</TabPanel>
+<TabPanel id="android" label="Android">
+Edit the `android/app/src/main/AndroidManifest.xml` file.
 
+Add an intent-filter to enable deep linking:
+
+```xml android/app/src/main/AndroidManifest.xml
+<manifest ...>
+  <!-- ... other tags -->
+  <application ...>
+    <activity ...>
+      <!-- ... other tags -->
+
+      <!-- Add this intent-filter for Deep Links -->
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <!-- Accepts URIs that begin with YOUR_SCHEME://YOUR_HOST -->
+        <data
+          android:scheme="io.supabase.flutterquickstart"
+          android:host="login-callback" />
+      </intent-filter>
+
+    </activity>
+  </application>
+</manifest>
+```
+
+</TabPanel>
+<TabPanel id="web" label="Web">
 There are no additional configurations.
+</TabPanel>
+</Tabs>
 
 ### Main function
 
@@ -115,43 +131,18 @@ These variables will be exposed on the app, and that's completely fine since we 
 
 ```dart lib/main.dart
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
   await Supabase.initialize(
     url: 'YOUR_SUPABASE_URL',
     anonKey: 'YOUR_SUPABASE_ANON_KEY',
+    authFlowType: AuthFlowType.pkce,
   );
   runApp(MyApp());
 }
-```
-
-### Setting up some constants and handy functions
-
-Let's also create a constant file to make it easier to use Supabase client.
-We will also include an extension method declaration to call `showSnackBar` with one line of code.
-
-```dart lib/constants.dart
-import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 final supabase = Supabase.instance.client;
-
-extension ShowSnackBar on BuildContext {
-  void showSnackBar({
-    required String message,
-    Color backgroundColor = Colors.white,
-  }) {
-    ScaffoldMessenger.of(this).showSnackBar(SnackBar(
-      content: Text(message),
-      backgroundColor: backgroundColor,
-    ));
-  }
-
-  void showErrorSnackBar({required String message}) {
-    showSnackBar(message: message, backgroundColor: Colors.red);
-  }
-}
 ```
+
+`AuthFlowType.pkce` on `authFlowType` parameter indicates that we are using a secure [PKCE flow](https://supabase.com/blog/supabase-auth-sso-pkce#introducing-pkce) to perform our magic link login.
 
 ### Set up Splash Screen
 
@@ -160,7 +151,7 @@ This screen retrieves the current session and redirects the user accordingly.
 
 ```dart lib/pages/splash_page.dart
 import 'package:flutter/material.dart';
-import 'package:supabase_quickstart/constants.dart';
+import 'package:supabase_quickstart/main.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -170,20 +161,18 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
-  bool _redirectCalled = false;
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
     _redirect();
   }
 
   Future<void> _redirect() async {
     await Future.delayed(Duration.zero);
-    if (_redirectCalled || !mounted) {
+    if (!mounted) {
       return;
     }
 
-    _redirectCalled = true;
     final session = supabase.auth.currentSession;
     if (session != null) {
       Navigator.of(context).pushReplacementNamed('/account');
@@ -199,7 +188,6 @@ class _SplashPageState extends State<SplashPage> {
     );
   }
 }
-
 ```
 
 ### Set up a Login page
@@ -215,8 +203,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import 'package:supabase_quickstart/constants.dart';
+import 'package:supabase_quickstart/main.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -228,37 +215,46 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
   bool _redirecting = false;
-  late final TextEditingController _emailController;
+  late final TextEditingController _emailController = TextEditingController();
   late final StreamSubscription<AuthState> _authStateSubscription;
 
   Future<void> _signIn() async {
-    setState(() {
-      _isLoading = true;
-    });
     try {
+      setState(() {
+        _isLoading = true;
+      });
       await supabase.auth.signInWithOtp(
         email: _emailController.text.trim(),
         emailRedirectTo:
             kIsWeb ? null : 'io.supabase.flutterquickstart://login-callback/',
       );
       if (mounted) {
-        context.showSnackBar(message: 'Check your email for login link!');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Check your email for a login link!')),
+        );
         _emailController.clear();
       }
     } on AuthException catch (error) {
-      context.showErrorSnackBar(message: error.message);
+      SnackBar(
+        content: Text(error.message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected error occurred');
+      SnackBar(
+        content: const Text('Unexpected error occurred'),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   @override
   void initState() {
-    _emailController = TextEditingController();
     _authStateSubscription = supabase.auth.onAuthStateChange.listen((data) {
       if (_redirecting) return;
       final session = data.session;
@@ -310,8 +306,7 @@ Let's create a new widget called `account_page.dart` for that.
 ```dart lib/pages/account_page.dart"
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:supabase_quickstart/components/avatar.dart';
-import 'package:supabase_quickstart/constants.dart';
+import 'package:supabase_quickstart/main.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -323,8 +318,8 @@ class AccountPage extends StatefulWidget {
 class _AccountPageState extends State<AccountPage> {
   final _usernameController = TextEditingController();
   final _websiteController = TextEditingController();
-  String? _avatarUrl;
-  var _loading = false;
+
+  var _loading = true;
 
   /// Called once a user id is received within `onAuthenticated()`
   Future<void> _getProfile() async {
@@ -336,21 +331,28 @@ class _AccountPageState extends State<AccountPage> {
       final userId = supabase.auth.currentUser!.id;
       final data = await supabase
           .from('profiles')
-          .select()
+          .select<Map<String, dynamic>>()
           .eq('id', userId)
-          .single() as Map;
+          .single();
       _usernameController.text = (data['username'] ?? '') as String;
       _websiteController.text = (data['website'] ?? '') as String;
-      _avatarUrl = (data['avatar_url'] ?? '') as String;
     } on PostgrestException catch (error) {
-      context.showErrorSnackBar(message: error.message);
+      SnackBar(
+        content: Text(error.message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected exception occurred');
+      SnackBar(
+        content: const Text('Unexpected error occurred'),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
     }
-
-    setState(() {
-      _loading = false;
-    });
   }
 
   /// Called when user taps `Update` button
@@ -370,28 +372,46 @@ class _AccountPageState extends State<AccountPage> {
     try {
       await supabase.from('profiles').upsert(updates);
       if (mounted) {
-        context.showSnackBar(message: 'Successfully updated profile!');
+        const SnackBar(
+          content: Text('Successfully updated profile!'),
+        );
       }
     } on PostgrestException catch (error) {
-      context.showErrorSnackBar(message: error.message);
+      SnackBar(
+        content: Text(error.message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpeted error occurred');
+      SnackBar(
+        content: const Text('Unexpected error occurred'),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
     }
-    setState(() {
-      _loading = false;
-    });
   }
 
   Future<void> _signOut() async {
     try {
       await supabase.auth.signOut();
     } on AuthException catch (error) {
-      context.showErrorSnackBar(message: error.message);
+      SnackBar(
+        content: Text(error.message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected error occurred');
-    }
-    if (mounted) {
-      Navigator.of(context).pushReplacementNamed('/');
+      SnackBar(
+        content: const Text('Unexpected error occurred'),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
+    } finally {
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed('/login');
+      }
     }
   }
 
@@ -412,27 +432,29 @@ class _AccountPageState extends State<AccountPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
-        children: [
-          TextFormField(
-            controller: _usernameController,
-            decoration: const InputDecoration(labelText: 'User Name'),
-          ),
-          const SizedBox(height: 18),
-          TextFormField(
-            controller: _websiteController,
-            decoration: const InputDecoration(labelText: 'Website'),
-          ),
-          const SizedBox(height: 18),
-          ElevatedButton(
-            onPressed: _updateProfile,
-            child: Text(_loading ? 'Saving...' : 'Update'),
-          ),
-          const SizedBox(height: 18),
-          TextButton(onPressed: _signOut, child: const Text('Sign Out')),
-        ],
-      ),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+              children: [
+                TextFormField(
+                  controller: _usernameController,
+                  decoration: const InputDecoration(labelText: 'User Name'),
+                ),
+                const SizedBox(height: 18),
+                TextFormField(
+                  controller: _websiteController,
+                  decoration: const InputDecoration(labelText: 'Website'),
+                ),
+                const SizedBox(height: 18),
+                ElevatedButton(
+                  onPressed: _loading ? null : _updateProfile,
+                  child: Text(_loading ? 'Saving...' : 'Update'),
+                ),
+                const SizedBox(height: 18),
+                TextButton(onPressed: _signOut, child: const Text('Sign Out')),
+              ],
+            ),
     );
   }
 }
@@ -451,12 +473,13 @@ import 'package:supabase_quickstart/pages/splash_page.dart';
 
 Future<void> main() async {
   await Supabase.initialize(
-    // TODO: Replace credentials with your own
     url: 'YOUR_SUPABASE_URL',
     anonKey: 'YOUR_SUPABASE_ANON_KEY',
   );
   runApp(MyApp());
 }
+
+final supabase = Supabase.instance.client;
 
 class MyApp extends StatelessWidget {
   @override
@@ -539,7 +562,7 @@ We can start by creating a new component:
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:supabase_quickstart/constants.dart';
+import 'package:supabase_quickstart/main.dart';
 
 class Avatar extends StatefulWidget {
   const Avatar({
@@ -614,11 +637,21 @@ class _AvatarState extends State<Avatar> {
       widget.onUpload(imageUrlResponse);
     } on StorageException catch (error) {
       if (mounted) {
-        context.showErrorSnackBar(message: error.message);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.message),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
       }
     } catch (error) {
       if (mounted) {
-        context.showErrorSnackBar(message: 'Unexpected error occurred');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Unexpected error occurred'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
       }
     }
 
@@ -635,7 +668,7 @@ And then we can add the widget to the Account page as well as some logic to upda
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_quickstart/components/avatar.dart';
-import 'package:supabase_quickstart/constants.dart';
+import 'package:supabase_quickstart/main.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -647,8 +680,9 @@ class AccountPage extends StatefulWidget {
 class _AccountPageState extends State<AccountPage> {
   final _usernameController = TextEditingController();
   final _websiteController = TextEditingController();
+
   String? _avatarUrl;
-  var _loading = false;
+  var _loading = true;
 
   /// Called once a user id is received within `onAuthenticated()`
   Future<void> _getProfile() async {
@@ -660,21 +694,29 @@ class _AccountPageState extends State<AccountPage> {
       final userId = supabase.auth.currentUser!.id;
       final data = await supabase
           .from('profiles')
-          .select()
+          .select<Map<String, dynamic>>()
           .eq('id', userId)
-          .single() as Map;
+          .single();
       _usernameController.text = (data['username'] ?? '') as String;
       _websiteController.text = (data['website'] ?? '') as String;
       _avatarUrl = (data['avatar_url'] ?? '') as String;
     } on PostgrestException catch (error) {
-      context.showErrorSnackBar(message: error.message);
+      SnackBar(
+        content: Text(error.message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected exception occurred');
+      SnackBar(
+        content: const Text('Unexpected error occurred'),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
     }
-
-    setState(() {
-      _loading = false;
-    });
   }
 
   /// Called when user taps `Update` button
@@ -694,28 +736,46 @@ class _AccountPageState extends State<AccountPage> {
     try {
       await supabase.from('profiles').upsert(updates);
       if (mounted) {
-        context.showSnackBar(message: 'Successfully updated profile!');
+        const SnackBar(
+          content: Text('Successfully updated profile!'),
+        );
       }
     } on PostgrestException catch (error) {
-      context.showErrorSnackBar(message: error.message);
+      SnackBar(
+        content: Text(error.message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpeted error occurred');
+      SnackBar(
+        content: const Text('Unexpected error occurred'),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
     }
-    setState(() {
-      _loading = false;
-    });
   }
 
   Future<void> _signOut() async {
     try {
       await supabase.auth.signOut();
     } on AuthException catch (error) {
-      context.showErrorSnackBar(message: error.message);
+      SnackBar(
+        content: Text(error.message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected error occurred');
-    }
-    if (mounted) {
-      Navigator.of(context).pushReplacementNamed('/');
+      SnackBar(
+        content: const Text('Unexpected error occurred'),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
+    } finally {
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed('/login');
+      }
     }
   }
 
@@ -728,12 +788,20 @@ class _AccountPageState extends State<AccountPage> {
         'avatar_url': imageUrl,
       });
       if (mounted) {
-        context.showSnackBar(message: 'Updated your profile image!');
+        const SnackBar(
+          content: Text('Updated your profile image!'),
+        );
       }
     } on PostgrestException catch (error) {
-      context.showErrorSnackBar(message: error.message);
+      SnackBar(
+        content: Text(error.message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
     } catch (error) {
-      context.showErrorSnackBar(message: 'Unexpected error has occurred');
+      SnackBar(
+        content: const Text('Unexpected error occurred'),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      );
     }
     if (!mounted) {
       return;
@@ -761,32 +829,34 @@ class _AccountPageState extends State<AccountPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
-        children: [
-          Avatar(
-            imageUrl: _avatarUrl,
-            onUpload: _onUpload,
-          ),
-          const SizedBox(height: 18),
-          TextFormField(
-            controller: _usernameController,
-            decoration: const InputDecoration(labelText: 'User Name'),
-          ),
-          const SizedBox(height: 18),
-          TextFormField(
-            controller: _websiteController,
-            decoration: const InputDecoration(labelText: 'Website'),
-          ),
-          const SizedBox(height: 18),
-          ElevatedButton(
-            onPressed: _updateProfile,
-            child: Text(_loading ? 'Saving...' : 'Update'),
-          ),
-          const SizedBox(height: 18),
-          TextButton(onPressed: _signOut, child: const Text('Sign Out')),
-        ],
-      ),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+              children: [
+                Avatar(
+                  imageUrl: _avatarUrl,
+                  onUpload: _onUpload,
+                ),
+                const SizedBox(height: 18),
+                TextFormField(
+                  controller: _usernameController,
+                  decoration: const InputDecoration(labelText: 'User Name'),
+                ),
+                const SizedBox(height: 18),
+                TextFormField(
+                  controller: _websiteController,
+                  decoration: const InputDecoration(labelText: 'Website'),
+                ),
+                const SizedBox(height: 18),
+                ElevatedButton(
+                  onPressed: _loading ? null : _updateProfile,
+                  child: Text(_loading ? 'Saving...' : 'Update'),
+                ),
+                const SizedBox(height: 18),
+                TextButton(onPressed: _signOut, child: const Text('Sign Out')),
+              ],
+            ),
     );
   }
 }

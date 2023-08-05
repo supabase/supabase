@@ -1,0 +1,64 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'functions-troubleshooting',
+  title: 'Troubleshooting Edge Functions',
+  description: 'Troubleshooting Supabase Edge Functions.',
+}
+
+## Unable to call Edge Function
+
+If you're unable to call your Edge Function or are experiencing any CORS issues, even though you followed the [CORS guide](/docs/guides/functions/cors), please head over to [supabase.com/dashboard/project/\_/functions](https://supabase.com/dashboard/project/_/functions), select your function from the list & click Logs. Do you see any errors listed there?
+
+There are two debugging tools available: Invocations and Logs. Invocations shows the Request and Response for each execution, while Logs shows any platform events, including deployments and errors.
+
+## Unable to deploy Edge Function
+
+- Make sure you're on the latest version of the [Supabase CLI](/docs/guides/cli#updates).
+- Run the deploy command with the `--debug` flag.
+- Run the deploy command with the `--legacy-bundle` flag and see if that works.
+- If the output from the commands above does not help you to resolve the issue, please open a support ticket via the Supabase Dashboard (by clicking the "Help" button at the top right) and include all output from the commands mentioned above.
+
+## Edge Function takes too long to respond
+
+- Head over to [supabase.com/dashboard/project/\_/functions](https://supabase.com/dashboard/project/_/functions), select your function from the list & click Logs.
+- In the looks, look for the `booted` event and check if they have consistent boot times.
+  - If the boot times are similar, it's likely an issue with your function's code, like a large dependency etc.
+  - If only some of the `booted` events are slow, please find the affected `region` in the metadata and submit a support request via the "Help" button at the top.
+
+## Issues serving Edge Functions locally with the Supabase CLI
+
+- Make sure you're on the latest version of the [Supabase CLI](/docs/guides/cli#updates).
+- Run the serve command with the `--debug` flag.
+- Support engineers can then try to run the provided sample code locally and see if they can reproduce the issue.
+- Search the [Edge Runtime](https://github.com/supabase/edge-runtime) and [CLI](https://github.com/supabase/cli) repos for the error message, to see if it has been reported before.
+- If the output from the commands above does not help you to resolve the issue, please open a support ticket via the Supabase Dashboard (by clicking the "Help" button at the top right) and include all output and details about your commands.
+
+# Advanced Techniques
+
+## Checking Function Boot Time
+
+Check the logs for the function. In the logs, look for a "Booted" event and note the reported boot time. If available, click on the event to access more details, including the regions from where the function was served. Investigate if the boot time is excessively high (`higher than 1 second`) and note any patterns or regions where it occurs.
+
+## Finding Bundle Size
+
+To find the bundle size of a function, run the following command locally:
+
+```bash
+deno info /path/to/function/index.ts
+```
+
+Look for the "size" field in the output which represents an approximated the bundle size of the function.You can find the accurate bundle size when you deploy your function via Supabase CLI. If the function is part of a larger application, consider examining the bundle size of the specific function independently.
+
+## Analyze Dependencies
+
+Review the dependencies listed in the output of the `deno info` command. Pay attention to any significantly large dependencies, as they can contribute to increased bundle size and potential boot time issues.
+Examine if there are any unnecessary or redundant dependencies that can be removed. Check for outdated dependencies and recommend updating to the latest versions if applicable. When running deno info make sure to provide the correct path of the import map if you use one.
+
+```bash
+deno info --import-map=/path/to/import_map.json /path/to/function/index.ts
+```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

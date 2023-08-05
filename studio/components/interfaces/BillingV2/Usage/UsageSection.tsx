@@ -14,12 +14,11 @@ import Link from 'next/link'
 import SparkBar from 'components/ui/SparkBar'
 import clsx from 'clsx'
 import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
-import { ChartYFormatterCompactNumber, getUpgradeUrlFromV2Subscription } from './Usage.utils'
+import { ChartTooltipValueFormatter, ChartYFormatterCompactNumber, getUpgradeUrl } from './Usage.utils'
 import { formatBytes } from 'lib/helpers'
 import UsageBarChart from './UsageBarChart'
 import Panel from 'components/ui/Panel'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useFlag } from 'hooks'
 
 interface UsageSectionProps {
   projectRef: string
@@ -38,7 +37,6 @@ const UsageSection = ({
   subscription,
   currentBillingCycleSelected,
 }: UsageSectionProps) => {
-  const enableSubscriptionV2 = useFlag('subscriptionV2')
   const { data: usage } = useProjectUsageQuery({ projectRef })
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === categoryKey)
 
@@ -47,7 +45,7 @@ const UsageSection = ({
   const usageBasedBilling = subscription?.usage_billing_enabled
   const exceededLimitStyle = !usageBasedBilling ? 'text-red-900' : 'text-amber-900'
 
-  const upgradeUrl = getUpgradeUrlFromV2Subscription(projectRef, subscription, enableSubscriptionV2)
+  const upgradeUrl = getUpgradeUrl(projectRef, subscription)
 
   return (
     <>
@@ -148,7 +146,7 @@ const UsageSection = ({
                         barClass={clsx(
                           usageRatio >= 1
                             ? usageBasedBilling
-                              ? 'bg-amber-900'
+                              ? 'bg-scale-1100'
                               : 'bg-red-900'
                             : usageBasedBilling === false &&
                               usageRatio >= USAGE_APPROACHING_THRESHOLD
@@ -204,7 +202,7 @@ const UsageSection = ({
                     </div>
                   </div>
 
-                  {attribute.additionalInfo?.(subscription, usage)}
+                  {attribute.additionalInfo?.(projectRef, subscription, usage)}
 
                   <div className="space-y-1">
                     <p>
@@ -231,6 +229,7 @@ const UsageSection = ({
                       data={chartData}
                       yLeftMargin={chartMeta[attribute.key].margin}
                       yFormatter={(value) => ChartYFormatterCompactNumber(value, attribute.unit)}
+                      tooltipFormatter={(value) => ChartTooltipValueFormatter(value, attribute.unit)}
                     />
                   ) : (
                     <Panel>
@@ -256,7 +255,7 @@ const UsageSection = ({
                           </p>
                         </div>
                       </div>
-                      <Link href={`/project/${projectRef}/settings/billing/subscription`}>
+                      <Link href={`/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`}>
                         <a>
                           <Button type="primary">Upgrade plan</Button>
                         </a>

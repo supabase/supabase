@@ -1,6 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { ResponseError } from 'types'
 import { subscriptionKeys } from './keys'
 
 export type ProjectAddonUpdateVariables = {
@@ -35,22 +38,31 @@ type ProjectAddonUpdateData = Awaited<ReturnType<typeof updateSubscriptionAddon>
 
 export const useProjectAddonUpdateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<ProjectAddonUpdateData, unknown, ProjectAddonUpdateVariables>,
+  UseMutationOptions<ProjectAddonUpdateData, ResponseError, ProjectAddonUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProjectAddonUpdateData, unknown, ProjectAddonUpdateVariables>(
+  return useMutation<ProjectAddonUpdateData, ResponseError, ProjectAddonUpdateVariables>(
     (vars) => updateSubscriptionAddon(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        // [Joshen] Only invalidate addons, not subscriptions, as AddOn section in
-        // subscription page is using AddOn react query
-        await queryClient.invalidateQueries(subscriptionKeys.addons(projectRef))
+        await Promise.all([
+          queryClient.invalidateQueries(subscriptionKeys.subscriptionV2(projectRef)),
+          queryClient.invalidateQueries(subscriptionKeys.addons(projectRef)),
+        ])
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to update addon: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }
