@@ -216,15 +216,13 @@ const SQLEditor = () => {
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
 
   /**
-   * Sets the snippet title using AI if it is still untitled.
+   * Sets the snippet title using AI.
    */
   const setAiTitle = useCallback(
     async (id: string, sql: string) => {
-      if (id) {
-        const { title } = await generateSqlTitle({ sql })
+      const { title } = await generateSqlTitle({ sql })
 
-        snap.renameSnippet(id, title)
-      }
+      snap.renameSnippet(id, title)
     },
     [generateSqlTitle, snap]
   )
@@ -252,8 +250,8 @@ const SQLEditor = () => {
           return
         }
 
-        if (idRef.current) {
-          // Intentionally don't await title gen
+        if (idRef.current && snippet.snippet.name === untitledSnippetTitle) {
+          // Intentionally don't await title gen (lazy)
           setAiTitle(idRef.current, sql)
         }
 
