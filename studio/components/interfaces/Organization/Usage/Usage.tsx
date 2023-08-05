@@ -84,6 +84,10 @@ const Usage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateRange, subscription])
 
+  const selectedProject = selectedProjectRef
+    ? orgProjects?.find((it) => it.ref === selectedProjectRef)
+    : undefined
+
   return (
     <>
       <ScaffoldContainer className="sticky top-0 border-b bg-scale-200 z-10 overflow-hidden">
@@ -162,10 +166,12 @@ const Usage = () => {
             description={
               <div className="space-y-3">
                 <p>
-                  You are currently viewing usage for a specific project. Since your organization is
+                  You are currently viewing usage for the "
+                  {selectedProject?.name || selectedProjectRef}" project. Since your organization is
                   using the new organization-level billing, the included quota is for your whole
-                  organization and not just this project. For billing purposes, we sum up usage from all
-                  your projects. To view your usage quota, remove the project filter.
+                  organization and not just this project. For billing purposes, we sum up usage from
+                  all your projects. To view your usage quota, set the project filter above back to
+                  "All Projects".
                 </p>
                 <div>
                   <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
