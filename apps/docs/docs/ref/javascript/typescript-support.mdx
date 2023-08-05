@@ -116,7 +116,7 @@ title: Typescript Support
         return await supabase.from('movies').select('id, title, actors(\*)')
       }
 
-      type Actors = Database['public']['tables']['actors']['row']
+      type Actors = Database['public']['Tables']['actors']['Row']
       type MoviesResponse = Awaited<ReturnType<typeof getMovies>>
       type MoviesResponseSuccess = MoviesResponse['data'] & {
       actors: Actors[]
