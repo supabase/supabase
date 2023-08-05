@@ -57,13 +57,13 @@ export function useLocalStorageQuery<T>(key: string, initialValue: T) {
 
   const { data: storedValue = initialValue } = useQuery(queryKey, () => {
     if (typeof window === 'undefined') {
-      throw new Error('Window not defined')
+      return initialValue
     }
 
     const item = window.localStorage.getItem(key)
 
     if (!item) {
-      throw new Error(`No item exists for key '${key}'`)
+      return initialValue
     }
 
     return JSON.parse(item) as T
