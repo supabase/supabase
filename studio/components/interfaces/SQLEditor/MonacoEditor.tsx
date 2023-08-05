@@ -70,7 +70,9 @@ const MonacoEditor = ({
   }
 
   function handleEditorChange(value: string | undefined) {
-    if (id && value) snap.setSql(id, value)
+    if (id && value !== undefined) {
+      snap.setSql(id, value)
+    }
   }
 
   return (
