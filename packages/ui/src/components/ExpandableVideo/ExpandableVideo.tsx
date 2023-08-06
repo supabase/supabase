@@ -70,7 +70,7 @@ export function ExpandableVideo({
           '!bg-[#f8f9fa]/95 dark:!bg-[#1c1c1c]/80',
           '!border-[#e6e8eb]/90 dark:!border-[#282828]/90',
           'transition ease-out',
-          'mx-auto backdrop-blur-md',
+          'mx-auto backdrop-blur-md w-full',
         ].join(' ')}
         onInteractOutside={(e) => {
           // Only hide menu when clicking outside, not focusing outside
@@ -81,8 +81,8 @@ export function ExpandableVideo({
         }}
         size="xxlarge"
       >
-        <div className="w-full flex items-center justify-center">
-          <div className="relative w-full">
+        <div className="!w-full flex items-center justify-center">
+          <div className="relative w-full mx-4">
             <button
               onClick={() => setExpandVideo(false)}
               className="text-scale-1100 hover:text-scale-1200 absolute -top-8 right-0"
