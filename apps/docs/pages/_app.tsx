@@ -5,12 +5,14 @@ import 'config/code-hike.scss'
 import '../styles/main.scss?v=1.0.0'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
+import '@docsly/react/styles.css'
 
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
+import Docsly from '@docsly/react'
 import { AppPropsWithLayout } from 'types'
 import { CommandMenuProvider } from 'ui'
 import { TabsProvider } from 'ui/src/components/Tabs'
@@ -22,6 +24,8 @@ import { post } from '~/lib/fetchWrappers'
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
+
+  const { pathname } = router
 
   const [supabase] = useState(() =>
     IS_PLATFORM || LOCAL_SUPABASE ? createBrowserSupabaseClient() : undefined
@@ -159,6 +163,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
           </CommandMenuProvider>
         </ThemeProvider>
       </AuthContainer>
+      <Docsly publicId="<paste-from-docsly-dashboard>" pathname={pathname} />
     </>
   )
 }
