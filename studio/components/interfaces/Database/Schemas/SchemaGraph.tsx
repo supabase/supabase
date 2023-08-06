@@ -214,7 +214,7 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
     <>
       {data.isForeign ? (
         <div className="rounded-lg overflow-hidden">
-          <header className="text-[0.5rem] leading-5 font-bold px-2 text-center bg-brand-900 text-gray-300">
+          <header className="text-[0.5rem] leading-5 font-bold px-2 text-center bg-brand text-gray-300">
             {data.name}
             {targetPosition && (
               <Handle
@@ -228,7 +228,7 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
         </div>
       ) : (
         <div className="rounded-lg overflow-hidden" style={{ width: NODE_WIDTH / 2 }}>
-          <header className="text-[0.5rem] leading-5 font-bold px-2 text-center bg-brand-900 text-gray-300">
+          <header className="text-[0.5rem] leading-5 font-bold px-2 text-center bg-brand text-gray-300">
             {data.name}
           </header>
 

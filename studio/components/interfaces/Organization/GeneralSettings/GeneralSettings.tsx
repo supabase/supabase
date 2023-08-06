@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { Collapsible, Form, IconChevronRight, Input, Toggle } from 'ui'
 
 import { useParams } from 'common/hooks'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import {
   FormActions,
   FormPanel,
@@ -18,9 +19,9 @@ import { invalidateOrganizationsQuery } from 'data/organizations/organizations-q
 import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { isResponseOk, patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import OrganizationDeletePanel from './OrganizationDeletePanel'
-import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import { Organization } from 'types'
+import OrganizationDeletePanel from './OrganizationDeletePanel'
+import NoProjectsOnPaidOrgInfo from 'components/interfaces/BillingV2/NoProjectsOnPaidOrgInfo'
 
 const GeneralSettings = () => {
   const queryClient = useQueryClient()
@@ -72,6 +73,8 @@ const GeneralSettings = () => {
 
   return (
     <ScaffoldContainerLegacy>
+      <NoProjectsOnPaidOrgInfo organization={selectedOrganization} />
+
       <Form id={formId} initialValues={initialValues} onSubmit={onUpdateOrganization}>
         {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
           const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
@@ -172,7 +175,7 @@ const GeneralSettings = () => {
                                 <a
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="text-brand-900 border-b border-brand-900"
+                                  className="text-brand border-b border-brand"
                                 >
                                   privacy policy
                                 </a>

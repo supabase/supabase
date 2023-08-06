@@ -33,7 +33,9 @@ export const generateToolRoutes = (ref?: string, project?: ProjectBase): Route[]
           preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
         />
       ),
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
+      link: !IS_PLATFORM
+        ? `/project/${ref}/sql/1`
+        : ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
     },
   ]
 }
