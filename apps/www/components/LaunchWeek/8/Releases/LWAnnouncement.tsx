@@ -18,7 +18,11 @@ const LWAnnouncement = ({ title }: { title?: string }) => {
             <div className="relative flex-shrink flex items-center p-2 w-2/3 md:w-auto">
               <div className="flex flex-col gap-1 sm:pl-2">
                 <div className="flex items-center gap-2">
-                  <div className={['flex min-w-[20px] opacity-50', 'opacity-pulse'].join(' ')}>
+                  <div
+                    className={['hidden sm:flex min-w-[20px] opacity-50', 'opacity-pulse'].join(
+                      ' '
+                    )}
+                  >
                     <svg
                       width="21"
                       height="21"
