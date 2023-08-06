@@ -165,7 +165,12 @@ export const AccordionHeader = ({
   <div
     className={['flex flex-1 justify-between items-stretch scroll-mt-20 text-scale-900'].join(' ')}
   >
-    <div className={['flex', shippable && shipped ? 'items-stretch' : 'flex-row'].join(' ')}>
+    <div
+      className={[
+        'flex flex-1',
+        shippable && shipped ? 'items-stretch' : 'flex-row items-center',
+      ].join(' ')}
+    >
       <div className="flex gap-4 w-full sm:w-auto sm:min-w-[240px] md:min-w-[380px] items-center">
         <span className="text-sm">
           <span className="inline sm:hidden md:inline">{weekDay} </span>
