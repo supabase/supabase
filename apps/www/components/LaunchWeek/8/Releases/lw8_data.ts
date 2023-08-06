@@ -61,13 +61,13 @@ const days: WeekDayProps[] = [
     steps: [
       {
         title: "Why we'll stay remote",
-        blog: '/blog/why-we-will-stay-remote',
+        blog: '/blog/why-supabase-remote',
         bg_layers: [{ img: images['00-stay-remote'] }],
         steps: [],
       },
       {
         title: 'Postgres Language Server',
-        github: '/blog/',
+        github: 'https://github.com/supabase/postgres_lsp',
         hackernews: '/blog/',
         bg_layers: [{ img: images['00-pg-server'] }],
         steps: [],
