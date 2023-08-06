@@ -132,7 +132,7 @@ const AuditLogs = () => {
                   return (
                     <Alert title="" variant="info" className="mx-3 pl-2 pr-2 pt-1 pb-2">
                       Your organization has a log retention period of{' '}
-                      <span className="text-brand-900">
+                      <span className="text-brand">
                         {retentionPeriod} day
                         {retentionPeriod > 1 ? 's' : ''}
                       </span>

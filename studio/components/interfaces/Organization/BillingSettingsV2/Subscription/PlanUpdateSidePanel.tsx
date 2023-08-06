@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
+import { SubscriptionTier, useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
@@ -110,8 +110,13 @@ const PlanUpdateSidePanel = () => {
       return ui.setNotification({ category: 'error', message: 'Please select a payment method' })
     }
 
-    updateOrgSubscription({ slug, tier: selectedTier, paymentMethod: selectedPaymentMethod })
+    // If the user is downgrading from team, should have spend cap disabled by default 
+    const tier = subscription?.plan?.id === 'team' && selectedTier === PRICING_TIER_PRODUCT_IDS.PRO ? PRICING_TIER_PRODUCT_IDS.PAYG as SubscriptionTier : selectedTier
+
+    updateOrgSubscription({ slug, tier, paymentMethod: selectedPaymentMethod })
   }
+
+  const planMeta = selectedTier ? availablePlans.find((p) => p.id === selectedTier.split('tier_')[1]) : null
 
   return (
     <>
@@ -157,13 +162,13 @@ const PlanUpdateSidePanel = () => {
                 >
                   <div className="w-full">
                     <div className="flex items-center space-x-2">
-                      <p className={clsx('text-brand-900 text-sm uppercase')}>{plan.name}</p>
+                      <p className={clsx('text-brand text-sm uppercase')}>{plan.name}</p>
                       {isCurrentPlan ? (
                         <div className="text-xs bg-scale-500 text-scale-1000 rounded px-2 py-0.5">
                           Current plan
                         </div>
                       ) : plan.nameBadge ? (
-                        <div className="text-xs bg-brand-400 text-brand-900 rounded px-2 py-0.5">
+                        <div className="text-xs bg-brand-400 text-brand rounded px-2 py-0.5">
                           {plan.nameBadge}
                         </div>
                       ) : (
@@ -182,7 +187,7 @@ const PlanUpdateSidePanel = () => {
                       <p className="text-scale-1000 text-sm">{tierMeta?.costUnitOrg}</p>
                     </div>
                     <div className={clsx('flex mt-1 mb-4', !tierMeta?.warning && 'opacity-0')}>
-                      <div className="bg-scale-200 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
+                      <div className="bg-scale-200 text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
                         {tierMeta?.warning}
                       </div>
                     </div>
@@ -250,7 +255,7 @@ const PlanUpdateSidePanel = () => {
                         <li key={feature} className="flex py-2">
                           <div className="w-[12px]">
                             <IconCheck
-                              className="h-3 w-3 text-brand-900 translate-y-[2.5px]"
+                              className="h-3 w-3 text-brand translate-y-[2.5px]"
                               aria-hidden="true"
                               strokeWidth={3}
                             />
@@ -289,7 +294,7 @@ const PlanUpdateSidePanel = () => {
         onCancel={() => setSelectedTier(undefined)}
         onConfirm={onUpdateSubscription}
         overlayClassName="pointer-events-none"
-        header={`Confirm to upgrade to ${subscriptionPlanMeta?.name}`}
+        header={`Confirm ${planMeta?.change_type === 'downgrade' ? 'downgrade' : 'upgrade'} to ${subscriptionPlanMeta?.name}`}
       >
         <Modal.Content>
           <div className="py-6 space-y-2">

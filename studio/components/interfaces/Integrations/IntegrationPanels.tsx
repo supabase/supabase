@@ -6,8 +6,10 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
-import { getVercelConfigurationUrl } from 'lib/integration-utils'
 import { Badge, Button, IconArrowRight, IconExternalLink, IconGitHub, IconSquare, cn } from 'ui'
+import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
+import Link from 'next/link'
+import { BooleanFormatter } from 'components/grid/components/formatter'
 
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
@@ -24,9 +26,9 @@ const HandleIcon = ({ type, className }: { type: HandleIconType; className?: str
     case 'GitHub':
       return <IconGitHub strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
       break
-    case 'Netlify':
-      return <IconSquare strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
-      break
+    // case 'Netlify':
+    //   return <IconSquare strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
+    //   break
     case 'Vercel':
       return (
         <svg
@@ -91,9 +93,11 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
           </div>
           <div className="flex flex-col gap-0">
             <div className="flex items-center gap-2">
-              <span className="text-scale-1200 font-medium">
-                {/* {title} integration connection •{' '} */}
-                {integration.metadata?.account.name || integration.metadata?.gitHubConnectionOwner}
+              <span className="text font-medium">
+                {integration.metadata?.account.name ||
+                  (integration.metadata !== undefined &&
+                    'gitHubConnectionOwner' in integration.metadata &&
+                    integration.metadata?.gitHubConnectionOwner)}
               </span>
 
               <Badge color="scale" className="capitalize">
@@ -101,26 +105,26 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
               </Badge>
             </div>
             <div className="flex flex-col gap-0">
-              <span className="text-scale-900 text-sm">
+              <span className="text-lighter text-xs">
                 Created {dayjs(integration.inserted_at).fromNow()}
               </span>
-              <span className="text-scale-900 text-sm">
+              <span className="text-lighter text-xs">
                 Added by {integration?.added_by?.primary_email}
               </span>
             </div>
           </div>
         </div>
 
-        <Button type="default" asChild iconRight={<IconExternalLink />}>
-          {/* hard coded to vercel for now, TODO: move to a prop */}
-          <a
-            href={getVercelConfigurationUrl(integration)}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Manage
-          </a>
-        </Button>
+        <Link
+          href={getIntegrationConfigurationUrl(integration)}
+          target="_blank"
+          rel="noopener noreferrer"
+          passHref
+        >
+          <Button type="default" asChild iconRight={<IconExternalLink />}>
+            <a>Manage</a>
+          </Button>
+        </Link>
       </li>
     )
   }
@@ -130,10 +134,15 @@ export interface IntegrationConnectionProps extends React.HTMLAttributes<HTMLLIE
   connection: IntegrationProjectConnection
   type: Integration['integration']['name']
   actions?: React.ReactNode
+  showNode?: boolean
+  orientation?: 'horizontal' | 'vertical'
 }
 
 const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnectionProps>(
-  ({ className, connection, type, actions, ...props }, ref) => {
+  (
+    { className, connection, type, actions, showNode = true, orientation = 'horizontal', ...props },
+    ref
+  ) => {
     const { data: projects } = useProjectsQuery()
     const project = projects?.find((project) => project.ref === connection.supabase_project_ref)
 
@@ -142,18 +151,31 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
         ref={ref}
         key={connection.id}
         {...props}
-        className={cn('ml-6 pl-8 pb-2 border-l border-scale-600 dark:border-scale-400', 'relative')}
+        className={cn(
+          showNode && 'pl-8  ml-6 border-l border-scale-600 dark:border-scale-400',
+          'pb-2',
+          'relative'
+        )}
       >
-        <div className="absolute w-8 rounded-bl-full border-b border-l border-scale-600 dark:border-scale-400 h-10 -left-px"></div>
-        <div className="bg-surface-100 border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg">
-          <div className="flex flex-col gap-1">
+        {showNode && (
+          <div className="absolute w-8 rounded-bl-full border-b border-l border-scale-600 dark:border-scale-400 h-10 -left-px"></div>
+        )}
+        <div
+          className={cn(
+            orientation === 'horizontal'
+              ? 'flex items-center justify-between'
+              : 'flex flex-col gap-3',
+            'bg-surface-100 border shadow-sm px-8 py-4 rounded-lg'
+          )}
+        >
+          <div className={'flex flex-col gap-1'}>
             <div className="flex gap-2 items-center">
               <HandleIcon type={'Supabase'} />
-              <span>{project?.name}</span>
+              <span className="text-sm">{project?.name}</span>
               <IconArrowRight size={14} className="text-scale-900" strokeWidth={1.5} />
               {!connection?.metadata?.framework ? (
                 <div className="bg-black text-white w-4 h-4 rounded flex items-center justify-center">
-                  <HandleIcon type={'Vercel'} className={'!w-2.5'} />
+                  <HandleIcon type={type} className={'!w-2.5'} />
                 </div>
               ) : (
                 <img
@@ -163,14 +185,14 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
                   alt={`icon`}
                 />
               )}
-              <span>{connection.metadata?.name}</span>
+              <span className="text-sm">{connection.metadata?.name}</span>
             </div>
 
             <div className="flex flex-col gap-0">
-              <span className="text-scale-900 text-sm">
+              <span className="text-scale-900 text-xs">
                 Connected {dayjs(connection?.inserted_at).fromNow()}
               </span>
-              <span className="text-scale-900 text-sm">
+              <span className="text-scale-900 text-xs">
                 Added by {connection?.added_by?.primary_email}
               </span>
             </div>
@@ -206,7 +228,7 @@ const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationC
             <span>{connection.metadata.name}</span>
           </div>
 
-          <span className="text-scale-900 text-sm">
+          <span className="text-lighter text-xs">
             Connected {dayjs(connection.inserted_at).fromNow()}
           </span>
         </div>
@@ -219,15 +241,23 @@ const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationC
 
 const EmptyIntegrationConnection = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => {
+  React.HTMLAttributes<HTMLDivElement> & { showNode?: boolean }
+>(({ className, showNode = true, ...props }, ref) => {
   return (
     <div
       ref={ref}
       {...props}
-      className={cn('ml-6 pl-8 pb-2 border-l', 'last:border-l-transparent', 'relative', className)}
+      className={cn(
+        showNode && 'ml-6 pl-8  border-l',
+        'pb-2 ',
+        'last:border-l-transparent',
+        'relative',
+        className
+      )}
     >
-      <div className="absolute w-8 rounded-bl-full border-b border-l border-scale-600 dark:border-scale-400 h-10 -left-px"></div>
+      {showNode && (
+        <div className="absolute w-8 rounded-bl-full border-b border-l border-scale-600 dark:border-scale-400 h-10 -left-px"></div>
+      )}
       <div
         className={cn(
           'w-full',
