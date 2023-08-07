@@ -174,8 +174,8 @@
   }
 
   [type='checkbox']:checked {
-    @apply dark:bg-brand-900;
-    @apply bg-brand-900;
+    @apply dark:bg-brand;
+    @apply bg-brand;
     border-color: transparent;
     background-size: 100% 100%;
     background-position: center;
@@ -186,7 +186,7 @@
     @apply cursor-pointer rounded border border-solid;
 
     @apply text-brand-600 border-scale-400 transition-all;
-    @apply hover:border-brand-900 focus:ring-brand-500 focus:outline-none;
+    @apply hover:border-brand focus:ring-brand-300 focus:outline-none;
 
     @apply dark:border-scale-500 dark:bg-transparent dark:text-white;
     @apply dark:hover:border-green-900;
@@ -388,7 +388,7 @@
 .sb-grid-select-editor {
   button {
     @apply border-none rounded-none shadow-none;
-    box-shadow: none !important
+    box-shadow: none !important;
   }
 }
 
@@ -491,7 +491,7 @@
 }
 
 .sb-grid-column-header__inner svg {
-  @apply border-brand-900 text-brand-900 dark:border-brand-900 dark:text-brand-900;
+  @apply border-brand text-brand dark:border-brand dark:text-brand;
 }
 
 /*
@@ -523,7 +523,7 @@
 }
 
 .sb-grid-select-cell__header__input {
-  /* @apply focus:ring-brand-500; */
+  /* @apply focus:ring-brand-300; */
   @apply border-scale-300;
 }
 

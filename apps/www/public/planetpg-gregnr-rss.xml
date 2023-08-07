@@ -5,9 +5,16 @@
       <link>https://supabase.com/blog</link>
       <description>Latest Postgres news from Greg Richardson at Supabase</description>
       <language>en</language>
-      <lastBuildDate>Sun, 05 Feb 2023 23:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Wed, 02 Aug 2023 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/planetpg-gregnr-rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/fewer-dimensions-are-better-pgvector</guid>
+  <title>pgvector: Fewer dimensions are better</title>
+  <link>https://supabase.com/blog/fewer-dimensions-are-better-pgvector</link>
+  <description>Increase performance in pgvector by using embedding vectors with fewer dimensions</description>
+  <pubDate>Wed, 02 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/openai-embeddings-postgres-vector</guid>
   <title>Storing OpenAI embeddings in Postgres with pgvector</title>
   <link>https://supabase.com/blog/openai-embeddings-postgres-vector</link>

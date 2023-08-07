@@ -1,17 +1,16 @@
-import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
 
 import Table from 'components/to-be-cleaned/Table'
 import TriggerList from './TriggerList'
 
-interface Props {
+interface SchemaTableProps {
   filterString: string
   schema: string
   editTrigger: (trigger: any) => void
   deleteTrigger: (trigger: any) => void
 }
 
-const SchemaTable: FC<Props> = ({ filterString, schema, editTrigger, deleteTrigger }) => {
+const SchemaTable = ({ filterString, schema, editTrigger, deleteTrigger }: SchemaTableProps) => {
   return (
     <div key={schema} className="">
       <div className="sticky top-0 backdrop-blur backdrop-filter">

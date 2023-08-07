@@ -28,9 +28,7 @@ const AuthorizedAppRow = ({ app, onSelectRevoke }: AuthorizedAppRowProps) => {
         <span className="font-mono truncate">{app.id}</span>
         <Button
           type="default"
-          icon={
-            isCopied ? <IconCheck className="text-brand-900" strokeWidth={3} /> : <IconClipboard />
-          }
+          icon={isCopied ? <IconCheck className="text-brand" strokeWidth={3} /> : <IconClipboard />}
           className="ml-2 px-1"
           onClick={() => {
             copyToClipboard(app.id)

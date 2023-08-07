@@ -1,23 +1,22 @@
-import { FC, useState } from 'react'
-import { Alert, Button, Form, Input, Modal } from 'ui'
+import { useParams } from 'common'
+import { Alert, Button, Modal } from 'ui'
 
-import { useStore } from 'hooks'
-import { useParams } from 'common/hooks'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
+import { useStore } from 'hooks'
 
-interface Props {
+interface RemoveRestrictionModalProps {
   visible: boolean
   restrictedIps: string[]
   selectedRestriction?: string
   onClose: () => void
 }
 
-const RemoveRestrictionModal: FC<Props> = ({
+const RemoveRestrictionModal = ({
   visible,
   restrictedIps,
   selectedRestriction,
   onClose,
-}) => {
+}: RemoveRestrictionModalProps) => {
   const { ui } = useStore()
   const { ref } = useParams()
   const { mutate: applyNetworkRestrictions, isLoading: isApplying } =

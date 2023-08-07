@@ -1,6 +1,5 @@
 import { User } from '@supabase/gotrue-js'
 import { gotrueClient } from 'common'
-import { DEFAULT_HOME, IS_PLATFORM } from './constants'
 export { STORAGE_KEY } from 'common'
 
 export const auth = gotrueClient
@@ -37,7 +36,7 @@ export const getIdentity = (gotrueUser: User) => {
 
 // NOTE: do not use any imports in this function as it is used standalone in the documents head
 // [Joshen] Potentially can remove after full move over to /dashboard
-export const getReturnToPath = (fallback = DEFAULT_HOME) => {
+export const getReturnToPath = (fallback = '/projects') => {
   const searchParams = new URLSearchParams(location.search)
 
   // [Joshen] Remove base path value ("/dashboard") from returnTo

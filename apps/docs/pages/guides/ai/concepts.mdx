@@ -7,7 +7,7 @@ export const meta = {
   sidebar_label: 'Concepts',
 }
 
-Embeddings are a core concept when building AI and vector applications.
+Embeddings are core to many AI and vector applications. This guide covers these concepts. If you prefer to get started right away, see our guide on [Generating Embeddings](/docs/guides/ai/quickstarts/generate-text-embeddings).
 
 ## What are embeddings?
 
@@ -48,7 +48,7 @@ In this example we only have 2 dimensions: the X and Y axis. In reality, we woul
 
 ## Using embeddings
 
-Compared to our 2-dimensional example above, most embedding models will output many more dimensions. For example OpenAI's `text-embedding-ada-002` model outputs 1536 dimensions.
+Compared to our 2-dimensional example above, most embedding models will output many more dimensions. For example the open source [`gte-small`](https://huggingface.co/Supabase/gte-small) model outputs 384 dimensions.
 
 Why is this useful? Once we have generated embeddings on multiple texts, it is trivial to calculate how similar they are using vector math operations like cosine distance. A common use case for this is search. Your process might look something like this:
 

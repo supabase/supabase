@@ -16,7 +16,7 @@ const MigrationsEmptyState = () => {
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">supabase</span> link --project-ref {ref}
+            <span className="text-brand-600">supabase</span> link --project-ref {ref}
           </>
         )
       },
@@ -27,7 +27,7 @@ const MigrationsEmptyState = () => {
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">supabase</span> migration new new-migration
+            <span className="text-brand-600">supabase</span> migration new new-migration
           </>
         )
       },
@@ -38,7 +38,7 @@ const MigrationsEmptyState = () => {
       jsx: () => {
         return (
           <>
-            <span className="text-brand-1100">supabase</span> db push
+            <span className="text-brand-600">supabase</span> db push
           </>
         )
       },

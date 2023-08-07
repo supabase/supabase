@@ -42,6 +42,13 @@ export interface paths {
     /** Get infrastructure status */
     get: operations["StatusController_getStatus"];
   };
+  "/platform/projects-resource-warnings": {
+    /**
+     * Gets resource warnings for all projects accessible by the user 
+     * @description Only returns the minimal project info
+     */
+    get: operations["ProjectsResourceWarningsController_getProjectsResourceWarnings"];
+  };
   "/platform/auth/{ref}/config": {
     /** Gets GoTrue config */
     get: operations["GoTrueConfigController_getGoTrueConfig"];
@@ -99,7 +106,7 @@ export interface paths {
     get: operations["HooksController_getHookLogs"];
   };
   "/platform/database/{ref}/hook-enable": {
-    /** Enables hooks on the project */
+    /** Enables Database Webhooks on the project */
     post: operations["HooksController_enableHooks"];
   };
   "/platform/database/{ref}/owner-reassign": {
@@ -713,6 +720,38 @@ export interface paths {
   "/platform/integrations/vercel/connections/{connection_id}": {
     /** Deletes vercel project connection */
     delete: operations["VercelConnectionsController_deleteVercelConnection"];
+    /** Updates a Vercel connection for a supabase project */
+    patch: operations["VercelConnectionsController_updateVercelConnection"];
+  };
+  "/platform/integrations/github": {
+    /** Create github integration */
+    post: operations["GitHubIntegrationController_createGitHubIntegration"];
+  };
+  "/platform/integrations/github/connections/{organization_integration_id}": {
+    /** Gets installed github project connections for the given organization integration */
+    get: operations["GitHubConnectionsController_getGitHubConnections"];
+  };
+  "/platform/integrations/github/connections": {
+    /** Connects a GitHub project to a supabase project */
+    post: operations["GitHubConnectionsController_createGitHubConnection"];
+  };
+  "/platform/integrations/github/connections/{connection_id}": {
+    /** Deletes github project connection */
+    delete: operations["GitHubConnectionsController_deleteGitHubConnection"];
+    /** Updates a GitHub connection for a supabase project */
+    patch: operations["GitHubConnectionsController_updateGitHubConnection"];
+  };
+  "/platform/integrations/github/repos/{organization_integration_id}": {
+    /** Gets github repos for the given organization */
+    get: operations["GitHubRepoController_getRepos"];
+  };
+  "/platform/integrations/github/branches/{organization_integration_id}/{repo_owner}/{repo_name}": {
+    /** Gets github branches for a given repo */
+    get: operations["GitHubBranchController_getBranches"];
+  };
+  "/platform/integrations/github/pull-requests/{organization_integration_id}/{repo_owner}/{repo_name}/{target}": {
+    /** Gets github pull requests for a given repo */
+    get: operations["GitHubPullRequestController_getPullRequests"];
   };
   "/system/auth/{ref}/templates/{template}": {
     /** Gets GoTrue template */
@@ -790,9 +829,17 @@ export interface paths {
     /** Previews the migration of the organization to the new org level billing. */
     post: operations["BillingMigrationController_preview"];
   };
+  "/system/projects/{ref}/config/update-jwt/complete": {
+    /** Handle update project jwt on completion */
+    post: operations["ProjectUpdateJwtController_completeUpdateJwt"];
+  };
   "/system/integrations/vercel/webhooks": {
     /** Processes Vercel event */
     post: operations["VercelWebhooksController_processEvent"];
+  };
+  "/system/integrations/github/webhooks": {
+    /** Processes GitHub event */
+    post: operations["GitHubWebhooksController_processEvent"];
   };
   "/system/stripe/webhooks-v2": {
     /** Processes Stripe event */
@@ -871,7 +918,7 @@ export interface paths {
     get: operations["HooksController_getHookLogs"];
   };
   "/v0/database/{ref}/hook-enable": {
-    /** Enables hooks on the project */
+    /** Enables Database Webhooks on the project */
     post: operations["HooksController_enableHooks"];
   };
   "/v0/organizations": {
@@ -1343,10 +1390,6 @@ export interface paths {
     /** Updates project's postgrest config */
     patch: operations["PostgrestConfigController_updatePostgRESTConfig"];
   };
-  "/v1/projects/{ref}/database/query": {
-    /** Run sql query */
-    post: operations["QueryController_runQuery"];
-  };
   "/v1/projects/{ref}/secrets": {
     /**
      * List all secrets 
@@ -1423,6 +1466,34 @@ export interface paths {
     /** Updates project's pgbouncer config */
     patch: operations["V1PgbouncerConfigController_updatePgbouncerConfig"];
   };
+  "/v1/projects/{ref}/config/auth": {
+    /** Gets project's auth config */
+    get: operations["V1AuthConfigController_getV1AuthConfig"];
+    /** Updates a project's auth config */
+    patch: operations["V1AuthConfigController_updateV1AuthConfig"];
+  };
+  "/v1/projects/{ref}/config/auth/sso/providers": {
+    /** Lists all SSO providers */
+    get: operations["ProvidersController_listAllProviders"];
+    /** Creates a new SSO provider */
+    post: operations["ProvidersController_createProviderForProject"];
+  };
+  "/v1/projects/{ref}/config/auth/sso/providers/{provider_id}": {
+    /** Gets a SSO provider by its UUID */
+    get: operations["ProvidersController_getProviderById"];
+    /** Updates a SSO provider by its UUID */
+    put: operations["ProvidersController_updateProviderById"];
+    /** Removes a SSO provider by its UUID */
+    delete: operations["ProvidersController_removeProviderById"];
+  };
+  "/v1/projects/{ref}/database/query": {
+    /** Run sql query */
+    post: operations["V1QueryController_v1RunQuery"];
+  };
+  "/v1/projects/{ref}/database/webhooks/enable": {
+    /** Enables Database Webhooks on the project */
+    post: operations["V1DatabaseWebhooksController_v1EnableDatabaseWebhooks"];
+  };
   "/v1/projects/{ref}/functions": {
     /**
      * List all functions 
@@ -1458,20 +1529,6 @@ export interface paths {
      * @description Retrieves a function body for the specified slug and project.
      */
     get: operations["FunctionSlugController_getFunctionBody"];
-  };
-  "/v1/projects/{ref}/config/auth/sso/providers": {
-    /** Lists all SSO providers */
-    get: operations["ProvidersController_listAllProviders"];
-    /** Creates a new SSO provider */
-    post: operations["ProvidersController_createProviderForProject"];
-  };
-  "/v1/projects/{ref}/config/auth/sso/providers/{provider_id}": {
-    /** Gets a SSO provider by its UUID */
-    get: operations["ProvidersController_getProviderById"];
-    /** Updates a SSO provider by its UUID */
-    put: operations["ProvidersController_updateProviderById"];
-    /** Removes a SSO provider by its UUID */
-    delete: operations["ProvidersController_removeProviderById"];
   };
   "/v1/organizations": {
     /**
@@ -1578,36 +1635,18 @@ export interface components {
       password: string;
       redirectTo?: string;
     };
+    ProjectResourceWarningsResponse: {
+      project: string;
+      is_readonly_mode_enabled: boolean;
+      is_disk_io_budget_below_threshold: boolean;
+      is_disk_space_usage_beyond_threshold: boolean;
+      is_cpu_load_beyond_threshold: boolean;
+      is_memory_and_swap_usage_beyond_threshold: boolean;
+    };
     GetGoTrueConfigResponse: {
-      app_version: string;
-      isFreeTier: boolean;
-      SAML_PRIVATE_KEY_ENCRYPTED?: string;
-      id: number;
-      project_id: number;
-      updated_at: string;
       SITE_URL: string;
       DISABLE_SIGNUP: boolean;
-      RATE_LIMIT_HEADER: string;
       JWT_EXP: number;
-      JWT_AUD: string;
-      JWT_DEFAULT_GROUP_NAME: string;
-      EXTERNAL_GITHUB_ENABLED: boolean;
-      EXTERNAL_GITHUB_CLIENT_ID: string;
-      EXTERNAL_GITHUB_SECRET: string;
-      EXTERNAL_BITBUCKET_ENABLED: boolean;
-      EXTERNAL_BITBUCKET_CLIENT_ID: string;
-      EXTERNAL_BITBUCKET_SECRET: string;
-      EXTERNAL_GOOGLE_ENABLED: boolean;
-      EXTERNAL_GOOGLE_CLIENT_ID: string;
-      EXTERNAL_GOOGLE_SECRET: string;
-      EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS?: string;
-      EXTERNAL_GITLAB_ENABLED: boolean;
-      EXTERNAL_GITLAB_CLIENT_ID: string;
-      EXTERNAL_GITLAB_SECRET: string;
-      EXTERNAL_GITLAB_URL: string;
-      EXTERNAL_KAKAO_ENABLED: boolean;
-      EXTERNAL_KAKAO_CLIENT_ID: string;
-      EXTERNAL_KAKAO_SECRET: string;
       SMTP_ADMIN_EMAIL: string;
       SMTP_HOST: string;
       SMTP_PORT: string;
@@ -1615,64 +1654,22 @@ export interface components {
       SMTP_PASS?: string | null;
       SMTP_PASS_ENCRYPTED?: string | null;
       SMTP_MAX_FREQUENCY: number;
+      SMTP_SENDER_NAME?: string;
       MAILER_AUTOCONFIRM: boolean;
-      MAILER_URLPATHS_INVITE: string;
-      MAILER_URLPATHS_CONFIRMATION: string;
-      MAILER_URLPATHS_RECOVERY: string;
-      MAILER_URLPATHS_EMAIL_CHANGE: string;
       MAILER_SUBJECTS_INVITE: string;
       MAILER_SUBJECTS_CONFIRMATION: string;
       MAILER_SUBJECTS_RECOVERY: string;
       MAILER_SUBJECTS_EMAIL_CHANGE: string;
-      MAILER_TEMPLATES_INVITE: string;
-      MAILER_TEMPLATES_INVITE_CONTENT: string;
-      MAILER_TEMPLATES_CONFIRMATION: string;
-      MAILER_TEMPLATES_CONFIRMATION_CONTENT: string;
-      MAILER_TEMPLATES_RECOVERY: string;
-      MAILER_TEMPLATES_RECOVERY_CONTENT: string;
-      MAILER_TEMPLATES_EMAIL_CHANGE: string;
-      MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT: string;
       MAILER_SUBJECTS_MAGIC_LINK: string;
-      MAILER_TEMPLATES_MAGIC_LINK: string;
+      MAILER_TEMPLATES_INVITE_CONTENT: string;
+      MAILER_TEMPLATES_CONFIRMATION_CONTENT: string;
+      MAILER_TEMPLATES_RECOVERY_CONTENT: string;
+      MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT: string;
       MAILER_TEMPLATES_MAGIC_LINK_CONTENT: string;
-      MAX_ENROLLED_FACTORS: number;
       MFA_MAX_ENROLLED_FACTORS: number;
-      EXTERNAL_AZURE_ENABLED: boolean;
-      EXTERNAL_AZURE_CLIENT_ID: string;
-      EXTERNAL_AZURE_SECRET: string;
-      EXTERNAL_FACEBOOK_ENABLED: boolean;
-      EXTERNAL_FACEBOOK_CLIENT_ID: string;
-      EXTERNAL_FACEBOOK_SECRET: string;
       URI_ALLOW_LIST: string;
-      EXTERNAL_TWITTER_ENABLED: boolean;
-      EXTERNAL_TWITTER_CLIENT_ID: string;
-      EXTERNAL_TWITTER_SECRET: string;
-      EXTERNAL_APPLE_ENABLED: boolean;
-      EXTERNAL_APPLE_CLIENT_ID: string;
-      EXTERNAL_APPLE_SECRET: string;
-      EXTERNAL_IOS_BUNDLE_ID?: string;
-      EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS?: string;
-      EXTERNAL_DISCORD_ENABLED: boolean;
-      EXTERNAL_DISCORD_CLIENT_ID: string;
-      EXTERNAL_DISCORD_SECRET: string;
-      EXTERNAL_TWITCH_ENABLED: boolean;
-      EXTERNAL_TWITCH_CLIENT_ID: string;
-      EXTERNAL_TWITCH_SECRET: string;
-      SMTP_SENDER_NAME?: string;
       EXTERNAL_EMAIL_ENABLED: boolean;
       EXTERNAL_PHONE_ENABLED: boolean;
-      SMS_AUTOCONFIRM: boolean;
-      SMS_MAX_FREQUENCY: number;
-      SMS_OTP_EXP: number;
-      SMS_OTP_LENGTH: number;
-      SMS_PROVIDER: string;
-      SMS_TWILIO_ACCOUNT_SID: string;
-      SMS_TWILIO_AUTH_TOKEN: string;
-      SMS_TWILIO_MESSAGE_SERVICE_SID: string;
-      SMS_TWILIO_VERIFY_ACCOUNT_SID: string;
-      SMS_TWILIO_VERIFY_AUTH_TOKEN: string;
-      SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string;
-      SMS_TEMPLATE: string;
       SAML_ENABLED?: boolean;
       SECURITY_CAPTCHA_ENABLED: boolean;
       SECURITY_CAPTCHA_PROVIDER: string;
@@ -1680,74 +1677,98 @@ export interface components {
       RATE_LIMIT_EMAIL_SENT: number;
       RATE_LIMIT_SMS_SENT: number;
       MAILER_SECURE_EMAIL_CHANGE_ENABLED: boolean;
-      EXTERNAL_SPOTIFY_ENABLED: boolean;
-      EXTERNAL_SPOTIFY_CLIENT_ID: string;
-      EXTERNAL_SPOTIFY_SECRET: string;
-      EXTERNAL_SLACK_ENABLED: boolean;
-      EXTERNAL_SLACK_CLIENT_ID: string;
-      EXTERNAL_SLACK_SECRET: string;
+      REFRESH_TOKEN_ROTATION_ENABLED: boolean;
+      PASSWORD_MIN_LENGTH: number;
+      SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: boolean;
+      SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number;
+      MAILER_OTP_EXP: number;
+      SMS_AUTOCONFIRM: boolean;
+      SMS_MAX_FREQUENCY: number;
+      SMS_OTP_EXP: number;
+      SMS_OTP_LENGTH: number;
+      SMS_PROVIDER: string;
       SMS_MESSAGEBIRD_ACCESS_KEY: string;
       SMS_MESSAGEBIRD_ORIGINATOR: string;
-      REFRESH_TOKEN_ROTATION_ENABLED: boolean;
+      SMS_TEXTLOCAL_API_KEY: string;
+      SMS_TEXTLOCAL_SENDER: string;
+      SMS_TWILIO_ACCOUNT_SID: string;
+      SMS_TWILIO_AUTH_TOKEN: string;
+      SMS_TWILIO_MESSAGE_SERVICE_SID: string;
+      SMS_TWILIO_VERIFY_ACCOUNT_SID: string;
+      SMS_TWILIO_VERIFY_AUTH_TOKEN: string;
+      SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string;
+      SMS_VONAGE_API_KEY: string;
+      SMS_VONAGE_API_SECRET: string;
+      SMS_VONAGE_FROM: string;
+      SMS_TEMPLATE: string;
+      EXTERNAL_APPLE_ENABLED: boolean;
+      EXTERNAL_APPLE_CLIENT_ID: string;
+      EXTERNAL_APPLE_SECRET: string;
+      EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS?: string;
+      EXTERNAL_AZURE_ENABLED: boolean;
+      EXTERNAL_AZURE_CLIENT_ID: string;
+      EXTERNAL_AZURE_SECRET: string;
+      EXTERNAL_AZURE_URL: string;
+      EXTERNAL_BITBUCKET_ENABLED: boolean;
+      EXTERNAL_BITBUCKET_CLIENT_ID: string;
+      EXTERNAL_BITBUCKET_SECRET: string;
+      EXTERNAL_DISCORD_ENABLED: boolean;
+      EXTERNAL_DISCORD_CLIENT_ID: string;
+      EXTERNAL_DISCORD_SECRET: string;
+      EXTERNAL_FACEBOOK_ENABLED: boolean;
+      EXTERNAL_FACEBOOK_CLIENT_ID: string;
+      EXTERNAL_FACEBOOK_SECRET: string;
+      EXTERNAL_FIGMA_ENABLED: boolean;
+      EXTERNAL_FIGMA_CLIENT_ID: string;
+      EXTERNAL_FIGMA_SECRET: string;
+      EXTERNAL_GITHUB_ENABLED: boolean;
+      EXTERNAL_GITHUB_CLIENT_ID: string;
+      EXTERNAL_GITHUB_SECRET: string;
+      EXTERNAL_GITLAB_ENABLED: boolean;
+      EXTERNAL_GITLAB_CLIENT_ID: string;
+      EXTERNAL_GITLAB_SECRET: string;
+      EXTERNAL_GITLAB_URL: string;
+      EXTERNAL_GOOGLE_ENABLED: boolean;
+      EXTERNAL_GOOGLE_CLIENT_ID: string;
+      EXTERNAL_GOOGLE_SECRET: string;
+      EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS?: string;
+      EXTERNAL_KAKAO_ENABLED: boolean;
+      EXTERNAL_KAKAO_CLIENT_ID: string;
+      EXTERNAL_KAKAO_SECRET: string;
+      EXTERNAL_KEYCLOAK_ENABLED: boolean;
+      EXTERNAL_KEYCLOAK_CLIENT_ID: string;
+      EXTERNAL_KEYCLOAK_SECRET: string;
+      EXTERNAL_KEYCLOAK_URL: string;
       EXTERNAL_LINKEDIN_ENABLED: boolean;
       EXTERNAL_LINKEDIN_CLIENT_ID: string;
       EXTERNAL_LINKEDIN_SECRET: string;
       EXTERNAL_NOTION_ENABLED: boolean;
       EXTERNAL_NOTION_CLIENT_ID: string;
       EXTERNAL_NOTION_SECRET: string;
-      SMS_VONAGE_API_KEY: string;
-      SMS_VONAGE_API_SECRET: string;
-      SMS_VONAGE_FROM: string;
-      SMS_TEXTLOCAL_API_KEY: string;
-      SMS_TEXTLOCAL_SENDER: string;
-      EXTERNAL_ZOOM_ENABLED: boolean;
-      EXTERNAL_ZOOM_CLIENT_ID: string;
-      EXTERNAL_ZOOM_SECRET: string;
-      EXTERNAL_AZURE_URL: string;
-      PASSWORD_MIN_LENGTH: number;
-      EXTERNAL_KEYCLOAK_ENABLED: boolean;
-      EXTERNAL_KEYCLOAK_CLIENT_ID: string;
-      EXTERNAL_KEYCLOAK_SECRET: string;
-      EXTERNAL_KEYCLOAK_URL: string;
+      EXTERNAL_SLACK_ENABLED: boolean;
+      EXTERNAL_SLACK_CLIENT_ID: string;
+      EXTERNAL_SLACK_SECRET: string;
+      EXTERNAL_SPOTIFY_ENABLED: boolean;
+      EXTERNAL_SPOTIFY_CLIENT_ID: string;
+      EXTERNAL_SPOTIFY_SECRET: string;
+      EXTERNAL_TWITCH_ENABLED: boolean;
+      EXTERNAL_TWITCH_CLIENT_ID: string;
+      EXTERNAL_TWITCH_SECRET: string;
+      EXTERNAL_TWITTER_ENABLED: boolean;
+      EXTERNAL_TWITTER_CLIENT_ID: string;
+      EXTERNAL_TWITTER_SECRET: string;
       EXTERNAL_WORKOS_ENABLED: boolean;
       EXTERNAL_WORKOS_CLIENT_ID: string;
       EXTERNAL_WORKOS_SECRET: string;
       EXTERNAL_WORKOS_URL: string;
-      EXTERNAL_FIGMA_ENABLED: boolean;
-      EXTERNAL_FIGMA_CLIENT_ID: string;
-      EXTERNAL_FIGMA_SECRET: string;
-      EXTERNAL_FIGMA_URL: string;
-      MFA_ENABLED: boolean;
-      SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: boolean;
-      SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number;
-      MAILER_OTP_EXP: number;
-      RATE_LIMIT_VERIFY: number;
-      RATE_LIMIT_TOKEN_REFRESH: number;
+      EXTERNAL_ZOOM_ENABLED: boolean;
+      EXTERNAL_ZOOM_CLIENT_ID: string;
+      EXTERNAL_ZOOM_SECRET: string;
     };
     UpdateGoTrueConfigBody: {
       SITE_URL: string;
       DISABLE_SIGNUP: boolean;
-      RATE_LIMIT_HEADER: string;
       JWT_EXP: number;
-      JWT_AUD: string;
-      JWT_DEFAULT_GROUP_NAME: string;
-      EXTERNAL_GITHUB_ENABLED: boolean;
-      EXTERNAL_GITHUB_CLIENT_ID: string;
-      EXTERNAL_GITHUB_SECRET: string;
-      EXTERNAL_BITBUCKET_ENABLED: boolean;
-      EXTERNAL_BITBUCKET_CLIENT_ID: string;
-      EXTERNAL_BITBUCKET_SECRET: string;
-      EXTERNAL_GOOGLE_ENABLED: boolean;
-      EXTERNAL_GOOGLE_CLIENT_ID: string;
-      EXTERNAL_GOOGLE_SECRET: string;
-      EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS?: string;
-      EXTERNAL_GITLAB_ENABLED: boolean;
-      EXTERNAL_GITLAB_CLIENT_ID: string;
-      EXTERNAL_GITLAB_SECRET: string;
-      EXTERNAL_GITLAB_URL: string;
-      EXTERNAL_KAKAO_ENABLED: boolean;
-      EXTERNAL_KAKAO_CLIENT_ID: string;
-      EXTERNAL_KAKAO_SECRET: string;
       SMTP_ADMIN_EMAIL: string;
       SMTP_HOST: string;
       SMTP_PORT: string;
@@ -1755,64 +1776,22 @@ export interface components {
       SMTP_PASS?: string | null;
       SMTP_PASS_ENCRYPTED?: string | null;
       SMTP_MAX_FREQUENCY: number;
+      SMTP_SENDER_NAME?: string;
       MAILER_AUTOCONFIRM: boolean;
-      MAILER_URLPATHS_INVITE: string;
-      MAILER_URLPATHS_CONFIRMATION: string;
-      MAILER_URLPATHS_RECOVERY: string;
-      MAILER_URLPATHS_EMAIL_CHANGE: string;
       MAILER_SUBJECTS_INVITE: string;
       MAILER_SUBJECTS_CONFIRMATION: string;
       MAILER_SUBJECTS_RECOVERY: string;
       MAILER_SUBJECTS_EMAIL_CHANGE: string;
-      MAILER_TEMPLATES_INVITE: string;
-      MAILER_TEMPLATES_INVITE_CONTENT: string;
-      MAILER_TEMPLATES_CONFIRMATION: string;
-      MAILER_TEMPLATES_CONFIRMATION_CONTENT: string;
-      MAILER_TEMPLATES_RECOVERY: string;
-      MAILER_TEMPLATES_RECOVERY_CONTENT: string;
-      MAILER_TEMPLATES_EMAIL_CHANGE: string;
-      MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT: string;
       MAILER_SUBJECTS_MAGIC_LINK: string;
-      MAILER_TEMPLATES_MAGIC_LINK: string;
+      MAILER_TEMPLATES_INVITE_CONTENT: string;
+      MAILER_TEMPLATES_CONFIRMATION_CONTENT: string;
+      MAILER_TEMPLATES_RECOVERY_CONTENT: string;
+      MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT: string;
       MAILER_TEMPLATES_MAGIC_LINK_CONTENT: string;
-      MAX_ENROLLED_FACTORS: number;
       MFA_MAX_ENROLLED_FACTORS: number;
-      EXTERNAL_AZURE_ENABLED: boolean;
-      EXTERNAL_AZURE_CLIENT_ID: string;
-      EXTERNAL_AZURE_SECRET: string;
-      EXTERNAL_FACEBOOK_ENABLED: boolean;
-      EXTERNAL_FACEBOOK_CLIENT_ID: string;
-      EXTERNAL_FACEBOOK_SECRET: string;
       URI_ALLOW_LIST: string;
-      EXTERNAL_TWITTER_ENABLED: boolean;
-      EXTERNAL_TWITTER_CLIENT_ID: string;
-      EXTERNAL_TWITTER_SECRET: string;
-      EXTERNAL_APPLE_ENABLED: boolean;
-      EXTERNAL_APPLE_CLIENT_ID: string;
-      EXTERNAL_APPLE_SECRET: string;
-      EXTERNAL_IOS_BUNDLE_ID?: string;
-      EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS?: string;
-      EXTERNAL_DISCORD_ENABLED: boolean;
-      EXTERNAL_DISCORD_CLIENT_ID: string;
-      EXTERNAL_DISCORD_SECRET: string;
-      EXTERNAL_TWITCH_ENABLED: boolean;
-      EXTERNAL_TWITCH_CLIENT_ID: string;
-      EXTERNAL_TWITCH_SECRET: string;
-      SMTP_SENDER_NAME?: string;
       EXTERNAL_EMAIL_ENABLED: boolean;
       EXTERNAL_PHONE_ENABLED: boolean;
-      SMS_AUTOCONFIRM: boolean;
-      SMS_MAX_FREQUENCY: number;
-      SMS_OTP_EXP: number;
-      SMS_OTP_LENGTH: number;
-      SMS_PROVIDER: string;
-      SMS_TWILIO_ACCOUNT_SID: string;
-      SMS_TWILIO_AUTH_TOKEN: string;
-      SMS_TWILIO_MESSAGE_SERVICE_SID: string;
-      SMS_TWILIO_VERIFY_ACCOUNT_SID: string;
-      SMS_TWILIO_VERIFY_AUTH_TOKEN: string;
-      SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string;
-      SMS_TEMPLATE: string;
       SAML_ENABLED?: boolean;
       SECURITY_CAPTCHA_ENABLED: boolean;
       SECURITY_CAPTCHA_PROVIDER: string;
@@ -1820,74 +1799,98 @@ export interface components {
       RATE_LIMIT_EMAIL_SENT: number;
       RATE_LIMIT_SMS_SENT: number;
       MAILER_SECURE_EMAIL_CHANGE_ENABLED: boolean;
-      EXTERNAL_SPOTIFY_ENABLED: boolean;
-      EXTERNAL_SPOTIFY_CLIENT_ID: string;
-      EXTERNAL_SPOTIFY_SECRET: string;
-      EXTERNAL_SLACK_ENABLED: boolean;
-      EXTERNAL_SLACK_CLIENT_ID: string;
-      EXTERNAL_SLACK_SECRET: string;
+      REFRESH_TOKEN_ROTATION_ENABLED: boolean;
+      PASSWORD_MIN_LENGTH: number;
+      SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: boolean;
+      SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number;
+      MAILER_OTP_EXP: number;
+      SMS_AUTOCONFIRM: boolean;
+      SMS_MAX_FREQUENCY: number;
+      SMS_OTP_EXP: number;
+      SMS_OTP_LENGTH: number;
+      SMS_PROVIDER: string;
       SMS_MESSAGEBIRD_ACCESS_KEY: string;
       SMS_MESSAGEBIRD_ORIGINATOR: string;
-      REFRESH_TOKEN_ROTATION_ENABLED: boolean;
+      SMS_TEXTLOCAL_API_KEY: string;
+      SMS_TEXTLOCAL_SENDER: string;
+      SMS_TWILIO_ACCOUNT_SID: string;
+      SMS_TWILIO_AUTH_TOKEN: string;
+      SMS_TWILIO_MESSAGE_SERVICE_SID: string;
+      SMS_TWILIO_VERIFY_ACCOUNT_SID: string;
+      SMS_TWILIO_VERIFY_AUTH_TOKEN: string;
+      SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string;
+      SMS_VONAGE_API_KEY: string;
+      SMS_VONAGE_API_SECRET: string;
+      SMS_VONAGE_FROM: string;
+      SMS_TEMPLATE: string;
+      EXTERNAL_APPLE_ENABLED: boolean;
+      EXTERNAL_APPLE_CLIENT_ID: string;
+      EXTERNAL_APPLE_SECRET: string;
+      EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS?: string;
+      EXTERNAL_AZURE_ENABLED: boolean;
+      EXTERNAL_AZURE_CLIENT_ID: string;
+      EXTERNAL_AZURE_SECRET: string;
+      EXTERNAL_AZURE_URL: string;
+      EXTERNAL_BITBUCKET_ENABLED: boolean;
+      EXTERNAL_BITBUCKET_CLIENT_ID: string;
+      EXTERNAL_BITBUCKET_SECRET: string;
+      EXTERNAL_DISCORD_ENABLED: boolean;
+      EXTERNAL_DISCORD_CLIENT_ID: string;
+      EXTERNAL_DISCORD_SECRET: string;
+      EXTERNAL_FACEBOOK_ENABLED: boolean;
+      EXTERNAL_FACEBOOK_CLIENT_ID: string;
+      EXTERNAL_FACEBOOK_SECRET: string;
+      EXTERNAL_FIGMA_ENABLED: boolean;
+      EXTERNAL_FIGMA_CLIENT_ID: string;
+      EXTERNAL_FIGMA_SECRET: string;
+      EXTERNAL_GITHUB_ENABLED: boolean;
+      EXTERNAL_GITHUB_CLIENT_ID: string;
+      EXTERNAL_GITHUB_SECRET: string;
+      EXTERNAL_GITLAB_ENABLED: boolean;
+      EXTERNAL_GITLAB_CLIENT_ID: string;
+      EXTERNAL_GITLAB_SECRET: string;
+      EXTERNAL_GITLAB_URL: string;
+      EXTERNAL_GOOGLE_ENABLED: boolean;
+      EXTERNAL_GOOGLE_CLIENT_ID: string;
+      EXTERNAL_GOOGLE_SECRET: string;
+      EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS?: string;
+      EXTERNAL_KAKAO_ENABLED: boolean;
+      EXTERNAL_KAKAO_CLIENT_ID: string;
+      EXTERNAL_KAKAO_SECRET: string;
+      EXTERNAL_KEYCLOAK_ENABLED: boolean;
+      EXTERNAL_KEYCLOAK_CLIENT_ID: string;
+      EXTERNAL_KEYCLOAK_SECRET: string;
+      EXTERNAL_KEYCLOAK_URL: string;
       EXTERNAL_LINKEDIN_ENABLED: boolean;
       EXTERNAL_LINKEDIN_CLIENT_ID: string;
       EXTERNAL_LINKEDIN_SECRET: string;
       EXTERNAL_NOTION_ENABLED: boolean;
       EXTERNAL_NOTION_CLIENT_ID: string;
       EXTERNAL_NOTION_SECRET: string;
-      SMS_VONAGE_API_KEY: string;
-      SMS_VONAGE_API_SECRET: string;
-      SMS_VONAGE_FROM: string;
-      SMS_TEXTLOCAL_API_KEY: string;
-      SMS_TEXTLOCAL_SENDER: string;
-      EXTERNAL_ZOOM_ENABLED: boolean;
-      EXTERNAL_ZOOM_CLIENT_ID: string;
-      EXTERNAL_ZOOM_SECRET: string;
-      EXTERNAL_AZURE_URL: string;
-      PASSWORD_MIN_LENGTH: number;
-      EXTERNAL_KEYCLOAK_ENABLED: boolean;
-      EXTERNAL_KEYCLOAK_CLIENT_ID: string;
-      EXTERNAL_KEYCLOAK_SECRET: string;
-      EXTERNAL_KEYCLOAK_URL: string;
+      EXTERNAL_SLACK_ENABLED: boolean;
+      EXTERNAL_SLACK_CLIENT_ID: string;
+      EXTERNAL_SLACK_SECRET: string;
+      EXTERNAL_SPOTIFY_ENABLED: boolean;
+      EXTERNAL_SPOTIFY_CLIENT_ID: string;
+      EXTERNAL_SPOTIFY_SECRET: string;
+      EXTERNAL_TWITCH_ENABLED: boolean;
+      EXTERNAL_TWITCH_CLIENT_ID: string;
+      EXTERNAL_TWITCH_SECRET: string;
+      EXTERNAL_TWITTER_ENABLED: boolean;
+      EXTERNAL_TWITTER_CLIENT_ID: string;
+      EXTERNAL_TWITTER_SECRET: string;
       EXTERNAL_WORKOS_ENABLED: boolean;
       EXTERNAL_WORKOS_CLIENT_ID: string;
       EXTERNAL_WORKOS_SECRET: string;
       EXTERNAL_WORKOS_URL: string;
-      EXTERNAL_FIGMA_ENABLED: boolean;
-      EXTERNAL_FIGMA_CLIENT_ID: string;
-      EXTERNAL_FIGMA_SECRET: string;
-      EXTERNAL_FIGMA_URL: string;
-      MFA_ENABLED: boolean;
-      SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: boolean;
-      SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number;
-      MAILER_OTP_EXP: number;
-      RATE_LIMIT_VERIFY: number;
-      RATE_LIMIT_TOKEN_REFRESH: number;
+      EXTERNAL_ZOOM_ENABLED: boolean;
+      EXTERNAL_ZOOM_CLIENT_ID: string;
+      EXTERNAL_ZOOM_SECRET: string;
     };
     GoTrueConfig: {
       SITE_URL: string;
       DISABLE_SIGNUP: boolean;
-      RATE_LIMIT_HEADER: string;
       JWT_EXP: number;
-      JWT_AUD: string;
-      JWT_DEFAULT_GROUP_NAME: string;
-      EXTERNAL_GITHUB_ENABLED: boolean;
-      EXTERNAL_GITHUB_CLIENT_ID: string;
-      EXTERNAL_GITHUB_SECRET: string;
-      EXTERNAL_BITBUCKET_ENABLED: boolean;
-      EXTERNAL_BITBUCKET_CLIENT_ID: string;
-      EXTERNAL_BITBUCKET_SECRET: string;
-      EXTERNAL_GOOGLE_ENABLED: boolean;
-      EXTERNAL_GOOGLE_CLIENT_ID: string;
-      EXTERNAL_GOOGLE_SECRET: string;
-      EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS?: string;
-      EXTERNAL_GITLAB_ENABLED: boolean;
-      EXTERNAL_GITLAB_CLIENT_ID: string;
-      EXTERNAL_GITLAB_SECRET: string;
-      EXTERNAL_GITLAB_URL: string;
-      EXTERNAL_KAKAO_ENABLED: boolean;
-      EXTERNAL_KAKAO_CLIENT_ID: string;
-      EXTERNAL_KAKAO_SECRET: string;
       SMTP_ADMIN_EMAIL: string;
       SMTP_HOST: string;
       SMTP_PORT: string;
@@ -1895,64 +1898,22 @@ export interface components {
       SMTP_PASS?: string | null;
       SMTP_PASS_ENCRYPTED?: string | null;
       SMTP_MAX_FREQUENCY: number;
+      SMTP_SENDER_NAME?: string;
       MAILER_AUTOCONFIRM: boolean;
-      MAILER_URLPATHS_INVITE: string;
-      MAILER_URLPATHS_CONFIRMATION: string;
-      MAILER_URLPATHS_RECOVERY: string;
-      MAILER_URLPATHS_EMAIL_CHANGE: string;
       MAILER_SUBJECTS_INVITE: string;
       MAILER_SUBJECTS_CONFIRMATION: string;
       MAILER_SUBJECTS_RECOVERY: string;
       MAILER_SUBJECTS_EMAIL_CHANGE: string;
-      MAILER_TEMPLATES_INVITE: string;
-      MAILER_TEMPLATES_INVITE_CONTENT: string;
-      MAILER_TEMPLATES_CONFIRMATION: string;
-      MAILER_TEMPLATES_CONFIRMATION_CONTENT: string;
-      MAILER_TEMPLATES_RECOVERY: string;
-      MAILER_TEMPLATES_RECOVERY_CONTENT: string;
-      MAILER_TEMPLATES_EMAIL_CHANGE: string;
-      MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT: string;
       MAILER_SUBJECTS_MAGIC_LINK: string;
-      MAILER_TEMPLATES_MAGIC_LINK: string;
+      MAILER_TEMPLATES_INVITE_CONTENT: string;
+      MAILER_TEMPLATES_CONFIRMATION_CONTENT: string;
+      MAILER_TEMPLATES_RECOVERY_CONTENT: string;
+      MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT: string;
       MAILER_TEMPLATES_MAGIC_LINK_CONTENT: string;
-      MAX_ENROLLED_FACTORS: number;
       MFA_MAX_ENROLLED_FACTORS: number;
-      EXTERNAL_AZURE_ENABLED: boolean;
-      EXTERNAL_AZURE_CLIENT_ID: string;
-      EXTERNAL_AZURE_SECRET: string;
-      EXTERNAL_FACEBOOK_ENABLED: boolean;
-      EXTERNAL_FACEBOOK_CLIENT_ID: string;
-      EXTERNAL_FACEBOOK_SECRET: string;
       URI_ALLOW_LIST: string;
-      EXTERNAL_TWITTER_ENABLED: boolean;
-      EXTERNAL_TWITTER_CLIENT_ID: string;
-      EXTERNAL_TWITTER_SECRET: string;
-      EXTERNAL_APPLE_ENABLED: boolean;
-      EXTERNAL_APPLE_CLIENT_ID: string;
-      EXTERNAL_APPLE_SECRET: string;
-      EXTERNAL_IOS_BUNDLE_ID?: string;
-      EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS?: string;
-      EXTERNAL_DISCORD_ENABLED: boolean;
-      EXTERNAL_DISCORD_CLIENT_ID: string;
-      EXTERNAL_DISCORD_SECRET: string;
-      EXTERNAL_TWITCH_ENABLED: boolean;
-      EXTERNAL_TWITCH_CLIENT_ID: string;
-      EXTERNAL_TWITCH_SECRET: string;
-      SMTP_SENDER_NAME?: string;
       EXTERNAL_EMAIL_ENABLED: boolean;
       EXTERNAL_PHONE_ENABLED: boolean;
-      SMS_AUTOCONFIRM: boolean;
-      SMS_MAX_FREQUENCY: number;
-      SMS_OTP_EXP: number;
-      SMS_OTP_LENGTH: number;
-      SMS_PROVIDER: string;
-      SMS_TWILIO_ACCOUNT_SID: string;
-      SMS_TWILIO_AUTH_TOKEN: string;
-      SMS_TWILIO_MESSAGE_SERVICE_SID: string;
-      SMS_TWILIO_VERIFY_ACCOUNT_SID: string;
-      SMS_TWILIO_VERIFY_AUTH_TOKEN: string;
-      SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string;
-      SMS_TEMPLATE: string;
       SAML_ENABLED?: boolean;
       SECURITY_CAPTCHA_ENABLED: boolean;
       SECURITY_CAPTCHA_PROVIDER: string;
@@ -1960,53 +1921,93 @@ export interface components {
       RATE_LIMIT_EMAIL_SENT: number;
       RATE_LIMIT_SMS_SENT: number;
       MAILER_SECURE_EMAIL_CHANGE_ENABLED: boolean;
-      EXTERNAL_SPOTIFY_ENABLED: boolean;
-      EXTERNAL_SPOTIFY_CLIENT_ID: string;
-      EXTERNAL_SPOTIFY_SECRET: string;
-      EXTERNAL_SLACK_ENABLED: boolean;
-      EXTERNAL_SLACK_CLIENT_ID: string;
-      EXTERNAL_SLACK_SECRET: string;
+      REFRESH_TOKEN_ROTATION_ENABLED: boolean;
+      PASSWORD_MIN_LENGTH: number;
+      SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: boolean;
+      SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number;
+      MAILER_OTP_EXP: number;
+      SMS_AUTOCONFIRM: boolean;
+      SMS_MAX_FREQUENCY: number;
+      SMS_OTP_EXP: number;
+      SMS_OTP_LENGTH: number;
+      SMS_PROVIDER: string;
       SMS_MESSAGEBIRD_ACCESS_KEY: string;
       SMS_MESSAGEBIRD_ORIGINATOR: string;
-      REFRESH_TOKEN_ROTATION_ENABLED: boolean;
+      SMS_TEXTLOCAL_API_KEY: string;
+      SMS_TEXTLOCAL_SENDER: string;
+      SMS_TWILIO_ACCOUNT_SID: string;
+      SMS_TWILIO_AUTH_TOKEN: string;
+      SMS_TWILIO_MESSAGE_SERVICE_SID: string;
+      SMS_TWILIO_VERIFY_ACCOUNT_SID: string;
+      SMS_TWILIO_VERIFY_AUTH_TOKEN: string;
+      SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string;
+      SMS_VONAGE_API_KEY: string;
+      SMS_VONAGE_API_SECRET: string;
+      SMS_VONAGE_FROM: string;
+      SMS_TEMPLATE: string;
+      EXTERNAL_APPLE_ENABLED: boolean;
+      EXTERNAL_APPLE_CLIENT_ID: string;
+      EXTERNAL_APPLE_SECRET: string;
+      EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS?: string;
+      EXTERNAL_AZURE_ENABLED: boolean;
+      EXTERNAL_AZURE_CLIENT_ID: string;
+      EXTERNAL_AZURE_SECRET: string;
+      EXTERNAL_AZURE_URL: string;
+      EXTERNAL_BITBUCKET_ENABLED: boolean;
+      EXTERNAL_BITBUCKET_CLIENT_ID: string;
+      EXTERNAL_BITBUCKET_SECRET: string;
+      EXTERNAL_DISCORD_ENABLED: boolean;
+      EXTERNAL_DISCORD_CLIENT_ID: string;
+      EXTERNAL_DISCORD_SECRET: string;
+      EXTERNAL_FACEBOOK_ENABLED: boolean;
+      EXTERNAL_FACEBOOK_CLIENT_ID: string;
+      EXTERNAL_FACEBOOK_SECRET: string;
+      EXTERNAL_FIGMA_ENABLED: boolean;
+      EXTERNAL_FIGMA_CLIENT_ID: string;
+      EXTERNAL_FIGMA_SECRET: string;
+      EXTERNAL_GITHUB_ENABLED: boolean;
+      EXTERNAL_GITHUB_CLIENT_ID: string;
+      EXTERNAL_GITHUB_SECRET: string;
+      EXTERNAL_GITLAB_ENABLED: boolean;
+      EXTERNAL_GITLAB_CLIENT_ID: string;
+      EXTERNAL_GITLAB_SECRET: string;
+      EXTERNAL_GITLAB_URL: string;
+      EXTERNAL_GOOGLE_ENABLED: boolean;
+      EXTERNAL_GOOGLE_CLIENT_ID: string;
+      EXTERNAL_GOOGLE_SECRET: string;
+      EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS?: string;
+      EXTERNAL_KAKAO_ENABLED: boolean;
+      EXTERNAL_KAKAO_CLIENT_ID: string;
+      EXTERNAL_KAKAO_SECRET: string;
+      EXTERNAL_KEYCLOAK_ENABLED: boolean;
+      EXTERNAL_KEYCLOAK_CLIENT_ID: string;
+      EXTERNAL_KEYCLOAK_SECRET: string;
+      EXTERNAL_KEYCLOAK_URL: string;
       EXTERNAL_LINKEDIN_ENABLED: boolean;
       EXTERNAL_LINKEDIN_CLIENT_ID: string;
       EXTERNAL_LINKEDIN_SECRET: string;
       EXTERNAL_NOTION_ENABLED: boolean;
       EXTERNAL_NOTION_CLIENT_ID: string;
       EXTERNAL_NOTION_SECRET: string;
-      SMS_VONAGE_API_KEY: string;
-      SMS_VONAGE_API_SECRET: string;
-      SMS_VONAGE_FROM: string;
-      SMS_TEXTLOCAL_API_KEY: string;
-      SMS_TEXTLOCAL_SENDER: string;
-      EXTERNAL_ZOOM_ENABLED: boolean;
-      EXTERNAL_ZOOM_CLIENT_ID: string;
-      EXTERNAL_ZOOM_SECRET: string;
-      EXTERNAL_AZURE_URL: string;
-      PASSWORD_MIN_LENGTH: number;
-      EXTERNAL_KEYCLOAK_ENABLED: boolean;
-      EXTERNAL_KEYCLOAK_CLIENT_ID: string;
-      EXTERNAL_KEYCLOAK_SECRET: string;
-      EXTERNAL_KEYCLOAK_URL: string;
+      EXTERNAL_SLACK_ENABLED: boolean;
+      EXTERNAL_SLACK_CLIENT_ID: string;
+      EXTERNAL_SLACK_SECRET: string;
+      EXTERNAL_SPOTIFY_ENABLED: boolean;
+      EXTERNAL_SPOTIFY_CLIENT_ID: string;
+      EXTERNAL_SPOTIFY_SECRET: string;
+      EXTERNAL_TWITCH_ENABLED: boolean;
+      EXTERNAL_TWITCH_CLIENT_ID: string;
+      EXTERNAL_TWITCH_SECRET: string;
+      EXTERNAL_TWITTER_ENABLED: boolean;
+      EXTERNAL_TWITTER_CLIENT_ID: string;
+      EXTERNAL_TWITTER_SECRET: string;
       EXTERNAL_WORKOS_ENABLED: boolean;
       EXTERNAL_WORKOS_CLIENT_ID: string;
       EXTERNAL_WORKOS_SECRET: string;
       EXTERNAL_WORKOS_URL: string;
-      EXTERNAL_FIGMA_ENABLED: boolean;
-      EXTERNAL_FIGMA_CLIENT_ID: string;
-      EXTERNAL_FIGMA_SECRET: string;
-      EXTERNAL_FIGMA_URL: string;
-      MFA_ENABLED: boolean;
-      SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: boolean;
-      SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number;
-      MAILER_OTP_EXP: number;
-      RATE_LIMIT_VERIFY: number;
-      RATE_LIMIT_TOKEN_REFRESH: number;
-      id: number;
-      project_id: number;
-      updated_at: string;
-      SAML_PRIVATE_KEY_ENCRYPTED?: string;
+      EXTERNAL_ZOOM_ENABLED: boolean;
+      EXTERNAL_ZOOM_CLIENT_ID: string;
+      EXTERNAL_ZOOM_SECRET: string;
     };
     UserBody: {
       id?: string;
@@ -2257,7 +2258,7 @@ export interface components {
       unlimited: boolean;
       capped: boolean;
       /** @enum {string} */
-      metric: "EGRESS" | "DATABASE_EGRESS" | "DATABASE_SIZE" | "STORAGE_EGRESS" | "STORAGE_SIZE" | "MONTHLY_ACTIVE_USERS" | "MONTHLY_ACTIVE_SSO_USERS" | "FUNCTION_INVOCATIONS" | "FUNCTION_COUNT" | "STORAGE_IMAGES_TRANSFORMED" | "REALTIME_MESSAGE_COUNT" | "REALTIME_PEAK_CONNECTIONS" | "COMPUTE_HOURS_XS" | "COMPUTE_HOURS_SM" | "COMPUTE_HOURS_MD" | "COMPUTE_HOURS_L" | "COMPUTE_HOURS_XL" | "COMPUTE_HOURS_2XL" | "COMPUTE_HOURS_4XL" | "COMPUTE_HOURS_8XL" | "COMPUTE_HOURS_12XL" | "COMPUTE_HOURS_16XL";
+      metric: "EGRESS" | "DATABASE_EGRESS" | "DATABASE_SIZE" | "STORAGE_EGRESS" | "STORAGE_SIZE" | "MONTHLY_ACTIVE_USERS" | "MONTHLY_ACTIVE_SSO_USERS" | "FUNCTION_INVOCATIONS" | "FUNCTION_COUNT" | "STORAGE_IMAGES_TRANSFORMED" | "REALTIME_MESSAGE_COUNT" | "REALTIME_PEAK_CONNECTIONS" | "COMPUTE_HOURS_BRANCH" | "COMPUTE_HOURS_XS" | "COMPUTE_HOURS_SM" | "COMPUTE_HOURS_MD" | "COMPUTE_HOURS_L" | "COMPUTE_HOURS_XL" | "COMPUTE_HOURS_2XL" | "COMPUTE_HOURS_4XL" | "COMPUTE_HOURS_8XL" | "COMPUTE_HOURS_12XL" | "COMPUTE_HOURS_16XL";
       /** @enum {string} */
       pricing_strategy: "UNIT" | "PACKAGE" | "NONE";
       pricing_free_units?: number;
@@ -2503,7 +2504,7 @@ export interface components {
     };
     BillingUsageBasedPrice: {
       /** @enum {string} */
-      metric: "EGRESS" | "DATABASE_EGRESS" | "DATABASE_SIZE" | "STORAGE_EGRESS" | "STORAGE_SIZE" | "MONTHLY_ACTIVE_USERS" | "MONTHLY_ACTIVE_SSO_USERS" | "FUNCTION_INVOCATIONS" | "FUNCTION_COUNT" | "STORAGE_IMAGES_TRANSFORMED" | "REALTIME_MESSAGE_COUNT" | "REALTIME_PEAK_CONNECTIONS" | "COMPUTE_HOURS_XS" | "COMPUTE_HOURS_SM" | "COMPUTE_HOURS_MD" | "COMPUTE_HOURS_L" | "COMPUTE_HOURS_XL" | "COMPUTE_HOURS_2XL" | "COMPUTE_HOURS_4XL" | "COMPUTE_HOURS_8XL" | "COMPUTE_HOURS_12XL" | "COMPUTE_HOURS_16XL";
+      metric: "EGRESS" | "DATABASE_EGRESS" | "DATABASE_SIZE" | "STORAGE_EGRESS" | "STORAGE_SIZE" | "MONTHLY_ACTIVE_USERS" | "MONTHLY_ACTIVE_SSO_USERS" | "FUNCTION_INVOCATIONS" | "FUNCTION_COUNT" | "STORAGE_IMAGES_TRANSFORMED" | "REALTIME_MESSAGE_COUNT" | "REALTIME_PEAK_CONNECTIONS" | "COMPUTE_HOURS_BRANCH" | "COMPUTE_HOURS_XS" | "COMPUTE_HOURS_SM" | "COMPUTE_HOURS_MD" | "COMPUTE_HOURS_L" | "COMPUTE_HOURS_XL" | "COMPUTE_HOURS_2XL" | "COMPUTE_HOURS_4XL" | "COMPUTE_HOURS_8XL" | "COMPUTE_HOURS_12XL" | "COMPUTE_HOURS_16XL";
       /** @enum {string} */
       pricingStrategy: "UNIT" | "PACKAGE" | "NONE";
       pricingOptions: components["schemas"]["BillingPricingOptionsUnit"] | components["schemas"]["BillingPricingOptionsPackage"] | components["schemas"]["BillingPricingOptionsNone"];
@@ -2998,6 +2999,8 @@ export interface components {
       status: string;
       subscription_id: string;
       is_readonly_mode_enabled?: boolean;
+      is_branch_enabled: boolean;
+      preview_branch_refs: (string)[];
     };
     AmiSearchOptions: {
       search_tags?: Record<string, never>;
@@ -3037,6 +3040,8 @@ export interface components {
       status: string;
       subscription_id: string;
       is_readonly_mode_enabled?: boolean;
+      is_branch_enabled: boolean;
+      preview_branch_refs: (string)[];
       endpoint: string;
       anon_key: string;
       service_key: string;
@@ -3122,16 +3127,6 @@ export interface components {
       postgrest: string;
       "supabase-postgres": string;
     };
-    BranchResponse: {
-      id: string;
-      name: string;
-      project_ref: string;
-      parent_project_ref: string;
-      is_default: boolean;
-      git_branch: string;
-      created_at: string;
-      updated_at: string;
-    };
     ProjectDetailResponse: {
       cloud_provider: string;
       db_host: string;
@@ -3152,7 +3147,7 @@ export interface components {
       volumeSizeGb?: number;
       maxDatabasePreprovisionGb?: number;
       lastDatabaseResizeAt?: string;
-      preview_branches: (components["schemas"]["BranchResponse"])[];
+      is_branch_enabled: boolean;
       parent_project_ref?: string;
     };
     ProjectRefResponse: {
@@ -3178,7 +3173,7 @@ export interface components {
       back_ups: (components["schemas"]["BackupId"])[];
     };
     RestartServiceRequest: {
-      services: ("adminapi" | "api-gateway" | "functions" | "gotrue" | "kong" | "pgbouncer" | "pgsodium" | "postgresql" | "postgrest" | "realtime" | "storage" | "walg")[];
+      services: ("adminapi" | "api-gateway" | "functions" | "gotrue" | "kong" | "pgbouncer" | "pgsodium" | "postgresql" | "postgrest" | "realtime" | "storage" | "walg" | "autoshutdown")[];
       source_notification_id?: string;
       region: string;
     };
@@ -3297,6 +3292,7 @@ export interface components {
       /** @enum {string} */
       pool_mode: "transaction" | "session" | "statement";
       max_client_conn?: number | null;
+      connectionString: string;
     };
     UpdatePgbouncerConfigBody: {
       default_pool_size?: number;
@@ -3848,8 +3844,50 @@ export interface components {
     CreateVercelConnectionResponse: {
       id: string;
     };
+    UpdateVercelConnectionsBody: {
+      metadata: Record<string, never>;
+    };
     DeleteVercelConnectionResponse: {
       id: string;
+    };
+    CreateGitHubIntegrationBody: {
+      installation_id: number;
+      organization_slug: string;
+      metadata: Record<string, never>;
+    };
+    CreateGitHubIntegrationResponse: {
+      id: string;
+    };
+    GetGitHubConnections: {
+      id: string;
+      inserted_at: string;
+      updated_at: string;
+      organization_integration_id: string;
+      supabase_project_ref: string;
+      foreign_project_id: string;
+      metadata: Record<string, never>;
+    };
+    CreateGitHubConnectionsBody: {
+      organization_integration_id: string;
+      connection: components["schemas"]["IntegrationConnection"];
+    };
+    UpdateGitHubConnectionsBody: {
+      metadata: Record<string, never>;
+    };
+    GetGithubRepo: {
+      id: number;
+      full_name: string;
+    };
+    GetGithubBranch: {
+      name: string;
+    };
+    GetGithubPullRequest: {
+      id: number;
+      url: string;
+      title: string;
+      branch: string;
+      created_at: string;
+      created_by?: string;
     };
     FunctionResponse: {
       id: string;
@@ -3940,6 +3978,16 @@ export interface components {
     UpdateBranchBody: {
       branch_name?: string;
       git_branch?: string;
+    };
+    BranchResponse: {
+      id: string;
+      name: string;
+      project_ref: string;
+      parent_project_ref: string;
+      is_default: boolean;
+      git_branch?: string;
+      created_at: string;
+      updated_at: string;
     };
     DatabaseResponse: {
       /** @description Database host */
@@ -4054,19 +4102,25 @@ export interface components {
       override_enabled: boolean;
       override_active_until: string;
     };
-    FunctionSlugResponse: {
-      id: string;
-      slug: string;
-      name: string;
-      /** @enum {string} */
-      status: "ACTIVE" | "REMOVED" | "THROTTLED";
-      version: number;
-      created_at: number;
-      updated_at: number;
-      verify_jwt?: boolean;
-      import_map?: boolean;
-      entrypoint_path?: string;
-      import_map_path?: string;
+    AuthConfigResponse: {
+      smtp_admin_email?: string;
+      smtp_host?: string;
+      smtp_port?: string;
+      smtp_user?: string;
+      smtp_pass?: string;
+      smtp_max_frequency?: number;
+      smtp_sender_name?: string;
+      rate_limit_email_sent?: number;
+    };
+    UpdateAuthConfigBody: {
+      smtp_admin_email?: string;
+      smtp_host?: string;
+      smtp_port?: string;
+      smtp_user?: string;
+      smtp_pass?: string;
+      smtp_max_frequency?: number;
+      smtp_sender_name?: string;
+      rate_limit_email_sent?: number;
     };
     AttributeValue: {
       default?: Record<string, never> | number | string | boolean;
@@ -4145,6 +4199,20 @@ export interface components {
       domains?: (components["schemas"]["Domain"])[];
       created_at?: string;
       updated_at?: string;
+    };
+    FunctionSlugResponse: {
+      id: string;
+      slug: string;
+      name: string;
+      /** @enum {string} */
+      status: "ACTIVE" | "REMOVED" | "THROTTLED";
+      version: number;
+      created_at: number;
+      updated_at: number;
+      verify_jwt?: boolean;
+      import_map?: boolean;
+      entrypoint_path?: string;
+      import_map_path?: string;
     };
     OAuthAppResponse: {
       id: string;
@@ -4369,6 +4437,19 @@ export interface operations {
       200: never;
       /** @description Failed to get project's status */
       500: never;
+    };
+  };
+  /**
+   * Gets resource warnings for all projects accessible by the user 
+   * @description Only returns the minimal project info
+   */
+  ProjectsResourceWarningsController_getProjectsResourceWarnings: {
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["ProjectResourceWarningsResponse"])[];
+        };
+      };
     };
   };
   /** Gets GoTrue config */
@@ -4709,25 +4790,18 @@ export interface operations {
       500: never;
     };
   };
-  /** Enables hooks on the project */
+  /** Enables Database Webhooks on the project */
   HooksController_enableHooks: {
     parameters: {
-      header: {
-        "x-connection-encrypted": string;
-      };
       path: {
         /** @description Project ref */
         ref: string;
       };
     };
     responses: {
-      201: {
-        content: {
-          "application/json": Record<string, never>;
-        };
-      };
+      201: never;
       403: never;
-      /** @description Failed to enable hooks on the project */
+      /** @description Failed to enable Database Webhooks on the project */
       500: never;
     };
   };
@@ -5024,7 +5098,7 @@ export interface operations {
   OrgDailyStatsController_getDailyStats: {
     parameters: {
       query: {
-        metric: "EGRESS" | "DATABASE_EGRESS" | "DATABASE_SIZE" | "STORAGE_EGRESS" | "STORAGE_SIZE" | "MONTHLY_ACTIVE_USERS" | "MONTHLY_ACTIVE_SSO_USERS" | "FUNCTION_INVOCATIONS" | "FUNCTION_COUNT" | "STORAGE_IMAGES_TRANSFORMED" | "REALTIME_MESSAGE_COUNT" | "REALTIME_PEAK_CONNECTIONS" | "COMPUTE_HOURS_XS" | "COMPUTE_HOURS_SM" | "COMPUTE_HOURS_MD" | "COMPUTE_HOURS_L" | "COMPUTE_HOURS_XL" | "COMPUTE_HOURS_2XL" | "COMPUTE_HOURS_4XL" | "COMPUTE_HOURS_8XL" | "COMPUTE_HOURS_12XL" | "COMPUTE_HOURS_16XL";
+        metric: "EGRESS" | "DATABASE_EGRESS" | "DATABASE_SIZE" | "STORAGE_EGRESS" | "STORAGE_SIZE" | "MONTHLY_ACTIVE_USERS" | "MONTHLY_ACTIVE_SSO_USERS" | "FUNCTION_INVOCATIONS" | "FUNCTION_COUNT" | "STORAGE_IMAGES_TRANSFORMED" | "REALTIME_MESSAGE_COUNT" | "REALTIME_PEAK_CONNECTIONS" | "COMPUTE_HOURS_BRANCH" | "COMPUTE_HOURS_XS" | "COMPUTE_HOURS_SM" | "COMPUTE_HOURS_MD" | "COMPUTE_HOURS_L" | "COMPUTE_HOURS_XL" | "COMPUTE_HOURS_2XL" | "COMPUTE_HOURS_4XL" | "COMPUTE_HOURS_8XL" | "COMPUTE_HOURS_12XL" | "COMPUTE_HOURS_16XL";
         interval: string;
         endDate: string;
         startDate: string;
@@ -6003,6 +6077,9 @@ export interface operations {
   /** Run sql query */
   QueryController_runQuery: {
     parameters: {
+      header: {
+        "x-connection-encrypted": string;
+      };
       path: {
         /** @description Project ref */
         ref: string;
@@ -8415,6 +8492,158 @@ export interface operations {
       500: never;
     };
   };
+  /** Updates a Vercel connection for a supabase project */
+  VercelConnectionsController_updateVercelConnection: {
+    parameters: {
+      path: {
+        connection_id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateVercelConnectionsBody"];
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to update Vercel connection */
+      500: never;
+    };
+  };
+  /** Create github integration */
+  GitHubIntegrationController_createGitHubIntegration: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateGitHubIntegrationBody"];
+      };
+    };
+    responses: {
+      201: {
+        content: {
+          "application/json": components["schemas"]["CreateGitHubIntegrationResponse"];
+        };
+      };
+      /** @description Failed to create github integration */
+      500: never;
+    };
+  };
+  /** Gets installed github project connections for the given organization integration */
+  GitHubConnectionsController_getGitHubConnections: {
+    parameters: {
+      path: {
+        organization_integration_id: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["GetGitHubConnections"])[];
+        };
+      };
+      /** @description Failed to get installed github connections for the given organization integration */
+      500: never;
+    };
+  };
+  /** Connects a GitHub project to a supabase project */
+  GitHubConnectionsController_createGitHubConnection: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateGitHubConnectionsBody"];
+      };
+    };
+    responses: {
+      201: never;
+      /** @description Failed to create project connections */
+      500: never;
+    };
+  };
+  /** Deletes github project connection */
+  GitHubConnectionsController_deleteGitHubConnection: {
+    parameters: {
+      path: {
+        connection_id: string;
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to delete github integration project connection */
+      500: never;
+    };
+  };
+  /** Updates a GitHub connection for a supabase project */
+  GitHubConnectionsController_updateGitHubConnection: {
+    parameters: {
+      path: {
+        connection_id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateGitHubConnectionsBody"];
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to update GitHub connection */
+      500: never;
+    };
+  };
+  /** Gets github repos for the given organization */
+  GitHubRepoController_getRepos: {
+    parameters: {
+      path: {
+        organization_integration_id: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["GetGithubRepo"])[];
+        };
+      };
+      /** @description Failed to get github repos for the given organization */
+      500: never;
+    };
+  };
+  /** Gets github branches for a given repo */
+  GitHubBranchController_getBranches: {
+    parameters: {
+      path: {
+        organization_integration_id: string;
+        repo_owner: string;
+        repo_name: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["GetGithubBranch"])[];
+        };
+      };
+      /** @description Failed to get github branches for a given repo */
+      500: never;
+    };
+  };
+  /** Gets github pull requests for a given repo */
+  GitHubPullRequestController_getPullRequests: {
+    parameters: {
+      path: {
+        organization_integration_id: string;
+        repo_owner: string;
+        repo_name: string;
+        target: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["GetGithubPullRequest"])[];
+        };
+      };
+      /** @description Failed to get github pull requests for a given repo */
+      500: never;
+    };
+  };
   /** Gets GoTrue template */
   AuthTemplateController_getTemplate: {
     parameters: {
@@ -8758,6 +8987,18 @@ export interface operations {
       500: never;
     };
   };
+  /** Handle update project jwt on completion */
+  ProjectUpdateJwtController_completeUpdateJwt: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    responses: {
+      201: never;
+    };
+  };
   /** Processes Vercel event */
   VercelWebhooksController_processEvent: {
     parameters: {
@@ -8773,6 +9014,25 @@ export interface operations {
     responses: {
       201: never;
       /** @description Failed to process Vercel event */
+      500: never;
+    };
+  };
+  /** Processes GitHub event */
+  GitHubWebhooksController_processEvent: {
+    parameters: {
+      header: {
+        "x-github-delivery": string;
+        "x-hub-signature-256": string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["Buffer"];
+      };
+    };
+    responses: {
+      201: never;
+      /** @description Failed to process GitHub event */
       500: never;
     };
   };
@@ -9573,105 +9833,46 @@ export interface operations {
       500: never;
     };
   };
-  /**
-   * Retrieve a function 
-   * @description Retrieves a function with the specified slug and project.
-   */
-  FunctionSlugController_getFunction: {
+  /** Gets project's auth config */
+  V1AuthConfigController_getV1AuthConfig: {
     parameters: {
       path: {
         /** @description Project ref */
         ref: string;
-        /** @description Function slug */
-        function_slug: string;
       };
     };
     responses: {
       200: {
         content: {
-          "application/json": components["schemas"]["FunctionSlugResponse"];
+          "application/json": components["schemas"]["AuthConfigResponse"];
         };
       };
       403: never;
-      /** @description Failed to retrieve function with given slug */
+      /** @description Failed to retrieve project's auth config */
       500: never;
     };
   };
-  /**
-   * Delete a function 
-   * @description Deletes a function with the specified slug from the specified project.
-   */
-  FunctionSlugController_deleteFunction: {
+  /** Updates a project's auth config */
+  V1AuthConfigController_updateV1AuthConfig: {
     parameters: {
       path: {
         /** @description Project ref */
         ref: string;
-        /** @description Function slug */
-        function_slug: string;
-      };
-    };
-    responses: {
-      200: never;
-      403: never;
-      /** @description Failed to delete function with given slug */
-      500: never;
-    };
-  };
-  /**
-   * Update a function 
-   * @description Updates a function with the specified slug and project.
-   */
-  FunctionSlugController_updateFunction: {
-    parameters: {
-      query?: {
-        slug?: string;
-        name?: string;
-        verify_jwt?: boolean;
-        import_map?: boolean;
-        entrypoint_path?: string;
-        import_map_path?: string;
-      };
-      path: {
-        /** @description Project ref */
-        ref: string;
-        /** @description Function slug */
-        function_slug: string;
       };
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["UpdateFunctionBody"];
-        "application/vnd.denoland.eszip": components["schemas"]["UpdateFunctionBody"];
+        "application/json": components["schemas"]["UpdateAuthConfigBody"];
       };
     };
     responses: {
       200: {
         content: {
-          "application/json": components["schemas"]["FunctionResponse"];
+          "application/json": components["schemas"]["AuthConfigResponse"];
         };
       };
       403: never;
-      /** @description Failed to update function with given slug */
-      500: never;
-    };
-  };
-  /**
-   * Retrieve a function body 
-   * @description Retrieves a function body for the specified slug and project.
-   */
-  FunctionSlugController_getFunctionBody: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string;
-        /** @description Function slug */
-        function_slug: string;
-      };
-    };
-    responses: {
-      200: never;
-      403: never;
-      /** @description Failed to retrieve function body with given slug */
+      /** @description Failed to update project's auth config */
       500: never;
     };
   };
@@ -9781,6 +9982,147 @@ export interface operations {
       403: never;
       /** @description Either SAML 2.0 was not enabled for this project, or the provider does not exist */
       404: never;
+    };
+  };
+  /** Run sql query */
+  V1QueryController_v1RunQuery: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RunQueryBody"];
+      };
+    };
+    responses: {
+      201: {
+        content: {
+          "application/json": Record<string, never>;
+        };
+      };
+      403: never;
+      /** @description Failed to run sql query */
+      500: never;
+    };
+  };
+  /** Enables Database Webhooks on the project */
+  V1DatabaseWebhooksController_v1EnableDatabaseWebhooks: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    responses: {
+      201: never;
+      403: never;
+      /** @description Failed to enable Database Webhooks on the project */
+      500: never;
+    };
+  };
+  /**
+   * Retrieve a function 
+   * @description Retrieves a function with the specified slug and project.
+   */
+  FunctionSlugController_getFunction: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+        /** @description Function slug */
+        function_slug: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["FunctionSlugResponse"];
+        };
+      };
+      403: never;
+      /** @description Failed to retrieve function with given slug */
+      500: never;
+    };
+  };
+  /**
+   * Delete a function 
+   * @description Deletes a function with the specified slug from the specified project.
+   */
+  FunctionSlugController_deleteFunction: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+        /** @description Function slug */
+        function_slug: string;
+      };
+    };
+    responses: {
+      200: never;
+      403: never;
+      /** @description Failed to delete function with given slug */
+      500: never;
+    };
+  };
+  /**
+   * Update a function 
+   * @description Updates a function with the specified slug and project.
+   */
+  FunctionSlugController_updateFunction: {
+    parameters: {
+      query?: {
+        slug?: string;
+        name?: string;
+        verify_jwt?: boolean;
+        import_map?: boolean;
+        entrypoint_path?: string;
+        import_map_path?: string;
+      };
+      path: {
+        /** @description Project ref */
+        ref: string;
+        /** @description Function slug */
+        function_slug: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateFunctionBody"];
+        "application/vnd.denoland.eszip": components["schemas"]["UpdateFunctionBody"];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["FunctionResponse"];
+        };
+      };
+      403: never;
+      /** @description Failed to update function with given slug */
+      500: never;
+    };
+  };
+  /**
+   * Retrieve a function body 
+   * @description Retrieves a function body for the specified slug and project.
+   */
+  FunctionSlugController_getFunctionBody: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+        /** @description Function slug */
+        function_slug: string;
+      };
+    };
+    responses: {
+      200: never;
+      403: never;
+      /** @description Failed to retrieve function body with given slug */
+      500: never;
     };
   };
   /** Create an organization */

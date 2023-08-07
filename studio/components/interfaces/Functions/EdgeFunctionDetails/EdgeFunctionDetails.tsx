@@ -181,9 +181,7 @@ const EdgeFunctionDetails = () => {
                         <div className="flex items-center space-x-2">
                           <p className="text-sm">
                             Import maps are{' '}
-                            <span
-                              className={clsx(hasImportMap ? 'text-brand-900' : 'text-amber-900')}
-                            >
+                            <span className={clsx(hasImportMap ? 'text-brand' : 'text-amber-900')}>
                               {hasImportMap ? 'used' : 'not used'}
                             </span>{' '}
                             for this function

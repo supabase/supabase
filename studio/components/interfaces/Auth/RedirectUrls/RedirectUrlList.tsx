@@ -1,18 +1,18 @@
-import { FC } from 'react'
+import { noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { Button, IconGlobe, IconTrash } from 'ui'
 
+import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
+import { EmptyListState } from 'components/ui/States'
 import { useStore } from 'hooks'
 import ValueContainer from './ValueContainer'
-import { EmptyListState } from 'components/ui/States'
-import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
 
-interface Props {
+interface RedirectUrlListProps {
   canUpdate: boolean
   onSelectUrlToDelete: (url: string) => void
 }
 
-const RedirectUrlList: FC<Props> = ({ canUpdate, onSelectUrlToDelete }) => {
+const RedirectUrlList = ({ canUpdate, onSelectUrlToDelete = noop }: RedirectUrlListProps) => {
   const { authConfig } = useStore()
 
   const URI_ALLOW_LIST_ARRAY = authConfig.config.URI_ALLOW_LIST
