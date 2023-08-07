@@ -58,32 +58,6 @@ Let's generate some seed data for a typical blog application, with the following
 
 ![An example schema](/docs/img/guides/cli/snaplet-example-schema.png)
 
-{/*
-```sql schema.sql
-
-create table "User" (
-  id bigint not null primary key,
-  email text not null,
-  name text
-);
-
-create table "Comment" (
-  id bigint not null primary key,
-  text text not null,
-  "userId" bigint references "User" (id),
-  "postId" bigint references "Post" (id)
-);
-
-
-create table "Post" (
-  id bigint not null primary key,
-  title text not null,
-  content text,
-  "createdBy" bigint references "User" (id)
-);
-```
-\*/}
-
 We can use the Snaplet configuration file to define the values you want to generate. For example
 
 * A `Post` with the title `"There is a lot of snow around here!"`
