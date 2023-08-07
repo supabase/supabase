@@ -1,14 +1,14 @@
-import { FC, useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { SidePanel } from 'ui'
 
-import { useStore } from 'hooks'
-import JsonEditor from './JsonCodeEditor'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import DrilldownViewer from './DrilldownViewer'
-import ActionBar from '../../ActionBar'
+import { useStore } from 'hooks'
 import { minifyJSON, prettifyJSON, tryParseJson } from 'lib/helpers'
+import ActionBar from '../../ActionBar'
+import DrilldownViewer from './DrilldownViewer'
+import JsonEditor from './JsonCodeEditor'
 
-type JsonEditProps = {
+interface JsonEditProps {
   column: string
   jsonString: string
   visible: boolean
@@ -18,7 +18,7 @@ type JsonEditProps = {
   onSaveJSON: (value: string | number) => void
 }
 
-const JsonEdit: FC<JsonEditProps> = ({
+const JsonEdit = ({
   column,
   jsonString,
   visible,
@@ -26,7 +26,7 @@ const JsonEdit: FC<JsonEditProps> = ({
   applyButtonLabel,
   closePanel,
   onSaveJSON,
-}) => {
+}: JsonEditProps) => {
   const { ui } = useStore()
   const [view, setView] = useState<'edit' | 'view'>('edit')
   const [jsonStr, setJsonStr] = useState('')

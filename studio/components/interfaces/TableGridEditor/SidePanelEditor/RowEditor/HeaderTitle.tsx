@@ -1,11 +1,9 @@
-import { FC } from 'react'
-
-interface Props {
+interface HeaderTitleProps {
   isNewRecord: boolean
   tableName?: string
 }
 
-const HeaderTitle: FC<Props> = ({ isNewRecord, tableName }) => {
+const HeaderTitle = ({ isNewRecord, tableName }: HeaderTitleProps) => {
   let header = `${isNewRecord ? 'Add new' : 'Update'} row ${isNewRecord ? 'to' : 'from'} `
 
   return (
