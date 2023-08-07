@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import days from './lw8_data'
 import { ExpandableVideo } from 'ui'
+import { useRouter } from 'next/router'
 
 const LWAnnouncement = ({
   title,
@@ -13,6 +14,7 @@ const LWAnnouncement = ({
   isLaunchWeekPage?: boolean
 }) => {
   if (typeof document === 'undefined') return null
+  const router = useRouter()
   const [_pre, d1, _d2, _d3, _d4, _d5] = days
   const today = document.getElementById('today')
 
@@ -63,7 +65,7 @@ const LWAnnouncement = ({
 
   const handleClick = (e: any) => {
     if (!today) return
-    today.scrollIntoView({ behavior: 'smooth' })
+    router.replace('#today')
   }
 
   return (
