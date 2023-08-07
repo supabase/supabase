@@ -1,11 +1,10 @@
-import { FC } from 'react'
 import DataGrid, { Row } from '@supabase/react-data-grid'
 
-interface Props {
+interface ResultsPaneProps {
   results: any
 }
 
-const ResultsPane: FC<Props> = ({ results }) => {
+const ResultsPane = ({ results }: ResultsPaneProps) => {
   if (results.length === 0) {
     return (
       <div className="p-5 flex items-center space-x-2 bg-gray-100 dark:bg-gray-700">

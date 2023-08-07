@@ -1,16 +1,16 @@
-import { FC } from 'react'
+import { isNull, noop } from 'lodash'
 import { IconChevronRight } from 'ui'
-import { isNull } from 'lodash'
+
 import { Dictionary } from 'components/grid'
 
-interface Props {
+interface DrilldownPaneProps {
   pane: number
   jsonData: Dictionary<any>
   activeKey?: string
   onSelectKey: (key: string, pane: number) => void
 }
 
-const DrilldownPane: FC<Props> = ({ pane, jsonData, activeKey, onSelectKey = () => {} }) => {
+const DrilldownPane = ({ pane, jsonData, activeKey, onSelectKey = noop }: DrilldownPaneProps) => {
   if (!jsonData) {
     return (
       <div className={`flex-1 ${pane === 2 ? 'border-l border-gray-500' : ''}`}>

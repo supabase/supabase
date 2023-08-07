@@ -1,7 +1,7 @@
 import type { PostgresColumn, PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 import { Dictionary } from 'components/grid'
 import { find, get, isEmpty, sortBy } from 'lodash'
-import { FC, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { IconDatabase, IconHelpCircle, Input, Listbox, SidePanel } from 'ui'
 
 import InformationBox from 'components/ui/InformationBox'
@@ -13,7 +13,7 @@ import { FOREIGN_KEY_DELETION_OPTIONS } from './ForeignKeySelector.constants'
 import { ForeignKey } from './ForeignKeySelector.types'
 import { generateDeletionActionDescription } from './ForeignKeySelector.utils'
 
-interface Props {
+interface ForeignKeySelectorProps {
   column: ColumnField
   metadata?: any
   visible: boolean
@@ -23,7 +23,12 @@ interface Props {
   ) => void
 }
 
-const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, saveChanges }) => {
+const ForeignKeySelector = ({
+  column,
+  visible = false,
+  closePanel,
+  saveChanges,
+}: ForeignKeySelectorProps) => {
   const { meta } = useStore()
   const [errors, setErrors] = useState<any>({})
   const [selectedForeignKey, setSelectedForeignKey] = useState<ForeignKey>({
