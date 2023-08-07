@@ -159,7 +159,7 @@ This is great for search, where you might want to “debounce” the user query 
 
 For example, if we were storing image embeddings inside our database, we could provide search functionality using a simple Postgres function, powered by pgvector:
 
-```
+```sql
 create function match_images (
     query_embedding vector(512),
     match_threshold float,
