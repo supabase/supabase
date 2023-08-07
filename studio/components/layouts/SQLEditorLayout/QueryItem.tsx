@@ -164,7 +164,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
     try {
       const snippet = createSqlSnippetSkeleton({ name, sql: content.sql, owner_id: profile?.id })
       const data = { ...snippet, id: uuidv4() }
-      snap.addSnippet(data as SqlSnippet, ref, true)
+      snap.addSnippet(data as SqlSnippet, ref)
       router.push(`/project/${ref}/sql/${data.id}`)
     } catch (error: any) {
       ui.setNotification({
