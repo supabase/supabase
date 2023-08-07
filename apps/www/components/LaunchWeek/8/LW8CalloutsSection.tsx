@@ -9,7 +9,7 @@ const LW8CalloutsSection = () => {
     <SectionContainer className="!py-0 w-full !px-0 !max-w-none">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 scroll-mt-[105px]" id="hackathon">
         <SmallCard className="hover:from-scale-900 hover:to-scale-900">
-          <Link href="https://twitter.com/i/spaces/1DXGyvjkeEeJM">
+          <Link href="https://twitter.com/supabase/status/1688544202643111936">
             <a
               target="_blank"
               className="flex flex-row justify-between items-center w-full h-full gap-2"
