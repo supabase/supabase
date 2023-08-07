@@ -21,10 +21,10 @@ import { useState } from 'react'
 import { format } from 'sql-formatter'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIcon, AiIconAnimation, IconCornerDownLeft, IconSettings, Input } from 'ui'
+import AISchemaSuggestionPopover from '../AISchemaSuggestionPopover'
 import AISettingsModal from '../AISettingsModal'
 import { sqlAiDisclaimerComment } from '../SQLEditor.constants'
 import { createSqlSnippetSkeleton } from '../SQLEditor.utils'
-import AISchemaSuggestionPopover from '../AISchemaSuggestionPopover'
 
 const SQLAI = () => {
   const { ui } = useStore()
@@ -76,10 +76,15 @@ const SQLAI = () => {
     }
 
     try {
-      const snippet = createSqlSnippetSkeleton({ name, sql, owner_id: profile?.id })
-      const data = { ...snippet, id: uuidv4() }
-      snap.addSnippet(data as SqlSnippet, ref)
-      router.push(`/project/${ref}/sql/${data.id}`)
+      const snippet = createSqlSnippetSkeleton({
+        id: uuidv4(),
+        name,
+        sql,
+        owner_id: profile?.id,
+        project_id: selectedProject?.id,
+      })
+      snap.addSnippet(snippet as SqlSnippet, ref)
+      router.push(`/project/${ref}/sql/${snippet.id}`)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',

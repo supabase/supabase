@@ -19,7 +19,6 @@ import {
   Input_Shadcn_,
 } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
 import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
@@ -87,7 +86,7 @@ const SQLEditor = () => {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
   const { profile } = useProfile()
-  const { project } = useProjectContext()
+  const project = useSelectedProject()
   const snap = useSqlEditorStateSnapshot()
   const { mutateAsync: generateSql, isLoading: isGenerateSqlLoading } = useSqlGenerateMutation()
   const { mutateAsync: editSql, isLoading: isEditSqlLoading } = useSqlEditMutation()
@@ -228,10 +227,15 @@ const SQLEditor = () => {
       if (!ref) return console.error('Project ref is required')
 
       try {
-        const snippet = createSqlSnippetSkeleton({ name, sql, owner_id: profile?.id })
-        const data = { ...snippet, id: uuidv4() }
-        snap.addSnippet(data as SqlSnippet, ref)
-        router.push(`/project/${ref}/sql/${data.id}`)
+        const snippet = createSqlSnippetSkeleton({
+          id: uuidv4(),
+          name,
+          sql,
+          owner_id: profile?.id,
+          project_id: project?.id,
+        })
+        snap.addSnippet(snippet as SqlSnippet, ref)
+        router.push(`/project/${ref}/sql/${snippet.id}`)
       } catch (error: any) {
         ui.setNotification({
           category: 'error',
@@ -239,7 +243,7 @@ const SQLEditor = () => {
         })
       }
     },
-    [profile, ref, router, snap, ui]
+    [profile?.id, project?.id, ref, router, snap, ui]
   )
 
   const acceptAiHandler = useCallback(async () => {
