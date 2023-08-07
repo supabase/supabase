@@ -35,7 +35,7 @@ export const typeExpressionSuggestions: Dictionary<Suggestion[]> = {
       name: 'auth.uid()',
       value: 'auth.uid()',
       description:
-        'Extracts the unique user ID when rows are added or updated through serverless API',
+        'Returns the user's ID when rows are added or updated through the API',
     },
     {
       name: 'gen_random_uuid()',
