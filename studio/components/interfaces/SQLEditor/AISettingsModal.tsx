@@ -12,12 +12,12 @@ const AISettingsModal = (props: ModalProps) => {
   const selectedOrganization = useSelectedOrganization()
   const isOptedInToAI =
     selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
-  const [isOptedInToAISchema, setIsOptedInToAISchema] = useLocalStorageQuery(
+  const [hasEnabledAISchema, setHasEnabledAISchema] = useLocalStorageQuery(
     'supabase_sql-editor-ai-schema-enabled',
-    false
+    true
   )
 
-  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && isOptedInToAISchema
+  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
 
   return (
     <Modal header="SQL Editor AI Settings" hideFooter closable {...props}>
@@ -33,7 +33,7 @@ const AISettingsModal = (props: ModalProps) => {
           <Toggle
             disabled={IS_PLATFORM && !isOptedInToAI}
             checked={includeSchemaMetadata}
-            onChange={() => setIsOptedInToAISchema((prev) => !prev)}
+            onChange={() => setHasEnabledAISchema((prev) => !prev)}
           />
         </div>
         {IS_PLATFORM && !isOptedInToAI && selectedOrganization && (
