@@ -38,7 +38,7 @@ export default withAuth(observer(WizardLayout))
 
 export const WizardLayoutWithoutAuth = observer(WizardLayout)
 
-const Header = ({ organization, project }: PropsWithChildren<any>) => {
+const Header = ({ organization, project }: WizardLayoutProps) => {
   let stepNumber = organization ? 1 : project ? 2 : 0
   return (
     <div className="border-b p-3 dark:border-dark">
