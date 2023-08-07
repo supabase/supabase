@@ -1,7 +1,8 @@
-import { Badge } from 'ui'
+import { Badge, ExpandableVideo } from 'ui'
 
 import Link from 'next/link'
 import CountdownComponent from '../../Countdown'
+import Image from 'next/image'
 
 export const PencilSvg = () => (
   <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -81,10 +82,33 @@ export const HackernewsSvg = () => (
   </svg>
 )
 
-export const SmallCard = ({ className, children }: { className?: string; children: any }) => (
+export const TwitterSpacesSvg = () => (
+  <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M4.46228 5.78799C4.46228 3.4802 6.3331 1.60938 8.64089 1.60938C10.9487 1.60938 12.8195 3.4802 12.8195 5.78799V8.17578C12.8195 10.4836 10.9487 12.3544 8.64089 12.3544C6.3331 12.3544 4.46228 10.4836 4.46228 8.17578V5.78799ZM6.85006 8.17578C7.09719 8.17578 7.29777 7.9752 7.29777 7.72807V6.2357C7.29777 5.98857 7.09719 5.78799 6.85006 5.78799C6.60292 5.78799 6.40235 5.98857 6.40235 6.2357V7.72807C6.40235 7.9752 6.60292 8.17578 6.85006 8.17578ZM8.64089 8.77272C8.88803 8.77272 9.0886 8.57215 9.0886 8.32501V5.63876C9.0886 5.39162 8.88803 5.19105 8.64089 5.19105C8.39376 5.19105 8.19319 5.39162 8.19319 5.63876V8.32501C8.19319 8.57215 8.39376 8.77272 8.64089 8.77272ZM10.4317 8.17578C10.6789 8.17578 10.8794 7.9752 10.8794 7.72807V6.2357C10.8794 5.98857 10.6789 5.78799 10.4317 5.78799C10.1846 5.78799 9.98402 5.98857 9.98402 6.2357V7.72807C9.98402 7.9752 10.1846 8.17578 10.4317 8.17578Z"
+      fill="#8F8F8F"
+    />
+    <path
+      d="M2.85924 9.24628C3.17502 9.15077 3.50692 9.32985 3.60243 9.64624C4.24654 11.7934 6.23138 13.3992 8.64185 13.3992C11.0523 13.3992 13.0372 11.7934 13.6819 9.64564C13.7768 9.32926 14.1099 9.15137 14.4251 9.24569C14.7402 9.34 14.9205 9.6725 14.825 9.98888C14.0364 12.6172 11.6039 14.5931 8.64185 14.5931C5.67981 14.5931 3.24725 12.6172 2.45928 9.98948C2.36377 9.6737 2.54286 9.34179 2.85924 9.24628Z"
+      fill="#8F8F8F"
+    />
+  </svg>
+)
+
+export const SmallCard = ({
+  className,
+  innerClassName,
+  children,
+}: {
+  className?: string
+  innerClassName?: string
+  children: any
+}) => (
   <div
     className={[
-      'relative p-[1px] bg-gradient-to-b from-[#111718] to-[#1C1C1C60] rounded-2xl overflow-hidden shadow-lg',
+      'group relative p-[1px] bg-gradient-to-b from-[#11171890] to-[#1C1C1C60] rounded-2xl overflow-hidden shadow-lg',
       className,
     ].join(' ')}
   >
@@ -92,6 +116,7 @@ export const SmallCard = ({ className, children }: { className?: string; childre
       className={[
         'rounded-2xl text-sm text-[#9296AA] p-2 flex flex-row justify-between items-center backdrop-blur-md h-full',
         'bg-[#030A0C]',
+        innerClassName,
       ].join(' ')}
     >
       {children}
@@ -128,6 +153,8 @@ export const AccordionHeader = ({
   shipped,
   publishedAt,
   shippable = true,
+  youtube_id,
+  videoThumbnail,
 }: {
   date: string
   day: number
@@ -136,58 +163,96 @@ export const AccordionHeader = ({
   shipped?: boolean
   publishedAt: string
   shippable?: boolean
+  youtube_id?: string
+  videoThumbnail?: string
 }) => (
   <div
-    className={['flex flex-1', shippable && shipped ? 'flex-col sm:flex-row' : 'flex-row'].join(
-      ' '
-    )}
+    className={['flex flex-1 justify-between items-stretch scroll-mt-20 text-scale-900'].join(' ')}
   >
-    <div className="flex gap-4 w-full sm:w-auto sm:min-w-[240px] md:min-w-[380px] items-center">
-      <span className="text-scale-900 text-sm">
-        <span className="inline sm:hidden md:inline">{weekDay} </span>
-        {date && (
-          <span>
-            <span className="inline sm:hidden md:inline">・</span> {date}
-          </span>
-        )}
-      </span>
-    </div>
-    {shippable && shipped && (
-      <Badge
-        className={`relative inset-0 !bg-transparent !py-1 !px-4 h-fit backdrop-blur-md ${
-          shipped
-            ? 'bg-gradient-to-br from-[#05090B] to-[#05090B] !border-[#061517]'
-            : 'border-[#FFFFFF20]'
-        }`}
-      >
-        <span className="text-[#A0A0A0] text-sm font-normal bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
-          Shipped
+    <div
+      className={[
+        'flex flex-1',
+        shippable && shipped ? 'items-stretch' : 'flex-row items-center',
+      ].join(' ')}
+    >
+      <div className="flex gap-4 w-full sm:w-auto sm:min-w-[240px] md:min-w-[380px] items-center">
+        <span className="text-sm">
+          <span className="inline sm:hidden md:inline">{weekDay} </span>
+          {date && (
+            <span>
+              <span className="inline sm:hidden md:inline">・</span> {date}
+            </span>
+          )}
         </span>
-      </Badge>
-    )}
-    {shipped && <span className="text-scale-1200 text-lg mt-1 sm:mt-0">{title}</span>}
-    {shippable && !shipped && (
-      <span className="text-sm font-normal text-[#A0A0A0] mt-1 sm:mt-0 flex items-center gap-1 md:gap-4">
-        <svg
-          width="17"
-          height="17"
-          viewBox="0 0 17 17"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+      </div>
+      {shippable && shipped && (
+        <Badge
+          className={`relative hidden sm:inline-flex inset-0 !bg-[#05090B] border !border-[#061517] !py-1 !px-4 h-fit`}
         >
-          <g opacity="0.5">
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M4.32656 7.58047V5.98047C4.32656 3.77133 6.11742 1.98047 8.32656 1.98047C10.5357 1.98047 12.3266 3.77133 12.3266 5.98047V7.58047C13.2102 7.58047 13.9266 8.29681 13.9266 9.18047V13.1805C13.9266 14.0641 13.2102 14.7805 12.3266 14.7805H4.32656C3.44291 14.7805 2.72656 14.0641 2.72656 13.1805V9.18047C2.72656 8.29681 3.44291 7.58047 4.32656 7.58047ZM10.7266 5.98047V7.58047H5.92656V5.98047C5.92656 4.65499 7.00108 3.58047 8.32656 3.58047C9.65205 3.58047 10.7266 4.65499 10.7266 5.98047Z"
-              fill="#A0A0A0"
-            />
-          </g>
-        </svg>
+          <span className="text-[#F4FFFA40] text-sm font-normal bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
+            Shipped
+          </span>
+        </Badge>
+      )}
+      {shippable && !shipped && (
+        <span className="text-sm font-normal text-[#A0A0A0] mt-1 sm:mt-0 flex items-center gap-1 md:gap-4">
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 17 17"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g opacity="0.5">
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M4.32656 7.58047V5.98047C4.32656 3.77133 6.11742 1.98047 8.32656 1.98047C10.5357 1.98047 12.3266 3.77133 12.3266 5.98047V7.58047C13.2102 7.58047 13.9266 8.29681 13.9266 9.18047V13.1805C13.9266 14.0641 13.2102 14.7805 12.3266 14.7805H4.32656C3.44291 14.7805 2.72656 14.0641 2.72656 13.1805V9.18047C2.72656 8.29681 3.44291 7.58047 4.32656 7.58047ZM10.7266 5.98047V7.58047H5.92656V5.98047C5.92656 4.65499 7.00108 3.58047 8.32656 3.58047C9.65205 3.58047 10.7266 4.65499 10.7266 5.98047Z"
+                fill="#A0A0A0"
+              />
+            </g>
+          </svg>
 
-        {day === 1 && <CountdownComponent date={publishedAt} showCard={false} />}
-      </span>
+          {day === 2 && <CountdownComponent date={publishedAt} showCard={false} />}
+        </span>
+      )}
+    </div>
+    {shippable && shipped && youtube_id && (
+      <div className="self-end hover:cursor-pointer">
+        <ExpandableVideo
+          videoId={youtube_id}
+          trigger={
+            <VideoPreviewTrigger
+              title={`Watch: Day ${day}`}
+              thumbnail={videoThumbnail ?? '/images/launchweek/8/lw8-yt-thumb.jpg'}
+            />
+          }
+        />
+      </div>
     )}
+  </div>
+)
+
+export const VideoPreviewTrigger = ({ title, thumbnail }: { title: string; thumbnail: string }) => (
+  <div className="flex items-center h-full gap-3 text-xs group/vid text-scale-1100 hover:text-scale-1200 transition-colors">
+    <span>{title}</span>
+    <div className="relative h-8 !aspect-video flex items-center justify-center rounded overflow-hidden border border-scale-1000 opacity-80 group-hover/vid:opacity-100 transition-colors">
+      <div className="absolute z-10 w-2.5 h-2.5 text-scale-1000 opacity-80 group-hover/vid:opacity-100">
+        <svg viewBox="0 0 81 91" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M76.5621 37.998C82.3369 41.3321 82.3369 49.6673 76.5621 53.0014L13.2198 89.5721C7.44504 92.9062 0.226562 88.7386 0.226562 82.0704L0.226566 8.92901C0.226566 2.26085 7.44506 -1.90673 13.2199 1.42735L76.5621 37.998Z"
+            fill="currentColor"
+          />
+        </svg>
+      </div>
+      <Image
+        src={thumbnail}
+        alt="Video thumbnail"
+        layout="fill"
+        objectFit="cover"
+        className="blur-sm"
+      />
+    </div>
   </div>
 )
 
@@ -253,6 +318,7 @@ export const SectionButtons = ({
   github,
   url,
   hackernews,
+  twitter_spaces,
   mobileGrid,
 }: {
   blog?: string
@@ -261,6 +327,7 @@ export const SectionButtons = ({
   github?: string
   url?: string
   hackernews?: string
+  twitter_spaces?: string
   mobileGrid?: boolean
 }) => {
   return (
@@ -296,7 +363,7 @@ export const SectionButtons = ({
       )}
       {!!github && (
         <ChipLink href={github} target="_blank">
-          Github
+          GitHub
           <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <GithubSvg />
           </div>
@@ -312,9 +379,17 @@ export const SectionButtons = ({
       )}
       {hackernews && (
         <ChipLink href={hackernews} target="_blank">
-          Hackernews
+          Hacker News
           <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <HackernewsSvg />
+          </div>
+        </ChipLink>
+      )}
+      {twitter_spaces && (
+        <ChipLink href={twitter_spaces} target="_blank" className="col-span-full">
+          Twitter Spaces
+          <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
+            <TwitterSpacesSvg />
           </div>
         </ChipLink>
       )}
