@@ -91,47 +91,38 @@ AI/ML is primarily the domain of the Python community, but thanks to some amazin
 Let’s step through a small demo where we accept some text, convert it into an embedding, and then store it in our Postgres database. You can create a new function with supabase functions new embed and fill it with the following code snippet:
 
 ```ts
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { env, pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.5.0';
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { env, pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.5.0'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 // Preparation for Deno runtime
-env.useBrowserCache = false;
-env.allowLocalModels = false;
+env.useBrowserCache = false
+env.allowLocalModels = false
 
 const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
 
 // Construct pipeline outside of serve for faster warm starts
-const pipe = await pipeline(
-  'feature-extraction',
-  'Supabase/gte-small',
-);
+const pipe = await pipeline('feature-extraction', 'Supabase/gte-small')
 
 // Deno Handler
 serve(async (req) => {
-  const { input } = await req.json();
+  const { input } = await req.json()
 
   // Generate the embedding from the user input
   const output = await pipe(input, {
     pooling: 'mean',
     normalize: true,
-  });
+  })
 
   // Get the embedding output
-  const embedding = Array.from(output.data);
+  const embedding = Array.from(output.data)
 
   // Store the embedding
-  const { data, error } = await supabase
-    .from('collections')
-    .insert({ embedding });
+  const { data, error } = await supabase.from('collections').insert({ embedding })
 
   // Return the embedding
-  return new Response(
-    { new_row: data },
-    { headers: { 'Content-Type': 'application/json' } }
-  );
-});
-
+  return new Response({ new_row: data }, { headers: { 'Content-Type': 'application/json' } })
+})
 ```
 
 Now run `supabase functions serve` and you’re ready to call your function locally:
@@ -179,12 +170,11 @@ $$;
 Now, we can call that function directly from the browser using [supabase-js](https://supabase.com/docs/reference/javascript/installing):
 
 ```js
-let { data: images, error } = await supabase
-    .rpc('match_images', {
-        query_embedding,
-        match_threshold,
-        match_count,
-    });
+let { data: images, error } = await supabase.rpc('match_images', {
+  query_embedding,
+  match_threshold,
+  match_count,
+})
 ```
 
 Of course, even the [smallest](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) quantized models in the [MTEB leaderboard](https://huggingface.co/spaces/mteb/leaderboard) are around 20 MB - so you won’t be seeing this on an e-commerce store any time soon. But for some web-based applications or browser extensions it’s an exciting prospect.
