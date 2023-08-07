@@ -164,6 +164,7 @@ const SQLEditor = () => {
   const [selectedDiffType, setSelectedDiffType] = useState(DiffType.Modification)
   const [isFirstRender, setIsFirstRender] = useState(true)
 
+  // Used for cleaner framer motion transitions
   useEffect(() => {
     setIsFirstRender(false)
   }, [])
@@ -215,20 +216,16 @@ const SQLEditor = () => {
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
 
   /**
-   * Sets the snippet title using AI if it is still untitled.
+   * Sets the snippet title using AI.
    */
-  const setAiTitle = useCallback(async () => {
-    if (
-      id &&
-      snippet &&
-      snippet.snippet.name === untitledSnippetTitle &&
-      !!snippet.snippet.content.sql
-    ) {
-      const { title } = await generateSqlTitle({ sql: snippet.snippet.content.sql })
+  const setAiTitle = useCallback(
+    async (id: string, sql: string) => {
+      const { title } = await generateSqlTitle({ sql })
 
       snap.renameSnippet(id, title)
-    }
-  }, [id, snippet, generateSqlTitle, snap])
+    },
+    [generateSqlTitle, snap]
+  )
 
   const executeQuery = useCallback(
     async (force: boolean = false) => {
@@ -253,8 +250,10 @@ const SQLEditor = () => {
           return
         }
 
-        // Intentionally don't await title gen
-        setAiTitle()
+        if (idRef.current && snippet.snippet.name === untitledSnippetTitle) {
+          // Intentionally don't await title gen (lazy)
+          setAiTitle(idRef.current, sql)
+        }
 
         execute({
           projectRef: project.ref,
