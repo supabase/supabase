@@ -12,7 +12,7 @@ image: launch-week-8/day-1/hugging-face-supabase-og.jpg
 thumb: launch-week-8/day-1/hugging-face-supabase-thumb.jpg
 ---
 
-Since launching our [Vector Toolkit](https://supabase.com/vector) a few months ago, the number of AI applications on Supabase has grown - a lot. Hundreds of new databases every week are using [pgvector](https://github.com/pgvector/pgvector). 
+Since launching our [Vector Toolkit](https://supabase.com/vector) a few months ago, the number of AI applications on Supabase has grown - a lot. Hundreds of new databases every week are using [pgvector](https://github.com/pgvector/pgvector).
 
 98% of those applications use OpenAI to store embeddings using their `text-embedding-ada-002` model. While OpenAI is easy, it’s not open source, which means it can’t be self-hosted.
 
@@ -84,7 +84,7 @@ docs.query(data="how many ping pong balls fit in a Boeing ...")
 # Results: [...]
 ```
 
-## Hugging Face with Edge Functions 
+## Hugging Face with Edge Functions
 
 AI/ML is primarily the domain of the Python community, but thanks to some amazing work by [Joshua](https://twitter.com/xenovacom) at Hugging Face, you can now run inference workloads in Deno/JavaScript. This is an exciting development. It opens up the world of AI/ML to millions of new developers. We’re hoping to accelerate this with better Hugging Face tooling within Supabase Edge Functions.
 
@@ -103,7 +103,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
 
 // Construct pipeline outside of serve for faster warm starts
 const pipe = await pipeline(
-	'feature-extraction', 
+	'feature-extraction',
 	'Supabase/gte-small',
 );
 
@@ -127,7 +127,7 @@ serve(async (req) => {
 
 	// Return the embedding
   return new Response(
-		{ new_row: data }, 
+		{ new_row: data },
 		{ headers: { 'Content-Type': 'application/json' } }
   );
 });
@@ -148,7 +148,7 @@ Supabase also provides [Database Webhooks](https://supabase.com/docs/guides/data
 
 ## Hugging Face from the browser
 
-One of the coolest ideas we’ve seen so far is the ability to support Hugging Face models directly in the browser. With sufficiently small models, you can embed them directly into your application and cut out an entire network hop. 
+One of the coolest ideas we’ve seen so far is the ability to support Hugging Face models directly in the browser. With sufficiently small models, you can embed them directly into your application and cut out an entire network hop.
 
 !(Hugging Face from the browser - demo)[/images/blog/launch-week-8/day-1/hugging-face-from-the-browser-demo.png]
 
