@@ -7,16 +7,20 @@ interface ExpandableVideoProps {
   videoId: string
   imgUrl?: string
   imgOverlayText?: string
+  triggerContainerClassName?: string
   imgAltText?: string
   trigger?: ReactNode
+  onOpenCallback?: any
 }
 
 export function ExpandableVideo({
   imgUrl,
   videoId,
   imgOverlayText,
+  triggerContainerClassName = '',
   imgAltText,
   trigger,
+  onOpenCallback,
 }: ExpandableVideoProps) {
   const [expandVideo, setExpandVideo] = React.useState(false)
   const isMobile = useBreakpoint(768)
@@ -99,7 +103,15 @@ export function ExpandableVideo({
           </div>
         </div>
       </Modal>
-      <div onClick={() => setExpandVideo(true)}>{trigger ?? <CliccablePreview />}</div>
+      <button
+        onClick={() => {
+          setExpandVideo(true)
+          if (onOpenCallback) onOpenCallback()
+        }}
+        className={[triggerContainerClassName].join(' ')}
+      >
+        {trigger ?? <CliccablePreview />}
+      </button>
     </>
   )
 }

@@ -220,7 +220,7 @@ export const AccordionHeader = ({
       )}
     </div>
     {shippable && shipped && youtube_id && (
-      <div className="hover:cursor-pointer">
+      <div className="hover:cursor-pointer animate-pulse hover:!opacity-100">
         <ExpandableVideo
           videoId={youtube_id}
           trigger={
