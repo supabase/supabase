@@ -1,16 +1,16 @@
+import Link from 'next/link'
+import { IconInfo } from 'ui'
+
 import InformationBox from 'components/ui/InformationBox'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import Link from 'next/link'
-import { FC } from 'react'
 import { Organization } from 'types'
-import { IconInfo } from 'ui'
 
-interface Props {
+interface NoProjectsOnPaidOrgInfoProps {
   organization?: Organization
 }
 
-const NoProjectsOnPaidOrgInfo: FC<Props> = ({ organization }) => {
+const NoProjectsOnPaidOrgInfo = ({ organization }: NoProjectsOnPaidOrgInfoProps) => {
   const { data: allProjects } = useProjectsQuery({
     enabled: organization?.subscription_id !== undefined,
   })

@@ -1,15 +1,16 @@
 import Link from 'next/link'
-import { FC, useState } from 'react'
-import { Button, Input, IconHelpCircle, IconEye, IconEyeOff, IconLoader } from 'ui'
+import { useState } from 'react'
+import { Button, IconEye, IconEyeOff, IconHelpCircle, IconLoader, Input } from 'ui'
+
 import { ServerOption } from './Wrappers.types'
 
-interface Props {
+interface InputFieldProps {
   option: ServerOption
   loading: boolean
   error: any
 }
 
-const InputField: FC<Props> = ({ option, loading, error }) => {
+const InputField = ({ option, loading, error }: InputFieldProps) => {
   const [showHidden, setShowHidden] = useState(!option.hidden)
   if (option.isTextArea) {
     return (
