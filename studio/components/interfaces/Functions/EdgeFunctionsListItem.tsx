@@ -21,7 +21,7 @@ const EdgeFunctionsListItem: FC<Props> = ({ function: item }) => {
   const { project } = useProjectContext()
   // get the .co or .net TLD from the restUrl
   const restUrl = project?.restUrl
-  const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
+  const restUrlTld = restUrl !== undefined ? new URL(restUrl as string).hostname.split('.').pop() : 'co'
   const functionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${item.slug}`
 
   return (
