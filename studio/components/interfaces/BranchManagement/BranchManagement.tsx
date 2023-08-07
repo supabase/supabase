@@ -1,4 +1,5 @@
-import { isError, partition } from 'lodash'
+import { useParams } from 'common'
+import { partition } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -14,7 +15,6 @@ import {
   Modal,
 } from 'ui'
 
-import { useParams } from 'common'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
