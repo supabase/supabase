@@ -1,13 +1,9 @@
-import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
-import { Markdown } from 'components/interfaces/Markdown'
-import { vercelIcon } from 'components/to-be-cleaned/ListIcons'
-import { useIntegrationConnectionsCreateMutation } from 'data/integrations/integration-connections-create-mutation'
-import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
-import { VercelProjectsResponse } from 'data/integrations/integrations-vercel-projects-query'
+import { ReactNode, useRef, useState } from 'react'
+
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { IntegrationConnectionsCreateVariables } from 'data/integrations/types'
 import { useSelectedOrganization } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import { useRef, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import {
   Button,
@@ -24,22 +20,33 @@ import {
   cn,
 } from 'ui'
 
-interface Project {
+export interface Project {
   id: string
   name: string
   ref: string
 }
 
+export interface ForeignProject {
+  id: string
+  name: string
+}
+
 export interface ProjectLinkerProps {
   organizationIntegrationId: string | undefined
-  foreignProjects: VercelProjectsResponse[]
+  foreignProjects: ForeignProject[]
   supabaseProjects: Project[]
-  onCreateConnections?: () => void
+  onCreateConnections: (variables: IntegrationConnectionsCreateVariables) => void
   installedConnections: IntegrationProjectConnection[] | undefined
-  setLoading?: (x: boolean) => void
-  showSkip?: boolean
+  isLoading?: boolean
+  integrationIcon: ReactNode
+  getForeignProjectIcon?: (project: ForeignProject) => ReactNode
+  choosePrompt?: string
+  onSkip?: () => void
   loadingForeignProjects?: boolean
   loadingSupabaseProjects?: boolean
+
+  defaultSupabaseProjectRef?: string
+  defaultForeignProjectId?: string
 }
 
 const ProjectLinker = ({
@@ -48,77 +55,63 @@ const ProjectLinker = ({
   supabaseProjects,
   onCreateConnections: _onCreateConnections,
   installedConnections = [],
-  setLoading,
-  showSkip = false,
+  isLoading,
+  integrationIcon,
+  getForeignProjectIcon,
+  choosePrompt = 'Choose a project',
+  onSkip,
   loadingForeignProjects,
   loadingSupabaseProjects,
+
+  defaultSupabaseProjectRef,
+  defaultForeignProjectId,
 }: ProjectLinkerProps) => {
   const [supabaseProjectsComboBoxOpen, setSupabaseProjectsComboboxOpen] = useState(false)
-  const [vercelProjectsComboBoxOpen, setVercelProjectsComboboxOpen] = useState(false)
+  const [foreignProjectsComboBoxOpen, setForeignProjectsComboboxOpen] = useState(false)
   const supabaseProjectsComboBoxRef = useRef<HTMLButtonElement>(null)
-  const vercelProjectsComboBoxRef = useRef<HTMLButtonElement>(null)
+  const foreignProjectsComboBoxRef = useRef<HTMLButtonElement>(null)
 
   const selectedOrganization = useSelectedOrganization()
 
-  const [supabaseProjectRef, setSupabaseProjectRef] = useState<string | undefined>(undefined)
-  const [vercelProjectId, setVercelProjectId] = useState<string | undefined>(undefined)
-
-  const { mutateAsync: syncEnvs } = useIntegrationsVercelConnectionSyncEnvsMutation()
-  const { mutate: createConnections, isLoading } = useIntegrationConnectionsCreateMutation({
-    async onSuccess({ id }) {
-      try {
-        await syncEnvs({ connectionId: id })
-      } catch (error: any) {
-        toast.error('Failed to sync environment variables: ', error.message)
-      }
-
-      if (setLoading) setLoading(false)
-      _onCreateConnections?.()
-    },
-    onError() {
-      if (setLoading) setLoading(false)
-    },
-  })
+  const [supabaseProjectRef, setSupabaseProjectRef] = useState<string | undefined>(
+    defaultSupabaseProjectRef
+  )
+  const [foreignProjectId, setForeignProjectId] = useState<string | undefined>(
+    defaultForeignProjectId
+  )
 
   // create a flat array of foreign project ids. ie, ["prj_MlkO6AiLG5ofS9ojKrkS3PhhlY3f", ..]
   const flatInstalledConnectionsIds = new Set(installedConnections.map((x) => x.foreign_project_id))
-
-  // check that vercel project is not already installed
-  const filteredForeignProjects: VercelProjectsResponse[] = foreignProjects.filter(
-    (foreignProject) => {
-      return !flatInstalledConnectionsIds.has(foreignProject.id)
-    }
-  )
 
   const selectedSupabaseProject = supabaseProjectRef
     ? supabaseProjects.find((x) => x.ref?.toLowerCase() === supabaseProjectRef?.toLowerCase())
     : undefined
 
-  const selectedVercelProject = vercelProjectId
-    ? filteredForeignProjects.find((x) => x.id?.toLowerCase() === vercelProjectId?.toLowerCase())
+  const selectedForeignProject = foreignProjectId
+    ? foreignProjects.find((x) => x.id?.toLowerCase() === foreignProjectId?.toLowerCase())
     : undefined
 
   function onCreateConnections() {
-    const projectDetails = selectedVercelProject
+    const projectDetails = selectedForeignProject
 
     if (!organizationIntegrationId) return console.error('No integration ID set')
-    if (!selectedVercelProject?.id) return console.error('No Vercel project ID set')
+    if (!selectedForeignProject?.id) return console.error('No Foreign project ID set')
     if (!selectedSupabaseProject?.ref) return console.error('No Supabase project ref set')
 
-    if (setLoading) setLoading(true)
+    const alreadyInstalled = flatInstalledConnectionsIds.has(foreignProjectId ?? '')
+    if (alreadyInstalled) {
+      return toast.error(
+        `Unable to connect to ${selectedForeignProject.name}: Selected repository already has an installed connection to a project`
+      )
+    }
 
-    createConnections({
+    _onCreateConnections({
       organizationIntegrationId,
       connection: {
-        foreign_project_id: selectedVercelProject?.id,
+        foreign_project_id: selectedForeignProject?.id,
         supabase_project_ref: selectedSupabaseProject?.ref,
         metadata: {
           ...projectDetails,
-          supabaseConfig: {
-            projectEnvVars: {
-              write: true,
-            },
-          },
         },
       },
       orgSlug: selectedOrganization?.slug,
@@ -162,7 +155,7 @@ const ProjectLinker = ({
                   type="default"
                   size="medium"
                   block
-                  disabled={loadingSupabaseProjects}
+                  disabled={defaultSupabaseProjectRef !== undefined || loadingSupabaseProjects}
                   loading={loadingSupabaseProjects}
                   className="justify-start"
                   icon={
@@ -175,9 +168,11 @@ const ProjectLinker = ({
                     </div>
                   }
                   iconRight={
-                    <span className="grow flex justify-end">
-                      <IconChevronDown className={''} />
-                    </span>
+                    defaultSupabaseProjectRef === undefined ? (
+                      <span className="grow flex justify-end">
+                        <IconChevronDown className={''} />
+                      </span>
+                    ) : null
                   }
                 >
                   {selectedSupabaseProject ? selectedSupabaseProject.name : 'Choose Project'}
@@ -194,14 +189,14 @@ const ProjectLinker = ({
                   <CommandList_Shadcn_ className="!max-h-[170px]">
                     <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
                     <CommandGroup_Shadcn_>
-                      {supabaseProjects.map((project) => {
+                      {supabaseProjects.map((project, i) => {
                         return (
                           <CommandItem_Shadcn_
-                            value={project.ref}
+                            value={`${project.name}-${i}`}
                             key={project.ref}
                             className="flex gap-2 items-center"
-                            onSelect={(ref) => {
-                              if (ref) setSupabaseProjectRef(ref)
+                            onSelect={() => {
+                              if (project.ref) setSupabaseProjectRef(project.ref)
                               setSupabaseProjectsComboboxOpen(false)
                             }}
                           >
@@ -225,23 +220,16 @@ const ProjectLinker = ({
           <div className="border border-scale-1000 h-px w-16 border-dashed self-end mb-5"></div>
           <Panel>
             <div className="bg-black shadow rounded p-1 w-12 h-12 flex justify-center items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="white"
-                viewBox="0 0 512 512"
-                className="w-6"
-              >
-                <path fillRule="evenodd" d="M256,48,496,464H16Z" />
-              </svg>
+              {integrationIcon}
             </div>
 
             <Popover_Shadcn_
-              open={vercelProjectsComboBoxOpen}
-              onOpenChange={setVercelProjectsComboboxOpen}
+              open={foreignProjectsComboBoxOpen}
+              onOpenChange={setForeignProjectsComboboxOpen}
             >
               <PopoverTrigger_Shadcn_ asChild>
                 <Button
-                  ref={vercelProjectsComboBoxRef}
+                  ref={foreignProjectsComboBoxRef}
                   type="default"
                   size="medium"
                   block
@@ -249,20 +237,9 @@ const ProjectLinker = ({
                   loading={loadingForeignProjects}
                   className="justify-start"
                   icon={
-                    selectedVercelProject ? (
-                      selectedVercelProject?.framework ? (
-                        vercelIcon
-                      ) : (
-                        <img
-                          src={`${BASE_PATH}/img/icons/frameworks/${selectedVercelProject.framework}.svg`}
-                          width={21}
-                          height={21}
-                          alt={`icon`}
-                        />
-                      )
-                    ) : (
-                      <></>
-                    )
+                    selectedForeignProject
+                      ? getForeignProjectIcon?.(selectedForeignProject)
+                      : integrationIcon
                   }
                   iconRight={
                     <span className="grow flex justify-end">
@@ -270,42 +247,32 @@ const ProjectLinker = ({
                     </span>
                   }
                 >
-                  {(selectedVercelProject && selectedVercelProject.name) ??
-                    'Choose a Vercel Project'}
+                  {(selectedForeignProject && selectedForeignProject.name) ?? choosePrompt}
                 </Button>
               </PopoverTrigger_Shadcn_>
               <PopoverContent_Shadcn_
                 className="p-0 w-full"
                 side="bottom"
                 align="center"
-                style={{ width: vercelProjectsComboBoxRef.current?.offsetWidth }}
+                style={{ width: foreignProjectsComboBoxRef.current?.offsetWidth }}
               >
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_ placeholder="Search organization..." />
                   <CommandList_Shadcn_ className="!max-h-[170px]">
                     <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
                     <CommandGroup_Shadcn_>
-                      {filteredForeignProjects.map((project) => {
+                      {foreignProjects.map((project, i) => {
                         return (
                           <CommandItem_Shadcn_
-                            value={project.id}
                             key={project.id}
+                            value={`${project.name}-${i}`}
                             className="flex gap-2 items-center"
-                            onSelect={(id) => {
-                              if (id) setVercelProjectId(id)
-                              setVercelProjectsComboboxOpen(false)
+                            onSelect={() => {
+                              if (project.id) setForeignProjectId(project.id)
+                              setForeignProjectsComboboxOpen(false)
                             }}
                           >
-                            {!project?.framework ? (
-                              vercelIcon
-                            ) : (
-                              <img
-                                src={`${BASE_PATH}/img/icons/frameworks/${project.framework}.svg`}
-                                width={21}
-                                height={21}
-                                alt={`icon`}
-                              />
-                            )}
+                            {getForeignProjectIcon?.(project) ?? integrationIcon}
                             <span>{project.name}</span>
                           </CommandItem_Shadcn_>
                         )
@@ -319,12 +286,12 @@ const ProjectLinker = ({
         </div>
       </div>
       <div className="flex w-full justify-end gap-2">
-        {showSkip && (
+        {onSkip !== undefined && (
           <Button
             size="medium"
             type="default"
             onClick={() => {
-              _onCreateConnections?.()
+              onSkip()
             }}
           >
             Skip
@@ -340,26 +307,14 @@ const ProjectLinker = ({
             loadingForeignProjects ||
             loadingSupabaseProjects ||
             isLoading ||
-            // check wether both project types are not undefined
+            // check whether both project types are not undefined
             !selectedSupabaseProject ||
-            !selectedVercelProject
+            !selectedForeignProject
           }
         >
           Connect project
         </Button>
       </div>
-      <Markdown
-        content={`
-The following environment variables will be added:
-
-${ENV_VAR_RAW_KEYS.map((x, idx) => {
-  return `
-  \n
-  - \`${x}\`
-`
-})}
-`}
-      />
     </div>
   )
 }

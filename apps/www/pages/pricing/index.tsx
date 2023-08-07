@@ -104,7 +104,7 @@ export default function IndexPage() {
   }) => {
     return (
       <div className="mt-8 px-4 mobile-header">
-        <h2 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-3xl font-medium uppercase font-mono">
+        <h2 className="gradient-text-brand-300 dark:gradient-text-brand-100 text-3xl font-medium uppercase font-mono">
           {plan}
         </h2>
         <div className="flex items-baseline gap-2">
@@ -150,7 +150,7 @@ export default function IndexPage() {
         <div className="relative z-10 py-16 lg:py-28">
           <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
-              <h1 className="text-brand-900 text-base">Pricing</h1>
+              <h1 className="text-brand text-base">Pricing</h1>
               <h2 className="h1">Predictable pricing, no surprises</h2>
               <p className="p text-lg">
                 Start building for free, collaborate with a team, then scale to millions of users
@@ -174,7 +174,7 @@ export default function IndexPage() {
                   key={`row-${plan.name}`}
                   className={[
                     plan.name === 'Pro'
-                      ? 'bg-brand-1100 dark:bg-brand-900 border px-0.5 -mt-8 rounded-[6px]'
+                      ? 'bg-brand-600 dark:bg-brand border px-0.5 -mt-8 rounded-[6px]'
                       : '',
                   ].join(' ')}
                 >
@@ -198,13 +198,13 @@ export default function IndexPage() {
                       <div className="mb-2 flex items-center gap-2">
                         <div className="flex items-center gap-2">
                           <h3
-                            className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-normal
+                            className="gradient-text-brand-300 dark:gradient-text-brand-100 text-2xl font-normal
                            uppercase flex items-center gap-4 font-mono"
                           >
                             {plan.name}
                           </h3>
                           {plan.nameBadge && (
-                            <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
+                            <span className="bg-brand-300 text-brand-600 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
                               {plan.nameBadge}
                             </span>
                           )}
@@ -249,7 +249,7 @@ export default function IndexPage() {
 
                               {plan.warning && (
                                 <p className="-mt-2">
-                                  <span className="bg-scale-200 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
+                                  <span className="bg-scale-200 text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
                                     {plan.warning}
                                   </span>
                                 </p>
@@ -273,7 +273,7 @@ export default function IndexPage() {
                         {plan.features.map((feature) => (
                           <li key={feature} className="flex items-center py-2 first:mt-0">
                             <IconCheck
-                              className="text-brand-900 h-4 w-4"
+                              className="text-brand h-4 w-4"
                               aria-hidden="true"
                               strokeWidth={3}
                             />
@@ -308,7 +308,7 @@ export default function IndexPage() {
             <div className="flex flex-col justify-center lg:px-8">
               <div>
                 <h3
-                  className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-normal
+                  className="gradient-text-brand-300 dark:gradient-text-brand-100 text-2xl font-normal
                            uppercase flex items-center gap-4 font-mono"
                 >
                   {planEnterprise.name}
@@ -331,11 +331,7 @@ export default function IndexPage() {
               >
                 {planEnterprise.features.map((feature) => (
                   <li key={feature} className="flex items-center py-2 first:mt-0">
-                    <IconCheck
-                      className="text-brand-900 h-4 w-4 "
-                      aria-hidden="true"
-                      strokeWidth={3}
-                    />
+                    <IconCheck className="text-brand h-4 w-4 " aria-hidden="true" strokeWidth={3} />
                     <span className="dark:text-scale-1200 mb-0 ml-3 ">{feature}</span>
                   </li>
                 ))}
@@ -407,7 +403,7 @@ export default function IndexPage() {
                     </Link>
                     {addon.name === 'Optimized Compute' ? (
                       <button
-                        className="text-brand-1000 text-[13px] leading-4 hover:underline "
+                        className="text-brand-600 text-[13px] leading-4 hover:underline "
                         onClick={() => setShowComputeModal(true)}
                       >
                         {addon.rightCtaText}
@@ -440,7 +436,7 @@ export default function IndexPage() {
           className="grid lg:grid-cols-2 gap-8 items-center mt-12 lg:mt-8 max-w-6xl mx-auto"
         >
           <div>
-            <span className="bg-brand-500 text-brand-1100 rounded-md bg-opacity-30 inline-block  dark:bg-scale-400 dark:text-scale-1100 py-0.5 px-2 text-[13px] leading-4 mt-2">
+            <span className="bg-brand-300 text-brand-600 rounded-md bg-opacity-30 inline-block  dark:bg-scale-400 dark:text-scale-1100 py-0.5 px-2 text-[13px] leading-4 mt-2">
               Available for Pro plan
             </span>
             <h2 className="text-scale-1200 text-4xl mt-4">Cost control with spend caps</h2>
@@ -735,7 +731,7 @@ export default function IndexPage() {
                         scope="col"
                         key={plan.name}
                       >
-                        <h3 className="gradient-text-brand-500 dark:gradient-text-brand-100 text-2xl font-mono font-normal uppercase flex items-center gap-4">
+                        <h3 className="gradient-text-brand-300 dark:gradient-text-brand-100 text-2xl font-mono font-normal uppercase flex items-center gap-4">
                           {plan.name}
                         </h3>
                         <div
@@ -796,7 +792,7 @@ export default function IndexPage() {
 
                             {plan.warning && (
                               <p className="-mt-2">
-                                <span className="bg-scale-100 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
+                                <span className="bg-scale-100 text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4">
                                   {plan.warning}
                                 </span>
                               </p>
@@ -953,7 +949,7 @@ export default function IndexPage() {
                 <a
                   target="_blank"
                   href="https://supabase.com/dashboard/support/new"
-                  className="transition text-brand-900 hover:text-brand-1000"
+                  className="transition text-brand hover:text-brand-600"
                 >
                   open a support ticket
                 </a>{' '}
@@ -964,7 +960,7 @@ export default function IndexPage() {
                 <a
                   target="_blank"
                   href="https://supabase.com/dashboard/support/new"
-                  className="transition text-brand-900 hover:text-brand-1000"
+                  className="transition text-brand hover:text-brand-600"
                 >
                   you can contact the team here
                 </a>

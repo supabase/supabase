@@ -29,12 +29,18 @@ module.exports = config({
           '0%': { transform: 'translateX(0%)' },
           '100%': { transform: 'translateX(-100%)' },
         },
+        'pulse-radar': {
+          '0%': { transform: 'scale(0)', opacity: 0 },
+          '50%': { opacity: 0.8 },
+          '100%': { transform: 'scale(100%)', opacity: 0 },
+        },
       },
       animation: {
         'flash-code': 'flash-code 1s forwards',
         'flash-code-slow': 'flash-code 2s forwards',
         spin: 'spin 1s both infinite',
         marquee: 'marquee 35s linear infinite',
+        'pulse-radar': 'pulse-radar 3s linear infinite',
       },
     },
   },

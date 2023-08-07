@@ -29,7 +29,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
       <div className="flex items-center gap-3">
         <div
           className="flex h-6 w-6 items-center justify-center rounded border
-            border-brand-600 bg-brand-300 text-brand-900
+            border-brand-600 bg-brand-300 text-brand
           "
         >
           <IconList size={14} strokeWidth={3} />
@@ -81,7 +81,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                 respective source. Do note that to access nested keys, you would need to perform the
                 necessary{' '}
                 <Link href="https://supabase.com/docs/guides/platform/logs#unnesting-arrays">
-                  <a target="_blank" rel="noreferrer" className="text-brand-900">
+                  <a target="_blank" rel="noreferrer" className="text-brand">
                     unnesting joins
                     <IconExternalLink
                       size="tiny"
@@ -159,7 +159,7 @@ const Field = ({
         {isCopied ? (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
-              <IconCheck size={14} strokeWidth={3} className="text-brand-900" />
+              <IconCheck size={14} strokeWidth={3} className="text-brand" />
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content side="bottom">
