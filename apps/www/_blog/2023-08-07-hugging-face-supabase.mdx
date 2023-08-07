@@ -212,7 +212,7 @@ We’re in the early stages of development, and we have some exciting ideas to o
 
 ### Reducing cold starts
 
-Cold-starts are the time it takes for the “initial load” of an Edge Function. Because the model needs to be downloaded to the Edge Function, could starts can take anywhere from ~2-6s (based on the model). Loading the initial model and building the pipeline usually contributes to it. We are experimenting with the idea of attaching a “read-only disk” of models to our [Edge Runtime](https://github.com/supabase/edge-runtime) which mitigate any download penalties. We’ll share more details about these optimizations in a future blog post.
+Cold-starts are the time it takes for the “initial load” of an Edge Function. Because the model needs to be downloaded to the Edge Function, cold starts can take anywhere from ~2-6s (based on the model). Loading the initial model and building the pipeline usually contributes to it. We are experimenting with the idea of attaching a “read-only disk” of models to our [Edge Runtime](https://github.com/supabase/edge-runtime) which mitigate any download penalties. We’ll share more details about these optimizations in a future blog post.
 
 ### Handling heavier workloads
 
@@ -228,7 +228,7 @@ Images have the same challenge. Models like CLIP, which can generate embeddings 
 
 ## Getting started
 
-If you’re a Python Dev, check out our [Hello World notebook](https://supabase.com/docs/guides/ai/quickstarts/hello-world). If you’re a JavaScript developer, check out our our [Text Embeddings docs](https://supabase.com/docs/guides/ai/quickstarts/generate-text-embeddings).
+If you’re a Python Dev, check out our [Hello World notebook](https://supabase.com/docs/guides/ai/quickstarts/hello-world). If you’re a JavaScript developer, check out our [Text Embeddings docs](https://supabase.com/docs/guides/ai/quickstarts/generate-text-embeddings).
 
 And no matter your language preference, remember to jump into the [Hugging Face community](https://github.com/huggingface) and show your support.
 
