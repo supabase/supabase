@@ -103,8 +103,8 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
 
 // Construct pipeline outside of serve for faster warm starts
 const pipe = await pipeline(
-	'feature-extraction',
-	'Supabase/gte-small',
+  'feature-extraction',
+  'Supabase/gte-small',
 );
 
 // Deno Handler
