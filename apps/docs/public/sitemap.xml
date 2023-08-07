@@ -145,6 +145,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/docs/guides/ai/litellm</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
     <loc>https://supabase.com/docs/guides/ai/managing-collections</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
