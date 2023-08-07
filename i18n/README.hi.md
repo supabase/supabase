@@ -1,6 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727234-cda046d6-28c6-491a-b284-b86c5cede25d.png#gh-light-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
 </p>
 
 ---
@@ -57,7 +57,7 @@
 
 सुपाबसे [होस्टेड प्लेटफार्म](https://supabase.com/dashboard). आप साइन अप कर सकते हैं और कुछ भी स्थापित किए बिना सुपाबसे का उपयोग करना शुरू कर सकते हैं। हम अभी भी स्थानीय विकास का अनुभव पैदा कर रहे हैं - यह अब मंच स्थिरता के साथ-साथ हमारा मुख्य फोकस है।
 
-![आर्किटेक्चर](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
+![आर्किटेक्चर](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) 30 से अधिक वर्षों के सक्रिय विकास के साथ एक वस्तु-संबंधपरक डेटाबेस प्रणाली है जिसने इसे विश्वसनीयता, सुविधा मजबूती और प्रदर्शन के लिए एक मजबूत प्रतिष्ठा अर्जित की है।
 - [Realtime](https://github.com/supabase/realtime) एक एलिक्जिर सर्वर है जो आपको पोस्टग्रॉसीक्यूएल आवेषण, अपडेट्स को सुनने की अनुमति देता है और वेबसोकेट का उपयोग करके हटाता है। सुपबेस पोस्टग्रेज की अंतर्निहित प्रतिकृति कार्यक्षमता को सुनता है, प्रतिकृति बाइट स्ट्रीम को JSON में परिवर्तित करता है, फिर JSON को वेबस्कॉक पर प्रसारित करता है।

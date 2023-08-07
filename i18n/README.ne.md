@@ -1,6 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727234-cda046d6-28c6-491a-b284-b86c5cede25d.png#gh-light-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
 </p>
 
 ---
@@ -50,7 +50,7 @@
 
 सुपाबेस एक [होस्ट गरिएको प्लेटफर्म](https://supabase.com/dashboard) हो। तपाई आफै साइन अप गर्न सक्नुहुन्छ र कुनै स्थापना बिना सुपाबेस प्रयोग गर्न सक्नुहुन्छ। हामी अझै स्थानीय विकासको अनुभव सिर्जना गर्दैछौं। यो प्लेटफर्म स्थिरताको साथ हाम्रो मूल फोकस हो।
 
-![आर्किटेक्चर](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
+![आर्किटेक्चर](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) एक वस्तु-रिलेशनल डाटाबेस प्रणाली हो जसले ३० बर्ष भन्दा बढी सक्रिय विकासको साथ विश्वसनीयता, सुविधा मजबूती र प्रदर्शनको बलियो प्रतिष्ठा कमाएको छ।
 - [Realtime](https://github.com/supabase/realtime) एक Elixer सर्भर हो जसले तपाइँलाई वेबसकेटहरू प्रयोग गरेर PostgreSQL इन्सर्टहरू, अपडेटहरु, र डिलीटहरु सुन्न अनुमति दिन्छ। सुपाबेसले पोष्टग्रेसको भित्र निर्मित प्रतिकृति कार्यक्षमता सुन्दछ, प्रतिकृति बाइट स्ट्रिमलाई JSON मा रूपान्तरण गर्दछ, र त्यसपछि JSON लाई वेबसकेटमा प्रसारण गर्दछ।।
