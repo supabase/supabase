@@ -1,21 +1,19 @@
-import Link from 'next/link'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { FC, Fragment, useState, useEffect } from 'react'
-import { IconSearch, Input, Button, Listbox, IconLoader, IconExternalLink, IconX } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
+import { Fragment, useEffect, useState } from 'react'
+import { Button, IconExternalLink, IconLoader, IconSearch, IconX, Input, Listbox } from 'ui'
 
-import { useStore, useCheckPermissions } from 'hooks'
-import { useParams } from 'common/hooks'
-import SecretRow from './SecretRow'
-import EditSecretModal from './EditSecretModal'
-import DeleteSecretModal from './DeleteSecretModal'
-import AddNewSecretModal from './AddNewSecretModal'
 import Divider from 'components/ui/Divider'
+import { useCheckPermissions, useStore } from 'hooks'
+import AddNewSecretModal from './AddNewSecretModal'
+import DeleteSecretModal from './DeleteSecretModal'
+import EditSecretModal from './EditSecretModal'
+import SecretRow from './SecretRow'
 
-interface Props {}
-
-const SecretsManagement: FC<Props> = ({}) => {
+const SecretsManagement = () => {
   const { vault } = useStore()
   const { search } = useParams()
 

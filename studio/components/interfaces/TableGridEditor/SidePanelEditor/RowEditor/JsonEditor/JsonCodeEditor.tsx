@@ -1,20 +1,21 @@
 import Editor, { useMonaco } from '@monaco-editor/react'
 import { useTheme } from 'common'
-import { FC, useEffect, useRef } from 'react'
+import { noop } from 'lodash'
+import { useEffect, useRef } from 'react'
 
-interface Props {
+interface JsonEditorProps {
   queryId?: string
   defaultValue: string
   readOnly?: boolean
   onInputChange: (value: any) => void
 }
 
-const JsonEditor: FC<Props> = ({
+const JsonEditor = ({
   queryId = '',
   defaultValue = '',
   readOnly = false,
-  onInputChange = () => {},
-}) => {
+  onInputChange = noop,
+}: JsonEditorProps) => {
   const monaco = useMonaco()
   const editorRef = useRef()
   const { isDarkMode } = useTheme()
