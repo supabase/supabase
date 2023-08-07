@@ -7,8 +7,18 @@ import { useFlag, withAuth } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import FeedbackDropdown from './ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from './ProjectLayout/LayoutHeader/HelpPopover'
+import { Organization, Project } from 'types'
 
-const WizardLayout = ({ organization, project, children }: PropsWithChildren<any>) => {
+interface WizardLayoutProps {
+  organization: Organization | null | undefined
+  project: Project | null
+}
+
+const WizardLayout = ({
+  organization,
+  project,
+  children,
+}: PropsWithChildren<WizardLayoutProps>) => {
   const ongoingIncident = useFlag('ongoingIncident')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
