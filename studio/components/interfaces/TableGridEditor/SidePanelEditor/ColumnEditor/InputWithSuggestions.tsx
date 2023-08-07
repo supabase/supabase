@@ -5,14 +5,16 @@
 // with timeouts and a lot of unnecessary defensive guards - but these can go away when we port
 // the component over to the UI library
 
-import { FC, useEffect, useRef, useState } from 'react'
-import { Button, Dropdown, IconList, Input } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { noop } from 'lodash'
+import { useEffect, useRef, useState } from 'react'
+import { Button, Dropdown, IconList, Input } from 'ui'
+
 import { Suggestion } from './ColumnEditor.types'
 
 const MAX_SUGGESTIONS = 3
 
-interface Props {
+interface InputWithSuggestionsProps {
   label?: string
   description?: string
   placeholder?: string
@@ -21,7 +23,6 @@ interface Props {
   disabled?: boolean
   className?: string
   value: string
-  format?: string
   suggestions: Suggestion[]
   suggestionsTooltip?: string
   suggestionsHeader?: string
@@ -29,7 +30,7 @@ interface Props {
   onSelectSuggestion: (suggestion: Suggestion) => void
 }
 
-const InputWithSuggestions: FC<Props> = ({
+const InputWithSuggestions = ({
   label,
   description,
   placeholder,
@@ -38,13 +39,12 @@ const InputWithSuggestions: FC<Props> = ({
   disabled = false,
   className = '',
   value = '',
-  format,
   suggestions = [],
   suggestionsTooltip,
   suggestionsHeader,
-  onChange = () => {},
-  onSelectSuggestion = () => {},
-}) => {
+  onChange = noop,
+  onSelectSuggestion = noop,
+}: InputWithSuggestionsProps) => {
   const ref = useRef(null)
   const [filteredSuggestions, setFilteredSuggestions] = useState<Suggestion[]>(suggestions)
   const showSuggestions = filteredSuggestions.length > 0
