@@ -7,9 +7,9 @@
 
 import Clipboard from 'clipboard'
 import rangeParser from 'parse-numeric-range'
-import Highlight, { defaultProps } from 'prism-react-renderer'
+import Highlight, { Language, defaultProps } from 'prism-react-renderer'
 import defaultTheme from 'prism-react-renderer/themes/palenight'
-import { useEffect, useRef, useState } from 'react'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 
 import { copyToClipboard } from 'lib/helpers'
@@ -20,15 +20,24 @@ const prism = {
   plugins: ['line-numbers', 'show-language'],
 }
 
-const SimpleCodeBlock = ({ children, className: languageClassName, metastring }: any) => {
+interface SimpleCodeBlockProps {
+  className?: string
+  metastring?: string
+}
+
+const SimpleCodeBlock = ({
+  children,
+  className: languageClassName,
+  metastring,
+}: PropsWithChildren<SimpleCodeBlockProps>) => {
   const [showCopied, setShowCopied] = useState(false)
   const target = useRef(null)
   const button = useRef(null)
   let highlightLines: any = []
 
   if (metastring && highlightLinesRangeRegex.test(metastring)) {
-    const highlightLinesRange = metastring.match(highlightLinesRangeRegex)[1]
-    highlightLines = rangeParser(highlightLinesRange).filter((n) => n > 0)
+    const highlightLinesRange = metastring.match(highlightLinesRangeRegex)?.[1]
+    if (highlightLinesRange) highlightLines = rangeParser(highlightLinesRange).filter((n) => n > 0)
   }
 
   useEffect(() => {
@@ -70,10 +79,10 @@ const SimpleCodeBlock = ({ children, className: languageClassName, metastring }:
     <Highlight
       {...defaultProps}
       theme={(prism as any).theme || defaultTheme}
-      code={children.trim()}
-      language={language}
+      code={(children as string)?.trim() ?? ''}
+      language={language as Language}
     >
-      {({ className, style, tokens, getLineProps, getTokenProps }) => {
+      {({ className, tokens, getLineProps, getTokenProps }) => {
         return (
           <div className="Code codeBlockWrapper group">
             <pre ref={target} className={`codeBlock ${className}`}>
@@ -94,12 +103,7 @@ const SimpleCodeBlock = ({ children, className: languageClassName, metastring }:
               })}
             </pre>
             <div className="invisible absolute right-0 top-0 opacity-0 transition-opacity group-hover:visible group-hover:opacity-100">
-              <Button
-                size="tiny"
-                type="default"
-                onClick={() => handleCopyCode(children)}
-                // style={{ padding: '2px 5px' }}
-              >
+              <Button size="tiny" type="default" onClick={() => handleCopyCode(children)}>
                 {showCopied ? 'Copied' : 'Copy'}
               </Button>
             </div>
