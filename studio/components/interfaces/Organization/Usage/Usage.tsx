@@ -99,14 +99,11 @@ const Usage = () => {
           {isSuccessSubscription && (
             <>
               <DateRangePicker
-                id="billingCycle"
-                name="billingCycle"
                 onChange={setDateRange}
                 value={TIME_PERIODS_BILLING[0].key}
                 options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
                 loading={isLoadingSubscription}
                 currentBillingPeriodStart={subscription?.current_period_start}
-                className="!w-[200px]"
               />
 
               <Listbox
