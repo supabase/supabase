@@ -95,75 +95,74 @@ const AttributeUsage = ({
           <>
             {usageMeta?.available_in_plan ? (
               <>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <p className="text-sm">{attribute.name} usage</p>
-                      {showUsageWarning && (
-                        <Tooltip.Root delayDuration={0}>
-                          <Tooltip.Trigger asChild>
-                            {usageRatio >= 1 ? (
-                              <div className="flex items-center space-x-2 min-w-[115px] cursor-help">
-                                <IconAlertTriangle
-                                  size={14}
-                                  strokeWidth={2}
-                                  className={exceededLimitStyle}
-                                />
-                                <p className={`text-sm ${exceededLimitStyle}`}>Exceeded limit</p>
-                              </div>
-                            ) : (
-                              usageRatio >= USAGE_APPROACHING_THRESHOLD && (
+                {!projectRef && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <p className="text-sm">{attribute.name} usage</p>
+                        {showUsageWarning && (
+                          <Tooltip.Root delayDuration={0}>
+                            <Tooltip.Trigger asChild>
+                              {usageRatio >= 1 ? (
                                 <div className="flex items-center space-x-2 min-w-[115px] cursor-help">
                                   <IconAlertTriangle
                                     size={14}
                                     strokeWidth={2}
-                                    className="text-amber-900"
+                                    className={exceededLimitStyle}
                                   />
-                                  <p className="text-sm text-amber-900">Approaching limit</p>
+                                  <p className={`text-sm ${exceededLimitStyle}`}>Exceeded limit</p>
                                 </div>
-                              )
-                            )}
-                          </Tooltip.Trigger>
-                          <Tooltip.Portal>
-                            <Tooltip.Content side="bottom">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                  'border border-scale-200',
-                                ].join(' ')}
-                              >
-                                <p className="text-xs text-scale-1200">
-                                  Exceeding your plans included usage will lead to restrictions to
-                                  your project.
-                                </p>
-                                <p className="text-xs text-scale-1200">
-                                  Upgrade to a usage-based plan or disable the spend cap to avoid
-                                  restrictions.
-                                </p>
-                              </div>
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        </Tooltip.Root>
+                              ) : (
+                                usageRatio >= USAGE_APPROACHING_THRESHOLD && (
+                                  <div className="flex items-center space-x-2 min-w-[115px] cursor-help">
+                                    <IconAlertTriangle
+                                      size={14}
+                                      strokeWidth={2}
+                                      className="text-amber-900"
+                                    />
+                                    <p className="text-sm text-amber-900">Approaching limit</p>
+                                  </div>
+                                )
+                              )}
+                            </Tooltip.Trigger>
+                            <Tooltip.Portal>
+                              <Tooltip.Content side="bottom">
+                                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                <div
+                                  className={[
+                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                    'border border-scale-200',
+                                  ].join(' ')}
+                                >
+                                  <p className="text-xs text-scale-1200">
+                                    Exceeding your plans included usage will lead to restrictions to
+                                    your project.
+                                  </p>
+                                  <p className="text-xs text-scale-1200">
+                                    Upgrade to a usage-based plan or disable the spend cap to avoid
+                                    restrictions.
+                                  </p>
+                                </div>
+                              </Tooltip.Content>
+                            </Tooltip.Portal>
+                          </Tooltip.Root>
+                        )}
+                      </div>
+
+                      {showUsageWarning && (
+                        <Link href={upgradeUrl}>
+                          <a className="pb-1">
+                            <Button type="default" size="tiny">
+                              {subscription?.plan?.id === 'free'
+                                ? 'Upgrade plan'
+                                : 'Change spend cap'}
+                            </Button>
+                          </a>
+                        </Link>
                       )}
                     </div>
 
-                    {showUsageWarning && (
-                      <Link href={upgradeUrl}>
-                        <a className="pb-1">
-                          <Button type="default" size="tiny">
-                            {subscription?.plan?.id === 'free'
-                              ? 'Upgrade plan'
-                              : 'Change spend cap'}
-                          </Button>
-                        </a>
-                      </Link>
-                    )}
-                  </div>
-
-                  {projectRef === undefined &&
-                    currentBillingCycleSelected &&
-                    !usageMeta.unlimited && (
+                    {currentBillingCycleSelected && !usageMeta.unlimited && (
                       <SparkBar
                         type="horizontal"
                         barClass={clsx(
@@ -182,49 +181,51 @@ const AttributeUsage = ({
                       />
                     )}
 
-                  {projectRef === undefined && (
-                    <div>
-                      <div className="flex items-center justify-between border-b py-1">
-                        <p className="text-xs text-scale-1000">
-                          Included in {subscription?.plan?.name.toLowerCase()} plan
-                        </p>
-                        {usageMeta.unlimited ? (
-                          <p className="text-xs">Unlimited</p>
-                        ) : (
-                          <p className="text-xs">
-                            {attribute.unit === 'bytes'
-                              ? `${usageMeta.pricing_free_units ?? 0} GB`
-                              : (usageMeta.pricing_free_units ?? 0).toLocaleString()}
-                          </p>
-                        )}
-                      </div>
-                      {currentBillingCycleSelected && (
-                        <div className="flex items-center justify-between py-1">
+                    {
+                      <div>
+                        <div className="flex items-center justify-between border-b py-1">
                           <p className="text-xs text-scale-1000">
-                            {attribute.chartPrefix || 'Used '} in period
+                            Included in {subscription?.plan?.name.toLowerCase()} plan
                           </p>
-                          <p className="text-xs">
-                            {attribute.unit === 'bytes'
-                              ? `${(usageMeta?.usage ?? 0).toFixed(2)} GB`
-                              : (usageMeta?.usage ?? 0).toLocaleString()}
-                          </p>
+                          {usageMeta.unlimited ? (
+                            <p className="text-xs">Unlimited</p>
+                          ) : (
+                            <p className="text-xs">
+                              {attribute.unit === 'bytes'
+                                ? `${usageMeta.pricing_free_units ?? 0} GB`
+                                : (usageMeta.pricing_free_units ?? 0).toLocaleString()}
+                            </p>
+                          )}
                         </div>
-                      )}
-                      {currentBillingCycleSelected && (usageMeta?.pricing_free_units ?? 0) > 0 && (
-                        <div className="flex items-center justify-between border-t py-1">
-                          <p className="text-xs text-scale-1000">Overage in period</p>
-                          <p className="text-xs">
-                            {(usageMeta?.pricing_free_units ?? 0) === -1 || usageExcess < 0
-                              ? `0${attribute.unit === 'bytes' ? ' GB' : ''}`
-                              : attribute.unit === 'bytes'
-                              ? `${usageExcess.toFixed(2)} GB`
-                              : usageExcess.toLocaleString()}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                        {currentBillingCycleSelected && (
+                          <div className="flex items-center justify-between py-1">
+                            <p className="text-xs text-scale-1000">
+                              {attribute.chartPrefix || 'Used '} in period
+                            </p>
+                            <p className="text-xs">
+                              {attribute.unit === 'bytes'
+                                ? `${(usageMeta?.usage ?? 0).toFixed(2)} GB`
+                                : (usageMeta?.usage ?? 0).toLocaleString()}
+                            </p>
+                          </div>
+                        )}
+                        {currentBillingCycleSelected &&
+                          (usageMeta?.pricing_free_units ?? 0) > 0 && (
+                            <div className="flex items-center justify-between border-t py-1">
+                              <p className="text-xs text-scale-1000">Overage in period</p>
+                              <p className="text-xs">
+                                {(usageMeta?.pricing_free_units ?? 0) === -1 || usageExcess < 0
+                                  ? `0${attribute.unit === 'bytes' ? ' GB' : ''}`
+                                  : attribute.unit === 'bytes'
+                                  ? `${usageExcess.toFixed(2)} GB`
+                                  : usageExcess.toLocaleString()}
+                              </p>
+                            </div>
+                          )}
+                      </div>
+                    }
+                  </div>
+                )}
 
                 {attribute.additionalInfo?.(usage)}
 
