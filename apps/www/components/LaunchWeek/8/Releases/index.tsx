@@ -296,6 +296,8 @@ export default function LW8Releases() {
                   title={day1.title}
                   shipped={day1Shipped}
                   publishedAt={day1.publishedAt}
+                  youtube_id={day1.youtube_id}
+                  videoThumbnail={day1.videoThumbnail}
                 />
               }
               disabled={true}

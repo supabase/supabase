@@ -1,4 +1,6 @@
 const images = {
+  yt_thumbnail: '/images/launchweek/8/lw8-yt-thumb.jpg',
+  day_1_thumb: '/images/launchweek/8/day1/day-01-thumb.jpg',
   '00-stay-remote': '/images/launchweek/8/day0/remote.png',
   '00-pg-server': '/images/launchweek/8/day0/pg-server.png',
   '00-constellation': '/images/launchweek/8/day0/constellation-pre.svg',
@@ -38,6 +40,7 @@ export interface WeekDayProps {
   d: number
   dd: string
   youtube_id: string
+  videoThumbnail?: string
   blogpost: string
   docs: string
   twitter_spaces?: string
@@ -91,15 +94,16 @@ const days: WeekDayProps[] = [
     description: '',
     d: 1,
     dd: 'Mon',
-    youtube_id: '',
+    youtube_id: 'RJccSbJ9Go4',
+    videoThumbnail: images.day_1_thumb,
     blogpost: '',
     docs: '',
     twitter_spaces: 'https://twitter.com/i/spaces/1DXGyvjkeEeJM',
     steps: [
       {
         title: 'Huggingface now supported in Supabase',
-        blog: '/blog/',
-        hackernews: '/blog/',
+        blog: '/blog/hugging-face-is-now-supported-in-supabase',
+        hackernews: '/',
         twitter_spaces: 'https://twitter.com/i/spaces/1DXGyvjkeEeJM',
         bg_layers: [{ img: images['01-hugging'] }],
         steps: [],
