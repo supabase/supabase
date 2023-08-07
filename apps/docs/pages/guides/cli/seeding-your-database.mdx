@@ -52,7 +52,9 @@ COPY countries (name, code) FROM 'seed/countries.csv' WITH (FORMAT csv);
 
 ## Generating seed data
 
-Snaplet generates seed data from a database schema and a definition of the intended values. For instance if you wanted to seed a typical blog application, with the following schema:
+You can generate seed data for local development using [Snaplet](https://www.snaplet.dev/).
+
+Let's generate some seed data for a typical blog application, with the following schema:
 
 ![An example schema](/docs/img/guides/cli/snaplet-example-schema.png)
 
