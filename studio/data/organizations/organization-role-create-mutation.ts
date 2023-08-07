@@ -49,10 +49,7 @@ export const useOrganizationRoleCreateMutation = ({
       async onSuccess(data, variables, context) {
         const { slug } = variables
 
-        await Promise.all([
-          queryClient.invalidateQueries(organizationKeys.detail(slug)),
-          queryClient.invalidateQueries(organizationKeys.roles(slug)),
-        ])
+        await Promise.all([queryClient.invalidateQueries(organizationKeys.roles(slug))])
 
         await onSuccess?.(data, variables, context)
       },

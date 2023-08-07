@@ -53,7 +53,7 @@ const NewRoleButton = ({ roles = [] }: NewRoleButtonProps) => {
     try {
       const response = await createRole({
         slug,
-        name: values.name.toLowerCase(),
+        name: values.name,
         description: values.description,
         baseRoleId: baseRoleId,
       })

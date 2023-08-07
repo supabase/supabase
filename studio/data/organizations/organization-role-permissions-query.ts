@@ -49,7 +49,7 @@ export const useOrganizationRolePermissionsQuery = <TData = OrganizationRolePerm
   }: UseQueryOptions<OrganizationRolePermissionsData, OrganizationRolePermissionsError, TData> = {}
 ) =>
   useQuery<OrganizationRolePermissionsData, OrganizationRolePermissionsError, TData>(
-    organizationKeys.roles(slug),
+    organizationKeys.rolePermissions(slug, roleId),
     ({ signal }) => getOrganizationRolePermisions({ slug, roleId }, signal),
     {
       enabled: enabled && typeof slug !== 'undefined',
@@ -65,7 +65,7 @@ export const useOrganizationRolePermissionsPrefetch = ({
 
   return useCallback(() => {
     if (slug) {
-      client.prefetchQuery(organizationKeys.roles(slug), ({ signal }) =>
+      client.prefetchQuery(organizationKeys.rolePermissions(slug, roleId), ({ signal }) =>
         getOrganizationRolePermisions({ slug, roleId }, signal)
       )
     }

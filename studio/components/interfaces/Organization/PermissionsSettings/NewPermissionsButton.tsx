@@ -4,9 +4,9 @@ import { useParams } from 'common/hooks'
 import { Button, Checkbox, Form, Input, Listbox, Modal } from 'ui'
 import { useStore } from 'hooks'
 import { Role } from 'types'
-import { object, string } from 'yup'
-import { useOrganizationRoleCreateMutation } from 'data/organizations/organization-role-create-mutation'
+import { boolean, object, string } from 'yup'
 import { isNil } from 'lodash'
+import { useOrganizationRolePermissionCreateMutation } from 'data/organizations/organization-role-permission-create-mutation'
 
 export interface NewPermissionsButtonProps {
   roleId: number
@@ -18,39 +18,48 @@ const NewPermissionsButton = ({ roleId }: NewPermissionsButtonProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
   const canCreatePermission = true
-  const initialValues = { name: '', description: '', baseRole: undefined }
+  const initialValues = {
+    actions: '["read:Read"]',
+    resources: '["projects"]',
+    condition: '{"and":[{"var":"resource.project_id"}]}',
+    restrictive: false,
+  }
+  // TODO: how to support array + object
   const schema = object({
-    name: string()
-      .required('Role name is required')
-      .matches(
-        /^[A-Za-z0-9_+=,.@-]+$/,
-        'Invalid role name. Role name is an alphanumeric string with no spaces and can contain _+=,.@-'
-      ),
-    description: string(),
-    baseRole: string().required('Base role is required'),
+    actions: string().required('Actions is required'),
+    resources: string().required('Resources is required'),
+    condition: string(),
+    restrictive: boolean(),
   })
-  const { mutateAsync: createRole, isLoading: isCreating } = useOrganizationRoleCreateMutation()
+  const { mutateAsync: createPermission, isLoading: isCreating } =
+    useOrganizationRolePermissionCreateMutation()
 
-  const onCreateRole = async (values: any, { resetForm }: any) => {
+  const onCreatePermission = async (values: any, { resetForm }: any) => {
+    console.log('onCreatePermission onCreatePermission onCreatePermission')
     if (!slug) {
       throw new Error('slug is required')
     }
 
-    // try {
-    //   const response = await createRole({
-    //     slug,
-    //     name: values.name.toLowerCase(),
-    //     description: values.description,
-    //     baseRoleId: baseRoleId,
-    //   })
-    //   if (isNil(response)) {
-    //     ui.setNotification({ category: 'error', message: 'Failed to create role' })
-    //   } else {
-    //     ui.setNotification({ category: 'success', message: 'Successfully created new role.' })
-    //     setIsOpen(!isOpen)
-    //     resetForm({ initialValues: { ...initialValues, baseRole: baseRoleId } })
-    //   }
-    // } catch (error) {}
+    try {
+      const response = await createPermission({
+        slug,
+        roleId,
+        actions: JSON.parse(values.actions),
+        resources: JSON.parse(values.resources),
+        condition: JSON.parse(values.condition),
+        restrictive: values.restrictive,
+      })
+      if (isNil(response)) {
+        ui.setNotification({ category: 'error', message: 'Failed to create role permission' })
+      } else {
+        ui.setNotification({
+          category: 'success',
+          message: 'Successfully created new role permission.',
+        })
+        setIsOpen(!isOpen)
+        resetForm({ initialValues: { ...initialValues } })
+      }
+    } catch (error) {}
   }
 
   return (
@@ -88,7 +97,7 @@ const NewPermissionsButton = ({ roleId }: NewPermissionsButtonProps) => {
         onCancel={() => setIsOpen(false)}
         header="Create a new permission for this role"
       >
-        <Form validationSchema={schema} initialValues={initialValues} onSubmit={onCreateRole}>
+        <Form validationSchema={schema} initialValues={initialValues} onSubmit={onCreatePermission}>
           {({ resetForm }: any) => {
             return (
               <>
@@ -96,15 +105,12 @@ const NewPermissionsButton = ({ roleId }: NewPermissionsButtonProps) => {
                   <div className="w-full py-4">
                     <div className="space-y-4">
                       <Input autoFocus id="actions" label="Actions" />
-
                       <Input id="resources" label="Resources" />
-
                       <Checkbox
-                        name="restritive"
+                        id="restrictive"
                         label="Restrictive permission"
                         description="Proin enim tortor, consequat et erat vitae, pretium fermentum leo. Curabitur sit amet dolor egestas, eleifend nunc et, sagittis sapien."
                       />
-
                       <Input id="condition" label="Condition" />
                     </div>
                   </div>

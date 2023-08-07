@@ -49,18 +49,19 @@ const RolePermissionsView = ({ roleId }: RolePermissionsViewProps) => {
               ]}
               body={[
                 ...permissions.map((x: BasePermission, i: number) => {
+                  console.log(JSON.stringify(x.condition))
                   return (
                     <Fragment key={`member-row-${i}`}>
                       <Table.tr>
                         <Table.td>
                           <div className="flex items-center space-x-4">
-                            <div>{x.actions}</div>
+                            <div>{JSON.stringify(x.actions)}</div>
                           </div>
                         </Table.td>
 
                         <Table.td>
                           <div className="flex items-center space-x-4">
-                            <div>{x.resources}</div>
+                            <div>{JSON.stringify(x.resources)}</div>
                           </div>
                         </Table.td>
 
@@ -72,7 +73,7 @@ const RolePermissionsView = ({ roleId }: RolePermissionsViewProps) => {
 
                         <Table.td>
                           <div className="flex items-center space-x-4">
-                            <div>{x.condition}</div>
+                            <div>{x.condition ? JSON.stringify(x.condition) : ''}</div>
                           </div>
                         </Table.td>
 
