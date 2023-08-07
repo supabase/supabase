@@ -1,20 +1,19 @@
+import { useParams } from 'common'
 import Link from 'next/link'
-import { FC } from 'react'
 import { Alert, Button } from 'ui'
 
-import { useParams } from 'common/hooks'
+import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { getResourcesApproachingLimits, getResourcesExceededLimits } from './OveragesBanner.utils'
-import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 
-interface Props {
+interface OveragesBannerProps {
   tier: string
   minimal?: boolean
 }
 
 // Banner will not be shown for PAYG or Enterprise projects
 
-const OveragesBanner: FC<Props> = ({ tier, minimal }) => {
+const OveragesBanner = ({ tier, minimal }: OveragesBannerProps) => {
   const { ref: projectRef } = useParams()
   const { data: usage, error, isLoading } = useProjectUsageQuery({ projectRef })
 

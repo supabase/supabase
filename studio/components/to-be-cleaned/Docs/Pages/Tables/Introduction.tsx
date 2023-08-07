@@ -1,14 +1,14 @@
-import { FC } from 'react'
+import { useParams } from 'common'
 import Link from 'next/link'
-import { useParams } from 'common/hooks'
-import CodeSnippet from '../../CodeSnippet'
-import GeneratingTypes from 'components/interfaces/Docs/GeneratingTypes'
 
-interface Props {
+import GeneratingTypes from 'components/interfaces/Docs/GeneratingTypes'
+import CodeSnippet from '../../CodeSnippet'
+
+interface IntroductionProps {
   selectedLang: string
 }
 
-const Introduction: FC<Props> = ({ selectedLang }) => {
+const Introduction = ({ selectedLang }: IntroductionProps) => {
   const { ref } = useParams()
 
   return (
