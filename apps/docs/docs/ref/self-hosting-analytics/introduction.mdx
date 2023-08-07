@@ -37,8 +37,8 @@ Currently the Analytics service supports two backends for ingestion:
 
 - Requires you to use supabase/logflare:1.3.26 or above
 - Requires the following environment variables set:
-  - Required - POSTGRES_BACKEND_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
-  - Optional - POSTGRES_BACKEND_SCHEMA: ${SCHEMA_NAME}
+  - Required - POSTGRES_BACKEND_URL: `postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}`
+  - Optional - POSTGRES_BACKEND_SCHEMA: `{SCHEMA_NAME}`
 
 ### Big Query Ingestion Requirements
 
