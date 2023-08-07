@@ -196,8 +196,8 @@ Check out [this demo](https://huggingface.co/spaces/Xenova/semantic-image-search
 
 Supabase is mainly used to store embeddings, so that’s where we’re starting. Over time we’ll add more Hugging Face support - even beyond embeddings. To help you identify which Hugging Face model to use, we ran a detailed analysis and found that embeddings with [fewer dimensions are better](https://supabase.com/blog/fewer-dimensions-are-better-pgvector) within pgvector. Fewer dimensions have several advantages:
 
-- They require less space in your database (saving you money!)
-- Retrieval is faster
+1. They require less space in your database (saving you money!)
+2. Retrieval is faster
 
 To simplify your choice we’ve shortlisted a few recommendations in the official [Supabase org on Hugging Face](https://huggingface.co/Supabase). The [gte-small](https://huggingface.co/Supabase/gte-small) model is the best (it even [outperforms OpenAI’s embedding model](https://huggingface.co/spaces/mteb/leaderboard) in some tasks), but it’s only trained on English text, so you’ll need to find another model if you have non-English text.
 
