@@ -44,7 +44,7 @@ const PermissionsSettings = () => {
         <ScaffoldActionsContainer className="justify-between">
           <ScaffoldActionsGroup>
             <div>
-              <NewRoleButton parentRoles={roles} />
+              <NewRoleButton baseRoles={roles} />
             </div>
           </ScaffoldActionsGroup>
         </ScaffoldActionsContainer>

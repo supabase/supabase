@@ -63,7 +63,7 @@ const RolesView = () => {
 
                         <Table.td>
                           <div className="flex items-center space-x-4">
-                            <div>{x.id}</div>
+                            <div>{x.description}</div>
                           </div>
                         </Table.td>
 
