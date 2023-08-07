@@ -80,7 +80,9 @@ const LWAnnouncement = ({
                   </div>
                   <span className="text-foreground">Launch Week 8: Day 1</span>
                 </div>
-                <span className="text-foreground-light">Huggingface now supported in Supabase</span>
+                <span className="text-foreground-light">
+                  Hugging Face now supported in Supabase
+                </span>
               </div>
             </div>
             <div className="relative flex items-center justify-center !aspect-video h-[80px] md:h-[80px] gap-2 z-10 rounded overflow-hidden">
