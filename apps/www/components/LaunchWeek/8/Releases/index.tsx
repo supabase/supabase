@@ -287,80 +287,71 @@ export default function LW8Releases() {
             </Accordion.Item>
           </div>
           <div className="border-b border-[#111718] scroll-mt-16" id="today">
-            <Accordion.Item
-              header={
-                <AccordionHeader
-                  date={day1.date}
-                  day={day1.d}
-                  weekDay={day1.dd}
-                  title={day1.title}
-                  shipped={day1Shipped}
-                  publishedAt={day1.publishedAt}
-                  youtube_id={day1.youtube_id}
-                  videoThumbnail={day1.videoThumbnail}
-                />
-              }
-              disabled={true}
-              className="h-[79px] hover:cursor-default"
-              id={day1.d.toString()}
-            >
-              {day1.steps.length > 0 && (
-                <div className="flex flex-col gap-5 lg:flex-row pb-4">
-                  <motion.div
-                    className={`
+            <AccordionHeader
+              date={day1.date}
+              day={day1.d}
+              weekDay={day1.dd}
+              title={day1.title}
+              shipped={day1Shipped}
+              publishedAt={day1.publishedAt}
+              youtube_id={day1.youtube_id}
+              videoThumbnail={day1.videoThumbnail}
+            />
+
+            {day1.steps.length > 0 && (
+              <div className="flex flex-col gap-5 lg:flex-row pb-4">
+                <motion.div
+                  className={`
                       min-h-[400px] relative overflow-hidden group/d1 flex-1 flex flex-col items-center lg:items-start justify-between
                       basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
                       `}
-                    initial="default"
-                    animate="default"
-                    whileHover="hover"
-                  >
-                    <div
-                      className="inset-0 absolute group-hover/d1:scale-105 opacity-60 group-hover/d1:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
-                      style={{
-                        background: `radial-gradient(100% 100% at 80% 80%, #6F13A450, #030A0C)`,
-                      }}
-                    />
-                    <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
-                      <CartTitle>{day1.steps[0].title}</CartTitle>
-                      <p className="text-sm text-slate-900">{day1.steps[0]?.description}</p>
-                    </div>
-                    <SectionButtons
-                      blog={day1.steps[0].blog}
-                      video={day1.steps[0].video}
-                      // hackernews={day1.steps[0].hackernews}
-                      // twitter_spaces={day1.steps[0].twitter_spaces}
-                      // mobileGrid
-                    />
-                    {day1.steps[0]?.bg_layers &&
-                      day1.steps[0]?.bg_layers?.map(
-                        (layer, i) =>
-                          !!layer.img && (
-                            <motion.div
-                              className="absolute opacity-90 inset-0 w-full h-full -z-10"
-                              variants={i === 1 ? scaleOpacityVariant : undefined}
-                            >
-                              <Image
-                                src={
-                                  !!layer.mobileImg && isTablet
-                                    ? (layer.mobileImg as any)
-                                    : layer.img
-                                }
-                                className={`
+                  initial="default"
+                  animate="default"
+                  whileHover="hover"
+                >
+                  <div
+                    className="inset-0 absolute group-hover/d1:scale-105 opacity-60 group-hover/d1:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
+                    style={{
+                      background: `radial-gradient(100% 100% at 80% 80%, #6F13A450, #030A0C)`,
+                    }}
+                  />
+                  <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
+                    <CartTitle>{day1.steps[0].title}</CartTitle>
+                    <p className="text-sm text-slate-900">{day1.steps[0]?.description}</p>
+                  </div>
+                  <SectionButtons
+                    blog={day1.steps[0].blog}
+                    video={day1.steps[0].video}
+                    // hackernews={day1.steps[0].hackernews}
+                    // twitter_spaces={day1.steps[0].twitter_spaces}
+                    // mobileGrid
+                  />
+                  {day1.steps[0]?.bg_layers &&
+                    day1.steps[0]?.bg_layers?.map(
+                      (layer, i) =>
+                        !!layer.img && (
+                          <motion.div
+                            className="absolute opacity-90 inset-0 w-full h-full -z-10"
+                            variants={i === 1 ? scaleOpacityVariant : undefined}
+                          >
+                            <Image
+                              src={
+                                !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
+                              }
+                              className={`
                                   absolute opacity-90
                                   w-full h-full -z-10 transition-all duration-300
                                 `}
-                                layout="fill"
-                                objectPosition={isTablet ? '50%' : '90% 50%'}
-                                objectFit="contain"
-                              />
-                            </motion.div>
-                          )
-                      )}
-                  </motion.div>
-                </div>
-              )}
-            </Accordion.Item>
+                              layout="fill"
+                              objectPosition={isTablet ? '50%' : '90% 50%'}
+                              objectFit="contain"
+                            />
+                          </motion.div>
+                        )
+                    )}
+                </motion.div>
+              </div>
+            )}
           </div>
           <div className="border-b border-[#111718]">
             <Accordion.Item
