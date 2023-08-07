@@ -1,23 +1,24 @@
-import { CalculatedColumn } from '@supabase/react-data-grid'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { CalculatedColumn } from '@supabase/react-data-grid'
 import {
   Button,
+  Divider,
   Dropdown,
   IconChevronDown,
-  Divider,
   IconEdit,
-  IconTrash,
   IconLock,
+  IconTrash,
   IconUnlock,
 } from 'ui'
+
 import { useDispatch, useTrackedState } from '../../store'
 
-type ColumnMenuProps = {
+interface ColumnMenuProps {
   column: CalculatedColumn<any, unknown>
   isEncrypted?: boolean
 }
 
-const ColumnMenu: React.FC<ColumnMenuProps> = ({ column, isEncrypted }) => {
+const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
   const state = useTrackedState()
   const dispatch = useDispatch()
   const { onEditColumn: onEditColumnFunc, onDeleteColumn: onDeleteColumnFunc } = state
