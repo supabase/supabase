@@ -168,7 +168,7 @@ export const AccordionHeader = ({
 }) => (
   <div
     className={[
-      'h-[79px] hover:cursor-default flex flex-1 justify-between items-center scroll-mt-20 text-scale-900',
+      'h-[79px] hover:cursor-default flex flex-1 items-center scroll-mt-20 text-scale-900',
     ].join(' ')}
   >
     <div
@@ -186,16 +186,16 @@ export const AccordionHeader = ({
             </span>
           )}
         </span>
+        {shippable && shipped && (
+          <Badge
+            className={`relative hidden sm:inline-flex inset-0 !bg-[#05090B] border !border-[#061517] !py-1 !px-4 h-fit`}
+          >
+            <span className="text-[#F4FFFA40] text-sm font-normal bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
+              Shipped
+            </span>
+          </Badge>
+        )}
       </div>
-      {shippable && shipped && (
-        <Badge
-          className={`relative hidden sm:inline-flex inset-0 !bg-[#05090B] border !border-[#061517] !py-1 !px-4 h-fit`}
-        >
-          <span className="text-[#F4FFFA40] text-sm font-normal bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
-            Shipped
-          </span>
-        </Badge>
-      )}
       {shippable && !shipped && (
         <span className="text-sm font-normal text-[#A0A0A0] mt-1 sm:mt-0 flex items-center gap-1 md:gap-4">
           <svg
