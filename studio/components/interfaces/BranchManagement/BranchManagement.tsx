@@ -36,16 +36,16 @@ const BranchManagement = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref } = useParams()
-  const projectDetails = useSelectedProject()
+  const project = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
 
   const hasAccessToBranching =
     selectedOrg?.opt_in_tags?.includes('PREVIEW_BRANCHES_OPT_IN') ?? false
+  const hasBranchEnabled = project?.is_branch_enabled
 
-  const isBranch = projectDetails?.parent_project_ref !== undefined
-  const hasBranchEnabled = projectDetails?.is_branch_enabled
+  const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
-    projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
+    project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
   const snap = useAppUiStateSnapshot()
   const [showCreateBranch, setShowCreateBranch] = useState(false)
@@ -64,7 +64,7 @@ const BranchManagement = () => {
     ?.filter((integration) => integration.integration.name === 'GitHub')
     .flatMap((integration) => integration.connections)
   const githubConnection = githubConnections?.find(
-    (connection) => connection.supabase_project_ref === ref
+    (connection) => connection.supabase_project_ref === projectRef
   )
 
   const { data: branches } = useBranchesQuery({ projectRef })

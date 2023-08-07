@@ -5,7 +5,7 @@ import { useParams } from 'common'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useGithubPullRequestsQuery } from 'data/integrations/integrations-github-pull-requests-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { BranchContainer, BranchHeader, PullRequestPanel } from './BranchPanels'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import AlertError from 'components/ui/AlertError'
@@ -22,8 +22,13 @@ const PullRequests = ({
   onSelectDeleteBranch,
 }: PullRequestsProps) => {
   const { ref } = useParams()
+  const project = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
   const pullRequestUrl = generateCreatePullRequestURL()
+
+  const isBranch = project?.parent_project_ref !== undefined
+  const projectRef =
+    project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
   const { data: integrations, isLoading: isLoadingIntegrations } = useOrgIntegrationsQuery({
     orgSlug: selectedOrg?.slug,
@@ -35,11 +40,11 @@ const PullRequests = ({
   )
 
   const githubConnection = githubIntegration?.connections?.find(
-    (connection) => connection.supabase_project_ref === ref
+    (connection) => connection.supabase_project_ref === projectRef
   )
   const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') || []
 
-  const { data: branches, isLoading: isLoadingBranches } = useBranchesQuery({ projectRef: ref })
+  const { data: branches, isLoading: isLoadingBranches } = useBranchesQuery({ projectRef })
   const mainBranch = branches?.find((branch) => branch.is_default)
 
   const {
