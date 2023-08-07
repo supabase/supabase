@@ -1,13 +1,12 @@
-import { FC } from 'react'
 import { Badge } from 'ui'
 
-interface Props {
+interface CreditBalanceProps {
   balance: string | number
   isCredit: boolean
   isDebt: boolean
 }
 
-const CreditBalance: FC<Props> = ({ balance, isCredit, isDebt }) => {
+const CreditBalance = ({ balance, isCredit, isDebt }: CreditBalanceProps) => {
   return (
     <div className="flex items-center justify-between">
       <div className="space-y-1">

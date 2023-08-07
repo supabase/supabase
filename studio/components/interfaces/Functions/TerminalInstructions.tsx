@@ -1,19 +1,23 @@
-import CommandRender from 'components/interfaces/Functions/CommandRender'
-import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
-import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useParams } from 'common/hooks'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import { Button, IconBookOpen, IconCode, IconMaximize2, IconMinimize2, IconTerminal } from 'ui'
+
+import CommandRender from 'components/interfaces/Functions/CommandRender'
+import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import { Commands } from './Functions.types'
 
-interface Props {
+interface TerminalInstructionsProps {
   closable?: boolean
   removeBorder?: boolean
 }
 
-const TerminalInstructions: FC<Props> = ({ closable = false, removeBorder = false }) => {
+const TerminalInstructions = ({
+  closable = false,
+  removeBorder = false,
+}: TerminalInstructionsProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const [showInstructions, setShowInstructions] = useState(!closable)
