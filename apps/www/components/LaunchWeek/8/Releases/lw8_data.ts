@@ -101,7 +101,7 @@ const days: WeekDayProps[] = [
     twitter_spaces: 'https://twitter.com/i/spaces/1DXGyvjkeEeJM',
     steps: [
       {
-        title: 'Huggingface now supported in Supabase',
+        title: 'Hugging Face now supported in Supabase',
         blog: '/blog/hugging-face-supabase',
         hackernews: '/',
         twitter_spaces: 'https://twitter.com/i/spaces/1DXGyvjkeEeJM',
