@@ -1,14 +1,14 @@
+import { useParams } from 'common'
 import Link from 'next/link'
 import { Button, IconExternalLink, IconGitBranch } from 'ui'
 
-import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useGithubPullRequestsQuery } from 'data/integrations/integrations-github-pull-requests-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { BranchContainer, BranchHeader, PullRequestPanel } from './BranchPanels'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import AlertError from 'components/ui/AlertError'
 
 interface PullRequestsProps {
   previewBranches: Branch[]

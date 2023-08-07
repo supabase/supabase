@@ -1,14 +1,14 @@
+import { useParams } from 'common'
+import { partition } from 'lodash'
 import { Button, IconExternalLink, IconGitBranch } from 'ui'
 
-import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { BranchContainer, BranchHeader, BranchPanel } from './BranchPanels'
-import { useParams } from 'common'
-import { useGithubPullRequestsQuery } from 'data/integrations/integrations-github-pull-requests-query'
-import { partition } from 'lodash'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { Branch, useBranchesQuery } from 'data/branches/branches-query'
+import { useGithubPullRequestsQuery } from 'data/integrations/integrations-github-pull-requests-query'
+import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
+import { BranchContainer, BranchHeader, BranchPanel } from './BranchPanels'
 
 interface PreviewBranchesProps {
   generateCreatePullRequestURL: (branch?: string) => string
