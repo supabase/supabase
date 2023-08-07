@@ -18,7 +18,7 @@ import QueryItem from './QueryItem'
 
 const SideBarContent = observer(() => {
   const { ui } = useStore()
-  const { ref, id } = useParams()
+  const { ref } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
   const sharedSnippetsFeature = useFlag<boolean>('sharedSnippets')
@@ -84,7 +84,8 @@ const SideBarContent = observer(() => {
   })
 
   const handleNewQuery = async () => {
-    if (!ref) return console.error('Project ref is required')
+    if (!ref) return console.error('Project is required')
+    if (!profile) return console.error('Profile is required')
     if (!canCreateSQLSnippet) {
       return ui.setNotification({
         category: 'info',
@@ -99,7 +100,7 @@ const SideBarContent = observer(() => {
       })
       const data = { ...snippet, id: uuidv4() }
 
-      snap.addSnippet(data as SqlSnippet, ref, true)
+      snap.addSnippet(data as SqlSnippet, ref)
 
       router.push(`/project/${ref}/sql/${data.id}`)
       // reset all search inputs when a new query is added

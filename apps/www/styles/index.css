@@ -179,6 +179,16 @@ h6:not(.overwrite) {
   position: relative;
 }
 
+.stroke-text {
+  -webkit-text-fill-color: transparent; /* Will override color (regardless of order) */
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: var(--colors-scale9);
+}
+
+.stroke-text.fill {
+  -webkit-text-fill-color: #1ae88f;
+}
+
 /* Database page */
 
 .dashboard-tabs div[role='separator'] {

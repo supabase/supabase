@@ -3,7 +3,19 @@ import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
-import { Alert, Button, IconHelpCircle, Listbox, Loading, Modal, Toggle } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertCircle,
+  IconAlertTriangle,
+  IconHelpCircle,
+  Listbox,
+  Loading,
+  Modal,
+  Toggle,
+} from 'ui'
 
 import { SpendCapModal } from 'components/interfaces/BillingV2'
 import { useOrganizationBillingMigrationMutation } from 'data/organizations/organization-migrate-billing-mutation'
@@ -114,39 +126,66 @@ const MigrateOrganizationBillingButton = observer(() => {
         <div className="space-y-4 py-3">
           <Modal.Content>
             <div className="space-y-2">
-              <Alert title="About the migration" withIcon variant="info">
-                <div className="text-sm space-y-2">
-                  <p>
-                    Migrating to new organization-level billing combines subscriptions for all
-                    projects in the organization into a single subscription.
-                  </p>
+              <Alert_Shadcn_ variant="destructive">
+                <IconAlertCircle strokeWidth={2} />
+                <AlertTitle_Shadcn_>Irreversible</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  Once migrated to the new organization-level billing, you cannot go back to the old
+                  project-level billing.
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
 
-                  <p>
-                    For a detailed breakdown of changes, see{' '}
-                    <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
-                      <a target="_blank" rel="noreferrer" className="underline">
-                        Billing Migration Docs
-                      </a>
-                    </Link>
-                    . To transfer projects to a different organization, visit{' '}
-                    <Link href="/projects/_/settings/general">
-                      <a target="_blank" rel="noreferrer" className="underline">
-                        General settings
-                      </a>
-                    </Link>
-                    .
-                  </p>
-                </div>
-              </Alert>
+              {migrationPreviewData?.addons_to_be_removed &&
+                migrationPreviewData.addons_to_be_removed.length > 0 && (
+                  <Alert_Shadcn_ variant="warning">
+                    <IconAlertTriangle strokeWidth={2} />
+                    <AlertTitle_Shadcn_>Project addons will be removed</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      <div>
+                        The following project addons will be removed when downgrading
+                        <ul className="list-disc list-inside pl-4">
+                          {migrationPreviewData.addons_to_be_removed.map((addon) =>
+                            addon.addons.map((variant) => (
+                              <li key={`${addon.projectRef}-${variant.variant}`}>
+                                {variant.type === 'pitr'
+                                  ? 'PITR - '
+                                  : variant.type === 'compute_instance'
+                                  ? 'Compute Instance - '
+                                  : ''}
+                                {variant.name} for project {addon.projectName || addon.projectRef}
+                              </li>
+                            ))
+                          )}
+                        </ul>
+                      </div>
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
+            </div>
+          </Modal.Content>
+          <Modal.Separator />
+          <Modal.Content>
+            <div className="text-scale-1000 text-sm space-y-2">
+              <p>
+                Migrating to new organization-level billing combines subscriptions for all projects
+                in the organization into a single subscription.
+              </p>
 
-              <Alert title="Irreversible" withIcon variant="danger">
-                <div className="text-sm">
-                  <p>
-                    Once migrated to the new organization-level billing, you cannot go back to the
-                    old project-level billing.
-                  </p>
-                </div>
-              </Alert>
+              <p>
+                For a detailed breakdown of changes, see{' '}
+                <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
+                  <a target="_blank" rel="noreferrer" className="underline">
+                    Billing Migration Docs
+                  </a>
+                </Link>
+                . To transfer projects to a different organization, visit{' '}
+                <Link href="/projects/_/settings/general">
+                  <a target="_blank" rel="noreferrer" className="underline">
+                    General settings
+                  </a>
+                </Link>
+                .
+              </p>
             </div>
           </Modal.Content>
           <Modal.Separator />
@@ -261,16 +300,22 @@ const MigrateOrganizationBillingButton = observer(() => {
           <Modal.Content>
             <Loading active={tier !== '' && migrationPreviewIsLoading}>
               {migrationPreviewError && (
-                <Alert title="Organization cannot be migrated" variant="danger">
-                  <span>{migrationPreviewError.message}</span>
-                </Alert>
+                <Alert_Shadcn_ variant="destructive">
+                  <IconAlertCircle strokeWidth={2} />
+                  <AlertTitle_Shadcn_>Organization cannot be migrated</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    {migrationPreviewError.message}
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
               )}
             </Loading>
 
             {migrationError && (
-              <Alert title="Organization cannot be migrated" variant="danger">
-                <span>{migrationError.message}</span>
-              </Alert>
+              <Alert_Shadcn_ variant="destructive">
+                <IconAlertCircle strokeWidth={2} />
+                <AlertTitle_Shadcn_>Organization cannot be migrated</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>{migrationError.message}</AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
             )}
           </Modal.Content>
           <Modal.Content>

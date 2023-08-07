@@ -153,6 +153,8 @@ export {
   AccordionContent as AccordionContent_Shadcn_,
 } from './src/components/shadcn/ui/accordion'
 
+export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
+
 // links
 
 export * from './src/components/TextLink'

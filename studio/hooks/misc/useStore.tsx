@@ -1,12 +1,12 @@
 import { useMonaco } from '@monaco-editor/react'
+import { useTheme } from 'common'
 import { autorun } from 'mobx'
-import { createContext, FC, useContext, useEffect } from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
-import { IRootStore } from 'stores'
 import { getTheme } from 'components/ui/CodeEditor'
 import SparkBar from 'components/ui/SparkBar'
-import { useTheme } from 'common'
+import { IRootStore } from 'stores'
 
 const StoreContext = createContext<IRootStore>(undefined!)
 
@@ -22,7 +22,7 @@ export function useStore() {
 interface StoreProvider {
   rootStore: IRootStore
 }
-export const StoreProvider: FC<StoreProvider> = ({ children, rootStore }) => {
+export const StoreProvider = ({ children, rootStore }: PropsWithChildren<StoreProvider>) => {
   const monaco = useMonaco()
   const { ui } = rootStore
   const { isDarkMode } = useTheme()
