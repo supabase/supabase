@@ -1,8 +1,10 @@
 import { useParams } from 'common'
-import { useFlag, useSelectedOrganization } from 'hooks'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 import { Tabs } from 'ui'
+
+import { useFlag, useLocalStorage, useSelectedOrganization } from 'hooks'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { AccountLayout } from './'
 import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
 import SettingsLayout from './SettingsLayout/SettingsLayout'
@@ -19,7 +21,13 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const showAuditLogs = useFlag('auditLogs')
   const showIntegrationsV2 = useFlag('integrationsV2')
 
-  if (navLayoutV2) {
+  const [navigationPreview] = useLocalStorage(
+    LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT,
+    'false'
+  )
+  const useNewNavigationLayout = navLayoutV2 && navigationPreview === 'true'
+
+  if (useNewNavigationLayout) {
     return <SettingsLayout>{children}</SettingsLayout>
   }
 

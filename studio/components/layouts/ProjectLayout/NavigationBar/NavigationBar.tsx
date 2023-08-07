@@ -5,8 +5,8 @@ import { useRouter } from 'next/router'
 
 import { useTheme } from 'common'
 import { useParams } from 'common/hooks'
-import { useFlag } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
+import { useFlag, useLocalStorage } from 'hooks'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import {
   Button,
@@ -33,6 +33,11 @@ const NavigationBar = ({}) => {
 
   const { project } = useProjectContext()
   const navLayoutV2 = useFlag('navigationLayoutV2')
+  const [navigationPreview] = useLocalStorage(
+    LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT,
+    'false'
+  )
+  const useNewNavigationLayout = navLayoutV2 && navigationPreview === 'true'
 
   const activeRoute = router.pathname.split('/')[3]
   const toolRoutes = generateToolRoutes(projectRef, project)
@@ -49,7 +54,7 @@ const NavigationBar = ({}) => {
       ].join(' ')}
     >
       <ul className="flex flex-col space-y-2">
-        {(!navLayoutV2 || !IS_PLATFORM) && (
+        {(!useNewNavigationLayout || !IS_PLATFORM) && (
           <Link href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}>
             <a className="block">
               <img
@@ -95,7 +100,7 @@ const NavigationBar = ({}) => {
           />
         ))}
       </ul>
-      {!navLayoutV2 && (
+      {!useNewNavigationLayout && (
         <ul className="flex flex-col space-y-4 items-center">
           {IS_PLATFORM && showCmdkHelper && (
             <Tooltip.Root delayDuration={0}>

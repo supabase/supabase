@@ -5,7 +5,7 @@ import AlertError from 'components/ui/AlertError'
 import Connecting from 'components/ui/Loading/Loading'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
-import { useFlag } from 'hooks'
+import { useFlag, useLocalStorage } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { useRouter } from 'next/router'
@@ -27,8 +27,14 @@ const ProjectsPage: NextPageWithLayout = () => {
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const hasWindowLoaded = typeof window !== 'undefined'
 
+  const [navigationPreview] = useLocalStorage(
+    LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT,
+    'false'
+  )
+  const useNewNavigationLayout = navLayoutV2 && navigationPreview === 'true'
+
   useEffect(() => {
-    if (navLayoutV2 && isSuccess && hasWindowLoaded) {
+    if (useNewNavigationLayout && isSuccess && hasWindowLoaded) {
       const localStorageSlug = localStorage.getItem(
         LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION
       )
@@ -38,11 +44,11 @@ const ProjectsPage: NextPageWithLayout = () => {
       else if (localStorageSlug && verifiedSlug) router.push(`/org/${localStorageSlug}`)
       else router.push(`/org/${organizations[0].slug}`)
     }
-  }, [navLayoutV2, isSuccess, hasWindowLoaded])
+  }, [useNewNavigationLayout, isSuccess, hasWindowLoaded])
 
   return (
     <>
-      {navLayoutV2 && isLoading && (
+      {useNewNavigationLayout && isLoading && (
         <div className={`flex items-center justify-center h-full`}>
           <Connecting />
         </div>
@@ -50,13 +56,15 @@ const ProjectsPage: NextPageWithLayout = () => {
 
       {isError && (
         <div
-          className={`py-4 px-5 ${navLayoutV2 ? 'h-full flex items-center justify-center' : ''}`}
+          className={`py-4 px-5 ${
+            useNewNavigationLayout ? 'h-full flex items-center justify-center' : ''
+          }`}
         >
           <AlertError subject="Failed to retrieve organizations" />
         </div>
       )}
 
-      {!navLayoutV2 && isSuccess && (
+      {!useNewNavigationLayout && isSuccess && (
         <div className="py-4 px-5">
           {IS_PLATFORM && (
             <div className="my-2">

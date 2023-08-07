@@ -3,9 +3,9 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useFlag, useSelectedOrganization, withAuth } from 'hooks'
+import { useFlag, useLocalStorage, useSelectedOrganization, withAuth } from 'hooks'
 import { useSignOut } from 'lib/auth'
-import { IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { SidebarSection } from './AccountLayout.types'
 import WithSidebar from './WithSidebar'
 import SettingsLayout from '../SettingsLayout/SettingsLayout'
@@ -26,6 +26,12 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
   const ongoingIncident = useFlag('ongoingIncident')
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
+
+  const [navigationPreview] = useLocalStorage(
+    LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT,
+    'false'
+  )
+  const useNewNavigationLayout = navLayoutV2 && navigationPreview === 'true'
 
   const signOut = useSignOut()
   const onClickLogout = async () => {
@@ -127,7 +133,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
       : []),
   ]
 
-  if (navLayoutV2) {
+  if (useNewNavigationLayout) {
     return <SettingsLayout>{children}</SettingsLayout>
   }
 
@@ -143,7 +149,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
           className="flex flex-col flex-1 w-full overflow-y-auto"
         >
           <WithSidebar
-            hideSidebar={navLayoutV2}
+            hideSidebar={useNewNavigationLayout}
             title={title}
             breadcrumbs={breadcrumbs}
             sections={sectionsWithHeaders}

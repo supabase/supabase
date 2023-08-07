@@ -89,4 +89,5 @@ export const USAGE_APPROACHING_THRESHOLD = 0.75
 
 export const LOCAL_STORAGE_KEYS = {
   RECENTLY_VISITED_ORGANIZATION: 'supabase-organization',
+  UI_PREVIEW_NAVIGATION_LAYOUT: 'supabase-ui-preview-nav-layout',
 }

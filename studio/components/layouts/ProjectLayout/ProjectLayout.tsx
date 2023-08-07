@@ -4,8 +4,14 @@ import { Fragment, PropsWithChildren, ReactNode } from 'react'
 
 import { useParams } from 'common/hooks'
 import Connecting from 'components/ui/Loading'
-import { useFlag, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
-import { PROJECT_STATUS, IS_PLATFORM } from 'lib/constants'
+import {
+  useFlag,
+  useLocalStorage,
+  useSelectedOrganization,
+  useSelectedProject,
+  withAuth,
+} from 'hooks'
+import { PROJECT_STATUS, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import LayoutHeader from './LayoutHeader'
@@ -68,6 +74,11 @@ const ProjectLayout = ({
   const organizationName = selectedOrganization?.name
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
+  const [navigationPreview] = useLocalStorage(
+    LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT,
+    'false'
+  )
+  const useNewNavigationLayout = navLayoutV2 && navigationPreview === 'true'
 
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
   const ignorePausedState =
@@ -103,7 +114,7 @@ const ProjectLayout = ({
           )}
 
           <main className="flex flex-col flex-1 w-full overflow-x-hidden">
-            {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
+            {!useNewNavigationLayout && !hideHeader && IS_PLATFORM && <LayoutHeader />}
             {showPausedState ? (
               <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
                 <div className="w-full">
@@ -222,6 +233,11 @@ export const ProjectLayoutNonBlocking = ({
   const showPausedState = isPaused && !ignorePausedState
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
+  const [navigationPreview] = useLocalStorage(
+    LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT,
+    'false'
+  )
+  const useNewNavigationLayout = navLayoutV2 && navigationPreview === 'true'
 
   return (
     <AppLayout>
@@ -241,7 +257,7 @@ export const ProjectLayoutNonBlocking = ({
           )}
 
           <main className="flex w-full flex-1 flex-col overflow-x-hidden">
-            {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
+            {!useNewNavigationLayout && !hideHeader && IS_PLATFORM && <LayoutHeader />}
             {showPausedState ? (
               <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
                 <div className="w-full">

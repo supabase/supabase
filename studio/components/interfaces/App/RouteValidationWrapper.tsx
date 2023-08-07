@@ -5,7 +5,7 @@ import { PropsWithChildren, useEffect } from 'react'
 import { useParams } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useFlag, useStore } from 'hooks'
+import { useFlag, useLocalStorage, useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
 import { DEFAULT_HOME, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 
@@ -14,7 +14,13 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref, slug } = useParams()
+
   const navLayoutV2 = useFlag('navigationLayoutV2')
+  const [navigationPreview] = useLocalStorage(
+    LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT,
+    'false'
+  )
+  const useNewNavigationLayout = navLayoutV2 && navigationPreview === 'true'
 
   /**
    * Array of urls/routes that should be ignored
@@ -51,7 +57,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
       if (!isValidOrg) {
         ui.setNotification({ category: 'error', message: 'This organization does not exist' })
-        router.push(navLayoutV2 ? `/org/${organizations[0].slug}` : DEFAULT_HOME)
+        router.push(useNewNavigationLayout ? `/org/${organizations[0].slug}` : DEFAULT_HOME)
         return
       }
     }
@@ -74,7 +80,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
       if (!isValidProject && !isValidBranch) {
         ui.setNotification({ category: 'error', message: 'This project does not exist' })
-        router.push(navLayoutV2 ? `/org/${organizations?.[0].slug}` : DEFAULT_HOME)
+        router.push(useNewNavigationLayout ? `/org/${organizations?.[0].slug}` : DEFAULT_HOME)
         return
       }
     }
