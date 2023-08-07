@@ -46,7 +46,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
       <>
         {state.editable && onEditColumn !== undefined && (
           <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger className={`w-full ${isEncrypted ? 'opacity-50' : ''}`}>
+            <Tooltip.Trigger className={`${isEncrypted ? 'opacity-50' : ''}`}>
               <Dropdown.Item
                 onClick={onEditColumn}
                 disabled={isEncrypted}
