@@ -1,13 +1,10 @@
-import { FC, ReactNode } from 'react'
 import Head from 'next/head'
+import { PropsWithChildren } from 'react'
+
 import Divider from 'components/ui/Divider'
 import { BASE_PATH } from 'lib/constants'
 
-interface Props {
-  children: ReactNode
-}
-
-const VercelIntegrationLayout: FC<Props> = ({ children }) => {
+const VercelIntegrationLayout = ({ children }: PropsWithChildren<{}>) => {
   return (
     <>
       <Head>

@@ -1,11 +1,12 @@
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
+import { useParams } from 'common'
+import { PropsWithChildren } from 'react'
+import { IconAlertCircle, IconLoader, Input } from 'ui'
+
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { useParams } from 'common/hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
-import { FC } from 'react'
-import { IconAlertCircle, IconLoader, Input } from 'ui'
 
 const DisplayConfigSettings = () => {
   const { ref: projectRef } = useParams()
@@ -93,7 +94,7 @@ const DisplayConfigSettings = () => {
 
 export default DisplayConfigSettings
 
-const ConfigContentWrapper: FC = ({ children }) => {
+const ConfigContentWrapper = ({ children }: PropsWithChildren<{}>) => {
   return (
     <Panel
       title={
