@@ -1,4 +1,5 @@
-import { isError, partition } from 'lodash'
+import { useParams } from 'common'
+import { partition } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -14,7 +15,6 @@ import {
   Modal,
 } from 'ui'
 
-import { useParams } from 'common'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
@@ -36,16 +36,16 @@ const BranchManagement = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref } = useParams()
-  const projectDetails = useSelectedProject()
+  const project = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
 
   const hasAccessToBranching =
     selectedOrg?.opt_in_tags?.includes('PREVIEW_BRANCHES_OPT_IN') ?? false
+  const hasBranchEnabled = project?.is_branch_enabled
 
-  const isBranch = projectDetails?.parent_project_ref !== undefined
-  const hasBranchEnabled = projectDetails?.is_branch_enabled
+  const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
-    projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
+    project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
   const snap = useAppUiStateSnapshot()
   const [showCreateBranch, setShowCreateBranch] = useState(false)
@@ -64,7 +64,7 @@ const BranchManagement = () => {
     ?.filter((integration) => integration.integration.name === 'GitHub')
     .flatMap((integration) => integration.connections)
   const githubConnection = githubConnections?.find(
-    (connection) => connection.supabase_project_ref === ref
+    (connection) => connection.supabase_project_ref === projectRef
   )
 
   const { data: branches } = useBranchesQuery({ projectRef })
@@ -162,7 +162,9 @@ const BranchManagement = () => {
               <div className="flex items-center space-x-2">
                 <Input placeholder="Search branch" size="small" icon={<IconSearch />} />
               </div>
-              <Button onClick={() => setShowCreateBranch(true)}>Create preview branch</Button>
+              <Button type="default" onClick={() => setShowCreateBranch(true)}>
+                Create preview branch
+              </Button>
             </div>
             <div className="">
               {isLoadingIntegrations && <GenericSkeletonLoader />}
