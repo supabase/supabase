@@ -1,16 +1,5 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { useState } from 'react'
-import { Button, IconSearch, Input } from 'ui'
-
 import { useParams } from 'common/hooks'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useSelectedOrganization, useStore } from 'hooks'
-import { delete_, isResponseOk } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { useProfile } from 'lib/profile'
 import {
   ScaffoldActionsGroup,
   ScaffoldContainerLegacy,
@@ -20,23 +9,17 @@ import {
 } from 'components/layouts/Scaffold'
 import NewRoleButton from './NewRoleButton'
 import RolesView from './RolesView'
+import { useState } from 'react'
+import { Role } from 'types'
+import NewPermissionsButton from './NewPermissionsButton'
+import RolePermissionsView from './RolePermissionsView'
+import { Button } from 'ui'
 
 const PermissionsSettings = () => {
-  const { ui } = useStore()
   const { slug } = useParams()
-
-  const { profile } = useProfile()
-  const selectedOrganization = useSelectedOrganization()
-  const isOwner = selectedOrganization?.is_owner
-
-  const { data: permissions } = usePermissionsQuery()
-  const { data: detailData } = useOrganizationDetailQuery({ slug })
   const { data: rolesData } = useOrganizationRolesQuery({ slug })
-
-  const members = detailData?.members ?? []
+  const [selectedRole, setRole] = useState<Role | undefined>(undefined)
   const roles = rolesData?.roles ?? []
-
-  const [isLeaving, setIsLeaving] = useState(false)
 
   return (
     <ScaffoldContainerLegacy>
@@ -44,12 +27,33 @@ const PermissionsSettings = () => {
         <ScaffoldActionsContainer className="justify-between">
           <ScaffoldActionsGroup>
             <div>
-              <NewRoleButton roles={roles} />
+              {selectedRole ? (
+                <div className="flex flex-col space-y-4">
+                  <div className="flex space-x-4">
+                    <Button
+                      type={'text'}
+                      onClick={() => {
+                        setRole(undefined)
+                      }}
+                    >
+                      Back
+                    </Button>
+                    <NewPermissionsButton roleId={selectedRole.id} />
+                  </div>
+                  <div>{selectedRole.name}</div>
+                </div>
+              ) : (
+                <NewRoleButton roles={roles} />
+              )}
             </div>
           </ScaffoldActionsGroup>
         </ScaffoldActionsContainer>
         <ScaffoldSectionContent className="w-full">
-          <RolesView />
+          {selectedRole ? (
+            <RolePermissionsView roleId={selectedRole.id} />
+          ) : (
+            <RolesView selectRole={setRole} />
+          )}
         </ScaffoldSectionContent>
       </ScaffoldFilterAndContent>
     </ScaffoldContainerLegacy>

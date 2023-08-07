@@ -76,11 +76,15 @@ export interface Role {
   description: string
 }
 
-export interface Permission {
+export interface BasePermission {
   actions: PermissionAction[]
   condition: jsonLogic.RulesLogic
-  organization_id: number
   resources: string[]
+  restrictive: boolean
+}
+
+export interface Permission extends BasePermission {
+  organization_id: number
 }
 
 export interface ResponseFailure {

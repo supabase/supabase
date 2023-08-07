@@ -1,25 +1,21 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { observer } from 'mobx-react-lite'
-import Image from 'next/image'
-import { Fragment, useState } from 'react'
+import { Dispatch, Fragment, SetStateAction } from 'react'
 
 import { useParams } from 'common/hooks'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
-import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { useProfile } from 'lib/profile'
 import { Role } from 'types'
-import { Badge, Button, IconAlertCircle, IconLoader, IconUser, Listbox, Loading, Modal } from 'ui'
-import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
+import { Button, Loading } from 'ui'
 
-interface SelectedRole extends Role {}
+export interface RolesViewProps {
+  selectRole: Dispatch<SetStateAction<Role | undefined>>
+}
 
-const RolesView = () => {
+const RolesView = ({ selectRole }: RolesViewProps) => {
   const { ui } = useStore()
   const { slug } = useParams()
   const selectedOrganization = useSelectedOrganization()
@@ -52,6 +48,15 @@ const RolesView = () => {
               ]}
               body={[
                 ...roles.map((x: Role, i: number) => {
+                  const isDefaultRole = [
+                    'owner',
+                    'administrator',
+                    'developer',
+                    'none',
+                    'read-only',
+                    'billing-only',
+                  ].includes(x.name.toLowerCase())
+                  const allowCustomPermission = !isDefaultRole
                   return (
                     <Fragment key={`member-row-${i}`}>
                       <Table.tr>
@@ -68,10 +73,13 @@ const RolesView = () => {
                         </Table.td>
 
                         <Table.td>
-                          <div className="flex space-x-4">
-                            <Button>Edit</Button>
-                            <Button type={'danger'}>Delete</Button>
-                          </div>
+                          {allowCustomPermission && (
+                            <div className="flex space-x-4">
+                              <Button>Edit</Button>
+                              <Button onClick={() => selectRole(x)}>Permissions</Button>
+                              <Button type={'danger'}>Delete</Button>
+                            </div>
+                          )}
                         </Table.td>
                       </Table.tr>
                     </Fragment>
