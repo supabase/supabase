@@ -1,25 +1,26 @@
-import Link from 'next/link'
-import { FC } from 'react'
-import { useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Badge, Button, IconLock } from 'ui'
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { noop } from 'lodash'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { Badge, Button, IconLock } from 'ui'
+
 import { useCheckPermissions } from 'hooks'
 
-interface Props {
+interface PolicyTableRowHeaderProps {
   table: PostgresTable
   isLocked: boolean
   onSelectToggleRLS: (table: PostgresTable) => void
   onSelectCreatePolicy: (table: PostgresTable) => void
 }
 
-const PolicyTableRowHeader: FC<Props> = ({
+const PolicyTableRowHeader = ({
   table,
   isLocked,
-  onSelectToggleRLS = () => {},
-  onSelectCreatePolicy = () => {},
-}) => {
+  onSelectToggleRLS = noop,
+  onSelectCreatePolicy = noop,
+}: PolicyTableRowHeaderProps) => {
   const router = useRouter()
   const { ref } = router.query
   const canToggleRLS = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')

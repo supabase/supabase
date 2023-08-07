@@ -1,11 +1,12 @@
-import { FC, useEffect } from 'react'
-import { IconHelpCircle } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { noop } from 'lodash'
+import { useEffect } from 'react'
+import { IconHelpCircle } from 'ui'
 
-import { usePrevious } from 'hooks'
 import SqlEditor from 'components/ui/SqlEditor'
+import { usePrevious } from 'hooks'
 
-interface Props {
+interface PolicyDefinitionProps {
   operation: string
   definition: string
   check: string
@@ -13,13 +14,13 @@ interface Props {
   onUpdatePolicyCheck: (check: string | undefined) => void
 }
 
-const PolicyDefinition: FC<Props> = ({
+const PolicyDefinition = ({
   operation = '',
   definition = '',
   check = '',
-  onUpdatePolicyUsing,
-  onUpdatePolicyCheck,
-}) => {
+  onUpdatePolicyUsing = noop,
+  onUpdatePolicyCheck = noop,
+}: PolicyDefinitionProps) => {
   const showUsing = (operation: string) =>
     ['SELECT', 'UPDATE', 'DELETE', 'ALL'].includes(operation) || !operation
   const showCheck = (operation: string) => ['INSERT', 'UPDATE', 'ALL'].includes(operation)

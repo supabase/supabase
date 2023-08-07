@@ -1,20 +1,20 @@
-import ReactMarkdown from 'react-markdown'
-import { FC, useState, useEffect } from 'react'
-import { observer } from 'mobx-react-lite'
-import { Input, Form } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { Form, Input } from 'ui'
 
-import { useStore, useCheckPermissions } from 'hooks'
-import { FormSchema } from 'types'
-import { FormActions, FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import CodeEditor from 'components/ui/CodeEditor'
+import { FormActions, FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import InformationBox from 'components/ui/InformationBox'
+import { useCheckPermissions, useStore } from 'hooks'
+import { FormSchema } from 'types'
 
-interface Props {
+interface TemplateEditorProps {
   template: FormSchema
 }
 
-const TemplateEditor: FC<Props> = ({ template }) => {
+const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const { ui, authConfig } = useStore()
   const [bodyValue, setBodyValue] = useState('')
 
