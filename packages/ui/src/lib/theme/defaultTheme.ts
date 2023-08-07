@@ -210,13 +210,13 @@ export default {
    */
 
   badge: {
-    base: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-opacity-10',
+    base: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-normal bg-opacity-10',
     size: {
       large: 'px-3 py-0.5 rounded-full text-sm',
     },
     dot: '-ml-0.5 mr-1.5 h-2 w-2 rounded-full',
     color: {
-      brand: 'bg-brand-200 text-brand-1100 border border-brand-700',
+      brand: 'bg-brand-500 text-brand-600 border border-brand-400',
       scale: 'bg-scale-200 text-scale-1100 border border-scale-700',
       tomato: `bg-tomato-200 text-tomato-1100 border border-tomato-700`,
       red: `bg-red-200 text-red-1100 border border-red-700`,
@@ -269,10 +269,10 @@ export default {
         description: `text-scale-1100`,
       },
       success: {
-        base: `bg-brand-300 dark:bg-brand-100 border-brand-700`,
-        icon: `text-brand-900`,
-        header: `text-brand-1200`,
-        description: `text-brand-1100`,
+        base: `bg-brand-300 dark:bg-brand-100 border-brand-400`,
+        icon: `text-brand`,
+        header: `text-brand-600`,
+        description: `text-brand-600`,
       },
       neutral: {
         base: `bg-scale-300 dark:bg-scale-300 border-scale-500`,
@@ -568,7 +568,7 @@ export default {
       bg-transparent
       ${defaults.focus}
       focus:ring-scale-400
-      text-brand-900
+      text-brand
       border-scale-700
       shadow-sm
       rounded
@@ -629,7 +629,7 @@ export default {
       focus:ring-brand-400
       border-scale-700
 
-      text-brand-900
+      text-brand
       shadow-sm
       cursor-pointer
       peer
@@ -934,8 +934,8 @@ export default {
       hover:bg-scale-700
     `,
     active: `
-      !bg-brand-900
-      !hover:bg-brand-900
+      !bg-brand
+      !hover:bg-brand
     `,
     handle_container: {
       tiny: 'h-4 w-7',
@@ -1268,8 +1268,8 @@ export default {
             z-10
 
             border-l
-            border-brand-900
-            group-hover:border-brand-900
+            border-brand
+            group-hover:border-brand
           `,
           rounded: `rounded-md`,
         },
@@ -1455,8 +1455,8 @@ export default {
     option_active: `text-scale-1200 bg-scale-600`,
     option_disabled: `cursor-not-allowed opacity-50`,
     option_inner: `flex items-center space-x-3`,
-    option_check: `absolute inset-y-0 right-0 flex items-center pr-3 text-brand-900`,
-    option_check_active: `text-brand-900`,
+    option_check: `absolute inset-y-0 right-0 flex items-center pr-3 text-brand`,
+    option_check_active: `text-brand`,
     option_check_icon: `h-5 w-5`,
   },
 
@@ -1500,7 +1500,7 @@ export default {
     },
     spinner: `
       absolute
-      text-brand-900 animate-spin
+      text-brand animate-spin
       inset-0
       m-auto
     `,

@@ -2246,4 +2246,9 @@ module.exports = [
     source: '/docs/guides/integrations/zuplo',
     destination: '/partners/integrations/zuplo',
   },
+  {
+    permanent: true,
+    source: '/docs/reference/cli/config',
+    destination: '/docs/guides/cli/config',
+  },
 ]

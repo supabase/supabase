@@ -45,11 +45,7 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
           <Button
             type="default"
             icon={
-              isCopied ? (
-                <IconCheck className="text-brand-900" strokeWidth={3} />
-              ) : (
-                <IconClipboard />
-              )
+              isCopied ? <IconCheck className="text-brand" strokeWidth={3} /> : <IconClipboard />
             }
             className="ml-2 px-1"
             onClick={() => {
