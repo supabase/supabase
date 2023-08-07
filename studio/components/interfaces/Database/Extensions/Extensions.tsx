@@ -1,20 +1,18 @@
-import { FC, useEffect, useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { partition, isNull } from 'lodash'
-import { Input, IconSearch, IconAlertCircle, Button, IconBookOpen } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { isNull, partition } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { Button, IconAlertCircle, IconBookOpen, IconSearch, Input } from 'ui'
 
-import { useStore, useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
+import InformationBox from 'components/ui/InformationBox'
+import NoSearchResults from 'components/ui/NoSearchResults'
+import { useCheckPermissions, useStore } from 'hooks'
 import ExtensionCard from './ExtensionCard'
 import { HIDDEN_EXTENSIONS } from './Extensions.constants'
-import NoSearchResults from 'components/ui/NoSearchResults'
-import InformationBox from 'components/ui/InformationBox'
-import Link from 'next/link'
 
-interface Props {}
-
-const Extensions: FC<Props> = ({}) => {
+const Extensions = () => {
   const { meta } = useStore()
   const { filter } = useParams()
   const [filterString, setFilterString] = useState<string>('')

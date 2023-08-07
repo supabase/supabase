@@ -1,15 +1,17 @@
-import { FC, useRef, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Form, IconHelpCircle, Input, SidePanel, Button, Toggle } from 'ui'
-import { ROLE_PERMISSIONS } from './Roles.constants'
-import { FormSection, FormSectionLabel, FormSectionContent } from 'components/ui/Forms'
+import { useRef, useState } from 'react'
+import { Button, Form, IconHelpCircle, Input, SidePanel, Toggle } from 'ui'
+
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import { useStore } from 'hooks'
-interface Props {
+import { ROLE_PERMISSIONS } from './Roles.constants'
+
+interface CreateRolePanelProps {
   visible: boolean
   onClose: () => void
 }
 
-const CreateRolePanel: FC<Props> = ({ visible, onClose }) => {
+const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   const formId = 'create-new-role'
   const submitRef: any = useRef()
   const { ui, meta } = useStore()
