@@ -151,7 +151,7 @@ const SQLEditor = () => {
   const selectedProject = useSelectedProject()
   const isOptedInToAI =
     selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
-  const [isOptedInToAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema-enabled', false)
+  const [hasEnabledAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema-enabled', true)
   const [isAcceptDiffLoading, setIsAcceptDiffLoading] = useState(false)
   const [, setAiQueryCount] = useLocalStorageQuery('supabase_sql-editor-ai-query-count', 0)
   const [, setIsSchemaSuggestionDismissed] = useLocalStorageQuery(
@@ -159,7 +159,7 @@ const SQLEditor = () => {
     false
   )
 
-  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && isOptedInToAISchema
+  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
 
   const [selectedDiffType, setSelectedDiffType] = useState(DiffType.Modification)
   const [isFirstRender, setIsFirstRender] = useState(true)
