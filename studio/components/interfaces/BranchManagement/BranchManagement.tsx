@@ -162,7 +162,9 @@ const BranchManagement = () => {
               <div className="flex items-center space-x-2">
                 <Input placeholder="Search branch" size="small" icon={<IconSearch />} />
               </div>
-              <Button onClick={() => setShowCreateBranch(true)}>Create preview branch</Button>
+              <Button type="default" onClick={() => setShowCreateBranch(true)}>
+                Create preview branch
+              </Button>
             </div>
             <div className="">
               {isLoadingIntegrations && <GenericSkeletonLoader />}
