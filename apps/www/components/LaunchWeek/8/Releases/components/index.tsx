@@ -383,7 +383,7 @@ export const SectionButtons = ({
       )}
       {hackernews && (
         <ChipLink href={hackernews} target="_blank">
-          HackerNews
+          Hacker News
           <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <HackernewsSvg />
           </div>
