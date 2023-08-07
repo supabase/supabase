@@ -1,4 +1,5 @@
-import { FC, useState } from 'react'
+import { noop } from 'lodash'
+import { useState } from 'react'
 import { Button } from 'ui'
 
 interface ActionBarProps {
@@ -12,7 +13,7 @@ interface ActionBarProps {
   closePanel: () => void
   formId?: string
 }
-const ActionBar: FC<ActionBarProps> = ({
+const ActionBar = ({
   loading = false,
   disableApply = false,
   hideApply = false,
@@ -20,9 +21,9 @@ const ActionBar: FC<ActionBarProps> = ({
   applyButtonLabel = 'Apply',
   backButtonLabel = 'Back',
   applyFunction = undefined,
-  closePanel = () => {},
+  closePanel = noop,
   formId,
-}) => {
+}: ActionBarProps) => {
   const [isRunning, setIsRunning] = useState(false)
 
   // @ts-ignore
