@@ -58,7 +58,6 @@ const ColumnDefaultValue = ({
           : 'NULL'
       }
       value={columnFields?.defaultValue ?? ''}
-      format={columnFields?.format}
       suggestions={suggestions}
       suggestionsHeader="Suggested expressions"
       suggestionsTooltip="Suggested expressions"
