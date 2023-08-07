@@ -1,4 +1,24 @@
 import { useParams, useTelemetryProps } from 'common'
+import { AnimatePresence, motion } from 'framer-motion'
+import dynamic from 'next/dynamic'
+import { useRouter } from 'next/router'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import Split from 'react-split'
+import { format } from 'sql-formatter'
+import {
+  AiIconAnimation,
+  Button,
+  cn,
+  Dropdown,
+  IconCheck,
+  IconChevronDown,
+  IconCornerDownLeft,
+  IconLoader,
+  IconSettings,
+  IconX,
+  Input_Shadcn_,
+} from 'ui'
+
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
@@ -7,8 +27,6 @@ import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { isError } from 'data/utils/error-check'
-import { AnimatePresence, motion } from 'framer-motion'
 import {
   useLocalStorage,
   useLocalStorageQuery,
@@ -21,34 +39,8 @@ import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import Telemetry from 'lib/telemetry'
-import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
-import {
-  Dispatch,
-  SetStateAction,
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
-import Split from 'react-split'
-import { format } from 'sql-formatter'
+import { isError } from 'lodash'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import {
-  AiIconAnimation,
-  Button,
-  Dropdown,
-  IconCheck,
-  IconChevronDown,
-  IconCornerDownLeft,
-  IconLoader,
-  IconSettings,
-  IconX,
-  Input_Shadcn_,
-  cn,
-} from 'ui'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import AISettingsModal from './AISettingsModal'
 import {
@@ -56,8 +48,18 @@ import {
   sqlAiDisclaimerComment,
   untitledSnippetTitle,
 } from './SQLEditor.constants'
-import { IStandaloneCodeEditor, IStandaloneDiffEditor } from './SQLEditor.types'
-import { createSqlSnippetSkeleton } from './SQLEditor.utils'
+import {
+  ContentDiff,
+  DiffType,
+  IStandaloneCodeEditor,
+  IStandaloneDiffEditor,
+  SQLEditorContextValues,
+} from './SQLEditor.types'
+import {
+  createSqlSnippetSkeleton,
+  getDiffTypeButtonLabel,
+  getDiffTypeDropdownLabel,
+} from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
 
 // Load the monaco editor client-side only (does not behave well server-side)
@@ -66,20 +68,6 @@ const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
   { ssr: false }
 )
-
-type ContentDiff = {
-  original: string
-  modified: string
-}
-
-type SQLEditorContextValues = {
-  aiInput: string
-  setAiInput: Dispatch<SetStateAction<string>>
-  sqlDiff?: ContentDiff
-  setSqlDiff: Dispatch<SetStateAction<ContentDiff | undefined>>
-  debugSolution?: string
-  setDebugSolution: Dispatch<SetStateAction<string | undefined>>
-}
 
 const SQLEditorContext = createContext<SQLEditorContextValues | undefined>(undefined)
 
@@ -91,38 +79,6 @@ export function useSqlEditor() {
   }
 
   return values
-}
-
-enum DiffType {
-  Modification = 'modification',
-  Addition = 'addition',
-  NewSnippet = 'new-snippet',
-}
-
-function getDiffTypeButtonLabel(diffType: DiffType) {
-  switch (diffType) {
-    case DiffType.Modification:
-      return 'Accept change'
-    case DiffType.Addition:
-      return 'Accept addition'
-    case DiffType.NewSnippet:
-      return 'Create new snippet'
-    default:
-      throw new Error(`Unknown diff type '${diffType}'`)
-  }
-}
-
-function getDiffTypeDropdownLabel(diffType: DiffType) {
-  switch (diffType) {
-    case DiffType.Modification:
-      return 'Compare as change'
-    case DiffType.Addition:
-      return 'Compare as addition'
-    case DiffType.NewSnippet:
-      return 'Compare as new snippet'
-    default:
-      throw new Error(`Unknown diff type '${diffType}'`)
-  }
 }
 
 const SQLEditor = () => {
