@@ -117,20 +117,21 @@ serve(async (req) => {
     normalize: true,
   });
 
-	// Get the embedding output
+  // Get the embedding output
   const embedding = Array.from(output.data);
 
-	// Store the embedding
-	const { data, error } = await supabase
-		.from('collections')
-		.insert({ embedding })
+  // Store the embedding
+  const { data, error } = await supabase
+    .from('collections')
+    .insert({ embedding });
 
-	// Return the embedding
+  // Return the embedding
   return new Response(
-		{ new_row: data },
-		{ headers: { 'Content-Type': 'application/json' } }
+    { new_row: data },
+    { headers: { 'Content-Type': 'application/json' } }
   );
 });
+
 ```
 
 Now run `supabase functions serve` and you’re ready to call your function locally:
