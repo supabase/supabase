@@ -151,6 +151,7 @@ Postgres has built in tooling to help you optimize poorly performing queries. Yo
 ```sql
 explain analyze <query-statement-here>;
 ```
+
 When you include `analyze` in the explain statement, the database attempts to execute the query and provides a detailed query plan along with actual execution times. So, be careful using `explain analyze` with `insert`/`update`/`delete` queries, because the query will actually run, and could have unintended side-effects.
 
 If you run just `explain` without the `analyze` keyword, the database will only perform query planning without actually executing the query. This approach can be beneficial when you want to inspect the query plan without affecting the database or if you encounter timeouts in your queries. 
