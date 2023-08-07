@@ -84,10 +84,11 @@ create table "Post" (
 ```
 \*/}
 
-And the intended values you want to generate:
-  * A `Post` with the title `"There is a lot of snow around here!"`
-  * The `Post.createdBy` user with an email address ending in `"@acme.org"`
-  * Three `Post.comments` from three different users.
+We can use the Snaplet configuration file to define the values you want to generate. For example
+
+* A `Post` with the title `"There is a lot of snow around here!"`
+* The `Post.createdBy` user with an email address ending in `"@acme.org"`
+* Three `Post.comments` from three different users.
 
 The definition of intended values would resemble:
 ```ts snaplet.config.ts
