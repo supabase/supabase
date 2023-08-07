@@ -327,7 +327,7 @@ export default function LW8Releases() {
                     </div>
                     <SectionButtons
                       blog={day1.steps[0].blog}
-                      hackernews={day1.steps[0].hackernews}
+                      // hackernews={day1.steps[0].hackernews}
                       // twitter_spaces={day1.steps[0].twitter_spaces}
                       // mobileGrid
                     />
