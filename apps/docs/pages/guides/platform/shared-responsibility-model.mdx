@@ -48,12 +48,14 @@ You are responsible of provisioning enough compute to run the workload that your
 
 ## Managing Healthcare Data
 
-If you sign a BAA with Supabase, you can use Supabase to store and process Protected Health Information (PHI). You are responsible for ensuring that your project is configured with these required best practices
+You can use Supabase to store and process Protected Health Information (PHI). You are responsible for the following
 
+- Signing a Business Associate Agreement with Supabase. Reach out to growth@supabase.io to get started.
 - Enabling [Point in Time Recovery](/docs/guides/platform/backups#point-in-time-recovery)
 - Turning on [SSL Enforcement](/docs/guides/platform/ssl-enforcement).
 - Enabling [Network Restrictions](/docs/guides/platform/network-restrictions).
 - Your project is not making use of the [Supabase AI editor](https://supabase.com/dashboard/project/_/sql) in our dashboard.
+- Encrypting PHI in your database. Consider using pgsodium's [Transparent Column Encryption](https://github.com/michelp/pgsodium#transparent-column-encryption) which comes bundled in with every Supabase project.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
