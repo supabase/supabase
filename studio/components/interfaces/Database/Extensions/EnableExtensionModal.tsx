@@ -1,17 +1,17 @@
-import { FC, useEffect, useState } from 'react'
-import { Button, Input, Form, Modal, Listbox, IconPlus, IconDatabase } from 'ui'
 import type { PostgresExtension, PostgresSchema } from '@supabase/postgres-meta'
+import { useEffect, useState } from 'react'
+import { Button, Form, IconDatabase, IconPlus, Input, Listbox, Modal } from 'ui'
 
-import { useStore } from 'hooks'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useStore } from 'hooks'
 
-interface Props {
+interface EnableExtensionModalProps {
   visible: boolean
   extension: PostgresExtension
   onCancel: () => void
 }
 
-const EnableExtensionModal: FC<Props> = ({ visible, extension, onCancel }) => {
+const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionModalProps) => {
   const { ui, meta } = useStore()
   const [defaultSchema, setDefaultSchema] = useState()
   const [fetchingSchemaInfo, setFetchingSchemaInfo] = useState(false)

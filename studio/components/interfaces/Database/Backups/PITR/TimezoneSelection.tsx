@@ -1,21 +1,21 @@
-import { FC, useState, FormEvent } from 'react'
-import { Listbox, IconSearch, IconGlobe } from 'ui'
+import { FormEvent, useState } from 'react'
+import { IconGlobe, IconSearch, Listbox } from 'ui'
 
 import { ALL_TIMEZONES } from './PITR.constants'
 
-interface Props {
+interface TimezoneSelectionProps {
   hideLabel?: boolean
   dropdownWidth?: string
   selectedTimezone: any
   onSelectTimezone: (timezone: any) => void
 }
 
-const TimezoneSelection: FC<Props> = ({
+const TimezoneSelection = ({
   hideLabel,
   dropdownWidth,
   selectedTimezone,
   onSelectTimezone,
-}) => {
+}: TimezoneSelectionProps) => {
   const [searchString, setSearchString] = useState<string>('')
 
   const timezoneOptions =

@@ -1,24 +1,25 @@
-import { FC, useState, ComponentProps } from 'react'
+import { ComponentProps, useState } from 'react'
 import {
-  Dropdown,
-  Popover,
   Button,
-  IconPlus,
-  IconChevronDown,
-  Select,
-  Input,
-  IconX,
-  IconKey,
+  Dropdown,
   IconBox,
+  IconChevronDown,
   IconCode,
   IconDatabase,
+  IconKey,
+  IconPlus,
+  IconX,
   IconZap,
+  Input,
+  Popover,
+  Select,
 } from 'ui'
+
 import DatePickers from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
 import { ReportFilterItem } from './Reports.types'
 
-interface Props {
+interface ReportFilterBarProps {
   filters: ReportFilterItem[]
   onAddFilter: (filter: ReportFilterItem) => void
   onRemoveFilters: (filters: ReportFilterItem[]) => void
@@ -80,7 +81,7 @@ const PRODUCT_FILTERS = [
   },
 ]
 
-const ReportFilterBar: FC<Props> = ({
+const ReportFilterBar = ({
   filters,
   onAddFilter,
   onDatepickerChange,
@@ -88,7 +89,7 @@ const ReportFilterBar: FC<Props> = ({
   datepickerFrom = '',
   onRemoveFilters,
   datepickerHelpers,
-}) => {
+}: ReportFilterBarProps) => {
   const filterKeys = [
     'request.path',
     'request.method',

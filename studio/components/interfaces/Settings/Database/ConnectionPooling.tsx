@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { FC, Fragment, useState } from 'react'
+import { Fragment, useState } from 'react'
+import { Input } from 'ui'
 import { AutoField } from 'uniforms-bootstrap4'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -13,7 +14,6 @@ import { useCheckPermissions, useStore } from 'hooks'
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { pluckObjectFields } from 'lib/helpers'
-import { Input } from 'ui'
 
 const ConnectionPooling = () => {
   const { project } = useProjectContext()
@@ -119,7 +119,7 @@ interface ConfigProps {
   }
 }
 
-export const PgbouncerConfig: FC<ConfigProps> = ({ projectRef, bouncerInfo, connectionInfo }) => {
+export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: ConfigProps) => {
   const { ui } = useStore()
 
   const canUpdateConnectionPoolingConfiguration = useCheckPermissions(

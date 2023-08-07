@@ -1,22 +1,25 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
-import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Button, IconAlertCircle } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { FormPanel } from 'components/ui/Forms'
 import { useCheckPermissions, useStore } from 'hooks'
 import { Timezone } from './PITR.types'
-import { FormPanel } from 'components/ui/Forms'
 import TimezoneSelection from './TimezoneSelection'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-interface Props {
+interface PITRStatusProps {
   selectedTimezone: Timezone
   onUpdateTimezone: (timezone: Timezone) => void
   onSetConfiguration: () => void
 }
 
-const PITRStatus: FC<Props> = ({ selectedTimezone, onUpdateTimezone, onSetConfiguration }) => {
+const PITRStatus = ({
+  selectedTimezone,
+  onUpdateTimezone,
+  onSetConfiguration,
+}: PITRStatusProps) => {
   const { backups } = useStore()
   const { earliestPhysicalBackupDateUnix, latestPhysicalBackupDateUnix } =
     backups?.configuration?.physicalBackupData ?? {}

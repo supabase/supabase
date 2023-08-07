@@ -1,14 +1,14 @@
 import Link from 'next/link'
 import { Button, IconAlertCircle, IconExternalLink } from 'ui'
-import InformationBox from 'components/ui/InformationBox'
-import { FC } from 'react'
 
-interface Props {
+import InformationBox from 'components/ui/InformationBox'
+
+interface DisabledStateForFreeTierProps {
   projectRef: string
   category: string
 }
 
-const DisabledStateForFreeTier: FC<Props> = ({ projectRef, category }) => {
+const DisabledStateForFreeTier = ({ projectRef, category }: DisabledStateForFreeTierProps) => {
   return (
     <div className="px-6">
       <InformationBox
@@ -20,7 +20,9 @@ const DisabledStateForFreeTier: FC<Props> = ({ projectRef, category }) => {
           <div className="space-y-4 mb-1">
             <p>Upgrade your project to the Pro plan for support in this area</p>
             <div className="flex items-center space-x-2">
-              <Link href={`/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`}>
+              <Link
+                href={`/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`}
+              >
                 <a>
                   <Button>Upgrade project</Button>
                 </a>

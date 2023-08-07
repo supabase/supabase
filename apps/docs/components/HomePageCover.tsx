@@ -29,6 +29,11 @@ const HomePageCover = (props) => {
       href: '/guides/getting-started/quickstarts/flutter',
     },
     {
+      tooltip: 'Android Kotlin',
+      icon: '/docs/img/icons/kotlin-icon',
+      href: '/guides/getting-started/quickstarts/kotlin',
+    },
+    {
       tooltip: 'SvelteKit',
       icon: '/docs/img/icons/svelte-icon',
       href: '/guides/getting-started/quickstarts/sveltekit',

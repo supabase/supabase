@@ -211,9 +211,9 @@ const Nav = () => {
         />
         <nav
           className={[
-            `border-scale-300 border-b backdrop-blur-sm transition-opacity`,
-            showLaunchWeekNavMode && '!opacity-100 !border-[#e0d2f430]',
-            isLaunchWeekPage && showLaunchWeekNavMode && '!border-b-0',
+            `relative z-40 border-scale-300 border-b backdrop-blur-sm transition-opacity`,
+            showLaunchWeekNavMode ? '!opacity-100 !border-[#e0d2f430]' : '',
+            isLaunchWeekPage && showLaunchWeekNavMode ? '!border-b-0' : '',
           ].join(' ')}
         >
           {/* <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-10 xl:px-0"> */}

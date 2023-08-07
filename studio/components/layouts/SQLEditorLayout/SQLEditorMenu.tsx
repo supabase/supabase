@@ -13,7 +13,8 @@ import { useCheckPermissions, useFlag, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { Button, cn, IconPlus, IconSearch, IconX, Input, Menu } from 'ui'
+import { Button, cn, IconPlus, IconSearch, IconX, Input, Menu, useCommandMenu } from 'ui'
+import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import QueryItem from './QueryItem'
 
 const SideBarContent = observer(() => {
@@ -21,6 +22,7 @@ const SideBarContent = observer(() => {
   const { ref, id } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
+  const { project } = useProjectContext()
   const sharedSnippetsFeature = useFlag<boolean>('sharedSnippets')
 
   const [personalSnippetsFilterString, setPersonalSnippetsFilterString] = useState('')
@@ -29,6 +31,8 @@ const SideBarContent = observer(() => {
   const [isPersonalSnippetsFilterOpen, setIsPersonalSnippetsFilterOpen] = useState(false)
   const [isProjectSnippetsFilterOpen, setIsProjectSnippetsFilterOpen] = useState(false)
   const [isFavoritesFilterOpen, setIsFavoritesFilterOpen] = useState(false)
+  const { setPages, setIsOpen } = useCommandMenu()
+  const showCmdkHelper = useFlag('dashboardCmdk')
 
   const snap = useSqlEditorStateSnapshot()
   const { isLoading, isSuccess } = useSqlSnippetsQuery(ref, {
@@ -84,7 +88,8 @@ const SideBarContent = observer(() => {
   })
 
   const handleNewQuery = async () => {
-    if (!ref) return console.error('Project ref is required')
+    if (!project) return console.error('Project is required')
+    if (!profile) return console.error('Profile is required')
     if (!canCreateSQLSnippet) {
       return ui.setNotification({
         category: 'info',
@@ -94,14 +99,14 @@ const SideBarContent = observer(() => {
 
     try {
       const snippet = createSqlSnippetSkeleton({
+        id: uuidv4(),
         name: untitledSnippetTitle,
-        owner_id: profile?.id,
+        owner_id: profile.id,
+        project_id: project.id,
       })
-      const data = { ...snippet, id: uuidv4() }
+      snap.addSnippet(snippet as SqlSnippet, project.ref)
 
-      snap.addSnippet(data as SqlSnippet, ref, true)
-
-      router.push(`/project/${ref}/sql/${data.id}`)
+      router.push(`/project/${project.ref}/sql/${snippet.id}`)
       // reset all search inputs when a new query is added
       setPersonalSnippetsFilterString('')
       setProjectSnippetsFilterString('')

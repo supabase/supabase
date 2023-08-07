@@ -1,12 +1,11 @@
-import { FC } from 'react'
 import { Input } from 'ui'
 
-interface Props {
+interface SpreadSheetTextInputProps {
   input: string
   onInputChange: (event: any) => void
 }
 
-const SpreadSheetTextInput: FC<Props> = ({ input, onInputChange }) => (
+const SpreadSheetTextInput = ({ input, onInputChange }: SpreadSheetTextInputProps) => (
   <div className="space-y-10">
     <div>
       <p className="mb-2 text-sm text-scale-1100">

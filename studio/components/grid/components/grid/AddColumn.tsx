@@ -1,6 +1,6 @@
-import * as React from 'react'
 import { CalculatedColumn } from '@supabase/react-data-grid'
 import { Button, IconPlus } from 'ui'
+
 import { ADD_COLUMN_KEY } from '../../constants'
 import { useTrackedState } from '../../store'
 import { DefaultFormatter } from '../formatter'
@@ -17,13 +17,7 @@ export const AddColumn: CalculatedColumn<any, any> = {
   isLastFrozenColumn: false,
   rowGroup: false,
   headerRenderer(props) {
-    return (
-      <AddColumnHeader
-        aria-label="Add New Row"
-        value={props.allRowsSelected}
-        onChange={props.onAllRowsSelectionChange}
-      />
-    )
+    return <AddColumnHeader aria-label="Add New Row" />
   },
   formatter: DefaultFormatter,
 }
@@ -33,12 +27,7 @@ type SharedInputProps = Pick<
   'disabled' | 'tabIndex' | 'onClick' | 'aria-label' | 'aria-labelledby'
 >
 
-interface AddColumnHeaderProps extends SharedInputProps {
-  value: boolean
-  onChange: (value: boolean, isShiftClick: boolean) => void
-}
-
-const AddColumnHeader: React.FC<AddColumnHeaderProps> = () => {
+const AddColumnHeader = ({}: SharedInputProps) => {
   const state = useTrackedState()
   const { onAddColumn } = state
   return (
