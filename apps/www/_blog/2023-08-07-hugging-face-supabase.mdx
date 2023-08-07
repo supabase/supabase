@@ -90,6 +90,7 @@ AI/ML is primarily the domain of the Python community, but thanks to some amazin
 
 Let’s step through a small demo where we accept some text, convert it into an embedding, and then store it in our Postgres database. You can create a new function with supabase functions new embed and fill it with the following code snippet:
 
+{/* prettier-ignore */}
 ```ts
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { env, pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.5.0'
@@ -99,10 +100,16 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 env.useBrowserCache = false
 env.allowLocalModels = false
 
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+const supabase = createClient(
+  'https://xyzcompany.supabase.co',
+  'public-anon-key',
+)
 
 // Construct pipeline outside of serve for faster warm starts
-const pipe = await pipeline('feature-extraction', 'Supabase/gte-small')
+const pipe = await pipeline(
+  'feature-extraction',
+  'Supabase/gte-small',
+)
 
 // Deno Handler
 serve(async (req) => {
@@ -118,10 +125,15 @@ serve(async (req) => {
   const embedding = Array.from(output.data)
 
   // Store the embedding
-  const { data, error } = await supabase.from('collections').insert({ embedding })
+  const { data, error } = await supabase
+    .from('collections')
+    .insert({ embedding })
 
   // Return the embedding
-  return new Response({ new_row: data }, { headers: { 'Content-Type': 'application/json' } })
+  return new Response(
+    { new_row: data },
+    { headers: { 'Content-Type': 'application/json' } },
+  )
 })
 ```
 
