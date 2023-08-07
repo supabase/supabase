@@ -185,18 +185,14 @@ export const AccordionHeader = ({
           )}
         </span>
       </div>
-      {shippable && shipped && day === 1 && (
-        <Link href="https://twitter.com/i/spaces/1DXGyvjkeEeJM">
-          <a className="group/ts" target="_blank">
-            <Badge
-              className={`relative hidden sm:inline-flex inset-0 !bg-transparent border border-foreground-light group-hover/ts:border-foreground !py-1 !px-4 h-fit backdrop-blur-md`}
-            >
-              <span className="text-foreground-light group-hover/ts:text-foreground text-sm font-normal flex gap-2 items-center h-full">
-                Twitter Spaces <TwitterSpacesSvg />
-              </span>
-            </Badge>
-          </a>
-        </Link>
+      {shippable && shipped && (
+        <Badge
+          className={`relative hidden sm:inline-flex inset-0 !bg-[#05090B] border !border-[#061517] !py-1 !px-4 h-fit`}
+        >
+          <span className="text-[#F4FFFA40] text-sm font-normal bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#675FA7]">
+            Shipped
+          </span>
+        </Badge>
       )}
       {shippable && !shipped && (
         <span className="text-sm font-normal text-[#A0A0A0] mt-1 sm:mt-0 flex items-center gap-1 md:gap-4">
