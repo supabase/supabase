@@ -1,21 +1,21 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import { FC, Fragment } from 'react'
-import { observer } from 'mobx-react-lite'
-import { Button, Dropdown, IconPlus } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Fragment } from 'react'
+import { Button, Dropdown, IconPlus } from 'ui'
 
-import { useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
+import { useCheckPermissions } from 'hooks'
 import { WRAPPERS } from './Wrappers.constants'
 
-interface Props {
+interface WrapperDropdownProps {
   buttonText?: string
   align?: 'center' | 'end'
 }
 
-const WrapperDropdown: FC<Props> = ({ buttonText = 'Add wrapper', align = 'end' }) => {
+const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperDropdownProps) => {
   const { ref } = useParams()
   const canManageWrappers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
