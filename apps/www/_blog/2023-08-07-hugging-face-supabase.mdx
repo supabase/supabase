@@ -150,11 +150,11 @@ Supabase also provides [Database Webhooks](https://supabase.com/docs/guides/data
 
 One of the coolest ideas we’ve seen so far is the ability to support Hugging Face models directly in the browser. With sufficiently small models, you can embed them directly into your application and cut out an entire network hop.
 
-!(Hugging Face from the browser - demo)[/images/blog/launch-week-8/day-1/hugging-face-from-the-browser-demo.png]
+![Hugging Face from the browser example](/images/blog/launch-week-8/day-1/hugging-face-from-the-browser-middleware.png)
 
 This is great for search, where you might want to “debounce” the user query as they type. Of course, this is only helpful if you have a database that allows access from the browser. Fortunately, Supabase provides that functionality using Postgres Row Level Security and PostgREST:
 
-![IMAGE GOES HERE]
+!(Hugging Face from the browser with postgREST)[/images/blog/launch-week-8/day-1/hugging-face-from-the-browser-postgrest.png]
 
 For example, if we were storing image embeddings inside our database, we could provide search functionality using a simple Postgres function, powered by pgvector:
 
@@ -190,7 +190,7 @@ Of course, even the [smallest](https://huggingface.co/sentence-transformers/all-
 
 Check out [this demo](https://huggingface.co/spaces/Xenova/semantic-image-search) for inspiration, which uses the Unsplash data set and provides image search functionality using natural language:
 
-![IMAGE GOES HERE]()
+!(Hugging Face from the browser - demo)[/images/blog/launch-week-8/day-1/hugging-face-from-the-browser-demo.png]
 
 ## Choosing a Hugging Face model
 
