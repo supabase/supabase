@@ -1,6 +1,6 @@
 ---
 title: 'Hugging Face is now supported in Supabase'
-description: WIP
+description: We've added support Hugging Face support in our Python Vector Client and Edge Functions.
 launchweek: 8
 tags:
   - launch-week
@@ -14,13 +14,24 @@ thumb: WIP
 
 Since launching our [Vector Toolkit](https://supabase.com/vector) a few months ago, the number of AI applications on Supabase has grown - a lot. Hundreds of new databases every week are using [pgvector](https://github.com/pgvector/pgvector). 
 
-98% of those applications use OpenAI, generally to store embeddings using their `text-embedding-ada-002` model. While OpenAI is easy, it’s not open source, which means it can’t be self-hosted.
+98% of those applications use OpenAI to store embeddings using their `text-embedding-ada-002` model. While OpenAI is easy, it’s not open source, which means it can’t be self-hosted.
 
 Our goal at Supabase is to [promote open source collaboration](https://supabase.com/docs/guides/getting-started/architecture#support-existing-tools), and [Hugging Face](https://huggingface.co/) is one of the open source communities we admire most. Today, we’re adding first-class support for Hugging Face, starting with embeddings. Why embeddings? Because this is one area where open source models are [measurably ahead](https://supabase.com/blog/fewer-dimensions-are-better-pgvector) for pgvector performance.
 
 We’ve added support in our [Python Vector Client](https://supabase.com/docs/guides/ai/python/api) and [Edge Functions](https://supabase.com/docs/guides/functions) (Deno/Javascript). Let’s start with Python.
 
-### Hugging Face with Python
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/RJccSbJ9Go4"
+    title="YouTube video player"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  ></iframe>
+</div>
+
+## Hugging Face with Python
 
 [supabase/vecs](https://github.com/supabase/vecs) is our Python client for vector projects. Today, we're releasing a new feature for vecs called "adapters".
 
