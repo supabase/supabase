@@ -35,7 +35,7 @@ We’ve added support in our [Python Vector Client](https://supabase.com/docs/gu
 
 [supabase/vecs](https://github.com/supabase/vecs) is our Python client for vector projects. Today, we're releasing a new feature for vecs called "adapters".
 
-Adapters transform your input into a new format when upserting and querying. For example, you can split large text into smaller chunks, or transform it into embeddings. And, of course, Adapters have first-class support for HuggingFace models.
+Adapters transform your input into a new format when upserting and querying. For example, you can split large text into smaller chunks, or transform it into embeddings. And, of course, Adapters have first-class support for Hugging Face models.
 
 As an example, let’s look at how we might adapt text input. If we're inserting large text documents, it might be a good idea to chunk the text into paragraphs using the ParagraphChunker before creating an embedding for each paragraph with the TextEmbedding adapter step.
 
