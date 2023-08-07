@@ -56,7 +56,7 @@ const SQLQuickstarts = observer(() => {
     <div className="block h-full space-y-8 overflow-y-auto p-6">
       <div className="mb-8">
         <div className="mb-4">
-          <h1 className="text-scale-1200 mb-3 text-xl">Quick start</h1>
+          <h1 className="text-scale-1200 mb-3 text-xl">Quickstarts</h1>
           <p className="text-scale-1100 text-sm">
             While we're in beta, we want to offer a quick way to explore Supabase. While we build
             importers, check out these simple starters.
