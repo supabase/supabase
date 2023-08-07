@@ -1,29 +1,29 @@
-import { FC, useEffect, createContext, useContext, useState } from 'react'
+import { Dictionary } from 'components/grid'
+import { has, isEmpty, mapValues, union, without } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { isEmpty, mapValues, has, without, union } from 'lodash'
+import { useRouter } from 'next/router'
+import { createContext, useContext, useEffect, useState } from 'react'
+import SVG from 'react-inlinesvg'
 import {
-  Input,
-  SidePanel,
-  Checkbox,
-  Listbox,
-  IconPlayCircle,
-  IconPauseCircle,
-  IconTerminal,
   Badge,
   Button,
+  Checkbox,
+  IconPauseCircle,
+  IconPlayCircle,
+  IconTerminal,
+  Input,
+  Listbox,
   Modal,
+  SidePanel,
 } from 'ui'
-import { Dictionary } from 'components/grid'
-import { useRouter } from 'next/router'
-import SVG from 'react-inlinesvg'
 
-import ChooseFunctionForm from './ChooseFunctionForm'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import FormEmptyBox from 'components/ui/FormBoxEmpty'
 import NoTableState from 'components/ui/States/NoTableState'
 import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ChooseFunctionForm from './ChooseFunctionForm'
 
 class CreateTriggerFormState {
   id: number | undefined
@@ -249,13 +249,13 @@ function hasWhitespace(value: string) {
 
 const CreateTriggerContext = createContext<ICreateTriggerStore | null>(null)
 
-type CreateTriggerProps = {
+interface CreateTriggerProps {
   trigger?: any
   visible: boolean
   setVisible: (value: boolean) => void
-} & any
+}
 
-const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible }) => {
+const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => {
   const { ui, meta } = useStore()
   const [isClosingPanel, setIsClosingPanel] = useState(false)
   const _localState = useLocalObservable(() => new CreateTriggerStore())
@@ -413,7 +413,7 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
 
 export default observer(CreateTrigger)
 
-const InputName: FC = observer(({}) => {
+const InputName = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <Input
@@ -435,7 +435,7 @@ const InputName: FC = observer(({}) => {
   )
 })
 
-const SelectEnabledMode: FC = observer(({}) => {
+const SelectEnabledMode = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <Listbox
@@ -508,7 +508,7 @@ const SelectEnabledMode: FC = observer(({}) => {
   )
 })
 
-const SelectOrientation: FC = observer(({}) => {
+const SelectOrientation = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <Listbox
@@ -537,7 +537,7 @@ const SelectOrientation: FC = observer(({}) => {
   )
 })
 
-const ListboxTable: FC = observer(({}) => {
+const ListboxTable = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
 
   return (
@@ -597,7 +597,7 @@ const ListboxTable: FC = observer(({}) => {
   )
 })
 
-const CheckboxEvents: FC = observer(({}) => {
+const CheckboxEvents = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     // @ts-ignore
@@ -643,7 +643,7 @@ const CheckboxEvents: FC = observer(({}) => {
   )
 })
 
-const ListboxActivation: FC = observer(({}) => {
+const ListboxActivation = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <Listbox
@@ -699,7 +699,7 @@ const ListboxActivation: FC = observer(({}) => {
   )
 })
 
-const FunctionForm: FC = observer(({}) => {
+const FunctionForm = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
 
   return (
@@ -718,7 +718,7 @@ const FunctionForm: FC = observer(({}) => {
   )
 })
 
-const FunctionEmpty: FC = observer(({}) => {
+const FunctionEmpty = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <button
@@ -742,7 +742,7 @@ const FunctionEmpty: FC = observer(({}) => {
   )
 })
 
-const FunctionWithArguments: FC = observer(({}) => {
+const FunctionWithArguments = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
 
   return (
