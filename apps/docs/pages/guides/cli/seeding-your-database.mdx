@@ -95,12 +95,12 @@ defineConfig({
         return snaplet.Post({
           data: {
             title: "There is a lot of snow around here!"
-            createdBy: {
+            User: {
                 data: {
                   email: copycat.email(seed, { domain: 'acme.org' })
                 }
             },
-            comments: {
+            Comment: {
               count: 3,
             }
           }
