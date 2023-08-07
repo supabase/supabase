@@ -134,10 +134,6 @@ INSERT INTO "User" (name, email) VALUES ("Steven Plank", "s@plank.org")
 INSERT INTO "Comment" (text, userId, postId) VALUES ("Actually, that's not correct...", 4, 1)
 ```
 
-Three things that were automatically generated:
-- Three comments were requested, resulting in the generated comment `text`, and three additional users.
-- The `content` of `Post` was generated
-- The `Post.createBy` user was requested, the `name` was generated.
 
 For more information about how this works reference [Snaplet's documentation](https://docs.snaplet.dev/references/data-operations/generate)
 
