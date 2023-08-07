@@ -5,7 +5,7 @@ import { BranchContainer, BranchHeader, BranchPanel } from './BranchPanels'
 import { useParams } from 'common'
 import { useGithubPullRequestsQuery } from 'data/integrations/integrations-github-pull-requests-query'
 import { partition } from 'lodash'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import AlertError from 'components/ui/AlertError'
@@ -22,7 +22,12 @@ const PreviewBranches = ({
   onSelectDeleteBranch,
 }: PreviewBranchesProps) => {
   const { ref } = useParams()
+  const project = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
+
+  const isBranch = project?.parent_project_ref !== undefined
+  const projectRef =
+    project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
   const { data: integrations } = useOrgIntegrationsQuery({
     orgSlug: selectedOrg?.slug,
@@ -33,7 +38,7 @@ const PreviewBranches = ({
       integration.organization.slug === selectedOrg?.slug
   )
   const githubConnection = githubIntegration?.connections.find(
-    (connection) => connection.supabase_project_ref === ref
+    (connection) => connection.supabase_project_ref === projectRef
   )
   const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') || []
 
@@ -43,7 +48,7 @@ const PreviewBranches = ({
     isLoading: isLoadingBranches,
     isError: isErrorBranches,
     isSuccess: isSuccessBranches,
-  } = useBranchesQuery({ projectRef: ref })
+  } = useBranchesQuery({ projectRef })
   const [[mainBranch], previewBranches] = partition(branches, (branch) => branch.is_default)
 
   const { data: allPullRequests } = useGithubPullRequestsQuery({
