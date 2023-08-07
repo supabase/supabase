@@ -1,6 +1,7 @@
-import { FC, useEffect, useState } from 'react'
-import { Button, Dropdown, IconChevronDown } from 'ui'
 import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
+import { Button, Dropdown, IconChevronDown } from 'ui'
+
 import { DATE_FORMAT } from 'lib/constants'
 
 /**
@@ -11,13 +12,7 @@ import { DATE_FORMAT } from 'lib/constants'
  * Otherwise there won't be any data shown on the graphs
  */
 
-const DateRangePicker: FC<any> = ({
-  onChange,
-  value,
-  options,
-  loading,
-  currentBillingPeriodStart,
-}) => {
+const DateRangePicker = ({ onChange, value, options, loading, currentBillingPeriodStart }: any) => {
   const [timePeriod, setTimePeriod] = useState(value)
 
   useEffect(() => {

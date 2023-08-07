@@ -5,12 +5,13 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { FC, useEffect, useState, useRef } from 'react'
-import Highlight, { defaultProps } from 'prism-react-renderer'
-import defaultTheme from 'prism-react-renderer/themes/palenight'
 import Clipboard from 'clipboard'
 import rangeParser from 'parse-numeric-range'
+import Highlight, { defaultProps } from 'prism-react-renderer'
+import defaultTheme from 'prism-react-renderer/themes/palenight'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
+
 import { copyToClipboard } from 'lib/helpers'
 
 const highlightLinesRangeRegex = /{([\d,-]+)}/
@@ -19,7 +20,7 @@ const prism = {
   plugins: ['line-numbers', 'show-language'],
 }
 
-const SimpleCodeBlock: FC<any> = ({ children, className: languageClassName, metastring }) => {
+const SimpleCodeBlock = ({ children, className: languageClassName, metastring }: any) => {
   const [showCopied, setShowCopied] = useState(false)
   const target = useRef(null)
   const button = useRef(null)
