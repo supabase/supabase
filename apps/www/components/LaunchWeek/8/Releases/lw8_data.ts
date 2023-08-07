@@ -1,6 +1,11 @@
 const images = {
+  yt_thumbnail: '/images/launchweek/8/lw8-yt-thumb.jpg',
+  day_1_thumb: '/images/launchweek/8/day1/day-01-thumb.jpg',
+  '00-stay-remote': '/images/launchweek/8/day0/remote.png',
+  '00-pg-server': '/images/launchweek/8/day0/pg-server.png',
   '00-constellation': '/images/launchweek/8/day0/constellation-pre.svg',
   '00-constellation-mobile': '/images/launchweek/8/day0/constellation.svg',
+  '01-hugging': '/images/launchweek/8/day1/hugging.svg',
 }
 
 export interface StepProps {
@@ -16,6 +21,7 @@ export interface StepProps {
   thumb?: string
   url?: string
   video?: string
+  twitter_spaces?: string
   className?: string
   hideInBlog?: boolean
   bg_layers?: {
@@ -34,8 +40,10 @@ export interface WeekDayProps {
   d: number
   dd: string
   youtube_id: string
+  videoThumbnail?: string
   blogpost: string
   docs: string
+  twitter_spaces?: string
   steps: StepProps[] | []
 }
 
@@ -55,6 +63,19 @@ const days: WeekDayProps[] = [
     docs: '',
     steps: [
       {
+        title: "Why we'll stay remote",
+        blog: '/blog/why-supabase-remote',
+        bg_layers: [{ img: images['00-stay-remote'] }],
+        steps: [],
+      },
+      {
+        title: 'Postgres Language Server',
+        github: 'https://github.com/supabase/postgres_lsp',
+        hackernews: 'https://news.ycombinator.com/item?id=37020610',
+        bg_layers: [{ img: images['00-pg-server'] }],
+        steps: [],
+      },
+      {
         title:
           'Coding the stars - an interactive constellation with Three.js and React Three Fiber',
         blog: '/blog/interactive-constellation-threejs-react-three-fiber',
@@ -67,16 +88,27 @@ const days: WeekDayProps[] = [
   },
   {
     title: '',
-    shipped: false,
+    shipped: true,
     date: '07 Aug',
     publishedAt: '2023-08-07T09:00:00.000-07:00',
     description: '',
     d: 1,
     dd: 'Mon',
-    youtube_id: '',
+    youtube_id: 'RJccSbJ9Go4',
+    videoThumbnail: images.day_1_thumb,
     blogpost: '',
     docs: '',
-    steps: [],
+    twitter_spaces: 'https://twitter.com/i/spaces/1DXGyvjkeEeJM',
+    steps: [
+      {
+        title: 'Huggingface now supported in Supabase',
+        blog: '/blog/hugging-face-supabase',
+        hackernews: '/',
+        twitter_spaces: 'https://twitter.com/i/spaces/1DXGyvjkeEeJM',
+        bg_layers: [{ img: images['01-hugging'] }],
+        steps: [],
+      },
+    ],
   },
   {
     title: '',
