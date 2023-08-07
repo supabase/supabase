@@ -6,7 +6,7 @@ import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEdi
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useFlag, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useSelectedProject, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -90,6 +90,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
   const router = useRouter()
   const snap = useSqlEditorStateSnapshot()
   const { profile } = useProfile()
+  const project = useSelectedProject()
   const sharedSnippetsFeature = useFlag<boolean>('sharedSnippets')
   const { mutate: deleteContent } = useContentDeleteMutation({
     onSuccess(data) {
@@ -162,10 +163,15 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
     if (!ref) return console.error('Project ref is required')
     if (!id) return console.error('Snippet ID is required')
     try {
-      const snippet = createSqlSnippetSkeleton({ name, sql: content.sql, owner_id: profile?.id })
-      const data = { ...snippet, id: uuidv4() }
-      snap.addSnippet(data as SqlSnippet, ref)
-      router.push(`/project/${ref}/sql/${data.id}`)
+      const snippet = createSqlSnippetSkeleton({
+        id: uuidv4(),
+        name,
+        sql: content.sql,
+        owner_id: profile?.id,
+        project_id: project?.id,
+      })
+      snap.addSnippet(snippet as SqlSnippet, ref)
+      router.push(`/project/${ref}/sql/${snippet.id}`)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
