@@ -32,6 +32,7 @@ values
 
 {/* prettier-ignore */}
 {/*
+
 ### Splitting up your seed file
 
 The seed file can grow quite large, so you can split it up into multiple files. For example, you can create a `seed` folder and add a `countries.sql` file. Then you can add the following to your `seed.sql` file.
@@ -48,6 +49,7 @@ You can use the `COPY` command to import CSV data into your database. For exampl
 ```sql supabase/seed.sql
 COPY countries (name, code) FROM 'seed/countries.csv' WITH (FORMAT csv);
 ```
+
 \*/}
 
 ## Generating seed data
@@ -60,9 +62,9 @@ Let's generate some seed data for a typical blog application, with the following
 
 We can use the Snaplet configuration file to define the values you want to generate. For example
 
-* A `Post` with the title `"There is a lot of snow around here!"`
-* The `Post.createdBy` user with an email address ending in `"@acme.org"`
-* Three `Post.comments` from three different users.
+- A `Post` with the title `"There is a lot of snow around here!"`
+- The `Post.createdBy` user with an email address ending in `"@acme.org"`
+- Three `Post.comments` from three different users.
 
 ```ts snaplet.config.ts
 defineConfig({
@@ -88,14 +90,14 @@ defineConfig({
 
 Running `npx snaplet generate --sql > supabase/seed.sql` would generate these relevant SQL statements inside our `supabase/seed.sql` file:
 
-```sql 
+```sql
 -- The `Post.createdBy` user with an email address ending in `"@acme.org"`
 INSERT INTO "User" (name, email) VALUES ("John Snow", "snow@acme.org")
 
 --- A `Post` with the title `"There is a lot of snow around here!"`
 INSERT INTO "Post" (title, content, createdBy) VALUES (
   "There is a lot of snow around here!",
-  "Lorem ipsum dolar", 
+  "Lorem ipsum dolar",
   1)
 
 --- Three `Post.comments` from three different users.
@@ -108,7 +110,6 @@ INSERT INTO "Comment" (text, userId, postId) VALUES ("Lorem ipsum dolar sit", 3,
 INSERT INTO "User" (name, email) VALUES ("Steven Plank", "s@plank.org")
 INSERT INTO "Comment" (text, userId, postId) VALUES ("Actually, that's not correct...", 4, 1)
 ```
-
 
 For more information, check out Snaplet's ["generate" documentation](https://docs.snaplet.dev/references/data-operations/generate)
 
