@@ -4,7 +4,7 @@ import ExampleProject from 'components/interfaces/Home/ExampleProject'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
-import { Badge, Button, IconArrowRight, IconLoader, LWAnnouncement } from 'ui'
+import { Badge, Button, IconArrowRight, IconLoader } from 'ui'
 
 import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
