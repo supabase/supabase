@@ -16,6 +16,7 @@ import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { Button, Dropdown, IconPlus, IconSearch, IconX, Input, Menu, useCommandMenu } from 'ui'
 import { COMMAND_ROUTES } from 'ui/src/components/Command/Command.constants'
+import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import QueryItem from './QueryItem'
 
 const SideBarContent = observer(() => {
@@ -26,6 +27,7 @@ const SideBarContent = observer(() => {
   const [filterString, setFilterString] = useState('')
   const { setPages, setIsOpen } = useCommandMenu()
   const showCmdkHelper = useFlag('dashboardCmdk')
+  const { project } = useProjectContext()
 
   const snap = useSqlEditorStateSnapshot()
   const { isLoading, isSuccess } = useSqlSnippetsQuery(ref, {
@@ -58,7 +60,8 @@ const SideBarContent = observer(() => {
   })
 
   const handleNewQuery = async () => {
-    if (!ref) return console.error('Project ref is required')
+    if (!project) return console.error('Project is required')
+    if (!profile) return console.error('Profile is required')
     if (!canCreateSQLSnippet) {
       return ui.setNotification({
         category: 'info',
@@ -67,12 +70,16 @@ const SideBarContent = observer(() => {
     }
 
     try {
-      const snippet = createSqlSnippetSkeleton({ name: 'Untitled query', owner_id: profile?.id })
-      const data = { ...snippet, id: uuidv4() }
+      const snippet = createSqlSnippetSkeleton({
+        id: uuidv4(),
+        name: 'Untitled query',
+        owner_id: profile.id,
+        project_id: project.id,
+      })
 
-      snap.addSnippet(data as SqlSnippet, ref, true)
+      snap.addSnippet(snippet as SqlSnippet, project.ref)
 
-      router.push(`/project/${ref}/sql/${data.id}`)
+      router.push(`/project/${project.ref}/sql/${snippet.id}`)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',

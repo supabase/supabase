@@ -21,6 +21,7 @@ import { isResponseOk, patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Organization } from 'types'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
+import NoProjectsOnPaidOrgInfo from 'components/interfaces/BillingV2/NoProjectsOnPaidOrgInfo'
 
 const GeneralSettings = () => {
   const queryClient = useQueryClient()
@@ -72,6 +73,8 @@ const GeneralSettings = () => {
 
   return (
     <ScaffoldContainerLegacy>
+      <NoProjectsOnPaidOrgInfo organization={selectedOrganization} />
+
       <Form id={formId} initialValues={initialValues} onSubmit={onUpdateOrganization}>
         {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
           const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)

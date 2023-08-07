@@ -54,13 +54,8 @@ export default function LaunchWeekPrizeSection({
               </svg>
             </div>
             <h2 className="text-4xl">
-              Get your <span className="gradient-text-pink-500">winning ticket</span>
+              Submissions <span className="gradient-text-pink-500">closed</span>
             </h2>
-            <p className="radial-gradient-text-scale-500">
-              Join us on April 16th for Launch Week 7's final day
-              <br className="hidden md:inline-block" /> and find out if you are one of the lucky
-              winners. Get sharing!
-            </p>
           </motion.div>
         </div>
         {ticket && <Ticket />}
