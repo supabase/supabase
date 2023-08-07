@@ -1,0 +1,57 @@
+import Link from 'next/link'
+import { Button, Input } from 'ui'
+
+import Panel from 'components/ui/Panel'
+import { Profile as ProfileType } from 'data/profile/types'
+import { useSession } from 'lib/auth'
+
+const AccountInformation = ({ profile }: { profile?: ProfileType }) => {
+  const session = useSession()
+
+  return (
+    <Panel
+      title={
+        <h5 key="panel-title" className="mb-0">
+          Account Information
+        </h5>
+      }
+    >
+      <Panel.Content>
+        <div className="space-y-2">
+          <Input
+            readOnly
+            disabled
+            label="Username"
+            layout="horizontal"
+            value={profile?.username ?? ''}
+          />
+          <Input
+            readOnly
+            disabled
+            label="Email"
+            layout="horizontal"
+            value={profile?.primary_email ?? ''}
+          />
+          {session?.user.app_metadata.provider === 'email' && (
+            <div className="text-sm grid gap-2 md:grid md:grid-cols-12 md:gap-x-4">
+              <div className="flex flex-col space-y-2 col-span-4 ">
+                <p className="text-scale-1100 break-all">Password</p>
+              </div>
+              <div className="col-span-8">
+                <Link href="/reset-password">
+                  <a>
+                    <Button type="default" size="medium">
+                      Reset password
+                    </Button>
+                  </a>
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
+      </Panel.Content>
+    </Panel>
+  )
+}
+
+export default AccountInformation

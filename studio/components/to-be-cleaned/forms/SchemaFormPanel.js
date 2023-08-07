@@ -7,7 +7,7 @@ export default function SchemaFormPanel({
   schema,
   title,
   model,
-  children,
+  children = null,
   onChangeModel = (model) => {},
   onReset = () => {},
   onSubmit,
