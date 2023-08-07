@@ -177,7 +177,7 @@ $$;
 
 Now, we can call that function directly from the browser using [supabase-js](https://supabase.com/docs/reference/javascript/installing):
 
-```
+```js
 let { data: images, error } = await supabase
     .rpc('match_images', {
         query_embedding,
