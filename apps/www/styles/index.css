@@ -392,6 +392,10 @@ launch week
   padding-bottom: 56.25%;
 }
 
+.video-container.no-border {
+  @apply !border-none;
+}
+
 .video-container iframe {
   position: absolute;
   top: 0;

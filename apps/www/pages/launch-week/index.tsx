@@ -14,6 +14,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/8/LaunchWeekLogoHeader'
 import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
 import LW8CalloutsSection from '~/components/LaunchWeek/8/LW8CalloutsSection'
+import LWAnnouncement from '~/components/LaunchWeek/8/Releases/LWAnnouncement'
 
 import { useTheme } from 'common/Providers'
 
@@ -138,11 +139,14 @@ export default function TicketHome({ users, meetups }: Props) {
           <div className="-mt-[65px]">
             <div className="relative">
               <div className="relative z-10">
-                <SectionContainer className="relative flex flex-col justify-around items-center min-h-[600px] lg:min-h-[600px] !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !px-0 !mx-auto">
+                <SectionContainer className="relative flex flex-col justify-around items-center min-h-[500px] !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !px-0 !mx-auto">
                   <div className="absolute bottom-0 z-10 w-full justify-center flex items-end">
                     <LaunchWeekLogoHeader />
                   </div>
-                  <div className="absolute inset-0 z-0">
+                  <div className="absolute inset-0 z-0 flex items-center justify-center">
+                    <div className="absolute z-40 w-full flex justify-center -translate-y-8 px-6">
+                      <LWAnnouncement />
+                    </div>
                     <AnimatedParticles />
                     <Image
                       src="/images/launchweek/8/stars.svg"
