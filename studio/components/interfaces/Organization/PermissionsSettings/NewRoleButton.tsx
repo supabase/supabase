@@ -9,10 +9,10 @@ import { useOrganizationRoleCreateMutation } from 'data/organizations/organizati
 import { isNil } from 'lodash'
 
 export interface NewRoleButtonProps {
-  baseRoles: Role[]
+  roles: Role[]
 }
 
-const NewRoleButton = ({ baseRoles: parentRoles = [] }: NewRoleButtonProps) => {
+const NewRoleButton = ({ roles = [] }: NewRoleButtonProps) => {
   const { ui } = useStore()
   const { slug } = useParams()
   const [isOpen, setIsOpen] = useState(false)
@@ -30,7 +30,7 @@ const NewRoleButton = ({ baseRoles: parentRoles = [] }: NewRoleButtonProps) => {
     baseRole: string().required('Base role is required'),
   })
   const { mutateAsync: createRole, isLoading: isCreating } = useOrganizationRoleCreateMutation()
-  const eligibleBaseRoles = parentRoles.filter((x) =>
+  const eligibleBaseRoles = roles.filter((x) =>
     ['administrator', 'developer', 'none', 'read-only', 'billing-only'].includes(
       x.name.toLowerCase()
     )
@@ -39,6 +39,15 @@ const NewRoleButton = ({ baseRoles: parentRoles = [] }: NewRoleButtonProps) => {
     if (!slug) {
       throw new Error('slug is required')
     }
+
+    const existingRole = roles.find((r) => r.name.toLowerCase() === values.name.toLowerCase())
+    if (existingRole !== undefined) {
+      return ui.setNotification({
+        category: 'info',
+        message: 'Role name already exists. It is case insensitive.',
+      })
+    }
+
     const baseRoleId = Number(values.baseRole)
 
     try {
