@@ -51,6 +51,7 @@ In the example, we're using the `gte-small` model, but any model compatible with
 
 Once the adapter is registered with the collection we can upsert data using plain text and records are automatically converted to vectors:
 
+```
 # Upsert
 docs.upsert(
     records=[
@@ -61,13 +62,16 @@ docs.upsert(
         )
     ]
 )
+```
 
 Similarly, queries are transparently converted into vectors:
 
+```
 # Search by text
 docs.query(data="how many ping pong balls fit in a Boeing ...")
 
 # Results: [...]
+```
 
 ## Hugging Face with Edge Functions 
 
@@ -75,6 +79,7 @@ AI/ML is primarily the domain of the Python community, but thanks to some amazin
 
 Let’s step through a small demo where we accept some text, convert it into an embedding, and then store it in our Postgres database. You can create a new function with supabase functions new embed and fill it with the following code snippet:
 
+```
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { env, pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.5.0';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -115,6 +120,7 @@ serve(async (req) => {
 		{ headers: { 'Content-Type': 'application/json' } }
   );
 });
+```
 
 Now run `supabase functions serve` and you’re ready to call your function locally:
 
@@ -133,7 +139,7 @@ Supabase also provides [Database Webhooks](https://supabase.com/docs/guides/data
 
 One of the coolest ideas we’ve seen so far is the ability to support Hugging Face models directly in the browser. With sufficiently small models, you can embed them directly into your application and cut out an entire network hop. 
 
-![IMAGE GOES HERE]
+!(Hugging Face from the browser - demo)[/images/blog/launch-week-8/day-1/hugging-face-from-the-browser-demo.png]
 
 This is great for search, where you might want to “debounce” the user query as they type. Of course, this is only helpful if you have a database that allows access from the browser. Fortunately, Supabase provides that functionality using Postgres Row Level Security and PostgREST:
 
@@ -214,4 +220,7 @@ And no matter your language preference, remember to jump into the [Hugging Face 
 
 ## More Launch Week 8
 
-- 
+- (Launch Week 8)[https://supabase.com/launch-week]
+- (Coding the stars - an interactive constellation with Three.js and React Three Fiber)[https://supabase.com/blog/interactive-constellation-threejs-react-three-fiber]
+- (Why we'll stay remote)[https://supabase.com/blog/why-supabase-remote]
+- (Postgres Language Server)[https://github.com/supabase/postgres_lsp]
