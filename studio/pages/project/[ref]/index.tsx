@@ -7,7 +7,6 @@ import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner
 import { useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
-import { LWAnnouncement } from 'ui'
 
 const Home: NextPageWithLayout = () => {
   const project = useSelectedProject()
