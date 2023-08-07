@@ -167,7 +167,9 @@ export const AccordionHeader = ({
   videoThumbnail?: string
 }) => (
   <div
-    className={['flex flex-1 justify-between items-stretch scroll-mt-20 text-scale-900'].join(' ')}
+    className={[
+      'h-[79px] hover:cursor-default flex flex-1 justify-between items-center scroll-mt-20 text-scale-900',
+    ].join(' ')}
   >
     <div
       className={[
@@ -218,7 +220,7 @@ export const AccordionHeader = ({
       )}
     </div>
     {shippable && shipped && youtube_id && (
-      <div className="self-end hover:cursor-pointer">
+      <div className="hover:cursor-pointer">
         <ExpandableVideo
           videoId={youtube_id}
           trigger={
