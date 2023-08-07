@@ -1,14 +1,13 @@
-import { FC } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconHelpCircle, Modal } from 'ui'
 import Link from 'next/link'
+import { Button, IconHelpCircle, Modal } from 'ui'
 
-interface Props {
+interface SpendCapModalProps {
   visible: boolean
   onHide: () => void
 }
 
-const SpendCapModal: FC<Props> = ({ visible, onHide }) => {
+const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
   return (
     <Modal hideFooter visible={visible} size="xlarge" header="Spend cap" onCancel={() => onHide()}>
       <div className="py-4 space-y-4">
