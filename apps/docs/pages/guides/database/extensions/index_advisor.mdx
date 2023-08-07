@@ -136,7 +136,8 @@ from
 
 ## Limitations
 
-Currently, index_advisor will only recommend single column, B-tree indexes. This restriction will be relaxed in future releases.
+- index_advisor will only recommend single column, B-tree indexes. This restriction will be relaxed in future releases.
+- when a generic argument's type is not discernible from context, an error is returned in the `errors` field. To resolve those errors add explicit type casting to uses of the generic argument e.g. `$1::int`.
 
 ## Resources
 
