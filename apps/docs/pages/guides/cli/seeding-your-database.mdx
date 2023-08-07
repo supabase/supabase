@@ -32,7 +32,6 @@ values
 
 {/* prettier-ignore */}
 {/*
-
 ### Splitting up your seed file
 
 The seed file can grow quite large, so you can split it up into multiple files. For example, you can create a `seed` folder and add a `countries.sql` file. Then you can add the following to your `seed.sql` file.
@@ -49,11 +48,99 @@ You can use the `COPY` command to import CSV data into your database. For exampl
 ```sql supabase/seed.sql
 COPY countries (name, code) FROM 'seed/countries.csv' WITH (FORMAT csv);
 ```
+\*/}
 
-## Generating seed data from Production
+## Seed your database with Snaplet
 
-- Use snaplet
-  \*/}
+Snaplet generates seed data from a database schema and a definition of the intended values. For instance if you wanted to seed a typical blog application, with the following schema:
+
+![An example schema](/docs/img/guides/cli/snaplet-example-schema.png)
+
+{/*
+```sql schema.sql
+
+create table "User" (
+  id bigint not null primary key,
+  email text not null,
+  name text
+);
+
+create table "Comment" (
+  id bigint not null primary key,
+  text text not null,
+  "userId" bigint references "User" (id),
+  "postId" bigint references "Post" (id)
+);
+
+
+create table "Post" (
+  id bigint not null primary key,
+  title text not null,
+  content text,
+  "createdBy" bigint references "User" (id)
+);
+```
+\*/}
+
+And the intended values you want to generate:
+  * A `Post` with the title `"There is a lot of snow around here!"`
+  * The `Post.createdBy` user with an email address ending in `"@acme.org"`
+  * Three `Post.comments` from three different users.
+
+The definition of intended values would resemble:
+```ts snaplet.config.ts
+defineConfig({
+   generate: {
+      plan(snaplet) {
+        return snaplet.Post({
+          data: {
+            title: "There is a lot of snow around here!"
+            createdBy: {
+                data: {
+                  email: copycat.email(seed, { domain: 'acme.org' })
+                }
+            },
+            comments: {
+              count: 3,
+            }
+          }
+        })
+      }
+   }
+})
+```
+
+Running `npx snaplet generate` would produce these SQL statements:
+
+```sql 
+-- The `Post.createdBy` user with an email address ending in `"@acme.org"`
+INSERT INTO "User" (name, email) VALUES ("John Snow", "snow@acme.org")
+
+--- A `Post` with the title `"There is a lot of snow around here!"`
+INSERT INTO "Post" (title, content, createdBy) VALUES (
+  "There is a lot of snow around here!",
+  "Lorem ipsum dolar", 
+  1)
+
+--- Three `Post.comments` from three different users.
+INSERT INTO "User" (name, email) VALUES ("Stephanie Shadow", "shadow@domain.com")
+INSERT INTO "Comment" (text, userId, postId) VALUES ("I love cheese", 2, 1)
+
+INSERT INTO "User" (name, email) VALUES ("John Rambo", "rambo@trymore.dev")
+INSERT INTO "Comment" (text, userId, postId) VALUES ("Lorem ipsum dolar sit", 3, 1)
+
+INSERT INTO "User" (name, email) VALUES ("Steven Plank", "s@plank.org")
+INSERT INTO "Comment" (text, userId, postId) VALUES ("Actually, that's not correct...", 4, 1)
+```
+
+A benefit of using Snaplet is that _so much_ of the resulting data has been contextually generated. A minimum definition of intention still results in a comprehensive set of data returned.
+
+Three things that were automatically generated:
+- Three comments were request, resulting in the `text` and three additional users.
+- The `content` of `Post` was generated
+- The `Post.createBy` was requested, the `name` was generated.
+
+For more information about how this works reference [Snaplet's documentation](https://docs.snaplet.dev/references/data-operations/generate)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
