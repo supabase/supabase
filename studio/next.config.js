@@ -167,6 +167,11 @@ const nextConfig = {
         destination: '/project/:ref/settings/billing/subscription',
         permanent: true,
       },
+      {
+        source: '/project/:ref/sql',
+        destination: '/project/:ref/sql/new',
+        permanent: true,
+      },
     ]
   },
   async headers() {
