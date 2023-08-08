@@ -189,19 +189,20 @@ const SQLEditor = () => {
 
   const executeQuery = useCallback(
     async (force: boolean = false) => {
-      if (isDiffOpen) {
-        return
-      }
+      if (isDiffOpen) return
 
       // use the latest state
       const state = getSqlEditorStateSnapshot()
-      const snippet = idRef.current && state.snippets[idRef.current]
+      const snippet = idRef.current ? state.snippets[idRef.current] : null
 
-      if (project && snippet && !isExecuting && editorRef.current !== null) {
+      if (editorRef.current !== null && !isExecuting && project !== undefined) {
         const editor = editorRef.current
         const selection = editor.getSelection()
         const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
-        const sql = (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
+
+        const sql = snippet
+          ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
+          : selectedValue || editorRef.current?.getValue()
 
         const containsDestructiveOperations = destructiveSqlRegex.some((regex) => regex.test(sql))
 
@@ -210,7 +211,7 @@ const SQLEditor = () => {
           return
         }
 
-        if (idRef.current && snippet.snippet.name === untitledSnippetTitle) {
+        if (idRef.current && snippet?.snippet.name === untitledSnippetTitle) {
           // Intentionally don't await title gen (lazy)
           setAiTitle(idRef.current, sql)
         }
@@ -297,9 +298,6 @@ const SQLEditor = () => {
       setSelectedDiffType(DiffType.Modification)
       setDebugSolution(undefined)
       setSqlDiff(undefined)
-      setTimeout(() => {
-        inputRef.current?.focus()
-      }, 0)
     } finally {
       setIsAcceptDiffLoading(false)
     }
@@ -318,9 +316,6 @@ const SQLEditor = () => {
 
     setDebugSolution(undefined)
     setSqlDiff(undefined)
-    setTimeout(() => {
-      inputRef.current?.focus()
-    }, 0)
   }, [debugSolution, telemetryProps, router])
 
   useEffect(() => {
@@ -483,7 +478,6 @@ const SQLEditor = () => {
                       }}
                     >
                       <Input_Shadcn_
-                        autoFocus
                         value={aiInput}
                         onChange={(e) => setAiInput(e.currentTarget.value)}
                         disabled={isDiffOpen}
@@ -838,7 +832,7 @@ const SQLEditor = () => {
                     id={id}
                     editorRef={editorRef}
                     isExecuting={isExecuting}
-                    autoFocus={false}
+                    autoFocus
                     executeQuery={executeQuery}
                   />
                 </motion.div>
