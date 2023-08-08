@@ -199,7 +199,7 @@ export const AccordionHeader = ({
           <div
             className={[
               'hover:cursor-pointer hover:!opacity-100',
-              day === 2 ? 'animate-pulse' : '',
+              day === 3 ? 'animate-pulse' : '',
             ].join(' ')}
           >
             <ExpandableVideo
@@ -233,7 +233,7 @@ export const AccordionHeader = ({
             </g>
           </svg>
 
-          {day === 3 && <CountdownComponent date={publishedAt} showCard={false} />}
+          {day === 4 && <CountdownComponent date={publishedAt} showCard={false} />}
         </span>
       )}
     </div>
