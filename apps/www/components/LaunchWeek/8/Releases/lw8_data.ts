@@ -117,7 +117,7 @@ const days: WeekDayProps[] = [
     description: '',
     d: 2,
     dd: 'Tue',
-    youtube_id: '',
+    youtube_id: 'RJccSbJ9Go4',
     blogpost: '',
     twitter_spaces: 'https://twitter.com/i/spaces/1vAxRAvNQyDJl?s=20',
     docs: '',

@@ -282,7 +282,7 @@ export default function LW8Releases() {
               )}
             </Accordion.Item>
           </div>
-          <div className="border-b border-[#111718] scroll-mt-16" id="today">
+          <div className="border-b border-[#111718] scroll-mt-16">
             <AccordionHeader
               date={day1.date}
               day={day1.d}

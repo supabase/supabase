@@ -220,7 +220,12 @@ export const AccordionHeader = ({
       )}
     </div>
     {shippable && shipped && youtube_id && (
-      <div className="hover:cursor-pointer animate-pulse hover:!opacity-100">
+      <div
+        className={[
+          'hover:cursor-pointer hover:!opacity-100',
+          day === 2 ? 'animate-pulse' : '',
+        ].join(' ')}
+      >
         <ExpandableVideo
           videoId={youtube_id}
           trigger={
@@ -235,9 +240,15 @@ export const AccordionHeader = ({
   </div>
 )
 
-export const VideoPreviewTrigger = ({ title, thumbnail }: { title: string; thumbnail: string }) => (
+export const VideoPreviewTrigger = ({
+  title,
+  thumbnail,
+}: {
+  title?: string
+  thumbnail: string
+}) => (
   <div className="flex items-center h-full gap-3 text-xs group/vid text-scale-1100 hover:text-scale-1200 transition-colors">
-    <span>{title}</span>
+    {title && <span>{title}</span>}
     <div className="relative h-10 !aspect-video flex items-center justify-center rounded overflow-hidden border border-scale-1000 opacity-80 group-hover/vid:opacity-100 transition-colors">
       <div className="absolute z-10 w-2.5 h-2.5 text-white opacity-100">
         <svg viewBox="0 0 81 91" fill="none" xmlns="http://www.w3.org/2000/svg">
