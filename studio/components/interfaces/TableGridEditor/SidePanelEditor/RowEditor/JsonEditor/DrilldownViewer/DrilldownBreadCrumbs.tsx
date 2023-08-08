@@ -1,13 +1,15 @@
-import { FC } from 'react'
-import { last } from 'lodash'
-import { IconHome, IconChevronRight } from 'ui'
+import { last, noop } from 'lodash'
+import { IconChevronRight, IconHome } from 'ui'
 
-interface Props {
+interface DrilldownBreadCrumbsProps {
   breadcrumbs: string[]
   onSelectBreadcrumb: (breadcrumb: string[]) => void
 }
 
-const DrilldownBreadCrumbs: FC<Props> = ({ breadcrumbs = [], onSelectBreadcrumb = () => {} }) => {
+const DrilldownBreadCrumbs = ({
+  breadcrumbs = [],
+  onSelectBreadcrumb = noop,
+}: DrilldownBreadCrumbsProps) => {
   return (
     <div className="flex items-center space-x-2">
       <IconHome size={16} strokeWidth={2} />

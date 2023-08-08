@@ -146,14 +146,11 @@ const Usage = () => {
               <div className="flex items-center space-x-4">
                 {!isLoadingSubscription && (
                   <DateRangePicker
-                    id="billingCycle"
-                    name="billingCycle"
                     onChange={setDateRange}
                     value={TIME_PERIODS_BILLING[0].key}
                     options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
                     loading={isLoadingSubscription}
                     currentBillingPeriodStart={subscription?.current_period_start}
-                    className="!w-[200px]"
                   />
                 )}
 

@@ -1,9 +1,10 @@
-import { FC, useState } from 'react'
+import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
+import { useState } from 'react'
 import { Button, Modal } from 'ui'
-import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js'
+
 import { useStore } from 'hooks'
 
-interface Props {
+interface AddPaymentMethodFormProps {
   returnUrl: string
   onCancel: () => void
   onConfirm: () => void
@@ -13,7 +14,7 @@ interface Props {
 // manually creating and attaching payment methods via the API
 // Small UX annoyance here, that the page will be refreshed
 
-const AddPaymentMethodForm: FC<Props> = ({ returnUrl, onCancel, onConfirm }) => {
+const AddPaymentMethodForm = ({ returnUrl, onCancel, onConfirm }: AddPaymentMethodFormProps) => {
   const { ui } = useStore()
   const stripe = useStripe()
   const elements = useElements()

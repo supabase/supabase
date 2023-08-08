@@ -1,19 +1,19 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
-import { FC, useState } from 'react'
+import { useState } from 'react'
+import { IconCheck, IconClipboard } from 'ui'
 
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
-import { IconCheck, IconClipboard } from 'ui'
 
-interface Props {
+interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
 }
 
-const EdgeFunctionsListItem: FC<Props> = ({ function: item }) => {
+const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const [isCopied, setIsCopied] = useState(false)
@@ -21,7 +21,7 @@ const EdgeFunctionsListItem: FC<Props> = ({ function: item }) => {
   const { project } = useProjectContext()
   // get the .co or .net TLD from the restUrl
   const restUrl = project?.restUrl
-  const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
+  const restUrlTld = restUrl !== undefined ? new URL(restUrl as string).hostname.split('.').pop() : 'co'
   const functionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${item.slug}`
 
   return (

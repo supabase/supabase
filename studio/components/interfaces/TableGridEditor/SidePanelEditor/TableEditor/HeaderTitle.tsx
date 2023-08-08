@@ -1,13 +1,12 @@
-import { FC } from 'react'
 import type { PostgresTable } from '@supabase/postgres-meta'
 
-interface Props {
+interface HeaderTitleProps {
   schema: string
   table: PostgresTable
   isDuplicating: boolean
 }
 
-const HeaderTitle: FC<Props> = ({ schema, table, isDuplicating }) => {
+const HeaderTitle = ({ schema, table, isDuplicating }: HeaderTitleProps) => {
   if (!table) {
     return (
       <>

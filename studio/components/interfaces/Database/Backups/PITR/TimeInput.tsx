@@ -1,7 +1,7 @@
-import dayjs from 'dayjs'
-import { isNaN } from 'lodash'
-import { ChangeEvent, FC, useEffect, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import dayjs from 'dayjs'
+import { isNaN, noop } from 'lodash'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { IconClock } from 'ui'
 
 import { Time } from './PITR.types'
@@ -15,14 +15,14 @@ import { formatNumberToTwoDigits, formatTimeToTimeString } from './PITR.utils'
 
 // [Joshen] Potential extension, give option to toggle 24 hours or AM/PM
 
-interface Props {
+interface TimeInputProps {
   defaultTime?: Time
   minimumTime?: Time
   maximumTime?: Time
   onChange?: (time: Time) => void
 }
 
-const TimeInput: FC<Props> = ({ defaultTime, minimumTime, maximumTime, onChange = () => {} }) => {
+const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: TimeInputProps) => {
   const [isFocused, setIsFocused] = useState(false)
   const [error, setError] = useState<string>()
   const [time, setTime] = useState<Time>(defaultTime || { h: 0, m: 0, s: 0 })
