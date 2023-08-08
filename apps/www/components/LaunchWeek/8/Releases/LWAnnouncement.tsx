@@ -12,9 +12,7 @@ const LWAnnouncement = ({
   title?: string
   isLaunchWeekPage?: boolean
 }) => {
-  if (typeof document === 'undefined') return null
   const [_pre, _d1, d2, _d3, _d4, _d5] = days
-  const today = document.getElementById('today')
 
   const announcement = (
     <>
@@ -61,10 +59,11 @@ const LWAnnouncement = ({
     </>
   )
 
-  const handleClick = (e: any) => {
-    e?.preventDefault()
+  const handleClick = () => {
+    if (typeof document === 'undefined') return null
+    const today = document.getElementById('today')
     if (!today) return
-    today?.scrollIntoView({ behavior: 'smooth' })
+    window.scrollTo({ top: today?.offsetTop + today?.offsetHeight, left: 0, behavior: 'smooth' })
   }
 
   return (
