@@ -145,7 +145,7 @@ export default function TicketHome({ users, meetups }: Props) {
                   </div>
                   <div className="absolute inset-0 z-0 flex items-center justify-center">
                     <div className="absolute z-40 w-full flex justify-center -translate-y-8 px-6">
-                      <LWAnnouncement />
+                      <LWAnnouncement isLaunchWeekPage />
                     </div>
                     <AnimatedParticles />
                     <Image
