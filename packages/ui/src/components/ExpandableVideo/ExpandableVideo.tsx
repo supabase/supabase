@@ -104,9 +104,9 @@ export function ExpandableVideo({
         </div>
       </Modal>
       <button
-        onClick={() => {
+        onClick={(e: any) => {
+          if (onOpenCallback) onOpenCallback(e)
           setExpandVideo(true)
-          if (onOpenCallback) onOpenCallback()
         }}
         className={[triggerContainerClassName].join(' ')}
       >

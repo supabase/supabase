@@ -13,7 +13,7 @@ const LWAnnouncement = ({
   isLaunchWeekPage?: boolean
 }) => {
   if (typeof document === 'undefined') return null
-  const [_pre, d1, _d2, _d3, _d4, _d5] = days
+  const [_pre, _d1, d2, _d3, _d4, _d5] = days
   const today = document.getElementById('today')
 
   const announcement = (
@@ -37,9 +37,9 @@ const LWAnnouncement = ({
                 />
               </svg>
             </div>
-            <span className="text-foreground">{title ?? 'Launch Week 8: Day 1'}</span>
+            <span className="text-foreground">{title ?? 'Launch Week 8: Day 2'}</span>
           </div>
-          <span className="text-foreground-light">{d1.steps[0].title}</span>
+          <span className="text-foreground-light">{d2.steps[0].title}</span>
         </div>
       </div>
       <div className="relative flex items-center justify-center !aspect-video h-[80px] md:h-[80px] gap-2 z-10 rounded overflow-hidden">
@@ -62,8 +62,9 @@ const LWAnnouncement = ({
   )
 
   const handleClick = (e: any) => {
+    e?.preventDefault()
     if (!today) return
-    today.scrollIntoView({ behavior: 'smooth' })
+    today?.scrollIntoView({ behavior: 'smooth' })
   }
 
   return (
