@@ -254,7 +254,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
                     </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
                 )}
-                <p className="mt-4">{`Are you sure you want to delete '${name}'?`}</p>
+                <p>Are you sure you want to delete '{name}'?</p>
               </div>
             </div>
           </div>
