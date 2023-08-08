@@ -9,7 +9,7 @@ import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEdi
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useFlag, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useSelectedProject, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
@@ -21,6 +21,7 @@ const SideBarContent = observer(() => {
   const { ref } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
+  const project = useSelectedProject()
   const sharedSnippetsFeature = useFlag<boolean>('sharedSnippets')
 
   const [personalSnippetsFilterString, setPersonalSnippetsFilterString] = useState('')
@@ -95,14 +96,15 @@ const SideBarContent = observer(() => {
 
     try {
       const snippet = createSqlSnippetSkeleton({
+        id: uuidv4(),
         name: untitledSnippetTitle,
         owner_id: profile?.id,
+        project_id: project?.id,
       })
-      const data = { ...snippet, id: uuidv4() }
 
-      snap.addSnippet(data as SqlSnippet, ref)
+      snap.addSnippet(snippet as SqlSnippet, ref)
 
-      router.push(`/project/${ref}/sql/${data.id}`)
+      router.push(`/project/${ref}/sql/${snippet.id}`)
       // reset all search inputs when a new query is added
       setPersonalSnippetsFilterString('')
       setProjectSnippetsFilterString('')
@@ -143,11 +145,6 @@ const SideBarContent = observer(() => {
             </div>
             <div className="space-y-6 px-3">
               <div>
-                <ProductMenuItem
-                  name="Build with AI"
-                  isActive={router.asPath === `/project/${ref}/sql`}
-                  url={`/project/${ref}/sql`}
-                />
                 <ProductMenuItem
                   name="Templates"
                   isActive={router.asPath === `/project/${ref}/sql/templates`}

@@ -6,7 +6,7 @@ import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEdi
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useFlag, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useSelectedProject, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -90,6 +90,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
   const router = useRouter()
   const snap = useSqlEditorStateSnapshot()
   const { profile } = useProfile()
+  const project = useSelectedProject()
   const sharedSnippetsFeature = useFlag<boolean>('sharedSnippets')
   const { mutate: deleteContent } = useContentDeleteMutation({
     onSuccess(data) {
@@ -97,7 +98,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
 
       const existingSnippetIds = (snap.orders[ref!] ?? []).filter((x) => x !== id)
       if (existingSnippetIds.length === 0) {
-        router.push(`/project/${ref}/sql`)
+        router.push(`/project/${ref}/sql/new`)
       } else {
         router.push(`/project/${ref}/sql/${existingSnippetIds[0]}`)
       }
@@ -162,10 +163,16 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
     if (!ref) return console.error('Project ref is required')
     if (!id) return console.error('Snippet ID is required')
     try {
-      const snippet = createSqlSnippetSkeleton({ name, sql: content.sql, owner_id: profile?.id })
-      const data = { ...snippet, id: uuidv4() }
-      snap.addSnippet(data as SqlSnippet, ref)
-      router.push(`/project/${ref}/sql/${data.id}`)
+      const snippet = createSqlSnippetSkeleton({
+        id: uuidv4(),
+        name,
+        sql: content.sql,
+        owner_id: profile?.id,
+        project_id: project?.id,
+      })
+      snap.addSnippet(snippet as SqlSnippet, ref)
+      snap.addNeedsSaving(snippet.id!)
+      router.push(`/project/${ref}/sql/${snippet.id}`)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -248,7 +255,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
                     </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
                 )}
-                <p className="mt-4">{`Are you sure you want to delete '${name}'?`}</p>
+                <p>Are you sure you want to delete '{name}'?</p>
               </div>
             </div>
           </div>
