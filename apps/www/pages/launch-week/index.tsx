@@ -140,7 +140,7 @@ export default function TicketHome({ users, meetups }: Props) {
             <div className="relative">
               <div className="relative z-10">
                 <SectionContainer className="relative flex flex-col justify-around items-center min-h-[500px] !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !px-0 !mx-auto">
-                  <div className="absolute bottom-0 z-10 w-full flex flex-col items-center justify-end gap-4">
+                  <div className="absolute bottom-0 z-10 w-full flex flex-col items-center justify-end gap-4 px-6">
                     <LaunchWeekLogoHeader />
                     <LWAnnouncement isLaunchWeekPage />
                   </div>
@@ -170,7 +170,7 @@ export default function TicketHome({ users, meetups }: Props) {
             </div>
 
             <div id="twitter-spaces">
-              <SectionContainer className="!pb-0" id="hackathon">
+              <SectionContainer className="!pt-10 lg:!pt-14 !pb-0" id="hackathon">
                 <LW8CalloutsSection />
               </SectionContainer>
             </div>
