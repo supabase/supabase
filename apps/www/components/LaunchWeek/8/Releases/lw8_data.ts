@@ -3,8 +3,7 @@ const images = {
   day_1_thumb: '/images/launchweek/8/day1/day-01-thumb.jpg',
   '00-stay-remote': '/images/launchweek/8/day0/remote.png',
   '00-pg-server': '/images/launchweek/8/day0/pg-server.png',
-  '00-constellation': '/images/launchweek/8/day0/constellation-pre.svg',
-  '00-constellation-mobile': '/images/launchweek/8/day0/constellation.svg',
+  '00-constellation': '/images/launchweek/8/day0/constellation.svg',
   '01-hugging': '/images/launchweek/8/day1/hugging.svg',
 }
 
@@ -76,12 +75,9 @@ const days: WeekDayProps[] = [
         steps: [],
       },
       {
-        title:
-          'Coding the stars - an interactive constellation with Three.js and React Three Fiber',
+        title: 'Coding an interactive constellation with Three.js and React Three Fiber',
         blog: '/blog/interactive-constellation-threejs-react-three-fiber',
-        bg_layers: [
-          { img: images['00-constellation'], mobileImg: images['00-constellation-mobile'] },
-        ],
+        bg_layers: [{ img: images['00-constellation'] }],
         steps: [],
       },
     ],
