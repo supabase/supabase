@@ -163,7 +163,9 @@ const BranchPanel = ({
       <div className="flex items-center space-x-4">
         <Link passHref href={pullRequestURL}>
           <a target="_blank" rel="noreferrer">
-            <Button icon={<IconExternalLink />}>Create pull request</Button>
+            <Button type="default" icon={<IconExternalLink />}>
+              Create pull request
+            </Button>
           </a>
         </Link>
         <DropdownMenu_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>

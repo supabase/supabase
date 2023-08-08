@@ -1,18 +1,18 @@
 import { isEmpty } from 'lodash'
-import { FC, useState, useEffect } from 'react'
-import { Modal, Form, Input, Button, IconEyeOff, IconEye } from 'ui'
+import { useEffect, useState } from 'react'
+import { Button, Form, IconEye, IconEyeOff, Input, Modal } from 'ui'
 
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useStore } from 'hooks'
 import { VaultSecret } from 'types'
 import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
-interface Props {
+interface EditSecretModalProps {
   selectedSecret: VaultSecret
   onClose: () => void
 }
 
-const EditSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
+const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
   const { ui, vault } = useStore()
   const [selectedKeyId, setSelectedKeyId] = useState<string>()
   const [showSecretValue, setShowSecretValue] = useState(false)

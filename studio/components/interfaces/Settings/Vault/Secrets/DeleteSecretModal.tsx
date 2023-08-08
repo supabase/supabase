@@ -1,14 +1,15 @@
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import { Modal } from 'ui'
-import { VaultSecret } from 'types'
-import { useStore } from 'hooks'
 
-interface Props {
+import { useStore } from 'hooks'
+import { VaultSecret } from 'types'
+
+interface DeleteSecretModalProps {
   selectedSecret: VaultSecret
   onClose: () => void
 }
 
-const DeleteSecretModal: FC<Props> = ({ selectedSecret, onClose }) => {
+const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) => {
   const { vault, ui } = useStore()
 
   const [isDeleting, setIsDeleting] = useState(false)

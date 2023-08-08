@@ -1,17 +1,17 @@
-import Link from 'next/link'
 import dayjs from 'dayjs'
-import { FC, useEffect } from 'react'
+import Link from 'next/link'
+import { useEffect } from 'react'
 import { IconChevronRight, IconLoader } from 'ui'
 
-import { useStore } from 'hooks'
 import Panel from 'components/ui/Panel'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useStore } from 'hooks'
 
 interface ProjectSummaryProps {
   project: any
 }
 
-const ProjectSummary: FC<ProjectSummaryProps> = ({ project }) => {
+const ProjectSummary = ({ project }: ProjectSummaryProps) => {
   const { ui } = useStore()
   const {
     data: subscription,
@@ -68,7 +68,7 @@ interface ProjectsSummaryProps {
   projects: any
 }
 
-const ProjectsSummary: FC<ProjectsSummaryProps> = ({ projects }) => {
+const ProjectsSummary = ({ projects }: ProjectsSummaryProps) => {
   return (
     <div className="space-y-2">
       <h4>Projects at a glance</h4>
