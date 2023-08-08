@@ -2,10 +2,10 @@ import { useParams } from 'common'
 
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useStore } from 'hooks'
+import { useStore, useFlag } from 'hooks'
 import { useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { AiIconAnimation, Button, Form, IconLoader, Input, Modal, cn } from 'ui'
+import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
 
 export interface RenameQueryModalProps {
   snippet: SqlSnippet
@@ -18,6 +18,7 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
   const { ui } = useStore()
   const { ref } = useParams()
   const snap = useSqlEditorStateSnapshot()
+  const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
 
   const { id, name, description } = snippet
 
@@ -94,10 +95,12 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
                     disabled={isTitleGenerationLoading}
                     // className="!px-2 !py-0.5 !pr-3"
                   >
-                    <div className="flex items-center gap-1">
-                      <AiIconAnimation loading={isTitleGenerationLoading} className="scale-75" />
-                      <span>Rename with AI</span>
-                    </div>
+                    {supabaseAIEnabled && (
+                      <div className="flex items-center gap-1">
+                        <AiIconAnimation loading={isTitleGenerationLoading} className="scale-75" />
+                        <span>Rename with AI</span>
+                      </div>
+                    )}
                   </Button>
                 )}
               </div>

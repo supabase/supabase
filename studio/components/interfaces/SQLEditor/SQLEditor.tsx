@@ -32,6 +32,7 @@ import {
   useSelectedOrganization,
   useSelectedProject,
   useStore,
+  useFlag,
 } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
@@ -102,6 +103,7 @@ const SQLEditor = () => {
   const [debugSolution, setDebugSolution] = useState<string>()
   const [sqlDiff, setSqlDiff] = useState<ContentDiff>()
   const inputRef = useRef<HTMLInputElement>(null)
+  const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
 
   const [isAiOpen, setIsAiOpen] = useLocalStorageQuery('supabase_sql-editor-ai-open', true)
 
@@ -421,7 +423,7 @@ const SQLEditor = () => {
         }}
       />
       <div className="flex h-full flex-col relative">
-        {isAiOpen && (
+        {isAiOpen && supabaseAIEnabled && (
           <AISchemaSuggestionPopover
             onClickSettings={() => {
               setIsAISettingsOpen(true)
