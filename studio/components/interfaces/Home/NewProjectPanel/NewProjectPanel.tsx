@@ -56,7 +56,7 @@ const NewProjectPanel = () => {
                     </Button>
                   </a>
                 </Link>
-                <Link href={`/project/${ref}/sql`}>
+                <Link href={`/project/${ref}/sql/new`}>
                   <a>
                     <Button
                       type="default"

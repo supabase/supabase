@@ -98,7 +98,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
 
       const existingSnippetIds = (snap.orders[ref!] ?? []).filter((x) => x !== id)
       if (existingSnippetIds.length === 0) {
-        router.push(`/project/${ref}/sql`)
+        router.push(`/project/${ref}/sql/new`)
       } else {
         router.push(`/project/${ref}/sql/${existingSnippetIds[0]}`)
       }

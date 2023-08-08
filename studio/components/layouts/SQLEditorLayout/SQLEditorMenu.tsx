@@ -147,8 +147,8 @@ const SideBarContent = observer(() => {
               <div>
                 <ProductMenuItem
                   name="Build with AI"
-                  isActive={router.asPath === `/project/${ref}/sql`}
-                  url={`/project/${ref}/sql`}
+                  isActive={router.asPath === `/project/${ref}/sql/new`}
+                  url={`/project/${ref}/sql/new`}
                 />
                 <ProductMenuItem
                   name="Templates"
