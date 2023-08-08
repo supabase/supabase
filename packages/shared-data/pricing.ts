@@ -291,6 +291,16 @@ export const pricing: Pricing = {
         },
         usage_based: true,
       },
+      {
+        title: 'Bring your own storage provider',
+        plans: {
+          free: false,
+          pro: false,
+          team: false,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
     ],
   },
   edge_functions: {
@@ -478,6 +488,19 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
+        title: 'HIPAA',
+        plans: {
+          free: false,
+          pro: false,
+          team: true,
+          enterprise: true,
+        },
+        tooltips: {
+          main: 'Available as a paid add-on on Team plan and above.',
+        },
+        usage_based: false,
+      },
+      {
         title: 'SSO',
         plans: {
           free: false,
@@ -527,6 +550,19 @@ export const pricing: Pricing = {
           pro: '$10 per domain per month per project add on',
           team: '$10 per domain per month per project add on',
           enterprise: '1, additional $10/domain/month',
+        },
+        usage_based: false,
+      },
+      {
+        title: 'Bring your own cloud deployment options',
+        tooltips: {
+          main: 'On-Premises, single tenant, and managed dedicated cloud provider instance options',
+        },
+        plans: {
+          free: false,
+          pro: false,
+          team: false,
+          enterprise: true,
         },
         usage_based: false,
       },
