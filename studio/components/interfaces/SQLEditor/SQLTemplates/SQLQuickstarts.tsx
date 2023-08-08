@@ -29,8 +29,6 @@ const SQLQuickstarts = observer(() => {
     subject: { id: profile?.id },
   })
 
-  // [Joshen TODO] Removed optimistic query creation logic for now, need to figure out
-  // how to do that after using ids as part of the URL
   const handleNewQuery = async (sql: string, name: string) => {
     if (!ref) return console.error('Project ref is required')
     if (!canCreateSQLSnippet) {
@@ -49,6 +47,7 @@ const SQLQuickstarts = observer(() => {
         project_id: project?.id,
       })
       snap.addSnippet(snippet as SqlSnippet, ref)
+      snap.addNeedsSaving(snippet.id!)
       router.push(`/project/${ref}/sql/${snippet.id}`)
     } catch (error: any) {
       ui.setNotification({
