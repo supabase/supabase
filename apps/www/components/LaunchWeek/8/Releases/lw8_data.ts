@@ -1,6 +1,7 @@
 const images = {
   yt_thumbnail: '/images/launchweek/8/lw8-yt-thumb.jpg',
   day_1_thumb: '/images/launchweek/8/day1/day-01-thumb.jpg',
+  day_2_thumb: '/images/launchweek/8/day2/yt_d2.jpg',
   '00-stay-remote': '/images/launchweek/8/day0/remote.png',
   '00-pg-server': '/images/launchweek/8/day0/pg-server.png',
   '00-constellation': '/images/launchweek/8/day0/constellation.svg',
@@ -117,7 +118,8 @@ const days: WeekDayProps[] = [
     description: '',
     d: 2,
     dd: 'Tue',
-    youtube_id: 'RJccSbJ9Go4',
+    youtube_id: 'N0Wb85m3YMI',
+    videoThumbnail: images.day_2_thumb,
     blogpost: '',
     twitter_spaces: 'https://twitter.com/i/spaces/1vAxRAvNQyDJl?s=20',
     docs: '',

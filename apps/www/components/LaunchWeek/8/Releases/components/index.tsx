@@ -262,7 +262,7 @@ export const VideoPreviewTrigger = ({
         alt="Video thumbnail"
         layout="fill"
         objectFit="cover"
-        // className="blur-sm"
+        // className="blur-[.5px]"
       />
     </div>
     {title && <span>{title}</span>}
