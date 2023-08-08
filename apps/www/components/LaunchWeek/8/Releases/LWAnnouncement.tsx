@@ -50,7 +50,7 @@ const LWAnnouncement = ({
           </svg>
         </div>
         <Image
-          src="/images/launchweek/8/lw8-yt-thumb.jpg"
+          src="/images/launchweek/8/day2/yt_d2.jpg"
           alt="Youtube video thumbnail"
           layout="fill"
           objectFit="cover"
@@ -74,7 +74,7 @@ const LWAnnouncement = ({
       >
         {isLaunchWeekPage ? (
           <ExpandableVideo
-            videoId="RJccSbJ9Go4"
+            videoId="N0Wb85m3YMI"
             onOpenCallback={handleClick}
             triggerContainerClassName="w-full"
             trigger={
