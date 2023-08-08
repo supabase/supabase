@@ -1,13 +1,6 @@
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
-import Countdown from 'react-countdown'
-import { AnnouncementProps } from '../Announcement'
-import _announcement from '../data/Announcement.json'
-import CountdownWidget from '../../../components/CountdownWidget/CountdownWidget'
 import Lw8BannerBg from './Lw8BannerBg'
 import VideoPreview from './VideoPreview'
-
-const announcement = _announcement as AnnouncementProps
 
 export function LW8CountdownBanner() {
   const { pathname } = useRouter()
@@ -33,7 +26,7 @@ export function LW8CountdownBanner() {
           ].join(' ')}
         >
           <p>
-            <span className="hidden md:inline">Supabase</span> Launch Week 8: Day 1
+            <span className="hidden md:inline">Supabase</span> Launch Week 8: Day 2
           </p>
           <VideoPreview />
         </div>
