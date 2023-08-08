@@ -16,6 +16,7 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  ScrollArea,
 } from 'ui'
 
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -50,6 +51,7 @@ const OrganizationDropdown = () => {
           <div className="flex items-center space-x-2 cursor-pointer">
             <Button
               type="text"
+              className="pr-2"
               iconRight={
                 <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />
               }
@@ -67,30 +69,32 @@ const OrganizationDropdown = () => {
             <CommandList_Shadcn_>
               <CommandEmpty_Shadcn_>No organizations found</CommandEmpty_Shadcn_>
               <CommandGroup_Shadcn_>
-                {organizations?.map((org) => {
-                  const href = router.pathname.includes('[slug]')
-                    ? router.pathname.replace('[slug]', org.slug)
-                    : `/org/${org.slug}`
-                  return (
-                    <Link passHref href={href} key={org.slug}>
-                      <CommandItem_Shadcn_
-                        asChild
-                        value={org.name}
-                        className="cursor-pointer w-full flex items-center justify-between"
-                        onSelect={() => {
-                          setOpen(false)
-                          router.push(href)
-                        }}
-                        onClick={() => setOpen(false)}
-                      >
-                        <a>
-                          {org.name}
-                          {org.slug === slug && <IconCheck />}
-                        </a>
-                      </CommandItem_Shadcn_>
-                    </Link>
-                  )
-                })}
+                <ScrollArea className={(organizations || []).length > 7 ? 'h-[210px]' : ''}>
+                  {organizations?.map((org) => {
+                    const href = router.pathname.includes('[slug]')
+                      ? router.pathname.replace('[slug]', org.slug)
+                      : `/org/${org.slug}`
+                    return (
+                      <Link passHref href={href} key={org.slug}>
+                        <CommandItem_Shadcn_
+                          asChild
+                          value={org.name}
+                          className="cursor-pointer w-full flex items-center justify-between"
+                          onSelect={() => {
+                            setOpen(false)
+                            router.push(href)
+                          }}
+                          onClick={() => setOpen(false)}
+                        >
+                          <a>
+                            {org.name}
+                            {org.slug === slug && <IconCheck />}
+                          </a>
+                        </CommandItem_Shadcn_>
+                      </Link>
+                    )
+                  })}
+                </ScrollArea>
               </CommandGroup_Shadcn_>
               <CommandGroup_Shadcn_ className="border-t">
                 <Link passHref href={orgCreationV2 ? `/new-with-subscription` : `/new`}>

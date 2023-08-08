@@ -1,29 +1,31 @@
-import { GetServerSideProps } from 'next'
-import { NextSeo } from 'next-seo'
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
+import { GetServerSideProps } from 'next'
 import dynamic from 'next/dynamic'
+import Head from 'next/head'
+import Image from 'next/image'
 import { useRouter } from 'next/router'
+import { NextSeo } from 'next-seo'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
 
-import { PageState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import DefaultLayout from '~/components/Layouts/Default'
+import { PageState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/8/LaunchWeekLogoHeader'
 import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
+import LW8CalloutsSection from '~/components/LaunchWeek/8/LW8CalloutsSection'
+import LWAnnouncement from '~/components/LaunchWeek/8/Releases/LWAnnouncement'
 
 import { useTheme } from 'common/Providers'
 
 import 'swiper/swiper.min.css'
-import Head from 'next/head'
-import LW8CalloutsSection from '../../components/LaunchWeek/8/LW8CalloutsSection'
 
 const AnimatedParticles = dynamic(
   () => import('~/components/LaunchWeek/8/AnimatedParticles/ParticlesCanvas')
 )
-const TicketContainer = dynamic(() => import('~/components/LaunchWeek/8/Ticket/TicketContainer'))
+const LW8Releases = dynamic(() => import('~/components/LaunchWeek/8/Releases'))
 const LW8Meetups = dynamic(() => import('~/components/LaunchWeek/8/LW8Meetups'))
+const TicketContainer = dynamic(() => import('~/components/LaunchWeek/8/Ticket/TicketContainer'))
 const LaunchWeekPrizeSection = dynamic(
   () => import('~/components/LaunchWeek/8/LaunchWeekPrizeSection')
 )
@@ -67,7 +69,7 @@ export default function TicketHome({ users, meetups }: Props) {
   }
 
   const [userData, setUserData] = useState<UserData>(defaultUserData)
-  const [pageState, setPageState] = useState<PageState>('ticket')
+  const [_, setPageState] = useState<PageState>('ticket')
 
   useEffect(() => {
     if (!supabase) {
@@ -137,32 +139,35 @@ export default function TicketHome({ users, meetups }: Props) {
           <div className="-mt-[65px]">
             <div className="relative">
               <div className="relative z-10">
-                <SectionContainer className="relative flex flex-col justify-around items-center min-h-[600px] lg:min-h-[600px] !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !px-0 !mx-auto">
+                <SectionContainer className="relative flex flex-col justify-around items-center min-h-[500px] !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !px-0 !mx-auto">
                   <div className="absolute bottom-0 z-10 w-full justify-center flex items-end">
                     <LaunchWeekLogoHeader />
                   </div>
-                  <div className="absolute inset-0 z-0">
-                    {supabase && <AnimatedParticles supabase={supabase} users={users} />}
+                  <div className="absolute inset-0 z-0 flex items-center justify-center">
+                    <div className="absolute z-40 w-full flex justify-center -translate-y-8 px-6">
+                      <LWAnnouncement isLaunchWeekPage />
+                    </div>
+                    <AnimatedParticles />
                     <Image
                       src="/images/launchweek/8/stars.svg"
                       alt="starts background"
                       layout="fill"
                       objectFit="cover"
-                      className="opacity-70"
+                      className="opacity-70 pointer-events-none"
                       draggable={false}
                     />
                   </div>
                 </SectionContainer>
-                <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0 pointer-events-none">
-                  <Image
-                    src="/images/launchweek/8/LW8-gradient.png"
-                    layout="fill"
-                    objectFit="cover"
-                    objectPosition="top"
-                    priority
-                    draggable={false}
-                  />
-                </div>
+              </div>
+              <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0">
+                <Image
+                  src="/images/launchweek/8/LW8-gradient.png"
+                  layout="fill"
+                  objectFit="cover"
+                  objectPosition="top"
+                  priority
+                  draggable={false}
+                />
               </div>
             </div>
 
@@ -172,11 +177,18 @@ export default function TicketHome({ users, meetups }: Props) {
               </SectionContainer>
             </div>
 
-            <SectionContainer id="meetups">
+            <SectionContainer className="!pt-0">
+              <LW8Releases />
+            </SectionContainer>
+
+            <SectionContainer id="meetups" className="!pt-0">
               <LW8Meetups meetups={meetups} />
             </SectionContainer>
 
-            <div className="relative !w-full max-w-[100vw] min-h-[400px] !px-4 sm:max-w-xl md:max-w-4xl lg:max-w-7xl z-20 flex flex-col justify-around items-center !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !mx-auto">
+            <div
+              id="ticket"
+              className="relative !w-full max-w-[100vw] min-h-[400px] !px-4 sm:max-w-xl md:max-w-4xl lg:max-w-7xl z-20 flex flex-col justify-around items-center !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !mx-auto"
+            >
               {supabase && (
                 <div className="w-full max-w-[100vw] px-4 flex justify-center py-8 md:py-20">
                   <TicketContainer
@@ -187,8 +199,8 @@ export default function TicketHome({ users, meetups }: Props) {
                 </div>
               )}
             </div>
-            <SectionContainer className="!pt-8 !px-4 w-full">
-              <LaunchWeekPrizeSection className="" />
+            <SectionContainer className="!px-4 w-full">
+              <LaunchWeekPrizeSection />
             </SectionContainer>
             {users && <TicketBrickWall users={users.slice(0, 17)} />}
           </div>
@@ -204,7 +216,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const { data: users } = await supabaseAdmin!
     .from('lw8_tickets_golden')
     .select('username, golden')
-    .limit(1000)
+    .limit(17)
 
   const { data: meetups } = await supabaseAdmin!.from('lw8_meetups').select('*')
 

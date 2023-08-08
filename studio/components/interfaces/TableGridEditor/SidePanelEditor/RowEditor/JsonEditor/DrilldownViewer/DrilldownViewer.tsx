@@ -1,14 +1,15 @@
-import { FC, useState } from 'react'
 import { isEmpty, last } from 'lodash'
-import DrilldownPane from './DrilldownPane'
-import DrilldownBreadCrumbs from './DrilldownBreadCrumbs'
-import { Dictionary } from 'components/grid'
+import { useState } from 'react'
 
-interface Props {
+import { Dictionary } from 'components/grid'
+import DrilldownBreadCrumbs from './DrilldownBreadCrumbs'
+import DrilldownPane from './DrilldownPane'
+
+interface DrilldownViewerProps {
   jsonData: Dictionary<any>
 }
 
-const DrilldownViewer: FC<Props> = ({ jsonData = {} }) => {
+const DrilldownViewer = ({ jsonData = {} }: DrilldownViewerProps) => {
   const [activeKey, setActiveKey] = useState<string>()
   const [breadCrumbs, setBreadCrumbs] = useState<string[]>([])
   const [jsonPane1, setJsonPane1] = useState<Dictionary<any>>(jsonData)

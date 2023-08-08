@@ -1,19 +1,20 @@
-import { FC, useEffect, useState } from 'react'
-import { Modal, Button, Alert } from 'ui'
+import { noop } from 'lodash'
+import { useEffect, useState } from 'react'
+import { Alert, Button, Modal } from 'ui'
 
-interface Props {
+interface ConfirmDeleteModalProps {
   visible: boolean
   selectedItemsToDelete: any[]
   onSelectCancel: () => void
   onSelectDelete: () => void
 }
 
-const ConfirmDeleteModal: FC<Props> = ({
+const ConfirmDeleteModal = ({
   visible = false,
   selectedItemsToDelete = [],
-  onSelectCancel = () => {},
-  onSelectDelete = () => {},
-}) => {
+  onSelectCancel = noop,
+  onSelectDelete = noop,
+}: ConfirmDeleteModalProps) => {
   const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {

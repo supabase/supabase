@@ -1,13 +1,12 @@
-import { FC } from 'react'
-import { isEmpty } from 'lodash'
 import SqlEditor from 'components/ui/SqlEditor'
+import { isEmpty } from 'lodash'
 import { PolicyTemplate } from './PolicyTemplates.constants'
 
-interface Props {
+interface TemplatePreviewProps {
   selectedTemplate: PolicyTemplate
 }
 
-const TemplatePreview: FC<Props> = ({ selectedTemplate }) => {
+const TemplatePreview = ({ selectedTemplate }: TemplatePreviewProps) => {
   const { id, templateName, description, statement } = selectedTemplate
   return (
     <div className="space-y-8" style={{ width: '70%' }}>

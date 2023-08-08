@@ -1,16 +1,13 @@
 import Link from 'next/link'
-import { FC } from 'react'
-import SVG from 'react-inlinesvg'
 import { useRouter } from 'next/router'
-import { Button, IconKey, IconArchive, IconExternalLink, IconCode, IconActivity } from 'ui'
+import SVG from 'react-inlinesvg'
+import { Button, IconActivity, IconArchive, IconCode, IconExternalLink, IconKey } from 'ui'
 
 import Panel from 'components/ui/Panel'
 import APIKeys from './APIKeys'
 import GetStartedHero from './GetStartedHero'
 
-interface Props {}
-
-const NewProjectPanel: FC<Props> = ({}) => {
+const NewProjectPanel = () => {
   const router = useRouter()
   const { ref } = router.query
 
