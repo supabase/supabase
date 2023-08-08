@@ -5,6 +5,8 @@ const images = {
   '00-pg-server': '/images/launchweek/8/day0/pg-server.png',
   '00-constellation': '/images/launchweek/8/day0/constellation.svg',
   '01-hugging': '/images/launchweek/8/day1/hugging.svg',
+  '02-localdev': '/images/launchweek/8/day2/localdev.svg',
+  '02-localdev-mobile': '/images/launchweek/8/day2/localdev-mobile.svg',
 }
 
 export interface StepProps {
@@ -115,10 +117,21 @@ const days: WeekDayProps[] = [
     description: '',
     d: 2,
     dd: 'Tue',
-    youtube_id: 'cPGxPl1lx4Y',
+    youtube_id: '',
     blogpost: '',
+    twitter_spaces: 'https://twitter.com/i/spaces/1vAxRAvNQyDJl?s=20',
     docs: '',
-    steps: [],
+    steps: [
+      {
+        title: 'Supabase Local Dev: Migrations, Branching, Observability',
+        blog: '/blog/hugging-face-supabase',
+        hackernews: '',
+        video: '',
+        twitter_spaces: 'https://twitter.com/i/spaces/1vAxRAvNQyDJl?s=20',
+        bg_layers: [{ img: images['02-localdev'], mobileImg: images['02-localdev-mobile'] }],
+        steps: [],
+      },
+    ],
   },
   {
     title: '',
