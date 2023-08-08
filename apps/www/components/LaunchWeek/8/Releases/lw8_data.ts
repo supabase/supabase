@@ -103,7 +103,7 @@ const days: WeekDayProps[] = [
       {
         title: 'Hugging Face now supported in Supabase',
         blog: '/blog/hugging-face-supabase',
-        hackernews: '/',
+        hackernews: 'https://news.ycombinator.com/item?id=37035960',
         video: 'https://www.youtube.com/watch?v=RJccSbJ9Go4',
         twitter_spaces: 'https://twitter.com/i/spaces/1DXGyvjkeEeJM',
         bg_layers: [{ img: images['01-hugging'] }],
