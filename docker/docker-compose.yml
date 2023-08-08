@@ -321,7 +321,7 @@ services:
 
   analytics:
     container_name: supabase-analytics
-    image: supabase/logflare:1.3.28
+    image: supabase/logflare:1.4.0
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:4000/health" ]
       timeout: 5s
