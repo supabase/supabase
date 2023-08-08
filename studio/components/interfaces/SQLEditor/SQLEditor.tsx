@@ -241,6 +241,7 @@ const SQLEditor = () => {
           project_id: project?.id,
         })
         snap.addSnippet(snippet as SqlSnippet, ref)
+        snap.addNeedsSaving(snippet.id!)
         router.push(`/project/${ref}/sql/${snippet.id}`)
       } catch (error: any) {
         ui.setNotification({

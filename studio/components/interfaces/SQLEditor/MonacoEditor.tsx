@@ -95,6 +95,7 @@ const MonacoEditor = ({
         })
         if (ref) {
           snap.addSnippet(snippet as SqlSnippet, ref)
+          snap.addNeedsSaving(snippet.id!)
           router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
         }
       }
