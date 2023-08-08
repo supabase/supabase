@@ -42,7 +42,7 @@ const BackupsList = () => {
   }
 
   if (isPitrEnabled) {
-    return <></>
+    return null
   }
 
   return (
