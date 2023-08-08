@@ -117,7 +117,11 @@ const Wrappers = () => {
                           return (
                             <Table.tr key={migration.version}>
                               <Table.td>{migration.version}</Table.td>
-                              <Table.td>{migration.name}</Table.td>
+                              <Table.td
+                                className={migration.name.length === 0 ? '!text-scale-900' : ''}
+                              >
+                                {migration.name ?? 'Name not available'}
+                              </Table.td>
                               <Table.td>{insertedAt}</Table.td>
                               <Table.td align="right">
                                 <Button
