@@ -263,11 +263,7 @@ export default function LW8Releases() {
                               variants={i === 1 ? scaleOpacityVariant : undefined}
                             >
                               <Image
-                                src={
-                                  !!layer.mobileImg && isTablet
-                                    ? (layer.mobileImg as any)
-                                    : layer.img
-                                }
+                                src={layer.img}
                                 className={`
                                   absolute opacity-90
                                   w-full h-full -z-10 transition-all duration-300
