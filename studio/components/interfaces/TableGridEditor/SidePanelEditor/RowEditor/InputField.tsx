@@ -135,7 +135,8 @@ const InputField = ({
           }
           actions={
             <div className="mr-1 mt-0.5">
-              {(field.isNullable || (!field.isNullable && field.defaultValue)) && (
+              {((field.isNullable && !field.value && field.value !== null) ||
+                (!field.isNullable && field.defaultValue && !field.value && field.value !== null)) && (
                 <Button
                   type="default"
                   size="tiny"
