@@ -1,13 +1,12 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Button } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import SchemaForm from './SchemaForm'
 
 export default function SchemaFormPanel({
   schema,
   title,
   model,
-  children = null,
+  children,
   onChangeModel = (model) => {},
   onReset = () => {},
   onSubmit,
