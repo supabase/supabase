@@ -31,7 +31,7 @@ Follow the progress of the [Postgres Language Server on GitHub](https://github.c
 
 ## Observability tools for Postgres
 
-IMAGE GOES HERE
+![Inspect your database](/images/blog/launch-week-8/day-2/inspect-your-database.png)
 
 We’ve added [debugging utilities](https://supabase.com/docs/guides/database/inspect) to our CLI to identify production issues via the `supabase inspect db` command. This interface includes 19 different commands to help you solve everything from slow queries to redundant indexes. 
 
@@ -97,6 +97,8 @@ This is just a starting point for the Supabase inspector. We’ll grow this feat
 
 ## Easier backups
 
+![How to back up your database with SUpabase CLI](/images/blog/launch-week-8/day-2/backup-your-database.png)
+
 We’ve made it even easer to backup and migrate your database, using `supabase db dump`. Under the hood, this simply uses [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) (it is just Postgres, after all). However we also handle a few of the hairy issues that you might need to navigate on your own, like object permissions.
 
 - See full command
@@ -118,6 +120,7 @@ We’ve made it even easer to backup and migrate your database, using `supabase 
 
 ## Improved Database Migrations
 
+![modify your database](/blog/launch-week-8/day-2/modify-your-database.png)
 
 We’ve extended the CLI migration feature and added Dashboard support. Database migrations give you a way to update your database using version-controlled SQL files. We’ve built a lot of tooling around our migrations, including [reparation](https://supabase.com/docs/reference/cli/supabase-migration-repair), migration cleanup using the [squash](https://supabase.com/docs/reference/cli/supabase-migration-squash) command, and [diffing](https://supabase.com/docs/reference/cli/supabase-db-diff) (using [migra](https://github.com/djrobstep/migra)) to generate a new migration or to detect schema drift.
 
@@ -144,7 +147,7 @@ Finally, we’ve added a Migrations view [in the dashboard](https://app.supabase
 
 ## Test and lint your database
 
-IMAGE
+![Test your database](/images/blog/launch-week-8/day-2/test-your-database.png)
 
 We’ve simplified the database testing experience, with `supabase test`. When you run `supabase test new`, we’ll stub out a [pgTAP test](https://pgtap.org/). The CLI includes [pg_prove and TAP harness](https://pgtap.org/pg_prove), so all you need to do is run `supabase test db`. 
 
@@ -182,7 +185,7 @@ Finally, while you wait for us to make progress on the Language Server, we’ve 
 
 ## Database seeding
 
-IMAGE
+![Support for seeding](/images/blog/launch-week-8/day-2/support-for-seeding.png)
 
 Seeding is the process of populating a database with initial data, typically used to provide sample or default records for testing and development purposes. This gives you a reproducible development environment across your entire team.
 
@@ -195,6 +198,8 @@ npx snaplet generate --sql > supabase/seed.sql
 ```
 
 ## Type generators
+
+![End to end Type Safety](/images/blog/launch-week-8/day-2/end-to-end-type-safety.png)
 
 Type generators introspect a PostgreSQL schema and automatically generate TypeScript definitions.  This gives you [end-to-end type safety](https://www.youtube.com/watch?v=VSNgAIObBdw) from the database to the browser.
 
@@ -223,7 +228,7 @@ let movie: Tables<'movies'> = // ...
 
 ## Official GitHub Action
 
-IMAGE
+![Support for GitHub Actions](/images/blog/launch-week-8/day-2/support-for-github-actions.png)
 
 We’ve developed an official [GitHub Action](https://github.com/marketplace/actions/supabase-cli-action) which leverages the CLI. You can [generate types on every PR](https://supabase.com/docs/guides/cli/github-action/generating-types), or run [your tests on every commit](https://supabase.com/docs/guides/cli/github-action/testing).
 
@@ -231,7 +236,7 @@ We’ve developed an official [GitHub Action](https://github.com/marketplace/act
 
 Logs are now accessible locally in the Dashboard. Last launch week we released an open source logging server, with support for BigQuery. In the past few months we’ve added Postgres support to this server. This means that all of your local logs are accessible with no additional config - simply run supabase start and then visit the local dashboard to start debugging.
 
-IMAGE
+![Logs are now accesible locally in the dashboard](/images/blog/launch-week-8/day-2/local-logging-debugging.png)
 
 ## Stable releases
 
@@ -243,9 +248,9 @@ For the adventurous feature hunters, we’ve added a `beta` release channel for 
 
 And finally, probably our most anticipated feature - branching:
 
-IMAGE
+![Branch manager in the Supabase dashboard](/images/blog/launch-week-8/day-2/branching-preview-environments.png)
 
-IMAGE
+![Searching branches with Supabase](/images/blog/launch-week-8/day-2/branching-02.png)
 
 We’ve made big improvements to our local development above - but we have bigger ambitions. For several months we’ve been developing Supabase branching. 
 
