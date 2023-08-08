@@ -1,19 +1,19 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 
-import { useParams } from 'common/hooks'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import OrganizationBillingMigrationPanel from '../GeneralSettings/OrganizationBillingMigrationPanel'
 import BillingAddress from './BillingAddress/BillingAddress'
 import BillingEmail from './BillingEmail'
 import CreditBalance from './CreditBalance'
 import PaymentMethods from './PaymentMethods'
 import ProjectsSummary from './ProjectsSummary'
 import TaxID from './TaxID/TaxID'
-import OrganizationBillingMigrationPanel from '../GeneralSettings/OrganizationBillingMigrationPanel'
-import { ScaffoldContainer, ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 
 const BillingSettings = () => {
   const { ui } = useStore()

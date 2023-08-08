@@ -16,15 +16,23 @@ export type OrganizationCustomerProfileUpdateVariables = {
     postal_code: string | null
     state: string | null
   } | null
+  invoice_settings?: {
+    default_payment_method: string
+  }
 }
 
 export async function updateOrganizationCustomerProfile({
   slug,
   address,
+  invoice_settings,
 }: OrganizationCustomerProfileUpdateVariables) {
   if (!slug) return console.error('Slug is required')
 
-  const response = await patch(`${API_URL}/organizations/${slug}/customer`, { address })
+  const payload: any = {}
+  if (address) payload.address = address
+  if (invoice_settings) payload.invoice_settings = invoice_settings
+
+  const response = await patch(`${API_URL}/organizations/${slug}/customer`, payload)
   if (response.error) throw response.error
   return response
 }
