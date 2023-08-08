@@ -1,6 +1,6 @@
 ---
-title: 'Supabase Studio 3.0: AI SQL Editor, Schema Diagrams, and a Wrappers UI'
-description: Supabase Studio now comes with ChatGPT, and GraphiQL built in, Cascade Deletes, and Foreign Key Selectors, and much more.
+title: 'Supabase Studio 3.0: AI SQL Editor, Schema Diagrams, and new Wrappers'
+description: Supabase Studio now comes with an AI assisted SQL Editor, schema diagrams, and much more.
 launchweek: 8
 tags:
   - launch-week
@@ -9,7 +9,7 @@ tags:
 date: '2023-08-09'
 published_at: '2023-08-09T09:00:00.000-07:00'
 to_depth: 3
-author: alaister,gregnr,joshenlim,jonny,saltcod
+author: alaister,gregnr,jonny,joshenlim,saltcod
 image: launch-week-7/day-5-supabase-studio-2.0/day-5-supabase-studio-2.0-og.jpg
 thumb: launch-week-7/day-5-supabase-studio-2.0/day-5-supabase-studio-2.0-thumb.jpg
 ---
@@ -38,7 +38,7 @@ Here's the highlight reel:
   <li>[**Role Management**](#role-management): — fine-grained access to table data</li>
   <li>[**Shared SQL Snippets**](#shared-sql-snippets): — share your snippets with the team</li>
   <li>[**Database Migration UI**](#database-migration-ui): — your database, with receipts</li>
-  <li>[**Wrappers UI**](#wrappers-ui): — easily query foregin data</li>
+  <li>[**Wrappers UI**](#wrappers-ui): — easily query foreign data</li>
 </ul>
 
 ## Supabase AI, right in the SQL Editor
@@ -61,15 +61,15 @@ Today, we're releasing a huge improvement to our SQL Editor. First up, we've add
 
 ![New query](/images/blog/launch-week-8/day-3/supabase-ai-blank.png)
 
-Supabase AI is aware of the SQL snippet in the editor and can modify it for you. You can ask it to change `customers` to `customer_orders`, for example. You can interact with the code the same way you would converse with ChatGPT until its just right.
+Supabase AI is aware of the SQL snippet in the editor and can modify it for you. You can ask it to change `customers` to `customer_orders`, for example. You can interact with the code the same way you would converse with ChatGPT until it's just right.
 
 ![Create a table](/images/blog/launch-week-8/day-3/create-orders.png)
 
-Next, we've added a diffing view for changes that Supabase AI has made to your SQL snippet. You can tell Supabase AI what you want changed, and visualize is as you would a Git diff. From this view, you can accept or reject the diffs, and keep asking Supabase AI to make changes until you're satisfied.
+Next, we've added a diffing view for changes that Supabase AI has made to your SQL snippet. You can tell Supabase AI what you want changed, and visualize it as you would a Git diff. From this view, you can accept or reject the diffs, and keep asking Supabase AI to make changes until you're satisfied.
 
 ![Create a table diff](/images/blog/launch-week-8/day-3/create-orders-diff.png)
 
-For a long time we've wondered how we could make it easier to teach developers how to use SQL. It's a good thing we didn't solve that problem too fast, because it turns out that AI does a much better job than we could have ourselves.
+We've wondered for a long time how to make it easier to teach developers how to use SQL. It's fortunate we didn't solve this problem too quickly, as it turns out that AI does a much better job than we could do ourselves.
 
 With Supabase AI, you won't even need the whole weekend to scale to millions. Head over to the [SQL Editor](https://supabase.com/dashboard/project/_/sql) and give it a try!
 
@@ -80,7 +80,7 @@ In the coming months we're looking to sprinkle Supabase AI through more parts of
 
 ---
 
-Along with these huge AI features, we also managed to add a bunch of new improvements elsewhere around the Studio. Several of these features have come either from requests from the community, or are contributions by community members themselves.
+Along with these huge AI features, we also added a bunch of new improvements elsewhere around the Studio. Several of these features have come either from requests from the community, or are contributions by community members themselves.
 
 <div className="bg-gray-300 rounded-lg px-6 py-2 italic">
 
@@ -106,7 +106,7 @@ A few months back, we saw this [PR](https://github.com/supabase/supabase/pull/13
 
 ![Role management](/images/blog/launch-week-8/day-3/role-management.png)
 
-Given the security focus of this feature, we want to make sure we do a very thorough job of testing, so we're hoping to make this generally available in the next week or so.
+Due to the security focus of this feature, we want to make sure we do a very thorough job of testing, so we're hoping to make this generally available in the next week or so.
 
 Massive thanks to [HTMHell](https://github.com/HTMHell) (amazing handle btw) for the work on this!
 
