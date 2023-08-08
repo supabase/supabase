@@ -12,7 +12,7 @@ image: launch-week-8/day-2/OG-day2.jpg
 thumb: launch-week-8/day-2/thumb-day2.jpg
 ---
 
-One of our goals at Supabase is to make Postgres development delightful. To do this, we need to simplify the experience between our CLI, your code editor, and the remote Postgres database powering your applications. 
+One of our goals at Supabase is to make Postgres development delightful. To do this, we need to simplify the experience between our CLI, your code editor, and the remote Postgres database powering your applications.
 
 We received feedback recently about our local development experience, encouraging us to improve. This iteration introduces many new features to address that feedback. Let’s jump into a few of the features we’re launching today.
 
@@ -20,7 +20,7 @@ We received feedback recently about our local development experience, encouragin
 
 ![Postgres Language Server](/images/blog/launch-week-8/day-2/postgres-language-server.png)
 
-One of the unique features of Supabase is the ability to access your Postgres database directly from a browser or mobile app through our [Serverless APIs](https://supabase.com/docs/guides/api). This means that developers are writing more [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html). 
+One of the unique features of Supabase is the ability to access your Postgres database directly from a browser or mobile app through our [Serverless APIs](https://supabase.com/docs/guides/api). This means that developers are writing more [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html).
 
 While code editors have great support for most programming languages, the SQL support is underwhelming. We want to make Postgres as simple as Python. Our recently announced [Postgres Language Server](https://github.com/supabase/postgres_lsp) takes us a step in that direction - eventually it will provide first-class support for Postgres in your favorite code editor including: Linting, Syntax Highlighting, Migrations Parsing, SQL Auto-complete, and Intellisense.
 
@@ -32,9 +32,9 @@ Follow the progress of the [Postgres Language Server on GitHub](https://github.c
 
 ![Inspect your database](/images/blog/launch-week-8/day-2/inspect-your-database.png)
 
-We’ve added [debugging utilities](https://supabase.com/docs/guides/database/inspect) to our CLI to identify production issues via the `supabase inspect db` command. This interface includes 19 different commands to help you solve everything from slow queries to redundant indexes. 
+We’ve added [debugging utilities](https://supabase.com/docs/guides/database/inspect) to our CLI to identify production issues via the `supabase inspect db` command. This interface includes 19 different commands to help you solve everything from slow queries to redundant indexes.
 
-A lot of the credit for this belongs to [Heroku’s pg-extras](https://github.com/heroku/heroku-pg-extras) feature, an amazingly useful set of functionality. We’ve adapted the work they started, added a few additional commands, and made it available for any Postgres database. Simply append the `--db-url` param to use these commands with your own Postgres database. 
+A lot of the credit for this belongs to [Heroku’s pg-extras](https://github.com/heroku/heroku-pg-extras) feature, an amazingly useful set of functionality. We’ve adapted the work they started, added a few additional commands, and made it available for any Postgres database. Simply append the `--db-url` param to use these commands with your own Postgres database.
 
 This is just a starting point for the Supabase inspector. We’ll grow this feature to become an essential part of your Postgres toolkit.
 
@@ -152,7 +152,7 @@ Finally, we’ve added a Migrations view [in the dashboard](https://app.supabase
 
 ![Test your database](/images/blog/launch-week-8/day-2/test-your-database.png)
 
-We’ve simplified the database testing experience, with `supabase test`. Runing `supabase test new` stubs out a [pgTAP test](https://pgtap.org/) for you to fill with testing logic. The CLI includes [pg_prove and the TAP harness](https://pgtap.org/pg_prove), so all you need to do is run `supabase test db`. 
+We’ve simplified the database testing experience, with `supabase test`. Runing `supabase test new` stubs out a [pgTAP test](https://pgtap.org/) for you to fill with testing logic. The CLI includes [pg_prove and the TAP harness](https://pgtap.org/pg_prove), so all you need to do is run `supabase test db`.
 
 To make life even easier, our friends at [Basejump](https://usebasejump.com/) have created an entire suite of [Supabase Test Helpers](https://github.com/usebasejump/supabase-test-helpers) which make it simple to create users, run tests as an [authenticated user](https://usebasejump.com/blog/testing-on-supabase-with-pgtap#testing-authenticated), and test your [RLS policies](https://usebasejump.com/blog/testing-on-supabase-with-pgtap#rls-testing).
 
@@ -199,14 +199,14 @@ We’ve added [support for seeding](https://supabase.com/docs/guides/cli/seeding
 We’ve also worked with our friends at Snaplet to [generate seed data](https://supabase.com/docs/guides/cli/seeding-your-database#generating-seed-data) directly from your database:
 
 ```markdown
-npx snaplet generate --sql > supabase/seed.sql 
+npx snaplet generate --sql > supabase/seed.sql
 ```
 
 ## Type generators
 
 ![End to end Type Safety](/images/blog/launch-week-8/day-2/end-to-end-type-safety.png)
 
-Type generators introspect a PostgreSQL schema and automatically generate TypeScript definitions.  This gives you [end-to-end type safety](https://www.youtube.com/watch?v=VSNgAIObBdw) from the database to the browser.
+Type generators introspect a PostgreSQL schema and automatically generate TypeScript definitions. This gives you [end-to-end type safety](https://www.youtube.com/watch?v=VSNgAIObBdw) from the database to the browser.
 
 In the past month, we've added relationship detection in supabase-js. Foreign keys are now included in the generated types so that supabase-js can detect whether a foreign table should be an array (one-to-many) or an object (many-to-one). We've also added Helper Types to improve the developer experience for common scenarios, like short-hand accessors:
 
@@ -265,7 +265,7 @@ Supabase isn’t simply a database, it’s an entire backend - everything from y
 
 ### Supabase branching is hard
 
-Every project is a Postgres database, wrapped in a suite of tools like [Auth](https://supabase.com/auth), [Storage](https://supabase.com/storage), [Edge Functions](https://supabase.com/edge-functions), [Realtime](https://supabase.com/realtime) and [Vectors](https://supabase.com/vector), and encompassed by [API middleware](https://supabase.com/docs/guides/api) and [logs](https://supabase.com/blog/supabase-logs-self-hosted). 
+Every project is a Postgres database, wrapped in a suite of tools like [Auth](https://supabase.com/auth), [Storage](https://supabase.com/storage), [Edge Functions](https://supabase.com/edge-functions), [Realtime](https://supabase.com/realtime) and [Vectors](https://supabase.com/vector), and encompassed by [API middleware](https://supabase.com/docs/guides/api) and [logs](https://supabase.com/blog/supabase-logs-self-hosted).
 
 A good branching solution requires each tool to provide multi-tenancy support so that:
 
@@ -274,7 +274,7 @@ A good branching solution requires each tool to provide multi-tenancy support so
 
 ### How does branching work?
 
-We use Git to bridge the gap between your local development environment and your hosted database. For now, we’ve focused on GitHub. 
+We use Git to bridge the gap between your local development environment and your hosted database. For now, we’ve focused on GitHub.
 
 Every time you open a new Pull Request on GitHub, a corresponding “Preview Environment” is created. Each preview branch is an isolated Firecracker instance that pauses automatically after a period of inactivity. Every time a change is pushed to GitHub, the migrations within the `./supabase/migrations` folder are run against the Preview Branch so that your entire team is working from the same source of truth.
 
@@ -282,13 +282,13 @@ When you hit merge on your Pull Request we run the migrations on your Production
 
 ### What about data?
 
-We’re starting with seed data. Any SQL with  `./supabase/seed.sql` will populate your Preview Branch. This provides your entire team with an isolated and reproducible environment, safe from any data privacy concerns.
+We’re starting with seed data. Any SQL with `./supabase/seed.sql` will populate your Preview Branch. This provides your entire team with an isolated and reproducible environment, safe from any data privacy concerns.
 
-Importantly, we *aren’t* cloning production data until we find something appropriate for data security. We know that copy-on-write is an available option, and with the appropriate anonymization techniques it seems like a promising way to provide a “production-like” test environment. 
+Importantly, we _aren’t_ cloning production data until we find something appropriate for data security. We know that copy-on-write is an available option, and with the appropriate anonymization techniques it seems like a promising way to provide a “production-like” test environment.
 
 We’ll also need to figure out what this means for large files in Supabase Storage. Do you need to anonymize your photos and videos? This is a work in progress and we’re open to feedback.
 
-Either way, we want to support *both* seed data and anonymized production data, so that teams can choose their preference based on their risk profile. It makes sense to start with a seed.
+Either way, we want to support _both_ seed data and anonymized production data, so that teams can choose their preference based on their risk profile. It makes sense to start with a seed.
 
 ### Is it available yet?
 
@@ -307,5 +307,3 @@ If you’re an existing user simply [update your CLI](https://supabase.com/docs/
 - [Coding the stars - an interactive constellation with Three.js and React Three Fiber](https://supabase.com/blog/interactive-constellation-threejs-react-three-fiber)
 - [Why we'll stay remote](https://supabase.com/blog/why-supabase-remote)
 - [Postgres Language Server](https://github.com/supabase/postgres_lsp)
-
-
