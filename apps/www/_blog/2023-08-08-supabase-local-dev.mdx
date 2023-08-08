@@ -284,7 +284,9 @@ When you hit merge on your Pull Request we run the migrations on your Production
 
 We’re starting with seed data. Any SQL with  `./supabase/seed.sql` will populate your Preview Branch. This provides your entire team with an isolated and reproducible environment, safe from any data privacy concerns.
 
-Importantly, we *aren’t* cloning production data until we find something appropriate for data security. We know that copy-on-write is an available option, and with the appropriate anonymization techniques, it seems like a promising way to provide a “production-like” test environment. We’ll also need to figure out what this means for large files in Supabase Storage. Do you need to anonymize your photos and videos? This is a work in progress and we’re open to feedback.
+Importantly, we *aren’t* cloning production data until we find something appropriate for data security. We know that copy-on-write is an available option, and with the appropriate anonymization techniques it seems like a promising way to provide a “production-like” test environment. 
+
+We’ll also need to figure out what this means for large files in Supabase Storage. Do you need to anonymize your photos and videos? This is a work in progress and we’re open to feedback.
 
 Either way, we want to support *both* seed data and anonymized production data, so that teams can choose their preference based on their risk profile. It makes sense to start with a seed.
 
