@@ -1,5 +1,3 @@
-import Link from 'next/link'
-
 export function LaunchWeekLogoHeader() {
   return (
     <div className="flex flex-col gap-1 md:gap-2 items-center justify-end">
@@ -9,18 +7,6 @@ export function LaunchWeekLogoHeader() {
           <span className="block">August 7th–11th, 2023</span>
           <span>9:00 AM PT</span>
         </p>
-        <div className="text-[#9296AA] px-4">
-          Join us in a week of announcing new features. <br className="hidden md:block" />
-          Connect with GitHub to generate your unique ticket and contribute to the constellation.
-          <span className="inline sm:block">
-            {' '}
-            You might also win{' '}
-            <Link href="#lw8-prizes">
-              <a className="underline transition-opacity hover:text-scale-1200">swag</a>
-            </Link>
-            .
-          </span>
-        </div>
       </div>
     </div>
   )

@@ -173,7 +173,7 @@ export const AccordionHeader = ({
   >
     <div
       className={[
-        'flex flex-1',
+        'flex flex-1 sm:flex-none',
         shippable && shipped ? 'items-stretch' : 'flex-row items-center',
       ].join(' ')}
     >
@@ -194,6 +194,24 @@ export const AccordionHeader = ({
               Shipped
             </span>
           </Badge>
+        )}
+        {shippable && shipped && youtube_id && (
+          <div
+            className={[
+              'hover:cursor-pointer hover:!opacity-100',
+              day === 2 ? 'animate-pulse' : '',
+            ].join(' ')}
+          >
+            <ExpandableVideo
+              videoId={youtube_id}
+              trigger={
+                <VideoPreviewTrigger
+                  title={`Watch: Day ${day}`}
+                  thumbnail={videoThumbnail ?? '/images/launchweek/8/lw8-yt-thumb.jpg'}
+                />
+              }
+            />
+          </div>
         )}
       </div>
       {shippable && !shipped && (
@@ -219,24 +237,6 @@ export const AccordionHeader = ({
         </span>
       )}
     </div>
-    {shippable && shipped && youtube_id && (
-      <div
-        className={[
-          'hover:cursor-pointer hover:!opacity-100',
-          day === 2 ? 'animate-pulse' : '',
-        ].join(' ')}
-      >
-        <ExpandableVideo
-          videoId={youtube_id}
-          trigger={
-            <VideoPreviewTrigger
-              title={`Watch: Day ${day}`}
-              thumbnail={videoThumbnail ?? '/images/launchweek/8/lw8-yt-thumb.jpg'}
-            />
-          }
-        />
-      </div>
-    )}
   </div>
 )
 
@@ -248,7 +248,6 @@ export const VideoPreviewTrigger = ({
   thumbnail: string
 }) => (
   <div className="flex items-center h-full gap-3 text-xs group/vid text-scale-1100 hover:text-scale-1200 transition-colors">
-    {title && <span>{title}</span>}
     <div className="relative h-10 !aspect-video flex items-center justify-center rounded overflow-hidden border border-scale-1000 opacity-80 group-hover/vid:opacity-100 transition-colors">
       <div className="absolute z-10 w-2.5 h-2.5 text-white opacity-100">
         <svg viewBox="0 0 81 91" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -266,6 +265,7 @@ export const VideoPreviewTrigger = ({
         // className="blur-sm"
       />
     </div>
+    {title && <span>{title}</span>}
   </div>
 )
 
