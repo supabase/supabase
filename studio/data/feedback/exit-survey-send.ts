@@ -10,6 +10,7 @@ export type SendDowngradeFeedbackVariables = {
   orgSlug?: string
   reasons: string
   message: string
+  exitAction: 'downgrade' | 'delete'
 }
 
 export async function sendDowngradeFeedback({
