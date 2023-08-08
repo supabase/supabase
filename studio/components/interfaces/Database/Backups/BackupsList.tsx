@@ -41,14 +41,14 @@ const BackupsList = () => {
     )
   }
 
+  if (isPitrEnabled) {
+    return <></>
+  }
+
   return (
     <div className="space-y-6">
       {!sortedBackups?.length && tierKey !== 'FREE' ? (
-        !isPitrEnabled ? (
-          <BackupsEmpty />
-        ) : (
-          <></>
-        )
+        <BackupsEmpty />
       ) : (
         <>
           {!canTriggerScheduledBackups && (
