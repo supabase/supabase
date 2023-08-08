@@ -165,7 +165,6 @@ const SQLEditor = () => {
   const snapOffset = 50
 
   const isLoading = !(id && ref && snap.loaded[ref])
-  const isUtilityPanelCollapsed = (snippet?.splitSizes?.[1] ?? 0) === 0
 
   const onDragEnd = useCallback(
     (sizes: number[]) => {
@@ -711,7 +710,6 @@ const SQLEditor = () => {
           minSize={minSize}
           snapOffset={snapOffset}
           expandToMin={true}
-          collapsed={isUtilityPanelCollapsed ? 1 : undefined}
           onDragEnd={onDragEnd}
         >
           <div className="flex-grow overflow-y-auto border-b">
