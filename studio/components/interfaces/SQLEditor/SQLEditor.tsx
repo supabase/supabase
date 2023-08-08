@@ -2,7 +2,7 @@ import { useParams, useTelemetryProps } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import Split from 'react-split'
 import { format } from 'sql-formatter'
 import {
@@ -85,7 +85,11 @@ const SQLEditor = () => {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
 
-  const [id] = useState(!urlId || urlId === 'new' ? uuidv4() : urlId)
+  // generate an id to be used for new snippets. The dependency on urlId is to avoid a bug which
+  // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
+  const generatedId = useMemo(() => uuidv4(), [urlId])
+  // the id is stable across renders - it depends either on the url or on the memoized generated id
+  const id = !urlId || urlId === 'new' ? generatedId : urlId
 
   const { profile } = useProfile()
   const project = useSelectedProject()
