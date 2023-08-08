@@ -77,6 +77,7 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
           projectRef,
           message,
           reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+          exitAction: 'delete',
         })
       }
 

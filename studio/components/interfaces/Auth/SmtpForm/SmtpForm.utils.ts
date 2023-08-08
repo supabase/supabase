@@ -12,7 +12,7 @@ export const isSmtpEnabled = (config?: Partial<AuthConfig>): boolean => {
     config?.SMTP_HOST &&
     config?.SMTP_PASS &&
     config?.SMTP_PORT &&
-    (config?.SMTP_MAX_FREQUENCY ?? 0) > 0
+    (config?.SMTP_MAX_FREQUENCY ?? 0) >= 0
   )
 }
 
