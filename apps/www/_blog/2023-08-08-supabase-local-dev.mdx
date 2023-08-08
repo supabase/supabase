@@ -152,7 +152,7 @@ Finally, we’ve added a Migrations view [in the dashboard](https://app.supabase
 
 ![Test your database](/images/blog/launch-week-8/day-2/test-your-database.png)
 
-We’ve simplified the database testing experience, with `supabase test`. When you run `supabase test new`, we’ll stub out a [pgTAP test](https://pgtap.org/). The CLI includes [pg_prove and TAP harness](https://pgtap.org/pg_prove), so all you need to do is run `supabase test db`. 
+We’ve simplified the database testing experience, with `supabase test`. Runing `supabase test new` stubs out a [pgTAP test](https://pgtap.org/) for you to fill with testing logic. The CLI includes [pg_prove and the TAP harness](https://pgtap.org/pg_prove), so all you need to do is run `supabase test db`. 
 
 To make life even easier, our friends at [Basejump](https://usebasejump.com/) have created an entire suite of [Supabase Test Helpers](https://github.com/usebasejump/supabase-test-helpers) which make it simple to create users, run tests as an [authenticated user](https://usebasejump.com/blog/testing-on-supabase-with-pgtap#testing-authenticated), and test your [RLS policies](https://usebasejump.com/blog/testing-on-supabase-with-pgtap#rls-testing).
 
