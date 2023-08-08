@@ -140,13 +140,11 @@ export default function TicketHome({ users, meetups }: Props) {
             <div className="relative">
               <div className="relative z-10">
                 <SectionContainer className="relative flex flex-col justify-around items-center min-h-[500px] !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !px-0 !mx-auto">
-                  <div className="absolute bottom-0 z-10 w-full justify-center flex items-end">
+                  <div className="absolute bottom-0 z-10 w-full flex flex-col items-center justify-end gap-4">
                     <LaunchWeekLogoHeader />
+                    <LWAnnouncement isLaunchWeekPage />
                   </div>
                   <div className="absolute inset-0 z-0 flex items-center justify-center">
-                    <div className="absolute z-40 w-full flex justify-center -translate-y-8 px-6">
-                      <LWAnnouncement isLaunchWeekPage />
-                    </div>
                     <AnimatedParticles />
                     <Image
                       src="/images/launchweek/8/stars.svg"
