@@ -82,9 +82,12 @@ export function useSqlEditor() {
 
 const SQLEditor = () => {
   const { ui } = useStore()
-  const { ref, id } = useParams()
+  const { ref, id: urlId } = useParams()
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
+
+  const [id] = useState(urlId === 'new' ? uuidv4() : urlId)
+
   const { profile } = useProfile()
   const project = useSelectedProject()
   const snap = useSqlEditorStateSnapshot()
