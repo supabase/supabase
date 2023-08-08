@@ -22,7 +22,7 @@ We received feedback recently about our local development experience, encouragin
 
 One of the unique features of Supabase is the ability to access your Postgres database directly from a browser or mobile app through our [Serverless APIs](https://supabase.com/docs/guides/api). This means that developers are writing more [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html).
 
-While code editors have great support for most programming languages, the SQL support is underwhelming. We want to make Postgres as simple as Python. Our recently announced [Postgres Language Server](https://github.com/supabase/postgres_lsp) takes us a step in that direction - eventually it will provide first-class support for Postgres in your favorite code editor including: Linting, Syntax Highlighting, Migrations Parsing, SQL Auto-complete, and Intellisense.
+While code editors have great support for most programming languages, SQL support is underwhelming. We want to make Postgres as simple as Python. Our recently announced [Postgres Language Server](https://github.com/supabase/postgres_lsp) takes us a step in that direction - eventually it will provide first-class support for Postgres in your favorite code editor including Linting, Syntax Highlighting, Migrations Parsing, SQL Auto-complete, and Intellisense.
 
 The Postgres Language Server is not ready for Production just yet. The majority of work is still ahead, but we've verified that the technical approach works and we're making it public now so that we can develop it in the open with input from the community. We’re already receiving amazing [feedback](https://github.com/supabase/postgres_lsp/discussions) and [support](https://news.ycombinator.com/item?id=37020610).
 
@@ -41,6 +41,7 @@ This is just a starting point for the Supabase inspector. We’ll grow this feat
 <details>
 <summary>See full command</summary>
   <div>
+
     {/* prettier-ignore */}
     ```markdown
     supabase inspect db --help
@@ -75,29 +76,32 @@ This is just a starting point for the Supabase inspector. We’ll grow this feat
 </details>
 
 <details>
-<summary>Read the docs</summary>
-<div>
+  <summary>Read the docs</summary>
 
-- [Show most frequently run queries](https://supabase.com/docs/reference/cli/supabase-inspect-db-calls)
-- [Show long running queries](https://supabase.com/docs/reference/cli/supabase-inspect-db-long-running-queries)
-- [Show queries ordered by total execution time](https://supabase.com/docs/reference/cli/supabase-inspect-db-outliers)
-- [Show queries waiting and holding locks](https://supabase.com/docs/reference/cli/supabase-inspect-db-blocking) - [Show queries taking exclusive locks](https://supabase.com/docs/reference/cli/supabase-inspect-db-locks)
-- [Show total size of all indexes](https://supabase.com/docs/reference/cli/supabase-inspect-db-total-index-size)
-- [Show sizes of individual indexes](https://supabase.com/docs/reference/cli/supabase-inspect-db-index-sizes)
-- [Show information about index efficiency](https://supabase.com/docs/reference/cli/supabase-inspect-db-index-usage)
-- [Show indexes with low usage](https://supabase.com/docs/reference/cli/supabase-inspect-db-unused-indexes)
-- [Show total size of all tables](https://supabase.com/docs/reference/cli/supabase-inspect-db-total-table-sizes)
-- [Show sizes of individual tables](https://supabase.com/docs/reference/cli/supabase-inspect-db-table-sizes)
-- [Show index sizes of individual tables](https://supabase.com/docs/reference/cli/supabase-inspect-db-table-index-sizes)
-- [Show cache hit rates for tables and indices](https://supabase.com/docs/reference/cli/supabase-inspect-db-cache-hit)
-- [Show estimated number of rows per table](https://supabase.com/docs/reference/cli/supabase-inspect-db-table-record-counts)
-- [Show number of sequential scans for all tables](https://supabase.com/docs/reference/cli/supabase-inspect-db-seq-scans)
-- [Show information about replication slots](https://supabase.com/docs/reference/cli/supabase-inspect-db-replication-slots)
-- [Show number of active connections](https://supabase.com/docs/reference/cli/supabase-inspect-db-role-connections)
-- [Show estimated database bloat](https://supabase.com/docs/reference/cli/supabase-inspect-db-bloat) -
-- [Show statistics related to vacuum operations](https://supabase.com/docs/reference/cli/supabase-inspect-db-vacuum-stats)
+{/* prettier-ignore */}
+  <div>
 
-</div>
+    - [Show most frequently run queries](https://supabase.com/docs/reference/cli/supabase-inspect-db-calls)
+    - [Show long running queries](https://supabase.com/docs/reference/cli/supabase-inspect-db-long-running-queries)
+    - [Show queries ordered by total execution time](https://supabase.com/docs/reference/cli/supabase-inspect-db-outliers)
+    - [Show queries waiting and holding locks](https://supabase.com/docs/reference/cli/supabase-inspect-db-blocking)
+    - [Show queries taking exclusive locks](https://supabase.com/docs/reference/cli/supabase-inspect-db-locks)
+    - [Show total size of all indexes](https://supabase.com/docs/reference/cli/supabase-inspect-db-total-index-size)
+    - [Show sizes of individual indexes](https://supabase.com/docs/reference/cli/supabase-inspect-db-index-sizes)
+    - [Show information about index efficiency](https://supabase.com/docs/reference/cli/supabase-inspect-db-index-usage)
+    - [Show indexes with low usage](https://supabase.com/docs/reference/cli/supabase-inspect-db-unused-indexes)
+    - [Show total size of all tables](https://supabase.com/docs/reference/cli/supabase-inspect-db-total-table-sizes)
+    - [Show sizes of individual tables](https://supabase.com/docs/reference/cli/supabase-inspect-db-table-sizes)
+    - [Show index sizes of individual tables](https://supabase.com/docs/reference/cli/supabase-inspect-db-table-index-sizes)
+    - [Show cache hit rates for tables and indices](https://supabase.com/docs/reference/cli/supabase-inspect-db-cache-hit)
+    - [Show estimated number of rows per table](https://supabase.com/docs/reference/cli/supabase-inspect-db-table-record-counts)
+    - [Show number of sequential scans for all tables](https://supabase.com/docs/reference/cli/supabase-inspect-db-seq-scans)
+    - [Show information about replication slots](https://supabase.com/docs/reference/cli/supabase-inspect-db-replication-slots)
+    - [Show number of active connections](https://supabase.com/docs/reference/cli/supabase-inspect-db-role-connections)
+    - [Show estimated database bloat](https://supabase.com/docs/reference/cli/supabase-inspect-db-bloat)
+    - [Show statistics related to vacuum operations](https://supabase.com/docs/reference/cli/supabase-inspect-db-vacuum-stats)
+
+  </div>
 </details>
 
 ## Easier backups
@@ -131,7 +135,7 @@ We’ve made it even easer to backup and migrate your database, using `supabase 
 
 ## Improved Database Migrations
 
-![modify your database](/blog/launch-week-8/day-2/modify-your-database.png)
+![modify your database](/images/blog/launch-week-8/day-2/modify-your-database.png)
 
 We’ve extended the CLI migration feature and added Dashboard support. Database migrations give you a way to update your database using version-controlled SQL files. We’ve built a lot of tooling around our migrations, including [reparation](https://supabase.com/docs/reference/cli/supabase-migration-repair), migration cleanup using the [squash](https://supabase.com/docs/reference/cli/supabase-migration-squash) command, and [diffing](https://supabase.com/docs/reference/cli/supabase-db-diff) (using [migra](https://github.com/djrobstep/migra)) to generate a new migration or to detect schema drift.
 
@@ -187,6 +191,7 @@ Finally, while you wait for us to make progress on the Language Server, we’ve 
       db          Tests local database with pgTAP
       new         Create a new test file
     ````
+
     {/* prettier-ignore */}
     ```markdown
     supabase db lint
