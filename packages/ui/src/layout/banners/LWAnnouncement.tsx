@@ -78,10 +78,10 @@ const LWAnnouncement = ({
                       />
                     </svg>
                   </div>
-                  <span className="text-foreground">Launch Week 8: Day 1</span>
+                  <span className="text-foreground">Launch Week 8: Day 2</span>
                 </div>
                 <span className="text-foreground-light">
-                  Hugging Face now supported in Supabase
+                  Supabase Local Dev: Migrations, Branching, Observability
                 </span>
               </div>
             </div>
