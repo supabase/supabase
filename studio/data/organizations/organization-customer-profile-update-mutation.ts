@@ -67,7 +67,7 @@ export const useOrganizationCustomerProfileUpdateMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to update billing address: ${data.message}`)
+        toast.error(`Failed to update customer profile: ${data.message}`)
       } else {
         onError(data, variables, context)
       }
