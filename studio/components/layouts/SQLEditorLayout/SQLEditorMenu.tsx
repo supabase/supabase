@@ -146,11 +146,6 @@ const SideBarContent = observer(() => {
             <div className="space-y-6 px-3">
               <div>
                 <ProductMenuItem
-                  name="Build with AI"
-                  isActive={router.asPath === `/project/${ref}/sql/new`}
-                  url={`/project/${ref}/sql/new`}
-                />
-                <ProductMenuItem
                   name="Templates"
                   isActive={router.asPath === `/project/${ref}/sql/templates`}
                   url={`/project/${ref}/sql/templates`}
