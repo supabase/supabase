@@ -1,6 +1,6 @@
 const images = {
   yt_thumbnail: '/images/launchweek/8/lw8-yt-thumb.jpg',
-  day_1_thumb: '/images/launchweek/8/day1/day-01-thumb.jpg',
+  day_1_thumb: '/images/launchweek/8/day1/yt_d1.jpg',
   day_2_thumb: '/images/launchweek/8/day2/yt_d2.jpg',
   '00-stay-remote': '/images/launchweek/8/day0/remote.png',
   '00-pg-server': '/images/launchweek/8/day0/pg-server.png',
