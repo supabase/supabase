@@ -1,18 +1,22 @@
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { Button, IconPlus } from 'ui'
 
+import { useIsNavigationPreviewEnabled } from 'components/interfaces/App/FeaturePreviewContext'
+import NoProjectsOnPaidOrgInfo from 'components/interfaces/BillingV2/NoProjectsOnPaidOrgInfo'
 import ProjectCard from 'components/interfaces/Home/ProjectList/ProjectCard'
 import ShimmeringCard from 'components/interfaces/Home/ProjectList/ShimmeringCard'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
 import { NextPageWithLayout } from 'types'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import NoProjectsOnPaidOrgInfo from 'components/interfaces/BillingV2/NoProjectsOnPaidOrgInfo'
 
 const ProjectsPage: NextPageWithLayout = () => {
+  const router = useRouter()
   const {
     data: allProjects,
     error: projectsError,
@@ -30,6 +34,12 @@ const ProjectsPage: NextPageWithLayout = () => {
   const githubConnections = integrations
     ?.filter((integration) => integration.integration.name === 'GitHub')
     .flatMap((integration) => integration.connections)
+
+  const isNavigationPreviewEnabled = useIsNavigationPreviewEnabled()
+
+  useEffect(() => {
+    if (!isNavigationPreviewEnabled) router.push('/projects')
+  }, [isNavigationPreviewEnabled])
 
   return (
     <ScaffoldContainer className="h-full overflow-y-auto">

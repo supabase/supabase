@@ -3,8 +3,8 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 import { Tabs } from 'ui'
 
-import { useFlag, useLocalStorage, useSelectedOrganization } from 'hooks'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useIsNavigationPreviewEnabled } from 'components/interfaces/App/FeaturePreviewContext'
+import { useFlag, useSelectedOrganization } from 'hooks'
 import { AccountLayout } from './'
 import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
 import SettingsLayout from './SettingsLayout/SettingsLayout'
@@ -16,18 +16,12 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const id = router.asPath.split('/').at(-1)?.split('?')[0]?.split('#')[0]
   const isOrgBilling = !!selectedOrganization?.subscription_id
 
-  const navLayoutV2 = useFlag('navigationLayoutV2')
   const showOAuthApps = useFlag('oauthApps')
   const showAuditLogs = useFlag('auditLogs')
   const showIntegrationsV2 = useFlag('integrationsV2')
+  const isNavigationPreviewEnabled = useIsNavigationPreviewEnabled()
 
-  const [navigationPreview] = useLocalStorage(
-    LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT,
-    'false'
-  )
-  const useNewNavigationLayout = navLayoutV2 && navigationPreview === 'true'
-
-  if (useNewNavigationLayout) {
+  if (isNavigationPreviewEnabled) {
     return <SettingsLayout>{children}</SettingsLayout>
   }
 

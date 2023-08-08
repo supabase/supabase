@@ -1,5 +1,7 @@
+import { useTheme } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import {
   DropdownMenuContent_Shadcn_,
   DropdownMenuGroup_Shadcn_,
@@ -15,18 +17,22 @@ import {
   useCommandMenu,
 } from 'ui'
 
-import { useTheme } from 'common'
 import { useSignOut } from 'lib/auth'
+import { detectOS } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { useState } from 'react'
+import { useFlag } from 'hooks'
+import { useAppUiStateSnapshot } from 'state/app'
 
 const UserSettingsDropdown = () => {
-  const signOut = useSignOut()
+  const os = detectOS()
   const router = useRouter()
-  const [open, setOpen] = useState(false)
+  const signOut = useSignOut()
   const { profile } = useProfile()
-  const { setIsOpen: setCommandMenuOpen } = useCommandMenu()
+  const snap = useAppUiStateSnapshot()
+  const [open, setOpen] = useState(false)
   const { isDarkMode, toggleTheme } = useTheme()
+  const { setIsOpen: setCommandMenuOpen } = useCommandMenu()
+  const navLayoutV2 = useFlag('navigationLayoutV2')
 
   const onClickLogout = async () => {
     await signOut()
@@ -53,6 +59,7 @@ const UserSettingsDropdown = () => {
           </div>
 
           <DropdownMenuSeparator_Shadcn_ />
+
           <Link passHref href="/account/me">
             <DropdownMenuItem_Shadcn_
               className="cursor-pointer"
@@ -65,6 +72,7 @@ const UserSettingsDropdown = () => {
               <a>Preferences</a>
             </DropdownMenuItem_Shadcn_>
           </Link>
+
           <Link passHref href="/account/tokens">
             <DropdownMenuItem_Shadcn_
               className="cursor-pointer"
@@ -77,7 +85,9 @@ const UserSettingsDropdown = () => {
               <a>Access tokens</a>
             </DropdownMenuItem_Shadcn_>
           </Link>
+
           <DropdownMenuSeparator_Shadcn_ />
+
           <DropdownMenuItem_Shadcn_
             className="cursor-pointer"
             onSelect={() => {
@@ -86,10 +96,30 @@ const UserSettingsDropdown = () => {
             }}
           >
             <span>Command menu</span>
-            <DropdownMenuShortcut_Shadcn_>⌘K</DropdownMenuShortcut_Shadcn_>
+            <DropdownMenuShortcut_Shadcn_>
+              {os === 'macos' ? '⌘' : 'CTRL '}K
+            </DropdownMenuShortcut_Shadcn_>
           </DropdownMenuItem_Shadcn_>
+
+          {navLayoutV2 && (
+            <>
+              <DropdownMenuSeparator_Shadcn_ />
+              <DropdownMenuItem_Shadcn_
+                className="cursor-pointer"
+                onSelect={() => {
+                  setOpen(false)
+                  snap.setShowFeaturePreviewModal(true)
+                }}
+              >
+                <span>Feature preview</span>
+              </DropdownMenuItem_Shadcn_>
+            </>
+          )}
+
           <DropdownMenuSeparator_Shadcn_ />
+
           <DropdownMenuLabel_Shadcn_>Theme</DropdownMenuLabel_Shadcn_>
+
           <DropdownMenuRadioGroup_Shadcn_
             value={isDarkMode ? 'dark' : 'light'}
             onValueChange={(x) => {
@@ -102,6 +132,7 @@ const UserSettingsDropdown = () => {
           </DropdownMenuRadioGroup_Shadcn_>
 
           <DropdownMenuSeparator_Shadcn_ />
+
           <DropdownMenuItem_Shadcn_
             className="cursor-pointer"
             onClick={() => {

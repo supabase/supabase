@@ -2,9 +2,13 @@ import { proxy, snapshot, useSnapshot } from 'valtio'
 
 export const appUiState = proxy({
   showEnableBranchingModal: false,
+  showFeaturePreviewModal: false,
 
   setShowEnableBranchingModal: (value: boolean) => {
     appUiState.showEnableBranchingModal = value
+  },
+  setShowFeaturePreviewModal: (value: boolean) => {
+    appUiState.showFeaturePreviewModal = value
   },
 })
 

@@ -54,6 +54,8 @@ import Favicons from 'components/head/Favicons'
 import { IS_PLATFORM } from 'lib/constants'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
+import FeaturePreviewModal from 'components/interfaces/App/FeaturePreviewModal'
+import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreviewContext'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -148,7 +150,10 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       <ThemeProvider>
                         <CommandMenuWrapper>
                           <AppBannerWrapper>
-                            {getLayout(<Component {...pageProps} />)}
+                            <FeaturePreviewContextProvider>
+                              {getLayout(<Component {...pageProps} />)}
+                              <FeaturePreviewModal />
+                            </FeaturePreviewContextProvider>
                           </AppBannerWrapper>
                         </CommandMenuWrapper>
                       </ThemeProvider>

@@ -1,11 +1,12 @@
-import { useFlag, useLocalStorage } from 'hooks'
 import { isUndefined } from 'lodash'
 import Link from 'next/link'
 import { ReactNode } from 'react'
 import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
+
+import { useIsNavigationPreviewEnabled } from 'components/interfaces/App/FeaturePreviewContext'
+import { useFlag } from 'hooks'
 import LayoutHeader from '../ProjectLayout/LayoutHeader'
 import { SidebarLink, SidebarSection } from './AccountLayout.types'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 interface WithSidebarProps {
   title: string
@@ -41,14 +42,8 @@ const WithSidebar = ({
 }: WithSidebarProps) => {
   const noContent = !sections && !customSidebarContent
   const ongoingIncident = useFlag('ongoingIncident')
-  const navLayoutV2 = useFlag('navigationLayoutV2')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
-
-  const [navigationPreview] = useLocalStorage(
-    LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT,
-    'false'
-  )
-  const useNewNavigationLayout = navLayoutV2 && navigationPreview === 'true'
+  const isNavigationPreviewEnabled = useIsNavigationPreviewEnabled()
 
   return (
     <div className="flex max-h-full">
@@ -97,7 +92,7 @@ const WithSidebar = ({
         </div>
       )}
       <div className="flex flex-1 flex-col">
-        {!useNewNavigationLayout && <LayoutHeader breadcrumbs={breadcrumbs} />}
+        {!isNavigationPreviewEnabled && <LayoutHeader breadcrumbs={breadcrumbs} />}
         <div className="flex-1 flex-grow overflow-auto">{children}</div>
       </div>
     </div>
@@ -111,7 +106,11 @@ interface SectionWithHeadersProps {
   subitemsParentKey?: number
 }
 
-const SectionWithHeaders = ({ section, subitems, subitemsParentKey }: SectionWithHeadersProps) => (
+export const SectionWithHeaders = ({
+  section,
+  subitems,
+  subitemsParentKey,
+}: SectionWithHeadersProps) => (
   <div key={section.heading} className="border-b py-5 px-6 border-scale-500">
     {section.heading && <Menu.Group title={section.heading} />}
     {section.versionLabel && (

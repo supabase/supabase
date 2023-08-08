@@ -1,3 +1,4 @@
+import { useIsNavigationPreviewEnabled } from 'components/interfaces/App/FeaturePreviewContext'
 import ProjectList from 'components/interfaces/Home/ProjectList'
 import { AccountLayout } from 'components/layouts'
 import OrganizationDropdown from 'components/to-be-cleaned/Dropdown/OrganizationDropdown'
@@ -24,17 +25,11 @@ const ProjectsPage: NextPageWithLayout = () => {
 
   const { isLoading: isProfileLoading } = useProfile()
   const isLoading = isOrganizationLoading || isProfileLoading
-  const navLayoutV2 = useFlag('navigationLayoutV2')
   const hasWindowLoaded = typeof window !== 'undefined'
-
-  const [navigationPreview] = useLocalStorage(
-    LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT,
-    'false'
-  )
-  const useNewNavigationLayout = navLayoutV2 && navigationPreview === 'true'
+  const isNavigationPreviewEnabled = useIsNavigationPreviewEnabled()
 
   useEffect(() => {
-    if (useNewNavigationLayout && isSuccess && hasWindowLoaded) {
+    if (isNavigationPreviewEnabled && isSuccess && hasWindowLoaded) {
       const localStorageSlug = localStorage.getItem(
         LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION
       )
@@ -44,11 +39,11 @@ const ProjectsPage: NextPageWithLayout = () => {
       else if (localStorageSlug && verifiedSlug) router.push(`/org/${localStorageSlug}`)
       else router.push(`/org/${organizations[0].slug}`)
     }
-  }, [useNewNavigationLayout, isSuccess, hasWindowLoaded])
+  }, [isNavigationPreviewEnabled, isSuccess, hasWindowLoaded])
 
   return (
     <>
-      {useNewNavigationLayout && isLoading && (
+      {isNavigationPreviewEnabled && isLoading && (
         <div className={`flex items-center justify-center h-full`}>
           <Connecting />
         </div>
@@ -57,14 +52,14 @@ const ProjectsPage: NextPageWithLayout = () => {
       {isError && (
         <div
           className={`py-4 px-5 ${
-            useNewNavigationLayout ? 'h-full flex items-center justify-center' : ''
+            isNavigationPreviewEnabled ? 'h-full flex items-center justify-center' : ''
           }`}
         >
           <AlertError subject="Failed to retrieve organizations" />
         </div>
       )}
 
-      {!useNewNavigationLayout && isSuccess && (
+      {!isNavigationPreviewEnabled && isSuccess && (
         <div className="py-4 px-5">
           {IS_PLATFORM && (
             <div className="my-2">

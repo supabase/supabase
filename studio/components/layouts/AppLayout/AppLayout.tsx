@@ -1,25 +1,16 @@
 import { PropsWithChildren } from 'react'
 
+import { useFlag } from 'hooks'
 import AppHeader from './AppHeader'
-import { useFlag, useLocalStorage } from 'hooks'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 const AppLayout = ({ children }: PropsWithChildren<{}>) => {
-  const navLayoutV2 = useFlag('navigationLayoutV2')
   const ongoingIncident = useFlag('ongoingIncident')
-
-  const [navigationPreview] = useLocalStorage(
-    LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT,
-    'false'
-  )
-  const useNewNavigationLayout = navLayoutV2 && navigationPreview === 'true'
-
-  const appHeaderHeight = useNewNavigationLayout ? 49 : 0
+  const appHeaderHeight = 49
   const incidentBannerHeight = 44
 
   return (
     <div>
-      {useNewNavigationLayout && <AppHeader />}
+      <AppHeader />
       <div
         style={{
           height: ongoingIncident

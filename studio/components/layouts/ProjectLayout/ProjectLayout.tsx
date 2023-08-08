@@ -11,10 +11,10 @@ import {
   useSelectedProject,
   withAuth,
 } from 'hooks'
-import { PROJECT_STATUS, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
+import AppLayout from '../AppLayout/AppLayout'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
-import LayoutHeader from './LayoutHeader'
 import NavigationBar from './NavigationBar/NavigationBar'
 import PausingState from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
@@ -22,7 +22,6 @@ import { ProjectContextProvider } from './ProjectContext'
 import ProjectPausedState from './ProjectPausedState'
 import RestoringState from './RestoringState'
 import UpgradingState from './UpgradingState'
-import AppLayout from '../AppLayout/AppLayout'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -73,13 +72,6 @@ const ProjectLayout = ({
   const projectName = selectedProject?.name
   const organizationName = selectedOrganization?.name
 
-  const navLayoutV2 = useFlag('navigationLayoutV2')
-  const [navigationPreview] = useLocalStorage(
-    LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT,
-    'false'
-  )
-  const useNewNavigationLayout = navLayoutV2 && navigationPreview === 'true'
-
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
   const ignorePausedState =
     router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
@@ -114,7 +106,6 @@ const ProjectLayout = ({
           )}
 
           <main className="flex flex-col flex-1 w-full overflow-x-hidden">
-            {!useNewNavigationLayout && !hideHeader && IS_PLATFORM && <LayoutHeader />}
             {showPausedState ? (
               <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
                 <div className="w-full">
@@ -232,13 +223,6 @@ export const ProjectLayoutNonBlocking = ({
     router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
   const showPausedState = isPaused && !ignorePausedState
 
-  const navLayoutV2 = useFlag('navigationLayoutV2')
-  const [navigationPreview] = useLocalStorage(
-    LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT,
-    'false'
-  )
-  const useNewNavigationLayout = navLayoutV2 && navigationPreview === 'true'
-
   return (
     <AppLayout>
       <ProjectContextProvider projectRef={projectRef}>
@@ -257,7 +241,6 @@ export const ProjectLayoutNonBlocking = ({
           )}
 
           <main className="flex w-full flex-1 flex-col overflow-x-hidden">
-            {!useNewNavigationLayout && !hideHeader && IS_PLATFORM && <LayoutHeader />}
             {showPausedState ? (
               <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
                 <div className="w-full">

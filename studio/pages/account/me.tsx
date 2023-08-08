@@ -1,6 +1,5 @@
 import {
   AccountInformation,
-  InterfacePreviews,
   Profile,
   ThemeSettings,
 } from 'components/interfaces/Account/Preferences'
@@ -8,12 +7,10 @@ import { AccountLayout } from 'components/layouts'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useFlag } from 'hooks'
 import { useProfile } from 'lib/profile'
 import { NextPageWithLayout } from 'types'
 
 const User: NextPageWithLayout = () => {
-  const navLayoutV2 = useFlag('navigationLayoutV2')
   const { profile, error, isLoading, isError, isSuccess } = useProfile()
 
   return (
@@ -49,12 +46,6 @@ const User: NextPageWithLayout = () => {
         <section>
           <ThemeSettings />
         </section>
-
-        {navLayoutV2 && (
-          <section>
-            <InterfacePreviews />
-          </section>
-        )}
       </article>
     </div>
   )

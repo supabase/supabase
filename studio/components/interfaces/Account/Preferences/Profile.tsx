@@ -27,6 +27,7 @@ const Profile = () => {
   }
 
   return (
+    // @ts-ignore
     <SchemaFormPanel
       title="Profile"
       schema={{
