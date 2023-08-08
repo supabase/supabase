@@ -38,9 +38,7 @@ A lot of the credit for this belongs to [Heroku’s pg-extras](https://github.co
 
 This is just a starting point for the Supabase inspector. We’ll grow this feature to become an essential part of your Postgres toolkit.
 
-<details>
-<summary>See full command</summary>
-  <div>
+<BlogCollapsible title="See full command">
 
     {/* prettier-ignore */}
     ```markdown
@@ -72,12 +70,11 @@ This is just a starting point for the Supabase inspector. We’ll grow this feat
       vacuum-stats         Show statistics related to vacuum operations per table
     ```
 
-  </div>
-</details>
+</BlogCollapsible>
 
-<details>
-  <summary>Read the docs</summary>
-  {/* prettier-ignore */}
+<BlogCollapsible title="Read the docs">
+
+{/* prettier-ignore */}
   <div>
     - [Show most frequently run queries](https://supabase.com/docs/reference/cli/supabase-inspect-db-calls)
     - [Show long running queries](https://supabase.com/docs/reference/cli/supabase-inspect-db-long-running-queries)
@@ -99,7 +96,8 @@ This is just a starting point for the Supabase inspector. We’ll grow this feat
     - [Show estimated database bloat](https://supabase.com/docs/reference/cli/supabase-inspect-db-bloat)
     - [Show statistics related to vacuum operations](https://supabase.com/docs/reference/cli/supabase-inspect-db-vacuum-stats)
   </div>
-</details>
+
+</BlogCollapsible>
 
 ## Easier backups
 
@@ -107,12 +105,11 @@ This is just a starting point for the Supabase inspector. We’ll grow this feat
 
 We’ve made it even easer to backup and migrate your database, using `supabase db dump`. Under the hood, this simply uses [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) (it's just Postgres, after all). However we also handle a few of the hairy issues that you might need to navigate on your own, like object permissions.
 
-<details>
-  <summary>See full command</summary>
+<BlogCollapsible title="See full command">
   <div>
-  
+
     {/* prettier-ignore */}
-    ```markdown 
+    ```markdown
     supabase db dump --help
     Dumps data or schemas from the remote database
 
@@ -128,7 +125,7 @@ We’ve made it even easer to backup and migrate your database, using `supabase 
     ```
 
   </div>
-</details>
+</BlogCollapsible>
 
 ## Improved Database Migrations
 
@@ -140,12 +137,12 @@ With the new Postgres Language Server, we hope to make it as easy to write Postg
 
 Finally, we’ve added a Migrations view [in the dashboard](https://app.supabase.com/project/_/database/migrations) to track your migration history to improve the discoverability of migrations.
 
-<details>
-  <summary>See full command</summary>
+<BlogCollapsible title="See full command">
   <div>
+
     {/* prettier-ignore */}
     ```markdown
-    supabase migration 
+    supabase migration
     Manage database migration scripts
 
     Usage:
@@ -160,7 +157,7 @@ Finally, we’ve added a Migrations view [in the dashboard](https://app.supabase
     ```
 
   </div>
-</details>
+</BlogCollapsible>
 
 ## Test and lint your database
 
@@ -172,8 +169,7 @@ To make life even easier, our friends at [Basejump](https://usebasejump.com/) ha
 
 Finally, while you wait for us to make progress on the Language Server, we’ve added [support for linting](https://supabase.com/docs/guides/cli/testing-and-linting#linting-your-database) through the excellent [plpgsql_check](https://github.com/okbob/plpgsql_check) extension.
 
-<details>
-  <summary>See full command</summary>
+<BlogCollapsible title="See full command">
   <div>
 
     {/* prettier-ignore */}
@@ -205,7 +201,7 @@ Finally, while you wait for us to make progress on the Language Server, we’ve 
     ```
 
   </div>
-</details>
+</BlogCollapsible>
 
 ## Database seeding
 
@@ -237,8 +233,7 @@ let movie: Database['public']['Tables']['movies']['Row'] = // ...
 let movie: Tables<'movies'> = // ...
 ```
 
-<details>
-  <summary>See full command</summary>
+<BlogCollapsible title="See full command">
   <div>
 
     {/* prettier-ignore */}
@@ -254,7 +249,7 @@ let movie: Tables<'movies'> = // ...
     ```
 
   </div>
-</details>
+</BlogCollapsible>
 
 ## Official GitHub Action
 
