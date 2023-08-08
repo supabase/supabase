@@ -49,6 +49,7 @@ const SQLTemplates = observer(() => {
       })
 
       snap.addSnippet(snippet as SqlSnippet, project.ref)
+      snap.addNeedsSaving(snippet.id!)
       router.push(`/project/${project.ref}/sql/${snippet.id}`)
     } catch (error: any) {
       ui.setNotification({

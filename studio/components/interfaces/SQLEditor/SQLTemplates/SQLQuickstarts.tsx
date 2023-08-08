@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite'
 import { useParams, useTelemetryProps } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import Telemetry from 'lib/telemetry'
@@ -19,6 +19,7 @@ const SQLQuickstarts = observer(() => {
   const { ref } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
+  const project = useSelectedProject()
   const [, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
 
   const telemetryProps = useTelemetryProps()
@@ -28,8 +29,6 @@ const SQLQuickstarts = observer(() => {
     subject: { id: profile?.id },
   })
 
-  // [Joshen TODO] Removed optimistic query creation logic for now, need to figure out
-  // how to do that after using ids as part of the URL
   const handleNewQuery = async (sql: string, name: string) => {
     if (!ref) return console.error('Project ref is required')
     if (!canCreateSQLSnippet) {
@@ -40,10 +39,16 @@ const SQLQuickstarts = observer(() => {
     }
 
     try {
-      const snippet = createSqlSnippetSkeleton({ name, sql, owner_id: profile?.id })
-      const data = { ...snippet, id: uuidv4() }
-      snap.addSnippet(data as SqlSnippet, ref)
-      router.push(`/project/${ref}/sql/${data.id}`)
+      const snippet = createSqlSnippetSkeleton({
+        id: uuidv4(),
+        name,
+        sql,
+        owner_id: profile?.id,
+        project_id: project?.id,
+      })
+      snap.addSnippet(snippet as SqlSnippet, ref)
+      snap.addNeedsSaving(snippet.id!)
+      router.push(`/project/${ref}/sql/${snippet.id}`)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
