@@ -22,7 +22,7 @@ We received feedback recently about our local development experience, encouragin
 
 One of the unique features of Supabase is the ability to access your Postgres database directly from a browser or mobile app through our [Serverless APIs](https://supabase.com/docs/guides/api). This means that developers are writing more [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html).
 
-While code editors have great support for most programming languages, the SQL support is underwhelming. We want to make Postgres as simple as Python. Our recently announced [Postgres Language Server](https://github.com/supabase/postgres_lsp) takes us a step in that direction - eventually it will provide first-class support for Postgres in your favorite code editor including: Linting, Syntax Highlighting, Migrations Parsing, SQL Auto-complete, and Intellisense.
+While code editors have great support for most programming languages, SQL support is underwhelming. We want to make Postgres as simple as Python. Our recently announced [Postgres Language Server](https://github.com/supabase/postgres_lsp) takes us a step in that direction - eventually it will provide first-class support for Postgres in your favorite code editor including Linting, Syntax Highlighting, Migrations Parsing, SQL Auto-complete, and Intellisense.
 
 The Postgres Language Server is not ready for Production just yet. The majority of work is still ahead, but we've verified that the technical approach works and we're making it public now so that we can develop it in the open with input from the community. We’re already receiving amazing [feedback](https://github.com/supabase/postgres_lsp/discussions) and [support](https://news.ycombinator.com/item?id=37020610).
 
@@ -39,15 +39,17 @@ A lot of the credit for this belongs to [Heroku’s pg-extras](https://github.co
 This is just a starting point for the Supabase inspector. We’ll grow this feature to become an essential part of your Postgres toolkit.
 
 <details>
-    <summary>See full command</summary>
-    
+<summary>See full command</summary>
+  <div>
+
+    {/* prettier-ignore */}
     ```markdown
     supabase inspect db --help
     Tools to inspect your Supabase database
-    
+
     Usage:
       supabase inspect db [command]
-    
+
     Available Commands:
       bloat                Estimates space allocated to a relation that is full of dead tuples
       blocking             Show queries that are holding locks and the queries that are waiting for them to be released
@@ -69,10 +71,16 @@ This is just a starting point for the Supabase inspector. We’ll grow this feat
       unused-indexes       Show indexes with low usage
       vacuum-stats         Show statistics related to vacuum operations per table
     ```
+
+  </div>
 </details>
 
 <details>
-<summary>- Read the docs</summary>
+  <summary>Read the docs</summary>
+
+{/* prettier-ignore */}
+  <div>
+
     - [Show most frequently run queries](https://supabase.com/docs/reference/cli/supabase-inspect-db-calls)
     - [Show long running queries](https://supabase.com/docs/reference/cli/supabase-inspect-db-long-running-queries)
     - [Show queries ordered by total execution time](https://supabase.com/docs/reference/cli/supabase-inspect-db-outliers)
@@ -92,6 +100,8 @@ This is just a starting point for the Supabase inspector. We’ll grow this feat
     - [Show number of active connections](https://supabase.com/docs/reference/cli/supabase-inspect-db-role-connections)
     - [Show estimated database bloat](https://supabase.com/docs/reference/cli/supabase-inspect-db-bloat)
     - [Show statistics related to vacuum operations](https://supabase.com/docs/reference/cli/supabase-inspect-db-vacuum-stats)
+
+  </div>
 </details>
 
 ## Easier backups
@@ -101,27 +111,31 @@ This is just a starting point for the Supabase inspector. We’ll grow this feat
 We’ve made it even easer to backup and migrate your database, using `supabase db dump`. Under the hood, this simply uses [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) (it's just Postgres, after all). However we also handle a few of the hairy issues that you might need to navigate on your own, like object permissions.
 
 <details>
-<summary>- See full command</summary>
-    
-    ```markdown
+  <summary>See full command</summary>
+  <div>
+  
+    {/* prettier-ignore */}
+    ```markdown 
     supabase db dump --help
     Dumps data or schemas from the remote database
-    
+
     Usage:
-      supabase db dump [flags]
-    
+    supabase db dump [flags]
+
     Flags:
-          --data-only         Dumps only data records.
-      -f, --file string       File path to save the dumped contents.
-          --keep-comments     Keeps commented lines from pg_dump output.
-          --role-only         Dumps only cluster roles.
-          --use-copy          Uses copy statements in place of inserts.
+    --data-only Dumps only data records.
+    -f, --file string File path to save the dumped contents.
+    --keep-comments Keeps commented lines from pg_dump output.
+    --role-only Dumps only cluster roles.
+    --use-copy Uses copy statements in place of inserts.
     ```
+
+  </div>
 </details>
 
 ## Improved Database Migrations
 
-![modify your database](/blog/launch-week-8/day-2/modify-your-database.png)
+![modify your database](/images/blog/launch-week-8/day-2/modify-your-database.png)
 
 We’ve extended the CLI migration feature and added Dashboard support. Database migrations give you a way to update your database using version-controlled SQL files. We’ve built a lot of tooling around our migrations, including [reparation](https://supabase.com/docs/reference/cli/supabase-migration-repair), migration cleanup using the [squash](https://supabase.com/docs/reference/cli/supabase-migration-squash) command, and [diffing](https://supabase.com/docs/reference/cli/supabase-db-diff) (using [migra](https://github.com/djrobstep/migra)) to generate a new migration or to detect schema drift.
 
@@ -130,15 +144,16 @@ With the new Postgres Language Server, we hope to make it as easy to write Postg
 Finally, we’ve added a Migrations view [in the dashboard](https://app.supabase.com/project/_/database/migrations) to track your migration history to improve the discoverability of migrations.
 
 <details>
-<summary>- See full command</summary>
-    
+  <summary>See full command</summary>
+  <div>
+    {/* prettier-ignore */}
     ```markdown
     supabase migration 
     Manage database migration scripts
-    
+
     Usage:
       supabase migration [command]
-    
+
     Available Commands:
       list        List local and remote migrations
       new         Create an empty migration script
@@ -146,6 +161,8 @@ Finally, we’ve added a Migrations view [in the dashboard](https://app.supabase
       squash      Squash migrations to a single file
       up          Apply pending migrations to local database
     ```
+
+  </div>
 </details>
 
 ## Test and lint your database
@@ -159,33 +176,38 @@ To make life even easier, our friends at [Basejump](https://usebasejump.com/) ha
 Finally, while you wait for us to make progress on the Language Server, we’ve added [support for linting](https://supabase.com/docs/guides/cli/testing-and-linting#linting-your-database) through the excellent [plpgsql_check](https://github.com/okbob/plpgsql_check) extension.
 
 <details>
-<summary>- See full command</summary>
-    
+  <summary>See full command</summary>
+  <div>
+
+    {/* prettier-ignore */}
     ```markdown
     supabase test
     Run tests on local Supabase containers
-    
+
     Usage:
       supabase test [command]
-    
+
     Available Commands:
       db          Tests local database with pgTAP
       new         Create a new test file
-    ```
-    
+    ````
+
+    {/* prettier-ignore */}
     ```markdown
     supabase db lint
     Checks local database for typing error
-    
+
     Usage:
       supabase db lint [flags]
-    
+
     Flags:
       -h, --help                        help for lint
           --level [ warning | error ]   Error level to emit. (default warning)
           --linked                      Lints the linked project for schema errors.
       -s, --schema strings              List of schema to include. (default all)
     ```
+
+  </div>
 </details>
 
 ## Database seeding
@@ -219,18 +241,22 @@ let movie: Tables<'movies'> = // ...
 ```
 
 <details>
-<summary>- See full command</summary>
-    
+  <summary>See full command</summary>
+  <div>
+
+    {/* prettier-ignore */}
     ```markdown
     supabase gen types
     Generate types from Postgres schema
-    
+
     Usage:
       supabase gen types [command]
-    
+
     Available Commands:
       typescript  Generate types for TypeScript
     ```
+
+  </div>
 </details>
 
 ## Official GitHub Action
