@@ -103,9 +103,9 @@ This is just a starting point for the Supabase inspector. We’ll grow this feat
 
 ## Easier backups
 
-![How to back up your database with SUpabase CLI](/images/blog/launch-week-8/day-2/backup-your-database.png)
+![How to back up your database with Supabase CLI](/images/blog/launch-week-8/day-2/backup-your-database.png)
 
-We’ve made it even easer to backup and migrate your database, using `supabase db dump`. Under the hood, this simply uses [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) (it's just Postgres, after all). However we also handle a few of the hairy issues that you might need to navigate on your own, like object permissions.
+We’ve made it even easier to backup and migrate your database, using `supabase db dump`. Under the hood, this simply uses [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) (it's just Postgres, after all). However we also handle a few of the hairy issues that you might need to navigate on your own, like object permissions.
 
 <details>
   <summary>See full command</summary>
@@ -166,7 +166,7 @@ Finally, we’ve added a Migrations view [in the dashboard](https://app.supabase
 
 ![Test your database](/images/blog/launch-week-8/day-2/test-your-database.png)
 
-We’ve simplified the database testing experience, with `supabase test`. Runnning `supabase test new` stubs out a [pgTAP test](https://pgtap.org/) for you to fill with testing logic. The CLI includes [pg_prove and the TAP harness](https://pgtap.org/pg_prove), so all you need to do is run `supabase test db`.
+We’ve simplified the database testing experience, with `supabase test`. Running `supabase test new` stubs out a [pgTAP test](https://pgtap.org/) for you to fill with testing logic. The CLI includes [pg_prove and the TAP harness](https://pgtap.org/pg_prove), so all you need to do is run `supabase test db`.
 
 To make life even easier, our friends at [Basejump](https://usebasejump.com/) have created an entire suite of [Supabase Test Helpers](https://github.com/usebasejump/supabase-test-helpers) which make it simple to create users, run tests as an [authenticated user](https://usebasejump.com/blog/testing-on-supabase-with-pgtap#testing-authenticated), and test your [RLS policies](https://usebasejump.com/blog/testing-on-supabase-with-pgtap#rls-testing).
 
@@ -266,7 +266,7 @@ We’ve developed an official [GitHub Action](https://github.com/marketplace/act
 
 Logs are now accessible locally in the Dashboard. Last launch week we released an open source logging server, with support for BigQuery. In the past few months we’ve added Postgres support to this server. This means that all of your local logs are accessible with no additional config - simply run supabase start and then visit the local dashboard to start debugging.
 
-![Logs are now accesible locally in the dashboard](/images/blog/launch-week-8/day-2/local-logging-debugging.png)
+![Logs are now accessible locally in the dashboard](/images/blog/launch-week-8/day-2/local-logging-debugging.png)
 
 ## Stable releases
 
