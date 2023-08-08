@@ -33,7 +33,6 @@ import {
   useSelectedProject,
   useStore,
 } from 'hooks'
-import useLatest from 'hooks/misc/useLatest'
 import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -86,7 +85,7 @@ const SQLEditor = () => {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
 
-  const [id] = useState(urlId === 'new' ? uuidv4() : urlId)
+  const [id] = useState(!urlId || urlId === 'new' ? uuidv4() : urlId)
 
   const { profile } = useProfile()
   const project = useSelectedProject()
@@ -157,8 +156,6 @@ const SQLEditor = () => {
     },
   })
 
-  const idRef = useLatest(id)
-
   const minSize = 44
   const snippet = id ? snap.snippets[id] : null
   const snapOffset = 50
@@ -166,11 +163,13 @@ const SQLEditor = () => {
   const isLoading = !(id && ref && snap.loaded[ref])
   const isUtilityPanelCollapsed = (snippet?.splitSizes?.[1] ?? 0) === 0
 
-  const onDragEnd = useCallback((sizes: number[]) => {
-    const id = idRef.current
-    if (id) snap.setSplitSizes(id, sizes)
-    setSavedSplitSize(JSON.stringify(sizes))
-  }, [])
+  const onDragEnd = useCallback(
+    (sizes: number[]) => {
+      if (id) snap.setSplitSizes(id, sizes)
+      setSavedSplitSize(JSON.stringify(sizes))
+    },
+    [id]
+  )
 
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
@@ -193,7 +192,7 @@ const SQLEditor = () => {
 
       // use the latest state
       const state = getSqlEditorStateSnapshot()
-      const snippet = idRef.current ? state.snippets[idRef.current] : null
+      const snippet = state.snippets[id]
 
       if (editorRef.current !== null && !isExecuting && project !== undefined) {
         const editor = editorRef.current
@@ -211,9 +210,9 @@ const SQLEditor = () => {
           return
         }
 
-        if (idRef.current && snippet?.snippet.name === untitledSnippetTitle) {
+        if (snippet?.snippet.name === untitledSnippetTitle) {
           // Intentionally don't await title gen (lazy)
-          setAiTitle(idRef.current, sql)
+          setAiTitle(id, sql)
         }
 
         execute({
@@ -223,7 +222,7 @@ const SQLEditor = () => {
         })
       }
     },
-    [isExecuting, isDiffOpen, execute, project, setAiTitle]
+    [isDiffOpen, id, isExecuting, project, execute, setAiTitle]
   )
 
   const handleNewQuery = useCallback(
