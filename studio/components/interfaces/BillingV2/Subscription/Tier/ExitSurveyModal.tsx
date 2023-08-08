@@ -98,6 +98,7 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
         projectRef,
         reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
         message,
+        exitAction: 'downgrade',
       })
     } finally {
     }
