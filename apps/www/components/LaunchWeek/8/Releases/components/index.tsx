@@ -215,7 +215,7 @@ export const AccordionHeader = ({
             </g>
           </svg>
 
-          {day === 2 && <CountdownComponent date={publishedAt} showCard={false} />}
+          {day === 3 && <CountdownComponent date={publishedAt} showCard={false} />}
         </span>
       )}
     </div>
