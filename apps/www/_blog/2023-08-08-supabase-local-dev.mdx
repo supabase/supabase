@@ -38,8 +38,8 @@ A lot of the credit for this belongs to [Heroku’s pg-extras](https://github.co
 
 This is just a starting point for the Supabase inspector. We’ll grow this feature to become an essential part of your Postgres toolkit.
 
-<summary>
-<details>- See full command<details>
+<details>
+    <summary>See full command</summary>
     
     ```markdown
     supabase inspect db --help
@@ -69,10 +69,10 @@ This is just a starting point for the Supabase inspector. We’ll grow this feat
       unused-indexes       Show indexes with low usage
       vacuum-stats         Show statistics related to vacuum operations per table
     ```
-</summary>
+</details>
 
-<summary>
-<details>- Read the docs<details>
+<details>
+<summary>- Read the docs</summary>
     - [Show most frequently run queries](https://supabase.com/docs/reference/cli/supabase-inspect-db-calls)
     - [Show long running queries](https://supabase.com/docs/reference/cli/supabase-inspect-db-long-running-queries)
     - [Show queries ordered by total execution time](https://supabase.com/docs/reference/cli/supabase-inspect-db-outliers)
@@ -92,7 +92,7 @@ This is just a starting point for the Supabase inspector. We’ll grow this feat
     - [Show number of active connections](https://supabase.com/docs/reference/cli/supabase-inspect-db-role-connections)
     - [Show estimated database bloat](https://supabase.com/docs/reference/cli/supabase-inspect-db-bloat)
     - [Show statistics related to vacuum operations](https://supabase.com/docs/reference/cli/supabase-inspect-db-vacuum-stats)
-</summary>
+</details>
 
 ## Easier backups
 
@@ -100,8 +100,8 @@ This is just a starting point for the Supabase inspector. We’ll grow this feat
 
 We’ve made it even easer to backup and migrate your database, using `supabase db dump`. Under the hood, this simply uses [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) (it's just Postgres, after all). However we also handle a few of the hairy issues that you might need to navigate on your own, like object permissions.
 
-<summary>
-<details>- See full command<details>
+<details>
+<summary>- See full command</summary>
     
     ```markdown
     supabase db dump --help
@@ -117,7 +117,7 @@ We’ve made it even easer to backup and migrate your database, using `supabase 
           --role-only         Dumps only cluster roles.
           --use-copy          Uses copy statements in place of inserts.
     ```
-    </summary>
+</details>
 
 ## Improved Database Migrations
 
@@ -129,8 +129,8 @@ With the new Postgres Language Server, we hope to make it as easy to write Postg
 
 Finally, we’ve added a Migrations view [in the dashboard](https://app.supabase.com/project/_/database/migrations) to track your migration history to improve the discoverability of migrations.
 
-<summary>
-<details>- See full command<details>
+<details>
+<summary>- See full command</summary>
     
     ```markdown
     supabase migration 
@@ -146,7 +146,7 @@ Finally, we’ve added a Migrations view [in the dashboard](https://app.supabase
       squash      Squash migrations to a single file
       up          Apply pending migrations to local database
     ```
-     </summary>
+</details>
 
 ## Test and lint your database
 
@@ -158,8 +158,8 @@ To make life even easier, our friends at [Basejump](https://usebasejump.com/) ha
 
 Finally, while you wait for us to make progress on the Language Server, we’ve added [support for linting](https://supabase.com/docs/guides/cli/testing-and-linting#linting-your-database) through the excellent [plpgsql_check](https://github.com/okbob/plpgsql_check) extension.
 
-<summary>
-<details>- See full command<details>
+<details>
+<summary>- See full command</summary>
     
     ```markdown
     supabase test
@@ -186,7 +186,7 @@ Finally, while you wait for us to make progress on the Language Server, we’ve 
           --linked                      Lints the linked project for schema errors.
       -s, --schema strings              List of schema to include. (default all)
     ```
-    </summary>
+</details>
 
 ## Database seeding
 
@@ -218,8 +218,8 @@ let movie: Database['public']['Tables']['movies']['Row'] = // ...
 let movie: Tables<'movies'> = // ...
 ```
 
-<summary>
-<details>- See full command<details>
+<details>
+<summary>- See full command</summary>
     
     ```markdown
     supabase gen types
@@ -231,7 +231,7 @@ let movie: Tables<'movies'> = // ...
     Available Commands:
       typescript  Generate types for TypeScript
     ```
-    </summary>
+</details>
 
 ## Official GitHub Action
 
