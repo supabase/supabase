@@ -1,10 +1,17 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
-import { timeout } from 'lib/helpers'
+import { useParams } from 'common'
 import { editor } from 'monaco-editor'
+import { useRouter } from 'next/router'
 import { MutableRefObject, useRef, useState } from 'react'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { IStandaloneCodeEditor } from './SQLEditor.types'
 import { cn } from 'ui'
+
+import { SqlSnippet } from 'data/content/sql-snippets-query'
+import { useSelectedProject } from 'hooks'
+import { useProfile } from 'lib/profile'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { untitledSnippetTitle } from './SQLEditor.constants'
+import { IStandaloneCodeEditor } from './SQLEditor.types'
+import { createSqlSnippetSkeleton } from './SQLEditor.utils'
 
 export type MonacoEditorProps = {
   id: string
@@ -23,6 +30,11 @@ const MonacoEditor = ({
   className,
   executeQuery,
 }: MonacoEditorProps) => {
+  const { ref } = useParams()
+  const router = useRouter()
+  const { profile } = useProfile()
+  const project = useSelectedProject()
+
   const snap = useSqlEditorStateSnapshot({ sync: true })
   const snippet = snap.snippets[id]
 
@@ -64,14 +76,28 @@ const MonacoEditor = ({
     })
 
     if (autoFocus) {
-      await timeout(500)
+      if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
       editor.focus()
     }
   }
 
   function handleEditorChange(value: string | undefined) {
-    if (id && value !== undefined) {
-      snap.setSql(id, value)
+    if (id && value) {
+      if (snap.snippets[id]) {
+        snap.setSql(id, value)
+      } else {
+        const snippet = createSqlSnippetSkeleton({
+          id,
+          name: untitledSnippetTitle,
+          sql: value,
+          owner_id: profile?.id,
+          project_id: project?.id,
+        })
+        if (ref) {
+          snap.addSnippet(snippet as SqlSnippet, ref)
+          router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
+        }
+      }
     }
   }
 
