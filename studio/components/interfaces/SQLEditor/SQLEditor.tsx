@@ -60,6 +60,7 @@ import {
   getDiffTypeDropdownLabel,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -82,7 +83,7 @@ export function useSqlEditor() {
 
 const SQLEditor = () => {
   const { ui } = useStore()
-  const { ref, id: urlId } = useParams()
+  const { ref, id: urlId, slug } = useParams()
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
 
@@ -104,6 +105,11 @@ const SQLEditor = () => {
   const [sqlDiff, setSqlDiff] = useState<ContentDiff>()
   const inputRef = useRef<HTMLInputElement>(null)
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
+
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+
+  // Customers on HIPAA plans should not have access to Supabase AI
+  const isHipaaSubscription = subscription?.plan?.id === 'hipaa'
 
   const [isAiOpen, setIsAiOpen] = useLocalStorageQuery('supabase_sql-editor-ai-open', true)
 
@@ -423,7 +429,7 @@ const SQLEditor = () => {
         }}
       />
       <div className="flex h-full flex-col relative">
-        {isAiOpen && supabaseAIEnabled && (
+        {isAiOpen && supabaseAIEnabled && !isHipaaSubscription && (
           <AISchemaSuggestionPopover
             onClickSettings={() => {
               setIsAISettingsOpen(true)

@@ -6,7 +6,7 @@ import { useStore, useFlag } from 'hooks'
 import { useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
-
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 export interface RenameQueryModalProps {
   snippet: SqlSnippet
   visible: boolean
@@ -16,9 +16,14 @@ export interface RenameQueryModalProps {
 
 const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQueryModalProps) => {
   const { ui } = useStore()
-  const { ref } = useParams()
+  const { ref, slug } = useParams()
   const snap = useSqlEditorStateSnapshot()
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
+
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+
+  // Customers on HIPAA plans should not have access to Supabase AI
+  const isHipaaSubscription = subscription?.plan?.id === 'hipaa'
 
   const { id, name, description } = snippet
 
@@ -95,10 +100,10 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
                     disabled={isTitleGenerationLoading}
                     // className="!px-2 !py-0.5 !pr-3"
                   >
-                    {supabaseAIEnabled && (
+                    {supabaseAIEnabled && !isHipaaSubscription && (
                       <div className="flex items-center gap-1">
                         <AiIconAnimation loading={isTitleGenerationLoading} className="scale-75" />
-                        <span>Rename with AI</span>
+                        <span>Rename with Supabase AI</span>
                       </div>
                     )}
                   </Button>
