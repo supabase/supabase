@@ -1,11 +1,13 @@
 const images = {
   yt_thumbnail: '/images/launchweek/8/lw8-yt-thumb.jpg',
-  day_1_thumb: '/images/launchweek/8/day1/day-01-thumb.jpg',
+  day_1_thumb: '/images/launchweek/8/day1/yt_d1.jpg',
+  day_2_thumb: '/images/launchweek/8/day2/yt_d2.jpg',
   '00-stay-remote': '/images/launchweek/8/day0/remote.png',
   '00-pg-server': '/images/launchweek/8/day0/pg-server.png',
-  '00-constellation': '/images/launchweek/8/day0/constellation-pre.svg',
-  '00-constellation-mobile': '/images/launchweek/8/day0/constellation.svg',
+  '00-constellation': '/images/launchweek/8/day0/constellation.svg',
   '01-hugging': '/images/launchweek/8/day1/hugging.svg',
+  '02-localdev': '/images/launchweek/8/day2/localdev.svg',
+  '02-localdev-mobile': '/images/launchweek/8/day2/localdev-mobile.svg',
 }
 
 export interface StepProps {
@@ -76,12 +78,9 @@ const days: WeekDayProps[] = [
         steps: [],
       },
       {
-        title:
-          'Coding the stars - an interactive constellation with Three.js and React Three Fiber',
+        title: 'Coding an interactive constellation with Three.js and React Three Fiber',
         blog: '/blog/interactive-constellation-threejs-react-three-fiber',
-        bg_layers: [
-          { img: images['00-constellation'], mobileImg: images['00-constellation-mobile'] },
-        ],
+        bg_layers: [{ img: images['00-constellation'] }],
         steps: [],
       },
     ],
@@ -119,10 +118,22 @@ const days: WeekDayProps[] = [
     description: '',
     d: 2,
     dd: 'Tue',
-    youtube_id: 'cPGxPl1lx4Y',
+    youtube_id: 'N0Wb85m3YMI',
+    videoThumbnail: images.day_2_thumb,
     blogpost: '',
+    twitter_spaces: 'https://twitter.com/i/spaces/1vAxRAvNQyDJl?s=20',
     docs: '',
-    steps: [],
+    steps: [
+      {
+        title: 'Supabase Local Dev: Migrations, Branching, Observability',
+        blog: '/blog/supabase-local-dev',
+        hackernews: '',
+        video: '',
+        twitter_spaces: 'https://twitter.com/i/spaces/1vAxRAvNQyDJl?s=20',
+        bg_layers: [{ img: images['02-localdev'], mobileImg: images['02-localdev-mobile'] }],
+        steps: [],
+      },
+    ],
   },
   {
     title: '',
