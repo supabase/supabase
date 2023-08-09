@@ -5,7 +5,7 @@ import { useBreakpoint } from 'common/hooks/useBreakpoint'
 
 import days, { WeekDayProps } from './lw8_data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { AccordionHeader, CartTitle, SectionButtons } from './components'
+import { AccordionHeader, CartTitle, CheckCircleSolidIcon, SectionButtons } from './components'
 
 export const defaultEase = [0.25, 0.25, 0, 1]
 export const defaultDuratonIn = 0.25
@@ -420,6 +420,17 @@ export default function LW8Releases() {
                   <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
                     <CartTitle>{day3.steps[0].title}</CartTitle>
                     <p className="text-sm text-slate-900">{day3.steps[0]?.description}</p>
+                    <ul className="flex flex-row flex-wrap lg:flex-col gap-2 text-sm md:text-base">
+                      <li className="flex items-center gap-2">
+                        <CheckCircleSolidIcon /> AI SQL Editor
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircleSolidIcon /> Schema Diagrams
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircleSolidIcon /> Wrappers
+                      </li>
+                    </ul>
                   </div>
                   <SectionButtons blog={day3.steps[0].blog} hackernews={day3.steps[0].hackernews} />
                   {day3.steps[0]?.bg_layers &&
@@ -429,6 +440,7 @@ export default function LW8Releases() {
                           <motion.div
                             className={[
                               'absolute opacity-90 inset-0 w-full h-full -z-10',
+                              i === 2 && '!opacity-20',
                               (i === 0 || i === 2) && '!mix-blend-overlay blur-lg',
                             ].join(' ')}
                           >
