@@ -43,6 +43,18 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
     return ''
   }, [result])
 
+  const headers = useMemo(() => {
+    if (result?.rows) {
+      const firstRow = Array.from(result.rows || [])[0]
+      if (firstRow) {
+        return Object.keys(firstRow)
+      }
+    }
+    // if undefined is returned no headers will be set. In this case, no headers would be better
+    // than malformed headers.
+    return undefined
+  }, [result])
+
   function onDownloadCSV() {
     csvRef.current?.link.click()
     Telemetry.sendEvent(
@@ -99,6 +111,7 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
       <CSVLink
         ref={csvRef}
         className="hidden"
+        headers={headers}
         data={csvData}
         filename={`supabase_${project?.ref}_${snap.snippets[id]?.snippet.name}`}
       />
