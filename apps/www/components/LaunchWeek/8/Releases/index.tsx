@@ -450,21 +450,14 @@ export default function LW8Releases() {
                     day3.steps[0]?.bg_layers?.map(
                       (layer, i) =>
                         !!layer.img && (
-                          <motion.div
-                            className={[
-                              'absolute opacity-90 inset-0 w-full h-full -z-10',
-                              i === 1 && '!opacity-100',
-                              i === 2 && '!opacity-20',
-                              (i === 0 || i === 2) && '!mix-blend-overlay blur-lg',
-                            ].join(' ')}
-                          >
+                          <motion.div className="absolute opacity-90 inset-0 w-full h-full -z-10">
                             <Image
                               src={
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
                               }
                               className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
                               layout="fill"
-                              objectPosition="100% 50%"
+                              objectPosition={isTablet ? '50%' : '100% 50%'}
                               objectFit={i == 1 && isTablet ? 'contain' : 'cover'}
                             />
                           </motion.div>
