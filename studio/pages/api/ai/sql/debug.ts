@@ -109,8 +109,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     stream: false,
   }
 
-  console.log({ sql, completionMessages })
-
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     headers: {
       Authorization: `Bearer ${openAiKey}`,
@@ -122,7 +120,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   if (!response.ok) {
     const errorResponse: ErrorResponse = await response.json()
-    console.log({ errorResponse })
     console.error(`AI SQL debugging failed: ${errorResponse.error.message}`)
 
     if ('code' in errorResponse.error && errorResponse.error.code === 'context_length_exceeded') {
@@ -153,8 +150,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const completionResponse: CreateChatCompletionResponse = await response.json()
 
-  console.log(completionResponse)
-
   const [firstChoice] = completionResponse.choices
 
   const sqlResponseString = firstChoice.message?.function_call?.arguments
@@ -168,8 +163,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       error: 'There was an unknown error debugging the SQL snippet. Please try again.',
     })
   }
-
-  console.log({ sqlResponseString })
 
   try {
     const debugSqlResult: DebugSqlResult = JSON.parse(sqlResponseString)

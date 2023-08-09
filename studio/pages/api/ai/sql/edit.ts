@@ -101,8 +101,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     stream: false,
   }
 
-  console.log({ sql, prompt, completionMessages })
-
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     headers: {
       Authorization: `Bearer ${openAiKey}`,
@@ -144,8 +142,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const completionResponse: CreateChatCompletionResponse = await response.json()
 
-  console.log(completionResponse)
-
   const [firstChoice] = completionResponse.choices
 
   const sqlResponseString = firstChoice.message?.function_call?.arguments
@@ -159,8 +155,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       error: 'There was an unknown error editing the SQL snippet. Please try again.',
     })
   }
-
-  console.log({ sqlResponseString })
 
   try {
     const editSqlResult: EditSqlResult = JSON.parse(sqlResponseString)
