@@ -97,6 +97,17 @@ export const TwitterSpacesSvg = () => (
   </svg>
 )
 
+export const CheckCircleSolidIcon = () => (
+  <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M8.00156 14.7805C11.5362 14.7805 14.4016 11.9151 14.4016 8.38047C14.4016 4.84585 11.5362 1.98047 8.00156 1.98047C4.46694 1.98047 1.60156 4.84585 1.60156 8.38047C1.60156 11.9151 4.46694 14.7805 8.00156 14.7805ZM10.9672 7.34615C11.2797 7.03373 11.2797 6.5272 10.9672 6.21478C10.6548 5.90236 10.1483 5.90236 9.83588 6.21478L7.20156 8.8491L6.16725 7.81478C5.85483 7.50236 5.3483 7.50236 5.03588 7.81478C4.72346 8.1272 4.72346 8.63373 5.03588 8.94615L6.63588 10.5462C6.9483 10.8586 7.45483 10.8586 7.76725 10.5462L10.9672 7.34615Z"
+      fill="currentColor"
+    />
+  </svg>
+)
+
 export const SmallCard = ({
   className,
   innerClassName,
@@ -199,7 +210,7 @@ export const AccordionHeader = ({
           <div
             className={[
               'hover:cursor-pointer hover:!opacity-100',
-              day === 2 ? 'animate-pulse' : '',
+              day === 3 ? 'animate-pulse' : '',
             ].join(' ')}
           >
             <ExpandableVideo
@@ -207,7 +218,7 @@ export const AccordionHeader = ({
               trigger={
                 <VideoPreviewTrigger
                   title={`Watch: Day ${day}`}
-                  thumbnail={videoThumbnail ?? '/images/launchweek/8/day2/yt_d2.jpg'}
+                  thumbnail={videoThumbnail ?? '/images/launchweek/8/day3/yt_d3.jpg'}
                 />
               }
             />
@@ -233,7 +244,7 @@ export const AccordionHeader = ({
             </g>
           </svg>
 
-          {day === 3 && <CountdownComponent date={publishedAt} showCard={false} />}
+          {day === 4 && <CountdownComponent date={publishedAt} showCard={false} />}
         </span>
       )}
     </div>

@@ -5,7 +5,8 @@ import { useBreakpoint } from 'common/hooks/useBreakpoint'
 
 import days, { WeekDayProps } from './lw8_data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { AccordionHeader, CartTitle, SectionButtons } from './components'
+import { AccordionHeader, CartTitle, CheckCircleSolidIcon, SectionButtons } from './components'
+import Link from 'next/link'
 
 export const defaultEase = [0.25, 0.25, 0, 1]
 export const defaultDuratonIn = 0.25
@@ -104,7 +105,7 @@ export default function LW8Releases() {
 
   const day1Shipped = true
   const day2Shipped = true
-  const day3Shipped = Date.parse(day3.publishedAt) <= Date.now()
+  const day3Shipped = true
   const day4Shipped = Date.parse(day4.publishedAt) <= Date.now()
   const day5Shipped = Date.parse(day5.publishedAt) <= Date.now()
 
@@ -163,10 +164,7 @@ export default function LW8Releases() {
                       preRelease.steps[0]?.bg_layers?.map(
                         (layer, i) =>
                           !!layer.img && (
-                            <motion.div
-                              className="absolute opacity-90 inset-0 w-full h-full -z-10"
-                              variants={i === 1 ? scaleOpacityVariant : undefined}
-                            >
+                            <motion.div className="absolute opacity-90 inset-0 w-full h-full -z-10">
                               <Image
                                 src={
                                   !!layer.mobileImg && isTablet
@@ -212,10 +210,7 @@ export default function LW8Releases() {
                       preRelease.steps[1]?.bg_layers?.map(
                         (layer, i) =>
                           !!layer.img && (
-                            <motion.div
-                              className="absolute opacity-90 inset-0 w-full h-full -z-10"
-                              variants={i === 1 ? scaleOpacityVariant : undefined}
-                            >
+                            <motion.div className="absolute opacity-90 inset-0 w-full h-full -z-10">
                               <Image
                                 src={
                                   !!layer.mobileImg && isTablet
@@ -258,10 +253,7 @@ export default function LW8Releases() {
                       preRelease.steps[2]?.bg_layers?.map(
                         (layer, i) =>
                           !!layer.img && (
-                            <motion.div
-                              className="absolute opacity-90 inset-0 w-full h-full -z-10"
-                              variants={i === 1 ? scaleOpacityVariant : undefined}
-                            >
+                            <motion.div className="absolute opacity-90 inset-0 w-full h-full -z-10">
                               <Image
                                 src={layer.img}
                                 className={`
@@ -312,24 +304,19 @@ export default function LW8Releases() {
                     }}
                   />
                   <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
-                    <CartTitle>{day1.steps[0].title}</CartTitle>
+                    <Link href={day1.steps[0].blog!}>
+                      <a className="m-0">
+                        <CartTitle>{day1.steps[0].title}</CartTitle>
+                      </a>
+                    </Link>
                     <p className="text-sm text-slate-900">{day1.steps[0]?.description}</p>
                   </div>
-                  <SectionButtons
-                    blog={day1.steps[0].blog}
-                    // video={day1.steps[0].video}
-                    hackernews={day1.steps[0].hackernews}
-                    // twitter_spaces={day1.steps[0].twitter_spaces}
-                    // mobileGrid
-                  />
+                  <SectionButtons blog={day1.steps[0].blog} hackernews={day1.steps[0].hackernews} />
                   {day1.steps[0]?.bg_layers &&
                     day1.steps[0]?.bg_layers?.map(
                       (layer, i) =>
                         !!layer.img && (
-                          <motion.div
-                            className="absolute opacity-90 inset-0 w-full h-full -z-10"
-                            variants={i === 1 ? scaleOpacityVariant : undefined}
-                          >
+                          <motion.div className="absolute opacity-90 inset-0 w-full h-full -z-10">
                             <Image
                               src={
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
@@ -349,7 +336,7 @@ export default function LW8Releases() {
               </div>
             )}
           </div>
-          <div className="border-b border-[#111718] scroll-mt-16" id="today">
+          <div className="border-b border-[#111718] scroll-mt-16">
             <AccordionHeader
               date={day2.date}
               day={day2.d}
@@ -379,24 +366,19 @@ export default function LW8Releases() {
                     }}
                   />
                   <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
-                    <CartTitle>{day2.steps[0].title}</CartTitle>
+                    <Link href={day2.steps[0].blog!}>
+                      <a className="m-0">
+                        <CartTitle>{day2.steps[0].title}</CartTitle>
+                      </a>
+                    </Link>
                     <p className="text-sm text-slate-900">{day2.steps[0]?.description}</p>
                   </div>
-                  <SectionButtons
-                    blog={day2.steps[0].blog}
-                    // video={day2.steps[0].video}
-                    hackernews={day2.steps[0].hackernews}
-                    // twitter_spaces={day2.steps[0].twitter_spaces}
-                    // mobileGrid
-                  />
+                  <SectionButtons blog={day2.steps[0].blog} hackernews={day2.steps[0].hackernews} />
                   {day2.steps[0]?.bg_layers &&
                     day2.steps[0]?.bg_layers?.map(
                       (layer, i) =>
                         !!layer.img && (
-                          <motion.div
-                            className="absolute opacity-90 inset-0 w-full h-full -z-10"
-                            variants={i === 1 ? scaleOpacityVariant : undefined}
-                          >
+                          <motion.div className="absolute opacity-90 inset-0 w-full h-full -z-10">
                             <Image
                               src={
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
@@ -406,7 +388,6 @@ export default function LW8Releases() {
                                   w-full h-full -z-10 transition-all duration-300
                                 `}
                               layout="fill"
-                              // objectPosition={isTablet ? '50%' : '90% 50%'}
                               objectFit="cover"
                             />
                           </motion.div>
@@ -416,22 +397,82 @@ export default function LW8Releases() {
               </div>
             )}
           </div>
-          <div className="border-b border-[#111718]">
-            <Accordion.Item
-              header={
-                <AccordionHeader
-                  date={day3.date}
-                  day={day3.d}
-                  weekDay={day3.dd}
-                  title={day3.title}
-                  shipped={day3Shipped}
-                  publishedAt={day3.publishedAt}
-                />
-              }
-              disabled={!day3Shipped}
-              className="h-[79px]"
-              id={day3.d.toString()}
-            ></Accordion.Item>
+          <div className="border-b border-[#111718] scroll-mt-16" id="today">
+            <AccordionHeader
+              date={day3.date}
+              day={day3.d}
+              weekDay={day3.dd}
+              title={day3.title}
+              shipped={day3Shipped}
+              publishedAt={day3.publishedAt}
+              youtube_id={day3.youtube_id}
+              videoThumbnail={day3.videoThumbnail}
+            />
+
+            {day3.steps.length > 0 && (
+              <div className="flex flex-col gap-5 lg:flex-row pb-4">
+                <motion.div
+                  className={`
+                      min-h-[400px] relative overflow-hidden group/d1 flex-1 flex flex-col items-center lg:items-start justify-between
+                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
+                      `}
+                  initial="default"
+                  animate="default"
+                  whileHover="hover"
+                >
+                  <div
+                    className="inset-0 absolute group-hover/d1:scale-105 opacity-60 group-hover/d1:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
+                    style={{
+                      background: `radial-gradient(100% 100% at 80% 80%, #6F13A450, #030A0C)`,
+                    }}
+                  />
+                  <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
+                    <Link href={day3.steps[0].blog!}>
+                      <a className="m-0">
+                        <CartTitle>{day3.steps[0].title}</CartTitle>
+                      </a>
+                    </Link>
+                    <p className="text-sm text-slate-900">{day3.steps[0]?.description}</p>
+                    <ul className="flex flex-row flex-wrap lg:flex-col gap-2 text-sm md:text-base justify-center">
+                      <li className="flex items-center gap-2">
+                        <CheckCircleSolidIcon /> AI SQL Editor
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircleSolidIcon /> Schema Diagrams
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircleSolidIcon /> Wrappers
+                      </li>
+                    </ul>
+                  </div>
+                  <SectionButtons blog={day3.steps[0].blog} hackernews={day3.steps[0].hackernews} />
+                  {day3.steps[0]?.bg_layers &&
+                    day3.steps[0]?.bg_layers?.map(
+                      (layer, i) =>
+                        !!layer.img && (
+                          <motion.div
+                            className={[
+                              'absolute opacity-90 inset-0 w-full h-full -z-10',
+                              i === 1 && '!opacity-100',
+                              i === 2 && '!opacity-20',
+                              (i === 0 || i === 2) && '!mix-blend-overlay blur-lg',
+                            ].join(' ')}
+                          >
+                            <Image
+                              src={
+                                !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
+                              }
+                              className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
+                              layout="fill"
+                              objectPosition="100% 50%"
+                              objectFit={i == 1 && isTablet ? 'contain' : 'cover'}
+                            />
+                          </motion.div>
+                        )
+                    )}
+                </motion.div>
+              </div>
+            )}
           </div>
           <div className="border-b border-[#111718]">
             <Accordion.Item
