@@ -67,7 +67,7 @@ const RolePermissionsView = ({ roleId }: RolePermissionsViewProps) => {
 
                         <Table.td>
                           <div className="flex items-center space-x-4">
-                            <div>{x.restrictive}</div>
+                            <div>{x.restrictive.toString()}</div>
                           </div>
                         </Table.td>
 

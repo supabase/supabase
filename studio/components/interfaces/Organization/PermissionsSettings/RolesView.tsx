@@ -29,7 +29,7 @@ const RolesView = ({ selectRole }: RolesViewProps) => {
     isError: isErrorRoles,
     isSuccess: isSuccessRoles,
   } = useOrganizationRolesQuery({ slug })
-  const roles = rolesData?.roles ?? []
+  const roles = rolesData?.roles.sort((a, b) => a.name.localeCompare(b.name)) ?? []
 
   return (
     <>
@@ -48,6 +48,7 @@ const RolesView = ({ selectRole }: RolesViewProps) => {
               ]}
               body={[
                 ...roles.map((x: Role, i: number) => {
+                  const isOwnerRole = x.name.toLowerCase() === 'owner'
                   const isDefaultRole = [
                     'owner',
                     'administrator',
@@ -57,6 +58,7 @@ const RolesView = ({ selectRole }: RolesViewProps) => {
                     'billing-only',
                   ].includes(x.name.toLowerCase())
                   const allowCustomPermission = !isDefaultRole
+                  const allowDelete = !isOwnerRole
                   return (
                     <Fragment key={`member-row-${i}`}>
                       <Table.tr>
@@ -73,13 +75,13 @@ const RolesView = ({ selectRole }: RolesViewProps) => {
                         </Table.td>
 
                         <Table.td>
-                          {allowCustomPermission && (
-                            <div className="flex space-x-4">
-                              <Button>Edit</Button>
+                          <div className="flex space-x-4">
+                            {allowCustomPermission && <Button>Edit</Button>}
+                            {allowCustomPermission && (
                               <Button onClick={() => selectRole(x)}>Permissions</Button>
-                              <Button type={'danger'}>Delete</Button>
-                            </div>
-                          )}
+                            )}
+                            {allowDelete && <Button type={'danger'}>Delete</Button>}
+                          </div>
                         </Table.td>
                       </Table.tr>
                     </Fragment>
