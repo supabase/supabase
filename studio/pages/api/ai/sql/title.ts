@@ -108,8 +108,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const completionResponse: CreateChatCompletionResponse = await response.json()
 
-  console.log(completionResponse)
-
   const [firstChoice] = completionResponse.choices
 
   const titleResponseString = firstChoice.message?.function_call?.arguments
