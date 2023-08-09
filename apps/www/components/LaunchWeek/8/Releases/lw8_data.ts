@@ -9,9 +9,6 @@ const images = {
   '01-hugging': '/images/launchweek/8/day1/hugging.svg',
   '02-localdev': '/images/launchweek/8/day2/localdev.svg',
   '02-localdev-mobile': '/images/launchweek/8/day2/localdev-mobile.svg',
-  '03-studio3-1': '/images/launchweek/8/day3/studio3-1.svg',
-  '03-studio3-1-mobile': '/images/launchweek/8/day3/studio3-mobile-1.svg',
-  '03-studio3-2': '/images/launchweek/8/day3/studio3-2.png',
   '03-studio3': '/images/launchweek/8/day3/studio3.svg',
   '03-studio3-mobile': '/images/launchweek/8/day3/studio3-mobile.svg',
 }
@@ -160,11 +157,7 @@ const days: WeekDayProps[] = [
         hackernews: '',
         video: '',
         twitter_spaces: 'https://twitter.com/i/spaces/1vAxRAvNQyDJl?s=20',
-        bg_layers: [
-          { img: images['03-studio3-2'] },
-          { img: images['03-studio3'], mobileImg: images['03-studio3-mobile'] },
-          { img: images['03-studio3-1'], mobileImg: images['03-studio3-1-mobile'] },
-        ],
+        bg_layers: [{ img: images['03-studio3'], mobileImg: images['03-studio3-mobile'] }],
         steps: [],
       },
     ],
