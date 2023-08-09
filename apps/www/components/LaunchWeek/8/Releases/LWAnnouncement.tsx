@@ -12,9 +12,7 @@ const LWAnnouncement = ({
   title?: string
   isLaunchWeekPage?: boolean
 }) => {
-  if (typeof document === 'undefined') return null
-  const [_pre, d1, _d2, _d3, _d4, _d5] = days
-  const today = document.getElementById('today')
+  const [_pre, _d1, d2, _d3, _d4, _d5] = days
 
   const announcement = (
     <>
@@ -37,9 +35,9 @@ const LWAnnouncement = ({
                 />
               </svg>
             </div>
-            <span className="text-foreground">{title ?? 'Launch Week 8: Day 1'}</span>
+            <span className="text-foreground">{title ?? 'Launch Week 8: Day 2'}</span>
           </div>
-          <span className="text-foreground-light">{d1.steps[0].title}</span>
+          <span className="text-foreground-light">{d2.steps[0].title}</span>
         </div>
       </div>
       <div className="relative flex items-center justify-center !aspect-video h-[80px] md:h-[80px] gap-2 z-10 rounded overflow-hidden">
@@ -52,7 +50,7 @@ const LWAnnouncement = ({
           </svg>
         </div>
         <Image
-          src="/images/launchweek/8/lw8-yt-thumb.jpg"
+          src="/images/launchweek/8/day2/yt_d2.jpg"
           alt="Youtube video thumbnail"
           layout="fill"
           objectFit="cover"
@@ -61,9 +59,11 @@ const LWAnnouncement = ({
     </>
   )
 
-  const handleClick = (e: any) => {
+  const handleClick = () => {
+    if (typeof document === 'undefined') return null
+    const today = document.getElementById('today')
     if (!today) return
-    today.scrollIntoView({ behavior: 'smooth' })
+    window.scrollTo({ top: today?.offsetTop + today?.offsetHeight, left: 0, behavior: 'smooth' })
   }
 
   return (
@@ -74,7 +74,7 @@ const LWAnnouncement = ({
       >
         {isLaunchWeekPage ? (
           <ExpandableVideo
-            videoId="RJccSbJ9Go4"
+            videoId="N0Wb85m3YMI"
             onOpenCallback={handleClick}
             triggerContainerClassName="w-full"
             trigger={
