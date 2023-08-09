@@ -4,12 +4,14 @@ import SVG from 'react-inlinesvg'
 import { Button, IconActivity, IconArchive, IconCode, IconExternalLink, IconKey } from 'ui'
 
 import Panel from 'components/ui/Panel'
+import { useFlag } from 'hooks'
 import APIKeys from './APIKeys'
 import GetStartedHero from './GetStartedHero'
 
 const NewProjectPanel = () => {
   const router = useRouter()
   const { ref } = router.query
+  const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
 
   return (
     <div className="grid grid-cols-12 gap-4 lg:gap-20">
@@ -56,7 +58,11 @@ const NewProjectPanel = () => {
                     </Button>
                   </a>
                 </Link>
-                <Link href={`/project/${ref}/sql/new`}>
+                <Link
+                  href={
+                    supabaseAIEnabled ? `/project/${ref}/sql/new` : `/project/${ref}/sql/templates`
+                  }
+                >
                   <a>
                     <Button
                       type="default"

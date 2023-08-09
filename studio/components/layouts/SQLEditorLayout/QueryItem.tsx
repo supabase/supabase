@@ -1,20 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { useParams } from 'common'
-import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
-import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useFlag, useSelectedProject, useStore } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -32,6 +22,17 @@ import {
   IconUnlock,
   Modal,
 } from 'ui'
+
+import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
+import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
+import { SqlSnippet } from 'data/content/sql-snippets-query'
+import { useCheckPermissions, useFlag, useSelectedProject, useStore } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 
 export interface QueryItemProps {
   tabInfo: SqlSnippet
@@ -88,11 +89,13 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
   const { ui } = useStore()
   const { ref } = useParams()
   const router = useRouter()
-  const snap = useSqlEditorStateSnapshot()
   const { profile } = useProfile()
+
+  const snap = useSqlEditorStateSnapshot()
   const project = useSelectedProject()
   const sharedSnippetsFeature = useFlag<boolean>('sharedSnippets')
-  const { mutate: deleteContent } = useContentDeleteMutation({
+
+  const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onSuccess(data) {
       if (data.id) snap.removeSnippet(data.id)
 
@@ -103,8 +106,21 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
         router.push(`/project/${ref}/sql/${existingSnippetIds[0]}`)
       }
     },
-    onError(error) {
-      ui.setNotification({ category: 'error', message: `Failed to delete query: ${error.message}` })
+    onError(error, data) {
+      if (error.code === 404 && error.message.includes('Content not found')) {
+        if (data.id) snap.removeSnippet(data.id)
+        const existingSnippetIds = (snap.orders[ref!] ?? []).filter((x) => x !== id)
+        if (existingSnippetIds.length === 0) {
+          router.push(`/project/${ref}/sql/new`)
+        } else {
+          router.push(`/project/${ref}/sql/${existingSnippetIds[0]}`)
+        }
+      } else {
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to delete query: ${error.message}`,
+        })
+      }
     },
   })
 
@@ -238,6 +254,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
         buttonLabel="Delete query"
         buttonLoadingLabel="Deleting query"
         size="medium"
+        loading={isDeleting}
         visible={deleteModalOpen}
         onSelectConfirm={onConfirmDelete}
         onSelectCancel={() => setDeleteModalOpen(false)}
