@@ -96,10 +96,12 @@ const SQLEditor = () => {
   const { profile } = useProfile()
   const project = useSelectedProject()
   const snap = useSqlEditorStateSnapshot()
+
   const { mutateAsync: generateSql, isLoading: isGenerateSqlLoading } = useSqlGenerateMutation()
   const { mutateAsync: editSql, isLoading: isEditSqlLoading } = useSqlEditMutation()
   const { mutateAsync: titleSql } = useSqlTitleGenerateMutation()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
+
   const [aiInput, setAiInput] = useState('')
   const [debugSolution, setDebugSolution] = useState<string>()
   const [sqlDiff, setSqlDiff] = useState<ContentDiff>()
@@ -141,7 +143,7 @@ const SQLEditor = () => {
     setIsFirstRender(false)
   }, [])
 
-  const { data } = useEntityDefinitionsQuery(
+  const { data, refetch: refetchEntityDefinitions } = useEntityDefinitionsQuery(
     {
       projectRef: selectedProject?.ref,
       connectionString: selectedProject?.connectionString,
@@ -163,6 +165,9 @@ const SQLEditor = () => {
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess(data) {
       if (id) snap.addResult(id, data.result)
+
+      // Refetching instead of invalidating since invalidate doesn't work with `enabled` flag
+      refetchEntityDefinitions()
     },
     onError(error) {
       if (id) snap.addResultError(id, error)
