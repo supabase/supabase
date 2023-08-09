@@ -102,7 +102,7 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
                         if (isError(error)) {
                           ui.setNotification({
                             category: 'error',
-                            message: error.message,
+                            message: `Failed to rename query: ${error.message}`,
                           })
                         }
                       }
