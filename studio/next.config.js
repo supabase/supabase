@@ -167,6 +167,11 @@ const nextConfig = {
         destination: '/project/:ref/settings/billing/subscription',
         permanent: true,
       },
+      {
+        source: '/project/:ref/sql',
+        destination: '/project/:ref/sql/new',
+        permanent: true,
+      },
     ]
   },
   async headers() {
@@ -213,6 +218,19 @@ const nextConfig = {
   // Ref: https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
   experimental: {
     outputFileTracingRoot: path.join(__dirname, '../../'),
+  },
+  webpack(config) {
+    config.module?.rules
+      .find((rule) => rule.oneOf)
+      .oneOf.forEach((rule) => {
+        if (rule.issuer?.and?.[0]?.toString().includes('_app')) {
+          const and = rule.issuer.and
+          rule.issuer.or = [/[\\/]node_modules[\\/]monaco-editor[\\/]/, { and }]
+          delete rule.issuer.and
+        }
+      })
+
+    return config
   },
 }
 
