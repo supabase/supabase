@@ -433,7 +433,7 @@ export default function LW8Releases() {
                       </a>
                     </Link>
                     <p className="text-sm text-slate-900">{day3.steps[0]?.description}</p>
-                    <ul className="flex flex-row flex-wrap lg:flex-col gap-2 text-sm md:text-base">
+                    <ul className="flex flex-row flex-wrap lg:flex-col gap-2 text-sm md:text-base justify-center">
                       <li className="flex items-center gap-2">
                         <CheckCircleSolidIcon /> AI SQL Editor
                       </li>
