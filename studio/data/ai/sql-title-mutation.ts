@@ -1,6 +1,7 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { isResponseOk, post } from 'lib/common/fetch'
 import { BASE_PATH } from 'lib/constants'
+import { ResponseError } from 'types'
 
 export type SqlTitleGenerateResponse = {
   title: string
@@ -27,10 +28,10 @@ export const useSqlTitleGenerateMutation = ({
   onSuccess,
   ...options
 }: Omit<
-  UseMutationOptions<SqlTitleGenerateData, unknown, SqlTitleGenerateVariables>,
+  UseMutationOptions<SqlTitleGenerateData, ResponseError, SqlTitleGenerateVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SqlTitleGenerateData, unknown, SqlTitleGenerateVariables>(
+  return useMutation<SqlTitleGenerateData, ResponseError, SqlTitleGenerateVariables>(
     (vars) => generateSqlTitle(vars),
     {
       async onSuccess(data, variables, context) {
