@@ -5,9 +5,30 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 03 Aug 2023 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 07 Aug 2023 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-local-dev</guid>
+  <title>Supabase Local Dev: migrations, branching, and observability</title>
+  <link>https://supabase.com/blog/supabase-local-dev</link>
+  <description>New features to streamline the interaction between CLI, code editors, and remote databases.</description>
+  <pubDate>Mon, 07 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/hugging-face-supabase</guid>
+  <title>Hugging Face is now supported in Supabase</title>
+  <link>https://supabase.com/blog/hugging-face-supabase</link>
+  <description>We&apos;ve added support Hugging Face support in our Python Vector Client and Edge Functions.</description>
+  <pubDate>Sun, 06 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/why-supabase-remote</guid>
+  <title>Why we&apos;ll stay remote</title>
+  <link>https://supabase.com/blog/why-supabase-remote</link>
+  <description>Offices are making a comeback, just not at Supabase.</description>
+  <pubDate>Fri, 04 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/interactive-constellation-threejs-react-three-fiber</guid>
   <title>Coding the stars - an interactive constellation with Three.js and React Three Fiber</title>
   <link>https://supabase.com/blog/interactive-constellation-threejs-react-three-fiber</link>

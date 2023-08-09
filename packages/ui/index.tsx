@@ -153,6 +153,12 @@ export {
   AccordionContent as AccordionContent_Shadcn_,
 } from './src/components/shadcn/ui/accordion'
 
+export {
+  Collapsible as Collapsible_Shadcn_,
+  CollapsibleTrigger as CollapsibleTrigger_Shadcn_,
+  CollapsibleContent as CollapsibleContent_Shadcn_,
+} from './src/components/shadcn/ui/collapsible'
+
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
 // links

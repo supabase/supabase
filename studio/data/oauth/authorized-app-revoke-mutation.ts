@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { delete_ } from 'lib/common/fetch'
+import { post } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
 import { ResponseError } from 'types'
 import { oauthAppKeys } from './keys'
@@ -15,9 +15,7 @@ export async function revokeAuthorizedApp({ id, slug }: AuthorizedAppRevokeVaria
   if (!id) throw new Error('App ID is required')
   if (!slug) throw new Error('Organization slug is required')
 
-  const response = await delete_(
-    `${API_ADMIN_URL}/organizations/${slug}/oauth/apps/${id}?type=authorized`
-  )
+  const response = await post(`${API_ADMIN_URL}/organizations/${slug}/oauth/apps/${id}/revoke`, {})
   if (response.error) throw response.error
   return response
 }
