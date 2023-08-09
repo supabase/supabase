@@ -27,7 +27,7 @@ const UtilityActions = ({
       <SizeToggleButton id={id} />
       <Button
         onClick={() => executeQuery()}
-        disabled={isDisabled}
+        disabled={isDisabled || isExecuting}
         loading={isExecuting}
         type="default"
         size="tiny"

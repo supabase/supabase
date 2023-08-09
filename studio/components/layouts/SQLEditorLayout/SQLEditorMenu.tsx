@@ -1,9 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
+import { Button, IconPlus, IconSearch, IconX, Input, Menu, cn } from 'ui'
 
-import { useParams } from 'common'
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
@@ -13,7 +14,6 @@ import { useCheckPermissions, useFlag, useSelectedProject, useStore } from 'hook
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { Button, cn, IconPlus, IconSearch, IconX, Input, Menu } from 'ui'
 import QueryItem from './QueryItem'
 
 const SideBarContent = observer(() => {

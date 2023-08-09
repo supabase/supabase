@@ -103,7 +103,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
                   if (isError(error)) {
                     ui.setNotification({
                       category: 'error',
-                      message: error.message,
+                      message: `Failed to debug: ${error.message}`,
                     })
                   }
                 }
