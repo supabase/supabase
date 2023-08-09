@@ -862,10 +862,9 @@ const SQLEditor = () => {
                   className="w-full h-full"
                 >
                   <MonacoEditor
+                    autoFocus
                     id={id}
                     editorRef={editorRef}
-                    isExecuting={isExecuting}
-                    autoFocus
                     executeQuery={executeQuery}
                   />
                 </motion.div>

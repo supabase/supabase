@@ -1,6 +1,5 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
 import { useParams } from 'common'
-import { editor } from 'monaco-editor'
 import { useRouter } from 'next/router'
 import { MutableRefObject, useRef, useState } from 'react'
 import { cn } from 'ui'
@@ -16,7 +15,6 @@ import { createSqlSnippetSkeleton } from './SQLEditor.utils'
 export type MonacoEditorProps = {
   id: string
   editorRef: MutableRefObject<IStandaloneCodeEditor | null>
-  isExecuting: boolean
   autoFocus?: boolean
   executeQuery: () => void
   className?: string
@@ -25,7 +23,6 @@ export type MonacoEditorProps = {
 const MonacoEditor = ({
   id,
   editorRef,
-  isExecuting,
   autoFocus = true,
   className,
   executeQuery,
@@ -42,13 +39,9 @@ const MonacoEditor = ({
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
 
-  const [editor, setEditor] = useState<editor.IStandaloneCodeEditor>()
-
   const handleEditorOnMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
     monacoRef.current = monaco
-
-    setEditor(editor)
 
     const model = editorRef.current.getModel()
     if (model !== null) {
@@ -103,26 +96,27 @@ const MonacoEditor = ({
   }
 
   return (
-    <>
-      <Editor
-        className={cn(className, 'monaco-editor')}
-        theme={'supabase'}
-        onMount={handleEditorOnMount}
-        onChange={handleEditorChange}
-        defaultLanguage="pgsql"
-        defaultValue={snippet?.snippet.content.sql}
-        path={id}
-        options={{
-          tabSize: 2,
-          fontSize: 13,
-          minimap: {
-            enabled: false,
-          },
-          wordWrap: 'on',
-          fixedOverflowWidgets: true,
-        }}
-      />
-    </>
+    <Editor
+      className={cn(className, 'monaco-editor')}
+      theme={'supabase'}
+      onMount={handleEditorOnMount}
+      onChange={handleEditorChange}
+      defaultLanguage="pgsql"
+      defaultValue={snippet?.snippet.content.sql}
+      path={id}
+      options={{
+        tabSize: 2,
+        fontSize: 13,
+        minimap: { enabled: false },
+        wordWrap: 'on',
+        // [Joshen] Commenting the following out as it causes the autocomplete suggestion popover
+        // to be positioned wrongly somehow. I'm not sure if this affects anything though, but leaving
+        // comment just in case anyone might be wondering. Relevant issues:
+        // - https://github.com/microsoft/monaco-editor/issues/2229
+        // - https://github.com/microsoft/monaco-editor/issues/2503
+        // fixedOverflowWidgets: true,
+      }}
+    />
   )
 }
 
