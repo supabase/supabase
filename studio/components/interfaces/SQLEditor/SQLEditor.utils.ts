@@ -2,6 +2,7 @@
 import MarkdownTable from 'markdown-table'
 import { NEW_SQL_SNIPPET_SKELETON } from './SQLEditor.constants'
 import { SqlSnippets, UserContent } from 'types'
+import { DiffType } from './SQLEditor.types'
 
 export const getResultsMarkdown = (results: any[]) => {
   const columns = Object.keys(results[0])
@@ -38,5 +39,31 @@ export const createSqlSnippetSkeleton = ({
       content_id: id ?? '',
       sql: sql ?? '',
     },
+  }
+}
+
+export function getDiffTypeButtonLabel(diffType: DiffType) {
+  switch (diffType) {
+    case DiffType.Modification:
+      return 'Accept change'
+    case DiffType.Addition:
+      return 'Accept addition'
+    case DiffType.NewSnippet:
+      return 'Create new snippet'
+    default:
+      throw new Error(`Unknown diff type '${diffType}'`)
+  }
+}
+
+export function getDiffTypeDropdownLabel(diffType: DiffType) {
+  switch (diffType) {
+    case DiffType.Modification:
+      return 'Compare as change'
+    case DiffType.Addition:
+      return 'Compare as addition'
+    case DiffType.NewSnippet:
+      return 'Compare as new snippet'
+    default:
+      throw new Error(`Unknown diff type '${diffType}'`)
   }
 }

@@ -31,16 +31,18 @@ const NavigationBar = ({}) => {
   const { isDarkMode, toggleTheme } = useTheme()
   const { ref: projectRef } = useParams()
 
-  const { project } = useProjectContext()
-  const navLayoutV2 = useFlag('navigationLayoutV2')
-
-  const activeRoute = router.pathname.split('/')[3]
-  const toolRoutes = generateToolRoutes(projectRef, project)
-  const productRoutes = generateProductRoutes(projectRef, project)
-  const otherRoutes = generateOtherRoutes(projectRef, project)
-  const showCmdkHelper = useFlag('dashboardCmdk')
   const os = detectOS()
   const { setIsOpen } = useCommandMenu()
+
+  const { project } = useProjectContext()
+  const navLayoutV2 = useFlag('navigationLayoutV2')
+  const showCmdkHelper = useFlag('dashboardCmdk')
+  const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
+
+  const activeRoute = router.pathname.split('/')[3]
+  const toolRoutes = generateToolRoutes(projectRef, project, supabaseAIEnabled)
+  const productRoutes = generateProductRoutes(projectRef, project)
+  const otherRoutes = generateOtherRoutes(projectRef, project)
   return (
     <div
       className={[

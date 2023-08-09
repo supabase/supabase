@@ -2,11 +2,10 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
-import { useTelemetryProps } from 'common'
+import { useParams, useTelemetryProps } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constants'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import Telemetry from 'lib/telemetry'
@@ -15,12 +14,13 @@ import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { createSqlSnippetSkeleton } from '../SQLEditor.utils'
 import SQLCard from './SQLCard'
 
-const SQLTemplates = observer(() => {
+const SQLQuickstarts = observer(() => {
   const { ui } = useStore()
+  const { ref } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
-  const { project } = useProjectContext()
-  const [sql] = partition(SQL_TEMPLATES, { type: 'template' })
+  const project = useSelectedProject()
+  const [, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
 
   const telemetryProps = useTelemetryProps()
   const snap = useSqlEditorStateSnapshot()
@@ -30,8 +30,7 @@ const SQLTemplates = observer(() => {
   })
 
   const handleNewQuery = async (sql: string, name: string) => {
-    if (!project) return console.error('Project is required')
-    if (!profile) return console.error('Profile is required')
+    if (!ref) return console.error('Project ref is required')
     if (!canCreateSQLSnippet) {
       return ui.setNotification({
         category: 'info',
@@ -44,13 +43,12 @@ const SQLTemplates = observer(() => {
         id: uuidv4(),
         name,
         sql,
-        owner_id: profile.id,
-        project_id: project.id,
+        owner_id: profile?.id,
+        project_id: project?.id,
       })
-
-      snap.addSnippet(snippet as SqlSnippet, project.ref)
+      snap.addSnippet(snippet as SqlSnippet, ref)
       snap.addNeedsSaving(snippet.id!)
-      router.push(`/project/${project.ref}/sql/${snippet.id}`)
+      router.push(`/project/${ref}/sql/${snippet.id}`)
     } catch (error: any) {
       ui.setNotification({
         category: 'error',
@@ -61,17 +59,20 @@ const SQLTemplates = observer(() => {
 
   return (
     <div className="block h-full space-y-8 overflow-y-auto p-6">
-      <div>
+      <div className="mb-8">
         <div className="mb-4">
-          <h1 className="text-scale-1200 mb-3 text-xl">Scripts</h1>
-          <p className="text-scale-1100 text-sm">Quick scripts to run on your database.</p>
+          <h1 className="text-scale-1200 mb-3 text-xl">Quickstarts</h1>
+          <p className="text-scale-1100 text-sm">
+            While we're in beta, we want to offer a quick way to explore Supabase. While we build
+            importers, check out these simple starters.
+          </p>
           <p className="text-scale-1100 text-sm">
             Click on any script to fill the query box, modify the script, then click
             <span className="text-code">Run</span>.
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-          {sql.map((x) => (
+          {quickStart.map((x) => (
             <SQLCard
               key={x.title}
               title={x.title}
@@ -81,8 +82,8 @@ const SQLTemplates = observer(() => {
                 handleNewQuery(sql, title)
                 Telemetry.sendEvent(
                   {
-                    category: 'scripts',
-                    action: 'script_clicked',
+                    category: 'quickstart',
+                    action: 'quickstart_clicked',
                     label: x.title,
                   },
                   telemetryProps,
@@ -97,4 +98,4 @@ const SQLTemplates = observer(() => {
   )
 })
 
-export default SQLTemplates
+export default SQLQuickstarts
