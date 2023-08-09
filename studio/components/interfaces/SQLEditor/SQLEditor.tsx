@@ -173,7 +173,7 @@ const SQLEditor = () => {
   const snippet = id ? snap.snippets[id] : null
   const snapOffset = 50
 
-  const isLoading = !(id && ref && snap.loaded[ref])
+  const isLoading = urlId === 'new' ? false : !(id && ref && snap.loaded[ref])
 
   const onDragEnd = useCallback(
     (sizes: number[]) => {
