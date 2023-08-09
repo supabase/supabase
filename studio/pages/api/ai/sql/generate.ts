@@ -66,10 +66,11 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const model = 'gpt-3.5-turbo-0613'
   const maxCompletionTokenCount = 1024
+  const hasEntityDefinitions = entityDefinitions !== undefined && entityDefinitions.length > 0
 
   const completionMessages: ChatCompletionRequestMessage[] = []
 
-  if (entityDefinitions?.length > 0) {
+  if (hasEntityDefinitions) {
     completionMessages.push({
       role: 'user',
       content: codeBlock`
@@ -111,6 +112,17 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     const errorResponse: ErrorResponse = await response.json()
     console.error(`AI SQL generation failed: ${errorResponse.error.message}`)
 
+    if (
+      'code' in errorResponse.error &&
+      errorResponse.error.code === 'context_length_exceeded' &&
+      hasEntityDefinitions
+    ) {
+      return res.status(400).json({
+        error:
+          'Your database metadata is too large for Supabase AI to ingest. Try disabling database metadata in AI settings.',
+      })
+    }
+
     return res.status(500).json({
       error: 'There was an unknown error generating the SQL snippet. Please try again.',
     })
@@ -133,6 +145,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       error: 'There was an unknown error generating the SQL snippet. Please try again.',
     })
   }
+
   try {
     const generateSqlResult: GenerateSqlResult = JSON.parse(sqlResponseString)
 

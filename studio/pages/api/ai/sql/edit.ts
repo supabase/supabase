@@ -61,10 +61,11 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const model = 'gpt-3.5-turbo-0613'
   const maxCompletionTokenCount = 2048
+  const hasEntityDefinitions = entityDefinitions !== undefined && entityDefinitions.length > 0
 
   const completionMessages: ChatCompletionRequestMessage[] = []
 
-  if (entityDefinitions?.length > 0) {
+  if (hasEntityDefinitions) {
     completionMessages.push({
       role: 'user',
       content: codeBlock`
@@ -114,6 +115,27 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   if (!response.ok) {
     const errorResponse: ErrorResponse = await response.json()
     console.error(`AI SQL editing failed: ${errorResponse.error.message}`)
+
+    if ('code' in errorResponse.error && errorResponse.error.code === 'context_length_exceeded') {
+      if (hasEntityDefinitions) {
+        const definitionsLength = entityDefinitions.reduce(
+          (sum: number, def: string) => sum + def.length,
+          0
+        )
+
+        if (definitionsLength > sql.length) {
+          return res.status(400).json({
+            error:
+              'Your database metadata is too large for Supabase AI to ingest. Try disabling database metadata in AI settings.',
+          })
+        }
+      }
+
+      return res.status(400).json({
+        error:
+          'Your SQL query is too large for Supabase AI to ingest. Try splitting it into smaller queries.',
+      })
+    }
 
     return res.status(500).json({
       error: 'There was an unknown error editing the SQL snippet. Please try again.',
