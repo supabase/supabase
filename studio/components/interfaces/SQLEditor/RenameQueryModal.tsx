@@ -2,11 +2,12 @@ import { useParams } from 'common'
 
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useStore, useFlag } from 'hooks'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { isError } from 'data/utils/error-check'
+import { useFlag, useStore } from 'hooks'
 import { useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 export interface RenameQueryModalProps {
   snippet: SqlSnippet
   visible: boolean
@@ -54,7 +55,7 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
     }
   }
 
-  const { mutateAsync: generateSqlTitle, isLoading: isTitleGenerationLoading } =
+  const { mutateAsync: titleSql, isLoading: isTitleGenerationLoading } =
     useSqlTitleGenerateMutation()
 
   const isAiButtonVisible = !!snippet.content.sql
@@ -80,32 +81,41 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
                 name="name"
                 value={nameInput}
                 onChange={(e) => setNameInput(e.target.value)}
-                // inputClassName={cn(isAiButtonVisible && 'pr-[6.5rem]')}
-                // actions={}
               />
               <div className="flex w-full justify-end mt-2">
-                {isAiButtonVisible && (
+                {supabaseAIEnabled && !isHipaaSubscription && isAiButtonVisible && (
                   <Button
                     type="default"
                     onClick={async () => {
-                      const { title, description } = await generateSqlTitle({
-                        sql: snippet.content.sql,
-                      })
-                      setNameInput(title)
-                      if (!descriptionInput) {
-                        setDescriptionInput(description)
+                      try {
+                        const { title, description } = await titleSql({
+                          sql: snippet.content.sql,
+                        })
+
+                        setNameInput(title)
+
+                        // Only update description if it was empty
+                        if (!descriptionInput) {
+                          setDescriptionInput(description)
+                        }
+                      } catch (error: unknown) {
+                        if (isError(error)) {
+                          ui.setNotification({
+                            category: 'error',
+                            message: error.message,
+                          })
+                        }
                       }
                     }}
                     size="tiny"
                     disabled={isTitleGenerationLoading}
-                    // className="!px-2 !py-0.5 !pr-3"
                   >
-                    {supabaseAIEnabled && !isHipaaSubscription && (
-                      <div className="flex items-center gap-1">
-                        <AiIconAnimation loading={isTitleGenerationLoading} className="scale-75" />
-                        <span>Rename with Supabase AI</span>
+                    <div className="flex items-center gap-1">
+                      <div className="scale-75">
+                        <AiIconAnimation loading={isTitleGenerationLoading} />
                       </div>
-                    )}
+                      <span>Rename with Supabase AI</span>
+                    </div>
                   </Button>
                 )}
               </div>

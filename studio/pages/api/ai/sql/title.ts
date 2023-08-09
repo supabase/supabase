@@ -94,6 +94,13 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     const errorResponse: ErrorResponse = await response.json()
     console.error(`AI title generation failed: ${errorResponse.error.message}`)
 
+    if ('code' in errorResponse.error && errorResponse.error.code === 'context_length_exceeded') {
+      return res.status(400).json({
+        error:
+          'Your SQL query is too large for Supabase AI to ingest. Try splitting it into smaller queries.',
+      })
+    }
+
     return res.status(500).json({
       error: 'There was an unknown error generating the snippet title. Please try again.',
     })
