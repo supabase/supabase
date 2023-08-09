@@ -1,10 +1,15 @@
 import { useParams } from 'common'
-import { useStore } from 'hooks'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { Button, Form, Input, Modal } from 'ui'
 
+import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
+import { SqlSnippet } from 'data/content/sql-snippets-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { isError } from 'data/utils/error-check'
+import { useFlag, useStore } from 'hooks'
+import { useState } from 'react'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
 export interface RenameQueryModalProps {
-  snippet: any
+  snippet: SqlSnippet
   visible: boolean
   onCancel: () => void
   onComplete: () => void
@@ -12,14 +17,23 @@ export interface RenameQueryModalProps {
 
 const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQueryModalProps) => {
   const { ui } = useStore()
-  const { ref } = useParams()
+  const { ref, slug } = useParams()
   const snap = useSqlEditorStateSnapshot()
+  const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
+
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+
+  // Customers on HIPAA plans should not have access to Supabase AI
+  const isHipaaSubscription = subscription?.plan?.id === 'hipaa'
 
   const { id, name, description } = snippet
 
-  const validate = (values: any) => {
+  const [nameInput, setNameInput] = useState(name)
+  const [descriptionInput, setDescriptionInput] = useState(description)
+
+  const validate = () => {
     const errors: any = {}
-    if (!values.name) errors.name = 'Please enter a query name'
+    if (!nameInput) errors.name = 'Please enter a query name'
     return errors
   }
 
@@ -29,7 +43,7 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
 
     setSubmitting(true)
     try {
-      snap.renameSnippet(id, values.name, values.description)
+      snap.renameSnippet(id, nameInput, descriptionInput)
       if (onComplete) onComplete()
       return Promise.resolve()
     } catch (error: any) {
@@ -40,6 +54,11 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
       })
     }
   }
+
+  const { mutateAsync: titleSql, isLoading: isTitleGenerationLoading } =
+    useSqlTitleGenerateMutation()
+
+  const isAiButtonVisible = !!snippet.content.sql
 
   return (
     <Modal visible={visible} onCancel={onCancel} hideFooter header="Rename" size="small">
@@ -56,10 +75,61 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
         {({ isSubmitting }: { isSubmitting: boolean }) => (
           <div className="space-y-4 py-4">
             <Modal.Content>
-              <Input label="Name" id="name" name="name" />
+              <Input
+                label="Name"
+                id="name"
+                name="name"
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+              />
+              <div className="flex w-full justify-end mt-2">
+                {supabaseAIEnabled && !isHipaaSubscription && isAiButtonVisible && (
+                  <Button
+                    type="default"
+                    onClick={async () => {
+                      try {
+                        const { title, description } = await titleSql({
+                          sql: snippet.content.sql,
+                        })
+
+                        setNameInput(title)
+
+                        // Only update description if it was empty
+                        if (!descriptionInput) {
+                          setDescriptionInput(description)
+                        }
+                      } catch (error: unknown) {
+                        if (isError(error)) {
+                          ui.setNotification({
+                            category: 'error',
+                            message: `Failed to rename query: ${error.message}`,
+                          })
+                        }
+                      }
+                    }}
+                    size="tiny"
+                    disabled={isTitleGenerationLoading}
+                  >
+                    <div className="flex items-center gap-1">
+                      <div className="scale-75">
+                        <AiIconAnimation loading={isTitleGenerationLoading} />
+                      </div>
+                      <span>Rename with Supabase AI</span>
+                    </div>
+                  </Button>
+                )}
+              </div>
             </Modal.Content>
             <Modal.Content>
-              <Input label="Description" id="description" placeholder="Describe query" />
+              <Input.TextArea
+                label="Description"
+                id="description"
+                placeholder="Describe query"
+                size="medium"
+                textAreaClassName="resize-none"
+                value={descriptionInput}
+                onChange={(e) => setDescriptionInput(e.target.value)}
+              />
             </Modal.Content>
             <Modal.Separator />
             <Modal.Content>
