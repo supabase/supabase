@@ -8,9 +8,9 @@
       <lastBuildDate>Tue, 08 Aug 2023 02:30:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
-  <guid>https://supabase.com/blog/supabase-studio-3.0</guid>
+  <guid>https://supabase.com/blog/supabase-studio-3-0</guid>
   <title>Supabase Studio 3.0: AI SQL Editor, Schema Diagrams, and new Wrappers</title>
-  <link>https://supabase.com/blog/supabase-studio-3.0</link>
+  <link>https://supabase.com/blog/supabase-studio-3-0</link>
   <description>Supabase Studio now comes with an AI assisted SQL Editor, schema diagrams, and much more.</description>
   <pubDate>Tue, 08 Aug 2023 02:30:00 GMT</pubDate>
 </item>
