@@ -1,7 +1,7 @@
 import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 import { IconLock, Listbox } from 'ui'
 
-interface Props {
+export interface PrivilegesHeadProps {
   selectedSchema: string
   selectedRole: string
   selectedTable?: PostgresTable
@@ -16,33 +16,42 @@ interface Props {
   onChangeTable: (table: string) => void
 }
 
-function PrivilegesHead(props: Props) {
+const PrivilegesHead = ({
+  selectedSchema,
+  availableSchemas,
+  protectedSchemas,
+  openSchemas,
+  isSchemaLocked,
+  onChangeSchema,
+  selectedRole,
+  roles,
+  onChangeRole,
+  selectedTable,
+  tables,
+  onChangeTable,
+}: PrivilegesHeadProps) => {
   return (
     <div className="mb-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <div className="w-[230px]">
             <SchemasListbox
-              selectedSchema={props.selectedSchema}
-              availableSchemas={props.availableSchemas}
-              openSchemas={props.openSchemas}
-              protectedSchemas={props.protectedSchemas}
-              isSchemaLocked={props.isSchemaLocked}
-              onChangeSchema={props.onChangeSchema}
+              selectedSchema={selectedSchema}
+              availableSchemas={availableSchemas}
+              openSchemas={openSchemas}
+              protectedSchemas={protectedSchemas}
+              isSchemaLocked={isSchemaLocked}
+              onChangeSchema={onChangeSchema}
             />
           </div>
           <div className="w-[230px]">
-            <RolesListbox
-              selectedRole={props.selectedRole}
-              roles={props.roles}
-              onChangeRole={props.onChangeRole}
-            />
+            <RolesListbox selectedRole={selectedRole} roles={roles} onChangeRole={onChangeRole} />
           </div>
           <div className="w-[230px]">
             <TablesListbox
-              selectedTable={props.selectedTable}
-              tables={props.tables}
-              onChangeTable={props.onChangeTable}
+              selectedTable={selectedTable}
+              tables={tables}
+              onChangeTable={onChangeTable}
             />
           </div>
         </div>
@@ -51,26 +60,33 @@ function PrivilegesHead(props: Props) {
   )
 }
 
-function SchemasListbox(props: {
+const SchemasListbox = ({
+  selectedSchema,
+  availableSchemas,
+  openSchemas,
+  protectedSchemas,
+  isSchemaLocked,
+  onChangeSchema,
+}: {
   selectedSchema: string
   availableSchemas: string[]
   openSchemas: PostgresSchema[]
   protectedSchemas: PostgresSchema[]
   isSchemaLocked: boolean
   onChangeSchema: (schema: string) => void
-}) {
+}) => {
   return (
     <Listbox
       size="small"
-      value={props.selectedSchema}
-      onChange={props.onChangeSchema}
-      icon={props.isSchemaLocked && <IconLock size={14} strokeWidth={2} />}
+      value={selectedSchema}
+      onChange={onChangeSchema}
+      icon={isSchemaLocked && <IconLock size={14} strokeWidth={2} />}
     >
       <Listbox.Option disabled key="normal-schemas" value="normal-schemas" label="Schemas">
         <p className="text-sm">Schemas</p>
       </Listbox.Option>
-      {props.openSchemas
-        .filter((schema) => props.availableSchemas.includes(schema.name))
+      {openSchemas
+        .filter((schema) => availableSchemas.includes(schema.name))
         .map((schema) => (
           <Listbox.Option
             key={schema.id}
@@ -89,8 +105,8 @@ function SchemasListbox(props: {
       >
         <p className="text-sm">Protected schemas</p>
       </Listbox.Option>
-      {props.protectedSchemas
-        .filter((schema) => props.availableSchemas.includes(schema.name))
+      {protectedSchemas
+        .filter((schema) => availableSchemas.includes(schema.name))
         .map((schema) => (
           <Listbox.Option
             key={schema.id}
@@ -105,17 +121,21 @@ function SchemasListbox(props: {
   )
 }
 
-function RolesListbox(props: {
+const RolesListbox = ({
+  selectedRole,
+  roles,
+  onChangeRole,
+}: {
   selectedRole: string
   roles: string[]
   onChangeRole: (role: string) => void
-}) {
+}) => {
   return (
-    <Listbox size="small" value={props.selectedRole} onChange={props.onChangeRole}>
+    <Listbox size="small" value={selectedRole} onChange={onChangeRole}>
       <Listbox.Option disabled key="normal-rols" value="normal-rols" label="Roles">
         <p className="text-sm">Roles</p>
       </Listbox.Option>
-      {props.roles.map((role) => (
+      {roles.map((role) => (
         <Listbox.Option
           key={role}
           value={role}
@@ -129,17 +149,21 @@ function RolesListbox(props: {
   )
 }
 
-function TablesListbox(props: {
+const TablesListbox = ({
+  selectedTable,
+  tables,
+  onChangeTable,
+}: {
   selectedTable?: PostgresTable
   tables: string[]
   onChangeTable: (table: string) => void
-}) {
+}) => {
   return (
-    <Listbox size="small" value={props.selectedTable?.name} onChange={props.onChangeTable}>
+    <Listbox size="small" value={selectedTable?.name} onChange={onChangeTable}>
       <Listbox.Option disabled key="normal-tables" value="normal-tables" label="Tables">
         <p className="text-sm">Tables</p>
       </Listbox.Option>
-      {props.tables.map((table) => (
+      {tables.map((table) => (
         <Listbox.Option
           key={table}
           value={table}

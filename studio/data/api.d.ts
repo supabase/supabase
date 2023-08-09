@@ -225,6 +225,14 @@ export interface paths {
     /** Gets the upcoming invoice */
     get: operations["OrgInvoicesController_getUpcomingInvoice"];
   };
+  "/platform/pg-meta/{ref}/column-privileges": {
+    /** Retrieve column privileges */
+    get: operations["ColumnPrivilegesController_getColumnPrivileges"];
+    /** Grant column privileges */
+    post: operations["ColumnPrivilegesController_grantColumnPrivileges"];
+    /** Revoke column privileges */
+    delete: operations["ColumnPrivilegesController_revokeColumnPrivileges"];
+  };
   "/platform/pg-meta/{ref}/columns": {
     /** Gets project pg.columns */
     get: operations["ColumnsController_getColumns"];
@@ -320,6 +328,14 @@ export interface paths {
   "/platform/pg-meta/{ref}/search/columns": {
     /** Searches project pg.columns. Return maximum 50 results. */
     post: operations["SearchController_searchColumns"];
+  };
+  "/platform/pg-meta/{ref}/table-privileges": {
+    /** Retrieve table privileges */
+    get: operations["TablePrivilegesController_getTablePrivileges"];
+    /** Grant table privileges */
+    post: operations["TablePrivilegesController_grantTablePrivileges"];
+    /** Revoke table privileges */
+    delete: operations["TablePrivilegesController_revokeTablePrivileges"];
   };
   "/platform/pg-meta/{ref}/tables": {
     /** Gets project pg.tables or pg.table with the given ID */
@@ -961,6 +977,14 @@ export interface paths {
     /** Updates organization member */
     patch: operations["MembersController_updateMember"];
   };
+  "/v0/pg-meta/{ref}/column-privileges": {
+    /** Retrieve column privileges */
+    get: operations["ColumnPrivilegesController_getColumnPrivileges"];
+    /** Grant column privileges */
+    post: operations["ColumnPrivilegesController_grantColumnPrivileges"];
+    /** Revoke column privileges */
+    delete: operations["ColumnPrivilegesController_revokeColumnPrivileges"];
+  };
   "/v0/pg-meta/{ref}/columns": {
     /** Gets project pg.columns */
     get: operations["ColumnsController_getColumns"];
@@ -1056,6 +1080,14 @@ export interface paths {
   "/v0/pg-meta/{ref}/search/columns": {
     /** Searches project pg.columns. Return maximum 50 results. */
     post: operations["SearchController_searchColumns"];
+  };
+  "/v0/pg-meta/{ref}/table-privileges": {
+    /** Retrieve table privileges */
+    get: operations["TablePrivilegesController_getTablePrivileges"];
+    /** Grant table privileges */
+    post: operations["TablePrivilegesController_grantTablePrivileges"];
+    /** Revoke table privileges */
+    delete: operations["TablePrivilegesController_revokeTablePrivileges"];
   };
   "/v0/pg-meta/{ref}/tables": {
     /** Gets project pg.tables or pg.table with the given ID */
@@ -2536,6 +2568,20 @@ export interface components {
       /** @enum {string} */
       tier: "tier_payg" | "tier_pro" | "tier_free" | "tier_team" | "tier_enterprise";
     };
+    ColumnPrivilege: {
+      grantor: string;
+      grantee: string;
+      /** @enum {string} */
+      privilege_type: "ALL" | "SELECT" | "INSERT" | "UPDATE" | "REFERENCES";
+      is_grantable: boolean;
+    };
+    PostgresColumnPrivileges: {
+      column_id: string;
+      relation_schema: string;
+      relation_name: string;
+      column_name: string;
+      privileges: (components["schemas"]["ColumnPrivilege"])[];
+    };
     PostgresColumn: {
       table_id: number;
       schema: string;
@@ -2795,6 +2841,19 @@ export interface components {
       schema: string;
       table_id: number;
       table: string;
+    };
+    TablePrivilege: {
+      grantor: string;
+      grantee: string;
+      /** @enum {string} */
+      privilege_type: "ALL" | "SELECT" | "INSERT" | "UPDATE" | "DELETE" | "TRUNCATE" | "REFERENCES" | "TRIGGER";
+      is_grantable: boolean;
+    };
+    PostgresTablePrivileges: {
+      schema: string;
+      name: string;
+      kind: string;
+      privileges: (components["schemas"]["TablePrivilege"])[];
     };
     PrimaryKey: {
       schema: string;
@@ -5499,6 +5558,82 @@ export interface operations {
       500: never;
     };
   };
+  /** Retrieve column privileges */
+  ColumnPrivilegesController_getColumnPrivileges: {
+    parameters: {
+      header: {
+        "x-connection-encrypted": string;
+      };
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["PostgresColumnPrivileges"])[];
+        };
+      };
+      403: never;
+      /** @description Failed to retrieve column privileges */
+      500: never;
+    };
+  };
+  /** Grant column privileges */
+  ColumnPrivilegesController_grantColumnPrivileges: {
+    parameters: {
+      header: {
+        "x-connection-encrypted": string;
+      };
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": (string)[];
+      };
+    };
+    responses: {
+      201: {
+        content: {
+          "application/json": (components["schemas"]["PostgresColumnPrivileges"])[];
+        };
+      };
+      403: never;
+      /** @description Failed to grant column privileges */
+      500: never;
+    };
+  };
+  /** Revoke column privileges */
+  ColumnPrivilegesController_revokeColumnPrivileges: {
+    parameters: {
+      header: {
+        "x-connection-encrypted": string;
+      };
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": (string)[];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["PostgresColumnPrivileges"])[];
+        };
+      };
+      403: never;
+      /** @description Failed to revoke column privileges */
+      500: never;
+    };
+  };
   /** Gets project pg.columns */
   ColumnsController_getColumns: {
     parameters: {
@@ -6410,6 +6545,82 @@ export interface operations {
       };
       403: never;
       /** @description Failed to search pg.columns */
+      500: never;
+    };
+  };
+  /** Retrieve table privileges */
+  TablePrivilegesController_getTablePrivileges: {
+    parameters: {
+      header: {
+        "x-connection-encrypted": string;
+      };
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["PostgresTablePrivileges"])[];
+        };
+      };
+      403: never;
+      /** @description Failed to retrieve table privileges */
+      500: never;
+    };
+  };
+  /** Grant table privileges */
+  TablePrivilegesController_grantTablePrivileges: {
+    parameters: {
+      header: {
+        "x-connection-encrypted": string;
+      };
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": (string)[];
+      };
+    };
+    responses: {
+      201: {
+        content: {
+          "application/json": (components["schemas"]["PostgresTablePrivileges"])[];
+        };
+      };
+      403: never;
+      /** @description Failed to grant table privileges */
+      500: never;
+    };
+  };
+  /** Revoke table privileges */
+  TablePrivilegesController_revokeTablePrivileges: {
+    parameters: {
+      header: {
+        "x-connection-encrypted": string;
+      };
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": (string)[];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["PostgresTablePrivileges"])[];
+        };
+      };
+      403: never;
+      /** @description Failed to revoke table privileges */
       500: never;
     };
   };

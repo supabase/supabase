@@ -1,29 +1,24 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { FC } from 'react'
 
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import { PrivilegeColumnUI } from './Privileges.types'
 import PrivilegesTable from './PrivilegesTable'
 
-interface Props {
+export interface PrivilegesBodyProps {
   columns: PrivilegeColumnUI[]
-  hasChanges: boolean
   table?: PostgresTable
-  onChange: (table: string, columnName: string, privileges: string[]) => void
 }
 
-const PrivilegesBody: FC<Props> = (props) => {
-  const { table } = props
-
-  const handleToggle = (tableName: string, column: PrivilegeColumnUI, privileges: string[]) => {
-    props.onChange(
-      tableName,
-      column.name,
-      column.privileges.some((p) => privileges.includes(p))
-        ? column.privileges.filter((p) => !privileges.includes(p))
-        : [...new Set([...column.privileges, ...privileges])]
-    )
-  }
+const PrivilegesBody = ({ table, columns }: PrivilegesBodyProps) => {
+  // const handleToggle = (tableName: string, column: PrivilegeColumnUI, privileges: string[]) => {
+  //   onChange(
+  //     tableName,
+  //     column.name,
+  // column.privileges.some((p) => privileges.includes(p))
+  //   ? column.privileges.filter((p) => !privileges.includes(p))
+  //   : [...new Set([...column.privileges, ...privileges])]
+  //   )
+  // }
 
   if (table === undefined) return <NoSearchResults />
 
@@ -36,8 +31,8 @@ const PrivilegesBody: FC<Props> = (props) => {
         </div>
       </div>
       <PrivilegesTable
-        columns={props.columns}
-        onToggle={(column, privileges) => handleToggle(table.name, column, privileges)}
+        columns={columns}
+        // onToggle={(column, privileges) => handleToggle(table.name, column, privileges)}
       />
     </section>
   )

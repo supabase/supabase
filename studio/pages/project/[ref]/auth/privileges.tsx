@@ -1,23 +1,17 @@
+import { PostgresRole } from '@supabase/postgres-meta'
 import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
-import { PostgresRole } from '@supabase/postgres-meta'
 import { useParams } from 'common/hooks'
-import { PrivilegesModal } from 'components/interfaces/Auth/Privileges'
 import Privileges from 'components/interfaces/Auth/Privileges/Privileges'
-import { PrivilegesState } from 'components/interfaces/Auth/Privileges/Privileges.types'
-import {
-  arePrivilegesEqual,
-  mapDataToPrivilegeColumnUI,
-} from 'components/interfaces/Auth/Privileges/Privileges.utils'
+import { mapDataToPrivilegeColumnUI } from 'components/interfaces/Auth/Privileges/Privileges.utils'
 import { AuthLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import EmptyPageState from 'components/ui/Error'
 import Connecting from 'components/ui/Loading/Loading'
 import { usePrivilegesQuery } from 'data/database/privileges-query'
 import { useStore } from 'hooks'
-import React from 'react'
 import { NextPageWithLayout } from 'types'
 
 const PrivilegesPage: NextPageWithLayout = () => {
@@ -41,12 +35,14 @@ const PrivilegesPage: NextPageWithLayout = () => {
 
   const [selectedTable, setSelectedTable] = useState<string>(pathParams.table ?? tables[0] ?? '')
 
-  const query = usePrivilegesQuery({
+  const {
+    data: privileges,
+    isLoading,
+    isError,
+    error,
+  } = usePrivilegesQuery({
     projectRef: ref,
     connectionString: project?.connectionString,
-    schema: selectedSchema,
-    table: selectedTable,
-    role: selectedRole,
   })
   const [protectedSchemas, openSchemas] = partition(schemaList, (schema) =>
     meta.excludedSchemas.includes(schema?.name ?? '')
@@ -55,14 +51,6 @@ const PrivilegesPage: NextPageWithLayout = () => {
   const isSchemaLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
   const roles = rolesList.map((role: PostgresRole) => role.name)
-
-  const [isModalOpen, setModalOpen] = React.useState(false)
-  const [data, setData] = React.useState<PrivilegesState>({})
-
-  const handleSuccess = () => {
-    setModalOpen(false)
-    query.refetch()
-  }
 
   const handleChangeSchema = (schema: string) => {
     const newTable = tableList.find((table) => table.schema === schema)?.name ?? ''
@@ -74,49 +62,20 @@ const PrivilegesPage: NextPageWithLayout = () => {
     setSelectedRole(role)
   }
 
-  if (query.isError) {
-    return <EmptyPageState error={query.error} />
+  const columnsState = useMemo(
+    () => mapDataToPrivilegeColumnUI(privileges, selectedSchema, selectedTable, selectedRole),
+    [privileges, selectedRole, selectedSchema, selectedTable]
+  )
+
+  if (isError) {
+    return <EmptyPageState error={error} />
   }
 
-  if (query.isLoading) {
+  if (isLoading) {
     return <Connecting />
   }
 
   const table = tableList.find((table) => table.name === selectedTable)
-
-  const columnsServerState = mapDataToPrivilegeColumnUI(
-    query.data,
-    table?.columns?.map((c) => c.name) ?? []
-  )
-  const columnsState = data[selectedSchema]?.[selectedRole]?.[selectedTable] ?? columnsServerState
-
-  const changes = {
-    schema: selectedSchema,
-    role: selectedRole,
-    table: selectedTable,
-    columns: columnsState,
-  }
-
-  const hasChanges = !arePrivilegesEqual(columnsState, columnsServerState)
-
-  const handleChangePrivileges = (table: string, columnName: string, privileges: string[]) => {
-    setData((data) => {
-      const columns = data[selectedSchema]?.[selectedRole]?.[table] ?? columnsServerState
-
-      return {
-        ...data,
-        [selectedSchema]: {
-          ...data[selectedSchema],
-          [selectedRole]: {
-            ...data[selectedSchema]?.[selectedRole],
-            [table]: columns.map((column) =>
-              column.name === columnName ? { ...column, privileges } : column
-            ),
-          },
-        },
-      }
-    })
-  }
 
   return (
     <>
@@ -131,20 +90,9 @@ const PrivilegesPage: NextPageWithLayout = () => {
         protectedSchemas={protectedSchemas}
         roles={roles}
         isSchemaLocked={isSchemaLocked}
-        hasChanges={hasChanges}
         onChangeSchema={handleChangeSchema}
         onChangeRole={handleChangeRole}
         onChangeTable={setSelectedTable}
-        onChangePrivileges={handleChangePrivileges}
-        onReset={() => setData({})}
-        onClickSave={() => setModalOpen(true)}
-      />
-      <PrivilegesModal
-        visible={isModalOpen}
-        original={query.data}
-        changes={changes}
-        onCancel={() => setModalOpen(false)}
-        onSuccess={handleSuccess}
       />
     </>
   )
