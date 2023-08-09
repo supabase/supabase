@@ -103,6 +103,7 @@ const SQLEditor = () => {
   const [aiInput, setAiInput] = useState('')
   const [debugSolution, setDebugSolution] = useState<string>()
   const [sqlDiff, setSqlDiff] = useState<ContentDiff>()
+  const [pendingTitle, setPendingTitle] = useState<string>()
   const inputRef = useRef<HTMLInputElement>(null)
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
 
@@ -293,6 +294,10 @@ const SQLEditor = () => {
             range: editorModel.getFullModelRange(),
           },
         ])
+
+        if (pendingTitle) {
+          snap.renameSnippet(id, pendingTitle)
+        }
       }
 
       Telemetry.sendEvent(
@@ -309,10 +314,22 @@ const SQLEditor = () => {
       setSelectedDiffType(DiffType.Modification)
       setDebugSolution(undefined)
       setSqlDiff(undefined)
+      setPendingTitle(undefined)
     } finally {
       setIsAcceptDiffLoading(false)
     }
-  }, [sqlDiff, selectedDiffType, handleNewQuery, titleSql, debugSolution, telemetryProps, router])
+  }, [
+    sqlDiff,
+    selectedDiffType,
+    handleNewQuery,
+    titleSql,
+    debugSolution,
+    telemetryProps,
+    router,
+    id,
+    pendingTitle,
+    snap,
+  ])
 
   const discardAiHandler = useCallback(() => {
     Telemetry.sendEvent(
@@ -327,6 +344,7 @@ const SQLEditor = () => {
 
     setDebugSolution(undefined)
     setSqlDiff(undefined)
+    setPendingTitle(undefined)
   }, [debugSolution, telemetryProps, router])
 
   useEffect(() => {
@@ -522,9 +540,10 @@ const SQLEditor = () => {
                               const currentSql = editorRef.current?.getValue()
 
                               let sql: string | undefined
+                              let title: string | undefined
 
                               if (!currentSql) {
-                                ;({ sql } = await generateSql({
+                                ;({ sql, title } = await generateSql({
                                   prompt,
                                   entityDefinitions,
                                 }))
@@ -560,6 +579,10 @@ const SQLEditor = () => {
                                 original: currentSql ?? '',
                                 modified: formattedSql,
                               })
+
+                              if (title) {
+                                setPendingTitle(title)
+                              }
                             } catch (error: unknown) {
                               if (isError(error)) {
                                 ui.setNotification({
