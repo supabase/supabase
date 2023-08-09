@@ -5,7 +5,7 @@ import { useBreakpoint } from 'common/hooks/useBreakpoint'
 
 import days, { WeekDayProps } from './lw8_data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { AccordionHeader, CartTitle, SectionButtons, StyledArticleBadge } from './components'
+import { AccordionHeader, CartTitle, SectionButtons } from './components'
 
 export const defaultEase = [0.25, 0.25, 0, 1]
 export const defaultDuratonIn = 0.25
@@ -98,12 +98,12 @@ export default function LW8Releases() {
   const publishedSections =
     days
       .filter(
-        (day: WeekDayProps) => day.d === 0 || Date.parse(day.publishedAt) <= Date.now() || showAll
+        (day: WeekDayProps) => Date.parse(day.publishedAt) <= Date.now() || day.shipped || showAll
       )
       .map((day: WeekDayProps) => day.d.toString()) ?? []
 
-  const day1Shipped = Date.parse(day1.publishedAt) <= Date.now()
-  const day2Shipped = Date.parse(day2.publishedAt) <= Date.now()
+  const day1Shipped = true
+  const day2Shipped = true
   const day3Shipped = Date.parse(day3.publishedAt) <= Date.now()
   const day4Shipped = Date.parse(day4.publishedAt) <= Date.now()
   const day5Shipped = Date.parse(day5.publishedAt) <= Date.now()
@@ -120,7 +120,7 @@ export default function LW8Releases() {
           chevronAlign="right"
           defaultValue={publishedSections}
         >
-          <div className="border-b border-[#111718]" id="currentDay">
+          <div className="border-b border-[#111718]">
             <Accordion.Item
               header={
                 <AccordionHeader
@@ -138,24 +138,24 @@ export default function LW8Releases() {
               id={preRelease.d.toString()}
             >
               {preRelease.steps.length > 0 && (
-                <div className="h-[400px] flex flex-col gap-5 lg:flex-row pb-4">
+                <div className="flex flex-col gap-5 lg:flex-row pb-4">
                   <motion.div
                     className={`
-                      relative overflow-hidden group/3 flex-1 flex flex-col items-center lg:items-start justify-between
-                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl h-full bg-no-repeat py-10 lg:py-14 px-8 lg:px-10 text-2xl bg-contain shadow-lg
+                      min-h-[400px] relative overflow-hidden group/pre0 flex-1 flex flex-col items-center justify-between
+                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
                       `}
                     initial="default"
                     animate="default"
                     whileHover="hover"
                   >
                     <div
-                      className="inset-0 absolute group-hover/3:scale-105 opacity-60 group-hover/3:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
+                      className="inset-0 absolute group-hover/pre0:scale-105 opacity-10 group-hover/pre0:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
                       style={{
-                        background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, #030A0C)`,
+                        background: `radial-gradient(100% 100% at 80% 110%, #6F13A490, #030A0C)`,
                       }}
                     />
-                    <div className="flex flex-col items-center lg:items-start gap-2 max-w-[400px] w-full text-center lg:text-left">
-                      <CartTitle>{preRelease.steps[0]?.title}</CartTitle>
+                    <div className="flex flex-col items-center gap-2 min-w-[300px] w-full text-center lg:text-left">
+                      <CartTitle>{preRelease.steps[0].title}</CartTitle>
                       <p className="text-sm text-slate-900">{preRelease.steps[0]?.description}</p>
                     </div>
                     <SectionButtons blog={preRelease.steps[0].blog} />
@@ -178,8 +178,99 @@ export default function LW8Releases() {
                                   w-full h-full -z-10 transition-all duration-300
                                 `}
                                 layout="fill"
+                                objectPosition="100%"
+                                objectFit="cover"
+                              />
+                            </motion.div>
+                          )
+                      )}
+                  </motion.div>
+                  <motion.div
+                    className={`
+                      min-h-[400px] relative overflow-hidden group/pre1 flex-1 flex flex-col items-center justify-between
+                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-cover shadow-lg
+                      `}
+                    initial="default"
+                    animate="default"
+                    whileHover="hover"
+                  >
+                    <div
+                      className="inset-0 absolute group-hover/pre1:scale-105 opacity-60 group-hover/pre1:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
+                      style={{
+                        background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, #030A0C)`,
+                      }}
+                    />
+                    <div className="flex flex-col items-center gap-2 min-w-[300px] w-full text-center lg:text-left">
+                      <CartTitle>{preRelease.steps[1].title}</CartTitle>
+                      <p className="text-sm text-slate-900">{preRelease.steps[1]?.description}</p>
+                    </div>
+                    <SectionButtons
+                      github={preRelease.steps[1].github}
+                      hackernews={preRelease.steps[1].hackernews}
+                    />
+                    {preRelease.steps[1]?.bg_layers &&
+                      preRelease.steps[1]?.bg_layers?.map(
+                        (layer, i) =>
+                          !!layer.img && (
+                            <motion.div
+                              className="absolute opacity-90 inset-0 w-full h-full -z-10"
+                              variants={i === 1 ? scaleOpacityVariant : undefined}
+                            >
+                              <Image
+                                src={
+                                  !!layer.mobileImg && isTablet
+                                    ? (layer.mobileImg as any)
+                                    : layer.img
+                                }
+                                className={`
+                                  absolute opacity-90
+                                  w-full h-full -z-10 transition-all duration-300
+                                `}
+                                layout="fill"
+                                objectPosition="20% 50%"
+                                objectFit="cover"
+                              />
+                            </motion.div>
+                          )
+                      )}
+                  </motion.div>
+                  <motion.div
+                    className={`
+                      min-h-[400px] relative overflow-hidden group/pre2 flex-1 flex flex-col items-center justify-between
+                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
+                      `}
+                    initial="default"
+                    animate="default"
+                    whileHover="hover"
+                  >
+                    <div
+                      className="inset-0 absolute group-hover/pre2:scale-105 opacity-60 group-hover/pre2:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
+                      style={{
+                        background: `radial-gradient(100% 100% at 80% 110%, #6F13A450, #030A0C)`,
+                      }}
+                    />
+                    <div className="flex flex-col items-center gap-2 w-full text-center">
+                      <CartTitle>{preRelease.steps[2].title}</CartTitle>
+                      <p className="text-sm text-slate-900">{preRelease.steps[2]?.description}</p>
+                    </div>
+                    <SectionButtons blog={preRelease.steps[2].blog} />
+                    {preRelease.steps[2]?.bg_layers &&
+                      preRelease.steps[2]?.bg_layers?.map(
+                        (layer, i) =>
+                          !!layer.img && (
+                            <motion.div
+                              className="absolute opacity-90 inset-0 w-full h-full -z-10"
+                              variants={i === 1 ? scaleOpacityVariant : undefined}
+                            >
+                              <Image
+                                src={layer.img}
+                                className={`
+                                  absolute opacity-90
+                                  w-full h-full -z-10 transition-all duration-300
+                                `}
+                                layout="fill"
                                 objectPosition={
-                                  isTablet ? '50%' : isDesktop ? '200% 50%' : '100% 50%'
+                                  isTablet ? '50%' : isDesktop ? '100% 50%' : '30% 50%'
                                 }
                                 objectFit="contain"
                               />
@@ -191,39 +282,139 @@ export default function LW8Releases() {
               )}
             </Accordion.Item>
           </div>
-          <div className="border-b border-[#111718]">
-            <Accordion.Item
-              header={
-                <AccordionHeader
-                  date={day1.date}
-                  day={day1.d}
-                  weekDay={day1.dd}
-                  title={day1.title}
-                  shipped={day1Shipped}
-                  publishedAt={day1.publishedAt}
-                />
-              }
-              disabled={!day1Shipped}
-              className="h-[79px]"
-              id={day1.d.toString()}
-            ></Accordion.Item>
+          <div className="border-b border-[#111718] scroll-mt-16">
+            <AccordionHeader
+              date={day1.date}
+              day={day1.d}
+              weekDay={day1.dd}
+              title={day1.title}
+              shipped={day1Shipped}
+              publishedAt={day1.publishedAt}
+              youtube_id={day1.youtube_id}
+              videoThumbnail={day1.videoThumbnail}
+            />
+
+            {day1.steps.length > 0 && (
+              <div className="flex flex-col gap-5 lg:flex-row pb-4">
+                <motion.div
+                  className={`
+                      min-h-[400px] relative overflow-hidden group/d1 flex-1 flex flex-col items-center lg:items-start justify-between
+                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
+                      `}
+                  initial="default"
+                  animate="default"
+                  whileHover="hover"
+                >
+                  <div
+                    className="inset-0 absolute group-hover/d1:scale-105 opacity-60 group-hover/d1:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
+                    style={{
+                      background: `radial-gradient(100% 100% at 80% 80%, #6F13A450, #030A0C)`,
+                    }}
+                  />
+                  <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
+                    <CartTitle>{day1.steps[0].title}</CartTitle>
+                    <p className="text-sm text-slate-900">{day1.steps[0]?.description}</p>
+                  </div>
+                  <SectionButtons
+                    blog={day1.steps[0].blog}
+                    // video={day1.steps[0].video}
+                    hackernews={day1.steps[0].hackernews}
+                    // twitter_spaces={day1.steps[0].twitter_spaces}
+                    // mobileGrid
+                  />
+                  {day1.steps[0]?.bg_layers &&
+                    day1.steps[0]?.bg_layers?.map(
+                      (layer, i) =>
+                        !!layer.img && (
+                          <motion.div
+                            className="absolute opacity-90 inset-0 w-full h-full -z-10"
+                            variants={i === 1 ? scaleOpacityVariant : undefined}
+                          >
+                            <Image
+                              src={
+                                !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
+                              }
+                              className={`
+                                  absolute opacity-90
+                                  w-full h-full -z-10 transition-all duration-300
+                                `}
+                              layout="fill"
+                              objectPosition={isTablet ? '50%' : '90% 50%'}
+                              objectFit="contain"
+                            />
+                          </motion.div>
+                        )
+                    )}
+                </motion.div>
+              </div>
+            )}
           </div>
-          <div className="border-b border-[#111718]">
-            <Accordion.Item
-              header={
-                <AccordionHeader
-                  date={day2.date}
-                  day={day2.d}
-                  weekDay={day2.dd}
-                  title={day2.title}
-                  shipped={day2Shipped}
-                  publishedAt={day2.publishedAt}
-                />
-              }
-              disabled={!day2Shipped}
-              className="h-[79px]"
-              id={day2.d.toString()}
-            ></Accordion.Item>
+          <div className="border-b border-[#111718] scroll-mt-16" id="today">
+            <AccordionHeader
+              date={day2.date}
+              day={day2.d}
+              weekDay={day2.dd}
+              title={day2.title}
+              shipped={day2Shipped}
+              publishedAt={day2.publishedAt}
+              youtube_id={day2.youtube_id}
+              videoThumbnail={day2.videoThumbnail}
+            />
+
+            {day2.steps.length > 0 && (
+              <div className="flex flex-col gap-5 lg:flex-row pb-4">
+                <motion.div
+                  className={`
+                      min-h-[400px] relative overflow-hidden group/d1 flex-1 flex flex-col items-center lg:items-start justify-between
+                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
+                      `}
+                  initial="default"
+                  animate="default"
+                  whileHover="hover"
+                >
+                  <div
+                    className="inset-0 absolute group-hover/d1:scale-105 opacity-60 group-hover/d1:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
+                    style={{
+                      background: `radial-gradient(100% 100% at 80% 80%, #6F13A450, #030A0C)`,
+                    }}
+                  />
+                  <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
+                    <CartTitle>{day2.steps[0].title}</CartTitle>
+                    <p className="text-sm text-slate-900">{day2.steps[0]?.description}</p>
+                  </div>
+                  <SectionButtons
+                    blog={day2.steps[0].blog}
+                    // video={day2.steps[0].video}
+                    hackernews={day2.steps[0].hackernews}
+                    // twitter_spaces={day2.steps[0].twitter_spaces}
+                    // mobileGrid
+                  />
+                  {day2.steps[0]?.bg_layers &&
+                    day2.steps[0]?.bg_layers?.map(
+                      (layer, i) =>
+                        !!layer.img && (
+                          <motion.div
+                            className="absolute opacity-90 inset-0 w-full h-full -z-10"
+                            variants={i === 1 ? scaleOpacityVariant : undefined}
+                          >
+                            <Image
+                              src={
+                                !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
+                              }
+                              className={`
+                                  absolute opacity-90
+                                  w-full h-full -z-10 transition-all duration-300
+                                `}
+                              layout="fill"
+                              // objectPosition={isTablet ? '50%' : '90% 50%'}
+                              objectFit="cover"
+                            />
+                          </motion.div>
+                        )
+                    )}
+                </motion.div>
+              </div>
+            )}
           </div>
           <div className="border-b border-[#111718]">
             <Accordion.Item

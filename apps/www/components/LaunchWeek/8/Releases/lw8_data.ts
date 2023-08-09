@@ -1,6 +1,13 @@
 const images = {
-  '00-constellation': '/images/launchweek/8/day0/constellation-pre.svg',
-  '00-constellation-mobile': '/images/launchweek/8/day0/constellation.svg',
+  yt_thumbnail: '/images/launchweek/8/lw8-yt-thumb.jpg',
+  day_1_thumb: '/images/launchweek/8/day1/yt_d1.jpg',
+  day_2_thumb: '/images/launchweek/8/day2/yt_d2.jpg',
+  '00-stay-remote': '/images/launchweek/8/day0/remote.png',
+  '00-pg-server': '/images/launchweek/8/day0/pg-server.png',
+  '00-constellation': '/images/launchweek/8/day0/constellation.svg',
+  '01-hugging': '/images/launchweek/8/day1/hugging.svg',
+  '02-localdev': '/images/launchweek/8/day2/localdev.svg',
+  '02-localdev-mobile': '/images/launchweek/8/day2/localdev-mobile.svg',
 }
 
 export interface StepProps {
@@ -16,6 +23,7 @@ export interface StepProps {
   thumb?: string
   url?: string
   video?: string
+  twitter_spaces?: string
   className?: string
   hideInBlog?: boolean
   bg_layers?: {
@@ -34,8 +42,10 @@ export interface WeekDayProps {
   d: number
   dd: string
   youtube_id: string
+  videoThumbnail?: string
   blogpost: string
   docs: string
+  twitter_spaces?: string
   steps: StepProps[] | []
 }
 
@@ -55,28 +65,50 @@ const days: WeekDayProps[] = [
     docs: '',
     steps: [
       {
-        title:
-          'Coding the stars - an interactive constellation with Three.js and React Three Fiber',
+        title: "Why we'll stay remote",
+        blog: '/blog/why-supabase-remote',
+        bg_layers: [{ img: images['00-stay-remote'] }],
+        steps: [],
+      },
+      {
+        title: 'Postgres Language Server',
+        github: 'https://github.com/supabase/postgres_lsp',
+        hackernews: 'https://news.ycombinator.com/item?id=37020610',
+        bg_layers: [{ img: images['00-pg-server'] }],
+        steps: [],
+      },
+      {
+        title: 'Coding an interactive constellation with Three.js and React Three Fiber',
         blog: '/blog/interactive-constellation-threejs-react-three-fiber',
-        bg_layers: [
-          { img: images['00-constellation'], mobileImg: images['00-constellation-mobile'] },
-        ],
+        bg_layers: [{ img: images['00-constellation'] }],
         steps: [],
       },
     ],
   },
   {
     title: '',
-    shipped: false,
+    shipped: true,
     date: '07 Aug',
     publishedAt: '2023-08-07T09:00:00.000-07:00',
     description: '',
     d: 1,
     dd: 'Mon',
-    youtube_id: '',
+    youtube_id: 'RJccSbJ9Go4',
+    videoThumbnail: images.day_1_thumb,
     blogpost: '',
     docs: '',
-    steps: [],
+    twitter_spaces: 'https://twitter.com/i/spaces/1DXGyvjkeEeJM',
+    steps: [
+      {
+        title: 'Hugging Face now supported in Supabase',
+        blog: '/blog/hugging-face-supabase',
+        hackernews: 'https://news.ycombinator.com/item?id=37035960',
+        video: 'https://www.youtube.com/watch?v=RJccSbJ9Go4',
+        twitter_spaces: 'https://twitter.com/i/spaces/1DXGyvjkeEeJM',
+        bg_layers: [{ img: images['01-hugging'] }],
+        steps: [],
+      },
+    ],
   },
   {
     title: '',
@@ -86,10 +118,22 @@ const days: WeekDayProps[] = [
     description: '',
     d: 2,
     dd: 'Tue',
-    youtube_id: 'cPGxPl1lx4Y',
+    youtube_id: 'N0Wb85m3YMI',
+    videoThumbnail: images.day_2_thumb,
     blogpost: '',
+    twitter_spaces: 'https://twitter.com/i/spaces/1vAxRAvNQyDJl?s=20',
     docs: '',
-    steps: [],
+    steps: [
+      {
+        title: 'Supabase Local Dev: Migrations, Branching, Observability',
+        blog: '/blog/supabase-local-dev',
+        hackernews: '',
+        video: '',
+        twitter_spaces: 'https://twitter.com/i/spaces/1vAxRAvNQyDJl?s=20',
+        bg_layers: [{ img: images['02-localdev'], mobileImg: images['02-localdev-mobile'] }],
+        steps: [],
+      },
+    ],
   },
   {
     title: '',
