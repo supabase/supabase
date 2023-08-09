@@ -77,7 +77,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
                   <AiIconAnimation className="w-3 h-3" loading={isDebugSqlLoading} />
                 </div>
               }
-              disabled={!!sqlDiff}
+              disabled={!!sqlDiff || isDebugSqlLoading}
               onClick={async () => {
                 try {
                   const { solution, sql } = await debugSql({
