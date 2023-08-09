@@ -183,9 +183,9 @@ function Partner({
                   {partner.video && (
                     <div className="mb-6">
                       <ExpandableVideo
-                        imgUrl=""
                         videoId={partner.video}
                         imgOverlayText="Watch an introductory video"
+                        triggerContainerClassName="w-full"
                       />
                     </div>
                   )}
