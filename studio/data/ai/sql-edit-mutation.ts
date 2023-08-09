@@ -1,6 +1,7 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { isResponseOk, post } from 'lib/common/fetch'
 import { BASE_PATH } from 'lib/constants'
+import { ResponseError } from 'types'
 
 export type SqlEditResponse = {
   sql: string
@@ -31,8 +32,8 @@ type SqlEditData = Awaited<ReturnType<typeof editSql>>
 export const useSqlEditMutation = ({
   onSuccess,
   ...options
-}: Omit<UseMutationOptions<SqlEditData, unknown, SqlEditVariables>, 'mutationFn'> = {}) => {
-  return useMutation<SqlEditData, unknown, SqlEditVariables>((vars) => editSql(vars), {
+}: Omit<UseMutationOptions<SqlEditData, ResponseError, SqlEditVariables>, 'mutationFn'> = {}) => {
+  return useMutation<SqlEditData, ResponseError, SqlEditVariables>((vars) => editSql(vars), {
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
     },
