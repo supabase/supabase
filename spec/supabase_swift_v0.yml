@@ -2148,7 +2148,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          let url = try await supabase.auth.signOut()
+          try await supabase.auth.signOut()
           ```
   - id: verify-otp
     title: 'verifyOtp()'
