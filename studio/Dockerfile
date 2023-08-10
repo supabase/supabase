@@ -13,6 +13,7 @@ FROM node:18-slim as base
 # Fixes issues with Sentry CLI and SSL certificates during build
 RUN apt-get update -qq && \
     apt-get install -y ca-certificates && \
+    rm -rf /var/lib/apt/lists/* && \
     update-ca-certificates
 
 WORKDIR /app
