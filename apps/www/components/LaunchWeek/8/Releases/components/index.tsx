@@ -337,6 +337,7 @@ export const SectionButtons = ({
   url,
   hackernews,
   twitter_spaces,
+  templates,
   mobileGrid,
 }: {
   blog?: string
@@ -346,6 +347,7 @@ export const SectionButtons = ({
   url?: string
   hackernews?: string
   twitter_spaces?: string
+  templates?: string
   mobileGrid?: boolean
 }) => {
   return (
@@ -400,6 +402,14 @@ export const SectionButtons = ({
           Hacker News
           <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <HackernewsSvg />
+          </div>
+        </ChipLink>
+      )}
+      {templates && (
+        <ChipLink href={templates} target="_blank" className="col-span-full">
+          Templates
+          <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
+            <DocsSvg />
           </div>
         </ChipLink>
       )}
