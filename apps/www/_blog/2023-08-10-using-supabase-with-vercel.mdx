@@ -1,0 +1,147 @@
+---
+title: 'Supabase, Vercel, and Next.js 13'
+description: 'Using Supabase with Vercel and Next.js is now a lot easier.'
+launchweek: 8
+tags:
+  - launch-week
+  - integrations
+date: '2023-08-10'
+published_at: '2023-08-10T09:00:00.000-07:00'
+toc_depth: 3
+author: jonny
+image: launch-week-8/day-3/og-day3.jpg
+thumb: launch-week-8/day-3/thumb-day3.jpg
+---
+
+Vercel's open source framework, [Next.js](https://nextjs.org/), is the most popular choice of frontend framework when developing an app with Supabase.
+
+Vercel's developer experience is second-to-none, and we feel it's important to provide Supabase developers with all the tools they need to develop with the platforms they love.
+For the past few months, we've doubled-down on the Vercel x Supabase experience. Here are some of newest improvements we've made.
+
+## The New Supabase x Vercel integration
+
+Our new [Vercel Integration](https://vercel.com/integrations/supabase-v2) streamlines the process of creating, deploying, and maintaining web applications.
+
+New projects can be launched using any of our [Starter Kits](#starter-kits). You link an existing Vercel project inside the Supabase [Dashboard](https://app.supabase.com/org/_/integrations).
+
+### Monorepo support
+
+You can now link multiple Vercel projects to a single Supabase project:
+
+![Vercel in the Supabase dashboard](/images/blog/launch-week-8/day-4/vercel-dashboard.png)
+
+Previously we mapped each Vercel project to a single Supabase project. With this release, we're introducing the concept of project 'Connections'. Any Supabase project can have an unlimited number of Vercel Connections, especially helpful for monorepos using [Turborepo](https://turbo.build/).
+
+### Automatically managed Supabase config
+
+We've improved the way we manage your Supabase environment variables.
+
+![Vercel config](/images/blog/launch-week-8/day-4/vercel-config.png)
+
+Supabase keeps each of your Vercel Projects updated with Environment Variables, managing your secrets (like `service-role-key`) and public variables (like `supabase-url`).
+
+Importantly, Supabase also updates the Auth Redirect URIs to match your main Vercel project domain, and any preview deployment URLs. We listen to the Vercel webhooks for any deployments and adjust your redirects accordingly.
+
+<BlogCollapsible title="View the full list of environment variables">
+
+    {/* prettier-ignore */}
+    ```jsx
+    POSTGRES_URL // URL of your Postgres database.
+    POSTGRES_URL_NON_POOLING // URL of your Postgres database without pooling.
+    POSTGRES_USER // Username for your Postgres database.
+    POSTGRES_HOST // Host for your Postgres database.
+    POSTGRES_PASSWORD // Password for your Postgres database.
+    POSTGRES_DATABASE // Name of your Postgres database.
+    SUPABASE_SERVICE_ROLE_KEY // Service role key for your Supabase project.
+    SUPABASE_URL // URL for your Supabase project.
+    SUPABASE_ANON_KEY // Anonymous key for your Supabase project.
+    NEXT_PUBLIC_SUPABASE_URL // Publicly accessible URL for your Supabase project.
+    NEXT_PUBLIC_SUPABASE_ANON_KEY // Publicly accessible anonymous key for your Supabase project.
+    ```
+
+    _We've used the same naming convention as Vercel Postgres to make it easy to migrate between platforms._
+
+</BlogCollapsible>
+
+### Starter kits
+
+Don't have a project to work on yet? Not a problem, Supabase has a range of Starter kits. With the click of a button you can you have an full-stack application running in less than a minute.
+
+You can find a Vercel Starter kit by looking for Vercel's blue "Deploy Button". Clicking on any one of these buttons will:
+
+1. Take you to Vercel to clone the repository to your own GitHub account/organization
+2. Auto install the Supabase Integration (if not already done so).
+3. Then we make things really easy: Supabase checks for any migrations in the Starter kit, and if so, we'll run them in your new Supabase project.
+
+After Vercel has deployed the app, it works without any additional configuration. Starter kits include everything from table schemas, authentication, and sample data from the `seed.sql` file.
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/0252085d-f9d2-46ac-b30c-00122e5d2eeb/Untitled.png)
+
+**Vercel AI Chatbot**
+Next.js 13, Open AI, Vercel Function, Auth
+
+### Database branching
+
+We announced Database Branching on [Tuesday](/blog/supabase-local-dev#branching-and-preview-environments). We've designed this to work perfectly with Vercel's Preview Deployments.
+
+![Vercel config](/images/blog/launch-week-8/day-4/supabase-vercel-branching.png)
+
+For now, Branching in Supabase is limited to development partners, but we'll be rolling it out to everyone over the coming months. If you're interested in testing the new features, [sign up for early access](https://forms.supabase.com/branching-request).
+
+## Next.js 13 App Router Support
+
+The new App Router in Next.js adds a lot of exciting features, like React Suspense and Streaming. Supabase has built support for both modalities of Next.js - the Pages Router and the new App Router.
+
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/w3LD0Z73vgU"
+    title="YouTube video player"
+    frameBorder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  ></iframe>
+</div>
+
+The Next.js App Router adds support for server-side features - Server Components, Route Handlers and Server Actions. Server-side rendering is powerful, but also makes it difficult to share state across user sessions. Supabase Auth solves this problem by storing session data in cookies, and we've simplified this for you with our new [Next.js Auth Helpers](https://supabase.com/docs/guides/auth/auth-helpers/nextjs).
+
+You can use `supabase-js` in all the new server based areas of App Router based Next.js:
+
+- [Server Components](/docs/guides/auth/auth-helpers/nextjs#server-components) — `createServerComponentClient`
+- [Server Actions](/docs/guides/auth/auth-helpers/nextjs#server-actions) — `createServerActionClient`
+- [Route Handlers](/docs/guides/auth/auth-helpers/nextjs#route-handlers) — `createRouteHandlerClient`
+- [Middleware](/docs/guides/auth/auth-helpers/nextjs#middleware) — `createMiddlewareClient`
+
+For client components, Supabase works exactly as it did before. Next.js explicitly supports this by adding `'use client'` to the top of pages/components.
+
+## Scaffolding a new Next.js app with Supabase
+
+[create-next-app](https://nextjs.org/docs/pages/api-reference/create-next-app) is one of the easiest way to get started with Next.js.
+
+We've created a new template for `create-next-app` scaffolding Supabase projects:
+
+```markdown
+npx create-next-app --with-supabase
+```
+
+This new official template is fully-loaded with the new App Router setup.
+
+Check out the [`/app/_examples`](https://github.com/vercel/next.js/blob/canary/examples/with-supabase/app/_examples) folder for an example of creating a Supabase client in:
+
+- [Client Components](https://github.com/vercel/next.js/blob/canary/examples/with-supabase/app/_examples/client-component/page.tsx)
+- [Server Components](https://github.com/vercel/next.js/blob/canary/examples/with-supabase/app/_examples/server-component/page.tsx)
+- [Route Handlers](https://github.com/vercel/next.js/blob/canary/examples/with-supabase/app/_examples/route-handler/route.ts)
+- [Server Actions](https://github.com/vercel/next.js/blob/canary/examples/with-supabase/app/_examples/server-action/page.tsx)
+
+## More integrations
+
+We've got plenty more in store for Next.js developers which we will be rolling out over the next few months. If you're looking for more integrations, or you want to build your own, we're also launching a new Supabase [Integrations Marketplace](/blog/supabase-integrations-marketplace).
+
+## More Launch Week 8
+
+- [Supabase Local Dev: migrations, branching, and observability](/blog/supabase-local-dev)
+- [Hugging Face is now supported in Supabase](/blog/hugging-face-supabase)
+- [Launch Week 8](/launch-week)
+- [Coding the stars - an interactive constellation with Three.js and React Three Fiber](/blog/interactive-constellation-threejs-react-three-fiber)
+- [Why we'll stay remote](/blog/why-supabase-remote)
+- [Postgres Language Server](https://github.com/supabase/postgres_lsp)
