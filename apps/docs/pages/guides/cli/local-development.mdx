@@ -423,39 +423,15 @@ If you have additional triggers or RLS policies defined on your `auth` schema, y
 supabase db remote commit --schema auth
 ```
 
-### Enabling Local Logging
+### Local Logging
 
-Local logs rely on the Supabase Analytics Server. This can be enabled via the CLI configuration, and requires a Google Cloud project and BigQuery access.
+Local logs rely on the Supabase Analytics Server, and are available in the Studio automatically.
 
 <Admonition type="note">
-  The Google Cloud project must have billing enabled. The dataset created and managed by Analytics
-  will be within the US. Read more about this requirement
-  [here](https://supabase.com/docs/reference/self-hosting-analytics/introduction#bigquery).
+  For advanced logs analysis using the Logs Explorer, it is advised to use the BigQuery backend instead of the default Postgres backend. Read about the steps [here](https://supabase.com/docs/reference/self-hosting-analytics/introduction#bigquery).
 </Admonition>
 
-Requirements:
-
-1. Google Cloud project number
-2. Google Cloud project ID
-3. Google Cloud Service Account Key, obtained through [Google Cloud IAM dashboard](https://console.cloud.google.com/iam-admin/iam), with BigQuery Admin role assigned to the service account.
-
-Once you have these 3 items, follow these steps:
-
-First, update your project's `supabase/config.toml`:
-
-```bash
-[analytics]
-enabled = true
-gcp_project_number = "123456"
-gcp_project_id = "my-project-id"
-gcp_jwt_path = "supabase/gcloud.json"
-```
-
-Next, place your service account key (a JSON file) at the corresponding path and ensure that it is correctly named.
-
-Last, start your local stack using `supabase start`
-
-This will switch the logging drivers and will direct logs to the Analytics server. You will be able to view and query your logs via the Studio Logs Explorer and Logs UI.
+Logs will be directed to the Analytics server instead of the docker logging driver. All logs will be stored in the local database under the `_analytics` schema.
 
 ## Limitations and considerations
 
