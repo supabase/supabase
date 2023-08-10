@@ -117,7 +117,7 @@ const VercelIntegration: NextPageWithLayout = () => {
         snapshot.setLoading(true)
       },
       onError(error) {
-        snapshot.setLoading(true)
+        snapshot.setLoading(false)
         toast.error(`Creating connection failed: ${error.message}`)
       },
     })
