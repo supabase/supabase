@@ -13,19 +13,26 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
+import { useBranchesQuery } from 'data/branches/branches-query'
+import { useGithubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutate'
+import { useGithubBranchesQuery } from 'data/integrations/integrations-github-branches-query'
 import { useIntegrationsGitHubInstalledConnectionDeleteMutation } from 'data/integrations/integrations-github-connection-delete-mutation'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import {
+  Integration,
   IntegrationName,
   IntegrationProjectConnection,
-  Integration,
 } from 'data/integrations/integrations.types'
+import { useVercelConnectionUpdateMutation } from 'data/integrations/vercel-connection-update-mutate'
 import { useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
+import { GitBranch, RotateCcw, Shield } from 'lucide-react'
+import Link from 'next/link'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
@@ -46,7 +53,6 @@ import {
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   Form_Shadcn_,
-  IconAlertTriangle,
   IconCheck,
   IconChevronDown,
   IconClock,
@@ -63,14 +69,6 @@ import * as z from 'zod'
 import { IntegrationConnectionItem } from '../../Integrations/IntegrationConnection'
 import SidePanelGitHubRepoLinker from './../../Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './../../Organization/IntegrationSettings/SidePanelVercelProjectLinker'
-import { useGithubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutate'
-import { useGithubBranchesQuery } from 'data/integrations/integrations-github-branches-query'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
-import { useBranchQuery } from 'data/branches/branch-query'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { GitBranch, Shield, RotateCcw, GitCompare } from 'lucide-react'
-import { useVercelConnectionUpdateMutation } from 'data/integrations/vercel-connection-update-mutate'
-import Link from 'next/link'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
