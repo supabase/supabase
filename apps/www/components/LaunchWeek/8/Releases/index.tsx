@@ -3,7 +3,13 @@ import Link from 'next/link'
 import { Accordion } from 'ui'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
 
-import { AccordionHeader, CartTitle, CheckCircleSolidIcon, SectionButtons } from './components'
+import {
+  AccordionHeader,
+  CartTitle,
+  CheckCircleSolidIcon,
+  MultistepSectionHeader,
+  SectionButtons,
+} from './components'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import days, { WeekDayProps } from './lw8_data'
 
@@ -457,22 +463,138 @@ export default function LW8Releases() {
               </div>
             )}
           </div>
-          <div className="border-b border-[#111718]">
-            <Accordion.Item
-              header={
-                <AccordionHeader
-                  date={day5.date}
-                  day={day5.d}
-                  weekDay={day5.dd}
-                  title={day5.title}
-                  shipped={day5.shipped}
-                  publishedAt={day5.publishedAt}
-                />
-              }
-              disabled={!day5.shipped}
-              className="h-[79px]"
-              id={day5.d.toString()}
-            ></Accordion.Item>
+          <div className="border-b border-[#111718] scroll-mt-16" id="today">
+            <AccordionHeader
+              date={day5.date}
+              day={day5.d}
+              weekDay={day5.dd}
+              title={day5.title}
+              shipped={day5.shipped}
+              publishedAt={day5.publishedAt}
+              youtube_id={day5.youtube_id}
+              videoThumbnail={day5.videoThumbnail}
+            />
+
+            {day5.steps.length > 0 && (
+              <div className="flex flex-col pb-4">
+                <div
+                  className={`
+                      min-h-[400px] relative overflow-hidden group/d1 flex-1 flex flex-col items-center lg:items-start justify-between
+                      border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
+                      `}
+                >
+                  <div
+                    className="inset-0 absolute group-hover/d1:scale-105 opacity-60 group-hover/d1:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
+                    style={{
+                      background: `radial-gradient(100% 100% at 80% 80%, #6F13A450, #030A0C)`,
+                    }}
+                  />
+                  <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
+                    <Link href={day5.steps[0].blog!}>
+                      <a className="m-0">
+                        <CartTitle>{day5.steps[0].title}</CartTitle>
+                      </a>
+                    </Link>
+                    <p className="text-sm text-slate-900">{day5.steps[0]?.description}</p>
+                  </div>
+                  <SectionButtons blog={day5.steps[0].blog} hackernews={day5.steps[0].hackernews} />
+                  {day5.steps[0]?.bg_layers &&
+                    day5.steps[0]?.bg_layers?.map(
+                      (layer, i) =>
+                        !!layer.img && (
+                          <div className="absolute opacity-90 inset-0 w-full h-full -z-10">
+                            <Image
+                              src={
+                                !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
+                              }
+                              className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
+                              layout="fill"
+                              objectFit="cover"
+                            />
+                          </div>
+                        )
+                    )}
+                </div>
+                <MultistepSectionHeader title="Community" />
+                <div
+                  className={`
+                      min-h-[400px] relative overflow-hidden group/d1 flex-1 flex flex-col items-center lg:items-start justify-between
+                      border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
+                      `}
+                >
+                  <div
+                    className="inset-0 absolute group-hover/d1:scale-105 opacity-60 group-hover/d1:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
+                    style={{
+                      background: `radial-gradient(100% 100% at 80% 80%, #6F13A450, #030A0C)`,
+                    }}
+                  />
+                  <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
+                    <Link href={day5.steps[1].blog!}>
+                      <a className="m-0">
+                        <CartTitle>{day5.steps[1].title}</CartTitle>
+                      </a>
+                    </Link>
+                    <p className="text-sm text-slate-900">{day5.steps[1]?.description}</p>
+                  </div>
+                  <SectionButtons blog={day5.steps[1].blog} hackernews={day5.steps[1].hackernews} />
+                  {day5.steps[1]?.bg_layers &&
+                    day5.steps[1]?.bg_layers?.map(
+                      (layer, i) =>
+                        !!layer.img && (
+                          <div className="absolute opacity-90 inset-0 w-full h-full -z-10">
+                            <Image
+                              src={
+                                !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
+                              }
+                              className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
+                              layout="fill"
+                              objectFit="cover"
+                            />
+                          </div>
+                        )
+                    )}
+                </div>
+                <MultistepSectionHeader title="One more thing" />
+                <div
+                  className={`
+                      min-h-[400px] relative overflow-hidden group/d1 flex-1 flex flex-col items-center lg:items-start justify-between
+                      border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
+                      `}
+                >
+                  <div
+                    className="inset-0 absolute group-hover/d1:scale-105 opacity-60 group-hover/d1:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
+                    style={{
+                      background: `radial-gradient(100% 100% at 80% 80%, #6F13A450, #030A0C)`,
+                    }}
+                  />
+                  <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
+                    <Link href={day5.steps[2].blog!}>
+                      <a className="m-0">
+                        <CartTitle>{day5.steps[2].title}</CartTitle>
+                      </a>
+                    </Link>
+                    <p className="text-sm text-slate-900">{day5.steps[2]?.description}</p>
+                  </div>
+                  <SectionButtons blog={day5.steps[2].blog} hackernews={day5.steps[0].hackernews} />
+                  {day5.steps[2]?.bg_layers &&
+                    day5.steps[2]?.bg_layers?.map(
+                      (layer, i) =>
+                        !!layer.img && (
+                          <div className="absolute opacity-90 inset-0 w-full h-full -z-10">
+                            <Image
+                              src={
+                                !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
+                              }
+                              className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
+                              layout="fill"
+                              objectFit="cover"
+                            />
+                          </div>
+                        )
+                    )}
+                </div>
+              </div>
+            )}
           </div>
         </Accordion>
       </SectionContainer>
