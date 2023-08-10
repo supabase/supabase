@@ -26,7 +26,7 @@ import { useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import {
@@ -87,20 +87,22 @@ const IntegrationSettings = () => {
 
   const projectContext = useProjectContext()
 
-  const vercelIntegrations = data
-    ?.filter((integration) => integration.integration.name === 'Vercel')
-    .map((integration) => {
-      if (integration.metadata && integration.integration.name === 'Vercel') {
-        const avatarSrc =
-          !integration.metadata.account.avatar && integration.metadata.account.type === 'Team'
-            ? `https://vercel.com/api/www/avatar?teamId=${integration.metadata.account.team_id}&s=48`
-            : `https://vercel.com/api/www/avatar/${integration.metadata.account.avatar}?s=48`
+  const vercelIntegrations = useMemo(() => {
+    return data
+      ?.filter((integration) => integration.integration.name === 'Vercel')
+      .map((integration) => {
+        if (integration.metadata && integration.integration.name === 'Vercel') {
+          const avatarSrc =
+            !integration.metadata.account.avatar && integration.metadata.account.type === 'Team'
+              ? `https://vercel.com/api/www/avatar?teamId=${integration.metadata.account.team_id}&s=48`
+              : `https://vercel.com/api/www/avatar/${integration.metadata.account.avatar}?s=48`
 
-        integration['metadata']['account']['avatar'] = avatarSrc
-      }
+          integration['metadata']['account']['avatar'] = avatarSrc
+        }
 
-      return integration
-    })
+        return integration
+      })
+  }, [data])
 
   const githubIntegrations = data?.filter(
     (integration) => integration.integration.name === 'GitHub'
