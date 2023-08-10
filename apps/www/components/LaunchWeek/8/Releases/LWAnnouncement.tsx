@@ -12,7 +12,7 @@ const LWAnnouncement = ({
   title?: string
   isLaunchWeekPage?: boolean
 }) => {
-  const [_pre, _d1, _d2, currentDay, _d4, _d5] = days
+  const [_pre, _d1, _d2, _d3, currentDay, _d5] = days
 
   const announcement = (
     <>
@@ -35,7 +35,7 @@ const LWAnnouncement = ({
                 />
               </svg>
             </div>
-            <span className="text-foreground">{title ?? 'Launch Week 8: Day 3'}</span>
+            <span className="text-foreground">{title ?? 'Launch Week 8: Day 4'}</span>
           </div>
           <span className="text-foreground-light">{currentDay.steps[0].title}</span>
         </div>
@@ -50,7 +50,7 @@ const LWAnnouncement = ({
           </svg>
         </div>
         <Image
-          src="/images/launchweek/8/day3/yt_d3.jpg"
+          src="/images/launchweek/8/day4/yt_d4.jpg"
           alt="Youtube video thumbnail"
           layout="fill"
           objectFit="cover"
@@ -74,7 +74,7 @@ const LWAnnouncement = ({
       >
         {isLaunchWeekPage ? (
           <ExpandableVideo
-            videoId="51tCMQPiitQ"
+            videoId="gtJo1lTxHfs"
             onOpenCallback={handleClick}
             triggerContainerClassName="w-full"
             trigger={

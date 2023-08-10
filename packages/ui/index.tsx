@@ -127,8 +127,6 @@ export {
   AlertDescription as AlertDescription_Shadcn_,
 } from './src/components/shadcn/ui/alert'
 
-export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
-
 export {
   useFormField as useFormField_Shadcn_,
   Form as Form_Shadcn_,
@@ -153,6 +151,11 @@ export {
   AccordionContent as AccordionContent_Shadcn_,
 } from './src/components/shadcn/ui/accordion'
 
+export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
+export { Label as Label_Shadcn_ } from './src/components/shadcn/ui/label'
+export * from './src/components/shadcn/ui/switch'
+export { Checkbox as Checkbox_Shadcn_ } from './src/components/shadcn/ui/checkbox'
+export * from './src/components/shadcn/ui/scroll-area'
 export {
   Collapsible as Collapsible_Shadcn_,
   CollapsibleTrigger as CollapsibleTrigger_Shadcn_,
