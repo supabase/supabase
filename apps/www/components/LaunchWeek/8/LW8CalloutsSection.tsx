@@ -17,7 +17,7 @@ const LW8CalloutsSection = () => {
               <div className="relative flex-shrink flex items-center p-2 w-2/3 lg:w-1/2 md:w-auto">
                 <div className="flex flex-col gap-1 sm:pl-4">
                   <span className="text-white">Join us daily at Twitter Spaces</span>
-                  <span className="">Tuesday – Day 2</span>
+                  <span className="">Wednesday – Day 3</span>
                 </div>
               </div>
               <div className="relative flex !aspect-video h-[80px] md:h-[100px] gap-2 z-10 rounded overflow-hidden">

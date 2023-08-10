@@ -11,7 +11,7 @@ const VideoPreview = () => (
       </svg>
     </div>
     <Image
-      src="https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw8/assets/yt_d2.jpg?t=2023-08-08T13%3A38%3A32.544Z"
+      src="https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw8/assets/yt_d3.jpg?t=2023-08-09T12%3A25%3A42.376Z"
       alt="Video thumbnail"
       layout="fill"
       objectFit="cover"
