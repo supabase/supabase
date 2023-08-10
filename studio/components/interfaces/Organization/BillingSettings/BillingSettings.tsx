@@ -30,9 +30,6 @@ const BillingSettings = () => {
   const [paymentMethods, setPaymentMethods] = useState<any>(null)
   const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
 
-  const [taxIds, setTaxIds] = useState<any>(null)
-  const [isLoadingTaxIds, setIsLoadingTaxIds] = useState(false)
-
   const defaultPaymentMethod = customer?.invoice_settings?.default_payment_method ?? ''
   const customerBalance = customer && customer.balance ? customer.balance / 100 : 0
   const isCredit = customerBalance < 0
@@ -79,26 +76,9 @@ const BillingSettings = () => {
     }
   }
 
-  const getTaxIds = async () => {
-    try {
-      setIsLoadingTaxIds(true)
-      const { data: taxIds, error } = await get(`${API_URL}/organizations/${slug}/tax-ids`)
-      if (error) throw error
-      setTaxIds(taxIds)
-      setIsLoadingTaxIds(false)
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to get organization tax IDs: ${error.message}`,
-      })
-    }
-  }
-
   useEffect(() => {
     getCustomerProfile()
     getPaymentMethods()
-    getTaxIds()
   }, [slug])
 
   return (
@@ -124,11 +104,7 @@ const BillingSettings = () => {
         address={customer?.address ?? {}}
         onAddressUpdated={(address: any) => setCustomer({ ...customer, address })}
       />
-      <TaxID
-        loading={isLoadingTaxIds}
-        taxIds={taxIds || []}
-        onTaxIdsUpdated={(ids: any) => setTaxIds(ids)}
-      />
+      <TaxID />
     </ScaffoldContainerLegacy>
   )
 }
