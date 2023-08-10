@@ -26,7 +26,6 @@ import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { isError } from 'data/utils/error-check'
 import {
   useFlag,
@@ -61,6 +60,8 @@ import {
   getDiffTypeDropdownLabel,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { subscriptionHasHipaaAddon } from '../BillingV2/Subscription/Subscription.utils'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -83,7 +84,7 @@ export function useSqlEditor() {
 
 const SQLEditor = () => {
   const { ui } = useStore()
-  const { ref, id: urlId, slug } = useParams()
+  const { ref, id: urlId } = useParams()
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
 
@@ -107,10 +108,10 @@ const SQLEditor = () => {
   const inputRef = useRef<HTMLInputElement>(null)
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: project?.ref })
 
   // Customers on HIPAA plans should not have access to Supabase AI
-  const isHipaaSubscription = subscription?.plan?.id === 'hipaa'
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   const [isAiOpen, setIsAiOpen] = useLocalStorageQuery('supabase_sql-editor-ai-open', true)
 
@@ -447,7 +448,7 @@ const SQLEditor = () => {
         }}
       />
       <div className="flex h-full flex-col relative">
-        {isAiOpen && supabaseAIEnabled && !isHipaaSubscription && (
+        {isAiOpen && supabaseAIEnabled && !hasHipaaAddon && (
           <AISchemaSuggestionPopover
             onClickSettings={() => {
               setIsAISettingsOpen(true)

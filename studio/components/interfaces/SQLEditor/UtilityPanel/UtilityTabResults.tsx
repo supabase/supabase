@@ -15,8 +15,8 @@ import { AiIconAnimation, Button } from 'ui'
 import { useSqlEditor } from '../SQLEditor'
 import { sqlAiDisclaimerComment } from '../SQLEditor.constants'
 import Results from './Results'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useParams } from 'common'
+import { subscriptionHasHipaaAddon } from 'components/interfaces/BillingV2/Subscription/Subscription.utils'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 export type UtilityTabResultsProps = {
   id: string
@@ -25,7 +25,6 @@ export type UtilityTabResultsProps = {
 
 const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   const { ui } = useStore()
-  const { slug } = useParams()
   const snap = useSqlEditorStateSnapshot()
   const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
   const { setDebugSolution, setAiInput, setSqlDiff, sqlDiff } = useSqlEditor()
@@ -52,10 +51,10 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   const isUtilityPanelCollapsed = (snippet?.splitSizes?.[1] ?? 0) === 0
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: selectedProject?.ref })
 
   // Customers on HIPAA plans should not have access to Supabase AI
-  const isHipaaSubscription = subscription?.plan?.id === 'hipaa'
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   if (isUtilityPanelCollapsed) return null
 
@@ -70,7 +69,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
       <div className="bg-table-header-light dark:bg-table-header-dark">
         <div className="flex flex-row justify-between items-center pr-8">
           <p className="m-0 border-0 px-6 py-4 font-mono">{result.error.message ?? result.error}</p>
-          {supabaseAIEnabled && !isHipaaSubscription && (
+          {supabaseAIEnabled && !hasHipaaAddon && (
             <Button
               icon={
                 <div className="scale-75">
