@@ -1,16 +1,16 @@
-import React, { FC, ReactNode, useState, useEffect } from 'react'
-import { useRouter } from 'next/router'
-import { isUndefined } from 'lodash'
-import { Button, IconActivity, IconAlertCircle, IconBarChart, IconLoader } from 'ui'
 import { Dictionary } from 'components/grid'
+import { isUndefined } from 'lodash'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect, useState } from 'react'
+import { Button, IconActivity, IconAlertCircle, IconBarChart, IconLoader } from 'ui'
 
-import { API_URL } from 'lib/constants'
-import { get } from 'lib/common/fetch'
-import { BarChart } from './ChartRenderer'
 import AreaChart from 'components/ui/Charts/AreaChart'
+import { get } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 import { ChartData } from './ChartHandler.types'
+import { BarChart } from './ChartRenderer'
 
-interface Props {
+interface ChartHandlerProps {
   label: string
   attribute: string
   provider: string
@@ -18,7 +18,6 @@ interface Props {
   endDate: string
   interval: string
   customDateFormat?: string
-  children?: ReactNode
   defaultChartStyle?: 'bar' | 'line'
   hideChartType?: boolean
   data?: ChartData
@@ -37,7 +36,7 @@ interface Props {
  *
  * Provided data must be in the expected chart format.
  */
-const ChartHandler: FC<Props> = ({
+const ChartHandler = ({
   label,
   attribute,
   provider,
@@ -53,7 +52,7 @@ const ChartHandler: FC<Props> = ({
   format,
   highlightedValue,
   onBarClick,
-}) => {
+}: PropsWithChildren<ChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query
 

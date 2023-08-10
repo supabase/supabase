@@ -1,15 +1,16 @@
-import { FC, useState } from 'react'
-import { Modal } from 'ui'
 import { PostgresRole } from '@supabase/postgres-meta'
+import { useState } from 'react'
+import { Modal } from 'ui'
+
 import { useStore } from 'hooks'
 
-interface Props {
+interface DeleteRoleModalProps {
   role: PostgresRole
   visible: boolean
   onClose: () => void
 }
 
-const DeleteRoleModal: FC<Props> = ({ role, visible, onClose }) => {
+const DeleteRoleModal = ({ role, visible, onClose }: DeleteRoleModalProps) => {
   const { ui, meta } = useStore()
   const [isDeleting, setIsDeleting] = useState(false)
 

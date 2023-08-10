@@ -1,18 +1,17 @@
 import Link from 'next/link'
-import { FC } from 'react'
-import SVG from 'react-inlinesvg'
 import { useRouter } from 'next/router'
-import { Button, IconKey, IconArchive, IconExternalLink, IconCode, IconActivity } from 'ui'
+import SVG from 'react-inlinesvg'
+import { Button, IconActivity, IconArchive, IconCode, IconExternalLink, IconKey } from 'ui'
 
 import Panel from 'components/ui/Panel'
+import { useFlag } from 'hooks'
 import APIKeys from './APIKeys'
 import GetStartedHero from './GetStartedHero'
 
-interface Props {}
-
-const NewProjectPanel: FC<Props> = ({}) => {
+const NewProjectPanel = () => {
   const router = useRouter()
   const { ref } = router.query
+  const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
 
   return (
     <div className="grid grid-cols-12 gap-4 lg:gap-20">
@@ -59,7 +58,11 @@ const NewProjectPanel: FC<Props> = ({}) => {
                     </Button>
                   </a>
                 </Link>
-                <Link href={`/project/${ref}/sql`}>
+                <Link
+                  href={
+                    supabaseAIEnabled ? `/project/${ref}/sql/new` : `/project/${ref}/sql/templates`
+                  }
+                >
                   <a>
                     <Button
                       type="default"

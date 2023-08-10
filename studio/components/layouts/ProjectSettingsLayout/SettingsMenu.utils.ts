@@ -1,15 +1,17 @@
-import { ProjectBase } from 'types'
+import { Organization, ProjectBase } from 'types'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 
 export const generateSettingsMenu = (
   ref?: string,
   project?: ProjectBase,
-  isVaultEnabled: boolean = false,
-  isOrgBilling: boolean = false
+  organization?: Organization,
+  isVaultEnabled: boolean = false
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
+
+  const isOrgBilling = !!organization?.subscription_id
 
   if (isOrgBilling) {
     return [
@@ -88,6 +90,24 @@ export const generateSettingsMenu = (
                 },
               ]
             : []),
+        ],
+      },
+
+      {
+        title: 'Billing',
+        items: [
+          {
+            name: 'Subscription',
+            key: 'subscription',
+            url: `/org/${organization?.slug}/billing`,
+            items: [],
+          },
+          {
+            name: 'Usage',
+            key: 'usage',
+            url: `/org/${organization?.slug}/usage?projectRef=${ref}`,
+            items: [],
+          },
         ],
       },
     ]

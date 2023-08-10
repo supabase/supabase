@@ -1,15 +1,14 @@
-import { FC } from 'react'
 import { IconBarChart2 } from 'ui'
 
-interface Props {
+interface EmptyStateProps {
   title?: string
   message?: string
 }
 
-const EmptyState: FC<Props> = ({
+const EmptyState = ({
   title = 'No data to show',
   message = 'May take 24 hours for data to show',
-}) => (
+}: EmptyStateProps) => (
   <div
     className="
       flex h-full

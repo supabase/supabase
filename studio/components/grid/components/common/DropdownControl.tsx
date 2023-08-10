@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { PropsWithChildren } from 'react'
 import { Dropdown } from 'ui'
 
 interface DropdownControlProps {
@@ -15,7 +15,7 @@ interface DropdownControlProps {
   isNested?: boolean
 }
 
-export const DropdownControl: FC<DropdownControlProps> = (p) => {
+export const DropdownControl = (p: PropsWithChildren<DropdownControlProps>) => {
   const { className, children, side, align, isNested } = p
   return (
     <Dropdown
@@ -30,7 +30,7 @@ export const DropdownControl: FC<DropdownControlProps> = (p) => {
   )
 }
 
-const DropdownItems: FC<DropdownControlProps> = ({ options, onSelect }) => {
+const DropdownItems = ({ options, onSelect }: DropdownControlProps) => {
   return (
     <div className="dropdown-control" style={{ maxHeight: '30vh' }}>
       {options.length == 0 && <p className="dropdown-control__empty-text">No more items</p>}
