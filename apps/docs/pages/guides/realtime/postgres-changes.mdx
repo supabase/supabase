@@ -552,9 +552,11 @@ From our testing and observation of the performance of the polling query, we hav
 | large and above  | ✅      | ✅        | 1,000              | 1                             | 1,000                       | 431              |
 | large and above  | ✅      | ✅        | 5,000              | 0.2 (1 in 5 seconds)          | 1,000                       | 702              |
 
-If you want to use Realtime's Postgres Changes feature you should be aware of these limitations. And if you are planning to use this feature at scale, you should consider using separate table without RLS and filters for the purpose of streaming changes to subscribed clients. Another option is to use it on the server side only and restream the changes to your clients using a Realtime Broadcast because it does not have these limitations.
+If you want to use Realtime's Postgres Changes feature you should be aware of these limitations. And if you are planning to use this feature at scale, you should consider using separate table without RLS and filters for the purpose of streaming changes to subscribed clients. Another option is to use it on the server side only and restream the changes to your clients using a Realtime Broadcast because it does not have these limitations. And don't forget to run your own benchmarks to make sure that the performance is acceptable for your use case.
 
 We have ideas on how to improve Realtime's Postgres Changes in the future. Follow Supabase to stay up to date with the latest news and updates on this feature.
+
+And if you are uncertain about the performance of your use case, please reach out using [Support Form](https://supabase.com/dashboard/support/new) and we will be happy to help you. We have a whole team of engineers that can advise you the solution that will work best for your usage scenario.
 
 ## More Realtime Quickstarts
 
