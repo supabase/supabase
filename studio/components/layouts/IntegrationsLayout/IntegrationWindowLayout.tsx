@@ -30,7 +30,7 @@ const IntegrationWindowLayout = ({
       <main className="overflow-auto flex flex-col h-full bg">{children}</main>
       <ScaffoldContainer className="bg-body flex flex-row gap-6 py-6 border-t">
         {docsHref && (
-          <Link href={'https://supabase.com' + docsHref} passHref>
+          <Link href={docsHref} passHref>
             <a
               target="_blank"
               rel="noopener noreferrer"
