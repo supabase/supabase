@@ -71,8 +71,13 @@ export * from './src/components/LoadingLine'
 // banners
 export * from './src/layout/banners'
 
+// ai icon
+export * from './src/layout/ai-icon-animation'
+
 // utilities
 export * from './src/lib/utils'
+
+// animated ui
 
 // shadcn
 
@@ -151,6 +156,13 @@ export { Label as Label_Shadcn_ } from './src/components/shadcn/ui/label'
 export * from './src/components/shadcn/ui/switch'
 export { Checkbox as Checkbox_Shadcn_ } from './src/components/shadcn/ui/checkbox'
 export * from './src/components/shadcn/ui/scroll-area'
+export {
+  Collapsible as Collapsible_Shadcn_,
+  CollapsibleTrigger as CollapsibleTrigger_Shadcn_,
+  CollapsibleContent as CollapsibleContent_Shadcn_,
+} from './src/components/shadcn/ui/collapsible'
+
+export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
 // links
 

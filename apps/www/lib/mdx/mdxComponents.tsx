@@ -6,7 +6,13 @@ import ImageGrid from '~/components/ImageGrid'
 import Quote from '~/components/Quote'
 import Chart from '~/components/Charts/PGCharts'
 import InlineCodeTag from '~/components/InlineCode'
-import { Badge } from 'ui'
+import {
+  Badge,
+  Collapsible_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  IconTriangle,
+} from 'ui'
 import ImageFadeStack from '~/components/ImageFadeStack'
 
 // import all components used in blog articles here
@@ -24,6 +30,29 @@ const getCaptionAlign = (align?: 'left' | 'center' | 'right') => {
     default:
       return 'text-center'
   }
+}
+
+const BlogCollapsible = ({ title, ...props }: { title: string }) => {
+  return (
+    <Collapsible_Shadcn_>
+      <CollapsibleTrigger_Shadcn_
+        className="    
+        data-[state=open]:text
+        hover:text-light
+        flex items-center gap-3
+        [&>svg]:fill-current
+        [&>svg]:rotate-90
+        [&>svg]:transition-transform
+        [&>svg]:data-[state='open']:rotate-180
+        [&>svg]:data-[state='open']:text
+        "
+      >
+        <IconTriangle size={10} />
+        <span>{title}</span>
+      </CollapsibleTrigger_Shadcn_>
+      <CollapsibleContent_Shadcn_ {...props} />
+    </Collapsible_Shadcn_>
+  )
 }
 
 export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
@@ -81,6 +110,7 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
       </a>
     ),
     code: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
+    BlogCollapsible: (props: any) => <BlogCollapsible {...props} />,
   }
 
   return components

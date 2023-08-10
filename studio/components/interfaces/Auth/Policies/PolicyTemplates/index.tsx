@@ -1,22 +1,22 @@
+import { isEmpty, noop } from 'lodash'
+import { useState } from 'react'
 import { Button } from 'ui'
-import { FC, useState } from 'react'
-import { isEmpty } from 'lodash'
 
-import TemplatesList from './TemplatesList'
-import TemplatePreview from './TemplatePreview'
 import { PolicyTemplate } from './PolicyTemplates.constants'
+import TemplatePreview from './TemplatePreview'
+import TemplatesList from './TemplatesList'
 
-interface Props {
+interface PolicyTemplatesProps {
   templates: PolicyTemplate[]
   templatesNote: string
   onUseTemplate: (template: PolicyTemplate) => void
 }
 
-const PolicyTemplates: FC<Props> = ({
+const PolicyTemplates = ({
   templates = [],
   templatesNote = '',
-  onUseTemplate = () => {},
-}) => {
+  onUseTemplate = noop,
+}: PolicyTemplatesProps) => {
   const [selectedTemplate, setSelectedTemplate] = useState(templates[0])
   return (
     <div>

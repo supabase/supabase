@@ -920,6 +920,10 @@ export const ai: NavMenuConstant = {
       items: [
         { name: 'Developing locally with Vecs', url: '/guides/ai/vecs-python-client' },
         { name: 'Creating and managing collections', url: '/guides/ai/quickstarts/hello-world' },
+        {
+          name: 'Generate Embeddings',
+          url: '/guides/ai/quickstarts/generate-text-embeddings',
+        },
         { name: 'Text Deduplication', url: '/guides/ai/quickstarts/text-deduplication' },
         { name: 'Face similarity search', url: '/guides/ai/quickstarts/face-similarity' },
       ],
@@ -1135,12 +1139,8 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/marketplace',
         },
         {
-          name: 'Publish an OAuth App',
-          url: '/guides/platform/oauth-apps/publish-an-oauth-app',
-        },
-        {
-          name: 'Sign in with Supabase',
-          url: '/guides/platform/oauth-apps/authorize-an-oauth-app',
+          name: 'Build a Supabase Integration',
+          url: '/guides/platform/oauth-apps/build-a-supabase-integration',
         },
       ],
     },

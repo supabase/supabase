@@ -1,11 +1,10 @@
-import { FC, Fragment, useState } from 'react'
-import { IconCheck, IconHelpCircle, IconInfo, Modal } from 'ui'
-import { PERMISSIONS_MAPPING } from './RolesHelperModal.constants'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { Fragment, useState } from 'react'
+import { IconCheck, IconHelpCircle, IconInfo, Modal } from 'ui'
 
-interface Props {}
+import { PERMISSIONS_MAPPING } from './RolesHelperModal.constants'
 
-const RolesHelperModal: FC<Props> = ({}) => {
+const RolesHelperModal = () => {
   const [showModal, setShowModal] = useState(false)
 
   const permissionColumnClassName = 'w-[40%] text-sm pl-4 font-bold'
