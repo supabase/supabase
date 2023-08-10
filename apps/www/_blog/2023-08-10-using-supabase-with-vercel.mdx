@@ -21,15 +21,13 @@ At Supabase, we feel it's important to provide developers with the tools they ne
 
 Our new [Vercel Integration](https://vercel.com/integrations/supabase-v2) streamlines the process of creating, deploying, and maintaining web applications.
 
-New projects can be launched using any of our [Starter Kits](#starter-kits). You link an existing Vercel project inside the Supabase [Dashboard](https://app.supabase.com/org/_/integrations).
-
 ### Monorepo support
 
-You can now link multiple Vercel projects to a single Supabase project:
+You can now [link multiple](https://app.supabase.com/org/_/integrations) Vercel projects to a single Supabase project:
 
 ![Vercel in the Supabase dashboard](/images/blog/launch-week-8/day-4/vercel-dashboard.png)
 
-Previously we mapped each Vercel project to a single Supabase project. With this release, we're introducing the concept of project 'Connections'. Any Supabase project can have an unlimited number of Vercel Connections, especially helpful for monorepos using [Turborepo](https://turbo.build/).
+Previously we mapped each Vercel project to a single Supabase project. With this release, we're introducing the concept of project 'Connections'. Supabase projects can have an unlimited number of Vercel Connections. This is especially useful for monorepos using [Turborepo](https://turbo.build/).
 
 ### Automatically managed Supabase config
 
@@ -39,7 +37,7 @@ We've improved the way we manage your Supabase environment variables.
 
 Supabase keeps each of your Vercel Projects updated with Environment Variables, managing your secrets (like `service-role-key`) and public variables (like `supabase-url`).
 
-Importantly, Supabase also updates the Auth Redirect URIs to match your main Vercel project domain, and any preview deployment URLs. We listen to the Vercel webhooks for any deployments and adjust your redirects accordingly.
+Importantly, Supabase now updates the Auth Redirect URIs to match your main Vercel project domain and any preview deployment URLs. We listen to your Vercel deployment webhooks and adjust your redirects accordingly.
 
 <BlogCollapsible title="View the full list of environment variables">
 
@@ -85,11 +83,11 @@ We announced Database Branching on [Tuesday](/blog/supabase-local-dev#branching-
 
 ![Vercel config](/images/blog/launch-week-8/day-4/supabase-vercel-branching.png)
 
-For now, Branching in Supabase is limited to development partners, but we'll be rolling it out to everyone over the coming months. If you're interested in testing the new features, [sign up for early access](https://forms.supabase.com/branching-request).
+For now, Branching in Supabase is limited to development partners. We'll be rolling it out to everyone over the coming months. If you're interested in testing the new features, [sign up for early access](https://forms.supabase.com/branching-request).
 
 ## Next.js 13 App Router Support
 
-The new App Router in Next.js adds a lot of exciting features, like React Suspense and Streaming. Supabase has built support for both modalities of Next.js - the Pages Router and the new App Router.
+The new App Router in Next.js adds a lot of exciting features, like React Suspense and Streaming. Supabase now fully-supports the App Router in Next.js:
 
 <div className="video-container">
   <iframe
@@ -102,7 +100,7 @@ The new App Router in Next.js adds a lot of exciting features, like React Suspen
   ></iframe>
 </div>
 
-The Next.js App Router adds support for server-side features - Server Components, Route Handlers and Server Actions. Server-side rendering is powerful, but also makes it difficult to share state across user sessions. Supabase Auth solves this problem by storing session data in cookies, and we've simplified this for you with our new [Next.js Auth Helpers](https://supabase.com/docs/guides/auth/auth-helpers/nextjs).
+Server-side rendering is powerful, but also makes it difficult to share state across user sessions. This isn't a problem with Supabase Auth - we've added support for cookies and simplified the build process with our new [Next.js Auth Helpers](https://supabase.com/docs/guides/auth/auth-helpers/nextjs).
 
 You can use `supabase-js` in all the new server based areas of App Router based Next.js:
 
@@ -123,9 +121,7 @@ We've created a new template for `create-next-app` scaffolding Supabase projects
 npx create-next-app --with-supabase
 ```
 
-This new official template is fully-loaded with the new App Router setup.
-
-Check out the [`/app/_examples`](https://github.com/vercel/next.js/blob/canary/examples/with-supabase/app/_examples) folder for an example of creating a Supabase client in:
+This new official template is fully-loaded with the new App Router setup. Check out the [`/app/_examples`](https://github.com/vercel/next.js/blob/canary/examples/with-supabase/app/_examples) folder for an example of creating a Supabase client in:
 
 - [Client Components](https://github.com/vercel/next.js/blob/canary/examples/with-supabase/app/_examples/client-component/page.tsx)
 - [Server Components](https://github.com/vercel/next.js/blob/canary/examples/with-supabase/app/_examples/server-component/page.tsx)
