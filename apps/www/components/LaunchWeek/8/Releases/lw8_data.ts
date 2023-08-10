@@ -12,6 +12,9 @@ const images = {
   '02-localdev-mobile': '/images/launchweek/8/day2/localdev-mobile.svg',
   '03-studio3': '/images/launchweek/8/day3/studio3.svg',
   '03-studio3-mobile': '/images/launchweek/8/day3/studio3-mobile.svg',
+  '04-marketplace': '/images/launchweek/8/day4/marketplace.svg',
+  '04-marketplace-mobile': '/images/launchweek/8/day4/marketplace-mobile.svg',
+  '04-vercel': '/images/launchweek/8/day4/vercel-integration.svg',
 }
 
 export interface StepProps {
@@ -23,6 +26,7 @@ export interface StepProps {
   description?: string
   github?: string
   hackernews?: string
+  templates?: string
   isNew?: boolean
   thumb?: string
   url?: string
@@ -172,10 +176,24 @@ const days: WeekDayProps[] = [
     d: 4,
     dd: 'Thu',
     youtube_id: 'gtJo1lTxHfs',
-    videoThumbnail: images.day_1_thumb,
+    videoThumbnail: images.day_4_thumb,
     blogpost: '',
     docs: '',
-    steps: [],
+    steps: [
+      {
+        title: 'Supabase Integrations Marketplace',
+        blog: '/blog/#',
+        bg_layers: [{ img: images['04-marketplace'], mobileImg: images['04-marketplace-mobile'] }],
+        steps: [],
+      },
+      {
+        title: 'Vercel integrations',
+        blog: '/blog/#',
+        templates: '#',
+        bg_layers: [{ img: images['04-vercel'] }],
+        steps: [],
+      },
+    ],
   },
   {
     title: '',
