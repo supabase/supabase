@@ -38,7 +38,6 @@ export default ProjectBilling
 
 const Settings = () => {
   const selectedOrganization = useSelectedOrganization()
-  const { project: selectedProject } = useProjectContext()
   const orgSlug = selectedOrganization?.slug ?? ''
 
   return (
@@ -58,7 +57,7 @@ const Settings = () => {
           </Link>
         </div>
 
-        <Invoices projectRef={selectedProject?.ref ?? ''} />
+        <Invoices />
       </div>
     </div>
   )
