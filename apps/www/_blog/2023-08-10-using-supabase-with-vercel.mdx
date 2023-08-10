@@ -77,7 +77,7 @@ After Vercel has deployed the app, it works without any additional configuration
 **Vercel AI Chatbot**
 Next.js 13, Open AI, Vercel Function, Auth
 
-### Database branching
+### Database Branching
 
 We announced Database Branching on [Tuesday](/blog/supabase-local-dev#branching-and-preview-environments). We've designed this to work perfectly with Vercel's Preview Deployments.
 
@@ -87,7 +87,7 @@ For now, Branching in Supabase is limited to development partners. We'll be roll
 
 ## Next.js 13 App Router Support
 
-The new App Router in Next.js adds a lot of exciting features, like React Suspense and Streaming. Supabase now fully-supports the App Router in Next.js:
+The Next.js App Router introduces exciting new functionality made possible by React Suspense and Streaming. Supabase has been working closely with the Next.js team to ensure full support for the App Router, without compromising the experience for those building with the Pages Router.
 
 <div className="video-container">
   <iframe
@@ -100,16 +100,15 @@ The new App Router in Next.js adds a lot of exciting features, like React Suspen
   ></iframe>
 </div>
 
-Server-side rendering is powerful, but also makes it difficult to share state across user sessions. This isn't a problem with Supabase Auth - we've added support for cookies and simplified the build process with our new [Next.js Auth Helpers](https://supabase.com/docs/guides/auth/auth-helpers/nextjs).
+The Next.js App Router shifts a significant amount of your app development from the client to the server, using Server Components, Route Handlers and Server Actions. This means Supabase Auth needs to be configured to store session data in cookies - available in the browser and on the server - rather than Local Storage. We've simplified this process for you with our new [Next.js Auth Helpers package](https://supabase.com/docs/guides/auth/auth-helpers/nextjs).
 
-You can use `supabase-js` in all the new server based areas of App Router based Next.js:
+This configures cookie-based Auth, making the user's session available throughout the entire Next.js App Router stack:
 
+- [Client Components](/docs/guides/auth/auth-helpers/nextjs#client-components) — `createClientComponentClient`
 - [Server Components](/docs/guides/auth/auth-helpers/nextjs#server-components) — `createServerComponentClient`
 - [Server Actions](/docs/guides/auth/auth-helpers/nextjs#server-actions) — `createServerActionClient`
 - [Route Handlers](/docs/guides/auth/auth-helpers/nextjs#route-handlers) — `createRouteHandlerClient`
 - [Middleware](/docs/guides/auth/auth-helpers/nextjs#middleware) — `createMiddlewareClient`
-
-For client components, Supabase works exactly as it did before. Next.js explicitly supports this by adding `'use client'` to the top of pages/components.
 
 ## Scaffolding a new Next.js app with Supabase
 
@@ -117,11 +116,19 @@ For client components, Supabase works exactly as it did before. Next.js explicit
 
 We've created a new template for `create-next-app` scaffolding Supabase projects:
 
-```markdown
-npx create-next-app --with-supabase
+```sh
+npx create-next-app -e with-supabase
 ```
 
-This new official template is fully-loaded with the new App Router setup. Check out the [`/app/_examples`](https://github.com/vercel/next.js/blob/canary/examples/with-supabase/app/_examples) folder for an example of creating a Supabase client in:
+This creates a new Next.js app configured with:
+
+- 100% Server-side cookie-based Auth
+- 100% TypeScript
+- Beautiful landing and auth pages with Tailwind CSS
+
+This is the perfect starting point for any application built with Next.js and Supabase! 🚀
+
+Check out the [`/app/_examples`](https://github.com/vercel/next.js/blob/canary/examples/with-supabase/app/_examples) folder for an example of creating a Supabase client in:
 
 - [Client Components](https://github.com/vercel/next.js/blob/canary/examples/with-supabase/app/_examples/client-component/page.tsx)
 - [Server Components](https://github.com/vercel/next.js/blob/canary/examples/with-supabase/app/_examples/server-component/page.tsx)
