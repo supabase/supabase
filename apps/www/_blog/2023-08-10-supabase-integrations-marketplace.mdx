@@ -19,15 +19,15 @@ We've been running our [Integrations Marketplace](/partners) in “stealth mode�
 
 Supabase Integrations allows Partners to extend the Supabase platform with useful tooling. Today we're adding [OAuth2.0 Applications](https://supabase.com/docs/guides/platform/oauth-apps/publish-an-oauth-app). For Supabase users, this makes it even easier to connect your favorite tools to the Supabase projects. Within minutes you can:
 
-1. Add your favorite [Low Code](https://supabase.com/partners/integrations#low-code) tools on top of your Supabase database.
-1. Integrate your favorite [DevTools](https://supabase.com/partners/integrations#devtools): including secrets managers and database management tools.
-1. Add [caching](https://supabase.com/partners/integrations#caching%20/%20offline-first) to your Supabase database.
-1. Don't link the Supabase admin dashboard? Try [one of these](https://supabase.com/partners/integrations#data%20platform).
-1. Try out a different [SMS and email provider](https://supabase.com/partners/integrations#messaging).
+- Add your favorite [Low Code](https://supabase.com/partners/integrations#low-code) tools on top of your Supabase database.
+- Integrate your favorite [DevTools](https://supabase.com/partners/integrations#devtools): including secrets managers and database management tools.
+- Add [caching](https://supabase.com/partners/integrations#caching%20/%20offline-first) to your Supabase database.
+- Don't link the Supabase admin dashboard? Try [one of these](https://supabase.com/partners/integrations#data%20platform).
+- Try out a different [SMS and email provider](https://supabase.com/partners/integrations#messaging).
 
 ## Featured Partners
 
-For the initial launch we're started with a few development partners who we worked closely with to build the OAuth functionality.
+For the initial launch we're started with a few development partners who we worked with to build and test the OAuth functionality.
 
 ### Cloudflare
 
@@ -43,13 +43,13 @@ Check out the [latest episode](https://cloudflare.tv/event/using-supabase-with-c
 
 [Resend](https://resend.com) (YC [W23](https://www.ycombinator.com/companies/resend)) is building the modern email sending platform. If you're using Supabase for Auth, then you'll know already that we handle all your Auth emails. But did you know that the email configuration we provide you is only for testing purposes? When you're [going into production](https://supabase.com/docs/guides/platform/going-into-prod#restricted-access-levels-for-team-members), you need to integrate your own email provider. That's where Resend come in. They've built a one-click integration to add Resend as a custom SMTP provider for Supabase.
 
-- Blogpost draft: https://resend-git-feature-dse-136-write-blog-post-about-9bb77e-resend.vercel.app/blog/how-to-configure-supabase-to-send-emails-from-your-domain
+Read more on [Resend's blog](https://resend.com/blog/how-to-configure-supabase-to-send-emails-from-your-domain).
 
 ### Snaplet
 
 ![Snaplet x Supabase](/images/blog/launch-week-8/day-4/marketplace-snaplet.jpg)
 
-Snaplet is a tool for typescript developers to copy your database, transform sensitive data and share it with your team without worrying about PII. If you followed our Tuesday launch you'll be familiar with Snaplet - they are one of the best tools for [generating seed data](https://supabase.com/docs/guides/cli/seeding-your-database#generating-seed-data) for your local development environment. Now they are making it even easier with their official OAuth App build production-like development environments for you team.
+Snaplet is a tool for Typescript developers to copy your database, transform sensitive data, and share it with your team without worrying about PII. If you followed our [Tuesday launch](https://supabase.com/blog/supabase-local-dev#database-seeding) you'll be familiar with Snaplet - they are one of the best tools for [generating seed data](https://supabase.com/docs/guides/cli/seeding-your-database#generating-seed-data) for your local development environment. Now they are making it even easier with their official OAuth App build production-like development environments for you team.
 
 [Learn more on snaplet.dev](https://www.snaplet.dev/post/now-live-supabase-x-snaplet-integration).
 
@@ -67,7 +67,7 @@ Learn more about their integration at: [trigger.dev/supabase](http://trigger.dev
 
 One that requires no introduction - since so many of you use Vercel, we've dedicated an entire blog post to the upgraded Vercel integration.
 
-Learn more about the Vercel integration updates we're launching today.
+Learn more about the Vercel integration [updates we're launching](/blog/using-supabase-with-vercel) today.
 
 ### Windmill
 
@@ -77,9 +77,9 @@ Learn more about the Vercel integration updates we're launching today.
 
 Read the [official blog post on windmill.dev](https://www.windmill.dev/blog/2023/08/10/supabase-partnership).
 
-## Build your own Supabase Integration
+## Building Supabase Integrations
 
-We've released full instructions inside our [documentation](https://supabase.com/docs/guides/platform/oauth-apps/build-a-supabase-integration) so that you can build your own OAuth application. Simply visit your [Organization settings](https://supabase.com/dashboard/org/_/apps) and click “Add application” to get started:
+We've released full instructions in our [Build with Supabase](https://supabase.com/docs/guides/platform/oauth-apps/build-a-supabase-integration) documentation so that you can build your own Supabase OAuth application for your users. Simply visit your [Organization settings](https://supabase.com/dashboard/org/_/apps) and click “Add application” to get started:
 
 <div className="video-container">
   <iframe
@@ -92,13 +92,7 @@ We've released full instructions inside our [documentation](https://supabase.com
   ></iframe>
 </div>
 
-The Integrations marketplace is open to everyone.
-
-1. In your organization's settings, navigate to the **[OAuth Apps](https://supabase.com/dashboard/org/_/apps)** tab.
-2. In the upper-right section of the page, click **Add application**.
-3. Fill in the required details and click **Confirm**.
-
-After your submission is complete, simply create a button to launch your new app. We've provided some [brand assets](https://supabase.com/brand-assets) so that developers can quickly find the integration on your site.
+The Integrations marketplace is open to everyone. After your submission is complete, you can share the integration with your own users - simply create a button to launch your new app. We've provided some [brand assets](https://supabase.com/brand-assets) so that developers can quickly identify the integration on your site.
 
 ## Building custom integrations
 
