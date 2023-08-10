@@ -41,7 +41,7 @@ Once you've created an encrypted column, you can insert data into the table like
 
 ![Encrypted data](/docs/img/guides/database/vault-encrypted-data.png)
 
-Note that, as mentioned above, indexing an encrypted column serves no purpose and has a detrimental effect on performance. Indexing encrypted values is not useful since the index needs to store the unencrypted value to be usable, and that would defeat the purpose of storing encrypted data. Do not create indexes on encrypted columns.
+As mentioned above, indexing an encrypted column serves no purpose and has a detrimental effect on performance. Indexing encrypted values is not useful since the index needs to store the unencrypted value to be usable, and that would defeat the purpose of storing encrypted data. Do not create indexes on encrypted columns.
 
 ## Decrypting data
 
