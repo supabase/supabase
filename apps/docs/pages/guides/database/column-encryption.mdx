@@ -17,7 +17,7 @@ Column Encryption comes with tradeoffs that need to be considered before using i
 
     - Encryption and decryption both take time, inserting and selecting encrypted data takes more time than a "plain" column of data.  Queries that must load a lot of rows with encrypted columns will be slower than those that are not encrypted.
 
-    - Encrypted columns should never be indexed.  This is because the index must store the unencrypted value of a column to be useful, which would defeat the purpose of storing values encrypted.  To look up an encrypted column, you must first look up its row by some other unencrypted column, like a primary key.
+    - Encrypted columns should never be indexed.  This is because the index will store the encrypted value of a column, which would not be useful.  To look up an encrypted column, you must first look up its row by some other unencrypted column, like a primary key.
 
     - Encrypted columns can be queried in a `WHERE` clause, but this can also have some negative performance consequences, since the value must be decrypted in order to matched to any `WHERE` qualifiers.  For small result sets this is not a big deal, but broad queries that match many rows will have to be scanned and each row decrypted in order to check against the `WHERE` clause.  Worst case is the entire table must be scanned and decrypted to check against a `WHERE`.
 
