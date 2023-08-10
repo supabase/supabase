@@ -1,4 +1,3 @@
-import { useCallback, useState } from 'react'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -12,6 +11,7 @@ import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/int
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { IntegrationName, IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
+import { useCallback, useMemo } from 'react'
 import { IntegrationConnectionItem } from '../../Integrations/IntegrationConnection'
 import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
@@ -41,20 +41,22 @@ const IntegrationSettings = () => {
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
 
-  const vercelIntegrations = data
-    ?.filter((integration) => integration.integration.name === 'Vercel')
-    .map((integration) => {
-      if (integration.metadata && integration.integration.name === 'Vercel') {
-        const avatarSrc =
-          !integration.metadata.account.avatar && integration.metadata.account.type === 'Team'
-            ? `https://vercel.com/api/www/avatar?teamId=${integration.metadata.account.team_id}&s=48`
-            : `https://vercel.com/api/www/avatar/${integration.metadata.account.avatar}?s=48`
+  const vercelIntegrations = useMemo(() => {
+    return data
+      ?.filter((integration) => integration.integration.name === 'Vercel')
+      .map((integration) => {
+        if (integration.metadata && integration.integration.name === 'Vercel') {
+          const avatarSrc =
+            !integration.metadata.account.avatar && integration.metadata.account.type === 'Team'
+              ? `https://vercel.com/api/www/avatar?teamId=${integration.metadata.account.team_id}&s=48`
+              : `https://vercel.com/api/www/avatar/${integration.metadata.account.avatar}?s=48`
 
-        integration['metadata']['account']['avatar'] = avatarSrc
-      }
+          integration['metadata']['account']['avatar'] = avatarSrc
+        }
 
-      return integration
-    })
+        return integration
+      })
+  }, [data])
 
   const githubIntegrations = data?.filter(
     (integration) => integration.integration.name === 'GitHub'
