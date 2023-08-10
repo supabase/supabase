@@ -39,7 +39,6 @@ const VercelIntegration: NextPageWithLayout = () => {
   const { ui } = useStore()
   const { code, configurationId, teamId, source, externalId } = useParams()
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
-  const [organizationIntegrationId, setOrganizationIntegrationId] = useState<string | null>(null)
 
   const snapshot = useIntegrationInstallationSnapshot()
 
@@ -112,8 +111,7 @@ const VercelIntegration: NextPageWithLayout = () => {
       onMutate() {
         snapshot.setLoading(true)
       },
-      onSuccess({ id }) {
-        setOrganizationIntegrationId(id)
+      onSuccess() {
         handleRouteChange()
         snapshot.setLoading(false)
       },
