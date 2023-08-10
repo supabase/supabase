@@ -2,14 +2,18 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'ai-hugging-face',
-  title: 'Hugging Face',
+  title: 'Hugging Face Inference API',
   description: 'Learn how to integrate hugging face models with Supabase',
   sidebar_label: 'Hugging Face',
 }
 
 [Hugging Face](https://huggingface.co) is an open source hub for AI/ML models and tools. With over 100,000 machine learning models available, Hugging Face provides a great way to integrate specialized AI & ML tasks into your application.
 
-Hugging Face exposes an [Inference API](https://huggingface.co/inference-api) you can use to execute AI tasks remotely on Hugging Face servers. This opens the doors to using Hugging Face with languages like TypeScript and can be deployed using [Edge Functions](/docs/guides/functions).
+There are 3 ways to use Hugging Face models in your application:
+
+1. Use the [Transformers](https://huggingface.co/docs/transformers/index) Python library to perform inference in a Python backend.
+1. [Generate embeddings](/docs/guides/ai/quickstarts/generate-text-embeddings) directly in Edge Functions using Transformers.js.
+1. Use Hugging Face's hosted [Inference API](https://huggingface.co/inference-api) to execute AI tasks remotely on Hugging Face servers. This guide will walk you through this approach.
 
 ## AI Tasks
 

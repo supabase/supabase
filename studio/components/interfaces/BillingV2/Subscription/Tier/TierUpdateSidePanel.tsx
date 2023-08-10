@@ -30,7 +30,6 @@ const TierUpdateSidePanel = () => {
   const slug = selectedOrganization?.slug
   const { ref: projectRef } = useParams()
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showExitSurvey, setShowExitSurvey] = useState(false)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [showDowngradeError, setShowDowngradeError] = useState(false)
@@ -49,7 +48,18 @@ const TierUpdateSidePanel = () => {
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
-  const { mutateAsync: updateSubscriptionTier } = useProjectSubscriptionUpdateMutation()
+  const { mutate: updateSubscriptionTier, isLoading: isUpdating } =
+    useProjectSubscriptionUpdateMutation({
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully updated subscription to ${selectedTierMeta?.name}!`,
+        })
+        setSelectedTier(undefined)
+        onClose()
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+      },
+    })
 
   const availablePlans = plans ?? []
   const subscriptionAddons = addons?.selected_addons ?? []
@@ -71,6 +81,7 @@ const TierUpdateSidePanel = () => {
             title: 'Change Subscription Plan',
             section: 'Subscription plan',
           },
+          projectRef,
         },
         router
       )
@@ -93,29 +104,11 @@ const TierUpdateSidePanel = () => {
       return ui.setNotification({ category: 'error', message: 'Please select a payment method' })
     }
 
-    try {
-      setIsSubmitting(true)
-      await updateSubscriptionTier({
-        projectRef,
-        tier: selectedTier,
-        paymentMethod: selectedPaymentMethod,
-      })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated subscription to ${selectedTierMeta?.name}!`,
-      })
-      setSelectedTier(undefined)
-      onClose()
-      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to update subscription: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+    updateSubscriptionTier({
+      projectRef,
+      tier: selectedTier,
+      paymentMethod: selectedPaymentMethod,
+    })
   }
 
   return (
@@ -162,13 +155,13 @@ const TierUpdateSidePanel = () => {
                 >
                   <div className="w-full">
                     <div className="flex items-center space-x-2">
-                      <p className={clsx('text-brand-900 text-sm uppercase')}>{plan.name}</p>
+                      <p className={clsx('text-brand text-sm uppercase')}>{plan.name}</p>
                       {isCurrentPlan ? (
                         <div className="text-xs bg-scale-500 text-scale-1000 rounded px-2 py-0.5">
                           Current plan
                         </div>
                       ) : plan.nameBadge ? (
-                        <div className="text-xs bg-brand-400 text-brand-900 rounded px-2 py-0.5">
+                        <div className="text-xs bg-brand-400 text-brand rounded px-2 py-0.5">
                           {plan.nameBadge}
                         </div>
                       ) : (
@@ -187,7 +180,7 @@ const TierUpdateSidePanel = () => {
                       <p className="text-scale-1000 text-sm">{tierMeta?.costUnit}</p>
                     </div>
                     <div className={clsx('flex mt-1 mb-4', !tierMeta?.warning && 'opacity-0')}>
-                      <div className="bg-scale-200 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
+                      <div className="bg-scale-200 text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
                         {tierMeta?.warning}
                       </div>
                     </div>
@@ -220,6 +213,7 @@ const TierUpdateSidePanel = () => {
                                         : 'Upgrade' + ' to ' + plan.name,
                                       section: 'Subscription plan',
                                     },
+                                    projectRef,
                                   },
                                   router
                                 )
@@ -264,7 +258,7 @@ const TierUpdateSidePanel = () => {
                         <li key={feature} className="flex py-2">
                           <div className="w-[12px]">
                             <IconCheck
-                              className="h-3 w-3 text-brand-900 translate-y-[2.5px]"
+                              className="h-3 w-3 text-brand translate-y-[2.5px]"
                               aria-hidden="true"
                               strokeWidth={3}
                             />
@@ -332,7 +326,7 @@ const TierUpdateSidePanel = () => {
       </Modal>
 
       <Modal
-        loading={isSubmitting}
+        loading={isUpdating}
         alignFooter="right"
         className="!w-[450px]"
         visible={selectedTier !== undefined && selectedTier !== 'tier_free'}

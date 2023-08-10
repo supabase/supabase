@@ -28,6 +28,27 @@ However, it's important to note that certain [differences](#differences) may ari
 
 ### Pre-requisites
 
+Currently the Analytics service supports two backends for ingestion:
+
+- Postgres ingestion
+- Big Query ingestion
+
+### Postgres Ingestion Requirements
+
+- Requires you to use supabase/logflare:1.3.26 or above
+- Requires the following environment variables set:
+  - Required - POSTGRES_BACKEND_URL: `postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}`
+  - Optional - POSTGRES_BACKEND_SCHEMA: `{SCHEMA_NAME}`
+
+### Big Query Ingestion Requirements
+
+- Google Cloud Account with billing enabled
+- Big Query enabled
+
+The remainder of the instructions are specified in the [Setup Big Query ingestion](#setup-big-query-ingestion) section.
+
+#### Setup Big Query ingestion
+
 Logflare currently requires BigQuery usage. You will need to create a Google Cloud project with billing enabled.
 
 The requirements are as follows after creating the project:
@@ -36,7 +57,7 @@ The requirements are as follows after creating the project:
 - Project number
 - A service account key
 
-#### Setting up BigQuery Service Account
+##### Setting up BigQuery Service Account
 
 To ensure that you have sufficient permissions to insert into your Google Cloud BigQuery, ensure that you have created a service account with either:
 
@@ -60,30 +81,50 @@ You can create the service account via the web console or `gcloud`, as per the [
 
 We recommend setting the BigQuery Admin role, as it simplifies permissions setup.
 
-#### Downloading the Service Account key
+##### Downloading the Service Account key
 
 After the service account is created, you will need to create a key for the service account. This key will sign the JWTs for API requests that the Analytics server makes with BigQuery.
 
 ### Docker Compose
 
-Using the example [self-hosting stack based on docker-compose](https://github.com/supabase/supabase/tree/master/docker), you include the logging related services using the following command
+For analytics to work we're adding two services: Logflare and Vector.
 
-You will first need to update the `.env.example` file with the necessary environment variables.
+Logflare is the analytics server that will ingest your logs into your preferred backend while Vector is the log router that will route all the docker logs using syslog unto Logflare.
 
-- `GOOGLE_PROJECT_ID`
-- `GOOGLE_PROJECT_NUMBER`
+#### Using the Postgres Backend
 
-You will need to place your Service Account key in your present working directory with the filename `gcloud.json`.
-
-Thereafter, you can run the docker-compose commands and include the logging-specific compose file.
+You can simply startup using the following command
 
 ```bash
 # assuming you clone the supabase/supabase repo.
 cd docker
-docker compose -f docker-compose.yml -f docker-compose-logging.yml up
+docker compose -f docker-compose.yml up
 ```
 
-This would include two additional docker services to your compose stack: Logflare and Vector.
+> ⚠️ WARNING: Please be aware of the heavy consumption of analytics. For heavy usage you might want to consider the usage of a different database for analytics only by updating the `POSTGRES_BACKEND_URL` in the `analytics` service on the `docker-compose.yml` file.
+
+Also be aware that you won't be able to use [Log Explorer](https://supabase.com/docs/guides/platform/logs#logs-explorer) when using the Postgres Backend as some of the querying features are still not supported by our translation layer.
+
+#### Using the Big Query Backend
+
+Using the example [self-hosting stack based on docker-compose](https://github.com/supabase/supabase/tree/master/docker), you include the logging related services using the following command
+
+1. Update the `.env.example` file with the necessary environment variables.
+
+- `GOOGLE_PROJECT_ID`
+- `GOOGLE_PROJECT_NUMBER`
+
+2. Place your Service Account key in your present working directory with the filename `gcloud.json`.
+3. On `docker-compose.yml`, uncomment the block section below the commentary `# Uncomment to use Big Query backend for analytics`
+4. On `docker-compose.yml`, comment the block section below the commentary `# Comment variables to use Big Query backend for analytics`
+
+Thereafter, you can simply startup using the following command
+
+```bash
+# assuming you clone the supabase/supabase repo.
+cd docker
+docker compose -f docker-compose.yml
+```
 
 <Admonition type="info" label="Self-hosting">
   Read more about [self-hosting Logflare](https://docs.logflare.app/self-hosting) as your analytics
@@ -98,9 +139,7 @@ If you need to customize the logging pipeline for your own needs, you must ensur
 
 ### Standalone Docker Container
 
-If desired, you can utilize the standalone docker-container. Please refer to the [docker-compose file](https://github.com/supabase/supabase/tree/master/docker/docker-compose-logging.yml) for required docker configuration.
-
-Additional supplementary technical documentation on self-hosting and using the `supabase/logflare` image for a full Logflare experience is available at the [official Logflare documentation](https://docs.logflare.app/self-hosting/).
+Supplementary technical documentation on self-hosting and using the `supabase/logflare` image for a full Logflare experience is available at the [official Logflare documentation](https://docs.logflare.app/self-hosting/).
 
 ## Differences
 
@@ -108,6 +147,16 @@ API logs rely on Kong instead of the Supabase Cloud API Gateway. Logs from Kong 
 
 Within the self-hosted setup, all logs are routed to Logflare via Vector. As Kong routes API requests to PostgREST, self-hosted or local deployments will result in Kong request logs instead.
 This would result in differences in the log event metadata between self-hosted API requests and Supabase Platform requests.
+
+## Postgres
+
+Log event data is stored and queried from a Postgres database.
+
+Make sure to set the `POSTGRES_BACKEND_URL` environment variable.
+
+### Storage
+
+All data will be stored on the Postgres Database configured by setting `POSTGRES_BACKEND_URL`
 
 ## BigQuery
 
@@ -121,6 +170,10 @@ Download your Google Cloud API JWT and store it under gcloud.json in your workin
   You must also enable billing on your Google Cloud project, as the streaming inserts feature is
   required.
 </Admonition>
+
+### Storage Location
+
+Currently, all BigQuery datasets stored and managed by Analytics, whether via CLI or self-hosted, will default to the US region.
 
 ## Production Recommendations
 
@@ -136,6 +189,10 @@ If dashboard access is required for managing sources, we recommend having an aut
 Logflare requires a Postgres database to function. However, if there is an issue with you self-hosted Postgres service, you would not be able to debug it as it would also bring Logflare down together.
 
 The self-hosted example is only used as a minimal example on running the entire stack, however it is not recommended to use the same database server for both production and observability.
+
+### Use Big Query as the Logflare Backend
+
+The current Postgres Ingestion backend isn't optimized for production usage. We recommend using Big Query for more heavy use cases.
 
   </RefSubLayout.Details>
 

@@ -1,7 +1,7 @@
 import { Button, IconGrid, IconLayers, IconMenu } from 'ui'
 import ApiExamples from 'data/products/realtime/api-examples'
 import AppExamples from 'data/products/realtime/app-examples'
-import Solutions from 'data/Solutions.json'
+import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -66,7 +66,7 @@ function RealtimePage() {
             <div className="bg-scale-300 border-scale-500 relative flex h-[372px] w-[560px] items-center justify-center overflow-hidden rounded border drop-shadow-md">
               <div
                 className={[
-                  'border-brand-800 relative h-12 w-48 bg-[#34B27B]',
+                  'border-brand-300 relative h-12 w-48 bg-[#34B27B]',
                   `flex items-center justify-center ${RealtimeStyles['shape']}`,
                 ].join(' ')}
               >

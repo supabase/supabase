@@ -27,7 +27,7 @@ const Pagination = ({ currentPage, totalCount }: { currentPage: number; totalCou
             <Link href={`/discussions?page=${page}`}>
               <a
                 className={`border-scale-600 inline-flex h-8 w-8 items-center justify-center rounded border ${
-                  currentPage === page ? 'bg-brand-900' : 'bg-scale-300'
+                  currentPage === page ? 'bg-brand' : 'bg-scale-300'
                 }`}
               >
                 {page}

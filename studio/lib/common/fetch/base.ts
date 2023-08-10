@@ -1,6 +1,7 @@
 import { auth } from 'lib/gotrue'
 import { isUndefined } from 'lodash'
 import { SupaResponse } from 'types/base'
+import { Session } from '@supabase/gotrue-js'
 
 export function handleError<T>(e: any, requestId: string): SupaResponse<T> {
   const message = e?.message ? `An error has occurred: ${e.message}` : 'An error has occurred'
@@ -86,15 +87,32 @@ export async function handleResponseError<T = unknown>(
   }
 }
 
+let currentSession: Session | null = null
+
+auth.onAuthStateChange((event, session) => {
+  currentSession = session
+})
+
 export async function getAccessToken() {
   // ignore if server-side
   if (typeof window === 'undefined') return ''
 
-  const {
-    data: { session },
-  } = await auth.getSession()
+  const aboutToExpire = currentSession?.expires_at
+    ? currentSession.expires_at - Math.ceil(Date.now() / 1000) < 60
+    : false
 
-  return session?.access_token
+  if (!currentSession || aboutToExpire) {
+    const {
+      data: { session },
+    } = await auth.getSession()
+
+    currentSession = session
+  }
+
+  // using memory version as gotrue-js can be a bit slow when using
+  // #getSession() as it has to read directly from local storage
+
+  return currentSession?.access_token
 }
 
 export async function constructHeaders(requestId: string, optionHeaders?: { [prop: string]: any }) {
@@ -112,4 +130,12 @@ export async function constructHeaders(requestId: string, optionHeaders?: { [pro
   }
 
   return headers
+}
+
+export function isResponseOk<T>(response: SupaResponse<T> | undefined): response is T {
+  return (
+    response !== undefined &&
+    response !== null &&
+    !(typeof response === 'object' && 'error' in response && Boolean(response.error))
+  )
 }

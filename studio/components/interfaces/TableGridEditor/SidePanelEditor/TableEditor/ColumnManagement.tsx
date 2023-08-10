@@ -1,27 +1,26 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import type { PostgresColumn, PostgresTable, PostgresType } from '@supabase/postgres-meta'
+import { isEmpty, noop, partition } from 'lodash'
 import Link from 'next/link'
-import { FC, useState } from 'react'
-import { partition, isEmpty } from 'lodash'
-import { Alert, Button, IconEdit, IconHelpCircle, IconKey, IconTrash, IconExternalLink } from 'ui'
-
-import type { PostgresTable, PostgresColumn, PostgresType } from '@supabase/postgres-meta'
+import { useState } from 'react'
 import {
   DragDropContext,
-  Droppable,
   Draggable,
-  DroppableProvided,
   DraggableProvided,
+  Droppable,
+  DroppableProvided,
 } from 'react-beautiful-dnd'
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { Alert, Button, IconEdit, IconExternalLink, IconHelpCircle, IconKey, IconTrash } from 'ui'
 
-import Column from './Column'
 import InformationBox from 'components/ui/InformationBox'
-import ForeignKeySelector from '../ForeignKeySelector/ForeignKeySelector'
-import { ImportContent } from './TableEditor.types'
 import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
-import { ColumnField, ExtendedPostgresRelationship } from '../SidePanelEditor.types'
+import ForeignKeySelector from '../ForeignKeySelector/ForeignKeySelector'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
+import { ColumnField, ExtendedPostgresRelationship } from '../SidePanelEditor.types'
+import Column from './Column'
+import { ImportContent } from './TableEditor.types'
 
-interface Props {
+interface ColumnManagementProps {
   table?: Partial<PostgresTable>
   columns?: ColumnField[]
   enumTypes: PostgresType[]
@@ -32,16 +31,16 @@ interface Props {
   onClearImportContent: () => void
 }
 
-const ColumnManagement: FC<Props> = ({
+const ColumnManagement = ({
   table,
   columns = [],
   enumTypes = [],
   importContent,
   isNewRecord,
-  onColumnsUpdated = () => {},
-  onSelectImportData = () => {},
-  onClearImportContent = () => {},
-}) => {
+  onColumnsUpdated = noop,
+  onSelectImportData = noop,
+  onClearImportContent = noop,
+}: ColumnManagementProps) => {
   const [selectedColumnToEditRelation, setSelectedColumnToEditRelation] = useState<ColumnField>()
 
   const hasImportContent = !isEmpty(importContent)

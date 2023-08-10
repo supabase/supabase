@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.75.2
+  version: 1.82.2
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1137,9 +1137,13 @@ commands:
     summary: Apply pending migrations to local database
     tags: []
     links: []
-    usage: supabase migration up
+    usage: supabase migration up [flags]
     subcommands: []
-    flags: []
+    flags:
+      - id: include-all
+        name: --include-all
+        description: Include all migrations not found on remote history table.
+        default_value: 'false'
   - id: supabase-migration-squash
     title: supabase migration squash
     summary: Squash migrations to a single file
@@ -1388,45 +1392,521 @@ commands:
         default_value: ''
   - id: supabase-inspect
     title: supabase inspect
-    summary: Tools to inspect your Supabase Database
+    summary: Tools to inspect your Supabase project
     tags:
       - local-dev
     links: []
     subcommands:
-      - supabase-inspect-db:cache-hit
-      - supabase-inspect-db:index-usage
-      - supabase-inspect-db:replication-slots
+      - supabase-inspect-db
     flags: []
-  - id: supabase-inspect-db:replication-slots
-    title: supabase inspect db:replication-slots
-    summary: Shows information about replication slots on the database
+  - id: supabase-inspect-db
+    title: supabase inspect db
+    summary: Tools to inspect your Supabase database
     tags: []
     links: []
-    usage: supabase inspect db:replication-slots
+    subcommands:
+      - supabase-inspect-db-bloat
+      - supabase-inspect-db-blocking
+      - supabase-inspect-db-cache-hit
+      - supabase-inspect-db-calls
+      - supabase-inspect-db-index-sizes
+      - supabase-inspect-db-index-usage
+      - supabase-inspect-db-locks
+      - supabase-inspect-db-long-running-queries
+      - supabase-inspect-db-outliers
+      - supabase-inspect-db-replication-slots
+      - supabase-inspect-db-role-connections
+      - supabase-inspect-db-seq-scans
+      - supabase-inspect-db-table-index-sizes
+      - supabase-inspect-db-table-record-counts
+      - supabase-inspect-db-table-sizes
+      - supabase-inspect-db-total-index-size
+      - supabase-inspect-db-total-table-sizes
+      - supabase-inspect-db-unused-indexes
+      - supabase-inspect-db-vacuum-stats
+    flags: []
+  - id: supabase-inspect-db-vacuum-stats
+    title: supabase inspect db vacuum-stats
+    summary: Show statistics related to vacuum operations per table
+    description: |2
+
+      This shows you stats about the vacuum activities for each table. Due to Postgres' [MVCC](https://www.postgresql.org/docs/current/mvcc.html) when data is updated or deleted new rows are created and old rows are made invisible and marked as "dead tuples". Usually the [autovaccum](https://supabase.com/docs/guides/platform/database-size#vacuum-operations) process will aysnchronously clean the dead tuples.
+
+      The command lists when the last vacuum and last auto vacuum took place, the row count on the table as well as the count of dead rows and whether autovacuum is expected to run or not. If the number of dead rows is much higher than the row count, or if an autovacuum is expected but has not been performed for some time, this can indicate that autovacuum is not able to keep up and that your vacuum settings need to be tweaked or that you require more compute or disk IOPS to allow autovaccum to complete.
+
+
+      ```
+              SCHEMA        │              TABLE               │ LAST VACUUM │ LAST AUTO VACUUM │      ROW COUNT       │ DEAD ROW COUNT │ EXPECT AUTOVACUUM?
+      ──────────────────────┼──────────────────────────────────┼─────────────┼──────────────────┼──────────────────────┼────────────────┼─────────────────────
+       auth                 │ users                            │             │ 2023-06-26 12:34 │               18,030 │              0 │ no
+       public               │ profiles                         │             │ 2023-06-26 23:45 │               13,420 │             28 │ no
+       public               │ logs                             │             │ 2023-06-26 01:23 │            1,313,033 │      3,318,228 │ yes
+       storage              │ objects                          │             │                  │             No stats │              0 │ no
+       storage              │ buckets                          │             │                  │             No stats │              0 │ no
+       supabase_migrations  │ schema_migrations                │             │                  │             No stats │              0 │ no
+
+      ```
+    tags: []
+    links: []
+    usage: supabase inspect db vacuum-stats
     subcommands: []
     flags:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
         default_value: ''
-  - id: supabase-inspect-db:index-usage
-    title: supabase inspect db:index-usage
-    summary: Shows information about the efficiency of indexes
+  - id: supabase-inspect-db-unused-indexes
+    title: supabase inspect db unused-indexes
+    summary: Show indexes with low usage
+    description: |2
+
+      This command displays indexes that have < 50 scans recorded against them, and are greater than 5 pages in size, ordered by size relative to the number of index scans. This command is generally useful for discovering indexes that are unused. Indexes can impact write performance, as well as read performance should they occupy space in memory, its a good idea to remove indexes that are not needed or being used.
+
+      ```
+              TABLE        │                   INDEX                    │ INDEX SIZE │ INDEX SCANS
+      ─────────────────────┼────────────────────────────────────────────┼────────────┼──────────────
+       public.users        │ user_id_created_at_idx                     │ 97 MB      │           0
+      ```
     tags: []
     links: []
-    usage: supabase inspect db:index-usage
+    usage: supabase inspect db unused-indexes
     subcommands: []
     flags:
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
         default_value: ''
-  - id: supabase-inspect-db:cache-hit
-    title: supabase inspect db:cache-hit
-    summary: Shows cache hit rates for tables and indices
+  - id: supabase-inspect-db-total-table-sizes
+    title: supabase inspect db total-table-sizes
+    summary: Show total table sizes, including table index sizes
+    description: |2-
+
+      This command displays the total size of each table in the database. It is the sum of the values that `pg_table_size()` and `pg_indexes_size()` gives for each table.
+
+      ```
+                      NAME               │    SIZE
+      ───────────────────────────────────┼─────────────
+        job_run_details                  │ 395 MB
+        slack_msgs                       │ 648 kB
+        emails                           │ 640 kB
+      ```
     tags: []
     links: []
-    usage: supabase inspect db:cache-hit
+    usage: supabase inspect db total-table-sizes
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-total-index-size
+    title: supabase inspect db total-index-size
+    summary: Show total size of all indexes
+    description: |2-
+
+      This command displays the total size of all indexes on the database. It is calculated by taking the number of pages (reported in `relpages`) and multiplying it by the page size (8192 bytes).
+
+      ```
+          SIZE
+        ─────────
+          12 MB
+      ```
+    tags: []
+    links: []
+    usage: supabase inspect db total-index-size
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-table-sizes
+    title: supabase inspect db table-sizes
+    summary: |
+      Show table sizes of individual tables without their index sizes
+    description: |2-
+
+      This command displays the size of each table in the database. It is calculated by using the system administration function `pg_table_size()`, which includes the size of the main data fork, free space map, visibility map and TOAST data. It does not include the size of the table's indexes.
+
+
+      ```
+                        NAME               │    SIZE
+        ───────────────────────────────────┼─────────────
+          job_run_details                  │ 385 MB
+          emails                           │ 584 kB
+          job                              │ 40 kB
+          sessions                         │ 0 bytes
+          prod_resource_notifications_meta │ 0 bytes
+      ```
+    tags: []
+    links: []
+    usage: supabase inspect db table-sizes
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-table-record-counts
+    title: supabase inspect db table-record-counts
+    summary: Show estimated number of rows per table
+    description: |2-
+
+      This command displays an estimated count of rows per table, descending by estimated count. The estimated count is derived from `n_live_tup`, which is updated by vacuum operations. Due to the way `n_live_tup` is populated, sparse vs. dense pages can result in estimations that are significantly out from the real count of rows.
+
+
+      ```
+             NAME    │ ESTIMATED COUNT
+        ─────────────┼──────────────────
+          logs       │          322943
+          emails     │            1103
+          job        │               1
+          migrations │               0
+      ```
+    tags: []
+    links: []
+    usage: supabase inspect db table-record-counts
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-table-index-sizes
+    title: supabase inspect db table-index-sizes
+    summary: Show index sizes of individual tables
+    description: |2
+
+      This command displays the total size of indexes for each table. It is calculated by using the system administration function `pg_indexes_size()`.
+
+      ```
+                       TABLE               │ INDEX SIZE
+        ───────────────────────────────────┼─────────────
+          job_run_details                  │ 10104 kB
+          users                            │ 128 kB
+          job                              │ 32 kB
+          instances                        │ 8192 bytes
+          http_request_queue               │ 0 bytes
+      ```
+    tags: []
+    links: []
+    usage: supabase inspect db table-index-sizes
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-seq-scans
+    title: supabase inspect db seq-scans
+    summary: Show number of sequential scans recorded against all tables
+    description: |2+
+
+      This command displays the number of sequential scans recorded against all tables, descending by count of sequential scans. Tables that have very high numbers of sequential scans may be underindexed, and it may be worth investigating queries that read from these tables.
+
+
+      ```
+                        NAME               │ COUNT
+        ───────────────────────────────────┼─────────
+          emails                           │ 182435
+          users                            │  25063
+          job_run_details                  │     60
+          schema_migrations                │      0
+          migrations                       │      0
+      ```
+
+    tags: []
+    links: []
+    usage: supabase inspect db seq-scans
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-role-connections
+    title: supabase inspect db role-connections
+    summary: Show number of active connections for all database roles
+    description: |2
+
+      This command shows the number of active connections for each database roles to see which specific role might be consuming more connections than expected.
+
+      This is a Supabase specific command. You can see this breakdown on the dashboard as well:
+      https://app.supabase.com/project/_/database/roles
+
+      The maximum number of active connections depends [on your instance size](https://supabase.com/docs/guides/platform/compute-add-ons). You can [manually overwrite](https://supabase.com/docs/guides/platform/performance#allowing-higher-number-of-connections) the allowed number of connection but it is not advised.
+
+      ```
+
+
+                  ROLE NAME         │ ACTIVE CONNCTION
+        ────────────────────────────┼───────────────────
+          authenticator             │                5
+          postgres                  │                5
+          supabase_admin            │                1
+          pgbouncer                 │                1
+          anon                      │                0
+          authenticated             │                0
+          service_role              │                0
+          dashboard_user            │                0
+          supabase_auth_admin       │                0
+          supabase_storage_admin    │                0
+          supabase_functions_admin  │                0
+          pgsodium_keyholder        │                0
+          pg_read_all_data          │                0
+          pg_write_all_data         │                0
+          pg_monitor                │                0
+
+      Active connections 12/90
+
+      ```
+    tags: []
+    links: []
+    usage: supabase inspect db role-connections
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-replication-slots
+    title: supabase inspect db replication-slots
+    summary: Show information about replication slots on the database
+    description: |2-
+
+      This command shows information about [logical replication slots](https://www.postgresql.org/docs/current/logical-replication.html) that are setup on the database. It shows if the slot is active, the state of the WAL sender process ('startup', 'catchup', 'streaming', 'backup', 'stopping') the replication client address and the replication lag in GB.
+
+      This command is useful to check that the amount of replication lag is as low as possible, replication lag can occur due to network latency issues, slow disk I/O, long running transactions or lack of ability for the subscriber to consume WAL fast enough.
+
+
+      ```
+                             NAME                    │ ACTIVE │ STATE   │ REPLICATION CLIENT ADDRESS │ REPLICATION LAG GB
+        ─────────────────────────────────────────────┼────────┼─────────┼────────────────────────────┼─────────────────────
+          supabase_realtime_replication_slot         │ t      │ N/A     │ N/A                        │                  0
+          datastream                                 │ t      │ catchup │ 24.201.24.106              │                 45
+      ```
+    tags: []
+    links: []
+    usage: supabase inspect db replication-slots
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-outliers
+    title: supabase inspect db outliers
+    summary: |
+      Show queries from pg_stat_statements ordered by total execution time
+    description: |2
+
+      This command displays statements, obtained from `pg_stat_statements`, ordered by the amount of time to execute in aggregate. This includes the statement itself, the total execution time for that statement, the proportion of total execution time for all statements that statement has taken up, the number of times that statement has been called, and the amount of time that statement spent on synchronous I/O (reading/writing from the file system).
+
+      Typically, an efficient query will have an appropriate ratio of calls to total execution time, with as little time spent on I/O as possible. Queries that have a high total execution time but low call count should be investigated to improve their performance. Queries that have a high proportion of execution time being spent on synchronous I/O should also be investigated.
+
+      ```
+
+                       QUERY                   │ EXECUTION TIME   │ PROPORTION OF EXEC TIME │ NUMBER CALLS │ SYNC IO TIME
+      ─────────────────────────────────────────┼──────────────────┼─────────────────────────┼──────────────┼───────────────
+       SELECT * FROM archivable_usage_events.. │ 154:39:26.431466 │ 72.2%                   │ 34,211,877   │ 00:00:00
+       COPY public.archivable_usage_events (.. │ 50:38:33.198418  │ 23.6%                   │ 13           │ 13:34:21.00108
+       COPY public.usage_events (id, reporte.. │ 02:32:16.335233  │ 1.2%                    │ 13           │ 00:34:19.784318
+       INSERT INTO usage_events (id, retaine.. │ 01:42:59.436532  │ 0.8%                    │ 12,328,187   │ 00:00:00
+       SELECT * FROM usage_events WHERE (alp.. │ 01:18:10.754354  │ 0.6%                    │ 102,114,301  │ 00:00:00
+      ```
+    tags: []
+    links: []
+    usage: supabase inspect db outliers
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-long-running-queries
+    title: supabase inspect db long-running-queries
+    summary: |
+      Show currently running queries running for longer than 5 minutes
+    description: |2
+
+      This command displays currently running queries, that have been running for longer than 5 minutes, descending by duration. Very long running queries can be a source of multiple issues, such as preventing DDL statements completing or vacuum being unable to update `relfrozenxid`.
+
+      ```
+        PID  │     DURATION    │                                         QUERY
+      ───────┼─────────────────┼───────────────────────────────────────────────────────────────────────────────────────
+       19578 | 02:29:11.200129 | EXPLAIN SELECT  "students".* FROM "students"  WHERE "students"."id" = 1450645 LIMIT 1
+       19465 | 02:26:05.542653 | EXPLAIN SELECT  "students".* FROM "students"  WHERE "students"."id" = 1889881 LIMIT 1
+       19632 | 02:24:46.962818 | EXPLAIN SELECT  "students".* FROM "students"  WHERE "students"."id" = 1581884 LIMIT 1
+      ```
+    tags: []
+    links: []
+    usage: supabase inspect db long-running-queries
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-locks
+    title: supabase inspect db locks
+    summary: |
+      Show queries which have taken out an exclusive lock on a relation
+    description: |2
+
+      This command displays queries that have taken out an exclusive lock on a relation. Exclusive locks typically prevent other operations on that relation from taking place, and can be a cause of "hung" queries that are waiting for a lock to be granted.
+
+      If you see a query that is hanging for a very long time or causing blocking issues you may consider killing the query by connecting to the database and running `SELECT pg_cancel_backend(PID);` to cancel the query. If the query still does not stop you can force a hard stop by running `SELECT pg_terminate_backend(PID);`
+
+      ```
+           PID   │ RELNAME │ TRANSACTION ID │ GRANTED │                  QUERY                  │   AGE
+        ─────────┼─────────┼────────────────┼─────────┼─────────────────────────────────────────┼───────────
+          328112 │ null    │              0 │ t       │ SELECT * FROM logs;                     │ 00:04:20
+      ```
+    tags: []
+    links: []
+    usage: supabase inspect db locks
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-index-usage
+    title: supabase inspect db index-usage
+    summary: Show information about the efficiency of indexes
+    description: "\n\nThis command provides information on the efficiency of indexes, represented as what percentage of total scans were index scans. A low percentage can indicate under indexing, or wrong data being indexed.\n\n```\n       TABLE NAME     │ PERCENTAGE OF TIMES INDEX USED │ ROWS IN TABLE\n  ────────────────────┼────────────────────────────────┼────────────────\n    user_events       │                             99 │       4225318 \n    user_feed         │                             99 │       3581573\n    unindexed_table   │                              0 │        322911\n    job               │                            100 │         33242\n    schema_migrations │                             97 │             0\n    migrations        │ Insufficient data              │             0\n```"
+    tags: []
+    links: []
+    usage: supabase inspect db index-usage
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-index-sizes
+    title: supabase inspect db index-sizes
+    summary: Show index sizes of individual indexes
+    description: |2-
+
+      This command displays the size of each each index in the database. It is calculated by taking the number of pages (reported in `relpages`) and multiplying it by the page size (8192 bytes).
+
+      ```
+                    NAME              │    SIZE
+        ──────────────────────────────┼─────────────
+          user_events_index           │ 2082 MB
+          job_run_details_pkey        │ 3856 kB
+          schema_migrations_pkey      │ 16 kB
+          refresh_tokens_token_unique │ 8192 bytes
+          users_instance_id_idx       │ 0 bytes
+          buckets_pkey                │ 0 bytes
+      ```
+    tags: []
+    links: []
+    usage: supabase inspect db index-sizes
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-calls
+    title: supabase inspect db calls
+    summary: |
+      Show queries from pg_stat_statements ordered by total times called
+    description: |2
+
+      This command is much like the `supabase inspect db outliers` command, but ordered by the number of times a statement has been called.
+
+      You can use this information to see which queries are called most often, which can potentially be good candidates for optimisation.
+
+      ```
+
+                              QUERY                      │ TOTAL EXECUTION TIME │ PROPORTION OF TOTAL EXEC TIME │ NUMBER CALLS │  SYNC IO TIME
+        ─────────────────────────────────────────────────┼──────────────────────┼───────────────────────────────┼──────────────┼──────────────────
+          SELECT * FROM users WHERE id = $1              │ 14:50:11.828939      │ 89.8%                         │  183,389,757 │ 00:00:00.002018
+          SELECT * FROM user_events                      │ 01:20:23.466633      │ 1.4%                          │       78,325 │ 00:00:00
+          INSERT INTO users (email, name) VALUES ($1, $2)│ 00:40:11.616882      │ 0.8%                          │       54,003 │ 00:00:00.000322
+
+      ```
+    tags: []
+    links: []
+    usage: supabase inspect db calls
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-cache-hit
+    title: supabase inspect db cache-hit
+    summary: Show cache hit rates for tables and indices
+    description: |2-
+
+      This command provides information on the efficiency of the buffer cache and how often your queries have to go hit the disk rather than reading from memory. Information on both index reads (`index hit rate`) as well as table reads (`table hit rate`) are shown. In general, databases with low cache hit rates perform worse as it is slower to go to disk than retrieve data from memory. If your table hit rate is low, this can indicate that you do not have enough RAM and you may benefit from upgrading to a larger compute addon with more memory. If your index hit rate is low, this may indicate that there is scope to add more appropriate indexes.
+
+      The hit rates are calculated as a ratio of number of table or index blocks fetched from the postgres buffer cache against the sum of cached blocks and uncached blocks read from disk.
+
+      On smaller compute plans (free, small, medium), a ratio of below 99% can indicate a problem. On larger plans the hit rates may be lower but performance will remain constant as the data may use the OS cache rather than Postgres buffer cache.
+
+      ```
+               NAME      │  RATIO
+        ─────────────────┼───────────
+          index hit rate │ 0.996621
+          table hit rate │ 0.999341
+       ```
+    tags: []
+    links: []
+    usage: supabase inspect db cache-hit
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-blocking
+    title: supabase inspect db blocking
+    summary: |
+      Show queries that are holding locks and the queries that are waiting for them to be released
+    description: |2
+
+      This command shows you statements that are currently holding locks and blocking, as well as the statement that is being blocked. This can be used in conjunction with `inspect db locks` to determine which statements need to be terminated in order to resolve lock contention.
+
+      ```
+          BLOCKED PID │ BLOCKING STATEMENT           │ BLOCKING DURATION │ BLOCKING PID │ BLOCKED STATEMENT                                                                      │ BLOCKED DURATION
+        ──────────────┼──────────────────────────────┼───────────────────┼──────────────┼────────────────────────────────────────────────────────────────────────────────────────┼───────────────────
+          253         │ select count(*) from mytable │ 00:00:03.838314   │        13495 │ UPDATE "mytable" SET "updated_at" = '2023─08─03 14:07:04.746688' WHERE "id" = 83719341 │ 00:00:03.821826
+      ```
+    tags: []
+    links: []
+    usage: supabase inspect db blocking
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-inspect-db-bloat
+    title: supabase inspect db bloat
+    summary: |
+      Estimates space allocated to a relation that is full of dead tuples
+    description: |2
+
+      This command displays an estimation of table "bloat" - Due to Postgres' [MVCC](https://www.postgresql.org/docs/current/mvcc.html) when data is updated or deleted new rows are created and old rows are made invisible and marked as "dead tuples". Usually the [autovaccum](https://supabase.com/docs/guides/platform/database-size#vacuum-operations) process will asynchronously clean the dead tuples. Sometimes the autovaccum is unable to work fast enough to reduce or prevent tables from becoming bloated. High bloat can slow down queries, cause excessive IOPS and waste space in your database.
+
+      Tables with a high bloat ratio should be investigated to see if there are vacuuming is not quick enough or there are other issues.
+
+      ```
+          TYPE  │ SCHEMA NAME │        OBJECT NAME         │ BLOAT │ WASTE
+        ────────┼─────────────┼────────────────────────────┼───────┼─────────────
+          table │ public      │ very_bloated_table         │  41.0 │ 700 MB
+          table │ public      │ my_table                   │   4.0 │ 76 MB
+          table │ public      │ happy_table                │   1.0 │ 1472 kB
+          index │ public      │ happy_table::my_nice_index │   0.7 │ 880 kB
+      ```
+    tags: []
+    links: []
+    usage: supabase inspect db bloat
     subcommands: []
     flags:
       - id: db-url
@@ -1908,6 +2388,18 @@ commands:
         description: |
           Print the migrations that would be applied, but don't actually apply them.
         default_value: 'false'
+      - id: include-all
+        name: --include-all
+        description: Include all migrations not found on remote history table.
+        default_value: 'false'
+      - id: include-roles
+        name: --include-roles
+        description: Include custom roles from supabase/roles.sql.
+        default_value: 'false'
+      - id: include-seed
+        name: --include-seed
+        description: Include seed data from supabase/seed.sql.
+        default_value: 'false'
       - id: password
         name: -p, --password <string>
         description: Password to your remote Postgres database.
@@ -1990,7 +2482,7 @@ commands:
 
       Requires your local project to be linked to a remote database by running `supabase link`. For self-hosted databases, you can pass in the connection parameters using `--db-url` flag.
 
-      Runs `pg_dump` in a container with additional flags to exclude Supabase managed schemas. The ignored schemas include auth, stroage, and those created by extensions.
+      Runs `pg_dump` in a container with additional flags to exclude Supabase managed schemas. The ignored schemas include auth, storage, and those created by extensions.
 
       The default dump does not contain any data or custom roles. To dump those contents explicitly, specify either the `--data-only` and `--role-only` flag.
     examples:
@@ -2021,6 +2513,10 @@ commands:
         name: --data-only
         description: Dumps only data records.
         default_value: 'false'
+      - id: dry-run
+        name: --dry-run
+        description: Print the pg_dump script that would be executed.
+        default_value: 'false'
       - id: file
         name: -f, --file <string>
         description: File path to save the dumped contents.
@@ -2037,6 +2533,10 @@ commands:
         name: --role-only
         description: Dumps only cluster roles.
         default_value: 'false'
+      - id: schema
+        name: -s, --schema <strings>
+        description: List of schema to include.
+        default_value: all
       - id: use-copy
         name: --use-copy
         description: Uses copy statements in place of inserts.
@@ -2101,14 +2601,23 @@ commands:
     usage: supabase db diff [flags]
     subcommands: []
     flags:
+      - id: db-url
+        name: --db-url <string>
+        description: |
+          Diffs local migration files against the database specified by the connection string (must be percent-encoded).
+        default_value: ''
       - id: file
         name: -f, --file <string>
         description: Saves schema diff to a new migration file.
         default_value: ''
       - id: linked
         name: --linked
-        description: Diffs local schema against the linked project.
+        description: Diffs local migration files against the linked project.
         default_value: 'false'
+      - id: local
+        name: --local
+        description: Diffs local migration files against the local database.
+        default_value: 'true'
       - id: schema
         name: -s, --schema <strings>
         description: List of schema to include.
@@ -2121,10 +2630,6 @@ commands:
         name: --use-pgadmin
         description: Use pgAdmin to generate schema diff.
         default_value: 'false'
-      - id: db-url
-        name: --db-url <string>
-        description: connect using the specified database url
-        default_value: ''
   - id: supabase-completion
     title: supabase completion
     summary: Generate the autocompletion script for the specified shell
@@ -2252,4 +2757,211 @@ commands:
       - id: no-descriptions
         name: --no-descriptions
         description: disable completion descriptions
+        default_value: 'false'
+  - id: supabase-branches
+    title: supabase branches
+    summary: Manage Supabase preview branches
+    tags:
+      - management-api
+    links: []
+    subcommands:
+      - supabase-branches-create
+      - supabase-branches-delete
+      - supabase-branches-disable
+      - supabase-branches-get
+      - supabase-branches-list
+      - supabase-branches-update
+    flags: []
+  - id: supabase-branches-update
+    title: supabase branches update
+    summary: Update a preview branch
+    description: Update a preview branch by its ID.
+    tags: []
+    links: []
+    usage: supabase branches update <branch-id> [flags]
+    subcommands: []
+    flags:
+      - id: git-branch
+        name: --git-branch <string>
+        description: Change the associated git branch.
+        default_value: ''
+      - id: name
+        name: --name <string>
+        description: Rename the preview branch.
+        default_value: ''
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+  - id: supabase-branches-list
+    title: supabase branches list
+    summary: List all preview branches
+    description: List all preview branches of the linked project.
+    tags: []
+    links: []
+    usage: supabase branches list
+    subcommands: []
+    flags:
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+  - id: supabase-branches-get
+    title: supabase branches get
+    summary: Retrieve details of a preview branch
+    description: Retrieve details of the specified preview branch.
+    tags: []
+    links: []
+    usage: supabase branches get <branch-id>
+    subcommands: []
+    flags:
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+  - id: supabase-branches-disable
+    title: supabase branches disable
+    summary: Disable preview branching
+    description: Disable preview branching for the linked project.
+    tags: []
+    links: []
+    usage: supabase branches disable
+    subcommands: []
+    flags:
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+  - id: supabase-branches-delete
+    title: supabase branches delete
+    summary: Delete a preview branch
+    description: Delete a preview branch by its ID.
+    tags: []
+    links: []
+    usage: supabase branches delete <branch-id>
+    subcommands: []
+    flags:
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+  - id: supabase-branches-create
+    title: supabase branches create
+    summary: Create a preview branch
+    description: Create a preview branch for the linked project.
+    tags: []
+    links: []
+    usage: supabase branches create <name> [flags]
+    subcommands: []
+    flags:
+      - id: region
+        name: --region <string>
+        description: Select a region to deploy the branch database.
+        default_value: ''
+        accepted_values:
+          - id: ams
+            name: ams
+            type: string
+          - id: arn
+            name: arn
+            type: string
+          - id: bog
+            name: bog
+            type: string
+          - id: bos
+            name: bos
+            type: string
+          - id: cdg
+            name: cdg
+            type: string
+          - id: den
+            name: den
+            type: string
+          - id: dfw
+            name: dfw
+            type: string
+          - id: ewr
+            name: ewr
+            type: string
+          - id: fra
+            name: fra
+            type: string
+          - id: gdl
+            name: gdl
+            type: string
+          - id: gig
+            name: gig
+            type: string
+          - id: gru
+            name: gru
+            type: string
+          - id: hkg
+            name: hkg
+            type: string
+          - id: iad
+            name: iad
+            type: string
+          - id: jnb
+            name: jnb
+            type: string
+          - id: lax
+            name: lax
+            type: string
+          - id: lhr
+            name: lhr
+            type: string
+          - id: maa
+            name: maa
+            type: string
+          - id: mad
+            name: mad
+            type: string
+          - id: mia
+            name: mia
+            type: string
+          - id: nrt
+            name: nrt
+            type: string
+          - id: ord
+            name: ord
+            type: string
+          - id: otp
+            name: otp
+            type: string
+          - id: qro
+            name: qro
+            type: string
+          - id: scl
+            name: scl
+            type: string
+          - id: sea
+            name: sea
+            type: string
+          - id: sin
+            name: sin
+            type: string
+          - id: sjc
+            name: sjc
+            type: string
+          - id: syd
+            name: syd
+            type: string
+          - id: waw
+            name: waw
+            type: string
+          - id: yul
+            name: yul
+            type: string
+          - id: yyz
+            name: yyz
+            type: string
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
         default_value: 'false'

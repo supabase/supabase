@@ -22,14 +22,15 @@ import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 
 const OAuthApps = () => {
   const { slug } = useParams()
-  const [createdApp, setCreatedApp] = useState<OAuthAppCreateResponse>()
   const [showPublishModal, setShowPublishModal] = useState(false)
+  const [createdApp, setCreatedApp] = useState<OAuthAppCreateResponse>()
   const [selectedAppToUpdate, setSelectedAppToUpdate] = useState<OAuthApp>()
   const [selectedAppToDelete, setSelectedAppToDelete] = useState<OAuthApp>()
   const [selectedAppToRevoke, setSelectedAppToRevoke] = useState<AuthorizedApp>()
 
   const {
     data: publishedApps,
+    error: publishedAppsError,
     isLoading: isLoadingPublishedApps,
     isSuccess: isSuccessPublishedApps,
     isError: isErrorPublishedApps,
@@ -53,7 +54,7 @@ const OAuthApps = () => {
   return (
     <>
       <ScaffoldContainerLegacy>
-        <div>
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <p>Published Apps</p>
@@ -75,7 +76,10 @@ const OAuthApps = () => {
           )}
 
           {isErrorPublishedApps && (
-            <AlertError className="mt-4" subject="Unable to retrieve published OAuth apps" />
+            <AlertError
+              error={publishedAppsError}
+              subject="Failed to retrieve published OAuth apps"
+            />
           )}
 
           {createdApp !== undefined && (
@@ -98,7 +102,6 @@ const OAuthApps = () => {
                     copy
                     readOnly
                     size="small"
-                    // layout="horizontal"
                     label="Client ID"
                     className="max-w-xl input-mono"
                     value={createdApp.client_id}
@@ -108,7 +111,6 @@ const OAuthApps = () => {
                     copy
                     readOnly
                     size="small"
-                    // layout="horizontal"
                     label="Client secret"
                     className="max-w-xl input-mono"
                     value={createdApp.client_secret}
@@ -127,13 +129,12 @@ const OAuthApps = () => {
                 </div>
               ) : (
                 <Table
-                  className="mt-4"
                   head={[
                     <Table.th key="icon" className="w-[30px]"></Table.th>,
                     <Table.th key="name">Name</Table.th>,
                     <Table.th key="client-id">Client ID</Table.th>,
                     <Table.th key="client-secret">Client Secret</Table.th>,
-                    <Table.th key="client-secret">Created at</Table.th>,
+                    <Table.th key="created-at">Created at</Table.th>,
                     <Table.th key="delete-action"></Table.th>,
                   ]}
                   body={
@@ -170,7 +171,7 @@ const OAuthApps = () => {
               </div>
             )}
 
-            {isErrorAuthorizedApps && <AlertError subject="Unable to retrieve authorized apps" />}
+            {isErrorAuthorizedApps && <AlertError subject="Failed to retrieve authorized apps" />}
 
             {isSuccessAuthorizedApps && (
               <>

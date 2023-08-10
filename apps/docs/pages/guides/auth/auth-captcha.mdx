@@ -51,7 +51,7 @@ In the Settings page, look for the **Sitekey** section and copy the key.
 
 ## Enable Captcha protection for your Supabase project
 
-Navigate to the **[Authentication](https://supabase.com/dashboard/project/_/settings/auth)** page in the Supabase Dashboard and find the **Enable Captcha protection** toggle under the **Security and Protection** section.
+Navigate to the **[Auth](https://supabase.com/dashboard/project/_/settings/auth)** section of your Project Settings in the Supabase Dashboard and find the **Enable Captcha protection** toggle under the **Security and Protection** section.
 
 ![supabase_auth_general_settings.png](/docs/img/guides/auth-captcha/supabase_auth_general_settings.png)
 
@@ -165,18 +165,18 @@ Let's create an empty state to store our `captchaToken`
 const [captchaToken, setCaptchaToken] = useState()
 ```
 
-Now lets add the Cloudflare Turnstile component to the JSX section of our code
+Now lets add the Cloudflare Turnstile component to the JSX section of our code:
 
 ```html
 <Turnstile />
 ```
 
-We will pass it the sitekey we copied from the Cloudflare website as a property along with a `onVerify` property which takes a callback function. This callback function will have a token as one of its properties. Let's set the token in the state using `setCaptchaToken`
+We will pass it the sitekey we copied from the Cloudflare website as a property along with a `onSuccess` property which takes a callback function. This callback function will have a token as one of its properties. Let's set the token in the state using `setCaptchaToken`:
 
 ```jsx
 <Turnstile
   sitekey="your-sitekey"
-  onVerify={(token) => { setCaptchaToken(token) }
+  onSuccess={(token) => { setCaptchaToken(token) }
 />
 ```
 

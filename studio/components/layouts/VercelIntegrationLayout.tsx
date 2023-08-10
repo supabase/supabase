@@ -1,20 +1,16 @@
-import { FC, ReactNode } from 'react'
 import Head from 'next/head'
+import { PropsWithChildren } from 'react'
+
 import Divider from 'components/ui/Divider'
 import { BASE_PATH } from 'lib/constants'
 
-interface Props {
-  children: ReactNode
-}
-
-const VercelIntegrationLayout: FC<Props> = ({ children }) => {
+const VercelIntegrationLayout = ({ children }: PropsWithChildren<{}>) => {
   return (
     <>
       <Head>
         <title>Supabase + Vercel</title>
       </Head>
-
-      <main className="flex flex-col w-full h-full overflow-y-auto">
+      <main className="flex flex-col w-full h-full">
         <div>
           <div className="mx-auto px-4 sm:px-6">
             <div className="max-w-xl flex justify-between items-center mx-auto py-4">
@@ -32,7 +28,7 @@ const VercelIntegrationLayout: FC<Props> = ({ children }) => {
           </div>
         </div>
         <Divider light />
-        <div className="flex-grow">
+        <div className="flex-grow overflow-y-auto">
           <div className="max-w-7xl h-full mx-auto px-4 sm:px-6">
             <div className="max-w-xl h-full mx-auto py-10">{children}</div>
           </div>

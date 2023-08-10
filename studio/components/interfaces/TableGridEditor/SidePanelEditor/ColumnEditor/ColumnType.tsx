@@ -1,27 +1,27 @@
-import React, { FC, ReactNode } from 'react'
-import {
-  IconCalendar,
-  IconType,
-  IconHash,
-  Listbox,
-  IconToggleRight,
-  Input,
-  Alert,
-  IconAlertCircle,
-  Button,
-  IconExternalLink,
-} from 'ui'
 import type { PostgresType } from '@supabase/postgres-meta'
+import { noop } from 'lodash'
+import Link from 'next/link'
+import { ReactNode } from 'react'
+import {
+  Alert,
+  Button,
+  IconCalendar,
+  IconExternalLink,
+  IconHash,
+  IconToggleRight,
+  IconType,
+  Input,
+  Listbox,
+} from 'ui'
+
 import {
   POSTGRES_DATA_TYPES,
   POSTGRES_DATA_TYPE_OPTIONS,
   RECOMMENDED_ALTERNATIVE_DATA_TYPE,
 } from '../SidePanelEditor.constants'
 import { PostgresDataTypeOption } from '../SidePanelEditor.types'
-import InformationBox from 'components/ui/InformationBox'
-import Link from 'next/link'
 
-interface Props {
+interface ColumnTypeProps {
   value: string
   enumTypes: PostgresType[]
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
@@ -35,7 +35,7 @@ interface Props {
   onOptionSelect: (value: string) => void
 }
 
-const ColumnType: FC<Props> = ({
+const ColumnType = ({
   value,
   enumTypes = [],
   className,
@@ -46,8 +46,8 @@ const ColumnType: FC<Props> = ({
   showLabel = true,
   description,
   showRecommendation = false,
-  onOptionSelect = () => {},
-}) => {
+  onOptionSelect = noop,
+}: ColumnTypeProps) => {
   // @ts-ignore
   const availableTypes = POSTGRES_DATA_TYPES.concat(enumTypes.map((type) => type.name))
   const isAvailableType = value ? availableTypes.includes(value) : true

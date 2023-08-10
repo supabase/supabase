@@ -1,13 +1,13 @@
+import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
-import { observer } from 'mobx-react-lite'
 import { Button, IconExternalLink, IconTrash } from 'ui'
 
-import { useStore } from 'hooks'
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import Panel from 'components/ui/Panel'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
-import Panel from 'components/ui/Panel'
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import { useStore } from 'hooks'
 
 export type CustomDomainDeleteProps = {
   projectRef?: string
@@ -16,31 +16,17 @@ export type CustomDomainDeleteProps = {
 
 const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProps) => {
   const { ui } = useStore()
-
   const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false)
-
-  const { mutateAsync: deleteCustomDomain } = useCustomDomainDeleteMutation()
+  const { mutate: deleteCustomDomain } = useCustomDomainDeleteMutation({
+    onSuccess: () => {
+      ui.setNotification({ category: 'success', message: `Successfully deleted custom domain` })
+      setIsDeleteConfirmModalVisible(false)
+    },
+  })
 
   const onDeleteCustomDomain = async () => {
-    if (!projectRef) {
-      throw new Error('Project ref is required')
-    }
-
-    try {
-      await deleteCustomDomain({ projectRef })
-
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully deleted custom domain`,
-      })
-
-      setIsDeleteConfirmModalVisible(false)
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: error.message,
-      })
-    }
+    if (!projectRef) return console.error('Project ref is required')
+    deleteCustomDomain({ projectRef })
   }
 
   return (
@@ -50,7 +36,7 @@ const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProp
           <p className="text-xs text-scale-1100">Active custom domain:</p>
           <div className="flex items-center space-x-2">
             <code className="text-lg mx-0 flex items-center space-x-2">
-              <div className="h-2 w-2 rounded-full bg-brand-900" />
+              <div className="h-2 w-2 rounded-full bg-brand" />
               <span>{customDomain.hostname}</span>
             </code>
           </div>

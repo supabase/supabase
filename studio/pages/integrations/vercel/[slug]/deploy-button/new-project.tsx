@@ -1,25 +1,25 @@
+import generator from 'generate-password'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useRef, useState } from 'react'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
-import IntegrationWindowLayout from 'components/layouts/IntegrationWindowLayout'
+import { VercelIntegrationLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useIntegrationConnectionsCreateMutation } from 'data/integrations/integration-connections-create-mutation'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
+import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
+import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
-import { Integration } from 'data/integrations/integrations.types'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
-import generator from 'generate-password'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { AWS_REGIONS, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PROVIDERS } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
-import { NextPageWithLayout, ProjectBase } from 'types'
+import { NextPageWithLayout } from 'types'
 import { Alert, Button, Checkbox, IconBook, IconLifeBuoy, Input, Listbox, LoadingLine } from 'ui'
 
 const VercelIntegration: NextPageWithLayout = () => {
@@ -34,14 +34,14 @@ const VercelIntegration: NextPageWithLayout = () => {
           <ScaffoldContainer className="max-w-md flex flex-col gap-6 grow py-8">
             <h1 className="text-xl text-scale-1200">New project</h1>
             <>
-              <Markdown content={`Choose the Supabase Organization you wish to install to`} />
+              <Markdown content={`Choose the Supabase organization you wish to install in`} />
               <CreateProject loading={loading} setLoading={setLoading} />
             </>
           </ScaffoldContainer>
           <ScaffoldContainer className="flex flex-col gap-6 py-3">
             <Alert withIcon variant="info" title="You can uninstall this Integration at any time.">
               <Markdown
-                content={`You can remove this integration at any time either via Vercel or the Supabase dashboard.`}
+                content={`You can remove this integration at any time via Vercel or the Supabase dashboard.`}
               />
             </Alert>
           </ScaffoldContainer>
@@ -61,7 +61,7 @@ const VercelIntegration: NextPageWithLayout = () => {
   )
 }
 
-VercelIntegration.getLayout = (page) => <IntegrationWindowLayout>{page}</IntegrationWindowLayout>
+VercelIntegration.getLayout = (page) => <VercelIntegrationLayout>{page}</VercelIntegrationLayout>
 
 const CreateProject = ({
   loading,
@@ -79,7 +79,7 @@ const CreateProject = ({
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(-1)
   const [shouldRunMigrations, setShouldRunMigrations] = useState(true)
   const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region)
-  // const [loading, setLoading] = useState(false)
+
   const delayedCheckPasswordStrength = useRef(
     debounce((value: string) => checkPasswordStrength(value), 300)
   ).current
@@ -93,10 +93,10 @@ const CreateProject = ({
   } = useParams()
 
   const { mutateAsync: createConnections, isLoading: isLoadingCreateConnections } =
-    useIntegrationConnectionsCreateMutation({})
+    useIntegrationVercelConnectionsCreateMutation()
+  const { mutateAsync: syncEnvs } = useIntegrationsVercelConnectionSyncEnvsMutation()
 
   const { data: organizationData, isLoading: isLoadingOrganizationsQuery } = useOrganizationsQuery()
-
   const organization = organizationData?.find((x) => x.slug === slug)
 
   /**
@@ -107,9 +107,7 @@ const CreateProject = ({
   /**
    * the vercel integration installed for organization chosen
    */
-  const organizationIntegration: Integration | undefined = integrationData?.find(
-    (x) => x.organization.slug === slug
-  )
+  const organizationIntegration = integrationData?.find((x) => x.organization.slug === slug)
 
   /**
    * Vercel projects available for this integration
@@ -157,77 +155,50 @@ const CreateProject = ({
     delayedCheckPasswordStrength(password)
   }
 
-  const { mutateAsync: createProject } = useProjectCreateMutation()
+  const { mutate: createProject } = useProjectCreateMutation({
+    onSuccess: (res) => {
+      setNewProjectRef(res.ref)
+    },
+    onError: (error) => {
+      ui.setNotification({ error, category: 'error', message: error.message })
+      setLoading(false)
+    },
+  })
 
   const [newProjectRef, setNewProjectRef] = useState<string | undefined>(undefined)
   async function onCreateProject() {
-    if (!organizationIntegration) {
-      console.error('No organization installation details found')
-    }
-
-    if (!organizationIntegration?.id) {
-      console.error('No organization installation ID found')
-      return
-    }
-
-    if (!foreignProjectId) {
-      console.error('No foreignProjectId ID set')
-      return
-    }
-
-    if (!configurationId) {
-      console.error('No configurationId ID set')
-      return
-    }
+    if (!organizationIntegration) return console.error('No organization installation details found')
+    if (!organizationIntegration?.id) return console.error('No organization installation ID found')
+    if (!foreignProjectId) return console.error('No foreignProjectId ID set')
+    if (!configurationId) return console.error('No configurationId ID set')
+    if (!organization) return console.error('No organization ID set')
 
     setLoading(true)
 
-    try {
-      if (!organization) {
-        throw new Error('No organization set')
-      }
+    let dbSql: string | undefined
+    if (shouldRunMigrations) {
+      const id = ui.setNotification({
+        category: 'info',
+        message: `Fetching initial migrations from GitHub repo`,
+      })
 
-      let dbSql: string | undefined
-      if (shouldRunMigrations) {
-        const id = ui.setNotification({
-          category: 'info',
-          message: `Fetching initial migrations from GitHub repo`,
-        })
+      dbSql = (await getInitialMigrationSQLFromGitHubRepo(externalId)) ?? undefined
 
-        dbSql = (await getInitialMigrationSQLFromGitHubRepo(externalId)) ?? undefined
-
-        ui.setNotification({
-          id,
-          category: 'success',
-          message: `Done fetching initial migrations`,
-        })
-      }
-
-      let project: ProjectBase
-
-      try {
-        project = await createProject({
-          organizationId: organization.id,
-          name: projectName,
-          dbPass,
-          dbRegion,
-          dbSql,
-          configurationId,
-        })
-
-        setNewProjectRef(project.ref)
-      } catch (error: any) {
-        setLoading(false)
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to create project: ${error.message}`,
-        })
-        return
-      }
-    } catch (error) {
-      console.error('Error', error)
-      setLoading(false)
+      ui.setNotification({
+        id,
+        category: 'success',
+        message: `Done fetching initial migrations`,
+      })
     }
+
+    createProject({
+      organizationId: organization.id,
+      name: projectName,
+      dbPass,
+      dbRegion,
+      dbSql,
+      configurationId,
+    })
   }
   const isInstallingRef = useRef(false)
 
@@ -254,11 +225,10 @@ const CreateProject = ({
         }
         isInstallingRef.current = true
 
-        const projectDetails = vercelProjects?.find((x) => x.id === foreignProjectId)
+        const projectDetails = vercelProjects?.find((x: any) => x.id === foreignProjectId)
 
-        // Wrap the createConnections function call in a try-catch block
         try {
-          await createConnections({
+          const { id: connectionId } = await createConnections({
             organizationIntegrationId: organizationIntegration?.id,
             connection: {
               foreign_project_id: foreignProjectId,
@@ -274,6 +244,8 @@ const CreateProject = ({
             },
             orgSlug: selectedOrganization?.slug,
           })
+
+          await syncEnvs({ connectionId })
         } catch (error) {
           console.error('An error occurred during createConnections:', error)
           return
@@ -290,7 +262,7 @@ const CreateProject = ({
 
   return (
     <div className="">
-      <p className="mb-2">Project details for integration</p>
+      <p className="mb-2">Supabase project details</p>
       <div className="py-2">
         <Input
           autoFocus
@@ -356,8 +328,8 @@ const CreateProject = ({
       <div className="py-2 pb-4">
         <Checkbox
           name="shouldRunMigrations"
-          label="Run migrations & seed.sql"
-          description="If your repository has migrations under supabase/migrations, they will be run automatically."
+          label="Create sample tables with seed data"
+          description="To get you started quickly, we can create new tables for you with seed (sample) data. You can delete these tables later."
           checked={shouldRunMigrations}
           onChange={(e) => setShouldRunMigrations(e.target.checked)}
         />

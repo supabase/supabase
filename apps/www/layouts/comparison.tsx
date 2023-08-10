@@ -90,7 +90,7 @@ const LayoutComparison = ({ components, props }: Props) => {
           {/* Title and description */}
           <div className="mb-16 max-w-5xl space-y-8">
             <div className="space-y-4">
-              <p className="text-brand-900 text-center">Alternative</p>
+              <p className="text-brand text-center">Alternative</p>
               <h1 className="h1 text-center">{props.blog.title}</h1>
               <div className="text-scale-900 flex justify-center space-x-3 text-sm">
                 <p>{props.blog.date}</p>

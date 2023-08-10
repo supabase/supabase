@@ -1,20 +1,21 @@
-import { DragEvent, useRef, useState, FC } from 'react'
-import { Button, IconLoader, IconFileText } from 'ui'
+import { DragEvent, useRef, useState } from 'react'
+import { Button, IconFileText, IconLoader } from 'ui'
+
 import SparkBar from 'components/ui/SparkBar'
 
-interface Props {
+interface SpreadSheetFileUploadProps {
   parseProgress: number
   uploadedFile: any
   onFileUpload: (event: any) => void
   removeUploadedFile: () => void
 }
 
-const SpreadSheetFileUpload: FC<Props> = ({
+const SpreadSheetFileUpload = ({
   parseProgress,
   uploadedFile,
   onFileUpload,
   removeUploadedFile,
-}) => {
+}: SpreadSheetFileUploadProps) => {
   const [isDraggedOver, setIsDraggedOver] = useState(false)
   const uploadButtonRef = useRef(null)
 
@@ -57,7 +58,7 @@ const SpreadSheetFileUpload: FC<Props> = ({
           onClick={() => (uploadButtonRef.current as any)?.click()}
         >
           <p className="text-sm">
-            Drag and drop, or <span className="text-brand-900">browse</span> your files
+            Drag and drop, or <span className="text-brand">browse</span> your files
           </p>
         </div>
       ) : (

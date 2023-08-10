@@ -35,7 +35,17 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
   const { ref } = useParams()
   const router = useRouter()
 
-  const { mutateAsync: createBucket } = useBucketCreateMutation()
+  const { mutate: createBucket, isLoading: isCreating } = useBucketCreateMutation({
+    onSuccess: (res) => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully created bucket ${res.name}`,
+      })
+      router.push(`/project/${ref}/storage/buckets/${res.name}`)
+      onClose()
+    },
+  })
+
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
@@ -63,38 +73,21 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
     return errors
   }
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
+  const onSubmit = async (values: any) => {
     if (!ref) return console.error('Project ref is required')
-    setSubmitting(true)
 
-    try {
-      const res = await createBucket({
-        projectRef: ref,
-        id: values.name,
-        isPublic: values.public,
-        file_size_limit: values.has_file_size_limit
-          ? convertToBytes(values.formatted_size_limit, selectedUnit)
+    createBucket({
+      projectRef: ref,
+      id: values.name,
+      isPublic: values.public,
+      file_size_limit: values.has_file_size_limit
+        ? convertToBytes(values.formatted_size_limit, selectedUnit)
+        : null,
+      allowed_mime_types:
+        values.allowed_mime_types.length > 0
+          ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
           : null,
-        allowed_mime_types:
-          values.allowed_mime_types.length > 0
-            ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
-            : null,
-      })
-
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully created bucket ${res.name}`,
-      })
-      router.push(`/project/${ref}/storage/buckets/${res.name}`)
-
-      onClose()
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create bucket: ${error.message}`,
-      })
-      setSubmitting(false)
-    }
+    })
   }
 
   useEffect(() => {
@@ -118,7 +111,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
         validate={validate}
         onSubmit={onSubmit}
       >
-        {({ values, isSubmitting }: { values: any; isSubmitting: boolean }) => {
+        {({ values }: { values: any }) => {
           return (
             <div className="space-y-4 py-4">
               <Modal.Content>
@@ -216,7 +209,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                               <p className="text-scale-1000 text-sm">
                                 Note: The{' '}
                                 <Link href={`/project/${ref}/settings/storage`}>
-                                  <a className="text-brand-900 opacity-80 hover:opacity-100 transition">
+                                  <a className="text-brand opacity-80 hover:opacity-100 transition">
                                     global upload limit
                                   </a>
                                 </Link>{' '}
@@ -244,7 +237,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                   <Button
                     type="default"
                     htmlType="button"
-                    disabled={isSubmitting}
+                    disabled={isCreating}
                     onClick={() => onClose()}
                   >
                     Cancel
@@ -252,8 +245,8 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                   <Button
                     type="primary"
                     htmlType="submit"
-                    loading={isSubmitting}
-                    disabled={isSubmitting}
+                    loading={isCreating}
+                    disabled={isCreating}
                   >
                     Save
                   </Button>
