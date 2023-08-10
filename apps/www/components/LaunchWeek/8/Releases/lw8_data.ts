@@ -182,13 +182,13 @@ const days: WeekDayProps[] = [
     steps: [
       {
         title: 'Supabase Integrations Marketplace',
-        blog: '/blog/#',
+        blog: '/blog/supabase-integrations-marketplace',
         bg_layers: [{ img: images['04-marketplace'], mobileImg: images['04-marketplace-mobile'] }],
         steps: [],
       },
       {
         title: 'Vercel integrations',
-        blog: '/blog/#',
+        blog: '/blog/using-supabase-with-vercel',
         templates: '#',
         bg_layers: [{ img: images['04-vercel'] }],
         steps: [],
