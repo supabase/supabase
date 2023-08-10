@@ -122,8 +122,8 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                   }}
                   forceMount
                 >
-                  <AiIconAnimation className="mr-2" />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-900 to-brand-1100">
+                  <AiIconAnimation />
+                  <span className="text-brand">
                     Ask Supabase AI
                     {search ? (
                       <>
@@ -255,7 +255,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
 
               <CommandGroup heading="Settings">
                 <CommandItem type="link" onSelect={() => setPages([...pages, 'Theme'])}>
-                  <IconMonitor className="mr-2" />
+                  <IconMonitor />
                   Change theme
                 </CommandItem>
               </CommandGroup>
