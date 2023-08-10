@@ -7,11 +7,12 @@ import OrganizationPicker from 'components/interfaces/Integrations/OrganizationP
 import { Markdown } from 'components/interfaces/Markdown'
 import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
-import { ScaffoldColumn, ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-integration-create-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useStore } from 'hooks'
+import Link from 'next/link'
 import { NextPageWithLayout, Organization } from 'types'
 import {
   AlertDescription_Shadcn_,
@@ -19,11 +20,9 @@ import {
   Alert_Shadcn_,
   Button,
   IconAlertTriangle,
-  IconBook,
   IconInfo,
-  IconLifeBuoy,
-  LoadingLine,
 } from 'ui'
+import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 
 /**
  * Variations of the Vercel integration flow.
@@ -42,6 +41,8 @@ const VercelIntegration: NextPageWithLayout = () => {
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
   const [organizationIntegrationId, setOrganizationIntegrationId] = useState<string | null>(null)
 
+  const snapshot = useIntegrationInstallationSnapshot()
+
   /**
    * Fetch the list of organization based integration installations for Vercel.
    *
@@ -49,8 +50,11 @@ const VercelIntegration: NextPageWithLayout = () => {
    */
   const { data: integrationData } = useIntegrationsQuery()
 
-  const { data: organizationsData, isLoading: isLoadingOrganizationsQuery } =
-    useOrganizationsQuery()
+  const {
+    data: organizationsData,
+    isLoading: isLoadingOrganizationsQuery,
+    isSuccess: isOrganizationsDataSuccess,
+  } = useOrganizationsQuery()
 
   useEffect(() => {
     if (organizationsData !== undefined && integrationData !== undefined) {
@@ -105,9 +109,12 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   const { mutate, isLoading: isLoadingVercelIntegrationCreateMutation } =
     useVercelIntegrationCreateMutation({
+      onMutate() {
+        snapshot.setLoading(true)
+      },
       onSuccess({ id }) {
         setOrganizationIntegrationId(id)
-
+        snapshot.setLoading(false)
         handleRouteChange()
       },
       onError(error) {
@@ -158,81 +165,88 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   const dataLoading = isLoadingVercelIntegrationCreateMutation || isLoadingOrganizationsQuery
 
+  const noOrganizations = useMemo(() => {
+    return isOrganizationsDataSuccess && organizationsData?.length === 0 ? true : false
+  }, [isOrganizationsDataSuccess, organizationsData])
+
+  const alreadyInstalled = useMemo(() => {
+    return selectedOrg && installed[selectedOrg.slug] && source === 'marketplace' && !dataLoading
+      ? true
+      : false
+  }, [installed, selectedOrg, source, dataLoading])
+
   const disableInstallationForm =
     (isLoadingVercelIntegrationCreateMutation && !dataLoading) ||
     // disables installation button if integration is already installed and it is Marketplace flow
-    (selectedOrg && installed[selectedOrg.slug] && source === 'marketplace' && !dataLoading)
-      ? true
-      : false
+    alreadyInstalled ||
+    noOrganizations
+
+  const isLoading = useMemo(() => {
+    return isLoadingVercelIntegrationCreateMutation || isLoadingOrganizationsQuery
+  }, [isLoadingVercelIntegrationCreateMutation, isLoadingOrganizationsQuery])
 
   return (
     <>
-      <main className="overflow-auto flex flex-col h-full bg">
-        <LoadingLine loading={isLoadingVercelIntegrationCreateMutation} />
-        {organizationIntegrationId === null && (
+      <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
+        <ScaffoldColumn className="mx-auto w-full max-w-md">
+          <h1 className="text-xl text-scale-1200">Choose organization</h1>
           <>
-            <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
-              <ScaffoldColumn className="mx-auto w-full max-w-md">
-                <h1 className="text-xl text-scale-1200">Choose organization</h1>
-                <>
-                  <Markdown content={`Choose the Supabase organization you wish to install in`} />
-                  <OrganizationPicker
-                    integrationName="Vercel"
-                    selectedOrg={selectedOrg}
-                    onSelectedOrgChange={(org) => {
-                      setSelectedOrg(org)
-                      router.query.organizationSlug = org.slug
-                    }}
-                    configurationId={configurationId}
-                  />
-                  {disableInstallationForm && (
-                    <Alert_Shadcn_ variant="warning">
-                      <IconAlertTriangle className="h-4 w-4" strokeWidth={2} />
-                      <AlertTitle_Shadcn_>
-                        Vercel Integration is already installed.
-                      </AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        You will need to choose another organization to install the integration.
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  )}
-                  <div className="flex flex-row w-full justify-end">
-                    <Button
-                      size="medium"
-                      className="self-end"
-                      disabled={disableInstallationForm || isLoadingVercelIntegrationCreateMutation}
-                      loading={isLoadingVercelIntegrationCreateMutation}
-                      onClick={onInstall}
-                    >
-                      Install integration
-                    </Button>
-                  </div>
-                </>
-              </ScaffoldColumn>
-            </ScaffoldContainer>
-            <ScaffoldContainer className="flex flex-col gap-6 py-3">
-              <Alert_Shadcn_ variant="default">
-                <IconInfo className="h-4 w-4" strokeWidth={2} />
-                <AlertTitle_Shadcn_>
-                  You can uninstall this Integration at any time.
-                </AlertTitle_Shadcn_>
+            <Markdown content={`Choose the Supabase organization you wish to install in`} />
+            <OrganizationPicker
+              integrationName="Vercel"
+              selectedOrg={selectedOrg}
+              disabled={noOrganizations || isLoading}
+              onSelectedOrgChange={(org) => {
+                setSelectedOrg(org)
+                router.query.organizationSlug = org.slug
+              }}
+              configurationId={configurationId}
+            />
+            {alreadyInstalled && (
+              <Alert_Shadcn_ variant="warning">
+                <IconAlertTriangle className="h-4 w-4" strokeWidth={2} />
+                <AlertTitle_Shadcn_>Vercel Integration is already installed.</AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
-                  Remove this integration at any time via Vercel or the Supabase dashboard.
+                  You will need to choose another organization to install the integration.
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
-            </ScaffoldContainer>
+            )}
+            {noOrganizations && (
+              <Alert_Shadcn_ variant="warning">
+                <IconAlertTriangle className="h-4 w-4" strokeWidth={2} />
+                <AlertTitle_Shadcn_>There are no Supabase Organizations</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_ className="prose">
+                  You will need to create a Supabase Organization before you can install the Vercel
+                  Integration. You can create a new organization{' '}
+                  <Link href="https://supabase.com/dashboard/new" passHref>
+                    <a target="_blank">here</a>
+                  </Link>
+                  .
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            )}
+            <div className="flex flex-row w-full justify-end">
+              <Button
+                size="medium"
+                className="self-end"
+                disabled={disableInstallationForm || isLoadingVercelIntegrationCreateMutation}
+                loading={isLoadingVercelIntegrationCreateMutation}
+                onClick={onInstall}
+              >
+                Install integration
+              </Button>
+            </div>
           </>
-        )}
-
-        <ScaffoldDivider />
-      </main>
-      <ScaffoldContainer className="bg-body flex flex-row gap-6 py-6">
-        <div className="flex items-center gap-2 text-xs text-scale-900">
-          <IconBook size={16} /> Docs
-        </div>
-        <div className="flex items-center gap-2 text-xs text-scale-900">
-          <IconLifeBuoy size={16} /> Support
-        </div>
+        </ScaffoldColumn>
+      </ScaffoldContainer>
+      <ScaffoldContainer className="flex flex-col gap-6 py-3">
+        <Alert_Shadcn_ variant="default">
+          <IconInfo className="h-4 w-4" strokeWidth={2} />
+          <AlertTitle_Shadcn_>You can uninstall this Integration at any time.</AlertTitle_Shadcn_>
+          <AlertDescription_Shadcn_>
+            Remove this integration at any time via Vercel or the Supabase dashboard.
+          </AlertDescription_Shadcn_>
+        </Alert_Shadcn_>
       </ScaffoldContainer>
     </>
   )
