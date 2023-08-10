@@ -78,9 +78,9 @@ const LWAnnouncement = ({
                       />
                     </svg>
                   </div>
-                  <span className="text-foreground">Launch Week 8: Day 3</span>
+                  <span className="text-foreground">Launch Week 8: Day 4</span>
                 </div>
-                <span className="text-foreground-light">Supabase Studio 3.0</span>
+                <span className="text-foreground-light">Supabase Integrations Marketplace</span>
               </div>
             </div>
             <div className="relative flex items-center justify-center !aspect-video h-[80px] md:h-[80px] gap-2 z-10 rounded overflow-hidden">

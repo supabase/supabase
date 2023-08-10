@@ -35,7 +35,7 @@ const LWAnnouncement = ({
                 />
               </svg>
             </div>
-            <span className="text-foreground">{title ?? 'Launch Week 8: Day 3'}</span>
+            <span className="text-foreground">{title ?? 'Launch Week 8: Day 4'}</span>
           </div>
           <span className="text-foreground-light">{currentDay.steps[0].title}</span>
         </div>
