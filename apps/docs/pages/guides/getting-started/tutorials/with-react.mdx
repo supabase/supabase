@@ -148,20 +148,20 @@ export default function Account({ session }) {
         .eq('id', user.id)
         .single()
 
-      if (error) {
-        console.warn(error)
-      } else if (data) {
-        setUsername(data.username)
-        setWebsite(data.website)
-        setAvatarUrl(data.avatar_url)
+      if (!ignore) {
+        if (error) {
+          console.warn(error)
+        } else if (data) {
+          setUsername(data.username)
+          setWebsite(data.website)
+          setAvatarUrl(data.avatar_url)
+        }
       }
 
       setLoading(false)
     }
 
-    if (!ignore) {
-      getProfile()
-    }
+    getProfile()
 
     return () => {
       ignore = true
