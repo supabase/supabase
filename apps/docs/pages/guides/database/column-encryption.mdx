@@ -9,9 +9,27 @@ export const meta = {
   video: 'https://www.youtube.com/v/J9mTPY8rIXE',
 }
 
-Supabase provides a secure method for encrypting columns using [Vault](/docs/guides/database/vault), our Postgres secrets manager. Vault is a Postgres extension with an integrated UI intended to act as a secure global secrets management for your project.
+Supabase provides a secure method for encrypting data using [Vault](/docs/guides/database/vault), our Postgres secrets manager. Vault is a Postgres extension with an integrated UI intended to act as a secure global secrets management for your project.
 
-Vault enables an advanced feature called Transparent Column Encryption (TCE) which provides a safe way to encrypt your data so that it doesn't leak into logs and backups. It can also provide row-level authenticated encryption.
+In addition to the Vault secret storage table, Supabase also enables an advanced feature called Transparent Column Encryption (TCE) which provides a safe way to encrypt columns in your own tables so that they doesn't leak into logs and backups. It can also provide row-level authenticated encryption.
+
+Column Encryption comes with tradeoffs that need to be considered before using it.
+
+    - Encryption and decryption both take time, inserting and selecting encrypted data takes more time than a "plain" column of data.  Queries that must load a lot of rows with encrypted columns will be slower than those that are not encrypted.
+
+    - Encrypted columns should never be indexed.  This is because the index must store the unencrypted value of a column to be useful, which would defeat the purpose of storing values encrypted.  To look up an encrypted column, you must first look up its row by some other unencrypted column, like a primary key.
+
+    - Encrypted columns can be queried in a `WHERE` clause, but this can also have some negative performance consequences, since the value must be decrypted in order to matched to any `WHERE` qualifiers.  For small result sets this is not a big deal, but broad queries that match many rows will have to be scanned and each row decrypted in order to check against the `WHERE` clause.  Worst case is the entire table must be scanned and decrypted to check against a `WHERE`.
+
+    - While you can encrypt multiple columns in the same table, each column must go through a full encryption cycle, so two columns will take twice the time as one, three columns three time as long, and so on.  It is usually better to break up large tables into smaller tables with at most one or two encrypted columns, and associated them with [foreign keys](https://www.postgresql.org/docs/current/tutorial-fk.html) that can be used to JOIN them when necessary.
+
+In general, it is a bad idea to over-use column encryption for mundane data or data that you need to search against such as names, user or account types, addresses, country codes, etc.  Column encryption is intended to be used for very sensitive data that would cause serious issues if it were to leak, such as API keys, payment keys, highly sensitive personal information, etc.
+
+## Encryption Keys
+
+Encryption requires keys, but keeping the keys in the same database as the encrypted data doesn't make any sense, it would be like leaving a key in a door lock, a door lock only makes sense when the lock and key can be separated. So similarly, the encryption keys in Supabse are kept separate from the database.
+
+Supabase column encryption and the Vault both use a low level Postgres extension library called [pgsodium](https://github.com/michelp/pgsodium/).  This library in turn wraps a very popular encryption library called [libsodium](https://doc.libsodium.org/).  These libraries provide functionaly for doing something called [Key Derivation](https://libsodium.gitbook.io/doc/key_derivation).  Supabase uses key derivation to *derive* the encryption keys used by column encryption.  These keys are derived from a *Root Key* that is stored by Supabase, outside the database.  If you need to migrate encrypted data from one system to another, you must ensure that this root key is copied over as well.  There is a [REST API for getting the root key for a project](https://supabase.com/docs/reference/api/gets-projects-pgsodium-config).
 
 ## Encrypting columns
 
@@ -23,15 +41,19 @@ Once you've created an encrypted column, you can insert data into the table like
 
 ![Encrypted data](/docs/img/guides/database/vault-encrypted-data.png)
 
+Note that, as mentioned above, indexing an encrypted column serves no purpose and has a detrimental effect on performance.  Indexing encrypted values is not useful since the index needs to store the unencrypted value to be usable, and that would defeat the purpose of storing encrypted data.  Do not create indexes on encrypted columns.
+
 ## Decrypting data
 
 Decrypted data is accessed using a special view that is automatically created after adding an encrypted column to a table. This view decrypts the data row-by-row as you access it. By default, this view is called `decrypted_<your-table-name>`. In the example below, the decryption view for the `profiles` table is called `decrypted_profiles`. Notice there is a new column in the view called `decrypted_emails` that contains the decrypted email value.
 
 ![Decrypted data](/docs/img/guides/database/vault-decrypted-data.png)
 
+As mentioned above, accessing decrypted data is slower than accessing unencrypted data.  Any row you query from this view will go through a decryption function, which takes some time and can be a significant performance pentalty if your query loads lots of rows.  It's always advisable to look up rows by some indexed unencrypted key first, like a primary key, so that only one row is decrypted at a time.
+
 ## Using an Encrypted Table
 
-Now that you have TCE setup for a table, it's easy to use by simply inserting data into the table, and querying that data by looking at its generated view. The view is named `decrypted_<table_name>` and by default is in the same schema as your table:
+Now that you have column encryption setup for a table, it's easy to use by simply inserting data into the table, and querying that data by looking at its generated view. The view is named `decrypted_<table_name>` and by default is in the same schema as your table:
 
 ```sql
 insert into secrets
@@ -66,6 +88,22 @@ nonce                        | \x300a14aa721184ff7cf0f6bf088da267
 ```
 
 Notice how there is a new column called `decrypted_secret`. This column is not stored in database or on disk at all, it is generated “on-the-fly” as you select from the view. Database dumps do not contain this information, only the view itself, and most importantly, **raw decryption keys are never stored**.
+
+## Granting API Access to encrypted columns
+
+When you create an encrypted column in the `public` database schema, then that column and the decryption view that is created for it are given *public access via the PostgREST API*.  In general it is not recommended to encrypt columns in the public schema, as this adds some additional security considerations that you need to think about, but it is still possible and useful in some cases depending on your level of security comfort.  Only you can decide the risks and rewards of making decrypted data available to public API access.  It is very strongly recommended that you must protect your public encrypted columns with a Row Level Security (RLS) Policy.
+
+Even though objects created in the `public` schema default to public access, There is an additional layer of security with pgsodium that must be enabled in order for decryption to work with the PostgREST API.  The permissions necessary to call pgsodium functions must be granted to one of the API role that is accessing the public objects.
+
+There are three roles available for API access with Supabase, The `anon` role represents unauthenticated anonymous users and should *never* be granted access to pgsodium, you do so at your own risk.  The `service_role` which is meant to be used by other services in your system, and whose token should never be exposed publicly, and the `authenticated` role which represents authenticated users who present a valid JWT token and are identified by the system as a known user.
+
+By default, only the `service_user` role is granted access to the column encryption functions.  If you wish to make encrypted columns available to your authenticated users, then you must run `GRANT pgsodium_keyiduser TO authenticated;` from the Supabase console or logged in as the `postgres` role.  This table shows the default permission settings for API roles accessing the pgsodium encryption functions:
+
+|Role | pgsodium_keyiduser  | pgsodium_keymaker   |
+|---|---|---|
+| anon | X  | X |
+| authenticated | X  | X  |
+| service_role | Y  | X  |
 
 ## How Key Derivation Works
 
