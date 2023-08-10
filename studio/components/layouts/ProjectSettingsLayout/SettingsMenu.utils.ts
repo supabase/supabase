@@ -181,6 +181,12 @@ export const generateSettingsMenu = (
                   items: [],
                 },
                 {
+                  name: 'Integrations',
+                  key: 'integrations',
+                  url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/integrations`,
+                  items: [],
+                },
+                {
                   name: 'Usage',
                   key: 'usage',
                   url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/billing/usage`,
