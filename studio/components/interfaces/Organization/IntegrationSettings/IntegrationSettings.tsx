@@ -165,6 +165,11 @@ You can change the scope of the access for Supabase by configuring
 `
       : ''
 
+  const integrationUrl =
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+      ? 'https://vercel.com/integrations/supabase-v2-staging'
+      : 'https://vercel.com/integrations/supabase-v2'
+
   const VercelSection = () => (
     <ScaffoldContainer>
       <ScaffoldSection>
@@ -218,7 +223,7 @@ You can change the scope of the access for Supabase by configuring
             })
           ) : (
             <div>
-              <Link href="https://vercel.com/integrations/supabase-v2" passHref>
+              <Link href={integrationUrl} passHref>
                 <Button type="default" iconRight={<IconExternalLink />} asChild>
                   <a target="_blank">Install Vercel Integration</a>
                 </Button>
