@@ -640,9 +640,6 @@ These connections will be part of a GitHub workflow that is currently in develop
       },
     })
 
-    // useEffect(() => {
-    //   form.reset()
-    // }, [form, connection])
 
     const { mutate: updateGithubConnection, isLoading: isUpdatingGithubConnection } =
       useGithubConnectionUpdateMutation({
