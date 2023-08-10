@@ -208,6 +208,8 @@ const nextConfig = {
     ]
   },
   images: {
+    // to make Vercel avatars work without issue. Vercel uses SVGs for users who don't have set avatars.
+    dangerouslyAllowSVG: true,
     domains: [
       'github.com',
       'avatars.githubusercontent.com',
