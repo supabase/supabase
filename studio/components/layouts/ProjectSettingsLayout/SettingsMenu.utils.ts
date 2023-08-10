@@ -30,6 +30,16 @@ export const generateSettingsMenu = (
             url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/infrastructure`,
             items: [],
           },
+          ...(IS_PLATFORM
+            ? [
+                {
+                  name: 'Integrations',
+                  key: 'Integrations',
+                  url: `/project/${ref}/settings/integrations`,
+                  items: [],
+                },
+              ]
+            : []),
           {
             name: 'Add Ons',
             key: 'addons',
@@ -128,6 +138,16 @@ export const generateSettingsMenu = (
             url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
             items: [],
           },
+          ...(IS_PLATFORM
+            ? [
+                {
+                  name: 'Integrations',
+                  key: 'integrations',
+                  url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/integrations`,
+                  items: [],
+                },
+              ]
+            : []),
           ...(IS_PLATFORM
             ? [
                 {

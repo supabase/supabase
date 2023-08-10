@@ -100,7 +100,11 @@ const GitHubIntegration: NextPageWithLayout = () => {
       mutate({
         installationId: Number(installationId),
         orgSlug,
-        metadata: {},
+        metadata: {
+          supabaseConfig: {
+            supabaseDirectory: '/supabase',
+          },
+        },
       })
     } else {
       router.push({
