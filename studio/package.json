@@ -100,7 +100,7 @@
     "recharts": "^2.1.15",
     "sass": "^1.55.0",
     "scheduler": "^0.20.2",
-    "semver": "^6.3.0",
+    "semver": "^6.3.1",
     "shared-data": "*",
     "sql-formatter": "^12.2.0",
     "sqlstring": "^2.3.2",
