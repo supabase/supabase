@@ -1,3 +1,8 @@
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { forwardRef, useCallback, useState } from 'react'
+import { Button, Dropdown, IconChevronDown, IconLoader, IconRefreshCw, IconTrash, Modal } from 'ui'
+
 import {
   IntegrationConnection,
   IntegrationConnectionProps,
@@ -6,10 +11,6 @@ import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useStore } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
-import { useRouter } from 'next/router'
-import React, { forwardRef, useCallback, useState } from 'react'
-import { Button, Dropdown, IconChevronDown, IconLoader, IconRefreshCw, IconTrash, Modal } from 'ui'
 
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
   onDeleteConnection: (connection: IntegrationProjectConnection) => void | Promise<void>
@@ -68,14 +69,19 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                   {props.type === 'Vercel' && (
                     <>
                       {router.pathname !== projectIntegrationUrl && (
-                        <Dropdown.Item
-                          onSelect={() => {
-                            router.push(projectIntegrationUrl)
-                          }}
-                          disabled={isSyncEnvLoading}
+                        <Link
+                          passHref
+                          href={projectIntegrationUrl.replace(
+                            '[ref]',
+                            props.connection.supabase_project_ref
+                          )}
                         >
-                          View project configuration
-                        </Dropdown.Item>
+                          <a>
+                            <Dropdown.Item disabled={isSyncEnvLoading}>
+                              View project configuration
+                            </Dropdown.Item>
+                          </a>
+                        </Link>
                       )}
                       <Dropdown.Item
                         icon={
