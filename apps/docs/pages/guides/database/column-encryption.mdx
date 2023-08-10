@@ -95,7 +95,7 @@ When you create an encrypted column in the `public` database schema, then that c
 
 Even though objects created in the `public` schema default to public access, There is an additional layer of security with pgsodium that must be enabled in order for decryption to work with the PostgREST API. The permissions necessary to call pgsodium functions must be granted to one of the API role that is accessing the public objects.
 
-There are three roles available for API access with Supabase, The `anon` role represents unauthenticated anonymous users and should _never_ be granted access to pgsodium, you do so at your own risk. The `service_role` which is meant to be used by other services in your system, and whose token should never be exposed publicly, and the `authenticated` role which represents authenticated users who present a valid JWT token and are identified by the system as a known user.
+There are three roles available for API access with Supabase, The `anon` role represents unauthenticated anonymous users and should _never_ be granted access to pgsodium. The `service_role` which is meant to be used by other services in your system, and whose token should never be exposed publicly, and the `authenticated` role which represents authenticated users who present a valid JWT token and are identified by the system as a known user.
 
 By default, only the `service_user` role is granted access to the column encryption functions. If you wish to make encrypted columns available to your authenticated users, then you must run `GRANT pgsodium_keyiduser TO authenticated;` from the Supabase console or logged in as the `postgres` role. This table shows the default permission settings for API roles accessing the pgsodium encryption functions:
 
