@@ -51,8 +51,8 @@ export interface WeekDayProps {
   dd: string
   youtube_id: string
   videoThumbnail?: string
-  blogpost: string
-  docs: string
+  blogpost?: string
+  docs?: string
   twitter_spaces?: string
   steps: StepProps[] | []
 }
@@ -103,8 +103,6 @@ const days: WeekDayProps[] = [
     dd: 'Mon',
     youtube_id: 'RJccSbJ9Go4',
     videoThumbnail: images.day_1_thumb,
-    blogpost: '',
-    docs: '',
     twitter_spaces: 'https://twitter.com/i/spaces/1DXGyvjkeEeJM',
     steps: [
       {
@@ -128,9 +126,7 @@ const days: WeekDayProps[] = [
     dd: 'Tue',
     youtube_id: 'N0Wb85m3YMI',
     videoThumbnail: images.day_2_thumb,
-    blogpost: '',
     twitter_spaces: 'https://twitter.com/i/spaces/1vAxRAvNQyDJl?s=20',
-    docs: '',
     steps: [
       {
         title: 'Supabase Local Dev: Migrations, Branching, Observability',
@@ -152,8 +148,6 @@ const days: WeekDayProps[] = [
     dd: 'Wed',
     youtube_id: '51tCMQPiitQ',
     videoThumbnail: images.day_3_thumb,
-    blogpost: '',
-    docs: '',
     steps: [
       {
         title: 'Supabase Studio 3.0',
@@ -178,8 +172,6 @@ const days: WeekDayProps[] = [
     youtube_id: 'gtJo1lTxHfs',
     videoThumbnail: images.day_4_thumb,
     twitter_spaces: 'https://twitter.com/supabase/status/1688544207571484672?s=20',
-    blogpost: '',
-    docs: '',
     steps: [
       {
         title: 'Supabase Integrations Marketplace',
@@ -199,13 +191,11 @@ const days: WeekDayProps[] = [
     title: '',
     shipped: false,
     date: '11 Aug',
-    publishedAt: '2023-08-11T00:00:00.000-07:00',
+    publishedAt: '2023-08-11T09:00:00.000-07:00',
     description: '',
     d: 5,
     dd: 'Fri',
     youtube_id: '',
-    blogpost: '',
-    docs: '',
     steps: [],
   },
 ]
