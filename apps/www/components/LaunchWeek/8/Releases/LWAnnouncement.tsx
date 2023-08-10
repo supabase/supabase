@@ -50,7 +50,7 @@ const LWAnnouncement = ({
           </svg>
         </div>
         <Image
-          src="/images/launchweek/8/day3/yt_d3.jpg"
+          src="/images/launchweek/8/day4/yt_d4.jpg"
           alt="Youtube video thumbnail"
           layout="fill"
           objectFit="cover"

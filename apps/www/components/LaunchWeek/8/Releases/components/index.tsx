@@ -210,7 +210,7 @@ export const AccordionHeader = ({
           <div
             className={[
               'hover:cursor-pointer hover:!opacity-100',
-              day === 3 ? 'animate-pulse' : '',
+              day === 4 ? 'animate-pulse' : '',
             ].join(' ')}
           >
             <ExpandableVideo
@@ -218,7 +218,7 @@ export const AccordionHeader = ({
               trigger={
                 <VideoPreviewTrigger
                   title={`Watch: Day ${day}`}
-                  thumbnail={videoThumbnail ?? '/images/launchweek/8/day3/yt_d3.jpg'}
+                  thumbnail={videoThumbnail ?? '/images/launchweek/8/day4/yt_d4.jpg'}
                 />
               }
             />
@@ -244,7 +244,7 @@ export const AccordionHeader = ({
             </g>
           </svg>
 
-          {day === 4 && <CountdownComponent date={publishedAt} showCard={false} />}
+          {day === 5 && <CountdownComponent date={publishedAt} showCard={false} />}
         </span>
       )}
     </div>
@@ -268,13 +268,7 @@ export const VideoPreviewTrigger = ({
           />
         </svg>
       </div>
-      <Image
-        src={thumbnail}
-        alt="Video thumbnail"
-        layout="fill"
-        objectFit="cover"
-        // className="blur-[.5px]"
-      />
+      <Image src={thumbnail} alt="Video thumbnail" layout="fill" objectFit="cover" />
     </div>
     {title && <span>{title}</span>}
   </div>
