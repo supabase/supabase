@@ -206,19 +206,12 @@ You can change the scope of the access for Supabase by configuring
                 x.connections.find((x) => x.supabase_project_ref === projectContext.project?.ref)
               )
               .map((integration, i) => {
-                const ConnectionHeaderTitle = `${
-                  integration.connections.length
-                } project ${pluralize(integration.connections.length, 'connection')} `
-
                 return (
                   <div key={integration.id}>
                     <IntegrationInstallation title={'Vercel'} integration={integration} />
                     {integration.connections.length > 0 ? (
                       <>
-                        <IntegrationConnectionHeader
-                        // title={ConnectionHeaderTitle}
-                        // markdown={`Repository connections for Vercel`}
-                        />
+                        <IntegrationConnectionHeader />
                         <ul className="flex flex-col">
                           {integration.connections.map((connection) => (
                             <div
