@@ -462,7 +462,7 @@ const AiCommand = () => {
                   forceMount
                   key={key}
                 >
-                  <AiIconAnimation className="mr-2" />
+                  <AiIconAnimation />
                   {question}
                 </CommandItem>
               )
