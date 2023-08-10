@@ -12,7 +12,7 @@ const LWAnnouncement = ({
   title?: string
   isLaunchWeekPage?: boolean
 }) => {
-  const [_pre, _d1, _d2, currentDay, _d4, _d5] = days
+  const [_pre, _d1, _d2, _d3, currentDay, _d5] = days
 
   const announcement = (
     <>
@@ -74,7 +74,7 @@ const LWAnnouncement = ({
       >
         {isLaunchWeekPage ? (
           <ExpandableVideo
-            videoId="51tCMQPiitQ"
+            videoId="gtJo1lTxHfs"
             onOpenCallback={handleClick}
             triggerContainerClassName="w-full"
             trigger={
