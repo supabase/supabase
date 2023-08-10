@@ -5,6 +5,7 @@ import { post } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { integrationKeys } from './keys'
 import { IntegrationConnectionsCreateVariables } from './integrations.types'
+import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 
 export async function createIntegrationVercelConnections({
   organizationIntegrationId,
@@ -44,6 +45,7 @@ export const useIntegrationVercelConnectionsCreateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const snapshot = useIntegrationInstallationSnapshot()
   return useMutation<
     IntegrationVercelConnectionsCreateData,
     ResponseError,
@@ -63,6 +65,7 @@ export const useIntegrationVercelConnectionsCreateMutation = ({
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
+      snapshot.setLoading(false)
       if (onError === undefined) {
         toast.error(`Failed to create connection: ${data.message}`)
       } else {
