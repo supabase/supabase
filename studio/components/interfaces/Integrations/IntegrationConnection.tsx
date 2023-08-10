@@ -44,8 +44,9 @@ const IntegrationConnectionItem = React.forwardRef<HTMLLIElement, IntegrationCon
       }
     }, [props.connection, syncEnvs])
 
-    const projectIntegrationUrl = `/project/${props.connection.supabase_project_ref}/settings/integrations`
+    const projectIntegrationUrl = `/project/[ref]/settings/integrations`
 
+    console.log(router)
     return (
       <>
         <IntegrationConnection
