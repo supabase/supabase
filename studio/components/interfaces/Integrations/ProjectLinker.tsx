@@ -19,6 +19,8 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 
 export interface Project {
   id: string
@@ -132,6 +134,11 @@ const ProjectLinker = ({
     )
   }
 
+  const noSupabaseProjects = supabaseProjects.length === 0
+  const noForeignProjects = foreignProjects.length === 0
+  const missingEntityString = noSupabaseProjects ? 'Supabase' : 'Vercel'
+  const oppositeEntityString = noSupabaseProjects ? 'Vercel' : 'Supabase'
+
   return (
     <div className="flex flex-col gap-4">
       <div className="relative border rounded-lg p-12 bg shadow">
@@ -139,13 +146,15 @@ const ProjectLinker = ({
           className="absolute inset-0 bg-grid-black/5 [mask-image:linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-white/5 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
           style={{ backgroundPosition: '10px 10px' }}
         ></div>
-        {supabaseProjects.length === 0 ? (
+        {(supabaseProjects.length === 0 || foreignProjects.length === 0) &&
+        (!loadingForeignProjects || !loadingSupabaseProjects) ? (
           <div className="text-center">
-            <h5 className="text">No Supabase projects found</h5>
+            <h5 className="text">No {missingEntityString} Projects found</h5>
             <p className="text-light text-sm">
-              You will need to create a Supabase Project to link to a Vercel Project.
+              You will need to create a {missingEntityString} Project to link to a{' '}
+              {oppositeEntityString} Project.
               <br />
-              You can skip this and link a project later.
+              You can skip this and create a Project Connection later.
             </p>
           </div>
         ) : (

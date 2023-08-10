@@ -147,7 +147,7 @@ const VercelIntegration: NextPageWithLayout = () => {
       <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
         <ScaffoldColumn className="!max-w-[900px] mx-auto w-full">
           <header>
-            <h1 className="text-xl text-scale-1200">Link a Supabase project to a Vercel project</h1>
+            <h1 className="text-xl text-scale-1200">Create your first Project Connection</h1>
             <Markdown
               className="text-scale-900"
               content={`
@@ -155,7 +155,6 @@ This Supabase integration manages your environment variables automatically to pr
 `}
             />
           </header>
-
           <ProjectLinker
             organizationIntegrationId={integration?.id}
             foreignProjects={vercelProjects}
@@ -179,10 +178,7 @@ This Supabase integration manages your environment variables automatically to pr
 The following environment variables will be added:
 
 ${ENV_VAR_RAW_KEYS.map((x) => {
-  return `
-  \n
-  - \`${x}\`
-`
+  return `\n - \`${x}\``
 })}
 `}
           />
