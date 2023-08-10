@@ -49,7 +49,7 @@ Decrypted data is accessed using a special view that is automatically created af
 
 ![Decrypted data](/docs/img/guides/database/vault-decrypted-data.png)
 
-As mentioned above, accessing decrypted data is slower than accessing unencrypted data. Any row you query from this view will go through a decryption function, which takes some time and can be a significant performance pentalty if your query loads lots of rows. It's always advisable to look up rows by some indexed unencrypted key first, like a primary key, so that only one row is decrypted at a time.
+Accessing decrypted data is slower than accessing unencrypted data. Any row you query from this view will go through a decryption function, which takes some time and can be a significant performance pentalty if your query loads lots of rows. It's always advisable to look up rows by some indexed unencrypted key first, like a primary key, so that only one row is decrypted at a time.
 
 ## Using an Encrypted Table
 
