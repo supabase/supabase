@@ -5,6 +5,8 @@ import {
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { BASE_PATH } from 'lib/constants'
+import { useRouter } from 'next/router'
 import React, { useCallback, useState } from 'react'
 import { Button, Dropdown, IconChevronDown, IconLoader, IconRefreshCw, IconTrash, Modal } from 'ui'
 
@@ -16,6 +18,8 @@ const IntegrationConnectionItem = React.forwardRef<HTMLLIElement, IntegrationCon
   ({ onDeleteConnection, ...props }, ref) => {
     const [isOpen, setIsOpen] = useState(false)
     const [dropdownVisible, setDropdownVisible] = useState(false)
+
+    const router = useRouter()
 
     const onConfirm = useCallback(async () => {
       try {
@@ -40,6 +44,8 @@ const IntegrationConnectionItem = React.forwardRef<HTMLLIElement, IntegrationCon
       }
     }, [props.connection, syncEnvs])
 
+    const projectIntegrationUrl = `/project/${props.connection.supabase_project_ref}/settings/integrations`
+
     return (
       <>
         <IntegrationConnection
@@ -55,6 +61,16 @@ const IntegrationConnectionItem = React.forwardRef<HTMLLIElement, IntegrationCon
                 <>
                   {props.type === 'Vercel' && (
                     <>
+                      {router.pathname !== projectIntegrationUrl && (
+                        <Dropdown.Item
+                          onSelect={() => {
+                            router.push(projectIntegrationUrl)
+                          }}
+                          disabled={isSyncEnvLoading}
+                        >
+                          View project configuration
+                        </Dropdown.Item>
+                      )}
                       <Dropdown.Item
                         icon={
                           isSyncEnvLoading ? (
