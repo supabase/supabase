@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { components } from 'data/api'
-import { get, isResponseOk } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { get } from 'data/fetchers'
 import { useCallback } from 'react'
+import { ResponseError } from 'types'
 import { authKeys } from './keys'
 
 export type AuthConfigVariables = {
@@ -19,18 +19,20 @@ export async function getProjectAuthConfig(
     throw new Error('projectRef is required')
   }
 
-  const response = await get<AuthConfigResponse>(`${API_URL}/auth/${projectRef}/config`, {
+  const { data, error } = await get('/platform/auth/{ref}/config', {
+    params: {
+      path: { ref: projectRef },
+    },
     signal,
   })
-  if (!isResponseOk(response)) {
-    throw response.error
-  }
 
-  return response
+  if (error) throw error
+
+  return data
 }
 
 export type ProjectAuthConfigData = Awaited<ReturnType<typeof getProjectAuthConfig>>
-export type ProjectAuthConfigError = unknown
+export type ProjectAuthConfigError = ResponseError
 
 export const useAuthConfigQuery = <TData = ProjectAuthConfigData>(
   { projectRef }: AuthConfigVariables,
