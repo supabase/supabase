@@ -178,7 +178,7 @@ Connect your Vercel teams to your Supabase organization.
 
 ### How does the Vercel integration work?
 
-Supabase will keep the right environment variables up to date in each of the projects you assign to a Supabase project.
+Supabase will keep your environment variables up to date in each of the projects you assign to a Supabase project.
 You can also link multiple Vercel Projects to the same Supabase project.
 `
 
@@ -398,7 +398,7 @@ You can change the scope of the access for Supabase by configuring
                         Auto update Auth Redirect URIs for Vercel Production Deployments
                       </FormLabel_Shadcn_>
                       <FormDescription_Shadcn_ className="text-xs text-lighter">
-                        Deploy Edge Functions when merged into Production Beanch
+                        Deploy Edge Functions when merged into Production Branch
                       </FormDescription_Shadcn_>
                     </div>
                     <FormControl_Shadcn_>
@@ -455,7 +455,7 @@ You can change the scope of the access for Supabase by configuring
                         Auto update Auth Redirect URIs for Vercel Preview Deployments
                       </FormLabel_Shadcn_>
                       <FormDescription_Shadcn_ className="text-xs text-lighter">
-                        Deploy Edge Functions when merged into Production Beanch
+                        Deploy Edge Functions when merged into Production Branch
                       </FormDescription_Shadcn_>
                     </div>
                     <FormControl_Shadcn_>
