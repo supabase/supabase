@@ -135,8 +135,7 @@ const days: WeekDayProps[] = [
       {
         title: 'Supabase Local Dev: Migrations, Branching, Observability',
         blog: '/blog/supabase-local-dev',
-        hackernews: '',
-        video: '',
+        hackernews: 'https://news.ycombinator.com/item?id=37059400',
         twitter_spaces: 'https://twitter.com/i/spaces/1vAxRAvNQyDJl?s=20',
         bg_layers: [{ img: images['02-localdev'], mobileImg: images['02-localdev-mobile'] }],
         steps: [],
