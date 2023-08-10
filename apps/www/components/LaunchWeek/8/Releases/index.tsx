@@ -1,95 +1,11 @@
 import Image from 'next/image'
-import { motion } from 'framer-motion'
+import Link from 'next/link'
 import { Accordion } from 'ui'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
 
-import days, { WeekDayProps } from './lw8_data'
-import SectionContainer from '~/components/Layouts/SectionContainer'
 import { AccordionHeader, CartTitle, CheckCircleSolidIcon, SectionButtons } from './components'
-import Link from 'next/link'
-
-export const defaultEase = [0.25, 0.25, 0, 1]
-export const defaultDuratonIn = 0.25
-export const defaultDuratonOut = 0.1
-
-export const opacityVariant = {
-  default: { opacity: 0.9, ease: defaultEase, duration: defaultDuratonOut },
-  hover: {
-    opacity: 1,
-    transition: {
-      duration: defaultDuratonIn,
-      ease: defaultEase,
-    },
-  },
-}
-export const opacityVariant2 = {
-  default: { opacity: 0, ease: defaultEase, duration: defaultDuratonOut },
-  hover: {
-    opacity: 0.2,
-    transition: {
-      duration: defaultDuratonIn,
-      ease: defaultEase,
-    },
-  },
-}
-export const opacityVariant3 = {
-  default: { opacity: 0, ease: defaultEase, duration: defaultDuratonOut },
-  hover: {
-    opacity: 1,
-    transition: {
-      duration: defaultDuratonIn,
-      ease: defaultEase,
-    },
-  },
-}
-export const opacityVariant4 = {
-  default: { opacity: 0.3, ease: defaultEase, duration: defaultDuratonOut },
-  hover: {
-    opacity: 1,
-    transition: {
-      duration: defaultDuratonIn,
-      ease: defaultEase,
-    },
-  },
-}
-export const scaleOpacityVariant = {
-  default: { scale: 1, opacity: 0.9, ease: defaultEase, duration: defaultDuratonOut },
-  hover: {
-    scale: 1.05,
-    opacity: 1,
-    transition: {
-      duration: defaultDuratonIn,
-      ease: defaultEase,
-    },
-  },
-}
-export const scaleOpacityVariant2 = {
-  default: { scale: 1, opacity: 0.8, ease: defaultEase, duration: defaultDuratonOut },
-  hover: {
-    scale: 1.025,
-    opacity: 1,
-    transition: {
-      duration: defaultDuratonIn,
-      ease: defaultEase,
-    },
-  },
-}
-export const aiImageMobileVariant = {
-  default: { scale: 0.9 },
-  hover: {
-    scale: 0.9,
-  },
-}
-export const moveX10 = {
-  default: { x: 0, ease: defaultEase, duration: defaultDuratonOut },
-  hover: {
-    x: 10,
-    transition: {
-      duration: defaultDuratonIn,
-      ease: defaultEase,
-    },
-  },
-}
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import days, { WeekDayProps } from './lw8_data'
 
 export default function LW8Releases() {
   const [preRelease, day1, day2, day3, day4, day5] = days
@@ -102,12 +18,6 @@ export default function LW8Releases() {
         (day: WeekDayProps) => Date.parse(day.publishedAt) <= Date.now() || day.shipped || showAll
       )
       .map((day: WeekDayProps) => day.d.toString()) ?? []
-
-  const day1Shipped = true
-  const day2Shipped = true
-  const day3Shipped = true
-  const day4Shipped = Date.parse(day4.publishedAt) <= Date.now()
-  const day5Shipped = Date.parse(day5.publishedAt) <= Date.now()
 
   return (
     <>
@@ -140,14 +50,11 @@ export default function LW8Releases() {
             >
               {preRelease.steps.length > 0 && (
                 <div className="flex flex-col gap-5 lg:flex-row pb-4">
-                  <motion.div
+                  <div
                     className={`
                       min-h-[400px] relative overflow-hidden group/pre0 flex-1 flex flex-col items-center justify-between
                       basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
                       `}
-                    initial="default"
-                    animate="default"
-                    whileHover="hover"
                   >
                     <div
                       className="inset-0 absolute group-hover/pre0:scale-105 opacity-10 group-hover/pre0:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
@@ -164,7 +71,7 @@ export default function LW8Releases() {
                       preRelease.steps[0]?.bg_layers?.map(
                         (layer, i) =>
                           !!layer.img && (
-                            <motion.div className="absolute opacity-90 inset-0 w-full h-full -z-10">
+                            <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
                               <Image
                                 src={
                                   !!layer.mobileImg && isTablet
@@ -179,18 +86,15 @@ export default function LW8Releases() {
                                 objectPosition="100%"
                                 objectFit="cover"
                               />
-                            </motion.div>
+                            </div>
                           )
                       )}
-                  </motion.div>
-                  <motion.div
+                  </div>
+                  <div
                     className={`
                       min-h-[400px] relative overflow-hidden group/pre1 flex-1 flex flex-col items-center justify-between
                       basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-cover shadow-lg
                       `}
-                    initial="default"
-                    animate="default"
-                    whileHover="hover"
                   >
                     <div
                       className="inset-0 absolute group-hover/pre1:scale-105 opacity-60 group-hover/pre1:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
@@ -210,7 +114,7 @@ export default function LW8Releases() {
                       preRelease.steps[1]?.bg_layers?.map(
                         (layer, i) =>
                           !!layer.img && (
-                            <motion.div className="absolute opacity-90 inset-0 w-full h-full -z-10">
+                            <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
                               <Image
                                 src={
                                   !!layer.mobileImg && isTablet
@@ -225,19 +129,17 @@ export default function LW8Releases() {
                                 objectPosition="20% 50%"
                                 objectFit="cover"
                               />
-                            </motion.div>
+                            </div>
                           )
                       )}
-                  </motion.div>
-                  <motion.div
+                  </div>
+                  <div
                     className={`
                       min-h-[400px] relative overflow-hidden group/pre2 flex-1 flex flex-col items-center justify-between
                       basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
                       `}
-                    initial="default"
-                    animate="default"
-                    whileHover="hover"
                   >
+                    {' '}
                     <div
                       className="inset-0 absolute group-hover/pre2:scale-105 opacity-60 group-hover/pre2:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
                       style={{
@@ -253,7 +155,7 @@ export default function LW8Releases() {
                       preRelease.steps[2]?.bg_layers?.map(
                         (layer, i) =>
                           !!layer.img && (
-                            <motion.div className="absolute opacity-90 inset-0 w-full h-full -z-10">
+                            <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
                               <Image
                                 src={layer.img}
                                 className={`
@@ -266,10 +168,10 @@ export default function LW8Releases() {
                                 }
                                 objectFit="contain"
                               />
-                            </motion.div>
+                            </div>
                           )
                       )}
-                  </motion.div>
+                  </div>
                 </div>
               )}
             </Accordion.Item>
@@ -280,7 +182,7 @@ export default function LW8Releases() {
               day={day1.d}
               weekDay={day1.dd}
               title={day1.title}
-              shipped={day1Shipped}
+              shipped={day1.shipped}
               publishedAt={day1.publishedAt}
               youtube_id={day1.youtube_id}
               videoThumbnail={day1.videoThumbnail}
@@ -288,14 +190,11 @@ export default function LW8Releases() {
 
             {day1.steps.length > 0 && (
               <div className="flex flex-col gap-5 lg:flex-row pb-4">
-                <motion.div
+                <div
                   className={`
                       min-h-[400px] relative overflow-hidden group/d1 flex-1 flex flex-col items-center lg:items-start justify-between
                       basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
                       `}
-                  initial="default"
-                  animate="default"
-                  whileHover="hover"
                 >
                   <div
                     className="inset-0 absolute group-hover/d1:scale-105 opacity-60 group-hover/d1:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
@@ -316,7 +215,7 @@ export default function LW8Releases() {
                     day1.steps[0]?.bg_layers?.map(
                       (layer, i) =>
                         !!layer.img && (
-                          <motion.div className="absolute opacity-90 inset-0 w-full h-full -z-10">
+                          <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
                             <Image
                               src={
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
@@ -329,10 +228,10 @@ export default function LW8Releases() {
                               objectPosition={isTablet ? '50%' : '90% 50%'}
                               objectFit="contain"
                             />
-                          </motion.div>
+                          </div>
                         )
                     )}
-                </motion.div>
+                </div>
               </div>
             )}
           </div>
@@ -342,7 +241,7 @@ export default function LW8Releases() {
               day={day2.d}
               weekDay={day2.dd}
               title={day2.title}
-              shipped={day2Shipped}
+              shipped={day2.shipped}
               publishedAt={day2.publishedAt}
               youtube_id={day2.youtube_id}
               videoThumbnail={day2.videoThumbnail}
@@ -350,14 +249,11 @@ export default function LW8Releases() {
 
             {day2.steps.length > 0 && (
               <div className="flex flex-col gap-5 lg:flex-row pb-4">
-                <motion.div
+                <div
                   className={`
                       min-h-[400px] relative overflow-hidden group/d1 flex-1 flex flex-col items-center lg:items-start justify-between
                       basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
                       `}
-                  initial="default"
-                  animate="default"
-                  whileHover="hover"
                 >
                   <div
                     className="inset-0 absolute group-hover/d1:scale-105 opacity-60 group-hover/d1:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
@@ -378,7 +274,7 @@ export default function LW8Releases() {
                     day2.steps[0]?.bg_layers?.map(
                       (layer, i) =>
                         !!layer.img && (
-                          <motion.div className="absolute opacity-90 inset-0 w-full h-full -z-10">
+                          <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
                             <Image
                               src={
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
@@ -390,20 +286,20 @@ export default function LW8Releases() {
                               layout="fill"
                               objectFit="cover"
                             />
-                          </motion.div>
+                          </div>
                         )
                     )}
-                </motion.div>
+                </div>
               </div>
             )}
           </div>
-          <div className="border-b border-[#111718] scroll-mt-16" id="today">
+          <div className="border-b border-[#111718] scroll-mt-16">
             <AccordionHeader
               date={day3.date}
               day={day3.d}
               weekDay={day3.dd}
               title={day3.title}
-              shipped={day3Shipped}
+              shipped={day3.shipped}
               publishedAt={day3.publishedAt}
               youtube_id={day3.youtube_id}
               videoThumbnail={day3.videoThumbnail}
@@ -411,14 +307,11 @@ export default function LW8Releases() {
 
             {day3.steps.length > 0 && (
               <div className="flex flex-col gap-5 lg:flex-row pb-4">
-                <motion.div
+                <div
                   className={`
                       min-h-[400px] relative overflow-hidden group/d1 flex-1 flex flex-col items-center lg:items-start justify-between
                       basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
                       `}
-                  initial="default"
-                  animate="default"
-                  whileHover="hover"
                 >
                   <div
                     className="inset-0 absolute group-hover/d1:scale-105 opacity-60 group-hover/d1:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
@@ -445,12 +338,15 @@ export default function LW8Releases() {
                       </li>
                     </ul>
                   </div>
-                  <SectionButtons blog={day3.steps[0].blog} hackernews={day3.steps[0].hackernews} />
+                  <SectionButtons
+                    blog={day3.steps[0].blog}
+                    product_hunt={day3.steps[0].product_hunt}
+                  />
                   {day3.steps[0]?.bg_layers &&
                     day3.steps[0]?.bg_layers?.map(
                       (layer, i) =>
                         !!layer.img && (
-                          <motion.div className="absolute opacity-90 inset-0 w-full h-full -z-10">
+                          <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
                             <Image
                               src={
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
@@ -460,29 +356,106 @@ export default function LW8Releases() {
                               objectPosition={isTablet ? '50%' : '100% 50%'}
                               objectFit={i == 1 && isTablet ? 'contain' : 'cover'}
                             />
-                          </motion.div>
+                          </div>
                         )
                     )}
-                </motion.div>
+                </div>
               </div>
             )}
           </div>
-          <div className="border-b border-[#111718]">
-            <Accordion.Item
-              header={
-                <AccordionHeader
-                  date={day4.date}
-                  day={day4.d}
-                  weekDay={day4.dd}
-                  title={day4.title}
-                  shipped={day4Shipped}
-                  publishedAt={day4.publishedAt}
-                />
-              }
-              disabled={!day4Shipped}
-              className="h-[79px]"
-              id={day4.d.toString()}
-            ></Accordion.Item>
+          <div className="border-b border-[#111718] scroll-mt-16" id="today">
+            <AccordionHeader
+              date={day4.date}
+              day={day4.d}
+              weekDay={day4.dd}
+              title={day4.title}
+              shipped={day4.shipped}
+              publishedAt={day4.publishedAt}
+              youtube_id={day4.youtube_id}
+              videoThumbnail={day4.videoThumbnail}
+            />
+
+            {day4.steps.length > 0 && (
+              <div className="flex flex-col gap-5 lg:flex-row pb-4">
+                <div
+                  className={`
+                      min-h-[400px] relative overflow-hidden group/d1 flex-1 flex flex-col items-center lg:items-start justify-between
+                      basis-1/2 lg:flex-shrink xl:basis-2/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
+                      `}
+                >
+                  <div
+                    className="inset-0 absolute group-hover/d1:scale-105 opacity-60 group-hover/d1:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
+                    style={{
+                      background: `radial-gradient(100% 100% at 80% 80%, #6F13A450, #030A0C)`,
+                    }}
+                  />
+                  <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
+                    <Link href={day4.steps[0].blog!}>
+                      <a className="m-0">
+                        <CartTitle>{day4.steps[0].title}</CartTitle>
+                      </a>
+                    </Link>
+                    <p className="text-sm text-slate-900">{day4.steps[0]?.description}</p>
+                  </div>
+                  <SectionButtons blog={day4.steps[0].blog} />
+                  {day4.steps[0]?.bg_layers &&
+                    day4.steps[0]?.bg_layers?.map(
+                      (layer, i) =>
+                        !!layer.img && (
+                          <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
+                            <Image
+                              src={
+                                !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
+                              }
+                              className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
+                              layout="fill"
+                              objectPosition={isTablet ? '50%' : '100% 50%'}
+                              objectFit={i == 1 && isTablet ? 'contain' : 'cover'}
+                            />
+                          </div>
+                        )
+                    )}
+                </div>
+                <div
+                  className={`
+                      min-h-[400px] relative overflow-hidden group/d1 flex-1 flex flex-col items-center justify-between
+                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
+                      `}
+                >
+                  <div
+                    className="inset-0 absolute group-hover/d1:scale-105 opacity-60 group-hover/d1:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
+                    style={{
+                      background: `radial-gradient(100% 100% at 80% 80%, #6F13A450, #030A0C)`,
+                    }}
+                  />
+                  <div className="flex flex-col items-center gap-2 min-w-[300px] w-full text-center lg:text-left">
+                    <Link href={day4.steps[1].blog!}>
+                      <a className="m-0">
+                        <CartTitle>{day4.steps[1].title}</CartTitle>
+                      </a>
+                    </Link>
+                    <p className="text-sm text-slate-900">{day4.steps[1]?.description}</p>
+                  </div>
+                  <SectionButtons blog={day4.steps[1].blog} />
+                  {day4.steps[1]?.bg_layers &&
+                    day4.steps[1]?.bg_layers?.map(
+                      (layer, i) =>
+                        !!layer.img && (
+                          <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
+                            <Image
+                              src={
+                                !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
+                              }
+                              className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
+                              layout="fill"
+                              objectFit="cover"
+                            />
+                          </div>
+                        )
+                    )}
+                </div>
+              </div>
+            )}
           </div>
           <div className="border-b border-[#111718]">
             <Accordion.Item
@@ -492,11 +465,11 @@ export default function LW8Releases() {
                   day={day5.d}
                   weekDay={day5.dd}
                   title={day5.title}
-                  shipped={day5Shipped}
+                  shipped={day5.shipped}
                   publishedAt={day5.publishedAt}
                 />
               }
-              disabled={!day5Shipped}
+              disabled={!day5.shipped}
               className="h-[79px]"
               id={day5.d.toString()}
             ></Accordion.Item>

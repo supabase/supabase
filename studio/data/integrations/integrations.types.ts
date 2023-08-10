@@ -114,12 +114,29 @@ export type VercelGitLink =
       productionBranch?: string
     }
 
+export type SupabaseConfigVercel = {
+  environmentVariables: {
+    production: boolean
+    preview: boolean
+  }
+  authRedirectUris: {
+    production: boolean
+    preview: boolean
+  }
+}
+
 export type Imetadata = {
   id: string
-  supabaseConfig: {
-    projectEnvVars: {
-      write: boolean
+  supabaseConfig?: {
+    environmentVariables?: {
+      production: boolean
+      preview: boolean
     }
+    authRedirectUris?: {
+      production: boolean
+      preview: boolean
+    }
+    supabaseDirectory?: string
   }
   link?: VercelGitLink
   name: string
@@ -222,3 +239,19 @@ export type Integration =
       }
       metadata?: GitHubMetadata
     })
+
+export type IntegrationConnectionsCreateVariables = {
+  organizationIntegrationId: string
+  connection: {
+    foreign_project_id: string
+    supabase_project_ref: string
+    metadata: any
+  }
+  orgSlug: string | undefined
+}
+
+export type UpdateConnectionPayload = {
+  id: string
+  organizationIntegrationId: string
+  metadata: Imetadata
+}
