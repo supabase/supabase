@@ -657,10 +657,6 @@ These connections will be part of a GitHub workflow that is currently in develop
       },
     })
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 07e830144 (Change mutateAsync to mutate in IntegrationSettings and IntegrationsSettings)
     const { mutate: updateGithubConnection, isLoading: isUpdatingGithubConnection } =
       useGithubConnectionUpdateMutation({
         onSuccess: () => {
