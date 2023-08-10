@@ -531,6 +531,31 @@ For example, if you're using the `supabase-js` `v2` client then you can pass you
 supabase.realtime.setAuth('fresh-token')
 ```
 
+## Limitations
+
+Realtime's Postgres Changes feature has the following limitations in terms of performance at the current time. There is a bottleneck on the database side that limits the number of messages that can be streamed to subscribed clients.
+
+The polling query that fetches the changes can only work in a single thread. This means that if you have a lot of changes happening in your database, the polling query will be blocked and will not be able to fetch the changes fast enough. This will result in a delay in the changes being sent to the subscribed clients until you will get timeouted. Additionally, the polling query works per each subscribed client, this means that each unique pair of `filters` and `JWT token` (logged-in user) will affect the performance of the polling query. In other words, RLS and filters can further limit the number of messages that can be streamed to subscribed clients.
+
+From our testing and observation of the performance of the polling query, we have found that the following limits are safe to use:
+
+| Database Add-on  | Filters | RLS Usage | Concurrent Clients | Records per second per client | Messages per second (total) | Latency p95 (ms) |
+| ---------------- | ------- | --------- | ------------------ | ----------------------------- | --------------------------- | ---------------- |
+| micro < > medium | 🚫      | 🚫        | 500                | 10                            | 5,000                       | 257              |
+| micro < > medium | 🚫      | 🚫        | 1,000              | 10                            | 10,000                      | 800              |
+| micro < > medium | 🚫      | 🚫        | 5,000              | 2                             | 10,000                      | 1,120            |
+| large and above  | 🚫      | 🚫        | 1,000              | 10                            | 10,000                      | 261              |
+| large and above  | 🚫      | 🚫        | 5,000              | 2                             | 10,000                      | 952              |
+| large and above  | 🚫      | 🚫        | 10,000             | 1                             | 10,000                      | 949              |
+| large and above  | 🚫      | 🚫        | 200,000            | 0.04 (1 in 25 seconds)        | 8,000                       | 15,709           |
+| large and above  | ✅      | ✅        | 500                | 2                             | 1,000                       | 262              |
+| large and above  | ✅      | ✅        | 1,000              | 1                             | 1,000                       | 431              |
+| large and above  | ✅      | ✅        | 5,000              | 0.2 (1 in 5 seconds)          | 1,000                       | 702              |
+
+If you want to use Realtime's Postgres Changes feature you should be aware of these limitations. And if you are planning to use this feature at scale, you should consider using separate table without RLS and filters for the purpose of streaming changes to subscribed clients. Another option is to use it on the server side only and restream the changes to your clients using a Realtime Broadcast because it does not have these limitations.
+
+We have ideas on how to improve Realtime's Postgres Changes in the future. Follow Supabase to stay up to date with the latest news and updates on this feature.
+
 ## More Realtime Quickstarts
 
 - [Broadcast Quickstart](/docs/guides/realtime/broadcast)
