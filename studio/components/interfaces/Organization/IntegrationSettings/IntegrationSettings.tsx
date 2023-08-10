@@ -127,22 +127,22 @@ const IntegrationSettings = () => {
 
   const VercelDetailsSection = `
 
-Connect your Vercel teams to your Supabase organization.  
+Connect your Vercel teams to your Supabase organization.
 `
 
   const VercelContentSectionTop = `
 
 ### How does the Vercel integration work?
 
-Supabase will keep the right environment variables up to date in each of the projects you assign to a Supabase project. 
+Supabase will keep your environment variables up to date in each of the projects you assign to a Supabase project.
 You can also link multiple Vercel Projects to the same Supabase project.
 `
 
   const VercelContentSectionBottom =
     vercelProjectCount > 0 && vercelIntegration !== undefined
       ? `
-Your Vercel connection has access to ${vercelProjectCount} Vercel Projects. 
-You can change the scope of the access for Supabase by configuring 
+Your Vercel connection has access to ${vercelProjectCount} Vercel Projects.
+You can change the scope of the access for Supabase by configuring
 [here](${getIntegrationConfigurationUrl(vercelIntegration)}).
 `
       : ''
@@ -222,14 +222,14 @@ You can change the scope of the access for Supabase by configuring
   const GitHubTitle = `GitHub Connections`
 
   const GitHubDetailsSection = `
-Connect any of your GitHub repositories to a project.  
+Connect any of your GitHub repositories to a project.
 `
 
   const GitHubContentSectionTop = `
 
 ### How will GitHub connections work?
 
-You will be able to connect a GitHub repository to a Supabase project. 
+You will be able to connect a GitHub repository to a Supabase project.
 The GitHub app will watch for changes in your repository such as file changes, branch changes as well as pull request activity.
 
 These connections will be part of a GitHub workflow that is currently in development.
