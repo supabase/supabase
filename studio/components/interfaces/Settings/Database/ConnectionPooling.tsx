@@ -128,7 +128,7 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
     max_client_conn: bouncerInfo.max_client_conn || undefined,
   })
 
-  const { mutate: updateConfiguration, isLoading: isUpdating } =
+  const { mutateAsync: updateConfiguration, isLoading: isUpdating } =
     usePoolingConfigurationUpdateMutation({
       onSuccess: (res) => {
         setUpdates({ ...(res as any) })
@@ -142,14 +142,17 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
   )
 
   const updateConfig = async (updatedConfig: any) => {
-    updateConfiguration({
-      ref: projectRef,
-      pgbouncer_enabled: updatedConfig.pgbouncer_enabled,
-      default_pool_size: updatedConfig.default_pool_size,
-      ignore_startup_parameters: updatedConfig.ignore_startup_parameters,
-      pool_mode: updatedConfig.pool_mode,
-      max_client_conn: updatedConfig.max_client_conn,
-    })
+    try {
+      await updateConfiguration({
+        ref: projectRef,
+        pgbouncer_enabled: updatedConfig.pgbouncer_enabled,
+        default_pool_size: updatedConfig.default_pool_size,
+        ignore_startup_parameters: updatedConfig.ignore_startup_parameters,
+        pool_mode: updatedConfig.pool_mode,
+        max_client_conn: updatedConfig.max_client_conn,
+      })
+    } finally {
+    }
   }
 
   const formSchema = {
