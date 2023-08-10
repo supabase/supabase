@@ -1,16 +1,15 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Notification, NotificationStatus } from '@supabase/shared-types/out/notifications'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { useState } from 'react'
+import { Button, IconX } from 'ui'
 
-import { notificationKeys } from 'data/notifications/keys'
+import { useNotificationsDismissMutation } from 'data/notifications/notifications-dismiss-mutation'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
-import { delete_, get } from 'lib/common/fetch'
+import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Project } from 'types'
-import { Button, IconX } from 'ui'
 import NotificationActions from './NotificationActions'
 import { formatNotificationCTAText, formatNotificationText } from './NotificationRows.utils'
 
@@ -30,14 +29,25 @@ const NotificationRow = ({
   onSelectFinalizeMigration,
 }: NotificationRowProps) => {
   const { ui } = useStore()
-  const queryClient = useQueryClient()
-  const [dismissing, setDismissing] = useState(false)
   const { data: projects } = useProjectsQuery()
   const project = projects?.find((project) => project.id === notification.project_id)
 
   const insertedAt = dayjs(notification.inserted_at).format('DD MMM YYYY, HH:mma')
   const changelogLink = (notification.data as any).changelog_link
   const availableActions = notification.meta?.actions_available ?? []
+
+  const { mutate: dismissNotifications, isLoading: isDismissing } = useNotificationsDismissMutation(
+    {
+      onError: (error) => {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to dismiss notification: ${error.message}`,
+          duration: 4000,
+        })
+      },
+    }
+  )
 
   // [Joshen TODO] This should be removed after the env of Feb when the migration notifications
   // have been removed, double check with Qiao before removing.
@@ -53,19 +63,7 @@ const NotificationRow = ({
 
   const dismissNotification = async (notificationId: string) => {
     if (!notificationId) return
-    setDismissing(true)
-    const { error } = await delete_(`${API_URL}/notifications`, { ids: [notificationId] })
-    if (error) {
-      ui.setNotification({
-        category: 'error',
-        message: 'Failed to dismiss notification',
-        error,
-        duration: 4000,
-      })
-    } else {
-      await queryClient.invalidateQueries(notificationKeys.list())
-    }
-    setDismissing(false)
+    dismissNotifications({ ids: [notificationId] })
   }
 
   if (!project) return null
@@ -91,7 +89,7 @@ const NotificationRow = ({
                   <Button
                     className="!px-1 group"
                     type="text"
-                    loading={dismissing}
+                    loading={isDismissing}
                     icon={
                       <IconX
                         size={14}
