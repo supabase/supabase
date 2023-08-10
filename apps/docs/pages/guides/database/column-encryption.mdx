@@ -19,7 +19,7 @@ Column Encryption comes with tradeoffs that need to be considered before using i
 
     - Encrypted columns should never be indexed.  This is because the index will store the encrypted value of a column, which would not be useful.  To look up an encrypted column, you must first look up its row by some other unencrypted column, like a primary key.
 
-    - Encrypted columns can be queried in a `WHERE` clause, but this can also have some negative performance consequences, since the value must be decrypted in order to matched to any `WHERE` qualifiers.  For small result sets this is not a big deal, but broad queries that match many rows will have to be scanned and each row decrypted in order to check against the `WHERE` clause.  Worst case is the entire table must be scanned and decrypted to check against a `WHERE`.
+    - Encrypted columns can be queried in a `WHERE` clause, but this can also have some negative performance consequences, since the value must be decrypted in order to matched to any `WHERE` qualifiers.  For small result sets the impact is small, but queries that match many rows will cause each row to be decrypted in order to check against the `WHERE` clause.  In the worst case, the entire table must be scanned and decrypted to check against a `WHERE` clause.
 
     - While you can encrypt multiple columns in the same table, each column must go through a full encryption cycle, so two columns will take twice the time as one, three columns three time as long, and so on.  It is usually better to break up large tables into smaller tables with at most one or two encrypted columns, and associated them with [foreign keys](https://www.postgresql.org/docs/current/tutorial-fk.html) that can be used to JOIN them when necessary.
 
