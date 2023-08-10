@@ -9,7 +9,7 @@ export interface Organization {
   is_owner?: boolean
   stripe_customer_id?: string
   opt_in_tags: string[]
-  subscription_id?: string
+  subscription_id?: string | null
 }
 
 export interface ProjectBase {

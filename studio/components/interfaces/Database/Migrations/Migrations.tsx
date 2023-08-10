@@ -24,7 +24,7 @@ const Wrappers = () => {
     search.length === 0
       ? data?.result ?? []
       : data?.result.filter(
-          (migration) => migration.version.includes(search) || migration.name.includes(search)
+          (migration) => migration.version.includes(search) || migration.name?.includes(search)
         ) ?? []
 
   return (
@@ -118,9 +118,11 @@ const Wrappers = () => {
                             <Table.tr key={migration.version}>
                               <Table.td>{migration.version}</Table.td>
                               <Table.td
-                                className={migration.name.length === 0 ? '!text-scale-900' : ''}
+                                className={
+                                  (migration?.name ?? '').length === 0 ? '!text-scale-900' : ''
+                                }
                               >
-                                {migration.name ?? 'Name not available'}
+                                {migration?.name ?? 'Name not available'}
                               </Table.td>
                               <Table.td>{insertedAt}</Table.td>
                               <Table.td align="right">

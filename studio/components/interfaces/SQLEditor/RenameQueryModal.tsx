@@ -2,12 +2,13 @@ import { useParams } from 'common'
 
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { isError } from 'data/utils/error-check'
 import { useFlag, useStore } from 'hooks'
 import { useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
+import { subscriptionHasHipaaAddon } from '../BillingV2/Subscription/Subscription.utils'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 export interface RenameQueryModalProps {
   snippet: SqlSnippet
   visible: boolean
@@ -17,14 +18,14 @@ export interface RenameQueryModalProps {
 
 const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQueryModalProps) => {
   const { ui } = useStore()
-  const { ref, slug } = useParams()
+  const { ref } = useParams()
   const snap = useSqlEditorStateSnapshot()
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: ref })
 
   // Customers on HIPAA plans should not have access to Supabase AI
-  const isHipaaSubscription = subscription?.plan?.id === 'hipaa'
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   const { id, name, description } = snippet
 
@@ -83,7 +84,7 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
                 onChange={(e) => setNameInput(e.target.value)}
               />
               <div className="flex w-full justify-end mt-2">
-                {supabaseAIEnabled && !isHipaaSubscription && isAiButtonVisible && (
+                {supabaseAIEnabled && !hasHipaaAddon && isAiButtonVisible && (
                   <Button
                     type="default"
                     onClick={async () => {
