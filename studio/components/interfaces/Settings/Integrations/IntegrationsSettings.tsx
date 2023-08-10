@@ -1,4 +1,39 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { GitBranch, RotateCcw, Shield } from 'lucide-react'
+import Link from 'next/link'
+import { useCallback, useMemo, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  Command_Shadcn_,
+  FormControl_Shadcn_,
+  FormDescription_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  Form_Shadcn_,
+  IconCheck,
+  IconChevronDown,
+  IconClock,
+  IconExternalLink,
+  Input_Shadcn_,
+  Label_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  Switch,
+  cn,
+} from 'ui'
+import * as z from 'zod'
+
 import {
   EmptyIntegrationConnection,
   IntegrationConnectionHeader,
@@ -31,41 +66,7 @@ import { useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
-import { GitBranch, RotateCcw, Shield } from 'lucide-react'
-import Link from 'next/link'
-import { useCallback, useMemo, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Command_Shadcn_,
-  FormControl_Shadcn_,
-  FormDescription_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  Form_Shadcn_,
-  IconCheck,
-  IconChevronDown,
-  IconClock,
-  IconExternalLink,
-  Input_Shadcn_,
-  Label_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  Switch,
-  cn,
-} from 'ui'
-import * as z from 'zod'
 import { IntegrationConnectionItem } from '../../Integrations/IntegrationConnection'
 import SidePanelGitHubRepoLinker from './../../Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './../../Organization/IntegrationSettings/SidePanelVercelProjectLinker'
@@ -81,11 +82,33 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 }
 
 const IntegrationSettings = () => {
+  const { ui } = useStore()
   const org = useSelectedOrganization()
+  const projectContext = useProjectContext()
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
 
-  const projectContext = useProjectContext()
+  const { mutate: deleteVercelConnection } = useIntegrationsVercelInstalledConnectionDeleteMutation(
+    {
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: 'Successfully deleted Vercel connection',
+        })
+      },
+    }
+  )
+
+  const { mutate: deleteGitHubConnection } = useIntegrationsGitHubInstalledConnectionDeleteMutation(
+    {
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: 'Successfully deleted Github connection',
+        })
+      },
+    }
+  )
 
   const vercelIntegrations = useMemo(() => {
     return data
@@ -135,12 +158,9 @@ const IntegrationSettings = () => {
     [sidePanelsStateSnapshot]
   )
 
-  const { mutateAsync: deleteVercelConnection } =
-    useIntegrationsVercelInstalledConnectionDeleteMutation()
-
   const onDeleteVercelConnection = useCallback(
     async (connection: IntegrationProjectConnection) => {
-      await deleteVercelConnection({
+      deleteVercelConnection({
         id: connection.id,
         organization_integration_id: connection.organization_integration_id,
         orgSlug: org?.slug,
@@ -149,12 +169,9 @@ const IntegrationSettings = () => {
     [deleteVercelConnection, org?.slug]
   )
 
-  const { mutateAsync: deleteGitHubConnection } =
-    useIntegrationsGitHubInstalledConnectionDeleteMutation()
-
   const onDeleteGitHubConnection = useCallback(
     async (connection: IntegrationProjectConnection) => {
-      await deleteGitHubConnection({
+      deleteGitHubConnection({
         connectionId: connection.id,
         integrationId: connection.organization_integration_id,
         orgSlug: org?.slug,
@@ -640,17 +657,10 @@ These connections will be part of a GitHub workflow that is currently in develop
       },
     })
 
-    // useEffect(() => {
-    //   form.reset()
-    // }, [form, connection])
-
     const { mutate: updateGithubConnection, isLoading: isUpdatingGithubConnection } =
       useGithubConnectionUpdateMutation({
-        onSuccess: (data) => {
-          ui.setNotification({
-            category: 'success',
-            message: `Updated Supabase directory`,
-          })
+        onSuccess: () => {
+          ui.setNotification({ category: 'success', message: `Updated Supabase directory` })
           setOpen(false)
         },
       })
