@@ -2,18 +2,23 @@ import { useParams } from 'common'
 import { useFlag, withAuth } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { PropsWithChildren, ReactNode, forwardRef } from 'react'
-import { IconX, cn } from 'ui'
+import { IconX, cn, LoadingLine, IconBook, IconLifeBuoy } from 'ui'
 import { ScaffoldContainer } from '../Scaffold'
+import Link from 'next/link'
 
 export type IntegrationWindowLayoutProps = {
   title: string
   integrationIcon: ReactNode
+  loading?: boolean
+  docsHref?: string
 }
 
 const IntegrationWindowLayout = ({
   title,
   integrationIcon,
   children,
+  loading = false,
+  docsHref,
 }: PropsWithChildren<IntegrationWindowLayoutProps>) => {
   const ongoingIncident = useFlag('ongoingIncident')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
@@ -21,8 +26,30 @@ const IntegrationWindowLayout = ({
   return (
     <div className="flex w-full flex-col" style={{ height: maxHeight, maxHeight }}>
       <Header title={title} integrationIcon={integrationIcon} />
-
-      {children}
+      <LoadingLine loading={loading} />
+      <main className="overflow-auto flex flex-col h-full bg">{children}</main>
+      <ScaffoldContainer className="bg-body flex flex-row gap-6 py-6 border-t">
+        {docsHref && (
+          <Link href={'https://supabase.com' + docsHref} passHref>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-xs text-light hover:text"
+            >
+              <IconBook size={16} /> Docs
+            </a>
+          </Link>
+        )}
+        <Link href={'https://supabase.com/support'} passHref>
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-xs text-light hover:text"
+          >
+            <IconLifeBuoy size={16} /> Support
+          </a>
+        </Link>
+      </ScaffoldContainer>
     </div>
   )
 }
