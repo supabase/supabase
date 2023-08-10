@@ -15,7 +15,7 @@ import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
 import { NextPageWithLayout, Organization } from 'types'
 import { IconBook, IconLifeBuoy, LoadingLine } from 'ui'
@@ -60,7 +60,13 @@ const VercelIntegration: NextPageWithLayout = () => {
   const supabaseProjects = useMemo(
     () =>
       supabaseProjectsData
-        ?.filter((project) => project.organization_id === organization?.id)
+        ?.filter(
+          (project) =>
+            project.organization_id === organization?.id &&
+            (project.status === PROJECT_STATUS['ACTIVE_HEALTHY'] ||
+              project.status === PROJECT_STATUS['COMING_UP'] ||
+              project.status === PROJECT_STATUS['RESTORING'])
+        )
         .map((project) => ({ id: project.id.toString(), name: project.name, ref: project.ref })) ??
       EMPTY_ARR,
     [organization?.id, supabaseProjectsData]
