@@ -7,14 +7,14 @@ import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integratio
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { BASE_PATH } from 'lib/constants'
 import { useRouter } from 'next/router'
-import React, { useCallback, useState } from 'react'
+import React, { forwardRef, useCallback, useState } from 'react'
 import { Button, Dropdown, IconChevronDown, IconLoader, IconRefreshCw, IconTrash, Modal } from 'ui'
 
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
   onDeleteConnection: (connection: IntegrationProjectConnection) => void | Promise<void>
 }
 
-const IntegrationConnectionItem = React.forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
+const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
   ({ onDeleteConnection, ...props }, ref) => {
     const [isOpen, setIsOpen] = useState(false)
     const [dropdownVisible, setDropdownVisible] = useState(false)
@@ -46,7 +46,6 @@ const IntegrationConnectionItem = React.forwardRef<HTMLLIElement, IntegrationCon
 
     const projectIntegrationUrl = `/project/[ref]/settings/integrations`
 
-    console.log(router)
     return (
       <>
         <IntegrationConnection
