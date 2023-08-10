@@ -228,7 +228,11 @@ const SQLEditor = () => {
           return
         }
 
-        if (snippet?.snippet.name === untitledSnippetTitle) {
+        if (
+          supabaseAIEnabled &&
+          !hasHipaaAddon &&
+          snippet?.snippet.name === untitledSnippetTitle
+        ) {
           // Intentionally don't await title gen (lazy)
           setAiTitle(id, sql)
         }
