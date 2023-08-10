@@ -5,6 +5,7 @@ import {
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { useRouter } from 'next/router'
 import React, { forwardRef, useCallback, useState } from 'react'
@@ -16,6 +17,7 @@ interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
 
 const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
   ({ onDeleteConnection, ...props }, ref) => {
+    const { ui } = useStore()
     const [isOpen, setIsOpen] = useState(false)
     const [dropdownVisible, setDropdownVisible] = useState(false)
 
@@ -33,15 +35,19 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
       setIsOpen(false)
     }, [])
 
-    const { mutateAsync: syncEnvs, isLoading: isSyncEnvLoading } =
-      useIntegrationsVercelConnectionSyncEnvsMutation()
+    const { mutate: syncEnvs, isLoading: isSyncEnvLoading } =
+      useIntegrationsVercelConnectionSyncEnvsMutation({
+        onSuccess: () => {
+          ui.setNotification({
+            category: 'success',
+            message: 'Successfully synced environment variables',
+          })
+          setDropdownVisible(false)
+        },
+      })
 
     const onReSyncEnvVars = useCallback(async () => {
-      try {
-        await syncEnvs({ connectionId: props.connection.id })
-      } finally {
-        setDropdownVisible(false)
-      }
+      syncEnvs({ connectionId: props.connection.id })
     }, [props.connection, syncEnvs])
 
     const projectIntegrationUrl = `/project/[ref]/settings/integrations`
