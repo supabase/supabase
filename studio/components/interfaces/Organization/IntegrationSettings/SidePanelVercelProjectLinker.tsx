@@ -120,7 +120,7 @@ const SidePanelVercelProjectLinker = ({
 
   return (
     <SidePanel
-      header={'Add GitHub repository'}
+      header={'Add new Vercel Project Connection'}
       size="large"
       visible={isOpen}
       hideFooter
@@ -153,10 +153,7 @@ Check the details below before proceeding
 The following environment variables will be added:
 
 ${ENV_VAR_RAW_KEYS.map((x) => {
-  return `
-  \n
-  - \`${x}\`
-`
+  return `\n - \`${x}\``
 })}
 `}
           />
