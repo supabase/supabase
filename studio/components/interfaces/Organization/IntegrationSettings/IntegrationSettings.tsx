@@ -25,6 +25,8 @@ import {
   IntegrationInstallation,
 } from 'components/interfaces/Integrations/IntegrationPanels'
 import { pluralize } from 'lib/helpers'
+import { Button, IconExternalLink } from 'ui'
+import Link from 'next/link'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -154,8 +156,8 @@ You can change the scope of the access for Supabase by configuring
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
           <Markdown content={VercelContentSectionTop} />
-          {vercelIntegrations &&
-            vercelIntegrations.length > 0 &&
+
+          {vercelIntegrations && vercelIntegrations.length > 0 ? (
             vercelIntegrations.map((integration, i) => {
               const ConnectionHeaderTitle = `${integration.connections.length} project ${pluralize(
                 integration.connections.length,
@@ -195,7 +197,16 @@ You can change the scope of the access for Supabase by configuring
                   </EmptyIntegrationConnection>
                 </div>
               )
-            })}
+            })
+          ) : (
+            <div>
+              <Link href="https://vercel.com/integrations/supabase-v2" passHref>
+                <Button type="default" iconRight={<IconExternalLink />} asChild>
+                  <a target="_blank">Install Vercel Integration</a>
+                </Button>
+              </Link>
+            </div>
+          )}
           {VercelContentSectionBottom && (
             <Markdown content={VercelContentSectionBottom} className="text-lighter" />
           )}
@@ -282,9 +293,9 @@ These connections will be part of a GitHub workflow that is currently in develop
 
   return (
     <>
-      <VercelSection />
-      <ScaffoldDivider />
       <GitHubSection />
+      <ScaffoldDivider />
+      <VercelSection />
       <SidePanelVercelProjectLinker />
       <SidePanelGitHubRepoLinker />
     </>
