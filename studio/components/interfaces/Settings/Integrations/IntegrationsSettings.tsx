@@ -50,6 +50,7 @@ import {
   IconCheck,
   IconChevronDown,
   IconClock,
+  IconExternalLink,
   Input_Shadcn_,
   Label_Shadcn_,
   PopoverContent_Shadcn_,
@@ -69,6 +70,7 @@ import { useBranchQuery } from 'data/branches/branch-query'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { GitBranch, Shield, RotateCcw, GitCompare } from 'lucide-react'
 import { useVercelConnectionUpdateMutation } from 'data/integrations/vercel-connection-update-mutate'
+import Link from 'next/link'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -200,8 +202,7 @@ You can change the scope of the access for Supabase by configuring
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
           <Markdown content={VercelContentSectionTop} />
-          {vercelIntegrations &&
-            vercelIntegrations.length > 0 &&
+          {vercelIntegrations && vercelIntegrations.length > 0 ? (
             vercelIntegrations
               .filter((x) =>
                 x.connections.find((x) => x.supabase_project_ref === projectContext.project?.ref)
@@ -259,7 +260,16 @@ You can change the scope of the access for Supabase by configuring
                     </EmptyIntegrationConnection>
                   </div>
                 )
-              })}
+              })
+          ) : (
+            <div>
+              <Link href="https://vercel.com/integrations/supabase-v2" passHref>
+                <Button type="default" iconRight={<IconExternalLink />} asChild>
+                  <a target="_blank">Install Vercel Integration</a>
+                </Button>
+              </Link>
+            </div>
+          )}
           {VercelContentSectionBottom && (
             <Markdown content={VercelContentSectionBottom} className="text-lighter" />
           )}

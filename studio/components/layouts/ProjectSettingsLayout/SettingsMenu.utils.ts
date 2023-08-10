@@ -137,6 +137,16 @@ export const generateSettingsMenu = (
           ...(IS_PLATFORM
             ? [
                 {
+                  name: 'Integrations',
+                  key: 'integrations',
+                  url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/integrations`,
+                  items: [],
+                },
+              ]
+            : []),
+          ...(IS_PLATFORM
+            ? [
+                {
                   name: 'Auth',
                   key: 'auth',
                   url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/auth`,
@@ -178,12 +188,6 @@ export const generateSettingsMenu = (
                   url: isProjectBuilding
                     ? buildingUrl
                     : `/project/${ref}/settings/billing/subscription`,
-                  items: [],
-                },
-                {
-                  name: 'Integrations',
-                  key: 'integrations',
-                  url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/integrations`,
                   items: [],
                 },
                 {
