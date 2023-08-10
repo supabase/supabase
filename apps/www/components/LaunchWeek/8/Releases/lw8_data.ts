@@ -2,12 +2,15 @@ const images = {
   yt_thumbnail: '/images/launchweek/8/lw8-yt-thumb.jpg',
   day_1_thumb: '/images/launchweek/8/day1/yt_d1.jpg',
   day_2_thumb: '/images/launchweek/8/day2/yt_d2.jpg',
+  day_3_thumb: '/images/launchweek/8/day3/yt_d3.jpg',
   '00-stay-remote': '/images/launchweek/8/day0/remote.png',
   '00-pg-server': '/images/launchweek/8/day0/pg-server.png',
   '00-constellation': '/images/launchweek/8/day0/constellation.svg',
   '01-hugging': '/images/launchweek/8/day1/hugging.svg',
   '02-localdev': '/images/launchweek/8/day2/localdev.svg',
   '02-localdev-mobile': '/images/launchweek/8/day2/localdev-mobile.svg',
+  '03-studio3': '/images/launchweek/8/day3/studio3.svg',
+  '03-studio3-mobile': '/images/launchweek/8/day3/studio3-mobile.svg',
 }
 
 export interface StepProps {
@@ -143,10 +146,21 @@ const days: WeekDayProps[] = [
     description: '',
     d: 3,
     dd: 'Wed',
-    youtube_id: '',
+    youtube_id: '51tCMQPiitQ',
+    videoThumbnail: images.day_3_thumb,
     blogpost: '',
-    docs: '/docs/guides/storage/uploads#resumable-upload',
-    steps: [],
+    docs: '',
+    steps: [
+      {
+        title: 'Supabase Studio 3.0',
+        blog: '/blog/supabase-studio-3-0',
+        hackernews: '',
+        video: '',
+        twitter_spaces: 'https://twitter.com/i/spaces/1vAxRAvNQyDJl?s=20',
+        bg_layers: [{ img: images['03-studio3'], mobileImg: images['03-studio3-mobile'] }],
+        steps: [],
+      },
+    ],
   },
   {
     title: '',

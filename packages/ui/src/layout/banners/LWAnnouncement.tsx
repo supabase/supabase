@@ -78,11 +78,9 @@ const LWAnnouncement = ({
                       />
                     </svg>
                   </div>
-                  <span className="text-foreground">Launch Week 8: Day 2</span>
+                  <span className="text-foreground">Launch Week 8: Day 3</span>
                 </div>
-                <span className="text-foreground-light">
-                  Supabase Local Dev: Migrations, Branching, Observability
-                </span>
+                <span className="text-foreground-light">Supabase Studio 3.0</span>
               </div>
             </div>
             <div className="relative flex items-center justify-center !aspect-video h-[80px] md:h-[80px] gap-2 z-10 rounded overflow-hidden">
@@ -95,7 +93,7 @@ const LWAnnouncement = ({
                 </svg>
               </div>
               <Image
-                src="https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw8/assets/yt_d2.jpg?t=2023-08-08T13%3A38%3A32.544Z"
+                src="https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw8/assets/yt_d3.jpg?t=2023-08-09T12%3A25%3A42.376Z"
                 alt="Youtube video thumbnail"
                 layout="fill"
                 objectFit="cover"

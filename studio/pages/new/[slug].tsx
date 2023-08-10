@@ -89,7 +89,7 @@ const Wizard: NextPageWithLayout = () => {
   )
 
   const { data: allProjects } = useProjectsQuery({
-    enabled: currentOrg?.subscription_id !== undefined,
+    enabled: currentOrg?.subscription_id != undefined,
   })
 
   const orgProjectCount = (allProjects || []).filter(
