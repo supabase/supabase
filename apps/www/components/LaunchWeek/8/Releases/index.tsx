@@ -360,7 +360,10 @@ export default function LW8Releases() {
                       </li>
                     </ul>
                   </div>
-                  <SectionButtons blog={day3.steps[0].blog} hackernews={day3.steps[0].hackernews} />
+                  <SectionButtons
+                    blog={day3.steps[0].blog}
+                    product_hunt={day3.steps[0].product_hunt}
+                  />
                   {day3.steps[0]?.bg_layers &&
                     day3.steps[0]?.bg_layers?.map(
                       (layer, i) =>
@@ -419,7 +422,7 @@ export default function LW8Releases() {
                     </Link>
                     <p className="text-sm text-slate-900">{day4.steps[0]?.description}</p>
                   </div>
-                  <SectionButtons blog={day4.steps[0].blog} hackernews={day4.steps[0].hackernews} />
+                  <SectionButtons blog={day4.steps[0].blog} />
                   {day4.steps[0]?.bg_layers &&
                     day4.steps[0]?.bg_layers?.map(
                       (layer, i) =>
