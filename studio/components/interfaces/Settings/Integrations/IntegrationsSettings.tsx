@@ -373,6 +373,7 @@ You can change the scope of the access for Supabase by configuring
                     </div>
                     <FormControl_Shadcn_>
                       <Switch
+                        disabled={!enableVercelConnectionsConfig}
                         checked={field.value}
                         onCheckedChange={(e) => {
                           field.onChange(e)
@@ -399,6 +400,7 @@ You can change the scope of the access for Supabase by configuring
                     </div>
                     <FormControl_Shadcn_>
                       <Switch
+                        disabled={!enableVercelConnectionsConfig}
                         checked={field.value}
                         onCheckedChange={(e) => {
                           field.onChange(e)
@@ -429,6 +431,7 @@ You can change the scope of the access for Supabase by configuring
                     </div>
                     <FormControl_Shadcn_>
                       <Switch
+                        disabled={!enableVercelConnectionsConfig}
                         checked={field.value}
                         onCheckedChange={(e) => {
                           field.onChange(e)
@@ -454,6 +457,7 @@ You can change the scope of the access for Supabase by configuring
                     </div>
                     <FormControl_Shadcn_>
                       <Switch
+                        disabled={!enableVercelConnectionsConfig}
                         checked={field.value}
                         onCheckedChange={(e) => {
                           field.onChange(e)
