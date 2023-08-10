@@ -22,7 +22,7 @@ import {
   IntegrationProjectConnection,
   Integration,
 } from 'data/integrations/integrations.types'
-import { useSelectedOrganization, useStore } from 'hooks'
+import { useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
@@ -30,6 +30,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
@@ -43,8 +46,10 @@ import {
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   Form_Shadcn_,
+  IconAlertTriangle,
   IconCheck,
   IconChevronDown,
+  IconClock,
   Input_Shadcn_,
   Label_Shadcn_,
   PopoverContent_Shadcn_,
@@ -268,29 +273,29 @@ You can change the scope of the access for Supabase by configuring
     connection: IntegrationProjectConnection
     integration: Integration
   }) => {
+    const enableVercelConnectionsConfig = useFlag('enableVercelConnectionsConfig')
+
     const { ui } = useStore()
     const config = connection.metadata.supabaseConfig
 
     const FormSchema = z.object({
       environmentVariablesProduction: z
         .boolean()
-        .default(config?.environmentVariables?.production ?? false),
-      authRedirectUrisProduction: z
-        .boolean()
-        .default(config?.authRedirectUris?.production ?? false),
+        .default(config?.environmentVariables?.production ?? true),
+      authRedirectUrisProduction: z.boolean().default(config?.authRedirectUris?.production ?? true),
       environmentVariablesPreview: z
         .boolean()
-        .default(config?.environmentVariables?.preview ?? false),
-      authRedirectUrisPreview: z.boolean().default(config?.authRedirectUris?.preview ?? false),
+        .default(config?.environmentVariables?.preview ?? true),
+      authRedirectUrisPreview: z.boolean().default(config?.authRedirectUris?.preview ?? true),
     })
 
     const form = useForm<z.infer<typeof FormSchema>>({
       resolver: zodResolver(FormSchema),
       defaultValues: {
-        environmentVariablesProduction: config?.environmentVariables?.production ?? false,
-        environmentVariablesPreview: config?.environmentVariables?.preview ?? false,
-        authRedirectUrisProduction: config?.authRedirectUris?.production ?? false,
-        authRedirectUrisPreview: config?.authRedirectUris?.preview ?? false,
+        environmentVariablesProduction: config?.environmentVariables?.production ?? true,
+        environmentVariablesPreview: config?.environmentVariables?.preview ?? true,
+        authRedirectUrisProduction: config?.authRedirectUris?.production ?? true,
+        authRedirectUrisPreview: config?.authRedirectUris?.preview ?? true,
       },
     })
 
@@ -305,6 +310,11 @@ You can change the scope of the access for Supabase by configuring
       })
 
     function onSubmit(data: z.infer<typeof FormSchema>) {
+      /**
+       * remove this hardcoded if statement when we are ready to enable this feature
+       */
+      if (!enableVercelConnectionsConfig) return
+
       const metadata = {
         ...connection.metadata,
       }
@@ -329,10 +339,25 @@ You can change the scope of the access for Supabase by configuring
 
     return (
       <Form_Shadcn_ {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
+        <div className="py-4 px-8">
+          <Alert_Shadcn_ variant="default" className="">
+            <IconClock className="h-4 w-4" strokeWidth={2} />
+            <AlertTitle_Shadcn_>Vercel Connection configuration coming soon</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              This configuration will allow you to control the environment variables and auth
+              redirects for production and preview deployments.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        </div>
+        <ScaffoldDivider />
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className={cn(!enableVercelConnectionsConfig && 'opacity-30', 'w-full space-y-6')}
+        >
           <div>
             {/* {isUpdatingVercelConnection && 'isUpdatingVercelConnection'} */}
             <div className="flex flex-col gap-6 px-8 py-8">
+              <h5 className="text text-sm">Vercel Production deployments </h5>
               <FormField_Shadcn_
                 control={form.control}
                 name="environmentVariablesProduction"
@@ -387,10 +412,7 @@ You can change the scope of the access for Supabase by configuring
             </div>
             <ScaffoldDivider />
             <div className="flex flex-col gap-6 px-8 py-8">
-              <div className="flex items-center gap-3">
-                <GitCompare className="text-light w-4 h-4" strokeWidth={1} />
-                <h5 className="text-sm">Database Branching configuration </h5>
-              </div>
+              <h5 className="text text-sm">Vercel Preview deployments </h5>
               <FormField_Shadcn_
                 control={form.control}
                 name="environmentVariablesPreview"
