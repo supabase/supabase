@@ -246,7 +246,7 @@ const VercelIntegration: NextPageWithLayout = () => {
           <IconInfo className="h-4 w-4" strokeWidth={2} />
           <AlertTitle_Shadcn_>You can uninstall this Integration at any time.</AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
-            Remove this integration at any time via Vercel or the Supabase dashboard.
+            Remove this integration at any time from Vercel or the Supabase dashboard.
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>
       </ScaffoldContainer>
