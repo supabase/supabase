@@ -461,7 +461,7 @@ export default function LW8Releases() {
                     </Link>
                     <p className="text-sm text-slate-900">{day4.steps[1]?.description}</p>
                   </div>
-                  <SectionButtons blog={day4.steps[1].blog} templates={day4.steps[1].templates} />
+                  <SectionButtons blog={day4.steps[1].blog} />
                   {day4.steps[1]?.bg_layers &&
                     day4.steps[1]?.bg_layers?.map(
                       (layer, i) =>
