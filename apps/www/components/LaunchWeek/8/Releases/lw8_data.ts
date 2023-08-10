@@ -26,7 +26,7 @@ export interface StepProps {
   description?: string
   github?: string
   hackernews?: string
-  templates?: string
+  product_hunt?: string
   isNew?: boolean
   thumb?: string
   url?: string
@@ -160,6 +160,7 @@ const days: WeekDayProps[] = [
         blog: '/blog/supabase-studio-3-0',
         hackernews: '',
         video: '',
+        product_hunt: 'https://www.producthunt.com/posts/ai-powered-sql-editor',
         twitter_spaces: 'https://twitter.com/i/spaces/1vAxRAvNQyDJl?s=20',
         bg_layers: [{ img: images['03-studio3'], mobileImg: images['03-studio3-mobile'] }],
         steps: [],
@@ -176,6 +177,7 @@ const days: WeekDayProps[] = [
     dd: 'Thu',
     youtube_id: 'gtJo1lTxHfs',
     videoThumbnail: images.day_4_thumb,
+    twitter_spaces: 'https://twitter.com/supabase/status/1688544207571484672?s=20',
     blogpost: '',
     docs: '',
     steps: [
