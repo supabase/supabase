@@ -12,85 +12,6 @@ export const defaultEase = [0.25, 0.25, 0, 1]
 export const defaultDuratonIn = 0.25
 export const defaultDuratonOut = 0.1
 
-export const opacityVariant = {
-  default: { opacity: 0.9, ease: defaultEase, duration: defaultDuratonOut },
-  hover: {
-    opacity: 1,
-    transition: {
-      duration: defaultDuratonIn,
-      ease: defaultEase,
-    },
-  },
-}
-export const opacityVariant2 = {
-  default: { opacity: 0, ease: defaultEase, duration: defaultDuratonOut },
-  hover: {
-    opacity: 0.2,
-    transition: {
-      duration: defaultDuratonIn,
-      ease: defaultEase,
-    },
-  },
-}
-export const opacityVariant3 = {
-  default: { opacity: 0, ease: defaultEase, duration: defaultDuratonOut },
-  hover: {
-    opacity: 1,
-    transition: {
-      duration: defaultDuratonIn,
-      ease: defaultEase,
-    },
-  },
-}
-export const opacityVariant4 = {
-  default: { opacity: 0.3, ease: defaultEase, duration: defaultDuratonOut },
-  hover: {
-    opacity: 1,
-    transition: {
-      duration: defaultDuratonIn,
-      ease: defaultEase,
-    },
-  },
-}
-export const scaleOpacityVariant = {
-  default: { scale: 1, opacity: 0.9, ease: defaultEase, duration: defaultDuratonOut },
-  hover: {
-    scale: 1.05,
-    opacity: 1,
-    transition: {
-      duration: defaultDuratonIn,
-      ease: defaultEase,
-    },
-  },
-}
-export const scaleOpacityVariant2 = {
-  default: { scale: 1, opacity: 0.8, ease: defaultEase, duration: defaultDuratonOut },
-  hover: {
-    scale: 1.025,
-    opacity: 1,
-    transition: {
-      duration: defaultDuratonIn,
-      ease: defaultEase,
-    },
-  },
-}
-export const aiImageMobileVariant = {
-  default: { scale: 0.9 },
-  hover: {
-    scale: 0.9,
-  },
-}
-export const moveX10 = {
-  default: { x: 0, ease: defaultEase, duration: defaultDuratonOut },
-  hover: {
-    x: 10,
-    transition: {
-      duration: defaultDuratonIn,
-      ease: defaultEase,
-    },
-  },
-}
-
 export default function LW8Releases() {
   const [preRelease, day1, day2, day3, day4, day5] = days
   const isTablet = useBreakpoint(1023)
@@ -102,12 +23,6 @@ export default function LW8Releases() {
         (day: WeekDayProps) => Date.parse(day.publishedAt) <= Date.now() || day.shipped || showAll
       )
       .map((day: WeekDayProps) => day.d.toString()) ?? []
-
-  const day1Shipped = true
-  const day2Shipped = true
-  const day3Shipped = true
-  const day4Shipped = Date.parse(day4.publishedAt) <= Date.now()
-  const day5Shipped = Date.parse(day5.publishedAt) <= Date.now()
 
   return (
     <>
@@ -280,7 +195,7 @@ export default function LW8Releases() {
               day={day1.d}
               weekDay={day1.dd}
               title={day1.title}
-              shipped={day1Shipped}
+              shipped={day1.shipped}
               publishedAt={day1.publishedAt}
               youtube_id={day1.youtube_id}
               videoThumbnail={day1.videoThumbnail}
@@ -342,7 +257,7 @@ export default function LW8Releases() {
               day={day2.d}
               weekDay={day2.dd}
               title={day2.title}
-              shipped={day2Shipped}
+              shipped={day2.shipped}
               publishedAt={day2.publishedAt}
               youtube_id={day2.youtube_id}
               videoThumbnail={day2.videoThumbnail}
@@ -397,13 +312,13 @@ export default function LW8Releases() {
               </div>
             )}
           </div>
-          <div className="border-b border-[#111718] scroll-mt-16" id="today">
+          <div className="border-b border-[#111718] scroll-mt-16">
             <AccordionHeader
               date={day3.date}
               day={day3.d}
               weekDay={day3.dd}
               title={day3.title}
-              shipped={day3Shipped}
+              shipped={day3.shipped}
               publishedAt={day3.publishedAt}
               youtube_id={day3.youtube_id}
               videoThumbnail={day3.videoThumbnail}
@@ -467,22 +382,75 @@ export default function LW8Releases() {
               </div>
             )}
           </div>
-          <div className="border-b border-[#111718]">
-            <Accordion.Item
-              header={
-                <AccordionHeader
-                  date={day4.date}
-                  day={day4.d}
-                  weekDay={day4.dd}
-                  title={day4.title}
-                  shipped={day4Shipped}
-                  publishedAt={day4.publishedAt}
-                />
-              }
-              disabled={!day4Shipped}
-              className="h-[79px]"
-              id={day4.d.toString()}
-            ></Accordion.Item>
+          <div className="border-b border-[#111718] scroll-mt-16" id="today">
+            <AccordionHeader
+              date={day4.date}
+              day={day4.d}
+              weekDay={day4.dd}
+              title={day4.title}
+              shipped={day4.shipped}
+              publishedAt={day4.publishedAt}
+              youtube_id={day4.youtube_id}
+              videoThumbnail={day4.videoThumbnail}
+            />
+
+            {day4.steps.length > 0 && (
+              <div className="flex flex-col gap-5 lg:flex-row pb-4">
+                <motion.div
+                  className={`
+                      min-h-[400px] relative overflow-hidden group/d1 flex-1 flex flex-col items-center lg:items-start justify-between
+                      basis-1/2 lg:basis-1/3 border border-[#111718] rounded-xl lg:h-full bg-no-repeat py-10 lg:py-12 px-8 lg:px-10 text-2xl bg-contain shadow-lg
+                      `}
+                  initial="default"
+                  animate="default"
+                  whileHover="hover"
+                >
+                  <div
+                    className="inset-0 absolute group-hover/d1:scale-105 opacity-60 group-hover/d1:opacity-100 w-full h-full -z-10 transition-all duration-500 pointer-events-none"
+                    style={{
+                      background: `radial-gradient(100% 100% at 80% 80%, #6F13A450, #030A0C)`,
+                    }}
+                  />
+                  <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
+                    <Link href={day4.steps[0].blog!}>
+                      <a className="m-0">
+                        <CartTitle>{day4.steps[0].title}</CartTitle>
+                      </a>
+                    </Link>
+                    <p className="text-sm text-slate-900">{day4.steps[0]?.description}</p>
+                    <ul className="flex flex-row flex-wrap lg:flex-col gap-2 text-sm md:text-base justify-center">
+                      <li className="flex items-center gap-2">
+                        <CheckCircleSolidIcon /> AI SQL Editor
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircleSolidIcon /> Schema Diagrams
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircleSolidIcon /> Wrappers
+                      </li>
+                    </ul>
+                  </div>
+                  <SectionButtons blog={day4.steps[0].blog} hackernews={day4.steps[0].hackernews} />
+                  {day4.steps[0]?.bg_layers &&
+                    day4.steps[0]?.bg_layers?.map(
+                      (layer, i) =>
+                        !!layer.img && (
+                          <motion.div className="absolute opacity-90 inset-0 w-full h-full -z-10">
+                            <Image
+                              src={
+                                !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
+                              }
+                              className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
+                              layout="fill"
+                              objectPosition={isTablet ? '50%' : '100% 50%'}
+                              objectFit={i == 1 && isTablet ? 'contain' : 'cover'}
+                            />
+                          </motion.div>
+                        )
+                    )}
+                </motion.div>
+              </div>
+            )}
           </div>
           <div className="border-b border-[#111718]">
             <Accordion.Item
@@ -492,11 +460,11 @@ export default function LW8Releases() {
                   day={day5.d}
                   weekDay={day5.dd}
                   title={day5.title}
-                  shipped={day5Shipped}
+                  shipped={day5.shipped}
                   publishedAt={day5.publishedAt}
                 />
               }
-              disabled={!day5Shipped}
+              disabled={!day5.shipped}
               className="h-[79px]"
               id={day5.d.toString()}
             ></Accordion.Item>
