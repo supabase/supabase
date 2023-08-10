@@ -136,8 +136,8 @@ const ProjectLinker = ({
 
   const noSupabaseProjects = supabaseProjects.length === 0
   const noForeignProjects = foreignProjects.length === 0
-  const missingEntityString = noSupabaseProjects ? 'Supabase' : 'Vercel'
-  const oppositeEntityString = noSupabaseProjects ? 'Vercel' : 'Supabase'
+  const missingEntity = noSupabaseProjects ? 'Supabase' : 'Vercel'
+  const oppositeMissingEntity = noSupabaseProjects ? 'Vercel' : 'Supabase'
 
   return (
     <div className="flex flex-col gap-4">
@@ -146,13 +146,13 @@ const ProjectLinker = ({
           className="absolute inset-0 bg-grid-black/5 [mask-image:linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-white/5 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
           style={{ backgroundPosition: '10px 10px' }}
         ></div>
-        {(supabaseProjects.length === 0 || foreignProjects.length === 0) &&
+        {(noSupabaseProjects || noForeignProjects) &&
         (!loadingForeignProjects || !loadingSupabaseProjects) ? (
           <div className="text-center">
-            <h5 className="text">No {missingEntityString} Projects found</h5>
+            <h5 className="text">No {missingEntity} Projects found</h5>
             <p className="text-light text-sm">
-              You will need to create a {missingEntityString} Project to link to a{' '}
-              {oppositeEntityString} Project.
+              You will need to create a {missingEntity} Project to link to a {oppositeMissingEntity}{' '}
+              Project.
               <br />
               You can skip this and create a Project Connection later.
             </p>

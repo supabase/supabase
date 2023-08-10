@@ -114,8 +114,8 @@ const VercelIntegration: NextPageWithLayout = () => {
       },
       onSuccess({ id }) {
         setOrganizationIntegrationId(id)
-        snapshot.setLoading(false)
         handleRouteChange()
+        snapshot.setLoading(false)
       },
       onError(error) {
         toast.error(`Creating Vercel integration failed: ${error.message}`)
@@ -214,7 +214,9 @@ const VercelIntegration: NextPageWithLayout = () => {
             {noOrganizations && (
               <Alert_Shadcn_ variant="warning">
                 <IconAlertTriangle className="h-4 w-4" strokeWidth={2} />
-                <AlertTitle_Shadcn_>There are no Supabase Organizations</AlertTitle_Shadcn_>
+                <AlertTitle_Shadcn_>
+                  No Supabase Organizations to install Integration.
+                </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_ className="prose">
                   You will need to create a Supabase Organization before you can install the Vercel
                   Integration. You can create a new organization{' '}
