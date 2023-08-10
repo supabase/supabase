@@ -1,8 +1,18 @@
+import Link from 'next/link'
+import { useCallback, useMemo } from 'react'
+import { Button, IconExternalLink } from 'ui'
+
+import {
+  EmptyIntegrationConnection,
+  IntegrationConnectionHeader,
+  IntegrationInstallation,
+} from 'components/interfaces/Integrations/IntegrationPanels'
+import { Markdown } from 'components/interfaces/Markdown'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
-  ScaffoldSectionContent,
   ScaffoldSection,
+  ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import { useIntegrationsGitHubInstalledConnectionDeleteMutation } from 'data/integrations/integrations-github-connection-delete-mutation'
@@ -10,23 +20,14 @@ import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-or
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { IntegrationName, IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { useSelectedOrganization, useStore } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
+import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
-import { useCallback, useMemo } from 'react'
+import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationConnectionItem } from '../../Integrations/IntegrationConnection'
 import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
-import { useSelectedOrganization } from 'hooks'
-import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { Markdown } from 'components/interfaces/Markdown'
-import { BASE_PATH } from 'lib/constants'
-import {
-  EmptyIntegrationConnection,
-  IntegrationConnectionHeader,
-  IntegrationInstallation,
-} from 'components/interfaces/Integrations/IntegrationPanels'
-import { pluralize } from 'lib/helpers'
-import { Button, IconExternalLink } from 'ui'
-import Link from 'next/link'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -39,9 +40,32 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 }
 
 const IntegrationSettings = () => {
+  const { ui } = useStore()
   const org = useSelectedOrganization()
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
+
+  const { mutate: deleteVercelConnection } = useIntegrationsVercelInstalledConnectionDeleteMutation(
+    {
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: 'Successfully deleted Vercel connection',
+        })
+      },
+    }
+  )
+
+  const { mutate: deleteGitHubConnection } = useIntegrationsGitHubInstalledConnectionDeleteMutation(
+    {
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: 'Successfully deleted Github connection',
+        })
+      },
+    }
+  )
 
   const vercelIntegrations = useMemo(() => {
     return data
@@ -91,12 +115,9 @@ const IntegrationSettings = () => {
     [sidePanelsStateSnapshot]
   )
 
-  const { mutateAsync: deleteVercelConnection } =
-    useIntegrationsVercelInstalledConnectionDeleteMutation()
-
   const onDeleteVercelConnection = useCallback(
     async (connection: IntegrationProjectConnection) => {
-      await deleteVercelConnection({
+      deleteVercelConnection({
         id: connection.id,
         organization_integration_id: connection.organization_integration_id,
         orgSlug: org?.slug,
@@ -105,12 +126,9 @@ const IntegrationSettings = () => {
     [deleteVercelConnection, org?.slug]
   )
 
-  const { mutateAsync: deleteGitHubConnection } =
-    useIntegrationsGitHubInstalledConnectionDeleteMutation()
-
   const onDeleteGitHubConnection = useCallback(
     async (connection: IntegrationProjectConnection) => {
-      await deleteGitHubConnection({
+      deleteGitHubConnection({
         connectionId: connection.id,
         integrationId: connection.organization_integration_id,
         orgSlug: org?.slug,
