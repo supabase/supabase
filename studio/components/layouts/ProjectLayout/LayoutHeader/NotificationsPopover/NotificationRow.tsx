@@ -85,7 +85,7 @@ const NotificationRow = ({
             <p className="text-scale-1100 text-sm !mt-2">{insertedAt}</p>
           </div>
           <div className="w-1/10 flex justify-end">
-            <div>
+            <div className="flex items-center">
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger asChild>
                   <Button
