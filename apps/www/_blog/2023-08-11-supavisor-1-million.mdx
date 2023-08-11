@@ -62,18 +62,10 @@ To simulate 1,000,000 concurrent active connections, we used 20 AWS EC2 instance
 
 In the first test, we set up a single ARM 16-core Supavisor instance on Ubuntu 22.04.2 aarch64 connected to one database instance.
 
-<div>
-  <img
-    alt="diagram supavisor 1 instance light"
-    className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/diagram-setup-light.png"
-  />
-  <img
-    alt="diagram supavisor 1 instance dark"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/diagram-setup-dark.png"
-  />
-</div>
+<Img
+  alt="diagram supavisor 1 instance dark"
+  src="/images/blog/launch-week-8/day-5/supavisor-tests--baseline.svg"
+/>
 
 We wanted to assess the capacity of a single Supavisor instance. We achieved:
 
@@ -81,18 +73,10 @@ We wanted to assess the capacity of a single Supavisor instance. We achieved:
 - Supavisor was running with a pool of 400 direct connections to the database
 - The system was processing 20,000 queries per second (QPS)
 
-<div>
-  <img
-    alt="diagram supavisor 1 instance light"
-    className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/diagram-baseline-light.png"
-  />
-  <img
-    alt="diagram supavisor 1 instance dark"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/diagram-baseline-dark.png"
-  />
-</div>
+<Img
+  alt="diagram supavisor 1 instance dark"
+  src="/images/blog/launch-week-8/day-5/supavisor-tests--250k-test.svg"
+/>
 
 With this setup the database is the bottleneck - 20,000 QPS was the maximum this instance could handle. Increasing QPS would have been possible with a larger instance or read-replicas, but we wanted to focus on the scalability of Supavisor's connection limit (not Postgres's). Since Supavisor is built with multi-tenancy, addition of read-replicas is as easy as sending a single post request.
 
@@ -113,18 +97,10 @@ With this setup the database is the bottleneck - 20,000 QPS was the maximum this
 
 In the next step, we focused on Supavisor's vertical scaling capabilities by connecting **500,000 concurrent users** with a 64-core Supavisor instance while the single database instance configuration remained the same.
 
-<div>
-  <img
-    alt="diagram supavisor 1 instance with more cpu light"
-    className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/diagram-vertical-light.png"
-  />
-  <img
-    alt="diagram supavisor 1 instance with more cpu dark"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/diagram-vertical-dark.png"
-  />
-</div>
+<Img
+  alt="diagram supavisor 1 instance dark"
+  src="/images/blog/launch-week-8/day-5/supavisor-tests--500k-test.svg"
+/>
 
 The system showed no signs of instability or performance degradation. QPS remained constant at 20,000, proving that an increased number of connections doesn't negatively affect Supavisor's overall performance (this is generally expected from a [BEAM-based language](https://stressgrid.com/blog/webserver_benchmark/) like Elixir).
 
@@ -162,18 +138,10 @@ The load is spread evenly between all cores, which is great. CPU usage is high, 
 
 To examine horizontal scalability, we deployed two 64-core Supavisor instances, with the first instance connected directly to the database and the other relaying queries through the first.
 
-<div>
-  <img
-    alt="diagram supavisor 2 instances light"
-    className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/diagram-1m-light.png"
-  />
-  <img
-    alt="diagram supavisor 2 instances dark"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/diagram-1m-dark.png"
-  />
-</div>
+<Img
+  alt="diagram supavisor 1 instance dark"
+  src="/images/blog/launch-week-8/day-5/supavisor-tests--scaling-to-1million.svg"
+/>
 
 In the Supavisor architecture, only a single node holds direct connections to each database instance. When you add more Postgres databases or read-replicas, Supavisor spreads the connections to the replicas. Every Supavisor instance can accept incoming connections and either execute queries themselves (if they directly connected) or relay to another node (if not).
 
@@ -215,18 +183,10 @@ Within the cluster:
 
 In a multi-tenant setup (or when using Read-Replicas), the load is much more evenly spread because all Supavisor instances connect to comparable numbers of databases and have both direct and relayed connections evenly distributed between each other.
 
-<div>
-  <img
-    alt="diagram supavisor 2 instances with more databases light"
-    className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/diagram-2db-light.png"
-  />
-  <img
-    alt="diagram supavisor 2 instances with more databases dark"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/diagram-2db-dark.png"
-  />
-</div>
+<Img
+  alt="diagram supavisor 1 instance dark"
+  src="/images/blog/launch-week-8/day-5/supavisor-tests--multi-tenant-concept.svg"
+/>
 
 ### Supavisor's impact on query duration
 
@@ -303,33 +263,17 @@ Additionally we compared current setup with pgbouncer and the new Supavisor setu
 
 - Right now every Supabase project comes with its own pgbouncer instance, running on the same instance as the database to ensure that the latency is as low as possible. But this setup comes with a trade-off: it uses the same compute resources as your database.
 
-<div>
-  <img
-    alt="diagram for connection pooling with pgbouncer light"
-    className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/diagram-pgbouncer-light.png"
-  />
-  <img
-    alt="diagram for connection pooling with pgbouncer dark"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/diagram-pgbouncer-dark.png"
-  />
-</div>
+<Img
+  alt="diagram supavisor 1 instance dark"
+  src="/images/blog/launch-week-8/day-5/supavisor-tests--pgbouncer.svg"
+/>
 
 - With Supavisor, you connect to a distinct multi-tenant Supavisor cluster through load-balancer. This cluster maintains a connection pool to your database. In this case the pooler doesn't consume your database's CPU and RAM resources, but it does involve extra network communication.
 
-<div>
-  <img
-    alt="diagram for connection pooling with supavisor light"
-    className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/diagram-supavisor-light.png"
-  />
-  <img
-    alt="diagram for connection pooling with supavisor dark"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/diagram-supavisor-dark.png"
-  />
-</div>
+<Img
+  alt="diagram supavisor 1 instance dark"
+  src="/images/blog/launch-week-8/day-5/supavisor-tests--supavisor-and-supabase.svg"
+/>
 
 We were running 5,000 queries per second for each configuration, and at this time we decided to make an experiment with `insert` query. We also enabled PostGIS extension to store coordinates:
 
