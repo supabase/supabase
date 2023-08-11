@@ -1,8 +1,9 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useCallback } from 'react'
+
 import { get, isResponseOk } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
-import { Project } from 'types'
+import { Project, ResponseError } from 'types'
 import { projectKeys } from './keys'
 
 export type ProjectDetailVariables = { ref?: string }
@@ -16,7 +17,7 @@ export async function getProjectDetail({ ref }: ProjectDetailVariables, signal?:
 }
 
 export type ProjectDetailData = Awaited<ReturnType<typeof getProjectDetail>>
-export type ProjectDetailError = unknown
+export type ProjectDetailError = ResponseError
 
 export const useProjectDetailQuery = <TData = ProjectDetailData>(
   { ref }: ProjectDetailVariables,
