@@ -1,5 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useState } from 'react'
 import {
   Alert,
@@ -17,36 +18,37 @@ import {
 import { AddNewPaymentMethodModal } from 'components/interfaces/BillingV2'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
+import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
+import { useCheckPermissions, useStore } from 'hooks'
 import { delete_, patch } from 'lib/common/fetch'
 import { API_URL, BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import AlertError from 'components/ui/AlertError'
 
-export interface PaymentMethodsProps {
-  loading: boolean
-  defaultPaymentMethod: string
-  paymentMethods: any[]
-  onDefaultMethodUpdated: (updatedCustomer: any) => void
-  onPaymentMethodsDeleted: () => void
-  onPaymentMethodAdded: () => void
-}
-
-const PaymentMethods = ({
-  loading,
-  defaultPaymentMethod,
-  paymentMethods,
-  onDefaultMethodUpdated,
-  onPaymentMethodsDeleted,
-  onPaymentMethodAdded,
-}: PaymentMethodsProps) => {
+const PaymentMethods = () => {
   const { ui } = useStore()
-  const selectedOrganization = useSelectedOrganization()
-  const orgSlug = selectedOrganization?.slug ?? ''
+  const { slug } = useParams()
 
   const [selectedMethodForDefault, setSelectedMethodForDefault] = useState<any>()
   const [selectedMethodToDelete, setSelectedMethodToDelete] = useState<any>()
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
   const [isUpdatingPaymentMethod, setIsUpdatingPaymentMethod] = useState(false)
+
+  const { data: customer, refetch: refetchCustomer } = useOrganizationCustomerProfileQuery({ slug })
+
+  const {
+    data,
+    error: paymentMethodsError,
+    refetch: refetchPaymentMethods,
+    isLoading: isLoadingPaymentMethods,
+    isError: isErrorPaymentMethods,
+    isSuccess: isSuccessPaymentMethods,
+  } = useOrganizationPaymentMethodsQuery({ slug })
+  const paymentMethods = data || []
+
+  const defaultPaymentMethod = customer?.invoice_settings?.default_payment_method ?? ''
 
   const canReadPaymentMethods = useCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -60,13 +62,13 @@ const PaymentMethods = ({
   const onConfirmMakeDefaultPaymentMethod = async () => {
     try {
       setIsUpdatingPaymentMethod(true)
-      const updatedCustomer = await patch(`${API_URL}/organizations/${orgSlug}/customer`, {
+      const updatedCustomer = await patch(`${API_URL}/organizations/${slug}/customer`, {
         invoice_settings: {
           default_payment_method: selectedMethodForDefault.id,
         },
       })
       if (updatedCustomer.error) throw updatedCustomer.error
-      onDefaultMethodUpdated(updatedCustomer)
+      refetchCustomer(updatedCustomer)
       setSelectedMethodForDefault(undefined)
       ui.setNotification({
         category: 'success',
@@ -85,11 +87,11 @@ const PaymentMethods = ({
   const onConfirmDetachPaymentMethod = async () => {
     try {
       setIsUpdatingPaymentMethod(true)
-      const { error } = await delete_(`${API_URL}/organizations/${orgSlug}/payments`, {
+      const { error } = await delete_(`${API_URL}/organizations/${slug}/payments`, {
         card_id: selectedMethodToDelete.id,
       })
       if (error) throw error
-      onPaymentMethodsDeleted()
+      refetchPaymentMethods()
       setSelectedMethodToDelete(undefined)
       ui.setNotification({ category: 'success', message: 'Successfully deleted payment method' })
     } catch (error: any) {
@@ -104,12 +106,12 @@ const PaymentMethods = ({
 
   const onLocalPaymentMethodAdded = () => {
     setShowAddPaymentMethodModal(false)
-    return onPaymentMethodAdded()
+    return refetchPaymentMethods()
   }
 
   return (
     <>
-      <div className="space-y-2">
+      <div className="space-y-2 -mb-8">
         <div>
           <h4>Payment methods</h4>
           <p className="text-sm opacity-50">
@@ -119,45 +121,45 @@ const PaymentMethods = ({
             your account.
           </p>
         </div>
-        {!canReadPaymentMethods ? (
+
+        {!isLoadingPaymentMethods && !canReadPaymentMethods && (
           <Panel>
             <NoPermission resourceText="view this organization's payment methods" />
           </Panel>
-        ) : (
+        )}
+
+        {isLoadingPaymentMethods && <GenericSkeletonLoader />}
+
+        {isErrorPaymentMethods && (
+          <AlertError error={paymentMethodsError} subject="Failed to retrieve payment methods" />
+        )}
+
+        {isSuccessPaymentMethods && (
           <Panel
-            loading={loading}
             footer={
-              !loading && (
-                <div className="flex w-full justify-between">
-                  {!canUpdatePaymentMethods ? (
-                    <p className="text-sm text-scale-1000">
-                      You need additional permissions to manage this organization's payment methods
-                    </p>
-                  ) : (
-                    <div />
-                  )}
-                  <div>
-                    <Button
-                      key="panel-footer"
-                      type="default"
-                      icon={<IconPlus />}
-                      disabled={!canUpdatePaymentMethods}
-                      onClick={() => setShowAddPaymentMethodModal(true)}
-                    >
-                      Add new card
-                    </Button>
-                  </div>
+              <div className="flex w-full justify-between">
+                {!canUpdatePaymentMethods ? (
+                  <p className="text-sm text-scale-1000">
+                    You need additional permissions to manage this organization's payment methods
+                  </p>
+                ) : (
+                  <div />
+                )}
+                <div>
+                  <Button
+                    key="panel-footer"
+                    type="default"
+                    icon={<IconPlus />}
+                    disabled={!canUpdatePaymentMethods}
+                    onClick={() => setShowAddPaymentMethodModal(true)}
+                  >
+                    Add new card
+                  </Button>
                 </div>
-              )
+              </div>
             }
           >
-            {loading && paymentMethods.length === 0 ? (
-              <div className="flex flex-col justify-between space-y-2 py-4 px-4">
-                <div className="shimmering-loader mx-1 w-2/3 rounded py-3" />
-                <div className="shimmering-loader mx-1 w-1/2 rounded py-3" />
-                <div className="shimmering-loader mx-1 w-1/3 rounded py-3" />
-              </div>
-            ) : paymentMethods.length >= 1 ? (
+            {paymentMethods.length >= 1 ? (
               <Panel.Content>
                 <div className="space-y-2">
                   {paymentMethods.map((paymentMethod: any) => {
@@ -233,7 +235,7 @@ const PaymentMethods = ({
                                 <Button
                                   type="outline"
                                   icon={<IconMoreHorizontal />}
-                                  loading={loading}
+                                  loading={isLoadingPaymentMethods}
                                   className="hover:border-gray-500"
                                 />
                               </Dropdown>
@@ -259,7 +261,7 @@ const PaymentMethods = ({
 
       <AddNewPaymentMethodModal
         visible={showAddPaymentMethodModal}
-        returnUrl={`${getURL()}/org/${orgSlug}/billing`}
+        returnUrl={`${getURL()}/org/${slug}/billing`}
         onCancel={() => setShowAddPaymentMethodModal(false)}
         onConfirm={() => onLocalPaymentMethodAdded()}
       />

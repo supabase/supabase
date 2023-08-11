@@ -3,6 +3,7 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { organizationKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type OrganizationPaymentMethodsVariables = { slug?: string }
 export type OrganizationPaymentMethod = {
@@ -46,7 +47,7 @@ export async function getOrganizationPaymentMethods(
 export type OrganizationPaymentMethodsData = Awaited<
   ReturnType<typeof getOrganizationPaymentMethods>
 >
-export type OrganizationPaymentMethodsError = unknown
+export type OrganizationPaymentMethodsError = ResponseError
 
 export const useOrganizationPaymentMethodsQuery = <TData = OrganizationPaymentMethodsData>(
   { slug }: OrganizationPaymentMethodsVariables,
