@@ -8,6 +8,7 @@ import {
   Alert_Shadcn_,
   Button,
   Form,
+  IconAlertCircle,
   IconAlertTriangle,
   IconEye,
   IconEyeOff,
@@ -36,21 +37,27 @@ import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
 const SmtpForm = () => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
-  const { data: config, isLoading, isFetched: isLoaded } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
+  const {
+    data: authConfig,
+    error: authConfigError,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useAuthConfigQuery({ projectRef })
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const [enableSmtp, setEnableSmtp] = useState(false)
   const [hidden, setHidden] = useState(true)
 
   const formId = 'auth-config-smtp-form'
-  const initialValues = generateFormValues(config)
+  const initialValues = generateFormValues(authConfig)
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   useEffect(() => {
-    if (isLoaded && isSmtpEnabled(config)) {
+    if (isSuccess && isSmtpEnabled(authConfig)) {
       setEnableSmtp(true)
     }
-  }, [isLoaded, config])
+  }, [isSuccess, authConfig])
 
   const schema = object({
     SMTP_ADMIN_EMAIL: string().when([], {
@@ -115,14 +122,13 @@ const SmtpForm = () => {
     }),
   })
 
-  const onSubmit = (values: any, { setSubmitting, resetForm }: any) => {
+  const onSubmit = (values: any, { resetForm }: any) => {
     const payload = enableSmtp ? values : defaultDisabledSmtpFormValues
 
     // Format payload: Remove redundant value + convert port to string
     delete payload.ENABLE_SMTP
     payload.SMTP_PORT = payload.SMTP_PORT ? payload.SMTP_PORT.toString() : payload.SMTP_PORT
 
-    setSubmitting(true)
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
       {
@@ -135,16 +141,23 @@ const SmtpForm = () => {
           resetForm({ values: updatedFormValues, initialValues: updatedFormValues })
           ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
         },
-        onSettled: () => {
-          setSubmitting(false)
-        },
       }
+    )
+  }
+
+  if (isError) {
+    return (
+      <Alert_Shadcn_ variant="destructive">
+        <IconAlertCircle strokeWidth={2} />
+        <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
     )
   }
 
   return (
     <Form id={formId} initialValues={initialValues} onSubmit={onSubmit} validationSchema={schema}>
-      {({ isSubmitting, resetForm, values }: any) => {
+      {({ resetForm, values }: any) => {
         const isValidSmtpConfig = isSmtpEnabled(values)
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
@@ -152,11 +165,11 @@ const SmtpForm = () => {
         // it won't error because the hooks are always rendered in the same order
         // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
-          if (isLoaded) {
-            const formValues = generateFormValues(config)
+          if (isSuccess) {
+            const formValues = generateFormValues(authConfig)
             resetForm({ values: formValues, initialValues: formValues })
           }
-        }, [isLoaded, config])
+        }, [isSuccess, authConfig])
 
         const onResetForm = () => {
           setEnableSmtp(isSmtpEnabled(initialValues))
@@ -174,7 +187,7 @@ const SmtpForm = () => {
                 <div className="flex py-4 px-8">
                   <FormActions
                     form={formId}
-                    isSubmitting={isSubmitting}
+                    isSubmitting={isUpdatingConfig}
                     hasChanges={hasChanges}
                     handleReset={onResetForm}
                     disabled={!canUpdateConfig}

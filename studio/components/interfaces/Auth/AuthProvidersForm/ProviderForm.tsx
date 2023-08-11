@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from 'ui'
 
 import { useParams } from 'common'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { components } from 'data/api'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCheckPermissions, useStore } from 'hooks'
@@ -15,16 +15,15 @@ import { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
 
 export interface ProviderFormProps {
+  config: components['schemas']['GetGoTrueConfigResponse']
   provider: Provider
 }
 
-const ProviderForm = ({ provider }: ProviderFormProps) => {
+const ProviderForm = ({ config, provider }: ProviderFormProps) => {
   const [open, setOpen] = useState(false)
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
-  const { data: config } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
-
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
@@ -33,9 +32,6 @@ const ProviderForm = ({ provider }: ProviderFormProps) => {
   const generateInitialValues = () => {
     const initialValues: { [x: string]: string } = {}
     // the config is already loaded through the parent component
-    if (!config) {
-      return
-    }
     Object.keys(provider.properties).forEach((key) => {
       // When the key is a 'double negative' key, we must reverse the boolean before adding it to the form
       const isDoubleNegative = doubleNegativeKeys.includes(key)
@@ -56,7 +52,7 @@ const ProviderForm = ({ provider }: ProviderFormProps) => {
       : (config && (config as any)[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]) ?? false
   const INITIAL_VALUES = generateInitialValues()
 
-  const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
+  const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
 
     // When the key is a 'double negative' key, we must reverse the boolean before the payload can be sent
@@ -80,9 +76,6 @@ const ProviderForm = ({ provider }: ProviderFormProps) => {
           resetForm({ values: { ...values }, initialValues: { ...values } })
           setOpen(false)
           ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
-        },
-        onSettled: () => {
-          setSubmitting(false)
         },
       }
     )
@@ -134,7 +127,7 @@ const ProviderForm = ({ provider }: ProviderFormProps) => {
         validationSchema={provider.validationSchema}
         onSubmit={onSubmit}
       >
-        {({ isSubmitting, handleReset, initialValues, values }: any) => {
+        {({ handleReset, initialValues, values }: any) => {
           const noChanges = JSON.stringify(initialValues) === JSON.stringify(values)
           return (
             <Collapsible.Content>
@@ -187,7 +180,7 @@ const ProviderForm = ({ provider }: ProviderFormProps) => {
                         handleReset()
                         setOpen(false)
                       }}
-                      disabled={isSubmitting}
+                      disabled={isUpdatingConfig}
                     >
                       Cancel
                     </Button>
@@ -195,8 +188,8 @@ const ProviderForm = ({ provider }: ProviderFormProps) => {
                       <Tooltip.Trigger type="button">
                         <Button
                           htmlType="submit"
-                          loading={isSubmitting}
-                          disabled={isSubmitting || !canUpdateConfig || noChanges}
+                          loading={isUpdatingConfig}
+                          disabled={isUpdatingConfig || !canUpdateConfig || noChanges}
                         >
                           Save
                         </Button>
