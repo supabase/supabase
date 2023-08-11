@@ -10,7 +10,7 @@ import {
   IconAlertCircle,
   Input,
 } from 'ui'
-import { object, string } from 'yup'
+import { InferType, object, string } from 'yup'
 
 import {
   FormActions,
@@ -26,6 +26,8 @@ import { useCheckPermissions, useStore } from 'hooks'
 const schema = object({
   SITE_URL: string().required('Must have a Site URL'),
 })
+
+type SiteURLSchema = InferType<typeof schema>
 
 const SiteUrl = observer(() => {
   const { ui } = useStore()
