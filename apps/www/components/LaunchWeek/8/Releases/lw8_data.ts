@@ -207,7 +207,7 @@ const days: WeekDayProps[] = [
     steps: [
       {
         title: 'Supabase Supavisor: 1M Postgres connections',
-        blog: '/blog/supabase-supavisor-1m-pg-connections',
+        blog: '/blog/supavisor-1-million',
         hackernews: '',
         video: '',
         twitter_spaces: '',
