@@ -1,5 +1,6 @@
 export const projectKeys = {
   list: () => ['all-projects'] as const,
+  types: (projectRef: string | undefined) => ['project', projectRef, 'types'] as const,
   detail: (projectRef: string | undefined) => ['project', projectRef, 'detail'] as const,
   readonlyStatusList: () => ['projects', 'readonly-statuses'] as const,
   readonlyStatus: (projectRef: string | undefined) =>
