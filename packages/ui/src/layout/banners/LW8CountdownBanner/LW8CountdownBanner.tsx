@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import Lw8BannerBg from './Lw8BannerBg'
-import VideoPreview from './VideoPreview'
+// import VideoPreview from './VideoPreview'
 
 export function LW8CountdownBanner() {
   const { pathname } = useRouter()
@@ -26,9 +26,9 @@ export function LW8CountdownBanner() {
           ].join(' ')}
         >
           <p>
-            <span className="hidden md:inline">Supabase</span> Launch Week 8: Day 5
+            <span className="hidden md:inline">Supabase</span> Launch Week 8
           </p>
-          <VideoPreview />
+          {/* <VideoPreview /> */}
         </div>
       </div>
       <Lw8BannerBg className="absolute z-0 inset-0 w-full flex items-center justify-center h-auto min-h-full [&>svg]:w-auto [&>svg]:h-[40%] md:[&>svg]:h-[64%]" />
