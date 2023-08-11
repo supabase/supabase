@@ -216,7 +216,7 @@ const days: WeekDayProps[] = [
       },
       {
         title: 'Community day',
-        blog: '/blog/lw8-community-day',
+        blog: '/blog/launch-week-8-community-day',
         hackernews: '',
         video: '',
         twitter_spaces: '',
@@ -224,11 +224,9 @@ const days: WeekDayProps[] = [
         steps: [],
       },
       {
-        title: 'SOC2 type 2 and HIPAA  compliant',
-        blog: '/blog/soc2-type2-and-hipaa-compliant',
+        title: 'SOC2 type 2 and HIPAA compliant',
+        blog: '/blog/supabase-soc2-hipaa',
         hackernews: '',
-        video: '',
-        twitter_spaces: '',
         bg_layers: [{ img: images['05-compliant'], mobileImg: images['05-compliant-mobile'] }],
         steps: [],
       },
