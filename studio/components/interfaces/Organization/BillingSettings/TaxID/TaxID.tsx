@@ -1,35 +1,43 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { useEffect, useState } from 'react'
 import { Button, IconPlus, IconX, Input, Listbox } from 'ui'
 
+import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useOrganizationTaxIDsQuery } from 'data/organizations/organization-tax-ids-query'
+import { TaxIdValue } from 'data/organizations/organization-tax-ids-update-mutation'
+import { useCheckPermissions, useStore } from 'hooks'
 import { delete_, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { StripeTaxId, TAX_IDS } from './TaxID.constants'
 import { sanitizeTaxID } from './TaxID.utils'
 
-export interface TaxIDProps {
-  loading: boolean
-  taxIds: any[]
-  onTaxIdsUpdated: (taxIds: any) => void
-}
-
 // Stripe recommends to delete tax ids and create new ones to update
 // https://stripe.com/docs/billing/customer/tax-ids
 
-const TaxID = ({ loading, taxIds, onTaxIdsUpdated }: TaxIDProps) => {
+const TaxID = () => {
   const { ui } = useStore()
-  const selectedOrganization = useSelectedOrganization()
-  const slug = selectedOrganization?.slug ?? ''
+  const { slug } = useParams()
+
+  const {
+    data,
+    error: taxIdsError,
+    refetch: refetchTaxIds,
+    isLoading: isLoadingTaxIds,
+    isError: isErrorTaxIds,
+    isSuccess: isSuccessTaxIds,
+  } = useOrganizationTaxIDsQuery({ slug })
+  const taxIds = data || []
 
   const [isSaving, setIsSaving] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
-  const [taxIdValues, setTaxIdValues] = useState<StripeTaxId[]>(taxIds)
-  const formattedTaxIds: StripeTaxId[] = taxIds.map((taxId: StripeTaxId) => {
+  const [taxIdValues, setTaxIdValues] = useState<TaxIdValue[]>([])
+  const formattedTaxIds: StripeTaxId[] = taxIds.map((taxId) => {
     return {
       id: taxId.id,
       type: taxId.type,
@@ -91,7 +99,7 @@ const TaxID = ({ loading, taxIds, onTaxIdsUpdated }: TaxIDProps) => {
     setIsSaving(true)
     try {
       const deletedIds = await Promise.all(
-        taxIds.map(async (taxId: StripeTaxId) => {
+        taxIds.map(async (taxId) => {
           return await delete_(`${API_URL}/organizations/${slug}/tax-ids`, { id: taxId.id })
         })
       )
@@ -118,11 +126,8 @@ const TaxID = ({ loading, taxIds, onTaxIdsUpdated }: TaxIDProps) => {
       } else {
         ui.setNotification({ category: 'success', message: 'Successfully updated tax IDs' })
       }
-      const idsCreated = newIds
-        .filter((taxId: any) => !taxId.result.error)
-        .map((taxId: any) => taxId.result)
 
-      onTaxIdsUpdated(idsCreated)
+      refetchTaxIds()
     } catch (error: any) {
       ui.setNotification({ category: 'error', message: 'Failed to save tax IDs' })
     } finally {
@@ -140,15 +145,20 @@ const TaxID = ({ loading, taxIds, onTaxIdsUpdated }: TaxIDProps) => {
         </p>
       </div>
 
-      {!canReadTaxIds ? (
+      {isLoadingTaxIds && <GenericSkeletonLoader />}
+
+      {!isLoadingTaxIds && !canReadTaxIds && (
         <Panel>
           <NoPermission resourceText="to view this organization's tax IDs" />
         </Panel>
-      ) : (
+      )}
+
+      {isErrorTaxIds && <AlertError error={taxIdsError} subject="Failed to retrieve tax IDs" />}
+
+      {isSuccessTaxIds && (
         <Panel
-          loading={loading}
           footer={
-            !loading && (
+            !isLoadingTaxIds && (
               <div className="flex w-full justify-between">
                 {!canUpdateTaxIds ? (
                   <p className="text-sm text-scale-1000">
@@ -180,71 +190,64 @@ const TaxID = ({ loading, taxIds, onTaxIdsUpdated }: TaxIDProps) => {
             )
           }
         >
-          {loading && taxIdValues.length === 0 ? (
-            <div className="flex flex-col justify-between space-y-2 py-4 px-4">
-              <div className="shimmering-loader mx-1 w-2/3 rounded py-3" />
-              <div className="shimmering-loader mx-1 w-1/2 rounded py-3" />
-              <div className="shimmering-loader mx-1 w-1/3 rounded py-3" />
-            </div>
-          ) : (
-            <Panel.Content className="w-8/12 space-y-4">
-              {taxIdValues.length >= 1 ? (
-                <div className="w-full space-y-2">
-                  {taxIdValues.map((taxId: StripeTaxId, idx: number) => {
-                    const selectedTaxId = TAX_IDS.find((option) => option.name === taxId.name)
-                    return (
-                      <div key={`tax-id-${idx}`} className="flex items-center space-x-2">
-                        <Listbox
-                          value={selectedTaxId?.name}
-                          onChange={(e: any) => onUpdateTaxId(taxId.id, 'name', e)}
-                          disabled={!canUpdateTaxIds}
-                          className="w-[200px]"
-                        >
-                          {TAX_IDS.sort((a, b) => a.country.localeCompare(b.country)).map(
-                            (option) => (
-                              <Listbox.Option
-                                key={option.name}
-                                value={option.name}
-                                label={option.name}
-                              >
-                                {option.country} - {option.name}
-                              </Listbox.Option>
-                            )
-                          )}
-                        </Listbox>
-                        <Input
-                          value={taxId.value}
-                          placeholder={selectedTaxId?.placeholder ?? ''}
-                          onChange={(e: any) => onUpdateTaxId(taxId.id, 'value', e.target.value)}
-                          disabled={!canUpdateTaxIds}
-                        />
-                        {canUpdateTaxIds && (
-                          <Button
-                            type="text"
-                            icon={<IconX />}
-                            onClick={() => onRemoveTaxId(taxId.id)}
-                          />
+          <Panel.Content className="w-8/12 space-y-4">
+            {taxIdValues.length >= 1 ? (
+              <div className="w-full space-y-2">
+                {taxIdValues.map((taxId: StripeTaxId, idx: number) => {
+                  const selectedTaxId = TAX_IDS.find((option) => option.name === taxId.name)
+
+                  return (
+                    <div key={`tax-id-${idx}`} className="flex items-center space-x-2">
+                      <Listbox
+                        value={selectedTaxId?.name}
+                        onChange={(e: any) => onUpdateTaxId(taxId.id, 'name', e)}
+                        disabled={!canUpdateTaxIds}
+                        className="w-[200px]"
+                      >
+                        {TAX_IDS.sort((a, b) => a.country.localeCompare(b.country)).map(
+                          (option) => (
+                            <Listbox.Option
+                              key={option.name}
+                              value={option.name}
+                              label={option.name}
+                            >
+                              {option.country} - {option.name}
+                            </Listbox.Option>
+                          )
                         )}
-                      </div>
-                    )
-                  })}
-                </div>
-              ) : (
-                <div>
-                  <p className="flex items-center space-x-2 text-sm text-scale-900">No tax IDs</p>
-                </div>
-              )}
-              {canUpdateTaxIds && (
-                <div
-                  className="flex cursor-pointer items-center space-x-2 opacity-50 transition hover:opacity-100"
-                  onClick={() => onAddNewTaxId()}
-                >
-                  <IconPlus size={14} />
-                  <p className="text-sm">Add another ID</p>
-                </div>
-              )}
-            </Panel.Content>
-          )}
+                      </Listbox>
+                      <Input
+                        value={taxId.value}
+                        placeholder={selectedTaxId?.placeholder ?? ''}
+                        onChange={(e: any) => onUpdateTaxId(taxId.id, 'value', e.target.value)}
+                        disabled={!canUpdateTaxIds}
+                      />
+                      {canUpdateTaxIds && (
+                        <Button
+                          type="text"
+                          icon={<IconX />}
+                          onClick={() => onRemoveTaxId(taxId.id)}
+                        />
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div>
+                <p className="flex items-center space-x-2 text-sm text-scale-900">No tax IDs</p>
+              </div>
+            )}
+            {canUpdateTaxIds && (
+              <div
+                className="flex cursor-pointer items-center space-x-2 opacity-50 transition hover:opacity-100"
+                onClick={() => onAddNewTaxId()}
+              >
+                <IconPlus size={14} />
+                <p className="text-sm">Add another ID</p>
+              </div>
+            )}
+          </Panel.Content>
         </Panel>
       )}
     </div>
