@@ -112,7 +112,7 @@
     "uniforms-bridge-json-schema": "^3.6.2",
     "uuid": "^9.0.0",
     "valtio": "^1.7.6",
-    "yup": "^0.32.11",
+    "yup": "^1.0.0",
     "yup-password": "^0.2.2",
     "zxcvbn": "^4.4.2"
   },
