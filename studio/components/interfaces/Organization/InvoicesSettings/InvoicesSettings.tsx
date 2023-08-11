@@ -3,14 +3,15 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { InvoiceStatusBadge } from 'components/interfaces/BillingV2'
-import { Invoice, InvoiceStatus } from 'components/interfaces/BillingV2/Invoices.types'
+import { InvoiceStatus } from 'components/interfaces/BillingV2/Invoices.types'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import NoPermission from 'components/ui/NoPermission'
+import { getInvoice } from 'data/invoices/invoice-query'
+import { useInvoicesCountQuery } from 'data/invoices/invoices-count-query'
+import { useInvoicesQuery } from 'data/invoices/invoices-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
-import { get, head } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText, Loading } from 'ui'
-import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 
 const PAGE_LIMIT = 10
 
@@ -18,11 +19,7 @@ const PAGE_LIMIT = 10
 
 const InvoicesSettings = () => {
   const { ui } = useStore()
-  const [loading, setLoading] = useState<any>(false)
-
   const [page, setPage] = useState(1)
-  const [count, setCount] = useState(0)
-  const [invoices, setInvoices] = useState<Invoice[]>([])
 
   const selectedOrganization = useSelectedOrganization()
   const { stripe_customer_id, slug } = selectedOrganization ?? {}
@@ -30,66 +27,30 @@ const InvoicesSettings = () => {
 
   const canReadInvoices = useCheckPermissions(PermissionAction.READ, 'invoices')
 
+  const { data: count, isError: isErrorCount } = useInvoicesCountQuery({
+    customerId: stripe_customer_id,
+    slug,
+  })
+  const { data, isLoading } = useInvoicesQuery({
+    customerId: stripe_customer_id,
+    slug,
+    offset,
+    limit: PAGE_LIMIT,
+  })
+  const invoices = data || []
+
   useEffect(() => {
-    if (!canReadInvoices || !stripe_customer_id || !slug) return
+    setPage(1)
+  }, [slug])
 
-    let cancel = false
-    const page = 1
-
-    const fetchInvoiceCount = async () => {
-      const res = await head(
-        `${API_URL}/stripe/invoices?customer=${stripe_customer_id}&slug=${slug}`,
-        ['X-Total-Count']
-      )
-      if (!cancel) {
-        if (res.error) {
-          ui.setNotification({ category: 'error', message: res.error.message })
-        } else {
-          setCount(res['X-Total-Count'])
-        }
-      }
-    }
-
-    setPage(page)
-    fetchInvoices(page)
-    fetchInvoiceCount()
-
-    return () => {
-      cancel = true
-    }
-  }, [stripe_customer_id, slug])
-
-  const fetchInvoices = async (page: number) => {
-    setLoading(true)
-    setPage(page)
-
-    const offset = (page - 1) * PAGE_LIMIT
-    const invoices = await get(
-      `${API_URL}/stripe/invoices?offset=${offset}&limit=${PAGE_LIMIT}&customer=${stripe_customer_id}&slug=${slug}`
-    )
-
-    if (invoices.error) {
+  const fetchInvoice = async (id: string) => {
+    try {
+      const invoice = await getInvoice({ id })
+      if (invoice?.invoice_pdf) window.open(invoice.invoice_pdf, '_blank')
+    } catch (error: any) {
       ui.setNotification({
-        error: invoices.error,
-        category: 'error',
-        message: `Failed to fetch invoices: ${invoices.error.message}`,
-      })
-    } else {
-      setInvoices(invoices)
-    }
-
-    setLoading(false)
-  }
-
-  const fetchInvoice = async (invoiceId: string) => {
-    const invoice = await get(`${API_URL}/stripe/invoices/${invoiceId}`)
-    if (invoice?.invoice_pdf) {
-      window.open(invoice.invoice_pdf, '_blank')
-    } else {
-      ui.setNotification({
-        error: invoice.error,
         category: 'info',
-        message: `Unable to fetch the selected invoice: ${invoice.error.message}`,
+        message: `Failed to fetch the selected invoice: ${error.message}`,
       })
     }
   }
@@ -100,7 +61,7 @@ const InvoicesSettings = () => {
 
   return (
     <ScaffoldContainerLegacy>
-      <Loading active={loading}>
+      <Loading active={isLoading}>
         <Table
           head={[
             <Table.th key="header-icon"></Table.th>,
@@ -117,7 +78,7 @@ const InvoicesSettings = () => {
               <Table.tr>
                 <Table.td colSpan={6} className="p-3 py-12 text-center">
                   <p className="text-scale-1000">
-                    {loading ? 'Checking for invoices' : 'No invoices for this organization yet'}
+                    {isLoading ? 'Checking for invoices' : 'No invoices for this organization yet'}
                   </p>
                 </Table.td>
               </Table.tr>
@@ -165,7 +126,11 @@ const InvoicesSettings = () => {
                   <Table.td colSpan={6}>
                     <div className="flex items-center justify-between">
                       <p className="text-sm opacity-50">
-                        Showing {offset + 1} to {offset + invoices.length} out of {count} invoices
+                        {isErrorCount
+                          ? 'Failed to retrieve total number of invoices'
+                          : `Showing ${offset + 1} to ${
+                              offset + invoices.length
+                            } out of ${count} invoices`}
                       </p>
                       <div className="flex items-center space-x-2">
                         <Button
@@ -173,14 +138,14 @@ const InvoicesSettings = () => {
                           type="default"
                           size="tiny"
                           disabled={page === 1}
-                          onClick={async () => await fetchInvoices(page - 1)}
+                          onClick={async () => setPage(page - 1)}
                         />
                         <Button
                           icon={<IconChevronRight />}
                           type="default"
                           size="tiny"
-                          disabled={page * PAGE_LIMIT >= count}
-                          onClick={async () => await fetchInvoices(page + 1)}
+                          disabled={page * PAGE_LIMIT >= (count ?? 0)}
+                          onClick={async () => setPage(page + 1)}
                         />
                       </div>
                     </div>
