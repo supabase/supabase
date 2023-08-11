@@ -34,7 +34,7 @@ Project settings are managed outside of the Dashboard. If you use docker compose
 ### Developer Quickstart
 
 ```bash
-# You'll need to be on Node v14
+# You'll need to be on Node v18
 # in /studio
 
 npm i # install dependencies
