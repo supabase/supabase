@@ -18,7 +18,7 @@ One of the most [widely-discussed shortcomings](https://news.ycombinator.com/ite
 
 A common solution is [connection pooling](https://supabase.com/docs/guides/database/connecting-to-postgres#how-connection-pooling-works). Supabase currently offers [pgbouncer](http://www.pgbouncer.org/) which is single-threaded, making it difficult to scale. We've seen some [novel ways](https://twitter.com/viggy28/status/1677674197664038912?s=12&t=_WCn3v_QJ7tkQLvOvkZkqg) to scale pgbouncer, but we have a [few other goals](https://github.com/supabase/supavisor#motivation) in mind for our platform.
 
-And so we've built [Supavisor](https://github.com/supabase/supavisor), a Postgres connection pooler that can handle millions of connections. 
+And so we've built [Supavisor](https://github.com/supabase/supavisor), a Postgres connection pooler that can handle millions of connections.
 
 ## What is Supavisor?
 
@@ -81,7 +81,7 @@ We wanted to assess the capacity of a single Supavisor instance. We achieved:
   />
 </div>
 
-At this point, the database was the bottleneck - 20,000 QPS was the maximum this instance could handle. Increasing QPS is possible with a larger instance or read-replicas, but wanted to focus on the scalability of Supavisor's connection limit. As Supavisor is multitenant and built with Elixir, scaling up is as easy as adding a new tenant.
+With this setup the database is the bottleneck - 20,000 QPS was the maximum this instance could handle. Increasing QPS would have been possible with a larger instance or read-replicas, but we wanted to focus on the scalability of Supavisor's connection limit (not Postgres's). Since Supavisor is built with multitenancy, addition of read-replicas is as easy as sending a single post request.
 
 <div>
   <img
@@ -243,25 +243,12 @@ We found with Supavisor median query duration was less than 2ms. And this includ
   <img
     alt="chart query duration for 5k qps light"
     className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-5k-duration-light.png"
+    src="/images/blog/2023-08-11-supavisor-1-million/chart-5k-light.png"
   />
   <img
     alt="chart query duration for 5k qps dark"
     className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-5k-duration-dark.png"
-  />
-</div>
-
-<div>
-  <img
-    alt="chart query per second for 5k qps light"
-    className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-5k-rps-light.png"
-  />
-  <img
-    alt="chart query per second for 5k qps dark"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-5k-rps-dark.png"
+    src="/images/blog/2023-08-11-supavisor-1-million/chart-5k-dark.png"
   />
 </div>
 
@@ -279,25 +266,12 @@ But if you are curious about the scenario with 20,000QPS, we measured a median o
   <img
     alt="chart query duration for 20k qps light"
     className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-20k-duration-light.png"
+    src="/images/blog/2023-08-11-supavisor-1-million/chart-20k-light.png"
   />
   <img
     alt="chart query duration for 20k qps dark"
     className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-20k-duration-dark.png"
-  />
-</div>
-
-<div>
-  <img
-    alt="chart query per second for 20k qps light"
-    className="dark:hidden"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-20k-rps-light.png"
-  />
-  <img
-    alt="chart query per second for 20k qps dark"
-    className="hidden dark:block"
-    src="/images/blog/2023-08-11-supavisor-1-million/chart-20k-rps-dark.png"
+    src="/images/blog/2023-08-11-supavisor-1-million/chart-20k-dark.png"
   />
 </div>
 
@@ -344,7 +318,7 @@ Additionally we compared current setup with pgbouncer and the new Supavisor setu
   />
 </div>
 
-We were running 5,000 queries per second for each configuration, and at this time we decided to make an experiment with insert query. We also enabled PostGIS extension to store coordinates:
+We were running 5,000 queries per second for each configuration, and at this time we decided to make an experiment with `insert` query. We also enabled PostGIS extension to store coordinates:
 
 ```sql
 insert into positions (
@@ -419,18 +393,21 @@ You'll be able to use both PgBouncer and Supavisor for a few months in parallel.
 
 Supavisor will be added to the self-hosted stack as soon as we have tested it across our database fleet. That said - we're confident that it's ready for use if you want to try it with your own Postgres database. [Sequin](https://sequin.io/), one of our partners, has been using Supavisor for several months:
 
-<div className="bg-gray-300 rounded-lg px-6 py-2 italic">
-
-With Supavisor, we've been able to ship incredible features that would have been very hard to build otherwise. For example, our customers can now read from and write to Salesforce and HubSpot via Postgres. We achieve this by intercepting queries that route through Supavisor.
-
-We chose Supavisor because it's scalable, multi-tenant, and written in Elixir. We were able to integrate it easily with our own Elixir infrastructure. As partners, we look forward to helping shape the future of Postgres connection pooling with Supabase.
-
-— Anthony Accomazzo - Co-founder of Sequin
-
-</div>
+<Quote img="anthony-accomazzo.jpeg" caption="Anthony Accomazzo, Co-founder of Sequin.">
+  <p>
+    With Supavisor, we've been able to ship incredible features that would have been very hard to
+    build otherwise. For example, our customers can now read from and write to Salesforce and
+    HubSpot via Postgres. We achieve this by intercepting queries that route through Supavisor.
+  </p>
+  <p>
+    We chose Supavisor because it's scalable, multi-tenant, and written in Elixir. We were able to
+    integrate it easily with our own Elixir infrastructure. As partners, we look forward to helping
+    shape the future of Postgres connection pooling with Supabase.
+  </p>
+</Quote>
 
 ## Conclusion
 
 Supavisor's vertical and horizontal scaling ability make it the optimal solution for developers who aim to create applications that can effortlessly scale, even under extreme workloads, avoiding issues such as "too many connections" and enabling the full power of edge functions and serverless.
 
-If you are interested in exploring Supavisor's potential or want to implement its scalability in your upcoming project, check out the GitHub repository to try it out. Or, if you are using the Supabase platform, [contact support](https://app.supabase.com/support/new) to start using it today, and we'll provide you with the connection details.
+If you are interested in exploring Supavisor's potential or want to implement its scalability in your upcoming project, check out [the GitHub repository](https://github.com/supabase/supavisor) to know more.
