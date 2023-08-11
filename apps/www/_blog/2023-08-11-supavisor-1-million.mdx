@@ -18,7 +18,7 @@ One of the most [widely-discussed shortcomings](https://news.ycombinator.com/ite
 
 A common solution is [connection pooling](https://supabase.com/docs/guides/database/connecting-to-postgres#how-connection-pooling-works). Supabase currently offers [pgbouncer](http://www.pgbouncer.org/) which is single-threaded, making it difficult to scale. We've seen some [novel ways](https://twitter.com/viggy28/status/1677674197664038912?s=12&t=_WCn3v_QJ7tkQLvOvkZkqg) to scale pgbouncer, but we have a [few other goals](https://github.com/supabase/supavisor#motivation) in mind for our platform.
 
-And so we've built [Supavisor](https://github.com/supabase/supavisor), a Postgres connection pooler that can handle millions of connections. You can use Supavisor to connect to your Postgres from servers and Edge Functions without worrying about connection limits.
+And so we've built [Supavisor](https://github.com/supabase/supavisor), a Postgres connection pooler that can handle millions of connections. 
 
 ## What is Supavisor?
 
