@@ -5,29 +5,25 @@ import { IS_PLATFORM } from 'lib/constants'
 export const generateDatabaseMenu = (
   project?: Project,
   flags?: {
-    foreignDataWrappersEnabled: boolean
+    wrappersExtensionExists: boolean
     pgNetExtensionExists: boolean
     schemaVisualizerEnabled: boolean
   }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const { foreignDataWrappersEnabled, pgNetExtensionExists, schemaVisualizerEnabled } = flags || {}
+  const { wrappersExtensionExists, pgNetExtensionExists, schemaVisualizerEnabled } = flags || {}
 
   return [
     {
       title: 'Database',
       items: [
         { name: 'Tables', key: 'tables', url: `/project/${ref}/database/tables`, items: [] },
-        ...(!!schemaVisualizerEnabled
-          ? [
-              {
-                name: 'Schema Visualizer',
-                key: 'schemas',
-                url: `/project/${ref}/database/schemas`,
-                items: [],
-              },
-            ]
-          : []),
+        {
+          name: 'Schema Visualizer',
+          key: 'schemas',
+          url: `/project/${ref}/database/schemas`,
+          items: [],
+        },
         {
           name: 'Triggers',
           key: 'triggers',
@@ -63,7 +59,7 @@ export const generateDatabaseMenu = (
               },
             ]
           : []),
-        ...(!!foreignDataWrappersEnabled
+        ...(!!wrappersExtensionExists
           ? [
               {
                 name: 'Wrappers',

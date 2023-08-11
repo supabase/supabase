@@ -26,7 +26,7 @@ const DatabaseLayout = ({ title, children }: PropsWithChildren<DatabaseLayoutPro
 
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
-  const foreignDataWrappersEnabled = useFlag('foreignDataWrappers')
+  const wrappersExtensionExists = meta.extensions.byId('wrappers') !== undefined
   const pgNetExtensionExists = meta.extensions.byId('pg_net') !== undefined
   const schemaVisualizerEnabled = useFlag('schemaVisualizer')
 
@@ -80,7 +80,7 @@ const DatabaseLayout = ({ title, children }: PropsWithChildren<DatabaseLayoutPro
         <ProductMenu
           page={page}
           menu={generateDatabaseMenu(project, {
-            foreignDataWrappersEnabled,
+            wrappersExtensionExists,
             pgNetExtensionExists,
             schemaVisualizerEnabled,
           })}
