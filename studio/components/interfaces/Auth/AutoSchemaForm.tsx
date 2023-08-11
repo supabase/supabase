@@ -71,13 +71,14 @@ const AutoSchemaForm = observer(() => {
     SECURITY_CAPTCHA_ENABLED: boolean().required(),
     SECURITY_CAPTCHA_SECRET: string().when('SECURITY_CAPTCHA_ENABLED', {
       is: true,
-      then: string().required('Must have a Captcha secret'),
+      then: () => string().required('Must have a Captcha secret'),
     }),
     SECURITY_CAPTCHA_PROVIDER: string().when('SECURITY_CAPTCHA_ENABLED', {
       is: true,
-      then: string()
-        .oneOf(['hcaptcha', 'turnstile'])
-        .required('Captcha provider must be either hcaptcha or turnstile'),
+      then: () =>
+        string()
+          .oneOf(['hcaptcha', 'turnstile'])
+          .required('Captcha provider must be either hcaptcha or turnstile'),
     }),
     MFA_MAX_ENROLLED_FACTORS: number()
       .min(0, 'Must be be a value more than 0')
