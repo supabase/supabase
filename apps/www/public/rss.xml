@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 09 Aug 2023 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Thu, 10 Aug 2023 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supavisor-1-million</guid>
+  <title>Supavisor: Scaling Postgres to 1 Million Connections</title>
+  <link>https://supabase.com/blog/supavisor-1-million</link>
+  <description>Supavisor is a scalable, cloud-native Postgres connection pooler. We connected a million clients to it to see how it performs.</description>
+  <pubDate>Thu, 10 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-integrations-marketplace</guid>
   <title>Supabase Integrations Marketplace</title>
   <link>https://supabase.com/blog/supabase-integrations-marketplace</link>
