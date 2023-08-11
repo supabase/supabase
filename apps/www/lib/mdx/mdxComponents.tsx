@@ -92,9 +92,9 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
       <figure>
         <span className={['next-image--dynamic-fill', props.wide && 'wide'].join(' ')}>
           <Image
-            {...props}
             className={[type === 'blog' ? 'rounded-md border' : ''].join(' ')}
             layout="fill"
+            {...props}
           />
         </span>
         {props.caption && (
