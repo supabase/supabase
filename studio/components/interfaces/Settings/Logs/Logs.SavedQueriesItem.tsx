@@ -1,16 +1,16 @@
-import dayjs from 'dayjs'
-import { FC, useState } from 'react'
-import { Button, IconChevronRight, IconMaximize2, IconPlay } from 'ui'
-import Table from 'components/to-be-cleaned/Table'
 import { useRouter } from 'next/router'
-import SqlSnippetCode from './Logs.SqlSnippetCode'
-import { timestampLocalFormatter, TimestampLocalFormatter } from './LogsFormatters'
+import { useState } from 'react'
+import { Button, IconChevronRight, IconPlay } from 'ui'
 
-interface Props {
+import Table from 'components/to-be-cleaned/Table'
+import SqlSnippetCode from './Logs.SqlSnippetCode'
+import { timestampLocalFormatter } from './LogsFormatters'
+
+interface SavedQueriesItemProps {
   item: any
 }
 
-const SavedQueriesItem: FC<Props> = ({ item }: Props) => {
+const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
   const [expand, setExpand] = useState<boolean>(false)
 
   const router = useRouter()
@@ -33,14 +33,10 @@ const SavedQueriesItem: FC<Props> = ({ item }: Props) => {
           <span className="text-scale-1100">{item.description}</span>
         </Table.td>
         <Table.td className="">
-          <span className="text-scale-1100">
-            {timestampLocalFormatter(item.inserted_at)}
-          </span>
+          <span className="text-scale-1100">{timestampLocalFormatter(item.inserted_at)}</span>
         </Table.td>
         <Table.td className="">
-          <span className="text-scale-1100">
-            {timestampLocalFormatter(item.updated_at)}
-          </span>
+          <span className="text-scale-1100">{timestampLocalFormatter(item.updated_at)}</span>
         </Table.td>
         <Table.td className=" text-right">
           <Button

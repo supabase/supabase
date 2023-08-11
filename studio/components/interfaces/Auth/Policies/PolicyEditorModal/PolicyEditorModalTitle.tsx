@@ -1,8 +1,9 @@
-import { FC } from 'react'
+import { noop } from 'lodash'
 import { IconChevronLeft } from 'ui'
+
 import { POLICY_MODAL_VIEWS } from 'components/interfaces/Auth/Policies'
 
-interface Props {
+interface PolicyEditorModalTitleProps {
   view: string
   schema: string
   table: string
@@ -10,13 +11,13 @@ interface Props {
   onSelectBackFromTemplates: () => void
 }
 
-const PolicyEditorModalTitle: FC<Props> = ({
+const PolicyEditorModalTitle = ({
   view,
   schema,
   table,
   isNewPolicy,
-  onSelectBackFromTemplates = () => {},
-}) => {
+  onSelectBackFromTemplates = noop,
+}: PolicyEditorModalTitleProps) => {
   const getTitle = () => {
     if (view === POLICY_MODAL_VIEWS.EDITOR || view === POLICY_MODAL_VIEWS.SELECTION) {
       return `${isNewPolicy ? 'Adding new policy to' : 'Editing policy from'} ${schema}.${table}`

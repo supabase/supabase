@@ -1,15 +1,14 @@
-import { FC } from 'react'
 import type { PostgresRole } from '@supabase/postgres-meta'
 
 import MultiSelect from 'components/ui/MultiSelect'
 
-interface Props {
+interface PolicyRolesProps {
   roles: PostgresRole[]
   selectedRoles: string[]
   onUpdateSelectedRoles: (roles: string[]) => void
 }
 
-const PolicyRoles: FC<Props> = ({ roles, selectedRoles, onUpdateSelectedRoles }) => {
+const PolicyRoles = ({ roles, selectedRoles, onUpdateSelectedRoles }: PolicyRolesProps) => {
   // @ts-ignore
   const formattedRoles = roles.map((role) => {
     return {

@@ -1,12 +1,15 @@
-import { FC } from 'react'
+import { noop } from 'lodash'
 import { Radio } from 'ui'
 
-interface Props {
+interface PolicyAllowedOperationProps {
   operation: string
   onSelectOperation: (operation: string) => void
 }
 
-const PolicyAllowedOperation: FC<Props> = ({ operation = '', onSelectOperation }) => {
+const PolicyAllowedOperation = ({
+  operation = '',
+  onSelectOperation = noop,
+}: PolicyAllowedOperationProps) => {
   return (
     <div className="flex justify-between space-x-12">
       <div className="flex w-1/3 flex-col space-y-2">

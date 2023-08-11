@@ -7,7 +7,7 @@ let defaultConfig = {
   goldParticlesSize: 1.5,
   particlesSides: 5,
   particlesBlending: true,
-  lightIntensity: 0.3,
+  lightIntensity: 0.4,
   widthRadius: 100,
   widthRatio: 1.2,
   topHeightRadius: 80,

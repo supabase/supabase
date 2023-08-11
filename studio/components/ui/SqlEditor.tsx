@@ -1,8 +1,10 @@
 import Editor, { OnChange, useMonaco } from '@monaco-editor/react'
-import { FC, useEffect, useRef } from 'react'
+import { noop } from 'lodash'
+import { useEffect, useRef } from 'react'
+
 import { useStore } from 'hooks'
 
-interface Props {
+interface SqlEditorProps {
   contextmenu?: boolean
   defaultValue?: string
   language?: string
@@ -11,14 +13,14 @@ interface Props {
   readOnly?: boolean
 }
 
-const SqlEditor: FC<Props> = ({
+const SqlEditor = ({
   queryId,
   language = 'pgsql',
   defaultValue = '',
   readOnly = false,
   contextmenu = true,
-  onInputChange = () => {},
-}) => {
+  onInputChange = noop,
+}: SqlEditorProps) => {
   const monaco = useMonaco()
   const { meta } = useStore()
   const editorRef = useRef<any>()
