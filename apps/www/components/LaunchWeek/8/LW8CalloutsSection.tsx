@@ -39,7 +39,7 @@ const LW8CalloutsSection = () => {
                   <div className="flex items-center gap-3">
                     <span className="text-white">LW8 Hackathon Aug 4 – Aug 13</span>
                   </div>
-                  <span className="">Terminated</span>
+                  <span className="">Finished</span>
                 </div>
               </div>
               <div className="relative flex !aspect-video h-[80px] md:h-[100px] gap-2 z-10 rounded overflow-hidden">

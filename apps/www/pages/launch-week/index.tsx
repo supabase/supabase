@@ -181,20 +181,6 @@ export default function TicketHome({ users, meetups }: Props) {
               <LW8Meetups meetups={meetups} />
             </SectionContainer>
 
-            <div
-              id="ticket"
-              className="relative !w-full max-w-[100vw] min-h-[400px] !px-4 sm:max-w-xl md:max-w-4xl lg:max-w-7xl z-20 flex flex-col justify-around items-center !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !mx-auto"
-            >
-              {supabase && (
-                <div className="w-full max-w-[100vw] px-4 flex justify-center py-8 md:py-20">
-                  <TicketContainer
-                    user={userData}
-                    referrals={userData.referrals ?? 0}
-                    supabase={supabase}
-                  />
-                </div>
-              )}
-            </div>
             <SectionContainer className="!px-4 w-full">
               <LaunchWeekPrizeSection />
             </SectionContainer>
