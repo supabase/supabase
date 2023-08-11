@@ -72,7 +72,7 @@ const ParticlesCanvas = () => {
       className="relative z-30"
     >
       <ambientLight intensity={config.lightIntensity} />
-      <group position={[0, 70, 0]} scale={[0.75, 0.75, 0.75]}>
+      <group position={[0, 30, 0]} scale={[0.85, 0.85, 0.85]}>
         {particles?.map((user: any, index: number) => (
           <Particle
             key={`particle-${user.username ?? index}`}
