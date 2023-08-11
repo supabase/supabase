@@ -779,3 +779,17 @@ launch week
   z-index: 9999 !important;
   margin-top: 65px !important;
 }
+
+/* Zoomable image */
+
+[data-rmiz-modal-overlay],
+[data-rmiz-modal-img] {
+  transition-timing-function: cubic-bezier(0.24, 0.25, 0.05, 1) !important;
+}
+[data-rmiz-modal-overlay='visible'] {
+  background-color: var(--colors-scale1) !important;
+  opacity: 0.8;
+}
+[data-rmiz-modal-img] {
+  image-rendering: high-quality;
+}
