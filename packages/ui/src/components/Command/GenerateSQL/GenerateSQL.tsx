@@ -228,10 +228,8 @@ const GenerateSQL = () => {
                           forceMount
                           key={query.replace(/\s+/g, '_')}
                         >
-                          <div className="flex">
-                            <div>
-                              <AiIcon />
-                            </div>
+                          <div className="flex flex-row gap-2">
+                            <AiIcon />
                             <p>{query}</p>
                           </div>
                         </CommandItem>
