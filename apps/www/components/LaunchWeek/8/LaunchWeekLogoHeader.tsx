@@ -7,6 +7,10 @@ export function LaunchWeekLogoHeader() {
           <span className="block">August 7th–11th, 2023</span>
           <span>9:00 AM PT</span>
         </p>
+        <div className="text-[#9296AA]">
+          <p>A week of announcing new features has come to an end.</p>
+          <p>Thanks to everyone who participated.</p>
+        </div>
       </div>
     </div>
   )
