@@ -38,7 +38,7 @@ const Command = ({ item }: any) => {
               }}
             >
               {isCopied ? (
-                <div className="text-brand-900">
+                <div className="text-brand">
                   <IconCheck size={14} strokeWidth={3} />
                 </div>
               ) : (

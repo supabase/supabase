@@ -142,7 +142,7 @@ from pg_statio_user_tables;
 
 This shows the ratio of data blocks fetched from the Postgres [shared_buffers](https://www.postgresql.org/docs/15/runtime-config-resource.html#RUNTIME-CONFIG-RESOURCE-MEMORY) cache against the data blocks that were read from disk/OS cache.
 
-If either of your index or table hit rate are < 99% then this can indicate your compute plan is too small for your current workload and you would benefit from more memory. [Upgrading your compute](./compute-add-ons) is easy and can be done from your [project dashboard](https://app.supabase.com/project/_/settings/billing/subscription).
+If either of your index or table hit rate are < 99% then this can indicate your compute plan is too small for your current workload and you would benefit from more memory. [Upgrading your compute](./compute-add-ons) is easy and can be done from your [project dashboard](https://supabase.com/dashboard/project/_/settings/billing/subscription).
 
 ### Optimizing poor performing queries
 
@@ -152,7 +152,9 @@ Postgres has built in tooling to help you optimize poorly performing queries. Yo
 explain analyze <query-statement-here>;
 ```
 
-Be careful using `explain analyze` with `insert`/`update`/`delete` queries, because the query will actually run, and could have unintended side-effects.
+When you include `analyze` in the explain statement, the database attempts to execute the query and provides a detailed query plan along with actual execution times. So, be careful using `explain analyze` with `insert`/`update`/`delete` queries, because the query will actually run, and could have unintended side-effects.
+
+If you run just `explain` without the `analyze` keyword, the database will only perform query planning without actually executing the query. This approach can be beneficial when you want to inspect the query plan without affecting the database or if you encounter timeouts in your queries.
 
 Using the query plan analyzer to optimize your queries is a large topic, with a number of online resources available:
 
@@ -189,7 +191,7 @@ FATAL: remaining connection slots are reserved for non-replication superuser con
 
 In such a scenario, you can consider:
 
-- [upgrading to a larger compute add-on](https://app.supabase.com/project/_/settings/billing)
+- [upgrading to a larger compute add-on](https://supabase.com/dashboard/project/_/settings/billing)
 - configuring your clients to use fewer connections
 - manually configuring the database for a higher number of connections
 

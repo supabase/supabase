@@ -7,7 +7,7 @@ import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } fro
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import { Provider } from './AuthProvidersForm.types'
@@ -23,7 +23,7 @@ const ProviderForm = ({ provider }: ProviderFormProps) => {
   const { project: selectedProject } = useProjectContext()
   const { ref } = useParams()
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
-  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
 
@@ -104,8 +104,8 @@ const ProviderForm = ({ provider }: ProviderFormProps) => {
           </div>
           <div className="flex items-center gap-3">
             {isActive ? (
-              <div className="flex items-center gap-1 rounded-full border border-brand-700 bg-brand-200 py-1 px-1 text-xs text-brand-900">
-                <span className="rounded-full bg-brand-900 p-0.5 text-xs text-brand-200">
+              <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
+                <span className="rounded-full bg-brand p-0.5 text-xs text-brand-200">
                   <IconCheck strokeWidth={2} size={12} />
                 </span>
                 <span className="px-1">Enabled</span>

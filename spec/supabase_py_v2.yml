@@ -257,7 +257,7 @@ functions:
         description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
         code: |
           ```
-          res = supabase.auth.set_session({"access_token": access_token, "refresh_token": refresh_token)
+          res = supabase.auth.set_session(access_token, refresh_token)
           ```
   - id: refresh-session
     title: 'refresh_session()'
@@ -782,7 +782,7 @@ functions:
   - id: from-get-public-url
     title: 'from_.get_public_url()'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: none

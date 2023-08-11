@@ -1,15 +1,17 @@
-_format_version: '1.1'
+_format_version: '2.1'
+_transform: true
 
 ###
 ### Consumers / Users
 ###
 consumers:
+  - username: DASHBOARD
   - username: anon
     keyauth_credentials:
-      - key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE
+      - key: $SUPABASE_ANON_KEY
   - username: service_role
     keyauth_credentials:
-      - key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJzZXJ2aWNlX3JvbGUiLAogICAgImlzcyI6ICJzdXBhYmFzZS1kZW1vIiwKICAgICJpYXQiOiAxNjQxNzY5MjAwLAogICAgImV4cCI6IDE3OTk1MzU2MDAKfQ.DaYlNEoUrrEn2Ig7tqibS-PHK5vgusbcbo7X36XVt4Q
+      - key: $SUPABASE_SERVICE_KEY
 
 ###
 ### Access Control List
@@ -21,9 +23,19 @@ acls:
     group: admin
 
 ###
+### Dashboard credentials
+###
+basicauth_credentials:
+- consumer: DASHBOARD
+  username: supabase
+  password: this_password_is_insecure_and_should_be_updated
+
+
+###
 ### API Routes
 ###
 services:
+
   ## Open Auth routes
   - name: auth-v1-open
     url: http://auth:9999/verify
@@ -175,6 +187,7 @@ services:
         strip_path: true
         paths:
           - /analytics/v1/
+
   ## Secure Database routes
   - name: meta
     _comment: 'pg-meta: /pg/* -> http://pg-meta:8080/*'
@@ -193,3 +206,18 @@ services:
           hide_groups_header: true
           allow:
             - admin
+
+  ## Protected Dashboard - catch all remaining routes
+  - name: dashboard
+    _comment: 'Studio: /* -> http://studio:3000/*'
+    url: http://studio:3000/
+    routes:
+      - name: dashboard-all
+        strip_path: true
+        paths:
+          - /
+    plugins:
+      - name: cors
+      - name: basic-auth
+        config:
+          hide_credentials: true

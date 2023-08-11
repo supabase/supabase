@@ -3,26 +3,25 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { FC } from 'react'
+import { Button, Dropdown, IconEdit3, IconFileText, IconMoreVertical, IconTrash } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
-import { checkPermissions, useStore } from 'hooks'
-import { Button, Dropdown, IconEdit3, IconFileText, IconMoreVertical, IconTrash } from 'ui'
+import { useCheckPermissions, useStore } from 'hooks'
 
-interface Props {
+interface FunctionListProps {
   schema: string
   filterString: string
   editFunction: (fn: any) => void
   deleteFunction: (fn: any) => void
 }
 
-const FunctionList: FC<Props> = ({
+const FunctionList = ({
   schema,
   filterString,
   editFunction = noop,
   deleteFunction = noop,
-}) => {
+}: FunctionListProps) => {
   const { project: selectedProject } = useProjectContext()
   const router = useRouter()
   const { meta } = useStore()
@@ -34,7 +33,10 @@ const FunctionList: FC<Props> = ({
   const isApiDocumentAvailable = schema == 'public'
   const projectRef = selectedProject?.ref
 
-  const canUpdateFunctions = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'functions')
+  const canUpdateFunctions = useCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'functions'
+  )
 
   function onEdit(func: any) {
     editFunction(func)

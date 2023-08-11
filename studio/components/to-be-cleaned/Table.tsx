@@ -1,6 +1,6 @@
-import * as React from 'react'
+import { PropsWithChildren } from 'react'
 
-type TableProps = {
+interface TableProps {
   body: JSX.Element | JSX.Element[]
   head?: JSX.Element | JSX.Element[]
   className?: string
@@ -40,13 +40,12 @@ function Table({
   )
 }
 
-type ThProps = {
-  children?: React.ReactNode
+interface ThProps {
   className?: string
   style?: React.CSSProperties
 }
 
-const Th: React.FC<ThProps> = ({ children, className, style }) => {
+const Th = ({ children, className, style }: PropsWithChildren<ThProps>) => {
   const classes = ['p-3 px-4 text-left']
   if (className) classes.push(className)
   return (
@@ -56,15 +55,14 @@ const Th: React.FC<ThProps> = ({ children, className, style }) => {
   )
 }
 
-type TrProps = {
-  children: React.ReactNode
+interface TrProps {
   className?: string
   hoverable?: boolean
   style?: React.CSSProperties
   onClick?: () => void
 }
 
-const Tr: React.FC<TrProps> = ({ children, className, onClick, style, hoverable }) => {
+const Tr = ({ children, className, onClick, style, hoverable }: PropsWithChildren<TrProps>) => {
   let classes = [className]
   if (onClick || hoverable) classes.push('tr--link')
   return (
@@ -74,14 +72,14 @@ const Tr: React.FC<TrProps> = ({ children, className, onClick, style, hoverable 
   )
 }
 
-type TdProps = {
-  children: React.ReactNode
+interface TdProps extends React.HTMLProps<HTMLTableCellElement> {
   colSpan?: number
   className?: string
   style?: React.CSSProperties
   align?: 'left' | 'center' | 'right' | 'justify' | 'char' | undefined
-} & React.HTMLProps<HTMLTableCellElement>
-const Td: React.FC<TdProps> = ({ children, colSpan, className, style, ...rest }) => {
+}
+
+const Td = ({ children, colSpan, className, style, ...rest }: PropsWithChildren<TdProps>) => {
   return (
     <td className={className} colSpan={colSpan} style={style} {...rest}>
       {children}

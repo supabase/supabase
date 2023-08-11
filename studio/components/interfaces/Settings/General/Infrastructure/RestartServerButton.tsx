@@ -8,26 +8,27 @@ import { Button, Dropdown, IconChevronDown } from 'ui'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { setProjectPostgrestStatus } from 'data/projects/projects-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { Project } from 'types'
+import {
+  useIsProjectActive,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
 
-export interface RestartServerButtonProps {
-  project: Project
-}
-
-const RestartServerButton = ({ project }: RestartServerButtonProps) => {
+const RestartServerButton = () => {
   const queryClient = useQueryClient()
+  const { project } = useProjectContext()
   const { ui } = useStore()
   const router = useRouter()
+  const isProjectActive = useIsProjectActive()
   const [loading, setLoading] = useState(false)
   const [serviceToRestart, setServiceToRestart] = useState<'project' | 'database'>()
 
-  const projectRef = project.ref
-  const projectRegion = project.region
+  const projectRef = project?.ref ?? ''
+  const projectRegion = project?.region
 
-  const canRestartProject = checkPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
+  const canRestartProject = useCheckPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
 
   const requestProjectRestart = async () => {
     if (!canRestartProject) {
@@ -64,7 +65,7 @@ const RestartServerButton = ({ project }: RestartServerButtonProps) => {
     ui.setNotification({
       error,
       category: 'error',
-      message: `Unable to restart ${type}`,
+      message: `Unable to restart ${type}: ${error.message}`,
     })
     setLoading(false)
     setServiceToRestart(undefined)
@@ -85,13 +86,13 @@ const RestartServerButton = ({ project }: RestartServerButtonProps) => {
           <div className="flex items-center">
             <Button
               type="default"
-              className="rounded-r-none px-3"
-              disabled={!canRestartProject}
+              className={`px-3 ${canRestartProject && isProjectActive ? 'rounded-r-none' : ''}`}
+              disabled={!canRestartProject || !isProjectActive}
               onClick={() => setServiceToRestart('project')}
             >
               Restart project
             </Button>
-            {canRestartProject && (
+            {canRestartProject && isProjectActive && (
               <Dropdown
                 align="end"
                 side="bottom"
@@ -105,7 +106,7 @@ const RestartServerButton = ({ project }: RestartServerButtonProps) => {
                   >
                     <div className="space-y-1">
                       <p className="block text-scale-1200">Fast database reboot</p>
-                      <p className="block text-scale-1100">
+                      <p className="block text-scale-1100 text-xs">
                         Restarts only the database - faster but may not be able to recover from all
                         failure modes
                       </p>
@@ -123,7 +124,7 @@ const RestartServerButton = ({ project }: RestartServerButtonProps) => {
             )}
           </div>
         </Tooltip.Trigger>
-        {!canRestartProject && (
+        {(!canRestartProject || !isProjectActive) && (
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -134,7 +135,11 @@ const RestartServerButton = ({ project }: RestartServerButtonProps) => {
                 ].join(' ')}
               >
                 <span className="text-xs text-scale-1200">
-                  You need additional permissions to restart this project
+                  {!canRestartProject
+                    ? 'You need additional permissions to restart this project'
+                    : !isProjectActive
+                    ? 'Unable to restart project as project is not active'
+                    : ''}
                 </span>
               </div>
             </Tooltip.Content>

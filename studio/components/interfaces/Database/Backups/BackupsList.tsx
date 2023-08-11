@@ -6,7 +6,7 @@ import InformationBox from 'components/ui/InformationBox'
 import Loading from 'components/ui/Loading'
 import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { IconAlertCircle, IconClock } from 'ui'
 import BackupItem from './BackupItem'
 import BackupsEmpty from './BackupsEmpty'
@@ -16,7 +16,7 @@ const BackupsList = () => {
   const { project: selectedProject } = useProjectContext()
   const { backups } = useStore()
   const projectRef = selectedProject?.ref || 'default'
-  const canTriggerScheduledBackups = checkPermissions(
+  const canTriggerScheduledBackups = useCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
   )
@@ -36,18 +36,19 @@ const BackupsList = () => {
         primaryText="Free Plan does not include project backups."
         projectRef={projectRef}
         secondaryText="Upgrade to the Pro plan for up to 7 days of scheduled backups."
+        addon="pitr"
       />
     )
+  }
+
+  if (isPitrEnabled) {
+    return null
   }
 
   return (
     <div className="space-y-6">
       {!sortedBackups?.length && tierKey !== 'FREE' ? (
-        !isPitrEnabled ? (
-          <BackupsEmpty />
-        ) : (
-          <></>
-        )
+        <BackupsEmpty />
       ) : (
         <>
           {!canTriggerScheduledBackups && (

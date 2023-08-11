@@ -32,7 +32,7 @@ const JoinOrganizationPage = () => {
   const signOut = useSignOut()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState(false)
+  const [error, setError] = useState<any>()
   const [tokenValidationInfo, setTokenValidationInfo] = useState<TokenInfo>(undefined)
   const [tokenInfoLoaded, setTokenInfoLoaded] = useState(false)
   const { token_does_not_exist, email_match, expired_token, organization_name, invite_id } =
@@ -70,6 +70,7 @@ const JoinOrganizationPage = () => {
 
     if (response.error) {
       ui.setNotification({
+        error: response.error,
         category: 'error',
         message: `Failed to join organization: ${response.error.message}`,
       })
@@ -118,7 +119,7 @@ const JoinOrganizationPage = () => {
     )
 
     const message = error ? (
-      <p>There was an error requesting details for this invitation.</p>
+      <p>There was an error requesting details for this invitation. ({error.message})</p>
     ) : token_does_not_exist ? (
       <>
         <p>The invite token is invalid.</p>
@@ -136,7 +137,7 @@ const JoinOrganizationPage = () => {
         <p className="text-scale-900">
           To accept this invitation, you will need to{' '}
           <a
-            className="cursor-pointer text-brand-900"
+            className="cursor-pointer text-brand"
             onClick={async () => {
               await signOut()
               router.reload()

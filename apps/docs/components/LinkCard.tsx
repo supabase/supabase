@@ -14,7 +14,7 @@ export default function LinkCard({
 }) {
   return (
     <Link href={link || '#'}>
-      <a className="border-scale-200 hover:border-brand-900 dark:bg-scale-400 m-4 w-full cursor-pointer rounded-md border p-4 shadow-sm hover:shadow-2xl lg:w-2/5">
+      <a className="border-scale-200 hover:border-brand dark:bg-scale-400 m-4 w-full cursor-pointer rounded-md border p-4 shadow-sm hover:shadow-2xl lg:w-2/5">
         {description ? (
           <>
             <h4 className="m-0 mb-4 p-0 text-base font-semibold">{title}</h4>

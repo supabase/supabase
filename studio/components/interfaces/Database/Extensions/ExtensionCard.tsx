@@ -1,24 +1,25 @@
-import { FC, useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { Badge, IconLoader, Toggle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
+import { Badge, IconLoader, Toggle } from 'ui'
 
-import { checkPermissions, useStore } from 'hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { useCheckPermissions, useStore } from 'hooks'
+import { isResponseOk } from 'lib/common/fetch'
 import EnableExtensionModal from './EnableExtensionModal'
 
-interface Props {
+interface ExtensionCardProps {
   extension: any
 }
 
-const ExtensionCard: FC<Props> = ({ extension }) => {
+const ExtensionCard = ({ extension }: ExtensionCardProps) => {
   const { ui, meta } = useStore()
 
   const isOn = extension.installed_version !== null
   const [loading, setLoading] = useState(false)
   const [showConfirmEnableModal, setShowConfirmEnableModal] = useState(false)
 
-  const canUpdateExtensions = checkPermissions(
+  const canUpdateExtensions = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'extensions'
   )
@@ -34,8 +35,8 @@ const ExtensionCard: FC<Props> = ({ extension }) => {
       onAsyncConfirm: async () => {
         try {
           setLoading(true)
-          const response: any = await meta.extensions.del(extension.name)
-          if (response.error) {
+          const response = await meta.extensions.del(extension.name)
+          if (!isResponseOk(response)) {
             throw response.error
           } else {
             ui.setNotification({

@@ -1,20 +1,16 @@
-import {
-  IconArchive,
-  IconBarChart,
-  IconCode,
-  IconDatabase,
-  IconFileText,
-  IconList,
-  IconSettings,
-  IconUsers,
-} from 'ui'
 import SVG from 'react-inlinesvg'
+import { products } from 'shared-data'
+import { IconBarChart, IconFileText, IconList, IconSettings } from 'ui'
 
-import { ProjectBase } from 'types'
 import { Route } from 'components/ui/ui.types'
 import { BASE_PATH, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { ProjectBase } from 'types'
 
-export const generateToolRoutes = (ref?: string, project?: ProjectBase): Route[] => {
+export const generateToolRoutes = (
+  ref?: string,
+  project?: ProjectBase,
+  supabaseAIEnabled?: boolean
+): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
 
@@ -41,7 +37,14 @@ export const generateToolRoutes = (ref?: string, project?: ProjectBase): Route[]
           preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
         />
       ),
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
+      link: !IS_PLATFORM
+        ? `/project/${ref}/sql/1`
+        : ref &&
+          (isProjectBuilding
+            ? buildingUrl
+            : supabaseAIEnabled
+            ? `/project/${ref}/sql/new`
+            : `/project/${ref}/sql/templates`),
     },
   ]
 }
@@ -53,19 +56,70 @@ export const generateProductRoutes = (ref?: string, project?: ProjectBase): Rout
     {
       key: 'database',
       label: 'Database',
-      icon: <IconDatabase size={18} strokeWidth={2} />,
+      icon: (
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 18 18"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d={products.database.icon[18]}
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeMiterlimit="10"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ),
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/database/tables`),
     },
     {
       key: 'auth',
       label: 'Authentication',
-      icon: <IconUsers size={18} strokeWidth={2} />,
+      icon: (
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d={products.authentication.icon[24]}
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeMiterlimit="10"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ),
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/auth/users`),
     },
     {
       key: 'storage',
       label: 'Storage',
-      icon: <IconArchive size={18} strokeWidth={2} />,
+      icon: (
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 18 18"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d={products.storage.icon[18]}
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeMiterlimit="10"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ),
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/storage/buckets`),
     },
     ...(IS_PLATFORM
@@ -73,7 +127,24 @@ export const generateProductRoutes = (ref?: string, project?: ProjectBase): Rout
           {
             key: 'functions',
             label: 'Edge Functions',
-            icon: <IconCode size={18} strokeWidth={2} />,
+            icon: (
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 18 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d={products.functions.icon[18]}
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeMiterlimit="10"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ),
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/functions`),
           },
         ]

@@ -7,7 +7,7 @@ import { DetailedHTMLProps, HTMLAttributes, KeyboardEventHandler } from 'react'
 import { Modal } from '../Modal'
 import { ModalProps } from '../Modal/Modal'
 import { useCommandMenu } from './CommandMenuProvider'
-import { LoadingLine } from './LoadingLine'
+import { LoadingLine } from '../LoadingLine/LoadingLine'
 
 type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>
 type CommandPrimitiveProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>
@@ -52,8 +52,6 @@ export const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDi
       <Command
         className={[
           '[&_[cmdk-group]]:px-2 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-scale-800 [&_[cmdk-input]]:h-12',
-
-          '[&_[cmdk-item]_svg]:mr-3',
           '[&_[cmdk-item]_svg]:h-5',
           '[&_[cmdk-item]_svg]:w-5',
           '[&_[cmdk-input-wrapper]_svg]:h-5',
@@ -241,7 +239,7 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
       {...props}
     >
       <div className="w-full flex flex-row justify-between items-center">
-        <div className="flex flex-row flex-grow items-center">{children}</div>
+        <div className="flex flex-row gap-2 flex-grow items-center">{children}</div>
         {badge}
       </div>
     </CommandPrimitive.Item>
@@ -408,8 +406,10 @@ export function useAutoInputFocus() {
 
   // Focus the input when typing from anywhere
   React.useEffect(() => {
-    function onKeyDown() {
-      input?.focus()
+    function onKeyDown(e: KeyboardEvent) {
+      if (!e.ctrlKey && !e.altKey && !e.metaKey && e.key !== 'Tab') {
+        input?.focus()
+      }
     }
 
     window.addEventListener('keydown', onKeyDown)

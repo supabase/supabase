@@ -8,7 +8,7 @@ import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import InformationBox from 'components/ui/InformationBox'
 import NoPermission from 'components/ui/NoPermission'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import { IconInfo, Tabs } from 'ui'
 
@@ -20,7 +20,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
 
   const isPitrEnabled = backups?.configuration?.walg_enabled
 
-  const canReadScheduledBackups = checkPermissions(PermissionAction.READ, 'back_ups')
+  const canReadScheduledBackups = useCheckPermissions(PermissionAction.READ, 'back_ups')
 
   return (
     <div
@@ -64,7 +64,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
                   needed, as PITR supports a superset of functionality, in terms of the granular
                   recovery that can be performed.{' '}
                   <a
-                    className="text-brand-900 transition-colors hover:text-brand-1200"
+                    className="text-brand transition-colors hover:text-brand-600"
                     href="https://supabase.com/docs/guides/platform/backups"
                   >
                     Learn more

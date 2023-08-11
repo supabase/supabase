@@ -29,7 +29,7 @@ const Index = ({}: Props) => {
           url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image.jpg`,
+              url: `https://supabase.com/images/og/og-image-v2.jpg`,
             },
           ],
         }}
@@ -38,9 +38,7 @@ const Index = ({}: Props) => {
         <Container>
           <SectionContainer className="">
             <div className="space-y-2 text-center">
-              <h1 className="text-brand-900 font-mono text-base uppercase tracking-widest">
-                Support
-              </h1>
+              <h1 className="text-brand font-mono text-base uppercase tracking-widest">Support</h1>
               <h1 className="h1">Get Support</h1>
               <p className="text-scale-1100 lg:text-lg">
                 The Supabase Support Team is ready to help.
@@ -64,8 +62,8 @@ const Index = ({}: Props) => {
                         our GitHub issues. This can be feature requests too!
                       </p>
                       <p className="text-scale-1100 mt-2 text-sm">
-                        <span className="text-brand-900 font-bold">Use this for:</span> Bugs and
-                        other issues
+                        <span className="text-brand font-bold">Use this for:</span> Bugs and other
+                        issues
                       </p>
                     </p>
                   </div>
@@ -112,8 +110,8 @@ const Index = ({}: Props) => {
                         join us on Discord. Browse and ask questions.
                       </p>
                       <p className="text-scale-1100 mt-2 text-sm">
-                        <span className="text-brand-900 text-sm font-bold">Use this for:</span>{' '}
-                        General questions
+                        <span className="text-brand text-sm font-bold">Use this for:</span> General
+                        questions
                       </p>
                     </p>
                   </div>
@@ -183,8 +181,8 @@ const Index = ({}: Props) => {
                         or have an issue, please contact us here.
                       </p>
                       <p className="text-scale-1100 mt-2 text-sm">
-                        <span className="text-brand-900 text-sm font-bold">Use this for:</span>{' '}
-                        Issues or questions specific to you
+                        <span className="text-brand text-sm font-bold">Use this for:</span> Issues
+                        or questions specific to you
                       </p>
                     </p>
                   </div>

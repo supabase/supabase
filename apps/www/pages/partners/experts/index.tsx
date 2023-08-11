@@ -31,10 +31,6 @@ interface Props {
 
 function ExpertPartnersPage(props: Props) {
   const { partners } = props
-  const partnersByCategory: { [category: string]: Partner[] } = {}
-  partners.map(
-    (p) => (partnersByCategory[p.category] = [...(partnersByCategory[p.category] ?? []), p])
-  )
   const router = useRouter()
 
   const meta_title = 'Find an expert'
@@ -56,7 +52,7 @@ function ExpertPartnersPage(props: Props) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout className="bg-scale-400 dark:bg-scale-100">
         <SectionContainer className="space-y-12">
           <div>
             <h1 className="h1">{meta_title}</h1>
@@ -82,11 +78,11 @@ function ExpertPartnersPage(props: Props) {
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
-                          stroke-width="1"
+                          strokeWidth="1"
                         >
                           <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                             d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"
                           />
                         </svg>
@@ -104,11 +100,11 @@ function ExpertPartnersPage(props: Props) {
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
-                          stroke-width="1"
+                          strokeWidth="1"
                         >
                           <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                             d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
                           />
                         </svg>
@@ -122,7 +118,7 @@ function ExpertPartnersPage(props: Props) {
               {/* Partner Tiles */}
               <div className="grid">
                 {partners.length ? (
-                  <TileGrid partnersByCategory={partnersByCategory} hideCategories={true} />
+                  <TileGrid partners={partners} hideCategories={true} />
                 ) : (
                   <h2 className="h2">No Partners Found</h2>
                 )}

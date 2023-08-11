@@ -61,29 +61,22 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
   ],
   [
     {
+      label: 'Local Dev / CLI',
+      icon: 'reference-cli',
+      href: '/guides/cli',
+      level: 'reference_javascript',
+    },
+    {
       label: 'Platform',
       icon: 'platform',
       href: '/guides/platform',
       level: 'platform',
     },
     {
-      label: 'Resources',
-      icon: 'resources',
-      href: '/guides/resources',
-      level: 'resources',
-    },
-    {
       label: 'Self-Hosting',
       icon: 'self-hosting',
       href: '/guides/self-hosting',
       level: 'self_hosting',
-    },
-    {
-      label: 'Integrations',
-      icon: 'integrations',
-      hasLightIcon: true,
-      href: '/guides/integrations',
-      level: 'integrations',
     },
   ],
   [
@@ -131,7 +124,13 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       community: true,
     },
     {
-      label: 'Tools reference',
+      label: 'Resources',
+    },
+    {
+      label: 'CLI Commands',
+      icon: 'reference-cli',
+      href: '/reference/cli/introduction',
+      level: 'reference_javascript',
     },
     {
       label: 'Management API',
@@ -140,10 +139,17 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       level: 'reference_javascript',
     },
     {
-      label: 'Supabase CLI',
-      icon: 'reference-cli',
-      href: '/guides/cli',
-      level: 'reference_javascript',
+      label: 'Guides and Examples',
+      icon: 'resources',
+      href: '/guides/resources',
+      level: 'resources',
+    },
+    {
+      label: 'Integrations',
+      icon: 'integrations',
+      hasLightIcon: true,
+      href: 'https://supabase.com/partners/integrations',
+      level: 'integrations',
     },
   ],
   [
@@ -206,7 +212,6 @@ export const gettingstarted: NavMenuConstant = {
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
-    { name: 'Local Development', url: '/guides/getting-started/local-development' },
     {
       name: 'Framework Quickstarts',
       items: [
@@ -215,9 +220,11 @@ export const gettingstarted: NavMenuConstant = {
         { name: 'NuxtJS', url: '/guides/getting-started/quickstarts/nuxtjs' },
         { name: 'RedwoodJS', url: '/guides/getting-started/quickstarts/redwoodjs' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
+        { name: 'Android Kotlin', url: '/guides/getting-started/quickstarts/kotlin' },
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit' },
         { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
+        { name: 'refine', url: '/guides/getting-started/quickstarts/refine' },
       ],
     },
     {
@@ -259,6 +266,10 @@ export const gettingstarted: NavMenuConstant = {
           name: 'SvelteKit',
           url: '/guides/getting-started/tutorials/with-sveltekit',
         },
+        {
+          name: 'refine',
+          url: '/guides/getting-started/tutorials/with-refine',
+        },
       ],
     },
     {
@@ -272,7 +283,10 @@ export const gettingstarted: NavMenuConstant = {
           name: 'Expo',
           url: '/guides/getting-started/tutorials/with-expo',
         },
-
+        {
+          name: 'Android Kotlin',
+          url: '/guides/getting-started/tutorials/with-kotlin',
+        },
         {
           name: 'Ionic React',
           url: '/guides/getting-started/tutorials/with-ionic-react',
@@ -348,6 +362,16 @@ export const SocialLoginItems = [
     name: 'Discord',
     icon: '/docs/img/icons/discord-icon',
     url: '/guides/auth/social-login/auth-discord',
+  },
+  {
+    name: 'Figma',
+    icon: '/docs/img/icons/figma-icon',
+    url: '/guides/auth/social-login/auth-figma',
+  },
+  {
+    name: 'Kakao',
+    icon: '/docs/img/icons/kakao-icon',
+    url: '/guides/auth/social-login/auth-kakao',
   },
   {
     name: 'Keycloak',
@@ -464,6 +488,7 @@ export const auth = {
       url: undefined,
       items: [
         { name: 'Enable Captcha Protection', url: '/guides/auth/auth-captcha' },
+        { name: 'Configuring Custom SMTP', url: '/guides/auth/auth-smtp' },
         { name: 'Managing User Data', url: '/guides/auth/managing-user-data' },
         { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
         { name: 'Row Level Security', url: '/guides/auth/row-level-security' },
@@ -531,6 +556,10 @@ export const database: NavMenuConstant = {
       name: 'Postgres Guides',
       url: undefined,
       items: [
+        {
+          name: 'Analyzing efficiency and performance',
+          url: '/guides/database/inspect',
+        },
         {
           name: 'JSON and unstructured data',
           url: '/guides/database/json',
@@ -644,10 +673,23 @@ export const database: NavMenuConstant = {
           name: 'RUM: inverted index for full-text search',
           url: '/guides/database/extensions/rum',
         },
+      ],
+    },
+    {
+      name: 'Foreign Data Wrappers',
+      url: undefined,
+      items: [
+        { name: 'Overview', url: '/guides/database/extensions/wrappers/overview' },
+        { name: 'Connecting to Airtable', url: '/guides/database/extensions/wrappers/airtable' },
+        { name: 'Connecting to AWS S3', url: '/guides/database/extensions/wrappers/s3' },
+        { name: 'Connecting to BigQuery', url: '/guides/database/extensions/wrappers/bigquery' },
         {
-          name: 'wrappers: 3rd Party Integrations',
-          url: '/guides/database/extensions/wrappers',
+          name: 'Connecting to ClickHouse',
+          url: '/guides/database/extensions/wrappers/clickhouse',
         },
+        { name: 'Connecting to Firebase', url: '/guides/database/extensions/wrappers/firebase' },
+        { name: 'Connecting to Logflare', url: '/guides/database/extensions/wrappers/logflare' },
+        { name: 'Connecting to Stripe', url: '/guides/database/extensions/wrappers/stripe' },
       ],
     },
     {
@@ -750,6 +792,7 @@ export const functions: NavMenuConstant = {
           name: 'Connecting directly to Postgres',
           url: '/guides/functions/connect-to-postgres',
         },
+        { name: 'Testing your Edge Functions', url: '/guides/functions/unit-test' },
         { name: 'Troubleshooting', url: '/guides/functions/troubleshooting' },
       ],
     },
@@ -802,10 +845,6 @@ export const realtime: NavMenuConstant = {
     {
       name: 'Concepts',
       url: '/guides/realtime/concepts',
-    },
-    {
-      name: 'Quickstart',
-      url: '/guides/realtime/quickstart',
     },
     {
       name: 'Features',
@@ -881,6 +920,10 @@ export const ai: NavMenuConstant = {
       items: [
         { name: 'Developing locally with Vecs', url: '/guides/ai/vecs-python-client' },
         { name: 'Creating and managing collections', url: '/guides/ai/quickstarts/hello-world' },
+        {
+          name: 'Generate Embeddings',
+          url: '/guides/ai/quickstarts/generate-text-embeddings',
+        },
         { name: 'Text Deduplication', url: '/guides/ai/quickstarts/text-deduplication' },
         { name: 'Face similarity search', url: '/guides/ai/quickstarts/face-similarity' },
       ],
@@ -903,7 +946,8 @@ export const ai: NavMenuConstant = {
         { name: 'Managing indexes', url: '/guides/ai/managing-indexes' },
         { name: 'Vector columns', url: '/guides/ai/vector-columns' },
         { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
-        { name: 'Choosing instance type', url: '/guides/ai/choosing-instance-type' },
+        { name: 'Choosing Compute Add-on', url: '/guides/ai/choosing-compute-addon' },
+        { name: 'Going to Production', url: '/guides/ai/going-to-prod' },
       ],
     },
     {
@@ -963,21 +1007,54 @@ export const ai: NavMenuConstant = {
 
 export const supabase_cli: NavMenuConstant = {
   icon: 'reference-cli',
-  title: 'Supabase CLI',
+  title: 'Local Dev / CLI',
   url: '/guides/cli',
   items: [
     { name: 'Overview', url: '/guides/cli' },
-    { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
     {
-      name: 'Using environment variables in config.toml',
-      url: '/guides/cli/using-environment-variables-in-config',
-    },
-    {
-      name: 'Reference',
+      name: 'Using the CLI',
       url: undefined,
       items: [
-        { name: 'Commands', url: '/reference/cli/introduction' },
-        { name: 'Configuration', url: '/reference/cli/config' },
+        { name: 'Getting started', url: '/guides/cli/getting-started' },
+        { name: 'CLI Configuration', url: '/guides/cli/config' },
+      ],
+    },
+    {
+      name: 'Developing with Supabase',
+      url: undefined,
+      items: [
+        { name: 'Local Development', url: '/guides/cli/local-development' },
+        { name: 'Managing environments', url: '/guides/cli/managing-environments' },
+        {
+          name: 'Managing config and secrets',
+          url: '/guides/cli/managing-config',
+        },
+        {
+          name: 'Seeding your database',
+          url: '/guides/cli/seeding-your-database',
+        },
+        {
+          name: 'Testing and linting',
+          url: '/guides/cli/testing-and-linting',
+        },
+      ],
+    },
+    {
+      name: 'GitHub Action',
+      url: undefined,
+      items: [
+        {
+          name: 'Generate types from your database',
+          url: '/guides/cli/github-action/generating-types',
+        },
+        {
+          name: 'Automated testing',
+          url: '/guides/cli/github-action/testing',
+        },
+        {
+          name: 'Backup your database',
+          url: '/guides/cli/github-action/backups',
+        },
       ],
     },
   ],
@@ -1051,6 +1128,20 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/maturity-model',
         },
         { name: 'Production Checklist', url: '/guides/platform/going-into-prod' },
+      ],
+    },
+    {
+      name: 'Integrations',
+      url: undefined,
+      items: [
+        {
+          name: 'Integrations Marketplace',
+          url: '/guides/platform/marketplace',
+        },
+        {
+          name: 'Build a Supabase Integration',
+          url: '/guides/platform/oauth-apps/build-a-supabase-integration',
+        },
       ],
     },
     {
@@ -1173,73 +1264,6 @@ export const migrate = {
     { name: 'Heroku', url: '/guides/migrations/heroku' },
     { name: 'Render', url: '/guides/migrations/render' },
     { name: 'Amazon RDS', url: '/guides/migrations/amazon-rds' },
-  ],
-}
-
-export const integrations: NavMenuConstant = {
-  icon: 'integrations',
-  title: 'Integrations',
-  url: '/guides/integrations',
-  items: [
-    { name: 'Overview', url: '/guides/integrations/integrations' },
-    {
-      name: 'Auth',
-      url: undefined,
-      items: [
-        {
-          name: 'Auth0',
-          url: '/guides/integrations/auth0',
-        },
-        { name: 'Authsignal', url: '/guides/integrations/authsignal' },
-        { name: 'Clerk', url: '/guides/integrations/clerk' },
-        { name: 'keyri', url: '/guides/integrations/keyri' },
-        { name: 'Passage', url: '/guides/integrations/passage' },
-        { name: 'Stytch', url: '/guides/integrations/stytch' },
-        { name: 'SuperTokens', url: '/guides/integrations/supertokens' },
-      ],
-    },
-    {
-      name: 'Caching / Offline-first',
-      url: undefined,
-      items: [{ name: 'Polyscale', url: '/guides/integrations/polyscale' }],
-    },
-    {
-      name: 'Developer Tools',
-      url: undefined,
-      items: [
-        { name: 'Cloudflare Workers', url: '/guides/integrations/cloudflare-workers' },
-        { name: 'Estuary', url: '/guides/integrations/estuary' },
-        { name: 'OpenAI', url: '/guides/ai/examples/openai' },
-        { name: 'pgMustard', url: '/guides/integrations/pgmustard' },
-        { name: 'Prisma', url: '/guides/integrations/prisma' },
-        { name: 'Sequin', url: '/guides/integrations/sequin' },
-        { name: 'Snaplet', url: '/guides/integrations/snaplet' },
-        { name: 'Vercel', url: '/guides/integrations/vercel' },
-        { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
-        { name: 'WeWeb', url: '/guides/integrations/weweb' },
-        { name: 'Zuplo', url: '/guides/integrations/zuplo' },
-      ],
-    },
-    {
-      name: 'Low-code',
-      url: undefined,
-      items: [
-        { name: 'Appsmith', url: '/guides/integrations/appsmith' },
-        { name: 'Bracket', url: '/guides/integrations/bracket' },
-        { name: 'DhiWise', url: '/guides/integrations/dhiwise' },
-        { name: 'Directus', url: '/guides/integrations/directus' },
-        { name: 'Draftbit', url: '/guides/integrations/draftbit' },
-        { name: 'FlutterFlow', url: '/guides/integrations/flutterflow' },
-        { name: 'Forest Admin', url: '/guides/integrations/forestadmin' },
-        { name: 'Plasmic', url: '/guides/integrations/plasmic' },
-        { name: 'ILLA', url: '/guides/integrations/illa' },
-      ],
-    },
-    {
-      name: 'Messaging',
-      url: undefined,
-      items: [{ name: 'OneSignal', url: '/guides/integrations/onesignal' }],
-    },
   ],
 }
 

@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { BASE_PATH } from 'lib/constants'
 import { useTheme } from 'common'
@@ -19,7 +19,10 @@ const WrappersDisabledState = () => {
   const isNotAvailable = wrappersExtension === undefined || vaultExtension === undefined
 
   const [isEnabling, setIsEnabling] = useState<boolean>(false)
-  const canToggleWrappers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
+  const canToggleWrappers = useCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'extensions'
+  )
 
   const onEnableWrappers = async () => {
     if (wrappersExtension === undefined || vaultExtension === undefined) return
@@ -104,7 +107,7 @@ const WrappersDisabledState = () => {
                 </div>
               </div>
               <div className="flex items-center space-x-2 my-1 ml-[1px]">
-                <Link href="https://supabase.com/docs/guides/database/extensions/wrappers">
+                <Link href="https://supabase.com/docs/guides/database/extensions/wrappers/overview">
                   <a target="_blank" rel="noreferrer">
                     <Button type="default" icon={<IconExternalLink />}>
                       About Wrappers
@@ -115,7 +118,7 @@ const WrappersDisabledState = () => {
             </div>
           ) : (
             <div className="flex items-center space-x-2">
-              <Link href="https://supabase.com/docs/guides/database/extensions/wrappers">
+              <Link href="https://supabase.com/docs/guides/database/extensions/wrappers/overview">
                 <a target="_blank" rel="noreferrer">
                   <Button type="default" icon={<IconExternalLink />}>
                     About Wrappers

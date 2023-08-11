@@ -1,57 +1,45 @@
 /**
  * Do not edit directly
- * Generated on Tue, 09 May 2023 15:35:29 GMT
+ * Generated on Thu, 10 Aug 2023 03:54:37 GMT
  */
 
 .dark {
-  --utility-mix-negative: 0deg 0% 0%;
-  --utility-mix-positive: 0deg 0% 100%;
-  --darken-percentage: 0.2;
-  --shading-hardest-xll: 0.85;
-  --shading-hardest-xl: 0.75;
-  --shading-hardest: 0.65;
-  --shading-harder: 0.5;
-  --shading-hard: 0.3;
-  --shading-soft: 0.05;
-  --shading-default: 0.1;
-  --text-override-lighten-strength: 0;
-  --theme-variables-text-body: 0deg 0% 92.9%; /* og color is colors.Gray.Dark.12 */
-  --theme-variables-success: 123.8deg 100% 66.3%;
-  --theme-variables-danger: 0deg 100% 64.7%;
-  --theme-variables-warning: 26.9deg 93.8% 56.1%;
-  --theme-variables-background-body-alt: 0deg 0% 8.6%; /*  og color is colors.Gray.Dark.1 */
-  --theme-variables-background-body: 0deg 0% 11%; /* og color is colors.Gray.Dark.2 */
-  --theme-variables-background: 0deg 0% 13.7%; /* og color is colors.Gray.Dark.3 */
-  --theme-variables-brand: 153.1deg 60.2% 52.7%;
-  --text-color-disabled-default: 0deg 0% 46.5%;
-  --text-color-danger-default: var(--theme-variables-danger);
-  --text-color-warning-default: var(--theme-variables-warning);
-  --text-color-link-default: var(--theme-variables-brand);
-  --text-color-success-default: var(--theme-variables-success);
-  --text-color-body-default: var(--theme-variables-text-body);
-  --background-color-danger-default: var(--theme-variables-danger);
-  --background-color-danger-300: 6.9deg 29% 16.2%;
-  --background-color-danger-200: 3.6deg 46.8% 35%;
-  --background-color-danger-100: 2.1deg 50.9% 46.5%;
-  --background-color-warning-default: var(--theme-variables-warning);
-  --background-color-warning-300: 24.5deg 32.6% 15.4%;
-  --background-color-warning-200: 25.7deg 57.5% 31.7%;
-  --background-color-warning-100: 26.2deg 64.9% 41.4%;
-  --background-color-success-default: var(--theme-variables-success);
-  --background-color-success-300: 114deg 21.2% 16.6%;
-  --background-color-success-200: 119deg 37.3% 36.8%;
-  --background-color-success-100: 121deg 43% 48.6%;
-  --background-color-body-alt: var(--theme-variables-background-body-alt);
-  --background-color-body: var(--theme-variables-background-body); /* Background color used for the main page body. */
-  --background-color-default: var(--theme-variables-background); /* Default background color for any container. */
-  --text-color-body-lightest: 91.8deg 0% 30.2%;
-  --text-color-body-lighter: 91.8deg 0% 43.5%;
-  --text-color-body-light: 91.8deg 0% 62.5%;
-  --border-color-selection: 91.8deg 0% 53.5%;
-  --border-color-body-alt: 91.8deg 0% 12.2%;
-  --border-color-body: 91.8deg 0% 14.6%;
-  --border-color-default: 91.8deg 0% 17.3%; /* Default border color */
-  --background-color-control: 91.8deg 0% 10.4%;
-  --background-color-selection: 91.8deg 0% 17.3%;
-  --border-color-control: 91.8deg 0% 20.8%;
+  --brand-default: 152.9deg 60% 52.9%;
+  --brand-600: 153deg 59.5% 70%;
+  --brand-500: 153.5deg 61.8% 21.6%;
+  --brand-400: 153.3deg 65.2% 13.5%;
+  --brand-300: 153.8deg 69.6% 9%;
+  --brand-200: 152.5deg 75% 6.3%;
+  --warning-default: 38.9deg 100% 57.1%;
+  --warning-600: 38.9deg 89.8% 49.8%;
+  --warning-500: 34.8deg 90.9% 21.6%;
+  --warning-400: 33.2deg 100% 14.5%;
+  --warning-300: 32.3deg 100% 10.2%;
+  --warning-200: 36.8deg 100% 6.1%;
+  --destructive-default: 10.2deg 77.9% 53.9%;
+  --destructive-600: 9.7deg 85.2% 62.9%;
+  --destructive-500: 7.9deg 71.6% 29%;
+  --destructive-400: 6.7deg 60% 20.6%;
+  --destructive-300: 7.5deg 51.3% 15.3%;
+  --destructive-200: 10.9deg 23.4% 9.2%;
+  --foreground-strong: 0deg 0% 100%;
+  --border-alternative: var(--colors-gray-dark-500);
+  --border-control: var(--colors-gray-dark-600);
+  --border-overlay: var(--colors-gray-dark-400);
+  --border-secondary: var(--colors-gray-dark-400);
+  --border-muted: var(--colors-gray-dark-400);
+  --border-default: var(--colors-gray-dark-500);
+  --background-overlay-hover: var(--colors-gray-dark-500);
+  --background-overlay-default: var(--colors-gray-dark-300);
+  --background-surface-300: var(--colors-gray-dark-500);
+  --background-surface-200: var(--colors-gray-dark-400);
+  --background-surface-100: var(--colors-gray-dark-300);
+  --background-control: var(--colors-gray-dark-300);
+  --background-selection: var(--colors-gray-dark-600);
+  --background-alternative: var(--colors-gray-dark-100);
+  --background-default: var(--colors-gray-dark-200);
+  --foreground-muted: var(--colors-gray-dark-900);
+  --foreground-lighter: var(--colors-gray-dark-1000);
+  --foreground-light: var(--colors-gray-dark-1100);
+  --foreground-default: var(--colors-gray-dark-1200);
 }

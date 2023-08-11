@@ -1,15 +1,17 @@
-import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
-import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
+import { useState } from 'react'
 
-type DeleteFunctionProps = {
+import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
+import { useStore } from 'hooks'
+import { isResponseOk } from 'lib/common/fetch'
+
+interface DeleteFunctionProps {
   func?: any
   visible: boolean
   setVisible: (value: boolean) => void
-} & any
+}
 
-const DeleteFunction: FC<DeleteFunctionProps> = ({ func, visible, setVisible }) => {
+const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
   const { ui, meta } = useStore()
   const [loading, setLoading] = useState(false)
   const { id, name, schema } = func ?? {}
@@ -20,8 +22,8 @@ const DeleteFunction: FC<DeleteFunctionProps> = ({ func, visible, setVisible }) 
       if (!id) {
         throw Error('Invalid function info')
       }
-      const response: any = await meta.functions.del(id)
-      if (response.error) {
+      const response = await meta.functions.del(id)
+      if (!isResponseOk(response)) {
         throw response.error
       } else {
         ui.setNotification({

@@ -8,7 +8,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { checkPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
@@ -27,7 +27,7 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
 
   const { profile } = useProfile()
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
-  const canCreateSQLSnippet = checkPermissions(PermissionAction.CREATE, 'user_content', {
+  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
@@ -75,12 +75,14 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
 
     try {
       const snippet = createSqlSnippetSkeleton({
+        id: uuidv4(),
         name: title || 'Generated query',
         owner_id: profile?.id,
+        project_id: selectedProject?.id,
         sql: formattedSql,
       })
-      const data = { ...snippet, id: uuidv4() }
-      snap.addSnippet(data as SqlSnippet, ref, true)
+
+      snap.addSnippet(snippet as SqlSnippet, ref)
       ui.setNotification({
         category: 'success',
         message: `Successfully saved snippet!`,

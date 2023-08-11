@@ -1,28 +1,28 @@
-import { FC, useState } from 'react'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { noop, partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
 import {
   Button,
+  IconCheck,
+  IconColumns,
+  IconEdit3,
+  IconLock,
   IconPlus,
-  Input,
   IconSearch,
   IconTrash,
-  IconEdit3,
-  IconColumns,
+  Input,
   Listbox,
-  IconLock,
-  IconCheck,
 } from 'ui'
-import { partition } from 'lodash'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, checkPermissions } from 'hooks'
-import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import type { PostgresTable, PostgresSchema } from '@supabase/postgres-meta'
+import Table from 'components/to-be-cleaned/Table'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useCheckPermissions, useStore } from 'hooks'
 
-interface Props {
+interface TableListProps {
   selectedSchema: string
   onSelectSchema: (schema: string) => void
   onAddTable: () => void
@@ -31,18 +31,18 @@ interface Props {
   onOpenTable: (table: any) => void
 }
 
-const TableList: FC<Props> = ({
+const TableList = ({
   selectedSchema,
-  onSelectSchema = () => {},
-  onAddTable = () => {},
-  onEditTable = () => {},
-  onDeleteTable = () => {},
-  onOpenTable = () => {},
-}) => {
+  onSelectSchema = noop,
+  onAddTable = noop,
+  onEditTable = noop,
+  onDeleteTable = noop,
+  onOpenTable = noop,
+}: TableListProps) => {
   const { meta } = useStore()
   const { isLoading } = meta.tables
   const [filterString, setFilterString] = useState<string>('')
-  const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canUpdateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const schemas: PostgresSchema[] = meta.schemas.list()
   const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>

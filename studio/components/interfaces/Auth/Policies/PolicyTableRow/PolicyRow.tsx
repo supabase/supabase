@@ -1,24 +1,24 @@
-import { FC } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Dropdown, IconEdit, IconTrash, IconMoreVertical } from 'ui'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { noop } from 'lodash'
+import { Button, Dropdown, IconEdit, IconMoreVertical, IconTrash } from 'ui'
 
-import { checkPermissions } from 'hooks'
 import Panel from 'components/ui/Panel'
+import { useCheckPermissions } from 'hooks'
 
-interface Props {
+interface PolicyRowProps {
   policy: PostgresPolicy
   onSelectEditPolicy: (policy: PostgresPolicy) => void
   onSelectDeletePolicy: (policy: PostgresPolicy) => void
 }
 
-const PolicyRow: FC<Props> = ({
+const PolicyRow = ({
   policy,
-  onSelectEditPolicy = () => {},
-  onSelectDeletePolicy = () => {},
-}) => {
-  const canUpdatePolicies = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
+  onSelectEditPolicy = noop,
+  onSelectDeletePolicy = noop,
+}: PolicyRowProps) => {
+  const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
 
   return (
     <Panel.Content

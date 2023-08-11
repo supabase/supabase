@@ -205,17 +205,6 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: 'Supabase Auth emails',
-        tooltips: { main: 'Rate limits do not apply to Custom SMTP' },
-        plans: {
-          free: '30 / hour',
-          pro: '100 / hour',
-          team: '100 / hour',
-          enterprise: 'Contact Us',
-        },
-        usage_based: false,
-      },
-      {
         title: 'Single Sign-On (SAML 2.0)',
         plans: {
           free: false,

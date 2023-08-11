@@ -1,3 +1,4 @@
+import { stripIndent } from 'common-tags'
 import { SqlSnippets, UserContent } from 'types'
 import { SQLTemplate } from './SQLEditor.types'
 
@@ -1169,7 +1170,7 @@ $$;
 `.trim(),
   },
   {
-    id: 21,
+    id: 22,
     type: 'template',
     title: 'Replication status report',
     description: 'See the status of your replication slots and replication lag.',
@@ -1184,6 +1185,52 @@ SELECT
 FROM pg_control_checkpoint(), pg_replication_slots s
 LEFT JOIN pg_stat_replication r ON (r.pid = s.active_pid);
 `,
+  },
+  {
+    id: 23,
+    type: 'quickstart',
+    title: 'LangChain',
+    description: 'LangChain is a popular framework for working with AI, Vectors, and embeddings.',
+    sql: `
+-- Enable the pgvector extension to work with embedding vectors
+create extension vector;
+
+-- Create a table to store your documents
+create table documents (
+  id bigserial primary key,
+  content text, -- corresponds to Document.pageContent
+  metadata jsonb, -- corresponds to Document.metadata
+  embedding vector(1536) -- 1536 works for OpenAI embeddings, change if needed
+);
+
+-- Create a function to search for documents
+create function match_documents (
+  query_embedding vector(1536),
+  match_count int default null,
+  filter jsonb DEFAULT '{}'
+) returns table (
+  id bigint,
+  content text,
+  metadata jsonb,
+  similarity float
+)
+language plpgsql
+as $$
+#variable_conflict use_column
+begin
+  return query
+  select
+    id,
+    content,
+    metadata,
+    1 - (documents.embedding <=> query_embedding) as similarity
+  from documents
+  where metadata @> filter
+  order by documents.embedding <=> query_embedding
+  limit match_count;
+end;
+$$;
+`.trim(),
   },
 ]
 
@@ -1201,3 +1248,12 @@ export const NEW_SQL_SNIPPET_SKELETON: UserContent<SqlSnippets.Content> = {
     favorite: false,
   },
 }
+
+export const sqlAiDisclaimerComment = stripIndent`
+  -- Supabase AI is experimental and may produce incorrect answers
+  -- Always verify the output before executing
+`
+
+export const untitledSnippetTitle = 'Untitled query'
+
+export const destructiveSqlRegex = [/drop/i, /delete/i, /truncate/i]

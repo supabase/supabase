@@ -2,22 +2,20 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 
-import { useParams } from 'common'
 import { AutoSchemaForm, SmtpForm } from 'components/interfaces/Auth'
 import { SettingsLayout } from 'components/layouts'
 import NoPermission from 'components/ui/NoPermission'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => {
-  const { authConfig } = useStore()
-  const { ref: projectRef } = useParams()
+  const { authConfig, ui } = useStore()
 
   useEffect(() => {
     authConfig.load()
-  }, [projectRef])
+  }, [ui.selectedProjectRef])
 
-  const canReadAuthSettings = checkPermissions(PermissionAction.READ, 'custom_config_gotrue')
+  const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
 
   if (!canReadAuthSettings) {
     return <NoPermission isFullPage resourceText="access your project's authentication settings" />
