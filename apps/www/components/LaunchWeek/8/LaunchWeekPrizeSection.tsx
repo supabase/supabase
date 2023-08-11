@@ -37,12 +37,7 @@ export default function LaunchWeekPrizeSection({
                 quality={100}
               />
             </div>
-            <h2 className="text-4xl">Get your winning ticket</h2>
-            <p className="text-[#9296AA]">
-              Join us on August 11th for Launch Week 8's final day
-              <br className="hidden md:inline-block" /> and find out if you are one of the lucky
-              winners. Get sharing!
-            </p>
+            <h2 className="text-4xl">Swag has been delivered</h2>
           </div>
         </div>
         {ticket && <Ticket />}
