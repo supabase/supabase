@@ -10,7 +10,8 @@ export type NotificationsUpdateVariables = {
 }
 
 export async function updateNotifications({ ids }: NotificationsUpdateVariables) {
-  const { data, error } = await patch('/platform/notifications', { body: ids })
+  // @ts-ignore
+  const { data, error } = await patch('/platform/notifications', { body: { ids } })
   if (error) throw error
   return data
 }

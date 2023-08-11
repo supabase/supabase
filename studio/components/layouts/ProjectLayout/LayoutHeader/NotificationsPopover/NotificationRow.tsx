@@ -2,7 +2,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Notification, NotificationStatus } from '@supabase/shared-types/out/notifications'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { Button, IconX } from 'ui'
+import { Button, IconArchive, IconX } from 'ui'
 
 import { useNotificationsDismissMutation } from 'data/notifications/notifications-dismiss-mutation'
 import { useProjectsQuery } from 'data/projects/projects-query'
@@ -84,36 +84,19 @@ const NotificationRow = ({
           </div>
           <div className="w-1/10 flex justify-end">
             <div>
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger asChild>
-                  <Button
-                    className="!px-1 group"
-                    type="text"
-                    loading={isDismissing}
-                    icon={
-                      <IconX
-                        size={14}
-                        strokeWidth={2}
-                        className="text-scale-1100 group-hover:text-scale-1200 transition"
-                      />
-                    }
-                    onClick={() => dismissNotification(notification.id)}
+              <Button
+                className="!px-1 group"
+                type="text"
+                loading={isDismissing}
+                icon={
+                  <IconX
+                    size={14}
+                    strokeWidth={2}
+                    className="text-scale-1100 group-hover:text-scale-1200 transition"
                   />
-                </Tooltip.Trigger>
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-scale-1200">Dismiss</span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              </Tooltip.Root>
+                }
+                onClick={() => dismissNotification(notification.id)}
+              />
             </div>
           </div>
         </div>
