@@ -86,8 +86,7 @@ export const plans: PricingInformation[] = [
       '7-day log retention',
       'Email support',
     ],
-    footer:
-      'Your cost control settings determine if you allow over-usage.',
+    footer: 'Your cost control settings determine if you allow over-usage.',
     preface: 'Everything in the Free plan, plus:',
     cta: 'Get Started',
   },
@@ -107,6 +106,7 @@ export const plans: PricingInformation[] = [
       'Daily backups stored for 14 days',
       'Standardised Security Questionnaire',
       'SOC2',
+      'HIPAA',
       'SSO for Supabase Dashboard',
       'Priority email support & SLAs',
       '28-day log retention',

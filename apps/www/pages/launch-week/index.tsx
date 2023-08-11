@@ -48,7 +48,7 @@ const supabaseAdmin = createClient(
 export default function TicketHome({ users, meetups }: Props) {
   const { query } = useRouter()
 
-  const TITLE = 'Supabase LaunchWeek 8'
+  const TITLE = 'Supabase Launch Week 8'
   const DESCRIPTION = 'Supabase Launch Week 8 | 7–11 August 2023'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/8/lw8-og.jpg`
 
