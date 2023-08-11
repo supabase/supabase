@@ -37,8 +37,8 @@ const DisallowAllModal = ({ visible, onClose }: DisallowAllModalProps) => {
           <InformationBox
             defaultVisibility
             hideCollapse
-            title="Note: Restrictions only apply to your database and PgBouncer"
-            description="They do not currently apply to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication"
+            title="Note: Restrictions only apply to direct connections to your database and PgBouncer"
+            description="They do not currently apply to Supavisor and to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication"
           />
         </div>
       </Modal.Content>
