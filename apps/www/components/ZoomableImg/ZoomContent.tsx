@@ -8,6 +8,7 @@ any) => {
         [&_img]:rounded-md
         [&_img]:border
         [&_img]:bg-scale-100
+        [&_img]:dark:bg-scale-200
       `}
     >
       {img}
