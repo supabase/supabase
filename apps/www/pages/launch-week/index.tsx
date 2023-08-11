@@ -19,6 +19,7 @@ import LWAnnouncement from '~/components/LaunchWeek/8/Releases/LWAnnouncement'
 import { useTheme } from 'common/Providers'
 
 import 'swiper/swiper.min.css'
+import LWArchive from '../../components/LaunchWeek/8/LWArchive'
 
 const AnimatedParticles = dynamic(
   () => import('~/components/LaunchWeek/8/AnimatedParticles/ParticlesCanvas')
@@ -179,6 +180,10 @@ export default function TicketHome({ users, meetups }: Props) {
 
             <SectionContainer id="meetups" className="!pt-0">
               <LW8Meetups meetups={meetups} />
+            </SectionContainer>
+
+            <SectionContainer id="archive">
+              <LWArchive />
             </SectionContainer>
 
             <SectionContainer className="!px-4 w-full">
