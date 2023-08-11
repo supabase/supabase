@@ -10,9 +10,10 @@ import { AuthLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import EmptyPageState from 'components/ui/Error'
 import Connecting from 'components/ui/Loading/Loading'
-import { usePrivilegesQuery } from 'data/database/privileges-query'
+import { useColumnPrivilegesQuery } from 'data/privileges/column-privileges-query'
 import { useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
+import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
 
 const PrivilegesPage: NextPageWithLayout = () => {
   const { meta } = useStore()
@@ -36,11 +37,31 @@ const PrivilegesPage: NextPageWithLayout = () => {
   const [selectedTable, setSelectedTable] = useState<string>(pathParams.table ?? tables[0] ?? '')
 
   const {
-    data: privileges,
-    isLoading,
-    isError,
-    error,
-  } = usePrivilegesQuery({
+    data: allTablePrivileges,
+    isLoading: isLoadingTablePrivileges,
+    isError: isErrorTablePrivileges,
+    error: errorTablePrivileges,
+  } = useTablePrivilegesQuery({
+    projectRef: ref,
+    connectionString: project?.connectionString,
+  })
+  const tablePrivileges = useMemo(
+    () =>
+      allTablePrivileges
+        ?.find(
+          (tablePrivilege) =>
+            tablePrivilege.schema === selectedSchema && tablePrivilege.name === selectedTable
+        )
+        ?.privileges.filter((privilege) => privilege.grantee === selectedRole) ?? [],
+    [allTablePrivileges, selectedRole, selectedSchema, selectedTable]
+  )
+
+  const {
+    data: columnPrivileges,
+    isLoading: isLoadingColumnPrivileges,
+    isError: isErrorColumnPrivileges,
+    error: errorColumnPrivileges,
+  } = useColumnPrivilegesQuery({
     projectRef: ref,
     connectionString: project?.connectionString,
   })
@@ -63,15 +84,15 @@ const PrivilegesPage: NextPageWithLayout = () => {
   }
 
   const columnsState = useMemo(
-    () => mapDataToPrivilegeColumnUI(privileges, selectedSchema, selectedTable, selectedRole),
-    [privileges, selectedRole, selectedSchema, selectedTable]
+    () => mapDataToPrivilegeColumnUI(columnPrivileges, selectedSchema, selectedTable, selectedRole),
+    [columnPrivileges, selectedRole, selectedSchema, selectedTable]
   )
 
-  if (isError) {
-    return <EmptyPageState error={error} />
+  if (isErrorTablePrivileges || isErrorColumnPrivileges) {
+    return <EmptyPageState error={errorTablePrivileges || errorColumnPrivileges} />
   }
 
-  if (isLoading) {
+  if (isLoadingTablePrivileges || isLoadingColumnPrivileges) {
     return <Connecting />
   }
 
@@ -80,6 +101,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
   return (
     <>
       <Privileges
+        tablePrivileges={tablePrivileges}
         columns={columnsState}
         tables={tables}
         selectedSchema={selectedSchema}

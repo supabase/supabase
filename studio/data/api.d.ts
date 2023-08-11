@@ -1571,22 +1571,6 @@ export interface paths {
     /** Create an organization */
     post: operations["OrganizationsController_createOrganization"];
   };
-  "/v1/organizations/{slug}/oauth/apps": {
-    /** List published or authorized oauth apps */
-    get: operations["OAuthAppsController_listOAuthApps"];
-    /** Create an oauth app */
-    post: operations["OAuthAppsController_createOAuthApp"];
-  };
-  "/v1/organizations/{slug}/oauth/apps/{id}": {
-    /** Update an oauth app */
-    put: operations["OAuthAppsController_updateOAuthApp"];
-    /** Remove a published oauth app */
-    delete: operations["OAuthAppsController_removeOAuthApp"];
-  };
-  "/v1/organizations/{slug}/oauth/apps/{id}/revoke": {
-    /** Revoke an authorized oauth app */
-    post: operations["OAuthAppsController_revokeAuthorizedOAuthApp"];
-  };
   "/v1/oauth/authorize": {
     /** Authorize user through oauth */
     get: operations["OAuthController_authorize"];
@@ -1594,13 +1578,6 @@ export interface paths {
   "/v1/oauth/token": {
     /** Exchange auth code for user's access and refresh token */
     post: operations["OAuthController_token"];
-  };
-  "/v1/oauth/authorizations/{id}": {
-    get: operations["AuthorizationsController_getAuthorizationRequest"];
-    /** Approve oauth app authorization request */
-    post: operations["AuthorizationsController_approveAuthorizationRequest"];
-    /** Decline oauth app authorization request */
-    delete: operations["AuthorizationsController_declineAuthorizationRequest"];
   };
 }
 
@@ -2582,6 +2559,19 @@ export interface components {
       column_name: string;
       privileges: (components["schemas"]["ColumnPrivilege"])[];
     };
+    GrantColumnPrivilegesBody: {
+      is_grantable?: boolean;
+      column_id: string;
+      grantee: string;
+      /** @enum {string} */
+      privilege_type: "ALL" | "SELECT" | "INSERT" | "UPDATE" | "REFERENCES";
+    };
+    RevokeColumnPrivilegesBody: {
+      column_id: string;
+      grantee: string;
+      /** @enum {string} */
+      privilege_type: "ALL" | "SELECT" | "INSERT" | "UPDATE" | "REFERENCES";
+    };
     PostgresColumn: {
       table_id: number;
       schema: string;
@@ -2854,6 +2844,19 @@ export interface components {
       name: string;
       kind: string;
       privileges: (components["schemas"]["TablePrivilege"])[];
+    };
+    GrantTablePrivilegesBody: {
+      is_grantable?: boolean;
+      relation_id: number;
+      grantee: string;
+      /** @enum {string} */
+      privilege_type: "ALL" | "SELECT" | "INSERT" | "UPDATE" | "DELETE" | "TRUNCATE" | "REFERENCES" | "TRIGGER";
+    };
+    RevokeTablePrivilegesBody: {
+      relation_id: number;
+      grantee: string;
+      /** @enum {string} */
+      privilege_type: "ALL" | "SELECT" | "INSERT" | "UPDATE" | "DELETE" | "TRUNCATE" | "REFERENCES" | "TRIGGER";
     };
     PrimaryKey: {
       schema: string;
@@ -4273,55 +4276,6 @@ export interface components {
       entrypoint_path?: string;
       import_map_path?: string;
     };
-    OAuthAppResponse: {
-      id: string;
-      name: string;
-      website: string;
-      icon?: string;
-      authorized_at?: string;
-      created_at?: string;
-      client_id?: string;
-      client_secret_alias?: string;
-      redirect_uris?: (string)[];
-    };
-    CreateOAuthAppBody: {
-      name: string;
-      website: string;
-      icon?: string;
-      redirect_uris: (string)[];
-    };
-    CreateOAuthAppResponse: {
-      id: string;
-      client_id: string;
-      client_secret: string;
-    };
-    PutOAuthAppResponse: {
-      id: string;
-      client_id: string;
-      client_secret_alias: string;
-      created_at: string;
-      name: string;
-      website: string;
-      icon?: string;
-      redirect_uris: (string)[];
-    };
-    RevokeAuthorizedOAuthAppResponse: {
-      id: string;
-      name: string;
-      website: string;
-      icon?: string;
-      authorized_at: string;
-    };
-    DeleteOAuthAppResponse: {
-      id: string;
-      name: string;
-      website: string;
-      icon?: string;
-      created_at: string;
-      client_id: string;
-      client_secret_alias: string;
-      redirect_uris: (string)[];
-    };
     OAuthTokenBody: {
       /** @enum {string} */
       grant_type: "authorization_code" | "refresh_token";
@@ -4338,24 +4292,6 @@ export interface components {
       access_token: string;
       refresh_token: string;
       expires_in: number;
-    };
-    GetAuthorizationResponse: {
-      name: string;
-      website: string;
-      icon?: string;
-      domain: string;
-      expires_at: string;
-      approved_at?: string;
-      approved_organization_slug?: string;
-    };
-    AuthorizationsApproveBody: {
-      organization_id: string;
-    };
-    ApproveAuthorizationResponse: {
-      url: string;
-    };
-    DeclineAuthorizationResponse: {
-      id: string;
     };
   };
   responses: never;
@@ -5593,7 +5529,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": (string)[];
+        "application/json": (components["schemas"]["GrantColumnPrivilegesBody"])[];
       };
     };
     responses: {
@@ -5620,7 +5556,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": (string)[];
+        "application/json": (components["schemas"]["RevokeColumnPrivilegesBody"])[];
       };
     };
     responses: {
@@ -6583,7 +6519,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": (string)[];
+        "application/json": (components["schemas"]["GrantTablePrivilegesBody"])[];
       };
     };
     responses: {
@@ -6610,7 +6546,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": (string)[];
+        "application/json": (components["schemas"]["RevokeTablePrivilegesBody"])[];
       };
     };
     responses: {
@@ -8669,7 +8605,7 @@ export interface operations {
           "application/json": components["schemas"]["CreateVercelConnectionResponse"];
         };
       };
-      /** @description Failed to create project connections */
+      /** @description Failed to create project connection */
       500: never;
     };
   };
@@ -10353,97 +10289,6 @@ export interface operations {
       500: never;
     };
   };
-  /** List published or authorized oauth apps */
-  OAuthAppsController_listOAuthApps: {
-    parameters: {
-      query: {
-        type: "published" | "authorized";
-      };
-      path: {
-        slug: string;
-      };
-    };
-    responses: {
-      200: {
-        content: {
-          "application/json": (components["schemas"]["OAuthAppResponse"])[];
-        };
-      };
-    };
-  };
-  /** Create an oauth app */
-  OAuthAppsController_createOAuthApp: {
-    parameters: {
-      path: {
-        slug: string;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateOAuthAppBody"];
-      };
-    };
-    responses: {
-      201: {
-        content: {
-          "application/json": components["schemas"]["CreateOAuthAppResponse"];
-        };
-      };
-    };
-  };
-  /** Update an oauth app */
-  OAuthAppsController_updateOAuthApp: {
-    parameters: {
-      path: {
-        slug: string;
-        id: string;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateOAuthAppBody"];
-      };
-    };
-    responses: {
-      200: {
-        content: {
-          "application/json": components["schemas"]["PutOAuthAppResponse"];
-        };
-      };
-    };
-  };
-  /** Remove a published oauth app */
-  OAuthAppsController_removeOAuthApp: {
-    parameters: {
-      path: {
-        slug: string;
-        id: string;
-      };
-    };
-    responses: {
-      200: {
-        content: {
-          "application/json": components["schemas"]["DeleteOAuthAppResponse"];
-        };
-      };
-    };
-  };
-  /** Revoke an authorized oauth app */
-  OAuthAppsController_revokeAuthorizedOAuthApp: {
-    parameters: {
-      path: {
-        slug: string;
-        id: string;
-      };
-    };
-    responses: {
-      201: {
-        content: {
-          "application/json": components["schemas"]["RevokeAuthorizedOAuthAppResponse"];
-        };
-      };
-    };
-  };
   /** Authorize user through oauth */
   OAuthController_authorize: {
     parameters: {
@@ -10473,55 +10318,6 @@ export interface operations {
       201: {
         content: {
           "application/json": components["schemas"]["OAuthTokenResponse"];
-        };
-      };
-    };
-  };
-  AuthorizationsController_getAuthorizationRequest: {
-    parameters: {
-      path: {
-        id: string;
-      };
-    };
-    responses: {
-      200: {
-        content: {
-          "application/json": components["schemas"]["GetAuthorizationResponse"];
-        };
-      };
-    };
-  };
-  /** Approve oauth app authorization request */
-  AuthorizationsController_approveAuthorizationRequest: {
-    parameters: {
-      path: {
-        id: string;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["AuthorizationsApproveBody"];
-      };
-    };
-    responses: {
-      201: {
-        content: {
-          "application/json": components["schemas"]["ApproveAuthorizationResponse"];
-        };
-      };
-    };
-  };
-  /** Decline oauth app authorization request */
-  AuthorizationsController_declineAuthorizationRequest: {
-    parameters: {
-      path: {
-        id: string;
-      };
-    };
-    responses: {
-      200: {
-        content: {
-          "application/json": components["schemas"]["DeclineAuthorizationResponse"];
         };
       };
     };

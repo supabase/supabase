@@ -1,25 +1,17 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import { PrivilegeColumnUI } from './Privileges.types'
+import { PrivilegeColumnUI, TablePrivilegesUI } from './Privileges.types'
 import PrivilegesTable from './PrivilegesTable'
 
 export interface PrivilegesBodyProps {
+  tablePrivileges: TablePrivilegesUI[]
   columns: PrivilegeColumnUI[]
   table?: PostgresTable
+  role: string
 }
 
-const PrivilegesBody = ({ table, columns }: PrivilegesBodyProps) => {
-  // const handleToggle = (tableName: string, column: PrivilegeColumnUI, privileges: string[]) => {
-  //   onChange(
-  //     tableName,
-  //     column.name,
-  // column.privileges.some((p) => privileges.includes(p))
-  //   ? column.privileges.filter((p) => !privileges.includes(p))
-  //   : [...new Set([...column.privileges, ...privileges])]
-  //   )
-  // }
-
+const PrivilegesBody = ({ tablePrivileges, table, columns, role }: PrivilegesBodyProps) => {
   if (table === undefined) return <NoSearchResults />
 
   return (
@@ -31,8 +23,10 @@ const PrivilegesBody = ({ table, columns }: PrivilegesBodyProps) => {
         </div>
       </div>
       <PrivilegesTable
+        tableId={table.id}
+        tablePrivileges={tablePrivileges}
         columns={columns}
-        // onToggle={(column, privileges) => handleToggle(table.name, column, privileges)}
+        role={role}
       />
     </section>
   )

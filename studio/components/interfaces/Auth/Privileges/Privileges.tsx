@@ -1,11 +1,12 @@
 import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
-import { PrivilegeColumnUI } from './Privileges.types'
+import { PrivilegeColumnUI, TablePrivilegesUI } from './Privileges.types'
 import PrivilegesBody from './PrivilegesBody'
 import PrivilegesHead from './PrivilegesHead'
 
 export interface PrivilegesProps {
   tables: string[]
   columns: PrivilegeColumnUI[]
+  tablePrivileges: TablePrivilegesUI[]
   selectedSchema: string
   selectedRole: string
   availableSchemas: string[]
@@ -24,6 +25,7 @@ const Privileges = ({
   selectedRole,
   selectedTable,
   tables,
+  tablePrivileges,
   availableSchemas,
   openSchemas,
   protectedSchemas,
@@ -52,9 +54,10 @@ const Privileges = ({
           onChangeTable={onChangeTable}
         />
         <PrivilegesBody
+          tablePrivileges={tablePrivileges}
           columns={columns}
           table={selectedTable}
-          // onChange={onChangePrivileges}
+          role={selectedRole}
         />
       </div>
     </>

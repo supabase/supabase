@@ -1,41 +1,114 @@
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
+import { useColumnPrivilegesGrantMutation } from 'data/privileges/column-privileges-grant-mutation'
+import { useColumnPrivilegesRevokeMutation } from 'data/privileges/column-privileges-revoke-mutation'
+import { useTablePrivilegesGrantMutation } from 'data/privileges/table-privileges-grant-mutation'
+import { useTablePrivilegesRevokeMutation } from 'data/privileges/table-privileges-revoke-mutation'
 import { Toggle } from 'ui'
-import { PRIVILEGE_TYPES } from './Privileges.constants'
-import { PrivilegeColumnUI } from './Privileges.types'
+import {
+  COLUMN_PRIVILEGE_TYPES,
+  ColumnPrivilegeType,
+  TABLE_PRIVILEGE_TYPES,
+  TablePrivilegeType,
+} from './Privileges.constants'
+import { PrivilegeColumnUI, TablePrivilegesUI } from './Privileges.types'
 
 export interface PrivilegesTableProps {
+  tableId: number
+  tablePrivileges: TablePrivilegesUI[]
   columns: PrivilegeColumnUI[]
-  // onToggle: (column: PrivilegeColumnUI, privileges: string[]) => void
+  role: string
 }
 
-const PrivilegesTable = ({ columns }: PrivilegesTableProps) => {
-  const onToggle = (column: PrivilegeColumnUI, privileges: string[]) => {
-    // TODO: implement
+const PrivilegesTable = ({ tableId, tablePrivileges, columns, role }: PrivilegesTableProps) => {
+  const { project } = useProjectContext()
+
+  const { mutate: grantTable } = useTablePrivilegesGrantMutation()
+  const { mutate: revokeTable } = useTablePrivilegesRevokeMutation()
+
+  const onToggleTable = (privileges: readonly TablePrivilegeType[], shouldGrant = true) => {
+    if (!project) return console.error('No project found')
+
+    if (shouldGrant) {
+      grantTable({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        grants: privileges.map((privilege) => ({
+          relation_id: tableId,
+          grantee: role,
+          privilege_type: privilege,
+        })),
+      })
+    } else {
+      revokeTable({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        revokes: privileges.map((privilege) => ({
+          relation_id: tableId,
+          grantee: role,
+          privilege_type: privilege,
+        })),
+      })
+    }
   }
 
-  const handleClickPrivilege = (privilege: string) => {
+  const { mutate: grantColumn } = useColumnPrivilegesGrantMutation()
+  const { mutate: revokeColumn } = useColumnPrivilegesRevokeMutation()
+
+  const onToggleColumn = (
+    column: PrivilegeColumnUI,
+    privileges: readonly ColumnPrivilegeType[],
+    shouldGrant = true
+  ) => {
+    if (!project) return console.error('No project found')
+
+    if (shouldGrant) {
+      grantColumn({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        grants: privileges.map((privilege) => ({
+          column_id: column.id,
+          grantee: role,
+          privilege_type: privilege,
+        })),
+      })
+    } else {
+      revokeColumn({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        revokes: privileges.map((privilege) => ({
+          column_id: column.id,
+          grantee: role,
+          privilege_type: privilege,
+        })),
+      })
+    }
+  }
+
+  const handleClickPrivilege = (privilege: ColumnPrivilegeType) => {
     const allColumnsHavePrivilege = columns.every((column) => column.privileges.includes(privilege))
 
     columns.forEach((column) => {
       if (allColumnsHavePrivilege) {
-        onToggle(column, [privilege])
+        onToggleColumn(column, [privilege], false)
       } else if (!column.privileges.includes(privilege)) {
-        onToggle(column, [privilege])
+        onToggleColumn(column, [privilege], true)
       }
     })
   }
 
   const handleClickColumnName = (column: PrivilegeColumnUI) => {
-    const hasAllPrivileges = PRIVILEGE_TYPES.every((privilege) =>
+    const hasAllPrivileges = COLUMN_PRIVILEGE_TYPES.every((privilege) =>
       column.privileges.includes(privilege)
     )
 
     if (hasAllPrivileges) {
-      onToggle(column, PRIVILEGE_TYPES)
+      onToggleColumn(column, COLUMN_PRIVILEGE_TYPES, false)
     } else {
-      onToggle(
+      onToggleColumn(
         column,
-        PRIVILEGE_TYPES.filter((privilege) => !column.privileges.includes(privilege))
+        COLUMN_PRIVILEGE_TYPES.filter((privilege) => !column.privileges.includes(privilege)),
+        true
       )
     }
   }
@@ -44,30 +117,57 @@ const PrivilegesTable = ({ columns }: PrivilegesTableProps) => {
     <Table
       className="table-fixed mb-4"
       head={[
-        <Table.th key="header-column">Column</Table.th>,
-        ...PRIVILEGE_TYPES.map((privilege) => (
-          <Table.th key={`header-${privilege}`}>
-            <PrivilegeButton
-              privilege={privilege}
-              onClick={() => handleClickPrivilege(privilege)}
-            />
-          </Table.th>
-        )),
+        <Table.th key="header-column"></Table.th>,
+        ...TABLE_PRIVILEGE_TYPES.map((privilege) => {
+          const checked = tablePrivileges.find((p) => p.privilege_type === privilege) !== undefined
+
+          return (
+            <Table.th key={`header-${privilege}`}>
+              <div className="flex items-baseline gap-2">
+                <PrivilegeButton
+                  privilege={privilege}
+                  onClick={() => {
+                    if (COLUMN_PRIVILEGE_TYPES.includes(privilege as any)) {
+                      handleClickPrivilege(privilege as ColumnPrivilegeType)
+                    }
+                  }}
+                />
+
+                <Toggle
+                  checked={checked}
+                  onChange={() => onToggleTable([privilege], !checked)}
+                  size="tiny"
+                />
+              </div>
+            </Table.th>
+          )
+        }),
       ]}
       body={columns.map((column) => (
         <Table.tr key={column.name}>
           <Table.td>
             <button onClick={() => handleClickColumnName(column)}>{column.name}</button>
           </Table.td>
-          {PRIVILEGE_TYPES.map((privilege) => (
-            <Table.td key={privilege}>
-              <Toggle
-                checked={column.privileges.includes(privilege)}
-                size="tiny"
-                onChange={() => onToggle(column, [privilege])}
-              />
-            </Table.td>
-          ))}
+          {TABLE_PRIVILEGE_TYPES.map((privilege) => {
+            const checked = column.privileges.includes(privilege)
+            const disabled =
+              tablePrivileges.find((p) => p.privilege_type === privilege) !== undefined
+
+            return (
+              <Table.td key={privilege}>
+                {COLUMN_PRIVILEGE_TYPES.includes(privilege as any) && (
+                  <Toggle
+                    checked={checked}
+                    onChange={() =>
+                      onToggleColumn(column, [privilege as ColumnPrivilegeType], !checked)
+                    }
+                    disabled={disabled}
+                    size="tiny"
+                  />
+                )}
+              </Table.td>
+            )
+          })}
         </Table.tr>
       ))}
     />
