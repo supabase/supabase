@@ -97,15 +97,15 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
           <span className={['next-image--dynamic-fill', props.wide && 'wide'].join(' ')}>
             {zoomable ? (
               <img
-                {...props}
                 className={[type === 'blog' ? 'rounded-md border' : ''].join(' ')}
                 layout="fill"
+                {...props}
               />
             ) : (
               <Image
-                {...props}
                 className={[type === 'blog' ? 'rounded-md border' : ''].join(' ')}
                 layout="fill"
+                {...props}
               />
             )}
           </span>
