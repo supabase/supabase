@@ -19,6 +19,7 @@ export async function getInvoices(
 
   const { data, error } = await get(`/platform/stripe/invoices`, {
     params: {
+      // @ts-ignore: [Joshen] Might be API spec wrong
       query: { offset: offset.toString(), limit: limit.toString(), customer: customerId, slug },
     },
     signal,
