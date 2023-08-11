@@ -1,4 +1,5 @@
-import { Children } from 'react'
+import clsx from 'clsx'
+import { Children, PropsWithChildren } from 'react'
 
 const FormSection = ({
   children,
@@ -7,23 +8,22 @@ const FormSection = ({
   disabled,
   visible = true,
   className,
-}: {
-  children: React.ReactNode
+}: PropsWithChildren<{
   id?: string
   header?: React.ReactNode
   disabled?: boolean
   visible?: boolean
   className?: string
-}) => {
-  const classes = [
+}>) => {
+  const classes = clsx(
     'grid grid-cols-12 gap-6 px-8 py-8',
-    `${disabled ? ' opacity-30' : ' opacity-100'}`,
-    `${visible ? ' block' : ' hidden'}`,
-    `${className}`,
-  ]
+    disabled ? ' opacity-30' : ' opacity-100',
+    visible ? ' block' : ' hidden',
+    className
+  )
 
   return (
-    <div id={id} className={classes.join(' ')}>
+    <div id={id} className={classes}>
       {header}
       {children}
     </div>
@@ -34,21 +34,26 @@ const FormSectionLabel = ({
   children,
   className = '',
   description,
-}: {
-  children: React.ReactNode | string
+  htmlFor,
+}: PropsWithChildren<{
   className?: string
   description?: React.ReactNode
-}) => {
+  htmlFor?: string
+}>) => {
   if (description !== undefined) {
+    const classes = clsx('flex flex-col space-y-2 col-span-12 lg:col-span-5', className)
     return (
-      <div className={`flex flex-col space-y-2 col-span-12 lg:col-span-5 ${className}`}>
-        <label className="text-foreground text-sm">{children}</label>
+      <div className={classes}>
+        <label className="text-foreground text-sm" htmlFor={htmlFor}>
+          {children}
+        </label>
         {description}
       </div>
     )
   } else {
+    const classes = clsx('text-scale-1200 col-span-12 text-sm lg:col-span-5', className)
     return (
-      <label className={`text-foreground col-span-12 text-sm lg:col-span-5 ${className}`}>
+      <label className={classes} htmlFor={htmlFor}>
         {children}
       </label>
     )
@@ -69,20 +74,19 @@ const FormSectionContent = ({
   loading = true,
   fullWidth,
   className,
-}: {
-  children: React.ReactNode | string
+}: PropsWithChildren<{
   loading?: boolean
   fullWidth?: boolean
   className?: string
-}) => {
+}>) => {
+  const classes = clsx(
+    'relative col-span-12 flex flex-col gap-6 lg:col-span-7',
+    fullWidth && '!col-span-12',
+    className
+  )
+
   return (
-    <div
-      className={`
-        relative col-span-12 flex flex-col gap-6 lg:col-span-7
-        ${fullWidth && '!col-span-12'}
-        ${className}
-      `}
-    >
+    <div className={classes}>
       {loading ? Children.map(children, (child) => <Shimmer />) : children}
     </div>
   )
