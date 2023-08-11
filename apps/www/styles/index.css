@@ -782,6 +782,11 @@ launch week
 
 /* Zoomable image */
 
+[data-rmiz-modal]:focus,
+[data-rmiz-modal-overlay]:focus {
+  outline: none !important;
+}
+
 [data-rmiz-modal-overlay],
 [data-rmiz-modal-img] {
   transition-timing-function: cubic-bezier(0.24, 0.25, 0.05, 1) !important;
