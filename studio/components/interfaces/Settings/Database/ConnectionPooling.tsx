@@ -89,7 +89,13 @@ const ConnectionPooling = () => {
           ) : (
             <PgbouncerConfig
               projectRef={projectRef}
-              bouncerInfo={bouncerInfo}
+              // [Joshen TODO] remove this check once API PR has been deployed:
+              // https://github.com/supabase/infrastructure/pull/14173
+              bouncerInfo={{
+                ...bouncerInfo,
+                supavisor_enabled:
+                  poolingConfiguration.connectionString.includes('pooler.supabase.com'),
+              }}
               connectionInfo={connectionInfo}
             />
           )}
