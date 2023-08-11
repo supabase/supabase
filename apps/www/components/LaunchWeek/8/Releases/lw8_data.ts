@@ -202,7 +202,7 @@ const days: WeekDayProps[] = [
     description: '',
     d: 5,
     dd: 'Fri',
-    youtube_id: 'gtJo1lTxHfs',
+    youtube_id: 'qzxzLSAJDfE',
     videoThumbnail: images.day_5_thumb,
     steps: [
       {
@@ -216,7 +216,7 @@ const days: WeekDayProps[] = [
       },
       {
         title: 'Community day',
-        blog: '/blog/launch-week-8-community-day',
+        blog: '/blog/launch-week-8-community-highlights',
         hackernews: '',
         video: '',
         twitter_spaces: '',

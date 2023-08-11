@@ -502,7 +502,7 @@ export default function LW8Releases() {
                     day5.steps[0]?.bg_layers?.map(
                       (layer, i) =>
                         !!layer.img && (
-                          <div className="absolute opacity-90 inset-0 w-full h-full -z-10">
+                          <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
                             <Image
                               src={
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
@@ -541,7 +541,7 @@ export default function LW8Releases() {
                     day5.steps[1]?.bg_layers?.map(
                       (layer, i) =>
                         !!layer.img && (
-                          <div className="absolute opacity-90 inset-0 w-full h-full -z-10">
+                          <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
                             <Image
                               src={
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
@@ -580,7 +580,7 @@ export default function LW8Releases() {
                     day5.steps[2]?.bg_layers?.map(
                       (layer, i) =>
                         !!layer.img && (
-                          <div className="absolute opacity-90 inset-0 w-full h-full -z-10">
+                          <div className="absolute opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100">
                             <Image
                               src={
                                 !!layer.mobileImg && isTablet ? (layer.mobileImg as any) : layer.img
@@ -588,6 +588,7 @@ export default function LW8Releases() {
                               className="absolute opacity-90 w-full h-full -z-10 transition-all duration-300"
                               layout="fill"
                               objectFit="cover"
+                              objectPosition={isTablet ? '50%' : '100% 50%'}
                             />
                           </div>
                         )
