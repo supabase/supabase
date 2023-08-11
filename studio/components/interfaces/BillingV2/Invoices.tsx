@@ -1,12 +1,12 @@
 import { useParams } from 'common'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText } from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { getProjectInvoice } from 'data/invoices/project-invoice-query'
+import { getInvoice } from 'data/invoices/invoice-query'
 import { useProjectInvoicesCountQuery } from 'data/invoices/project-invoices-count-query'
 import { useProjectInvoicesQuery } from 'data/invoices/project-invoices-query'
 import { useStore } from 'hooks'
@@ -29,9 +29,13 @@ const Invoices = () => {
   })
   const invoices = data || []
 
+  useEffect(() => {
+    setPage(1)
+  }, [projectRef])
+
   const fetchInvoice = async (id: string) => {
     try {
-      const invoice = await getProjectInvoice({ id })
+      const invoice = await getInvoice({ id })
       if (invoice?.invoice_pdf) window.open(invoice.invoice_pdf, '_blank')
     } catch (error: any) {
       ui.setNotification({

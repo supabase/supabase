@@ -134,17 +134,15 @@ const TaxID = () => {
   return (
     <ScaffoldSection>
       <ScaffoldSectionDetail>
-        <div className="sticky space-y-6 top-16">
-          <div>
-            <p className="text-base">Tax ID</p>
-            <p className="text-sm text-scale-1000 pr-4">
-              If you would like to include specific tax ID(s) to your invoices. Old invoices are not
-              affected.
-            </p>
-            <p className="text-sm text-scale-1000">
-              Make sure the tax ID looks exactly like the placeholder text.
-            </p>
-          </div>
+        <div className="sticky space-y-2 top-12">
+          <p className="text-base m-0">Tax ID</p>
+          <p className="text-sm text-scale-1000 pr-4 m-0">
+            If you would like to include specific tax ID(s) to your invoices. Old invoices are not
+            affected.
+          </p>
+          <p className="text-sm text-scale-1000 m-0">
+            Make sure the tax ID looks exactly like the placeholder text.
+          </p>
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>

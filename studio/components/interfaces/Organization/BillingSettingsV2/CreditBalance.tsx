@@ -26,13 +26,13 @@ const CreditBalance = () => {
   return (
     <ScaffoldSection>
       <ScaffoldSectionDetail>
-        <div className="sticky top-16">
+        <div className="sticky space-y-2 top-12">
           <div className="flex items-center space-x-2">
-            <p className="text-base">Credit balance</p>
+            <p className="text-base m-0">Credit balance</p>
             {isCredit && <Badge>You have credits available</Badge>}
             {isDebt && <Badge color="red">Outstanding payments</Badge>}
           </div>
-          <p className="text-sm text-scale-1000">
+          <p className="text-sm text-scale-1000 m-0">
             Charges will be deducted from your balance first
           </p>
         </div>
