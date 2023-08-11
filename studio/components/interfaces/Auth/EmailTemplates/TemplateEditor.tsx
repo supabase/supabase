@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Form, Input } from 'ui'
 
@@ -9,40 +9,37 @@ import { FormActions, FormSection, FormSectionContent, FormSectionLabel } from '
 import InformationBox from 'components/ui/InformationBox'
 
 import { useParams } from 'common'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
 import { FormSchema } from 'types'
 
 interface TemplateEditorProps {
   template: FormSchema
+  authConfig: Record<string, string>
 }
 
-const TemplateEditor = ({ template }: TemplateEditorProps) => {
+const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
-  const { data, isFetched: isLoaded } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
-  const [bodyValue, setBodyValue] = useState('')
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+
   const { id, properties } = template
-  const config = data as Record<string, string> | undefined
 
   const formId = `auth-config-email-templates-${id}`
-  const INITIAL_VALUES: { [x: string]: string } = {}
+  const INITIAL_VALUES = useMemo(() => {
+    const result: { [x: string]: string } = {}
+    Object.keys(properties).forEach((key) => {
+      result[key] = (authConfig && authConfig[key]) ?? ''
+    })
+    return result
+  }, [authConfig, properties])
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
-
-  useEffect(() => {
-    if (isLoaded) {
-      Object.keys(properties).forEach((key) => {
-        INITIAL_VALUES[key] = (config && config[key]) ?? ''
-      })
-    }
-  }, [isLoaded])
 
   const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT`
   const messageProperty = properties[messageSlug]
+  const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
 
-  const onSubmit = (values: any, { setSubmitting, resetForm }: any) => {
+  const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
 
     // Because the template content uses the code editor which is not a form component
@@ -50,7 +47,6 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
     delete payload[messageSlug]
     if (messageProperty) payload[messageSlug] = bodyValue
 
-    setSubmitting(true)
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
       {
@@ -64,36 +60,21 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
             initialValues: values,
           })
         },
-        onSettled: () => {
-          setSubmitting(false)
-        },
       }
     )
   }
 
   return (
     <Form id={formId} className="!border-t-0" initialValues={INITIAL_VALUES} onSubmit={onSubmit}>
-      {({ isSubmitting, resetForm, values, initialValues }: any) => {
-        // [Alaister] although this "technically" is breaking the rules of React hooks
-        // it won't error because the hooks are always rendered in the same order
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        useEffect(() => {
-          // Form is reset once remote data is loaded in store
-          resetForm({
-            values: INITIAL_VALUES,
-            initialValues: INITIAL_VALUES,
-          })
-          setBodyValue((config && config[messageSlug]) ?? '')
-        }, [isLoaded])
-
-        const message = (config && config[messageSlug]) ?? ''
+      {({ resetForm, values, initialValues }: any) => {
+        const message = (authConfig && authConfig[messageSlug]) ?? ''
         const hasChanges =
           JSON.stringify(values) !== JSON.stringify(initialValues) || message !== bodyValue
 
         return (
           <>
             <FormSection className="!border-t-0 pb-8 pt-4">
-              <FormSectionContent loading={!isLoaded}>
+              <FormSectionContent loading={false}>
                 {Object.keys(properties).map((x: string) => {
                   const property = properties[x]
                   if (property.type === 'string') {
@@ -131,7 +112,7 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
               </FormSectionContent>
             </FormSection>
             <FormSection className="!mt-0 grid-cols-12 !border-t-0 !pt-0">
-              <FormSectionContent fullWidth loading={!isLoaded}>
+              <FormSectionContent fullWidth loading={false}>
                 {messageProperty && (
                   <>
                     <div className="space-y-3">
@@ -152,7 +133,6 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                     <div className="relative h-96">
                       <CodeEditor
                         id="code-id"
-                        loading={!isLoaded}
                         language="html"
                         isReadOnly={!canUpdateConfig}
                         className="!mb-0 h-96 overflow-hidden rounded border"
@@ -167,13 +147,13 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                   <FormActions
                     handleReset={() => {
                       resetForm({
-                        values: config,
-                        initialValues: config,
+                        values: authConfig,
+                        initialValues: authConfig,
                       })
-                      setBodyValue((config && config[messageSlug]) ?? '')
+                      setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
                     }}
                     form={formId}
-                    isSubmitting={isSubmitting}
+                    isSubmitting={isUpdatingConfig}
                     hasChanges={hasChanges}
                     disabled={!canUpdateConfig}
                     helper={

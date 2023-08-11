@@ -5,12 +5,20 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useFlag } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import { PROVIDERS_SCHEMAS, PROVIDER_SAML } from 'stores/authConfig/schema'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, IconAlertCircle } from 'ui'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import ProviderForm from './ProviderForm'
 
 const AuthProvidersForm = () => {
   const { ref: projectRef } = useParams()
-  const { isFetched } = useAuthConfigQuery({ projectRef })
+  const {
+    isLoading,
+    error: authConfigError,
+    isError,
+    data: authConfig,
+    isSuccess,
+  } = useAuthConfigQuery({ projectRef })
+
   const isSamlEnabled = useFlag('isSamlEnabled')
   const providers = isSamlEnabled
     ? PROVIDERS_SCHEMAS
@@ -24,19 +32,32 @@ const AuthProvidersForm = () => {
       />
 
       <div className="-space-y-px">
-        {!isFetched
-          ? providers.map((provider) => (
-              <div
+        {isLoading &&
+          providers.map((provider) => (
+            <div
+              key={`provider_${provider.title}`}
+              className={[...ProviderCollapsibleClasses, 'px-6 py-3'].join(' ')}
+            >
+              <HorizontalShimmerWithIcon />
+            </div>
+          ))}
+        {isError && (
+          <Alert_Shadcn_ variant="destructive">
+            <IconAlertCircle strokeWidth={2} />
+            <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        )}
+        {isSuccess &&
+          providers.map((provider) => {
+            return (
+              <ProviderForm
                 key={`provider_${provider.title}`}
-                className={[...ProviderCollapsibleClasses, 'px-6 py-3'].join(' ')}
-              >
-                <HorizontalShimmerWithIcon />
-              </div>
-            ))
-          : providers.map((provider) => {
-              // @ts-expect-error: Fix type to be dynamic
-              return <ProviderForm key={`provider_${provider.title}`} provider={provider} />
-            })}
+                config={authConfig}
+                provider={provider as any}
+              />
+            )
+          })}
       </div>
     </div>
   )

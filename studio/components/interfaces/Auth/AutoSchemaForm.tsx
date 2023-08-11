@@ -1,7 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
-import { Button, Form, IconEye, IconEyeOff, Input, InputNumber, Radio, Toggle } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Form,
+  IconAlertCircle,
+  IconEye,
+  IconEyeOff,
+  Input,
+  InputNumber,
+  Radio,
+  Toggle,
+} from 'ui'
 import { boolean, number, object, string } from 'yup'
 
 import { useParams } from 'common'
@@ -20,23 +33,29 @@ import { useCheckPermissions, useStore } from 'hooks'
 const AutoSchemaForm = observer(() => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
-  const { data: config, isFetched: isLoaded } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
+  const {
+    data: authConfig,
+    error: authConfigError,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useAuthConfigQuery({ projectRef })
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const formId = 'auth-config-general-form'
   const [hidden, setHidden] = useState(true)
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const INITIAL_VALUES = {
-    DISABLE_SIGNUP: config?.DISABLE_SIGNUP,
-    SITE_URL: config?.SITE_URL,
-    JWT_EXP: config?.JWT_EXP,
-    REFRESH_TOKEN_ROTATION_ENABLED: config?.REFRESH_TOKEN_ROTATION_ENABLED || false,
-    SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: config?.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
-    SECURITY_CAPTCHA_ENABLED: config?.SECURITY_CAPTCHA_ENABLED || false,
-    SECURITY_CAPTCHA_SECRET: config?.SECURITY_CAPTCHA_SECRET || '',
-    SECURITY_CAPTCHA_PROVIDER: config?.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
-    MFA_MAX_ENROLLED_FACTORS: config?.MFA_MAX_ENROLLED_FACTORS || 10,
+    DISABLE_SIGNUP: !authConfig?.DISABLE_SIGNUP,
+    SITE_URL: authConfig?.SITE_URL,
+    JWT_EXP: authConfig?.JWT_EXP,
+    REFRESH_TOKEN_ROTATION_ENABLED: authConfig?.REFRESH_TOKEN_ROTATION_ENABLED || false,
+    SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig?.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
+    SECURITY_CAPTCHA_ENABLED: authConfig?.SECURITY_CAPTCHA_ENABLED || false,
+    SECURITY_CAPTCHA_SECRET: authConfig?.SECURITY_CAPTCHA_SECRET || '',
+    SECURITY_CAPTCHA_PROVIDER: authConfig?.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
+    MFA_MAX_ENROLLED_FACTORS: authConfig?.MFA_MAX_ENROLLED_FACTORS || 10,
   }
 
   const schema = object({
@@ -65,11 +84,10 @@ const AutoSchemaForm = observer(() => {
       .max(30, 'Must be a value less than 30'),
   })
 
-  const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
+  const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
     payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
 
-    setSubmitting(true)
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
       {
@@ -86,22 +104,29 @@ const AutoSchemaForm = observer(() => {
           })
           resetForm({ values: values, initialValues: values })
         },
-        onSettled: () => {
-          setSubmitting(false)
-        },
       }
+    )
+  }
+
+  if (isError) {
+    return (
+      <Alert_Shadcn_ variant="destructive">
+        <IconAlertCircle strokeWidth={2} />
+        <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
     )
   }
 
   return (
     <Form id={formId} initialValues={INITIAL_VALUES} onSubmit={onSubmit} validationSchema={schema}>
-      {({ isSubmitting, handleReset, resetForm, values, initialValues }: any) => {
+      {({ handleReset, resetForm, values, initialValues }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
         // Form is reset once remote data is loaded in store
         useEffect(() => {
-          resetForm({ values: INITIAL_VALUES, initialValues: INITIAL_VALUES })
-        }, [isLoaded])
+          if (isSuccess) resetForm({ values: INITIAL_VALUES, initialValues: INITIAL_VALUES })
+        }, [isSuccess])
 
         return (
           <>
@@ -115,7 +140,7 @@ const AutoSchemaForm = observer(() => {
                 <div className="flex py-4 px-8">
                   <FormActions
                     form={formId}
-                    isSubmitting={isSubmitting}
+                    isSubmitting={isUpdatingConfig}
                     hasChanges={hasChanges}
                     handleReset={handleReset}
                     disabled={!canUpdateConfig}
@@ -129,7 +154,7 @@ const AutoSchemaForm = observer(() => {
               }
             >
               <FormSection header={<FormSectionLabel>User Signups</FormSectionLabel>}>
-                <FormSectionContent loading={!isLoaded}>
+                <FormSectionContent loading={isLoading}>
                   <Toggle
                     id="DISABLE_SIGNUP"
                     size="small"
@@ -142,7 +167,7 @@ const AutoSchemaForm = observer(() => {
               </FormSection>
               <div className="border-t border-scale-400"></div>
               <FormSection header={<FormSectionLabel>User Sessions</FormSectionLabel>}>
-                <FormSectionContent loading={!isLoaded}>
+                <FormSectionContent loading={isLoading}>
                   {/* Permitted redirects for anything on that domain */}
                   {/* Check with @kangming about this */}
                   <InputNumber
@@ -156,7 +181,7 @@ const AutoSchemaForm = observer(() => {
                 </FormSectionContent>
               </FormSection>
               <FormSection header={<FormSectionLabel>Security and Protection</FormSectionLabel>}>
-                <FormSectionContent loading={!isLoaded}>
+                <FormSectionContent loading={isLoading}>
                   <Toggle
                     id="SECURITY_CAPTCHA_ENABLED"
                     size="small"
@@ -223,7 +248,7 @@ const AutoSchemaForm = observer(() => {
               <FormSection
                 header={<FormSectionLabel>Multi Factor Authentication (MFA)</FormSectionLabel>}
               >
-                <FormSectionContent loading={!isLoaded}>
+                <FormSectionContent loading={isLoading}>
                   <InputNumber
                     id="MFA_MAX_ENROLLED_FACTORS"
                     size="small"
