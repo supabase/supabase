@@ -554,7 +554,7 @@ From our testing and observation of the performance of the polling query, we hav
 
 If you want to use Realtime's Postgres Changes feature you should be aware of these limitations. And if you are using this feature at scale, you should consider using separate table without RLS and filters for the purpose of streaming changes to subscribed clients. Alternatively, you can use Realtime server-side only and then re-stream the changes to your clients using a Realtime Broadcast. Don't forget to run your own benchmarks to make sure that the performance is acceptable for your use case.
 
-We are making many improvements to Realtime's Postgres Changes. 
+We are making many improvements to Realtime's Postgres Changes.
 
 If you are uncertain about the performance of your use case, please reach out using [Support Form](https://supabase.com/dashboard/support/new) and we will be happy to help you. We have a team of engineers that can advise you on the best solution for your use-case.
 
