@@ -26,7 +26,7 @@ Supavisor is a scalable, cloud-native Postgres connection pooler. It has been de
 
 <Img
   alt="diagram of supavisor architecture"
-  src="/images/blog/launch-week-8/day-5/pooler-diagram-github--dark.svg"
+  src="/images/blog/2023-08-11-supavisor-1-million/pooler-diagram-github--dark.png"
 />
 
 Supavisor will enable us to build some exciting new features for your Postgres cluster:
@@ -56,7 +56,7 @@ In the first test, we set up a single ARM 16-core Supavisor instance on Ubuntu 2
 
 <Img
   alt="diagram supavisor 1 instance dark"
-  src="/images/blog/launch-week-8/day-5/supavisor-tests--baseline.svg"
+  src="/images/blog/2023-08-11-supavisor-1-million/supavisor-tests--baseline.png"
 />
 
 We wanted to assess the capacity of a single Supavisor instance. We achieved:
@@ -67,18 +67,18 @@ We wanted to assess the capacity of a single Supavisor instance. We achieved:
 
 <Img
   alt="diagram supavisor 1 instance dark"
-  src="/images/blog/launch-week-8/day-5/supavisor-tests--250k-test.svg"
+  src="/images/blog/2023-08-11-supavisor-1-million/supavisor-tests--250k-test.png"
 />
 
 With this setup the database is the bottleneck - 20,000 QPS was the maximum this instance could handle. Increasing QPS would have been possible with a larger instance or read-replicas, but we wanted to focus on the scalability of Supavisor's connection limit (not Postgres's). Since Supavisor is built with multi-tenancy, addition of read-replicas is as easy as sending a single post request.
 
 <div>
-  <img
+  <Img
     alt="chart connections baseline light"
     className="dark:hidden"
     src="/images/blog/2023-08-11-supavisor-1-million/chart-baseline-light.png"
   />
-  <img
+  <Img
     alt="chart connections baseline dark"
     className="hidden dark:block"
     src="/images/blog/2023-08-11-supavisor-1-million/chart-baseline-dark.png"
@@ -91,18 +91,18 @@ In the next step, we focused on Supavisor's vertical scaling capabilities by con
 
 <Img
   alt="diagram supavisor 1 instance dark"
-  src="/images/blog/launch-week-8/day-5/supavisor-tests--500k-test.svg"
+  src="/images/blog/2023-08-11-supavisor-1-million/supavisor-tests--500k-test.png"
 />
 
 The system showed no signs of instability or performance degradation. QPS remained constant at 20,000, proving that an increased number of connections doesn't negatively affect Supavisor's overall performance (this is generally expected from a [BEAM-based language](https://stressgrid.com/blog/webserver_benchmark/) like Elixir).
 
 <div>
-  <img
+  <Img
     alt="chart connections vertical scaling light"
     className="dark:hidden"
     src="/images/blog/2023-08-11-supavisor-1-million/chart-vertical-light.png"
   />
-  <img
+  <Img
     alt="chart connections vertical scaling dark"
     className="hidden dark:block"
     src="/images/blog/2023-08-11-supavisor-1-million/chart-vertical-dark.png"
@@ -112,12 +112,12 @@ The system showed no signs of instability or performance degradation. QPS remain
 We also monitored how the load was distributed over Supavisor instance's cores:
 
 <div>
-  <img
+  <Img
     alt="cpu load vertical scaling light"
     className="dark:hidden"
     src="/images/blog/2023-08-11-supavisor-1-million/cpu-vertical-light.png"
   />
-  <img
+  <Img
     alt="cpu load vertical scaling dark"
     className="hidden dark:block"
     src="/images/blog/2023-08-11-supavisor-1-million/cpu-vertical-dark.png"
@@ -132,7 +132,7 @@ To examine horizontal scalability, we deployed two 64-core Supavisor instances, 
 
 <Img
   alt="diagram supavisor 1 instance dark"
-  src="/images/blog/launch-week-8/day-5/supavisor-tests--scaling-to-1million.svg"
+  src="/images/blog/2023-08-11-supavisor-1-million/supavisor-tests--scaling-to-1million.png"
 />
 
 In the Supavisor architecture, only a single node holds direct connections to each database instance. When you add more Postgres databases or read-replicas, Supavisor spreads the connections to the replicas. Every Supavisor instance can accept incoming connections and either execute queries themselves (if they directly connected) or relay to another node (if not).
@@ -143,12 +143,12 @@ This setup successfully handled:
 - **20,000 QPS** or **1.2 million queries per minute.** Each connection executed a `select` query once every 50 seconds.
 
 <div>
-  <img
+  <Img
     alt="chart connections 1 million light"
     className="dark:hidden"
     src="/images/blog/2023-08-11-supavisor-1-million/chart-1m-light.png"
   />
-  <img
+  <Img
     alt="chart connections 1 million dark"
     className="hidden dark:block"
     src="/images/blog/2023-08-11-supavisor-1-million/chart-1m-dark.png"
@@ -161,12 +161,12 @@ Within the cluster:
 - The relaying instance was extremely over-resourced. Most cores had little-to-no workload because relayed connections are more lightweight.
 
 <div>
-  <img
+  <Img
     alt="cpu load 1 million light"
     className="dark:hidden"
     src="/images/blog/2023-08-11-supavisor-1-million/cpu-1m-light.png"
   />
-  <img
+  <Img
     alt="cpu load 1 million dark"
     className="hidden dark:block"
     src="/images/blog/2023-08-11-supavisor-1-million/cpu-1m-dark.png"
@@ -177,7 +177,7 @@ In a multi-tenant setup (or when using Read-Replicas), the load is much more eve
 
 <Img
   alt="diagram supavisor 1 instance dark"
-  src="/images/blog/launch-week-8/day-5/supavisor-tests--multi-tenant-concept.svg"
+  src="/images/blog/2023-08-11-supavisor-1-million/supavisor-tests--multi-tenant-concept.png"
 />
 
 ### Supavisor's impact on query duration
@@ -205,12 +205,12 @@ We found with Supavisor median query duration was less than 2ms. And this includ
 | p99    | 23ms           |
 
 <div>
-  <img
+  <Img
     alt="chart query duration for 5k qps light"
     className="dark:hidden"
     src="/images/blog/2023-08-11-supavisor-1-million/chart-5k-light.png"
   />
-  <img
+  <Img
     alt="chart query duration for 5k qps dark"
     className="hidden dark:block"
     src="/images/blog/2023-08-11-supavisor-1-million/chart-5k-dark.png"
@@ -228,12 +228,12 @@ We continued to scale up to 20,000QPS to assess the impact on query duration and
 | p99    | 68ms           |
 
 <div>
-  <img
+  <Img
     alt="chart query duration for 20k qps light"
     className="dark:hidden"
     src="/images/blog/2023-08-11-supavisor-1-million/chart-20k-light.png"
   />
-  <img
+  <Img
     alt="chart query duration for 20k qps dark"
     className="hidden dark:block"
     src="/images/blog/2023-08-11-supavisor-1-million/chart-20k-dark.png"
@@ -259,7 +259,7 @@ Currently, every Supabase project comes with its own PgBouncer server running on
 
 <Img
   alt="diagram supavisor 1 instance dark"
-  src="/images/blog/launch-week-8/day-5/supavisor-tests--pgbouncer.svg"
+  src="/images/blog/2023-08-11-supavisor-1-million/supavisor-tests--pgbouncer.png"
 />
 
 _Supavisor architecture_
@@ -268,7 +268,7 @@ In the future, you connect to a distinct multi-tenant Supavisor cluster through 
 
 <Img
   alt="diagram supavisor 1 instance dark"
-  src="/images/blog/launch-week-8/day-5/supavisor-tests--supavisor-and-supabase.svg"
+  src="/images/blog/2023-08-11-supavisor-1-million/supavisor-tests--supavisor-and-supabase.png"
 />
 
 We ran 5,000 queries per second for each configuration, this time experimenting with `insert` query. To make the expreriment more realistic, we enabled the PostGIS extension to store coordinates:
@@ -305,13 +305,13 @@ We observed an additional 2ms required each query to be executed on the Supaviso
 | p99    | 5ms                           | 3ms                           |
 
 <div>
-  <img
+  <Img
     style={{ marginBottom: '0em' }}
     alt="chart query duration for 5k qps inserts with supavisor light"
     className="dark:hidden"
     src="/images/blog/2023-08-11-supavisor-1-million/chart-supavisor-duration-light.png"
   />
-  <img
+  <Img
     style={{ marginBottom: '0em' }}
     alt="chart query duration for 5k qps inserts with supavisor dark"
     className="hidden dark:block"
@@ -321,13 +321,13 @@ We observed an additional 2ms required each query to be executed on the Supaviso
 </div>
 
 <div>
-  <img
+  <Img
     style={{ marginBottom: '0em' }}
     alt="chart query duration for 5k qps inserts with pgbouncer light"
     className="dark:hidden"
     src="/images/blog/2023-08-11-supavisor-1-million/chart-pgbouncer-duration-light.png"
   />
-  <img
+  <Img
     style={{ marginBottom: '0em' }}
     alt="chart query duration for 5k qps inserts with pgbouncer dark"
     className="hidden dark:block"
