@@ -1,13 +1,12 @@
-import { FC } from 'react'
+import { useParams, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { Input, Tabs } from 'ui'
-import { pluckObjectFields } from 'lib/helpers'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 
-import { useParams, useTelemetryProps } from 'common'
-import Telemetry from 'lib/telemetry'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { pluckObjectFields } from 'lib/helpers'
+import Telemetry from 'lib/telemetry'
 import ResetDbPassword from './ResetDbPassword'
 
 const DatabaseSettings = () => {
