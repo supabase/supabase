@@ -19,9 +19,9 @@ const LWAnnouncement = ({
       <div className="relative flex-shrink flex items-center p-2 w-2/3 md:w-auto">
         <div className="flex flex-col gap-1 sm:pl-2">
           <div className="flex items-center gap-2">
-            <span className="text-foreground">Launch Week 8: August 7th–11th</span>
+            <span className="text-foreground">Launch Week 8</span>
           </div>
-          <span className="text-foreground-light">Check out all the announcements</span>
+          <span className="text-foreground-light">Explore all the announcements</span>
         </div>
       </div>
       <div className="relative flex items-center justify-center !aspect-video h-[80px] md:h-[80px] gap-2 z-10 rounded overflow-hidden">
