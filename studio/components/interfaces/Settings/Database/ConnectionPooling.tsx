@@ -34,6 +34,7 @@ const ConnectionPooling = () => {
     'ignore_startup_parameters',
     'pool_mode',
     'pgbouncer_enabled',
+    'supavisor_enabled',
     'max_client_conn',
     'connectionString',
   ]
@@ -88,7 +89,13 @@ const ConnectionPooling = () => {
           ) : (
             <PgbouncerConfig
               projectRef={projectRef}
-              bouncerInfo={bouncerInfo}
+              // [Joshen TODO] remove this check once API PR has been deployed:
+              // https://github.com/supabase/infrastructure/pull/14173
+              bouncerInfo={{
+                ...bouncerInfo,
+                supavisor_enabled:
+                  poolingConfiguration.connectionString.includes('pooler.supabase.com'),
+              }}
               connectionInfo={connectionInfo}
             />
           )}
@@ -109,6 +116,7 @@ interface ConfigProps {
     pgbouncer_enabled: boolean
     max_client_conn: number
     connectionString: string
+    supavisor_enabled: boolean
   }
   connectionInfo: {
     db_host: string
@@ -232,12 +240,16 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
                   .
                 </p>
               </div>
-              <Divider light />
-              <AutoField name="ignore_startup_parameters" />
-              <Divider light />
-              <AutoField name="max_client_conn" />
-              <Divider light />
-              <AutoField name="default_pool_size" />
+              {!bouncerInfo.supavisor_enabled && (
+                <>
+                  <Divider light />
+                  <AutoField name="ignore_startup_parameters" />
+                  <Divider light />
+                  <AutoField name="max_client_conn" />
+                  <Divider light />
+                  <AutoField name="default_pool_size" />
+                </>
+              )}
             </>
           )}
           <Divider light />
