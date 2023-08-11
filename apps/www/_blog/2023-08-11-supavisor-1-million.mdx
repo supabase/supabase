@@ -162,7 +162,7 @@ To examine horizontal scalability, we deployed two 64-core Supavisor instances, 
   />
 </div>
 
-In the Supavisor architecture, only a single node holds direct connections to each database instance. When you add Postgres more databases or read-replicas, Supavisor spreads the connections to the replicas. Every Supavisor instance can accept incoming connections and either execute queries themselves (if they directly connected) or relay to another node (if not).
+In the Supavisor architecture, only a single node holds direct connections to each database instance. When you add more Postgres databases or read-replicas, Supavisor spreads the connections to the replicas. Every Supavisor instance can accept incoming connections and either execute queries themselves (if they directly connected) or relay to another node (if not).
 
 This setup successfully handled:
 
