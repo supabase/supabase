@@ -100,9 +100,11 @@ export const del: typeof _del = async (url, init) => {
 export const head: typeof _head = async (url, init) => {
   const headers = await constructHeaders(init?.headers)
 
+  // @ts-ignore
   return await _head(url, {
     ...init,
     headers,
+    parseAs: 'text',
   })
 }
 
