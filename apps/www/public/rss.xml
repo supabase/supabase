@@ -8,10 +8,10 @@
       <lastBuildDate>Thu, 10 Aug 2023 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
-  <guid>https://supabase.com/blog/supabase-soc2-hipaa</guid>
-  <title>Supabase is now HIPAA and SOC2 Type 2 compliant</title>
-  <link>https://supabase.com/blog/supabase-soc2-hipaa</link>
-  <description>This documents our journey from SOC2 Type 1 to SOC2 Type2 and HIPAA compliance. You can start building healthcare apps on Supabase today.</description>
+  <guid>https://supabase.com/blog/supavisor-1-million</guid>
+  <title>Supavisor: Scaling Postgres to 1 Million Connections</title>
+  <link>https://supabase.com/blog/supavisor-1-million</link>
+  <description>Supavisor is a scalable, cloud-native Postgres connection pooler. We connected a million clients to it to see how it performs.</description>
   <pubDate>Thu, 10 Aug 2023 22:00:00 GMT</pubDate>
 </item>
 <item>
