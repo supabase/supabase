@@ -74,7 +74,7 @@ const LWAnnouncement = ({
       >
         {isLaunchWeekPage ? (
           <ExpandableVideo
-            videoId="gtJo1lTxHfs"
+            videoId="qzxzLSAJDfE"
             onOpenCallback={handleClick}
             triggerContainerClassName="w-full"
             trigger={
