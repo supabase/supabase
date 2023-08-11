@@ -81,7 +81,7 @@ We wanted to assess the capacity of a single Supavisor instance. We achieved:
   />
 </div>
 
-With this setup the database is the bottleneck - 20,000 QPS was the maximum this instance could handle. Increasing QPS would have been possible with a larger instance or read-replicas, but we wanted to focus on the scalability of Supavisor's connection limit (not Postgres's). Since Supavisor is built with multitenancy, addition of read-replicas is as easy as sending a single post request.
+With this setup the database is the bottleneck - 20,000 QPS was the maximum this instance could handle. Increasing QPS would have been possible with a larger instance or read-replicas, but we wanted to focus on the scalability of Supavisor's connection limit (not Postgres's). Since Supavisor is built with multi-tenancy, addition of read-replicas is as easy as sending a single post request.
 
 <div>
   <img
@@ -200,7 +200,7 @@ Within the cluster:
   />
 </div>
 
-In a multitenant setup (or when using Read-Replicas), the load is much more evenly spread because all Supavisor instances connect to comparable numbers of databases and have both direct and relayed connections evenly distributed between each other.
+In a multi-tenant setup (or when using Read-Replicas), the load is much more evenly spread because all Supavisor instances connect to comparable numbers of databases and have both direct and relayed connections evenly distributed between each other.
 
 <div>
   <img
@@ -254,7 +254,7 @@ We found with Supavisor median query duration was less than 2ms. And this includ
 
 We can see that 95% of queries were completed in less than 3 milliseconds. A slightly higher query duration at the beginning of the test can be explained by the dynamic nature of Supavisor-to-Database connection pool. It is being scaled up to the hard limit when more clients establish connections to Supavisor itself and scaled back down when users leave.
 
-We continued to scale up to 20,000QPS to assess the impact on latency and measured a median of 18.4ms:
+We continued to scale up to 20,000QPS to assess the impact on query duration and measured a median of 18.4ms:
 
 |        | Query Duration |
 | ------ | -------------- |
@@ -303,7 +303,7 @@ Additionally we compared current setup with pgbouncer and the new Supavisor setu
   />
 </div>
 
-- With Supavisor, you connect to a distinct multitenant Supavisor cluster through load-balancer. This cluster maintains a connection pool to your database. In this case the pooler doesn't consume your database's CPU and RAM resources, but it does involve extra network communication.
+- With Supavisor, you connect to a distinct multi-tenant Supavisor cluster through load-balancer. This cluster maintains a connection pool to your database. In this case the pooler doesn't consume your database's CPU and RAM resources, but it does involve extra network communication.
 
 <div>
   <img
