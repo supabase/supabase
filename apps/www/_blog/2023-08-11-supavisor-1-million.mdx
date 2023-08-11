@@ -253,8 +253,7 @@ The scalability can be further enhanced by adding more databases (or read-replic
 
 We compared our current PgBouncer setup with the new Supavisor setup to assess any impact on query duration.
 
-
-*Current architecture*
+_Current architecture_
 
 Currently, every Supabase project comes with its own PgBouncer server running on the same instance as the Postgres database to ensure that the latency is as low as possible. But this setup comes with a trade-off: it uses the same compute resources as your database.
 
@@ -263,7 +262,7 @@ Currently, every Supabase project comes with its own PgBouncer server running on
   src="/images/blog/launch-week-8/day-5/supavisor-tests--pgbouncer.svg"
 />
 
-*Supavisor architecture*
+_Supavisor architecture_
 
 In the future, you connect to a distinct multi-tenant Supavisor cluster through a load-balancer. The Supavisor cluster maintains a connection pool to your database. In this case the pooler doesn't consume additional CPU and RAM resources on the database server, but it does involve extra network latency.
 
