@@ -225,6 +225,14 @@ export interface paths {
     /** Gets the upcoming invoice */
     get: operations["OrgInvoicesController_getUpcomingInvoice"];
   };
+  "/platform/pg-meta/{ref}/column-privileges": {
+    /** Retrieve column privileges */
+    get: operations["ColumnPrivilegesController_getColumnPrivileges"];
+    /** Grant column privileges */
+    post: operations["ColumnPrivilegesController_grantColumnPrivileges"];
+    /** Revoke column privileges */
+    delete: operations["ColumnPrivilegesController_revokeColumnPrivileges"];
+  };
   "/platform/pg-meta/{ref}/columns": {
     /** Gets project pg.columns */
     get: operations["ColumnsController_getColumns"];
@@ -320,6 +328,14 @@ export interface paths {
   "/platform/pg-meta/{ref}/search/columns": {
     /** Searches project pg.columns. Return maximum 50 results. */
     post: operations["SearchController_searchColumns"];
+  };
+  "/platform/pg-meta/{ref}/table-privileges": {
+    /** Retrieve table privileges */
+    get: operations["TablePrivilegesController_getTablePrivileges"];
+    /** Grant table privileges */
+    post: operations["TablePrivilegesController_grantTablePrivileges"];
+    /** Revoke table privileges */
+    delete: operations["TablePrivilegesController_revokeTablePrivileges"];
   };
   "/platform/pg-meta/{ref}/tables": {
     /** Gets project pg.tables or pg.table with the given ID */
@@ -961,6 +977,14 @@ export interface paths {
     /** Updates organization member */
     patch: operations["MembersController_updateMember"];
   };
+  "/v0/pg-meta/{ref}/column-privileges": {
+    /** Retrieve column privileges */
+    get: operations["ColumnPrivilegesController_getColumnPrivileges"];
+    /** Grant column privileges */
+    post: operations["ColumnPrivilegesController_grantColumnPrivileges"];
+    /** Revoke column privileges */
+    delete: operations["ColumnPrivilegesController_revokeColumnPrivileges"];
+  };
   "/v0/pg-meta/{ref}/columns": {
     /** Gets project pg.columns */
     get: operations["ColumnsController_getColumns"];
@@ -1056,6 +1080,14 @@ export interface paths {
   "/v0/pg-meta/{ref}/search/columns": {
     /** Searches project pg.columns. Return maximum 50 results. */
     post: operations["SearchController_searchColumns"];
+  };
+  "/v0/pg-meta/{ref}/table-privileges": {
+    /** Retrieve table privileges */
+    get: operations["TablePrivilegesController_getTablePrivileges"];
+    /** Grant table privileges */
+    post: operations["TablePrivilegesController_grantTablePrivileges"];
+    /** Revoke table privileges */
+    delete: operations["TablePrivilegesController_revokeTablePrivileges"];
   };
   "/v0/pg-meta/{ref}/tables": {
     /** Gets project pg.tables or pg.table with the given ID */
@@ -1539,22 +1571,6 @@ export interface paths {
     /** Create an organization */
     post: operations["OrganizationsController_createOrganization"];
   };
-  "/v1/organizations/{slug}/oauth/apps": {
-    /** List published or authorized oauth apps */
-    get: operations["OAuthAppsController_listOAuthApps"];
-    /** Create an oauth app */
-    post: operations["OAuthAppsController_createOAuthApp"];
-  };
-  "/v1/organizations/{slug}/oauth/apps/{id}": {
-    /** Update an oauth app */
-    put: operations["OAuthAppsController_updateOAuthApp"];
-    /** Remove a published oauth app */
-    delete: operations["OAuthAppsController_removeOAuthApp"];
-  };
-  "/v1/organizations/{slug}/oauth/apps/{id}/revoke": {
-    /** Revoke an authorized oauth app */
-    post: operations["OAuthAppsController_revokeAuthorizedOAuthApp"];
-  };
   "/v1/oauth/authorize": {
     /** Authorize user through oauth */
     get: operations["OAuthController_authorize"];
@@ -1562,13 +1578,6 @@ export interface paths {
   "/v1/oauth/token": {
     /** Exchange auth code for user's access and refresh token */
     post: operations["OAuthController_token"];
-  };
-  "/v1/oauth/authorizations/{id}": {
-    get: operations["AuthorizationsController_getAuthorizationRequest"];
-    /** Approve oauth app authorization request */
-    post: operations["AuthorizationsController_approveAuthorizationRequest"];
-    /** Decline oauth app authorization request */
-    delete: operations["AuthorizationsController_declineAuthorizationRequest"];
   };
 }
 
@@ -1766,126 +1775,126 @@ export interface components {
       EXTERNAL_ZOOM_SECRET: string;
     };
     UpdateGoTrueConfigBody: {
-      SITE_URL: string;
-      DISABLE_SIGNUP: boolean;
-      JWT_EXP: number;
-      SMTP_ADMIN_EMAIL: string;
-      SMTP_HOST: string;
-      SMTP_PORT: string;
-      SMTP_USER: string;
+      SITE_URL?: string;
+      DISABLE_SIGNUP?: boolean;
+      JWT_EXP?: number;
+      SMTP_ADMIN_EMAIL?: string;
+      SMTP_HOST?: string;
+      SMTP_PORT?: string;
+      SMTP_USER?: string;
       SMTP_PASS?: string | null;
       SMTP_PASS_ENCRYPTED?: string | null;
-      SMTP_MAX_FREQUENCY: number;
+      SMTP_MAX_FREQUENCY?: number;
       SMTP_SENDER_NAME?: string;
-      MAILER_AUTOCONFIRM: boolean;
-      MAILER_SUBJECTS_INVITE: string;
-      MAILER_SUBJECTS_CONFIRMATION: string;
-      MAILER_SUBJECTS_RECOVERY: string;
-      MAILER_SUBJECTS_EMAIL_CHANGE: string;
-      MAILER_SUBJECTS_MAGIC_LINK: string;
-      MAILER_TEMPLATES_INVITE_CONTENT: string;
-      MAILER_TEMPLATES_CONFIRMATION_CONTENT: string;
-      MAILER_TEMPLATES_RECOVERY_CONTENT: string;
-      MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT: string;
-      MAILER_TEMPLATES_MAGIC_LINK_CONTENT: string;
-      MFA_MAX_ENROLLED_FACTORS: number;
-      URI_ALLOW_LIST: string;
-      EXTERNAL_EMAIL_ENABLED: boolean;
-      EXTERNAL_PHONE_ENABLED: boolean;
+      MAILER_AUTOCONFIRM?: boolean;
+      MAILER_SUBJECTS_INVITE?: string;
+      MAILER_SUBJECTS_CONFIRMATION?: string;
+      MAILER_SUBJECTS_RECOVERY?: string;
+      MAILER_SUBJECTS_EMAIL_CHANGE?: string;
+      MAILER_SUBJECTS_MAGIC_LINK?: string;
+      MAILER_TEMPLATES_INVITE_CONTENT?: string;
+      MAILER_TEMPLATES_CONFIRMATION_CONTENT?: string;
+      MAILER_TEMPLATES_RECOVERY_CONTENT?: string;
+      MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT?: string;
+      MAILER_TEMPLATES_MAGIC_LINK_CONTENT?: string;
+      MFA_MAX_ENROLLED_FACTORS?: number;
+      URI_ALLOW_LIST?: string;
+      EXTERNAL_EMAIL_ENABLED?: boolean;
+      EXTERNAL_PHONE_ENABLED?: boolean;
       SAML_ENABLED?: boolean;
-      SECURITY_CAPTCHA_ENABLED: boolean;
-      SECURITY_CAPTCHA_PROVIDER: string;
-      SECURITY_CAPTCHA_SECRET: string;
-      RATE_LIMIT_EMAIL_SENT: number;
-      RATE_LIMIT_SMS_SENT: number;
-      MAILER_SECURE_EMAIL_CHANGE_ENABLED: boolean;
-      REFRESH_TOKEN_ROTATION_ENABLED: boolean;
-      PASSWORD_MIN_LENGTH: number;
-      SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: boolean;
-      SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number;
-      MAILER_OTP_EXP: number;
-      SMS_AUTOCONFIRM: boolean;
-      SMS_MAX_FREQUENCY: number;
-      SMS_OTP_EXP: number;
-      SMS_OTP_LENGTH: number;
-      SMS_PROVIDER: string;
-      SMS_MESSAGEBIRD_ACCESS_KEY: string;
-      SMS_MESSAGEBIRD_ORIGINATOR: string;
-      SMS_TEXTLOCAL_API_KEY: string;
-      SMS_TEXTLOCAL_SENDER: string;
-      SMS_TWILIO_ACCOUNT_SID: string;
-      SMS_TWILIO_AUTH_TOKEN: string;
-      SMS_TWILIO_MESSAGE_SERVICE_SID: string;
-      SMS_TWILIO_VERIFY_ACCOUNT_SID: string;
-      SMS_TWILIO_VERIFY_AUTH_TOKEN: string;
-      SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string;
-      SMS_VONAGE_API_KEY: string;
-      SMS_VONAGE_API_SECRET: string;
-      SMS_VONAGE_FROM: string;
-      SMS_TEMPLATE: string;
-      EXTERNAL_APPLE_ENABLED: boolean;
-      EXTERNAL_APPLE_CLIENT_ID: string;
-      EXTERNAL_APPLE_SECRET: string;
+      SECURITY_CAPTCHA_ENABLED?: boolean;
+      SECURITY_CAPTCHA_PROVIDER?: string;
+      SECURITY_CAPTCHA_SECRET?: string;
+      RATE_LIMIT_EMAIL_SENT?: number;
+      RATE_LIMIT_SMS_SENT?: number;
+      MAILER_SECURE_EMAIL_CHANGE_ENABLED?: boolean;
+      REFRESH_TOKEN_ROTATION_ENABLED?: boolean;
+      PASSWORD_MIN_LENGTH?: number;
+      SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION?: boolean;
+      SECURITY_REFRESH_TOKEN_REUSE_INTERVAL?: number;
+      MAILER_OTP_EXP?: number;
+      SMS_AUTOCONFIRM?: boolean;
+      SMS_MAX_FREQUENCY?: number;
+      SMS_OTP_EXP?: number;
+      SMS_OTP_LENGTH?: number;
+      SMS_PROVIDER?: string;
+      SMS_MESSAGEBIRD_ACCESS_KEY?: string;
+      SMS_MESSAGEBIRD_ORIGINATOR?: string;
+      SMS_TEXTLOCAL_API_KEY?: string;
+      SMS_TEXTLOCAL_SENDER?: string;
+      SMS_TWILIO_ACCOUNT_SID?: string;
+      SMS_TWILIO_AUTH_TOKEN?: string;
+      SMS_TWILIO_MESSAGE_SERVICE_SID?: string;
+      SMS_TWILIO_VERIFY_ACCOUNT_SID?: string;
+      SMS_TWILIO_VERIFY_AUTH_TOKEN?: string;
+      SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID?: string;
+      SMS_VONAGE_API_KEY?: string;
+      SMS_VONAGE_API_SECRET?: string;
+      SMS_VONAGE_FROM?: string;
+      SMS_TEMPLATE?: string;
+      EXTERNAL_APPLE_ENABLED?: boolean;
+      EXTERNAL_APPLE_CLIENT_ID?: string;
+      EXTERNAL_APPLE_SECRET?: string;
       EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS?: string;
-      EXTERNAL_AZURE_ENABLED: boolean;
-      EXTERNAL_AZURE_CLIENT_ID: string;
-      EXTERNAL_AZURE_SECRET: string;
-      EXTERNAL_AZURE_URL: string;
-      EXTERNAL_BITBUCKET_ENABLED: boolean;
-      EXTERNAL_BITBUCKET_CLIENT_ID: string;
-      EXTERNAL_BITBUCKET_SECRET: string;
-      EXTERNAL_DISCORD_ENABLED: boolean;
-      EXTERNAL_DISCORD_CLIENT_ID: string;
-      EXTERNAL_DISCORD_SECRET: string;
-      EXTERNAL_FACEBOOK_ENABLED: boolean;
-      EXTERNAL_FACEBOOK_CLIENT_ID: string;
-      EXTERNAL_FACEBOOK_SECRET: string;
-      EXTERNAL_FIGMA_ENABLED: boolean;
-      EXTERNAL_FIGMA_CLIENT_ID: string;
-      EXTERNAL_FIGMA_SECRET: string;
-      EXTERNAL_GITHUB_ENABLED: boolean;
-      EXTERNAL_GITHUB_CLIENT_ID: string;
-      EXTERNAL_GITHUB_SECRET: string;
-      EXTERNAL_GITLAB_ENABLED: boolean;
-      EXTERNAL_GITLAB_CLIENT_ID: string;
-      EXTERNAL_GITLAB_SECRET: string;
-      EXTERNAL_GITLAB_URL: string;
-      EXTERNAL_GOOGLE_ENABLED: boolean;
-      EXTERNAL_GOOGLE_CLIENT_ID: string;
-      EXTERNAL_GOOGLE_SECRET: string;
+      EXTERNAL_AZURE_ENABLED?: boolean;
+      EXTERNAL_AZURE_CLIENT_ID?: string;
+      EXTERNAL_AZURE_SECRET?: string;
+      EXTERNAL_AZURE_URL?: string;
+      EXTERNAL_BITBUCKET_ENABLED?: boolean;
+      EXTERNAL_BITBUCKET_CLIENT_ID?: string;
+      EXTERNAL_BITBUCKET_SECRET?: string;
+      EXTERNAL_DISCORD_ENABLED?: boolean;
+      EXTERNAL_DISCORD_CLIENT_ID?: string;
+      EXTERNAL_DISCORD_SECRET?: string;
+      EXTERNAL_FACEBOOK_ENABLED?: boolean;
+      EXTERNAL_FACEBOOK_CLIENT_ID?: string;
+      EXTERNAL_FACEBOOK_SECRET?: string;
+      EXTERNAL_FIGMA_ENABLED?: boolean;
+      EXTERNAL_FIGMA_CLIENT_ID?: string;
+      EXTERNAL_FIGMA_SECRET?: string;
+      EXTERNAL_GITHUB_ENABLED?: boolean;
+      EXTERNAL_GITHUB_CLIENT_ID?: string;
+      EXTERNAL_GITHUB_SECRET?: string;
+      EXTERNAL_GITLAB_ENABLED?: boolean;
+      EXTERNAL_GITLAB_CLIENT_ID?: string;
+      EXTERNAL_GITLAB_SECRET?: string;
+      EXTERNAL_GITLAB_URL?: string;
+      EXTERNAL_GOOGLE_ENABLED?: boolean;
+      EXTERNAL_GOOGLE_CLIENT_ID?: string;
+      EXTERNAL_GOOGLE_SECRET?: string;
       EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS?: string;
-      EXTERNAL_KAKAO_ENABLED: boolean;
-      EXTERNAL_KAKAO_CLIENT_ID: string;
-      EXTERNAL_KAKAO_SECRET: string;
-      EXTERNAL_KEYCLOAK_ENABLED: boolean;
-      EXTERNAL_KEYCLOAK_CLIENT_ID: string;
-      EXTERNAL_KEYCLOAK_SECRET: string;
-      EXTERNAL_KEYCLOAK_URL: string;
-      EXTERNAL_LINKEDIN_ENABLED: boolean;
-      EXTERNAL_LINKEDIN_CLIENT_ID: string;
-      EXTERNAL_LINKEDIN_SECRET: string;
-      EXTERNAL_NOTION_ENABLED: boolean;
-      EXTERNAL_NOTION_CLIENT_ID: string;
-      EXTERNAL_NOTION_SECRET: string;
-      EXTERNAL_SLACK_ENABLED: boolean;
-      EXTERNAL_SLACK_CLIENT_ID: string;
-      EXTERNAL_SLACK_SECRET: string;
-      EXTERNAL_SPOTIFY_ENABLED: boolean;
-      EXTERNAL_SPOTIFY_CLIENT_ID: string;
-      EXTERNAL_SPOTIFY_SECRET: string;
-      EXTERNAL_TWITCH_ENABLED: boolean;
-      EXTERNAL_TWITCH_CLIENT_ID: string;
-      EXTERNAL_TWITCH_SECRET: string;
-      EXTERNAL_TWITTER_ENABLED: boolean;
-      EXTERNAL_TWITTER_CLIENT_ID: string;
-      EXTERNAL_TWITTER_SECRET: string;
-      EXTERNAL_WORKOS_ENABLED: boolean;
-      EXTERNAL_WORKOS_CLIENT_ID: string;
-      EXTERNAL_WORKOS_SECRET: string;
-      EXTERNAL_WORKOS_URL: string;
-      EXTERNAL_ZOOM_ENABLED: boolean;
-      EXTERNAL_ZOOM_CLIENT_ID: string;
-      EXTERNAL_ZOOM_SECRET: string;
+      EXTERNAL_KAKAO_ENABLED?: boolean;
+      EXTERNAL_KAKAO_CLIENT_ID?: string;
+      EXTERNAL_KAKAO_SECRET?: string;
+      EXTERNAL_KEYCLOAK_ENABLED?: boolean;
+      EXTERNAL_KEYCLOAK_CLIENT_ID?: string;
+      EXTERNAL_KEYCLOAK_SECRET?: string;
+      EXTERNAL_KEYCLOAK_URL?: string;
+      EXTERNAL_LINKEDIN_ENABLED?: boolean;
+      EXTERNAL_LINKEDIN_CLIENT_ID?: string;
+      EXTERNAL_LINKEDIN_SECRET?: string;
+      EXTERNAL_NOTION_ENABLED?: boolean;
+      EXTERNAL_NOTION_CLIENT_ID?: string;
+      EXTERNAL_NOTION_SECRET?: string;
+      EXTERNAL_SLACK_ENABLED?: boolean;
+      EXTERNAL_SLACK_CLIENT_ID?: string;
+      EXTERNAL_SLACK_SECRET?: string;
+      EXTERNAL_SPOTIFY_ENABLED?: boolean;
+      EXTERNAL_SPOTIFY_CLIENT_ID?: string;
+      EXTERNAL_SPOTIFY_SECRET?: string;
+      EXTERNAL_TWITCH_ENABLED?: boolean;
+      EXTERNAL_TWITCH_CLIENT_ID?: string;
+      EXTERNAL_TWITCH_SECRET?: string;
+      EXTERNAL_TWITTER_ENABLED?: boolean;
+      EXTERNAL_TWITTER_CLIENT_ID?: string;
+      EXTERNAL_TWITTER_SECRET?: string;
+      EXTERNAL_WORKOS_ENABLED?: boolean;
+      EXTERNAL_WORKOS_CLIENT_ID?: string;
+      EXTERNAL_WORKOS_SECRET?: string;
+      EXTERNAL_WORKOS_URL?: string;
+      EXTERNAL_ZOOM_ENABLED?: boolean;
+      EXTERNAL_ZOOM_CLIENT_ID?: string;
+      EXTERNAL_ZOOM_SECRET?: string;
     };
     GoTrueConfig: {
       SITE_URL: string;
@@ -2536,6 +2545,33 @@ export interface components {
       /** @enum {string} */
       tier: "tier_payg" | "tier_pro" | "tier_free" | "tier_team" | "tier_enterprise";
     };
+    ColumnPrivilege: {
+      grantor: string;
+      grantee: string;
+      /** @enum {string} */
+      privilege_type: "ALL" | "SELECT" | "INSERT" | "UPDATE" | "REFERENCES";
+      is_grantable: boolean;
+    };
+    PostgresColumnPrivileges: {
+      column_id: string;
+      relation_schema: string;
+      relation_name: string;
+      column_name: string;
+      privileges: (components["schemas"]["ColumnPrivilege"])[];
+    };
+    GrantColumnPrivilegesBody: {
+      is_grantable?: boolean;
+      column_id: string;
+      grantee: string;
+      /** @enum {string} */
+      privilege_type: "ALL" | "SELECT" | "INSERT" | "UPDATE" | "REFERENCES";
+    };
+    RevokeColumnPrivilegesBody: {
+      column_id: string;
+      grantee: string;
+      /** @enum {string} */
+      privilege_type: "ALL" | "SELECT" | "INSERT" | "UPDATE" | "REFERENCES";
+    };
     PostgresColumn: {
       table_id: number;
       schema: string;
@@ -2795,6 +2831,32 @@ export interface components {
       schema: string;
       table_id: number;
       table: string;
+    };
+    TablePrivilege: {
+      grantor: string;
+      grantee: string;
+      /** @enum {string} */
+      privilege_type: "ALL" | "SELECT" | "INSERT" | "UPDATE" | "DELETE" | "TRUNCATE" | "REFERENCES" | "TRIGGER";
+      is_grantable: boolean;
+    };
+    PostgresTablePrivileges: {
+      schema: string;
+      name: string;
+      kind: string;
+      privileges: (components["schemas"]["TablePrivilege"])[];
+    };
+    GrantTablePrivilegesBody: {
+      is_grantable?: boolean;
+      relation_id: number;
+      grantee: string;
+      /** @enum {string} */
+      privilege_type: "ALL" | "SELECT" | "INSERT" | "UPDATE" | "DELETE" | "TRUNCATE" | "REFERENCES" | "TRIGGER";
+    };
+    RevokeTablePrivilegesBody: {
+      relation_id: number;
+      grantee: string;
+      /** @enum {string} */
+      privilege_type: "ALL" | "SELECT" | "INSERT" | "UPDATE" | "DELETE" | "TRUNCATE" | "REFERENCES" | "TRIGGER";
     };
     PrimaryKey: {
       schema: string;
@@ -4214,55 +4276,6 @@ export interface components {
       entrypoint_path?: string;
       import_map_path?: string;
     };
-    OAuthAppResponse: {
-      id: string;
-      name: string;
-      website: string;
-      icon?: string;
-      authorized_at?: string;
-      created_at?: string;
-      client_id?: string;
-      client_secret_alias?: string;
-      redirect_uris?: (string)[];
-    };
-    CreateOAuthAppBody: {
-      name: string;
-      website: string;
-      icon?: string;
-      redirect_uris: (string)[];
-    };
-    CreateOAuthAppResponse: {
-      id: string;
-      client_id: string;
-      client_secret: string;
-    };
-    PutOAuthAppResponse: {
-      id: string;
-      client_id: string;
-      client_secret_alias: string;
-      created_at: string;
-      name: string;
-      website: string;
-      icon?: string;
-      redirect_uris: (string)[];
-    };
-    RevokeAuthorizedOAuthAppResponse: {
-      id: string;
-      name: string;
-      website: string;
-      icon?: string;
-      authorized_at: string;
-    };
-    DeleteOAuthAppResponse: {
-      id: string;
-      name: string;
-      website: string;
-      icon?: string;
-      created_at: string;
-      client_id: string;
-      client_secret_alias: string;
-      redirect_uris: (string)[];
-    };
     OAuthTokenBody: {
       /** @enum {string} */
       grant_type: "authorization_code" | "refresh_token";
@@ -4279,24 +4292,6 @@ export interface components {
       access_token: string;
       refresh_token: string;
       expires_in: number;
-    };
-    GetAuthorizationResponse: {
-      name: string;
-      website: string;
-      icon?: string;
-      domain: string;
-      expires_at: string;
-      approved_at?: string;
-      approved_organization_slug?: string;
-    };
-    AuthorizationsApproveBody: {
-      organization_id: string;
-    };
-    ApproveAuthorizationResponse: {
-      url: string;
-    };
-    DeclineAuthorizationResponse: {
-      id: string;
     };
   };
   responses: never;
@@ -5499,6 +5494,82 @@ export interface operations {
       500: never;
     };
   };
+  /** Retrieve column privileges */
+  ColumnPrivilegesController_getColumnPrivileges: {
+    parameters: {
+      header: {
+        "x-connection-encrypted": string;
+      };
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["PostgresColumnPrivileges"])[];
+        };
+      };
+      403: never;
+      /** @description Failed to retrieve column privileges */
+      500: never;
+    };
+  };
+  /** Grant column privileges */
+  ColumnPrivilegesController_grantColumnPrivileges: {
+    parameters: {
+      header: {
+        "x-connection-encrypted": string;
+      };
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": (components["schemas"]["GrantColumnPrivilegesBody"])[];
+      };
+    };
+    responses: {
+      201: {
+        content: {
+          "application/json": (components["schemas"]["PostgresColumnPrivileges"])[];
+        };
+      };
+      403: never;
+      /** @description Failed to grant column privileges */
+      500: never;
+    };
+  };
+  /** Revoke column privileges */
+  ColumnPrivilegesController_revokeColumnPrivileges: {
+    parameters: {
+      header: {
+        "x-connection-encrypted": string;
+      };
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": (components["schemas"]["RevokeColumnPrivilegesBody"])[];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["PostgresColumnPrivileges"])[];
+        };
+      };
+      403: never;
+      /** @description Failed to revoke column privileges */
+      500: never;
+    };
+  };
   /** Gets project pg.columns */
   ColumnsController_getColumns: {
     parameters: {
@@ -6410,6 +6481,82 @@ export interface operations {
       };
       403: never;
       /** @description Failed to search pg.columns */
+      500: never;
+    };
+  };
+  /** Retrieve table privileges */
+  TablePrivilegesController_getTablePrivileges: {
+    parameters: {
+      header: {
+        "x-connection-encrypted": string;
+      };
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["PostgresTablePrivileges"])[];
+        };
+      };
+      403: never;
+      /** @description Failed to retrieve table privileges */
+      500: never;
+    };
+  };
+  /** Grant table privileges */
+  TablePrivilegesController_grantTablePrivileges: {
+    parameters: {
+      header: {
+        "x-connection-encrypted": string;
+      };
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": (components["schemas"]["GrantTablePrivilegesBody"])[];
+      };
+    };
+    responses: {
+      201: {
+        content: {
+          "application/json": (components["schemas"]["PostgresTablePrivileges"])[];
+        };
+      };
+      403: never;
+      /** @description Failed to grant table privileges */
+      500: never;
+    };
+  };
+  /** Revoke table privileges */
+  TablePrivilegesController_revokeTablePrivileges: {
+    parameters: {
+      header: {
+        "x-connection-encrypted": string;
+      };
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": (components["schemas"]["RevokeTablePrivilegesBody"])[];
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["PostgresTablePrivileges"])[];
+        };
+      };
+      403: never;
+      /** @description Failed to revoke table privileges */
       500: never;
     };
   };
@@ -8458,7 +8605,7 @@ export interface operations {
           "application/json": components["schemas"]["CreateVercelConnectionResponse"];
         };
       };
-      /** @description Failed to create project connections */
+      /** @description Failed to create project connection */
       500: never;
     };
   };
@@ -10142,97 +10289,6 @@ export interface operations {
       500: never;
     };
   };
-  /** List published or authorized oauth apps */
-  OAuthAppsController_listOAuthApps: {
-    parameters: {
-      query: {
-        type: "published" | "authorized";
-      };
-      path: {
-        slug: string;
-      };
-    };
-    responses: {
-      200: {
-        content: {
-          "application/json": (components["schemas"]["OAuthAppResponse"])[];
-        };
-      };
-    };
-  };
-  /** Create an oauth app */
-  OAuthAppsController_createOAuthApp: {
-    parameters: {
-      path: {
-        slug: string;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateOAuthAppBody"];
-      };
-    };
-    responses: {
-      201: {
-        content: {
-          "application/json": components["schemas"]["CreateOAuthAppResponse"];
-        };
-      };
-    };
-  };
-  /** Update an oauth app */
-  OAuthAppsController_updateOAuthApp: {
-    parameters: {
-      path: {
-        slug: string;
-        id: string;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateOAuthAppBody"];
-      };
-    };
-    responses: {
-      200: {
-        content: {
-          "application/json": components["schemas"]["PutOAuthAppResponse"];
-        };
-      };
-    };
-  };
-  /** Remove a published oauth app */
-  OAuthAppsController_removeOAuthApp: {
-    parameters: {
-      path: {
-        slug: string;
-        id: string;
-      };
-    };
-    responses: {
-      200: {
-        content: {
-          "application/json": components["schemas"]["DeleteOAuthAppResponse"];
-        };
-      };
-    };
-  };
-  /** Revoke an authorized oauth app */
-  OAuthAppsController_revokeAuthorizedOAuthApp: {
-    parameters: {
-      path: {
-        slug: string;
-        id: string;
-      };
-    };
-    responses: {
-      201: {
-        content: {
-          "application/json": components["schemas"]["RevokeAuthorizedOAuthAppResponse"];
-        };
-      };
-    };
-  };
   /** Authorize user through oauth */
   OAuthController_authorize: {
     parameters: {
@@ -10262,55 +10318,6 @@ export interface operations {
       201: {
         content: {
           "application/json": components["schemas"]["OAuthTokenResponse"];
-        };
-      };
-    };
-  };
-  AuthorizationsController_getAuthorizationRequest: {
-    parameters: {
-      path: {
-        id: string;
-      };
-    };
-    responses: {
-      200: {
-        content: {
-          "application/json": components["schemas"]["GetAuthorizationResponse"];
-        };
-      };
-    };
-  };
-  /** Approve oauth app authorization request */
-  AuthorizationsController_approveAuthorizationRequest: {
-    parameters: {
-      path: {
-        id: string;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["AuthorizationsApproveBody"];
-      };
-    };
-    responses: {
-      201: {
-        content: {
-          "application/json": components["schemas"]["ApproveAuthorizationResponse"];
-        };
-      };
-    };
-  };
-  /** Decline oauth app authorization request */
-  AuthorizationsController_declineAuthorizationRequest: {
-    parameters: {
-      path: {
-        id: string;
-      };
-    };
-    responses: {
-      200: {
-        content: {
-          "application/json": components["schemas"]["DeclineAuthorizationResponse"];
         };
       };
     };

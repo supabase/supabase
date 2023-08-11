@@ -19,11 +19,7 @@ export async function updateAuthConfig({ projectRef, config }: AuthConfigUpdateV
       path: { ref: projectRef },
     },
     body: {
-      // TODO: The config sent to the API can be partial according to the backend implementation.
-      // The definition for the body https://github.com/supabase/infrastructure/blob/develop/api/src/routes/platform/auth/ref/config.dto.ts#L16 is wrong.
-      // Every property type should be optional (with ?). When that's fixed, the new generated code will have the correct type.
-      // Can be removed once https://github.com/supabase/infrastructure/pull/14167 goes in.
-      ...(config as any),
+      ...config,
     },
   })
 
