@@ -4,6 +4,7 @@ const images = {
   day_2_thumb: '/images/launchweek/8/day2/yt_d2.jpg',
   day_3_thumb: '/images/launchweek/8/day3/yt_d3.jpg',
   day_4_thumb: '/images/launchweek/8/day4/yt_d4.jpg',
+  day_5_thumb: '/images/launchweek/8/day5/yt_d5.jpg',
   '00-stay-remote': '/images/launchweek/8/day0/remote.png',
   '00-pg-server': '/images/launchweek/8/day0/pg-server.png',
   '00-constellation': '/images/launchweek/8/day0/constellation.svg',
@@ -201,9 +202,8 @@ const days: WeekDayProps[] = [
     description: '',
     d: 5,
     dd: 'Fri',
-    youtube_id: '',
-    blogpost: '',
-    docs: '',
+    youtube_id: 'gtJo1lTxHfs',
+    videoThumbnail: images.day_5_thumb,
     steps: [
       {
         title: 'Supabase Supavisor: 1M Postgres connections',

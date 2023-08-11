@@ -236,7 +236,7 @@ export const AccordionHeader = ({
               trigger={
                 <VideoPreviewTrigger
                   title={`Watch: Day ${day}`}
-                  thumbnail={videoThumbnail ?? '/images/launchweek/8/day4/yt_d4.jpg'}
+                  thumbnail={videoThumbnail ?? '/images/launchweek/8/day5/yt_d5.jpg'}
                 />
               }
             />
