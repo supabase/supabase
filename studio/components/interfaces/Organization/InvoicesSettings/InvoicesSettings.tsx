@@ -12,10 +12,10 @@ import { useInvoicesCountQuery } from 'data/invoices/invoices-count-query'
 import { useInvoicesQuery } from 'data/invoices/invoices-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText, Loading } from 'ui'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import AlertError from 'components/ui/AlertError'
 
 const PAGE_LIMIT = 10
-
-// Refactor: Split invoices by projects so it's easier for users to identify
 
 const InvoicesSettings = () => {
   const { ui } = useStore()
@@ -31,7 +31,7 @@ const InvoicesSettings = () => {
     customerId: stripe_customer_id,
     slug,
   })
-  const { data, isLoading } = useInvoicesQuery({
+  const { data, error, isLoading, isError, isSuccess } = useInvoicesQuery({
     customerId: stripe_customer_id,
     slug,
     offset,
@@ -61,7 +61,11 @@ const InvoicesSettings = () => {
 
   return (
     <ScaffoldContainerLegacy>
-      <Loading active={isLoading}>
+      {isLoading && <GenericSkeletonLoader />}
+
+      {isError && <AlertError error={error} subject="Failed to retrieve invoices" />}
+
+      {isSuccess && (
         <Table
           head={[
             <Table.th key="header-icon"></Table.th>,
@@ -155,7 +159,7 @@ const InvoicesSettings = () => {
             )
           }
         />
-      </Loading>
+      )}
     </ScaffoldContainerLegacy>
   )
 }

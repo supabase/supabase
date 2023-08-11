@@ -1,11 +1,23 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import generator from 'generate-password'
 import { debounce, isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
 import Router, { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
+import {
+  Alert,
+  Button,
+  IconExternalLink,
+  IconHelpCircle,
+  IconInfo,
+  IconUsers,
+  Input,
+  Listbox,
+  Toggle,
+} from 'ui'
 
-import { useParams } from 'common/hooks'
 import { SpendCapModal } from 'components/interfaces/BillingV2'
 import {
   EmptyPaymentMethodWarning,
@@ -18,10 +30,12 @@ import InformationBox from 'components/ui/InformationBox'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useFlag, useStore, withAuth } from 'hooks'
-import { get, post } from 'lib/common/fetch'
+import { post } from 'lib/common/fetch'
 import {
   API_URL,
   AWS_REGIONS,
@@ -38,19 +52,6 @@ import {
 } from 'lib/constants'
 import { passwordStrength, pluckObjectFields } from 'lib/helpers'
 import { NextPageWithLayout } from 'types'
-import {
-  Alert,
-  Button,
-  IconExternalLink,
-  IconHelpCircle,
-  IconInfo,
-  IconUsers,
-  Input,
-  Listbox,
-  Toggle,
-} from 'ui'
-import Link from 'next/link'
-import { useProjectsQuery } from 'data/projects/projects-query'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -73,15 +74,15 @@ const Wizard: NextPageWithLayout = () => {
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
-  const [paymentMethods, setPaymentMethods] = useState<any[] | undefined>(undefined)
-
   const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
-
   const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(true)
 
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
   const billedViaOrg = Boolean(currentOrg?.subscription_id)
+
+  const { data: paymentMethods, refetch: refetchPaymentMethods } =
+    useOrganizationPaymentMethodsQuery({ slug })
 
   const { data: orgSubscription } = useOrgSubscriptionQuery(
     { orgSlug: slug },
@@ -148,25 +149,6 @@ const Wizard: NextPageWithLayout = () => {
     }
   }, [])
 
-  async function getPaymentMethods(slug: string) {
-    const { data: paymentMethods, error } = await get(`${API_URL}/organizations/${slug}/payments`)
-    if (!error) {
-      setPaymentMethods(paymentMethods)
-    } else {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to retrieve payment methods: ${error.message}`,
-      })
-    }
-  }
-
-  useEffect(() => {
-    if (slug) {
-      getPaymentMethods(slug as string)
-    }
-  }, [slug])
-
   function onProjectNameChange(e: any) {
     e.target.value = e.target.value.replace(/\./g, '')
     setProjectName(e.target.value)
@@ -194,12 +176,6 @@ const Wizard: NextPageWithLayout = () => {
 
   function onDbPricingPlanChange(value: string) {
     setDbPricingTierKey(value)
-  }
-
-  function onPaymentMethodAdded() {
-    if (slug) {
-      return getPaymentMethods(slug)
-    }
   }
 
   async function checkPasswordStrength(value: any) {
@@ -575,7 +551,7 @@ const Wizard: NextPageWithLayout = () => {
                 )}
 
                 {!billedViaOrg && !isSelectFreeTier && isEmptyPaymentMethod && (
-                  <EmptyPaymentMethodWarning onPaymentMethodAdded={onPaymentMethodAdded} />
+                  <EmptyPaymentMethodWarning onPaymentMethodAdded={() => refetchPaymentMethods()} />
                 )}
               </Panel.Content>
             )}

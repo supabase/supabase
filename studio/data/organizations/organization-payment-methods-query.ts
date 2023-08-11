@@ -31,7 +31,7 @@ export type OrganizationPaymentMethod = {
   }
 }
 
-export async function getOrganizations(
+export async function getOrganizationPaymentMethods(
   { slug }: OrganizationPaymentMethodsVariables,
   signal?: AbortSignal
 ) {
@@ -43,7 +43,9 @@ export async function getOrganizations(
   return response.data as OrganizationPaymentMethod[]
 }
 
-export type OrganizationPaymentMethodsData = Awaited<ReturnType<typeof getOrganizations>>
+export type OrganizationPaymentMethodsData = Awaited<
+  ReturnType<typeof getOrganizationPaymentMethods>
+>
 export type OrganizationPaymentMethodsError = unknown
 
 export const useOrganizationPaymentMethodsQuery = <TData = OrganizationPaymentMethodsData>(
@@ -55,7 +57,7 @@ export const useOrganizationPaymentMethodsQuery = <TData = OrganizationPaymentMe
 ) =>
   useQuery<OrganizationPaymentMethodsData, OrganizationPaymentMethodsError, TData>(
     organizationKeys.paymentMethods(slug),
-    ({ signal }) => getOrganizations({ slug }, signal),
+    ({ signal }) => getOrganizationPaymentMethods({ slug }, signal),
     { enabled: enabled, ...options }
   )
 
@@ -67,7 +69,7 @@ export const useOrganizationPaymentMethodsPrefetch = ({
   return useCallback(
     () =>
       client.prefetchQuery(organizationKeys.paymentMethods(slug), ({ signal }) =>
-        getOrganizations({ slug }, signal)
+        getOrganizationPaymentMethods({ slug }, signal)
       ),
     []
   )
