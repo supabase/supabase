@@ -1,7 +1,0 @@
-name = "supabase-at-the-edge"
-main = "src/index.js"
-compatibility_date = "2022-07-07"
-
-kv_namespaces = [
-  { binding = "replace-with-your-kv-name", id = "replace-with-your-kv-production-id", preview_id = "replace-with-your-kv-preview-id" }
-]
