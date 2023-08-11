@@ -1,5 +1,5 @@
 import { IS_PLATFORM } from './constants'
-import { User } from '@supabase/gotrue-js'
+import { User, Session } from '@supabase/gotrue-js'
 import { gotrueClient } from 'common'
 import { getFlags } from './configcat'
 import { getNavigatorLockFeatureFlagThreshold, setNavigatorLockEnabled } from './local-storage'
@@ -36,6 +36,53 @@ async function determineNavigatorLockFeatureFlag() {
 export { STORAGE_KEY } from 'common'
 
 export const auth = gotrueClient
+
+let currentSession: Session | null = null
+let getAccessTokenPromise: Promise<string | undefined | null> | null = null
+
+auth.onAuthStateChange((event, session) => {
+  currentSession = session
+})
+
+/**
+ * Grabs the currently available access token, or starts a single getSession call.
+ */
+export async function getAccessToken() {
+  // ignore if server-side
+  if (typeof window === 'undefined') return undefined
+
+  const aboutToExpire = currentSession?.expires_at
+    ? currentSession.expires_at - Math.ceil(Date.now() / 1000) < 30
+    : false
+
+  if (!currentSession || aboutToExpire) {
+    if (!getAccessTokenPromise) {
+      const promise = (async () => {
+        try {
+          const {
+            data: { session },
+            error,
+          } = await auth.getSession()
+          if (error) {
+            throw error
+          }
+
+          return session?.access_token
+        } finally {
+          getAccessTokenPromise = null
+        }
+      })()
+
+      getAccessTokenPromise = promise
+
+      return await promise
+    }
+
+    return await getAccessTokenPromise
+  }
+
+  return currentSession.access_token
+}
 
 export const getAuthUser = async (token: String): Promise<any> => {
   try {
