@@ -13,15 +13,13 @@ export async function getProjectInvoicesCount(
 ) {
   if (!projectRef) throw new Error('Project ref is required')
 
-  const { data, error } = await head(`/platform/projects/{ref}/invoices`, {
+  const res = await head(`/platform/projects/{ref}/invoices`, {
     params: { path: { ref: projectRef } },
     signal,
   })
-  // Need to check with Alaister how to extract the header
-  console.log({ data })
 
-  if (error) throw error
-  return data
+  if (res.error) throw (res as any).error
+  return Number(res.response.headers.get('X-Total-Count'))
 }
 
 export type ProjectInvoicesCountData = Awaited<ReturnType<typeof getProjectInvoicesCount>>

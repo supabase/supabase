@@ -1,14 +1,15 @@
 import { useParams } from 'common'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText, Loading } from 'ui'
+import { useState } from 'react'
+import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText } from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { getProjectInvoice } from 'data/invoices/project-invoice-query'
+import { useProjectInvoicesCountQuery } from 'data/invoices/project-invoices-count-query'
 import { useProjectInvoicesQuery } from 'data/invoices/project-invoices-query'
 import { useStore } from 'hooks'
-import { head } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import InvoiceStatusBadge from './InvoiceStatusBadge'
 import { InvoiceStatus } from './Invoices.types'
 
@@ -17,41 +18,16 @@ const PAGE_LIMIT = 10
 const Invoices = () => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
-
   const [page, setPage] = useState(1)
-  const [count, setCount] = useState(0)
 
   const offset = (page - 1) * PAGE_LIMIT
-  const { data, isLoading } = useProjectInvoicesQuery({ projectRef, limit: PAGE_LIMIT, offset })
+  const { data: count, isError: isErrorCount } = useProjectInvoicesCountQuery({ projectRef })
+  const { data, error, isLoading, isError, isSuccess } = useProjectInvoicesQuery({
+    projectRef,
+    limit: PAGE_LIMIT,
+    offset,
+  })
   const invoices = data || []
-
-  // [JOSHEN TODO] How to extract the X-Total-Count?
-  // const { data: invoicesCount, error } = useProjectInvoicesCountQuery({ projectRef })
-  // console.log({ invoicesCount, error })
-
-  useEffect(() => {
-    if (!projectRef) return
-
-    setPage(1)
-    let cancel = false
-
-    const fetchInvoiceCount = async () => {
-      const res = await head(`${API_URL}/projects/${projectRef}/invoices`, ['X-Total-Count'])
-      if (!cancel) {
-        if (res.error) {
-          ui.setNotification({ category: 'error', message: res.error.message })
-        } else {
-          setCount(res['X-Total-Count'])
-        }
-      }
-    }
-
-    fetchInvoiceCount()
-
-    return () => {
-      cancel = true
-    }
-  }, [projectRef])
 
   const fetchInvoice = async (id: string) => {
     try {
@@ -67,7 +43,11 @@ const Invoices = () => {
 
   return (
     <div className="container my-4 max-w-4xl space-y-1">
-      <Loading active={isLoading}>
+      {isLoading && <GenericSkeletonLoader />}
+
+      {isError && <AlertError error={error} subject="Failed to retrieve project invoices" />}
+
+      {isSuccess && (
         <Table
           head={[
             <Table.th key="header-icon"></Table.th>,
@@ -136,7 +116,11 @@ const Invoices = () => {
                   <Table.td colSpan={6}>
                     <div className="flex items-center justify-between">
                       <p className="text-sm opacity-50">
-                        Showing {offset + 1} to {offset + invoices.length} out of {count} invoices
+                        {isErrorCount
+                          ? 'Failed to retrieve total number of invoices'
+                          : `Showing ${offset + 1} to ${
+                              offset + invoices.length
+                            } out of ${count} invoices`}
                       </p>
                       <div className="flex items-center space-x-2">
                         <Button
@@ -150,7 +134,7 @@ const Invoices = () => {
                           icon={<IconChevronRight />}
                           type="default"
                           size="tiny"
-                          disabled={page * PAGE_LIMIT >= count}
+                          disabled={page * PAGE_LIMIT >= (count ?? 0)}
                           onClick={async () => setPage(page + 1)}
                         />
                       </div>
@@ -161,7 +145,7 @@ const Invoices = () => {
             )
           }
         />
-      </Loading>
+      )}
     </div>
   )
 }
