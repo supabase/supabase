@@ -92,7 +92,7 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
       return <img {...props} />
     },
     Img: ({ zoomable = true, ...props }: any) => (
-      <figure>
+      <figure className="m-0">
         <ZoomableImg zoomable={zoomable}>
           <span className={['next-image--dynamic-fill', props.wide && 'wide'].join(' ')}>
             {zoomable ? (
