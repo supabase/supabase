@@ -78,11 +78,9 @@ const LWAnnouncement = ({
                       />
                     </svg>
                   </div>
-                  <span className="text-foreground">Launch Week 8: Day 5</span>
+                  <span className="text-foreground">Launch Week 8: August 7th–11th</span>
                 </div>
-                <span className="text-foreground-light">
-                  Supabase Supavisor: 1M Postgres connections
-                </span>
+                <span className="text-foreground-light">Check out all the announcements</span>
               </div>
             </div>
             <div className="relative flex items-center justify-center !aspect-video h-[80px] md:h-[80px] gap-2 z-10 rounded overflow-hidden">

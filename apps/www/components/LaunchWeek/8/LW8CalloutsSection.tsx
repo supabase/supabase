@@ -16,8 +16,8 @@ const LW8CalloutsSection = () => {
             >
               <div className="relative flex-shrink flex items-center p-2 w-2/3 lg:w-1/2 md:w-auto">
                 <div className="flex flex-col gap-1 sm:pl-4">
-                  <span className="text-white">Join us daily at Twitter Spaces</span>
-                  <span className="">Friday – Day 5</span>
+                  <span className="text-white">Twitter Spaces</span>
+                  <span className="">Replay recordings</span>
                 </div>
               </div>
               <div className="relative flex !aspect-video h-[80px] md:h-[100px] gap-2 z-10 rounded overflow-hidden">
@@ -37,13 +37,9 @@ const LW8CalloutsSection = () => {
               <div className="relative flex-shrink flex items-center p-2 w-2/3 lg:w-1/2 md:w-auto">
                 <div className="flex flex-col gap-1 sm:pl-4">
                   <div className="flex items-center gap-3">
-                    <div className="relative w-2 h-2 flex items-center justify-center">
-                      <div className="absolute w-2 h-2 rounded-full bg-white" />
-                      <div className="absolute animate-pulse-radar w-6 h-6 rounded-full bg-white will-change-transform" />
-                    </div>
                     <span className="text-white">LW8 Hackathon Aug 4 – Aug 13</span>
                   </div>
-                  <span className="">Read more about rules and prizes on the blog</span>
+                  <span className="">Finished</span>
                 </div>
               </div>
               <div className="relative flex !aspect-video h-[80px] md:h-[100px] gap-2 z-10 rounded overflow-hidden">
