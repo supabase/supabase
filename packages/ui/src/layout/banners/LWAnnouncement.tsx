@@ -95,7 +95,7 @@ const LWAnnouncement = ({
                 </svg>
               </div>
               <Image
-                src="https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw8/assets/yt_d4.jpg?t=2023-08-10T07%3A48%3A40.532Z"
+                src="https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw8/assets/yt_d5.jpg?t=2023-08-11T06%3A31%3A39.412Z"
                 alt="Youtube video thumbnail"
                 layout="fill"
                 objectFit="cover"
