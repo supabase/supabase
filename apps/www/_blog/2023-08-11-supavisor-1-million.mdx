@@ -251,23 +251,27 @@ The scalability can be further enhanced by adding more databases (or read-replic
 
 ### Supavisor on Supabase Platform
 
-Additionally we compared current setup with pgbouncer and the new Supavisor setup on Supabase Platform in the cloud, so you will be aware how it may affect query duration.
+We compared our current PgBouncer setup with the new Supavisor setup to assess any impact on query duration.
 
-- Right now every Supabase project comes with its own pgbouncer instance, running on the same instance as the database to ensure that the latency is as low as possible. But this setup comes with a trade-off: it uses the same compute resources as your database.
+_Current architecture_
+
+Currently, every Supabase project comes with its own PgBouncer server running on the same instance as the Postgres database to ensure that the latency is as low as possible. But this setup comes with a trade-off: it uses the same compute resources as your database.
 
 <Img
   alt="diagram supavisor 1 instance dark"
   src="/images/blog/launch-week-8/day-5/supavisor-tests--pgbouncer.svg"
 />
 
-- With Supavisor, you connect to a distinct multi-tenant Supavisor cluster through load-balancer. This cluster maintains a connection pool to your database. In this case the pooler doesn't consume your database's CPU and RAM resources, but it does involve extra network communication.
+_Supavisor architecture_
+
+In the future, you connect to a distinct multi-tenant Supavisor cluster through a load-balancer. The Supavisor cluster maintains a connection pool to your database. In this case the pooler doesn't consume additional CPU and RAM resources on the database server, but it does involve extra network latency.
 
 <Img
   alt="diagram supavisor 1 instance dark"
   src="/images/blog/launch-week-8/day-5/supavisor-tests--supavisor-and-supabase.svg"
 />
 
-We were running 5,000 queries per second for each configuration, and at this time we decided to make an experiment with `insert` query. We also enabled PostGIS extension to store coordinates:
+We ran 5,000 queries per second for each configuration, this time experimenting with `insert` query. To make the expreriment more realistic, we enabled the PostGIS extension to store coordinates:
 
 ```sql
 insert into positions (
@@ -292,7 +296,7 @@ values (
 );
 ```
 
-We observed additional 2ms required for query to be executed for Supavisor cluster compared to PgBouncer running on the same machine as the database itself.
+We observed an additional 2ms required each query to be executed on the Supavisor architecture compared to PgBouncer architecture.
 
 |        | Query Duration with Supavisor | Query Duration with PgBouncer |
 | ------ | ----------------------------- | ----------------------------- |
@@ -360,3 +364,14 @@ Supavisor will be added to the self-hosted stack as soon as we have tested it ac
 Supavisor's vertical and horizontal scaling ability make it the optimal solution for developers who aim to create applications that can effortlessly scale, even under extreme workloads, avoiding issues such as "too many connections" and enabling the full power of edge functions and serverless.
 
 If you are interested in exploring Supavisor's potential or want to implement its scalability in your upcoming project, check out [the GitHub repository](https://github.com/supabase/supavisor) to know more.
+
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/qzxzLSAJDfE"
+    title="YouTube video player"
+    frameBorder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  ></iframe>
+</div>
