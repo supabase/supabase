@@ -129,8 +129,6 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
     'projects'
   )
 
-  console.log({ bouncerInfo })
-
   const [updates, setUpdates] = useState({
     pool_mode: bouncerInfo.pool_mode || 'transaction',
     default_pool_size: bouncerInfo.default_pool_size || undefined,
