@@ -358,14 +358,14 @@ export function useHistoryKeys({ enable, messages, setPrompt }: UseHistoryKeysOp
         case 'ArrowUp':
           setMessageSelectionIndex((index) => {
             const newIndex = Math.max(index - 1, 0)
-            setPrompt(messages[newIndex] ?? '')
+            messages[newIndex] ? setPrompt(messages[newIndex]) : null
             return newIndex
           })
           return
         case 'ArrowDown':
           setMessageSelectionIndex((index) => {
             const newIndex = Math.min(index + 1, messages.length)
-            setPrompt(messages[newIndex] ?? '')
+            messages[newIndex] ? setPrompt(messages[newIndex]) : null
             return newIndex
           })
           return
