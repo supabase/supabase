@@ -1037,6 +1037,10 @@ export const supabase_cli: NavMenuConstant = {
           name: 'Testing and linting',
           url: '/guides/cli/testing-and-linting',
         },
+        {
+          name: 'Customizing email templates',
+          url: '/guides/cli/customizing-email-templates',
+        },
       ],
     },
     {
