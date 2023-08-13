@@ -1,0 +1,31 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'customizing-email-templates',
+  title: 'Customizing email teplates',
+  description: 'Customizing local email templates using config.toml.',
+}
+
+The Supabase CLI uses a `config.toml` file to manage local configuration. This file is located in the `supabase` directory of your project.
+
+## Config reference
+
+The `config.toml` file is automatically created when you run `supabase start`.
+
+There are a wide variety of options available, which can be found in the [CLI Config Reference](/docs/reference/cli/config).
+
+For example, to update the "Invite" email subject and content for local development, you can append the following information to `config.toml`:
+
+```toml
+[auth.email.template.invite]
+subject = "You are invited to Acme Inc"
+content_path = "./supabase/auth/email/invite.html"
+```
+
+The `content_path` should contain the html file you are pointing to otherwise the CLI won't start the project.
+
+> Note: These settings are only for local development, if you want to use the same content for your hosted Supabase you will need to copy and paste these into the Supabase Dashboard
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
