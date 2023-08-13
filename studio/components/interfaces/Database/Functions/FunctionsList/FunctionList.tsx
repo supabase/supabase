@@ -50,7 +50,7 @@ const FunctionList = ({
     <>
       {_functions.map((x) => (
         <Table.tr key={x.id}>
-          <Table.td>
+          <Table.td className='w-28 overflow-x-scroll'>
             <p>{x.name}</p>
           </Table.td>
           <Table.td className="hidden md:table-cell md:overflow-auto">
