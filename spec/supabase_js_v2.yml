@@ -342,10 +342,16 @@ functions:
   - id: sign-in-with-id-token
     title: 'signInWithIdToken'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithIdToken'
-    notes: |
-      -  Notes
     examples:
       - id: sign-in-with-id-token
+        name: "Sign In using ID Token"
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.signInWithIdToken({
+            provider: 'google',
+            token: 'eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY5MjAwNjQzOCwiaWF0IjoxNjkyMDA2NDM4fQ.cwbytwt6uAauaFSFfoA_kxQjmMVhS58_zZxj6dd_fVg'
+          })
+          ```
 
   - id: sign-in-with-sso
     title: 'signInWithSSO()'
