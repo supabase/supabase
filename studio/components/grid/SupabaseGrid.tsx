@@ -22,6 +22,7 @@ import {
   formatSortURLParams,
 } from './SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ExpressionFilter } from './components/header/filter/ExpressionFilter'
 
 /** Supabase Grid: React component to render database table */
 
@@ -203,6 +204,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
         <>{children}</>
       ) : (
         <>
+          <ExpressionFilter />
           <Grid
             ref={gridRef}
             {...gridProps}
