@@ -1256,4 +1256,5 @@ export const sqlAiDisclaimerComment = stripIndent`
 
 export const untitledSnippetTitle = 'Untitled query'
 
+// TODO: Update this to exclude commented out code
 export const destructiveSqlRegex = [/(drop|delete|truncate)\s/i]
