@@ -6,10 +6,12 @@ import { post } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { privilegeKeys } from './keys'
 
+export type ColumnPrivilegesGrant = components['schemas']['GrantColumnPrivilegesBody']
+
 export type ColumnPrivilegesGrantVariables = {
   projectRef: string
   connectionString?: string
-  grants: components['schemas']['GrantColumnPrivilegesBody'][]
+  grants: ColumnPrivilegesGrant[]
 }
 
 export async function grantColumnPrivileges({

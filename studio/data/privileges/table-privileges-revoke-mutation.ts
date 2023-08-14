@@ -6,10 +6,12 @@ import { del } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { privilegeKeys } from './keys'
 
+export type TablePrivilegesRevoke = components['schemas']['RevokeTablePrivilegesBody']
+
 export type TablePrivilegesRevokeVariables = {
   projectRef: string
   connectionString?: string
-  revokes: components['schemas']['RevokeTablePrivilegesBody'][]
+  revokes: TablePrivilegesRevoke[]
 }
 
 export async function revokeTablePrivileges({
