@@ -1,5 +1,5 @@
 import { API_URL } from 'lib/constants'
-import { auth } from 'lib/gotrue'
+import { getAccessToken } from 'lib/gotrue'
 import { uuidv4 } from 'lib/helpers'
 import createClient from 'openapi-fetch'
 import { paths } from './api' // generated from openapi-typescript
@@ -26,17 +26,6 @@ const {
   referrerPolicy: 'no-referrer-when-downgrade',
   headers: DEFAULT_HEADERS,
 })
-
-export async function getAccessToken() {
-  // ignore if server-side
-  if (typeof window === 'undefined') return undefined
-
-  const {
-    data: { session },
-  } = await auth.getSession()
-
-  return session?.access_token
-}
 
 export async function constructHeaders(headersInit?: HeadersInit | undefined) {
   const requestId = uuidv4()
