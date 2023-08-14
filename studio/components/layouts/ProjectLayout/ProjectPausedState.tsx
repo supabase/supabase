@@ -27,7 +27,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const { project } = useProjectContext()
   const orgSlug = selectedOrganization?.slug
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: ref })
-  const isFreePlan = subscription?.plan.id === 'free'
+  const isFreePlan = subscription?.plan?.id === 'free'
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug: orgSlug })
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
