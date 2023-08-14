@@ -64,10 +64,10 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
       ref={isActive ? (activeItemRef as React.RefObject<HTMLDivElement>) : null}
     >
       <Link href={`/project/${ref}/sql/${id}`}>
-        <a className="py-1 px-3 w-full">
+        <a className="py-1 px-3 w-full overflow-hidden">
           <p
             title={description || name}
-            className="text-sm text-scale-1100 group-hover:text-scale-1200 transition"
+            className="text-sm text-scale-1100 group-hover:text-scale-1200 transition overflow-hidden overflow-hidden truncate"
           >
             {name}
           </p>
