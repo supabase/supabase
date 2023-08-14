@@ -48,9 +48,8 @@ Be aware that you have to set the right use case permissions to enable Third par
 Under `Build Your App`, click on `Use Cases` screen. From there, do the following steps:
 
 - Click the Edit button in `Authentication and Account Creation` on the right side. This action will lead to the other page.
-- `public_profile` is set by default, so make sure it and `email` have status of **Ready for testing** in the redirected page. 
+- `public_profile` is set by default, so make sure it and `email` have status of **Ready for testing** in the redirected page.
 - If not, click the **Add** button in email on right side.
-
 
 ## Copy your Facebook App ID and Secret
 
@@ -82,6 +81,7 @@ async function signout() {
   const { error } = await supabase.auth.signOut()
 }
 ```
+
 Now, you should be able to login with Facebook and alert you to `Submit for Login Review` when users try to sign into your app. Follow the instructions there to make your app go live for full features and products.
 You can read more about App Review [here](https://developers.facebook.com/docs/app-review/).
 
