@@ -165,6 +165,10 @@ input[type='radio'] {
   @apply p-0;
 }
 
+input[type='number'] {
+  -moz-appearance: textfield; /* Firefox, Not included in tailwind styles reset */
+}
+
 // TODO: It doesnt' work, need to check
 .hide-scrollbar {
   scrollbar-width: none; /* Firefox */
