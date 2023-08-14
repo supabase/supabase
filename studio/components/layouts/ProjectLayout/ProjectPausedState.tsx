@@ -28,6 +28,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const orgSlug = selectedOrganization?.slug
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: ref })
   const isFreePlan = subscription?.plan?.id === 'free'
+  const billedViaOrg = Boolean(selectedOrganization?.subscription_id)
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug: orgSlug })
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
@@ -138,10 +139,14 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                 </Tooltip.Root>
                 {isFreePlan ? (
                   <Link
-                    href={`/project/${ref}/settings/billing/subscription?panel=subscriptionPlan`}
+                    href={
+                      billedViaOrg
+                        ? `/org/${orgSlug}/billing?panel=subscriptionPlan`
+                        : `/project/${ref}/settings/billing/subscription?panel=subscriptionPlan`
+                    }
                   >
                     <a>
-                      <Button type="default">Change Plan</Button>
+                      <Button type="default">Upgrade to Pro</Button>
                     </a>
                   </Link>
                 ) : (
