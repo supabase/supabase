@@ -118,7 +118,7 @@ const ColumnManagement = ({
     if (!result.destination) {
       return
     }
-
+    
     if (type === 'pks') {
       const updatedPrimaryKeyColumns = primaryKeyColumns.slice()
       const [removed] = updatedPrimaryKeyColumns.splice(result.source.index, 1)
@@ -190,7 +190,7 @@ const ColumnManagement = ({
           {/* Headers */}
           <div className="flex w-full px-3">
             {/* Drag handle */}
-            {isNewRecord && <div className="w-[5%]" />}
+            <div className="w-[5%]" />
             <div className="w-[25%] flex items-center space-x-2">
               <h5 className="text-xs text-scale-900">Name</h5>
               <Tooltip.Root delayDuration={0}>
@@ -220,7 +220,7 @@ const ColumnManagement = ({
             <div className="w-[25%]">
               <h5 className="text-xs text-scale-900">Type</h5>
             </div>
-            <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'} flex items-center space-x-2`}>
+            <div className="w-[25%] flex items-center space-x-2">
               <h5 className="text-xs text-scale-900">Default Value</h5>
 
               <Tooltip.Root delayDuration={0}>
@@ -264,9 +264,7 @@ const ColumnManagement = ({
                 {(droppableProvided: DroppableProvided) => (
                   <div
                     ref={droppableProvided.innerRef}
-                    className={`space-y-2 rounded-md bg-gray-400 px-3 py-2 ${
-                      isNewRecord ? '' : '-mx-3'
-                    }`}
+                    className="space-y-2 rounded-md bg-gray-400 px-3 py-2"
                   >
                     {primaryKeyColumns.map((column: ColumnField, index: number) => (
                       <Draggable key={column.id} draggableId={column.id} index={index}>
@@ -278,7 +276,6 @@ const ColumnManagement = ({
                             <Column
                               column={column}
                               enumTypes={enumTypes}
-                              isNewRecord={isNewRecord}
                               hasImportContent={hasImportContent}
                               dragHandleProps={draggableProvided.dragHandleProps}
                               onEditRelation={() => {
@@ -303,7 +300,7 @@ const ColumnManagement = ({
               {(droppableProvided: DroppableProvided) => (
                 <div
                   ref={droppableProvided.innerRef}
-                  className={`space-y-2 py-2 ${isNewRecord ? 'px-3 ' : ''}`}
+                  className="space-y-2 py-2 px-3"
                 >
                   {otherColumns.map((column: ColumnField, index: number) => (
                     <Draggable key={column.id} draggableId={column.id} index={index}>
@@ -312,7 +309,6 @@ const ColumnManagement = ({
                           <Column
                             column={column}
                             enumTypes={enumTypes}
-                            isNewRecord={isNewRecord}
                             hasImportContent={hasImportContent}
                             dragHandleProps={draggableProvided.dragHandleProps}
                             onEditRelation={() => {

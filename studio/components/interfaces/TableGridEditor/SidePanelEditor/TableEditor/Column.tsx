@@ -42,7 +42,6 @@ import { ColumnField } from '../SidePanelEditor.types'
 interface ColumnProps {
   column: ColumnField
   enumTypes: PostgresType[]
-  isNewRecord: boolean
   hasImportContent: boolean
   dragHandleProps?: any
   onEditRelation: (column: any) => void
@@ -53,7 +52,6 @@ interface ColumnProps {
 const Column = ({
   column = {} as ColumnField,
   enumTypes = [] as PostgresType[],
-  isNewRecord = false,
   hasImportContent = false,
   dragHandleProps = {},
   onEditRelation = noop,
@@ -71,7 +69,7 @@ const Column = ({
 
   return (
     <div className="flex w-full items-center">
-      <div className={`w-[5%] ${!isNewRecord ? 'hidden' : ''}`}>
+      <div className="w-[5%]">
         <div className="cursor-drag" {...dragHandleProps}>
           <IconMenu strokeWidth={1} size={15} />
         </div>
@@ -156,7 +154,7 @@ const Column = ({
           />
         </div>
       </div>
-      <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'}`}>
+      <div className="w-[25%]">
         <div className="w-[95%]">
           <InputWithSuggestions
             placeholder={
