@@ -71,7 +71,7 @@ const Column = ({
 
   return (
     <div className="flex w-full items-center">
-      <div className={`w-[5%] ${!isNewRecord ? 'hidden' : ''}`}>
+      <div className={'w-[5%]'}>
         <div className="cursor-drag" {...dragHandleProps}>
           <IconMenu strokeWidth={1} size={15} />
         </div>
