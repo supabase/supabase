@@ -67,7 +67,7 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
         <a className="py-1 px-3 w-full overflow-hidden">
           <p
             title={description || name}
-            className="text-sm text-scale-1100 group-hover:text-scale-1200 transition overflow-hidden overflow-hidden truncate"
+            className="text-sm text-scale-1100 group-hover:text-scale-1200 transition overflow-hidden text-ellipsis"
           >
             {name}
           </p>
