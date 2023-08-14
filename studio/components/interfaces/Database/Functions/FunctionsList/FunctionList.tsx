@@ -50,7 +50,7 @@ const FunctionList = ({
     <>
       {_functions.map((x) => (
         <Table.tr key={x.id}>
-          <Table.td>
+          <Table.td className="truncate">
             <p>{x.name}</p>
           </Table.td>
           <Table.td className="hidden md:table-cell md:overflow-auto">
