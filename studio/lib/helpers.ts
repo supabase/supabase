@@ -269,6 +269,7 @@ export const isValidHttpUrl = (value: string) => {
 
 /**
  * Helper function to remove comments from SQL.
+ * Disclaimer: Doesn't work as intended for nested comments.
  */
 export const removeCommentsFromSql = (sql: string) => {
   // Removing single-line comments:
