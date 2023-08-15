@@ -79,7 +79,9 @@ Contains a hashed version of the `Token`. This is useful for constructing your o
 ```html
 <p>Follow this link to confirm your user:</p>
 <p>
-  <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">Confirm your mail</a>
+  <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email"
+    >Confirm your email</a
+  >
 </p>
 ```
 
