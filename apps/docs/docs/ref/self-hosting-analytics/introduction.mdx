@@ -42,7 +42,7 @@ The Postgres backend is recommended for getting familiar and experimenting with 
 To get started with self-hosting Supabase, the [example docker-compose](https://github.com/supabase/supabase/tree/master/docker) will give you a jumpstart to setting up logging for the stack.
 Two compose services are required: Logflare, and Vector. Logflare is the HTTP Analytics server, while Vector is the logging pipeline to route all compose services' syslog to the Logflare sever.
 
-Regardless of backend chosen, the following environment variables **must** be set for the `supabase/logflare` docker image:
+Regardless of the backend chosen, the following environment variables **must** be set for the `supabase/logflare` docker image:
 
 - `LOGFLARE_SINGLE_TENANT_MODE=true`: The feature flag for enabling single tenant mode for Logflare. Must be set to `true`
 - `LOGFLARE_SUPABASE_MODE=true`: The feature flag for seeding Supabase-related data. Must be set to `true`
