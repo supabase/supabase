@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.83.7
+  version: 1.86.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -2257,8 +2257,8 @@ commands:
       - supabase-db-diff
       - supabase-db-dump
       - supabase-db-lint
+      - supabase-db-pull
       - supabase-db-push
-      - supabase-db-remote
       - supabase-db-reset
       - supabase-db-start
     flags: []
@@ -2305,45 +2305,14 @@ commands:
         name: --linked
         description: Resets the linked project to current migrations.
         default_value: 'false'
+      - id: version
+        name: --version <string>
+        description: Reset up to the specified version.
+        default_value: ''
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
         default_value: ''
-  - id: supabase-db-remote
-    title: supabase db remote
-    summary: Manage remote databases
-    tags: []
-    links: []
-    subcommands:
-      - supabase-db-remote-commit
-    flags: []
-  - id: supabase-db-remote-commit
-    title: supabase db remote commit
-    summary: Commit remote changes as a new migration
-    description: |2
-
-      Pulls schema changes from a remote database and inserts a new row into the migration history table.
-
-      Requires your local project to be linked to a remote database by running `supabase link`. For self-hosted databases, you can pass in the connection parameters using `--db-url` flag.
-
-      If no entries exist in the migration history table, `pg_dump` will be used to capture all contents of the remote schemas you have created. After that, a new record will be inserted into the migration history table. Subsequent runs of this command will only diff schema changes against the remote database similar to `db diff --linked`.
-    tags: []
-    links: []
-    usage: supabase db remote commit
-    subcommands: []
-    flags:
-      - id: db-url
-        name: --db-url <string>
-        description: connect using the specified database url
-        default_value: ''
-      - id: password
-        name: -p, --password <string>
-        description: Password to your remote Postgres database.
-        default_value: ''
-      - id: schema
-        name: -s, --schema <strings>
-        description: List of schema to include.
-        default_value: all
   - id: supabase-db-push
     title: supabase db push
     summary: Push new migrations to the remote database
@@ -2404,6 +2373,35 @@ commands:
         name: -p, --password <string>
         description: Password to your remote Postgres database.
         default_value: ''
+      - id: db-url
+        name: --db-url <string>
+        description: connect using the specified database url
+        default_value: ''
+  - id: supabase-db-pull
+    title: supabase db pull
+    summary: Pull schema from the remote database
+    description: |2
+
+      Pulls schema changes from a remote database.
+
+      Requires your local project to be linked to a remote database by running `supabase link`. For self-hosted databases, you can pass in the connection parameters using `--db-url` flag.
+
+      Optionally, a new row can be inserted into the migration history table to reflect the current state of the remote database.
+
+      If no entries exist in the migration history table, `pg_dump` will be used to capture all contents of the remote schemas you have created. Otherwise, this command will only diff schema changes against the remote database, similar to running `db diff --linked`.
+    tags: []
+    links: []
+    usage: supabase db pull [flags]
+    subcommands: []
+    flags:
+      - id: password
+        name: -p, --password <string>
+        description: Password to your remote Postgres database.
+        default_value: ''
+      - id: schema
+        name: -s, --schema <strings>
+        description: List of schema to include.
+        default_value: all
       - id: db-url
         name: --db-url <string>
         description: connect using the specified database url
