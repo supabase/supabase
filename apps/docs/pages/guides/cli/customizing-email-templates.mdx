@@ -24,7 +24,30 @@ content_path = "./supabase/auth/email/invite.html"
 
 The `content_path` should contain the html file you are pointing to otherwise the CLI won't start the project.
 
-> Note: These settings are only for local development, if you want to use the same content for your hosted Supabase you will need to copy and paste these into the Supabase Dashboard
+<Admonition type="note">
+
+These settings are only for local development, if you want to use the same content for your hosted Supabase instance you will need to copy and paste these into the Supabase Dashboard
+
+</Admonition>
+
+### Email template variables
+
+The following template variables are available inside of your email template.
+
+```
+{{ .ConfirmationURL }} : URL to confirm the email change
+{{ .Token }} : The 6-digit numeric email OTP
+{{ .TokenHash }} : The hashed token used in the URL
+{{ .SiteURL }} : The URL of the site
+{{ .Email }} : The original users email address
+{{ .NewEmail }} : The users new email address
+```
+
+<Admonition type="note">
+
+`{{ .NewEmail }}` is only available in the email_change email template
+
+</Admonition>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
