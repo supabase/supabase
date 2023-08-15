@@ -34,6 +34,7 @@ import APIKeys from './APIKeys'
 import SearchableStudioItems from './SearchableStudioItems'
 import CommandMenuShortcuts from './CommandMenuShortcuts'
 import { BadgeExperimental } from './Command.Badges'
+import { AiIconAnimation } from '@ui/layout/ai-icon-animation'
 
 export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI, // this one is temporary
@@ -121,8 +122,8 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                   }}
                   forceMount
                 >
-                  <AiIcon />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand to-brand-600">
+                  <AiIconAnimation />
+                  <span className="text-brand">
                     Ask Supabase AI
                     {search ? (
                       <>
@@ -254,7 +255,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
 
               <CommandGroup heading="Settings">
                 <CommandItem type="link" onSelect={() => setPages([...pages, 'Theme'])}>
-                  <IconMonitor className="mr-2" />
+                  <IconMonitor />
                   Change theme
                 </CommandItem>
               </CommandGroup>

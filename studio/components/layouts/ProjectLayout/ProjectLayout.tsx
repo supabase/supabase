@@ -171,7 +171,9 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
 
   const isProjectUpgrading = selectedProject?.status === PROJECT_STATUS.UPGRADING
   const isProjectRestoring = selectedProject?.status === PROJECT_STATUS.RESTORING
-  const isProjectBuilding = selectedProject?.status === PROJECT_STATUS.COMING_UP
+  const isProjectBuilding =
+    selectedProject?.status === PROJECT_STATUS.COMING_UP ||
+    selectedProject?.status === PROJECT_STATUS.UNKNOWN
   const isProjectPausing =
     selectedProject?.status === PROJECT_STATUS.GOING_DOWN ||
     selectedProject?.status === PROJECT_STATUS.PAUSING

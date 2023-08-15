@@ -2,6 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { ResponseError } from 'types'
 import { Integration, IntegrationsVariables } from './integrations.types'
 import { integrationKeys } from './keys'
 
@@ -23,7 +24,7 @@ export async function getIntegrations({ orgSlug }: IntegrationsVariables, signal
 
 export type IntegrationsData = Awaited<ReturnType<typeof getIntegrations>>
 export type ProjectIntegrationConnectionsData = Awaited<ReturnType<typeof getIntegrations>>
-export type IntegrationsError = unknown
+export type IntegrationsError = ResponseError
 
 export const useOrgIntegrationsQuery = <TData = IntegrationsData>(
   { orgSlug }: IntegrationsVariables,

@@ -2563,7 +2563,7 @@ functions:
           - `NotAuthenticated`, 
           - `LoadingFromStorage`, 
           - `NetworkError`, 
-          - `Authenticated(sesssion)`
+          - `Authenticated(session)`
   - id: reset-password-for-email
     title: 'Send a password reset request'
     notes: |
@@ -2571,12 +2571,10 @@ functions:
       - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password.
       - The `sendRecoveryEmail()` only sends a password reset link to the user's email.
       To update the user's password, see [`modifyUser()`](/docs/reference/kotlin/auth-updateuser).
-      - When the user clicks the reset link in the email they are redirected back to your application.
-      You can configure the URL that the user is redirected to with the `redirectUrl` parameter.
-      See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - The user gets redirected back to your app, assuming you setup [OTP handling](/docs/reference/kotlin/initializing)
       - After the user has been redirected successfully, prompt them for a new password and call `modifyUser()`:
         ```kotlin
-        client.gotrue.modifyUser(Email) {
+        client.gotrue.modifyUser {
             password = "1234567"
         }
         ```
@@ -3098,9 +3096,10 @@ functions:
           function()
           //invoke it with a body:
           function(body)
-          //invoke it with custom headers:
+          //invoke it with custom request options:
           function(body) {
-              set("Header", "Value")
+              header("Header", "Value")
+              parameter("Key", "Value") //url parameter
           }
           ```
   - id: subscribe

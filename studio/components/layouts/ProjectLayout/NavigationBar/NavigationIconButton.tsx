@@ -1,16 +1,15 @@
-import { FC } from 'react'
-import Link from 'next/link'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import Link from 'next/link'
 
-import { Route } from 'components/ui/ui.types'
 import ConditionalWrap from 'components/ui/ConditionalWrap'
+import { Route } from 'components/ui/ui.types'
 
-interface Props {
+interface NavigationIconButtonProps {
   route: Route
   isActive?: boolean
 }
 
-const NavigationIconButton: FC<Props> = ({ route, isActive = false }) => {
+const NavigationIconButton = ({ route, isActive = false }: NavigationIconButtonProps) => {
   return (
     <Tooltip.Root delayDuration={0}>
       <Tooltip.Trigger>

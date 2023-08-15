@@ -1,13 +1,12 @@
 import { IconAlertCircle } from 'ui'
-import { FC } from 'react'
 
-interface Props {
+interface NoPermissionProps {
   resourceText: string
   isFullPage?: boolean
 }
 
-const NoPermission: FC<Props> = ({ resourceText, isFullPage = false }) => {
-  const NoPermissionMessage = ({}) => (
+const NoPermission = ({ resourceText, isFullPage = false }: NoPermissionProps) => {
+  const NoPermissionMessage = () => (
     <div
       className={[
         'block w-full rounded border border-opacity-20 py-4 px-6',

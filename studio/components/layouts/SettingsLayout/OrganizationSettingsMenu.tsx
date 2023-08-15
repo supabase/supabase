@@ -28,7 +28,9 @@ const OrganizationSettingsMenu = () => {
           <SettingsMenuItem
             key={link.label}
             label={link.label}
-            href={link.pathname.replace('[slug]', organization?.slug ?? '')}
+            href={
+              organization !== undefined ? link.pathname.replace('[slug]', organization.slug) : '/'
+            }
             isActive={link.pathname === router.pathname}
           />
         ))}

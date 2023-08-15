@@ -72,8 +72,8 @@ API:
 begin;
 select plan( 2 );
 
-select has_column( 'profiles', 'id' );  # test that the "id" column exists in the "profiles" table
-select col_is_pk( 'profiles', 'id' );   # test that the "id" column is a primary key
+select has_column( 'profiles', 'id' ); -- test that the "id" column exists in the "profiles" table
+select col_is_pk( 'profiles', 'id' ); -- test that the "id" column is a primary key
 
 select * from finish();
 rollback;
@@ -94,8 +94,8 @@ select policies_are(
   'public',
   'profiles',
   ARRAY [
-    'Profiles are public', # Test that there is a policy called  "Profiles are public" on the "profiles" table.
-    'Profiles can only be updated by the owner'  # Test that there is a policy called  "Profiles can only be updated by the owner" on the "profiles" table.
+    'Profiles are public', -- Test that there is a policy called  "Profiles are public" on the "profiles" table.
+    'Profiles can only be updated by the owner'  -- Test that there is a policy called  "Profiles can only be updated by the owner" on the "profiles" table.
   ]
 );
 

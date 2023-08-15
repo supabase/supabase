@@ -411,6 +411,6 @@
     "name": "wrappers",
     "comment": "Foreign data wrappers developed by Supabase",
     "tags": ["Admin", "Utility"],
-    "link": "/guides/database/extensions/wrappers"
+    "link": "/guides/database/extensions/wrappers/overview"
   }
 ]

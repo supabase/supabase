@@ -8,7 +8,7 @@ import { integrationKeys } from './keys'
 export type GitHubIntegrationCreateVariables = {
   installationId: number
   orgSlug: string
-  metadata: { [key: string]: string }
+  metadata: { supabaseConfig: { supabaseDirectory: string } }
 }
 
 export async function createGitHubIntegration({

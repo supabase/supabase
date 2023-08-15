@@ -14,6 +14,8 @@ import { useFormContext } from '../Form/FormContext'
 
 export interface Props
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'onCopy'> {
+  inputClassName?: string
+  iconContainerClassName?: string
   copy?: boolean
   onCopy?: () => void
   defaultValue?: string | number
@@ -38,6 +40,8 @@ function Input({
   autoComplete,
   autoFocus,
   className,
+  inputClassName,
+  iconContainerClassName,
   copy,
   defaultValue,
   descriptionText,
@@ -124,13 +128,14 @@ function Input({
     setHidden(false)
   }
 
-  let inputClasses = [__styles.base]
+  let inputClasses = ['peer/input', __styles.base]
 
   if (error) inputClasses.push(__styles.variants.error)
   if (!error) inputClasses.push(__styles.variants.standard)
   if (icon) inputClasses.push(__styles.with_icon)
   if (size) inputClasses.push(__styles.size[size])
   if (disabled) inputClasses.push(__styles.disabled)
+  if (inputClassName) inputClasses.push(inputClassName)
 
   return (
     <FormLayout
@@ -164,7 +169,7 @@ function Input({
           className={inputClasses.join(' ')}
           {...props}
         />
-        {icon && <InputIconContainer icon={icon} />}
+        {icon && <InputIconContainer icon={icon} className={iconContainerClassName} />}
         {copy || error || actions ? (
           <div className={__styles.actions_container}>
             {error && <InputErrorIcon size={size} />}
@@ -188,6 +193,7 @@ function Input({
 
 export interface TextAreaProps
   extends Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'size' | 'onCopy'> {
+  textAreaClassName?: string
   descriptionText?: string
   error?: string
   icon?: any
@@ -208,6 +214,7 @@ export interface TextAreaProps
 
 function TextArea({
   className,
+  textAreaClassName,
   descriptionText,
   disabled,
   error,
@@ -291,6 +298,7 @@ function TextArea({
   if (icon) classes.push(__styles.with_icon)
   if (size) classes.push(__styles.size[size])
   if (disabled) classes.push(__styles.disabled)
+  if (textAreaClassName) classes.push(textAreaClassName)
 
   return (
     <FormLayout

@@ -1,7 +1,10 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
+import sumBy from 'lodash/sumBy'
 import Link from 'next/link'
-import { FC, useState } from 'react'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { ChartIntervals } from 'types'
 import {
   Button,
   Dropdown,
@@ -12,12 +15,10 @@ import {
   IconZap,
   Loading,
 } from 'ui'
-import Panel from 'components/ui/Panel'
-import { ChartIntervals } from 'types'
-import { useParams } from 'common/hooks'
-import { UsageApiCounts, useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
+
 import BarChart from 'components/ui/Charts/BarChart'
-import sumBy from 'lodash/sumBy'
+import Panel from 'components/ui/Panel'
+import { UsageApiCounts, useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
 import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
 
 const CHART_INTERVALS: ChartIntervals[] = [
@@ -31,9 +32,8 @@ const CHART_INTERVALS: ChartIntervals[] = [
   { key: 'hourly', label: '24 hours', startValue: 24, startUnit: 'hour', format: 'MMM D, ha' },
   { key: 'daily', label: '7 days', startValue: 7, startUnit: 'day', format: 'MMM D' },
 ]
-interface Props {}
 
-const ProjectUsage: FC<Props> = ({}) => {
+const ProjectUsage = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
 
