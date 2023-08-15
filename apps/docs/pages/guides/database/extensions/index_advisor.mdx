@@ -8,6 +8,22 @@ export const meta = {
 
 [Index advisor](https://github.com/supabase/index_advisor) is a Postgres extension for recommending indexes to improve query performance.
 
+
+For example:
+
+```sql
+select
+    *
+from
+  index_advisor('select book.id from book where title = $1');
+
+ startup_cost_before | startup_cost_after | total_cost_before | total_cost_after |                  index_statements                   | errors
+---------------------+--------------------+-------------------+------------------+-----------------------------------------------------+--------
+ 0.00                | 1.17               | 25.88             | 6.40             | {"CREATE INDEX ON public.book USING btree (title)"},| {}
+(1 row)
+```
+
+
 Features:
 
 - Supports generic parameters e.g. `$1`, `$2`
