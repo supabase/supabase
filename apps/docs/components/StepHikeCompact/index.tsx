@@ -1,5 +1,6 @@
 //import { Step } from 'next-seo/lib/types'
-import React, { FC } from 'react'
+import { FC } from 'react'
+import { cn } from 'ui'
 
 interface IStep {
   title: string
@@ -13,7 +14,9 @@ interface IStepHikeCompactSubcomponents {
 }
 interface IDetails {
   title?: string
+  fullWidth?: boolean
 }
+
 interface ICode {}
 
 interface IStepHikeCompact {
@@ -74,9 +77,9 @@ const Step: FC<IStep> = ({ children, title, step }) => {
   )
 }
 
-const Details: FC<IDetails> = ({ children, title }) => {
+const Details: FC<IDetails> = ({ children, title, fullWidth = false }) => {
   return (
-    <div className="col-span-5 ml-12 lg:ml-0">
+    <div className={cn(fullWidth ? 'col-span-12' : 'col-span-5', 'ml-12', 'lg:ml-0')}>
       <h3 className="mt-0 text-scale-1200 text-base">{title}</h3>
       {children}
     </div>

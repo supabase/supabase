@@ -68,6 +68,7 @@ Restrictions applied successfully: true
 
 - The current iteration of Network Restrictions applies to connections to Postgres and PgBouncer and doesn't currently apply to APIs offered over HTTPS (e.g., PostgREST, Storage, and Auth).
 - Network Restrictions should not be used if you need to connect to your Postgres database using Edge Functions.
+- [Supavisor](https://github.com/supabase/supavisor/) does not currently support Network Restrictions.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

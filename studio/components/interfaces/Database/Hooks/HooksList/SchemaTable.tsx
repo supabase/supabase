@@ -1,22 +1,22 @@
-import { FC } from 'react'
+import { noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
 import Table from 'components/to-be-cleaned/Table'
 import HookList from './HookList'
 
-interface Props {
+interface SchemaTableProps {
   schema: string
   filterString: string
   editHook: (hook: any) => void
   deleteHook: (hook: any) => void
 }
 
-const SchemaTable: FC<Props> = ({
+const SchemaTable = ({
   schema,
   filterString,
-  editHook = () => {},
-  deleteHook = () => {},
-}) => {
+  editHook = noop,
+  deleteHook = noop,
+}: SchemaTableProps) => {
   return (
     <div key={schema} className="">
       <div className="sticky top-0 backdrop-blur backdrop-filter">

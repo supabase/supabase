@@ -1,20 +1,40 @@
-import { Badge, IconAlertTriangle, IconLoader, IconPauseCircle } from 'ui'
+import {
+  Badge,
+  IconAlertTriangle,
+  IconGitBranch,
+  IconGitHub,
+  IconLoader,
+  IconPauseCircle,
+  IconTriangle,
+} from 'ui'
 
 import CardButton from 'components/ui/CardButton'
 import { useProjectReadOnlyStatus } from 'hooks/misc/useProjectReadOnlyStatus'
-import { PROJECT_STATUS } from 'lib/constants'
+import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { Project } from 'types'
+import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 
 export interface ProjectCardProps {
   project: Project
   rewriteHref?: string
+  githubIntegration?: IntegrationProjectConnection
+  vercelIntegration?: IntegrationProjectConnection
 }
 
-const ProjectCard = ({ project, rewriteHref }: ProjectCardProps) => {
+const ProjectCard = ({
+  project,
+  rewriteHref,
+  githubIntegration,
+  vercelIntegration,
+}: ProjectCardProps) => {
   const { name, ref: projectRef } = project
   const desc = `${project.cloud_provider} | ${project.region}`
 
   const isReadonly = useProjectReadOnlyStatus(projectRef)
+  const isBranchingEnabled = project.preview_branch_refs.length > 0
+  const isGithubIntegrated = githubIntegration !== undefined
+  const isVercelIntegrated = vercelIntegration !== undefined
+  const githubRepository = githubIntegration?.metadata.name ?? undefined
 
   // Project status should supersede is read only status
   const isHealthy = project.status === PROJECT_STATUS.ACTIVE_HEALTHY
@@ -24,12 +44,36 @@ const ProjectCard = ({ project, rewriteHref }: ProjectCardProps) => {
   const isRestoring = project.status === PROJECT_STATUS.RESTORING
 
   return (
-    <li className="col-span-1">
+    <li className="col-span-1 list-none">
       <CardButton
         linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
         title={
-          <div className="flex w-full flex-row justify-between gap-1">
-            <span className="flex-shrink truncate">{name}</span>
+          <div className="w-full justify-between space-y-1">
+            <p className="flex-shrink truncate">{name}</p>
+            <div className="flex items-center space-x-1.5">
+              {isVercelIntegrated && (
+                <div className="w-fit p-1 border rounded-md flex items-center border-scale-600">
+                  <img
+                    src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
+                    alt="Vercel Icon"
+                    className="w-3"
+                  />
+                </div>
+              )}
+              {isBranchingEnabled && (
+                <div className="w-fit p-1 border rounded-md flex items-center border-scale-600">
+                  <IconGitBranch size={12} strokeWidth={1.5} />
+                </div>
+              )}
+              {isGithubIntegrated && (
+                <>
+                  <div className="w-fit p-1 border rounded-md flex items-center border-scale-600">
+                    <IconGitHub size={12} strokeWidth={1.5} />
+                  </div>
+                  <p className="text-xs !ml-2 text-scale-1100">{githubRepository}</p>
+                </>
+              )}
+            </div>
           </div>
         }
         footer={

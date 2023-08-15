@@ -6,8 +6,17 @@ import ImageGrid from '~/components/ImageGrid'
 import Quote from '~/components/Quote'
 import Chart from '~/components/Charts/PGCharts'
 import InlineCodeTag from '~/components/InlineCode'
-import { Badge } from 'ui'
+import {
+  Badge,
+  Collapsible_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  IconTriangle,
+} from 'ui'
 import ImageFadeStack from '~/components/ImageFadeStack'
+import ZoomableImg from '~/components/ZoomableImg/ZoomableImg'
+
+import 'react-medium-image-zoom/dist/styles.css'
 
 // import all components used in blog articles here
 // to do: move this into a helper/utils, it is used elsewhere
@@ -24,6 +33,29 @@ const getCaptionAlign = (align?: 'left' | 'center' | 'right') => {
     default:
       return 'text-center'
   }
+}
+
+const BlogCollapsible = ({ title, ...props }: { title: string }) => {
+  return (
+    <Collapsible_Shadcn_>
+      <CollapsibleTrigger_Shadcn_
+        className="    
+        data-[state=open]:text
+        hover:text-light
+        flex items-center gap-3
+        [&>svg]:fill-current
+        [&>svg]:rotate-90
+        [&>svg]:transition-transform
+        [&>svg]:data-[state='open']:rotate-180
+        [&>svg]:data-[state='open']:text
+        "
+      >
+        <IconTriangle size={10} />
+        <span>{title}</span>
+      </CollapsibleTrigger_Shadcn_>
+      <CollapsibleContent_Shadcn_ {...props} />
+    </Collapsible_Shadcn_>
+  )
 }
 
 export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
@@ -59,15 +91,25 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
       }
       return <img {...props} />
     },
-    Img: (props: any) => (
-      <figure>
-        <span className={['next-image--dynamic-fill', props.wide && 'wide'].join(' ')}>
-          <Image
-            {...props}
-            className={[type === 'blog' ? 'rounded-md border' : ''].join(' ')}
-            layout="fill"
-          />
-        </span>
+    Img: ({ zoomable = true, ...props }: any) => (
+      <figure className="m-0">
+        <ZoomableImg zoomable={zoomable}>
+          <span className={['next-image--dynamic-fill', props.wide && 'wide'].join(' ')}>
+            {zoomable ? (
+              <img
+                className={[type === 'blog' ? 'rounded-md border' : ''].join(' ')}
+                layout="fill"
+                {...props}
+              />
+            ) : (
+              <Image
+                className={[type === 'blog' ? 'rounded-md border' : ''].join(' ')}
+                layout="fill"
+                {...props}
+              />
+            )}
+          </span>
+        </ZoomableImg>
         {props.caption && (
           <figcaption className={[getCaptionAlign(props.captionAlign)].join(' ')}>
             {props.caption}
@@ -75,7 +117,13 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
         )}
       </figure>
     ),
+    Link: (props: HTMLAnchorElement) => (
+      <a href={props.href} target={props.target}>
+        {props.children}
+      </a>
+    ),
     code: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
+    BlogCollapsible: (props: any) => <BlogCollapsible {...props} />,
   }
 
   return components

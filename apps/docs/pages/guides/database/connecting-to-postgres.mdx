@@ -38,7 +38,7 @@ Every Supabase project provides a full Postgres database. You can connect to the
 
 ## Connection Pooler
 
-Every Supabase project comes with PgBouncer for connection pooling. A connection pooler is useful for managing a large number of _temporary_ connections. For example, if you are using [Prisma](/docs/guides/integrations/prisma), Drizzle, Kysely, or anything deployed to a Serverless environment (AWS Lambdas or Edge Functions). You can find the connection pool config in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) inside the dashboard:
+Every Supabase project comes with PgBouncer for connection pooling. A connection pooler is useful for managing a large number of _temporary_ connections. For example, if you are using [Prisma](/partners/integrations/prisma), Drizzle, Kysely, or anything deployed to a Serverless environment (AWS Lambdas or Edge Functions). You can find the connection pool config in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) inside the dashboard:
 
 1. Go to the `Settings` section.
 2. Click `Database`.
@@ -50,6 +50,20 @@ Every Supabase project comes with PgBouncer for connection pooling. A connection
     type="video/mp4"
   />
 </video>
+
+## Supavisor
+
+Supavisor is a new connection pooler by Supabase. It can provide a more scalable connection pool than PgBouncer, and runs on a highly available cluster not on your database.
+
+This can free up some CPU cycles for your database to use for queries. It also makes connecting to Postgres in a serverless environment much easier.
+
+We're building compatibility with PgBouncer. It won't require any application changes to switch from PgBouncer to Supavisor.
+
+To use Supavisor [contact support](https://supabase.com/dashboard/support/new) and we will expose the connection string in your project dashboard.
+
+Supavisor is open source and compatible with any Postgres deployment.
+
+Check out [the Github repository](https://github.com/supabase/supavisor).
 
 ## Choosing a connection method
 
@@ -267,7 +281,7 @@ psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-supabase.cer host=db.
 
     <StepHikeCompact.Details title="Install">
 
-    Install Drizzle and releated dependencies.
+    Install Postgres.js and releated dependencies.
 
     </StepHikeCompact.Details>
 
@@ -275,7 +289,6 @@ psql "sslmode=verify-full sslrootcert=$HOME/Downloads/prod-supabase.cer host=db.
 
      ```shell
      npm i postgres
-     npm i -D drizzle-kit
      ```
 
     </StepHikeCompact.Code>

@@ -8,49 +8,52 @@ import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { Fragment, useState } from 'react'
+import { Alert, Button, IconArrowRight, IconBell, IconInbox, Popover } from 'ui'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useNotificationsQuery } from 'data/notifications/notifications-query'
+import { useNotificationsUpdateMutation } from 'data/notifications/notifications-update-mutation'
 import { getProjectDetail } from 'data/projects/project-detail-query'
-import { invalidateProjectsQuery, setProjectPostgrestStatus } from 'data/projects/projects-query'
+import { setProjectPostgrestStatus } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 import { delete_, patch, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Project } from 'types'
-import { Alert, Button, IconArrowRight, IconBell, Popover } from 'ui'
 import NotificationRow from './NotificationRow'
 
-const NotificationsPopover = () => {
+interface NotificationsPopoverProps {
+  alt?: boolean
+}
+
+const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
   const queryClient = useQueryClient()
   const router = useRouter()
   const { meta, ui } = useStore()
-  const { data: notifications, refetch } = useNotificationsQuery()
+  const { data: notifications } = useNotificationsQuery()
+  const { mutate: updateNotifications } = useNotificationsUpdateMutation({
+    onError: () => console.error('Failed to update notifications'),
+  })
 
   const [projectToRestart, setProjectToRestart] = useState<Project>()
   const [projectToApplyMigration, setProjectToApplyMigration] = useState<Project>()
   const [projectToRollbackMigration, setProjectToRollbackMigration] = useState<Project>()
   const [projectToFinalizeMigration, setProjectToFinalizeMigration] = useState<Project>()
-
   const [targetNotification, setTargetNotification] = useState<Notification>()
 
-  if (!notifications) return <></>
-
-  const hasNewNotifications = notifications?.some(
-    (notification) => notification.notification_status === NotificationStatus.New
-  )
+  const newNotifications =
+    notifications?.filter(
+      (notification) => notification.notification_status === NotificationStatus.New
+    ) ?? []
+  const hasNewNotifications = newNotifications.length > 0
 
   const onOpenChange = async (open: boolean) => {
-    // TODO(alaister): move this to a mutation
+    // Mark notifications as seen
     if (!open) {
-      // Mark notifications as seen
-      const notificationIds = notifications
-        .filter((notification) => notification.notification_status === NotificationStatus.New)
-        .map((notification) => notification.id)
-      if (notificationIds.length > 0) {
-        const { error } = await patch(`${API_URL}/notifications`, { ids: notificationIds })
-        if (error) console.error('Failed to update notifications', error)
-        refetch()
-      }
+      const notificationIds =
+        notifications
+          ?.filter((notification) => notification.notification_status === NotificationStatus.New)
+          .map((notification) => notification.id) ?? []
+      if (notificationIds.length > 0) updateNotifications({ ids: notificationIds })
     }
   }
 
@@ -175,6 +178,8 @@ const NotificationsPopover = () => {
     setProjectToFinalizeMigration(undefined)
   }
 
+  if (!notifications || !Array.isArray(notifications)) return null
+
   return (
     <>
       <Popover
@@ -232,21 +237,47 @@ const NotificationsPopover = () => {
       >
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger asChild>
-            <div className="relative flex">
+            <div className="relative flex items-center">
+              {hasNewNotifications && (
+                <>
+                  {alt ? null : (
+                    <div className="absolute -top-1 -right-1 z-50 flex h-3 w-3 items-center justify-center">
+                      <div className="h-full w-full animate-ping rounded-full bg-green-800 opacity-60"></div>
+                      <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
+                    </div>
+                  )}
+                </>
+              )}
               <Button
                 asChild
                 id="notification-button"
-                type="default"
-                icon={<IconBell size={16} strokeWidth={1.5} className="text-scale-1200" />}
+                type={alt ? 'text' : 'default'}
+                className={alt ? 'px-1' : ''}
+                icon={
+                  hasNewNotifications ? (
+                    <div className="-mr-3.5 z-10 h-4 w-4 flex items-center justify-center rounded-full bg-white">
+                      <p className="text-xs text-scale-100">{newNotifications.length}</p>
+                    </div>
+                  ) : alt ? (
+                    <IconInbox size={18} strokeWidth={1.5} className="text-scale-1100" />
+                  ) : (
+                    <IconBell size={16} strokeWidth={1.5} className="text-scale-1200" />
+                  )
+                }
+                iconRight={
+                  hasNewNotifications ? (
+                    <>
+                      {alt ? (
+                        <IconInbox size={18} strokeWidth={1.5} className="text-scale-1100" />
+                      ) : (
+                        <IconBell size={16} strokeWidth={1.5} className="text-scale-1200" />
+                      )}
+                    </>
+                  ) : null
+                }
               >
                 <span></span>
               </Button>
-              {hasNewNotifications && (
-                <div className="absolute -top-1 -right-1 z-50 flex h-3 w-3 items-center justify-center">
-                  <div className="h-full w-full animate-ping rounded-full bg-green-800 opacity-60"></div>
-                  <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
-                </div>
-              )}
             </div>
           </Tooltip.Trigger>
           <Tooltip.Portal>

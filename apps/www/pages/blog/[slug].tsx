@@ -202,7 +202,7 @@ function BlogPostPage(props: any) {
               {/* Title and description */}
               <div className="mb-16 max-w-5xl space-y-8">
                 <div className="space-y-4">
-                  <p className="text-brand-900">Blog post</p>
+                  <p className="text-brand">Blog post</p>
                   <h1 className="h1">{props.blog.title}</h1>
                   <div className="text-scale-900 flex space-x-3 text-sm">
                     <p>{props.blog.date}</p>
@@ -275,7 +275,7 @@ function BlogPostPage(props: any) {
                           </div>
                         )
                       )}
-                      <MDXRemote {...content} components={mdxComponents()} />
+                      <MDXRemote {...content} components={mdxComponents('blog')} />
                     </div>
                   </article>
                   {isLaunchWeek7 && <BlogLinks />}

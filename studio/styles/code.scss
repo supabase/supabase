@@ -46,7 +46,7 @@
 
   .token.string {
     font-style: normal !important;
-    @apply text-brand-900 #{!important};
+    @apply text-brand #{!important};
   }
 
   .token.constant {
@@ -60,12 +60,12 @@
   }
 
   .token.number {
-    @apply text-brand-900 #{!important};
+    @apply text-brand #{!important};
   }
 
   .token.boolean,
   .token.doc-comment.class-name {
-    @apply text-brand-900;
+    @apply text-brand;
   }
 
   .codeBlock {

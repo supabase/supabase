@@ -1,22 +1,21 @@
-import { FC, useState, useEffect } from 'react'
-import { Button, Loading, IconFileText, IconDownload, IconChevronLeft, IconChevronRight } from 'ui'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText, Loading } from 'ui'
 
-import { useStore } from 'hooks'
-import { API_URL } from 'lib/constants'
-import { get, head } from 'lib/common/fetch'
 import Table from 'components/to-be-cleaned/Table'
-
+import { useStore } from 'hooks'
+import { get, head } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 import InvoiceStatusBadge from './InvoiceStatusBadge'
 import { Invoice, InvoiceStatus } from './Invoices.types'
 
 const PAGE_LIMIT = 10
 
-interface Props {
+interface InvoicesProps {
   projectRef: string
 }
 
-const Invoices: FC<Props> = ({ projectRef }) => {
+const Invoices = ({ projectRef }: InvoicesProps) => {
   const { ui } = useStore()
   const [loading, setLoading] = useState<any>(false)
 

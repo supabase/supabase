@@ -1,28 +1,28 @@
-import { FC, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresRole } from '@supabase/postgres-meta'
+import { useState } from 'react'
 import {
   Button,
-  Form,
-  Dropdown,
-  IconChevronUp,
-  Toggle,
   Collapsible,
-  IconTrash,
+  Dropdown,
+  Form,
+  IconChevronUp,
   IconHelpCircle,
   IconMoreVertical,
+  IconTrash,
+  Toggle,
 } from 'ui'
 
 import { useStore } from 'hooks'
 import { ROLE_PERMISSIONS } from './Roles.constants'
 
-interface Props {
+interface RoleRowProps {
   role: PostgresRole
   disabled?: boolean
   onSelectDelete: (role: PostgresRole) => void
 }
 
-const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
+const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
   const { ui, meta } = useStore()
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -114,8 +114,8 @@ const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
                   {role.active_connections > 0 && (
                     <div className="relative h-2 w-2">
                       <span className="flex h-2 w-2">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-900 opacity-75"></span>
-                        <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-900 opacity-75"></span>
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75"></span>
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-brand opacity-75"></span>
                       </span>
                     </div>
                   )}

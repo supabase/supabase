@@ -51,16 +51,32 @@ const DowngradeModal = ({
     >
       <Modal.Content>
         <div className="py-6">
-          <Alert
-            withIcon
-            variant="warning"
-            title="Downgrading to the free plan will lead to reductions in your organization's quota"
-          >
-            <p>
-              If you're already past the limits of the free plan, your projects could become
-              unresponsive or enter read only mode.
-            </p>
-          </Alert>
+          <div className="space-y-2">
+            <Alert
+              withIcon
+              variant="warning"
+              title="Downgrading to the free plan will lead to reductions in your organization's quota"
+            >
+              <p>
+                If you're already past the limits of the free plan, your projects could become
+                unresponsive or enter read only mode.
+              </p>
+            </Alert>
+
+            {(subscription?.project_addons.length ?? 0) > 0 && (
+              <Alert
+                title={`A total of ${subscription?.project_addons.length} project(s) will be affected from the downgrade`}
+                variant="warning"
+                withIcon
+              >
+                <ul className="space-y-1 max-h-[100px] overflow-y-auto">
+                  {subscription?.project_addons.map((project) => (
+                    <ProjectDowngradeListItem key={project.ref} projectAddon={project} />
+                  ))}
+                </ul>
+              </Alert>
+            )}
+          </div>
 
           <ul className="mt-4 space-y-5 text-sm">
             <li className="flex gap-3">
@@ -77,19 +93,6 @@ const DowngradeModal = ({
                 </div>
                 <span>Add ons from all projects under this organization will be removed.</span>
               </div>
-              {(subscription?.project_addons.length ?? 0) > 0 && (
-                <Alert
-                  title={`A total of ${subscription?.project_addons.length} project(s) will be affected from the downgrade`}
-                  variant="warning"
-                  withIcon
-                >
-                  <ul className="space-y-1 max-h-[100px] overflow-y-auto">
-                    {subscription?.project_addons.map((project) => (
-                      <ProjectDowngradeListItem key={project.ref} projectAddon={project} />
-                    ))}
-                  </ul>
-                </Alert>
-              )}
             </li>
 
             <li className="flex gap-3">

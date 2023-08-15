@@ -5,9 +5,121 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 11 Jul 2023 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Thu, 10 Aug 2023 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supavisor-1-million</guid>
+  <title>Supavisor: Scaling Postgres to 1 Million Connections</title>
+  <link>https://supabase.com/blog/supavisor-1-million</link>
+  <description>Supavisor is a scalable, cloud-native Postgres connection pooler. We connected a million clients to it to see how it performs.</description>
+  <pubDate>Thu, 10 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-soc2-hipaa</guid>
+  <title>Supabase is now HIPAA and SOC2 Type 2 compliant</title>
+  <link>https://supabase.com/blog/supabase-soc2-hipaa</link>
+  <description>This documents our journey from SOC2 Type 1 to SOC2 Type2 and HIPAA compliance. You can start building healthcare apps on Supabase today.</description>
+  <pubDate>Thu, 10 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-8-community-highlights</guid>
+  <title>Launch Week 8 Community Highlights</title>
+  <link>https://supabase.com/blog/launch-week-8-community-highlights</link>
+  <description>Highlights from the community for the past 4 months.</description>
+  <pubDate>Thu, 10 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-integrations-marketplace</guid>
+  <title>Supabase Integrations Marketplace</title>
+  <link>https://supabase.com/blog/supabase-integrations-marketplace</link>
+  <description>Become a Supabase Integrations Partner: Publish OAuth Apps and Build with Supabase.</description>
+  <pubDate>Wed, 09 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/using-supabase-with-vercel</guid>
+  <title>Vercel Integration and Next.js App Router Support</title>
+  <link>https://supabase.com/blog/using-supabase-with-vercel</link>
+  <description>Using Supabase with Vercel and Next.js is now a lot easier.</description>
+  <pubDate>Wed, 09 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-studio-3-0</guid>
+  <title>Supabase Studio 3.0: AI SQL Editor, Schema Diagrams, and new Wrappers</title>
+  <link>https://supabase.com/blog/supabase-studio-3-0</link>
+  <description>Supabase Studio now comes with an AI assisted SQL Editor, schema diagrams, and much more.</description>
+  <pubDate>Tue, 08 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-local-dev</guid>
+  <title>Supabase Local Dev: migrations, branching, and observability</title>
+  <link>https://supabase.com/blog/supabase-local-dev</link>
+  <description>New features to streamline the interaction between CLI, code editors, and remote databases.</description>
+  <pubDate>Mon, 07 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/hugging-face-supabase</guid>
+  <title>Hugging Face is now supported in Supabase</title>
+  <link>https://supabase.com/blog/hugging-face-supabase</link>
+  <description>We&apos;ve added support Hugging Face support in our Python Vector Client and Edge Functions.</description>
+  <pubDate>Sun, 06 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/why-supabase-remote</guid>
+  <title>Why we&apos;ll stay remote</title>
+  <link>https://supabase.com/blog/why-supabase-remote</link>
+  <description>Offices are making a comeback, just not at Supabase.</description>
+  <pubDate>Fri, 04 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/interactive-constellation-threejs-react-three-fiber</guid>
+  <title>Coding the stars - an interactive constellation with Three.js and React Three Fiber</title>
+  <link>https://supabase.com/blog/interactive-constellation-threejs-react-three-fiber</link>
+  <description>How we built a constellation of stars with Three.js and React Three Fiber.</description>
+  <pubDate>Thu, 03 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/fewer-dimensions-are-better-pgvector</guid>
+  <title>pgvector: Fewer dimensions are better</title>
+  <link>https://supabase.com/blog/fewer-dimensions-are-better-pgvector</link>
+  <description>Increase performance in pgvector by using embedding vectors with fewer dimensions</description>
+  <pubDate>Wed, 02 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/beta-update-july-2023</guid>
+  <title>Supabase Beta July 2023</title>
+  <link>https://supabase.com/blog/beta-update-july-2023</link>
+  <description>Launch Week 8 is coming - but we still shipped some goodies during July</description>
+  <pubDate>Tue, 01 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/react-native-storage</guid>
+  <title>React Native file upload with Supabase Storage</title>
+  <link>https://supabase.com/blog/react-native-storage</link>
+  <description>Learn how to implement authentication and file upload in a React Native app.</description>
+  <pubDate>Mon, 31 Jul 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-lw8-hackathon</guid>
+  <title>Supabase Launch Week 8 Hackathon</title>
+  <link>https://supabase.com/blog/supabase-lw8-hackathon</link>
+  <description>Build an Open Source Project over 10 days. 5 prize categories.</description>
+  <pubDate>Mon, 24 Jul 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/flutter-authentication</guid>
+  <title>Getting started with Flutter authentication</title>
+  <link>https://supabase.com/blog/flutter-authentication</link>
+  <description>Learn how authentication on Flutter works through Google sign in with Supabase auth.</description>
+  <pubDate>Mon, 17 Jul 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/pgvector-performance</guid>
+  <title>pgvector 0.4.0 performance</title>
+  <link>https://supabase.com/blog/pgvector-performance</link>
+  <description>There&apos;s been lot of talk about pgvector performance lately, so we took some datasets and pushed pgvector to the limits to find out its strengths and limitations.</description>
+  <pubDate>Wed, 12 Jul 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/postgrest-11-1-release</guid>
   <title>What is new in PostgREST v11.1?</title>
   <link>https://supabase.com/blog/postgrest-11-1-release</link>
@@ -400,9 +512,9 @@
   <pubDate>Wed, 23 Nov 2022 23:00:00 GMT</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/flutter-authentication-and-authorization-with-rls</guid>
-  <title>Flutter Authentication and Authorization with RLS</title>
-  <link>https://supabase.com/blog/flutter-authentication-and-authorization-with-rls</link>
+  <guid>https://supabase.com/blog/flutter-authorization-with-rls</guid>
+  <title>Flutter Authorization with RLS</title>
+  <link>https://supabase.com/blog/flutter-authorization-with-rls</link>
   <description>Learn how you can secure your Flutter app using Supabase Row Level Security.</description>
   <pubDate>Mon, 21 Nov 2022 23:00:00 GMT</pubDate>
 </item>

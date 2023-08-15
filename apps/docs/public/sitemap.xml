@@ -1123,6 +1123,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/android</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+  
+  <url>
     <loc>https://supabase.com/docs/guides/auth/social-login/auth-discord</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -1519,7 +1525,7 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/database/extensions/wrappers</loc>
+    <loc>https://supabase.com/docs/guides/database/extensions/wrappers/overview</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -1592,6 +1598,12 @@
 
   <url>
     <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-flutter</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-kotlin</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>

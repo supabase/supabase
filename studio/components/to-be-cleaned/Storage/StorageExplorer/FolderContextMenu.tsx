@@ -1,17 +1,16 @@
-import { FC } from 'react'
-import { Menu, Item, Separator } from 'react-contexify'
-import 'react-contexify/dist/ReactContexify.css'
-import { IconEdit, IconDownload, IconTrash2 } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Item, Menu, Separator } from 'react-contexify'
+import 'react-contexify/dist/ReactContexify.css'
+import { IconDownload, IconEdit, IconTrash2 } from 'ui'
 
 import { useCheckPermissions } from 'hooks'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
-interface Props {
+interface FolderContextMenuProps {
   id: string
 }
 
-const FolderContextMenu: FC<Props> = ({ id = '' }) => {
+const FolderContextMenu = ({ id = '' }: FolderContextMenuProps) => {
   const storageExplorerStore = useStorageStore()
   const { downloadFolder, setSelectedItemToRename, setSelectedItemsToDelete } = storageExplorerStore
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')

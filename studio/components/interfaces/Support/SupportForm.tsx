@@ -36,6 +36,7 @@ import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.c
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
 
 const MAX_ATTACHMENTS = 5
+const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
 
 export interface SupportFormProps {
   setSentCategory: (value: string) => void
@@ -443,6 +444,28 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         id="subject"
                         label="Subject"
                         placeholder="Summary of the problem you have"
+                        descriptionText={
+                          values.subject.length > 0 &&
+                          INCLUDE_DISCUSSIONS.includes(values.category) ? (
+                            <p className="flex items-center space-x-1">
+                              <span>Check our </span>
+                              <Link
+                                key="gh-discussions"
+                                href={`https://github.com/orgs/supabase/discussions?discussions_q=${values.subject}`}
+                              >
+                                <a
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="flex items-center space-x-2 text-scale-1000 underline hover:text-scale-1100 transition"
+                                >
+                                  Github discussions
+                                  <IconExternalLink size={14} strokeWidth={2} className="ml-1" />
+                                </a>
+                              </Link>
+                              <span> for a quick answer</span>
+                            </p>
+                          ) : null
+                        }
                       />
                     </div>
                     {values.category === 'Problem' && (
@@ -631,6 +654,9 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                       <div className="flex items-center space-x-1 justify-end block text-sm mt-0 mb-2">
                         <p className="text-scale-1000">We will contact you at</p>
                         <p className="text-scale-1200 font-medium">{respondToEmail}</p>
+                      </div>
+                      <div className="flex items-center space-x-1 justify-end block text-sm mt-0 mb-2">
+                        <p className="text-scale-1000">Please ensure you haven't blocked Hubspot in your emails</p>
                       </div>
                       <div className="flex justify-end">
                         <Button

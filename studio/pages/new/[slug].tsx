@@ -50,6 +50,7 @@ import {
   Toggle,
 } from 'ui'
 import Link from 'next/link'
+import { useProjectsQuery } from 'data/projects/projects-query'
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
@@ -86,6 +87,14 @@ const Wizard: NextPageWithLayout = () => {
     { orgSlug: slug },
     { enabled: billedViaOrg }
   )
+
+  const { data: allProjects } = useProjectsQuery({
+    enabled: currentOrg?.subscription_id != undefined,
+  })
+
+  const orgProjectCount = (allProjects || []).filter(
+    (proj) => proj.organization_id === currentOrg?.id
+  ).length
 
   const [availableRegions, setAvailableRegions] = useState(
     getAvailableRegions(PROVIDERS[cloudProvider].id)
@@ -482,15 +491,15 @@ const Wizard: NextPageWithLayout = () => {
                   description={
                     <div className="space-y-3">
                       <p className="text-sm leading-normal">
-                        This organization uses organization level billing and is on the{' '}
-                        <span className="text-brand-900">{orgSubscription?.plan?.name} plan</span>.
+                        This organization uses the new organization-level billing and is on the{' '}
+                        <span className="text-brand">{orgSubscription?.plan?.name} plan</span>.
                       </p>
 
-                      {orgSubscription?.plan?.id !== 'free' && (
+                      {/* Show info when launching a new project in a paid org that already has at least one project */}
+                      {orgSubscription?.plan?.id !== 'free' && orgProjectCount > 0 && (
                         <p>
-                          Your plan comes with $10 of Compute Credits. Launching another project
-                          incurs additional compute costs - if you exhaust your Compute Credits, the
-                          additional compute hours result in additional usage charges.
+                          Launching another project incurs additional compute costs (starting at $10
+                          per month).
                         </p>
                       )}
 

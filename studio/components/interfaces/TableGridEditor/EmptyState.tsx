@@ -1,17 +1,17 @@
-import { FC } from 'react'
-import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useCheckPermissions, useLocalStorage, useStore } from 'hooks'
-import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { observer } from 'mobx-react-lite'
 
-interface Props {
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useCheckPermissions, useLocalStorage, useStore } from 'hooks'
+
+interface EmptyStateProps {
   selectedSchema: string
   onAddTable: () => void
 }
 
-const EmptyState: FC<Props> = ({ selectedSchema, onAddTable }) => {
+const EmptyState = ({ selectedSchema, onAddTable }: EmptyStateProps) => {
   const { meta } = useStore()
   const isProtectedSchema = meta.excludedSchemas.includes(selectedSchema)
   const canCreateTables =

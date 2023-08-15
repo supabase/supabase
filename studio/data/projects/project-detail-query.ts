@@ -8,16 +8,10 @@ import { projectKeys } from './keys'
 export type ProjectDetailVariables = { ref?: string }
 
 export async function getProjectDetail({ ref }: ProjectDetailVariables, signal?: AbortSignal) {
-  if (!ref) {
-    throw new Error('Project ref is required')
-  }
+  if (!ref) throw new Error('Project ref is required')
 
   const data = await get<Project>(`${API_URL}/projects/${ref}`, { signal })
-
-  if (!isResponseOk(data)) {
-    throw data.error
-  }
-
+  if (!isResponseOk(data)) throw data.error
   return data
 }
 

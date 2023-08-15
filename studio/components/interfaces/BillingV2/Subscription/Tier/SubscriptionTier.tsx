@@ -8,7 +8,7 @@ import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscr
 import { useFlag, useSelectedOrganization } from 'hooks'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink } from 'ui'
-import ProjectUpdateDisabledTooltip from '../../ProjectUpdateDisabledTooltip'
+import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import SubscriptionPaymentMethod from './SubscriptionPaymentMethod'
 import TierUpdateSidePanel from './TierUpdateSidePanel'
 
@@ -75,12 +75,13 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
           <div className="col-span-12 lg:col-span-7 space-y-6">
             <div>
               <p className="text-sm">This project is currently on the plan:</p>
-              <p className="text-2xl text-brand-900 uppercase">{tierName}</p>
+              <p className="text-2xl text-brand uppercase">{tierName}</p>
             </div>
             <div>
               <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
                 <Button
                   type="default"
+                  className="pointer-events-auto"
                   disabled={!canChangeTier}
                   onClick={() => snap.setPanelKey('subscriptionPlan')}
                 >

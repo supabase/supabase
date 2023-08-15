@@ -1,8 +1,10 @@
 import dynamic from 'next/dynamic'
+import { useEffect, useState } from 'react'
 import { getSortedPosts } from '~/lib/posts'
 import PostTypes from '~/types/post'
 import Layout from '~/components/Layouts/Default'
 import Hero from '~/components/Hero/Hero'
+import { useTheme } from 'common'
 
 // Import Swiper styles if swiper used on page
 import 'swiper/swiper.min.css'
@@ -19,6 +21,18 @@ const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSec
 type Props = { customerStories: PostTypes[] }
 
 const Index = ({ customerStories }: Props) => {
+  const { isDarkMode, toggleTheme } = useTheme()
+  const [initialDarkMode] = useState(isDarkMode)
+
+  useEffect(() => {
+    toggleTheme(true)
+    document.body.className = 'dark'
+    return () => {
+      document.body.className = ''
+      toggleTheme(initialDarkMode)
+    }
+  }, [])
+
   return (
     <Layout>
       <Hero />

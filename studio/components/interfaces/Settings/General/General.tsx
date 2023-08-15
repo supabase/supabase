@@ -1,6 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
-import { Button, Form, IconBarChart2, Input } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Form,
+  IconAlertCircle,
+  IconBarChart2,
+  Input,
+} from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
@@ -14,15 +23,17 @@ import {
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useProjectByRef, useSelectedOrganization, useStore } from 'hooks'
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
-import { Project } from 'types'
 
 const General = () => {
   const { ui } = useStore()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
+
+  const parentProject = useProjectByRef(project?.parent_project_ref)
+  const isBranch = parentProject !== undefined
 
   const isOrgBilling = !!organization?.subscription_id
   const formId = 'project-general-settings'
@@ -42,6 +53,24 @@ const General = () => {
   return (
     <div>
       <FormHeader title="Project Settings" description="" />
+
+      {isBranch && (
+        <Alert_Shadcn_ variant="default" className="mb-6">
+          <IconAlertCircle strokeWidth={2} />
+          <AlertTitle_Shadcn_>
+            You are currently on a preview branch of your project
+          </AlertTitle_Shadcn_>
+          <AlertDescription_Shadcn_>
+            Certain settings are not available while you're on a preview branch. To adjust your
+            project settings, you may return to your{' '}
+            <Link passHref href={`/project/${parentProject.ref}/settings/general`}>
+              <a className="text-brand-900">main branch</a>
+            </Link>
+            .
+          </AlertDescription_Shadcn_>
+        </Alert_Shadcn_>
+      )}
+
       {project === undefined ? (
         <GenericSkeletonLoader />
       ) : (
@@ -73,7 +102,7 @@ const General = () => {
                       id="name"
                       size="small"
                       label="Project name"
-                      disabled={!canUpdateProject}
+                      disabled={isBranch || !canUpdateProject}
                     />
                     <Input copy disabled id="ref" size="small" label="Reference ID" />
                   </FormSectionContent>
@@ -83,7 +112,7 @@ const General = () => {
           }}
         </Form>
       )}
-      {isOrgBilling && (
+      {!isBranch && isOrgBilling && (
         <>
           <div className="mt-6">
             <FormPanel>

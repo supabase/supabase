@@ -10,6 +10,7 @@ export type SendDowngradeFeedbackVariables = {
   orgSlug?: string
   reasons: string
   message: string
+  exitAction: 'downgrade' | 'delete'
 }
 
 export async function sendDowngradeFeedback({
@@ -17,13 +18,14 @@ export async function sendDowngradeFeedback({
   orgSlug,
   reasons,
   message,
+  exitAction,
 }: SendDowngradeFeedbackVariables) {
   const response = await post(`${API_URL}/feedback/downgrade`, {
     ...(projectRef !== undefined && { projectRef }),
     ...(orgSlug !== undefined && { orgSlug }),
     reasons,
     additionalFeedback: message,
-    exitAction: 'downgrade',
+    exitAction,
   })
   if (response.error) throw response.error
   return response

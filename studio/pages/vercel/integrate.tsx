@@ -173,8 +173,7 @@ class VercelIntegrationStore implements IVercelIntegrationStore {
 }
 const PageContext = createContext<IVercelIntegrationStore>(undefined!)
 
-type VercelIntegrationProps = {} & any
-const VercelIntegration: FC<VercelIntegrationProps> = ({}) => {
+const VercelIntegration = () => {
   // @ts-ignore
   const _store: IVercelIntegrationStore = useLocalObservable(() => new VercelIntegrationStore())
   const { data: projects } = useProjectsQuery()
@@ -218,7 +217,7 @@ const ProjectLinksEmptyState = () => (
       then close this window and retry adding integration.
     </p>
     <Link href="https://supabase.com/dashboard">
-      <a className="text-brand-900">
+      <a className="text-brand">
         Start a new Supabase project<span aria-hidden="true"> &rarr;</span>
       </a>
     </Link>
@@ -226,7 +225,7 @@ const ProjectLinksEmptyState = () => (
 )
 
 const UNDEFINED_SELECT_VALUE = 'undefined'
-const IntegrationProject: FC = observer(() => {
+const IntegrationProject = observer(() => {
   const _store = useContext(PageContext)
   const router = useRouter()
   const [name, setName] = useState<string>('')
@@ -312,7 +311,7 @@ const defaultVercelEnvs = [
     type: 'encrypted',
   },
 ]
-const ProjectLinks: FC = observer(() => {
+const ProjectLinks = observer(() => {
   const _store = useContext(PageContext)
 
   async function onSubmit() {
@@ -459,7 +458,7 @@ const ProjectLinks: FC = observer(() => {
   )
 })
 
-const ProjectLinkList: FC = observer(() => {
+const ProjectLinkList = observer(() => {
   const _store = useContext(PageContext)
 
   function addProjectLink() {
@@ -509,15 +508,15 @@ const ProjectLinkList: FC = observer(() => {
   )
 })
 
-type ProjectLinkItemProps = {
+interface ProjectLinkItemProps {
   idx: number
   vercelProjectId?: string
   supabaseProjectRef?: string
   error?: string
   result?: { status: 'waiting' | 'success' | 'fail'; message?: string }
 }
-const ProjectLinkItem: FC<ProjectLinkItemProps> = observer(
-  ({ idx, vercelProjectId, supabaseProjectRef, error, result }) => {
+const ProjectLinkItem = observer(
+  ({ idx, vercelProjectId, supabaseProjectRef, error, result }: ProjectLinkItemProps) => {
     const _store = useContext(PageContext)
     const selectedVercelProject = _store.vercelProjects.find((x) => x.id == vercelProjectId)
 

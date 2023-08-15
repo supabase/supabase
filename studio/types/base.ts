@@ -9,7 +9,7 @@ export interface Organization {
   is_owner?: boolean
   stripe_customer_id?: string
   opt_in_tags: string[]
-  subscription_id?: string
+  subscription_id?: string | null
 }
 
 export interface ProjectBase {
@@ -22,6 +22,7 @@ export interface ProjectBase {
   region: string
   inserted_at: string
   subscription_id: string
+  preview_branch_refs: string[]
 }
 
 export interface Project extends ProjectBase {
@@ -30,6 +31,10 @@ export interface Project extends ProjectBase {
   dbVersion?: string
   kpsVersion?: string
   restUrl?: string
+  lastDatabaseResizeAt?: string | null
+  maxDatabasePreprovisionGb?: string | null
+  parent_project_ref?: string
+  is_branch_enabled?: boolean
 
   /**
    * postgrestStatus is available on client side only.

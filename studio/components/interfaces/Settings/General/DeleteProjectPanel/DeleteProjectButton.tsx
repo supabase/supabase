@@ -25,7 +25,7 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
   const projectRef = project?.ref
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
   const projectPlan = subscription?.plan?.id ?? 'free'
-  const isFree = projectPlan === PRICING_TIER_PRODUCT_IDS.FREE
+  const isFree = projectPlan === 'free'
 
   const [isOpen, setIsOpen] = useState(false)
   const [message, setMessage] = useState<string>('')
@@ -77,6 +77,7 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
           projectRef,
           message,
           reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+          exitAction: 'delete',
         })
       }
 
