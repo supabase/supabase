@@ -220,14 +220,12 @@ const SQLEditor = () => {
         const sql = snippet
           ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
           : selectedValue || editorRef.current?.getValue()
-        console.log('sql', sql)
 
         const containsDestructiveOperations = destructiveSqlRegex.some((regex) =>
           regex.test(removeCommentsFromSql(sql))
         )
 
         if (!force && containsDestructiveOperations) {
-          console.log('Regex match')
           setIsConfirmModalOpen(true)
           return
         }
