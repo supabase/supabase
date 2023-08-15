@@ -260,6 +260,38 @@ parameters:
     links:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
+  
+  - id: 'auth.email.template.type.subject'
+    title: 'auth.email.template.<type>.subject'
+    tags: ['auth']
+    required: false
+    description: |
+      The full list of email template types are:
+
+      - `invite`
+      - `confirmation`
+      - `recovery`
+      - `magic_link`
+      - `email_change`
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+  
+  - id: 'auth.email.template.type.content_path'
+    title: 'auth.email.template.<type>.content_path'
+    tags: ['auth']
+    required: false
+    description: |
+      The full list of email template types are:
+
+      - `invite`
+      - `confirmation`
+      - `recovery`
+      - `magic_link`
+      - `email_change`
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
 
   - id: 'auth.external.provider.enabled'
     title: 'auth.external.<provider>.enabled'
