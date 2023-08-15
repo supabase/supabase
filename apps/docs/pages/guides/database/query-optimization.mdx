@@ -119,7 +119,7 @@ Avoid the urge to index columns you operate on infrequently. While indexes can s
 
 ### Statistics
 
-Postgres maintains a set of statistics about the contents of your tables. Those statistics are used by the query planner to decide e.g. when its is more efficient to use an index vs scanning the entire table. If the collected statistics drift too far from reality, the query planner may make poor decisions. To avoid the risk, you can periodically `analyze` tables.
+Postgres maintains a set of statistics about the contents of your tables. Those statistics are used by the query planner to decide when it's is more efficient to use an index vs scanning the entire table. If the collected statistics drift too far from reality, the query planner may make poor decisions. To avoid this risk, you can periodically `analyze` tables.
 
 ```sql
 analyze customers;
