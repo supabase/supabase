@@ -107,7 +107,7 @@ where status = 'shipped';
 
 ### Composite Indexes
 
-If filtering or joining on multiple columns, a composite index can help postgres referring to multiple indexes to identify the relevant rows.
+If filtering or joining on multiple columns, a composite index prevents Postgres from referring to multiple indexes when identifying the relevant rows.
 
 ```sql
 create index idx_customers_sign_up_date_priority on customers (sign_up_date, priority);
