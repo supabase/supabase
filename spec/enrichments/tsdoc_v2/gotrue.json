@@ -3140,7 +3140,7 @@
 														"isOptional": true
 													},
 													"comment": {
-														"shortText": "A custom data object to store additional metadata about the user. This maps to the `auth.users.user_metadata` column."
+														"shortText": "A custom data object to store additional metadata about the user. This maps to the `auth.users.raw_user_meta_data` column."
 													},
 													"sources": [
 														{
@@ -5786,7 +5786,7 @@
 						"isOptional": true
 					},
 					"comment": {
-						"shortText": "A custom data object to store the user's application specific metadata. This maps to the `auth.users.app_metadata` column.",
+						"shortText": "A custom data object to store the user's application specific metadata. This maps to the `auth.users.raw_app_meta_data` column.",
 						"text": "Only a service role can modify.\n\nThe `app_metadata` should be a JSON object that includes app-specific info, such as identity providers, roles, and other\naccess control information.\n"
 					},
 					"sources": [
@@ -5991,7 +5991,7 @@
 						"isOptional": true
 					},
 					"comment": {
-						"shortText": "A custom data object to store the user's metadata. This maps to the `auth.users.user_metadata` column.",
+						"shortText": "A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.",
 						"text": "The `user_metadata` should be a JSON object that includes user-specific info, such as their first and last name.\n\nNote: When using the GoTrueAdminApi and wanting to modify a user's metadata,\nthis attribute is used instead of UserAttributes data.\n\n"
 					},
 					"sources": [
@@ -6245,7 +6245,7 @@
 						"isOptional": true
 					},
 					"comment": {
-						"shortText": "A custom data object to store the user's metadata. This maps to the `auth.users.user_metadata` column.",
+						"shortText": "A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.",
 						"text": "The `data` should be a JSON object that includes user-specific info, such as their first and last name.\n"
 					},
 					"sources": [
@@ -7764,7 +7764,7 @@
 						"isOptional": true
 					},
 					"comment": {
-						"shortText": "A custom data object to store the user's metadata. This maps to the `auth.users.user_metadata` column.",
+						"shortText": "A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.",
 						"text": "The `data` should be a JSON object that includes user-specific info, such as their first and last name.\n\n"
 					},
 					"sources": [
@@ -14778,7 +14778,7 @@
 														"isOptional": true
 													},
 													"comment": {
-														"shortText": "A custom data object to store the user's metadata. This maps to the `auth.users.user_metadata` column.",
+														"shortText": "A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.",
 														"text": "The `data` should be a JSON object that includes user-specific info, such as their first and last name.\n"
 													},
 													"sources": [
@@ -14982,7 +14982,7 @@
 														"isOptional": true
 													},
 													"comment": {
-														"shortText": "A custom data object to store the user's metadata. This maps to the `auth.users.user_metadata` column.",
+														"shortText": "A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.",
 														"text": "The `data` should be a JSON object that includes user-specific info, such as their first and last name.\n"
 													},
 													"sources": [
@@ -15183,7 +15183,7 @@
 														"isOptional": true
 													},
 													"comment": {
-														"shortText": "A custom data object to store the user's metadata. This maps to the `auth.users.user_metadata` column.",
+														"shortText": "A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.",
 														"text": "The `data` should be a JSON object that includes user-specific info, such as their first and last name.\n"
 													},
 													"sources": [
@@ -15691,7 +15691,7 @@
 														"isOptional": true
 													},
 													"comment": {
-														"shortText": "A custom data object to store the user's metadata. This maps to the `auth.users.user_metadata` column.",
+														"shortText": "A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.",
 														"text": "The `data` should be a JSON object that includes user-specific info, such as their first and last name.\n"
 													},
 													"sources": [
@@ -15890,7 +15890,7 @@
 														"isOptional": true
 													},
 													"comment": {
-														"shortText": "A custom data object to store the user's metadata. This maps to the `auth.users.user_metadata` column.",
+														"shortText": "A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.",
 														"text": "The `data` should be a JSON object that includes user-specific info, such as their first and last name.\n"
 													},
 													"sources": [
