@@ -61,7 +61,7 @@ create table book(
 );
 
 select
-    *
+  *
 from
   index_advisor('select book.id from book where title = $1');
 
