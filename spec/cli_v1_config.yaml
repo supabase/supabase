@@ -15,7 +15,7 @@ info:
   description: |
     A `config.toml` file is generated after running `supabase init`.
 
-    This file is located in the `supabase` folder under `supabase/config.toml`.
+    This file is located in the `supabase` folder under `supabase/config.toml`. You can edit this file to change the settings for your locally running project. After you make changes, you will need to restart using `supabase stop` and then `supabase start` for the changes to take effect.
   tags:
     - id: general
       title: General
@@ -57,6 +57,9 @@ parameters:
     links:
       - name: 'PostgREST configuration'
         link: 'https://postgrest.org/en/stable/configuration.html'
+    usage: |
+      [api]
+      port = 54321
 
   - id: 'api.schemas'
     title: 'api.schemas'

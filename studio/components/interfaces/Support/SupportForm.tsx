@@ -655,6 +655,9 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         <p className="text-scale-1000">We will contact you at</p>
                         <p className="text-scale-1200 font-medium">{respondToEmail}</p>
                       </div>
+                      <div className="flex items-center space-x-1 justify-end block text-sm mt-0 mb-2">
+                        <p className="text-scale-1000">Please ensure you haven't blocked Hubspot in your emails</p>
+                      </div>
                       <div className="flex justify-end">
                         <Button
                           htmlType="submit"

@@ -20,8 +20,8 @@ export default function TicketActions({
   ticketGenerationState,
   setTicketGenerationState,
 }: Props) {
-  const [imgReady, setImgReady] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [_imgReady, setImgReady] = useState(false)
+  const [_loading, setLoading] = useState(false)
   const downloadLink = useRef<HTMLAnchorElement>()
   const link = `${SITE_URL}/tickets/${username}?lw=8${golden ? `&golden=true` : ''}`
   const permalink = encodeURIComponent(link)

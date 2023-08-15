@@ -114,7 +114,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
                     )}
                   </div>
                 </SectionContainer>
-                <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0">
+                <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0 pointer-events-none">
                   <Image
                     src="/images/launchweek/8/LW8-gradient.png"
                     layout="fill"

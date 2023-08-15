@@ -125,8 +125,8 @@ const AddRestrictionModal = ({
                     your database. Only IPv4 addresses are supported at the moment.
                   </p>
                   <InformationBox
-                    title="Note: Restrictions only apply to your database and PgBouncer"
-                    description="They do not currently apply to Supabase services such as PostgREST, Storage, or Authentication"
+                    title="Note: Restrictions only apply to direct connections to your database and PgBouncer"
+                    description="They do not currently apply to Supavisor and to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication"
                   />
                   <div className="flex space-x-4">
                     <div className="w-[55%]">

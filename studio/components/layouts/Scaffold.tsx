@@ -62,8 +62,13 @@ const ScaffoldColumn = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
 const ScaffoldSectionDetail = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => {
-  return <div ref={ref} {...props} className={cn('col-span-4 xl:col-span-5', className)} />
+>(({ className, children, title, ...props }, ref) => {
+  return (
+    <div ref={ref} {...props} className={cn('col-span-4 xl:col-span-5 prose text-sm', className)}>
+      <h2>{title}</h2>
+      {children}
+    </div>
+  )
 })
 
 const ScaffoldSectionContent = React.forwardRef<

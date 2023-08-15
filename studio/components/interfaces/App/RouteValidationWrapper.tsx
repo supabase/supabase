@@ -7,7 +7,7 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useFlag, useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
-import { DEFAULT_HOME, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { DEFAULT_HOME, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 // Ideally these could all be within a _middleware when we use Next 12
 const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
@@ -68,7 +68,9 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       // Check validity of project that the user is trying to access
       const projects = projectsRef.current ?? []
       const isValidProject = projects.some((project) => project.ref === ref)
-      const isValidBranch = projects.some((project) => project.preview_branch_refs.includes(ref))
+      const isValidBranch = IS_PLATFORM
+        ? projects.some((project) => project.preview_branch_refs.includes(ref))
+        : true
 
       if (!isValidProject && !isValidBranch) {
         ui.setNotification({ category: 'error', message: 'This project does not exist' })

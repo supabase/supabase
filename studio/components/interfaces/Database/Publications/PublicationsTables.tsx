@@ -1,21 +1,21 @@
-import { FC, useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { Button, Input, IconChevronLeft, IconSearch, IconAlertCircle } from 'ui'
 import type { PostgresPublication } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
+import { Button, IconAlertCircle, IconChevronLeft, IconSearch, Input } from 'ui'
 
+import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
+import Table from 'components/to-be-cleaned/Table'
+import InformationBox from 'components/ui/InformationBox'
 import { useCheckPermissions, useStore } from 'hooks'
 import PublicationsTableItem from './PublicationsTableItem'
-import Table from 'components/to-be-cleaned/Table'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import InformationBox from 'components/ui/InformationBox'
 
-interface Props {
+interface PublicationsTablesProps {
   selectedPublication: PostgresPublication
   onSelectBack: () => void
 }
 
-const PublicationsTables: FC<Props> = ({ selectedPublication, onSelectBack }) => {
+const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsTablesProps) => {
   const { meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
 

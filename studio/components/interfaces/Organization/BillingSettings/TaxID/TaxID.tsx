@@ -1,54 +1,92 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { useEffect, useState } from 'react'
 import { Button, IconPlus, IconX, Input, Listbox } from 'ui'
 
+import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
-import { delete_, post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { TaxId, useOrganizationTaxIDsQuery } from 'data/organizations/organization-tax-ids-query'
+import {
+  TaxIdValue,
+  useOrganizationTaxIDsUpdateMutation,
+} from 'data/organizations/organization-tax-ids-update-mutation'
+import { useCheckPermissions, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { StripeTaxId, TAX_IDS } from './TaxID.constants'
 import { sanitizeTaxID } from './TaxID.utils'
 
-export interface TaxIDProps {
-  loading: boolean
-  taxIds: any[]
-  onTaxIdsUpdated: (taxIds: any) => void
-}
-
 // Stripe recommends to delete tax ids and create new ones to update
 // https://stripe.com/docs/billing/customer/tax-ids
 
-const TaxID = ({ loading, taxIds, onTaxIdsUpdated }: TaxIDProps) => {
+const TaxID = () => {
   const { ui } = useStore()
-  const selectedOrganization = useSelectedOrganization()
-  const slug = selectedOrganization?.slug ?? ''
+  const { slug } = useParams()
 
-  const [isSaving, setIsSaving] = useState(false)
-  const [errors, setErrors] = useState<string[]>([])
-  const [taxIdValues, setTaxIdValues] = useState<StripeTaxId[]>(taxIds)
-  const formattedTaxIds: StripeTaxId[] = taxIds.map((taxId: StripeTaxId) => {
-    return {
-      id: taxId.id,
-      type: taxId.type,
-      value: taxId.value,
-      name:
-        taxId.type === 'eu_vat'
-          ? `${taxId.country} VAT`
-          : TAX_IDS.find((option) => option.code === taxId.type)?.name ?? '',
-    }
+  const {
+    data: taxIds,
+    error,
+    isLoading,
+    isSuccess,
+    isError,
+  } = useOrganizationTaxIDsQuery({ slug })
+
+  const { mutate: updateTaxIDs, isLoading: isUpdating } = useOrganizationTaxIDsUpdateMutation({
+    onSuccess: (res) => {
+      const { created, errors } = res
+      setErrors(errors?.map((taxId) => taxId.id) ?? [])
+      const updatedTaxIds =
+        created?.map((x) => {
+          return {
+            id: x.id,
+            type: x.type,
+            value: x.value,
+            name:
+              x.type === 'eu_vat'
+                ? `${x.country} VAT`
+                : TAX_IDS.find((option) => option.code === x.type)?.name ?? '',
+          }
+        }) ?? []
+      setTaxIdValues(updatedTaxIds)
+
+      if (errors !== undefined && errors.length > 0) {
+        errors.forEach((taxId: any) => {
+          ui.setNotification({ category: 'error', message: taxId.result.error.message })
+        })
+      } else {
+        ui.setNotification({ category: 'success', message: 'Successfully updated tax IDs' })
+      }
+    },
   })
 
+  const [errors, setErrors] = useState<string[]>([])
+  const [taxIdValues, setTaxIdValues] = useState<TaxIdValue[]>([])
+
+  const formattedTaxIds =
+    taxIds?.map((taxId: TaxId) => {
+      return {
+        id: taxId.id,
+        type: taxId.type,
+        value: taxId.value,
+        name:
+          taxId.type === 'eu_vat'
+            ? `${taxId.country} VAT`
+            : TAX_IDS.find((option) => option.code === taxId.type)?.name ?? '',
+      }
+    }) ?? []
+
   useEffect(() => {
-    if (taxIdValues.length === 0) {
-      setTaxIdValues(formattedTaxIds)
-    } else {
-      const erroredTaxIds = taxIdValues.filter((taxId: any) => errors.includes(taxId.id))
-      setTaxIdValues(formattedTaxIds.concat(erroredTaxIds))
+    if (isSuccess) {
+      if (taxIdValues.length === 0) {
+        setTaxIdValues(formattedTaxIds)
+      } else {
+        const erroredTaxIds = taxIdValues.filter((taxId: any) => errors.includes(taxId.id))
+        setTaxIdValues(formattedTaxIds.concat(erroredTaxIds))
+      }
     }
-  }, [taxIds])
+  }, [isSuccess])
 
   const hasChanges = !isEqual(taxIdValues, formattedTaxIds)
   const canReadTaxIds = useCheckPermissions(PermissionAction.BILLING_READ, 'stripe.tax_ids')
@@ -87,47 +125,11 @@ const TaxID = ({ loading, taxIds, onTaxIdsUpdated }: TaxIDProps) => {
   }
 
   const onSaveTaxIds = async () => {
-    // To make things simple we delete all existing ones and create new ones from this session
-    setIsSaving(true)
-    try {
-      const deletedIds = await Promise.all(
-        taxIds.map(async (taxId: StripeTaxId) => {
-          return await delete_(`${API_URL}/organizations/${slug}/tax-ids`, { id: taxId.id })
-        })
-      )
+    if (!slug) return console.error('Slug is required')
+    if (taxIds === undefined) return console.error('Tax IDs are required')
 
-      const newIds = await Promise.all(
-        taxIdValues.map(async (taxId: StripeTaxId) => {
-          const sanitizedID = sanitizeTaxID(taxId)
-          const result = await post(`${API_URL}/organizations/${slug}/tax-ids`, {
-            type: sanitizedID.type,
-            value: sanitizedID.value,
-          })
-          return { id: sanitizedID.id, result }
-        })
-      )
-      const taxIdsWithErrors = newIds.filter((taxId: any) => {
-        if (taxId.result.error) return taxId
-      })
-      setErrors(taxIdsWithErrors.map((taxId: any) => taxId.id))
-
-      if (taxIdsWithErrors.length > 0) {
-        taxIdsWithErrors.forEach((taxId: any) => {
-          ui.setNotification({ category: 'error', message: taxId.result.error.message })
-        })
-      } else {
-        ui.setNotification({ category: 'success', message: 'Successfully updated tax IDs' })
-      }
-      const idsCreated = newIds
-        .filter((taxId: any) => !taxId.result.error)
-        .map((taxId: any) => taxId.result)
-
-      onTaxIdsUpdated(idsCreated)
-    } catch (error: any) {
-      ui.setNotification({ category: 'error', message: 'Failed to save tax IDs' })
-    } finally {
-      setIsSaving(false)
-    }
+    const newIds = taxIdValues.map((x) => sanitizeTaxID(x))
+    updateTaxIDs({ slug, existingIds: taxIds, newIds })
   }
 
   return (
@@ -146,9 +148,9 @@ const TaxID = ({ loading, taxIds, onTaxIdsUpdated }: TaxIDProps) => {
         </Panel>
       ) : (
         <Panel
-          loading={loading}
+          loading={isLoading}
           footer={
-            !loading && (
+            !isLoading && (
               <div className="flex w-full justify-between">
                 {!canUpdateTaxIds ? (
                   <p className="text-sm text-scale-1000">
@@ -161,7 +163,7 @@ const TaxID = ({ loading, taxIds, onTaxIdsUpdated }: TaxIDProps) => {
                   <Button
                     type="default"
                     htmlType="reset"
-                    disabled={!hasChanges || isSaving}
+                    disabled={!hasChanges || isUpdating}
                     onClick={() => onResetTaxIds()}
                   >
                     Cancel
@@ -169,8 +171,8 @@ const TaxID = ({ loading, taxIds, onTaxIdsUpdated }: TaxIDProps) => {
                   <Button
                     type="primary"
                     htmlType="submit"
-                    loading={isSaving}
-                    disabled={!hasChanges || isSaving}
+                    loading={isUpdating}
+                    disabled={!hasChanges || isUpdating}
                     onClick={() => onSaveTaxIds()}
                   >
                     Save
@@ -180,13 +182,19 @@ const TaxID = ({ loading, taxIds, onTaxIdsUpdated }: TaxIDProps) => {
             )
           }
         >
-          {loading && taxIdValues.length === 0 ? (
-            <div className="flex flex-col justify-between space-y-2 py-4 px-4">
-              <div className="shimmering-loader mx-1 w-2/3 rounded py-3" />
-              <div className="shimmering-loader mx-1 w-1/2 rounded py-3" />
-              <div className="shimmering-loader mx-1 w-1/3 rounded py-3" />
-            </div>
-          ) : (
+          {isLoading && taxIdValues.length === 0 && (
+            <Panel.Content>
+              <GenericSkeletonLoader />
+            </Panel.Content>
+          )}
+
+          {isError && (
+            <Panel.Content>
+              <AlertError error={error} subject="Failed to retrieve organization tax IDs" />
+            </Panel.Content>
+          )}
+
+          {isSuccess && (
             <Panel.Content className="w-8/12 space-y-4">
               {taxIdValues.length >= 1 ? (
                 <div className="w-full space-y-2">

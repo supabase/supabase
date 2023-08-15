@@ -1,8 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { branchKeys } from './keys'
-import { ResponseError } from 'types'
 import { components } from 'data/api'
+import { get } from 'data/fetchers'
+import { ResponseError } from 'types'
+import { branchKeys } from './keys'
 
 export type BranchesVariables = {
   projectRef?: string

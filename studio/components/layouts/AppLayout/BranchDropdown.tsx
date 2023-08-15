@@ -1,10 +1,11 @@
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
-import Link from 'next/link'
 
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
+import { useSelectedProject } from 'hooks'
 import {
   Badge,
   Button,
@@ -18,12 +19,11 @@ import {
   IconCheck,
   IconCode,
   IconGitBranch,
-  IconPlus,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  ScrollArea,
 } from 'ui'
-import { useSelectedProject } from 'hooks'
 import { sanitizeRoute } from './ProjectDropdown'
 
 const BranchLink = ({
@@ -91,29 +91,24 @@ const BranchDropdown = () => {
 
       {isSuccess && branches.length > 0 && (
         <div className="flex items-center space-x-2 px-2">
-          <Link passHref href={`/project/${ref}`}>
-            <a ref={branchNameRef} className="flex items-center space-x-2 text-sm">
-              {selectedBranch?.name}
-            </a>
-          </Link>
-
-          <Link passHref href={`/project/${ref}/branches`}>
-            <a ref={branchNameRef} className="flex items-center space-x-2">
-              {selectedBranch?.is_default ? (
-                <Badge color="amber">Production</Badge>
-              ) : (
-                <Badge color="green">Preview Branch</Badge>
-              )}
-            </a>
-          </Link>
-
           <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
             <PopoverTrigger_Shadcn_ asChild>
               <Button
                 type="text"
-                className="px-1"
-                icon={<IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />}
-              />
+                className="pr-2"
+                iconRight={
+                  <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />
+                }
+              >
+                <div className="flex items-center space-x-2">
+                  <p className="text-sm">{selectedBranch?.name}</p>
+                  {selectedBranch?.is_default ? (
+                    <Badge color="amber">Production</Badge>
+                  ) : (
+                    <Badge color="green">Preview Branch</Badge>
+                  )}
+                </div>
+              </Button>
             </PopoverTrigger_Shadcn_>
             <PopoverContent_Shadcn_
               className="p-0"
@@ -126,14 +121,16 @@ const BranchDropdown = () => {
                 <CommandList_Shadcn_>
                   <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>
                   <CommandGroup_Shadcn_>
-                    {branches?.map((branch) => (
-                      <BranchLink
-                        key={branch.id}
-                        branch={branch}
-                        isSelected={branch.id === selectedBranch?.id}
-                        setOpen={setOpen}
-                      />
-                    ))}
+                    <ScrollArea className={(branches || []).length > 7 ? 'h-[210px]' : ''}>
+                      {branches?.map((branch) => (
+                        <BranchLink
+                          key={branch.id}
+                          branch={branch}
+                          isSelected={branch.id === selectedBranch?.id}
+                          setOpen={setOpen}
+                        />
+                      ))}
+                    </ScrollArea>
                   </CommandGroup_Shadcn_>
                   <CommandGroup_Shadcn_ className="border-t">
                     <Link passHref href={`/project/${ref}/branches`}>

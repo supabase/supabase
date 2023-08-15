@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
+import { SubscriptionTier, useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
@@ -110,8 +110,13 @@ const PlanUpdateSidePanel = () => {
       return ui.setNotification({ category: 'error', message: 'Please select a payment method' })
     }
 
-    updateOrgSubscription({ slug, tier: selectedTier, paymentMethod: selectedPaymentMethod })
+    // If the user is downgrading from team, should have spend cap disabled by default 
+    const tier = subscription?.plan?.id === 'team' && selectedTier === PRICING_TIER_PRODUCT_IDS.PRO ? PRICING_TIER_PRODUCT_IDS.PAYG as SubscriptionTier : selectedTier
+
+    updateOrgSubscription({ slug, tier, paymentMethod: selectedPaymentMethod })
   }
+
+  const planMeta = selectedTier ? availablePlans.find((p) => p.id === selectedTier.split('tier_')[1]) : null
 
   return (
     <>
@@ -289,7 +294,7 @@ const PlanUpdateSidePanel = () => {
         onCancel={() => setSelectedTier(undefined)}
         onConfirm={onUpdateSubscription}
         overlayClassName="pointer-events-none"
-        header={`Confirm to upgrade to ${subscriptionPlanMeta?.name}`}
+        header={`Confirm ${planMeta?.change_type === 'downgrade' ? 'downgrade' : 'upgrade'} to ${subscriptionPlanMeta?.name}`}
       >
         <Modal.Content>
           <div className="py-6 space-y-2">

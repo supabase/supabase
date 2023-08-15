@@ -18,6 +18,7 @@ import { makeRandomString } from 'lib/helpers'
 import { Organization, Project, ResponseError } from 'types'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
+import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 
 export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string

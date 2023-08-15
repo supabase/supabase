@@ -11,7 +11,7 @@ const SettingsButton = () => {
     <Tooltip.Root delayDuration={0}>
       <Link href={slug ? `/org/${slug}/general` : '/'} passHref>
         <Tooltip.Trigger type="button" asChild className="px-1">
-          <a>
+          <a id="organization-settings">
             <IconSettings size={18} strokeWidth={1.5} className="text-scale-1100" />
           </a>
         </Tooltip.Trigger>
@@ -25,7 +25,7 @@ const SettingsButton = () => {
               'border border-scale-200',
             ].join(' ')}
           >
-            <span className="text-xs text-scale-1200">Settings</span>
+            <span className="text-xs text-scale-1200">Organization settings</span>
           </div>
         </Tooltip.Content>
       </Tooltip.Portal>

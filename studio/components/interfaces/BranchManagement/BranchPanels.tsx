@@ -1,15 +1,18 @@
 import clsx from 'clsx'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { noop } from 'lodash'
+import Link from 'next/link'
 import { PropsWithChildren, forwardRef, useState } from 'react'
 import {
   Badge,
   Button,
+  Dropdown,
   DropdownMenuContent_Shadcn_,
   DropdownMenuItem_Shadcn_,
   DropdownMenuTrigger_Shadcn_,
   DropdownMenu_Shadcn_,
-  IconEdit,
+  IconExternalLink,
   IconGitBranch,
   IconGitHub,
   IconMoreVertical,
@@ -18,20 +21,29 @@ import {
   cn,
 } from 'ui'
 
-import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Branch } from 'data/branches/branches-query'
+import { GitHubPullRequest } from 'data/integrations/integrations-github-pull-requests-query'
 
 interface BranchPanelProps {
-  branch: Branch
+  repo?: string
+  branch?: Branch
   onSelectUpdate?: () => void
   onSelectDelete?: () => void
+  onSelectDisableBranching?: () => void
+  generateCreatePullRequestURL?: (branch?: string) => string
 }
 
-const MainBranchPanel = ({ branch, onSelectUpdate = noop }: BranchPanelProps) => {
+const MainBranchPanel = ({
+  repo,
+  branch,
+  onSelectUpdate = noop,
+  onSelectDisableBranching = noop,
+}: BranchPanelProps) => {
   const { ref } = useParams()
   const [open, setOpen] = useState(false)
-  const isActive = ref === branch.project_ref
+  const isActive = ref === branch?.project_ref
 
   return (
     <div className="border rounded-lg">
@@ -41,32 +53,67 @@ const MainBranchPanel = ({ branch, onSelectUpdate = noop }: BranchPanelProps) =>
             <IconGitHub size={18} strokeWidth={2} />
           </div>
           <p>Github branch workflow</p>
+          <Link passHref href={`https://github.com/${repo}`}>
+            <a target="_blank" rel="noreferrer">
+              <Button
+                type="text"
+                size="small"
+                className="text-light hover:text py-1 px-1.5"
+                iconRight={<IconExternalLink size={14} strokeWidth={1.5} />}
+              >
+                {repo}
+              </Button>
+            </a>
+          </Link>
         </div>
       </div>
       <div className="bg-surface-100 border-t shadow-sm flex justify-between items-center pl-8 pr-6 py-3 rounded-b-lg text-sm">
-        <div className="flex items-center space-x-4">
-          <div className="w-8 h-8 bg-amber-300 rounded-md flex items-center justify-center">
-            <IconShield size={18} strokeWidth={2} className="text-amber-900" />
-          </div>
-          <p>{branch.name}</p>
-          <Badge color="amber">Production</Badge>
-          {isActive && <Badge color="green">Selected</Badge>}
-        </div>
-        <div className="flex items-center space-x-4">
-          <DropdownMenu_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
-            <DropdownMenuTrigger_Shadcn_>
-              <Button asChild type="text" className="px-1" icon={<IconMoreVertical size={14} />}>
-                <span></span>
-              </Button>
-            </DropdownMenuTrigger_Shadcn_>
-            <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-              <DropdownMenuItem_Shadcn_ className="flex gap-2" onSelect={() => onSelectUpdate()}>
-                <IconEdit size={14} />
-                Edit branch
-              </DropdownMenuItem_Shadcn_>
-            </DropdownMenuContent_Shadcn_>
-          </DropdownMenu_Shadcn_>
-        </div>
+        {branch === undefined ? (
+          <ShimmeringLoader className="w-full" />
+        ) : (
+          <>
+            <div className="flex items-center space-x-4">
+              <div className="w-8 h-8 bg-amber-300 rounded-md flex items-center justify-center">
+                <IconShield size={18} strokeWidth={2} className="text-amber-900" />
+              </div>
+              <p>{branch?.name}</p>
+              <Badge color="amber">Production</Badge>
+              {isActive && <Badge color="green">Selected</Badge>}
+            </div>
+            <div className="flex items-center space-x-4">
+              <DropdownMenu_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
+                <DropdownMenuTrigger_Shadcn_>
+                  <Button
+                    asChild
+                    type="text"
+                    className="px-1"
+                    icon={<IconMoreVertical size={14} />}
+                  >
+                    <span></span>
+                  </Button>
+                </DropdownMenuTrigger_Shadcn_>
+                <DropdownMenuContent_Shadcn_ side="bottom" align="end">
+                  <Link passHref href={`/project/${ref}/settings/general`}>
+                    <DropdownMenuItem_Shadcn_
+                      asChild
+                      className="flex gap-2"
+                      onSelect={() => onSelectUpdate()}
+                    >
+                      <a>Change production branch</a>
+                    </DropdownMenuItem_Shadcn_>
+                  </Link>
+                  <Dropdown.Separator />
+                  <DropdownMenuItem_Shadcn_
+                    className="flex gap-2"
+                    onSelect={() => onSelectDisableBranching()}
+                  >
+                    Disable branching
+                  </DropdownMenuItem_Shadcn_>
+                </DropdownMenuContent_Shadcn_>
+              </DropdownMenu_Shadcn_>
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
@@ -90,28 +137,37 @@ const BranchContainer = ({ className, children }: PropsWithChildren<{ className?
 
 const BranchPanel = ({
   branch,
-  onSelectUpdate = noop,
+  generateCreatePullRequestURL,
   onSelectDelete = noop,
 }: BranchPanelProps) => {
   const { ref } = useParams()
   const [open, setOpen] = useState(false)
 
-  const isActive = ref === branch.project_ref
-  const daysFromNow = dayjs().diff(dayjs(branch.created_at), 'day')
-  const formattedTimeFromNow = dayjs(branch.created_at).fromNow()
-  const formattedCreatedAt = dayjs(branch.created_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
+  const isActive = ref === branch?.project_ref
+  const daysFromNow = dayjs().diff(dayjs(branch?.created_at), 'day')
+  const formattedTimeFromNow = dayjs(branch?.created_at).fromNow()
+  const formattedCreatedAt = dayjs(branch?.created_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
+
+  const pullRequestURL = generateCreatePullRequestURL?.(branch?.git_branch) ?? 'https://github.com'
 
   return (
     <BranchContainer className="bg-surface-100">
       <div className="flex items-center space-x-4">
-        <IconGitBranch className="text-brand-900" size={16} strokeWidth={2} />
-        <p>{branch.name}</p>
+        <IconGitBranch size={16} strokeWidth={2} />
+        <p>{branch?.name}</p>
         {isActive && <Badge color="green">Selected</Badge>}
-        <p className="text-scale-1000">
+        <p className="text-light">
           {daysFromNow > 1 ? `Created on ${formattedCreatedAt}` : `Created ${formattedTimeFromNow}`}
         </p>
       </div>
-      <div>
+      <div className="flex items-center space-x-4">
+        <Link passHref href={pullRequestURL}>
+          <a target="_blank" rel="noreferrer">
+            <Button type="default" icon={<IconExternalLink />}>
+              Create pull request
+            </Button>
+          </a>
+        </Link>
         <DropdownMenu_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
           <DropdownMenuTrigger_Shadcn_>
             <Button asChild type="text" className="px-1" icon={<IconMoreVertical size={14} />}>
@@ -119,10 +175,6 @@ const BranchPanel = ({
             </Button>
           </DropdownMenuTrigger_Shadcn_>
           <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-            <DropdownMenuItem_Shadcn_ className="flex gap-2" onSelect={() => onSelectUpdate()}>
-              <IconEdit size={14} />
-              Edit branch
-            </DropdownMenuItem_Shadcn_>
             <DropdownMenuItem_Shadcn_ className="flex gap-2" onSelect={() => onSelectDelete()}>
               <IconTrash size={14} />
               Delete branch
@@ -156,5 +208,61 @@ const BranchHeader = forwardRef<HTMLDivElement, BranchHeader>(
   }
 )
 
+const PullRequestPanel = ({
+  pr,
+  onSelectDelete = noop,
+}: {
+  pr: GitHubPullRequest
+  onSelectDelete: () => void
+}) => {
+  const [open, setOpen] = useState(false)
+  const daysFromNow = dayjs().diff(dayjs(pr.created_at), 'day')
+  const formattedTimeFromNow = dayjs(pr.created_at).fromNow()
+  const formattedCreatedAt = dayjs(pr.created_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
+
+  return (
+    <BranchContainer className="bg-surface-100">
+      <div className="w-full">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center space-x-4">
+              <IconGitBranch className="text-brand-900" size={16} strokeWidth={2} />
+              <p>{pr.branch}</p>
+              <p className="text-light">
+                {daysFromNow > 1
+                  ? `Created on ${formattedCreatedAt}`
+                  : `Created ${formattedTimeFromNow}`}
+              </p>
+            </div>
+            <p className="text-scale-1000 ml-8 mt-0.5">{pr.title}</p>
+          </div>
+          <div className="flex items-center space-x-4">
+            <Link passHref href={pr.url}>
+              <a target="_blank" rel="noreferrer">
+                <Button type="default" icon={<IconExternalLink />}>
+                  View pull request
+                </Button>
+              </a>
+            </Link>
+            <DropdownMenu_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
+              <DropdownMenuTrigger_Shadcn_>
+                <Button asChild type="text" className="px-1" icon={<IconMoreVertical size={14} />}>
+                  <span></span>
+                </Button>
+              </DropdownMenuTrigger_Shadcn_>
+              <DropdownMenuContent_Shadcn_ side="bottom" align="end">
+                <DropdownMenuItem_Shadcn_ className="flex gap-2" onSelect={() => onSelectDelete()}>
+                  <IconTrash size={14} />
+                  Delete branch
+                </DropdownMenuItem_Shadcn_>
+              </DropdownMenuContent_Shadcn_>
+            </DropdownMenu_Shadcn_>
+          </div>
+        </div>
+      </div>
+    </BranchContainer>
+  )
+}
+
 BranchHeader.displayName = 'BranchHeader'
-export { BranchHeader, BranchContainer, BranchPanel, MainBranchPanel }
+export { BranchContainer, BranchHeader, BranchPanel, MainBranchPanel, PullRequestPanel }

@@ -1,13 +1,12 @@
+import { useParams } from 'common'
 import { toPng } from 'html-to-image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { ChangeEvent, FC, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import {
   Button,
-  Dropdown,
   DropdownMenuContent_Shadcn_,
   DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
   DropdownMenuTrigger_Shadcn_,
   DropdownMenu_Shadcn_,
   IconCamera,
@@ -15,16 +14,14 @@ import {
   IconUpload,
   IconX,
   Input,
-  Popover,
 } from 'ui'
 
-import { useParams } from 'common'
 import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
 import { useStore } from 'hooks'
 import { timeout } from 'lib/helpers'
 import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
 
-interface Props {
+interface FeedbackWidgetProps {
   onClose: () => void
   feedback: string
   setFeedback: (value: string) => void
@@ -32,13 +29,13 @@ interface Props {
   setScreenshot: (value: string | undefined) => void
 }
 
-const FeedbackWidget: FC<Props> = ({
+const FeedbackWidget = ({
   onClose,
   feedback,
   setFeedback,
   screenshot,
   setScreenshot,
-}) => {
+}: FeedbackWidgetProps) => {
   const router = useRouter()
   const { ref } = useParams()
 
