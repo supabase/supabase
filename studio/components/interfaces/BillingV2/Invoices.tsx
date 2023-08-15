@@ -67,9 +67,7 @@ const Invoices = () => {
             invoices.length === 0 ? (
               <Table.tr>
                 <Table.td colSpan={6} className="p-3 py-12 text-center">
-                  <p className="text-scale-1000">
-                    {isLoading ? 'Checking for invoices' : 'No invoices for this project yet'}
-                  </p>
+                  <p className="text-scale-1000">No invoices for this project yet</p>
                 </Table.td>
               </Table.tr>
             ) : (
