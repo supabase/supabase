@@ -17,9 +17,10 @@ import {
 import { AddNewPaymentMethodModal } from 'components/interfaces/BillingV2'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
+import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
+import { useOrganizationPaymentMethodDeleteMutation } from 'data/organizations/organization-payment-method-delete-mutation'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
-import { delete_, patch } from 'lib/common/fetch'
-import { API_URL, BASE_PATH } from 'lib/constants'
+import { BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 
 export interface PaymentMethodsProps {
@@ -46,7 +47,33 @@ const PaymentMethods = ({
   const [selectedMethodForDefault, setSelectedMethodForDefault] = useState<any>()
   const [selectedMethodToDelete, setSelectedMethodToDelete] = useState<any>()
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
-  const [isUpdatingPaymentMethod, setIsUpdatingPaymentMethod] = useState(false)
+
+  const { mutate: updateCustomerProfile, isLoading: isUpdating } =
+    useOrganizationCustomerProfileUpdateMutation({
+      onSuccess: (updatedCustomer) => {
+        onDefaultMethodUpdated(updatedCustomer)
+        setSelectedMethodForDefault(undefined)
+        ui.setNotification({
+          category: 'success',
+          message: 'Successfully updated default payment method',
+        })
+      },
+      onError: (error) => {
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to make payment method default: ${error.message}`,
+        })
+      },
+    })
+
+  const { mutate: deletePaymentMethod, isLoading: isDeleting } =
+    useOrganizationPaymentMethodDeleteMutation({
+      onSuccess: () => {
+        onPaymentMethodsDeleted()
+        setSelectedMethodToDelete(undefined)
+        ui.setNotification({ category: 'success', message: 'Successfully deleted payment method' })
+      },
+    })
 
   const canReadPaymentMethods = useCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -58,48 +85,16 @@ const PaymentMethods = ({
   )
 
   const onConfirmMakeDefaultPaymentMethod = async () => {
-    try {
-      setIsUpdatingPaymentMethod(true)
-      const updatedCustomer = await patch(`${API_URL}/organizations/${orgSlug}/customer`, {
-        invoice_settings: {
-          default_payment_method: selectedMethodForDefault.id,
-        },
-      })
-      if (updatedCustomer.error) throw updatedCustomer.error
-      onDefaultMethodUpdated(updatedCustomer)
-      setSelectedMethodForDefault(undefined)
-      ui.setNotification({
-        category: 'success',
-        message: 'Successfully updated default payment method',
-      })
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to make payment method default: ${error.message}`,
-      })
-    } finally {
-      setIsUpdatingPaymentMethod(false)
-    }
+    updateCustomerProfile({
+      slug: orgSlug,
+      invoice_settings: {
+        default_payment_method: selectedMethodForDefault.id,
+      },
+    })
   }
 
   const onConfirmDetachPaymentMethod = async () => {
-    try {
-      setIsUpdatingPaymentMethod(true)
-      const { error } = await delete_(`${API_URL}/organizations/${orgSlug}/payments`, {
-        card_id: selectedMethodToDelete.id,
-      })
-      if (error) throw error
-      onPaymentMethodsDeleted()
-      setSelectedMethodToDelete(undefined)
-      ui.setNotification({ category: 'success', message: 'Successfully deleted payment method' })
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete payment method: ${error.message}`,
-      })
-    } finally {
-      setIsUpdatingPaymentMethod(false)
-    }
+    deletePaymentMethod({ slug: orgSlug, cardId: selectedMethodToDelete.id })
   }
 
   const onLocalPaymentMethodAdded = () => {
@@ -271,12 +266,17 @@ const PaymentMethods = ({
         onCancel={() => setSelectedMethodForDefault(undefined)}
         customFooter={
           <div className="flex items-center gap-2">
-            <Button type="default" onClick={() => setSelectedMethodForDefault(undefined)}>
+            <Button
+              type="default"
+              disabled={isUpdating}
+              onClick={() => setSelectedMethodForDefault(undefined)}
+            >
               Cancel
             </Button>
             <Button
               type="primary"
-              loading={isUpdatingPaymentMethod}
+              disabled={isUpdating}
+              loading={isUpdating}
               onClick={onConfirmMakeDefaultPaymentMethod}
             >
               Confirm
@@ -301,12 +301,17 @@ const PaymentMethods = ({
         onCancel={() => setSelectedMethodToDelete(undefined)}
         customFooter={
           <div className="flex items-center gap-2">
-            <Button type="default" onClick={() => setSelectedMethodToDelete(undefined)}>
+            <Button
+              type="default"
+              disabled={isDeleting}
+              onClick={() => setSelectedMethodToDelete(undefined)}
+            >
               Cancel
             </Button>
             <Button
               type="primary"
-              loading={isUpdatingPaymentMethod}
+              disabled={isDeleting}
+              loading={isDeleting}
               onClick={onConfirmDetachPaymentMethod}
             >
               Confirm

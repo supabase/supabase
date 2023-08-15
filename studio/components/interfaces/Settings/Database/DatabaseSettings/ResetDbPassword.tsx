@@ -1,20 +1,19 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import generator from 'generate-password'
 import { debounce } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 import { Button, Input, Modal } from 'ui'
 
-import { useParams } from 'common/hooks'
-import { useCheckPermissions, useStore } from 'hooks'
-import { patch } from 'lib/common/fetch'
-import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
-import { passwordStrength } from 'lib/helpers'
-
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { useDatabasePasswordResetMutation } from 'data/database/database-password-reset-mutation'
 import { getProjectDetail } from 'data/projects/project-detail-query'
+import { useCheckPermissions, useStore } from 'hooks'
+import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
+import { passwordStrength } from 'lib/helpers'
 
 const ResetDbPassword = ({ disabled = false }) => {
   const { ref } = useParams()
@@ -24,16 +23,28 @@ const ResetDbPassword = ({ disabled = false }) => {
   const canResetDbPassword = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
-  const [isUpdatingPassword, setIsUpdatingPassword] = useState<boolean>(false)
 
   const [password, setPassword] = useState<string>('')
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState<string>('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState<string>('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState<number>(0)
 
+  const { mutate: resetDatabasePassword, isLoading: isUpdatingPassword } =
+    useDatabasePasswordResetMutation({
+      onSuccess: async () => {
+        const project = await getProjectDetail({ ref })
+        if (project) meta.setProjectDetails(project)
+
+        ui.setNotification({
+          category: 'success',
+          message: 'Successfully updated database password',
+        })
+        setShowResetDbPass(false)
+      },
+    })
+
   useEffect(() => {
     if (showResetDbPass) {
-      setIsUpdatingPassword(false)
       setPassword('')
       setPasswordStrengthMessage('')
       setPasswordStrengthWarning('')
@@ -62,26 +73,10 @@ const ResetDbPassword = ({ disabled = false }) => {
   }
 
   const confirmResetDbPass = async () => {
-    if (!ref) return
+    if (!ref) return console.error('Project ref is required')
 
     if (passwordStrengthScore >= DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
-      setIsUpdatingPassword(true)
-      const res = await patch(`${API_URL}/projects/${ref}/db-password`, { password })
-      if (!res.error) {
-        const project = await getProjectDetail({ ref })
-        if (project) {
-          meta.setProjectDetails(project)
-        }
-
-        ui.setNotification({ category: 'success', message: res.message })
-        setShowResetDbPass(false)
-      } else {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to reset password: ${res.error.message}`,
-        })
-      }
-      setIsUpdatingPassword(false)
+      resetDatabasePassword({ ref, password })
     }
   }
 
@@ -147,7 +142,6 @@ const ResetDbPassword = ({ disabled = false }) => {
         hideFooter
         header={<h5 className="text-sm text-scale-1200">Reset database password</h5>}
         confirmText="Reset password"
-        alignFooter="right"
         size="medium"
         visible={showResetDbPass}
         loading={isUpdatingPassword}
@@ -175,8 +169,12 @@ const ResetDbPassword = ({ disabled = false }) => {
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content>
-          <div className="flex space-x-2 pb-2">
-            <Button type="default" onClick={() => setShowResetDbPass(false)}>
+          <div className="flex items-center justify-end space-x-2 pt-1 pb-2">
+            <Button
+              type="default"
+              disabled={isUpdatingPassword}
+              onClick={() => setShowResetDbPass(false)}
+            >
               Cancel
             </Button>
             <Button
