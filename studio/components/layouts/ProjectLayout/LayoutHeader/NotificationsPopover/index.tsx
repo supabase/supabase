@@ -3,6 +3,7 @@ import {
   ActionType,
   Notification,
   NotificationStatus,
+  PostgresqlUpgradeData,
 } from '@supabase/shared-types/out/notifications'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
@@ -98,16 +99,12 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
     setTargetNotification(undefined)
   }
 
-  // [Joshen/Qiao] These are all very specific to the upcoming security patch
-  // https://github.com/supabase/supabase/discussions/9314
-  // We probably need to revisit this again when we're planning to push out the next wave of
-  // notifications. Ideally, we should allow these to be more flexible and configurable
-  // Perhaps the URLs could come from the notification themselves if the actions
-  // require an external API call, then we just need one method instead of individual ones like this
-
   const onConfirmProjectApplyMigration = async () => {
     if (!projectToApplyMigration) return
-    const res = await post(`${API_URL}/database/${projectToApplyMigration.ref}/owner-reassign`, {})
+    const data = targetNotification?.data as PostgresqlUpgradeData
+    const { resource } = data.additional as any
+    if (!resource) return
+    const res = await post(`${API_URL}/database/${projectToApplyMigration.ref}/${resource}`, {})
     if (!res.error) {
       const project = await getProjectDetail({ ref: projectToApplyMigration.ref })
       if (project) {
@@ -130,8 +127,11 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
 
   const onConfirmProjectRollbackMigration = async () => {
     if (!projectToRollbackMigration) return
+    const data = targetNotification?.data as PostgresqlUpgradeData
+    const { resource } = data.additional as any
+    if (!resource) return
     const res = await delete_(
-      `${API_URL}/database/${projectToRollbackMigration.ref}/owner-reassign`,
+      `${API_URL}/database/${projectToRollbackMigration.ref}/${resource}`,
       {}
     )
     if (!res.error) {
@@ -156,10 +156,10 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
 
   const onConfirmProjectFinalizeMigration = async () => {
     if (!projectToFinalizeMigration) return
-    const res = await patch(
-      `${API_URL}/database/${projectToFinalizeMigration.ref}/owner-reassign`,
-      {}
-    )
+    const data = targetNotification?.data as PostgresqlUpgradeData
+    const { resource } = data.additional as any
+    if (!resource) return
+    const res = await patch(`${API_URL}/database/${projectToFinalizeMigration.ref}/${resource}`, {})
     if (!res.error) {
       const project = await getProjectDetail({ ref: projectToFinalizeMigration.ref })
       if (project) {

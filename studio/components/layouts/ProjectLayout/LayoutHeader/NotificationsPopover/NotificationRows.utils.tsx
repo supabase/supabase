@@ -17,7 +17,6 @@ import Link from 'next/link'
 export const formatNotificationText = (
   project: Project,
   notification: Notification,
-  ownerReassignStatus?: any
 ) => {
   const projectName = project.name
 
@@ -89,28 +88,12 @@ export const formatNotificationText = (
       )
     } else if (upgrade_type === 'schema-migration') {
       const { version_to } = additional
-      if (ownerReassignStatus?.desired === 'unmigrated') {
-        return (
-          <p className="text-sm">
-            The schema migration "{version_to}" will be applied for project "{projectName}" within a
-            few days. You may opt to apply the changes now, or it'll be done so automatically.
-          </p>
-        )
-      } else if (ownerReassignStatus?.desired === 'temp_role') {
-        return (
-          <p className="text-sm">
-            The schema migration "{version_to}" will be finalized for project "{projectName}" within
-            a few days. You may opt to finalize the changes now, or it'll be done so automatically.
-          </p>
-        )
-      } else {
-        return (
-          <p className="text-sm">
-            The schema migration "{version_to}" has been successfully applied for project "
-            {projectName}".
-          </p>
-        )
-      }
+      return (
+        <p className="text-sm">
+          The schema migration "{version_to}" has been successfully applied for project "
+          {projectName}".
+        </p>
+      )
     }
   } else if (notification.data.name === NotificationName.ProjectUpdateCompleted) {
     const { upgrades } = notification.data
@@ -178,7 +161,6 @@ export const formatNotificationText = (
 
 export const formatNotificationCTAText = (
   availableActions: Action[],
-  ownerReassignStatus?: any
 ) => {
   const [action] = availableActions
   if (!action) return <p className="text-sm"></p>
@@ -192,43 +174,13 @@ export const formatNotificationCTAText = (
       return <p className="text-sm">Restart your connection pooler to get the latest updates.</p>
     case ActionType.MigratePostgresSchema:
       if (action.deadline) {
-        if (ownerReassignStatus?.desired === 'migrated') {
-          return (
-            <p className="text-sm space-x-1">
-              This patch was applied on{' '}
-              {dayjs(new Date(ownerReassignStatus.migrated_at ?? action.deadline)).format(
-                'DD MMM YYYY, HH:mma'
-              )}
-            </p>
-          )
-        } else if (ownerReassignStatus?.desired === 'temp_role') {
-          if (action.reason === ActionReason.Finalize) {
-            return (
-              <p className="text-sm space-x-1">
-                This patch will be automatically applied after{' '}
-                {dayjs(new Date(action.deadline)).format('DD MMM YYYY, HH:mma')}
-              </p>
-            )
-          } else {
-            return (
-              <p className="text-sm space-x-1">
-                This patch was applied on{' '}
-                {dayjs(new Date(ownerReassignStatus.modified_at)).format('DD MMM YYYY, HH:mma')}
-              </p>
-            )
-          }
-        } else {
-          return (
-            <p className="text-sm space-x-1">
-              This patch will be automatically applied after{' '}
-              {dayjs(new Date(action.deadline)).format('DD MMM YYYY, HH:mma')}
-            </p>
-          )
-        }
-      } else {
-        return ''
+        return (
+          <p className="text-sm space-x-1">
+            This patch will be automatically applied after{' '}
+            {dayjs(new Date(action.deadline)).format('DD MMM YYYY, HH:mma')}
+          </p>
+        )
       }
-
     default:
       return ''
   }
