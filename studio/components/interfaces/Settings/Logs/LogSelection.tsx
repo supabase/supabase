@@ -17,6 +17,7 @@ import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPrev
 import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
 import { LogData, QueryType } from './Logs.types'
+import { useMemo } from 'react'
 
 export interface LogSelectionProps {
   log: LogData | null
@@ -73,9 +74,8 @@ const LogSelection = ({
     }
   }
 
-  const selectionText = () => {
-    if (!fullLog) return ''
-    if (queryType) {
+  const selectionText = useMemo(() => {
+    if (fullLog && queryType) {
       return `Log ID
 ${fullLog.id}\n
 Log Timestamp (UTC)
@@ -87,8 +87,8 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
 `
     }
 
-    return JSON.stringify(fullLog, null, 2)
-  }
+    return JSON.stringify(fullLog || partialLog, null, 2)
+  }, [fullLog])
 
   return (
     <div
@@ -153,7 +153,7 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
         <div className="pt-4 px-4 flex flex-col gap-4">
           <div className="flex flex-row justify-between items-center">
             <div className={`transition ${!isLoading ? 'opacity-100' : 'opacity-0'}`}>
-              <CopyButton text={selectionText()} type="default" title="Copy log to clipboard" />
+              <CopyButton text={selectionText} type="default" title="Copy log to clipboard" />
             </div>
             <Button
               type="text"
