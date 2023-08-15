@@ -39,7 +39,7 @@ The Postgres backend is not yet optimized for a high volume of inserts, or for h
 
 The Postgres backend is recommended when familiarizing and experimenting with self-hosting Supabase. For production, we recommend using the BigQuery backend. See [production recommendations](#production-recommendations) for more information.
 
-To get started with self-hosting Supabase, the [example docker-compose](https://github.com/supabase/supabase/tree/master/docker) will give you a jumpstart to setting up logging for the stack.
+To set up logging in self-hosted Supabase, see the [docker-compose example](https://github.com/supabase/supabase/tree/master/docker).
 Two compose services are required: Logflare, and Vector. Logflare is the HTTP Analytics server, while Vector is the logging pipeline to route all compose services' syslog to the Logflare sever.
 
 Regardless of the backend chosen, the following environment variables **must** be set for the `supabase/logflare` docker image:
