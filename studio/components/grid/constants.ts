@@ -17,3 +17,5 @@ export const ERROR_PRIMARY_KEY_NOTFOUND =
   'Please add a primary key column to your table to update or delete rows'
 
 export const RLS_ACKNOWLEDGED_KEY = 'supabase-acknowledge-rls-warning'
+
+export const rlsAcknowledgedKey = (tableID?: string) => `${RLS_ACKNOWLEDGED_KEY}-${tableID}`
