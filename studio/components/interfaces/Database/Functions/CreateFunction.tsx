@@ -733,7 +733,7 @@ const InputDefinition = observer(({}) => {
           </p>
         )}
       </div>
-      <div className="h-40 border dark:border-dark">
+      <div className="h-60 resize-y border dark:border-dark">
         <SqlEditor
           defaultValue={_localState!.formState.definition.value}
           onInputChange={(value: string | undefined) => {
