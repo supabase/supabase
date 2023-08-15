@@ -7,40 +7,108 @@ export const meta = {
   subtitle: 'Customizing local email templates using config.toml.',
 }
 
-You can customize the email templates for local development [using the `config.toml` settings](/docs/guides/cli/managing-config).
+You can customize the email templates for local development [using the `config.toml` settings](/docs/guides/cli/config#auth-config).
 
-## Auth Templates 
+## Configuring Templates
 
-There are several Auth templates which can be configured, detailed in the [CLI Config Reference](/docs/guides/cli/config#auth-config).
+You should provide a relative URL to the `content_path` parameter, pointing to an HTML file which contains the template. For example
 
-For example, to update the "Invite" email subject and content for local development, you can append the following information to `config.toml`:
+<CH.Code>
 
-```toml
+```toml supabase/config.toml
 [auth.email.template.invite]
 subject = "You are invited to Acme Inc"
-content_path = "./supabase/auth/email/invite.html"
+content_path = "./supabase/templates/invite.html"
 ```
 
-The `content_path` should contain the html file you are pointing to otherwise the CLI won't start the project.
+```html supabase/templates/invite.html
+<html>
+  <body>
+    <h2>Confirm your signup</h2>
+    <p><a href="{{ .ConfirmationURL }}">Confirm your mail</a></p>
+  </body>
+</html>
+```
 
-### Email template variables
+</CH.Code>
+
+## Available email templates
+
+There are several Auth email templates which can be configured:
+
+- `auth.email.template.invite`
+- `auth.email.template.confirmation`
+- `auth.email.template.recovery`
+- `auth.email.template.magic_link`
+- `auth.email.template.email_change`
+
+## Template variables
 
 The templating system provides the following variables for use:
 
-| Name                     | Description                                                                                                                                                                                                       |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `{{ .ConfirmationURL }}` | Contains the confirmation URL. For example, a signup confirmation URL would look like: `https://project-ref.supabase.co/auth/v1/verify?token={{ .TokenHash }}&type=signup&redirect_to=https://example.com/path` . |
-| `{{ .Token }}`           | Contains a 6-digit One-Time-Password (OTP) that can be used instead of the `{{. ConfirmationURL }}` .                                                                                                             |
-| `{{ .TokenHash }}`       | Contains a hashed version of the `{{ .Token }}`. This is useful for constructing your own email link in the email template.                                                                                       |
-| `{{ .SiteURL }}`         | Contains your application's Site URL. This can be configured in your project's [authentication settings](https://supabase.com/dashboard/project/_/auth/url-configuration).                                        |
-| `{{ .Email }}`           | Contains the user's email address.                                                                                                                                                                                |
-| `{{ .NewEmail }}`        | Contains the new user's email address.                                                                                                                                                                            |
+### ConfirmationURL
 
-<Admonition type="note">
+Contains the confirmation URL. For example, a signup confirmation URL would look like:
 
-`{{ .NewEmail }}` is only available in the email_change email template
+```
+https://project-ref.supabase.co/auth/v1/verify?token={{ .TokenHash }}&type=signup&redirect_to=https://example.com/path
+```
 
-</Admonition>
+**Usage**
+
+```html
+<p>Click here to confirm: {{ .ConfirmationURL }}</p>
+```
+
+### Token
+
+Contains a 6-digit One-Time-Password (OTP) that can be used instead of the `ConfirmationURL`.
+
+**Usage**
+
+```html
+<p>Here is your one time password: {{ .Token }}</p>
+```
+
+### TokenHash
+
+Contains a hashed version of the `Token`. This is useful for constructing your own email link in the email template.
+
+**Usage**
+
+```html
+<p>Click <a href="{{ .TokenHash }}">here</a> to confirm your login.</p>
+```
+
+### SiteURL
+
+Contains your application's Site URL. This can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration).
+
+**Usage**
+
+```html
+<p>Visit <a href="{{ .SiteURL }}">here</a> to log in.</p>
+```
+
+### Email
+
+Contains the user's email address.
+
+**Usage**
+
+```html
+<p>A recovery request was sent to {{ .Email }}.</p>
+```
+
+### NewEmail
+
+Contains the new user's email address. This is only available in the `email_change` email template.
+
+**Usage**
+
+```html
+<p>You are requesting to update your email address to {{ .NewEmail }}.</p>
+```
 
 ## Deploying email templates
 
