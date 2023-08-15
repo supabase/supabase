@@ -541,7 +541,7 @@ const EXTERNAL_PROVIDER_AZURE = {
     }),
     EXTERNAL_AZURE_SECRET: string().when('EXTERNAL_AZURE_ENABLED', {
       is: true,
-      then: (schema) => schema.required('Secret ID is required'),
+      then: (schema) => schema.required('Secret Value is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_AZURE_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
