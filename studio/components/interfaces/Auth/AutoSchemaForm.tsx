@@ -4,7 +4,7 @@ import { boolean, number, object, string } from 'yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Button, Form, Input, IconEye, IconEyeOff, InputNumber, Toggle, Radio } from 'ui'
 
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, useCheckPermissions } from 'hooks'
 import {
   FormActions,
   FormHeader,
@@ -20,7 +20,7 @@ const AutoSchemaForm = observer(() => {
 
   const formId = 'auth-config-general-form'
   const [hidden, setHidden] = useState(true)
-  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig.config.DISABLE_SIGNUP,

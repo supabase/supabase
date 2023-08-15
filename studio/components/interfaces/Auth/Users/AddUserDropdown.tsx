@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { useState } from 'react'
 import semver from 'semver'
@@ -21,8 +21,8 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
       )
     : true
 
-  const canInviteUsers = checkPermissions(PermissionAction.AUTH_EXECUTE, 'invite_user')
-  const canCreateUsers = checkPermissions(PermissionAction.AUTH_EXECUTE, 'create_user')
+  const canInviteUsers = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'invite_user')
+  const canCreateUsers = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'create_user')
 
   const [inviteVisible, setInviteVisible] = useState(false)
   const [createVisible, setCreateVisible] = useState(false)
@@ -43,7 +43,7 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
                     disabled={!canInviteUsers}
                     onClick={() => setInviteVisible(true)}
                   >
-                    Send Invitation
+                    Send invitation
                   </Dropdown.Item>
                 </Tooltip.Trigger>
                 {!canInviteUsers && (
@@ -73,7 +73,7 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
                   disabled={!canCreateUsers}
                   onClick={() => setCreateVisible(true)}
                 >
-                  Create New User
+                  Create new user
                 </Dropdown.Item>
               </Tooltip.Trigger>
 

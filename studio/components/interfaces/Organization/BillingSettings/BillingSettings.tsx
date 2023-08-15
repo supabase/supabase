@@ -1,34 +1,34 @@
-import { useState, useEffect } from 'react'
-import { observer } from 'mobx-react-lite'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { useEffect, useState } from 'react'
 
-import { Project } from 'types'
-import { useStore } from 'hooks'
-import { useParams } from 'common/hooks'
-import { API_URL } from 'lib/constants'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { get } from 'lib/common/fetch'
-
-import ProjectsSummary from './ProjectsSummary'
+import { API_URL } from 'lib/constants'
+import OrganizationBillingMigrationPanel from '../GeneralSettings/OrganizationBillingMigrationPanel'
+import BillingAddress from './BillingAddress/BillingAddress'
+import BillingEmail from './BillingEmail'
 import CreditBalance from './CreditBalance'
 import PaymentMethods from './PaymentMethods'
-import BillingAddress from './BillingAddress/BillingAddress'
+import ProjectsSummary from './ProjectsSummary'
 import TaxID from './TaxID/TaxID'
-import BillingEmail from './BillingEmail'
 
 const BillingSettings = () => {
-  const { app, ui } = useStore()
+  const { ui } = useStore()
   const { slug } = useParams()
 
-  const organization = ui.selectedOrganization
-  const projects = app.projects.list((x: Project) => x.organization_id == organization?.id) || []
+  const organization = useSelectedOrganization()
+  const { data: allProjects } = useProjectsQuery()
+  const projects =
+    allProjects?.filter((project) => project.organization_id === organization?.id) ?? []
 
   const [customer, setCustomer] = useState<any>(null)
   const [isLoadingCustomer, setIsLoadingCustomer] = useState(false)
 
   const [paymentMethods, setPaymentMethods] = useState<any>(null)
   const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
-
-  const [taxIds, setTaxIds] = useState<any>(null)
-  const [isLoadingTaxIds, setIsLoadingTaxIds] = useState(false)
 
   const defaultPaymentMethod = customer?.invoice_settings?.default_payment_method ?? ''
   const customerBalance = customer && customer.balance ? customer.balance / 100 : 0
@@ -39,11 +39,10 @@ const BillingSettings = () => {
       ? customerBalance.toString().replace('-', '')
       : customerBalance
 
-  useEffect(() => {
-    getCustomerProfile()
-    getPaymentMethods()
-    getTaxIds()
-  }, [slug])
+  const orgBillingMigrationEnabled = useFlag('orgBillingMigration')
+  const canMigrateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const selectedOrganization = useSelectedOrganization()
+  const { subscription_id } = selectedOrganization ?? {}
 
   const getCustomerProfile = async () => {
     try {
@@ -77,51 +76,37 @@ const BillingSettings = () => {
     }
   }
 
-  const getTaxIds = async () => {
-    try {
-      setIsLoadingTaxIds(true)
-      const { data: taxIds, error } = await get(`${API_URL}/organizations/${slug}/tax-ids`)
-      if (error) throw error
-      setTaxIds(taxIds)
-      setIsLoadingTaxIds(false)
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to get organization tax IDs: ${error.message}`,
-      })
-    }
-  }
+  useEffect(() => {
+    getCustomerProfile()
+    getPaymentMethods()
+  }, [slug])
 
   return (
-    <article className="container my-4 max-w-4xl space-y-8">
-      <div className="space-y-8">
-        <ProjectsSummary projects={projects} />
-        <CreditBalance balance={balance} isCredit={isCredit} isDebt={isDebt} />
-        <PaymentMethods
-          loading={isLoadingCustomer || isLoadingPaymentMethods}
-          defaultPaymentMethod={defaultPaymentMethod}
-          paymentMethods={paymentMethods || []}
-          onDefaultMethodUpdated={setCustomer}
-          onPaymentMethodsDeleted={() => getPaymentMethods()}
-          onPaymentMethodAdded={() => getPaymentMethods()}
-        />
+    <ScaffoldContainerLegacy>
+      {orgBillingMigrationEnabled && canMigrateOrganization && !subscription_id && (
+        <OrganizationBillingMigrationPanel />
+      )}
+      <ProjectsSummary projects={projects} />
+      <CreditBalance balance={balance} isCredit={isCredit} isDebt={isDebt} />
+      <PaymentMethods
+        loading={isLoadingCustomer || isLoadingPaymentMethods}
+        defaultPaymentMethod={defaultPaymentMethod}
+        paymentMethods={paymentMethods || []}
+        onDefaultMethodUpdated={setCustomer}
+        onPaymentMethodsDeleted={() => getPaymentMethods()}
+        onPaymentMethodAdded={() => getPaymentMethods()}
+      />
 
-        <BillingEmail />
+      <BillingEmail />
 
-        <BillingAddress
-          loading={isLoadingCustomer}
-          address={customer?.address ?? {}}
-          onAddressUpdated={(address: any) => setCustomer({ ...customer, address })}
-        />
-        <TaxID
-          loading={isLoadingTaxIds}
-          taxIds={taxIds || []}
-          onTaxIdsUpdated={(ids: any) => setTaxIds(ids)}
-        />
-      </div>
-    </article>
+      <BillingAddress
+        loading={isLoadingCustomer}
+        address={customer?.address ?? {}}
+        onAddressUpdated={(address: any) => setCustomer({ ...customer, address })}
+      />
+      <TaxID />
+    </ScaffoldContainerLegacy>
   )
 }
 
-export default observer(BillingSettings)
+export default BillingSettings

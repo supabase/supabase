@@ -1,18 +1,19 @@
-import Panel from 'components/ui/Panel'
-import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
-import { Button, IconCreditCard, Modal } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
-import PaymentMethodSelection from './PaymentMethodSelection'
+
 import { useParams } from 'common'
+import Panel from 'components/ui/Panel'
 import {
   SubscriptionTier,
   updateSubscriptionTier,
 } from 'data/subscriptions/project-subscription-update-mutation'
-import { checkPermissions, useStore } from 'hooks'
+import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
+import { Button, IconCreditCard, Modal } from 'ui'
+import PaymentMethodSelection from './PaymentMethodSelection'
 
 export interface SubscriptionTierProps {
   subscription: ProjectSubscriptionResponse
@@ -26,9 +27,10 @@ const SubscriptionPaymentMethod = ({
   const { ref: projectRef } = useParams()
   const { ui } = useStore()
 
-  const currentOrgSlug = ui.selectedOrganization?.slug
+  const selectedOrganization = useSelectedOrganization()
+  const currentOrgSlug = selectedOrganization?.slug
 
-  const canUpdatePaymentMethod = checkPermissions(
+  const canUpdatePaymentMethod = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )

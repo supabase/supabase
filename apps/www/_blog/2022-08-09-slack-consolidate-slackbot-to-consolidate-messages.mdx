@@ -120,7 +120,7 @@ Now, we are done with Slack for now. Let's create some buffer tables in Supabase
 
 ## Creating Tables in Supabase
 
-Create an account [here](https://app.supabase.com/) (if you don't have one yet).
+Create an account [here](https://supabase.com/dashboard/) (if you don't have one yet).
 
 We will be using Supabase's [database](https://supabase.com/docs/guides/database) and the Python [client Libraries](https://supabase.com/docs/guides/client-libraries#managing-data). First, we will create one table to store the channels that are being watched and where they are going to send the message which works analogously to a multiplexer circuit. Since you may want to watch several channels but split them into a smaller buffer e.g VIP / Enterprise, etc.
 
@@ -187,7 +187,7 @@ The picture shows the UI in Supabase to insert a new row to the database table.
 
 **Method 2:**
 
-Go to [SQL Editor](https://app.supabase.com/project/_/sql) and run insert commands:
+Go to [SQL Editor](https://supabase.com/dashboard/project/_/sql) and run insert commands:
 
 Inserting a public channel named #support-channel to be monitored:
 
@@ -226,7 +226,7 @@ Notes:
 
 You need to get the supabase URL and API keys from here:
 
-[https://app.supabase.com/project/\_/settings/api](https://app.supabase.com/project/_/settings/api)
+[https://supabase.com/dashboard/project/\_/settings/api](https://supabase.com/dashboard/project/_/settings/api)
 
 ![The picture illustrates where to get the URL and the service key to setup the environment variables.](/images/blog/slackbot-consolidate/10_copy_supabase_apis.png)
 

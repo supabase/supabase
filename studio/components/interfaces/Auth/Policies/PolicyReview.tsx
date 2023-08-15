@@ -1,20 +1,20 @@
-import { Button, Modal } from 'ui'
-import { isEmpty } from 'lodash'
-import { FC, useState } from 'react'
 import SqlEditor from 'components/ui/SqlEditor'
+import { isEmpty, noop } from 'lodash'
+import { useState } from 'react'
+import { Button, Modal } from 'ui'
 import { PolicyForReview } from './Policies.types'
 
-interface Props {
+interface PolicyReviewProps {
   policy: PolicyForReview
   onSelectBack: () => void
   onSelectSave: () => void
 }
 
-const PolicyReview: FC<Props> = ({
+const PolicyReview = ({
   policy = {},
-  onSelectBack = () => {},
-  onSelectSave = () => {},
-}) => {
+  onSelectBack = noop,
+  onSelectSave = noop,
+}: PolicyReviewProps) => {
   const [isSaving, setIsSaving] = useState(false)
   const onSavePolicy = () => {
     setIsSaving(true)

@@ -1,8 +1,21 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
+
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Form,
+  IconAlertTriangle,
+  IconEye,
+  IconEyeOff,
+  Input,
+  InputNumber,
+  Toggle,
+} from 'ui'
 import { number, object, string } from 'yup'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Alert, Button, Form, Input, InputNumber, Toggle, IconEye, IconEyeOff } from 'ui'
 
 import {
   FormActions,
@@ -12,7 +25,7 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
-import { useStore, checkPermissions } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
@@ -26,13 +39,13 @@ const SmtpForm = () => {
 
   const formId = 'auth-config-smtp-form'
   const initialValues = generateFormValues(authConfig.config)
-  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   useEffect(() => {
     if (isLoaded && isSmtpEnabled(config)) {
       setEnableSmtp(true)
     }
-  }, [isLoaded])
+  }, [isLoaded, config])
 
   const schema = object({
     SMTP_ADMIN_EMAIL: string().when([], {
@@ -133,7 +146,7 @@ const SmtpForm = () => {
             const formValues = generateFormValues(config)
             resetForm({ values: formValues, initialValues: formValues })
           }
-        }, [isLoaded])
+        }, [isLoaded, config])
 
         const onResetForm = () => {
           setEnableSmtp(isSmtpEnabled(initialValues))
@@ -180,11 +193,38 @@ const SmtpForm = () => {
                 </FormSectionContent>
               </FormSection>
 
-              {enableSmtp && !isValidSmtpConfig && (
+              {enableSmtp ? (
+                !isValidSmtpConfig && (
+                  <div className="mx-8 mb-8 -mt-4">
+                    <Alert_Shadcn_ variant="warning">
+                      <IconAlertTriangle strokeWidth={2} />
+                      <AlertTitle_Shadcn_>All fields below must be filled</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        The following fields must be filled before custom SMTP can be properly
+                        enabled
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  </div>
+                )
+              ) : (
                 <div className="mx-8 mb-8 -mt-4">
-                  <Alert withIcon variant="warning" title="All fields below must be filled">
-                    The following fields must be filled before custom SMTP can be properly enabled
-                  </Alert>
+                  <Alert_Shadcn_ variant="warning">
+                    <IconAlertTriangle strokeWidth={2} />
+                    <AlertTitle_Shadcn_>Built-in email service is rate-limited!</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      You're using the built-in email service. The service has rate limits and it's
+                      not meant to be used for production apps. Check the{' '}
+                      <a
+                        href="https://supabase.com/docs/guides/platform/going-into-prod#auth-rate-limits"
+                        className="underline"
+                        target="_blank"                 
+                      >
+                        documentation
+                      </a>{' '}
+                      for an up-to-date information on the current rate limits. Please use a custom
+                      SMTP server if you're planning on having large number of users.
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
                 </div>
               )}
 

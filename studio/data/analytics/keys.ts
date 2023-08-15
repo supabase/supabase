@@ -23,6 +23,34 @@ export const analyticsKeys = {
         interval,
       },
     ] as const,
+  orgDailyStats: (
+    orgSlug: string | undefined,
+    {
+      metric,
+      startDate,
+      endDate,
+      interval,
+      projectRef,
+    }: {
+      metric?: string
+      startDate?: string
+      endDate?: string
+      interval?: string
+      projectRef?: string
+    }
+  ) =>
+    [
+      'organizations',
+      orgSlug,
+      'daily-stats',
+      {
+        metric,
+        startDate: isoDateStringToDate(startDate),
+        endDate: isoDateStringToDate(endDate),
+        interval,
+        projectRef,
+      },
+    ] as const,
   infraMonitoring: (
     projectRef: string | undefined,
     {

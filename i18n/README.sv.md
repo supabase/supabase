@@ -39,7 +39,7 @@ För att se hur man bidrar, besök [Getting Started](../DEVELOPERS.md)
 ## Status
 
 - [Alpha: Vi testar Supabase med en sluten grupp av kunder
-- [x] Public Alpha: Vem som helst kan registrera sig på [app.supabase.com](https://app.supabase.com). Men var försiktig med oss, det finns några problem
+- [x] Public Alpha: Vem som helst kan registrera sig på [supabase.com/dashboard](https://supabase.com/dashboard). Men var försiktig med oss, det finns några problem
 - [x] Public Beta: Stabil nog för de flesta användningsområden som inte är företag
 - [ ] Public: Allmän tillgänglighet [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]]
 
@@ -55,7 +55,7 @@ Supabase är en kombination av verktyg med öppen källkod. Vi bygger funktioner
 
 **Arkitektur**
 
-Supabase är en [värdplattform](https://app.supabase.com). Du kan registrera dig och börja använda Supabase utan att installera något.
+Supabase är en [värdplattform](https://supabase.com/dashboard). Du kan registrera dig och börja använda Supabase utan att installera något.
 Du kan också [självhosta](https://supabase.com/docs/guides/hosting/overview) och [utveckla lokalt](https://supabase.com/docs/guides/local-development).
 
 ![Arkitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)

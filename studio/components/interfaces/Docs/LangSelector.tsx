@@ -1,13 +1,12 @@
-import { FC } from 'react'
-import { Button, Dropdown, IconKey } from 'ui'
-import { checkPermissions } from 'hooks'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useCheckPermissions } from 'hooks'
+import { Button, Dropdown, IconKey } from 'ui'
 
 import { showApiKey } from 'components/interfaces/Docs/Docs.types'
 
 const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
-interface Props {
+interface LangSelectorProps {
   selectedLang: string
   setSelectedLang: (selectedLang: string) => void
   showApiKey: showApiKey
@@ -16,15 +15,15 @@ interface Props {
   autoApiService: any
 }
 
-const LangSelector: FC<Props> = ({
+const LangSelector = ({
   selectedLang,
   setSelectedLang,
   showApiKey,
   setShowApiKey,
   apiKey,
   autoApiService,
-}) => {
-  const canReadServiceKey = checkPermissions(
+}: LangSelectorProps) => {
+  const canReadServiceKey = useCheckPermissions(
     PermissionAction.READ,
     'service_api_keys.service_role_key'
   )

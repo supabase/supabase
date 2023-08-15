@@ -234,7 +234,7 @@ export const genChartQuery = (
   const where = _genWhereStatement(table, filters)
 
   let joins = 'cross join unnest(t.metadata) as metadata'
-  if (table === LogsTableName.EDGE) {
+  if (table === LogsTableName.EDGE || table === LogsTableName.FN_EDGE) {
     joins += ' \n  cross join unnest(metadata.request) as request'
     joins += ' \n  cross join unnest(metadata.response) as response'
   } else if (table === LogsTableName.POSTGRES) {

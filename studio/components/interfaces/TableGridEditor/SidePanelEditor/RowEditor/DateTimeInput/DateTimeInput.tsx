@@ -1,9 +1,10 @@
-import { FC, ReactNode } from 'react'
-import { Input } from 'ui'
-import { getColumnType } from './DateTimeInput.utils'
 import dayjs from 'dayjs'
+import { ReactNode } from 'react'
+import { Input } from 'ui'
 
-interface Props {
+import { getColumnType } from './DateTimeInput.utils'
+
+interface DateTimeInputProps {
   name: string
   format: string
   value: string
@@ -16,7 +17,7 @@ interface Props {
  * e.g Yes: 2022-05-13T14:29:03
  *     No:  2022-05-13T14:29:03+0800
  */
-const DateTimeInput: FC<Props> = ({ value, onChange, name, format, description }) => {
+const DateTimeInput = ({ value, onChange, name, format, description }: DateTimeInputProps) => {
   const inputType = getColumnType(format)
 
   function handleOnChange(e: any) {

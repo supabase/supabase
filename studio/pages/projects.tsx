@@ -1,28 +1,68 @@
 import ProjectList from 'components/interfaces/Home/ProjectList'
 import { AccountLayout } from 'components/layouts'
 import OrganizationDropdown from 'components/to-be-cleaned/Dropdown/OrganizationDropdown'
+import AlertError from 'components/ui/AlertError'
 import Connecting from 'components/ui/Loading/Loading'
-import { useStore } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
-import { observer } from 'mobx-react-lite'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
+import { useFlag } from 'hooks'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useProfile } from 'lib/profile'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { NextPageWithLayout } from 'types'
 
 const ProjectsPage: NextPageWithLayout = () => {
-  const { app } = useStore()
+  const router = useRouter()
+  const {
+    data: organizations,
+    isLoading: isOrganizationLoading,
+    isError,
+    isSuccess,
+  } = useOrganizationsQuery()
+  useAutoProjectsPrefetch()
+
+  const { isLoading: isProfileLoading } = useProfile()
+  const isLoading = isOrganizationLoading || isProfileLoading
+  const navLayoutV2 = useFlag('navigationLayoutV2')
+  const hasWindowLoaded = typeof window !== 'undefined'
+
+  useEffect(() => {
+    if (navLayoutV2 && isSuccess && hasWindowLoaded) {
+      const localStorageSlug = localStorage.getItem(
+        LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION
+      )
+      const verifiedSlug = organizations.some((org) => org.slug === localStorageSlug)
+
+      if (organizations.length === 0) router.push('/new')
+      else if (localStorageSlug && verifiedSlug) router.push(`/org/${localStorageSlug}`)
+      else router.push(`/org/${organizations[0].slug}`)
+    }
+  }, [navLayoutV2, isSuccess, hasWindowLoaded])
 
   return (
     <>
-      {!app.organizations.isInitialized ? (
-        <div className="flex h-full items-center justify-center space-x-2">
+      {navLayoutV2 && isLoading && (
+        <div className={`flex items-center justify-center h-full`}>
           <Connecting />
         </div>
-      ) : (
+      )}
+
+      {isError && (
+        <div
+          className={`py-4 px-5 ${navLayoutV2 ? 'h-full flex items-center justify-center' : ''}`}
+        >
+          <AlertError subject="Failed to retrieve organizations" />
+        </div>
+      )}
+
+      {!navLayoutV2 && isSuccess && (
         <div className="py-4 px-5">
           {IS_PLATFORM && (
             <div className="my-2">
               <div className="flex">
                 <div className="">
-                  <OrganizationDropdown organizations={app.organizations} />
+                  <OrganizationDropdown organizations={organizations} />
                 </div>
               </div>
             </div>
@@ -50,4 +90,4 @@ ProjectsPage.getLayout = (page) => (
   </AccountLayout>
 )
 
-export default observer(ProjectsPage)
+export default ProjectsPage

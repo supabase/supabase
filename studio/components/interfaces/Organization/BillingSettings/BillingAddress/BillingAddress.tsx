@@ -1,42 +1,55 @@
-import { FC, useState } from 'react'
-import { isEqual } from 'lodash'
-import { Dictionary } from 'components/grid'
-import { Form, Input, Button, Listbox } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { isEqual } from 'lodash'
+import { useState } from 'react'
+import { Button, Form, Input, Listbox } from 'ui'
 
-import { checkPermissions, useStore } from 'hooks'
-import { patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { COUNTRIES } from './BillingAddress.constants'
-import Panel from 'components/ui/Panel'
 import NoPermission from 'components/ui/NoPermission'
+import Panel from 'components/ui/Panel'
+import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { COUNTRIES } from './BillingAddress.constants'
 
-interface Props {
+export interface BillingAddressProps {
   loading: boolean
-  address: Dictionary<any>
+  address: { [key: string]: any }
   onAddressUpdated: (address: any) => void
 }
 
-const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
+const BillingAddress = ({ loading, address, onAddressUpdated }: BillingAddressProps) => {
   const { ui } = useStore()
-  const orgSlug = ui.selectedOrganization?.slug ?? ''
-  const { city, country, line1, line2, postal_code, state } = address
+  const [isDirty, setIsDirty] = useState(false)
+  const selectedOrganization = useSelectedOrganization()
 
-  const canReadBillingAddress = checkPermissions(PermissionAction.BILLING_READ, 'stripe.customer')
-  const canUpdateBillingAddress = checkPermissions(
+  const orgSlug = selectedOrganization?.slug ?? ''
+  const { city, country, line1, line2, postal_code, state } = address
+  const initialValues = { city, country, line1, line2, postal_code, state }
+
+  const { mutate: updateCustomer, isLoading: isUpdating } =
+    useOrganizationCustomerProfileUpdateMutation({
+      onSuccess: (updatedCustomer) => {
+        ui.setNotification({
+          category: 'success',
+          message: 'Successfully updated billing address',
+        })
+        setIsDirty(false)
+        onAddressUpdated(updatedCustomer.address)
+      },
+      onError: (error) => {
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to update billing address: ${error.message}`,
+        })
+      },
+    })
+
+  const canReadBillingAddress = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.customer'
+  )
+  const canUpdateBillingAddress = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.customer'
   )
-
-  const [isDirty, setIsDirty] = useState(false)
-  const initialValues = {
-    city,
-    country,
-    line1,
-    line2,
-    postal_code,
-    state,
-  }
 
   const onValidate = (values: any) => {
     const errors = {} as any
@@ -48,27 +61,8 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
     return errors
   }
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
-    try {
-      setSubmitting(true)
-      const updatedCustomer = await patch(`${API_URL}/organizations/${orgSlug}/customer`, {
-        address: values,
-      })
-      if (updatedCustomer.error) throw updatedCustomer.error
-      ui.setNotification({
-        category: 'success',
-        message: 'Successfully updated billing address',
-      })
-      onAddressUpdated(updatedCustomer.address)
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to update billing address: ${error.message}`,
-      })
-    } finally {
-      setSubmitting(false)
-      setIsDirty(false)
-    }
+  const onSubmit = async (values: any) => {
+    updateCustomer({ slug: orgSlug, address: values })
   }
 
   return (
@@ -93,7 +87,7 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
             validate={onValidate}
             onSubmit={onSubmit}
           >
-            {({ isSubmitting, handleReset }: any) => {
+            {({ handleReset }: any) => {
               return (
                 <>
                   <Panel.Content className="w-3/5 space-y-2">
@@ -169,7 +163,7 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
                       <Button
                         type="default"
                         htmlType="reset"
-                        disabled={!isDirty || isSubmitting || !canUpdateBillingAddress}
+                        disabled={!isDirty || isUpdating || !canUpdateBillingAddress}
                         onClick={() => {
                           handleReset()
                           setIsDirty(false)
@@ -180,8 +174,8 @@ const BillingAddress: FC<Props> = ({ loading, address, onAddressUpdated }) => {
                       <Button
                         type="primary"
                         htmlType="submit"
-                        loading={isSubmitting}
-                        disabled={!isDirty || isSubmitting || !canUpdateBillingAddress}
+                        loading={isUpdating}
+                        disabled={!isDirty || isUpdating || !canUpdateBillingAddress}
                       >
                         Save
                       </Button>

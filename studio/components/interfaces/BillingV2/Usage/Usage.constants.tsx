@@ -49,11 +49,11 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
     attributes: [
       {
         anchor: 'cpu',
-        key: 'cpu_usage',
-        attribute: 'cpu_usage',
+        key: 'max_cpu_usage',
+        attribute: 'max_cpu_usage',
         name: 'CPU',
         unit: 'percentage',
-        description: 'CPU usage of your server',
+        description: 'Max CPU usage of your server',
         chartDescription: '',
         links: [
           {
@@ -195,7 +195,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
                 The disk is expanded to be 50% larger. Auto-scaling can only take place once every 6
                 hours. You can also{' '}
                 <Link passHref href={`/project/${ref}/settings/database#diskManagement`}>
-                  <a className="text-brand-900 transition hover:text-brand-1000">preprovision</a>
+                  <a className="text-brand transition hover:text-brand-600">preprovision</a>
                 </Link>{' '}
                 disk for loading larger amounts of data.
               </p>

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { noop, partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import {
+  Alert,
   Button,
   Dropdown,
   IconCheck,
@@ -20,7 +21,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import type { PostgresSchema } from '@supabase/postgres-meta'
 
 import { useParams } from 'common/hooks'
-import { checkPermissions, useStore, useLocalStorage } from 'hooks'
+import { useCheckPermissions, useStore, useLocalStorage } from 'hooks'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { Entity } from 'data/entity-types/entity-type-query'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
@@ -83,9 +84,8 @@ const TableEditorMenu = ({
   )
 
   const schemas: PostgresSchema[] = meta.schemas.list()
-
   const schema = schemas.find((schema) => schema.name === selectedSchema)
-  const canCreateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canCreateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const isLoadingTableMetadata = id ? !meta.tables.byId(id) : true
 
@@ -110,6 +110,13 @@ const TableEditorMenu = ({
             <IconLoader className="animate-spin" size={12} />
             <span className="text-xs text-scale-900">Loading schemas...</span>
           </div>
+        ) : meta.schemas.hasError ? (
+          <Alert variant="warning" title="Failed to load schemas" className="!px-3 !py-3">
+            <p className="mb-2">Error: {meta.schemas?.error?.message}</p>
+            <Button type="default" size="tiny" onClick={() => meta.schemas.load()}>
+              Reload schemas
+            </Button>
+          </Alert>
         ) : (
           <Listbox
             size="tiny"

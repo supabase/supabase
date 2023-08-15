@@ -1,6 +1,7 @@
-import { auth } from 'lib/gotrue'
+import { getAccessToken } from 'lib/gotrue'
 import { isUndefined } from 'lodash'
 import { SupaResponse } from 'types/base'
+import { Session } from '@supabase/gotrue-js'
 
 export function handleError<T>(e: any, requestId: string): SupaResponse<T> {
   const message = e?.message ? `An error has occurred: ${e.message}` : 'An error has occurred'
@@ -86,17 +87,6 @@ export async function handleResponseError<T = unknown>(
   }
 }
 
-export async function getAccessToken() {
-  // ignore if server-side
-  if (typeof window === 'undefined') return ''
-
-  const {
-    data: { session },
-  } = await auth.getSession()
-
-  return session?.access_token
-}
-
 export async function constructHeaders(requestId: string, optionHeaders?: { [prop: string]: any }) {
   let headers: { [prop: string]: any } = {
     'Content-Type': 'application/json',
@@ -112,4 +102,12 @@ export async function constructHeaders(requestId: string, optionHeaders?: { [pro
   }
 
   return headers
+}
+
+export function isResponseOk<T>(response: SupaResponse<T> | undefined): response is T {
+  return (
+    response !== undefined &&
+    response !== null &&
+    !(typeof response === 'object' && 'error' in response && Boolean(response.error))
+  )
 }

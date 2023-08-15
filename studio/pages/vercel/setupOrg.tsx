@@ -1,13 +1,14 @@
-import { createContext, useEffect, useContext, useState, ChangeEvent } from 'react'
-import { useRouter } from 'next/router'
-import { observer, useLocalObservable } from 'mobx-react-lite'
-import { Button, Input, Select } from 'ui'
 import { runInAction } from 'mobx'
+import { observer, useLocalObservable } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import { ChangeEvent, createContext, useContext, useEffect, useState } from 'react'
 
-import { API_URL } from 'lib/constants'
-import { post } from 'lib/common/fetch'
-import { useStore } from 'hooks'
 import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useStore } from 'hooks'
+import { post } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import { Button, Input, Select } from 'ui'
 
 const PageContext = createContext(null)
 function SetupOrg() {
@@ -53,14 +54,13 @@ function SetupOrg() {
     },
   }))
 
-  const { app } = useStore()
+  const { data: organizations } = useOrganizationsQuery()
 
   useEffect(() => {
     PageState.loadInitialData()
 
-    const sortedOrganizations = app.organizations.list()
-    PageState.shouldShowOrgCreationUI = sortedOrganizations?.length == 0
-  }, [])
+    PageState.shouldShowOrgCreationUI = organizations?.length == 0
+  }, [organizations])
 
   return (
     // @ts-ignore
@@ -78,7 +78,7 @@ const CreateOrganization = observer(({}) => {
   const router = useRouter()
 
   const { ui, app } = useStore()
-  const sortedOrganizations = app.organizations.list()
+  const { data: organizations } = useOrganizationsQuery()
 
   const [orgName, setOrgName] = useState('')
   const [loading, setLoading] = useState(false)
@@ -109,7 +109,7 @@ const CreateOrganization = observer(({}) => {
 
   return (
     <div className="">
-      {sortedOrganizations?.length > 0 ? (
+      {(organizations?.length ?? 0) > 0 ? (
         <p className="mb-2">Create a new organization</p>
       ) : (
         <>
@@ -141,14 +141,13 @@ const OrgSelection = observer(({}) => {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
 
-  const { app } = useStore()
-  const sortedOrganizations = app.organizations.list()
+  const { data: organizations } = useOrganizationsQuery()
 
   useEffect(() => {
     if (!PageState.selectedOrg) {
-      PageState.selectedOrg = sortedOrganizations?.length > 0 ? sortedOrganizations[0] : undefined
+      PageState.selectedOrg = (organizations?.length ?? 0) > 0 ? organizations?.[0] : undefined
     }
-  }, [sortedOrganizations])
+  }, [organizations])
 
   function onContinue() {
     setLoading(true)
@@ -164,7 +163,7 @@ const OrgSelection = observer(({}) => {
   }
 
   function onOrgSelect(e: ChangeEvent<HTMLSelectElement>) {
-    const selectedOrg = sortedOrganizations.find((x: any) => x.slug === e.target.value)
+    const selectedOrg = organizations?.find((x: any) => x.slug === e.target.value)
     PageState.selectedOrg = selectedOrg
   }
 
@@ -176,7 +175,7 @@ const OrgSelection = observer(({}) => {
           value={PageState.selectedOrg?.slug}
           onChange={onOrgSelect}
         >
-          {sortedOrganizations?.map((x) => {
+          {organizations?.map((x) => {
             return (
               <Select.Option key={x.id} value={x.slug}>
                 {x.name}

@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import dayjs from 'dayjs'
 import { groupBy, isNull } from 'lodash'
 import { toJS } from 'mobx'
-import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
 import {
   Badge,
   Button,
@@ -14,26 +15,25 @@ import {
   IconSave,
   IconSettings,
 } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
-import { uuidv4 } from 'lib/helpers'
-import { METRIC_CATEGORIES, METRICS, TIME_PERIODS_REPORTS } from 'lib/constants'
-import { useProjectContentStore } from 'stores/projectContentStore'
-import Loading from 'components/ui/Loading'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import Loading from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
+import { useCheckPermissions } from 'hooks'
+import { METRIC_CATEGORIES, METRICS, TIME_PERIODS_REPORTS } from 'lib/constants'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { useProjectContentStore } from 'stores/projectContentStore'
 import GridResize from './GridResize'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
-import { useProfileQuery } from 'data/profile/profile-query'
 
 const DEFAULT_CHART_COLUMN_COUNT = 12
 const DEFAULT_CHART_ROW_COUNT = 4
 
 const Reports = () => {
   const { id, ref } = useParams()
-  const { data: profile } = useProfileQuery()
+  const { profile } = useProfile()
 
   const [report, setReport] = useState<any>()
 
@@ -46,7 +46,7 @@ const Reports = () => {
   const [endDate, setEndDate] = useState<any>(null)
 
   const contentStore = useProjectContentStore(ref)
-  const canReadReport = checkPermissions(PermissionAction.READ, 'user_content', {
+  const canReadReport = useCheckPermissions(PermissionAction.READ, 'user_content', {
     resource: {
       type: 'report',
       visibility: report?.visibility,
@@ -54,7 +54,7 @@ const Reports = () => {
     },
     subject: { id: profile?.id },
   })
-  const canUpdateReport = checkPermissions(PermissionAction.UPDATE, 'user_content', {
+  const canUpdateReport = useCheckPermissions(PermissionAction.UPDATE, 'user_content', {
     resource: {
       type: 'report',
       visibility: report?.visibility,

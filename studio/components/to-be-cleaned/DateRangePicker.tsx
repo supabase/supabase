@@ -1,6 +1,7 @@
-import { FC, useEffect, useState } from 'react'
-import { Button, Dropdown, IconChevronDown } from 'ui'
 import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
+import { Button, Dropdown, IconChevronDown } from 'ui'
+
 import { DATE_FORMAT } from 'lib/constants'
 
 /**
@@ -11,13 +12,29 @@ import { DATE_FORMAT } from 'lib/constants'
  * Otherwise there won't be any data shown on the graphs
  */
 
-const DateRangePicker: FC<any> = ({
+interface DateRangePickerProps {
+  value: string
+  loading: boolean
+  onChange: ({
+    period_start,
+    period_end,
+    interval,
+  }: {
+    period_start: { date: string; time_period: string }
+    period_end: { date: string; time_period: string }
+    interval?: string
+  }) => void
+  options: { key: string; label: string; interval?: string }[]
+  currentBillingPeriodStart?: number
+}
+
+const DateRangePicker = ({
   onChange,
   value,
   options,
   loading,
   currentBillingPeriodStart,
-}) => {
+}: DateRangePickerProps) => {
   const [timePeriod, setTimePeriod] = useState(value)
 
   useEffect(() => {
@@ -39,11 +56,14 @@ const DateRangePicker: FC<any> = ({
       case 'currentBillingCycle':
         onChange({
           period_start: {
-            date: dayjs.unix(currentBillingPeriodStart).format(DATE_FORMAT),
+            date: dayjs.unix(currentBillingPeriodStart ?? 0).format(DATE_FORMAT),
             time_period: '1d',
           },
           period_end: {
-            date: dayjs.unix(currentBillingPeriodStart).add(1, 'month').format(DATE_FORMAT),
+            date: dayjs
+              .unix(currentBillingPeriodStart ?? 0)
+              .add(1, 'month')
+              .format(DATE_FORMAT),
             time_period: 'today',
           },
           interval: '1d',
@@ -52,11 +72,14 @@ const DateRangePicker: FC<any> = ({
       case 'previousBillingCycle':
         onChange({
           period_start: {
-            date: dayjs.unix(currentBillingPeriodStart).subtract(1, 'month').format(DATE_FORMAT),
+            date: dayjs
+              .unix(currentBillingPeriodStart ?? 0)
+              .subtract(1, 'month')
+              .format(DATE_FORMAT),
             time_period: '1d',
           },
           period_end: {
-            date: dayjs.unix(currentBillingPeriodStart).format(DATE_FORMAT),
+            date: dayjs.unix(currentBillingPeriodStart ?? 0).format(DATE_FORMAT),
             time_period: 'today',
           },
           interval: '1d',
@@ -182,7 +205,7 @@ const DateRangePicker: FC<any> = ({
         }
       >
         <Button asChild type="default" iconRight={<IconChevronDown />}>
-          <span>{timePeriod && options.find((x: any) => x.key == timePeriod).label}</span>
+          <span>{timePeriod && options.find((x: any) => x.key == timePeriod)?.label}</span>
         </Button>
       </Dropdown>
     </>

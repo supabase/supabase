@@ -1,5 +1,6 @@
-import { FC } from 'react'
+import { noop } from 'lodash'
 import { Badge, IconCode, IconDatabase } from 'ui'
+
 import Description from './Description'
 
 function getColumnType(type: string, format: string) {
@@ -22,7 +23,7 @@ function getColumnType(type: string, format: string) {
   }
 }
 
-interface Props {
+interface ParamProps {
   name: string
   type: string
   format: string
@@ -31,15 +32,15 @@ interface Props {
   metadata?: any
   onDesciptionUpdated?: () => void
 }
-const Param: FC<Props> = ({
+const Param = ({
   name,
   type,
   format,
   required,
   description,
   metadata = {},
-  onDesciptionUpdated = () => {},
-}) => {
+  onDesciptionUpdated = noop,
+}: ParamProps) => {
   return (
     <>
       <div className="mb-4 flex items-center justify-between ">

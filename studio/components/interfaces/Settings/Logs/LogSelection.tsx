@@ -1,24 +1,22 @@
-import { FC } from 'react'
-import { Button, Divider, IconX } from 'ui'
+import { Button, IconX } from 'ui'
 
-import { LogData, QueryType } from './Logs.types'
-
-import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
-import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
-import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
-import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
-import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExplorerSelectionRenderer'
-import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
+import CopyButton from 'components/ui/CopyButton'
+import Connecting from 'components/ui/Loading/Loading'
+import useSingleLog from 'hooks/analytics/useSingleLog'
 import {
+  LogsEndpointParams,
   isDefaultLogPreviewFormat,
   isUnixMicro,
-  LogsEndpointParams,
   unixMicroToIsoTimestamp,
 } from '.'
-import useSingleLog from 'hooks/analytics/useSingleLog'
-import Connecting from 'components/ui/Loading/Loading'
-import CopyButton from 'components/ui/CopyButton'
 import AuthSelectionRenderer from './LogSelectionRenderers/AuthSelectionRenderer'
+import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
+import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
+import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExplorerSelectionRenderer'
+import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
+import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
+import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
+import { LogData, QueryType } from './Logs.types'
 
 export interface LogSelectionProps {
   log: LogData | null
@@ -28,13 +26,13 @@ export interface LogSelectionProps {
   params: Partial<LogsEndpointParams>
 }
 
-const LogSelection: FC<LogSelectionProps> = ({
+const LogSelection = ({
   projectRef,
   log: partialLog,
   onClose,
   queryType,
   params = {},
-}) => {
+}: LogSelectionProps) => {
   const { logData: fullLog, isLoading } = useSingleLog(
     projectRef,
     queryType,

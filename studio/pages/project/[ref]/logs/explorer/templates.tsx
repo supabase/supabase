@@ -41,8 +41,8 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
           bg-scale-1200
           text-scale-100
           transition-colors
-          group-hover:bg-brand-900
-          group-hover:text-brand-1200
+          group-hover:bg-brand
+          group-hover:text-brand-600
         "
         >
           <div className="scale-100 group-hover:scale-110">
