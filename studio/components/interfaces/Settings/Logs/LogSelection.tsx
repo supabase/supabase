@@ -40,25 +40,31 @@ const LogSelection = ({
     partialLog?.id
   )
   const Formatter = () => {
+    
     switch (queryType) {
       case 'api':
         if (!fullLog) return null
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />;
         return <DatabaseApiSelectionRender log={fullLog} />
 
       case 'database':
         if (!fullLog) return null
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />;
         return <DatabasePostgresSelectionRender log={fullLog} />
 
       case 'fn_edge':
         if (!fullLog) return null
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />;
         return <FunctionInvocationSelectionRender log={fullLog} />
 
       case 'functions':
         if (!fullLog) return null
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />;
         return <FunctionLogsSelectionRender log={fullLog} />
 
       case 'auth':
         if (!fullLog) return null
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />;
         return <AuthSelectionRenderer log={fullLog} />
 
       default:
