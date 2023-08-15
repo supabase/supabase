@@ -76,12 +76,14 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     if (option.value.toLowerCase() === ((category as string) ?? '').toLowerCase()) return option
   })
 
-  const selectedProjectRef =
+  const [selectedProjectRef, setSelectedProjectRef] = useState(
     selectedProjectFromUrl !== undefined
       ? selectedProjectFromUrl.ref
       : projects.length > 0
       ? projects[0].ref
       : 'no-project'
+  )
+
   const selectedOrganizationSlug =
     selectedProjectRef !== 'no-project'
       ? organizations?.find((org) => {
@@ -304,7 +306,14 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                   </div>
                 )}
                 {isSuccessProjects && (
-                  <Listbox id="projectRef" layout="vertical" label="Which project is affected?">
+                  <Listbox
+                    id="projectRef"
+                    layout="vertical"
+                    label="Which project is affected?"
+                    onChange={(val) => {
+                      setSelectedProjectRef(val)
+                    }}
+                  >
                     {projects.map((option) => {
                       const organization = organizations?.find(
                         (x) => x.id === option.organization_id
@@ -344,7 +353,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                   This project is on the{' '}
                   <span className="text-scale-1100">{subscription.plan.name} plan</span>
                 </p>
-              ) : isLoadingSubscription ? (
+              ) : isLoadingSubscription && selectedProjectRef !== 'no-project' ? (
                 <div className="flex items-center space-x-2 mt-2">
                   <IconLoader size={14} className="animate-spin" />
                   <p className="text-sm text-scale-1000">Checking project's plan</p>
@@ -656,7 +665,9 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         <p className="text-scale-1200 font-medium">{respondToEmail}</p>
                       </div>
                       <div className="flex items-center space-x-1 justify-end block text-sm mt-0 mb-2">
-                        <p className="text-scale-1000">Please ensure you haven't blocked Hubspot in your emails</p>
+                        <p className="text-scale-1000">
+                          Please ensure you haven't blocked Hubspot in your emails
+                        </p>
                       </div>
                       <div className="flex justify-end">
                         <Button
