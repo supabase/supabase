@@ -33,7 +33,7 @@ When using the BigQuery backend, a BigQuery dataset is created in the provided G
 
 When using the Postgres backend, tables are created for each source within the provided schema (for supabase-cli, this would be `_analytics`). Log events received by Logflare are inserted directly into the respective tables. All BigQuery-dialect SQL queries from Studio will be handled by a translation layer within the Analytics server. This translation layer translates the query to PostgreSQL dialect, and then executes it against the Postgres database.
 
-The Postgres backend is not yet optimized for high volume of inserts, or for heavy query usage. Furthermore, the translation layer only handles a limited subset of the BigQuery dialect such that the Studio is capable to work as per normal. As such, the [Log Explorer](https://supabase.com/docs/guides/platform/logs#logs-explorer) may have errors for more advanced queries when using the Postgres Backend.
+The Postgres backend is not yet optimized for a high volume of inserts, or for heavy query usage. Today the translation layer only handles a limited subset of the BigQuery dialect. As such, the [Log Explorer](https://supabase.com/docs/guides/platform/logs#logs-explorer) may produce errors for more advanced queries when using the Postgres Backend.
 
 ## Getting Started
 
