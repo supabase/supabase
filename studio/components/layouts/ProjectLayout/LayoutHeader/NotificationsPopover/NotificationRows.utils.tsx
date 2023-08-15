@@ -2,7 +2,6 @@ import dayjs from 'dayjs'
 import { Project } from 'types'
 import {
   Action,
-  ActionReason,
   ActionType,
   ExtensionsUpgrade,
   Notification,
@@ -14,10 +13,7 @@ import {
 import { IconArrowRight, IconExternalLink, Button } from 'ui'
 import Link from 'next/link'
 
-export const formatNotificationText = (
-  project: Project,
-  notification: Notification,
-) => {
+export const formatNotificationText = (project: Project, notification: Notification) => {
   const projectName = project.name
 
   if (notification.data.name === NotificationName.ProjectExceedingTierLimit) {
@@ -159,9 +155,7 @@ export const formatNotificationText = (
   }
 }
 
-export const formatNotificationCTAText = (
-  availableActions: Action[],
-) => {
+export const formatNotificationCTAText = (availableActions: Action[]) => {
   const [action] = availableActions
   if (!action) return <p className="text-sm"></p>
 
