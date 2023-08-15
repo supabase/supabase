@@ -344,7 +344,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithIdToken'
     examples:
       - id: sign-in-with-id-token
-        name: "Sign In using ID Token"
+        name: 'Sign In using ID Token'
         code: |
           ```js
           const { data, error } = await supabase.auth.signInWithIdToken({
