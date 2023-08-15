@@ -1,19 +1,19 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Button, IconAlertCircle, Modal } from 'ui'
 import Link from 'next/link'
 import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { RLS_ACKNOWLEDGED_KEY } from 'components/grid/constants'
+import { rlsAcknowledgedKey } from 'components/grid/constants'
 import RLSDisableModalContent from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/RLSDisableModal'
 
 export default function RLSBannerWarning() {
   const { meta } = useStore()
   const { ref: projectRef, id: tableID } = useParams()
 
-  const isAcknowledged =
-    localStorage?.getItem(`${RLS_ACKNOWLEDGED_KEY}-${tableID}`) === 'true' ?? false
+  const rlsKey = rlsAcknowledgedKey(tableID)
+  const isAcknowledged = localStorage?.getItem(rlsKey) === 'true' ?? false
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -22,10 +22,11 @@ export default function RLSBannerWarning() {
   const rlsEnabled = currentTable?.rls_enabled
   const isPublicTable = currentTable?.schema === 'public'
 
-  function handleDismissWarning() {
-    localStorage.setItem(`${RLS_ACKNOWLEDGED_KEY}-${tableID}`, 'true')
+  const handleDismissWarning = useCallback(() => {
+    new BroadcastChannel(rlsKey).postMessage({ type: 'dismiss' })
+    localStorage.setItem(rlsKey, 'true')
     setIsOpen(false)
-  }
+  }, [rlsKey])
 
   return (
     <>
