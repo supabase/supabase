@@ -255,7 +255,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
                 className={alt ? 'px-1' : ''}
                 icon={
                   hasNewNotifications ? (
-                    <div className="-mr-3.5 z-10 h-4 w-4 flex items-center justify-center rounded-full bg-white">
+                    <div className="-mr-3.5 z-10 h-4 w-4 flex items-center justify-center rounded-full bg-black dark:bg-white">
                       <p className="text-xs text-scale-100">{newNotifications.length}</p>
                     </div>
                   ) : alt ? (
