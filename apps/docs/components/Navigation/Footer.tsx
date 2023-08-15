@@ -29,11 +29,7 @@ const Footer = () => (
             {Icon && <Icon width={16} height={16} />}
             <p>{text}</p>
             <Link href={url} passHref>
-              <a
-                className="text-brand-900 hover:underline"
-                target="_blank"
-                rel="noreferrer noopener"
-              >
+              <a className="text-brand hover:underline" target="_blank" rel="noreferrer noopener">
                 {ctaLabel}
               </a>
             </Link>

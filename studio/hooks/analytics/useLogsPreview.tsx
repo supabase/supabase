@@ -17,7 +17,7 @@ import {
 } from 'components/interfaces/Settings/Logs'
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
 import { API_URL } from 'lib/constants'
-import { get } from 'lib/common/fetch'
+import { get, isResponseOk } from 'lib/common/fetch'
 import dayjs from 'dayjs'
 import useFillTimeseriesSorted from './useFillTimeseriesSorted'
 import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
@@ -76,18 +76,17 @@ function useLogsPreview(
   } = useInfiniteQuery(
     ['projects', projectRef, 'logs', queryParamsKey],
     ({ signal, pageParam }) => {
-      return get<Logs>(
-        `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
-          ...params,
-          iso_timestamp_end: pageParam,
-        } as any)}`,
-        { signal }
-      )
+      const uri = `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
+        ...params,
+        // don't overwrite unless user has already clicked on load older
+        iso_timestamp_end: pageParam || params.iso_timestamp_end,
+      } as any)}`
+      return get<Logs>(uri, { signal })
     },
     {
       refetchOnWindowFocus: false,
       getNextPageParam(lastPage) {
-        if ((lastPage?.result?.length ?? 0) === 0) {
+        if (!isResponseOk(lastPage) || (lastPage.result?.length ?? 0) === 0) {
           return undefined
         }
         const len = lastPage.result.length
@@ -122,7 +121,7 @@ function useLogsPreview(
     }
   )
 
-  const newCount = countData?.result?.[0]?.count ?? 0
+  const newCount = isResponseOk(countData) ? countData.result?.[0]?.count ?? 0 : 0
 
   // chart data
 
@@ -156,7 +155,7 @@ function useLogsPreview(
 
   let error: null | string | object = rqError ? (rqError as any).message : null
   data?.pages.forEach((response) => {
-    if (!error && response?.result) {
+    if (isResponseOk(response) && response.result) {
       logData = [...logData, ...response.result]
     }
     if (!error && response && response.error) {
@@ -178,7 +177,7 @@ function useLogsPreview(
   }
 
   const normalizedEventChartData = useTimeseriesUnixToIso(
-    eventChartResponse?.result || [],
+    (isResponseOk(eventChartResponse) && eventChartResponse.result) || [],
     'timestamp'
   )
 

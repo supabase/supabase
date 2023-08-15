@@ -162,7 +162,7 @@ export default {
       <>
         <span className="heading-gradient">Simple yet</span>
         <br />
-        <span className="text-brand-900">powerful APIs</span>
+        <span className="text-brand">powerful APIs</span>
       </>
     ),
     paragraph: 'Easy-to-use client libraries for managing and querying vector stores in Postgres.',
@@ -242,7 +242,7 @@ docs.query(
       <>
         <span className="heading-gradient">Powerful Features</span>
         <br />
-        <span className="text-brand-900">Scale to millions</span>
+        <span className="text-brand">Scale to millions</span>
       </>
     ),
     paragraph:

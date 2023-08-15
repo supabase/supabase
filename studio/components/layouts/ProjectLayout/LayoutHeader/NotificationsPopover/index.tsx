@@ -1,54 +1,59 @@
-import dayjs from 'dayjs'
-import { FC, Fragment, useState } from 'react'
-import { useRouter } from 'next/router'
-import { Alert, Button, IconBell, Popover, IconArrowRight } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import {
+  ActionType,
   Notification,
   NotificationStatus,
-  ActionType,
 } from '@supabase/shared-types/out/notifications'
+import { useQueryClient } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import { useRouter } from 'next/router'
+import { Fragment, useState } from 'react'
+import { Alert, Button, IconArrowRight, IconBell, IconInbox, Popover } from 'ui'
 
-import { Project } from 'types'
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import { useNotificationsQuery } from 'data/notifications/notifications-query'
+import { useNotificationsUpdateMutation } from 'data/notifications/notifications-update-mutation'
+import { getProjectDetail } from 'data/projects/project-detail-query'
+import { setProjectPostgrestStatus } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 import { delete_, patch, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { Project } from 'types'
 import NotificationRow from './NotificationRow'
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-import { useNotificationsQuery } from 'data/notifications/notifications-query'
 
-interface Props {}
+interface NotificationsPopoverProps {
+  alt?: boolean
+}
 
-const NotificationsPopover: FC<Props> = () => {
+const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
+  const queryClient = useQueryClient()
   const router = useRouter()
-  const { app, meta, ui } = useStore()
-  const { data: notifications, refetch } = useNotificationsQuery()
+  const { meta, ui } = useStore()
+  const { data: notifications } = useNotificationsQuery()
+  const { mutate: updateNotifications } = useNotificationsUpdateMutation({
+    onError: () => console.error('Failed to update notifications'),
+  })
 
   const [projectToRestart, setProjectToRestart] = useState<Project>()
   const [projectToApplyMigration, setProjectToApplyMigration] = useState<Project>()
   const [projectToRollbackMigration, setProjectToRollbackMigration] = useState<Project>()
   const [projectToFinalizeMigration, setProjectToFinalizeMigration] = useState<Project>()
-
   const [targetNotification, setTargetNotification] = useState<Notification>()
 
-  if (!notifications) return <></>
-
-  const hasNewNotifications = notifications?.some(
-    (notification) => notification.notification_status === NotificationStatus.New
-  )
+  const newNotifications =
+    notifications?.filter(
+      (notification) => notification.notification_status === NotificationStatus.New
+    ) ?? []
+  const hasNewNotifications = newNotifications.length > 0
 
   const onOpenChange = async (open: boolean) => {
-    // TODO(alaister): move this to a mutation
+    // Mark notifications as seen
     if (!open) {
-      // Mark notifications as seen
-      const notificationIds = notifications
-        .filter((notification) => notification.notification_status === NotificationStatus.New)
-        .map((notification) => notification.id)
-      if (notificationIds.length > 0) {
-        const { error } = await patch(`${API_URL}/notifications`, { ids: notificationIds })
-        if (error) console.error('Failed to update notifications', error)
-        refetch()
-      }
+      const notificationIds =
+        notifications
+          ?.filter((notification) => notification.notification_status === NotificationStatus.New)
+          .map((notification) => notification.id) ?? []
+      if (notificationIds.length > 0) updateNotifications({ ids: notificationIds })
     }
   }
 
@@ -57,7 +62,7 @@ const NotificationsPopover: FC<Props> = () => {
 
     const { id } = targetNotification
 
-    const { id: projectId, ref, region } = projectToRestart
+    const { ref, region } = projectToRestart
     const serviceNamesByActionName: Record<string, string> = {
       [ActionType.PgBouncerRestart]: 'pgbouncer',
       [ActionType.SchedulePostgresRestart]: 'postgresql',
@@ -82,7 +87,7 @@ const NotificationsPopover: FC<Props> = () => {
         error,
       })
     } else {
-      app.onProjectPostgrestStatusUpdated(projectId, 'OFFLINE')
+      setProjectPostgrestStatus(queryClient, ref, 'OFFLINE')
       ui.setNotification({ category: 'success', message: `Restarting services` })
       router.push(`/project/${ref}`)
     }
@@ -102,9 +107,11 @@ const NotificationsPopover: FC<Props> = () => {
     if (!projectToApplyMigration) return
     const res = await post(`${API_URL}/database/${projectToApplyMigration.ref}/owner-reassign`, {})
     if (!res.error) {
-      await app.projects.fetchDetail(projectToApplyMigration.ref, (project) =>
+      const project = await getProjectDetail({ ref: projectToApplyMigration.ref })
+      if (project) {
         meta.setProjectDetails(project)
-      )
+      }
+
       ui.setNotification({
         category: 'success',
         message: `Successfully applied migration for project "${projectToApplyMigration.name}"`,
@@ -126,9 +133,11 @@ const NotificationsPopover: FC<Props> = () => {
       {}
     )
     if (!res.error) {
-      await app.projects.fetchDetail(projectToRollbackMigration.ref, (project) =>
+      const project = await getProjectDetail({ ref: projectToRollbackMigration.ref })
+      if (project) {
         meta.setProjectDetails(project)
-      )
+      }
+
       ui.setNotification({
         category: 'success',
         message: `Successfully rolled back migration for project "${projectToRollbackMigration.name}"`,
@@ -150,9 +159,11 @@ const NotificationsPopover: FC<Props> = () => {
       {}
     )
     if (!res.error) {
-      await app.projects.fetchDetail(projectToFinalizeMigration.ref, (project) =>
+      const project = await getProjectDetail({ ref: projectToFinalizeMigration.ref })
+      if (project) {
         meta.setProjectDetails(project)
-      )
+      }
+
       ui.setNotification({
         category: 'success',
         message: `Successfully finalized migration for project "${projectToFinalizeMigration.name}"`,
@@ -166,6 +177,8 @@ const NotificationsPopover: FC<Props> = () => {
     }
     setProjectToFinalizeMigration(undefined)
   }
+
+  if (!notifications || !Array.isArray(notifications)) return null
 
   return (
     <>
@@ -224,21 +237,47 @@ const NotificationsPopover: FC<Props> = () => {
       >
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger asChild>
-            <div className="relative flex">
+            <div className="relative flex items-center">
+              {hasNewNotifications && (
+                <>
+                  {alt ? null : (
+                    <div className="absolute -top-1 -right-1 z-50 flex h-3 w-3 items-center justify-center">
+                      <div className="h-full w-full animate-ping rounded-full bg-green-800 opacity-60"></div>
+                      <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
+                    </div>
+                  )}
+                </>
+              )}
               <Button
                 asChild
                 id="notification-button"
-                type="default"
-                icon={<IconBell size={16} strokeWidth={1.5} className="text-scale-1200" />}
+                type={alt ? 'text' : 'default'}
+                className={alt ? 'px-1' : ''}
+                icon={
+                  hasNewNotifications ? (
+                    <div className="-mr-3.5 z-10 h-4 w-4 flex items-center justify-center rounded-full bg-white">
+                      <p className="text-xs text-scale-100">{newNotifications.length}</p>
+                    </div>
+                  ) : alt ? (
+                    <IconInbox size={18} strokeWidth={1.5} className="text-scale-1100" />
+                  ) : (
+                    <IconBell size={16} strokeWidth={1.5} className="text-scale-1200" />
+                  )
+                }
+                iconRight={
+                  hasNewNotifications ? (
+                    <>
+                      {alt ? (
+                        <IconInbox size={18} strokeWidth={1.5} className="text-scale-1100" />
+                      ) : (
+                        <IconBell size={16} strokeWidth={1.5} className="text-scale-1200" />
+                      )}
+                    </>
+                  ) : null
+                }
               >
                 <span></span>
               </Button>
-              {hasNewNotifications && (
-                <div className="absolute -top-1 -right-1 z-50 flex h-3 w-3 items-center justify-center">
-                  <div className="h-full w-full animate-ping rounded-full bg-green-800 opacity-60"></div>
-                  <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
-                </div>
-              )}
             </div>
           </Tooltip.Trigger>
           <Tooltip.Portal>

@@ -1,12 +1,11 @@
-import { FC } from 'react'
-import { Badge, IconLoader, IconCircle } from 'ui'
 import { Project } from 'types'
+import { Badge, IconCircle, IconLoader } from 'ui'
 
-interface Props {
+export interface PausingStateProps {
   project: Project
 }
 
-const PausingState: FC<Props> = ({ project }) => {
+const PausingState = ({ project }: PausingStateProps) => {
   return (
     <div className="mx-auto my-16 w-full max-w-7xl space-y-16">
       <div className="mx-6 space-y-16">

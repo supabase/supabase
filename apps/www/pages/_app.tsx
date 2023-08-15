@@ -3,7 +3,7 @@ import '../../../packages/ui/build/css/themes/dark.css'
 
 import '../styles/index.css'
 
-import { API_URL, APP_NAME, DESCRIPTION } from 'lib/constants'
+import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from 'lib/constants'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
 import { useRouter } from 'next/router'
@@ -52,7 +52,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     }
   }, [router.isReady])
 
-  const site_title = `The Open Source Firebase Alternative | ${APP_NAME}`
+  const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
   const { basePath } = useRouter()
 
   return (
@@ -63,14 +63,14 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       <Meta />
       <DefaultSeo
         title={site_title}
-        description={DESCRIPTION}
+        description={DEFAULT_META_DESCRIPTION}
         openGraph={{
           type: 'website',
           url: 'https://supabase.com/',
           site_name: 'Supabase',
           images: [
             {
-              url: `https://supabase.com${basePath}/images/og/og-image.jpg`,
+              url: `https://supabase.com${basePath}/images/og/og-image-v2.jpg`,
               width: 800,
               height: 600,
               alt: 'Supabase Og Image',
@@ -84,7 +84,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         }}
       />
       <AuthProvider>
-        <ThemeProvider>
+        <ThemeProvider detectSystemColorPreference={false}>
           <Component {...pageProps} />
         </ThemeProvider>
       </AuthProvider>

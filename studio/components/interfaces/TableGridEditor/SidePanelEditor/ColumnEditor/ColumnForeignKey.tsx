@@ -1,13 +1,12 @@
-import { FC } from 'react'
 import { isUndefined } from 'lodash'
 import { Badge, Button, IconArrowRight } from 'ui'
 
-import { ColumnField } from '../SidePanelEditor.types'
 import InformationBox from 'components/ui/InformationBox'
-import { getForeignKeyDeletionAction, getForeignKeyUIState } from './ColumnEditor.utils'
 import type { ExtendedPostgresRelationship } from '../SidePanelEditor.types'
+import { ColumnField } from '../SidePanelEditor.types'
+import { getForeignKeyDeletionAction, getForeignKeyUIState } from './ColumnEditor.utils'
 
-interface Props {
+interface ColumnForeignKeyProps {
   column: ColumnField
   originalForeignKey: ExtendedPostgresRelationship | undefined
   onSelectEditRelation: () => void
@@ -15,13 +14,13 @@ interface Props {
   onSelectCancelRemoveRelation: () => void
 }
 
-const ColumnForeignKey: FC<Props> = ({
+const ColumnForeignKey = ({
   column,
   originalForeignKey,
-  onSelectEditRelation = () => {},
-  onSelectRemoveRelation = () => {},
+  onSelectEditRelation,
+  onSelectRemoveRelation,
   onSelectCancelRemoveRelation,
-}) => {
+}: ColumnForeignKeyProps) => {
   const hasNoForeignKey = isUndefined(originalForeignKey) && isUndefined(column?.foreignKey)
   if (hasNoForeignKey) {
     return (
@@ -80,12 +79,19 @@ export default ColumnForeignKey
 
 // Just to break the components into smaller ones, we can create separate files for these
 
-const ColumnForeignKeyInformation: FC<{
+interface ColumnForeignKeyInformationProps {
   columnName: string
   foreignKey?: ExtendedPostgresRelationship
   onSelectEditRelation: () => void
   onSelectRemoveRelation: () => void
-}> = ({ columnName, foreignKey, onSelectEditRelation, onSelectRemoveRelation }) => {
+}
+
+const ColumnForeignKeyInformation = ({
+  columnName,
+  foreignKey,
+  onSelectEditRelation,
+  onSelectRemoveRelation,
+}: ColumnForeignKeyInformationProps) => {
   const deletionAction = getForeignKeyDeletionAction(foreignKey?.deletion_action)
   return (
     <InformationBox
@@ -120,12 +126,19 @@ const ColumnForeignKeyInformation: FC<{
   )
 }
 
-const ColumnForeignKeyAdded: FC<{
+interface ColumnForeignKeyAddedProps {
   columnName: string
   foreignKey?: ExtendedPostgresRelationship
   onSelectEditRelation: () => void
   onSelectRemoveRelation: () => void
-}> = ({ columnName, foreignKey, onSelectEditRelation, onSelectRemoveRelation }) => {
+}
+
+const ColumnForeignKeyAdded = ({
+  columnName,
+  foreignKey,
+  onSelectEditRelation,
+  onSelectRemoveRelation,
+}: ColumnForeignKeyAddedProps) => {
   const deletionAction = getForeignKeyDeletionAction(foreignKey?.deletion_action)
   return (
     <InformationBox
@@ -134,8 +147,7 @@ const ColumnForeignKeyAdded: FC<{
         <div className="flex flex-col space-y-4 text-scale-1100">
           <div className="space-y-2">
             <span>
-              The following foreign key relation will be{' '}
-              <span className="text-brand-900">added</span>:
+              The following foreign key relation will be <span className="text-brand">added</span>:
             </span>
             <div className="flex items-center space-x-2 text-scale-1200">
               <span
@@ -169,12 +181,19 @@ const ColumnForeignKeyAdded: FC<{
   )
 }
 
-const ColumnForeignKeyRemoved: FC<{
+interface ColumnForeignKeyRemovedProps {
   columnName: string
   originalForeignKey?: ExtendedPostgresRelationship
   onSelectEditRelation: () => void
   onSelectCancelRemoveRelation: () => void
-}> = ({ columnName, originalForeignKey, onSelectEditRelation, onSelectCancelRemoveRelation }) => {
+}
+
+const ColumnForeignKeyRemoved = ({
+  columnName,
+  originalForeignKey,
+  onSelectEditRelation,
+  onSelectCancelRemoveRelation,
+}: ColumnForeignKeyRemovedProps) => {
   return (
     <InformationBox
       block
@@ -208,19 +227,21 @@ const ColumnForeignKeyRemoved: FC<{
   )
 }
 
-const ColumnForeignKeyUpdated: FC<{
+interface ColumnForeignKeyUpdatedProps {
   columnName: string
   originalForeignKey?: ExtendedPostgresRelationship
   updatedForeignKey?: ExtendedPostgresRelationship
   onSelectEditRelation: () => void
   onSelectRemoveRelation: () => void
-}> = ({
+}
+
+const ColumnForeignKeyUpdated = ({
   columnName,
   originalForeignKey,
   updatedForeignKey,
   onSelectEditRelation,
   onSelectRemoveRelation,
-}) => {
+}: ColumnForeignKeyUpdatedProps) => {
   const originalKey = `${originalForeignKey?.target_table_schema}.${originalForeignKey?.target_table_name}.${originalForeignKey?.target_column_name}`
   const updatedKey = `${updatedForeignKey?.target_table_schema}.${updatedForeignKey?.target_table_name}.${updatedForeignKey?.target_column_name}`
 
@@ -234,8 +255,7 @@ const ColumnForeignKeyUpdated: FC<{
         <div className="flex flex-col space-y-4">
           <div className="space-y-2">
             <p>
-              The foreign key relation will be <span className="text-brand-900">updated</span> as
-              such:
+              The foreign key relation will be <span className="text-brand">updated</span> as such:
             </p>
             <div className="flex items-start space-x-2">
               <code className="text-xs font-mono">{columnName}</code>

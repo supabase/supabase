@@ -1,34 +1,28 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { get } from 'data/fetchers'
 import { useCallback } from 'react'
 import { resourceKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type ResourcesVariables = {
   projectRef?: string
 }
 
-export type ResourcesResponse = {
-  id: string
-}
-
 export async function getResources({ projectRef }: ResourcesVariables, signal?: AbortSignal) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
+  if (!projectRef) throw new Error('projectRef is required')
 
-  const response = await get(`${API_URL}/projects/${projectRef}/resources`, {
+  // Use any of the API endpoints as the parameter here, TS will check if its valid - "branches" here is just an example
+  const { data, error } = await get(`/v1/projects/{ref}/branches`, {
+    params: { path: { ref: projectRef } },
     signal,
   })
-  if (response.error) {
-    throw response.error
-  }
+  if (error) throw error
 
-  return response as ResourcesResponse[]
+  return data
 }
 
 export type ResourcesData = Awaited<ReturnType<typeof getResources>>
-export type ResourcesError = unknown
+export type ResourcesError = ResponseError
 
 export const useResourcesQuery = <TData = ResourcesData>(
   { projectRef }: ResourcesVariables,
@@ -42,6 +36,7 @@ export const useResourcesQuery = <TData = ResourcesData>(
 
 /**
  * useResourcesPrefetch is used for prefetching data. For example, starting a query loading before a page is navigated to.
+ * Feel free to omit if not required
  *
  * @example
  * const prefetch = useResourcesPrefetch({ projectRef })

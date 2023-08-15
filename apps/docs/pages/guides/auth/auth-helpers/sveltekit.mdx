@@ -21,10 +21,10 @@ npm install @supabase/auth-helpers-sveltekit @supabase/supabase-js
 
 ### Declare Environment Variables
 
-Retrieve your project's URL and anon key from your [API settings](https://app.supabase.com/project/_/settings/api), and create a `.env.local` file with the following environment variables:
+Retrieve your project's URL and anon key from your [API settings](https://supabase.com/dashboard/project/_/settings/api), and create a `.env.local` file with the following environment variables:
 
 ```bash .env.local
-# Find these in your Supabase project settings https://app.supabase.com/project/_/settings/api
+# Find these in your Supabase project settings https://supabase.com/dashboard/project/_/settings/api
 PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
@@ -416,6 +416,8 @@ We can access the supabase instance in our `+page.svelte` file through the data 
 
 ```js src/routes/login/+page.server.js
 // src/routes/login/+page.server.js
+import { fail } from '@sveltejs/kit'
+
 export const actions = {
   default: async ({ request, url, locals: { supabase } }) => {
     const formData = await request.formData()

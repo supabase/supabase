@@ -121,11 +121,11 @@ Of course, the types aren't very useful on its own, you need some way to consume
 
 The CLI is the first consumer of our new Management API. Over the next few weeks, we'll be adding the endpoints needed to programmatically manage your Supabase projects and organizations. This is ideal for CI/CD workflows and spinning up test environments.
 
-Here's an example of deploying a new project from the command line (generate your access token from the [Supabase Dashboard](https://app.supabase.com/account/tokens)).
+Here's an example of deploying a new project from the command line (generate your access token from the [Supabase Dashboard](https://supabase.com/dashboard/account/tokens)).
 
 ```bash
 curl 'https://api.supabase.com/v1/projects' \
-  -H 'Authorization: Bearer <[your-access-token](https://app.supabase.com/account/tokens)>' \
+  -H 'Authorization: Bearer <[your-access-token](https://supabase.com/dashboard/account/tokens)>' \
   -H "Content-Type: application/json" \
   -d '{"name": "my-project", "organization_id": "cool-green-pqdr0qc", "region": "us-east-1", "plan": "free", "db_pass": "********"}'
 ```

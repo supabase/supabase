@@ -35,6 +35,7 @@ import { RootStore } from 'stores'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { StoreProvider } from 'hooks'
 import { AuthProvider } from 'lib/auth'
+import { ProfileProvider } from 'lib/profile'
 import { dart } from 'lib/constants/prism'
 import { useRootQueryClient } from 'data/query-client'
 
@@ -60,6 +61,11 @@ dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 
 dart(Prism)
+
+// [Joshen TODO] Once we settle on the new nav layout - we'll need a lot of clean up in terms of our layout components
+// a lot of them are unnecessary and introduce way too many cluttered CSS especially with the height styles that make
+// debugging way too difficult. Ideal scenario is we just have one AppLayout to control the height and scroll areas of
+// the dashboard, all other layout components should not be doing that
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const queryClient = useRootQueryClient()
@@ -122,38 +128,39 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     },
     [supabase]
   )
-  //
 
   return (
     <QueryClientProvider client={queryClient}>
       <Hydrate state={pageProps.dehydratedState}>
         <StoreProvider rootStore={rootStore}>
           <AuthContainer>
-            <FlagProvider>
-              <Head>
-                <title>Supabase</title>
-                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-              </Head>
-              <Favicons />
+            <ProfileProvider>
+              <FlagProvider>
+                <Head>
+                  <title>Supabase</title>
+                  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                </Head>
+                <Favicons />
 
-              <PageTelemetry>
-                <TooltipProvider>
-                  <RouteValidationWrapper>
-                    <ThemeProvider>
-                      <CommandMenuWrapper>
-                        <AppBannerWrapper>
-                          {getLayout(<Component {...pageProps} />)}
-                        </AppBannerWrapper>
-                      </CommandMenuWrapper>
-                    </ThemeProvider>
-                  </RouteValidationWrapper>
-                </TooltipProvider>
-              </PageTelemetry>
+                <PageTelemetry>
+                  <TooltipProvider>
+                    <RouteValidationWrapper>
+                      <ThemeProvider>
+                        <CommandMenuWrapper>
+                          <AppBannerWrapper>
+                            {getLayout(<Component {...pageProps} />)}
+                          </AppBannerWrapper>
+                        </CommandMenuWrapper>
+                      </ThemeProvider>
+                    </RouteValidationWrapper>
+                  </TooltipProvider>
+                </PageTelemetry>
 
-              <HCaptchaLoadedStore />
-              <PortalToast />
-              <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
-            </FlagProvider>
+                <HCaptchaLoadedStore />
+                <PortalToast />
+                <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+              </FlagProvider>
+            </ProfileProvider>
           </AuthContainer>
         </StoreProvider>
       </Hydrate>

@@ -33,7 +33,7 @@ Per a veure la documentació completa, visita [supabase.com/docs](https://supaba
 ## Estat
 
 - [x] Alfa: Estem provant Supabase amb un cercle tancat de clients.
-- [x] Alfa pública: Qualsevol pot registrar-se a [app.supabase.com](https://app.supabase.com). Però sigues flexible amb nosaltres; encara poden existir obstacles.
+- [x] Alfa pública: Qualsevol pot registrar-se a [supabase.com/dashboard](https://supabase.com/dashboard). Però sigues flexible amb nosaltres; encara poden existir obstacles.
 - [x] Beta pública: Prou estable per a la majoria dels casos no empresarials.
 - [ ] Públic: Llest per a producció.
 
@@ -49,7 +49,7 @@ Supabase és una combinació d’eines de codi obert. Estem construint les funci
 
 **Arquitectura actual**
 
-Supabase és una [plataforma allotjada](https://app.supabase.com). Et pots registrar i començar a utilitzar Supabase sense instal·lar res. També podeu tenir una [_host_ pròpia](https://supabase.com/docs/guides/hosting/overview) i [desenvolupar localment](https://supabase.com/docs/guides/local-development).
+Supabase és una [plataforma allotjada](https://supabase.com/dashboard). Et pots registrar i començar a utilitzar Supabase sense instal·lar res. També podeu tenir una [_host_ pròpia](https://supabase.com/docs/guides/hosting/overview) i [desenvolupar localment](https://supabase.com/docs/guides/local-development).
 
 ![Arquitectura](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
 

@@ -1,29 +1,31 @@
-import { useEffect, useState } from 'react'
-import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useState } from 'react'
 
-import { NextPageWithLayout } from 'types'
-import { checkPermissions, useStore } from 'hooks'
-import { DatabaseLayout } from 'components/layouts'
 import { CreateTrigger, DeleteTrigger } from 'components/interfaces/Database'
 import TriggersList from 'components/interfaces/Database/Triggers/TriggersList/TriggersList'
+import { DatabaseLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoPermission from 'components/ui/NoPermission'
+import { useCheckPermissions, useStore } from 'hooks'
+import { NextPageWithLayout } from 'types'
 
 const TriggersPage: NextPageWithLayout = () => {
-  const { meta, ui } = useStore()
+  const { meta } = useStore()
+  const { project } = useProjectContext()
 
   const [filterString, setFilterString] = useState<string>('')
   const [selectedTrigger, setSelectedTrigger] = useState<any>()
   const [showCreateTriggerForm, setShowCreateTriggerForm] = useState<boolean>(false)
   const [showDeleteTriggerForm, setShowDeleteTriggerForm] = useState<boolean>(false)
 
-  const canReadTriggers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
+  const canReadTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
 
   useEffect(() => {
-    if (ui.selectedProject?.ref) {
+    if (project?.ref) {
       fetchTriggers()
     }
-  }, [ui.selectedProject?.ref])
+  }, [project?.ref])
 
   const fetchTriggers = async () => {
     meta.triggers.load()

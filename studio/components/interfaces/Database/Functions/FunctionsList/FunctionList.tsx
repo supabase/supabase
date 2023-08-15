@@ -1,38 +1,42 @@
-import { FC } from 'react'
-import { useRouter } from 'next/router'
-import { includes } from 'lodash'
-import { Button, Dropdown, IconEdit3, IconFileText, IconMoreVertical, IconTrash } from 'ui'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { includes, noop } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import { Button, Dropdown, IconEdit3, IconFileText, IconMoreVertical, IconTrash } from 'ui'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
+import { useCheckPermissions, useStore } from 'hooks'
 
-interface Props {
+interface FunctionListProps {
   schema: string
   filterString: string
   editFunction: (fn: any) => void
   deleteFunction: (fn: any) => void
 }
 
-const FunctionList: FC<Props> = ({
+const FunctionList = ({
   schema,
   filterString,
-  editFunction = () => {},
-  deleteFunction = () => {},
-}) => {
+  editFunction = noop,
+  deleteFunction = noop,
+}: FunctionListProps) => {
+  const { project: selectedProject } = useProjectContext()
   const router = useRouter()
-  const { ui, meta } = useStore()
+  const { meta } = useStore()
   const functions = meta.functions.list((fn: any) => !meta.excludedSchemas.includes(fn.schema))
   const filteredFunctions = functions.filter((x: any) =>
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
   const _functions = filteredFunctions.filter((x) => x.schema == schema)
   const isApiDocumentAvailable = schema == 'public'
-  const projectRef = ui.selectedProject?.ref
+  const projectRef = selectedProject?.ref
 
-  const canUpdateFunctions = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'functions')
+  const canUpdateFunctions = useCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'functions'
+  )
 
   function onEdit(func: any) {
     editFunction(func)
@@ -46,7 +50,7 @@ const FunctionList: FC<Props> = ({
     <>
       {_functions.map((x) => (
         <Table.tr key={x.id}>
-          <Table.td>
+          <Table.td className="truncate">
             <p>{x.name}</p>
           </Table.td>
           <Table.td className="hidden md:table-cell md:overflow-auto">

@@ -1,19 +1,19 @@
-import dayjs from 'dayjs'
-import { FC, useState } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Notification, NotificationStatus } from '@supabase/shared-types/out/notifications'
+import { useQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import { Button, IconArchive, IconX } from 'ui'
 
+import { useNotificationsDismissMutation } from 'data/notifications/notifications-dismiss-mutation'
+import { useProjectsQuery } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
-import { notificationKeys } from 'data/notifications/keys'
-import { Project } from 'types'
-import { formatNotificationCTAText, formatNotificationText } from './NotificationRows.utils'
-import NotificationActions from './NotificationActions'
-import { get, delete_ } from 'lib/common/fetch'
+import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { Button, IconX } from 'ui'
+import { Project } from 'types'
+import NotificationActions from './NotificationActions'
+import { formatNotificationCTAText, formatNotificationText } from './NotificationRows.utils'
 
-interface Props {
+export interface NotificationRowProps {
   notification: Notification
   onSelectRestartProject: (project: Project, notification: Notification) => void
   onSelectApplyMigration: (project: Project, notification: Notification) => void
@@ -21,49 +21,52 @@ interface Props {
   onSelectFinalizeMigration: (project: Project, notification: Notification) => void
 }
 
-const NotificationRow: FC<Props> = ({
+const NotificationRow = ({
   notification,
   onSelectRestartProject,
   onSelectApplyMigration,
   onSelectRollbackMigration,
   onSelectFinalizeMigration,
-}) => {
-  const { app, ui } = useStore()
-  const queryClient = useQueryClient()
-  const [dismissing, setDismissing] = useState(false)
-  const [project] = app.projects.list((project: Project) => project.id === notification.project_id)
+}: NotificationRowProps) => {
+  const { ui } = useStore()
+  const { data: projects } = useProjectsQuery()
+  const project = projects?.find((project) => project.id === notification.project_id)
 
   const insertedAt = dayjs(notification.inserted_at).format('DD MMM YYYY, HH:mma')
   const changelogLink = (notification.data as any).changelog_link
   const availableActions = notification.meta?.actions_available ?? []
 
+  const { mutate: dismissNotifications, isLoading: isDismissing } = useNotificationsDismissMutation(
+    {
+      onError: (error) => {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to dismiss notification: ${error.message}`,
+          duration: 4000,
+        })
+      },
+    }
+  )
+
   // [Joshen TODO] This should be removed after the env of Feb when the migration notifications
   // have been removed, double check with Qiao before removing.
   // Relevant PR: https://github.com/supabase/supabase/pull/9229
   const { data: ownerReassignStatus } = useQuery(
-    ['projects', project.ref, 'owner-reassign'],
-    ({ signal }) => get(`${API_URL}/database/${project.ref}/owner-reassign`, { signal }),
+    ['projects', project?.ref, 'owner-reassign'],
+    ({ signal }) => get(`${API_URL}/database/${project?.ref}/owner-reassign`, { signal }),
     {
-      enabled: (notification.data as any).upgrade_type === 'schema-migration',
+      enabled:
+        (notification.data as any).upgrade_type === 'schema-migration' && project !== undefined,
     }
   )
 
   const dismissNotification = async (notificationId: string) => {
     if (!notificationId) return
-    setDismissing(true)
-    const { error } = await delete_(`${API_URL}/notifications`, { ids: [notificationId] })
-    if (error) {
-      ui.setNotification({
-        category: 'error',
-        message: 'Failed to dismiss notification',
-        error,
-        duration: 4000,
-      })
-    } else {
-      await queryClient.invalidateQueries(notificationKeys.list())
-    }
-    setDismissing(false)
+    dismissNotifications({ ids: [notificationId] })
   }
+
+  if (!project) return null
 
   return (
     <div className="flex py-2">
@@ -81,36 +84,19 @@ const NotificationRow: FC<Props> = ({
           </div>
           <div className="w-1/10 flex justify-end">
             <div>
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger asChild>
-                  <Button
-                    className="!px-1 group"
-                    type="text"
-                    loading={dismissing}
-                    icon={
-                      <IconX
-                        size={14}
-                        strokeWidth={2}
-                        className="text-scale-1100 group-hover:text-scale-1200 transition"
-                      />
-                    }
-                    onClick={() => dismissNotification(notification.id)}
+              <Button
+                className="!px-1 group"
+                type="text"
+                loading={isDismissing}
+                icon={
+                  <IconX
+                    size={14}
+                    strokeWidth={2}
+                    className="text-scale-1100 group-hover:text-scale-1200 transition"
                   />
-                </Tooltip.Trigger>
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                        'border border-scale-200',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-scale-1200">Dismiss</span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              </Tooltip.Root>
+                }
+                onClick={() => dismissNotification(notification.id)}
+              />
             </div>
           </div>
         </div>

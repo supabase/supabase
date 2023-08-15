@@ -4,9 +4,10 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { Alert, Button, Form, IconEye, IconEyeOff, Input } from 'ui'
 
 import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
+import { isResponseOk, post } from 'lib/common/fetch'
 import { API_URL, BASE_PATH } from 'lib/constants'
 import { passwordSchema } from 'lib/schemas'
+import { resetSignInClicks } from 'lib/local-storage'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
 
 const signUpSchema = passwordSchema.shape({
@@ -33,19 +34,20 @@ const SignUpForm = () => {
       token = captchaResponse?.response ?? null
     }
 
-    const response = await post(`${API_URL}/signup`, {
+    resetSignInClicks()
+
+    const response = await post<void>(`${API_URL}/signup`, {
       email,
       password,
       hcaptchaToken: token ?? null,
       redirectTo: `${
         process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-          ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+          ? location.origin
           : process.env.NEXT_PUBLIC_SITE_URL
       }${BASE_PATH}/sign-in`,
     })
-    const error = response.error
 
-    if (!error) {
+    if (isResponseOk(response)) {
       ui.setNotification({
         id: toastId,
         category: 'success',
@@ -60,7 +62,7 @@ const SignUpForm = () => {
       ui.setNotification({
         id: toastId,
         category: 'error',
-        message: error.message,
+        message: `Failed to sign up: ${response.error.message}`,
       })
     }
   }

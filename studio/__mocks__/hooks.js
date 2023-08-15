@@ -1,5 +1,5 @@
 export const useFlag = jest.fn().mockReturnValue(true)
-export const checkPermissions = jest.fn().mockReturnValue(true)
+export const useCheckPermissions = jest.fn().mockReturnValue(true)
 
 const { useStore: _useStore, StoreProvider: _StoreProvider } = jest.requireActual('hooks')
 export const useStore = _useStore

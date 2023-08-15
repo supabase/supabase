@@ -1,30 +1,31 @@
-import dayjs from 'dayjs'
-import { FC, useState } from 'react'
-import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
-import { Badge, Button, IconDownload } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
 
-import { useStore, checkPermissions } from 'hooks'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { post } from 'lib/common/fetch'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { setProjectStatus } from 'data/projects/projects-query'
+import { useCheckPermissions, useStore } from 'hooks'
+import { post } from 'lib/common/fetch'
+import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { Badge, Button, IconDownload } from 'ui'
 
-interface Props {
+interface BackupItemProps {
   projectRef: string
   backup: any
   index: number
 }
 
-const BackupItem: FC<Props> = ({ projectRef, backup, index }) => {
+const BackupItem = ({ projectRef, backup, index }: BackupItemProps) => {
+  const queryClient = useQueryClient()
   const router = useRouter()
-  const { app, ui } = useStore()
+  const { ui } = useStore()
 
   const [isDownloading, setDownloading] = useState<boolean>(false)
   const [isRestoring, setRestoring] = useState<boolean>(false)
 
-  const projectId = ui.selectedProject?.id ?? -1
-  const canTriggerScheduledBackups = checkPermissions(
+  const canTriggerScheduledBackups = useCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
   )
@@ -34,7 +35,7 @@ const BackupItem: FC<Props> = ({ projectRef, backup, index }) => {
     try {
       post(`${API_URL}/database/${projectRef}/backups/restore`, backup).then(() => {
         setTimeout(() => {
-          app.onProjectStatusUpdated(projectId, PROJECT_STATUS.RESTORING)
+          setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
           ui.setNotification({
             category: 'success',
             message: `Restoring database back to ${dayjs(backup.inserted_at).format(
@@ -44,11 +45,11 @@ const BackupItem: FC<Props> = ({ projectRef, backup, index }) => {
           router.push(`/project/${projectRef}`)
         }, 3000)
       })
-    } catch (error) {
+    } catch (error: any) {
       ui.setNotification({
         error,
         category: 'error',
-        message: `You do not have permission to restore from this backup`,
+        message: `Failed to restore from backup: ${error.message}`,
       })
       setRestoring(false)
     }
@@ -68,11 +69,11 @@ const BackupItem: FC<Props> = ({ projectRef, backup, index }) => {
       document.body.removeChild(tempLink)
 
       setDownloading(false)
-    } catch (error) {
+    } catch (error: any) {
       ui.setNotification({
         error,
         category: 'error',
-        message: `You do not have permission to download this backup`,
+        message: `Failed to download backup: ${error.message}`,
       })
       setDownloading(false)
     }
@@ -132,4 +133,4 @@ const BackupItem: FC<Props> = ({ projectRef, backup, index }) => {
   )
 }
 
-export default observer(BackupItem)
+export default BackupItem

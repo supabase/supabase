@@ -1,29 +1,29 @@
-import { FC, useState, useEffect, useCallback, useRef } from 'react'
-import { compact, debounce, isEqual } from 'lodash'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { compact, debounce, isEqual, noop } from 'lodash'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Button,
   Dropdown,
-  Input,
   IconChevronLeft,
   IconChevronRight,
-  IconRefreshCw,
-  IconColumns,
   IconChevronsDown,
-  IconSearch,
+  IconChevronsUp,
+  IconColumns,
+  IconEdit2,
   IconFolderPlus,
+  IconList,
+  IconLoader,
+  IconRefreshCw,
+  IconSearch,
   IconUpload,
   IconX,
-  IconEdit2,
-  IconLoader,
-  IconChevronsUp,
-  IconList,
+  Input,
 } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { STORAGE_VIEWS, STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER } from '../Storage.constants'
+import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
 
 const HeaderPathEdit = ({ loading, breadcrumbs, togglePathEdit }: any) => {
   return (
@@ -95,7 +95,7 @@ const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }: any) => {
   )
 }
 
-interface Props {
+interface FileExplorerHeader {
   isSearching: boolean
   itemSearchString: string
   setIsSearching: (value: boolean) => void
@@ -103,11 +103,11 @@ interface Props {
   onFilesUpload: (event: any, columnIndex: number) => void
 }
 
-const FileExplorerHeader: FC<Props> = ({
+const FileExplorerHeader = ({
   itemSearchString = '',
-  setItemSearchString = () => {},
-  onFilesUpload = () => {},
-}) => {
+  setItemSearchString = noop,
+  onFilesUpload = noop,
+}: FileExplorerHeader) => {
   const debounceDuration = 300
   const [pathString, setPathString] = useState('')
   const [searchString, setSearchString] = useState('')
@@ -141,7 +141,7 @@ const FileExplorerHeader: FC<Props> = ({
 
   const breadcrumbs = columns.map((column: any) => column.name)
   const backDisabled = columns.length <= 1
-  const canUpdateStorage = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canUpdateStorage = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   useEffect(() => {
     if (itemSearchString) setSearchString(itemSearchString)

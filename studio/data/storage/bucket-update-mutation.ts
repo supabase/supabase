@@ -1,6 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { ResponseError } from 'types'
 import { storageKeys } from './keys'
 
 export type BucketUpdateVariables = {
@@ -34,20 +37,28 @@ type BucketUpdateData = Awaited<ReturnType<typeof updateBucket>>
 
 export const useBucketUpdateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<BucketUpdateData, unknown, BucketUpdateVariables>,
+  UseMutationOptions<BucketUpdateData, ResponseError, BucketUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<BucketUpdateData, unknown, BucketUpdateVariables>(
+  return useMutation<BucketUpdateData, ResponseError, BucketUpdateVariables>(
     (vars) => updateBucket(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
         await queryClient.invalidateQueries(storageKeys.buckets(projectRef))
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to update bucket: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }
