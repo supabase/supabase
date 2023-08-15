@@ -14,6 +14,9 @@ import {
   IconTriangle,
 } from 'ui'
 import ImageFadeStack from '~/components/ImageFadeStack'
+import ZoomableImg from '~/components/ZoomableImg/ZoomableImg'
+
+import 'react-medium-image-zoom/dist/styles.css'
 
 // import all components used in blog articles here
 // to do: move this into a helper/utils, it is used elsewhere
@@ -88,15 +91,25 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
       }
       return <img {...props} />
     },
-    Img: (props: any) => (
-      <figure>
-        <span className={['next-image--dynamic-fill', props.wide && 'wide'].join(' ')}>
-          <Image
-            {...props}
-            className={[type === 'blog' ? 'rounded-md border' : ''].join(' ')}
-            layout="fill"
-          />
-        </span>
+    Img: ({ zoomable = true, ...props }: any) => (
+      <figure className="m-0">
+        <ZoomableImg zoomable={zoomable}>
+          <span className={['next-image--dynamic-fill', props.wide && 'wide'].join(' ')}>
+            {zoomable ? (
+              <img
+                className={[type === 'blog' ? 'rounded-md border' : ''].join(' ')}
+                layout="fill"
+                {...props}
+              />
+            ) : (
+              <Image
+                className={[type === 'blog' ? 'rounded-md border' : ''].join(' ')}
+                layout="fill"
+                {...props}
+              />
+            )}
+          </span>
+        </ZoomableImg>
         {props.caption && (
           <figcaption className={[getCaptionAlign(props.captionAlign)].join(' ')}>
             {props.caption}

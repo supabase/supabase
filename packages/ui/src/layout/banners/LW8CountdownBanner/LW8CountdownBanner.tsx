@@ -26,7 +26,7 @@ export function LW8CountdownBanner() {
           ].join(' ')}
         >
           <p>
-            <span className="hidden md:inline">Supabase</span> Launch Week 8: Day 4
+            <span className="hidden md:inline">Supabase</span> Launch Week 8: Day 5
           </p>
           <VideoPreview />
         </div>
