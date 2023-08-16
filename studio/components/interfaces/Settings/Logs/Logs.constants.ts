@@ -303,6 +303,9 @@ export const SQL_FILTER_TEMPLATES: any = {
   pgbouncer_logs: {
     ..._SQL_FILTER_COMMON,
   },
+  supavisor_logs: {
+    ..._SQL_FILTER_COMMON,
+  },
 }
 
 export enum LogsTableName {
@@ -315,6 +318,7 @@ export enum LogsTableName {
   STORAGE = 'storage_logs',
   PGBOUNCER = 'pgbouncer_logs',
   POSTGREST = 'postgrest_logs',
+  SUPAVISOR = 'supavisor_logs',
 }
 
 export const LOGS_TABLES = {
@@ -327,6 +331,7 @@ export const LOGS_TABLES = {
   storage: LogsTableName.STORAGE,
   postgrest: LogsTableName.POSTGREST,
   pgbouncer: LogsTableName.PGBOUNCER,
+  supavisor: LogsTableName.SUPAVISOR,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {

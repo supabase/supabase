@@ -22,21 +22,9 @@ export const LogPage: NextPageWithLayout = () => {
     <LogsPreviewer
       projectRef={ref as string}
       condensedLayout={true}
-      tableName={LogsTableName.PGBOUNCER}
-      queryType="pgbouncer"
-    >
-      {isSupavisorEnabled && (
-        <div className="px-4 pt-4">
-          <Alert_Shadcn_ variant="warning">
-            <IconAlertCircle />
-            <AlertTitle_Shadcn_>Supavisor logs are not available yet</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              Your project currently has Supavisor enabled, which logs are currently unavailable.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-        </div>
-      )}
-    </LogsPreviewer>
+      tableName={isSupavisorEnabled ? LogsTableName.SUPAVISOR : LogsTableName.PGBOUNCER}
+      queryType={isSupavisorEnabled?  "supavisor" : "pgbouncer"}
+    />
   )
 }
 
