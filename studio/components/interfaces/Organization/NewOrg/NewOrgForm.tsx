@@ -1,4 +1,7 @@
+import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
+import type { PaymentMethod } from '@stripe/stripe-js'
 import { useQueryClient } from '@tanstack/react-query'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
@@ -12,18 +15,14 @@ import {
   Toggle,
 } from 'ui'
 
-import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
-import type { PaymentMethod } from '@stripe/stripe-js'
+import { SpendCapModal } from 'components/interfaces/BillingV2'
 import InformationBox from 'components/ui/InformationBox'
 import Panel from 'components/ui/Panel'
+import { useOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useStore } from 'hooks'
-import { isResponseOk, post } from 'lib/common/fetch'
-import { API_URL, BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
+import { BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
-import Link from 'next/link'
-import { SpendCapModal } from 'components/interfaces/BillingV2'
-import { Organization } from 'types'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -61,6 +60,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const [orgName, setOrgName] = useState('')
   const [orgKind, setOrgKind] = useState(ORG_KIND_DEFAULT)
   const [orgSize, setOrgSize] = useState(ORG_SIZE_DEFAULT)
+  // [Joshen] Separate loading state here as there's 2 async processes
   const [newOrgLoading, setNewOrgLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>()
 
@@ -68,6 +68,13 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
 
   const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
   const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(true)
+
+  const { mutateAsync: createOrganization } = useOrganizationCreateMutation({
+    onSuccess: async (org: any) => {
+      await invalidateOrganizationsQuery(queryClient)
+      router.push(`/new/${org.slug}`)
+    },
+  })
 
   function validateOrgName(name: any) {
     const value = name ? name.trim() : ''
@@ -92,36 +99,18 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
 
   async function createOrg(paymentMethodId?: string) {
     const dbTier = dbPricingTierKey === 'PRO' && !isSpendCapEnabled ? 'PAYG' : dbPricingTierKey
-
-    const response = await post<Organization>(
-      `${API_URL}/organizations`,
-      {
+    try {
+      await createOrganization({
         name: orgName,
         kind: orgKind,
-        payment_method: paymentMethodId,
         tier: 'tier_' + dbTier.toLowerCase(),
         ...(orgKind == 'COMPANY' ? { size: orgSize } : {}),
-      },
-      // Call new V2 endpoint from API
-      {
-        headers: {
-          Version: '2',
-        },
-      }
-    )
-
-    if (!isResponseOk(response)) {
-      ui.setNotification({
-        error: response.error,
-        category: 'error',
-        message: `Failed to create organization: ${response.error?.message ?? response.error}`,
+        payment_method: paymentMethodId,
+        V2: true,
       })
-    } else {
-      const org = response
-      await invalidateOrganizationsQuery(queryClient)
-      router.push(`/new/${org.slug}`)
+    } finally {
+      setNewOrgLoading(false)
     }
-    setNewOrgLoading(false)
   }
 
   const handleSubmit = async (event: any) => {
@@ -129,13 +118,11 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
 
     const isOrgNameValid = validateOrgName(orgName)
     if (!isOrgNameValid) {
-      ui.setNotification({ category: 'error', message: 'Organization name is empty' })
-      return
+      return ui.setNotification({ category: 'error', message: 'Organization name is empty' })
     }
 
     if (!stripe || !elements) {
-      console.error('Stripe.js has not loaded')
-      return
+      return console.error('Stripe.js has not loaded')
     }
     setNewOrgLoading(true)
 
