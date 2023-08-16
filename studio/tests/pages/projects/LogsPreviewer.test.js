@@ -217,7 +217,7 @@ test('Search will trigger a log refresh', async () => {
 test('poll count for new messages', async () => {
   get.mockImplementation((url) => {
     if (url.includes('count')) {
-      return { result: [{ count: 54325432 }] }
+      return { result: [{ count: 999 }] }
     }
     return {
       result: [logDataFixture({ id: 'some-uuid123' })],
@@ -226,10 +226,10 @@ test('poll count for new messages', async () => {
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
   await waitFor(() => screen.queryByText(/some-uuid123/) === null)
   // should display new logs count
-  await waitFor(() => screen.getByText(/54325432/))
+  await waitFor(() => screen.getByText(/999/))
 
   userEvent.click(screen.getByText(/Refresh/))
-  await waitFor(() => screen.queryByText(/54325432/) === null)
+  await waitFor(() => screen.queryByText(/999/) === null)
   await screen.findByText(/some-uuid123/)
 })
 test('log event chart', async () => {
