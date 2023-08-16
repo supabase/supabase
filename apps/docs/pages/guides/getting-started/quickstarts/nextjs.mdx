@@ -100,7 +100,7 @@ export const meta = {
           const { data: countries } = await supabase.from("countries").select();
 
           return (
-            <ul className="my-auto">
+            <ul className="my-auto text-white">
               {countries?.map((country) => (
                 <li key={country.id}>{country.name}</li>
               ))}
