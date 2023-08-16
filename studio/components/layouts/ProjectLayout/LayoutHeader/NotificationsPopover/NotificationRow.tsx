@@ -16,7 +16,6 @@ export interface NotificationRowProps {
   onSelectRestartProject: (project: Project, notification: Notification) => void
   onSelectApplyMigration: (project: Project, notification: Notification) => void
   onSelectRollbackMigration: (project: Project, notification: Notification) => void
-  onSelectFinalizeMigration: (project: Project, notification: Notification) => void
 }
 
 const NotificationRow = ({
@@ -24,7 +23,6 @@ const NotificationRow = ({
   onSelectRestartProject,
   onSelectApplyMigration,
   onSelectRollbackMigration,
-  onSelectFinalizeMigration,
 }: NotificationRowProps) => {
   const { ui } = useStore()
   const { data: projects } = useProjectsQuery()
@@ -95,7 +93,6 @@ const NotificationRow = ({
               onSelectRestartProject={() => onSelectRestartProject(project, notification)}
               onSelectApplyMigration={() => onSelectApplyMigration(project, notification)}
               onSelectRollbackMigration={() => onSelectRollbackMigration(project, notification)}
-              onSelectFinalizeMigration={() => onSelectFinalizeMigration(project, notification)}
             />
           </div>
         )}

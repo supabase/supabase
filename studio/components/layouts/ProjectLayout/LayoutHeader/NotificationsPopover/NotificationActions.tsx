@@ -13,7 +13,6 @@ interface NotificationActionsProps {
   onSelectRestartProject: () => void
   onSelectApplyMigration: () => void
   onSelectRollbackMigration: () => void
-  onSelectFinalizeMigration: () => void
 }
 
 const NotificationActions = ({
@@ -23,7 +22,6 @@ const NotificationActions = ({
   onSelectRestartProject,
   onSelectApplyMigration,
   onSelectRollbackMigration,
-  onSelectFinalizeMigration,
 }: NotificationActionsProps) => {
   const router = useRouter()
 
@@ -48,13 +46,7 @@ const NotificationActions = ({
           </Button>
         )
       case ActionType.MigratePostgresSchema:
-        if (action.reason === ActionReason.Finalize) {
-          return (
-            <Button type="default" onClick={onSelectFinalizeMigration}>
-              Finalize
-            </Button>
-          )
-        } else if (action.reason === ActionReason.Rollback) {
+        if (action.reason === ActionReason.Rollback) {
           return (
             <Button type="default" onClick={onSelectRollbackMigration}>
               Rollback
