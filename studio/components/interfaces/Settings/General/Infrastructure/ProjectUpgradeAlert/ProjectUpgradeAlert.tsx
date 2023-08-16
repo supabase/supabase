@@ -16,17 +16,17 @@ import {
 import { useParams } from 'common/hooks'
 import InformationBox from 'components/ui/InformationBox'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
+import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_ADMIN_URL, PROJECT_STATUS } from 'lib/constants'
+import { PROJECT_STATUS } from 'lib/constants'
 import { BREAKING_CHANGES } from './ProjectUpgradeAlert.constants'
 
 const ProjectUpgradeAlert = () => {
-  const queryClient = useQueryClient()
   const router = useRouter()
   const { ui } = useStore()
   const { ref } = useParams()
+  const queryClient = useQueryClient()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
   const formId = 'project-upgrade-form'
@@ -35,33 +35,17 @@ const ProjectUpgradeAlert = () => {
   const latestPgVersion = (data?.latest_app_version ?? '').split('supabase-postgres-')[1]
 
   const initialValues = { version: data?.target_upgrade_versions?.[0]?.postgres_version ?? 0 }
-
-  const onConfirmUpgrade = async (values: any, { setSubmitting }: any) => {
-    setSubmitting(true)
-
-    if (!ref) {
-      ui.setNotification({
-        category: 'error',
-        message: 'Project ref not found',
-      })
-      return
-    }
-
-    const res = await post(`${API_ADMIN_URL}/projects/${ref}/upgrade`, {
-      target_version: values.version,
-    })
-    if (res.error) {
-      ui.setNotification({
-        category: 'error',
-        error: res.error,
-        message: `Failed to upgrade: ${res.error.message}`,
-      })
-      setSubmitting(false)
-    } else {
-      setProjectStatus(queryClient, ref, PROJECT_STATUS.UPGRADING)
+  const { mutate: upgradeProject, isLoading: isUpgrading } = useProjectUpgradeMutation({
+    onSuccess: (res, variables) => {
+      setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.UPGRADING)
       ui.setNotification({ category: 'success', message: 'Upgrading project' })
-      router.push(`/project/${ref}?upgradeInitiated=true`)
-    }
+      router.push(`/project/${variables.ref}?upgradeInitiated=true`)
+    },
+  })
+
+  const onConfirmUpgrade = async (values: any) => {
+    if (!ref) return ui.setNotification({ category: 'error', message: 'Project ref not found' })
+    upgradeProject({ ref, target_version: values.version })
   }
 
   return (
@@ -85,7 +69,7 @@ const ProjectUpgradeAlert = () => {
         header={<h3>Upgrade Postgres</h3>}
       >
         <Form id={formId} initialValues={initialValues} onSubmit={onConfirmUpgrade}>
-          {({ values, isSubmitting }: { values: any; isSubmitting: boolean }) => {
+          {({ values }: { values: any }) => {
             const selectedVersion = (data?.target_upgrade_versions ?? []).find(
               (x) => x.postgres_version === values.version
             )
@@ -166,11 +150,11 @@ const ProjectUpgradeAlert = () => {
                   <Button
                     type="default"
                     onClick={() => setShowUpgradeModal(false)}
-                    disabled={isSubmitting}
+                    disabled={isUpgrading}
                   >
                     Cancel
                   </Button>
-                  <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
+                  <Button htmlType="submit" disabled={isUpgrading} loading={isUpgrading}>
                     Confirm upgrade
                   </Button>
                 </div>
