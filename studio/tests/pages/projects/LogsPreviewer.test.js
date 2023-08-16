@@ -115,7 +115,7 @@ test.each([
     ],
   },
   // these all use teh default selection/table renderers
-  ...['pgbouncer', 'postgrest', 'storage', 'realtime'].map((queryType) => ({
+  ...['pgbouncer', 'postgrest', 'storage', 'realtime', "pooler"].map((queryType) => ({
     queryType,
     tableName: undefined,
     tableLog: logDataFixture({
