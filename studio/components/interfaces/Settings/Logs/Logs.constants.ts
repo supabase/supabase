@@ -335,10 +335,10 @@ export const LOGS_TABLES = {
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
-  [LogsTableName.EDGE]: 'Logs obtained from the network edge, containing all API requests.',
-  [LogsTableName.POSTGRES]: 'Database logs obtained directly from Postgres.',
-  [LogsTableName.FUNCTIONS]: 'Function logs generated from runtime execution.',
-  [LogsTableName.FN_EDGE]: 'Function call logs, containing the request and response.',
+  [LogsTableName.EDGE]: 'Logs obtained from the network edge, containing all API requests',
+  [LogsTableName.POSTGRES]: 'Database logs obtained directly from Postgres',
+  [LogsTableName.FUNCTIONS]: 'Function logs generated from runtime execution',
+  [LogsTableName.FN_EDGE]: 'Function call logs, containing the request and response',
   [LogsTableName.AUTH]: 'Authentication logs from GoTrue',
   [LogsTableName.REALTIME]: 'Realtime server for Postgres logical replication broadcasting',
   [LogsTableName.STORAGE]: 'Object storage logs',
