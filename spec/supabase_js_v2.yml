@@ -77,7 +77,7 @@ functions:
           ```
         description: |
           By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
-          Go to [Settings > API > Exposed schemas](https://supabase.com/dashboard/project/_/settings/api) and add the schema which you want to expose to the API.
+          Go to [Settings > API > Exposed schemas](/dashboard/project/_/settings/api) and add the schema which you want to expose to the API.
 
           Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
       - id: custom-fetch-implementation
@@ -116,6 +116,15 @@ functions:
     title: 'Overview'
     notes: |
       - The auth methods can be accessed via the `supabase.auth` namespace.
+      - By default, the supabase client sets `persistSession` to true and attempts to store the session in local storage. When using the supabase client in an environment that doesn't support local storage, you might notice the following warning message being logged:
+
+      > No storage option exists to persist the session, which may result in unexpected behavior when using auth.
+      If you want to set `persistSession` to true, please provide a storage option or you may set `persistSession` to false to disable this warning.
+
+      This warning message can be safely ignored if you're not using auth on the server-side. If you are using auth and you want to set `persistSession` to true, you will need to provide a custom storage implementation that follows [this interface](https://github.com/supabase/gotrue-js/blob/master/src/lib/types.ts#L1027).
+      - Any email links and one-time passwords (OTPs) sent have a default expiry of 24 hours. We have the following [rate limits](/docs/guides/platform/going-into-prod#auth-rate-limits) in place to guard against brute force attacks.
+      - The expiry of an access token can be set in the "JWT expiry limit" field in [your project's auth settings](/dashboard/project/_/settings/auth). A refresh token never expires and can only be used once.
+
     examples:
       - id: create-auth-client
         name: Create auth client
@@ -145,13 +154,13 @@ functions:
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
-      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
+      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
-      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).
       - If signUp() is called for an existing confirmed user:
-          - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
+          - If **Confirm email** is enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
           - If **Confirm email** is disabled, the error message, `User already registered` is returned.
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/auth-getuser).
     examples:
@@ -244,7 +253,7 @@ functions:
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
       - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
-      - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
+      - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
       - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login/twilio) for details about configuring WhatsApp sign in.
     examples:
       - id: sign-in-with-email
@@ -288,7 +297,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOAuth'
     notes: |
       - This method is used for signing in using a third-party provider.
-      - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#configure-third-party-providers).
+      - Supabase supports many different [third-party providers](/docs/guides/auth#configure-third-party-providers).
     examples:
       - id: sign-in-using-a-third-party-provider
         name: Sign in using a third-party provider
@@ -449,8 +458,9 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
     notes: |
       - In order to use the `updateUser()` method, the user needs to be signed in first.
-      - By Default, email updates sends a confirmation link to both the user's current and new email.
-      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
+      - By default, email updates sends a confirmation link to both the user's current and new email.
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](/dashboard/project/_/auth/providers).
+
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
@@ -480,7 +490,8 @@ functions:
           ```
       - id: update-password-with-reauthentication
         name: Update the user's password with a nonce
-        description: If "Secure password change" is enabled, updating the user's password would require a nonce. The nonce is sent to the user's email or phone number.
+        description: |
+          If **Secure password change** is enabled in your [project's email provider settings](/dashboard/project/_/auth/providers), updating the user's password would require a nonce if the user **hasn't recently signed in**. The nonce is sent to the user's email or phone number. A user is deemed recently signed in if the session was created in the last 24 hours.
         isSpotlight: true
         code: |
           ```js
@@ -494,6 +505,8 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.reauthenticate'
     notes: |
       - This method is used together with `updateUser()` when a user's password needs to be updated.
+      - If you require your user to reauthenticate before updating their password, you need to enable the **Secure password change** option in your [project's email provider settings](/dashboard/project/_/auth/providers).
+      - A user is only require to reauthenticate before updating their password if **Secure password change** is enabled and the user **hasn't recently signed in**. A user is deemed recently signed in if the session was created in the last 24 hours.
       - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
     examples:
       - id: send-reauthentication-nonce
@@ -561,7 +574,7 @@ functions:
       - `setSession()` takes in a refresh token and uses it to get a new session.
       - The refresh token can only be used once to obtain a new session.
       - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
-      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
     examples:
       - id: refresh-the-session
         name: Refresh the session
@@ -980,7 +993,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
     notes: |
       - The following types can be passed into `generateLink()`: `signup`, `magiclink`, `invite`, `recovery`, `email_change_current`, `email_change_new`, `phone_change`.
-      - `generateLink()` only generates the email link for `email_change_email` if the "Secure email change" setting is enabled under the "Email" provider in your Supabase project.
+      - `generateLink()` only generates the email link for `email_change_email` if the **Secure email change** is enabled in your project's [email auth provider settings](/dashboard/project/_/auth/providers).
       - `generateLink()` handles the creation of the user for `signup`, `invite` and `magiclink`.
     examples:
       - id: generate-a-signup-link
@@ -1137,7 +1150,7 @@ functions:
     title: 'Fetch data: select()'
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.select'
     notes: |
-      - By default, Supabase projects return a maximum of 1,000 rows. This setting can be changed in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
+      - By default, Supabase projects return a maximum of 1,000 rows. This setting can be changed in your project's [API settings](/dashboard/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `select()` can be combined with [Filters](/docs/reference/javascript/using-filters)
       - `select()` can be combined with [Modifiers](/docs/reference/javascript/using-modifiers)
       - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).

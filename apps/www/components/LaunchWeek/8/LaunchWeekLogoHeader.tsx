@@ -5,8 +5,11 @@ export function LaunchWeekLogoHeader() {
         <h1 className="sr-only font-normal uppercase text-[28px] sm:text-[32px]">Launch week 8</h1>
         <p className="text-white radial-gradient-text-scale-600 text-lg sm:text-2xl">
           <span className="block">August 7th–11th, 2023</span>
-          <span>9:00 AM PT</span>
         </p>
+        <div className="text-[#9296AA]">
+          <p>A week of announcing new features has come to an end.</p>
+          <p>Thanks to everyone who participated.</p>
+        </div>
       </div>
     </div>
   )
