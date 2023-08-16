@@ -1,11 +1,11 @@
-import { useParams } from 'common/hooks'
-import CodeSnippet from 'components/to-be-cleaned/Docs/CodeSnippet'
-import { useStore } from 'hooks'
-import { get } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Button, IconDownload, IconExternalLink } from 'ui'
+
+import { useParams } from 'common/hooks'
+import CodeSnippet from 'components/to-be-cleaned/Docs/CodeSnippet'
+import { generateTypes } from 'data/projects/project-type-generation-query'
+import { useStore } from 'hooks'
 
 interface Props {
   selectedLang: string
@@ -16,11 +16,10 @@ export default function GeneratingTypes({ selectedLang }: Props) {
   const { ui } = useStore()
   const [isGeneratingTypes, setIsGeneratingTypes] = useState(false)
 
-  const generateTypes = async () => {
-    setIsGeneratingTypes(true)
-    const res = await get(`${API_ADMIN_URL}/projects/${ref}/types/typescript`)
-
-    if (!res.error) {
+  const onClickGenerateTypes = async () => {
+    try {
+      setIsGeneratingTypes(true)
+      const res = await generateTypes({ ref })
       let element = document.createElement('a')
       element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(res.types))
       element.setAttribute('download', 'supabase.ts')
@@ -32,16 +31,17 @@ export default function GeneratingTypes({ selectedLang }: Props) {
         category: 'success',
         message: `Successfully generated types! File is being downloaded`,
       })
-    } else {
+    } catch (error: any) {
       ui.setNotification({
+        error,
         category: 'error',
-        message: `Failed to generate types: ${res.error.message}`,
-        error: res.error,
+        message: `Failed to generate types: ${error.message}`,
       })
+    } finally {
+      setIsGeneratingTypes(false)
     }
-
-    setIsGeneratingTypes(false)
   }
+
   return (
     <>
       <h2 className="doc-heading flex items-center justify-between">
@@ -80,13 +80,13 @@ export default function GeneratingTypes({ selectedLang }: Props) {
                   disabled={isGeneratingTypes}
                   loading={isGeneratingTypes}
                   icon={<IconDownload strokeWidth={1.5} />}
-                  onClick={generateTypes}
+                  onClick={onClickGenerateTypes}
                 >
                   Generate and download types
                 </Button>
               )}
             </p>
-            <p className="text-xs text-scale-1100 bg-scale-200 p-4 mt-2">
+            <p className="text-xs text-scale-1100 bg-scale-200 p-4">
               Remember to re-generate and download this file as you make changes to your tables.
             </p>
           </div>
