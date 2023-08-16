@@ -1,19 +1,19 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 
-import { useParams } from 'common/hooks'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import OrganizationBillingMigrationPanel from '../GeneralSettings/OrganizationBillingMigrationPanel'
 import BillingAddress from './BillingAddress/BillingAddress'
 import BillingEmail from './BillingEmail'
 import CreditBalance from './CreditBalance'
 import PaymentMethods from './PaymentMethods'
 import ProjectsSummary from './ProjectsSummary'
 import TaxID from './TaxID/TaxID'
-import OrganizationBillingMigrationPanel from '../GeneralSettings/OrganizationBillingMigrationPanel'
-import { ScaffoldContainer, ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 
 const BillingSettings = () => {
   const { ui } = useStore()
@@ -29,9 +29,6 @@ const BillingSettings = () => {
 
   const [paymentMethods, setPaymentMethods] = useState<any>(null)
   const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
-
-  const [taxIds, setTaxIds] = useState<any>(null)
-  const [isLoadingTaxIds, setIsLoadingTaxIds] = useState(false)
 
   const defaultPaymentMethod = customer?.invoice_settings?.default_payment_method ?? ''
   const customerBalance = customer && customer.balance ? customer.balance / 100 : 0
@@ -79,26 +76,9 @@ const BillingSettings = () => {
     }
   }
 
-  const getTaxIds = async () => {
-    try {
-      setIsLoadingTaxIds(true)
-      const { data: taxIds, error } = await get(`${API_URL}/organizations/${slug}/tax-ids`)
-      if (error) throw error
-      setTaxIds(taxIds)
-      setIsLoadingTaxIds(false)
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to get organization tax IDs: ${error.message}`,
-      })
-    }
-  }
-
   useEffect(() => {
     getCustomerProfile()
     getPaymentMethods()
-    getTaxIds()
   }, [slug])
 
   return (
@@ -124,11 +104,7 @@ const BillingSettings = () => {
         address={customer?.address ?? {}}
         onAddressUpdated={(address: any) => setCustomer({ ...customer, address })}
       />
-      <TaxID
-        loading={isLoadingTaxIds}
-        taxIds={taxIds || []}
-        onTaxIdsUpdated={(ids: any) => setTaxIds(ids)}
-      />
+      <TaxID />
     </ScaffoldContainerLegacy>
   )
 }
