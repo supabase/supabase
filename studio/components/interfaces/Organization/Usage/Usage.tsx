@@ -171,7 +171,7 @@ const Usage = () => {
                   "All Projects".
                 </p>
                 <div>
-                  <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
+                  <Link href="https://www.notion.so/supabase/Org-Level-Billing-Public-Docs-f059a154beb743a19199d05bab4acb08">
                     <a target="_blank" rel="noreferrer">
                       <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                         Documentation
