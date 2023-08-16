@@ -1,14 +1,14 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
-import { FC, useCallback, useEffect, useState } from 'react'
-
 import { useTheme } from 'common'
-import { useSelectedOrganization, useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL, STRIPE_PUBLIC_KEY } from 'lib/constants'
-import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
+import { useCallback, useEffect, useState } from 'react'
 import { Modal } from 'ui'
+
+import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
+import { useSelectedOrganization, useStore } from 'hooks'
+import { STRIPE_PUBLIC_KEY } from 'lib/constants'
+import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import AddPaymentMethodForm from './AddPaymentMethodForm'
 
 interface AddNewPaymentMethodModalProps {
@@ -28,11 +28,25 @@ const AddNewPaymentMethodModal = ({
 }: AddNewPaymentMethodModalProps) => {
   const { ui } = useStore()
   const [intent, setIntent] = useState<any>()
+  const selectedOrganization = useSelectedOrganization()
 
   const captchaLoaded = useIsHCaptchaLoaded()
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
+
+  const { mutate: setupIntent } = useOrganizationPaymentMethodSetupIntent({
+    onSuccess: (intent) => {
+      setIntent(intent)
+    },
+    onError: (error) => {
+      ui.setNotification({
+        category: 'error',
+        error: intent.error,
+        message: `Failed to setup intent: ${error.message}`,
+      })
+    },
+  })
 
   const captchaRefCallback = useCallback((node) => {
     setCaptchaRef(node)
@@ -52,7 +66,7 @@ const AddNewPaymentMethodModal = ({
           return
         }
 
-        await setupIntent(token ?? undefined)
+        await initSetupIntent(token ?? undefined)
         resetCaptcha()
       }
     }
@@ -65,25 +79,13 @@ const AddNewPaymentMethodModal = ({
     captchaRef?.resetCaptcha()
   }
 
-  const selectedOrganization = useSelectedOrganization()
+  const initSetupIntent = async (hcaptchaToken: string | undefined) => {
+    const slug = selectedOrganization?.slug
+    if (!slug) return console.error('Slug is required')
+    if (!hcaptchaToken) return console.error('HCaptcha token required')
 
-  const setupIntent = async (hcaptchaToken: string | undefined) => {
     setIntent(undefined)
-
-    const orgSlug = selectedOrganization?.slug ?? ''
-    const intent = await post(`${API_URL}/organizations/${orgSlug}/payments/setup-intent`, {
-      hcaptchaToken,
-    })
-
-    if (intent.error) {
-      return ui.setNotification({
-        category: 'error',
-        error: intent.error,
-        message: `Failed to setup intent: ${intent.error.message}`,
-      })
-    } else {
-      setIntent(intent)
-    }
+    setupIntent({ slug, hcaptchaToken })
   }
 
   const { isDarkMode } = useTheme()
