@@ -25,7 +25,10 @@ Our new [Vercel Integration](https://vercel.com/integrations/supabase-v2) stream
 
 You can now [link multiple](https://app.supabase.com/org/_/integrations) Vercel projects to a single Supabase project:
 
-![Vercel in the Supabase dashboard](/images/blog/launch-week-8/day-4/vercel-dashboard.png)
+<Img
+  src="/images/blog/launch-week-8/day-4/vercel-dashboard.png"
+  alt="Vercel in the Supabase dashboard"
+/>
 
 Previously we mapped each Vercel project to a single Supabase project. With this release, we're introducing the concept of project 'Connections'. Supabase projects can have an unlimited number of Vercel Connections. This is especially useful for monorepos using [Turborepo](https://turbo.build/).
 
@@ -33,7 +36,7 @@ Previously we mapped each Vercel project to a single Supabase project. With this
 
 We've improved the way we manage your Supabase environment variables.
 
-![Vercel config](/images/blog/launch-week-8/day-4/vercel-config.png)
+<Img src="/images/blog/launch-week-8/day-4/vercel-config.png" alt="Vercel config" />
 
 Supabase keeps each of your Vercel Projects updated with Environment Variables, managing your secrets (like `service-role-key`) and public variables (like `supabase-url`).
 
@@ -76,7 +79,7 @@ After Vercel has deployed the app, it works without any additional configuration
 
 We announced Database Branching on [Tuesday](/blog/supabase-local-dev#branching-and-preview-environments). We've designed this to work perfectly with Vercel's Preview Deployments.
 
-![Vercel config](/images/blog/launch-week-8/day-4/supabase-vercel-branching.png)
+<Img src="/images/blog/launch-week-8/day-4/supabase-vercel-branching.png" alt="Vercel branching" />
 
 For now, Branching in Supabase is limited to development partners. We'll be rolling it out to everyone over the coming months. If you're interested in testing the new features, [sign up for early access](https://forms.supabase.com/branching-request).
 
