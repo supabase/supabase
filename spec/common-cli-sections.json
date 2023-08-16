@@ -120,9 +120,9 @@
         "type": "cli-command"
       },
       {
-        "id": "supabase-db-dump",
-        "title": "Dump schema from remote database",
-        "slug": "supabase-db-dump",
+        "id": "supabase-db-pull",
+        "title": "Pull schema changes from remote database",
+        "slug": "supabase-db-pull",
         "type": "cli-command"
       },
       {
@@ -138,6 +138,12 @@
         "type": "cli-command"
       },
       {
+        "id": "supabase-db-dump",
+        "title": "Dump schema from remote database",
+        "slug": "supabase-db-dump",
+        "type": "cli-command"
+      },
+      {
         "id": "supabase-db-diff",
         "title": "Diff local database",
         "slug": "supabase-db-diff",
@@ -147,18 +153,6 @@
         "id": "supabase-db-lint",
         "title": "Lint local database",
         "slug": "supabase-db-lint",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-db-remote",
-        "title": "Manage remote databases",
-        "slug": "supabase-db-remote",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-db-remote-commit",
-        "title": "Commit remote database changes",
-        "slug": "supabase-db-remote-commit",
         "type": "cli-command"
       }
     ]
