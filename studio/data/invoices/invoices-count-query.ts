@@ -18,6 +18,7 @@ export async function getInvoicesCount(
   const res = await head(`/platform/stripe/invoices`, {
     params: { query: { customer: customerId, slug } },
     signal,
+    parseAs: 'text',
   })
 
   if (res.error) throw (res as any).error

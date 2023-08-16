@@ -5,12 +5,12 @@ import { invoicesKeys } from './keys'
 
 export type ProjectInvoicesVariables = {
   projectRef?: string
-  offset: number
-  limit: number
+  offset?: number
+  limit?: number
 }
 
 export async function getProjectInvoices(
-  { projectRef, offset, limit }: ProjectInvoicesVariables,
+  { projectRef, offset = 0, limit = 10 }: ProjectInvoicesVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('Project ref is required')
@@ -37,15 +37,12 @@ export const useProjectInvoicesQuery = <TData = ProjectInvoicesData>(
     ...options
   }: UseQueryOptions<ProjectInvoicesData, ProjectInvoicesError, TData> = {}
 ) =>
+  // [Joshen] Switch to useInfiniteQuery
   useQuery<ProjectInvoicesData, ProjectInvoicesError, TData>(
-    invoicesKeys.projectInvoices(projectRef),
+    invoicesKeys.projectInvoices(projectRef, offset),
     ({ signal }) => getProjectInvoices({ projectRef, offset, limit }, signal),
     {
-      enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        typeof limit !== 'undefined' &&
-        typeof offset !== 'undefined',
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )

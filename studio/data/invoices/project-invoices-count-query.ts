@@ -16,6 +16,7 @@ export async function getProjectInvoicesCount(
   const res = await head(`/platform/projects/{ref}/invoices`, {
     params: { path: { ref: projectRef } },
     signal,
+    parseAs: 'text',
   })
 
   if (res.error) throw (res as any).error
