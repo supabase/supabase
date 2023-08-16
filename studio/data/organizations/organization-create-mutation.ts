@@ -7,7 +7,7 @@ import { organizationKeys } from './keys'
 
 export type OrganizationCreateVariables = {
   name: string
-  kind: string
+  kind?: string
   size?: string
 }
 
@@ -42,7 +42,7 @@ export const useOrganizationCreateMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to create new organization: ${data.message}`)
+          toast.error(`Failed to create organization: ${data.message}`)
         } else {
           onError(data, variables, context)
         }
