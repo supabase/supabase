@@ -15,6 +15,7 @@ export type ProjectCreateVariables = {
   dbPricingTierId?: string
   cloudProvider?: string
   configurationId?: string
+  authSiteUrl?: string
   customSupabaseRequest?: object
 }
 
@@ -27,6 +28,7 @@ export async function createProject({
   dbPricingTierId = PRICING_TIER_PRODUCT_IDS.FREE,
   cloudProvider = PROVIDERS.AWS.id,
   configurationId,
+  authSiteUrl,
   customSupabaseRequest,
 }: ProjectCreateVariables) {
   const response = await post(`${API_URL}/projects`, {
@@ -37,7 +39,7 @@ export async function createProject({
     db_region: dbRegion,
     db_sql: dbSql,
     db_pricing_tier_id: dbPricingTierId,
-    // auth_site_url: _store.selectedVercelProjectUrl,
+    auth_site_url: authSiteUrl,
     vercel_configuration_id: configurationId,
     ...(customSupabaseRequest !== undefined && {
       custom_supabase_internal_requests: customSupabaseRequest,
