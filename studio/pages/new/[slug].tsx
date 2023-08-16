@@ -4,7 +4,7 @@ import generator from 'generate-password'
 import { debounce, isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
-import Router, { useRouter } from 'next/router'
+import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import {
   Alert,
@@ -32,12 +32,14 @@ import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import {
+  ProjectCreateVariables,
+  useProjectCreateMutation,
+} from 'data/projects/project-create-mutation'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useFlag, useStore, withAuth } from 'hooks'
-import { post } from 'lib/common/fetch'
 import {
-  API_URL,
   AWS_REGIONS,
   CloudProvider,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
@@ -70,7 +72,6 @@ const Wizard: NextPageWithLayout = () => {
   const [dbPass, setDbPass] = useState('')
   const [dbRegion, setDbRegion] = useState(PROVIDERS[cloudProvider].default_region)
   const [dbPricingTierKey, setDbPricingTierKey] = useState(PRICING_TIER_DEFAULT_KEY)
-  const [newProjectedLoading, setNewProjectLoading] = useState(false)
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
@@ -91,6 +92,12 @@ const Wizard: NextPageWithLayout = () => {
 
   const { data: allProjects } = useProjectsQuery({
     enabled: currentOrg?.subscription_id != undefined,
+  })
+
+  const { mutate: createProject, isLoading: isCreatingNewProject } = useProjectCreateMutation({
+    onSuccess: (res) => {
+      router.push(`/project/${res.ref}/building`)
+    },
   })
 
   const orgProjectCount = (allProjects || []).filter(
@@ -186,43 +193,31 @@ const Wizard: NextPageWithLayout = () => {
   }
 
   const onClickNext = async () => {
-    setNewProjectLoading(true)
+    if (!currentOrg) return console.error('Unable to retrieve current organization')
 
     const dbTier = dbPricingTierKey === 'PRO' && !isSpendCapEnabled ? 'PAYG' : dbPricingTierKey
-
-    const data: Record<string, any> = {
-      cloud_provider: cloudProvider,
-      org_id: currentOrg?.id,
+    const data: ProjectCreateVariables = {
+      cloudProvider,
+      organizationId: currentOrg.id,
       name: projectName.trim(),
-      db_pass: dbPass,
-      db_region: dbRegion,
-      db_pricing_tier_id: (PRICING_TIER_PRODUCT_IDS as any)[dbTier],
+      dbPass: dbPass,
+      dbRegion: dbRegion,
+      dbPricingTierId: (PRICING_TIER_PRODUCT_IDS as any)[dbTier],
     }
     if (postgresVersion) {
       if (!postgresVersion.match(/1[2-9]\..*/)) {
-        setNewProjectLoading(false)
-        ui.setNotification({
+        return ui.setNotification({
           category: 'error',
           message: `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`,
         })
-        return
       }
 
-      data['custom_supabase_internal_requests'] = {
+      data['customSupabaseRequest'] = {
         ami: { search_tags: { 'tag:postgresVersion': postgresVersion } },
       }
     }
-    const response = await post(`${API_URL}/projects`, data)
-    if (response.error) {
-      setNewProjectLoading(false)
-      ui.setNotification({
-        error: response.error,
-        category: 'error',
-        message: `Failed to create new project: ${response.error.message}`,
-      })
-    } else {
-      router.push(`/project/${response.ref}/building`)
-    }
+
+    createProject(data)
   }
 
   // [Joshen] Refactor: DB Password could be a common component
@@ -263,7 +258,11 @@ const Wizard: NextPageWithLayout = () => {
       }
       footer={
         <div key="panel-footer" className="flex items-center justify-between w-full">
-          <Button type="default" onClick={() => Router.push('/projects')}>
+          <Button
+            type="default"
+            disabled={isCreatingNewProject}
+            onClick={() => router.push('/projects')}
+          >
             Cancel
           </Button>
           <div className="items-center space-x-3">
@@ -272,8 +271,8 @@ const Wizard: NextPageWithLayout = () => {
             )}
             <Button
               onClick={onClickNext}
-              loading={newProjectedLoading}
-              disabled={newProjectedLoading || !canSubmit}
+              loading={isCreatingNewProject}
+              disabled={isCreatingNewProject || !canSubmit}
             >
               Create new project
             </Button>
