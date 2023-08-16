@@ -1,18 +1,19 @@
-import { FC } from 'react'
+import { noop } from 'lodash'
 import { IconEdit, IconGrid, Modal } from 'ui'
+
 import CardButton from 'components/ui/CardButton'
 
-interface Props {
+interface PolicySelectionProps {
   description: string
   onViewTemplates: () => void
   onViewEditor: () => void
 }
 
-const PolicySelection: FC<Props> = ({
+const PolicySelection = ({
   description = '',
-  onViewTemplates = () => {},
-  onViewEditor = () => {},
-}) => {
+  onViewTemplates = noop,
+  onViewEditor = noop,
+}: PolicySelectionProps) => {
   return (
     <Modal.Content>
       <div className="space-y-6 py-8">

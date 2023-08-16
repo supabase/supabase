@@ -33,6 +33,7 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
           <Tooltip.Trigger asChild>
             <div className="relative flex items-center">
               <Button
+                id="help-popover-button"
                 type={alt ? 'text' : 'default'}
                 className={alt ? 'px-1' : ''}
                 icon={

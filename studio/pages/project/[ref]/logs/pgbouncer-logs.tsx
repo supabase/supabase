@@ -1,14 +1,22 @@
-import React from 'react'
-import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
-import { LogsLayout } from 'components/layouts'
-import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import { NextPageWithLayout } from 'types'
+import { useParams } from 'common'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, IconAlertCircle } from 'ui'
+
 import { LogsTableName } from 'components/interfaces/Settings/Logs'
+import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
+import { LogsLayout } from 'components/layouts'
+import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
+import { NextPageWithLayout } from 'types'
 
 export const LogPage: NextPageWithLayout = () => {
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
+  const { data: poolingConfiguration } = usePoolingConfigurationQuery({
+    projectRef: ref ?? 'default',
+  })
+
+  const isSupavisorEnabled =
+    poolingConfiguration?.supavisor_enabled ??
+    poolingConfiguration?.connectionString.includes('pooler.supabase.com') ??
+    false
 
   return (
     <LogsPreviewer
@@ -16,10 +24,22 @@ export const LogPage: NextPageWithLayout = () => {
       condensedLayout={true}
       tableName={LogsTableName.PGBOUNCER}
       queryType="pgbouncer"
-    />
+    >
+      {isSupavisorEnabled && (
+        <div className="px-4 pt-4">
+          <Alert_Shadcn_ variant="warning">
+            <IconAlertCircle />
+            <AlertTitle_Shadcn_>Supavisor logs are not available yet</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Your project currently has Supavisor enabled, which logs are currently unavailable.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        </div>
+      )}
+    </LogsPreviewer>
   )
 }
 
 LogPage.getLayout = (page) => <LogsLayout title="Database">{page}</LogsLayout>
 
-export default observer(LogPage)
+export default LogPage

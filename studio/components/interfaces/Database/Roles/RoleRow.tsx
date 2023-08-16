@@ -1,28 +1,28 @@
-import { FC, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresRole } from '@supabase/postgres-meta'
+import { useState } from 'react'
 import {
   Button,
-  Form,
-  Dropdown,
-  IconChevronUp,
-  Toggle,
   Collapsible,
-  IconTrash,
+  Dropdown,
+  Form,
+  IconChevronUp,
   IconHelpCircle,
   IconMoreVertical,
+  IconTrash,
+  Toggle,
 } from 'ui'
 
 import { useStore } from 'hooks'
 import { ROLE_PERMISSIONS } from './Roles.constants'
 
-interface Props {
+interface RoleRowProps {
   role: PostgresRole
   disabled?: boolean
   onSelectDelete: (role: PostgresRole) => void
 }
 
-const RoleRow: FC<Props> = ({ role, disabled = false, onSelectDelete }) => {
+const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
   const { ui, meta } = useStore()
   const [isExpanded, setIsExpanded] = useState(false)
 

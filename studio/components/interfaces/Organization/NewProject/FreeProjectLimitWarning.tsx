@@ -1,16 +1,20 @@
-import { FC } from 'react'
+import Link from 'next/link'
 import { Button, IconAlertCircle } from 'ui'
+
 import InformationBox from 'components/ui/InformationBox'
 import { MemberWithFreeProjectLimit } from 'data/organizations/free-project-limit-check-query'
-import Link from 'next/link'
 
-interface Props {
+interface FreeProjectLimitWarningProps {
   membersExceededLimit: MemberWithFreeProjectLimit[]
   orgLevelBilling: boolean
   orgSlug: string
 }
 
-const FreeProjectLimitWarning: FC<Props> = ({ membersExceededLimit, orgLevelBilling, orgSlug }) => {
+const FreeProjectLimitWarning = ({
+  membersExceededLimit,
+  orgLevelBilling,
+  orgSlug,
+}: FreeProjectLimitWarningProps) => {
   return (
     <div>
       <InformationBox

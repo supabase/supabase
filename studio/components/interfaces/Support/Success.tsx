@@ -1,15 +1,15 @@
 import Link from 'next/link'
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import { Button, IconCheck, IconExternalLink, IconMail, IconSearch, Input } from 'ui'
 
 import Divider from 'components/ui/Divider'
 import { CATEGORY_OPTIONS } from './Support.constants'
 
-interface Props {
+interface SuccessProps {
   sentCategory?: string
 }
 
-const Success: FC<Props> = ({ sentCategory = '' }) => {
+const Success = ({ sentCategory = '' }: SuccessProps) => {
   const categoriesToShowAdditionalResources = ['Problem', 'Unresponsive', 'Performance']
 
   const selectedCategory = CATEGORY_OPTIONS.find((option) => option.value === sentCategory)

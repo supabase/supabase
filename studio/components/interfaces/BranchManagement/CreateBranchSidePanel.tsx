@@ -1,3 +1,5 @@
+import { useParams } from 'common'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import {
   AlertDescription_Shadcn_,
@@ -11,7 +13,6 @@ import {
   SidePanel,
 } from 'ui'
 
-import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -20,7 +21,6 @@ import { useBranchesQuery } from 'data/branches/branches-query'
 import { useGithubBranchesQuery } from 'data/integrations/integrations-github-branches-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
-import Link from 'next/link'
 
 interface CreateBranchSidePanelProps {
   visible: boolean

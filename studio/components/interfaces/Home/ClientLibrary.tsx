@@ -1,8 +1,8 @@
-import { FC } from 'react'
-import { IconBookOpen, IconGitHub, Button, Badge } from 'ui'
+import { Badge, Button, IconBookOpen, IconGitHub } from 'ui'
+
 import { BASE_PATH } from 'lib/constants'
 
-interface Props {
+interface ClientLibraryProps {
   language: string
   officialSupport?: boolean
   docsUrl?: string
@@ -10,7 +10,13 @@ interface Props {
   altIconName?: string
 }
 
-const ClientLibrary: FC<Props> = ({ language, officialSupport, docsUrl, gitUrl, altIconName }) => {
+const ClientLibrary = ({
+  language,
+  officialSupport,
+  docsUrl,
+  gitUrl,
+  altIconName,
+}: ClientLibraryProps) => {
   return (
     <div className="flex items-start space-x-6">
       <img

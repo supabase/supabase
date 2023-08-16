@@ -10,7 +10,8 @@ import { useSelectedOrganization } from 'hooks'
 import { EMPTY_ARR } from 'lib/void'
 import { SidePanel } from 'ui'
 import { useIntegrationsGitHubInstalledConnectionDeleteMutation } from 'data/integrations/integrations-github-connection-delete-mutation'
-import { IntegrationConnectionsCreateVariables } from 'data/integrations/types'
+import { IntegrationConnectionsCreateVariables } from 'data/integrations/integrations.types'
+import { useSidePanelsStateSnapshot } from 'state/side-panels'
 
 const GITHUB_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96" className="w-6">
@@ -24,19 +25,14 @@ const GITHUB_ICON = (
 )
 
 export type SidePanelGitHubRepoLinkerProps = {
-  isOpen?: boolean
-  onClose?: () => void
-  organizationIntegrationId?: string
   projectRef?: string
 }
 
-const SidePanelGitHubRepoLinker = ({
-  isOpen = false,
-  onClose,
-  organizationIntegrationId,
-  projectRef,
-}: SidePanelGitHubRepoLinkerProps) => {
+const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProps) => {
   const selectedOrganization = useSelectedOrganization()
+  const sidePanelStateSnapshot = useSidePanelsStateSnapshot()
+
+  const organizationIntegrationId = sidePanelStateSnapshot.githubConnectionsIntegrationId
 
   const { data: integrationData } = useOrgIntegrationsQuery({
     orgSlug: selectedOrganization?.slug,
@@ -90,7 +86,7 @@ const SidePanelGitHubRepoLinker = ({
   const { mutate: createConnections, isLoading: isCreatingConnection } =
     useIntegrationGitHubConnectionsCreateMutation({
       onSuccess() {
-        onClose?.()
+        sidePanelStateSnapshot.setGithubConnectionsOpen(false)
       },
     })
 
@@ -108,6 +104,7 @@ const SidePanelGitHubRepoLinker = ({
         orgSlug: selectedOrganization.slug,
       })
     }
+
     createConnections(variables)
   }
 
@@ -115,9 +112,9 @@ const SidePanelGitHubRepoLinker = ({
     <SidePanel
       header={'Add GitHub repository'}
       size="large"
-      visible={isOpen}
+      visible={sidePanelStateSnapshot.githubConnectionsOpen}
       hideFooter
-      onCancel={() => onClose?.()}
+      onCancel={() => sidePanelStateSnapshot.setGithubConnectionsOpen(false)}
     >
       <div className="py-10 flex flex-col gap-6 bg-body h-full">
         <SidePanel.Content>

@@ -1170,37 +1170,47 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-list',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-branches-list',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-create',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-branches-create',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-delete',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-branches-delete',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-switch',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-branches-create',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-changes',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-db-diff',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-commit',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-db-pull',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-remote-set',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-link',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/cli/supabase-db-remote-changes',
+    destination: '/docs/reference/supabase-db-diff',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/cli/supabase-db-remote-commit',
+    destination: '/docs/reference/supabase-db-pull',
   },
 
   {
@@ -2248,7 +2258,14 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/reference/cli/config',
-    destination: '/docs/guides/cli/config',
+    source: '/docs/guides/platform/oauth-apps/publish-an-oauth-app',
+    destination:
+      '/docs/guides/platform/oauth-apps/build-a-supabase-integration#create-an-oauth-app',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/oauth-apps/authorize-an-oauth-app',
+    destination: '/docs/guides/platform/oauth-apps/build-a-supabase-integration',
+  },
+  { permanent: true, source: '/docs/reference/cli/config', destination: '/docs/guides/cli/config' },
 ]

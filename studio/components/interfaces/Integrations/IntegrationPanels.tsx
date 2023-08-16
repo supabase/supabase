@@ -93,7 +93,7 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
           </div>
           <div className="flex flex-col gap-0">
             <div className="flex items-center gap-2">
-              <span className="text font-medium">
+              <span className="text text-sm font-medium">
                 {integration.metadata?.account.name ||
                   (integration.metadata !== undefined &&
                     'gitHubConnectionOwner' in integration.metadata &&
@@ -140,7 +140,7 @@ export interface IntegrationConnectionProps extends React.HTMLAttributes<HTMLLIE
 
 const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnectionProps>(
   (
-    { className, connection, type, actions, showNode = true, orientation = 'horizontal', ...props },
+    { connection, type, actions, showNode = true, orientation = 'horizontal', className, ...props },
     ref
   ) => {
     const { data: projects } = useProjectsQuery()
@@ -152,7 +152,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
         key={connection.id}
         {...props}
         className={cn(
-          showNode && 'pl-8  ml-6 border-l border-scale-600 dark:border-scale-400',
+          showNode && 'pl-8 ml-6 border-l border-scale-600 dark:border-scale-400',
           'pb-2',
           'relative'
         )}
@@ -165,7 +165,8 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
             orientation === 'horizontal'
               ? 'flex items-center justify-between'
               : 'flex flex-col gap-3',
-            'bg-surface-100 border shadow-sm px-8 py-4 rounded-lg'
+            'bg-surface-100 border shadow-sm px-8 py-4 rounded-lg',
+            className
           )}
         >
           <div className={'flex flex-col gap-1'}>
@@ -222,10 +223,10 @@ const IntegrationConnectionOption = React.forwardRef<HTMLLIElement, IntegrationC
         <div className="flex flex-col gap-1">
           <div className="flex gap-2 items-center">
             <HandleIcon type={'Supabase'} />
-            <span>{project?.name}</span>
+            <span className="text-sm">{project?.name}</span>
             <IconArrowRight size={14} className="text-scale-900" strokeWidth={1.5} />
             <HandleIcon type={type} />
-            <span>{connection.metadata.name}</span>
+            <span className="text-sm">{connection.metadata.name}</span>
           </div>
 
           <span className="text-lighter text-xs">
@@ -275,19 +276,23 @@ const EmptyIntegrationConnection = React.forwardRef<
 interface IntegrationConnectionHeader extends React.HTMLAttributes<HTMLDivElement> {
   name?: string
   markdown?: string
+  showNode?: boolean
 }
 
 const IntegrationConnectionHeader = React.forwardRef<HTMLDivElement, IntegrationConnectionHeader>(
-  ({ className, name, markdown = '', ...props }, ref) => {
+  ({ className, name, markdown = '', showNode = true, ...props }, ref) => {
     return (
       <div
         {...props}
         ref={ref}
         className={cn(
-          'border-l border-scale-600 dark:border-scale-400 ml-6 pl-8 pt-6 pb-3',
+          showNode && 'border-l border-scale-600 dark:border-scale-400 ml-6 pl-8',
+          'pt-6 pb-3',
+          'prose text-sm',
           className
         )}
       >
+        {props.title && <h5 className="text">{props.title}</h5>}
         <Markdown content={markdown} className="" />
       </div>
     )

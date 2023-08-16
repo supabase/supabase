@@ -1,15 +1,11 @@
-import { FC } from 'react'
-
-import { useSelectedProject } from 'hooks'
-import Panel from 'components/ui/Panel'
-
-import TransferProjectButton from './TransferProjectButton'
-import { FormHeader } from 'components/ui/Forms'
 import { IconTruck } from 'ui'
 
-interface Props {}
+import { FormHeader } from 'components/ui/Forms'
+import Panel from 'components/ui/Panel'
+import { useSelectedProject } from 'hooks'
+import TransferProjectButton from './TransferProjectButton'
 
-const TransferProjectPanel: FC<Props> = ({}) => {
+const TransferProjectPanel = () => {
   const project = useSelectedProject()
 
   if (project === undefined) return <></>
