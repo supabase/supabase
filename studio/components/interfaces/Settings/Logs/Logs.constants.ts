@@ -344,6 +344,7 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.STORAGE]: 'Object storage logs',
   [LogsTableName.PGBOUNCER]: 'Postgres connection pooler logs',
   [LogsTableName.POSTGREST]: 'RESTful API web server logs',
+  [LogsTableName.SUPAVISOR]: 'Cloud-native Postgres connection pooler logs',
 }
 
 export const genQueryParams = (params: { [k: string]: string }) => {
