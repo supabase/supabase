@@ -228,11 +228,7 @@ const SQLEditor = () => {
           return
         }
 
-        if (
-          supabaseAIEnabled &&
-          !hasHipaaAddon &&
-          snippet?.snippet.name === untitledSnippetTitle
-        ) {
+        if (supabaseAIEnabled && !hasHipaaAddon && snippet?.snippet.name === untitledSnippetTitle) {
           // Intentionally don't await title gen (lazy)
           setAiTitle(id, sql)
         }
@@ -244,7 +240,7 @@ const SQLEditor = () => {
         })
       }
     },
-    [isDiffOpen, id, isExecuting, project, execute, setAiTitle]
+    [isDiffOpen, id, isExecuting, project, execute, setAiTitle, hasHipaaAddon, supabaseAIEnabled]
   )
 
   const handleNewQuery = useCallback(

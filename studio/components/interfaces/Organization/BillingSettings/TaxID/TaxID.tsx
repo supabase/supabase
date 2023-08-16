@@ -9,10 +9,11 @@ import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useOrganizationTaxIDsQuery } from 'data/organizations/organization-tax-ids-query'
-import { TaxIdValue } from 'data/organizations/organization-tax-ids-update-mutation'
+import {
+  TaxIdValue,
+  useOrganizationTaxIDsUpdateMutation,
+} from 'data/organizations/organization-tax-ids-update-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
-import { delete_, post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { StripeTaxId, TAX_IDS } from './TaxID.constants'
 import { sanitizeTaxID } from './TaxID.utils'
@@ -27,14 +28,40 @@ const TaxID = () => {
   const {
     data,
     error: taxIdsError,
-    refetch: refetchTaxIds,
     isLoading: isLoadingTaxIds,
     isError: isErrorTaxIds,
     isSuccess: isSuccessTaxIds,
   } = useOrganizationTaxIDsQuery({ slug })
   const taxIds = data || []
 
-  const [isSaving, setIsSaving] = useState(false)
+  const { mutate: updateTaxIDs, isLoading: isUpdating } = useOrganizationTaxIDsUpdateMutation({
+    onSuccess: (res) => {
+      const { created, errors } = res
+      setErrors(errors?.map((taxId) => taxId.id) ?? [])
+      const updatedTaxIds =
+        created?.map((x) => {
+          return {
+            id: x.id,
+            type: x.type,
+            value: x.value,
+            name:
+              x.type === 'eu_vat'
+                ? `${x.country} VAT`
+                : TAX_IDS.find((option) => option.code === x.type)?.name ?? '',
+          }
+        }) ?? []
+      setTaxIdValues(updatedTaxIds)
+
+      if (errors !== undefined && errors.length > 0) {
+        errors.forEach((taxId: any) => {
+          ui.setNotification({ category: 'error', message: taxId.result.error.message })
+        })
+      } else {
+        ui.setNotification({ category: 'success', message: 'Successfully updated tax IDs' })
+      }
+    },
+  })
+
   const [errors, setErrors] = useState<string[]>([])
   const [taxIdValues, setTaxIdValues] = useState<TaxIdValue[]>([])
   const formattedTaxIds: StripeTaxId[] = taxIds.map((taxId) => {
@@ -50,13 +77,15 @@ const TaxID = () => {
   })
 
   useEffect(() => {
-    if (taxIdValues.length === 0) {
-      setTaxIdValues(formattedTaxIds)
-    } else {
-      const erroredTaxIds = taxIdValues.filter((taxId: any) => errors.includes(taxId.id))
-      setTaxIdValues(formattedTaxIds.concat(erroredTaxIds))
+    if (isSuccessTaxIds) {
+      if (taxIdValues.length === 0) {
+        setTaxIdValues(formattedTaxIds)
+      } else {
+        const erroredTaxIds = taxIdValues.filter((taxId: any) => errors.includes(taxId.id))
+        setTaxIdValues(formattedTaxIds.concat(erroredTaxIds))
+      }
     }
-  }, [taxIds])
+  }, [isSuccessTaxIds])
 
   const hasChanges = !isEqual(taxIdValues, formattedTaxIds)
   const canReadTaxIds = useCheckPermissions(PermissionAction.BILLING_READ, 'stripe.tax_ids')
@@ -95,44 +124,11 @@ const TaxID = () => {
   }
 
   const onSaveTaxIds = async () => {
-    // To make things simple we delete all existing ones and create new ones from this session
-    setIsSaving(true)
-    try {
-      const deletedIds = await Promise.all(
-        taxIds.map(async (taxId) => {
-          return await delete_(`${API_URL}/organizations/${slug}/tax-ids`, { id: taxId.id })
-        })
-      )
+    if (!slug) return console.error('Slug is required')
+    if (taxIds === undefined) return console.error('Tax IDs are required')
 
-      const newIds = await Promise.all(
-        taxIdValues.map(async (taxId: StripeTaxId) => {
-          const sanitizedID = sanitizeTaxID(taxId)
-          const result = await post(`${API_URL}/organizations/${slug}/tax-ids`, {
-            type: sanitizedID.type,
-            value: sanitizedID.value,
-          })
-          return { id: sanitizedID.id, result }
-        })
-      )
-      const taxIdsWithErrors = newIds.filter((taxId: any) => {
-        if (taxId.result.error) return taxId
-      })
-      setErrors(taxIdsWithErrors.map((taxId: any) => taxId.id))
-
-      if (taxIdsWithErrors.length > 0) {
-        taxIdsWithErrors.forEach((taxId: any) => {
-          ui.setNotification({ category: 'error', message: taxId.result.error.message })
-        })
-      } else {
-        ui.setNotification({ category: 'success', message: 'Successfully updated tax IDs' })
-      }
-
-      refetchTaxIds()
-    } catch (error: any) {
-      ui.setNotification({ category: 'error', message: 'Failed to save tax IDs' })
-    } finally {
-      setIsSaving(false)
-    }
+    const newIds = taxIdValues.map((x) => sanitizeTaxID(x))
+    updateTaxIDs({ slug, existingIds: taxIds, newIds })
   }
 
   return (
@@ -171,7 +167,7 @@ const TaxID = () => {
                   <Button
                     type="default"
                     htmlType="reset"
-                    disabled={!hasChanges || isSaving}
+                    disabled={!hasChanges || isUpdating}
                     onClick={() => onResetTaxIds()}
                   >
                     Cancel
@@ -179,8 +175,8 @@ const TaxID = () => {
                   <Button
                     type="primary"
                     htmlType="submit"
-                    loading={isSaving}
-                    disabled={!hasChanges || isSaving}
+                    loading={isUpdating}
+                    disabled={!hasChanges || isUpdating}
                     onClick={() => onSaveTaxIds()}
                   >
                     Save

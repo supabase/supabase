@@ -14,7 +14,6 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/8/LaunchWeekLogoHeader'
 import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
 import LW8CalloutsSection from '~/components/LaunchWeek/8/LW8CalloutsSection'
-import LWAnnouncement from '~/components/LaunchWeek/8/Releases/LWAnnouncement'
 
 import { useTheme } from 'common/Providers'
 
@@ -25,7 +24,7 @@ const AnimatedParticles = dynamic(
 )
 const LW8Releases = dynamic(() => import('~/components/LaunchWeek/8/Releases'))
 const LW8Meetups = dynamic(() => import('~/components/LaunchWeek/8/LW8Meetups'))
-const TicketContainer = dynamic(() => import('~/components/LaunchWeek/8/Ticket/TicketContainer'))
+const LWArchive = dynamic(() => import('~/components/LaunchWeek/8/LWArchive'))
 const LaunchWeekPrizeSection = dynamic(
   () => import('~/components/LaunchWeek/8/LaunchWeekPrizeSection')
 )
@@ -48,7 +47,7 @@ const supabaseAdmin = createClient(
 export default function TicketHome({ users, meetups }: Props) {
   const { query } = useRouter()
 
-  const TITLE = 'Supabase LaunchWeek 8'
+  const TITLE = 'Supabase Launch Week 8'
   const DESCRIPTION = 'Supabase Launch Week 8 | 7–11 August 2023'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/8/lw8-og.jpg`
 
@@ -142,7 +141,6 @@ export default function TicketHome({ users, meetups }: Props) {
                 <SectionContainer className="relative flex flex-col justify-around items-center min-h-[500px] !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !px-0 !mx-auto">
                   <div className="absolute bottom-0 z-10 w-full flex flex-col items-center justify-end gap-4 px-6">
                     <LaunchWeekLogoHeader />
-                    <LWAnnouncement isLaunchWeekPage />
                   </div>
                   <div className="absolute inset-0 z-0 flex items-center justify-center">
                     <AnimatedParticles />
@@ -183,20 +181,10 @@ export default function TicketHome({ users, meetups }: Props) {
               <LW8Meetups meetups={meetups} />
             </SectionContainer>
 
-            <div
-              id="ticket"
-              className="relative !w-full max-w-[100vw] min-h-[400px] !px-4 sm:max-w-xl md:max-w-4xl lg:max-w-7xl z-20 flex flex-col justify-around items-center !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !mx-auto"
-            >
-              {supabase && (
-                <div className="w-full max-w-[100vw] px-4 flex justify-center py-8 md:py-20">
-                  <TicketContainer
-                    user={userData}
-                    referrals={userData.referrals ?? 0}
-                    supabase={supabase}
-                  />
-                </div>
-              )}
-            </div>
+            <SectionContainer id="archive">
+              <LWArchive />
+            </SectionContainer>
+
             <SectionContainer className="!px-4 w-full">
               <LaunchWeekPrizeSection />
             </SectionContainer>
