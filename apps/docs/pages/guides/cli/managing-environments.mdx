@@ -38,10 +38,10 @@ If you're using an existing Supabase project, you might have made schema changes
 Run the following command to pull these changes before making local schema changes from the CLI:
 
 ```sql
-supabase db remote commit
+supabase db pull
 ```
 
-This command creates a new migration in `supabase/migrations/<timestamp>_remote_commit.sql` which reflects the schema changes you have made previously.
+This command creates a new migration in `supabase/migrations/<timestamp>_remote_schema.sql` which reflects the schema changes you have made previously.
 
 Now commit your local changes to Git and run the local development setup:
 
@@ -348,9 +348,9 @@ Once pushed, check that the migration version is up to date for both local and r
 supabase migration list
 ```
 
-### Permission denied on db remote commit
+### Permission denied on db pull
 
-If you have been using Supabase hosted projects for a long time, you might encounter the following permission error when executing `db remote commit`.
+If you have been using Supabase hosted projects for a long time, you might encounter the following permission error when executing `db pull`.
 
 ```bash
 Error: Error running pg_dump on remote database: pg_dump: error: query failed: ERROR:  permission denied for table _type
