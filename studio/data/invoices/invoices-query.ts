@@ -6,12 +6,12 @@ import { invoicesKeys } from './keys'
 export type InvoicesVariables = {
   customerId?: string
   slug?: string
-  offset: number
-  limit: number
+  offset?: number
+  limit?: number
 }
 
 export async function getInvoices(
-  { customerId, slug, offset, limit }: InvoicesVariables,
+  { customerId, slug, offset = 0, limit = 10 }: InvoicesVariables,
   signal?: AbortSignal
 ) {
   if (!customerId) throw new Error('Customer ID is required')
@@ -36,16 +36,12 @@ export const useInvoicesQuery = <TData = InvoicesData>(
   { customerId, slug, offset, limit }: InvoicesVariables,
   { enabled = true, ...options }: UseQueryOptions<InvoicesData, InvoicesError, TData> = {}
 ) =>
+  // [Joshen] Switch to useInfiniteQuery
   useQuery<InvoicesData, InvoicesError, TData>(
-    invoicesKeys.list(customerId, slug),
+    invoicesKeys.list(customerId, slug, offset),
     ({ signal }) => getInvoices({ customerId, slug, offset, limit }, signal),
     {
-      enabled:
-        enabled &&
-        typeof customerId !== 'undefined' &&
-        typeof slug !== 'undefined' &&
-        typeof limit !== 'undefined' &&
-        typeof offset !== 'undefined',
+      enabled: enabled && typeof customerId !== 'undefined' && typeof slug !== 'undefined',
       ...options,
     }
   )
