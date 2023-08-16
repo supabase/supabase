@@ -291,6 +291,7 @@ Use of nonce is recommended, though optional. Make sure each nonce is generated 
 
 
 ### Important Note on Nonce Validation
+
 Supabase Auth expects the nonce in Google's ID token to be hashed (specifically with SHA-256 and represented as a hexadecimal string).
 
 To succeed with nonce validation, you will need to provide a hashed version of the nonce to Google and the non-hashed version to the `signInWithIdToken` method.
