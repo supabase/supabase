@@ -9,9 +9,8 @@ import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
+import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
-import { patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import { COUNTRIES } from './BillingAddress.constants'
 
 const BillingAddress = () => {
@@ -21,13 +20,31 @@ const BillingAddress = () => {
   const {
     data: customer,
     error: customerError,
-    refetch: refetchCustomer,
     isError: isErrorCustomer,
     isLoading: isLoadingCustomer,
     isSuccess: isSuccessCustomer,
   } = useOrganizationCustomerProfileQuery({ slug })
 
   const { city, country, line1, line2, postal_code, state } = customer?.address ?? {}
+  const [isDirty, setIsDirty] = useState(false)
+  const initialValues = { city, country, line1, line2, postal_code, state }
+
+  const { mutate: updateCustomer, isLoading: isUpdating } =
+    useOrganizationCustomerProfileUpdateMutation({
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: 'Successfully updated billing address',
+        })
+        setIsDirty(false)
+      },
+      onError: (error) => {
+        ui.setNotification({
+          category: 'error',
+          message: `Failed to update billing address: ${error.message}`,
+        })
+      },
+    })
 
   const canReadBillingAddress = useCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -37,16 +54,6 @@ const BillingAddress = () => {
     PermissionAction.BILLING_WRITE,
     'stripe.customer'
   )
-
-  const [isDirty, setIsDirty] = useState(false)
-  const initialValues = {
-    city,
-    country,
-    line1,
-    line2,
-    postal_code,
-    state,
-  }
 
   const onValidate = (values: any) => {
     const errors = {} as any
@@ -58,27 +65,9 @@ const BillingAddress = () => {
     return errors
   }
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
-    try {
-      setSubmitting(true)
-      const updatedCustomer = await patch(`${API_URL}/organizations/${slug}/customer`, {
-        address: values,
-      })
-      if (updatedCustomer.error) throw updatedCustomer.error
-      ui.setNotification({
-        category: 'success',
-        message: 'Successfully updated billing address',
-      })
-      refetchCustomer()
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to update billing address: ${error.message}`,
-      })
-    } finally {
-      setSubmitting(false)
-      setIsDirty(false)
-    }
+  const onSubmit = async (values: any) => {
+    if (!slug) return console.error('Slug is required')
+    updateCustomer({ slug, address: values })
   }
 
   return (
@@ -105,7 +94,7 @@ const BillingAddress = () => {
               validate={onValidate}
               onSubmit={onSubmit}
             >
-              {({ isSubmitting, handleReset }: any) => {
+              {({ handleReset }: any) => {
                 return (
                   <>
                     <Panel.Content className="w-3/5 space-y-2">
@@ -181,7 +170,7 @@ const BillingAddress = () => {
                         <Button
                           type="default"
                           htmlType="reset"
-                          disabled={!isDirty || isSubmitting || !canUpdateBillingAddress}
+                          disabled={!isDirty || isUpdating || !canUpdateBillingAddress}
                           onClick={() => {
                             handleReset()
                             setIsDirty(false)
@@ -192,8 +181,8 @@ const BillingAddress = () => {
                         <Button
                           type="primary"
                           htmlType="submit"
-                          loading={isSubmitting}
-                          disabled={!isDirty || isSubmitting || !canUpdateBillingAddress}
+                          loading={isUpdating}
+                          disabled={!isDirty || isUpdating || !canUpdateBillingAddress}
                         >
                           Save
                         </Button>

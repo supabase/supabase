@@ -114,6 +114,12 @@
     "link": "https://www.postgresql.org/docs/current/oldsnapshot.html"
   },
   {
+    "name": "index_advisor",
+    "comment": "optimize query performance with automatic index recommendation",
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/index_advisor"
+  },
+  {
     "name": "intarray",
     "comment": "functions, operators, and index support for 1-D arrays of integers",
     "tags": ["Utility"],
@@ -411,6 +417,6 @@
     "name": "wrappers",
     "comment": "Foreign data wrappers developed by Supabase",
     "tags": ["Admin", "Utility"],
-    "link": "/guides/database/extensions/wrappers"
+    "link": "/guides/database/extensions/wrappers/overview"
   }
 ]

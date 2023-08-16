@@ -8,16 +8,17 @@ import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { Fragment, useState } from 'react'
+import { Alert, Button, IconArrowRight, IconBell, IconInbox, Popover } from 'ui'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useNotificationsQuery } from 'data/notifications/notifications-query'
+import { useNotificationsUpdateMutation } from 'data/notifications/notifications-update-mutation'
 import { getProjectDetail } from 'data/projects/project-detail-query'
 import { setProjectPostgrestStatus } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 import { delete_, patch, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Project } from 'types'
-import { Alert, Button, IconArrowRight, IconBell, IconInbox, Popover } from 'ui'
 import NotificationRow from './NotificationRow'
 
 interface NotificationsPopoverProps {
@@ -28,34 +29,31 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
   const queryClient = useQueryClient()
   const router = useRouter()
   const { meta, ui } = useStore()
-  const { data: notifications, refetch } = useNotificationsQuery()
+  const { data: notifications } = useNotificationsQuery()
+  const { mutate: updateNotifications } = useNotificationsUpdateMutation({
+    onError: () => console.error('Failed to update notifications'),
+  })
 
   const [projectToRestart, setProjectToRestart] = useState<Project>()
   const [projectToApplyMigration, setProjectToApplyMigration] = useState<Project>()
   const [projectToRollbackMigration, setProjectToRollbackMigration] = useState<Project>()
   const [projectToFinalizeMigration, setProjectToFinalizeMigration] = useState<Project>()
-
   const [targetNotification, setTargetNotification] = useState<Notification>()
 
-  if (!notifications || !Array.isArray(notifications)) return null
-
-  const newNotifications = notifications?.filter(
-    (notification) => notification.notification_status === NotificationStatus.New
-  )
+  const newNotifications =
+    notifications?.filter(
+      (notification) => notification.notification_status === NotificationStatus.New
+    ) ?? []
   const hasNewNotifications = newNotifications.length > 0
 
   const onOpenChange = async (open: boolean) => {
-    // TODO(alaister): move this to a mutation
+    // Mark notifications as seen
     if (!open) {
-      // Mark notifications as seen
-      const notificationIds = notifications
-        .filter((notification) => notification.notification_status === NotificationStatus.New)
-        .map((notification) => notification.id)
-      if (notificationIds.length > 0) {
-        const { error } = await patch(`${API_URL}/notifications`, { ids: notificationIds })
-        if (error) console.error('Failed to update notifications', error)
-        refetch()
-      }
+      const notificationIds =
+        notifications
+          ?.filter((notification) => notification.notification_status === NotificationStatus.New)
+          .map((notification) => notification.id) ?? []
+      if (notificationIds.length > 0) updateNotifications({ ids: notificationIds })
     }
   }
 
@@ -179,6 +177,8 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
     }
     setProjectToFinalizeMigration(undefined)
   }
+
+  if (!notifications || !Array.isArray(notifications)) return null
 
   return (
     <>

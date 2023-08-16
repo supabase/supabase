@@ -225,25 +225,20 @@ export const AccordionHeader = ({
           </Badge>
         )}
         {shippable && shipped && youtube_id && (
-          <div
-            className={[
-              'hover:cursor-pointer hover:!opacity-100',
-              day === 4 ? 'animate-pulse' : '',
-            ].join(' ')}
-          >
+          <div className={['hover:cursor-pointer hover:!opacity-100'].join(' ')}>
             <ExpandableVideo
               videoId={youtube_id}
               trigger={
                 <VideoPreviewTrigger
                   title={`Watch: Day ${day}`}
-                  thumbnail={videoThumbnail ?? '/images/launchweek/8/day4/yt_d4.jpg'}
+                  thumbnail={videoThumbnail ?? '/images/launchweek/8/day5/yt_d5.jpg'}
                 />
               }
             />
           </div>
         )}
       </div>
-      {shippable && !shipped && (
+      {/* {shippable && !shipped && (
         <span className="text-sm font-normal text-[#A0A0A0] mt-1 sm:mt-0 flex items-center gap-1 md:gap-4">
           <svg
             width="17"
@@ -264,7 +259,7 @@ export const AccordionHeader = ({
 
           {day === 5 && <CountdownComponent date={publishedAt} showCard={false} />}
         </span>
-      )}
+      )} */}
     </div>
   </div>
 )
