@@ -155,14 +155,11 @@ const InfrastructureActivity = () => {
           {!isLoadingSubscription && (
             <>
               <DateRangePicker
-                id="billingCycle"
-                name="billingCycle"
                 onChange={setDateRange}
                 value={TIME_PERIODS_REPORTS[0].key}
                 options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
                 loading={isLoadingSubscription}
                 currentBillingPeriodStart={subscription?.current_period_start}
-                className="!w-[200px]"
               />
               <p className="text-sm text-scale-1000">
                 {dayjs(startDate).format('DD MMM YYYY')} - {dayjs(endDate).format('DD MMM YYYY')}

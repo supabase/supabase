@@ -44,7 +44,7 @@ const PageLayout: NextPageWithLayout = () => {
         body={
           <>
             {functions.length > 0 &&
-              functions.map((item: any) => <EdgeFunctionsListItem key={item.id} function={item} />)}
+              functions.map((item) => <EdgeFunctionsListItem key={item.id} function={item} />)}
           </>
         }
       />

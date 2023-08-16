@@ -93,6 +93,7 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
         orgSlug: slug,
         reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
         message,
+        exitAction: 'downgrade',
       })
     } finally {
     }

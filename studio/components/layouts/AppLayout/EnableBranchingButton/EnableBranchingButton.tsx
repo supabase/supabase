@@ -125,12 +125,8 @@ const EnableBranchingButton = () => {
               selectedBranch={selectedBranch}
               hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
               setSelectedBranch={setSelectedBranch}
-              onSelectConnectRepo={() => setAddConnectionType('GitHub')}
             />
-
             {/* <VercelProjectSelection integration={vercelIntegration} /> */}
-
-            {/* <Modal.Separator /> */}
           </>
         )}
 
@@ -183,12 +179,7 @@ const EnableBranchingButton = () => {
         </Modal.Content>
       </Modal>
 
-      <SidePanelGitHubRepoLinker
-        isOpen={addConnectionType === 'GitHub'}
-        projectRef={ref}
-        organizationIntegrationId={githubIntegration?.id}
-        onClose={() => setAddConnectionType(undefined)}
-      />
+      <SidePanelGitHubRepoLinker projectRef={ref} />
     </>
   )
 }

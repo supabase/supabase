@@ -1,18 +1,18 @@
-import { FC, useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { Badge, IconLoader, Toggle } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
+import { Badge, IconLoader, Toggle } from 'ui'
 
-import { useCheckPermissions, useStore } from 'hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import EnableExtensionModal from './EnableExtensionModal'
+import { useCheckPermissions, useStore } from 'hooks'
 import { isResponseOk } from 'lib/common/fetch'
+import EnableExtensionModal from './EnableExtensionModal'
 
-interface Props {
+interface ExtensionCardProps {
   extension: any
 }
 
-const ExtensionCard: FC<Props> = ({ extension }) => {
+const ExtensionCard = ({ extension }: ExtensionCardProps) => {
   const { ui, meta } = useStore()
 
   const isOn = extension.installed_version !== null

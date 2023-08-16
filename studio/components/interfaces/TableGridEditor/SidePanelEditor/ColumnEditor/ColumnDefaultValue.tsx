@@ -1,26 +1,25 @@
-import React, { FC } from 'react'
-import { isNil } from 'lodash'
-import { Select } from 'ui'
 import type { PostgresType } from '@supabase/postgres-meta'
+import { isNil, noop } from 'lodash'
+import { Select } from 'ui'
 
-import InputWithSuggestions from './InputWithSuggestions'
 import { POSTGRES_DATA_TYPES } from '../SidePanelEditor.constants'
 import { ColumnField } from '../SidePanelEditor.types'
+import { typeExpressionSuggestions } from './ColumnEditor.constants'
 import { Suggestion } from './ColumnEditor.types'
 import { getSelectedEnumValues } from './ColumnEditor.utils'
-import { typeExpressionSuggestions } from './ColumnEditor.constants'
+import InputWithSuggestions from './InputWithSuggestions'
 
-interface Props {
+interface ColumnDefaultValueProps {
   columnFields: ColumnField
   enumTypes: PostgresType[]
   onUpdateField: (changes: Partial<ColumnField>) => void
 }
 
-const ColumnDefaultValue: FC<Props> = ({
+const ColumnDefaultValue = ({
   columnFields,
   enumTypes = [],
-  onUpdateField = () => {},
-}) => {
+  onUpdateField = noop,
+}: ColumnDefaultValueProps) => {
   const suggestions: Suggestion[] = typeExpressionSuggestions?.[columnFields.format] ?? []
 
   // If selected column type is a user-defined enum, show a dropdown list of options
@@ -59,7 +58,6 @@ const ColumnDefaultValue: FC<Props> = ({
           : 'NULL'
       }
       value={columnFields?.defaultValue ?? ''}
-      format={columnFields?.format}
       suggestions={suggestions}
       suggestionsHeader="Suggested expressions"
       suggestionsTooltip="Suggested expressions"

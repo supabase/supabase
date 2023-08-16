@@ -416,6 +416,13 @@
         "type": "function"
       },
       {
+        "id": "sign-in-with-id-token",
+        "title": "Sign in with ID Token",
+        "slug": "auth-signinwithidtoken",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "sign-in-with-otp",
         "title": "Sign in a user through OTP",
         "slug": "auth-signinwithotp",

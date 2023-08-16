@@ -51,6 +51,7 @@ const OrganizationDropdown = () => {
           <div className="flex items-center space-x-2 cursor-pointer">
             <Button
               type="text"
+              className="pr-2"
               iconRight={
                 <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />
               }

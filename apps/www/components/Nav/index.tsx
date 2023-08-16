@@ -198,7 +198,7 @@ const Nav = () => {
 
   return (
     <>
-      <Announcement link="/launch-week">
+      <Announcement link="/launch-week#today">
         <LW8CountdownBanner />
       </Announcement>
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>

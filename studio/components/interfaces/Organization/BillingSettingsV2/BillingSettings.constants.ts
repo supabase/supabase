@@ -8,7 +8,7 @@ export const CANCELLATION_REASONS = [
   'Dashboard is too complicated',
   'Postgres is too complicated',
   'Problem not solved',
-  'Bug issues',
+  'Too many bugs/issues',
   'I decided to use something else',
   'My work has finished/discontinued',
   'I’m migrating to/starting a new project',

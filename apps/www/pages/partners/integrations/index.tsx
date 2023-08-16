@@ -86,8 +86,6 @@ function IntegrationPartnersPage(props: Props) {
     })
   }, [debouncedSearchTerm, router])
 
-  console.log(partners)
-
   return (
     <>
       <NextSeo

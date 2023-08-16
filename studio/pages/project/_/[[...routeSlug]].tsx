@@ -1,16 +1,13 @@
-import { FC } from 'react'
-import Link from 'next/link'
-import { NextPage } from 'next'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
+import { NextPage } from 'next'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
+import ProjectList from 'components/interfaces/Home/ProjectList'
 import { withAuth } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import ProjectList from 'components/interfaces/Home/ProjectList'
 
-interface Props {}
-
-const Header: FC<Props> = () => {
+const Header = () => {
   return (
     <div className="dark:border-dark border-b p-3">
       <div className="flex items-center space-x-2">
