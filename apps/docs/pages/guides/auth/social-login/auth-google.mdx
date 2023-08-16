@@ -291,15 +291,15 @@ Use of nonce is recommended, though optional. Make sure each nonce is generated 
 
 
 ### Important Note on Nonce Validation
-When implementing nonce validation there is a specific requirement to understand:
+Supabase Auth expects the nonce in Google's ID token to be hashed (specifically with SHA-256 and represented as a hexadecimal string).
 
-Supabase's GoTrue expects the nonce to be hashed (specifically with SHA-256, and then converted to a hexadecimal string), however Google's ID token will contain the raw value of the provided nonce.
-
-To succeed with nonce validation, you will need to provide a hashed version of the nonce to Google and the non-hashed version to the Supabase client.
+To succeed with nonce validation, you will need to provide a hashed version of the nonce to Google and the non-hashed version to the `signInWithIdToken` method.
 
 The following code snippet provides an example of how to create both versions in a web application:
 
-```
+```js
+// Adapted from https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest#converting_a_digest_to_a_hex_string
+
 import crypto from 'crypto';
 
 ...
@@ -312,13 +312,9 @@ const bytes = new Uint8Array(hash);
 const hashedNonce = Array.from(bytes)
   .map((b) => b.toString(16).padStart(2, '0')) // Convert the hash to a hexadecimal string
   .join('');
-
-// Use 'nonce' when passing to Supabase's client
-// Use 'hashedNonce' when passing to Google's authentication request
-```
-
-By following this approach, you'll ensure that the nonces are handled in a way that is compatible with both Google's and Supabase's expectations, allowing successful authentication.
-
+  
+// Use 'hashedNonce' when making the authentication request to Google
+// Use 'nonce' when invoking the supabase.auth.signInWithIdToken() method
 
 ### Configuration [#configuration-personalized-sign-in-button]
 
