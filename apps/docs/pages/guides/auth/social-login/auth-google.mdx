@@ -289,7 +289,6 @@ async function handleSignInWithGoogle(response) {
 
 Use of nonce is recommended, though optional. Make sure each nonce is generated randomly and available both in the `data-nonce` attribute as well as in the `handleSignInWithGoogle` callback function; otherwise the ID token will not be accepted.
 
-
 ### Important Note on Nonce Validation
 
 Supabase Auth expects the nonce in Google's ID token to be hashed (specifically with SHA-256 and represented as a hexadecimal string).
@@ -311,12 +310,11 @@ const encodedNonce = encoder.encode(nonce) // Encode the nonce
 const hash = await crypto.subtle.digest('SHA-256', encodedNonce) // Hash it with SHA-256
 const bytes = new Uint8Array(hash)
 const hashedNonce = Array.from(bytes)
-	.map((b) => b.toString(16).padStart(2, '0')) // Convert the hash to a hexadecimal string
-	.join('')
+  .map((b) => b.toString(16).padStart(2, '0')) // Convert the hash to a hexadecimal string
+  .join('')
 
 // Use 'hashedNonce' when making the authentication request to Google
 // Use 'nonce' when invoking the supabase.auth.signInWithIdToken() method
-
 ```
 
 ### Configuration [#configuration-personalized-sign-in-button]
