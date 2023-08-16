@@ -9,7 +9,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { Fragment, useState } from 'react'
-import { Alert, Button, IconArrowRight, IconBell, IconInbox, Popover } from 'ui'
+import { Button, IconArrowRight, IconBell, IconInbox, Popover } from 'ui'
 
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useNotificationsQuery } from 'data/notifications/notifications-query'
@@ -17,7 +17,7 @@ import { useNotificationsUpdateMutation } from 'data/notifications/notifications
 import { getProjectDetail } from 'data/projects/project-detail-query'
 import { setProjectPostgrestStatus } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
-import { delete_, patch, post } from 'lib/common/fetch'
+import { delete_, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Project } from 'types'
 import NotificationRow from './NotificationRow'
@@ -38,7 +38,6 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
   const [projectToRestart, setProjectToRestart] = useState<Project>()
   const [projectToApplyMigration, setProjectToApplyMigration] = useState<Project>()
   const [projectToRollbackMigration, setProjectToRollbackMigration] = useState<Project>()
-  const [projectToFinalizeMigration, setProjectToFinalizeMigration] = useState<Project>()
   const [targetNotification, setTargetNotification] = useState<Notification>()
 
   const newNotifications =
@@ -152,32 +151,6 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
     setProjectToRollbackMigration(undefined)
   }
 
-  const onConfirmProjectFinalizeMigration = async () => {
-    if (!projectToFinalizeMigration) return
-    const data = targetNotification?.data as PostgresqlUpgradeData
-    const { resource } = data.additional as any
-    if (!resource) return
-    const res = await patch(`${API_URL}/database/${projectToFinalizeMigration.ref}/${resource}`, {})
-    if (!res.error) {
-      const project = await getProjectDetail({ ref: projectToFinalizeMigration.ref })
-      if (project) {
-        meta.setProjectDetails(project)
-      }
-
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully finalized migration for project "${projectToFinalizeMigration.name}"`,
-      })
-    } else {
-      ui.setNotification({
-        error: res.error,
-        category: 'error',
-        message: `Failed to finalize migration: ${res.error.message}`,
-      })
-    }
-    setProjectToFinalizeMigration(undefined)
-  }
-
   if (!notifications || !Array.isArray(notifications)) return null
 
   return (
@@ -219,10 +192,6 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
                         }}
                         onSelectRollbackMigration={(project, notification) => {
                           setProjectToRollbackMigration(project)
-                          setTargetNotification(notification)
-                        }}
-                        onSelectFinalizeMigration={(project, notification) => {
-                          setProjectToFinalizeMigration(project)
                           setTargetNotification(notification)
                         }}
                       />
@@ -371,34 +340,6 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
         buttonLoadingLabel="Confirm"
         onSelectCancel={() => setProjectToRollbackMigration(undefined)}
         onSelectConfirm={onConfirmProjectRollbackMigration}
-      />
-      <ConfirmModal
-        danger
-        size="small"
-        visible={projectToFinalizeMigration !== undefined}
-        title={`Finalize schema migration for "${projectToFinalizeMigration?.name}"`}
-        // @ts-ignore
-        description={
-          <div className="text-scale-1200 space-y-4">
-            <Alert withIcon variant="warning" title="This action canot be undone" />
-            <div className="space-y-1">
-              <p>The following schema migration will be finalized for the project</p>
-              <ol className="list-disc pl-6">
-                <li>
-                  <div className="flex items-center space-x-1">
-                    <p>{(targetNotification?.data as any)?.additional?.name}</p>
-                    <IconArrowRight size={12} strokeWidth={2} />
-                    <p>{(targetNotification?.data as any)?.additional?.version_to}</p>
-                  </div>
-                </li>
-              </ol>
-            </div>
-          </div>
-        }
-        buttonLabel="Confirm"
-        buttonLoadingLabel="Confirm"
-        onSelectCancel={() => setProjectToFinalizeMigration(undefined)}
-        onSelectConfirm={onConfirmProjectFinalizeMigration}
       />
     </>
   )
