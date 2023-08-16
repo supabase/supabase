@@ -203,7 +203,7 @@ const genCrossJoinUnnests = (table: LogsTableName) => {
   cross join unnest(m.request) as request`
 
     default:
-      return ""
+      return ''
   }
 }
 
@@ -267,17 +267,11 @@ export const genChartQuery = (
   const [startOffset, trunc] = calcChartStart(params)
   const where = genWhereStatement(table, filters)
 
-  let joins = 'cross join unnest(t.metadata) as metadata'
-  if (table === LogsTableName.EDGE || table === LogsTableName.FN_EDGE) {
-    joins += ' \n  cross join unnest(metadata.request) as request'
-    joins += ' \n  cross join unnest(metadata.response) as response'
-  } else if (table === LogsTableName.POSTGRES) {
-    joins += ' \n  cross join unnest(metadata.parsed) as parsed'
-  }
+  let joins = genCrossJoinUnnests(table)
 
   return `
 SELECT
--- event-chart
+-- log-event-chart
   timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
   count(t.timestamp) as count
 FROM
