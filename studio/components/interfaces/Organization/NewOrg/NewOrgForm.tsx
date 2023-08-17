@@ -1,7 +1,16 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Button, IconEdit2, IconInfo, Input, Listbox } from 'ui'
+import {
+  Button,
+  IconEdit2,
+  IconExternalLink,
+  IconHelpCircle,
+  IconInfo,
+  Input,
+  Listbox,
+  Toggle,
+} from 'ui'
 
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import type { PaymentMethod } from '@stripe/stripe-js'
@@ -9,9 +18,12 @@ import InformationBox from 'components/ui/InformationBox'
 import Panel from 'components/ui/Panel'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
+import { isResponseOk, post } from 'lib/common/fetch'
 import { API_URL, BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
+import Link from 'next/link'
+import { SpendCapModal } from 'components/interfaces/BillingV2'
+import { Organization } from 'types'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -54,6 +66,9 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
 
   const [dbPricingTierKey, setDbPricingTierKey] = useState('FREE')
 
+  const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
+  const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(true)
+
   function validateOrgName(name: any) {
     const value = name ? name.trim() : ''
     return value.length >= 1
@@ -76,13 +91,15 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   }
 
   async function createOrg(paymentMethodId?: string) {
-    const response = await post(
+    const dbTier = dbPricingTierKey === 'PRO' && !isSpendCapEnabled ? 'PAYG' : dbPricingTierKey
+
+    const response = await post<Organization>(
       `${API_URL}/organizations`,
       {
         name: orgName,
         kind: orgKind,
         payment_method: paymentMethodId,
-        tier: 'tier_' + dbPricingTierKey.toLowerCase(),
+        tier: 'tier_' + dbTier.toLowerCase(),
         ...(orgKind == 'COMPANY' ? { size: orgSize } : {}),
       },
       // Call new V2 endpoint from API
@@ -93,8 +110,9 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
       }
     )
 
-    if (response.error) {
+    if (!isResponseOk(response)) {
       ui.setNotification({
+        error: response.error,
         category: 'error',
         message: `Failed to create organization: ${response.error?.message ?? response.error}`,
       })
@@ -185,25 +203,6 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
             </div>
           }
         >
-          <Panel.Content>
-            <InformationBox
-              icon={<IconInfo size="large" strokeWidth={1.5} />}
-              defaultVisibility={true}
-              hideCollapse
-              title="Billed via organization"
-              description={
-                <div className="space-y-3">
-                  <p className="text-sm leading-normal">
-                    This is heavy Work-In-Progress and not customer facing yet, use with caution!
-                    This organization will use the new org level billing, instead of having
-                    individual subscriptions per project. There are still a lot of open ends that
-                    may be restrictive for you, follow #team-billing for updates.
-                  </p>
-                </div>
-              }
-            />
-          </Panel.Content>
-
           <Panel.Content className="pt-0">
             <p className="text-sm">This is your organization within Supabase.</p>
             <p className="text-sm text-scale-1100">
@@ -294,6 +293,45 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
             </Listbox>
           </Panel.Content>
 
+          {dbPricingTierKey === 'PRO' && (
+            <>
+              <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <Toggle
+                  id="spend-cap"
+                  layout="horizontal"
+                  label={
+                    <div className="flex space-x-4">
+                      <span>Spend Cap</span>
+                      <IconHelpCircle
+                        size={16}
+                        strokeWidth={1.5}
+                        className="transition opacity-50 cursor-pointer hover:opacity-100"
+                        onClick={() => setShowSpendCapHelperModal(true)}
+                      />
+                    </div>
+                  }
+                  checked={isSpendCapEnabled}
+                  onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
+                  descriptionText={
+                    <div>
+                      <p>
+                        By default, Pro plan organizations have a spend cap to control costs. When
+                        enabled, usage is limited to the plan's quota, with restrictions when limits
+                        are exceeded. To scale beyond Pro limits without restrictions, disable the
+                        spend cap and pay for over-usage beyond the quota.
+                      </p>
+                    </div>
+                  }
+                />
+              </Panel.Content>
+
+              <SpendCapModal
+                visible={showSpendCapHelperModal}
+                onHide={() => setShowSpendCapHelperModal(false)}
+              />
+            </>
+          )}
+
           {dbPricingTierKey !== 'FREE' && (
             <Panel.Content>
               {paymentMethod?.card !== undefined ? (
@@ -331,6 +369,33 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
               )}
             </Panel.Content>
           )}
+
+          <Panel.Content>
+            <InformationBox
+              icon={<IconInfo size="large" strokeWidth={1.5} />}
+              defaultVisibility={true}
+              hideCollapse
+              title="Billed via organization"
+              description={
+                <div className="space-y-3">
+                  <p className="text-sm leading-normal">
+                    This organization will use the new organization level billing, which gives you a
+                    single subscription for your entire organization, instead of having individual
+                    subscriptions per project.{' '}
+                  </p>
+                  <div>
+                    <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
+                      <a target="_blank" rel="noreferrer">
+                        <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                          Documentation
+                        </Button>
+                      </a>
+                    </Link>
+                  </div>
+                </div>
+              }
+            />
+          </Panel.Content>
         </Panel>
       </form>
     </>

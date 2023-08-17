@@ -8,11 +8,12 @@ import { useParams } from 'common'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { Button, IconPauseCircle, Modal } from 'ui'
 import { useProjectContext } from './ProjectContext'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 export interface ProjectPausedStateProps {
   product?: string
@@ -25,8 +26,10 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const selectedOrganization = useSelectedOrganization()
   const { project } = useProjectContext()
   const orgSlug = selectedOrganization?.slug
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: ref })
+  const isFreePlan = subscription?.plan?.id === 'free'
+  const billedViaOrg = Boolean(selectedOrganization?.subscription_id)
 
-  const kpsEnabled = useFlag('initWithKps')
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug: orgSlug })
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
@@ -57,9 +60,18 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
       })
     }
 
-    await post(`${API_URL}/projects/${project.ref}/restore`, { kps_enabled: kpsEnabled })
-    setProjectStatus(queryClient, project.ref, PROJECT_STATUS.RESTORING)
-    ui.setNotification({ category: 'success', message: 'Restoring project' })
+    const { error } = await post(`${API_URL}/projects/${project.ref}/restore`, {})
+
+    if (error) {
+      ui.setNotification({
+        category: 'error',
+        error,
+        message: `Failed to restore project: ${error.message}`,
+      })
+    } else {
+      setProjectStatus(queryClient, project.ref, PROJECT_STATUS.RESTORING)
+      ui.setNotification({ category: 'success', message: 'Restoring project' })
+    }
   }
 
   return (
@@ -82,12 +94,17 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   {product !== undefined ? (
                     <>
                       Restore this project to access the{' '}
-                      <span className="text-brand-900">{product}</span> page
+                      <span className="text-brand">{product}</span> page
                     </>
                   ) : (
                     'Restore this project and get back to building the next big thing!'
                   )}
                 </p>
+                {isFreePlan && (
+                  <p className="text-sm text-scale-1100 text-center">
+                    You can also prevent project pausing in the future by upgrading to Pro.
+                  </p>
+                )}
               </div>
 
               <div className="flex items-center justify-center gap-4">
@@ -120,11 +137,25 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     </Tooltip.Portal>
                   )}
                 </Tooltip.Root>
-                <Link href={`/project/${ref}/settings/general`}>
-                  <a>
-                    <Button type="default">View project settings</Button>
-                  </a>
-                </Link>
+                {isFreePlan ? (
+                  <Link
+                    href={
+                      billedViaOrg
+                        ? `/org/${orgSlug}/billing?panel=subscriptionPlan`
+                        : `/project/${ref}/settings/billing/subscription?panel=subscriptionPlan`
+                    }
+                  >
+                    <a>
+                      <Button type="default">Upgrade to Pro</Button>
+                    </a>
+                  </Link>
+                ) : (
+                  <Link href={`/project/${ref}/settings/general`}>
+                    <a>
+                      <Button type="default">View project settings</Button>
+                    </a>
+                  </Link>
+                )}
               </div>
             </div>
           </div>

@@ -18,6 +18,7 @@ import { makeRandomString } from 'lib/helpers'
 import { Organization, Project, ResponseError } from 'types'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
+import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 
 export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string
@@ -124,14 +125,14 @@ const OrganizationProjects = ({
           {isErrorPermissions ? (
             <div className="col-span-3">
               <AlertError
-                subject="Unable to retrieve permissions for your account"
+                subject="Failed to retrieve permissions for your account"
                 error={permissionsError}
               />
             </div>
           ) : isErrorProjects ? (
             <div className="col-span-3">
               <AlertError
-                subject={`Unable to retrieve projects under ${name}`}
+                subject={`Failed to retrieve projects under ${name}`}
                 error={projectsError}
               />
             </div>

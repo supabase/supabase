@@ -1,19 +1,20 @@
-import { FC, useState } from 'react'
-import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Button, Input, Toggle, IconSearch, IconAlertCircle } from 'ui'
+import { noop } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
+import { Button, IconAlertCircle, IconSearch, Input, Toggle } from 'ui'
 
-import { useCheckPermissions, useStore } from 'hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import Table from 'components/to-be-cleaned/Table'
-import NoSearchResults from 'components/ui/NoSearchResults'
 import InformationBox from 'components/ui/InformationBox'
+import NoSearchResults from 'components/ui/NoSearchResults'
+import { useCheckPermissions, useStore } from 'hooks'
 
-interface Props {
+interface PublicationsListProps {
   onSelectPublication: (id: number) => void
 }
 
-const PublicationsList: FC<Props> = ({ onSelectPublication = () => {} }) => {
+const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps) => {
   const { ui, meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
 

@@ -1,8 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { put } from 'lib/common/fetch'
+import { isResponseOk, put } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { toast } from 'react-hot-toast'
+import { ResponseError } from 'types/base'
 import { subscriptionKeys } from './keys'
-import { SupaResponseV2 } from 'types/base'
 
 export type SubscriptionTier =
   | 'tier_free'
@@ -28,11 +29,11 @@ export async function updateOrgSubscription({
   const payload: { tier: string; payment_method?: string } = { tier }
   if (paymentMethod !== undefined) payload.payment_method = paymentMethod
 
-  const response = (await put(
-    `${API_URL}/organizations/${slug}/billing/subscription`,
-    payload
-  )) as SupaResponseV2<void>
-  if (typeof response === 'object' && response !== null && 'error' in response) throw response.error
+  const response = await put<void>(`${API_URL}/organizations/${slug}/billing/subscription`, payload)
+  if (!isResponseOk(response)) {
+    throw response.error
+  }
+
   return response
 }
 
@@ -40,20 +41,28 @@ type OrgSubscriptionUpdateData = Awaited<ReturnType<typeof updateOrgSubscription
 
 export const useOrgSubscriptionUpdateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<OrgSubscriptionUpdateData, unknown, OrgSubscriptionUpdateVariables>,
+  UseMutationOptions<OrgSubscriptionUpdateData, ResponseError, OrgSubscriptionUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OrgSubscriptionUpdateData, unknown, OrgSubscriptionUpdateVariables>(
+  return useMutation<OrgSubscriptionUpdateData, ResponseError, OrgSubscriptionUpdateVariables>(
     (vars) => updateOrgSubscription(vars),
     {
       async onSuccess(data, variables, context) {
         const { slug } = variables
         await queryClient.invalidateQueries(subscriptionKeys.orgSubscription(slug))
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to update subscription: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

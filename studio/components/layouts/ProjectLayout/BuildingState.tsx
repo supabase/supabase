@@ -3,7 +3,7 @@ import ClientLibrary from 'components/interfaces/Home/ClientLibrary'
 import ExampleProject from 'components/interfaces/Home/ExampleProject'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import Link from 'next/link'
-import { FC, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Badge, Button, IconArrowRight, IconLoader } from 'ui'
 
 import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
@@ -55,8 +55,8 @@ const BuildingState = ({ project }: BuildingStateProps) => {
               <div className="flex items-center gap-2">
                 <IconLoader className="animate-spin" size={12} />
                 <span>
-                  {project.status === PROJECT_STATUS.RESTORING
-                    ? 'Restoring project'
+                  {project.status === PROJECT_STATUS.UNKNOWN
+                    ? 'Initiating project set up'
                     : 'Setting up project'}
                 </span>
               </div>
@@ -82,7 +82,7 @@ const BuildingState = ({ project }: BuildingStateProps) => {
                       Browse the Supabase{' '}
                       <Link href="https://supabase.com/docs">
                         <a
-                          className="mb-0 text-brand-900 transition-colors hover:text-brand-1200"
+                          className="mb-0 text-brand transition-colors hover:text-brand-600"
                           target="_blank"
                           rel="noreferrer"
                         >

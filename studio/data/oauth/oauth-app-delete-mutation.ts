@@ -1,6 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { delete_ } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
+import { ResponseError } from 'types'
 import { oauthAppKeys } from './keys'
 
 export type OAuthAppDeleteVariables = {
@@ -23,20 +26,28 @@ type OAuthAppDeleteData = Awaited<ReturnType<typeof deleteOAuthApp>>
 
 export const useOAuthAppDeleteMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<OAuthAppDeleteData, unknown, OAuthAppDeleteVariables>,
+  UseMutationOptions<OAuthAppDeleteData, ResponseError, OAuthAppDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OAuthAppDeleteData, unknown, OAuthAppDeleteVariables>(
+  return useMutation<OAuthAppDeleteData, ResponseError, OAuthAppDeleteVariables>(
     (vars) => deleteOAuthApp(vars),
     {
       async onSuccess(data, variables, context) {
         const { slug } = variables
         await queryClient.invalidateQueries(oauthAppKeys.oauthApps(slug))
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to delete application: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

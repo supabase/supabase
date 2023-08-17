@@ -1,10 +1,9 @@
-import Link from 'next/link'
-import { useState, useEffect } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconDownload, Toggle, IconLoader, Alert, IconExternalLink } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { Alert, Button, IconDownload, IconExternalLink, IconLoader, Toggle } from 'ui'
 
-import { useCheckPermissions, useStore, useFlag } from 'hooks'
 import { useParams } from 'common/hooks'
 import {
   FormHeader,
@@ -16,12 +15,12 @@ import {
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
+import { useCheckPermissions, useFlag, useStore } from 'hooks'
 
 const SSLConfiguration = () => {
   const { ui } = useStore()
   const { ref } = useParams()
   const [isEnforced, setIsEnforced] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const sslEnforcement = useFlag('sslEnforcement')
 
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
@@ -32,9 +31,30 @@ const SSLConfiguration = () => {
   } = useSSLEnforcementQuery({
     projectRef: ref,
   })
-  const { mutateAsync: updateSSLEnforcement } = useSSLEnforcementUpdateMutation()
+  const { mutate: updateSSLEnforcement, isLoading: isSubmitting } = useSSLEnforcementUpdateMutation(
+    {
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: 'Successfully updated SSL configuration',
+        })
+      },
+      onError: (error) => {
+        setIsEnforced(initialIsEnforced)
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to update SSL enforcement: ${error.message}`,
+        })
+      },
+    }
+  )
 
   const canUpdateSSLEnforcement = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const initialIsEnforced = isSuccess
+    ? sslEnforcementConfiguration.appliedSuccessfully &&
+      sslEnforcementConfiguration.currentConfig.database
+    : false
 
   const hasAccessToSSLEnforcement = !sslEnforcementConfiguration?.isNotAllowed
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
@@ -44,33 +64,14 @@ const SSLConfiguration = () => {
 
   useEffect(() => {
     if (!isLoading && sslEnforcementConfiguration) {
-      setIsEnforced(
-        sslEnforcementConfiguration.appliedSuccessfully &&
-          sslEnforcementConfiguration.currentConfig.database
-      )
+      setIsEnforced(initialIsEnforced)
     }
   }, [isLoading])
 
   const toggleSSLEnforcement = async () => {
     if (!ref) return console.error('Project ref is required')
-
     setIsEnforced(!isEnforced)
-    setIsSubmitting(true)
-
-    try {
-      await updateSSLEnforcement({
-        projectRef: ref,
-        requestedConfig: { database: !isEnforced },
-      })
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to update SSL enforcement: ${error.message}`,
-      })
-      setIsEnforced(isEnforced)
-    } finally {
-      setIsSubmitting(false)
-    }
+    updateSSLEnforcement({ projectRef: ref, requestedConfig: { database: !isEnforced } })
   }
 
   return (

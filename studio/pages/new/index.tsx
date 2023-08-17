@@ -79,6 +79,7 @@ const Wizard: NextPageWithLayout = () => {
     if (response.error) {
       setNewOrgLoading(false)
       ui.setNotification({
+        error: response.error,
         category: 'error',
         message: `Failed to create organization: ${response.error?.message ?? response.error}`,
       })

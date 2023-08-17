@@ -34,8 +34,8 @@ const HooksPage: NextPageWithLayout = () => {
   const canCreateWebhooks = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   useEffect(() => {
-    if (project?.ref) meta.hooks.load()
-  }, [project?.ref])
+    if (ui.selectedProjectRef) meta.hooks.load()
+  }, [ui.selectedProjectRef])
 
   const enableHooksForProject = async () => {
     const res = await post(`${API_URL}/database/${ref}/hook-enable`, {})

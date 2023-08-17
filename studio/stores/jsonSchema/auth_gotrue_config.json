@@ -157,6 +157,18 @@
       "title": "Facebook secret",
       "type": "string"
     },
+    "EXTERNAL_FIGMA_ENABLED": {
+      "title": "Figma enabled",
+      "type": "boolean"
+    },
+    "EXTERNAL_FIGMA_CLIENT_ID": {
+      "title": "Figma client ID",
+      "type": "string"
+    },
+    "EXTERNAL_FIGMA_SECRET": {
+      "title": "Figma secret",
+      "type": "string"
+    },
     "EXTERNAL_GITHUB_ENABLED": {
       "title": "GitHub enabled",
       "type": "boolean"

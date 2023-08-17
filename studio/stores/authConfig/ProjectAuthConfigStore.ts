@@ -60,13 +60,10 @@ export default class ProjectAuthConfigStore implements IProjectAuthConfigStore {
   }
 
   async fetchData() {
-    const headers = {
-      'Content-Type': 'application/json',
-    }
+    const headers = { 'Content-Type': 'application/json' }
     const response = await get(this.baseUrl, { headers })
-    if (response.error) {
-      throw response.error
-    }
+
+    if (response.error) throw response.error
     this.data = response
     return response
   }
@@ -80,7 +77,6 @@ export default class ProjectAuthConfigStore implements IProjectAuthConfigStore {
       this.state = LOADED
       return this.data
     } catch (e: any) {
-      console.error('Failed to load auth config', e.message)
       this.error = e
       this.state = ERROR
     }

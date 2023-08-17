@@ -37,7 +37,7 @@ supabase.auth.signInWithOAuth({
 })
 ```
 
-This call takes the user to Google's consent screen. When the flow ends, the user's profile information is exchanegd and validated with Supabase Auth before it redirects back to your web application with an access and refresh token representing the user's session.
+This call takes the user to Google's consent screen. When the flow ends, the user's profile information is exchanged and validated with Supabase Auth before it redirects back to your web application with an access and refresh token representing the user's session.
 
 You can additionally extract the `provider_token` from the session (on initial login only) which is the OAuth 2.0 access token issued by Google that grants your application access to the Google services for the authenticated users. Please store this token in local storage, cookies or in your database or server.
 
@@ -55,7 +55,7 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 })
 ```
 
-### Configuration
+### Configuration [#configuration-web]
 
 To use the OAuth 2.0 flow, you will require the following information:
 
@@ -72,76 +72,87 @@ When the user provides consent, Google issues an identity token (commonly abbrev
 If you are building a Flutter app, you can use [flutter_appauth](https://pub.dev/packages/flutter_appauth) package to sign a user into your Supabase project:
 
 ````dart
+import 'dart:convert';
+import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-// Generate a random string
-final rawNonce = generateRandomString();
-final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
-
-// Your registered Google client ID here.
-// This will be different for iOS and Android
-const clientId = 'YOUR_GOODLE_CLIENT_ID';
-
-// bundle ID for iOS, package name for Android here
-final packageName = 'io.supabase.example';
-
-/// fixed for google login
-final redirectUrl = '$packageName:/google_auth';
-
-/// fixed for google login
-const discoveryUrl =
-    'https://accounts.google.com/.well-known/openid-configuration';
-
-final appAuth = FlutterAppAuth();
-
-// authorize the user by opening the concent page
-final result = await appAuth.authorize(
-  AuthorizationRequest(
-    clientId,
-    redirectUrl,
-    discoveryUrl: discoveryUrl,
-    nonce: hashedNonce,
-    scopes: [
-      'openid',
-      'email',
-    ],
-  ),
-);
-
-if (result == null) {
-  throw AuthException(
-      'Could not find AuthorizationResponse after authorizing');
+/// Function to generate a random 16 character string.
+String _generateRandomString() {
+  final random = Random.secure();
+  return base64Url.encode(List<int>.generate(16, (_) => random.nextInt(256)));
 }
 
-// Request the access and id token to google
-final tokenResponse = await appAuth.token(
-  TokenRequest(
-    clientId,
-    redirectUrl,
-    authorizationCode: result.authorizationCode,
-    discoveryUrl: discoveryUrl,
-    codeVerifier: result.codeVerifier,
-    nonce: result.nonce,
-    scopes: [
-      'openid',
-      'email',
-    ],
-  ),
-);
+Future<AuthResponse> signInWithGoogle() {
+  // Just a random string
+  final rawNonce = _generateRandomString();
+  final hashedNonce =
+      sha256.convert(utf8.encode(rawNonce)).toString();
 
-final idToken = tokenResponse?.idToken;
+  /// TODO: update the client ID with your own
+  ///
+  /// Client ID that you registered with Google Cloud.
+  /// You will have two different values for iOS and Android.
+  const clientId = 'YOUR_CLIENT_ID_HERE';
 
-if (idToken == null) {
-  throw AuthException('Could not find idToken from the token response');
+  /// reverse DNS form of the client ID + `:/` is set as the redirect URL
+  final redirectUrl = '${clientId.split('.').reversed.join('.')}:/';
+
+  /// Fixed value for google login
+  const discoveryUrl =
+      'https://accounts.google.com/.well-known/openid-configuration';
+
+  final appAuth = FlutterAppAuth();
+
+  // authorize the user by opening the consent page
+  final result = await appAuth.authorize(
+    AuthorizationRequest(
+      clientId,
+      redirectUrl,
+      discoveryUrl: discoveryUrl,
+      nonce: hashedNonce,
+      scopes: [
+        'openid',
+        'email',
+      ],
+    ),
+  );
+
+  if (result == null) {
+    throw 'Could not find AuthorizationResponse after authorizing';
+  }
+
+  // Request the access and id token to google
+  final tokenResult = await appAuth.token(
+    TokenRequest(
+      clientId,
+      redirectUrl,
+      authorizationCode: result.authorizationCode,
+      discoveryUrl: discoveryUrl,
+      codeVerifier: result.codeVerifier,
+      nonce: result.nonce,
+      scopes: [
+        'openid',
+        'email',
+      ],
+    ),
+  );
+
+  final idToken = tokenResult?.idToken;
+
+  if (idToken == null) {
+    throw 'Could not find idToken from the token response';
+  }
+
+  return supabase.auth.signInWithIdToken(
+    provider: Provider.google,
+    idToken: idToken,
+    accessToken: tokenResponse?.accessToken,
+    nonce: rawNonce,
+  );
 }
-
-await signInWithIdToken(
-  provider: Provider.google,
-  idToken: idToken,
-  accessToken: tokenResponse?.accessToken,
-  nonce: rawNonce,
-);```
+```
 
 In the Supabase JavaScript library, which you can use with web-based native frameworks like React Native or Expo, you can invoke this functionality like so:
 
@@ -159,7 +170,7 @@ Please take a look at these open-source projects which may help you obtain an ID
 
 For apps written in Kotlin, please consult the [community maintained library](/docs/reference/kotlin/introduction).
 
-### Configuration
+### Configuration [#configuration-native-app]
 
 1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Android_ or _iOS_ depending on the mobile operating system your app is built for.
 
@@ -222,7 +233,7 @@ chrome.identity.launchWebAuthFlow(
 )
 ```
 
-### Configuration
+### Configuration [#configuration-chrome-extension]
 
 You will need to configure a client ID for your Chrome extension:
 
@@ -278,13 +289,13 @@ async function handleSignInWithGoogle(response) {
 
 Use of nonce is recommended, though optional. Make sure each nonce is generated randomly and available both in the `data-nonce` attribute as well as in the `handleSignInWithGoogle` callback function; otherwise the ID token will not be accepted.
 
-### Configuration
+### Configuration [#configuration-personalized-sign-in-button]
 
 1. Obtain OAuth credentials for your Google Cloud project in the [Credentials](https://console.developers.google.com/apis/credentials) page of the console. When creating a new credential, choose _Web application_. As you're using the Google sign in button, you should configure the _Authorized JavaScript origins_ and _Authorized redirect URIs_ to the website where the buttons appear. You should not use your Supabase project domain name. For this use case, the client secret provided is not needed and can be ignored.
 2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
 3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Authorized Client IDs_.
 
-Note that you do not have to configure the OAuth flow client ID and secret in the Supabae Dashboard when using this approach!
+Note that you do not have to configure the OAuth flow client ID and secret in the Supabase Dashboard when using this approach!
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

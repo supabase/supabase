@@ -67,7 +67,7 @@ const ProjectUpgradeAlert = () => {
   return (
     <>
       <Alert
-        icon={<IconPackage className="text-brand-900" strokeWidth={1.5} />}
+        icon={<IconPackage className="text-brand" strokeWidth={1.5} />}
         variant="success"
         title="Your project can be upgraded to the latest version of Postgres"
       >
@@ -114,7 +114,7 @@ const ProjectUpgradeAlert = () => {
                                       <p className="flex items-center space-x-1">
                                         <span>This update has breaking changes. Read more </span>
                                         <Link href={change.url}>
-                                          <a className="text-brand-900 opacity-90 flex items-center space-x-1">
+                                          <a className="text-brand opacity-90 flex items-center space-x-1">
                                             <span>here</span>
                                             <IconExternalLink size="tiny" strokeWidth={2} />
                                           </a>

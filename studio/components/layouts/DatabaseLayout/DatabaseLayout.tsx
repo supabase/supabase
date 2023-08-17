@@ -28,6 +28,7 @@ const DatabaseLayout = ({ title, children }: PropsWithChildren<DatabaseLayoutPro
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
   const foreignDataWrappersEnabled = useFlag('foreignDataWrappers')
   const pgNetExtensionExists = meta.extensions.byId('pg_net') !== undefined
+  const schemaVisualizerEnabled = useFlag('schemaVisualizer')
 
   const isLoading = isSchemasLoading || (isVaultEnabled && isVaultLoading)
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
@@ -78,7 +79,11 @@ const DatabaseLayout = ({ title, children }: PropsWithChildren<DatabaseLayoutPro
       productMenu={
         <ProductMenu
           page={page}
-          menu={generateDatabaseMenu(project, foreignDataWrappersEnabled, pgNetExtensionExists)}
+          menu={generateDatabaseMenu(project, {
+            foreignDataWrappersEnabled,
+            pgNetExtensionExists,
+            schemaVisualizerEnabled,
+          })}
         />
       }
     >

@@ -1,6 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { ResponseError } from 'types'
 import { storageKeys } from './keys'
 
 export type BucketCreateVariables = {
@@ -35,20 +38,28 @@ type BucketCreateData = Awaited<ReturnType<typeof createBucket>>
 
 export const useBucketCreateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<BucketCreateData, unknown, BucketCreateVariables>,
+  UseMutationOptions<BucketCreateData, ResponseError, BucketCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<BucketCreateData, unknown, BucketCreateVariables>(
+  return useMutation<BucketCreateData, ResponseError, BucketCreateVariables>(
     (vars) => createBucket(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
         await queryClient.invalidateQueries(storageKeys.buckets(projectRef))
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to create bucket: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

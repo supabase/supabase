@@ -26,7 +26,7 @@ test('can display log data', async () => {
   await screen.findByText(/something_value/)
 
   // render copy button
-  userEvent.click(await screen.findByText(/Copy/))
+  userEvent.click(await screen.findByText('Copy'))
   await screen.findByText(/Copied/)
 })
 

@@ -1,4 +1,4 @@
-import { GeneralSettings } from 'components/interfaces/Organization'
+import { GeneralSettings as GeneralSettingsLegacy } from 'components/interfaces/Organization'
 import { OrganizationLayout } from 'components/layouts'
 import Loading from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
@@ -14,7 +14,7 @@ const OrgGeneralSettings: NextPageWithLayout = () => {
       {selectedOrganization === undefined && isLoadingPermissions ? (
         <Loading />
       ) : (
-        <GeneralSettings />
+        <GeneralSettingsLegacy />
       )}
     </>
   )

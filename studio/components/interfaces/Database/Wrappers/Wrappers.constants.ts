@@ -9,7 +9,7 @@ export const WRAPPERS: WrapperMeta[] = [
     icon: `${BASE_PATH}/img/icons/stripe-icon.svg`,
     extensionName: 'StripeFdw',
     label: 'Stripe',
-    docsUrl: 'https://supabase.github.io/wrappers/stripe/',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/stripe',
     server: {
       options: [
         {
@@ -421,7 +421,7 @@ export const WRAPPERS: WrapperMeta[] = [
     icon: `${BASE_PATH}/img/icons/firebase-icon.svg`,
     extensionName: 'FirebaseFdw',
     label: 'Firebase',
-    docsUrl: 'https://supabase.github.io/wrappers/firebase/',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/firebase',
     server: {
       options: [
         {
@@ -556,7 +556,7 @@ export const WRAPPERS: WrapperMeta[] = [
     icon: `${BASE_PATH}/img/icons/s3-icon.svg`,
     extensionName: 'S3Fdw',
     label: 'S3',
-    docsUrl: 'https://supabase.github.io/wrappers/s3/',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/s3',
     server: {
       options: [
         {
@@ -639,7 +639,7 @@ export const WRAPPERS: WrapperMeta[] = [
     icon: `${BASE_PATH}/img/icons/clickhouse-icon.svg`,
     extensionName: 'ClickHouseFdw',
     label: 'ClickHouse',
-    docsUrl: 'https://supabase.github.io/wrappers/clickhouse/',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/clickhouse',
     server: {
       options: [
         {
@@ -683,7 +683,7 @@ export const WRAPPERS: WrapperMeta[] = [
     icon: `${BASE_PATH}/img/icons/bigquery-icon.svg`,
     extensionName: 'BigQueryFdw',
     label: 'BigQuery',
-    docsUrl: 'https://supabase.github.io/wrappers/bigquery/',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/bigquery',
     server: {
       options: [
         {
@@ -744,6 +744,84 @@ export const WRAPPERS: WrapperMeta[] = [
             defaultValue: 'id',
             editable: true,
             required: false,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  // Commented out until the airtable is available in the postgres image
+  // {
+  //   name: 'airtable_wrapper',
+  //   handlerName: 'airtable_fdw_handler',
+  //   validatorName: 'airtable_fdw_validator',
+  //   icon: `${BASE_PATH}/img/icons/airtable-icon.svg`,
+  //   extensionName: 'airtableFdw',
+  //   label: 'Airtable',
+  //   docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/airtable',
+  //   server: {
+  //     options: [
+  //       {
+  //         name: 'api_key_id',
+  //         label: 'API Key ID',
+  //         required: true,
+  //         encrypted: true,
+  //         hidden: true,
+  //       },
+  //     ],
+  //   },
+  //   tables: [
+  //     {
+  //       label: 'Airtable Table',
+  //       description: 'Map to an Airtable Table',
+  //       options: [
+  //         {
+  //           name: 'base_id',
+  //           label: 'Base ID',
+  //           editable: true,
+  //           required: true,
+  //           type: 'text',
+  //         },
+  //         {
+  //           name: 'table_id',
+  //           label: 'Table ID',
+  //           editable: true,
+  //           required: true,
+  //           type: 'text',
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // },
+  {
+    name: 'logflare_wrapper',
+    handlerName: 'logflare_fdw_handler',
+    validatorName: 'logflare_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/logflare-icon.svg`,
+    extensionName: 'logflareFdw',
+    label: 'Logflare',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/logflare',
+    server: {
+      options: [
+        {
+          name: 'api_key_id',
+          label: 'API Key ID',
+          required: true,
+          encrypted: true,
+          hidden: true,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Logflare Table',
+        description: 'Map to a Logflare Table',
+        options: [
+          {
+            name: 'endpoint',
+            label: 'Endpoint',
+            editable: true,
+            required: true,
             type: 'text',
           },
         ],

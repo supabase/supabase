@@ -74,7 +74,7 @@ const UpgradingState = () => {
             {isCompleted ? (
               <div className="grid gap-4">
                 <div className="relative mx-auto max-w-[300px]">
-                  <IconCheckCircle className="text-brand-900" size={40} strokeWidth={1.5} />
+                  <IconCheckCircle className="text-brand" size={40} strokeWidth={1.5} />
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">Upgrade completed!</p>
@@ -176,7 +176,7 @@ const UpgradingState = () => {
                                 />
                               </div>
                             ) : isCompleted ? (
-                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand-800 border-brand-700">
+                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand-300 border-brand-400">
                                 <IconCheck size={12} className="text-white" strokeWidth={2} />
                               </div>
                             ) : (

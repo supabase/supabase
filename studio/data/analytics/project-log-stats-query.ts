@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
+import { get, isResponseOk } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { analyticsKeys } from './keys'
@@ -31,17 +31,17 @@ export async function getProjectLogStats(
     throw new Error('interval is required')
   }
 
-  const response = await get(
+  const response = await get<ProjectLogStatsResponse>(
     `${API_URL}/projects/${projectRef}/analytics/endpoints/usage.api-counts?interval=${interval}`,
     {
       signal,
     }
   )
-  if (response.error) {
+  if (!isResponseOk(response)) {
     throw response.error
   }
 
-  return response as ProjectLogStatsResponse
+  return response
 }
 
 export type ProjectLogStatsData = Awaited<ReturnType<typeof getProjectLogStats>>
