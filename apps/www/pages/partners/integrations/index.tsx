@@ -37,7 +37,7 @@ function IntegrationPartnersPage(props: Props) {
   const { partners: initialPartners } = props
   const [partners, setPartners] = useState(initialPartners)
 
-  const allCategories = Array.from(new Set(initialPartners.map((p) => p.category)))
+  const allCategories = Array.from(new Set(initialPartners?.map((p) => p.category)))
 
   const router = useRouter()
 
@@ -213,7 +213,7 @@ function IntegrationPartnersPage(props: Props) {
             <div className="lg:col-span-8 xl:col-span-9">
               {/* Partner Tiles */}
               <div className="grid space-y-10">
-                {partners.length ? (
+                {partners?.length ? (
                   <TileGrid partners={partners} />
                 ) : (
                   <h2 className="h2">No Partners Found</h2>
