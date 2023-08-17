@@ -1,17 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button, Form, Input, Modal } from 'ui'
 
-import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useOrganizationDeleteMutation } from 'data/organizations/organization-delete-mutation'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
-import { delete_, isResponseOk } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 
 const DeleteOrganizationButton = () => {
   const router = useRouter()
-  const queryClient = useQueryClient()
   const { ui } = useStore()
 
   const selectedOrganization = useSelectedOrganization()
@@ -21,6 +17,7 @@ const DeleteOrganizationButton = () => {
   const [value, setValue] = useState('')
 
   const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const { mutateAsync: deleteOrganization, isLoading: isDeleting } = useOrganizationDeleteMutation()
 
   const onValidate = (values: any) => {
     const errors: any = {}
@@ -33,30 +30,23 @@ const DeleteOrganizationButton = () => {
     return errors
   }
 
-  const onConfirmDelete = async (values: any, { setSubmitting }: any) => {
+  const onConfirmDelete = async (values: any) => {
     if (!canDeleteOrganization) {
       return ui.setNotification({
         category: 'error',
         message: 'You do not have the required permissions to delete this organization',
       })
     }
+    if (!orgSlug) return console.error('Org slug is required')
 
-    setSubmitting(true)
-    const response = await delete_<void>(`${API_URL}/organizations/${orgSlug}`)
-    if (!isResponseOk(response)) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete organization: ${response.error.message}`,
-      })
-      setSubmitting(false)
-    } else {
-      invalidateOrganizationsQuery(queryClient)
-      setSubmitting(false)
-      router.push('/')
+    try {
+      await deleteOrganization({ slug: orgSlug })
+    } finally {
       ui.setNotification({
         category: 'success',
         message: `Successfully deleted ${orgName}`,
       })
+      router.push('/')
     }
   }
 
@@ -86,7 +76,7 @@ const DeleteOrganizationButton = () => {
           onSubmit={onConfirmDelete}
           validate={onValidate}
         >
-          {({ isSubmitting }: { isSubmitting: boolean }) => (
+          {() => (
             <div className="space-y-4 py-3">
               <Modal.Content>
                 <p className="text-sm text-scale-900">
@@ -112,7 +102,14 @@ const DeleteOrganizationButton = () => {
               </Modal.Content>
               <Modal.Separator />
               <Modal.Content>
-                <Button block size="small" type="danger" htmlType="submit" loading={isSubmitting}>
+                <Button
+                  block
+                  size="small"
+                  type="danger"
+                  htmlType="submit"
+                  loading={isDeleting}
+                  disabled={isDeleting}
+                >
                   I understand, delete this organization
                 </Button>
               </Modal.Content>
