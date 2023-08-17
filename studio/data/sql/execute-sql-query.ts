@@ -11,6 +11,7 @@ import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { sqlKeys } from './keys'
 import { noop } from 'lodash'
+import { ResponseError } from 'types'
 
 export type Error = { code: number; message: string; requestId: string }
 
@@ -65,7 +66,7 @@ export async function executeSql(
 }
 
 export type ExecuteSqlData = Awaited<ReturnType<typeof executeSql>>
-export type ExecuteSqlError = unknown
+export type ExecuteSqlError = ResponseError
 
 export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
   { projectRef, connectionString, sql, queryKey, handleError }: ExecuteSqlVariables,
