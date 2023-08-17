@@ -33,6 +33,8 @@ const nextConfig = {
   async redirects() {
     return [
       // redirects with query params
+      //
+      // database.new redirect
       {
         source: '/',
         has: [
