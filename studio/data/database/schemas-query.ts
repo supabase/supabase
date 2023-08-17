@@ -28,7 +28,7 @@ export type SchemasVariables = {
 }
 
 export type SchemasData = { result: Schema[] }
-export type SchemasError = ResponseError
+export type SchemasError = unknown
 
 export const useSchemasQuery = <TData extends SchemasData = SchemasData>(
   { projectRef, connectionString }: SchemasVariables,
