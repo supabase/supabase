@@ -16,7 +16,7 @@ const DefaultPreviewSelectionRenderer = ({ log }: { log: PreviewLogData }) => (
       <pre
         className=" className={`text-scale-1200 text-sm col-span-8 overflow-x-auto text-xs font-mono`}"
         dangerouslySetInnerHTML={{
-          __html: jsonSyntaxHighlight(log.metadata!),
+          __html: jsonSyntaxHighlight(log.metadata || {}),
         }}
       />
     </div>
