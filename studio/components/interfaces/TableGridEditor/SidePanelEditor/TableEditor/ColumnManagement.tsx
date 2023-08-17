@@ -19,6 +19,7 @@ import { TEXT_TYPES } from '../SidePanelEditor.constants'
 import { ColumnField, ExtendedPostgresRelationship } from '../SidePanelEditor.types'
 import Column from './Column'
 import { ImportContent } from './TableEditor.types'
+import { useDispatch } from 'components/grid/store'
 
 interface ColumnManagementProps {
   table?: Partial<PostgresTable>
@@ -42,6 +43,16 @@ const ColumnManagement = ({
   onClearImportContent = noop,
 }: ColumnManagementProps) => {
   const [selectedColumnToEditRelation, setSelectedColumnToEditRelation] = useState<ColumnField>()
+  
+  const dispatch = useDispatch()
+
+  const moveColumn = (fromKey: string, toKey: string) => {
+    if (fromKey == toKey) return
+    dispatch({
+      type: 'MOVE_COLUMN',
+      payload: { fromKey, toKey },
+    })
+  }
 
   const hasImportContent = !isEmpty(importContent)
   const [primaryKeyColumns, otherColumns] = partition(
@@ -121,6 +132,11 @@ const ColumnManagement = ({
 
     if (type === 'pks') {
       const updatedPrimaryKeyColumns = primaryKeyColumns.slice()
+      if (!isNewRecord) {
+        const sourceColumn = updatedPrimaryKeyColumns[result.source.index]
+        const destinationColumn = updatedPrimaryKeyColumns[result.destination.index]
+        moveColumn(sourceColumn.name, destinationColumn.name)
+      }
       const [removed] = updatedPrimaryKeyColumns.splice(result.source.index, 1)
       updatedPrimaryKeyColumns.splice(result.destination.index, 0, removed)
       const updatedColumns = updatedPrimaryKeyColumns.concat(otherColumns)
@@ -298,7 +314,7 @@ const ColumnManagement = ({
             </DragDropContext>
           )}
 
-          <DragDropContext onDragEnd={(result: any) => onSortColumns(result, 'others')}>
+<DragDropContext onDragEnd={(result: any) => onSortColumns(result, 'others')}>
             <Droppable droppableId="other_columns_droppable">
               {(droppableProvided: DroppableProvided) => (
                 <div
