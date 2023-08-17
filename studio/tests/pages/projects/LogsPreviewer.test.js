@@ -37,6 +37,25 @@ beforeEach(() => {
   useParams.mockReturnValue(routerReturnValue.query)
 })
 
+// in the event that log metadata is not available, fall back to default renderer
+// generate test cases for each query type
+const defaultRendererFallbacksCases = [
+  'api', 'database', 'auth', 'pgbouncer', 'postgrest', 'storage', 'realtime'
+].map((queryType) => ({
+  testName: "fallback to default render",
+  queryType,
+  tableName: undefined,
+  tableLog: logDataFixture({
+    event_message: 'some message',
+    metadata: undefined,
+  }),
+  selectionLog: logDataFixture({
+    metadata: undefined,
+  }),
+  tableTexts: [/some message/],
+  selectionTexts: [/some message/],
+}))
+
 test.each([
   {
     queryType: 'api',
@@ -53,6 +72,7 @@ test.each([
     tableTexts: [/POST/, /some\-path/, /400/],
     selectionTexts: [/POST/, /Timestamp/, RegExp(`${new Date().getFullYear()}.+`, 'g')],
   },
+
   {
     queryType: 'database',
     tableName: undefined,
@@ -84,6 +104,7 @@ test.each([
     ],
   },
   {
+
     queryType: 'auth',
     tableName: undefined,
     tableLog: logDataFixture({
@@ -114,6 +135,7 @@ test.each([
       RegExp(`${new Date().getFullYear()}.+`, 'g'),
     ],
   },
+  ...defaultRendererFallbacksCases,
   // these all use teh default selection/table renderers
   ...['pgbouncer', 'postgrest', 'storage', 'realtime', "supavisor"].map((queryType) => ({
     queryType,
@@ -129,7 +151,7 @@ test.each([
     selectionTexts: [/some/, /nested/, /value/, RegExp(`${new Date().getFullYear()}.+`, 'g')],
   })),
 ])(
-  'selection $queryType $tableName , can display log data and metadata',
+  'selection $queryType $queryType, $tableName , can display log data and metadata $testName',
   async ({ queryType, tableName, tableLog, selectionLog, tableTexts, selectionTexts }) => {
     get.mockImplementation((url) => {
       // counts
