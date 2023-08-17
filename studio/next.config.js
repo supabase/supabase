@@ -32,6 +32,20 @@ const nextConfig = {
   output: 'standalone',
   async redirects() {
     return [
+      // redirects with query params
+      {
+        source: '/',
+        has: [
+          {
+            type: 'query',
+            key: 'next',
+            value: 'new-project',
+          },
+        ],
+        permanent: false,
+        destination: '/sign-in?next=new-project',
+      },
+      // redirects
       {
         source: '/',
         destination: '/sign-in',
