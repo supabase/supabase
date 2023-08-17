@@ -12,7 +12,7 @@ import {
 export interface AlertErrorProps {
   ref?: string
   subject?: string
-  error?: ResponseError | null | unknown
+  error?: ResponseError | null
   className?: string
 }
 

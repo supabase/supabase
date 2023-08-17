@@ -122,7 +122,7 @@ const Indexes = () => {
         {isLoadingIndexes && <GenericSkeletonLoader />}
 
         {isErrorIndexes && (
-          <AlertError error={indexesError} subject="Failed to retrieve database indexes" />
+          <AlertError error={indexesError as any} subject="Failed to retrieve database indexes" />
         )}
 
         {isSuccessIndexes && (

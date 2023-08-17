@@ -34,7 +34,7 @@ export type IndexesVariables = getIndexesDefinition & {
 }
 
 export type IndexesData = { result: DatabaseIndex[] }
-export type IndexesError = ResponseError
+export type IndexesError = unknown
 
 export const useIndexesQuery = <TData extends IndexesData = IndexesData>(
   { schema, projectRef, connectionString }: IndexesVariables,
