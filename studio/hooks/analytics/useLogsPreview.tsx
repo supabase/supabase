@@ -15,7 +15,7 @@ import {
   LogsTableName,
   PREVIEWER_DATEPICKER_HELPERS,
 } from 'components/interfaces/Settings/Logs'
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react'
 import { API_URL } from 'lib/constants'
 import { get, isResponseOk } from 'lib/common/fetch'
 import dayjs from 'dayjs'
@@ -125,14 +125,14 @@ function useLogsPreview(
 
   // chart data
 
-  const chartQuery = genChartQuery(table, params, filters)
-  const chartUrl = () => {
+  const chartQuery = useMemo(()=> genChartQuery(table, params, filters) , [params, filters])
+  const chartUrl = useMemo(() => {
     return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
       iso_timestamp_end: params.iso_timestamp_end,
       project: params.project,
       sql: chartQuery,
     } as any)}`
-  }
+  }, [params, chartQuery])
 
   const { data: eventChartResponse, refetch: refreshEventChart } = useQuery(
     [
@@ -141,7 +141,7 @@ function useLogsPreview(
       'logs-chart',
       { iso_timestamp_end: params.iso_timestamp_end, project: params.project, sql: chartQuery },
     ],
-    ({ signal }) => get<EventChart>(chartUrl(), { signal }),
+    ({ signal }) => get<EventChart>(chartUrl, { signal }),
     { refetchOnWindowFocus: false }
   )
 
