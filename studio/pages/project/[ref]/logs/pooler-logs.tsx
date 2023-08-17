@@ -6,13 +6,18 @@ import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import { LogsLayout } from 'components/layouts'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { NextPageWithLayout } from 'types'
+import Connecting from 'components/ui/Loading/Loading'
 
 export const LogPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const { data: poolingConfiguration } = usePoolingConfigurationQuery({
+  const { data: poolingConfiguration, isLoading } = usePoolingConfigurationQuery({
     projectRef: ref ?? 'default',
   })
 
+  // this prevents initial load of pgbouncer logs before config has been retrieved
+  if (isLoading) {
+    return <Connecting />
+  }
   const isSupavisorEnabled =
     poolingConfiguration?.supavisor_enabled ??
     poolingConfiguration?.connectionString.includes('pooler.supabase.com') ??
@@ -22,21 +27,9 @@ export const LogPage: NextPageWithLayout = () => {
     <LogsPreviewer
       projectRef={ref as string}
       condensedLayout={true}
-      tableName={LogsTableName.PGBOUNCER}
-      queryType="pgbouncer"
-    >
-      {isSupavisorEnabled && (
-        <div className="px-4 pt-4">
-          <Alert_Shadcn_ variant="warning">
-            <IconAlertCircle />
-            <AlertTitle_Shadcn_>Supavisor logs are not available yet</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              Your project currently has Supavisor enabled, which logs are currently unavailable.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-        </div>
-      )}
-    </LogsPreviewer>
+      tableName={isSupavisorEnabled ? LogsTableName.SUPAVISOR : LogsTableName.PGBOUNCER}
+      queryType={isSupavisorEnabled ? 'supavisor' : 'pgbouncer'}
+    />
   )
 }
 
