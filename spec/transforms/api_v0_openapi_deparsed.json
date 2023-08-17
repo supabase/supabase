@@ -1,6 +1,205 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/v1/branches/{branch_id}": {
+      "get": {
+        "operationId": "getBranchDetails",
+        "summary": "Get database branch config",
+        "description": "Fetches configurations of the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "db_port": {
+                      "type": "integer"
+                    },
+                    "ref": {
+                      "type": "string"
+                    },
+                    "postgres_version": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "ACTIVE_HEALTHY",
+                        "ACTIVE_UNHEALTHY",
+                        "COMING_UP",
+                        "GOING_DOWN",
+                        "INACTIVE",
+                        "INIT_FAILED",
+                        "REMOVED",
+                        "RESTORING",
+                        "UNKNOWN",
+                        "UPGRADING",
+                        "PAUSING"
+                      ],
+                      "type": "string"
+                    },
+                    "db_host": {
+                      "type": "string"
+                    },
+                    "db_user": {
+                      "type": "string"
+                    },
+                    "db_pass": {
+                      "type": "string"
+                    },
+                    "jwt_secret": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["db_port", "ref", "postgres_version", "status", "db_host"]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to update database branch"
+          }
+        },
+        "tags": ["database branches (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "updateBranch",
+        "summary": "Update database branch config",
+        "description": "Updates the configuration of the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "branch_name": {
+                    "type": "string"
+                  },
+                  "git_branch": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "project_ref": {
+                      "type": "string"
+                    },
+                    "parent_project_ref": {
+                      "type": "string"
+                    },
+                    "is_default": {
+                      "type": "boolean"
+                    },
+                    "git_branch": {
+                      "type": "string"
+                    },
+                    "created_at": {
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "project_ref",
+                    "parent_project_ref",
+                    "is_default",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to update database branch"
+          }
+        },
+        "tags": ["database branches (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteBranch",
+        "summary": "Delete a database branch",
+        "description": "Deletes the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to delete database branch"
+          }
+        },
+        "tags": ["database branches (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/v1/projects": {
       "get": {
         "operationId": "getProjects",
@@ -330,6 +529,7 @@
     "/v1/oauth/authorize": {
       "get": {
         "operationId": "authorize",
+        "summary": "Authorize user through oauth",
         "parameters": [
           {
             "name": "client_id",
@@ -393,13 +593,13 @@
             "required": false,
             "in": "query",
             "schema": {
-              "enum": ["plain", "sha256"],
+              "enum": ["plain", "sha256", "S256"],
               "type": "string"
             }
           }
         ],
         "responses": {
-          "200": {
+          "303": {
             "description": ""
           }
         },
@@ -409,834 +609,72 @@
     "/v1/oauth/token": {
       "post": {
         "operationId": "token",
-        "parameters": [
-          {
-            "name": "grant_type",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "enum": ["authorization_code", "refresh_token"],
-              "type": "string"
-            }
-          },
-          {
-            "name": "client_id",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "client_secret",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "code",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "code_verifier",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "redirect_uri",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "refresh_token",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
+        "summary": "Exchange auth code for user's access and refresh token",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "grant_type": {
+                    "enum": ["authorization_code", "refresh_token"],
+                    "type": "string"
+                  },
+                  "client_id": {
+                    "type": "string"
+                  },
+                  "client_secret": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  },
+                  "code_verifier": {
+                    "type": "string"
+                  },
+                  "redirect_uri": {
+                    "type": "string"
+                  },
+                  "refresh_token": {
+                    "type": "string"
+                  }
+                },
+                "required": ["grant_type", "client_id", "client_secret"]
+              }
             }
           }
-        ],
+        },
         "responses": {
           "201": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token_type": {
+                      "type": "string",
+                      "enum": ["Bearer"]
+                    },
+                    "access_token": {
+                      "type": "string"
+                    },
+                    "refresh_token": {
+                      "type": "string"
+                    },
+                    "expires_in": {
+                      "type": "number"
+                    }
+                  },
+                  "required": ["token_type", "access_token", "refresh_token", "expires_in"]
+                }
+              }
+            }
           }
         },
         "tags": ["oauth (beta)"]
-      }
-    },
-    "/v1/oauth/authorizations/{id}": {
-      "get": {
-        "operationId": "getAuthorizationRequest",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": ["oauth (beta)"],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "post": {
-        "operationId": "approveAuthorizationRequest",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "organization_id": {
-                    "type": "string"
-                  }
-                },
-                "required": ["organization_id"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": ["oauth (beta)"],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "delete": {
-        "operationId": "declineAuthorizationRequest",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": ["oauth (beta)"],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/v1/projects/{ref}/functions": {
-      "post": {
-        "operationId": "createFunction",
-        "summary": "Create a function",
-        "description": "Creates a function and adds it to the specified project.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          },
-          {
-            "name": "slug",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "pattern": "/^[A-Za-z0-9_-]+$/",
-              "type": "string"
-            }
-          },
-          {
-            "name": "name",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "verify_jwt",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "import_map",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "entrypoint_path",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "import_map_path",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "slug": {
-                    "type": "string",
-                    "pattern": "/^[A-Za-z0-9_-]+$/"
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "body": {
-                    "type": "string"
-                  },
-                  "verify_jwt": {
-                    "type": "boolean"
-                  }
-                },
-                "required": ["slug", "name", "body"]
-              }
-            },
-            "application/vnd.denoland.eszip": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "slug": {
-                    "type": "string",
-                    "pattern": "/^[A-Za-z0-9_-]+$/"
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "body": {
-                    "type": "string"
-                  },
-                  "verify_jwt": {
-                    "type": "boolean"
-                  }
-                },
-                "required": ["slug", "name", "body"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "slug": {
-                      "type": "string"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "status": {
-                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-                      "type": "string"
-                    },
-                    "version": {
-                      "type": "number"
-                    },
-                    "created_at": {
-                      "type": "number"
-                    },
-                    "updated_at": {
-                      "type": "number"
-                    },
-                    "verify_jwt": {
-                      "type": "boolean"
-                    },
-                    "import_map": {
-                      "type": "boolean"
-                    },
-                    "entrypoint_path": {
-                      "type": "string"
-                    },
-                    "import_map_path": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "slug",
-                    "name",
-                    "status",
-                    "version",
-                    "created_at",
-                    "updated_at"
-                  ]
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to create project's function"
-          }
-        },
-        "tags": ["functions"],
-        "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "get": {
-        "operationId": "getFunctions",
-        "summary": "List all functions",
-        "description": "Returns all functions you've previously added to the specified project.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string"
-                      },
-                      "slug": {
-                        "type": "string"
-                      },
-                      "name": {
-                        "type": "string"
-                      },
-                      "status": {
-                        "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-                        "type": "string"
-                      },
-                      "version": {
-                        "type": "number"
-                      },
-                      "created_at": {
-                        "type": "number"
-                      },
-                      "updated_at": {
-                        "type": "number"
-                      },
-                      "verify_jwt": {
-                        "type": "boolean"
-                      },
-                      "import_map": {
-                        "type": "boolean"
-                      },
-                      "entrypoint_path": {
-                        "type": "string"
-                      },
-                      "import_map_path": {
-                        "type": "string"
-                      }
-                    },
-                    "required": [
-                      "id",
-                      "slug",
-                      "name",
-                      "status",
-                      "version",
-                      "created_at",
-                      "updated_at"
-                    ]
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to retrieve project's functions"
-          }
-        },
-        "tags": ["functions"],
-        "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/v1/projects/{ref}/functions/{function_slug}": {
-      "get": {
-        "operationId": "getFunction",
-        "summary": "Retrieve a function",
-        "description": "Retrieves a function with the specified slug and project.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          },
-          {
-            "name": "function_slug",
-            "required": true,
-            "in": "path",
-            "description": "Function slug",
-            "schema": {
-              "pattern": "/^[A-Za-z0-9_-]+$/",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "slug": {
-                      "type": "string"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "status": {
-                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-                      "type": "string"
-                    },
-                    "version": {
-                      "type": "number"
-                    },
-                    "created_at": {
-                      "type": "number"
-                    },
-                    "updated_at": {
-                      "type": "number"
-                    },
-                    "verify_jwt": {
-                      "type": "boolean"
-                    },
-                    "import_map": {
-                      "type": "boolean"
-                    },
-                    "entrypoint_path": {
-                      "type": "string"
-                    },
-                    "import_map_path": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "slug",
-                    "name",
-                    "status",
-                    "version",
-                    "created_at",
-                    "updated_at"
-                  ]
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to retrieve function with given slug"
-          }
-        },
-        "tags": ["functions"],
-        "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "patch": {
-        "operationId": "updateFunction",
-        "summary": "Update a function",
-        "description": "Updates a function with the specified slug and project.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          },
-          {
-            "name": "function_slug",
-            "required": true,
-            "in": "path",
-            "description": "Function slug",
-            "schema": {
-              "pattern": "/^[A-Za-z0-9_-]+$/",
-              "type": "string"
-            }
-          },
-          {
-            "name": "slug",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "pattern": "/^[A-Za-z0-9_-]+$/",
-              "type": "string"
-            }
-          },
-          {
-            "name": "name",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "verify_jwt",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "import_map",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "entrypoint_path",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "import_map_path",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "body": {
-                    "type": "string"
-                  },
-                  "verify_jwt": {
-                    "type": "boolean"
-                  }
-                }
-              }
-            },
-            "application/vnd.denoland.eszip": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "body": {
-                    "type": "string"
-                  },
-                  "verify_jwt": {
-                    "type": "boolean"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "slug": {
-                      "type": "string"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "status": {
-                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-                      "type": "string"
-                    },
-                    "version": {
-                      "type": "number"
-                    },
-                    "created_at": {
-                      "type": "number"
-                    },
-                    "updated_at": {
-                      "type": "number"
-                    },
-                    "verify_jwt": {
-                      "type": "boolean"
-                    },
-                    "import_map": {
-                      "type": "boolean"
-                    },
-                    "entrypoint_path": {
-                      "type": "string"
-                    },
-                    "import_map_path": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "slug",
-                    "name",
-                    "status",
-                    "version",
-                    "created_at",
-                    "updated_at"
-                  ]
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to update function with given slug"
-          }
-        },
-        "tags": ["functions"],
-        "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
-          {
-            "bearer": []
-          }
-        ]
-      },
-      "delete": {
-        "operationId": "deleteFunction",
-        "summary": "Delete a function",
-        "description": "Deletes a function with the specified slug from the specified project.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          },
-          {
-            "name": "function_slug",
-            "required": true,
-            "in": "path",
-            "description": "Function slug",
-            "schema": {
-              "pattern": "/^[A-Za-z0-9_-]+$/",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to delete function with given slug"
-          }
-        },
-        "tags": ["functions"],
-        "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/v1/projects/{ref}/functions/{function_slug}/body": {
-      "get": {
-        "operationId": "getFunctionBody",
-        "summary": "Retrieve a function body",
-        "description": "Retrieves a function body for the specified slug and project.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          },
-          {
-            "name": "function_slug",
-            "required": true,
-            "in": "path",
-            "description": "Function slug",
-            "schema": {
-              "pattern": "/^[A-Za-z0-9_-]+$/",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to retrieve function body with given slug"
-          }
-        },
-        "tags": ["functions"],
-        "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
-          {
-            "bearer": []
-          }
-        ]
       }
     },
     "/v1/projects/{ref}/api-keys": {
@@ -1283,6 +721,213 @@
           }
         },
         "tags": ["projects"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/branches": {
+      "get": {
+        "operationId": "getBranches",
+        "summary": "List all database branches",
+        "description": "Returns all database branches of the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "project_ref": {
+                        "type": "string"
+                      },
+                      "parent_project_ref": {
+                        "type": "string"
+                      },
+                      "is_default": {
+                        "type": "boolean"
+                      },
+                      "git_branch": {
+                        "type": "string"
+                      },
+                      "created_at": {
+                        "type": "string"
+                      },
+                      "updated_at": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "project_ref",
+                      "parent_project_ref",
+                      "is_default",
+                      "created_at",
+                      "updated_at"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to retrieve database branches"
+          }
+        },
+        "tags": ["database branches (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createBranch",
+        "summary": "Create a database branch",
+        "description": "Creates a database branch from the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "branch_name": {
+                    "type": "string"
+                  },
+                  "git_branch": {
+                    "type": "string"
+                  },
+                  "region": {
+                    "type": "string"
+                  }
+                },
+                "required": ["branch_name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "project_ref": {
+                      "type": "string"
+                    },
+                    "parent_project_ref": {
+                      "type": "string"
+                    },
+                    "is_default": {
+                      "type": "boolean"
+                    },
+                    "git_branch": {
+                      "type": "string"
+                    },
+                    "created_at": {
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "project_ref",
+                    "parent_project_ref",
+                    "is_default",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to create database branch"
+          }
+        },
+        "tags": ["database branches (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "disableBranch",
+        "summary": "Disables preview branching",
+        "description": "Disables preview branching for the specified project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to disable preview branching"
+          }
+        },
+        "tags": ["database branches (beta)"],
         "security": [
           {
             "bearer": []
@@ -2522,8 +2167,8 @@
                   "type": "object",
                   "properties": {
                     "status": {
-                      "type": "string",
-                      "enum": ["not-used", "custom-domain-used", "active"]
+                      "enum": ["not-used", "custom-domain-used", "active"],
+                      "type": "string"
                     },
                     "custom_domain": {
                       "type": "string"
@@ -3057,19 +2702,13 @@
                   "type": "object",
                   "properties": {
                     "statement_timeout": {
-                      "type": "integer",
-                      "minimum": 0,
-                      "maximum": 2147483647
+                      "type": "string"
                     },
                     "effective_cache_size": {
-                      "type": "integer",
-                      "minimum": 1,
-                      "maximum": 2147483647
+                      "type": "string"
                     },
                     "maintenance_work_mem": {
-                      "type": "integer",
-                      "minimum": 1024,
-                      "maximum": 2147483647
+                      "type": "string"
                     },
                     "max_connections": {
                       "type": "integer",
@@ -3097,33 +2736,16 @@
                       "maximum": 262143
                     },
                     "shared_buffers": {
-                      "type": "integer",
-                      "minimum": 16,
-                      "maximum": 1073741823
+                      "type": "string"
                     },
                     "work_mem": {
-                      "type": "integer",
-                      "minimum": 64,
-                      "maximum": 2147483647
+                      "type": "string"
                     },
                     "session_replication_role": {
                       "enum": ["origin", "replica", "local"],
                       "type": "string"
                     }
-                  },
-                  "required": [
-                    "statement_timeout",
-                    "effective_cache_size",
-                    "maintenance_work_mem",
-                    "max_connections",
-                    "max_parallel_maintenance_workers",
-                    "max_parallel_workers",
-                    "max_parallel_workers_per_gather",
-                    "max_worker_processes",
-                    "shared_buffers",
-                    "work_mem",
-                    "session_replication_role"
-                  ]
+                  }
                 }
               }
             }
@@ -3166,19 +2788,13 @@
                 "type": "object",
                 "properties": {
                   "statement_timeout": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "maximum": 2147483647
+                    "type": "string"
                   },
                   "effective_cache_size": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 2147483647
+                    "type": "string"
                   },
                   "maintenance_work_mem": {
-                    "type": "integer",
-                    "minimum": 1024,
-                    "maximum": 2147483647
+                    "type": "string"
                   },
                   "max_connections": {
                     "type": "integer",
@@ -3206,33 +2822,16 @@
                     "maximum": 262143
                   },
                   "shared_buffers": {
-                    "type": "integer",
-                    "minimum": 16,
-                    "maximum": 1073741823
+                    "type": "string"
                   },
                   "work_mem": {
-                    "type": "integer",
-                    "minimum": 64,
-                    "maximum": 2147483647
+                    "type": "string"
                   },
                   "session_replication_role": {
                     "enum": ["origin", "replica", "local"],
                     "type": "string"
                   }
-                },
-                "required": [
-                  "statement_timeout",
-                  "effective_cache_size",
-                  "maintenance_work_mem",
-                  "max_connections",
-                  "max_parallel_maintenance_workers",
-                  "max_parallel_workers",
-                  "max_parallel_workers_per_gather",
-                  "max_worker_processes",
-                  "shared_buffers",
-                  "work_mem",
-                  "session_replication_role"
-                ]
+                }
               }
             }
           }
@@ -3246,19 +2845,13 @@
                   "type": "object",
                   "properties": {
                     "statement_timeout": {
-                      "type": "integer",
-                      "minimum": 0,
-                      "maximum": 2147483647
+                      "type": "string"
                     },
                     "effective_cache_size": {
-                      "type": "integer",
-                      "minimum": 1,
-                      "maximum": 2147483647
+                      "type": "string"
                     },
                     "maintenance_work_mem": {
-                      "type": "integer",
-                      "minimum": 1024,
-                      "maximum": 2147483647
+                      "type": "string"
                     },
                     "max_connections": {
                       "type": "integer",
@@ -3286,33 +2879,16 @@
                       "maximum": 262143
                     },
                     "shared_buffers": {
-                      "type": "integer",
-                      "minimum": 16,
-                      "maximum": 1073741823
+                      "type": "string"
                     },
                     "work_mem": {
-                      "type": "integer",
-                      "minimum": 64,
-                      "maximum": 2147483647
+                      "type": "string"
                     },
                     "session_replication_role": {
                       "enum": ["origin", "replica", "local"],
                       "type": "string"
                     }
-                  },
-                  "required": [
-                    "statement_timeout",
-                    "effective_cache_size",
-                    "maintenance_work_mem",
-                    "max_connections",
-                    "max_parallel_maintenance_workers",
-                    "max_parallel_workers",
-                    "max_parallel_workers_per_gather",
-                    "max_worker_processes",
-                    "shared_buffers",
-                    "work_mem",
-                    "session_replication_role"
-                  ]
+                  }
                 }
               }
             }
@@ -3387,6 +2963,9 @@
                     "pgbouncer_enabled": {
                       "type": "boolean"
                     },
+                    "supavisor_enabled": {
+                      "type": "boolean"
+                    },
                     "pgbouncer_status": {
                       "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
                       "type": "string"
@@ -3398,6 +2977,9 @@
                     "max_client_conn": {
                       "type": "number",
                       "nullable": true
+                    },
+                    "connectionString": {
+                      "type": "string"
                     }
                   },
                   "required": [
@@ -3407,12 +2989,13 @@
                     "db_port",
                     "db_ssl",
                     "db_user",
-                    "default_pool_size",
                     "ignore_startup_parameters",
                     "inserted_at",
                     "pgbouncer_enabled",
+                    "supavisor_enabled",
                     "pgbouncer_status",
-                    "pool_mode"
+                    "pool_mode",
+                    "connectionString"
                   ]
                 }
               }
@@ -3424,9 +3007,6 @@
         },
         "tags": ["projects config"],
         "security": [
-          {
-            "bearer": []
-          },
           {
             "bearer": []
           }
@@ -3458,7 +3038,7 @@
                   "default_pool_size": {
                     "type": "integer",
                     "minimum": 0,
-                    "maximum": 65535
+                    "maximum": 1000
                   },
                   "max_client_conn": {
                     "type": "integer",
@@ -3477,12 +3057,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "default_pool_size",
-                  "ignore_startup_parameters",
-                  "pgbouncer_enabled",
-                  "pool_mode"
-                ]
+                "required": ["ignore_startup_parameters", "pgbouncer_enabled", "pool_mode"]
               }
             }
           }
@@ -3498,7 +3073,7 @@
                     "default_pool_size": {
                       "type": "integer",
                       "minimum": 0,
-                      "maximum": 65535
+                      "maximum": 1000
                     },
                     "max_client_conn": {
                       "type": "integer",
@@ -3522,7 +3097,6 @@
                     }
                   },
                   "required": [
-                    "default_pool_size",
                     "ignore_startup_parameters",
                     "pgbouncer_enabled",
                     "pool_mode",
@@ -3543,6 +3117,949 @@
         "security": [
           {
             "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/config/auth": {
+      "get": {
+        "operationId": "getV1AuthConfig",
+        "summary": "Gets project's auth config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "smtp_admin_email": {
+                      "type": "string"
+                    },
+                    "smtp_host": {
+                      "type": "string"
+                    },
+                    "smtp_port": {
+                      "type": "string"
+                    },
+                    "smtp_user": {
+                      "type": "string"
+                    },
+                    "smtp_pass": {
+                      "type": "string"
+                    },
+                    "smtp_max_frequency": {
+                      "type": "number"
+                    },
+                    "smtp_sender_name": {
+                      "type": "string"
+                    },
+                    "rate_limit_email_sent": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 2147483647
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's auth config"
+          }
+        },
+        "tags": ["projects config"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "updateV1AuthConfig",
+        "summary": "Updates a project's auth config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "smtp_admin_email": {
+                    "type": "string"
+                  },
+                  "smtp_host": {
+                    "type": "string"
+                  },
+                  "smtp_port": {
+                    "type": "string"
+                  },
+                  "smtp_user": {
+                    "type": "string"
+                  },
+                  "smtp_pass": {
+                    "type": "string"
+                  },
+                  "smtp_max_frequency": {
+                    "type": "number"
+                  },
+                  "smtp_sender_name": {
+                    "type": "string"
+                  },
+                  "rate_limit_email_sent": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 2147483647
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "smtp_admin_email": {
+                      "type": "string"
+                    },
+                    "smtp_host": {
+                      "type": "string"
+                    },
+                    "smtp_port": {
+                      "type": "string"
+                    },
+                    "smtp_user": {
+                      "type": "string"
+                    },
+                    "smtp_pass": {
+                      "type": "string"
+                    },
+                    "smtp_max_frequency": {
+                      "type": "number"
+                    },
+                    "smtp_sender_name": {
+                      "type": "string"
+                    },
+                    "rate_limit_email_sent": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 2147483647
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update project's auth config"
+          }
+        },
+        "tags": ["projects config"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/database/query": {
+      "post": {
+        "operationId": "v1RunQuery",
+        "summary": "Run sql query",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string"
+                  }
+                },
+                "required": ["query"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to run sql query"
+          }
+        },
+        "tags": ["projects (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/database/webhooks/enable": {
+      "post": {
+        "operationId": "v1EnableDatabaseWebhooks",
+        "summary": "Enables Database Webhooks on the project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to enable Database Webhooks on the project"
+          }
+        },
+        "tags": ["projects (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/functions": {
+      "post": {
+        "operationId": "createFunction",
+        "summary": "Create a function",
+        "description": "Creates a function and adds it to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "pattern": "/^[A-Za-z0-9_-]+$/",
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "verify_jwt",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "import_map",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "entrypoint_path",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "import_map_path",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "slug": {
+                    "type": "string",
+                    "pattern": "/^[A-Za-z0-9_-]+$/"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "verify_jwt": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["slug", "name", "body"]
+              }
+            },
+            "application/vnd.denoland.eszip": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "slug": {
+                    "type": "string",
+                    "pattern": "/^[A-Za-z0-9_-]+$/"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "verify_jwt": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["slug", "name", "body"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "number"
+                    },
+                    "created_at": {
+                      "type": "number"
+                    },
+                    "updated_at": {
+                      "type": "number"
+                    },
+                    "verify_jwt": {
+                      "type": "boolean"
+                    },
+                    "import_map": {
+                      "type": "boolean"
+                    },
+                    "entrypoint_path": {
+                      "type": "string"
+                    },
+                    "import_map_path": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "status",
+                    "version",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to create project's function"
+          }
+        },
+        "tags": ["functions"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getFunctions",
+        "summary": "List all functions",
+        "description": "Returns all functions you've previously added to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "slug": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+                        "type": "string"
+                      },
+                      "version": {
+                        "type": "number"
+                      },
+                      "created_at": {
+                        "type": "number"
+                      },
+                      "updated_at": {
+                        "type": "number"
+                      },
+                      "verify_jwt": {
+                        "type": "boolean"
+                      },
+                      "import_map": {
+                        "type": "boolean"
+                      },
+                      "entrypoint_path": {
+                        "type": "string"
+                      },
+                      "import_map_path": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "slug",
+                      "name",
+                      "status",
+                      "version",
+                      "created_at",
+                      "updated_at"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's functions"
+          }
+        },
+        "tags": ["functions"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/functions/{function_slug}": {
+      "get": {
+        "operationId": "getFunction",
+        "summary": "Retrieve a function",
+        "description": "Retrieves a function with the specified slug and project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "description": "Function slug",
+            "schema": {
+              "pattern": "/^[A-Za-z0-9_-]+$/",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "number"
+                    },
+                    "created_at": {
+                      "type": "number"
+                    },
+                    "updated_at": {
+                      "type": "number"
+                    },
+                    "verify_jwt": {
+                      "type": "boolean"
+                    },
+                    "import_map": {
+                      "type": "boolean"
+                    },
+                    "entrypoint_path": {
+                      "type": "string"
+                    },
+                    "import_map_path": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "status",
+                    "version",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve function with given slug"
+          }
+        },
+        "tags": ["functions"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "updateFunction",
+        "summary": "Update a function",
+        "description": "Updates a function with the specified slug and project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "description": "Function slug",
+            "schema": {
+              "pattern": "/^[A-Za-z0-9_-]+$/",
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "pattern": "/^[A-Za-z0-9_-]+$/",
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "verify_jwt",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "import_map",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "entrypoint_path",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "import_map_path",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "verify_jwt": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            },
+            "application/vnd.denoland.eszip": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "verify_jwt": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "number"
+                    },
+                    "created_at": {
+                      "type": "number"
+                    },
+                    "updated_at": {
+                      "type": "number"
+                    },
+                    "verify_jwt": {
+                      "type": "boolean"
+                    },
+                    "import_map": {
+                      "type": "boolean"
+                    },
+                    "entrypoint_path": {
+                      "type": "string"
+                    },
+                    "import_map_path": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "status",
+                    "version",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update function with given slug"
+          }
+        },
+        "tags": ["functions"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteFunction",
+        "summary": "Delete a function",
+        "description": "Deletes a function with the specified slug from the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "description": "Function slug",
+            "schema": {
+              "pattern": "/^[A-Za-z0-9_-]+$/",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to delete function with given slug"
+          }
+        },
+        "tags": ["functions"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/functions/{function_slug}/body": {
+      "get": {
+        "operationId": "getFunctionBody",
+        "summary": "Retrieve a function body",
+        "description": "Retrieves a function body for the specified slug and project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "description": "Function slug",
+            "schema": {
+              "pattern": "/^[A-Za-z0-9_-]+$/",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve function body with given slug"
+          }
+        },
+        "tags": ["functions"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
           },
           {
             "bearer": []
@@ -4401,6 +4918,98 @@
       }
     },
     "schemas": {
+      "BranchDetailResponse": {
+        "type": "object",
+        "properties": {
+          "db_port": {
+            "type": "integer"
+          },
+          "ref": {
+            "type": "string"
+          },
+          "postgres_version": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ACTIVE_HEALTHY",
+              "ACTIVE_UNHEALTHY",
+              "COMING_UP",
+              "GOING_DOWN",
+              "INACTIVE",
+              "INIT_FAILED",
+              "REMOVED",
+              "RESTORING",
+              "UNKNOWN",
+              "UPGRADING",
+              "PAUSING"
+            ],
+            "type": "string"
+          },
+          "db_host": {
+            "type": "string"
+          },
+          "db_user": {
+            "type": "string"
+          },
+          "db_pass": {
+            "type": "string"
+          },
+          "jwt_secret": {
+            "type": "string"
+          }
+        },
+        "required": ["db_port", "ref", "postgres_version", "status", "db_host"]
+      },
+      "UpdateBranchBody": {
+        "type": "object",
+        "properties": {
+          "branch_name": {
+            "type": "string"
+          },
+          "git_branch": {
+            "type": "string"
+          }
+        }
+      },
+      "BranchResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "project_ref": {
+            "type": "string"
+          },
+          "parent_project_ref": {
+            "type": "string"
+          },
+          "is_default": {
+            "type": "boolean"
+          },
+          "git_branch": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "project_ref",
+          "parent_project_ref",
+          "is_default",
+          "created_at",
+          "updated_at"
+        ]
+      },
       "DatabaseResponse": {
         "type": "object",
         "properties": {
@@ -4526,127 +5135,52 @@
         },
         "required": ["name"]
       },
-      "AuthorizationsApproveBody": {
+      "OAuthTokenBody": {
         "type": "object",
         "properties": {
-          "organization_id": {
+          "grant_type": {
+            "enum": ["authorization_code", "refresh_token"],
+            "type": "string"
+          },
+          "client_id": {
+            "type": "string"
+          },
+          "client_secret": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "code_verifier": {
+            "type": "string"
+          },
+          "redirect_uri": {
+            "type": "string"
+          },
+          "refresh_token": {
             "type": "string"
           }
         },
-        "required": ["organization_id"]
+        "required": ["grant_type", "client_id", "client_secret"]
       },
-      "CreateFunctionBody": {
+      "OAuthTokenResponse": {
         "type": "object",
         "properties": {
-          "slug": {
+          "token_type": {
             "type": "string",
-            "pattern": "/^[A-Za-z0-9_-]+$/"
+            "enum": ["Bearer"]
           },
-          "name": {
+          "access_token": {
             "type": "string"
           },
-          "body": {
+          "refresh_token": {
             "type": "string"
           },
-          "verify_jwt": {
-            "type": "boolean"
+          "expires_in": {
+            "type": "number"
           }
         },
-        "required": ["slug", "name", "body"]
-      },
-      "FunctionResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "slug": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "status": {
-            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-            "type": "string"
-          },
-          "version": {
-            "type": "number"
-          },
-          "created_at": {
-            "type": "number"
-          },
-          "updated_at": {
-            "type": "number"
-          },
-          "verify_jwt": {
-            "type": "boolean"
-          },
-          "import_map": {
-            "type": "boolean"
-          },
-          "entrypoint_path": {
-            "type": "string"
-          },
-          "import_map_path": {
-            "type": "string"
-          }
-        },
-        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
-      },
-      "FunctionSlugResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "slug": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "status": {
-            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-            "type": "string"
-          },
-          "version": {
-            "type": "number"
-          },
-          "created_at": {
-            "type": "number"
-          },
-          "updated_at": {
-            "type": "number"
-          },
-          "verify_jwt": {
-            "type": "boolean"
-          },
-          "import_map": {
-            "type": "boolean"
-          },
-          "entrypoint_path": {
-            "type": "string"
-          },
-          "import_map_path": {
-            "type": "string"
-          }
-        },
-        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
-      },
-      "UpdateFunctionBody": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "body": {
-            "type": "string"
-          },
-          "verify_jwt": {
-            "type": "boolean"
-          }
-        }
+        "required": ["token_type", "access_token", "refresh_token", "expires_in"]
       },
       "ApiKeyResponse": {
         "type": "object",
@@ -4659,6 +5193,21 @@
           }
         },
         "required": ["name", "api_key"]
+      },
+      "CreateBranchBody": {
+        "type": "object",
+        "properties": {
+          "branch_name": {
+            "type": "string"
+          },
+          "git_branch": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          }
+        },
+        "required": ["branch_name"]
       },
       "UpdateCustomHostnameResponse": {
         "type": "object",
@@ -4912,8 +5461,8 @@
         "type": "object",
         "properties": {
           "status": {
-            "type": "string",
-            "enum": ["not-used", "custom-domain-used", "active"]
+            "enum": ["not-used", "custom-domain-used", "active"],
+            "type": "string"
           },
           "custom_domain": {
             "type": "string"
@@ -5132,19 +5681,13 @@
         "type": "object",
         "properties": {
           "statement_timeout": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 2147483647
+            "type": "string"
           },
           "effective_cache_size": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 2147483647
+            "type": "string"
           },
           "maintenance_work_mem": {
-            "type": "integer",
-            "minimum": 1024,
-            "maximum": 2147483647
+            "type": "string"
           },
           "max_connections": {
             "type": "integer",
@@ -5172,51 +5715,28 @@
             "maximum": 262143
           },
           "shared_buffers": {
-            "type": "integer",
-            "minimum": 16,
-            "maximum": 1073741823
+            "type": "string"
           },
           "work_mem": {
-            "type": "integer",
-            "minimum": 64,
-            "maximum": 2147483647
+            "type": "string"
           },
           "session_replication_role": {
             "enum": ["origin", "replica", "local"],
             "type": "string"
           }
-        },
-        "required": [
-          "statement_timeout",
-          "effective_cache_size",
-          "maintenance_work_mem",
-          "max_connections",
-          "max_parallel_maintenance_workers",
-          "max_parallel_workers",
-          "max_parallel_workers_per_gather",
-          "max_worker_processes",
-          "shared_buffers",
-          "work_mem",
-          "session_replication_role"
-        ]
+        }
       },
       "UpdatePostgresConfigBody": {
         "type": "object",
         "properties": {
           "statement_timeout": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 2147483647
+            "type": "string"
           },
           "effective_cache_size": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 2147483647
+            "type": "string"
           },
           "maintenance_work_mem": {
-            "type": "integer",
-            "minimum": 1024,
-            "maximum": 2147483647
+            "type": "string"
           },
           "max_connections": {
             "type": "integer",
@@ -5244,33 +5764,16 @@
             "maximum": 262143
           },
           "shared_buffers": {
-            "type": "integer",
-            "minimum": 16,
-            "maximum": 1073741823
+            "type": "string"
           },
           "work_mem": {
-            "type": "integer",
-            "minimum": 64,
-            "maximum": 2147483647
+            "type": "string"
           },
           "session_replication_role": {
             "enum": ["origin", "replica", "local"],
             "type": "string"
           }
-        },
-        "required": [
-          "statement_timeout",
-          "effective_cache_size",
-          "maintenance_work_mem",
-          "max_connections",
-          "max_parallel_maintenance_workers",
-          "max_parallel_workers",
-          "max_parallel_workers_per_gather",
-          "max_worker_processes",
-          "shared_buffers",
-          "work_mem",
-          "session_replication_role"
-        ]
+        }
       },
       "ProjectPgBouncerConfig": {
         "type": "object",
@@ -5305,6 +5808,9 @@
           "pgbouncer_enabled": {
             "type": "boolean"
           },
+          "supavisor_enabled": {
+            "type": "boolean"
+          },
           "pgbouncer_status": {
             "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
             "type": "string"
@@ -5316,6 +5822,9 @@
           "max_client_conn": {
             "type": "number",
             "nullable": true
+          },
+          "connectionString": {
+            "type": "string"
           }
         },
         "required": [
@@ -5325,12 +5834,13 @@
           "db_port",
           "db_ssl",
           "db_user",
-          "default_pool_size",
           "ignore_startup_parameters",
           "inserted_at",
           "pgbouncer_enabled",
+          "supavisor_enabled",
           "pgbouncer_status",
-          "pool_mode"
+          "pool_mode",
+          "connectionString"
         ]
       },
       "UpdatePgbouncerConfigBody": {
@@ -5339,7 +5849,7 @@
           "default_pool_size": {
             "type": "integer",
             "minimum": 0,
-            "maximum": 65535
+            "maximum": 1000
           },
           "max_client_conn": {
             "type": "integer",
@@ -5358,12 +5868,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "default_pool_size",
-          "ignore_startup_parameters",
-          "pgbouncer_enabled",
-          "pool_mode"
-        ]
+        "required": ["ignore_startup_parameters", "pgbouncer_enabled", "pool_mode"]
       },
       "UpdatePoolingConfigResponse": {
         "type": "object",
@@ -5371,7 +5876,7 @@
           "default_pool_size": {
             "type": "integer",
             "minimum": 0,
-            "maximum": 65535
+            "maximum": 1000
           },
           "max_client_conn": {
             "type": "integer",
@@ -5395,12 +5900,195 @@
           }
         },
         "required": [
-          "default_pool_size",
           "ignore_startup_parameters",
           "pgbouncer_enabled",
           "pool_mode",
           "pgbouncer_status"
         ]
+      },
+      "AuthConfigResponse": {
+        "type": "object",
+        "properties": {
+          "smtp_admin_email": {
+            "type": "string"
+          },
+          "smtp_host": {
+            "type": "string"
+          },
+          "smtp_port": {
+            "type": "string"
+          },
+          "smtp_user": {
+            "type": "string"
+          },
+          "smtp_pass": {
+            "type": "string"
+          },
+          "smtp_max_frequency": {
+            "type": "number"
+          },
+          "smtp_sender_name": {
+            "type": "string"
+          },
+          "rate_limit_email_sent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 2147483647
+          }
+        }
+      },
+      "UpdateAuthConfigBody": {
+        "type": "object",
+        "properties": {
+          "smtp_admin_email": {
+            "type": "string"
+          },
+          "smtp_host": {
+            "type": "string"
+          },
+          "smtp_port": {
+            "type": "string"
+          },
+          "smtp_user": {
+            "type": "string"
+          },
+          "smtp_pass": {
+            "type": "string"
+          },
+          "smtp_max_frequency": {
+            "type": "number"
+          },
+          "smtp_sender_name": {
+            "type": "string"
+          },
+          "rate_limit_email_sent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 2147483647
+          }
+        }
+      },
+      "RunQueryBody": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          }
+        },
+        "required": ["query"]
+      },
+      "CreateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "pattern": "/^[A-Za-z0-9_-]+$/"
+          },
+          "name": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "verify_jwt": {
+            "type": "boolean"
+          }
+        },
+        "required": ["slug", "name", "body"]
+      },
+      "FunctionResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+            "type": "string"
+          },
+          "version": {
+            "type": "number"
+          },
+          "created_at": {
+            "type": "number"
+          },
+          "updated_at": {
+            "type": "number"
+          },
+          "verify_jwt": {
+            "type": "boolean"
+          },
+          "import_map": {
+            "type": "boolean"
+          },
+          "entrypoint_path": {
+            "type": "string"
+          },
+          "import_map_path": {
+            "type": "string"
+          }
+        },
+        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
+      },
+      "FunctionSlugResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+            "type": "string"
+          },
+          "version": {
+            "type": "number"
+          },
+          "created_at": {
+            "type": "number"
+          },
+          "updated_at": {
+            "type": "number"
+          },
+          "verify_jwt": {
+            "type": "boolean"
+          },
+          "import_map": {
+            "type": "boolean"
+          },
+          "entrypoint_path": {
+            "type": "string"
+          },
+          "import_map_path": {
+            "type": "string"
+          }
+        },
+        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
+      },
+      "UpdateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "verify_jwt": {
+            "type": "boolean"
+          }
+        }
       },
       "AttributeValue": {
         "type": "object",

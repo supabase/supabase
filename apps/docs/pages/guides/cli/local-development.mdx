@@ -364,12 +364,12 @@ Associate your project with your remote project using [`supabase link`](/docs/re
 supabase link --project-ref <project-id>
 # You can get <project-id> from your project's dashboard URL: https://supabase.com/dashboard/project/<project-id>
 
-supabase db remote commit
+supabase db pull
 # Capture any changes that you have made to your remote database before you went through the steps above
 # If you have not made any changes to the remote database, skip this step
 ```
 
-`supabase/migrations` is now populated with a migration in `..._remote_commit.sql`.
+`supabase/migrations` is now populated with a migration in `<timestamp>_remote_schema.sql`.
 This migration captures any changes required for your local database to match the schema of your remote Supabase project.
 
 <Admonition type="note">
@@ -420,7 +420,7 @@ For these changes to take effect, you need to run `supabase stop` and `supabase 
 If you have additional triggers or RLS policies defined on your `auth` schema, you can pull them as a migration file locally.
 
 ```bash
-supabase db remote commit --schema auth
+supabase db pull --schema auth
 ```
 
 ### Local Logging
