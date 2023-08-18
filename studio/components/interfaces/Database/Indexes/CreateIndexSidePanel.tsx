@@ -27,7 +27,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
   const [selectedIndexType, setSelectedIndexType] = useState<string>(INDEX_TYPES[0].value)
 
-  const { refetch: refetchSchemaIndexes } = useIndexesQuery({
+  const { refetch: refetchIndexes } = useIndexesQuery({
     schema: selectedSchema,
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -57,8 +57,8 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
   })
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess(data) {
-      refetchSchemaIndexes()
+    onSuccess() {
+      refetchIndexes()
       onClose()
       ui.setNotification({ category: 'success', message: `Successfully created index` })
     },

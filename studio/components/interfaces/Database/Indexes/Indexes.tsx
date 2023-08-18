@@ -2,12 +2,18 @@ import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
 import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   IconAlertCircle,
+  IconAlertTriangle,
   IconExternalLink,
   IconSearch,
+  IconTrash,
   Input,
   Listbox,
+  Modal,
   SidePanel,
 } from 'ui'
 
@@ -19,16 +25,22 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import Table from 'components/to-be-cleaned/Table'
 import CodeEditor from 'components/ui/CodeEditor'
 import CreateIndexSidePanel from './CreateIndexSidePanel'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useStore } from 'hooks'
 
 const Indexes = () => {
+  const { ui } = useStore()
   const [search, setSearch] = useState('')
   const [selectedSchema, setSelectedSchema] = useState('public')
-  const [selectedIndex, setSelectedIndex] = useState<DatabaseIndex>()
   const [showCreateIndex, setShowCreateIndex] = useState(false)
+  const [selectedIndex, setSelectedIndex] = useState<DatabaseIndex>()
+  const [selectedIndexToDelete, setSelectedIndexToDelete] = useState<DatabaseIndex>()
 
   const { project } = useProjectContext()
   const {
     data: allIndexes,
+    refetch: refetchIndexes,
     error: indexesError,
     isLoading: isLoadingIndexes,
     isSuccess: isSuccessIndexes,
@@ -48,6 +60,21 @@ const Indexes = () => {
     connectionString: project?.connectionString,
   })
 
+  const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
+    onSuccess() {
+      refetchIndexes()
+      setSelectedIndexToDelete(undefined)
+      ui.setNotification({ category: 'success', message: `Successfully deleted index` })
+    },
+    onError(error) {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to delete index: ${error.message}`,
+      })
+    },
+  })
+
   const sortedIndexes = (allIndexes?.result ?? []).sort(
     (a, b) => a.table.localeCompare(b.table) || a.name.localeCompare(b.name)
   )
@@ -55,6 +82,15 @@ const Indexes = () => {
     search.length > 0
       ? sortedIndexes.filter((index) => index.name.includes(search) || index.table.includes(search))
       : sortedIndexes
+
+  const onConfirmDeleteIndex = (index: DatabaseIndex) => {
+    if (!project) return console.error('Project is required')
+    execute({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      sql: `drop index if exists "${index.name}"`,
+    })
+  }
 
   return (
     <>
@@ -179,10 +215,16 @@ const Indexes = () => {
                         <p title={index.name}>{index.name}</p>
                       </Table.td>
                       <Table.td>
-                        <div className="flex justify-end items-center">
+                        <div className="flex justify-end items-center space-x-2">
                           <Button type="default" onClick={() => setSelectedIndex(index)}>
                             View definition
                           </Button>
+                          <Button
+                            type="default"
+                            className="px-1"
+                            icon={<IconTrash />}
+                            onClick={() => setSelectedIndexToDelete(index)}
+                          />
                         </div>
                       </Table.td>
                     </Table.tr>
@@ -216,6 +258,48 @@ const Indexes = () => {
       </SidePanel>
 
       <CreateIndexSidePanel visible={showCreateIndex} onClose={() => setShowCreateIndex(false)} />
+
+      <ConfirmationModal
+        danger
+        size="medium"
+        loading={isExecuting}
+        visible={selectedIndexToDelete !== undefined}
+        header={
+          <>
+            Confirm to delete index <code className="text-sm">{selectedIndexToDelete?.name}</code>
+          </>
+        }
+        buttonLabel="Confirm delete"
+        buttonLoadingLabel="Deleting..."
+        onSelectConfirm={() =>
+          selectedIndexToDelete !== undefined ? onConfirmDeleteIndex(selectedIndexToDelete) : {}
+        }
+        onSelectCancel={() => setSelectedIndexToDelete(undefined)}
+      >
+        <Modal.Content>
+          <div className="py-6">
+            <Alert_Shadcn_ variant="warning">
+              <IconAlertTriangle strokeWidth={2} />
+              <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                Deleting an index that is still in use will cause queries to slow down, in some
+                cases causing major issues.
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+            <ul className="mt-4 space-y-5">
+              <li className="flex gap-3">
+                <div>
+                  <strong className="text-sm">Before deleting this index, consider:</strong>
+                  <ul className="space-y-2 mt-2 text-sm text-light">
+                    <li className="list-disc ml-6">This index is no longer in use</li>
+                    <li className="list-disc ml-6">Disabling the index instead of deleting it</li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </Modal.Content>
+      </ConfirmationModal>
     </>
   )
 }
