@@ -19,6 +19,7 @@ import { Organization, Project, ResponseError } from 'types'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { useResourceWarningQuery } from 'data/usage/resource-warnings-query'
 
 export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string
@@ -95,6 +96,10 @@ const OrganizationProjects = ({
 }: OrganizationProjectsProps) => {
   const isEmpty = !projects || projects.length === 0
   const canReadProjects = useCheckPermissions(PermissionAction.READ, 'projects', undefined, id)
+  const { data: resourceWarnings } = useResourceWarningQuery()
+
+  console.log(resourceWarnings)
+  console.log('one render')
 
   return (
     <div className="space-y-3" key={makeRandomString(5)}>
@@ -165,6 +170,9 @@ const OrganizationProjects = ({
                 key={makeRandomString(5)}
                 project={project}
                 rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
+                resourceWarnings={resourceWarnings?.find(
+                  (resourceWarning) => resourceWarning.project === project.ref
+                )}
               />
             ))
           )}
