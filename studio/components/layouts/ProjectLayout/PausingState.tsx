@@ -1,11 +1,34 @@
-import { Project } from 'types'
+import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { Badge, IconCircle, IconLoader } from 'ui'
+
+import { useProjectStatusQuery } from 'data/projects/project-status-query'
+import { invalidateProjectsQuery } from 'data/projects/projects-query'
+import { PROJECT_STATUS } from 'lib/constants'
+import { timeout } from 'lib/helpers'
+import { Project } from 'types'
 
 export interface PausingStateProps {
   project: Project
 }
 
 const PausingState = ({ project }: PausingStateProps) => {
+  const { ref } = useParams()
+  const queryClient = useQueryClient()
+  const { refetch } = useProjectStatusQuery(
+    { projectRef: ref },
+    {
+      onSuccess: async (res) => {
+        if ([PROJECT_STATUS.GOING_DOWN, PROJECT_STATUS.PAUSING].includes(res.status)) {
+          await timeout(2000)
+          refetch()
+        } else if (PROJECT_STATUS.INACTIVE) {
+          await invalidateProjectsQuery(queryClient)
+        }
+      },
+    }
+  )
+
   return (
     <div className="mx-auto my-16 w-full max-w-7xl space-y-16">
       <div className="mx-6 space-y-16">
