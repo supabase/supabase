@@ -1,4 +1,4 @@
-import { UpsertContentPayload, upsertContent } from 'data/content/content-upsert-mutation'
+import { upsertContent, UpsertContentPayload } from 'data/content/content-upsert-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { debounce, memoize } from 'lodash'
 import { useMemo } from 'react'
@@ -126,6 +126,16 @@ export const sqlEditorState = proxy({
       sqlEditorState.needsSaving.add(id)
     }
   },
+  shareSnippet: (id: string, visibility: 'user' | 'project' | 'org' | 'public') => {
+    if (sqlEditorState.snippets[id]) {
+      const { snippet, projectRef } = sqlEditorState.snippets[id]
+
+      snippet.visibility = visibility
+
+      sqlEditorState.reorderSnippets(projectRef)
+      sqlEditorState.needsSaving.add(id)
+    }
+  },
   addNeedsSaving: (id: string) => {
     sqlEditorState.needsSaving.add(id)
   },
@@ -199,7 +209,7 @@ if (typeof window !== 'undefined') {
           ...snippet.snippet,
           name: snippet.snippet.name ?? 'Untitled',
           description: snippet.snippet.description ?? '',
-          visibility: 'user',
+          visibility: snippet.snippet.visibility ?? 'user',
           project_id: snippet.snippet.project_id ?? 0,
           content: { ...snippet.snippet.content, content_id: id } as SqlSnippets.Content,
           type: 'sql',

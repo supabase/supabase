@@ -1,12 +1,12 @@
-import { FC, useEffect, useRef } from 'react'
 import Editor, { EditorProps } from '@monaco-editor/react'
+import { merge, noop } from 'lodash'
+import { useRef } from 'react'
 
 import { timeout } from 'lib/helpers'
 import Connecting from '../Loading'
 import { alignEditor } from './CodeEditor.utils'
-import { merge, noop } from 'lodash'
 
-interface Props {
+interface CodeEditorProps {
   id: string
   language: 'pgsql' | 'json' | 'html'
   defaultValue?: string
@@ -20,7 +20,7 @@ interface Props {
   value?: string
 }
 
-const CodeEditor: FC<Props> = ({
+const CodeEditor = ({
   id,
   language,
   defaultValue,
@@ -32,14 +32,8 @@ const CodeEditor: FC<Props> = ({
   loading,
   options,
   value,
-}) => {
+}: CodeEditorProps) => {
   const editorRef = useRef()
-
-  useEffect(() => {
-    if (editorRef.current) {
-      // alignEditor(editorRef.current)
-    }
-  }, [id])
 
   const onMount = async (editor: any, monaco: any) => {
     alignEditor(editor)

@@ -1,11 +1,10 @@
 import Link from 'next/link'
-import React from 'react'
+import React, { PropsWithChildren } from 'react'
 import { IconChevronRight, IconLoader } from 'ui'
 
 interface CardButtonProps {
   title: string | React.ReactNode
   description?: string
-  children?: React.ReactNode
   footer?: React.ReactNode
   url?: string
   linkHref?: string
@@ -30,7 +29,7 @@ const CardButton = ({
   icon,
   containerHeightClassName = 'h-32',
   loading = false,
-}: CardButtonProps) => {
+}: PropsWithChildren<CardButtonProps>) => {
   const LinkContainer = ({ children }: { children: React.ReactNode }) => (
     <Link href={linkHref}>
       <a>{children}</a>

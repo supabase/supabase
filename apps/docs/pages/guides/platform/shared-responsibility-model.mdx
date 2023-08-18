@@ -46,6 +46,17 @@ You are responsible for using best-practices to optimize and manage your databas
 
 You are responsible of provisioning enough compute to run the workload that your application requires. The Supabase Dashboard provides [observability tooling](https://supabase.com/dashboard/project/_/reports/database) to help with this.
 
+## Managing healthcare data
+
+You can use Supabase to store and process Protected Health Information (PHI). You are responsible for the following
+
+- Signing a Business Associate Agreement with Supabase. Reach out to growth@supabase.io to get started.
+- Enabling [Point in Time Recovery](/docs/guides/platform/backups#point-in-time-recovery).
+- Turning on [SSL Enforcement](/docs/guides/platform/ssl-enforcement).
+- Enabling [Network Restrictions](/docs/guides/platform/network-restrictions).
+- Disabling [Supabase AI editor](https://supabase.com/dashboard/org/_/general) in our dashboard.
+- Encrypting PHI in your database. Consider using pgsodium's [Transparent Column Encryption](https://github.com/michelp/pgsodium#transparent-column-encryption) which comes bundled in with every Supabase project.
+
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page

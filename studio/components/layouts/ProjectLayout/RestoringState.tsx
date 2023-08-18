@@ -1,16 +1,14 @@
 import Link from 'next/link'
-import { FC, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { Button, IconAlertCircle, IconCheckCircle, IconLoader } from 'ui'
 
 import { getProjectDetail } from 'data/projects/project-detail-query'
 import { useStore } from 'hooks'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { Button, IconAlertCircle, IconCheckCircle, IconLoader } from 'ui'
 import { useProjectContext } from './ProjectContext'
 
-interface Props {}
-
-const RestoringState: FC<Props> = ({}) => {
+const RestoringState = () => {
   const { meta } = useStore()
   const { project } = useProjectContext()
   const checkServerInterval = useRef<number>()

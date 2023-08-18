@@ -1,12 +1,16 @@
-import { IconBarChart, IconFileText, IconList, IconSettings, IconUsers } from 'ui'
-import { products } from 'shared-data'
 import SVG from 'react-inlinesvg'
+import { products } from 'shared-data'
+import { IconBarChart, IconFileText, IconList, IconSettings } from 'ui'
 
-import { ProjectBase } from 'types'
 import { Route } from 'components/ui/ui.types'
 import { BASE_PATH, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { ProjectBase } from 'types'
 
-export const generateToolRoutes = (ref?: string, project?: ProjectBase): Route[] => {
+export const generateToolRoutes = (
+  ref?: string,
+  project?: ProjectBase,
+  supabaseAIEnabled?: boolean
+): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
 
@@ -35,7 +39,12 @@ export const generateToolRoutes = (ref?: string, project?: ProjectBase): Route[]
       ),
       link: !IS_PLATFORM
         ? `/project/${ref}/sql/1`
-        : ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
+        : ref &&
+          (isProjectBuilding
+            ? buildingUrl
+            : supabaseAIEnabled
+            ? `/project/${ref}/sql/new`
+            : `/project/${ref}/sql/templates`),
     },
   ]
 }

@@ -275,7 +275,7 @@ function BlogPostPage(props: any) {
                           </div>
                         )
                       )}
-                      <MDXRemote {...content} components={mdxComponents()} />
+                      <MDXRemote {...content} components={mdxComponents('blog')} />
                     </div>
                   </article>
                   {isLaunchWeek7 && <BlogLinks />}

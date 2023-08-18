@@ -1,9 +1,9 @@
-import { FC } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Badge } from 'ui'
+
 import { InvoiceStatus } from './Invoices.types'
 
-interface Props {
+interface InvoiceStatusBadgeProps {
   status: InvoiceStatus
 }
 
@@ -33,7 +33,7 @@ export const invoiceStatusMapping: Record<InvoiceStatus, { label: string; badgeC
   },
 }
 
-const InvoiceStatusBadge: FC<Props> = ({ status }) => {
+const InvoiceStatusBadge = ({ status }: InvoiceStatusBadgeProps) => {
   const statusMapping = invoiceStatusMapping[status]
 
   return (

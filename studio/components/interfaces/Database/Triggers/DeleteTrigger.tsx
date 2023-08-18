@@ -1,16 +1,17 @@
-import { FC, useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
+import { useState } from 'react'
+
 import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
+import { useStore } from 'hooks'
 import { isResponseOk } from 'lib/common/fetch'
 
-type DeleteTriggerProps = {
+interface DeleteTriggerProps {
   trigger?: any
   visible: boolean
   setVisible: (value: boolean) => void
-} & any
+}
 
-const DeleteTrigger: FC<DeleteTriggerProps> = ({ store, trigger, visible, setVisible }) => {
+const DeleteTrigger = ({ trigger, visible, setVisible }: DeleteTriggerProps) => {
   const { ui, meta } = useStore()
   const [loading, setLoading] = useState(false)
   const { id, name, schema } = trigger ?? {}
