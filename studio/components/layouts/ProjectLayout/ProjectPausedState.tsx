@@ -13,6 +13,7 @@ import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { Button, IconPauseCircle, Modal } from 'ui'
 import { useProjectContext } from './ProjectContext'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 export interface ProjectPausedStateProps {
   product?: string
@@ -25,6 +26,9 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const selectedOrganization = useSelectedOrganization()
   const { project } = useProjectContext()
   const orgSlug = selectedOrganization?.slug
+  const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: ref })
+  const isFreePlan = subscription?.plan?.id === 'free'
+  const billedViaOrg = Boolean(selectedOrganization?.subscription_id)
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug: orgSlug })
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
@@ -80,7 +84,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                 <IconPauseCircle className="text-scale-1100" size={50} strokeWidth={1.5} />
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <p className="text-center">
                   The project "{project?.name ?? ''}" is currently paused.
                 </p>
@@ -96,6 +100,23 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     'Restore this project and get back to building the next big thing!'
                   )}
                 </p>
+                {isFreePlan && (
+                  <p className="text-sm text-scale-1100 text-center">
+                    You can also prevent project pausing in the future by upgrading to Pro.
+                  </p>
+                )}
+                {!isFreePlan && (
+                  <p className="text-sm text-scale-1100 text-center">
+                    Unpaused projects count towards compute usage. For every hour your instance is
+                    active, we'll bill you based on the instance size of your project. See{' '}
+                    <Link href="https://www.notion.so/supabase/Organization-Level-Billing-707638e35c92489995dc3ac991a324d1">
+                      <a target="_blank" rel="noreferrer" className="underline">
+                        Compute Instance Usage Billing
+                      </a>
+                    </Link>{' '}
+                    for more details.
+                  </p>
+                )}
               </div>
 
               <div className="flex items-center justify-center gap-4">
@@ -128,11 +149,25 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     </Tooltip.Portal>
                   )}
                 </Tooltip.Root>
-                <Link href={`/project/${ref}/settings/general`}>
-                  <a>
-                    <Button type="default">View project settings</Button>
-                  </a>
-                </Link>
+                {isFreePlan ? (
+                  <Link
+                    href={
+                      billedViaOrg
+                        ? `/org/${orgSlug}/billing?panel=subscriptionPlan`
+                        : `/project/${ref}/settings/billing/subscription?panel=subscriptionPlan`
+                    }
+                  >
+                    <a>
+                      <Button type="default">Upgrade to Pro</Button>
+                    </a>
+                  </Link>
+                ) : (
+                  <Link href={`/project/${ref}/settings/general`}>
+                    <a>
+                      <Button type="default">View project settings</Button>
+                    </a>
+                  </Link>
+                )}
               </div>
             </div>
           </div>

@@ -1,31 +1,32 @@
-import Link from 'next/link'
-import dayjs from 'dayjs'
-import { FC, useState } from 'react'
-import {
-  Button,
-  IconEye,
-  IconEyeOff,
-  IconTrash,
-  Input,
-  Dropdown,
-  IconEdit3,
-  IconKey,
-  IconMoreVertical,
-  IconLoader,
-} from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { VaultSecret } from 'types'
-import { useStore, useCheckPermissions } from 'hooks'
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
+import dayjs from 'dayjs'
+import Link from 'next/link'
+import { useState } from 'react'
+import {
+  Button,
+  Dropdown,
+  IconEdit3,
+  IconEye,
+  IconEyeOff,
+  IconKey,
+  IconLoader,
+  IconMoreVertical,
+  IconTrash,
+  Input,
+} from 'ui'
 
-interface Props {
+import { useCheckPermissions, useStore } from 'hooks'
+import { VaultSecret } from 'types'
+
+interface SecretRowProps {
   secret: VaultSecret
   onSelectEdit: (secret: any) => void
   onSelectRemove: (secret: any) => void
 }
 
-const SecretRow: FC<Props> = ({ secret, onSelectEdit, onSelectRemove }) => {
+const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => {
   const { vault } = useStore()
   const { ref } = useParams()
 

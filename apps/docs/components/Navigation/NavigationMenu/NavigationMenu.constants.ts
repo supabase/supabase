@@ -568,6 +568,7 @@ export const database: NavMenuConstant = {
         { name: 'Implementing Cascade Deletes', url: '/guides/database/postgres/cascade-deletes' },
         { name: 'Implementing column encryption', url: '/guides/database/column-encryption' },
         { name: 'Partitioning your tables', url: '/guides/database/partitions' },
+        { name: 'Query Optimization', url: '/guides/database/query-optimization' },
         { name: 'Testing your database', url: '/guides/database/testing' },
         { name: 'Managing Timeouts', url: '/guides/database/timeouts' },
         { name: 'Managing Passwords', url: '/guides/database/managing-passwords' },
@@ -588,6 +589,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/plv8',
         },
         { name: 'http: RESTful Client', url: '/guides/database/extensions/http' },
+        {
+          name: 'index_advisor: Query optimization',
+          url: '/guides/database/extensions/index_advisor',
+        },
         {
           name: 'PGAudit: Postgres Auditing',
           url: '/guides/database/extensions/pgaudit',
@@ -1037,6 +1042,10 @@ export const supabase_cli: NavMenuConstant = {
           name: 'Testing and linting',
           url: '/guides/cli/testing-and-linting',
         },
+        {
+          name: 'Customizing email templates',
+          url: '/guides/cli/customizing-email-templates',
+        },
       ],
     },
     {
@@ -1139,12 +1148,8 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/marketplace',
         },
         {
-          name: 'Publish an OAuth App',
-          url: '/guides/platform/oauth-apps/publish-an-oauth-app',
-        },
-        {
-          name: 'Sign in with Supabase',
-          url: '/guides/platform/oauth-apps/authorize-an-oauth-app',
+          name: 'Build a Supabase Integration',
+          url: '/guides/platform/oauth-apps/build-a-supabase-integration',
         },
       ],
     },

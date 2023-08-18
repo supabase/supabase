@@ -1,8 +1,8 @@
-import { FC } from 'react'
+import { noop } from 'lodash'
 import Link from 'next/link'
-import { Menu, IconLogOut, IconArrowUpRight } from 'ui'
+import { IconArrowUpRight, IconLogOut, Menu } from 'ui'
 
-interface Props {
+interface SidebarItemProps {
   id: any
   label: string
   href?: string
@@ -12,15 +12,15 @@ interface Props {
   onClick?: () => void
 }
 
-const SidebarItem: FC<Props> = ({
+const SidebarItem = ({
   id,
   label,
   href,
   isActive = false,
   isSubitem = false,
   isExternal = false,
-  onClick = () => {},
-}) => {
+  onClick = noop,
+}: SidebarItemProps) => {
   if (href === undefined) {
     const icon = isExternal ? (
       <IconArrowUpRight size="tiny" />

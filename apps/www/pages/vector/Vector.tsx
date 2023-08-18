@@ -21,9 +21,9 @@ const EnterpriseCta = dynamic(() => import('~/components/Sections/EnterpriseCta'
 function VectorPage() {
   // base path for images
   const { basePath } = useRouter()
-  const meta_title = 'Supabase Vector | The open source vector toolkit for Postgres.'
+  const meta_title = 'Supabase Vector | The Postgres Vector database.'
   const meta_description =
-    'An open source toolkit for developing AI applications using Postgres and pgvector. Integrate with your favorite ML-models to store, index, and access vector embeddings for any AI use case.'
+    'An open source Vector database for developing AI applications. Use pgvector to store, index, and access embeddings, and our AI toolkit to build AI applications with Hugging Face and OpenAI.'
 
   return (
     <>

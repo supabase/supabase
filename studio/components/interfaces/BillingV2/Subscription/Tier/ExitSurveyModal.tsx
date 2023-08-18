@@ -98,6 +98,7 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
         projectRef,
         reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
         message,
+        exitAction: 'downgrade',
       })
     } finally {
     }
@@ -116,6 +117,8 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
     onClose(true)
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   }
+
+  if (!visible) return null
 
   return (
     <>
