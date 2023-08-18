@@ -31,7 +31,6 @@ const BuildingState = ({ project }: BuildingStateProps) => {
       const { status } = projectStatus
       if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
         clearInterval(checkServerInterval.current)
-
         await invalidateProjectsQuery(queryClient)
       }
     }

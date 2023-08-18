@@ -7,6 +7,7 @@ import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { PROJECT_STATUS } from 'lib/constants'
 import { timeout } from 'lib/helpers'
 import { Project } from 'types'
+import { useEffect, useState } from 'react'
 
 export interface PausingStateProps {
   project: Project
@@ -15,9 +16,12 @@ export interface PausingStateProps {
 const PausingState = ({ project }: PausingStateProps) => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
+  const [startPolling, setStartPolling] = useState(false)
+
   const { refetch } = useProjectStatusQuery(
     { projectRef: ref },
     {
+      enabled: startPolling,
       onSuccess: async (res) => {
         if ([PROJECT_STATUS.GOING_DOWN, PROJECT_STATUS.PAUSING].includes(res.status)) {
           await timeout(2000)
@@ -28,6 +32,10 @@ const PausingState = ({ project }: PausingStateProps) => {
       },
     }
   )
+
+  useEffect(() => {
+    setTimeout(() => setStartPolling(true), 4000)
+  }, [])
 
   return (
     <div className="mx-auto my-16 w-full max-w-7xl space-y-16">
