@@ -54,14 +54,12 @@ const PaymentMethods = () => {
     <>
       <ScaffoldSection>
         <ScaffoldSectionDetail>
-          <div className="sticky space-y-6 top-16">
-            <div>
-              <p className="text-base">Payment methods</p>
-              <p className="text-sm text-scale-1000 mb-2 pr-4">
-                After adding a payment method, make sure to mark it as active to use it for billing.
-                You can remove unused cards.
-              </p>
-            </div>
+          <div className="sticky space-y-2 top-12">
+            <p className="text-base m-0">Payment methods</p>
+            <p className="text-sm text-scale-1000 mb-2 pr-4 m-0">
+              After adding a payment method, make sure to mark it as active to use it for billing.
+              You can remove unused cards.
+            </p>
           </div>
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
