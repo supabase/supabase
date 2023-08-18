@@ -17,6 +17,8 @@ import ProjectPausedState from './ProjectPausedState'
 import RestoringState from './RestoringState'
 import UpgradingState from './UpgradingState'
 import AppLayout from '../AppLayout/AppLayout'
+import UsageWarningBanner from 'components/ui/UsageWarnings/UsageWarningBanner'
+import { useResourceWarningQuery } from 'data/usage/resource-warnings-query'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -94,14 +96,12 @@ const ProjectLayout = ({
         <div className="flex h-full">
           {/* Left-most navigation side bar to access products */}
           {!hideIconBar && <NavigationBar />}
-
           {/* Product menu bar */}
           {!showPausedState && (
             <MenuBarWrapper isLoading={isLoading} productMenu={productMenu}>
               <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
             </MenuBarWrapper>
           )}
-
           <main className="flex flex-col flex-1 w-full overflow-x-hidden">
             {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
             {showPausedState ? (
@@ -179,6 +179,8 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
     selectedProject?.status === PROJECT_STATUS.PAUSING
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
 
+  const { data: resourceWarnings } = useResourceWarningQuery()
+  console.log(resourceWarnings)
   return (
     <>
       {isLoading || (requiresProjectDetails && selectedProject === undefined) ? (
@@ -194,7 +196,10 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
       ) : requiresDbConnection && isProjectBuilding ? (
         <BuildingState project={selectedProject} />
       ) : (
-        <Fragment key={selectedProject?.ref}>{children}</Fragment>
+        <>
+          <UsageWarningBanner />
+          <Fragment key={selectedProject?.ref}>{children}</Fragment>
+        </>
       )}
     </>
   )

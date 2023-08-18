@@ -27,7 +27,7 @@ const CardButton = ({
   imgAlt,
   onClick,
   icon,
-  containerHeightClassName = 'h-32',
+  containerHeightClassName = 'h-48',
   loading = false,
 }: PropsWithChildren<CardButtonProps>) => {
   const LinkContainer = ({ children }: { children: React.ReactNode }) => (

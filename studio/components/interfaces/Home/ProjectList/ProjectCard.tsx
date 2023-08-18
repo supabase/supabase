@@ -5,7 +5,6 @@ import {
   IconGitHub,
   IconLoader,
   IconPauseCircle,
-  IconTriangle,
 } from 'ui'
 
 import CardButton from 'components/ui/CardButton'
@@ -13,12 +12,15 @@ import { useProjectReadOnlyStatus } from 'hooks/misc/useProjectReadOnlyStatus'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { Project } from 'types'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { ResourceWarningResponse } from 'data/usage/resource-warnings-query'
+import ProjectCardWarnings from './ProjectCardWarnings'
 
 export interface ProjectCardProps {
   project: Project
   rewriteHref?: string
   githubIntegration?: IntegrationProjectConnection
   vercelIntegration?: IntegrationProjectConnection
+  resourceWarnings?: ResourceWarningResponse
 }
 
 const ProjectCard = ({
@@ -26,6 +28,7 @@ const ProjectCard = ({
   rewriteHref,
   githubIntegration,
   vercelIntegration,
+  resourceWarnings,
 }: ProjectCardProps) => {
   const { name, ref: projectRef } = project
   const desc = `${project.cloud_provider} | ${project.region}`
@@ -36,12 +39,22 @@ const ProjectCard = ({
   const isVercelIntegrated = vercelIntegration !== undefined
   const githubRepository = githubIntegration?.metadata.name ?? undefined
 
-  // Project status should supersede is read only status
+  // Project status should supersede its read only status
   const isHealthy = project.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const isPausing =
     project.status === PROJECT_STATUS.GOING_DOWN || project.status === PROJECT_STATUS.PAUSING
   const isPaused = project.status === PROJECT_STATUS.INACTIVE
   const isRestoring = project.status === PROJECT_STATUS.RESTORING
+
+  const checkProjectResourceWarnings = (resourceWarnings: ResourceWarningResponse) => {
+    return Object.values(resourceWarnings).some(
+      (value) => typeof value === 'boolean' && value === true
+    )
+  }
+
+  // const projectHasResourceWarnings =
+  //   resourceWarnings !== undefined ? checkProjectResourceWarnings(resourceWarnings) : false
+  const projectHasResourceWarnings = true
 
   return (
     <li className="col-span-1 list-none">
@@ -74,6 +87,9 @@ const ProjectCard = ({
                 </>
               )}
             </div>
+            {resourceWarnings && projectHasResourceWarnings && (
+              <ProjectCardWarnings resourceWarnings={resourceWarnings} />
+            )}
           </div>
         }
         footer={
