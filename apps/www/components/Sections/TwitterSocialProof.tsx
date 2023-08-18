@@ -39,7 +39,7 @@ function TwitterSocialProof() {
             <Link href={'https://github.com/supabase/supabase/discussions'} passHref>
               <a target="_blank">
                 <Button size="small" iconRight={<IconMessageCircle size={14} />} type="default">
-                  GitHub discussions
+                  GitHub discussions 
                 </Button>
               </a>
             </Link>
@@ -54,10 +54,17 @@ function TwitterSocialProof() {
         </div>
       </div>
       <div className="mt-6">
+<<<<<<< HEAD
         <div className="cursor-move lg:-mr-32 lg:-ml-32">
           <Swiper
             loop={true}
             initialSlide={3}
+=======
+        <div className="cursor-move lg:-mr-32 lg:-ml-32" >
+          <Swiper 
+          loop={true}
+            initialSlide={0}
+>>>>>>> 288c2624e (fix carosel on lnading page)
             spaceBetween={0}
             slidesPerView={4}
             speed={300}
