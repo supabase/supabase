@@ -84,7 +84,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                 <IconPauseCircle className="text-scale-1100" size={50} strokeWidth={1.5} />
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <p className="text-center">
                   The project "{project?.name ?? ''}" is currently paused.
                 </p>
@@ -103,6 +103,18 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                 {isFreePlan && (
                   <p className="text-sm text-scale-1100 text-center">
                     You can also prevent project pausing in the future by upgrading to Pro.
+                  </p>
+                )}
+                {!isFreePlan && (
+                  <p className="text-sm text-scale-1100 text-center">
+                    Unpaused projects count towards compute usage. For every hour your instance is
+                    active, we'll bill you based on the instance size of your project. See{' '}
+                    <Link href="https://www.notion.so/supabase/Organization-Level-Billing-707638e35c92489995dc3ac991a324d1">
+                      <a target="_blank" rel="noreferrer" className="underline">
+                        Compute Instance Usage Billing
+                      </a>
+                    </Link>{' '}
+                    for more details.
                   </p>
                 )}
               </div>
