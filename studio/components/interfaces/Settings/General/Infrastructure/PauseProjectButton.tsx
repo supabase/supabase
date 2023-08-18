@@ -15,8 +15,6 @@ import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { Button, IconPause } from 'ui'
 
-export interface PauseProjectButtonProps {}
-
 const PauseProjectButton = () => {
   const queryClient = useQueryClient()
   const { ui } = useStore()
