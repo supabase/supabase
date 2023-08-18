@@ -5,7 +5,6 @@ import { Badge, IconCircle, IconLoader } from 'ui'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { PROJECT_STATUS } from 'lib/constants'
-import { timeout } from 'lib/helpers'
 import { Project } from 'types'
 import { useEffect, useState } from 'react'
 
@@ -18,15 +17,15 @@ const PausingState = ({ project }: PausingStateProps) => {
   const queryClient = useQueryClient()
   const [startPolling, setStartPolling] = useState(false)
 
-  const { refetch } = useProjectStatusQuery(
+  useProjectStatusQuery(
     { projectRef: ref },
     {
       enabled: startPolling,
+      refetchInterval: (res) => {
+        return res?.status === PROJECT_STATUS.INACTIVE ? false : 2000
+      },
       onSuccess: async (res) => {
-        if ([PROJECT_STATUS.GOING_DOWN, PROJECT_STATUS.PAUSING].includes(res.status)) {
-          await timeout(2000)
-          refetch()
-        } else if (PROJECT_STATUS.INACTIVE) {
+        if (res.status === PROJECT_STATUS.INACTIVE) {
           await invalidateProjectsQuery(queryClient)
         }
       },
