@@ -3,7 +3,7 @@ export const alignEditor = (editor: any) => {
   editor.changeViewZones((accessor: any) => {
     accessor.addZone({
       afterLineNumber: 0,
-      heightInPx: 10,
+      heightInPx: 4,
       domNode: document.createElement('div'),
     })
   })

@@ -37,6 +37,7 @@ const CodeEditor = ({
 
   const onMount = async (editor: any, monaco: any) => {
     alignEditor(editor)
+
     editor.addAction({
       id: 'supabase',
       label: 'Run Query',

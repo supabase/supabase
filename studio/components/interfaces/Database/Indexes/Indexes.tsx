@@ -18,11 +18,13 @@ import { DatabaseIndex, useIndexesQuery } from 'data/database/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import Table from 'components/to-be-cleaned/Table'
 import CodeEditor from 'components/ui/CodeEditor'
+import CreateIndexSidePanel from './CreateIndexSidePanel'
 
 const Indexes = () => {
   const [search, setSearch] = useState('')
   const [selectedSchema, setSelectedSchema] = useState('public')
   const [selectedIndex, setSelectedIndex] = useState<DatabaseIndex>()
+  const [showCreateIndex, setShowCreateIndex] = useState(false)
 
   const { project } = useProjectContext()
   const {
@@ -82,41 +84,50 @@ const Indexes = () => {
           </div>
         </div>
 
-        <div className="flex items-center space-x-2 mb-4">
-          {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
-          {isErrorSchemas && (
-            <div className="w-[260px] text-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
-              <IconAlertCircle strokeWidth={2} size={16} />
-              <p>Failed to load schemas</p>
-            </div>
-          )}
-          {isSuccessSchemas && (
-            <Listbox
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
+            {isErrorSchemas && (
+              <div className="w-[260px] text-light text-sm border px-3 py-1.5 rounded flex items-center space-x-2">
+                <IconAlertCircle strokeWidth={2} size={16} />
+                <p>Failed to load schemas</p>
+              </div>
+            )}
+            {isSuccessSchemas && (
+              <Listbox
+                size="small"
+                value={selectedSchema}
+                onChange={setSelectedSchema}
+                className="w-[260px]"
+              >
+                {(schemas?.result ?? []).map((schema) => (
+                  <Listbox.Option
+                    key={schema.name}
+                    value={schema.name}
+                    label={schema.name}
+                    addOnBefore={() => <span className="text-scale-900">schema</span>}
+                  >
+                    {schema.name}
+                  </Listbox.Option>
+                ))}
+              </Listbox>
+            )}
+            <Input
               size="small"
-              value={selectedSchema}
-              onChange={setSelectedSchema}
-              className="w-[260px]"
-            >
-              {(schemas?.result ?? []).map((schema) => (
-                <Listbox.Option
-                  key={schema.name}
-                  value={schema.name}
-                  label={schema.name}
-                  addOnBefore={() => <span className="text-scale-900">schema</span>}
-                >
-                  {schema.name}
-                </Listbox.Option>
-              ))}
-            </Listbox>
-          )}
-          <Input
-            size="small"
-            value={search}
-            className="w-[250px]"
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search for an index"
-            icon={<IconSearch size={14} />}
-          />
+              value={search}
+              className="w-[250px]"
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search for an index"
+              icon={<IconSearch size={14} />}
+            />
+          </div>
+          <Button
+            type="primary"
+            onClick={() => setShowCreateIndex(true)}
+            disabled={!isSuccessSchemas}
+          >
+            Create index
+          </Button>
         </div>
 
         {isLoadingIndexes && <GenericSkeletonLoader />}
@@ -203,6 +214,8 @@ const Indexes = () => {
           </div>
         </div>
       </SidePanel>
+
+      <CreateIndexSidePanel visible={showCreateIndex} onClose={() => setShowCreateIndex(false)} />
     </>
   )
 }
