@@ -9,6 +9,7 @@ import { alignEditor } from './CodeEditor.utils'
 interface CodeEditorProps {
   id: string
   language: 'pgsql' | 'json' | 'html'
+  autofocus?: boolean
   defaultValue?: string
   isReadOnly?: boolean
   onInputChange?: (value?: string) => void
@@ -24,6 +25,7 @@ const CodeEditor = ({
   id,
   language,
   defaultValue,
+  autofocus = true,
   isReadOnly = false,
   hideLineNumbers = false,
   onInputChange = noop,
@@ -53,7 +55,7 @@ const CodeEditor = ({
     })
 
     await timeout(500)
-    editor?.focus()
+    if (autofocus) editor?.focus()
     editorRef.current = editor
   }
 

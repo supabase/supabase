@@ -221,6 +221,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
               <div className="relative h-full">
                 <CodeEditor
                   isReadOnly
+                  autofocus={false}
                   id={`${selectedSchema}-${selectedEntity}-${selectedColumns.join(
                     ','
                   )}-${selectedIndexType}`}
