@@ -7,6 +7,7 @@ import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Project } from 'types'
 import { useEffect, useState } from 'react'
+import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 
 export interface PausingStateProps {
   project: Project
@@ -26,6 +27,7 @@ const PausingState = ({ project }: PausingStateProps) => {
       },
       onSuccess: async (res) => {
         if (res.status === PROJECT_STATUS.INACTIVE) {
+          if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
           await invalidateProjectsQuery(queryClient)
         }
       },

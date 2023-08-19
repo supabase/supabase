@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { useCallback } from 'react'
 
 import { get, isResponseOk } from 'lib/common/fetch'
@@ -33,14 +33,6 @@ export const useProjectDetailQuery = <TData = ProjectDetailData>(
     }
   )
 
-export const useProjectDetailPrefetch = ({ ref }: ProjectDetailVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (ref) {
-      client.prefetchQuery(projectKeys.detail(ref), ({ signal }) =>
-        getProjectDetail({ ref }, signal)
-      )
-    }
-  }, [ref])
+export function invalidateProjectDetailsQuery(client: QueryClient, ref: string) {
+  return client.invalidateQueries(projectKeys.detail(ref))
 }
