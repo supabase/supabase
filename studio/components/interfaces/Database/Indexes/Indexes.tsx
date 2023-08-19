@@ -220,7 +220,7 @@ const Indexes = () => {
                             View definition
                           </Button>
                           <Button
-                            type="default"
+                            type="text"
                             className="px-1"
                             icon={<IconTrash />}
                             onClick={() => setSelectedIndexToDelete(index)}
@@ -282,8 +282,8 @@ const Indexes = () => {
               <IconAlertTriangle strokeWidth={2} />
               <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
-                Deleting an index that is still in use will cause queries to slow down, in some
-                cases causing major issues.
+                Deleting an index that is still in use will cause queries to slow down, and in some
+                cases causing significant performance issues.
               </AlertDescription_Shadcn_>
             </Alert_Shadcn_>
             <ul className="mt-4 space-y-5">
@@ -292,7 +292,10 @@ const Indexes = () => {
                   <strong className="text-sm">Before deleting this index, consider:</strong>
                   <ul className="space-y-2 mt-2 text-sm text-light">
                     <li className="list-disc ml-6">This index is no longer in use</li>
-                    <li className="list-disc ml-6">Disabling the index instead of deleting it</li>
+                    <li className="list-disc ml-6">
+                      The table which the index is on is not currently in use, as dropping an index
+                      requires a short exclusive access lock on the table.
+                    </li>
                   </ul>
                 </div>
               </li>
