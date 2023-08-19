@@ -217,7 +217,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 </Link>
               </div>
             </SidePanel.Content>
-            <div className="h-[200px]">
+            <div className="h-[200px] !mt-2">
               <div className="relative h-full">
                 <CodeEditor
                   isReadOnly
