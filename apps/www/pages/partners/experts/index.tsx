@@ -30,7 +30,7 @@ interface Props {
 }
 
 function ExpertPartnersPage(props: Props) {
-  const { partners } = props
+  const partners = props.partners ?? []
   const router = useRouter()
 
   const meta_title = 'Find an expert'
