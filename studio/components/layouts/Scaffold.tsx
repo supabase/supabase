@@ -65,7 +65,7 @@ const ScaffoldSectionDetail = React.forwardRef<
 >(({ className, children, title, ...props }, ref) => {
   return (
     <div ref={ref} {...props} className={cn('col-span-4 xl:col-span-5 prose text-sm', className)}>
-      <h2>{title}</h2>
+      {title && <h2>{title}</h2>}
       {children}
     </div>
   )
