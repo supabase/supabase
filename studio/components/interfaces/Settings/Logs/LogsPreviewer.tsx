@@ -166,9 +166,6 @@ export const LogsPreviewer = ({
         csvData={logData}
         isLoading={isLoading}
         newCount={newCount}
-        templates={TEMPLATES.filter(
-          (template) => queryType && template.for?.includes(queryType) && template.mode === 'simple'
-        )}
         onRefresh={handleRefresh}
         onSearch={handleSearch}
         defaultSearchValue={filters.search_query as string}

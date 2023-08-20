@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useCheckPermissions, useStore } from 'hooks'
 import { Button, IconAlertCircle, IconCode, IconLock } from 'ui'
+import { useEffect, useRef, useState } from 'react'
+import { RLS_ACKNOWLEDGED_KEY, rlsAcknowledgedKey } from 'components/grid/constants'
 
 export interface GridHeaderActionsProps {
   table: PostgresTable
@@ -28,6 +30,30 @@ const GridHeaderActions = ({
   const canSqlWriteTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
   const canSqlWriteColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
   const isReadOnly = !canSqlWriteTables && !canSqlWriteColumns
+
+  const rlsKey = rlsAcknowledgedKey(table.id.toString())
+
+  const rlsAcknowledgedChannel = useRef(new BroadcastChannel(rlsKey))
+  const [showRLSWarning, setShowRLSWarning] = useState(
+    !table.rls_enabled && localStorage.getItem(rlsKey) === 'true'
+  )
+
+  const rlsDisabledMessage = showRLSWarning ? 'RLS is not enabled' : ''
+
+  useEffect(() => {
+    if (rlsAcknowledgedChannel.current) {
+      rlsAcknowledgedChannel.current.close()
+    }
+
+    rlsAcknowledgedChannel.current = new BroadcastChannel(rlsKey)
+    rlsAcknowledgedChannel.current.onmessage = (event) => {
+      if (event.data.type === 'dismiss') {
+        setShowRLSWarning(true)
+      }
+    }
+
+    return () => rlsAcknowledgedChannel.current.close()
+  }, [rlsKey])
 
   function handlePreviewToggle() {
     setApiPreviewPanelOpen(!apiPreviewPanelOpen)
@@ -74,26 +100,30 @@ const GridHeaderActions = ({
         </Tooltip.Root>
       )}
 
-      <Link href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
-        <a>
-          <Button
-            type={table.rls_enabled ? 'link' : 'warning'}
-            icon={
-              table.rls_enabled ? (
-                <IconLock strokeWidth={2} size={14} />
-              ) : (
-                <IconAlertCircle strokeWidth={2} size={14} />
-              )
-            }
-          >
-            {!table.rls_enabled
-              ? 'RLS is not enabled'
-              : `${policies.length == 0 ? 'No' : policies.length} active RLS polic${
-                  policies.length > 1 || policies.length == 0 ? 'ies' : 'y'
-                }`}
-          </Button>
-        </a>
-      </Link>
+      {table.rls_enabled ||
+        (showRLSWarning && (
+          <Link href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
+            <a>
+              <Button
+                type={table.rls_enabled ? 'link' : 'warning'}
+                icon={
+                  table.rls_enabled ? (
+                    <IconLock strokeWidth={2} size={14} />
+                  ) : (
+                    <IconAlertCircle strokeWidth={2} size={14} />
+                  )
+                }
+              >
+                {!table.rls_enabled
+                  ? rlsDisabledMessage
+                  : `${policies.length == 0 ? 'No' : policies.length} active RLS polic${
+                      policies.length > 1 || policies.length == 0 ? 'ies' : 'y'
+                    }`}
+              </Button>
+            </a>
+          </Link>
+        ))}
+
       <div className="mt-[1px]">
         <RenderAPIPreviewToggle />
       </div>
