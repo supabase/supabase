@@ -2,14 +2,14 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { Badge, Button, IconDownload } from 'ui'
 
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
+import { useBackupRestoreMutation } from 'data/database/backup-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useCheckPermissions, useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { Badge, Button, IconDownload } from 'ui'
+import { PROJECT_STATUS } from 'lib/constants'
 
 interface BackupItemProps {
   projectRef: string
@@ -18,48 +18,33 @@ interface BackupItemProps {
 }
 
 const BackupItem = ({ projectRef, backup, index }: BackupItemProps) => {
-  const queryClient = useQueryClient()
   const router = useRouter()
   const { ui } = useStore()
-
-  const [isDownloading, setDownloading] = useState<boolean>(false)
-  const [isRestoring, setRestoring] = useState<boolean>(false)
+  const queryClient = useQueryClient()
 
   const canTriggerScheduledBackups = useCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
   )
 
-  async function restore(backup: any) {
-    setRestoring(true)
-    try {
-      post(`${API_URL}/database/${projectRef}/backups/restore`, backup).then(() => {
-        setTimeout(() => {
-          setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
-          ui.setNotification({
-            category: 'success',
-            message: `Restoring database back to ${dayjs(backup.inserted_at).format(
-              'DD MMM YYYY HH:mm:ss'
-            )}`,
-          })
-          router.push(`/project/${projectRef}`)
-        }, 3000)
-      })
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to restore from backup: ${error.message}`,
-      })
-      setRestoring(false)
-    }
-  }
+  const { mutate: restoreFromBackup, isLoading: isRestoring } = useBackupRestoreMutation({
+    onSuccess: () => {
+      setTimeout(() => {
+        setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
+        ui.setNotification({
+          category: 'success',
+          message: `Restoring database back to ${dayjs(backup.inserted_at).format(
+            'DD MMM YYYY HH:mm:ss'
+          )}`,
+        })
+        router.push(`/project/${projectRef}`)
+      }, 3000)
+    },
+  })
 
-  async function download(backup: any) {
-    setDownloading(true)
-    try {
-      const res = await post(`${API_URL}/database/${projectRef}/backups/download`, backup)
-      const { fileUrl } = await res
+  const { mutate: downloadBackup, isLoading: isDownloading } = useBackupDownloadMutation({
+    onSuccess: (res) => {
+      const { fileUrl } = res
 
       // Trigger browser download by create,trigger and remove tempLink
       const tempLink = document.createElement('a')
@@ -67,27 +52,16 @@ const BackupItem = ({ projectRef, backup, index }: BackupItemProps) => {
       document.body.appendChild(tempLink)
       tempLink.click()
       document.body.removeChild(tempLink)
+    },
+  })
 
-      setDownloading(false)
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to download backup: ${error.message}`,
-      })
-      setDownloading(false)
-    }
-  }
-
-  function onRestoreClick() {
+  const onRestoreClick = () => {
     confirmAlert({
       title: 'Confirm to restore',
       message: `Are you sure you want to restore from ${dayjs(backup.inserted_at).format(
         'DD MMM YYYY'
       )}? This will destroy any new data written since this backup was made.`,
-      onAsyncConfirm: async () => {
-        await restore(backup)
-      },
+      onAsyncConfirm: async () => restoreFromBackup({ ref: projectRef, backup }),
     })
   }
 
@@ -108,7 +82,7 @@ const BackupItem = ({ projectRef, backup, index }: BackupItemProps) => {
           <Button
             type="default"
             disabled={!canTriggerScheduledBackups || isRestoring || isDownloading}
-            onClick={() => download(backup)}
+            onClick={() => downloadBackup({ ref: projectRef, backup })}
             loading={isDownloading}
             icon={<IconDownload />}
           >
