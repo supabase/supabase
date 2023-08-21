@@ -266,3 +266,17 @@ export const isValidHttpUrl = (value: string) => {
   }
   return url.protocol === 'http:' || url.protocol === 'https:'
 }
+
+/**
+ * Helper function to remove comments from SQL.
+ * Disclaimer: Doesn't work as intended for nested comments.
+ */
+export const removeCommentsFromSql = (sql: string) => {
+  // Removing single-line comments:
+  let cleanedSql = sql.replace(/--.*$/gm, '')
+
+  // Removing multi-line comments:
+  cleanedSql = cleanedSql.replace(/\/\*[\s\S]*?\*\//gm, '')
+
+  return cleanedSql
+}
