@@ -750,49 +750,48 @@ export const WRAPPERS: WrapperMeta[] = [
       },
     ],
   },
-  // Commented out until the airtable is available in the postgres image
-  // {
-  //   name: 'airtable_wrapper',
-  //   handlerName: 'airtable_fdw_handler',
-  //   validatorName: 'airtable_fdw_validator',
-  //   icon: `${BASE_PATH}/img/icons/airtable-icon.svg`,
-  //   extensionName: 'airtableFdw',
-  //   label: 'Airtable',
-  //   docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/airtable',
-  //   server: {
-  //     options: [
-  //       {
-  //         name: 'api_key_id',
-  //         label: 'API Key ID',
-  //         required: true,
-  //         encrypted: true,
-  //         hidden: true,
-  //       },
-  //     ],
-  //   },
-  //   tables: [
-  //     {
-  //       label: 'Airtable Table',
-  //       description: 'Map to an Airtable Table',
-  //       options: [
-  //         {
-  //           name: 'base_id',
-  //           label: 'Base ID',
-  //           editable: true,
-  //           required: true,
-  //           type: 'text',
-  //         },
-  //         {
-  //           name: 'table_id',
-  //           label: 'Table ID',
-  //           editable: true,
-  //           required: true,
-  //           type: 'text',
-  //         },
-  //       ],
-  //     },
-  //   ],
-  // },
+  {
+    name: 'airtable_wrapper',
+    handlerName: 'airtable_fdw_handler',
+    validatorName: 'airtable_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/airtable-icon.svg`,
+    extensionName: 'airtableFdw',
+    label: 'Airtable',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/airtable',
+    server: {
+      options: [
+        {
+          name: 'api_key_id',
+          label: 'API Key ID',
+          required: true,
+          encrypted: true,
+          hidden: true,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Airtable Table',
+        description: 'Map to an Airtable Table',
+        options: [
+          {
+            name: 'base_id',
+            label: 'Base ID',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+          {
+            name: 'table_id',
+            label: 'Table ID',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
   {
     name: 'logflare_wrapper',
     handlerName: 'logflare_fdw_handler',
