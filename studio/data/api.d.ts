@@ -1493,10 +1493,8 @@ export interface paths {
     put: operations["AuthPostgresConfigController_updateConfig"];
   };
   "/v1/projects/{ref}/config/database/pgbouncer": {
-    /** Gets project's pgbouncer config */
-    get: operations["V1PgbouncerConfigController_getPgbouncerConfig"];
-    /** Updates project's pgbouncer config */
-    patch: operations["V1PgbouncerConfigController_updatePgbouncerConfig"];
+    /** Get project's pgbouncer config */
+    get: operations["V1PgbouncerConfigController_v1GetPgbouncerConfig"];
   };
   "/v1/projects/{ref}/config/auth": {
     /** Gets project's auth config */
@@ -1775,126 +1773,126 @@ export interface components {
       EXTERNAL_ZOOM_SECRET: string;
     };
     UpdateGoTrueConfigBody: {
-      SITE_URL: string;
-      DISABLE_SIGNUP: boolean;
-      JWT_EXP: number;
-      SMTP_ADMIN_EMAIL: string;
-      SMTP_HOST: string;
-      SMTP_PORT: string;
-      SMTP_USER: string;
+      SITE_URL?: string;
+      DISABLE_SIGNUP?: boolean;
+      JWT_EXP?: number;
+      SMTP_ADMIN_EMAIL?: string;
+      SMTP_HOST?: string;
+      SMTP_PORT?: string;
+      SMTP_USER?: string;
       SMTP_PASS?: string | null;
       SMTP_PASS_ENCRYPTED?: string | null;
-      SMTP_MAX_FREQUENCY: number;
+      SMTP_MAX_FREQUENCY?: number;
       SMTP_SENDER_NAME?: string;
-      MAILER_AUTOCONFIRM: boolean;
-      MAILER_SUBJECTS_INVITE: string;
-      MAILER_SUBJECTS_CONFIRMATION: string;
-      MAILER_SUBJECTS_RECOVERY: string;
-      MAILER_SUBJECTS_EMAIL_CHANGE: string;
-      MAILER_SUBJECTS_MAGIC_LINK: string;
-      MAILER_TEMPLATES_INVITE_CONTENT: string;
-      MAILER_TEMPLATES_CONFIRMATION_CONTENT: string;
-      MAILER_TEMPLATES_RECOVERY_CONTENT: string;
-      MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT: string;
-      MAILER_TEMPLATES_MAGIC_LINK_CONTENT: string;
-      MFA_MAX_ENROLLED_FACTORS: number;
-      URI_ALLOW_LIST: string;
-      EXTERNAL_EMAIL_ENABLED: boolean;
-      EXTERNAL_PHONE_ENABLED: boolean;
+      MAILER_AUTOCONFIRM?: boolean;
+      MAILER_SUBJECTS_INVITE?: string;
+      MAILER_SUBJECTS_CONFIRMATION?: string;
+      MAILER_SUBJECTS_RECOVERY?: string;
+      MAILER_SUBJECTS_EMAIL_CHANGE?: string;
+      MAILER_SUBJECTS_MAGIC_LINK?: string;
+      MAILER_TEMPLATES_INVITE_CONTENT?: string;
+      MAILER_TEMPLATES_CONFIRMATION_CONTENT?: string;
+      MAILER_TEMPLATES_RECOVERY_CONTENT?: string;
+      MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT?: string;
+      MAILER_TEMPLATES_MAGIC_LINK_CONTENT?: string;
+      MFA_MAX_ENROLLED_FACTORS?: number;
+      URI_ALLOW_LIST?: string;
+      EXTERNAL_EMAIL_ENABLED?: boolean;
+      EXTERNAL_PHONE_ENABLED?: boolean;
       SAML_ENABLED?: boolean;
-      SECURITY_CAPTCHA_ENABLED: boolean;
-      SECURITY_CAPTCHA_PROVIDER: string;
-      SECURITY_CAPTCHA_SECRET: string;
-      RATE_LIMIT_EMAIL_SENT: number;
-      RATE_LIMIT_SMS_SENT: number;
-      MAILER_SECURE_EMAIL_CHANGE_ENABLED: boolean;
-      REFRESH_TOKEN_ROTATION_ENABLED: boolean;
-      PASSWORD_MIN_LENGTH: number;
-      SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: boolean;
-      SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number;
-      MAILER_OTP_EXP: number;
-      SMS_AUTOCONFIRM: boolean;
-      SMS_MAX_FREQUENCY: number;
-      SMS_OTP_EXP: number;
-      SMS_OTP_LENGTH: number;
-      SMS_PROVIDER: string;
-      SMS_MESSAGEBIRD_ACCESS_KEY: string;
-      SMS_MESSAGEBIRD_ORIGINATOR: string;
-      SMS_TEXTLOCAL_API_KEY: string;
-      SMS_TEXTLOCAL_SENDER: string;
-      SMS_TWILIO_ACCOUNT_SID: string;
-      SMS_TWILIO_AUTH_TOKEN: string;
-      SMS_TWILIO_MESSAGE_SERVICE_SID: string;
-      SMS_TWILIO_VERIFY_ACCOUNT_SID: string;
-      SMS_TWILIO_VERIFY_AUTH_TOKEN: string;
-      SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string;
-      SMS_VONAGE_API_KEY: string;
-      SMS_VONAGE_API_SECRET: string;
-      SMS_VONAGE_FROM: string;
-      SMS_TEMPLATE: string;
-      EXTERNAL_APPLE_ENABLED: boolean;
-      EXTERNAL_APPLE_CLIENT_ID: string;
-      EXTERNAL_APPLE_SECRET: string;
+      SECURITY_CAPTCHA_ENABLED?: boolean;
+      SECURITY_CAPTCHA_PROVIDER?: string;
+      SECURITY_CAPTCHA_SECRET?: string;
+      RATE_LIMIT_EMAIL_SENT?: number;
+      RATE_LIMIT_SMS_SENT?: number;
+      MAILER_SECURE_EMAIL_CHANGE_ENABLED?: boolean;
+      REFRESH_TOKEN_ROTATION_ENABLED?: boolean;
+      PASSWORD_MIN_LENGTH?: number;
+      SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION?: boolean;
+      SECURITY_REFRESH_TOKEN_REUSE_INTERVAL?: number;
+      MAILER_OTP_EXP?: number;
+      SMS_AUTOCONFIRM?: boolean;
+      SMS_MAX_FREQUENCY?: number;
+      SMS_OTP_EXP?: number;
+      SMS_OTP_LENGTH?: number;
+      SMS_PROVIDER?: string;
+      SMS_MESSAGEBIRD_ACCESS_KEY?: string;
+      SMS_MESSAGEBIRD_ORIGINATOR?: string;
+      SMS_TEXTLOCAL_API_KEY?: string;
+      SMS_TEXTLOCAL_SENDER?: string;
+      SMS_TWILIO_ACCOUNT_SID?: string;
+      SMS_TWILIO_AUTH_TOKEN?: string;
+      SMS_TWILIO_MESSAGE_SERVICE_SID?: string;
+      SMS_TWILIO_VERIFY_ACCOUNT_SID?: string;
+      SMS_TWILIO_VERIFY_AUTH_TOKEN?: string;
+      SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID?: string;
+      SMS_VONAGE_API_KEY?: string;
+      SMS_VONAGE_API_SECRET?: string;
+      SMS_VONAGE_FROM?: string;
+      SMS_TEMPLATE?: string;
+      EXTERNAL_APPLE_ENABLED?: boolean;
+      EXTERNAL_APPLE_CLIENT_ID?: string;
+      EXTERNAL_APPLE_SECRET?: string;
       EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS?: string;
-      EXTERNAL_AZURE_ENABLED: boolean;
-      EXTERNAL_AZURE_CLIENT_ID: string;
-      EXTERNAL_AZURE_SECRET: string;
-      EXTERNAL_AZURE_URL: string;
-      EXTERNAL_BITBUCKET_ENABLED: boolean;
-      EXTERNAL_BITBUCKET_CLIENT_ID: string;
-      EXTERNAL_BITBUCKET_SECRET: string;
-      EXTERNAL_DISCORD_ENABLED: boolean;
-      EXTERNAL_DISCORD_CLIENT_ID: string;
-      EXTERNAL_DISCORD_SECRET: string;
-      EXTERNAL_FACEBOOK_ENABLED: boolean;
-      EXTERNAL_FACEBOOK_CLIENT_ID: string;
-      EXTERNAL_FACEBOOK_SECRET: string;
-      EXTERNAL_FIGMA_ENABLED: boolean;
-      EXTERNAL_FIGMA_CLIENT_ID: string;
-      EXTERNAL_FIGMA_SECRET: string;
-      EXTERNAL_GITHUB_ENABLED: boolean;
-      EXTERNAL_GITHUB_CLIENT_ID: string;
-      EXTERNAL_GITHUB_SECRET: string;
-      EXTERNAL_GITLAB_ENABLED: boolean;
-      EXTERNAL_GITLAB_CLIENT_ID: string;
-      EXTERNAL_GITLAB_SECRET: string;
-      EXTERNAL_GITLAB_URL: string;
-      EXTERNAL_GOOGLE_ENABLED: boolean;
-      EXTERNAL_GOOGLE_CLIENT_ID: string;
-      EXTERNAL_GOOGLE_SECRET: string;
+      EXTERNAL_AZURE_ENABLED?: boolean;
+      EXTERNAL_AZURE_CLIENT_ID?: string;
+      EXTERNAL_AZURE_SECRET?: string;
+      EXTERNAL_AZURE_URL?: string;
+      EXTERNAL_BITBUCKET_ENABLED?: boolean;
+      EXTERNAL_BITBUCKET_CLIENT_ID?: string;
+      EXTERNAL_BITBUCKET_SECRET?: string;
+      EXTERNAL_DISCORD_ENABLED?: boolean;
+      EXTERNAL_DISCORD_CLIENT_ID?: string;
+      EXTERNAL_DISCORD_SECRET?: string;
+      EXTERNAL_FACEBOOK_ENABLED?: boolean;
+      EXTERNAL_FACEBOOK_CLIENT_ID?: string;
+      EXTERNAL_FACEBOOK_SECRET?: string;
+      EXTERNAL_FIGMA_ENABLED?: boolean;
+      EXTERNAL_FIGMA_CLIENT_ID?: string;
+      EXTERNAL_FIGMA_SECRET?: string;
+      EXTERNAL_GITHUB_ENABLED?: boolean;
+      EXTERNAL_GITHUB_CLIENT_ID?: string;
+      EXTERNAL_GITHUB_SECRET?: string;
+      EXTERNAL_GITLAB_ENABLED?: boolean;
+      EXTERNAL_GITLAB_CLIENT_ID?: string;
+      EXTERNAL_GITLAB_SECRET?: string;
+      EXTERNAL_GITLAB_URL?: string;
+      EXTERNAL_GOOGLE_ENABLED?: boolean;
+      EXTERNAL_GOOGLE_CLIENT_ID?: string;
+      EXTERNAL_GOOGLE_SECRET?: string;
       EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS?: string;
-      EXTERNAL_KAKAO_ENABLED: boolean;
-      EXTERNAL_KAKAO_CLIENT_ID: string;
-      EXTERNAL_KAKAO_SECRET: string;
-      EXTERNAL_KEYCLOAK_ENABLED: boolean;
-      EXTERNAL_KEYCLOAK_CLIENT_ID: string;
-      EXTERNAL_KEYCLOAK_SECRET: string;
-      EXTERNAL_KEYCLOAK_URL: string;
-      EXTERNAL_LINKEDIN_ENABLED: boolean;
-      EXTERNAL_LINKEDIN_CLIENT_ID: string;
-      EXTERNAL_LINKEDIN_SECRET: string;
-      EXTERNAL_NOTION_ENABLED: boolean;
-      EXTERNAL_NOTION_CLIENT_ID: string;
-      EXTERNAL_NOTION_SECRET: string;
-      EXTERNAL_SLACK_ENABLED: boolean;
-      EXTERNAL_SLACK_CLIENT_ID: string;
-      EXTERNAL_SLACK_SECRET: string;
-      EXTERNAL_SPOTIFY_ENABLED: boolean;
-      EXTERNAL_SPOTIFY_CLIENT_ID: string;
-      EXTERNAL_SPOTIFY_SECRET: string;
-      EXTERNAL_TWITCH_ENABLED: boolean;
-      EXTERNAL_TWITCH_CLIENT_ID: string;
-      EXTERNAL_TWITCH_SECRET: string;
-      EXTERNAL_TWITTER_ENABLED: boolean;
-      EXTERNAL_TWITTER_CLIENT_ID: string;
-      EXTERNAL_TWITTER_SECRET: string;
-      EXTERNAL_WORKOS_ENABLED: boolean;
-      EXTERNAL_WORKOS_CLIENT_ID: string;
-      EXTERNAL_WORKOS_SECRET: string;
-      EXTERNAL_WORKOS_URL: string;
-      EXTERNAL_ZOOM_ENABLED: boolean;
-      EXTERNAL_ZOOM_CLIENT_ID: string;
-      EXTERNAL_ZOOM_SECRET: string;
+      EXTERNAL_KAKAO_ENABLED?: boolean;
+      EXTERNAL_KAKAO_CLIENT_ID?: string;
+      EXTERNAL_KAKAO_SECRET?: string;
+      EXTERNAL_KEYCLOAK_ENABLED?: boolean;
+      EXTERNAL_KEYCLOAK_CLIENT_ID?: string;
+      EXTERNAL_KEYCLOAK_SECRET?: string;
+      EXTERNAL_KEYCLOAK_URL?: string;
+      EXTERNAL_LINKEDIN_ENABLED?: boolean;
+      EXTERNAL_LINKEDIN_CLIENT_ID?: string;
+      EXTERNAL_LINKEDIN_SECRET?: string;
+      EXTERNAL_NOTION_ENABLED?: boolean;
+      EXTERNAL_NOTION_CLIENT_ID?: string;
+      EXTERNAL_NOTION_SECRET?: string;
+      EXTERNAL_SLACK_ENABLED?: boolean;
+      EXTERNAL_SLACK_CLIENT_ID?: string;
+      EXTERNAL_SLACK_SECRET?: string;
+      EXTERNAL_SPOTIFY_ENABLED?: boolean;
+      EXTERNAL_SPOTIFY_CLIENT_ID?: string;
+      EXTERNAL_SPOTIFY_SECRET?: string;
+      EXTERNAL_TWITCH_ENABLED?: boolean;
+      EXTERNAL_TWITCH_CLIENT_ID?: string;
+      EXTERNAL_TWITCH_SECRET?: string;
+      EXTERNAL_TWITTER_ENABLED?: boolean;
+      EXTERNAL_TWITTER_CLIENT_ID?: string;
+      EXTERNAL_TWITTER_SECRET?: string;
+      EXTERNAL_WORKOS_ENABLED?: boolean;
+      EXTERNAL_WORKOS_CLIENT_ID?: string;
+      EXTERNAL_WORKOS_SECRET?: string;
+      EXTERNAL_WORKOS_URL?: string;
+      EXTERNAL_ZOOM_ENABLED?: boolean;
+      EXTERNAL_ZOOM_CLIENT_ID?: string;
+      EXTERNAL_ZOOM_SECRET?: string;
     };
     GoTrueConfig: {
       SITE_URL: string;
@@ -3232,6 +3230,7 @@ export interface components {
       organization_id: number;
       subscription_id: string;
       region: string;
+      cloud_provider: string;
       back_ups: (components["schemas"]["BackupId"])[];
     };
     RestartServiceRequest: {
@@ -3338,22 +3337,23 @@ export interface components {
       }, string]>;
       result?: (Record<string, never>)[];
     };
-    ProjectPgBouncerConfig: {
-      db_dns_name: string;
-      db_host: string;
-      db_name: string;
-      db_port: number;
-      db_ssl: boolean;
-      db_user: string;
+    PgbouncerConfigResponse: {
       default_pool_size?: number;
-      ignore_startup_parameters: string;
+      ignore_startup_parameters?: string;
+      max_client_conn?: number;
+      /** @enum {string} */
+      pool_mode?: "transaction" | "session" | "statement";
       inserted_at: string;
+      db_dns_name: string;
+      db_user: string;
+      db_host: string;
+      db_port: number;
+      db_name: string;
+      db_ssl: boolean;
       pgbouncer_enabled: boolean;
+      supavisor_enabled: boolean;
       /** @enum {string} */
       pgbouncer_status: "COMING_DOWN" | "COMING_UP" | "DISABLED" | "ENABLED" | "RELOADING";
-      /** @enum {string} */
-      pool_mode: "transaction" | "session" | "statement";
-      max_client_conn?: number | null;
       connectionString: string;
     };
     UpdatePgbouncerConfigBody: {
@@ -4163,6 +4163,13 @@ export interface components {
       enabled: boolean;
       override_enabled: boolean;
       override_active_until: string;
+    };
+    V1PgbouncerConfigResponse: {
+      /** @enum {string} */
+      pool_mode?: "transaction" | "session" | "statement";
+      default_pool_size?: number;
+      ignore_startup_parameters?: string;
+      max_client_conn?: number;
     };
     AuthConfigResponse: {
       smtp_admin_email?: string;
@@ -7673,7 +7680,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          "application/json": components["schemas"]["ProjectPgBouncerConfig"];
+          "application/json": components["schemas"]["PgbouncerConfigResponse"];
         };
       };
       /** @description Failed to retrieve project's pgbouncer config */
@@ -9938,8 +9945,8 @@ export interface operations {
       500: never;
     };
   };
-  /** Gets project's pgbouncer config */
-  V1PgbouncerConfigController_getPgbouncerConfig: {
+  /** Get project's pgbouncer config */
+  V1PgbouncerConfigController_v1GetPgbouncerConfig: {
     parameters: {
       path: {
         /** @description Project ref */
@@ -9949,34 +9956,10 @@ export interface operations {
     responses: {
       200: {
         content: {
-          "application/json": components["schemas"]["ProjectPgBouncerConfig"];
+          "application/json": components["schemas"]["V1PgbouncerConfigResponse"];
         };
       };
       /** @description Failed to retrieve project's pgbouncer config */
-      500: never;
-    };
-  };
-  /** Updates project's pgbouncer config */
-  V1PgbouncerConfigController_updatePgbouncerConfig: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["UpdatePgbouncerConfigBody"];
-      };
-    };
-    responses: {
-      200: {
-        content: {
-          "application/json": components["schemas"]["UpdatePoolingConfigResponse"];
-        };
-      };
-      403: never;
-      /** @description Failed to update project's pgbouncer config */
       500: never;
     };
   };
