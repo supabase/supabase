@@ -17,7 +17,7 @@ interface Props {
 const Footer = (props: Props) => {
   const { isDarkMode } = useTheme()
   const { pathname } = useRouter()
-  const isLaunchWeekPage = pathname.includes('launch-week') || pathname === '/'
+  const isLaunchWeekPage = pathname.includes('launch-week') 
 
   return (
     <footer
