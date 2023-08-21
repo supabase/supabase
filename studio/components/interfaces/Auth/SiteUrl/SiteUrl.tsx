@@ -116,7 +116,7 @@ const SiteUrl = observer(() => {
           <>
             <FormHeader
               title="Site URL"
-              description="Configure the url of your site. This is used for password reset emails and other links."
+              description="Configure the default redirect URL used when a redirect URL is not specified or doesn't match one from the allow list. This value is also exposed as a template variable in the email templates section. Wildcards cannot be used here."
             />
             <FormPanel
               disabled={true}
@@ -139,13 +139,7 @@ const SiteUrl = observer(() => {
             >
               <FormSection>
                 <FormSectionContent loading={isLoading}>
-                  <Input
-                    id="SITE_URL"
-                    size="small"
-                    label="Site URL"
-                    descriptionText="The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails."
-                    disabled={!canUpdateConfig}
-                  />
+                  <Input id="SITE_URL" size="small" label="Site URL" disabled={!canUpdateConfig} />
                 </FormSectionContent>
               </FormSection>
             </FormPanel>

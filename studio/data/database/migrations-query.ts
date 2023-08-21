@@ -4,7 +4,7 @@ import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sq
 
 export type DatabaseMigration = {
   version: string
-  name: string
+  name?: string
   statements?: string[]
 }
 

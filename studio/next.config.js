@@ -109,7 +109,12 @@ const nextConfig = {
       },
       {
         source: '/project/:ref/database/pgbouncer-logs',
-        destination: '/project/:ref/logs/pgbouncer-logs',
+        destination: '/project/:ref/logs/pooler-logs',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/logs/pgbouncer-logs',
+        destination: '/project/:ref/logs/pooler-logs',
         permanent: true,
       },
       {
@@ -208,6 +213,8 @@ const nextConfig = {
     ]
   },
   images: {
+    // to make Vercel avatars work without issue. Vercel uses SVGs for users who don't have set avatars.
+    dangerouslyAllowSVG: true,
     domains: [
       'github.com',
       'avatars.githubusercontent.com',

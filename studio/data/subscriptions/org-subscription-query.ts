@@ -9,7 +9,7 @@ export type OrgSubscriptionVariables = {
   orgSlug?: string
 }
 
-export type PlanId = 'free' | 'pro' | 'team' | 'enterprise' | 'hipaa'
+export type PlanId = 'free' | 'pro' | 'team' | 'enterprise'
 
 export type ProjectAddon = {
   addons: {
