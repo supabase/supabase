@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -6,10 +5,8 @@ import { Button, Input, Listbox } from 'ui'
 
 import { WizardLayout } from 'components/layouts'
 import Panel from 'components/ui/Panel'
-import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
 import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
 
 const ORG_KIND_TYPES = {
@@ -35,14 +32,19 @@ const ORG_SIZE_DEFAULT = '1'
  * No org selected yet, create a new one
  */
 const Wizard: NextPageWithLayout = () => {
-  const queryClient = useQueryClient()
   const { ui } = useStore()
   const router = useRouter()
 
   const [orgName, setOrgName] = useState('')
   const [orgKind, setOrgKind] = useState(ORG_KIND_DEFAULT)
   const [orgSize, setOrgSize] = useState(ORG_SIZE_DEFAULT)
-  const [newOrgLoading, setNewOrgLoading] = useState(false)
+
+  const { mutate: createOrganization, isLoading: newOrgLoading } = useOrganizationCreateMutation({
+    onSuccess: async (org: any) => {
+      // [Joshen] API spec is wrong? its returning org type as only having id and name
+      router.push(`/new/${org.slug}`)
+    },
+  })
 
   function validateOrgName(name: any) {
     return name.length >= 1
@@ -65,29 +67,14 @@ const Wizard: NextPageWithLayout = () => {
     const trimmedOrgName = orgName ? orgName.trim() : ''
     const isOrgNameValid = validateOrgName(trimmedOrgName)
     if (!isOrgNameValid) {
-      ui.setNotification({ category: 'error', message: 'Organization name is empty' })
-      return
+      return ui.setNotification({ category: 'error', message: 'Organization name is empty' })
     }
 
-    setNewOrgLoading(true)
-    const response = await post(`${API_URL}/organizations`, {
+    createOrganization({
       name: trimmedOrgName,
       kind: orgKind,
       ...(orgKind == 'COMPANY' ? { size: orgSize } : {}),
     })
-
-    if (response.error) {
-      setNewOrgLoading(false)
-      ui.setNotification({
-        error: response.error,
-        category: 'error',
-        message: `Failed to create organization: ${response.error?.message ?? response.error}`,
-      })
-    } else {
-      const org = response
-      await invalidateOrganizationsQuery(queryClient)
-      router.push(`/new/${org.slug}`)
-    }
   }
 
   return (
