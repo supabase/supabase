@@ -139,7 +139,7 @@ const APIKeys = () => {
                   for your tables and configured policies. You may also use the service key which
                   can be found{' '}
                   <Link href={`/project/${projectRef}/settings/api`}>
-                    <a className="transition text-brand-800 hover:text-brand-900">here</a>
+                    <a className="transition text-brand hover:text-brand-600">here</a>
                   </Link>{' '}
                   to bypass RLS.
                 </p>

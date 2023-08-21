@@ -27,7 +27,7 @@
     "allure-commandline": "^2.17.2",
     "allure-js-commons": "^2.0.0-beta.14",
     "cross-fetch": "^3.1.5",
-    "eslint": "^8.41.0",
+    "eslint": "^8.45.0",
     "jest": "^27.4.7",
     "jest-allure2-adapter": "^0.3.11",
     "postgres": "^3.0.5",

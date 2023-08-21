@@ -17,6 +17,7 @@ Out of scope vulnerabilities:
 - Missing DNSSEC, CAA, CSP headers
 - Lack of Secure or HTTP only flag on non-sensitive cookies
 - Deadlinks
+- User enumeration
 
 Please do the following:
 

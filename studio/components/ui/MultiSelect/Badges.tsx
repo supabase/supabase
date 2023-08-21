@@ -1,7 +1,6 @@
-import { FC } from 'react'
 import { IconX } from 'ui'
 
-export const BadgeDisabled: FC<{ name: string }> = ({ name }) => (
+export const BadgeDisabled = ({ name }: { name: string }) => (
   <div
     className={[
       'text-typography-body-light dark:text-typography-body-dark',
@@ -13,9 +12,12 @@ export const BadgeDisabled: FC<{ name: string }> = ({ name }) => (
   </div>
 )
 
-export const BadgeSelected: FC<{ name: string; handleRemove: () => void }> = ({
+export const BadgeSelected = ({
   name,
   handleRemove,
+}: {
+  name: string
+  handleRemove: () => void
 }) => (
   <div
     className={[

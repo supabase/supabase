@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { storageKeys } from './keys'
 
@@ -35,7 +35,7 @@ export const useBucketsQuery = <TData = BucketsData>(
   useQuery<BucketsData, BucketsError, TData>(
     storageKeys.buckets(projectRef),
     ({ signal }) => getBuckets({ projectRef }, signal),
-    { enabled: IS_PLATFORM && enabled && typeof projectRef !== 'undefined', ...options }
+    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
 
 export const useBucketsPrefetch = ({ projectRef }: BucketsVariables) => {

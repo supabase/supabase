@@ -1,10 +1,7 @@
-import React, { FC } from 'react'
 import Lottie from 'lottie-react'
 import loadingAnim from './Loading.anim.json'
 
-interface Props {}
-
-const Connecting: FC<Props> = () => (
+const Connecting = () => (
   <div className="w-full h-full flex flex-col items-center justify-center">
     <div className="w-28">
       <Lottie loop={true} autoplay={true} animationData={loadingAnim} />
