@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { Button, Form, IconExternalLink, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import {
   FormActions,
@@ -23,12 +23,12 @@ const schema = yup.object({
 const CustomDomainsConfigureHostname = () => {
   const { ui } = useStore()
   const { ref } = useParams()
-  const { mutateAsync: createCustomDomain } = useCustomDomainCreateMutation()
+  const { mutate: createCustomDomain, isLoading: isCreating } = useCustomDomainCreateMutation()
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
 
   const FORM_ID = 'custom-domains-form'
   const endpoint = settings?.autoApiService.endpoint
-  const canConfigureCustomDomain = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const canConfigureCustomDomain = useCheckPermissions(PermissionAction.UPDATE, 'projects')
 
   const verifyCNAME = async (domain: string): Promise<boolean> => {
     const res = await fetch(`https://1.1.1.1/dns-query?name=${domain}`, {
@@ -40,7 +40,7 @@ const CustomDomainsConfigureHostname = () => {
   }
 
   const onCreateCustomDomain = async (values: yup.InferType<typeof schema>) => {
-    if (!ref) throw new Error('Project ref is required')
+    if (!ref) return console.error('Project ref is required')
 
     const cnameVerified = await verifyCNAME(values.domain)
     if (!cnameVerified) {
@@ -50,18 +50,7 @@ const CustomDomainsConfigureHostname = () => {
       })
     }
 
-    try {
-      await createCustomDomain({
-        projectRef: ref,
-        customDomain: values.domain,
-      })
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: error.message,
-      })
-    }
+    createCustomDomain({ projectRef: ref, customDomain: values.domain })
   }
 
   return (
@@ -71,7 +60,7 @@ const CustomDomainsConfigureHostname = () => {
       validationSchema={schema}
       onSubmit={onCreateCustomDomain}
     >
-      {({ isSubmitting, handleReset, values, initialValues }: any) => {
+      {({ handleReset, values, initialValues }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
         return (
@@ -82,7 +71,7 @@ const CustomDomainsConfigureHostname = () => {
                 <div className="flex py-4 px-8">
                   <FormActions
                     form={FORM_ID}
-                    isSubmitting={isSubmitting}
+                    isSubmitting={isCreating}
                     submitText="Add"
                     hasChanges={hasChanges}
                     handleReset={handleReset}

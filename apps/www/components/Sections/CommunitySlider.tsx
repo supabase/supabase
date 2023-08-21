@@ -56,7 +56,7 @@ const cards: CardInterface[] = [
     author: 'Caleb Peffer',
     role: 'CEO, Mendable',
     quote:
-      'We tried other vector databases - we tried Faiss, we tried Weviate, we tried Pinecone. We found them to be incredibly expensive and not very intuitive. If you’re just doing vector search they’re great, but if you need to store a bunch of metadata that becomes a huge pain.',
+      'We tried other vector databases - we tried Faiss, we tried Weaviate, we tried Pinecone. We found them to be incredibly expensive and not very intuitive. If you’re just doing vector search they’re great, but if you need to store a bunch of metadata that becomes a huge pain.',
     image: vectorImagesDir + 'supabase+markprompt.svg',
     abstract: 'Mendable switches from Pinecone to Supabase for PostgreSQL vector embeddings.',
     url: '/customers/mendable',
@@ -130,7 +130,7 @@ const CommunitySlider = () => {
       <p className="text-scale-900 my-3 text-base">{card.abstract}</p>
 
       {card.url && (
-        <div className="text-brand-900 block cursor-pointer text-sm">Read Customer Story</div>
+        <div className="text-brand block cursor-pointer text-sm">Read Customer Story</div>
       )}
     </div>
   )

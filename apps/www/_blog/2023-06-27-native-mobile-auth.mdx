@@ -1,0 +1,133 @@
+---
+title: Native Mobile Auth Support for Google and Apple Sign in
+description: Supabase auth adds full support for native mobile sign in with Apple and Google.
+author: stojan,tyler_shukert
+image: native-mobile-auth/native-mobile-auth.png
+thumb: native-mobile-auth/native-mobile-auth.png
+tags:
+  - auth
+date: '2023-06-27'
+toc_depth: 3
+---
+
+Supabase supports OAuth logins with 17 providers including Apple, Google, Microsoft, GitHub, … But for native mobile apps, this meant that developers had to use a web browser to sign in. It’s not an ideal flow for users, who are already used to signing in with the operating system’s native dialogs when possible. Today, we are excited to announce full native support for Sign in with Apple and Google on iOS and Android. But this is not all! Supabase Auth now can now be used with one-tap sign in methods like: Sign in with Apple JS, Sign in with Google for Web or even in Chrome extensions.
+
+## Native Sign in with Apple and Google
+
+Developers of native iOS and Android apps (using Flutter or React Native) can now take advantage of OS-provided authentication dialogs for Apple and Google. This is available on iOS, macOS, tvOS and watchOS apps in the Apple ecosystem, and all Android variants in the Google ecosystem.
+
+In full transparency, this was always sort-of possible but there were some edge cases that were not covered well with Supabase Auth. We’ve since ironed out the developer experience and made this into a fully supported feature.
+
+Behind the scenes, these native sign in methods use ID tokens. They’re a formalized version of a JWT that is issued by Apple or Google and contain profile information. Supabase Auth now can properly validate the ID tokens and create new or link to existing user accounts based on email similarity.
+
+### Using Sign in with Google in a Flutter App
+
+To setup Sign in with Google in your Flutter native app, you need to set up your Google Cloud project for each platform:
+
+- For iOS apps: [Get started with Google Sign In for iOS and macOS](https://developers.google.com/identity/sign-in/ios/start-integrating#get_an_oauth_client_id)
+- For Android apps: [Get started with One Tap sign-in and sign-up for Android](https://developers.google.com/identity/one-tap/android/get-started)
+
+We’ve revamped the Google provider [configuration screen in the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers). Besides the existing OAuth flow, you can now add additional _Authorized Client IDs_ meant for native sign in.
+
+The client ID you obtained from the setup instructions above should be added to _Authorized Client IDs._
+
+![Supabase dashboard Google provider](/images/blog/native-mobile-auth/google-setting.png)
+
+It really is as simple as that.
+
+### Using Sign in with Apple in a Flutter App
+
+We introduced support for native Sign in with Apple in our [previous launch week](https://supabase.com/blog/supabase-auth-sso-pkce#native-apple-login-on-ios#native-apple-login-on-ios), but today we are adding support for multiple apps on a single Supabase project.
+
+All you need to do is to register all of the bundle IDs of your apps in the [Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Authorized Client IDs_ as a comma separated string.
+
+![Supabase dashboard Apple provider](/images/blog/native-mobile-auth/apple-setting.png)
+
+## Using Sign in with Apple and Google in React Native Apps
+
+If you use React Native to build your native apps, you can still benefit. Please check out these resources to see how you can show the native authentication dialog and obtain an ID token from the operating system:
+
+- https://github.com/invertase/react-native-apple-authentication
+- [Expo AppleAuthentication](https://docs.expo.dev/versions/latest/sdk/apple-authentication/)
+- https://github.com/react-native-google-signin/google-signin
+
+You would still need to configure the _Authorized Client IDs_ as shown in the Flutter examples above.
+
+Finally, once you’ve received a valid ID token from the operating system you can call `supabase.auth.signInWithIdToken()` to complete the sign in with your Supabase project.
+
+For Sign in with Apple:
+
+```tsx
+await supabase.auth.signInWithIdToken({
+  provider: 'apple',
+  token: '<id token>',
+})
+```
+
+For Sign in with Google:
+
+```tsx
+await supabase.auth.signInWithIdToken({
+  provider: 'google',
+  token: '<id token>',
+})
+```
+
+We also have some sample implementation for Expo apps in our [create-t3-turbo example](https://github.com/supabase-community/create-t3-turbo/blob/main/apps/expo/src/app/profile.tsx#L47).
+
+## Using Sign in with Apple and Google in Flutter Apps
+
+Once you have configured your Supabase instance, you can utilize third party libraries like **[sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple) or [google_one_tap_sign_in](https://pub.dev/packages/google_one_tap_sign_in) to perform naive sign in, and pass the ID token to Supabase to complete the sign in.**
+
+For Sign in with Apple:
+
+```dart
+final credential = await SignInWithApple.getAppleIDCredential(
+  scopes: [
+    AppleIDAuthorizationScopes.email,
+    AppleIDAuthorizationScopes.fullName,
+  ],
+);
+
+await supabase.auth.signInWithIdToken(
+  provider: Provider.apple,
+  idToken: credential.identityToken!,
+);
+```
+
+And for Google:
+
+```dart
+var result = await GoogleOneTapSignIn.handleSignIn(webClientId: '<client ID>');
+
+supabase.auth.signInWithIdToken(
+  provider: Provider.google,
+  idToken: result.data!.idToken!,
+);
+```
+
+You can find more detailed instructions on the [here](https://github.com/supabase/supabase-flutter#authentication).
+
+## Sign in with Apple JS, Google One Tap and Chrome Extensions
+
+Although sign in on native platforms was the focus of the team when working on this feature, incidentally we’ve added proper support for Sign in with Apple JS, Google’s One Tap and support for authenticating within Google Chrome extensions.
+
+You can now take advantage of these web frameworks, most notably Google’s One Tap and Automatic Sign-in support for a frictionless onboarding experience for your users.
+
+All you need to do is configure the web frameworks and use the `signInWithIdToken()` method to pass the ID token provided by the Google and Apple libraries.
+
+For example, to use Google One tap you should first [generate an embed code for the Google Sign in Button](https://developers.google.com/identity/gsi/web/tools/configurator). Register this method as the callback that will receive the authentication response from the button:
+
+```tsx
+async function handleSignInWithGoogle(response) {
+  const { data, error } = await supabase.auth.signInWithIdToken({
+    token: response.credential,
+    nonce: 'NONCE', // must be the same one as provided in data-nonce (if any)
+  })
+}
+```
+
+## Resources
+
+- [Login with Apple Guide](https://supabase.com/docs/guides/auth/social-login/auth-apple)
+- [Login with Google Guide](https://supabase.com/docs/guides/auth/social-login/auth-google)

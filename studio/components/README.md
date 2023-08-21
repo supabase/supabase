@@ -29,16 +29,15 @@
 ## Template for building components
 
 ```ts
-import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
 
 // Declare the prop types of your component
-interface Props {
+interface ComponentAProps {
   sampleProp: string
 }
 
 // Name your component accordingly
-const ComponentA: FC<Props> = ({ sampleProp }) => {
+const ComponentA = ({ sampleProp }: ComponentAProps) => {
   return <div>ComponentA: {sampleProp}</div>
 }
 

@@ -1,11 +1,24 @@
-import { FC } from 'react'
-import Link from 'next/link'
-import { IconChevronRight } from 'ui'
-import { withAuth, useFlag } from 'hooks'
 import { observer } from 'mobx-react-lite'
-import { BASE_PATH } from 'lib/constants'
+import Link from 'next/link'
+import { PropsWithChildren } from 'react'
+import { IconChevronRight } from 'ui'
 
-const WizardLayout: FC<any> = ({ organization, project, children }) => {
+import { useFlag, withAuth } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
+import FeedbackDropdown from './ProjectLayout/LayoutHeader/FeedbackDropdown'
+import HelpPopover from './ProjectLayout/LayoutHeader/HelpPopover'
+import { Organization, Project } from 'types'
+
+interface WizardLayoutProps {
+  organization: Organization | null | undefined
+  project: Project | null
+}
+
+const WizardLayout = ({
+  organization,
+  project,
+  children,
+}: PropsWithChildren<WizardLayoutProps>) => {
   const ongoingIncident = useFlag('ongoingIncident')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
@@ -25,7 +38,7 @@ export default withAuth(observer(WizardLayout))
 
 export const WizardLayoutWithoutAuth = observer(WizardLayout)
 
-const Header: FC<any> = ({ organization, project }) => {
+const Header = ({ organization, project }: WizardLayoutProps) => {
   let stepNumber = organization ? 1 : project ? 2 : 0
   return (
     <div className="border-b p-3 dark:border-dark">
@@ -57,7 +70,11 @@ const Header: FC<any> = ({ organization, project }) => {
               </p>
             </div>
           </div>
-          <div className="flex">{/* End */}</div>
+          <div className="flex">{/* The End */}</div>
+          <div className="flex items-center space-x-2">
+            <HelpPopover />
+            <FeedbackDropdown />
+          </div>
         </div>
       </div>
     </div>

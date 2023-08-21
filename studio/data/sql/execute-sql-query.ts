@@ -10,12 +10,16 @@ import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { sqlKeys } from './keys'
+import { noop } from 'lodash'
+
+export type Error = { code: number; message: string; requestId: string }
 
 export type ExecuteSqlVariables = {
   projectRef?: string
   connectionString?: string
   sql: string
   queryKey?: QueryKey
+  handleError?: (error: { code: number; message: string; requestId: string }) => any
 }
 
 export async function executeSql(
@@ -24,7 +28,11 @@ export async function executeSql(
     connectionString,
     sql,
     queryKey,
-  }: Pick<ExecuteSqlVariables, 'projectRef' | 'connectionString' | 'sql' | 'queryKey'>,
+    handleError,
+  }: Pick<
+    ExecuteSqlVariables,
+    'projectRef' | 'connectionString' | 'sql' | 'queryKey' | 'handleError'
+  >,
   signal?: AbortSignal
 ) {
   if (!projectRef) {
@@ -44,8 +52,13 @@ export async function executeSql(
     { query: sql },
     { headers: Object.fromEntries(headers), signal }
   )
+
   if (response.error) {
-    throw response.error
+    if (handleError !== undefined) {
+      return handleError(response.error)
+    } else {
+      throw response.error
+    }
   }
 
   return { result: response }
@@ -55,21 +68,22 @@ export type ExecuteSqlData = Awaited<ReturnType<typeof executeSql>>
 export type ExecuteSqlError = unknown
 
 export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
-  { projectRef, connectionString, sql, queryKey }: ExecuteSqlVariables,
+  { projectRef, connectionString, sql, queryKey, handleError }: ExecuteSqlVariables,
   { enabled = true, ...options }: UseQueryOptions<ExecuteSqlData, ExecuteSqlError, TData> = {}
 ) =>
   useQuery<ExecuteSqlData, ExecuteSqlError, TData>(
     sqlKeys.query(projectRef, queryKey ?? [md5(sql)]),
-    ({ signal }) => executeSql({ projectRef, connectionString, sql, queryKey }, signal),
+    ({ signal }) =>
+      executeSql({ projectRef, connectionString, sql, queryKey, handleError }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
 
 export const prefetchExecuteSql = (
   client: QueryClient,
-  { projectRef, connectionString, sql, queryKey }: ExecuteSqlVariables
+  { projectRef, connectionString, sql, queryKey, handleError }: ExecuteSqlVariables
 ) => {
   return client.prefetchQuery(sqlKeys.query(projectRef, queryKey ?? [md5(sql)]), ({ signal }) =>
-    executeSql({ projectRef, connectionString, sql, queryKey }, signal)
+    executeSql({ projectRef, connectionString, sql, queryKey, handleError }, signal)
   )
 }
 
@@ -89,13 +103,14 @@ export const useExecuteSqlPrefetch = () => {
   const client = useQueryClient()
 
   return useCallback(
-    ({ projectRef, connectionString, sql, queryKey }: ExecuteSqlVariables) => {
+    ({ projectRef, connectionString, sql, queryKey, handleError }: ExecuteSqlVariables) => {
       if (projectRef) {
         return prefetchExecuteSql(client, {
           projectRef,
           connectionString,
           sql,
           queryKey,
+          handleError,
         })
       }
 

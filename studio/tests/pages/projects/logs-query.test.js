@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event'
 import { logDataFixture } from '../../fixtures'
 import { clickDropdown } from 'tests/helpers'
 import dayjs from 'dayjs'
-import { useProjectSubscriptionQuery } from 'data/subscriptions/project-subscription-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 jest.mock('common/hooks')
 import { useParams } from 'common/hooks'
 
@@ -178,7 +178,7 @@ test('bug: can edit query after selecting a log', async () => {
   const rowValue = await screen.findByText(/12345/) // row value
   // open up an show selection panel
   await userEvent.click(rowValue)
-  await screen.findByText(/Copy/)
+  await screen.findByText('Copy')
 
   // change the query
   let editor = container.querySelector('.monaco-editor')
@@ -197,7 +197,7 @@ test('bug: can edit query after selecting a log', async () => {
     { timeout: 1000 }
   )
   // closes the selection panel
-  await expect(screen.findByText(/Copy/)).rejects.toThrow()
+  await expect(screen.findByText('Copy')).rejects.toThrow()
 })
 
 test('query warnings', async () => {
@@ -220,13 +220,12 @@ test('field reference', async () => {
   await screen.findByText('metadata.request.cf.asOrganization')
 })
 
-describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (key) => {
+describe.each(['free', 'pro', 'team', 'enterprise'])('upgrade modal for %s', (key) => {
   beforeEach(() => {
-    useProjectSubscriptionQuery.mockReturnValue({
+    useProjectSubscriptionV2Query.mockReturnValue({
       data: {
-        tier: {
-          supabase_prod_id: `tier_${key.toLocaleLowerCase()}`,
-          key,
+        plan: {
+          id: key,
         },
       },
     })
@@ -255,7 +254,7 @@ describe.each(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'])('upgrade modal for %s', (ke
     })
 
     // only free plan will show modal
-    if (key === 'FREE') {
+    if (key === 'free') {
       await screen.findByText('Log retention') // assert modal title is present
     } else {
       await expect(screen.findByText('Log retention')).rejects.toThrow()

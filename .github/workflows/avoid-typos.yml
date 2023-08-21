@@ -21,5 +21,6 @@ jobs:
             *.css
             **/package.json
             **/package-lock.json
-            .git/*
+            ./.git/*
             *.ipynb
+            ./i18n/README.*.md

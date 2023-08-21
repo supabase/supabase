@@ -61,10 +61,10 @@ const Layout: FC<Props> = (props: Props) => {
         ].join(' ')}
       >
         <div>
-          <p className="text-brand-900 tracking-wider">Tutorials</p>
+          <p className="text-brand tracking-wider">Tutorials</p>
           <article className={['prose dark:prose-dark ', 'max-w-none'].join(' ')}>
             <h1>{props.meta.title}</h1>
-            <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-800 to-brand-900 my-16"></div>
+            <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-300 to-brand my-16"></div>
 
             <MDXProvider components={components} children={props.children} />
           </article>

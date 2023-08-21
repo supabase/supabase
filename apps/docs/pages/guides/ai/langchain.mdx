@@ -1,4 +1,6 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import { Tabs } from 'ui'
+export const TabPanel = Tabs.Panel
 
 export const meta = {
   id: 'ai-lang-chain',
@@ -13,6 +15,21 @@ export const meta = {
 ## Initializing your database
 
 Prepare you database with the relevant tables:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+>
+<TabPanel id="dashboard" label="Dashboard">
+
+1. Go to the [SQL Editor](https://supabase.com/dashboard/project/_/sql) page in the Dashboard.
+2. Click **LangChain** in the Quick start section.
+3. Click **Run**.
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 -- Enable the pgvector extension to work with embedding vectors
@@ -29,7 +46,7 @@ create table documents (
 -- Create a function to search for documents
 create function match_documents (
   query_embedding vector(1536),
-  match_count int,
+  match_count int default null,
   filter jsonb DEFAULT '{}'
 ) returns table (
   id bigint,
@@ -54,6 +71,9 @@ begin
 end;
 $$;
 ```
+
+</TabPanel>
+</Tabs>
 
 ## Usage
 
@@ -87,6 +107,114 @@ export const run = async () => {
   const resultOne = await vectorStore.similaritySearch('Hello world', 1)
 
   console.log(resultOne)
+}
+```
+
+### Simple Metadata Filtering
+
+Given the above `match_documents` Postgres function, you can also pass a filter parameter to only return documents with a specific metadata field value. This filter parameter is a JSON object, and the `match_documents` function will use the Postgres JSONB Containment operator `@>` to filter documents by the metadata field values you specify. See details on the [Postgres JSONB Containment operator](https://www.postgresql.org/docs/current/datatype-json.html#JSON-CONTAINMENT) for more information.
+
+```js
+import { SupabaseVectorStore } from 'langchain/vectorstores/supabase'
+import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
+import { createClient } from '@supabase/supabase-js'
+
+// First, follow set-up instructions above
+
+const privateKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+if (!privateKey) throw new Error(`Expected env var SUPABASE_SERVICE_ROLE_KEY`)
+
+const url = process.env.SUPABASE_URL
+if (!url) throw new Error(`Expected env var SUPABASE_URL`)
+
+export const run = async () => {
+  const client = createClient(url, privateKey)
+
+  const vectorStore = await SupabaseVectorStore.fromTexts(
+    ['Hello world', 'Hello world', 'Hello world'],
+    [{ user_id: 2 }, { user_id: 1 }, { user_id: 3 }],
+    new OpenAIEmbeddings(),
+    {
+      client,
+      tableName: 'documents',
+      queryName: 'match_documents',
+    }
+  )
+
+  const result = await vectorStore.similaritySearch('Hello world', 1, {
+    user_id: 3,
+  })
+
+  console.log(result)
+}
+```
+
+### Advanced Metadata Filtering
+
+You can also use query builder-style filtering ([similar to how the Supabase JavaScript library works](https://supabase.com/docs/reference/javascript/using-filters)) instead of passing an object. Note that since the filter properties will be in the metadata column, you need to use arrow operators (`->` for integer or `->>` for text) as defined in [Postgrest API documentation](https://postgrest.org/en/stable/references/api/tables_views.html?highlight=operators#json-columns) and specify the data type of the property (e.g. the column should look something like `metadata->some_int_value::int`).
+
+```js
+import { SupabaseFilterRPCCall, SupabaseVectorStore } from 'langchain/vectorstores/supabase'
+import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
+import { createClient } from '@supabase/supabase-js'
+
+// First, follow set-up instructions above
+
+const privateKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+if (!privateKey) throw new Error(`Expected env var SUPABASE_SERVICE_ROLE_KEY`)
+
+const url = process.env.SUPABASE_URL
+if (!url) throw new Error(`Expected env var SUPABASE_URL`)
+
+export const run = async () => {
+  const client = createClient(url, privateKey)
+
+  const embeddings = new OpenAIEmbeddings()
+
+  const store = new SupabaseVectorStore(embeddings, {
+    client,
+    tableName: 'documents',
+  })
+
+  const docs = [
+    {
+      pageContent:
+        'This is a long text, but it actually means something because vector database does not understand Lorem Ipsum. So I would need to expand upon the notion of quantum fluff, a theorectical concept where subatomic particles coalesce to form transient multidimensional spaces. Yet, this abstraction holds no real-world application or comprehensible meaning, reflecting a cosmic puzzle.',
+      metadata: { b: 1, c: 10, stuff: 'right' },
+    },
+    {
+      pageContent:
+        'This is a long text, but it actually means something because vector database does not understand Lorem Ipsum. So I would need to proceed by discussing the echo of virtual tweets in the binary corridors of the digital universe. Each tweet, like a pixelated canary, hums in an unseen frequency, a fascinatingly perplexing phenomenon that, while conjuring vivid imagery, lacks any concrete implication or real-world relevance, portraying a paradox of multidimensional spaces in the age of cyber folklore.',
+      metadata: { b: 2, c: 9, stuff: 'right' },
+    },
+    { pageContent: 'hello', metadata: { b: 1, c: 9, stuff: 'right' } },
+    { pageContent: 'hello', metadata: { b: 1, c: 9, stuff: 'wrong' } },
+    { pageContent: 'hi', metadata: { b: 2, c: 8, stuff: 'right' } },
+    { pageContent: 'bye', metadata: { b: 3, c: 7, stuff: 'right' } },
+    { pageContent: "what's this", metadata: { b: 4, c: 6, stuff: 'right' } },
+  ]
+
+  await store.addDocuments(docs)
+
+  const funcFilterA: SupabaseFilterRPCCall = (rpc) =>
+    rpc
+      .filter('metadata->b::int', 'lt', 3)
+      .filter('metadata->c::int', 'gt', 7)
+      .textSearch('content', `'multidimensional' & 'spaces'`, {
+        config: 'english',
+      })
+
+  const resultA = await store.similaritySearch('quantum', 4, funcFilterA)
+
+  const funcFilterB: SupabaseFilterRPCCall = (rpc) =>
+    rpc
+      .filter('metadata->b::int', 'lt', 3)
+      .filter('metadata->c::int', 'gt', 7)
+      .filter('metadata->>stuff', 'eq', 'right')
+
+  const resultB = await store.similaritySearch('hello', 2, funcFilterB)
+
+  console.log(resultA, resultB)
 }
 ```
 

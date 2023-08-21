@@ -1,15 +1,28 @@
-import { useState } from 'react'
-import { Button, IconEdit2, IconInfo, Input, Listbox } from 'ui'
+import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
+import type { PaymentMethod } from '@stripe/stripe-js'
+import { useQueryClient } from '@tanstack/react-query'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
+import {
+  Button,
+  IconEdit2,
+  IconExternalLink,
+  IconHelpCircle,
+  IconInfo,
+  Input,
+  Listbox,
+  Toggle,
+} from 'ui'
 
-import { API_URL, BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
-import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import Panel from 'components/ui/Panel'
-import { useElements, useStripe, PaymentElement } from '@stripe/react-stripe-js'
-import { PaymentMethod } from 'components/interfaces/Billing/Billing.types'
-import { getURL } from 'lib/helpers'
+import { SpendCapModal } from 'components/interfaces/BillingV2'
 import InformationBox from 'components/ui/InformationBox'
+import Panel from 'components/ui/Panel'
+import { useOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
+import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useStore } from 'hooks'
+import { BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
+import { getURL } from 'lib/helpers'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -38,7 +51,8 @@ interface NewOrgFormProps {
  * No org selected yet, create a new one
  */
 const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
-  const { ui, app } = useStore()
+  const queryClient = useQueryClient()
+  const { ui } = useStore()
   const router = useRouter()
   const stripe = useStripe()
   const elements = useElements()
@@ -46,10 +60,21 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const [orgName, setOrgName] = useState('')
   const [orgKind, setOrgKind] = useState(ORG_KIND_DEFAULT)
   const [orgSize, setOrgSize] = useState(ORG_SIZE_DEFAULT)
+  // [Joshen] Separate loading state here as there's 2 async processes
   const [newOrgLoading, setNewOrgLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>()
 
-  const [dbPricingTierKey, setDbPricingTierKey] = useState('PRO')
+  const [dbPricingTierKey, setDbPricingTierKey] = useState('FREE')
+
+  const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
+  const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(true)
+
+  const { mutateAsync: createOrganization } = useOrganizationCreateMutation({
+    onSuccess: async (org: any) => {
+      await invalidateOrganizationsQuery(queryClient)
+      router.push(`/new/${org.slug}`)
+    },
+  })
 
   function validateOrgName(name: any) {
     const value = name ? name.trim() : ''
@@ -72,35 +97,20 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     setDbPricingTierKey(value)
   }
 
-  async function createOrg(paymentMethodId: string) {
-    const response = await post(
-      `${API_URL}/organizations`,
-      {
+  async function createOrg(paymentMethodId?: string) {
+    const dbTier = dbPricingTierKey === 'PRO' && !isSpendCapEnabled ? 'PAYG' : dbPricingTierKey
+    try {
+      await createOrganization({
         name: orgName,
         kind: orgKind,
-        payment_method: paymentMethodId,
-        tier: 'tier_' + dbPricingTierKey.toLowerCase(),
+        tier: 'tier_' + dbTier.toLowerCase(),
         ...(orgKind == 'COMPANY' ? { size: orgSize } : {}),
-      },
-      // Call new V2 endpoint from API
-      {
-        headers: {
-          Version: '2',
-        },
-      }
-    )
-
-    if (response.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create organization: ${response.error?.message ?? response.error}`,
+        payment_method: paymentMethodId,
+        V2: true,
       })
-    } else {
-      const org = response
-      app.onOrgAdded(org)
-      router.push(`/new/${org.slug}`)
+    } finally {
+      setNewOrgLoading(false)
     }
-    setNewOrgLoading(false)
   }
 
   const handleSubmit = async (event: any) => {
@@ -108,17 +118,17 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
 
     const isOrgNameValid = validateOrgName(orgName)
     if (!isOrgNameValid) {
-      ui.setNotification({ category: 'error', message: 'Organization name is empty' })
-      return
+      return ui.setNotification({ category: 'error', message: 'Organization name is empty' })
     }
 
     if (!stripe || !elements) {
-      console.error('Stripe.js has not loaded')
-      return
+      return console.error('Stripe.js has not loaded')
     }
     setNewOrgLoading(true)
 
-    if (!paymentMethod) {
+    if (dbPricingTierKey === 'FREE') {
+      await createOrg()
+    } else if (!paymentMethod) {
       const { error, setupIntent } = await stripe.confirmSetup({
         elements,
         redirect: 'if_required',
@@ -169,7 +179,6 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
               <div className="flex items-center space-x-3">
                 <p className="text-xs text-scale-900">You can rename your organization later</p>
                 <Button
-                  block
                   htmlType="submit"
                   type="primary"
                   loading={newOrgLoading}
@@ -181,25 +190,6 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
             </div>
           }
         >
-          <Panel.Content>
-            <InformationBox
-              icon={<IconInfo size="large" strokeWidth={1.5} />}
-              defaultVisibility={true}
-              hideCollapse
-              title="Billed via organization"
-              description={
-                <div className="space-y-3">
-                  <p className="text-sm leading-normal">
-                    This is heavy Work-In-Progress and not customer facing yet, use with caution!
-                    This organization will use the new org level billing, instead of having
-                    individual subscriptions per project. There are still a lot of open ends that
-                    may be restrictive for you, follow #team-billing for updates.
-                  </p>
-                </div>
-              }
-            />
-          </Panel.Content>
-
           <Panel.Content className="pt-0">
             <p className="text-sm">This is your organization within Supabase.</p>
             <p className="text-sm text-scale-1100">
@@ -290,40 +280,108 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
             </Listbox>
           </Panel.Content>
 
+          {dbPricingTierKey === 'PRO' && (
+            <>
+              <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <Toggle
+                  id="spend-cap"
+                  layout="horizontal"
+                  label={
+                    <div className="flex space-x-4">
+                      <span>Spend Cap</span>
+                      <IconHelpCircle
+                        size={16}
+                        strokeWidth={1.5}
+                        className="transition opacity-50 cursor-pointer hover:opacity-100"
+                        onClick={() => setShowSpendCapHelperModal(true)}
+                      />
+                    </div>
+                  }
+                  checked={isSpendCapEnabled}
+                  onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
+                  descriptionText={
+                    <div>
+                      <p>
+                        By default, Pro plan organizations have a spend cap to control costs. When
+                        enabled, usage is limited to the plan's quota, with restrictions when limits
+                        are exceeded. To scale beyond Pro limits without restrictions, disable the
+                        spend cap and pay for over-usage beyond the quota.
+                      </p>
+                    </div>
+                  }
+                />
+              </Panel.Content>
+
+              <SpendCapModal
+                visible={showSpendCapHelperModal}
+                onHide={() => setShowSpendCapHelperModal(false)}
+              />
+            </>
+          )}
+
+          {dbPricingTierKey !== 'FREE' && (
+            <Panel.Content>
+              {paymentMethod?.card !== undefined ? (
+                <div key={paymentMethod.id} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-8">
+                    <img
+                      alt="Card"
+                      src={`${BASE_PATH}/img/payment-methods/${paymentMethod.card.brand
+                        .replace(' ', '-')
+                        .toLowerCase()}.png`}
+                      width="32"
+                    />
+                    <Input
+                      readOnly
+                      className="w-64"
+                      size="small"
+                      value={`•••• •••• •••• ${paymentMethod.card.last4}`}
+                    />
+                    <p className="text-sm tabular-nums">
+                      Expires: {paymentMethod.card.exp_month}/{paymentMethod.card.exp_year}
+                    </p>
+                  </div>
+                  <div>
+                    <Button
+                      type="outline"
+                      icon={<IconEdit2 />}
+                      onClick={() => resetPaymentMethod()}
+                      disabled={newOrgLoading}
+                      className="hover:border-gray-500"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <PaymentElement />
+              )}
+            </Panel.Content>
+          )}
+
           <Panel.Content>
-            {paymentMethod ? (
-              <div key={paymentMethod.id} className="flex items-center justify-between">
-                <div className="flex items-center space-x-8">
-                  <img
-                    alt="Card"
-                    src={`${BASE_PATH}/img/payment-methods/${paymentMethod.card.brand
-                      .replace(' ', '-')
-                      .toLowerCase()}.png`}
-                    width="32"
-                  />
-                  <Input
-                    readOnly
-                    className="w-64"
-                    size="small"
-                    value={`•••• •••• •••• ${paymentMethod.card.last4}`}
-                  />
-                  <p className="text-sm tabular-nums">
-                    Expires: {paymentMethod.card.exp_month}/{paymentMethod.card.exp_year}
+            <InformationBox
+              icon={<IconInfo size="large" strokeWidth={1.5} />}
+              defaultVisibility={true}
+              hideCollapse
+              title="Billed via organization"
+              description={
+                <div className="space-y-3">
+                  <p className="text-sm leading-normal">
+                    This organization will use the new organization level billing, which gives you a
+                    single subscription for your entire organization, instead of having individual
+                    subscriptions per project.{' '}
                   </p>
+                  <div>
+                    <Link href="https://www.notion.so/supabase/Org-Level-Billing-Public-Docs-f059a154beb743a19199d05bab4acb08">
+                      <a target="_blank" rel="noreferrer">
+                        <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                          Documentation
+                        </Button>
+                      </a>
+                    </Link>
+                  </div>
                 </div>
-                <div>
-                  <Button
-                    type="outline"
-                    icon={<IconEdit2 />}
-                    onClick={() => resetPaymentMethod()}
-                    disabled={newOrgLoading}
-                    className="hover:border-gray-500"
-                  />
-                </div>
-              </div>
-            ) : (
-              <PaymentElement />
-            )}
+              }
+            />
           </Panel.Content>
         </Panel>
       </form>

@@ -1,24 +1,24 @@
-import { useCallback, useState, FC, useEffect } from 'react'
-import { debounce, includes, noop } from 'lodash'
-import { SidePanel, Tabs } from 'ui'
 import { PostgresTable } from '@supabase/postgres-meta'
+import { debounce, includes, noop } from 'lodash'
+import { useCallback, useEffect, useState } from 'react'
+import { SidePanel, Tabs } from 'ui'
 
 import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
-import SpreadSheetTextInput from './SpreadSheetTextInput'
+import { ImportContent } from '../TableEditor/TableEditor.types'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'
+import SpreadsheetImportConfiguration from './SpreadSheetImportConfiguration'
+import SpreadSheetTextInput from './SpreadSheetTextInput'
+import { EMPTY_SPREADSHEET_DATA, UPLOAD_FILE_TYPES } from './SpreadsheetImport.constants'
 import { SpreadsheetData } from './SpreadsheetImport.types'
 import {
   acceptedFileExtension,
   parseSpreadsheet,
   parseSpreadsheetText,
 } from './SpreadsheetImport.utils'
-import { UPLOAD_FILE_TYPES, EMPTY_SPREADSHEET_DATA } from './SpreadsheetImport.constants'
-import { ImportContent } from '../TableEditor/TableEditor.types'
-import SpreadsheetImportConfiguration from './SpreadSheetImportConfiguration'
 import SpreadsheetImportPreview from './SpreadsheetImportPreview'
 
-interface Props {
+interface SpreadsheetImportProps {
   debounceDuration?: number
   headers?: string[]
   rows?: any[]
@@ -29,7 +29,7 @@ interface Props {
   updateEditorDirty?: (value: boolean) => void
 }
 
-const SpreadsheetImport: FC<Props> = ({
+const SpreadsheetImport = ({
   visible = false,
   debounceDuration = 250,
   headers = [],
@@ -38,7 +38,7 @@ const SpreadsheetImport: FC<Props> = ({
   saveContent,
   closePanel,
   updateEditorDirty = noop,
-}) => {
+}: SpreadsheetImportProps) => {
   const { ui } = useStore()
 
   useEffect(() => {

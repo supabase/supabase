@@ -12,20 +12,22 @@ export default {
     title: 'Supabase Vector',
     h1: (
       <span key={'vector-h1'} className="heading-gradient">
-        The open source Vector Toolkit <br />
-        for Postgres
+        The Postgres Vector database <br />
+        and AI Toolkit
       </span>
     ),
     subheader: (
       <>
-        Use pgvector with Supabase client libraries <br className="hidden md:block" />
-        to store, index, and query your vector embeddings at scale.
+        An open source Vector database for developing AI applications.
+        <br className="hidden md:block" />
+        Use pgvector to store, index, and access embeddings, and our AI toolkit to build AI
+        applications with Hugging Face and OpenAI.
       </>
     ),
     image: '/images/product/vector/vector-hero.svg',
     cta: {
-      label: 'Quickstart',
-      link: '/docs/guides/ai/quickstarts/hello-world',
+      label: 'Launch a free database',
+      link: '/dashboard',
     },
     secondaryCta: {
       label: 'Explore documentation',
@@ -159,7 +161,7 @@ export default {
       <>
         <span className="heading-gradient">Simple yet</span>
         <br />
-        <span className="text-brand-900">powerful APIs</span>
+        <span className="text-brand">powerful APIs</span>
       </>
     ),
     paragraph: 'Easy-to-use client libraries for managing and querying vector stores in Postgres.',
@@ -239,7 +241,7 @@ docs.query(
       <>
         <span className="heading-gradient">Powerful Features</span>
         <br />
-        <span className="text-brand-900">Scale to millions</span>
+        <span className="text-brand">Scale to millions</span>
       </>
     ),
     paragraph:
@@ -308,7 +310,7 @@ docs.query(
         author: 'Caleb Peffer',
         role: 'CEO at Mendable',
         quote:
-          'We tried other vector databases - we tried Faiss, we tried Weviate, we tried Pinecone. If you’re just doing vector search they’re great, but if you need to store a bunch of metadata that becomes a huge pain.',
+          'We tried other vector databases - we tried Faiss, we tried Weaviate, we tried Pinecone. If you’re just doing vector search they’re great, but if you need to store a bunch of metadata that becomes a huge pain.',
         image: '/images/customers/logos/mendableai.png',
         abstract: 'Mendable switches from Pinecone to Supabase for PostgreSQL vector embeddings.',
         url: '/customers/mendableai',

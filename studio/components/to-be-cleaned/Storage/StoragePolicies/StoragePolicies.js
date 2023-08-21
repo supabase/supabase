@@ -12,11 +12,18 @@ import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
 import { PolicyEditorModal } from 'components/interfaces/Auth/Policies'
+import { useBucketsQuery } from 'data/storage/buckets-query'
+import { useParams } from 'common'
 
 const StoragePolicies = () => {
   const { ui, meta } = useStore()
+  const { ref: projectRef } = useParams()
+
   const storageStore = useStorageStore()
-  const { loaded, buckets } = storageStore
+  const { loaded } = storageStore
+
+  const { data } = useBucketsQuery({ projectRef })
+  const buckets = data ?? []
 
   const roles = meta.roles.list((role) => !meta.roles.systemRoles.includes(role.name))
 

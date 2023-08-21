@@ -1,23 +1,21 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { useState, useEffect } from 'react'
-import { observer } from 'mobx-react-lite'
-import { isUndefined } from 'lodash'
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
-import { Modal } from 'ui'
+import { useQueryClient } from '@tanstack/react-query'
+import { isUndefined } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useState } from 'react'
 
-import { useStore } from 'hooks'
-import { sqlKeys } from 'data/sql/keys'
-
-import { DatabaseLayout } from 'components/layouts'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { TableList, ColumnList } from 'components/interfaces/Database'
+import { ColumnList, TableList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
+import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { sqlKeys } from 'data/sql/keys'
+import { useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
+import { Modal } from 'ui'
 
 const DatabaseTables: NextPageWithLayout = () => {
   const { meta, ui } = useStore()
-
   const { project } = useProjectContext()
 
   const queryClient = useQueryClient()
@@ -34,10 +32,10 @@ const DatabaseTables: NextPageWithLayout = () => {
   const [selectedTableToDelete, setSelectedTableToDelete] = useState<PostgresTable>()
 
   useEffect(() => {
-    if (ui.selectedProject?.ref) {
+    if (project?.ref) {
       meta.types.load()
     }
-  }, [ui.selectedProject?.ref])
+  }, [project?.ref])
 
   const onAddTable = () => {
     setSidePanelKey('table')

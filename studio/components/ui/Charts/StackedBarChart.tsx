@@ -115,14 +115,14 @@ const StackedBarChart: React.FC<Props> = ({
                 ? (label) => timestampFormatter(label, customDateFormat, displayDateInUtc)
                 : undefined
             }
-            formatter={(value: number, name: string, props: any) => {
+            formatter={(value, name, props) => {
               const suffix = format || ''
               if (variant === 'percentages' && percentagesStackedData) {
                 const index = percentagesStackedData.findIndex(
                   (pStack) => pStack === props.payload!
                 )
                 const val = stackedData[index][name]
-                const percentage = precisionFormatter(value * 100, 1) + '%'
+                const percentage = precisionFormatter(Number(value) * 100, 1) + '%'
                 return `${percentage} (${val}${suffix})`
               }
               return String(value) + suffix

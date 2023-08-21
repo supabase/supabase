@@ -22,41 +22,19 @@ This submodule provides convenience helpers for implementing user authentication
 
 ## Install the Remix helper library
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="npm"
->
-<TabPanel id="npm" label="npm">
-
-```sh
-npm install @supabase/auth-helpers-remix
+```sh Terminal
+npm install @supabase/auth-helpers-remix @supabase/supabase-js
 ```
 
 This library supports the following tooling versions:
 
 - Remix: `>=1.7.2`
-
-</TabPanel>
-<TabPanel id="yarn" label="Yarn">
-
-```sh
-yarn add @supabase/auth-helpers-remix
-```
-
-This library supports the following tooling versions:
-
-- Remix: `>=1.7.2`
-
-</TabPanel>
-</Tabs>
 
 ## Set up environment variables
 
-Retrieve your project URL and anon key in your project's [API settings](https://app.supabase.com/project/_/settings/api) in the Dashboard to set up the following environment variables. For local development you can set them in a `.env` file. See an [example](https://github.com/supabase/auth-helpers/blob/main/examples/remix/.env.example).
+Retrieve your project URL and anon key in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api) in the Dashboard to set up the following environment variables. For local development you can set them in a `.env` file. See an [example](https://github.com/supabase/auth-helpers/blob/main/examples/remix/.env.example).
 
-```bash title=.env
+```bash .env
 SUPABASE_URL=YOUR_SUPABASE_URL
 SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
@@ -75,7 +53,7 @@ The `Code Exchange` route is required for the [server-side auth flow](https://su
 
 Create a new file at `app/routes/auth.callback.jsx` and populate with the following:
 
-```jsx title="app/routes/auth.callback.jsx"
+```jsx app/routes/auth.callback.jsx
 import { redirect } from '@remix-run/node'
 import { createServerClient } from '@supabase/auth-helpers-remix'
 
@@ -105,7 +83,7 @@ export const loader = async ({ request }) => {
 
 Create a new file at `app/routes/auth.callback.tsx` and populate with the following:
 
-```tsx title="app/routes/auth.callback.tsx"
+```tsx app/routes/auth.callback.tsx
 import { redirect } from '@remix-run/node'
 import { createServerClient } from '@supabase/auth-helpers-remix'
 
@@ -328,7 +306,7 @@ Since our environment variables are not available client-side, we need to plumb 
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx title=app/root.jsx
+```jsx app/root.jsx
 export const loader = () => {
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL,
@@ -343,26 +321,26 @@ export const loader = () => {
 
 Next, we call the `useLoaderData` hook in our component to get the `env` object.
 
-```jsx title=app/root.jsx
+```jsx app/root.jsx
 const { env } = useLoaderData()
 ```
 
 We then want to instantiate a single instance of a Supabase browser client, to be used across our client-side components.
 
-```jsx title=app/root.jsx
+```jsx app/root.jsx
 const [supabase] = useState(() => createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY))
 ```
 
 And then we can share this instance across our application with Outlet Context.
 
-```jsx title=app/root.jsx
+```jsx app/root.jsx
 <Outlet context={{ supabase }} />
 ```
 
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title=app/root.tsx
+```tsx app/root.tsx
 export const loader = ({}: LoaderArgs) => {
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
@@ -377,13 +355,13 @@ export const loader = ({}: LoaderArgs) => {
 
 Next, we call the `useLoaderData` hook in our component to get the `env` object.
 
-```tsx title=app/root.tsx
+```tsx app/root.tsx
 const { env } = useLoaderData<typeof loader>()
 ```
 
 We then want to instantiate a single instance of a Supabase browser client, to be used across our client-side components.
 
-```tsx title=app/root.tsx
+```tsx app/root.tsx
 const [supabase] = useState(() =>
   createBrowserClient<Database>(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
 )
@@ -391,7 +369,7 @@ const [supabase] = useState(() =>
 
 And then we can share this instance across our application with Outlet Context.
 
-```tsx title=app/root.tsx
+```tsx app/root.tsx
 <Outlet context={{ supabase }} />
 ```
 
@@ -417,7 +395,7 @@ Let's pipe that through from our loader.
 
 <TabPanel id="js" label="JavaScript">
 
-```jsx title=app/root.jsx
+```jsx app/root.jsx
 export const loader = async ({ request }) => {
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL,
@@ -451,7 +429,7 @@ export const loader = async ({ request }) => {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title=app/root.tsx
+```tsx app/root.tsx
 export const loader = async ({ request }: LoaderArgs) => {
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
@@ -496,7 +474,7 @@ And then use the revalidator, inside the `onAuthStateChange` hook.
 
 <TabPanel id="js" label="JavaScript">
 
-```jsx title=app/root.jsx
+```jsx app/root.jsx
 const { env, session } = useLoaderData()
 const { revalidate } = useRevalidator()
 
@@ -524,7 +502,7 @@ useEffect(() => {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title=app/root.tsx
+```tsx app/root.tsx
 const { env, session } = useLoaderData<typeof loader>()
 const { revalidate } = useRevalidator()
 
@@ -569,7 +547,7 @@ Now we can use our outlet context to access our single instance of Supabase and 
 
 <TabPanel id="js" label="JavaScript">
 
-```jsx title=app/components/login.jsx
+```jsx app/components/login.jsx
 export default function Login() {
   const { supabase } = useOutletContext()
 
@@ -607,7 +585,7 @@ export default function Login() {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title=app/components/login.tsx
+```tsx app/components/login.tsx
 export default function Login() {
   const { supabase } = useOutletContext<{ supabase: SupabaseClient<Database> }>()
 
@@ -656,7 +634,7 @@ export default function Login() {
 
 <TabPanel id="js" label="JavaScript">
 
-```jsx title=app/routes/realtime.jsx
+```jsx app/routes/realtime.jsx
 import { useLoaderData, useOutletContext } from '@remix-run/react'
 import { createServerClient } from '@supabase/auth-helpers-remix'
 import { json } from '@remix-run/node'
@@ -704,7 +682,7 @@ export default function Index() {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx title=app/routes/realtime.tsx
+```tsx app/routes/realtime.tsx
 import { useLoaderData, useOutletContext } from '@remix-run/react'
 import { createServerClient } from '@supabase/auth-helpers-remix'
 import { json } from '@remix-run/node'
@@ -765,7 +743,7 @@ export default function Index() {
 
 </Tabs>
 
-> Ensure you have [enabled replication](https://app.supabase.com/project/_/database/replication) on the table you are subscribing to.
+> Ensure you have [enabled replication](https://supabase.com/dashboard/project/_/database/replication) on the table you are subscribing to.
 
 ## Migration Guide
 
