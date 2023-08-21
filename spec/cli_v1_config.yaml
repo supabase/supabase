@@ -260,7 +260,7 @@ parameters:
     links:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
-  
+
   - id: 'auth.email.template.type.subject'
     title: 'auth.email.template.<type>.subject'
     tags: ['auth']
@@ -276,7 +276,7 @@ parameters:
     links:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
-  
+
   - id: 'auth.email.template.type.content_path'
     title: 'auth.email.template.<type>.content_path'
     tags: ['auth']
