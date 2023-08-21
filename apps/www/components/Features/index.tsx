@@ -1,5 +1,5 @@
 import { Badge } from 'ui'
-import Solutions from 'data/Solutions.json'
+import Solutions from 'data/Solutions'
 import Telemetry from '~/lib/telemetry'
 import gaEvents from '~/lib/gaEvents'
 import SectionContainer from '../Layouts/SectionContainer'

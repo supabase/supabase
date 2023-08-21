@@ -1,7 +1,10 @@
+import { toast } from 'react-hot-toast'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+
 import { post } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
 import { oauthAppKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type OAuthAppCreateVariables = {
   slug: string
@@ -24,10 +27,6 @@ export async function createOAuthApp({
   icon,
   redirect_uris,
 }: OAuthAppCreateVariables) {
-  if (!slug) throw new Error('Organization slug is required')
-  if (!name) throw new Error('OAuth app name is required')
-  if (!website) throw new Error('OAuth app URL is required')
-
   const response = await post(`${API_ADMIN_URL}/organizations/${slug}/oauth/apps`, {
     name,
     website,
@@ -42,20 +41,28 @@ type OAuthAppCreateData = Awaited<ReturnType<typeof createOAuthApp>>
 
 export const useOAuthAppCreateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<OAuthAppCreateData, unknown, OAuthAppCreateVariables>,
+  UseMutationOptions<OAuthAppCreateData, ResponseError, OAuthAppCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OAuthAppCreateData, unknown, OAuthAppCreateVariables>(
+  return useMutation<OAuthAppCreateData, ResponseError, OAuthAppCreateVariables>(
     (vars) => createOAuthApp(vars),
     {
       async onSuccess(data, variables, context) {
         const { slug } = variables
         await queryClient.invalidateQueries(oauthAppKeys.oauthApps(slug))
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to create OAuth application: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

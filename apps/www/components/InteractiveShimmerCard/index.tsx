@@ -34,9 +34,9 @@ const InteractiveShimmerCard = ({
     const isActive = x > -3 && x < width + 3 && y > -3 && y < height + 3
     const activeGlow =
       hasActiveOnHover && isActive
-        ? `radial-gradient(65rem circle at ${x}px ${y}px, var(--colors-brand9), transparent), `
+        ? `radial-gradient(65rem circle at ${x}px ${y}px, hsl(var(--brand-default)), transparent), `
         : ''
-    outerElement.style.background = isActive ? `var(--colors-brand9)` : `var(--colors-scale3)`
+    outerElement.style.background = isActive ? `hsl(var(--brand-default))` : `var(--colors-scale3)`
     outerElement.style.backgroundImage = `
       ${activeGlow}radial-gradient(30rem circle at ${x}px ${y}px, ${
       shimmerFromColor ?? 'var(--colors-scale8)'

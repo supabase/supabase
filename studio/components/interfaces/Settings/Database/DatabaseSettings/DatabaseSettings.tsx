@@ -1,19 +1,19 @@
-import { FC } from 'react'
+import { useParams, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { Input, Tabs } from 'ui'
-import { pluckObjectFields } from 'lib/helpers'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 
-import { useTelemetryProps } from 'common'
-import Telemetry from 'lib/telemetry'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { pluckObjectFields } from 'lib/helpers'
+import Telemetry from 'lib/telemetry'
 import ResetDbPassword from './ResetDbPassword'
 
-const DatabaseSettings: FC<any> = ({ projectRef }) => {
-  const { data, isLoading, isError } = useProjectSettingsQuery({ projectRef })
+const DatabaseSettings = () => {
   const router = useRouter()
+  const { ref: projectRef } = useParams()
   const telemetryProps = useTelemetryProps()
+  const { data, isLoading, isError } = useProjectSettingsQuery({ projectRef })
 
   if (isError) {
     return (
@@ -50,7 +50,7 @@ const DatabaseSettings: FC<any> = ({ projectRef }) => {
           </Panel>
         </section>
 
-        <ResetDbPassword disabled={true} />
+        <ResetDbPassword disabled />
 
         <section className="space-y-6">
           <Panel

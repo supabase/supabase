@@ -1,20 +1,22 @@
-import { BASE_PATH } from 'lib/constants'
-import { FC, useState } from 'react'
+import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Button, Input, InputNumber, Toggle, Listbox, IconEye, IconEyeOff } from 'ui'
+import { Button, IconEye, IconEyeOff, Input, InputNumber, Listbox, Toggle } from 'ui'
+
+import { BASE_PATH } from 'lib/constants'
 import { Enum } from './AuthProvidersForm.types'
 
-interface Props {
+interface FormFieldProps {
   name: string
   properties: any
   formValues: any
   disabled?: boolean
 }
 
-const FormField: FC<Props> = ({ name, properties, formValues, disabled = false }) => {
+const FormField = ({ name, properties, formValues, disabled = false }: FormFieldProps) => {
   const [hidden, setHidden] = useState(!!properties.isSecret)
 
-  if (properties.show && formValues[properties.show.key] !== properties.show.matches) return null
+  if (properties.show && !properties.show.matches.includes(formValues[properties.show.key]))
+    return null
 
   switch (properties.type) {
     case 'string':

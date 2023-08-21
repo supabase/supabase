@@ -1,13 +1,11 @@
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 
-import { useParams } from 'common'
 import { StorageLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { StoragePolicies } from 'components/to-be-cleaned/Storage'
-import { useFlag, useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 /**
@@ -19,12 +17,7 @@ const PageLayout: NextPageWithLayout = () => {
   const { meta } = useStore()
   const { project } = useProjectContext()
 
-  const kpsEnabled = useFlag('initWithKps')
-
   useEffect(() => {
-    if (project && project.status === PROJECT_STATUS.INACTIVE) {
-      post(`${API_URL}/projects/${ref}/restore`, { kps_enabled: kpsEnabled })
-    }
     meta.roles.load()
   }, [project])
 

@@ -1,12 +1,13 @@
-import React, { FC, useEffect, useState } from 'react'
-import { Button, Input, IconRefreshCw, IconSearch, IconExternalLink, IconEye, IconEyeOff } from 'ui'
+import { useEffect, useState } from 'react'
+import { Button, IconExternalLink, IconEye, IconEyeOff, IconRefreshCw, IconSearch, Input } from 'ui'
+
+import CSVButton from 'components/ui/CSVButton'
 import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
+import DatePickers from './Logs.DatePickers'
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
 import LogsFilterPopover from './LogsFilterPopover'
-import DatePickers from './Logs.DatePickers'
-import CSVButton from 'components/ui/CSVButton'
 
-interface Props {
+interface PreviewFilterPanelProps {
   defaultSearchValue?: string
   defaultToValue?: string
   defaultFromValue?: string
@@ -29,7 +30,7 @@ interface Props {
 /**
  * Logs control panel header + wrapper
  */
-const PreviewFilterPanel: FC<Props> = ({
+const PreviewFilterPanel = ({
   isLoading,
   newCount,
   onRefresh,
@@ -45,7 +46,7 @@ const PreviewFilterPanel: FC<Props> = ({
   onFiltersChange,
   filters,
   table,
-}) => {
+}: PreviewFilterPanelProps) => {
   const [search, setSearch] = useState('')
 
   const hasEdits = search !== defaultSearchValue

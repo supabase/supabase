@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Form, Input } from 'ui'
 import { boolean, number, object, string } from 'yup'
 
@@ -10,17 +10,14 @@ import {
   FormPanel,
   FormSection,
   FormSectionContent,
-  FormSectionLabel,
 } from 'components/ui/Forms'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
 
 const SiteUrl = observer(() => {
   const { authConfig, ui } = useStore()
   const { isLoaded } = authConfig
 
   const formId = 'auth-config-general-form'
-  const [hidden, setHidden] = useState(true)
-
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const INITIAL_VALUES = {
@@ -30,6 +27,7 @@ const SiteUrl = observer(() => {
     REFRESH_TOKEN_ROTATION_ENABLED: authConfig.config.REFRESH_TOKEN_ROTATION_ENABLED || false,
     SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig.config.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
     SECURITY_CAPTCHA_ENABLED: authConfig.config.SECURITY_CAPTCHA_ENABLED || false,
+    SECURITY_CAPTCHA_PROVIDER: authConfig.config.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
     SECURITY_CAPTCHA_SECRET: authConfig.config.SECURITY_CAPTCHA_SECRET || '',
   }
 
@@ -46,14 +44,13 @@ const SiteUrl = observer(() => {
     SECURITY_CAPTCHA_ENABLED: boolean().required(),
     SECURITY_CAPTCHA_SECRET: string().when('SECURITY_CAPTCHA_ENABLED', {
       is: true,
-      then: string().required('Must have a hCaptcha secret'),
+      then: string().required('Must have a Captcha secret'),
     }),
   })
 
   const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
     const payload = { ...values }
     payload.DISABLE_SIGNUP = !values.DISABLE_SIGNUP
-    payload.SECURITY_CAPTCHA_PROVIDER = 'hcaptcha'
 
     setSubmitting(true)
     const { error } = await authConfig.update(payload)
@@ -88,7 +85,7 @@ const SiteUrl = observer(() => {
           <>
             <FormHeader
               title="Site URL"
-              description="Configure the url of your site. This is used for password reset emails and other links."
+              description="Configure the default redirect URL used when a redirect URL is not specified or doesn't match one from the allow list. This value is also exposed as a template variable in the email templates section. Wildcards cannot be used here."
             />
             <FormPanel
               disabled={true}
@@ -111,13 +108,7 @@ const SiteUrl = observer(() => {
             >
               <FormSection>
                 <FormSectionContent loading={!isLoaded}>
-                  <Input
-                    id="SITE_URL"
-                    size="small"
-                    label="Site URL"
-                    descriptionText="The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails."
-                    disabled={!canUpdateConfig}
-                  />
+                  <Input id="SITE_URL" size="small" label="Site URL" disabled={!canUpdateConfig} />
                 </FormSectionContent>
               </FormSection>
             </FormPanel>
