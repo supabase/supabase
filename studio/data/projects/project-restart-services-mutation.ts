@@ -22,12 +22,14 @@ export type ProjectRestartServicesVariables = {
     | 'walg'
     | 'autoshutdown'
   )[]
+  source_notification_id?: string
 }
 
 export async function restartProjectServices({
   ref,
   region,
   services = ['postgresql'],
+  source_notification_id,
 }: ProjectRestartServicesVariables) {
   const { data, error } = await post('/platform/projects/{ref}/restart-services', {
     params: { path: { ref } },
@@ -35,6 +37,7 @@ export async function restartProjectServices({
       restartRequest: {
         region,
         services,
+        source_notification_id,
       },
     },
   })

@@ -1,4 +1,4 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
 import { post } from 'data/fetchers'
@@ -37,8 +37,6 @@ export const useOrganizationPaymentMethodSetupIntent = ({
   >,
   'mutationFn'
 > = {}) => {
-  const queryClient = useQueryClient()
-
   return useMutation<
     OrganizationPaymentMethodSetupIntentData,
     ResponseError,
