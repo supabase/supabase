@@ -51,7 +51,10 @@ const Globe = () => {
       },
     })
     setTimeout(() => (canvasRef.current.style.opacity = '1'))
-    return () => cobe.destroy()
+    return () => {
+      cobe.destroy()
+      window.removeEventListener('resize', onResize)
+    }
   }, [isDarkMode])
 
   return (

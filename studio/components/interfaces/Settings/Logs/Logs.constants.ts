@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import { IS_PLATFORM } from 'lib/constants'
 import { DatetimeHelper, FilterTableSet, LogTemplate } from '.'
 
 export const LOGS_EXPLORER_DOCS_URL =
@@ -304,6 +303,9 @@ export const SQL_FILTER_TEMPLATES: any = {
   pgbouncer_logs: {
     ..._SQL_FILTER_COMMON,
   },
+  supavisor_logs: {
+    ..._SQL_FILTER_COMMON,
+  },
 }
 
 export enum LogsTableName {
@@ -316,6 +318,7 @@ export enum LogsTableName {
   STORAGE = 'storage_logs',
   PGBOUNCER = 'pgbouncer_logs',
   POSTGREST = 'postgrest_logs',
+  SUPAVISOR = 'supavisor_logs',
 }
 
 export const LOGS_TABLES = {
@@ -328,18 +331,20 @@ export const LOGS_TABLES = {
   storage: LogsTableName.STORAGE,
   postgrest: LogsTableName.POSTGREST,
   pgbouncer: LogsTableName.PGBOUNCER,
+  supavisor: LogsTableName.SUPAVISOR,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
-  [LogsTableName.EDGE]: 'Logs obtained from the network edge, containing all API requests.',
-  [LogsTableName.POSTGRES]: 'Database logs obtained directly from Postgres.',
-  [LogsTableName.FUNCTIONS]: 'Function logs generated from runtime execution.',
-  [LogsTableName.FN_EDGE]: 'Function call logs, containing the request and response.',
+  [LogsTableName.EDGE]: 'Logs obtained from the network edge, containing all API requests',
+  [LogsTableName.POSTGRES]: 'Database logs obtained directly from Postgres',
+  [LogsTableName.FUNCTIONS]: 'Function logs generated from runtime execution',
+  [LogsTableName.FN_EDGE]: 'Function call logs, containing the request and response',
   [LogsTableName.AUTH]: 'Authentication logs from GoTrue',
   [LogsTableName.REALTIME]: 'Realtime server for Postgres logical replication broadcasting',
   [LogsTableName.STORAGE]: 'Object storage logs',
   [LogsTableName.PGBOUNCER]: 'Postgres connection pooler logs',
   [LogsTableName.POSTGREST]: 'RESTful API web server logs',
+  [LogsTableName.SUPAVISOR]: 'Cloud-native Postgres connection pooler logs',
 }
 
 export const genQueryParams = (params: { [k: string]: string }) => {
@@ -666,5 +671,3 @@ export const TIER_QUERY_LIMITS: {
   TEAM: { text: '28 days', value: 28, unit: 'day', promptUpgrade: true },
   ENTERPRISE: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
 }
-
-export const SHOW_O11Y = IS_PLATFORM || process.env.NEXT_PUBLIC_ENABLE_LOGS == 'true'

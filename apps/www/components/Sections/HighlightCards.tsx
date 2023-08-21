@@ -44,8 +44,14 @@ const HighlightCard = ({ highlight, index }: { highlight: Highlight; index: numb
       onMouseLeave={() => setIsHovered(false)}
       animate={isInView ? animate : initial}
     >
-      <InteractiveShimmerCard innerClassName="flex flex-col !bg-scale-200">
+      <InteractiveShimmerCard innerClassName="flex flex-col !bg-scale-100">
         <div className="relative w-full aspect-[1.35/1] mb-4">
+          <div
+            className="absolute inset-0 w-full h-full z-10"
+            style={{
+              background: `radial-gradient(100% 50% at 50% 50%, transparent, var(--colors-scale1))`,
+            }}
+          />
           {highlight.image && <Img isHovered={isHovered} />}
           {highlight.svg && highlight.svg}
         </div>

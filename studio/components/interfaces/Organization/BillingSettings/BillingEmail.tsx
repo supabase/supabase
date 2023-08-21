@@ -1,24 +1,31 @@
-import { useEffect } from 'react'
-import { Form, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useStore, checkPermissions } from 'hooks'
+import { useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
+
 import { useParams } from 'common/hooks'
-import { API_URL } from 'lib/constants'
-import { patch } from 'lib/common/fetch'
 import { FormActions, FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
+import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { isResponseOk, patch } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import { Form, Input } from 'ui'
+import { Organization } from 'types'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 
 const BillingEmail = () => {
-  const { app, ui } = useStore()
+  const { ui } = useStore()
   const { slug } = useParams()
-  const { name, billing_email } = ui.selectedOrganization ?? {}
+  const queryClient = useQueryClient()
+  const selectedOrganization = useSelectedOrganization()
+  const { name, billing_email } = selectedOrganization ?? {}
 
   const formId = 'org-billing-email'
   const initialValues = {
     billing_email: billing_email ?? '',
   }
 
-  const canUpdateOrganization = checkPermissions(PermissionAction.UPDATE, 'organizations')
-  const canReadBillingEmail = checkPermissions(PermissionAction.READ, 'organizations')
+  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const canReadBillingEmail = useCheckPermissions(PermissionAction.READ, 'organizations')
 
   const onUpdateOrganization = async (values: any, { setSubmitting, resetForm }: any) => {
     if (!canUpdateOrganization) {
@@ -29,11 +36,11 @@ const BillingEmail = () => {
     }
 
     setSubmitting(true)
-    const response = await patch(`${API_URL}/organizations/${slug}`, {
+    const response = await patch<Organization>(`${API_URL}/organizations/${slug}`, {
       ...values,
       name,
     })
-    if (response.error) {
+    if (!isResponseOk(response)) {
       ui.setNotification({
         category: 'error',
         message: `Failed to update organization: ${response.error.message}`,
@@ -45,7 +52,7 @@ const BillingEmail = () => {
         initialValues: { billing_email },
       })
 
-      app.onOrgUpdated(response)
+      invalidateOrganizationsQuery(queryClient)
       ui.setNotification({
         category: 'success',
         message: 'Successfully saved settings',
@@ -55,56 +62,61 @@ const BillingEmail = () => {
   }
 
   return (
-    <div className="container my-4 max-w-4xl">
+    <div className="container my-4">
       <h4>Billing email</h4>
       <p className="text-sm opacity-50">All billing correspondence will go to this email</p>
 
       <div className="mt-3">
-        <Form id={formId} initialValues={initialValues} onSubmit={onUpdateOrganization}>
-          {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
-            const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
+        {selectedOrganization === undefined ? (
+          <GenericSkeletonLoader />
+        ) : (
+          <Form id={formId} initialValues={initialValues} onSubmit={onUpdateOrganization}>
+            {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
+              const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
-            // [Alaister] although this "technically" is breaking the rules of React hooks
-            // it won't error because the hooks are always rendered in the same order
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            useEffect(() => {
-              const values = { billing_email: billing_email ?? '' }
-              resetForm({ values, initialValues: values })
-            }, [slug])
+              // [Alaister] although this "technically" is breaking the rules of React hooks
+              // it won't error because the hooks are always rendered in the same order
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              useEffect(() => {
+                const values = { billing_email: billing_email ?? '' }
+                resetForm({ values, initialValues: values })
+                // eslint-disable-next-line react-hooks/exhaustive-deps
+              }, [slug])
 
-            return (
-              <FormPanel
-                footer={
-                  <div className="flex py-4 px-8">
-                    <FormActions
-                      form={formId}
-                      isSubmitting={isSubmitting}
-                      hasChanges={hasChanges}
-                      handleReset={handleReset}
-                      helper={
-                        !canUpdateOrganization
-                          ? "You need additional permissions to manage this organization's settings"
-                          : undefined
-                      }
-                    />
-                  </div>
-                }
-              >
-                <FormSection className="-mx-2">
-                  <FormSectionContent loading={false}>
-                    <Input
-                      id="billing_email"
-                      size="small"
-                      label="Email address"
-                      type={canReadBillingEmail ? 'text' : 'password'}
-                      disabled={!canUpdateOrganization}
-                    />
-                  </FormSectionContent>
-                </FormSection>
-              </FormPanel>
-            )
-          }}
-        </Form>
+              return (
+                <FormPanel
+                  footer={
+                    <div className="flex py-4 px-8">
+                      <FormActions
+                        form={formId}
+                        isSubmitting={isSubmitting}
+                        hasChanges={hasChanges}
+                        handleReset={handleReset}
+                        helper={
+                          !canUpdateOrganization
+                            ? "You need additional permissions to manage this organization's settings"
+                            : undefined
+                        }
+                      />
+                    </div>
+                  }
+                >
+                  <FormSection className="-mx-2">
+                    <FormSectionContent loading={false}>
+                      <Input
+                        id="billing_email"
+                        size="small"
+                        label="Email address"
+                        type={canReadBillingEmail ? 'text' : 'password'}
+                        disabled={!canUpdateOrganization}
+                      />
+                    </FormSectionContent>
+                  </FormSection>
+                </FormPanel>
+              )
+            }}
+          </Form>
+        )}
       </div>
     </div>
   )

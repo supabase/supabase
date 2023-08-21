@@ -17,12 +17,10 @@ const SizeToggleButton = ({ id }: SizeToggleButton) => {
   if (!snippet) return null
   return isUtilityPanelCollapsed ? (
     <Tooltip.Root delayDuration={0}>
-      <Tooltip.Trigger>
+      <Tooltip.Trigger asChild>
         <Button
-          as="span"
           type="text"
           size="tiny"
-          shadow={false}
           onClick={restorePanelSize}
           icon={<IconChevronUp className="text-gray-1100" size="tiny" strokeWidth={2} />}
         />
@@ -43,12 +41,10 @@ const SizeToggleButton = ({ id }: SizeToggleButton) => {
     </Tooltip.Root>
   ) : (
     <Tooltip.Root delayDuration={0}>
-      <Tooltip.Trigger>
+      <Tooltip.Trigger asChild>
         <Button
-          as="span"
           type="text"
           size="tiny"
-          shadow={false}
           onClick={maximizeEditor}
           icon={<IconChevronDown className="text-gray-1100" size="tiny" strokeWidth={2} />}
         />

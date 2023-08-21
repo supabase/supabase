@@ -1,18 +1,18 @@
-import { useEffect, useMemo } from 'react'
+import { Fetcher, createGraphiQLFetcher } from '@graphiql/toolkit'
 import { observer } from 'mobx-react-lite'
-import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
+import { useEffect, useMemo } from 'react'
 
-import { NextPageWithLayout } from 'types'
+import { useTheme } from 'common'
 import { useParams } from 'common/hooks'
-import { useStore } from 'hooks'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
 import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
 import { DocsLayout } from 'components/layouts'
 import Connecting from 'components/ui/Loading/Loading'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useTheme } from 'common'
+import { useStore } from 'hooks'
+import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { NextPageWithLayout } from 'types'
 
 const GraphiQLPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
@@ -32,12 +32,12 @@ const GraphiQLPage: NextPageWithLayout = () => {
     : undefined
 
   useEffect(() => {
-    if (ui.selectedProject?.ref) {
+    if (ui.selectedProjectRef) {
       // Schemas may be needed when enabling the GraphQL extension
       meta.schemas.load()
       meta.extensions.load()
     }
-  }, [ui.selectedProject?.ref])
+  }, [ui.selectedProjectRef])
 
   const graphqlUrl = `${API_URL}/projects/${projectRef}/api/graphql`
 

@@ -3,22 +3,18 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'ai',
   title: 'AI & Vectors',
-  description: 'Use Supabase to store and search embedding vectors.',
-  subtitle: 'Use Supabase to store and search embedding vectors.',
+  description: 'The best vector database is the database you already have.',
+  subtitle: 'The best vector database is the database you already have.',
   sidebar_label: 'Overview',
 }
 
-Supabase provides a number of tools to get started with Vectors and Embeddings. These tools include:
+Supabase provides an open source toolkit for developing AI applications using Postgres and pgvector. Use the Supabase client libraries to store, index, and query your vector embeddings at scale.
 
-- An embedding store using the popular [pgvector](https://github.com/pgvector/pgvector/)
-- A Python Library for managing unstructured collections called [Vecs](https://supabase.github.io/vecs/api)
+The toolkit includes:
 
-## Features
-
-Supabase provides a full toolkit for developing AI applications.
-
-- A [vector store](/docs/guides/ai/vector-columns) and embeddings support using pgvector.
+- A [vector store](/docs/guides/ai/vector-columns) and embeddings support using Postgres and pgvector.
 - A [Python client](/docs/guides/ai/vecs-python-client) for managing unstructured embeddings.
+- An [embedding generation](/docs/guides/ai/quickstarts/generate-text-embeddings) process using open source models directly in Edge Functions.
 - [Database migrations](/docs/guides/ai/examples/headless-vector-search#prepare-your-database) for managing structured embeddings.
 - Integrations with all popular AI providers, such as [OpenAI](/docs/guides/ai/examples/openai), [Hugging Face](/docs/guides/ai/hugging-face), [LangChain](/docs/guides/ai/langchain), and more.
 
@@ -74,6 +70,46 @@ export const examples = [
   },
 ]
 
+## Integrations
+
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {integrations.map((x) => (
+    <div className="col-span-4" key={x.href}>
+      <Link href={x.href} passHref>
+        <a>
+          <GlassPanel title={x.name}>{x.description}</GlassPanel>
+        </a>
+      </Link>
+    </div>
+  ))}
+</div>
+
+export const integrations = [
+  {
+    name: 'OpenAI',
+    description:
+      'OpenAI is an AI research and deployment company. Supabase provides a simple way to use OpenAI in your applications.',
+    href: '/guides/ai/examples/building-chatgpt-plugins',
+  },
+  {
+    name: 'Hugging Face',
+    description:
+      "Hugging Face is an open-source provider of NLP technologies. Supabase provides a simple way to use Hugging Face's models in your applications.",
+    href: '/guides/ai/hugging-face',
+  },
+  {
+    name: 'LangChain',
+    description:
+      'LangChain is a language-agnostic, open-source, and self-hosted API for text translation, summarization, and sentiment analysis.',
+    href: '/guides/ai/langchain',
+  },
+  {
+    name: 'LlamaIndex',
+    description: 'LlamaIndex is a data framework for your LLM applications.',
+    href: '/guides/ai/integrations/llamaindex',
+  },
+]
+
 ## Case studies
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
@@ -89,6 +125,12 @@ export const examples = [
 </div>
 
 export const customers = [
+  {
+    name: 'Berri AI Boosts Productivity by Migrating from AWS RDS to Supabase with pgvector',
+    description:
+      'Learn how Berri AI overcame challenges with self-hosting their vector database on AWS RDS and successfully migrated to Supabase.',
+    href: 'https://supabase.com/customers/berriai',
+  },
   {
     name: 'Mendable switches from Pinecone to Supabase for PostgreSQL vector embeddings',
     description:

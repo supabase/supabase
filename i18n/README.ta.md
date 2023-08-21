@@ -12,9 +12,9 @@
 - [x] ஹோஸ்ட் செய்யப்பட்ட பூஸ்ட்ஜீஆர்இஎஸ் தரவுத்தளம். [ஆவணம்](https://supabase.com/docs/guides/database)
 - [x] அங்கீகாரம் மற்றும் அங்கீகாரம்.. [ஆவணம்](https://supabase.com/docs/guides/auth)
 - [x] தானாக உருவாக்கப்பட்ட ஏபிஐ கள்.
-  - [x] ராஸ்ட். [ஆவணம்](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] நிகழ்நேர சந்தாக்கள். [ஆவணம்](https://supabase.com/docs/guides/database/api#realtime-api)
-  - [x] கிராப்க்யூஎல் (பீட்டா). [ஆவணம்](https://supabase.com/docs/guides/database/api#graphql-api)
+  - [x] ராஸ்ட். [ஆவணம்](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] நிகழ்நேர சந்தாக்கள். [ஆவணம்](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] கிராப்க்யூஎல் (பீட்டா). [ஆவணம்](https://supabase.com/docs/guides/api#graphql-api-overview)
 - [x] செயல்பாடுகள்.
   - [x] தரவுத்தளம் செயல்பாடுகள். [ஆவணம்](https://supabase.com/docs/guides/database/functions)
   - [x] விளிம்பு செயல்பாடுகள் [ஆவணம்](https://supabase.com/docs/guides/functions)
@@ -39,7 +39,7 @@
 ## நிலை
 
 - [x] ஆல்ஃபா: நாங்கள் வாடிக்கையாளர்களின் மூடிய தொகுப்புடன் சுபாபேஸை சோதிக்கிறோம்
-- [x] பொது ஆல்ஃபா: எவரும் [app.supabase.com](https://app.supabase.com) இல் பதிவு செய்யலாம், ஆனால் எங்களுக்கு எளிதாக செல்லுங்கள், ஒரு சில கின்க்ஸ் உள்ளன
+- [x] பொது ஆல்ஃபா: எவரும் [supabase.com/dashboard](https://supabase.com/dashboard) இல் பதிவு செய்யலாம், ஆனால் எங்களுக்கு எளிதாக செல்லுங்கள், ஒரு சில கின்க்ஸ் உள்ளன
 - [x] பொது பீட்டா: பெரும்பாலான அல்லாத நிறுவன பயன்பாட்டு-வழக்குகளுக்கு போதுமான நிலையானது
 - [ ] பொது: உற்பத்தி-தயார்
 
@@ -55,7 +55,7 @@
 
 **கட்டிடக்கலை**
 
-சுபாபேஸ் ஒரு [ஹோஸ்ட் செய்யப்பட்ட தளம்](https://app.supabase.com). எதையும் நிறுவாமல் நீங்கள் பதிவுசெய்து Supabase ஐப் பயன்படுத்தத் தொடங்கலாம்.
+சுபாபேஸ் ஒரு [ஹோஸ்ட் செய்யப்பட்ட தளம்](https://supabase.com/dashboard). எதையும் நிறுவாமல் நீங்கள் பதிவுசெய்து Supabase ஐப் பயன்படுத்தத் தொடங்கலாம்.
 நீங்கள் [சுய ஹோஸ்ட்](https://supabase.com/docs/guides/hosting/overview) மற்றும் [உள்நாட்டில் உருவாக்க](https://supabase.com/docs/guides/local-development) ஆகியவற்றையும் செய்யலாம்.
 
 ![கட்டிடக்கலை](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)

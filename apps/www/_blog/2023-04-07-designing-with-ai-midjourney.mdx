@@ -57,7 +57,7 @@ And voila, we had a baseline for generating variations:
 
 The final visual that you see everywhere won us over because of its vibrant swirls. While each swirl looks slightly different, a consistent style is still maintained throughout.
 
-Fortunately, we didn't require full-width images for each ticket. Upscaled MidJourney images sufficed. Nevertheless, we had to recreate the main visual on the landing page in vectors to use it effectively. You can view it in full glory at [https://supabase.com/launch-week](https://supabase.com/launch-week).
+Fortunately, we didn't require full-width images for each ticket. Upscaled MidJourney images sufficed. Nevertheless, we had to recreate the main visual on the landing page in vectors to use it effectively. You can view it in full glory at [https://supabase.com/launch-week/7](https://supabase.com/launch-week/7).
 
 ![Screenshot 2023-04-06 at 09.47.47.png](/images/blog/launch-week-7/designing-with-ai-midjourney/launch-week-7-ticket-home.png)
 
@@ -258,13 +258,13 @@ const channel = supabase
   .subscribe()
 ```
 
-Interested to know how this fits within your Next.js application? Find the code [here](https://github.com/supabase/supabase/blob/master/apps/www/components/LaunchWeek/Ticket/TicketForm.tsx#L70-L102).
+Interested to know how this fits within your Next.js application? Find the code [here](https://github.com/supabase/supabase/blob/master/apps/www/components/LaunchWeek/7/Ticket/TicketForm.tsx#L70-L102).
 
 ## Displaying the images
 
-We have some images, so how can we now display them somewhere? [@Francesco Sansalvadore](https://twitter.com/frnk_snslvdr) saw one of our team members trying to “swipe” on the tickets slider component on the [launch week page](https://supabase.com/launch-week/tickets) and he thought, why not feature all the fantastic people who generated tickets on a single page?
+We have some images, so how can we now display them somewhere? [@Francesco Sansalvadore](https://twitter.com/frnk_snslvdr) saw one of our team members trying to “swipe” on the tickets slider component on the [launch week page](https://supabase.com/launch-week/7/tickets) and he thought, why not feature all the fantastic people who generated tickets on a single page?
 
-We built a [ticket wall](https://supabase.com/launch-week/tickets) that you can scroll endlessly. We approached it with an infinite scroll technique, lazy-loading a few tickets at a time.
+We built a [ticket wall](https://supabase.com/launch-week/7/tickets) that you can scroll endlessly. We approached it with an infinite scroll technique, lazy-loading a few tickets at a time.
 
 ![launch week 7 ticket wall](/images/blog/launch-week-7/designing-with-ai-midjourney/launch-week-7-ticket-wall.png)
 

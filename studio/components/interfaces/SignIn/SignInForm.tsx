@@ -3,10 +3,12 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useStore } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
 import { auth } from 'lib/gotrue'
+import { incrementSignInClicks } from 'lib/local-storage'
 import Link from 'next/link'
 import { useRef, useState } from 'react'
 import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
+import * as Sentry from '@sentry/nextjs'
 
 const signInSchema = object({
   email: string().email('Must be a valid email').required('Email is required'),
@@ -40,6 +42,11 @@ const SignInForm = () => {
     })
 
     if (!error) {
+      const signInClicks = incrementSignInClicks()
+      if (signInClicks > 1) {
+        Sentry.captureMessage('Sign in without previous sign out detected')
+      }
+
       ui.setNotification({
         id: toastId,
         category: 'success',

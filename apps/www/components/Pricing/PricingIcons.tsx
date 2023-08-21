@@ -12,7 +12,7 @@ export const Check = () => (
 export const IconPricingIncludedCheck = (props: any) => (
   <span className="mx-auto">
     <Check />
-    <span className="sr-only">Included in {props.tier}</span>
+    <span className="sr-only">Included in {props.plan}</span>
   </span>
 )
 
@@ -32,7 +32,7 @@ export const IconPricingMinus = (props: any) => (
         clipRule="evenodd"
       />
     </svg>
-    <span className="sr-only">Not included in {props.tier}</span>
+    <span className="sr-only">Not included in {props.plan}</span>
   </>
 )
 

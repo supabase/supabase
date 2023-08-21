@@ -1,20 +1,26 @@
-import { useParams } from 'common'
+import { useParams, useTheme } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import dayjs from 'dayjs'
 import { useFlag } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconChevronRight, IconExternalLink } from 'ui'
 import { getAddons } from '../Subscription.utils'
-import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
-import CustomDomainSidePanel from './CustomDomainSidePanel'
-import PITRSidePanel from './PITRSidePanel'
-import ProjectUpdateDisabledTooltip from '../../ProjectUpdateDisabledTooltip'
+import {
+  ComputeInstanceSidePanel,
+  CustomDomainSidePanel,
+  PITRSidePanel,
+} from 'components/interfaces/Settings/Addons'
+import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
+import {
+  useIsProjectActive,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
+import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 
 export interface AddOnsProps {}
 
@@ -22,6 +28,11 @@ const AddOns = ({}: AddOnsProps) => {
   const { ref: projectRef } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+  const { isDarkMode } = useTheme()
+
+  const { project: selectedProject } = useProjectContext()
+  const isProjectActive = useIsProjectActive()
+  const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
 
   // [Joshen] We could possibly look into reducing the interval to be more "realtime"
   // I tried setting the interval to 1m but no data was returned, may need to experiment
@@ -38,16 +49,8 @@ const AddOns = ({}: AddOnsProps) => {
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const selectedAddons = addons?.selected_addons ?? []
-  const availableAddons = addons?.available_addons ?? []
 
   const { computeInstance, pitr, customDomain } = getAddons(selectedAddons)
-  const computeInstanceSpecs =
-    computeInstance !== undefined
-      ? availableAddons
-          .find((addon) => addon.type === 'compute_instance')
-          ?.variants.find((variant) => variant.identifier === computeInstance.variant.identifier)
-          ?.meta
-      : undefined
 
   return (
     <>
@@ -65,7 +68,7 @@ const AddOns = ({}: AddOnsProps) => {
                   <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
                     <a target="_blank" rel="noreferrer">
                       <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                        <p className="text-sm">About compute add-ons</p>
+                        <p className="text-sm">Compute add-ons</p>
                         <IconExternalLink size={16} strokeWidth={1.5} />
                       </div>
                     </a>
@@ -75,7 +78,7 @@ const AddOns = ({}: AddOnsProps) => {
                   <Link href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery">
                     <a target="_blank" rel="noreferrer">
                       <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                        <p className="text-sm">About PITR backups</p>
+                        <p className="text-sm">PITR backups</p>
                         <IconExternalLink size={16} strokeWidth={1.5} />
                       </div>
                     </a>
@@ -85,7 +88,17 @@ const AddOns = ({}: AddOnsProps) => {
                   <Link href="https://supabase.com/docs/guides/platform/custom-domains">
                     <a target="_blank" rel="noreferrer">
                       <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                        <p className="text-sm">About custom domains</p>
+                        <p className="text-sm">Custom domains</p>
+                        <IconExternalLink size={16} strokeWidth={1.5} />
+                      </div>
+                    </a>
+                  </Link>
+                </div>
+                <div>
+                  <Link href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler">
+                    <a target="_blank" rel="noreferrer">
+                      <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                        <p className="text-sm">Connection Pooler</p>
                         <IconExternalLink size={16} strokeWidth={1.5} />
                       </div>
                     </a>
@@ -107,15 +120,19 @@ const AddOns = ({}: AddOnsProps) => {
               {/* Compute add on selection */}
               <div className="flex space-x-6">
                 <div>
-                  <div className="rounded-md bg-scale-400 w-[160px] h-[96px] shadow">
-                    <Image
-                      alt="Optimized Compute add-on"
+                  <div className="rounded-md bg-scale-100 dark:bg-scale-400 w-[160px] h-[96px] shadow">
+                    <img
+                      alt="Optimized Compute"
                       width={160}
                       height={96}
                       src={
                         computeInstance !== undefined
-                          ? `${BASE_PATH}/img/optimized-compute-on.svg`
-                          : `${BASE_PATH}/img/optimized-compute-off.svg`
+                          ? `${BASE_PATH}/img/optimized-compute-on${
+                              isDarkMode ? '' : '--light'
+                            }.png`
+                          : `${BASE_PATH}/img/optimized-compute-off${
+                              isDarkMode ? '' : '--light'
+                            }.png`
                       }
                     />
                   </div>
@@ -123,12 +140,15 @@ const AddOns = ({}: AddOnsProps) => {
                 <div className="flex-grow">
                   <p className="text-sm text-scale-1000">Optimized compute</p>
                   <p className="">{computeInstance?.variant.name ?? 'Micro'}</p>
-                  <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
+                  <ProjectUpdateDisabledTooltip
+                    projectUpdateDisabled={projectUpdateDisabled}
+                    projectNotActive={!isProjectActive}
+                  >
                     <Button
                       type="default"
-                      className="mt-2"
+                      className="mt-2 pointer-events-auto"
                       onClick={() => snap.setPanelKey('computeInstance')}
-                      disabled={projectUpdateDisabled}
+                      disabled={!isProjectActive || projectUpdateDisabled}
                     >
                       Change optimized compute
                     </Button>
@@ -143,8 +163,9 @@ const AddOns = ({}: AddOnsProps) => {
                     >
                       <p>
                         Your workload is currently running at the baseline disk IO bandwidth at{' '}
-                        {computeInstanceSpecs?.baseline_disk_io_mbs?.toLocaleString() ?? 87} Mbps
-                        and may suffer degradation in performance.
+                        {computeInstance?.variant?.meta?.baseline_disk_io_mbs?.toLocaleString() ??
+                          87}{' '}
+                        Mbps and may suffer degradation in performance.
                       </p>
                       <p className="mt-1">
                         Consider upgrading to a larger compute instance for a higher baseline
@@ -161,8 +182,9 @@ const AddOns = ({}: AddOnsProps) => {
                       <p>
                         If the disk IO budget drops to zero, your workload will run at the baseline
                         disk IO bandwidth at{' '}
-                        {computeInstanceSpecs?.baseline_disk_io_mbs?.toLocaleString() ?? 87} Mbps
-                        and may suffer degradation in performance.
+                        {computeInstance?.variant?.meta?.baseline_disk_io_mbs?.toLocaleString() ??
+                          87}{' '}
+                        Mbps and may suffer degradation in performance.
                       </p>
                       <p className="mt-1">
                         Consider upgrading to a larger compute instance for a higher baseline
@@ -186,7 +208,7 @@ const AddOns = ({}: AddOnsProps) => {
                         </div>
                       </a>
                     </Link>
-                    <p className="text-sm">{computeInstanceSpecs?.memory_gb ?? 1} GB</p>
+                    <p className="text-sm">{computeInstance?.variant?.meta?.memory_gb ?? 1} GB</p>
                   </div>
                   <div className="w-full flex items-center justify-between border-b py-2">
                     <Link href={`/project/${projectRef}/settings/billing/usage#cpu`}>
@@ -204,24 +226,28 @@ const AddOns = ({}: AddOnsProps) => {
                       </a>
                     </Link>
                     <p className="text-sm">
-                      {computeInstanceSpecs?.cpu_cores ?? 2}-core ARM{' '}
-                      {computeInstanceSpecs?.cpu_dedicated ? '(Dedicated)' : '(Shared)'}
+                      {computeInstance?.variant?.meta?.cpu_cores ?? 2}-core {cpuArchitecture}{' '}
+                      {computeInstance?.variant?.meta?.cpu_dedicated ? '(Dedicated)' : '(Shared)'}
                     </p>
                   </div>
                   <div className="w-full flex items-center justify-between border-b py-2">
                     <p className="text-sm text-scale-1000">No. of direct connections</p>
-                    <p className="text-sm">{computeInstanceSpecs?.connections_direct ?? 60}</p>
+                    <p className="text-sm">
+                      {computeInstance?.variant?.meta?.connections_direct ?? 60}
+                    </p>
                   </div>
                   <div className="w-full flex items-center justify-between border-b py-2">
                     <p className="text-sm text-scale-1000">No. of pooler connections</p>
-                    <p className="text-sm">{computeInstanceSpecs?.connections_pooler ?? 200}</p>
+                    <p className="text-sm">
+                      {computeInstance?.variant?.meta?.connections_pooler ?? 200}
+                    </p>
                   </div>
                   <div className="w-full flex items-center justify-between border-b py-2">
-                    <Link href={`/project/${projectRef}/settings/billing/usage#disk_io_budget`}>
+                    <Link href={`/project/${projectRef}/settings/billing/usage#disk_io`}>
                       <a>
                         <div className="group flex items-center space-x-2">
                           <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
-                            Disk IO Bandwidth max burst
+                            Max Disk Throughput
                           </p>
                           <IconChevronRight
                             strokeWidth={1.5}
@@ -232,15 +258,16 @@ const AddOns = ({}: AddOnsProps) => {
                       </a>
                     </Link>
                     <p className="text-sm">
-                      {computeInstanceSpecs?.max_disk_io_mbs?.toLocaleString() ?? '2,606'} Mbps
+                      {computeInstance?.variant?.meta?.max_disk_io_mbs?.toLocaleString() ?? '2,085'}{' '}
+                      Mbps
                     </p>
                   </div>
                   <div className="w-full flex items-center justify-between py-2">
-                    <Link href={`/project/${projectRef}/settings/billing/usage#disk_io_budget`}>
+                    <Link href={`/project/${projectRef}/settings/billing/usage#disk_io`}>
                       <a>
                         <div className="group flex items-center space-x-2">
                           <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
-                            Baseline Disk IO Bandwidth
+                            Baseline Disk Throughput
                           </p>
                           <IconChevronRight
                             strokeWidth={1.5}
@@ -251,7 +278,8 @@ const AddOns = ({}: AddOnsProps) => {
                       </a>
                     </Link>
                     <p className="text-sm">
-                      {computeInstanceSpecs?.baseline_disk_io_mbs?.toLocaleString() ?? 87} Mbps
+                      {computeInstance?.variant?.meta?.baseline_disk_io_mbs?.toLocaleString() ?? 87}{' '}
+                      Mbps
                     </p>
                   </div>
                 </div>
@@ -262,15 +290,15 @@ const AddOns = ({}: AddOnsProps) => {
               {/* PITR selection */}
               <div className="flex space-x-6">
                 <div>
-                  <div className="rounded-md bg-scale-400 w-[160px] h-[96px] shadow">
-                    <Image
+                  <div className="rounded-md bg-scale-100 dark:bg-scale-400 w-[160px] h-[96px] shadow">
+                    <img
                       alt="Point-In-Time-Recovery"
                       width={160}
                       height={96}
                       src={
                         pitr !== undefined
-                          ? `${BASE_PATH}/img/pitr-on.svg`
-                          : `${BASE_PATH}/img/pitr-off.svg`
+                          ? `${BASE_PATH}/img/pitr-on${isDarkMode ? '' : '--light'}.png?v=2`
+                          : `${BASE_PATH}/img/pitr-off${isDarkMode ? '' : '--light'}.png?v=2`
                       }
                     />
                   </div>
@@ -279,17 +307,18 @@ const AddOns = ({}: AddOnsProps) => {
                   <p className="text-sm text-scale-1000">Point in time recovery</p>
                   <p className="">
                     {pitr !== undefined
-                      ? `Point in time recovery of ${
-                          pitr.variant.identifier.split('_')[1]
-                        } days is enabled`
+                      ? `Point in time recovery of ${pitr.variant.meta?.backup_duration_days} days is enabled`
                       : 'Point in time recovery is not enabled'}
                   </p>
-                  <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
+                  <ProjectUpdateDisabledTooltip
+                    projectUpdateDisabled={projectUpdateDisabled}
+                    projectNotActive={!isProjectActive}
+                  >
                     <Button
                       type="default"
-                      className="mt-2"
+                      className="mt-2 pointer-events-auto"
                       onClick={() => snap.setPanelKey('pitr')}
-                      disabled={projectUpdateDisabled}
+                      disabled={!isProjectActive || projectUpdateDisabled}
                     >
                       Change point in time recovery
                     </Button>
@@ -302,15 +331,15 @@ const AddOns = ({}: AddOnsProps) => {
               {/* Custom domain selection */}
               <div className="flex space-x-6">
                 <div>
-                  <div className="rounded-md bg-scale-400 w-[160px] h-[96px] shadow">
-                    <Image
+                  <div className="rounded-md bg-scale-100 dark:bg-scale-400 w-[160px] h-[96px] shadow">
+                    <img
                       alt="Custom Domain"
                       width={160}
                       height={96}
                       src={
                         customDomain !== undefined
-                          ? `${BASE_PATH}/img/custom-domain-on.svg`
-                          : `${BASE_PATH}/img/custom-domain-off.svg`
+                          ? `${BASE_PATH}/img/custom-domain-on${isDarkMode ? '' : '--light'}.png`
+                          : `${BASE_PATH}/img/custom-domain-off${isDarkMode ? '' : '--light'}.png`
                       }
                     />
                   </div>
@@ -322,12 +351,15 @@ const AddOns = ({}: AddOnsProps) => {
                       ? 'Custom domain is enabled'
                       : 'Custom domain is not enabled'}
                   </p>
-                  <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
+                  <ProjectUpdateDisabledTooltip
+                    projectUpdateDisabled={projectUpdateDisabled}
+                    projectNotActive={!isProjectActive}
+                  >
                     <Button
                       type="default"
-                      className="mt-2"
+                      className="mt-2 pointer-events-auto"
                       onClick={() => snap.setPanelKey('customDomain')}
-                      disabled={projectUpdateDisabled}
+                      disabled={!isProjectActive || projectUpdateDisabled}
                     >
                       Change custom domain
                     </Button>

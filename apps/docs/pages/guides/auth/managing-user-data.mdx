@@ -44,6 +44,17 @@ You cannot delete a user if they are the owner of any objects in Supabase Storag
 You will encounter an error when you try to delete an Auth user that owns any Storage objects. If this happens, try deleting all the objects for that user, or reassign ownership to another user.
 </Admonition>
 
+## Exporting Users
+
+As Supabase is built on top of PostgreSQL, you can query the `auth.users` and `auth.identities` table via the `SQL Editor` tab to extract all users:
+```sql
+select * from auth.users;
+```
+
+You can also opt to export the results via CSV through the dashboard if you wish:
+![export_users.png](/docs/img/guides/auth-managing-user-data/export_users.png)
+
+
 ## Public access
 
 Since Row Level Security is enabled, this table is accessible via the API but no data will be returned unless we set up some Policies.

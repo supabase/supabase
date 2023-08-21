@@ -11,14 +11,11 @@ function getRandomNumber(min: number, max: number) {
 const DeployGlobally = ({ isHovered }: { isHovered: boolean }) => {
   const { isDarkMode } = useTheme()
   const ref = React.useRef<any>()
-  const states = ['off', 'medium', 'high']
+  const states = ['1', '2', '3']
   const colors = {
     green: isDarkMode ? '#1CF7C3' : '#00B99F',
     gray: isDarkMode ? '#151918' : '#D3D3D3',
   }
-  const indices = [
-    3, 11, 14, 23, 27, 35, 42, 48, 55, 62, 67, 71, 81, 83, 91, 98, 103, 107, 110, 115,
-  ]
   const transitionDuration = 250
 
   React.useEffect(() => {
@@ -27,24 +24,18 @@ const DeployGlobally = ({ isHovered }: { isHovered: boolean }) => {
     const circles = [...ref.current?.querySelectorAll('circle')]
 
     const interval = setInterval(() => {
-      circles?.map((circle, index: any) => {
-        const isMatch = indices.includes(index)
-
-        if (!isMatch) {
-          return
-        }
-
+      circles?.map((circle) => {
         const nextState = states[Math.floor(Math.random() * states.length)]
         const currentState = circle.dataset.state
 
         const pulse =
           Math.random() > 0.2 &&
-          ((currentState === 'off' && nextState === 'high') ||
-            (currentState === 'off' && nextState === 'medium') ||
-            (currentState === 'medium' && nextState === 'high'))
+          ((currentState === '1' && nextState === '3') ||
+            (currentState === '1' && nextState === '2') ||
+            (currentState === '2' && nextState === '3'))
 
         if (pulse) {
-          const delay = getRandomNumber(50, 100)
+          const delay = getRandomNumber(40, 90)
 
           timeoutIds.push(
             setTimeout(() => {
@@ -59,13 +50,13 @@ const DeployGlobally = ({ isHovered }: { isHovered: boolean }) => {
           )
         }
 
-        if (currentState === 'high' && nextState === 'medium' && pulse) {
-          circle.dataset.state = 'off'
+        if (currentState === '3' && nextState === '2' && pulse) {
+          circle.dataset.state = '1'
         } else {
           circle.dataset.state = nextState
         }
       })
-    }, 300)
+    }, 200)
 
     return () => {
       clearInterval(interval)
@@ -75,12 +66,6 @@ const DeployGlobally = ({ isHovered }: { isHovered: boolean }) => {
 
   return (
     <>
-      <div
-        className="absolute inset-0 w-full h-full z-10"
-        style={{
-          background: `radial-gradient(100% 50% at 50% 50%, transparent, var(--colors-scale2))`,
-        }}
-      />
       <svg
         ref={ref}
         width="100%"
