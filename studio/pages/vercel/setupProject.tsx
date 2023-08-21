@@ -1,31 +1,30 @@
-import { toast } from 'react-hot-toast'
-import { createContext, useEffect, useContext, useRef, useState, ChangeEvent } from 'react'
-import { useRouter } from 'next/router'
-import { observer, useLocalObservable } from 'mobx-react-lite'
-import { makeAutoObservable } from 'mobx'
-import { debounce } from 'lodash'
-import { Button, Input, Listbox } from 'ui'
-import { Dictionary } from 'components/grid'
 import generator from 'generate-password'
-import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { passwordStrength } from 'lib/helpers'
-import {
-  PROVIDERS,
-  DEFAULT_MINIMUM_PASSWORD_STRENGTH,
-  API_URL,
-  PRICING_TIER_PRODUCT_IDS,
-  AWS_REGIONS,
-} from 'lib/constants'
-import { VERCEL_INTEGRATION_CONFIGS } from 'lib/vercelConfigs'
+import { debounce } from 'lodash'
+import { makeAutoObservable } from 'mobx'
+import { observer, useLocalObservable } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import { ChangeEvent, createContext, useContext, useEffect, useRef, useState } from 'react'
+import { toast } from 'react-hot-toast'
+import { Button, Input, Listbox } from 'ui'
+
+import { Dictionary } from 'components/grid'
+import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
 import {
   createVercelEnv,
   fetchVercelProject,
   prepareVercelEvns,
 } from 'components/to-be-cleaned/Integration/Vercel.utils'
-import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
 import Loading from 'components/ui/Loading'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
+import {
+  AWS_REGIONS,
+  DEFAULT_MINIMUM_PASSWORD_STRENGTH,
+  PRICING_TIER_PRODUCT_IDS,
+  PROVIDERS,
+} from 'lib/constants'
+import { passwordStrength } from 'lib/helpers'
+import { VERCEL_INTEGRATION_CONFIGS } from 'lib/vercelConfigs'
 
 interface ISetupProjectStore {
   token: string
@@ -144,18 +143,48 @@ const Connecting = () => (
 )
 
 const CreateProject = observer(() => {
-  const _store = useContext(PageContext)
   const router = useRouter()
-  const { ui } = useStore()
+  const _store = useContext(PageContext)
+
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(-1)
   const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region)
-  const [loading, setLoading] = useState(false)
+
   const delayedCheckPasswordStrength = useRef(
     debounce((value: string) => checkPasswordStrength(value), 300)
   ).current
+
+  const { mutate: createProject, isLoading } = useProjectCreateMutation({
+    onSuccess: async (res) => {
+      const project = { ...res, db_host: `db.${res.ref}.supabase.co`, db_password: dbPass }
+      _store.supabaseProjectRef = project.ref
+
+      const requiredEnvs =
+        VERCEL_INTEGRATION_CONFIGS.find((x) => x.id == _store.externalId)?.envs || []
+      const envs = prepareVercelEvns(requiredEnvs, project as any)
+
+      await Promise.allSettled(
+        envs.map(async (env: any) => {
+          try {
+            const data = await createVercelEnv({
+              ...env,
+              vercelProjectId: _store.selectedVercelProject?.id,
+              vercelTeamId: _store.teamId,
+              vercelToken: _store.token,
+            })
+            return data
+          } catch (err) {
+            console.error(`Error: ${err}`)
+          }
+        })
+      )
+
+      const query = new URLSearchParams(_store.queryParams).toString()
+      router.push(`/vercel/complete?${query}`)
+    },
+  })
 
   const canSubmit =
     projectName != '' &&
@@ -193,67 +222,24 @@ const CreateProject = observer(() => {
     delayedCheckPasswordStrength(password)
   }
 
-  async function createSupabaseProject(dbSql: string) {
-    const data = {
-      cloud_provider: PROVIDERS.AWS.id, // hardcoded for DB instances to be under AWS
-      org_id: Number(_store.supabaseOrgId),
-      name: projectName,
-      db_pass: dbPass,
-      db_region: dbRegion,
-      db_sql: dbSql || '',
-      db_pricing_tier_id: PRICING_TIER_PRODUCT_IDS.FREE,
-      auth_site_url: _store.selectedVercelProjectUrl,
-      vercel_configuration_id: _store.configurationId,
-    }
-    const project = await post(`${API_URL}/projects`, data)
-    return { ...project, db_host: `db.${project.ref}.supabase.co`, db_password: dbPass }
-  }
-
   async function onCreateProject() {
-    setLoading(true)
-
     try {
-      const requiredEnvs =
-        VERCEL_INTEGRATION_CONFIGS.find((x) => x.id == _store.externalId)?.envs || []
       const dbSql =
         VERCEL_INTEGRATION_CONFIGS.find((x) => x.id == _store.externalId)?.template?.sql || ''
 
-      const response = await createSupabaseProject(dbSql)
-      if (response.error) {
-        setLoading(false)
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to create project: ${response.error.message}`,
-        })
-        return
-      }
-
-      const project = response
-      _store.supabaseProjectRef = project.ref
-
-      const envs = prepareVercelEvns(requiredEnvs, project)
-
-      await Promise.allSettled(
-        envs.map(async (env: any) => {
-          try {
-            const data = await createVercelEnv({
-              ...env,
-              vercelProjectId: _store.selectedVercelProject?.id,
-              vercelTeamId: _store.teamId,
-              vercelToken: _store.token,
-            })
-            return data
-          } catch (err) {
-            console.error(`Error: ${err}`)
-          }
-        })
-      )
-
-      const query = new URLSearchParams(_store.queryParams).toString()
-      router.push(`/vercel/complete?${query}`)
+      createProject({
+        cloudProvider: PROVIDERS.AWS.id,
+        organizationId: Number(_store.supabaseOrgId),
+        name: projectName,
+        dbPass: dbPass,
+        dbRegion: dbRegion,
+        dbSql: dbSql || '',
+        dbPricingTierId: PRICING_TIER_PRODUCT_IDS.FREE,
+        configurationId: _store.configurationId,
+        authSiteUrl: _store.selectedVercelProjectUrl,
+      })
     } catch (error) {
       console.error('Error', error)
-      setLoading(false)
     }
   }
 
@@ -322,7 +308,7 @@ const CreateProject = observer(() => {
           </Listbox>
         </div>
       </div>
-      <Button disabled={loading || !canSubmit} loading={loading} onClick={onCreateProject}>
+      <Button disabled={isLoading || !canSubmit} loading={isLoading} onClick={onCreateProject}>
         Create project
       </Button>
     </div>
