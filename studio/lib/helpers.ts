@@ -1,4 +1,3 @@
-import { checkPasswordStrength } from 'data/profile/password-check-mutation'
 import { post } from 'lib/common/fetch'
 import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PASSWORD_STRENGTH } from 'lib/constants'
 import { toast } from 'react-hot-toast'
@@ -190,8 +189,10 @@ export async function passwordStrength(value: string) {
       message = `${PASSWORD_STRENGTH[0]} Maximum length of password exceeded`
       warning = `Password should be less than 100 characters`
     } else {
-      try {
-        const { result } = await checkPasswordStrength({ password: value })
+      // [Joshen] Unable to use RQ atm due to our Jest tests being in JS
+      const response = await post(`${API_URL}/profile/password-check`, { password: value })
+      if (!response.error) {
+        const { result } = response
         const resultScore = result?.score ?? 0
 
         const score = (PASSWORD_STRENGTH as any)[resultScore]
@@ -208,8 +209,8 @@ export async function passwordStrength(value: string) {
             result?.feedback?.warning ? result?.feedback?.warning + '.' : ''
           } You need a stronger password.`
         }
-      } catch (error: any) {
-        toast.error(`Failed to check password strength: ${error.message}`)
+      } else {
+        toast.error(`Failed to check password strength: ${response.error.message}`)
       }
     }
   }
