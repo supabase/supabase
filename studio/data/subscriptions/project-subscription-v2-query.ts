@@ -10,7 +10,7 @@ export type ProjectSubscriptionVariables = {
   projectRef?: string
 }
 
-export type PlanId = 'free' | 'pro' | 'team' | 'enterprise' | 'hipaa'
+export type PlanId = 'free' | 'pro' | 'team' | 'enterprise'
 
 export type ProjectSubscriptionResponse = {
   billing_cycle_anchor: number

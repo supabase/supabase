@@ -1493,10 +1493,8 @@ export interface paths {
     put: operations["AuthPostgresConfigController_updateConfig"];
   };
   "/v1/projects/{ref}/config/database/pgbouncer": {
-    /** Gets project's pgbouncer config */
-    get: operations["V1PgbouncerConfigController_getPgbouncerConfig"];
-    /** Updates project's pgbouncer config */
-    patch: operations["V1PgbouncerConfigController_updatePgbouncerConfig"];
+    /** Get project's pgbouncer config */
+    get: operations["V1PgbouncerConfigController_v1GetPgbouncerConfig"];
   };
   "/v1/projects/{ref}/config/auth": {
     /** Gets project's auth config */
@@ -3232,6 +3230,7 @@ export interface components {
       organization_id: number;
       subscription_id: string;
       region: string;
+      cloud_provider: string;
       back_ups: (components["schemas"]["BackupId"])[];
     };
     RestartServiceRequest: {
@@ -3338,22 +3337,23 @@ export interface components {
       }, string]>;
       result?: (Record<string, never>)[];
     };
-    ProjectPgBouncerConfig: {
-      db_dns_name: string;
-      db_host: string;
-      db_name: string;
-      db_port: number;
-      db_ssl: boolean;
-      db_user: string;
+    PgbouncerConfigResponse: {
       default_pool_size?: number;
-      ignore_startup_parameters: string;
+      ignore_startup_parameters?: string;
+      max_client_conn?: number;
+      /** @enum {string} */
+      pool_mode?: "transaction" | "session" | "statement";
       inserted_at: string;
+      db_dns_name: string;
+      db_user: string;
+      db_host: string;
+      db_port: number;
+      db_name: string;
+      db_ssl: boolean;
       pgbouncer_enabled: boolean;
+      supavisor_enabled: boolean;
       /** @enum {string} */
       pgbouncer_status: "COMING_DOWN" | "COMING_UP" | "DISABLED" | "ENABLED" | "RELOADING";
-      /** @enum {string} */
-      pool_mode: "transaction" | "session" | "statement";
-      max_client_conn?: number | null;
       connectionString: string;
     };
     UpdatePgbouncerConfigBody: {
@@ -4163,6 +4163,13 @@ export interface components {
       enabled: boolean;
       override_enabled: boolean;
       override_active_until: string;
+    };
+    V1PgbouncerConfigResponse: {
+      /** @enum {string} */
+      pool_mode?: "transaction" | "session" | "statement";
+      default_pool_size?: number;
+      ignore_startup_parameters?: string;
+      max_client_conn?: number;
     };
     AuthConfigResponse: {
       smtp_admin_email?: string;
@@ -7673,7 +7680,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          "application/json": components["schemas"]["ProjectPgBouncerConfig"];
+          "application/json": components["schemas"]["PgbouncerConfigResponse"];
         };
       };
       /** @description Failed to retrieve project's pgbouncer config */
@@ -9938,8 +9945,8 @@ export interface operations {
       500: never;
     };
   };
-  /** Gets project's pgbouncer config */
-  V1PgbouncerConfigController_getPgbouncerConfig: {
+  /** Get project's pgbouncer config */
+  V1PgbouncerConfigController_v1GetPgbouncerConfig: {
     parameters: {
       path: {
         /** @description Project ref */
@@ -9949,34 +9956,10 @@ export interface operations {
     responses: {
       200: {
         content: {
-          "application/json": components["schemas"]["ProjectPgBouncerConfig"];
+          "application/json": components["schemas"]["V1PgbouncerConfigResponse"];
         };
       };
       /** @description Failed to retrieve project's pgbouncer config */
-      500: never;
-    };
-  };
-  /** Updates project's pgbouncer config */
-  V1PgbouncerConfigController_updatePgbouncerConfig: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["UpdatePgbouncerConfigBody"];
-      };
-    };
-    responses: {
-      200: {
-        content: {
-          "application/json": components["schemas"]["UpdatePoolingConfigResponse"];
-        };
-      };
-      403: never;
-      /** @description Failed to update project's pgbouncer config */
       500: never;
     };
   };

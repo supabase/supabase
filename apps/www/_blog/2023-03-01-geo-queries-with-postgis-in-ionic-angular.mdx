@@ -127,10 +127,10 @@ Those are some powerful calculations, and we can easily use them through the Pos
 ```sql
 -- create database function to find nearby stores
 create or replace function nearby_stores(lat float, long float)
-returns setof record
+returns table (id public.stores.id%TYPE, name public.stores.name%TYPE, description public.stores.description%TYPE, lat float, long float, dist_meters float)
 language sql
 as $$
-  select id, name, description, st_astext(location) as location, st_distance(location, st_point(long, lat)::geography) as dist_meters
+  select id, name, description, st_y(location::geometry) as lat, st_x(location::geometry) as long, st_distance(location, st_point(long, lat)::geography) as dist_meters
   from public.stores
   order by location <-> st_point(long, lat)::geography;
 $$;
@@ -138,10 +138,10 @@ $$;
 
 -- create database function to find stores in a specific box
 create or replace function stores_in_view(min_lat float, min_long float, max_lat float, max_long float)
-returns setof record
+returns table (id public.stores.id%TYPE, name public.stores.name%TYPE, lat float, long float)
 language sql
 as $$
-	select id, name, ST_Y(location::geometry) as lat, ST_X(location::geometry) as long, st_astext(location) as location
+	select id, name, ST_Y(location::geometry) as lat, ST_X(location::geometry) as long
 	from public.stores
 	where location && ST_SetSRID(ST_MakeBox2D(ST_Point(min_long, min_lat), ST_Point(max_long, max_lat)),4326)
 $$;
