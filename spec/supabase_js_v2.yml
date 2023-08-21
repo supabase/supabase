@@ -339,6 +339,19 @@ functions:
           })
           const oAuthToken = data.session.provider_token // use to access provider API
           ```
+  - id: sign-in-with-id-token
+    title: 'signInWithIdToken'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signInWithIdToken'
+    examples:
+      - id: sign-in-with-id-token
+        name: 'Sign In using ID Token'
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.signInWithIdToken({
+            provider: 'google',
+            token: 'your-id-token'
+          })
+          ```
   - id: sign-in-with-sso
     title: 'signInWithSSO()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithSSO'
