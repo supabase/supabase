@@ -34,7 +34,7 @@ type BlogData = {
   author_url?: string
   launchweek?: number
   meta_title?: string
-  meat_description?: string
+  meta_description?: string
   video?: string
 }
 
