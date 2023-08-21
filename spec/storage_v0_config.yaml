@@ -9,6 +9,8 @@ info:
   bugs: 'https://github.com/supabase/storage-api/issues' # {string} Where developers can file bugs.
   spec: 'https://github.com/supabase/supabase/blob/master/spec/storage_v1_config.yml' # {string} Where developers can find this spec (to link directly in the docs).
   description: |
+    A sample `.env` file is located in the [storage repository](https://github.com/supabase/storage-api/blob/master/.env.sample).
+
     Use this file to configure your environment variables for your Storage server.
   tags:
     - id: general
