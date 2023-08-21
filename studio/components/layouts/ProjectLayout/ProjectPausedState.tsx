@@ -1,19 +1,19 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useState } from 'react'
+import { Button, IconPauseCircle, Modal } from 'ui'
 
-import { useParams } from 'common'
 import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { Button, IconPauseCircle, Modal } from 'ui'
-import { useProjectContext } from './ProjectContext'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { PROJECT_STATUS } from 'lib/constants'
+import { useProjectContext } from './ProjectContext'
 
 export interface ProjectPausedStateProps {
   product?: string
@@ -36,6 +36,13 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
   const [showFreeProjectLimitWarning, setShowFreeProjectLimitWarning] = useState(false)
 
+  const { mutate: restoreProject } = useProjectRestoreMutation({
+    onSuccess: (res, variables) => {
+      setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.RESTORING)
+      ui.setNotification({ category: 'success', message: 'Restoring project' })
+    },
+  })
+
   const canResumeProject = useCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_jobs.projects.initialize_or_resume'
@@ -51,7 +58,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     else setShowConfirmRestore(true)
   }
 
-  const onConfirmRestore = async () => {
+  const onConfirmRestore = () => {
     if (!project) {
       return ui.setNotification({
         error: 'Project is required',
@@ -59,19 +66,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
         message: 'Unable to restore: project is required',
       })
     }
-
-    const { error } = await post(`${API_URL}/projects/${project.ref}/restore`, {})
-
-    if (error) {
-      ui.setNotification({
-        category: 'error',
-        error,
-        message: `Failed to restore project: ${error.message}`,
-      })
-    } else {
-      setProjectStatus(queryClient, project.ref, PROJECT_STATUS.RESTORING)
-      ui.setNotification({ category: 'success', message: 'Restoring project' })
-    }
+    restoreProject({ ref: project.ref })
   }
 
   return (
