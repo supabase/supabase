@@ -53,17 +53,13 @@ const OrgDropdown = () => {
               )
             })}
           <Dropdown.Separator />
-          <Dropdown.Item icon={<IconPlus size="tiny" />} onClick={() => router.push(`/new`)}>
+
+          <Dropdown.Item
+            icon={<IconPlus size="tiny" />}
+            onClick={() => router.push(orgCreationV2 ? `/new-with-subscription` : `/new`)}
+          >
             New organization
           </Dropdown.Item>
-          {orgCreationV2 && (
-            <Dropdown.Item
-              icon={<IconPlus size="tiny" />}
-              onClick={() => router.push(`/new-with-subscription`)}
-            >
-              New organization V2
-            </Dropdown.Item>
-          )}
         </>
       }
     >

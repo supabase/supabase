@@ -56,27 +56,37 @@ create table documents (
   id serial primary key,
   title text not null,
   body text not null,
-  embedding vector(1536)
+  embedding vector(384)
 );
 ```
 
-In the above SQL snippet, we create a `documents` table with a column called `embedding` (note this is just a regular Postgres column - you can name it whatever you like). We give the `embedding` column a `vector` data type with 1536 dimensions. Change this to the number of dimensions used in your vector application. For example, if you are generating embeddings using OpenAI's `text-embeddings-ada-002` model, you would set this number as 1536 since that model produces 1536 dimensions.
+In the above SQL snippet, we create a `documents` table with a column called `embedding` (note this is just a regular Postgres column - you can name it whatever you like). We give the `embedding` column a `vector` data type with 384 dimensions. Change this to the number of dimensions produced by your embedding model. For example, if you are [generating embeddings](/docs/guides/ai/quickstarts/generate-text-embeddings) using the open source [`gte-small`](https://huggingface.co/Supabase/gte-small) model, you would set this number to 384 since that model produces 384 dimensions.
+
+<Admonition>
+
+In general, embeddings with fewer dimensions perform best. See our [analysis on fewer dimensions in pgvector](https://supabase.com/blog/fewer-dimensions-are-better-pgvector).
+
+</Admonition>
 
 ### Storing a vector / embedding
 
-In this example we'll generate a vector using the OpenAI API client, then store it in the database using the Supabase JavaScript client.
+In this example we'll generate a vector using Transformers.js, then store it in the database using the Supabase JavaScript client.
 
 ```js
+import { pipeline } from '@xenova/transformers'
+const generateEmbedding = await pipeline('feature-extraction', 'Supabase/gte-small')
+
 const title = 'First post!'
 const body = 'Hello world!'
 
-// Generate a vector using OpenAI
-const embeddingResponse = await openai.createEmbedding({
-  model: 'text-embedding-ada-002',
-  input: body,
+// Generate a vector using Transformers.js
+const output = await generateEmbedding(body, {
+  pooling: 'mean',
+  normalize: true,
 })
 
-const [{ embedding }] = embeddingResponse.data.data
+// Extract the embedding output
+const embedding = Array.from(output.data)
 
 // Store the vector in Postgres
 const { data, error } = await supabase.from('documents').insert({
@@ -90,7 +100,7 @@ This example uses the JavaScript Supabase client, but you can modify it to work 
 
 ### Querying a vector / embedding
 
-Similarity search is the most common use case for vectors. `pgvector` support 3 new operators for performing similarity search:
+Similarity search is the most common use case for vectors. `pgvector` support 3 new operators for computing distance:
 
 | Operator | Description            |
 | -------- | ---------------------- |
@@ -98,13 +108,13 @@ Similarity search is the most common use case for vectors. `pgvector` support 3 
 | `<#>`    | negative inner product |
 | `<=>`    | cosine distance        |
 
-Choosing the right operator depends on your needs. If you are searching over OpenAI embeddings, OpenAI recommends using cosine similarity. For more information on how embeddings work and how they relate to each other, see [What are Embeddings?](/docs/guides/ai/concepts#what-are-embeddings).
+Choosing the right operator depends on your needs. Dot product tends to be the fastest if your vectors are normalized. For more information on how embeddings work and how they relate to each other, see [What are Embeddings?](/docs/guides/ai/concepts#what-are-embeddings).
 
 Supabase client libraries like `supabase-js` connect to your Postgres instance via [PostgREST](docs/guides/getting-started/architecture#postgrest-api). PostgREST does not currently support `pgvector` similarity operators, so we'll need to wrap our query in a Postgres function and call it via the `rpc()` method:
 
 ```sql
 create or replace function match_documents (
-  query_embedding vector(1536),
+  query_embedding vector(384),
   match_threshold float,
   match_count int
 )
@@ -140,9 +150,15 @@ const { data: documents } = await supabaseClient.rpc('match_documents', {
 })
 ```
 
-In this example `embedding` would be another embedding you wish to compare against your table of pre-generated embedding documents. For example if you were building a search engine, every time the user submits their query you would first generate an embedding on the search query itself (using `openai.createEmbedding()`), then pass it into the above `rpc()` function to match.
+In this example `embedding` would be another embedding you wish to compare against your table of pre-generated embedding documents. For example if you were building a search engine, every time the user submits their query you would first generate an embedding on the search query itself, then pass it into the above `rpc()` function to match.
 
-Vectors and embedding can be used for much more than search. Learn more about embeddings at [What are Embeddings?](/docs/guides/ai/concepts#what-are-embeddings).
+<Admonition>
+
+Be sure to use embeddings produced from the same embedding model when calculating distance. Comparing embeddings from two different models will produce no meaningful result.
+
+</Admonition>
+
+Vectors and embeddings can be used for much more than search. Learn more about embeddings at [What are Embeddings?](/docs/guides/ai/concepts#what-are-embeddings).
 
 ### Indexes
 

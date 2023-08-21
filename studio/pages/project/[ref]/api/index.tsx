@@ -1,12 +1,11 @@
+import { useParams } from 'common'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { FC, createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 
-import { useParams } from 'common/hooks'
 import { GeneralContent, ResourceContent, RpcContent } from 'components/interfaces/Docs'
 import LangSelector from 'components/interfaces/Docs/LangSelector'
 import { DocsLayout } from 'components/layouts'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { snakeToCamel } from 'lib/helpers'
@@ -45,12 +44,11 @@ const PageConfig: NextPageWithLayout = () => {
 
   const router = useRouter()
   const { query } = router
-  const { project } = useProjectContext()
   PageState.projectRef = query.ref
 
   return (
     <PageContext.Provider value={PageState}>
-      <DocView project={project} />
+      <DocView />
     </PageContext.Provider>
   )
 }
@@ -61,7 +59,7 @@ export default observer(PageConfig)
 
 const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
-const DocView: FC<any> = observer(({}) => {
+const DocView = observer(() => {
   const PageState: any = useContext(PageContext)
   const { ref: projectRef, page, resource, rpc } = useParams()
   const [selectedLang, setSelectedLang] = useState<any>('js')

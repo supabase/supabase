@@ -1,11 +1,10 @@
-import React, { FC } from 'react'
-import { IconChevronRight, IconLoader } from 'ui'
 import Link from 'next/link'
+import React, { PropsWithChildren } from 'react'
+import { IconChevronRight, IconLoader } from 'ui'
 
-interface Props {
+interface CardButtonProps {
   title: string | React.ReactNode
   description?: string
-  children?: React.ReactNode
   footer?: React.ReactNode
   url?: string
   linkHref?: string
@@ -17,7 +16,7 @@ interface Props {
   loading?: boolean
 }
 
-const CardButton: FC<Props> = ({
+const CardButton = ({
   title,
   description,
   children,
@@ -30,7 +29,7 @@ const CardButton: FC<Props> = ({
   icon,
   containerHeightClassName = 'h-32',
   loading = false,
-}) => {
+}: PropsWithChildren<CardButtonProps>) => {
   const LinkContainer = ({ children }: { children: React.ReactNode }) => (
     <Link href={linkHref}>
       <a>{children}</a>
@@ -84,14 +83,14 @@ const CardButton: FC<Props> = ({
       )}
       {icon && <ImageContainer>{icon}</ImageContainer>}
       <div className="flex h-full w-full flex-col space-y-2">
-        <h5 className="text-scale-1200">{title}</h5>
+        {typeof title === 'string' ? <h5 className="text-scale-1200">{title}</h5> : title}
         {(children || description) && (
           <div className="flex w-full flex-1 flex-col">
             <p className="text-sm text-scale-1100">{description}</p>
             <div className="w-full">{children && children}</div>
           </div>
         )}
-        {footer && <div className="w-full">{footer}</div>}
+        {footer && <div className="w-full !mt-auto">{footer}</div>}
       </div>
       {isLink && (
         <div

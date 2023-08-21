@@ -1,8 +1,88 @@
-import { User } from '@supabase/gotrue-js'
+import { IS_PLATFORM } from './constants'
+import { User, Session } from '@supabase/gotrue-js'
 import { gotrueClient } from 'common'
+import { getFlags } from './configcat'
+import { getNavigatorLockFeatureFlagThreshold, setNavigatorLockEnabled } from './local-storage'
+
+// The first time this file is imported, ConfigCat will be asked for all
+// available feature flags. The client that this is running in will have
+// determined and saved a random number [0, 100) under
+// `supabase.dashboard.ff.threshold.navigatorLock`. If there is a number-valued
+// feature flag `navigatorLockThreshold`, the
+// `supabase.dashboard.auth.navigatorLock.enabled` localStorage key will be set
+// to true if the value chosen by the browser is <= the value in the feature
+// flag.On the _following_ refresh of the page, `packages/common/gotrue.ts`
+// will read this value and enable the GoTrueClient navigatorLock.
+// ConfigCat does not have a native way to do this, as percent-based rollouts
+// are only available when ConfigCat has a user ID, and not without one, which
+// can be the case here (GoTrue is used when not authenticated too).
+async function determineNavigatorLockFeatureFlag() {
+  const flags = await getFlags()
+  const value = flags.find((flag) => flag.settingKey === 'navigatorLockThreshold')?.settingValue
+
+  if (typeof value === 'number' && value > 0) {
+    const threshold = getNavigatorLockFeatureFlagThreshold()
+
+    if (typeof threshold === 'number') {
+      setNavigatorLockEnabled(threshold <= value)
+    } else {
+      setNavigatorLockEnabled(false)
+    }
+  } else {
+    setNavigatorLockEnabled(false)
+  }
+}
+
 export { STORAGE_KEY } from 'common'
 
 export const auth = gotrueClient
+
+let currentSession: Session | null = null
+let getAccessTokenPromise: Promise<string | undefined | null> | null = null
+
+auth.onAuthStateChange((event, session) => {
+  currentSession = session
+})
+
+/**
+ * Grabs the currently available access token, or starts a single getSession call.
+ */
+export async function getAccessToken() {
+  // ignore if server-side
+  if (typeof window === 'undefined') return undefined
+
+  const aboutToExpire = currentSession?.expires_at
+    ? currentSession.expires_at - Math.ceil(Date.now() / 1000) < 30
+    : false
+
+  if (!currentSession || aboutToExpire) {
+    if (!getAccessTokenPromise) {
+      const promise = (async () => {
+        try {
+          const {
+            data: { session },
+            error,
+          } = await auth.getSession()
+          if (error) {
+            throw error
+          }
+
+          return session?.access_token
+        } finally {
+          getAccessTokenPromise = null
+        }
+      })()
+
+      getAccessTokenPromise = promise
+
+      return await promise
+    }
+
+    return await getAccessTokenPromise
+  }
+
+  return currentSession.access_token
+}
 
 export const getAuthUser = async (token: String): Promise<any> => {
   try {
@@ -48,5 +128,21 @@ export const getReturnToPath = (fallback = '/projects') => {
 
   const remainingSearchParams = searchParams.toString()
 
-  return returnTo + (remainingSearchParams ? `?${remainingSearchParams}` : '')
+  let validReturnTo
+
+  // only allow returning to internal pages. e.g. /dashboard
+  try {
+    // if returnTo is a relative path, this will throw an error
+    new URL(returnTo)
+    // if no error, returnTo is a valid URL and NOT an internal page
+    validReturnTo = fallback
+  } catch (_) {
+    validReturnTo = returnTo
+  }
+
+  return validReturnTo + (remainingSearchParams ? `?${remainingSearchParams}` : '')
+}
+
+if (IS_PLATFORM && globalThis.window) {
+  determineNavigatorLockFeatureFlag()
 }
