@@ -73,7 +73,7 @@
   },
   {
     "name": "earthdistance",
-    "comment": "calculate great-circle distances on the surface of the Earth",
+    "comment": " great-circle distances on the surface of the Earth",
     "tags": ["Geo", "Utility"],
     "link": "https://www.postgresql.org/docs/current/earthdistance.html"
   },

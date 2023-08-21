@@ -733,18 +733,20 @@ const InputDefinition = observer(({}) => {
           </p>
         )}
       </div>
-      <div className="h-60 resize-y border dark:border-dark">
-        <SqlEditor
-          defaultValue={_localState!.formState.definition.value}
-          onInputChange={(value: string | undefined) => {
-            _localState!.onFormChange({
-              key: 'definition',
-              value: value,
-            })
-          }}
-          contextmenu={false}
-        />
-      </div>
+      <div className="flex-1 resize-y border dark:border-dark flex flex-col">
+  <SqlEditor
+    defaultValue={_localState!.formState.definition.value}
+    onInputChange={(value: string | undefined) => {
+      _localState!.onFormChange({
+        key: 'definition',
+        value: value,
+      })
+    }}
+    contextmenu={false}
+    className="flex-1"
+  />
+</div>
+
     </div>
   )
 })
