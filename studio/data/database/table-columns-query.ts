@@ -92,7 +92,7 @@ export const useTableColumnsQuery = <TData extends TableColumnsData = TableColum
       projectRef,
       connectionString,
       sql: getTableColumnsQuery(table),
-      queryKey: ['table-columns'],
+      queryKey: ['table-columns', table],
     },
     options
   )
