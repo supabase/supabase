@@ -208,7 +208,7 @@ const ColumnEditor = ({
             placeholder="column_name"
             error={errors.name}
             value={columnFields?.name ?? ''}
-            onChange={(event: any) => onUpdateField({ name: event.target.value })}
+            onChange={(event: any) => onUpdateField({ name: event.target.value.trim() })}
           />
           <Input
             label="Description"
