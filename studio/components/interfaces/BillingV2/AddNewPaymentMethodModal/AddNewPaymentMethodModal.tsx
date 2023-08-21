@@ -27,11 +27,11 @@ const AddNewPaymentMethodModal = ({
   onConfirm,
 }: AddNewPaymentMethodModalProps) => {
   const { ui } = useStore()
+  const { isDarkMode } = useTheme()
   const [intent, setIntent] = useState<any>()
   const selectedOrganization = useSelectedOrganization()
 
   const captchaLoaded = useIsHCaptchaLoaded()
-
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
 
@@ -53,6 +53,15 @@ const AddNewPaymentMethodModal = ({
   }, [])
 
   useEffect(() => {
+    const initSetupIntent = async (hcaptchaToken: string | undefined) => {
+      const slug = selectedOrganization?.slug
+      if (!slug) return console.error('Slug is required')
+      if (!hcaptchaToken) return console.error('HCaptcha token required')
+
+      setIntent(undefined)
+      setupIntent({ slug, hcaptchaToken })
+    }
+
     const loadPaymentForm = async () => {
       if (visible && captchaRef && captchaLoaded) {
         let token = captchaToken
@@ -78,17 +87,6 @@ const AddNewPaymentMethodModal = ({
     setCaptchaToken(null)
     captchaRef?.resetCaptcha()
   }
-
-  const initSetupIntent = async (hcaptchaToken: string | undefined) => {
-    const slug = selectedOrganization?.slug
-    if (!slug) return console.error('Slug is required')
-    if (!hcaptchaToken) return console.error('HCaptcha token required')
-
-    setIntent(undefined)
-    setupIntent({ slug, hcaptchaToken })
-  }
-
-  const { isDarkMode } = useTheme()
 
   const options = {
     clientSecret: intent ? intent.client_secret : '',

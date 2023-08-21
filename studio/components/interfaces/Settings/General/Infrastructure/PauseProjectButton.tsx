@@ -15,8 +15,6 @@ import { setProjectStatus } from 'data/projects/projects-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 
-export interface PauseProjectButtonProps {}
-
 const PauseProjectButton = () => {
   const { ui } = useStore()
   const router = useRouter()
@@ -59,12 +57,12 @@ const PauseProjectButton = () => {
             icon={<IconPause />}
             onClick={() => setIsModalOpen(true)}
             loading={isPausing}
-            disabled={isPaused || !canPauseProject || !isProjectActive}
+            disabled={project === undefined || isPaused || !canPauseProject || !isProjectActive}
           >
             Pause Project
           </Button>
         </Tooltip.Trigger>
-        {isPaused || !canPauseProject || !isProjectActive ? (
+        {project !== undefined && (isPaused || !canPauseProject || !isProjectActive) ? (
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
