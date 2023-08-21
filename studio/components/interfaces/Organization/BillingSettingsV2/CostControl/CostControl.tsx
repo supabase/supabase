@@ -42,10 +42,10 @@ const CostControl = ({}: CostControlProps) => {
     <>
       <ScaffoldSection>
         <ScaffoldSectionDetail>
-          <div className="sticky space-y-6 top-16">
-            <div>
-              <p className="text-base">Cost Control</p>
-              <p className="text-sm text-scale-1000">
+          <div className="sticky space-y-6 top-12">
+            <div className="space-y-2">
+              <p className="text-base m-0">Cost Control</p>
+              <p className="text-sm text-scale-1000 m-0">
                 Control whether to use beyond your plans included quota
               </p>
             </div>
@@ -55,7 +55,7 @@ const CostControl = ({}: CostControlProps) => {
                 <Link href="https://supabase.com/docs/guides/platform/spend-cap">
                   <a target="_blank" rel="noreferrer">
                     <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                      <p className="text-sm">Spend cap</p>
+                      <p className="text-sm m-0">Spend cap</p>
                       <IconExternalLink size={16} strokeWidth={1.5} />
                     </div>
                   </a>
