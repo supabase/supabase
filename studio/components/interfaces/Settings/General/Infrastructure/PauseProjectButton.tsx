@@ -15,13 +15,11 @@ import { post } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { Button, IconPause } from 'ui'
 
-export interface PauseProjectButtonProps {}
-
 const PauseProjectButton = () => {
-  const queryClient = useQueryClient()
   const { ui } = useStore()
-  const { project } = useProjectContext()
   const router = useRouter()
+  const queryClient = useQueryClient()
+  const { project } = useProjectContext()
   const isProjectActive = useIsProjectActive()
   const [loading, setLoading] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -72,12 +70,12 @@ const PauseProjectButton = () => {
             icon={<IconPause />}
             onClick={openModal}
             loading={loading}
-            disabled={isPaused || !canPauseProject || !isProjectActive}
+            disabled={project === undefined || isPaused || !canPauseProject || !isProjectActive}
           >
             Pause Project
           </Button>
         </Tooltip.Trigger>
-        {isPaused || !canPauseProject || !isProjectActive ? (
+        {project !== undefined && (isPaused || !canPauseProject || !isProjectActive) ? (
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
