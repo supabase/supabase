@@ -192,6 +192,21 @@ export const meta = {
 
 </StepHikeCompact>
 
+## Going to production
+
+### Android
+
+  If you plan to use Supabase in a production app, you need to allow the android app to use the internet connection of your device.
+  You do this by adding the following line to the `android/app/src/main/AndroidManifest.xml` file.
+
+  ```xml
+  <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Required to fetch data from the internet. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- ... -->
+  </manifest>
+
+
 export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
 
 export default Page
