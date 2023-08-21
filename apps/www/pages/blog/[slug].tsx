@@ -34,7 +34,7 @@ type BlogData = {
   author_url?: string
   launchweek?: number
   meta_title?: string
-  meat_description?: string
+  meta_description?: string
   video?: string
 }
 
@@ -181,7 +181,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
 
   const meta = {
     title: props.blog.meta_title ?? props.blog.title,
-    description: props.blog.meat_description ?? props.blog.description,
+    description: props.blog.meta_description ?? props.blog.description,
     url: `https://supabase.com/blog/${props.blog.slug}`,
   }
 
