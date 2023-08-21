@@ -166,14 +166,14 @@ const Nav = () => {
     <div
       className={[
         `
-        text-scale-1200 hover:text-brand
         inline-flex cursor-pointer items-center
         border-b-2
         border-transparent
         px-1
         text-sm font-medium
         transition-colors`,
-        showLaunchWeekNavMode && '!text-white',
+        showLaunchWeekNavMode && '!text-white', 
+        props.active ? 'text-brand' : 'hover:text-brand' , 
         props.active,
       ].join(' ')}
       onClick={props.onClick}
