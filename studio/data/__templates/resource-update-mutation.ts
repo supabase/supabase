@@ -1,6 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
+
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { ResponseError } from 'types'
 import { resourceKeys } from './keys'
 
 export type ResourceUpdateVariables = {
@@ -24,14 +27,15 @@ type ResourceUpdateData = Awaited<ReturnType<typeof updateResource>>
 
 export const useResourceUpdateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<ResourceUpdateData, unknown, ResourceUpdateVariables>,
+  UseMutationOptions<ResourceUpdateData, ResponseError, ResourceUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ResourceUpdateData, unknown, ResourceUpdateVariables>(
+  return useMutation<ResourceUpdateData, ResponseError, ResourceUpdateVariables>(
     (vars) => updateResource(vars),
     {
       async onSuccess(data, variables, context) {
@@ -43,6 +47,13 @@ export const useResourceUpdateMutation = ({
         ])
 
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to mutate: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

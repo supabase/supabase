@@ -1,5 +1,6 @@
 import { Button, Divider, IconArrowUpRight, IconGitHub, IconTriangle, Space } from 'ui'
 import Link from 'next/link'
+import Image from 'next/image'
 
 function ExampleCard(props: any) {
   return (
@@ -19,12 +20,15 @@ function ExampleCard(props: any) {
         <div className="mb-4">
           <h4 className="h6">{props.title}</h4>
           <p className="p text-sm">{props.description}</p>
-          <div>
-            <img
-              src={props.author_img}
-              alt={props.author + ' GitHub profile picture'}
-              className="border-scale-500 inline w-6 h-6 rounded-full"
-            />
+          <div className="flex items-center">
+            <div className="relative border-scale-500 inline !w-6 !h-6 rounded-full overflow-hidden">
+              <Image
+                src={props.author_img}
+                alt={props.author + ' GitHub profile picture'}
+                layout="fill"
+                objectFit="cover"
+              />
+            </div>
             <span className="text-scale-1200 ml-2 text-sm">{props.author}</span>
           </div>
         </div>

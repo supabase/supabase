@@ -3,6 +3,7 @@ export interface PricingInformation {
   name: string
   nameBadge?: string
   costUnit?: string
+  costUnitOrg?: string
   href: string
   priceLabel?: string
   priceMonthly: number | string
@@ -10,6 +11,7 @@ export interface PricingInformation {
   description: string
   preface: string
   features: string[]
+  featuresOrg?: string[]
   footer?: string
   cta: string
 }
@@ -20,6 +22,7 @@ export const plans: PricingInformation[] = [
     name: 'Free',
     nameBadge: '',
     costUnit: '/ month / project',
+    costUnitOrg: '/ month',
     href: 'https://supabase.com/dashboard/new/new-project',
     priceLabel: '',
     priceMonthly: 0,
@@ -48,11 +51,27 @@ export const plans: PricingInformation[] = [
     name: 'Pro',
     nameBadge: '',
     costUnit: '/ month / project',
+    costUnitOrg: '/ month',
     href: 'https://supabase.com/dashboard/new/new-project',
     priceLabel: 'From',
     warning: 'Usage-based plan',
     priceMonthly: 25,
     description: 'For production applications with the option to scale.',
+    featuresOrg: [
+      '$10 Compute Credits',
+      'No project pausing',
+      'Daily backups stored for 7 days',
+      '8GB database space included',
+      '100GB file storage included',
+      '50GB bandwidth included',
+      '5GB file uploads included',
+      '100,000 monthly active users included',
+      '2M Edge Function invocations included',
+      '500 concurrent Realtime connections included',
+      '5 million Realtime messages included',
+      '7-day log retention',
+      'Email support',
+    ],
     features: [
       'No project pausing',
       'Daily backups stored for 7 days',
@@ -67,8 +86,7 @@ export const plans: PricingInformation[] = [
       '7-day log retention',
       'Email support',
     ],
-    footer:
-      'Your cost control settings determine if you allow over-usage.',
+    footer: 'Your cost control settings determine if you allow over-usage.',
     preface: 'Everything in the Free plan, plus:',
     cta: 'Get Started',
   },
@@ -77,6 +95,7 @@ export const plans: PricingInformation[] = [
     name: 'Team',
     nameBadge: 'New',
     costUnit: '/ month',
+    costUnitOrg: '/ month',
     href: 'https://forms.supabase.com/team',
     priceLabel: 'From',
     warning: 'Usage-based plan',
@@ -87,6 +106,7 @@ export const plans: PricingInformation[] = [
       'Daily backups stored for 14 days',
       'Standardised Security Questionnaire',
       'SOC2',
+      'HIPAA',
       'SSO for Supabase Dashboard',
       'Priority email support & SLAs',
       '28-day log retention',

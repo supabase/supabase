@@ -1,6 +1,7 @@
-import { v4 as _uuidV4 } from 'uuid'
 import { post } from 'lib/common/fetch'
-import { PASSWORD_STRENGTH, DEFAULT_MINIMUM_PASSWORD_STRENGTH, API_URL } from 'lib/constants'
+import { API_URL, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PASSWORD_STRENGTH } from 'lib/constants'
+import { toast } from 'react-hot-toast'
+import { v4 as _uuidV4 } from 'uuid'
 
 export const tryParseJson = (jsonString: any) => {
   try {
@@ -179,35 +180,37 @@ export const copyToClipboard = async (str: string | Promise<string>, callback = 
 }
 
 export async function passwordStrength(value: string) {
-  let message = ''
-  let warning = ''
-  let strength = 0
+  let message: string = ''
+  let warning: string = ''
+  let strength: number = 0
 
   if (value && value !== '') {
     if (value.length > 99) {
       message = `${PASSWORD_STRENGTH[0]} Maximum length of password exceeded`
       warning = `Password should be less than 100 characters`
     } else {
+      // [Joshen] Unable to use RQ atm due to our Jest tests being in JS
       const response = await post(`${API_URL}/profile/password-check`, { password: value })
       if (!response.error) {
         const { result } = response
-        const score = (PASSWORD_STRENGTH as any)[result.score]
+        const resultScore = result?.score ?? 0
+
+        const score = (PASSWORD_STRENGTH as any)[resultScore]
         const suggestions = result.feedback?.suggestions
           ? result.feedback.suggestions.join(' ')
           : ''
 
-        // set message :string
         message = `${score} ${suggestions}`
-
-        // set strength :number
-        strength = result.score
+        strength = resultScore
 
         // warning message for anything below 4 strength :string
-        if (result.score < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
+        if (resultScore < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
           warning = `${
             result?.feedback?.warning ? result?.feedback?.warning + '.' : ''
           } You need a stronger password.`
         }
+      } else {
+        toast.error(`Failed to check password strength: ${response.error.message}`)
       }
     }
   }
@@ -245,6 +248,13 @@ export const detectOS = () => {
   } else {
     return undefined
   }
+}
+
+/**
+ * Pluralize a word based on a count
+ */
+export function pluralize(count: number, singular: string, plural?: string) {
+  return count === 1 ? singular : plural || singular + 's'
 }
 
 export const isValidHttpUrl = (value: string) => {

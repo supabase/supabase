@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
+import { get, isResponseOk } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { resourceKeys } from './keys'
@@ -21,14 +21,17 @@ export async function getResource({ projectRef, id }: ResourceVariables, signal?
     throw new Error('id is required')
   }
 
-  const response = await get(`${API_URL}/projects/${projectRef}/resources/${id}`, {
-    signal,
-  })
-  if (response.error) {
+  const response = await get<ResourceResponse>(
+    `${API_URL}/projects/${projectRef}/resources/${id}`,
+    {
+      signal,
+    }
+  )
+  if (!isResponseOk(response)) {
     throw response.error
   }
 
-  return response as ResourceResponse
+  return response
 }
 
 export type ResourceData = Awaited<ReturnType<typeof getResource>>

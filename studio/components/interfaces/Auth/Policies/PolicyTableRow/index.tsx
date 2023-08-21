@@ -1,13 +1,14 @@
-import { FC } from 'react'
-import type { PostgresTable, PostgresPolicy } from '@supabase/postgres-meta'
+import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
+import { noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
-import PolicyTableRowHeader from './PolicyTableRowHeader'
-import PolicyRow from './PolicyRow'
-import Panel from 'components/ui/Panel'
 import { Alert } from 'ui'
 
-interface Props {
+import Panel from 'components/ui/Panel'
+import { useStore } from 'hooks'
+import PolicyRow from './PolicyRow'
+import PolicyTableRowHeader from './PolicyTableRowHeader'
+
+interface PolicyTableRowProps {
   table: PostgresTable
   isLocked: boolean
   onSelectToggleRLS: (table: PostgresTable) => void
@@ -16,14 +17,14 @@ interface Props {
   onSelectDeletePolicy: (policy: PostgresPolicy) => void
 }
 
-const PolicyTableRow: FC<Props> = ({
+const PolicyTableRow = ({
   table,
   isLocked,
-  onSelectToggleRLS = () => {},
-  onSelectCreatePolicy = () => {},
-  onSelectEditPolicy = () => {},
-  onSelectDeletePolicy = () => {},
-}) => {
+  onSelectToggleRLS = noop,
+  onSelectCreatePolicy = noop,
+  onSelectEditPolicy = noop,
+  onSelectDeletePolicy = noop,
+}: PolicyTableRowProps) => {
   const { meta } = useStore()
   const policies = meta.policies.list(
     (policy: PostgresPolicy) => policy.schema === table.schema && policy.table === table.name

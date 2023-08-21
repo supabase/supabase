@@ -416,6 +416,8 @@ We can access the supabase instance in our `+page.svelte` file through the data 
 
 ```js src/routes/login/+page.server.js
 // src/routes/login/+page.server.js
+import { fail } from '@sveltejs/kit'
+
 export const actions = {
   default: async ({ request, url, locals: { supabase } }) => {
     const formData = await request.formData()
