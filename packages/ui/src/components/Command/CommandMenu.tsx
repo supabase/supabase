@@ -67,6 +67,12 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
     useCommandMenu()
   const showCommandInput = !currentPage || !CHAT_ROUTES.includes(currentPage)
 
+  // This function has been added to prevent the use of double quotes in the search docs input due to an issue with the cmdk-supabase module. This function can be removed when we transition to using cmdk.
+  const handleInputChange = (value: string) => {
+    const newValue = value.replace(/"/g, '') // Remove double quotes
+    setSearch(newValue)
+  }
+
   return (
     <>
       <CommandDialog
@@ -88,7 +94,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
             ref={commandInputRef}
             placeholder="Type a command or search..."
             value={search}
-            onValueChange={setSearch}
+            onValueChange={handleInputChange}
           />
         )}
         <CommandList className={['my-2', showCommandInput && 'max-h-[300px]'].join(' ')}>
