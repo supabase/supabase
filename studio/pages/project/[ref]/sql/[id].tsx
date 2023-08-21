@@ -1,5 +1,4 @@
 import { useMonaco } from '@monaco-editor/react'
-import { useTheme } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef } from 'react'
 
@@ -18,7 +17,6 @@ import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/Pg
 
 const SqlEditor: NextPageWithLayout = () => {
   const monaco = useMonaco()
-  const { isDarkMode } = useTheme()
   const { project } = useProjectContext()
 
   const { mutateAsync: formatQuery } = useFormatQueryMutation()
@@ -69,21 +67,6 @@ const SqlEditor: NextPageWithLayout = () => {
     pgInfoRef.current.keywords = keywords?.result
     pgInfoRef.current.functions = functions?.result
   }
-
-  useEffect(() => {
-    if (monaco) {
-      monaco.editor.defineTheme('supabase', {
-        base: isDarkMode ? 'vs-dark' : 'vs',
-        inherit: true,
-        rules: [
-          { token: '', background: isDarkMode ? '1f1f1f' : 'f0f0f0' },
-          { token: 'string.sql', foreground: '24b47e' },
-          { token: 'comment', foreground: '666666' },
-        ],
-        colors: { 'editor.background': isDarkMode ? '#1f1f1f' : '#f0f0f0' },
-      })
-    }
-  }, [monaco, isDarkMode])
 
   // Enable pgsql format
   useEffect(() => {

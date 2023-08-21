@@ -5,6 +5,7 @@ import { useRef } from 'react'
 import { timeout } from 'lib/helpers'
 import Connecting from '../Loading'
 import { alignEditor } from './CodeEditor.utils'
+import { cn } from 'ui'
 
 interface CodeEditorProps {
   id: string
@@ -38,6 +39,7 @@ const CodeEditor = ({
   const editorRef = useRef()
 
   const onMount = async (editor: any, monaco: any) => {
+    editorRef.current = editor
     alignEditor(editor)
 
     editor.addAction({
@@ -56,7 +58,6 @@ const CodeEditor = ({
 
     await timeout(500)
     if (autofocus) editor?.focus()
-    editorRef.current = editor
   }
 
   const optionsMerged = merge(
@@ -80,10 +81,10 @@ const CodeEditor = ({
 
   return (
     <Editor
-      value={value ?? undefined}
       path={id}
       theme="supabase"
-      className={`monaco-editor ${className}`}
+      className={cn(className, 'monaco-editor')}
+      value={value ?? undefined}
       defaultLanguage={language}
       defaultValue={defaultValue ?? undefined}
       loading={loading || <Connecting />}

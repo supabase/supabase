@@ -57,12 +57,12 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
   })
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess() {
-      refetchIndexes()
+    onSuccess: async () => {
+      await refetchIndexes()
       onClose()
       ui.setNotification({ category: 'success', message: `Successfully created index` })
     },
-    onError(error) {
+    onError: (error) => {
       ui.setNotification({
         error,
         category: 'error',
@@ -75,7 +75,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     () => entities?.pages.flatMap((page) => page.data.entities) || [],
     [entities?.pages]
   )
-  const columns = tableColumns?.result[0].columns ?? []
+  const columns = tableColumns?.result[0]?.columns ?? []
   const columnOptions: MultiSelectOption[] = columns.map((column) => {
     return { id: column.attname, value: column.attname, name: column.attname, disabled: false }
   })
@@ -144,7 +144,11 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
           {entityTypes.length === 0 ? (
             <div className="space-y-2">
               <p className="text-sm text-scale-1100 leading-4">Select a table</p>
-              <Input placeholder="No tables available in schema" />
+              <Input
+                disabled
+                placeholder="No tables available in schema"
+                descriptionText="Create a table in this schema via the Table or SQL editor first"
+              />
             </div>
           ) : (
             <Listbox

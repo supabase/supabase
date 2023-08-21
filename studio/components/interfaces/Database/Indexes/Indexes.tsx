@@ -28,6 +28,7 @@ import CreateIndexSidePanel from './CreateIndexSidePanel'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useStore } from 'hooks'
+import MonacoEditor from 'components/interfaces/SQLEditor/MonacoEditor'
 
 const Indexes = () => {
   const { ui } = useStore()
@@ -184,7 +185,7 @@ const Indexes = () => {
               <>
                 {sortedIndexes.length === 0 && search.length === 0 && (
                   <Table.tr>
-                    <Table.td colSpan={3}>
+                    <Table.td colSpan={4}>
                       <p className="text-sm text-scale-1200">No indexes created yet</p>
                       <p className="text-sm text-light">
                         There are no indexes found in the schema "{selectedSchema}"
@@ -194,7 +195,7 @@ const Indexes = () => {
                 )}
                 {sortedIndexes.length === 0 && search.length > 0 && (
                   <Table.tr>
-                    <Table.td colSpan={3}>
+                    <Table.td colSpan={4}>
                       <p className="text-sm text-scale-1200">No results found</p>
                       <p className="text-sm text-light">
                         Your search for "{search}" did not return any results
@@ -236,6 +237,7 @@ const Indexes = () => {
       </div>
 
       <SidePanel
+        size="xlarge"
         visible={selectedIndex !== undefined}
         header={
           <>
