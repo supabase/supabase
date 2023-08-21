@@ -11,12 +11,15 @@ import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { Project } from 'types'
+import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
+import { useParams } from 'common'
 
 export interface BuildingStateProps {
   project: Project
 }
 
 const BuildingState = ({ project }: BuildingStateProps) => {
+  const { ref } = useParams()
   const queryClient = useQueryClient()
   const checkServerInterval = useRef<number>()
 
@@ -31,7 +34,7 @@ const BuildingState = ({ project }: BuildingStateProps) => {
       const { status } = projectStatus
       if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
         clearInterval(checkServerInterval.current)
-
+        if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
         await invalidateProjectsQuery(queryClient)
       }
     }
