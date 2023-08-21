@@ -467,20 +467,26 @@ const Wizard: NextPageWithLayout = () => {
                   description={
                     <div className="space-y-3">
                       <p className="text-sm leading-normal">
-                        This organization uses the new organization-level billing and is on the{' '}
+                        This organization uses the new organization-level-billing and is on the{' '}
                         <span className="text-brand">{orgSubscription?.plan?.name} plan</span>.
                       </p>
 
                       {/* Show info when launching a new project in a paid org that already has at least one project */}
                       {orgSubscription?.plan?.id !== 'free' && orgProjectCount > 0 && (
-                        <p>
-                          Launching another project incurs additional compute costs (starting at $10
-                          per month).
-                        </p>
+                        <div>
+                          <p>
+                            Launching another project incurs additional compute costs, starting at
+                            $0.01344 per hour (~$10/month).
+                          </p>
+                          <p>
+                            You can also create a new organization under the free plan (unless you
+                            have exceeded your 2 free project limit).
+                          </p>
+                        </div>
                       )}
 
                       <div>
-                        <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
+                        <Link href="https://www.notion.so/supabase/Org-Level-Billing-Public-Docs-f059a154beb743a19199d05bab4acb08">
                           <a target="_blank" rel="noreferrer">
                             <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                               Documentation
