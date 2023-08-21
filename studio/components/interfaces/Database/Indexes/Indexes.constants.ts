@@ -2,7 +2,8 @@ export const INDEX_TYPES = [
   {
     name: 'B-Tree',
     value: 'btree',
-    description: 'For querying data with equality or range conditions on columns.',
+    description:
+      'For querying data with equality or range conditions on columns.\nThis is the default index type that Postgres uses.',
   },
   {
     name: 'Hash',

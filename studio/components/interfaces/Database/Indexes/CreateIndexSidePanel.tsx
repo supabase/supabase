@@ -198,7 +198,9 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 {INDEX_TYPES.map((index) => (
                   <Listbox.Option key={index.name} value={index.value} label={index.name}>
                     <p>{index.name}</p>
-                    <p>{index.description}</p>
+                    {index.description.split('\n').map((x, idx) => (
+                      <p key={`${index.value}-description-${idx}`}>{x}</p>
+                    ))}
                   </Listbox.Option>
                 ))}
               </Listbox>
