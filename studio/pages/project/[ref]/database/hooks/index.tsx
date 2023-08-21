@@ -30,7 +30,7 @@ const HooksPage: NextPageWithLayout = () => {
   const canReadWebhooks = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
   const canCreateWebhooks = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
-  const { mutate: enableHooks } = useHooksEnableMutation({
+  const { mutate: enableHooks, isLoading: isEnablingHooks } = useHooksEnableMutation({
     onSuccess: () => {
       meta.schemas.load()
       ui.setNotification({
@@ -85,8 +85,11 @@ const HooksPage: NextPageWithLayout = () => {
           title="Database Webhooks"
           ctaButtonLabel="Enable webhooks"
           onClickCta={() => enableHooksForProject()}
-          disabled={!canCreateWebhooks}
-          disabledMessage="You need additional permissions to enable webhooks"
+          loading={isEnablingHooks}
+          disabled={isEnablingHooks || !canCreateWebhooks}
+          disabledMessage={
+            !canCreateWebhooks ? 'You need additional permissions to enable webhooks' : undefined
+          }
         >
           <p className="text-sm text-scale-1100">
             Database Webhooks can be used to trigger serverless functions or send requests to an
