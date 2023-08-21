@@ -10,12 +10,12 @@ export type OrganizationBillingMigrationPreviewVariables = {
 
 export type OrganizationBillingMigrationPreviewResponse = {
   added_credits: number
-  addons_to_be_removed?: {
+  addons_to_be_removed: {
     projectRef: string
     projectName: string
     addons: { variant: string; name: string; type: string }[]
   }[]
-  monthly_invoice_breakdown?: {
+  monthly_invoice_breakdown: {
     description: string
     unit_price: number
     quantity: number

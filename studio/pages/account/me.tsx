@@ -42,7 +42,7 @@ export default User
 const ProfileCard = observer(() => {
   const { ui } = useStore()
   const { profile, error, isLoading, isError, isSuccess } = useProfile()
-  const { mutate: updateProfile, isLoading: isUpdating } = useProfileUpdateMutation({
+  const { mutateAsync: updateProfile, isLoading: isUpdating } = useProfileUpdateMutation({
     onSuccess: () => {
       ui.setNotification({ category: 'success', message: 'Successfully saved profile' })
     },
@@ -56,10 +56,13 @@ const ProfileCard = observer(() => {
   })
 
   const updateUser = async (model: any) => {
-    updateProfile({
-      firstName: model.first_name,
-      lastName: model.last_name,
-    })
+    try {
+      await updateProfile({
+        firstName: model.first_name,
+        lastName: model.last_name,
+      })
+    } finally {
+    }
   }
 
   return (

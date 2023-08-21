@@ -84,7 +84,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
           <>
             <Divider light />
             <Dropdown.Item onClick={onDeleteColumn} icon={<IconTrash size="tiny" stroke="red" />}>
-              Delete Column
+              Delete column
             </Dropdown.Item>
           </>
         )}

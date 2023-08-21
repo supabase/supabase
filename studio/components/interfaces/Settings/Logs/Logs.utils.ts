@@ -21,6 +21,12 @@ export const isUnixMicro = (unix: string | number): boolean => {
   return isNum && digitLength
 }
 
+/**
+ * Boolean check to verify that there are 3 columns:
+ * - id
+ * - timestamp
+ * - event_message
+ */
 export const isDefaultLogPreviewFormat = (log: LogData) =>
   log && log.timestamp && log.event_message && log.id
 
@@ -65,7 +71,7 @@ const getDotKeys = (obj: { [k: string]: unknown }, parent?: string): string[] =>
  *
  * @returns a where statement with WHERE clause.
  */
-const _genWhereStatement = (table: LogsTableName, filters: Filters) => {
+const genWhereStatement = (table: LogsTableName, filters: Filters) => {
   const keys = Object.keys(filters)
   const filterTemplates = SQL_FILTER_TEMPLATES[table]
   const _resolveTemplateToStatement = (dotKey: string): string | null => {
@@ -122,46 +128,42 @@ const _genWhereStatement = (table: LogsTableName, filters: Filters) => {
 }
 
 export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
-  const where = _genWhereStatement(table, filters)
+  const where = genWhereStatement(table, filters)
+  const joins = genCrossJoinUnnests(table)
 
   switch (table) {
     case 'edge_logs':
       return `select id, timestamp, event_message, request.method, request.path, response.status_code
   from ${table}
-  cross join unnest(metadata) as m
-  cross join unnest(m.request) as request
-  cross join unnest(m.response) as response
+  ${joins}
   ${where}
   limit 100
   `
 
     case 'postgres_logs':
       return `select postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table}
-  cross join unnest(metadata) as m
-  cross join unnest(m.parsed) as parsed
+  ${joins}
   ${where}
   limit 100
   `
 
     case 'function_logs':
       return `select id, ${table}.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.level from ${table}
-  cross join unnest(metadata) as metadata
+  ${joins}
   ${where}
   limit 100
     `
 
     case 'auth_logs':
       return `select id, ${table}.timestamp, event_message, metadata.level, metadata.status, metadata.path, metadata.msg as msg, metadata.error from ${table}
-  cross join unnest(metadata) as metadata
+  ${joins}
   ${where}
   limit 100
     `
 
     case 'function_edge_logs':
       return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
-  cross join unnest(metadata) as m
-  cross join unnest(m.response) as response
-  cross join unnest(m.request) as request
+  ${joins}
   ${where}
   limit 100
   `
@@ -171,6 +173,37 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   ${where}
   limit 100
   `
+  }
+}
+
+/**
+ * Hardcoded cross join unnests and aliases for each table.
+ * Should be used together with the getWhereStatements to allow for filtering on aliases
+ */
+const genCrossJoinUnnests = (table: LogsTableName) => {
+  switch (table) {
+    case 'edge_logs':
+      return `cross join unnest(metadata) as m
+  cross join unnest(m.request) as request
+  cross join unnest(m.response) as response`
+
+    case 'postgres_logs':
+      return `cross join unnest(metadata) as m
+  cross join unnest(m.parsed) as parsed`
+
+    case 'function_logs':
+      return `cross join unnest(metadata) as metadata`
+
+    case 'auth_logs':
+      return `cross join unnest(metadata) as metadata`
+
+    case 'function_edge_logs':
+      return `cross join unnest(metadata) as m
+  cross join unnest(m.response) as response
+  cross join unnest(m.request) as request`
+
+    default:
+      return ''
   }
 }
 
@@ -195,8 +228,9 @@ export const maybeShowUpgradePrompt = (from: string | null | undefined, planId?:
 }
 
 export const genCountQuery = (table: LogsTableName, filters: Filters): string => {
-  const where = _genWhereStatement(table, filters)
-  return `SELECT count(*) as count FROM ${table} ${where}`
+  const where = genWhereStatement(table, filters)
+  const joins = genCrossJoinUnnests(table)
+  return `SELECT count(*) as count FROM ${table} ${joins} ${where}`
 }
 
 /** calculates how much the chart start datetime should be offset given the current datetime filter params */
@@ -231,19 +265,13 @@ export const genChartQuery = (
   filters: Filters
 ) => {
   const [startOffset, trunc] = calcChartStart(params)
-  const where = _genWhereStatement(table, filters)
+  const where = genWhereStatement(table, filters)
 
-  let joins = 'cross join unnest(t.metadata) as metadata'
-  if (table === LogsTableName.EDGE || table === LogsTableName.FN_EDGE) {
-    joins += ' \n  cross join unnest(metadata.request) as request'
-    joins += ' \n  cross join unnest(metadata.response) as response'
-  } else if (table === LogsTableName.POSTGRES) {
-    joins += ' \n  cross join unnest(metadata.parsed) as parsed'
-  }
+  let joins = genCrossJoinUnnests(table)
 
   return `
 SELECT
--- event-chart
+-- log-event-chart
   timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
   count(t.timestamp) as count
 FROM

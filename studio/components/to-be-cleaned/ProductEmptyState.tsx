@@ -9,6 +9,7 @@ interface ProductEmptyStateProps {
   infoButtonLabel?: string
   infoButtonUrl?: string
   onClickCta?: () => void
+  loading?: boolean
   disabled?: boolean
   disabledMessage?: string
 }
@@ -21,6 +22,7 @@ const ProductEmptyState = ({
   infoButtonLabel = '',
   infoButtonUrl = '',
   onClickCta = () => {},
+  loading = false,
   disabled = false,
   disabledMessage = '',
 }: PropsWithChildren<ProductEmptyStateProps>) => {
@@ -39,7 +41,12 @@ const ProductEmptyState = ({
                 {ctaButtonLabel && onClickCta && (
                   <Tooltip.Root delayDuration={0}>
                     <Tooltip.Trigger asChild>
-                      <Button type="primary" onClick={onClickCta} disabled={disabled}>
+                      <Button
+                        type="primary"
+                        onClick={onClickCta}
+                        loading={loading}
+                        disabled={loading || disabled}
+                      >
                         {ctaButtonLabel}
                       </Button>
                     </Tooltip.Trigger>
