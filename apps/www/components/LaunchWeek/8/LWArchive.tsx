@@ -1,9 +1,17 @@
 import React from 'react'
 import { StyledArticleBadge } from './Releases/components'
 import Image from 'next/image'
-import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 const LWArchive = () => {
+  const router = useRouter()
+
+  const handleNavigate = (link: string) => {
+    if (typeof window === 'undefined') return
+    window.scrollTo(0, 0)
+    router.push(link)
+  }
+
   return (
     <div className="w-full text-white flex flex-col lg:flex-row gap-8 lg:gap-16">
       <div className="lg:basis-1/3 flex flex-col items-start gap-4">
@@ -14,36 +22,38 @@ const LWArchive = () => {
         </p>
       </div>
       <div className="lg:basis-2/3 relative grid grid-cols-1 xl:grid-cols-2 gap-4">
-        <Link href="/launch-week/6">
-          <a className="relative h-[160px] group w-full rounded-md md:rounded-lg transition-transform bg-[#030A0C] flex items-center justify-center border border-[#111618] hover:border-brand-800 overflow-hidden">
-            <span className="relative z-10 stroke-text inline-block text-transparent bg-clip-text bg-gradient-to-b from-scale-1200 to-scale-1000 text-7xl drop-shadow-lg">
-              6
-            </span>
-            <div className="absolute inset-0 grayscale group-hover:grayscale-0">
-              <Image
-                src="/images/launchweek/archive/lw6.jpg"
-                alt="Launch Week 6"
-                layout="fill"
-                objectFit="cover"
-              />
-            </div>
-          </a>
-        </Link>
-        <Link href="/launch-week/7">
-          <a className="relative h-[160px] group w-full rounded-md md:rounded-lg transition-transform bg-[#030A0C] flex items-center justify-center border border-[#111718] hover:border-brand-1200 overflow-hidden">
-            <span className="relative z-10 stroke-text inline-block text-transparent bg-clip-text bg-gradient-to-b from-scale-1200 to-scale-1000 text-7xl drop-shadow-lg">
-              7
-            </span>
-            <div className="absolute inset-0 grayscale group-hover:grayscale-0">
-              <Image
-                src="/images/launchweek/archive/lw7.jpg"
-                alt="Launch Week 7"
-                layout="fill"
-                objectFit="cover"
-              />
-            </div>
-          </a>
-        </Link>
+        <button
+          onClick={() => handleNavigate('/launch-week/6')}
+          className="relative h-[160px] group w-full rounded-md md:rounded-lg transition-transform bg-[#030A0C] flex items-center justify-center border border-[#111618] hover:border-brand-800 overflow-hidden"
+        >
+          <span className="relative z-10 stroke-text inline-block text-transparent bg-clip-text bg-gradient-to-b from-scale-1200 to-scale-1000 text-7xl drop-shadow-lg">
+            6
+          </span>
+          <div className="absolute inset-0 grayscale group-hover:grayscale-0">
+            <Image
+              src="/images/launchweek/archive/lw6.jpg"
+              alt="Launch Week 6"
+              layout="fill"
+              objectFit="cover"
+            />
+          </div>
+        </button>
+        <button
+          onClick={() => handleNavigate('/launch-week/7')}
+          className="relative h-[160px] group w-full rounded-md md:rounded-lg transition-transform bg-[#030A0C] flex items-center justify-center border border-[#111718] hover:border-brand-1200 overflow-hidden"
+        >
+          <span className="relative z-10 stroke-text inline-block text-transparent bg-clip-text bg-gradient-to-b from-scale-1200 to-scale-1000 text-7xl drop-shadow-lg">
+            7
+          </span>
+          <div className="absolute inset-0 grayscale group-hover:grayscale-0">
+            <Image
+              src="/images/launchweek/archive/lw7.jpg"
+              alt="Launch Week 7"
+              layout="fill"
+              objectFit="cover"
+            />
+          </div>
+        </button>
       </div>
     </div>
   )
