@@ -12,7 +12,11 @@ export type ProjectCreateVariables = {
   dbPass: string
   dbRegion: string
   dbSql?: string
+  dbPricingTierId?: string
+  cloudProvider?: string
   configurationId?: string
+  authSiteUrl?: string
+  customSupabaseRequest?: object
 }
 
 export async function createProject({
@@ -21,18 +25,25 @@ export async function createProject({
   dbPass,
   dbRegion,
   dbSql,
+  dbPricingTierId = PRICING_TIER_PRODUCT_IDS.FREE,
+  cloudProvider = PROVIDERS.AWS.id,
   configurationId,
+  authSiteUrl,
+  customSupabaseRequest,
 }: ProjectCreateVariables) {
   const response = await post(`${API_URL}/projects`, {
-    cloud_provider: PROVIDERS.AWS.id, // hardcoded for DB instances to be under AWS
+    cloud_provider: cloudProvider,
     org_id: organizationId,
     name,
     db_pass: dbPass,
     db_region: dbRegion,
     db_sql: dbSql,
-    db_pricing_tier_id: PRICING_TIER_PRODUCT_IDS.FREE,
-    // auth_site_url: _store.selectedVercelProjectUrl,
+    db_pricing_tier_id: dbPricingTierId,
+    auth_site_url: authSiteUrl,
     vercel_configuration_id: configurationId,
+    ...(customSupabaseRequest !== undefined && {
+      custom_supabase_internal_requests: customSupabaseRequest,
+    }),
   })
   if (response.error) throw response.error
   return response as ProjectBase
@@ -59,7 +70,7 @@ export const useProjectCreateMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to create project: ${data.message}`)
+          toast.error(`Failed to create new project: ${data.message}`)
         } else {
           onError(data, variables, context)
         }
