@@ -1,18 +1,18 @@
-import { useCallback, useEffect, useState } from 'react'
-import { observer } from 'mobx-react-lite'
-
-import { API_URL, STRIPE_PUBLIC_KEY } from 'lib/constants'
-import { useFlag, useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { WizardLayout } from 'components/layouts'
-import { NextPageWithLayout } from 'types'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
-import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
-import HCaptcha from '@hcaptcha/react-hcaptcha'
-import { NewOrgForm } from 'components/interfaces/Organization'
 import { useTheme } from 'common'
+import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
+import { useCallback, useEffect, useState } from 'react'
+
+import { NewOrgForm } from 'components/interfaces/Organization'
+import { WizardLayout } from 'components/layouts'
+import { useSetupIntent } from 'data/stripe/setup-intent-mutation'
+import { useFlag, useStore } from 'hooks'
+import { STRIPE_PUBLIC_KEY } from 'lib/constants'
+import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
+import { NextPageWithLayout } from 'types'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -22,16 +22,16 @@ const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 const Wizard: NextPageWithLayout = () => {
   const { ui } = useStore()
   const router = useRouter()
+  const { isDarkMode } = useTheme()
 
   const [intent, setIntent] = useState<any>()
   const captchaLoaded = useIsHCaptchaLoaded()
 
+  const orgCreationV2 = useFlag('orgcreationv2')
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
 
-  const orgCreationV2 = useFlag('orgcreationv2')
-
-  const { isDarkMode } = useTheme()
+  const { mutate: setupIntent } = useSetupIntent({ onSuccess: (res) => setIntent(res) })
 
   const captchaRefCallback = useCallback((node) => {
     setCaptchaRef(node)
@@ -43,23 +43,12 @@ const Wizard: NextPageWithLayout = () => {
     }
   }, [orgCreationV2])
 
-  const setupIntent = async (hcaptchaToken: string | undefined) => {
+  const initSetupIntent = async (hcaptchaToken: string | undefined) => {
+    if (!hcaptchaToken) return console.error('Hcaptcha token is required')
+
     // Force a reload of Elements, necessary for Stripe
     setIntent(undefined)
-
-    const intent = await post(`${API_URL}/stripe/setup-intent`, {
-      hcaptchaToken,
-    })
-
-    if (intent.error) {
-      return ui.setNotification({
-        category: 'error',
-        message: intent.error.message,
-        error: `Failed to retrieve intent: ${intent.error}`,
-      })
-    } else {
-      setIntent(intent)
-    }
+    setupIntent({ hcaptchaToken })
   }
 
   const options = {
@@ -80,7 +69,7 @@ const Wizard: NextPageWithLayout = () => {
         return
       }
 
-      await setupIntent(token ?? undefined)
+      await initSetupIntent(token ?? undefined)
       resetCaptcha()
     }
   }
