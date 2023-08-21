@@ -182,9 +182,14 @@ const CreateProject = observer(() => {
     setPasswordStrengthMessage(message)
   }
 
+  function getRandomInt(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
   function generateStrongPassword() {
+    const randomLength = getRandomInt(16, 24);
     const password = generator.generate({
-      length: 16,
+      length: randomLength,
       numbers: true,
       uppercase: true,
     })
