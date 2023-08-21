@@ -93,7 +93,7 @@ const RestartServerButton = () => {
             <Button
               type="default"
               className={`px-3 ${canRestartProject && isProjectActive ? 'rounded-r-none' : ''}`}
-              disabled={!canRestartProject || !isProjectActive}
+              disabled={project === undefined || !canRestartProject || !isProjectActive}
               onClick={() => setServiceToRestart('project')}
             >
               Restart project
@@ -130,7 +130,7 @@ const RestartServerButton = () => {
             )}
           </div>
         </Tooltip.Trigger>
-        {(!canRestartProject || !isProjectActive) && (
+        {project !== undefined && (!canRestartProject || !isProjectActive) && (
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
