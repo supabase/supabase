@@ -1,15 +1,19 @@
+import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Button, IconAlertCircle, IconCheckCircle, IconLoader } from 'ui'
 
-import { getProjectDetail } from 'data/projects/project-detail-query'
+import { getProjectDetail, invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useStore } from 'hooks'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { useProjectContext } from './ProjectContext'
 
 const RestoringState = () => {
+  const { ref } = useParams()
   const { meta } = useStore()
+  const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const checkServerInterval = useRef<number>()
 
@@ -45,9 +49,8 @@ const RestoringState = () => {
 
     setLoading(true)
     const projectDetail = await getProjectDetail({ ref: project?.ref })
-    if (projectDetail) {
-      meta.setProjectDetails(projectDetail)
-    }
+    if (projectDetail) meta.setProjectDetails(projectDetail)
+    if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
   }
 
   return (
