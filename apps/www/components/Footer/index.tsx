@@ -51,7 +51,7 @@ const Footer = (props: Props) => {
                       href="https://twitter.com/supabase"
                       className="text-scale-900 hover:text-scale-1200 transition"
         >
-                      <span className="sr-only">Twitter</span>
+                      <span className="sr-only">X</span>
                       <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true" >
                         <path
                         
