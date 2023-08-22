@@ -97,18 +97,3 @@ export const useTableColumnsQuery = <TData extends TableColumnsData = TableColum
     options
   )
 }
-
-export const useTableColumnsPrefetch = () => {
-  const prefetch = useExecuteSqlPrefetch()
-
-  return useCallback(
-    ({ projectRef, connectionString }: TableColumnsVariables) =>
-      prefetch({
-        projectRef,
-        connectionString,
-        sql: getTableColumnsQuery(),
-        queryKey: ['table-columns'],
-      }),
-    [prefetch]
-  )
-}
