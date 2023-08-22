@@ -45,7 +45,7 @@
   "dependencies": {
     "@algolia/autocomplete-js": "^1.7.2",
     "@algolia/autocomplete-plugin-recent-searches": "^1.7.2",
-    "@code-hike/mdx": "^0.8.3",
+    "@code-hike/mdx": "^0.9.0",
     "@docsearch/react": "^3.3.0",
     "@mdx-js/loader": "^2.1.5",
     "@mdx-js/react": "^2.1.5",
