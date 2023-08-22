@@ -51,7 +51,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     isLoading: isLoadingTableColumns,
     isSuccess: isSuccessTableColumns,
   } = useTableColumnsQuery({
-    table: 'countries',
+    table: selectedEntity,
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
