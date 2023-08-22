@@ -138,6 +138,7 @@ transforms:
       if .metadata.parsed.error_severity == "info" {
           .metadata.parsed.error_severity = "log"
       }
+      .metadata.parsed.error_severity = upcase(.metadata.parsed.error_severity)
 
 sinks:
   logflare_auth:
