@@ -135,6 +135,9 @@ transforms:
       .metadata.host = "db-default"
       .metadata.parsed.timestamp = .timestamp
       .metadata.parsed.error_severity = replace!(.severity, r'^err$', "warning")
+      if .metadata.parsed.error_severity == "info" {
+          .metadata.parsed.error_severity = "log"
+      }
 
 sinks:
   logflare_auth:
