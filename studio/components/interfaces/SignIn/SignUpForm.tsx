@@ -1,13 +1,13 @@
-import * as yup from 'yup'
-import { useRef, useState } from 'react'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { useRef, useState } from 'react'
 import { Alert, Button, Form, IconEye, IconEyeOff, Input } from 'ui'
+import * as yup from 'yup'
 
+import { useSignUpMutation } from 'data/misc/signup-mutation'
 import { useStore } from 'hooks'
-import { isResponseOk, post } from 'lib/common/fetch'
-import { API_URL, BASE_PATH } from 'lib/constants'
-import { passwordSchema } from 'lib/schemas'
+import { BASE_PATH } from 'lib/constants'
 import { resetSignInClicks } from 'lib/local-storage'
+import { passwordSchema } from 'lib/schemas'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
 
 const signUpSchema = passwordSchema.shape({
@@ -22,12 +22,25 @@ const SignUpForm = () => {
   const [passwordHidden, setPasswordHidden] = useState(true)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
-  const onSignUp = async ({ email, password }: { email: string; password: string }) => {
-    const toastId = ui.setNotification({
-      category: 'loading',
-      message: `Signing up...`,
-    })
+  const { mutate: signup, isLoading: isSigningUp } = useSignUpMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: `Signed up successfully!`,
+      })
+      setIsSubmitted(true)
+    },
+    onError: (error) => {
+      setCaptchaToken(null)
+      captchaRef.current?.resetCaptcha()
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to sign up: ${error.message}`,
+      })
+    },
+  })
 
+  const onSignUp = async ({ email, password }: { email: string; password: string }) => {
     let token = captchaToken
     if (!token) {
       const captchaResponse = await captchaRef.current?.execute({ async: true })
@@ -35,8 +48,7 @@ const SignUpForm = () => {
     }
 
     resetSignInClicks()
-
-    const response = await post<void>(`${API_URL}/signup`, {
+    signup({
       email,
       password,
       hcaptchaToken: token ?? null,
@@ -46,25 +58,6 @@ const SignUpForm = () => {
           : process.env.NEXT_PUBLIC_SITE_URL
       }${BASE_PATH}/sign-in`,
     })
-
-    if (isResponseOk(response)) {
-      ui.setNotification({
-        id: toastId,
-        category: 'success',
-        message: `Signed up successfully!`,
-      })
-
-      setIsSubmitted(true)
-    } else {
-      setCaptchaToken(null)
-      captchaRef.current?.resetCaptcha()
-
-      ui.setNotification({
-        id: toastId,
-        category: 'error',
-        message: `Failed to sign up: ${response.error.message}`,
-      })
-    }
   }
 
   return (
@@ -89,7 +82,7 @@ const SignUpForm = () => {
         validationSchema={signUpSchema}
         onSubmit={onSignUp}
       >
-        {({ isSubmitting, values }: { isSubmitting: boolean; values: any }) => {
+        {({ values }: { values: any }) => {
           return (
             <div className="flex flex-col gap-4">
               <Input
@@ -98,7 +91,7 @@ const SignUpForm = () => {
                 type="email"
                 label="Email"
                 placeholder="you@example.com"
-                disabled={isSubmitting}
+                disabled={isSigningUp}
                 autoComplete="email"
               />
 
@@ -108,7 +101,7 @@ const SignUpForm = () => {
                 type={passwordHidden ? 'password' : 'text'}
                 label="Password"
                 placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                disabled={isSubmitting}
+                disabled={isSigningUp}
                 autoComplete="new-password"
                 onFocus={() => setShowConditions(true)}
                 actions={
@@ -148,8 +141,8 @@ const SignUpForm = () => {
                 form="signUp-form"
                 htmlType="submit"
                 size="large"
-                disabled={values.password.length === 0 || isSubmitting}
-                loading={isSubmitting}
+                disabled={values.password.length === 0 || isSigningUp}
+                loading={isSigningUp}
               >
                 Sign Up
               </Button>

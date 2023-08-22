@@ -80,6 +80,12 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/migrations`,
           items: [],
         },
+        {
+          name: 'Indexes',
+          key: 'indexes',
+          url: `/project/${ref}/database/indexes`,
+          items: [],
+        },
       ],
     },
   ]

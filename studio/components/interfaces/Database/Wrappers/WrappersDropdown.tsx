@@ -8,7 +8,6 @@ import { Button, Dropdown, IconPlus } from 'ui'
 
 import { useParams } from 'common/hooks'
 import { useCheckPermissions } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
 import { WRAPPERS } from './Wrappers.constants'
 
 interface WrapperDropdownProps {
@@ -78,22 +77,6 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
               {idx !== WRAPPERS.length - 1 && <Dropdown.Separator />}
             </Fragment>
           ))}
-
-          <Dropdown.Separator />
-
-          <Dropdown.Item
-            disabled
-            icon={
-              <Image
-                src={`${BASE_PATH}/img/icons/airtable-icon.svg`}
-                width={20}
-                height={20}
-                alt="Airtable wrapper icon"
-              />
-            }
-          >
-            Airtable <span className="text-xs">(soon)</span>
-          </Dropdown.Item>
         </>
       }
     >
