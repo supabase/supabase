@@ -4,7 +4,7 @@ import { PropsWithChildren, useEffect, useState } from 'react'
 
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
-import { useFlag, useSelectedProject, useStore, withAuth } from 'hooks'
+import { useSelectedProject, useStore, withAuth } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import ProjectLayout from '../'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
@@ -28,7 +28,6 @@ const DatabaseLayout = ({ title, children }: PropsWithChildren<DatabaseLayoutPro
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
   const wrappersExtensionExists = meta.extensions.byId('wrappers') !== undefined
   const pgNetExtensionExists = meta.extensions.byId('pg_net') !== undefined
-  const schemaVisualizerEnabled = useFlag('schemaVisualizer')
 
   const isLoading = isSchemasLoading || (isVaultEnabled && isVaultLoading)
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
@@ -82,7 +81,6 @@ const DatabaseLayout = ({ title, children }: PropsWithChildren<DatabaseLayoutPro
           menu={generateDatabaseMenu(project, {
             wrappersExtensionExists,
             pgNetExtensionExists,
-            schemaVisualizerEnabled,
           })}
         />
       }

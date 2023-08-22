@@ -7,11 +7,10 @@ export const generateDatabaseMenu = (
   flags?: {
     wrappersExtensionExists: boolean
     pgNetExtensionExists: boolean
-    schemaVisualizerEnabled: boolean
   }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const { wrappersExtensionExists, pgNetExtensionExists, schemaVisualizerEnabled } = flags || {}
+  const { wrappersExtensionExists, pgNetExtensionExists } = flags || {}
 
   return [
     {
