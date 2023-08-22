@@ -49,10 +49,9 @@ const LW8Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
   return (
     <div className="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-8">
       <div className="col-span-1 xl:col-span-4 flex flex-col justify-center max-w-lg">
-        <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-.5px]">Join the community</h2>
-        <p className="text-scale-1000 text-base py-3 xl:max-w-md">
-          Celebrate LW8 at our first-ever live community meetups across various locations. Join the
-          fun, grab some swag, and meet the Supabase community.
+        <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-.5px]">Community meetups</h2>
+        <p className="text-[#9296AA] text-base py-3 xl:max-w-md">
+          We celebrated LW8 with our first-ever live community meetups across various locations.
         </p>
       </div>
       <div className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl flex flex-col justify-between items-stretch">

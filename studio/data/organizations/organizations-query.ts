@@ -27,7 +27,7 @@ export const useOrganizationsQuery = <TData = OrganizationsData>({
   useQuery<OrganizationsData, OrganizationsError, TData>(
     organizationKeys.list(),
     ({ signal }) => getOrganizations(signal),
-    { enabled: enabled, ...options }
+    { enabled: enabled, ...options, staleTime: 30 * 60 * 1000 }
   )
 
 export function prefetchOrganizations(client: QueryClient) {
