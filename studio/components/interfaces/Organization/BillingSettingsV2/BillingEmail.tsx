@@ -56,13 +56,11 @@ const BillingEmail = () => {
   return (
     <ScaffoldSection>
       <ScaffoldSectionDetail>
-        <div className="sticky space-y-6 top-16">
-          <div>
-            <p className="text-base">Email Recipient</p>
-            <p className="text-sm text-scale-1000">
-              All billing correspondence will go to this email
-            </p>
-          </div>
+        <div className="sticky space-y-2 top-12">
+          <p className="text-base m-0">Email Recipient</p>
+          <p className="text-sm text-scale-1000 m-0">
+            All billing correspondence will go to this email
+          </p>
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>

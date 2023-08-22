@@ -1,52 +1,31 @@
-import { useEffect, useState, useRef, forwardRef, useImperativeHandle } from 'react'
-import { createPortal } from 'react-dom'
+import { DataGridHandle } from '@supabase/react-data-grid'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import { useMonaco } from '@monaco-editor/react'
-import { DataGridHandle } from '@supabase/react-data-grid'
+import { createPortal } from 'react-dom'
 
-import { useUrlState } from 'hooks'
-import { Dictionary, SupabaseGridProps, SupabaseGridRef } from './types'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { StoreProvider, useDispatch, useTrackedState } from './store'
-import { Shortcuts } from './components/common'
-import { Grid } from './components/grid'
-import Header from './components/header'
-import Footer from './components/footer'
-import { RowContextMenu } from './components/menu'
+import { useUrlState } from 'hooks'
 import {
   cleanupProps,
-  initTable,
-  saveStorageDebounced,
   formatFilterURLParams,
   formatSortURLParams,
+  initTable,
+  saveStorageDebounced,
 } from './SupabaseGrid.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { Shortcuts } from './components/common'
+import Footer from './components/footer'
+import { Grid } from './components/grid'
+import Header from './components/header'
+import { RowContextMenu } from './components/menu'
+import { StoreProvider, useDispatch, useTrackedState } from './store'
+import { Dictionary, SupabaseGridProps, SupabaseGridRef } from './types'
 
 /** Supabase Grid: React component to render database table */
 
 export const SupabaseGrid = forwardRef<SupabaseGridRef, SupabaseGridProps>((props, ref) => {
-  const monaco = useMonaco()
   const _props = cleanupProps(props)
-  const { theme } = _props
-
-  useEffect(() => {
-    if (monaco) {
-      const darkTheme = theme && theme === 'dark' ? true : false
-      monaco.editor.defineTheme('supabase', {
-        base: darkTheme ? 'vs-dark' : 'vs',
-        inherit: true, // can also be false to completely replace the builtin rules
-        rules: [
-          { token: 'string.sql', foreground: '24b47e' },
-          { token: 'comment', foreground: '666666' },
-          { token: 'predefined.sql', foreground: '999999' },
-        ],
-        colors: {
-          'editor.background': darkTheme ? '#222222' : '#fbfcfd',
-        },
-      })
-    }
-  }, [monaco, theme])
 
   return (
     <StoreProvider>

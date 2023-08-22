@@ -23,6 +23,7 @@ import { useOrganizationBillingMigrationPreview } from 'data/organizations/organ
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import PaymentMethodSelection from '../BillingSettingsV2/Subscription/PaymentMethodSelection'
+import InformationBox from 'components/ui/InformationBox'
 
 const MigrateOrganizationBillingButton = observer(() => {
   const { ui } = useStore()
@@ -114,7 +115,7 @@ const MigrateOrganizationBillingButton = observer(() => {
       <Modal
         closable
         hideFooter
-        size="large"
+        size="xlarge"
         visible={isOpen}
         onCancel={toggle}
         header={
@@ -173,7 +174,7 @@ const MigrateOrganizationBillingButton = observer(() => {
 
               <p>
                 For a detailed breakdown of changes, see{' '}
-                <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
+                <Link href="https://www.notion.so/supabase/Org-Level-Billing-Public-Docs-f059a154beb743a19199d05bab4acb08">
                   <a target="_blank" rel="noreferrer" className="underline">
                     Billing Migration Docs
                   </a>
@@ -229,7 +230,7 @@ const MigrateOrganizationBillingButton = observer(() => {
                 <p className="text-sm text-scale-1000">
                   Paid plans come with one compute instance included. Additional projects will at
                   least cost the compute instance hours used (min $7/month). See{' '}
-                  <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
+                  <Link href="https://www.notion.so/supabase/Organization-Level-Billing-707638e35c92489995dc3ac991a324d1">
                     <a target="_blank" rel="noreferrer" className="underline">
                       Compute Instance Usage Billing
                     </a>
@@ -318,6 +319,75 @@ const MigrateOrganizationBillingButton = observer(() => {
               </Alert_Shadcn_>
             )}
           </Modal.Content>
+
+          {!migrationPreviewIsLoading && migrationPreviewData && dbTier !== 'tier_free' && (
+            <Modal.Content>
+              <InformationBox
+                defaultVisibility={false}
+                title={
+                  <span>
+                    Estimated monthly price is $
+                    {migrationPreviewData.monthly_invoice_breakdown.reduce(
+                      (prev, cur) => prev + cur.total_price,
+                      0
+                    )}{' '}
+                    + usage
+                  </span>
+                }
+                hideCollapse={false}
+                description={
+                  <div>
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="py-2 font-normal text-left text-sm text-scale-1000 w-1/2">
+                            Item
+                          </th>
+                          <th className="py-2 font-normal text-left text-sm text-scale-1000">
+                            Count
+                          </th>
+                          <th className="py-2 font-normal text-left text-sm text-scale-1000">
+                            Unit price
+                          </th>
+                          <th className="py-2 font-normal text-right text-sm text-scale-1000">
+                            Price
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {migrationPreviewData.monthly_invoice_breakdown.map((item) => (
+                          <tr key={item.description} className="border-b">
+                            <td className="py-2 text-sm">{item.description ?? 'Unknown'}</td>
+                            <td className="py-2 text-sm">{item.quantity}</td>
+                            <td className="py-2 text-sm">
+                              {item.unit_price === 0 ? 'FREE' : `$${item.unit_price}`}
+                            </td>
+                            <td className="py-2 text-sm text-right">${item.total_price}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+
+                      <tbody>
+                        <tr>
+                          <td className="py-2 text-sm">Total</td>
+                          <td className="py-2 text-sm" />
+                          <td className="py-2 text-sm" />
+                          <td className="py-2 text-sm text-right">
+                            $
+                            {migrationPreviewData.monthly_invoice_breakdown.reduce(
+                              (prev, cur) => prev + cur.total_price,
+                              0
+                            ) ?? 0}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                }
+              />
+            </Modal.Content>
+          )}
+
           <Modal.Content>
             <Button
               block
