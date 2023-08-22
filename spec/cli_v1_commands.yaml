@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.86.2
+  version: 1.88.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -354,7 +354,7 @@ commands:
       - id: exclude
         name: -x, --exclude <strings>
         description: |
-          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,inbucket,postgrest,pgadmin-schema-diff,migra,postgres-meta,studio,edge-runtime,logflare,vector]
+          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,inbucket,postgrest,pgadmin-schema-diff,migra,postgres-meta,studio,edge-runtime,logflare,vector,pgbouncer]
         default_value: '[]'
       - id: ignore-health-check
         name: --ignore-health-check
