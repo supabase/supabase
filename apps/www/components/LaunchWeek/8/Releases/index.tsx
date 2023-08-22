@@ -369,7 +369,7 @@ export default function LW8Releases() {
               </div>
             )}
           </div>
-          <div className="border-b border-[#111718] scroll-mt-16" id="today">
+          <div className="border-b border-[#111718] scroll-mt-16">
             <AccordionHeader
               date={day4.date}
               day={day4.d}
@@ -463,7 +463,7 @@ export default function LW8Releases() {
               </div>
             )}
           </div>
-          <div className="border-b border-[#111718] scroll-mt-16" id="today">
+          <div className="border-b border-[#111718] scroll-mt-16">
             <AccordionHeader
               date={day5.date}
               day={day5.d}
