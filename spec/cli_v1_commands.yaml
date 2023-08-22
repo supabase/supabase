@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.86.1
+  version: 1.86.2
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1191,7 +1191,7 @@ commands:
       To reset your migration history to a clean state, first delete your local migration file.
 
       ```bash
-      $ rm supabase/migrations/20230103054303_remote_schema.sql
+      $ rm supabase/migrations/20230103054303_remote_commit.sql
       $ supabase migration list
               LOCAL      │     REMOTE     │     TIME (UTC)
         ─────────────────┼────────────────┼──────────────────────
@@ -2568,7 +2568,7 @@ commands:
         response: |
           Connecting to local database...
           Creating shadow database...
-          Applying migration 20230425064254_remote_schema.sql...
+          Applying migration 20230425064254_remote_commit.sql...
           Diffing schemas: auth,extensions,public,storage
           Finished supabase db diff on branch main.
 
