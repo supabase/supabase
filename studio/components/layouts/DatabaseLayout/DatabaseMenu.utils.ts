@@ -5,12 +5,11 @@ import { IS_PLATFORM } from 'lib/constants'
 export const generateDatabaseMenu = (
   project?: Project,
   flags?: {
-    wrappersExtensionExists: boolean
     pgNetExtensionExists: boolean
   }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const { wrappersExtensionExists, pgNetExtensionExists } = flags || {}
+  const { pgNetExtensionExists } = flags || {}
 
   return [
     {
@@ -58,17 +57,13 @@ export const generateDatabaseMenu = (
               },
             ]
           : []),
-        ...(!!wrappersExtensionExists
-          ? [
-              {
-                name: 'Wrappers',
-                key: 'wrappers',
-                url: `/project/${ref}/database/wrappers`,
-                items: [],
-                label: 'ALPHA',
-              },
-            ]
-          : []),
+        {
+          name: 'Wrappers',
+          key: 'wrappers',
+          url: `/project/${ref}/database/wrappers`,
+          items: [],
+          label: 'ALPHA',
+        },
         ...(IS_PLATFORM
           ? [
               {

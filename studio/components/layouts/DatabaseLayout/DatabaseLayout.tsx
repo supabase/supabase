@@ -13,7 +13,7 @@ export interface DatabaseLayoutProps {
   title?: string
 }
 
-const DatabaseLayout = ({ title, children }: PropsWithChildren<DatabaseLayoutProps>) => {
+const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
   const { ui, meta, vault, backups } = useStore()
   const { isLoading: isSchemasLoading } = meta.schemas
   const { isLoading: isVaultLoading } = vault
@@ -26,7 +26,6 @@ const DatabaseLayout = ({ title, children }: PropsWithChildren<DatabaseLayoutPro
 
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
-  const wrappersExtensionExists = meta.extensions.byId('wrappers') !== undefined
   const pgNetExtensionExists = meta.extensions.byId('pg_net') !== undefined
 
   const isLoading = isSchemasLoading || (isVaultEnabled && isVaultLoading)
@@ -76,13 +75,7 @@ const DatabaseLayout = ({ title, children }: PropsWithChildren<DatabaseLayoutPro
       isLoading={!loaded}
       product="Database"
       productMenu={
-        <ProductMenu
-          page={page}
-          menu={generateDatabaseMenu(project, {
-            wrappersExtensionExists,
-            pgNetExtensionExists,
-          })}
-        />
+        <ProductMenu page={page} menu={generateDatabaseMenu(project, { pgNetExtensionExists })} />
       }
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
