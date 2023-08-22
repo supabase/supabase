@@ -82,13 +82,6 @@ function Blog(props: any) {
       router.replace(router, undefined, { shallow: true, scroll: false })
     }
 
-    const filteredd = props.blogs.filter((post: any) => {
-      const found = post.categories?.includes(category)
-      return found
-    })
-
-    console.log(filteredd)
-
     setBlogs(
       category === 'all'
         ? shiftedBlogs
