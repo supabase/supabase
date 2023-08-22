@@ -1,4 +1,6 @@
-import { AuthConfig } from '../Auth.types'
+import { components } from 'data/api'
+
+type AuthConfig = components['schemas']['GoTrueConfig']
 
 interface AuthConfigForm extends AuthConfig {
   ENABLE_SMTP: boolean
@@ -24,7 +26,7 @@ export const generateFormValues = (config?: Partial<AuthConfig>): Partial<AuthCo
     SMTP_USER: config?.SMTP_USER ?? '',
     SMTP_HOST: config?.SMTP_HOST ?? '',
     SMTP_PASS: config?.SMTP_PASS ?? '',
-    SMTP_PORT: config?.SMTP_PORT ?? 465,
+    SMTP_PORT: config?.SMTP_PORT ?? '465',
     SMTP_MAX_FREQUENCY: config?.SMTP_MAX_FREQUENCY ?? 60,
     RATE_LIMIT_EMAIL_SENT: config?.RATE_LIMIT_EMAIL_SENT ?? 30,
   }
