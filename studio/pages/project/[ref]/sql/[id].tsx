@@ -1,24 +1,22 @@
-import { useTheme } from 'common'
-import { useEffect, useRef } from 'react'
-import { observer } from 'mobx-react-lite'
 import { useMonaco } from '@monaco-editor/react'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useRef } from 'react'
 
-import { NextPageWithLayout } from 'types'
-import { useFormatQueryMutation } from 'data/sql/format-sql-query'
-import { useKeywordsQuery } from 'data/database/keywords-query'
 import { useFunctionsQuery } from 'data/database/functions-query'
+import { useKeywordsQuery } from 'data/database/keywords-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
+import { useFormatQueryMutation } from 'data/sql/format-sql-query'
+import { NextPageWithLayout } from 'types'
 
-import { SQLEditorLayout } from 'components/layouts'
 import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
+import { SQLEditorLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
 import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
 
 const SqlEditor: NextPageWithLayout = () => {
   const monaco = useMonaco()
-  const { isDarkMode } = useTheme()
   const { project } = useProjectContext()
 
   const { mutateAsync: formatQuery } = useFormatQueryMutation()
@@ -69,21 +67,6 @@ const SqlEditor: NextPageWithLayout = () => {
     pgInfoRef.current.keywords = keywords?.result
     pgInfoRef.current.functions = functions?.result
   }
-
-  useEffect(() => {
-    if (monaco) {
-      monaco.editor.defineTheme('supabase', {
-        base: isDarkMode ? 'vs-dark' : 'vs',
-        inherit: true,
-        rules: [
-          { token: '', background: isDarkMode ? '1f1f1f' : 'f0f0f0' },
-          { token: 'string.sql', foreground: '24b47e' },
-          { token: 'comment', foreground: '666666' },
-        ],
-        colors: { 'editor.background': isDarkMode ? '#1f1f1f' : '#f0f0f0' },
-      })
-    }
-  }, [monaco, isDarkMode])
 
   // Enable pgsql format
   useEffect(() => {

@@ -26,7 +26,7 @@ import {
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
 
-const NavigationBar = ({}) => {
+const NavigationBar = () => {
   const router = useRouter()
   const { isDarkMode, toggleTheme } = useTheme()
   const { ref: projectRef } = useParams()

@@ -17,15 +17,17 @@ import {
 
 import { useParams } from 'common/hooks'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
-import { getProjectDetail } from 'data/projects/project-detail-query'
+import { getProjectDetail, invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProjectContext } from '../ProjectContext'
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
+import { useQueryClient } from '@tanstack/react-query'
 
 const UpgradingState = () => {
   const { ref } = useParams()
   const { meta } = useStore()
+  const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const [loading, setLoading] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -55,9 +57,8 @@ const UpgradingState = () => {
     setLoading(true)
 
     const projectDetail = await getProjectDetail({ ref })
-    if (projectDetail) {
-      meta.setProjectDetails(projectDetail)
-    }
+    if (projectDetail) meta.setProjectDetails(projectDetail)
+    if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
   }
 
   const subject = 'Upgrade%20failed%20for%20project'

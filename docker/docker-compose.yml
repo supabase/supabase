@@ -275,7 +275,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.66.3
+    image: supabase/postgres-meta:v0.68.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
