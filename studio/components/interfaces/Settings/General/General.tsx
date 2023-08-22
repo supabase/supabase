@@ -125,7 +125,7 @@ const General = () => {
                     </p>
                   </div>
                 </div>
-                {project && <RestartServerButton />}
+                <RestartServerButton />
               </div>
               <div className="flex w-full items-center justify-between px-8 py-4">
                 <div>
@@ -136,7 +136,7 @@ const General = () => {
                     </p>
                   </div>
                 </div>
-                {project && <PauseProjectButton />}
+                <PauseProjectButton />
               </div>
             </FormPanel>
           </div>

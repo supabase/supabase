@@ -243,18 +243,20 @@ const ColumnEditor = ({
           <FormSectionLabel
             className="lg:!col-span-4"
             description={
-              <Link href="https://supabase.com/docs/guides/database/tables#data-types" passHref>
-                <Button
-                  asChild
-                  type="default"
-                  size="tiny"
-                  icon={<IconExternalLink size={14} strokeWidth={2} />}
-                >
-                  <a target="_blank" rel="noreferrer">
-                    About data types
-                  </a>
-                </Button>
-              </Link>
+              <div>
+                <Link href="https://supabase.com/docs/guides/database/tables#data-types" passHref>
+                  <Button
+                    asChild
+                    type="default"
+                    size="tiny"
+                    icon={<IconExternalLink size={14} strokeWidth={2} />}
+                  >
+                    <a target="_blank" rel="noreferrer">
+                      About data types
+                    </a>
+                  </Button>
+                </Link>
+              </div>
             }
           >
             Data Type
