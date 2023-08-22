@@ -10,11 +10,10 @@ import { generateRss } from '~/lib/rss'
 import { getSortedPosts, getAllCategories } from '~/lib/posts'
 import authors from 'lib/authors.json'
 
-import DefaultLayout from '~/components/Layouts/Default'
-import { Tabs } from 'ui'
 import PostTypes from '~/types/post'
+import DefaultLayout from '~/components/Layouts/Default'
 import BlogListItem from '~/components/Blog/BlogListItem'
-import { useParams } from '~/hooks/useParams'
+import BlogFilters from '~/components/Blog/BlogFilters'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts({ directory: '_blog', runner: '** BLOG PAGE **' })
@@ -38,25 +37,39 @@ export async function getStaticProps() {
     }
   })
 
-  // Append 'all' category here
-  categories.unshift('all')
-
   return {
     props: {
       blogs: allPostsData,
-      categories,
     },
   }
 }
 
 function Blog(props: any) {
-  const tag = useParams()?.tag
-  const [category, setCategory] = useState('all')
   const [blogs, setBlogs] = useState(props.blogs)
+  const [category, setCategory] = useState<string>('all')
 
+  // Using hard-coded categories here because
+  // - they serve as a reference
+  // - are easier to reorder
+  const allCategories = [
+    'all',
+    'product',
+    'company',
+    'postgres',
+    'developers',
+    'engineering',
+    'launch-week',
+  ]
   const router = useRouter()
 
+  const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
+  const meta_description = 'Get all your Supabase News on the Supabase blog.'
+
   useEffect(() => {
+    handlePosts()
+  }, [category])
+
+  const handlePosts = () => {
     // construct an array of blog posts
     // not inluding the first blog post
     const shiftedBlogs = [...props.blogs]
@@ -65,28 +78,26 @@ function Blog(props: any) {
     if (category === 'all') {
       router.replace('/blog', undefined, { shallow: true, scroll: false })
     } else {
-      router.query.tag = category
+      router.query.category = category
       router.replace(router, undefined, { shallow: true, scroll: false })
     }
+
+    const filteredd = props.blogs.filter((post: any) => {
+      const found = post.categories?.includes(category)
+      return found
+    })
+
+    console.log(filteredd)
 
     setBlogs(
       category === 'all'
         ? shiftedBlogs
         : props.blogs.filter((post: any) => {
-            const found = post.tags?.includes(category)
+            const found = post.categories?.includes(category)
             return found
           })
     )
-  }, [category])
-
-  useEffect(() => {
-    if (router.isReady && tag && tag !== 'all') {
-      setCategory(tag)
-    }
-  }, [tag, router.isReady])
-
-  const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
-  const meta_description = 'Get all your Supabase News on the Supabase blog.'
+  }
 
   return (
     <>
@@ -125,35 +136,29 @@ function Blog(props: any) {
 
         <div className="border-scale-600 border-t">
           <div className="container mx-auto mt-16 px-8 sm:px-16 xl:px-20">
-            <div className="mx-auto ">
-              <div className="grid grid-cols-12">
-                <div className="col-span-12 lg:col-span-12">
-                  <Tabs
-                    scrollable
-                    size="medium"
-                    onChange={setCategory}
-                    defaultActiveId={'all'}
-                    activeId={category}
-                  >
-                    {props.categories.map((tag: string) => (
-                      <Tabs.Panel id={tag} key={tag} label={tag} />
-                    ))}
-                  </Tabs>
-                </div>
-              </div>
-            </div>
+            <BlogFilters
+              posts={blogs}
+              setPosts={setBlogs}
+              setCategory={setCategory}
+              allCategories={allCategories}
+              handlePosts={handlePosts}
+            />
 
             <ol className="grid grid-cols-12 py-16 lg:gap-16">
-              {blogs.map((blog: PostTypes, idx: number) => (
-                <div
-                  className="col-span-12 mb-16 md:col-span-12 lg:col-span-6 xl:col-span-4"
-                  key={idx}
-                >
-                  <BlogListItem post={blog} />
-                </div>
-              ))}
+              {blogs?.length ? (
+                blogs?.map((blog: PostTypes, idx: number) => (
+                  <div
+                    className="col-span-12 mb-16 md:col-span-12 lg:col-span-6 xl:col-span-4"
+                    key={idx}
+                  >
+                    <BlogListItem post={blog} />
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-scale-800 col-span-full">No results</p>
+              )}
             </ol>
-          </div>{' '}
+          </div>
         </div>
       </DefaultLayout>
     </>

@@ -15,6 +15,7 @@ type GetSortedPostsParams = {
   tags?: string[]
   runner?: unknown
   currentPostSlug?: string
+  categories?: any
 }
 
 export const getSortedPosts = ({
@@ -160,13 +161,25 @@ export const getAllCategories = (directory: Directories) => {
   let categories: any = []
 
   posts.map((post: any) => {
-    // add tags into categories array
-    post.tags?.map((tag: string) => {
+    post.categories?.map((tag: string) => {
       if (!categories.includes(tag)) return categories.push(tag)
     })
   })
 
   return categories
+}
+
+export const getAllTags = (directory: Directories) => {
+  const posts = getSortedPosts({ directory })
+  let tags: any = []
+
+  posts.map((post: any) => {
+    post.tags?.map((tag: string) => {
+      if (!tags.includes(tag)) return tags.push(tag)
+    })
+  })
+
+  return tags
 }
 
 const getDatesFromFileName = (filename: string) => {

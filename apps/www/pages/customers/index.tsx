@@ -6,7 +6,7 @@ import Head from 'next/head'
 
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
-import { getSortedPosts, getAllCategories } from '~/lib/posts'
+import { getSortedPosts, getAllTags, getAllCategories } from '~/lib/posts'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import PostTypes from '~/types/post'
@@ -18,6 +18,7 @@ import { GlassPanel } from 'ui'
 export async function getStaticProps() {
   const allPostsData = getSortedPosts({ directory: '_customers' })
   const categories = getAllCategories('_customers')
+  const tags = getAllTags('_customers')
   const rss = generateRss(allPostsData)
 
   // create a rss feed in public directory
@@ -27,13 +28,13 @@ export async function getStaticProps() {
   return {
     props: {
       blogs: allPostsData,
-      categories,
+      tags,
     },
   }
 }
 
 function CustomerStoriesPage(props: any) {
-  const [category, setCategory] = useState('all')
+  const [tag, setTag] = useState('all')
   const [blogs, setBlogs] = useState(props.blogs)
   const { basePath } = useRouter()
 
@@ -47,14 +48,14 @@ function CustomerStoriesPage(props: any) {
   useEffect(() => {
     // Update the document title using the browser API
     setBlogs(
-      category === 'all'
+      tag === 'all'
         ? props.blogs
         : props.blogs.filter((post: any) => {
-            const found = post.tags?.includes(category)
+            const found = post.tags?.includes(tag)
             return found
           })
     )
-  }, [category])
+  }, [tag])
 
   const caseStudyThumbs = blogs.map((blog: PostTypes, idx: number) => {
     return {
