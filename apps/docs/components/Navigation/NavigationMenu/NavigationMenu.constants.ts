@@ -559,8 +559,8 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         { name: 'Managing Postgres Roles', url: '/guides/database/postgres/roles' },
-        { name: 'Column encryption', url: '/guides/database/column-encryption' },
         { name: 'Managing secrets with Vault', url: '/guides/database/vault' },
+        { name: 'Column encryption', url: '/guides/database/column-encryption' },
       ],
     },
     {
