@@ -6,41 +6,57 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button, Dropdown, IconChevronDown } from 'ui'
 
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
-import { setProjectPostgrestStatus } from 'data/projects/projects-query'
-import { useCheckPermissions, useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import {
   useIsProjectActive,
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import { useProjectRestartMutation } from 'data/projects/project-restart-mutation'
+import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
+import { setProjectPostgrestStatus } from 'data/projects/projects-query'
+import { useCheckPermissions, useStore } from 'hooks'
 
 const RestartServerButton = () => {
-  const queryClient = useQueryClient()
-  const { project } = useProjectContext()
   const { ui } = useStore()
   const router = useRouter()
+  const queryClient = useQueryClient()
+  const { project } = useProjectContext()
   const isProjectActive = useIsProjectActive()
-  const [loading, setLoading] = useState(false)
   const [serviceToRestart, setServiceToRestart] = useState<'project' | 'database'>()
 
   const projectRef = project?.ref ?? ''
-  const projectRegion = project?.region
+  const projectRegion = project?.region ?? ''
 
   const canRestartProject = useCheckPermissions(PermissionAction.INFRA_EXECUTE, 'reboot')
 
-  const requestProjectRestart = async () => {
+  const { mutate: restartProject, isLoading: isRestartingProject } = useProjectRestartMutation({
+    onSuccess: () => {
+      onRestartSuccess()
+    },
+    onError: (error) => {
+      onRestartFailed(error, 'project')
+    },
+  })
+  const { mutate: restartProjectServices, isLoading: isRestartingServices } =
+    useProjectRestartServicesMutation({
+      onSuccess: () => {
+        onRestartSuccess()
+      },
+      onError: (error) => {
+        onRestartFailed(error, 'database')
+      },
+    })
+
+  const isLoading = isRestartingProject || isRestartingServices
+
+  const requestProjectRestart = () => {
     if (!canRestartProject) {
       return ui.setNotification({
         category: 'error',
         message: 'You do not have the required permissions to restart this project',
       })
     }
-    setLoading(true)
-    const res = await post(`${API_URL}/projects/${projectRef}/restart`, {})
-    if (res.error) onRestartFailed(res.error, 'project')
-    else onRestartSuccess()
+    restartProject({ ref: projectRef })
   }
 
   const requestDatabaseRestart = async () => {
@@ -50,15 +66,7 @@ const RestartServerButton = () => {
         message: 'You do not have the required permissions to restart this project',
       })
     }
-    setLoading(true)
-    const res = await post(`${API_URL}/projects/${projectRef}/restart-services`, {
-      restartRequest: {
-        region: projectRegion,
-        services: ['postgresql'],
-      },
-    })
-    if (res.error) onRestartFailed(res.error, 'database')
-    else onRestartSuccess()
+    restartProjectServices({ ref: projectRef, region: projectRegion, services: ['postgresql'] })
   }
 
   const onRestartFailed = (error: any, type: string) => {
@@ -67,15 +75,13 @@ const RestartServerButton = () => {
       category: 'error',
       message: `Unable to restart ${type}: ${error.message}`,
     })
-    setLoading(false)
     setServiceToRestart(undefined)
   }
 
   const onRestartSuccess = () => {
     setProjectPostgrestStatus(queryClient, projectRef, 'OFFLINE')
-    ui.setNotification({ category: 'success', message: 'Restarting server' })
+    ui.setNotification({ category: 'success', message: 'Restarting server...' })
     router.push(`/project/${projectRef}`)
-    setLoading(false)
     setServiceToRestart(undefined)
   }
 
@@ -87,7 +93,7 @@ const RestartServerButton = () => {
             <Button
               type="default"
               className={`px-3 ${canRestartProject && isProjectActive ? 'rounded-r-none' : ''}`}
-              disabled={!canRestartProject || !isProjectActive}
+              disabled={project === undefined || !canRestartProject || !isProjectActive}
               onClick={() => setServiceToRestart('project')}
             >
               Restart project
@@ -99,7 +105,7 @@ const RestartServerButton = () => {
                 overlay={[
                   <Dropdown.Item
                     key="database"
-                    disabled={loading}
+                    disabled={isLoading}
                     onClick={() => {
                       setServiceToRestart('database')
                     }}
@@ -124,7 +130,7 @@ const RestartServerButton = () => {
             )}
           </div>
         </Tooltip.Trigger>
-        {(!canRestartProject || !isProjectActive) && (
+        {project !== undefined && (!canRestartProject || !isProjectActive) && (
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />

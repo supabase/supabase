@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
@@ -16,17 +17,17 @@ import {
   Listbox,
 } from 'ui'
 
-import { useParams } from 'common'
 import Divider from 'components/ui/Divider'
 import InformationBox from 'components/ui/InformationBox'
 import MultiSelect from 'components/ui/MultiSelect'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useFlag, useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
-import { get, isResponseOk, post } from 'lib/common/fetch'
+import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -48,6 +49,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
   const uploadButtonRef = useRef()
   const enableFreeSupport = useFlag('enableFreeSupport')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [uploadedDataUrls, setUploadedDataUrls] = useState<string[]>([])
   const [selectedServices, setSelectedServices] = useState<string[]>([])
@@ -68,6 +70,21 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     isSuccess: isSuccessProjects,
   } = useProjectsQuery()
 
+  const { mutate: submitSupportTicket } = useSendSupportTicketMutation({
+    onSuccess: (res, variables) => {
+      ui.setNotification({ category: 'success', message: 'Support request sent. Thank you!' })
+      setSentCategory(variables.category)
+    },
+    onError: (error) => {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to submit support ticket: ${error.message}`,
+      })
+      setIsSubmitting(false)
+    },
+  })
+
   const projectDefaults: Partial<Project>[] = [{ ref: 'no-project', name: 'No specific project' }]
 
   const projects = [...(allProjects ?? []), ...projectDefaults]
@@ -76,12 +93,14 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     if (option.value.toLowerCase() === ((category as string) ?? '').toLowerCase()) return option
   })
 
-  const selectedProjectRef =
+  const [selectedProjectRef, setSelectedProjectRef] = useState(
     selectedProjectFromUrl !== undefined
       ? selectedProjectFromUrl.ref
       : projects.length > 0
       ? projects[0].ref
       : 'no-project'
+  )
+
   const selectedOrganizationSlug =
     selectedProjectRef !== 'no-project'
       ? organizations?.find((org) => {
@@ -158,8 +177,8 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     return errors
   }
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
-    setSubmitting(true)
+  const onSubmit = async (values: any) => {
+    setIsSubmitting(true)
     const attachments =
       uploadedFiles.length > 0 ? await uploadAttachments(values.projectRef, uploadedFiles) : []
     const selectedLibrary = CLIENT_LIBRARIES.find((library) => library.language === values.library)
@@ -181,6 +200,8 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
     if (values.projectRef !== 'no-project') {
       const URL = `${API_URL}/auth/${values.projectRef}/config`
+      // [Joshen] Will refactor another time once
+      // https://github.com/supabase/supabase/pull/16227 goes in
       const authConfig = await get(URL)
       if (!authConfig.error) {
         payload.siteUrl = authConfig.SITE_URL
@@ -188,22 +209,12 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
       }
     }
 
-    const response = await post<void>(`${API_URL}/feedback/send`, payload)
-    if (!isResponseOk(response)) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to submit support ticket: ${response.error.message}`,
-      })
-      setSubmitting(false)
-    } else {
-      ui.setNotification({ category: 'success', message: 'Support request sent. Thank you!' })
-      setSentCategory(values.category)
-    }
+    submitSupportTicket(payload)
   }
 
   return (
     <Form id="support-form" initialValues={initialValues} validate={onValidate} onSubmit={onSubmit}>
-      {({ isSubmitting, resetForm, values }: any) => {
+      {({ resetForm, values }: any) => {
         const selectedCategory = CATEGORY_OPTIONS.find(
           (category) => category.value === values.category
         )
@@ -304,7 +315,14 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                   </div>
                 )}
                 {isSuccessProjects && (
-                  <Listbox id="projectRef" layout="vertical" label="Which project is affected?">
+                  <Listbox
+                    id="projectRef"
+                    layout="vertical"
+                    label="Which project is affected?"
+                    onChange={(val) => {
+                      setSelectedProjectRef(val)
+                    }}
+                  >
                     {projects.map((option) => {
                       const organization = organizations?.find(
                         (x) => x.id === option.organization_id
@@ -344,7 +362,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                   This project is on the{' '}
                   <span className="text-scale-1100">{subscription.plan.name} plan</span>
                 </p>
-              ) : isLoadingSubscription ? (
+              ) : isLoadingSubscription && selectedProjectRef !== 'no-project' ? (
                 <div className="flex items-center space-x-2 mt-2">
                   <IconLoader size={14} className="animate-spin" />
                   <p className="text-sm text-scale-1000">Checking project's plan</p>
@@ -656,7 +674,9 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         <p className="text-scale-1200 font-medium">{respondToEmail}</p>
                       </div>
                       <div className="flex items-center space-x-1 justify-end block text-sm mt-0 mb-2">
-                        <p className="text-scale-1000">Please ensure you haven't blocked Hubspot in your emails</p>
+                        <p className="text-scale-1000">
+                          Please ensure you haven't blocked Hubspot in your emails
+                        </p>
                       </div>
                       <div className="flex justify-end">
                         <Button

@@ -21,6 +21,7 @@ import {
   ScaffoldActionsContainer,
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
+import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 
 const TeamSettings = () => {
   const { ui } = useStore()
@@ -49,6 +50,8 @@ const TeamSettings = () => {
   const canAddMembers = rolesAddable.length > 0
   const canLeave = !isOwner || (isOwner && hasMultipleOwners(members, roles))
 
+  const { mutateAsync: deleteMember } = useOrganizationMemberDeleteMutation()
+
   const leaveTeam = async () => {
     setIsLeaving(true)
     try {
@@ -56,13 +59,11 @@ const TeamSettings = () => {
         title: 'Are you sure?',
         message: 'Are you sure you want to leave this organization? This is permanent.',
         onAsyncConfirm: async () => {
-          const response = await delete_<void>(
-            `${API_URL}/organizations/${slug}/members/${profile!.gotrue_id}`
-          )
-          if (!isResponseOk(response)) {
-            throw response.error
-          } else {
+          try {
+            if (!slug) return console.error('Org slug is required')
+            await deleteMember({ slug, gotrueId: profile!.gotrue_id })
             window?.location.replace('/') // Force reload to clear Store
+          } finally {
           }
         },
       })

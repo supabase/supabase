@@ -10,11 +10,12 @@ import { isResponseOk, patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Form, Input } from 'ui'
 import { Organization } from 'types'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 
 const BillingEmail = () => {
-  const queryClient = useQueryClient()
   const { ui } = useStore()
   const { slug } = useParams()
+  const queryClient = useQueryClient()
   const selectedOrganization = useSelectedOrganization()
   const { name, billing_email } = selectedOrganization ?? {}
 
@@ -66,52 +67,56 @@ const BillingEmail = () => {
       <p className="text-sm opacity-50">All billing correspondence will go to this email</p>
 
       <div className="mt-3">
-        <Form id={formId} initialValues={initialValues} onSubmit={onUpdateOrganization}>
-          {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
-            const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
+        {selectedOrganization === undefined ? (
+          <GenericSkeletonLoader />
+        ) : (
+          <Form id={formId} initialValues={initialValues} onSubmit={onUpdateOrganization}>
+            {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
+              const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
-            // [Alaister] although this "technically" is breaking the rules of React hooks
-            // it won't error because the hooks are always rendered in the same order
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            useEffect(() => {
-              const values = { billing_email: billing_email ?? '' }
-              resetForm({ values, initialValues: values })
-              // eslint-disable-next-line react-hooks/exhaustive-deps
-            }, [slug])
+              // [Alaister] although this "technically" is breaking the rules of React hooks
+              // it won't error because the hooks are always rendered in the same order
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              useEffect(() => {
+                const values = { billing_email: billing_email ?? '' }
+                resetForm({ values, initialValues: values })
+                // eslint-disable-next-line react-hooks/exhaustive-deps
+              }, [slug])
 
-            return (
-              <FormPanel
-                footer={
-                  <div className="flex py-4 px-8">
-                    <FormActions
-                      form={formId}
-                      isSubmitting={isSubmitting}
-                      hasChanges={hasChanges}
-                      handleReset={handleReset}
-                      helper={
-                        !canUpdateOrganization
-                          ? "You need additional permissions to manage this organization's settings"
-                          : undefined
-                      }
-                    />
-                  </div>
-                }
-              >
-                <FormSection className="-mx-2">
-                  <FormSectionContent loading={false}>
-                    <Input
-                      id="billing_email"
-                      size="small"
-                      label="Email address"
-                      type={canReadBillingEmail ? 'text' : 'password'}
-                      disabled={!canUpdateOrganization}
-                    />
-                  </FormSectionContent>
-                </FormSection>
-              </FormPanel>
-            )
-          }}
-        </Form>
+              return (
+                <FormPanel
+                  footer={
+                    <div className="flex py-4 px-8">
+                      <FormActions
+                        form={formId}
+                        isSubmitting={isSubmitting}
+                        hasChanges={hasChanges}
+                        handleReset={handleReset}
+                        helper={
+                          !canUpdateOrganization
+                            ? "You need additional permissions to manage this organization's settings"
+                            : undefined
+                        }
+                      />
+                    </div>
+                  }
+                >
+                  <FormSection className="-mx-2">
+                    <FormSectionContent loading={false}>
+                      <Input
+                        id="billing_email"
+                        size="small"
+                        label="Email address"
+                        type={canReadBillingEmail ? 'text' : 'password'}
+                        disabled={!canUpdateOrganization}
+                      />
+                    </FormSectionContent>
+                  </FormSection>
+                </FormPanel>
+              )
+            }}
+          </Form>
+        )}
       </div>
     </div>
   )

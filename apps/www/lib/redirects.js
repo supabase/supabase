@@ -1170,37 +1170,47 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-list',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-branches-list',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-create',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-branches-create',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-delete',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-branches-delete',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-switch',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-branches-create',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-changes',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-db-diff',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-commit',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-db-pull',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-remote-set',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-link',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/cli/supabase-db-remote-changes',
+    destination: '/docs/reference/supabase-db-diff',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/cli/supabase-db-remote-commit',
+    destination: '/docs/reference/supabase-db-pull',
   },
 
   {
@@ -1846,6 +1856,11 @@ module.exports = [
     permanent: true,
     source: '/docs/handbook/supasquad',
     destination: '/supasquad',
+  },
+  {
+    permanent: true,
+    source: '/supasquad',
+    destination: '/open-source/contributing/supasquad',
   },
   {
     permanent: true,
