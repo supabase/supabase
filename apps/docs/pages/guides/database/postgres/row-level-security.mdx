@@ -1,0 +1,127 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  id: 'row-level-security',
+  title: 'Row Level Security',
+  description: 'Secure your data using Postgres Row Level Security.',
+  subtitle: 'Secure your data using Postgres Row Level Security.',
+}
+
+When you need granular authorization rules, nothing beats Postgres's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html).
+
+## Row Level Security in Supabase
+
+RLS is incredibly powerful and flexible, allowing you to write complex SQL rules that fit your unique business needs. RLS can be [combined with Supabase Auth](/docs/guides/auth/row-level-security) for end-to-end user security from the browser to the database.
+
+Alternatively, RLS can provide "[defence in depth](<https://en.wikipedia.org/wiki/Defense_in_depth_(computing)>)" to protect your data from malicious actors if you're using your own tooling with the Postgres database we provide.
+
+## Policies
+
+[Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) are Postgres's rule engine. Policies are easy to understand once you get the hang of them. Each policy is attached to a table, and the policy is executed every time a table is accessed.
+
+You can just think of them as adding a `WHERE` clause to every query. For example a policy like this ...
+
+```sql
+create policy "Individuals can view their own todos."
+on todos for select
+using ( auth.uid() = user_id );
+```
+
+.. would translate to this whenever a user tries to select from the todos table:
+
+```sql
+select *
+from todos
+where auth.uid() = todos.user_id;
+-- Policy is implicitly added.
+```
+
+## Enabling Row Level Security
+
+You can enable RLS for any table using the `enable row level security` command:
+
+```sql
+alter table "table_name" enable row level security;
+```
+
+Once you have enabled RLS, no data will be accessible until you create policies.
+
+## Creating Policies
+
+Policies are simply SQL logic that you attach to a Postgres table. You can attach as many policies as you want to each table.
+
+Supabase provides some [helpers](/docs/guides/auth/row-level-security#helper-functions) that simplify RLS if you're using Supabase Auth. We'll use these helpers to illustrate some basic Policies:
+
+### SELECT Policies
+
+You can specify select policies with the `using` command.
+
+Let's say you have a table called `profiles` in the public schema and you want enable read access to everyone.
+
+```sql
+-- 1. Create table
+create table profiles (
+  id uuid primary key,
+  user_id references auth.users,
+  avatar_url text
+);
+
+-- 2. Enable RLS
+alter table profiles enable row level security;
+
+-- 3. Create Policy
+create policy "Public profiles are visible to everyone."
+on profiles for select
+to anon         -- the Postgres Role (recommended)
+using ( true ); -- the actual Policy
+```
+
+Alternatively if you only wanted users to be able to see their own profiles:
+
+```sql
+create policy "Profiles are viewable by everyone."
+on profiles
+for select using ( auth.uid() = user_id );
+```
+
+### INSERT Policies
+
+You can specify select policies with the `with check` command.
+
+Let's say you have a table called `profiles` in the public schema and you only want users to be able to create a profile for themselves. In that case, we want to check their User ID matches the value that they are trying to insert:
+
+```sql
+-- 1. Create table
+create table profiles (
+  id uuid primary key,
+  user_id references auth.users,
+  avatar_url text
+);
+
+-- 2. Enable RLS
+alter table profiles enable row level security;
+
+-- 3. Create Policy
+create policy "Users can create a profile."
+on profiles for insert
+to authenticated                    -- the Postgres Role (recommended)
+using ( auth.id() = user_id );      -- the actual Policy
+```
+
+## Bypassing Row Level Security
+
+You can create [Postgres Roles](/docs/guides/database/postgres/roles) which can bypass Row Level Security using the "bypass RLS" privelege:
+
+```sql
+grant bypassrls on "table_name" to "role_name";
+```
+
+This can be useful for system-level access. You should _never_ share login credentials for any Postgres Role with this privelege.
+
+## RLS Performance
+
+TBD
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

@@ -3,8 +3,9 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'row-level-security',
   title: 'Row Level Security',
-  description: 'Secure your data using Postgres Row Level Security.',
-  video: 'https://www.youtube.com/v/Ow_Uzedfohk',
+  description: 'Using Row Level Security with Supabase Auth.',
+  subtitle: 'Using Row Level Security with Supabase Auth.',
+  tocVideo: 'Ow_Uzedfohk',
 }
 
 When you need granular authorization rules, nothing beats PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html).
@@ -54,30 +55,6 @@ Returns the JWT of the user making the request.
 ## Examples
 
 Here are some examples to show you the power of PostgreSQL's RLS.
-
-### Allow read access
-
-```sql
--- 1. Create table
-create table profiles (
-  id uuid references auth.users,
-  avatar_url text
-);
-
--- 2. Enable RLS
-alter table profiles
-  enable row level security;
-
--- 3. Create Policy
-create policy "Public profiles are viewable by everyone."
-  on profiles for select using (
-    true
-  );
-```
-
-1. Creates a table called `profiles` in the public schema (default schema).
-2. Enables Row Level Security.
-3. Creates a policy which allows all `select` queries to run.
 
 ### Restrict updates
 
@@ -210,31 +187,6 @@ create policy "Only Blizzard staff can update leaderboard"
   );
 ```
 
-### Time to live for rows
-
-Policies can also be used to implement TTL or time to live feature that you see in Instagram stories or Snapchat.
-In the following example, rows of `stories` table are available only if they have been created within the last 24 hours.
-
-```sql
--- 1. Create table
-create table if not exists stories (
-  id uuid not null primary key DEFAULT uuid_generate_v4(),
-  created_at timestamp with time zone default timezone('utc' :: text, now()) not null,
-  content text not null
-);
-
--- 2. Enable RLS
-alter table stories
-  enable row level security;
-
--- 3. Create Policy
-create policy "Stories are live for a day"
-  on stories
-  for select using (
-    created_at > (current_timestamp - interval '1 day')
-  );
-```
-
 ### Advanced policies
 
 Use the full power of SQL to build extremely advanced rules.
@@ -285,17 +237,20 @@ using (
 );
 ```
 
-## Tips
+## Using external authorization systems
 
-### You don't have to use policies
+If you want to use another authorization method for your applications that's also fine. Supabase is "just Postgres", so if your application works with Postgres, then it also works with Supabase. If you take this path, don't put your tables in the `public` schema - instead create a new schema for your tables and functions:
 
-You can also put your authorization rules in your middleware, similar to how you would create security rules with any other `backend <-> middleware <-> frontend` architecture. You can use Edge Functions to run this architecture, or you can use your favorite server framework, like Rails, Django, Node.js, Phoenix, or Laravel.
+```sql 
+create schema private;
 
-Policies are a tool. In the case of "serverless/Jamstack" setups, they are especially effective because you don't have to deploy any middleware at all and can use the javascript libraries directly from the browser.
+create table private.employees (
+  id serial primary key,
+  name text
+);
+```
 
-That said, if you want to use another authorization method for your applications that's also fine. Supabase is "just Postgres", so if your application works with Postgres, then it also works with Supabase.
-
-If you plan to use this approach make sure to enable RLS for your tables. Then use the `service_role` key (for our client libraries) or the `postgres` role - both of these can bypass RLS. You don't need to create any policies with this approach, simply enabling RLS is sufficient:
+If you do put anything in the `public` schema, make sure to enable RLS (you don't need to add any policies):
 
 ```sql
 create table profiles (
@@ -305,6 +260,9 @@ create table profiles (
 
 alter table profiles enable row level security;
 ```
+
+This makes the tables inaccessible via the [Serverless APIs](/docs/guides/api).
+
 
 ### Never use a service key on the client
 
