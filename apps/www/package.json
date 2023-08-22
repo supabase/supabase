@@ -21,7 +21,7 @@
     "@next/mdx": "^12.3.2",
     "@react-three/fiber": "^7.0.29",
     "@supabase/auth-ui-react": "^0.1.6",
-    "@supabase/supabase-js": "^2.23.0",
+    "@supabase/supabase-js": "^2.33.0",
     "classnames": "^2.3.1",
     "cobe": "^0.6.2",
     "common": "*",

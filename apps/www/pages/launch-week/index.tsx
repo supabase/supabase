@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
+import { navigatorLock } from '@supabase/gotrue-js'
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
 
 import DefaultLayout from '~/components/Layouts/Default'
@@ -73,7 +74,13 @@ export default function TicketHome({ users, meetups }: Props) {
       setSupabase(
         createClient(
           process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          {
+            auth: {
+              debug: globalThis?.localStorage?.getItem('supabase.dashboard.auth.debug') === 'true',
+              lock: globalThis?.localStorage?.getItem('supabase.dashboard.auth.navigatorLock.enabled') === 'true' && globalThis?.navigator?.locks ? navigatorLock: undefined,
+            }
+          }
         )
       )
     }
