@@ -6,29 +6,22 @@ import { Button, IconExternalLink } from 'ui'
 
 import { Project } from 'types'
 
-// [Joshen TODO] Remove all things about "ownerReassignStatus" after 5th November
-// double check with Qiao before we remove them.
-
 interface NotificationActionsProps {
   project: Project
   changelogLink?: string
-  ownerReassignStatus?: any
   availableActions: Action[]
   onSelectRestartProject: () => void
   onSelectApplyMigration: () => void
   onSelectRollbackMigration: () => void
-  onSelectFinalizeMigration: () => void
 }
 
 const NotificationActions = ({
   project,
   changelogLink,
-  ownerReassignStatus,
   availableActions,
   onSelectRestartProject,
   onSelectApplyMigration,
   onSelectRollbackMigration,
-  onSelectFinalizeMigration,
 }: NotificationActionsProps) => {
   const router = useRouter()
 
@@ -53,29 +46,17 @@ const NotificationActions = ({
           </Button>
         )
       case ActionType.MigratePostgresSchema:
-        if (action.reason === ActionReason.Finalize) {
+        if (action.reason === ActionReason.Rollback) {
           return (
-            ownerReassignStatus?.desired !== 'migrated' && (
-              <Button type="default" onClick={onSelectFinalizeMigration}>
-                Finalize
-              </Button>
-            )
-          )
-        } else if (action.reason === ActionReason.Rollback) {
-          return (
-            ownerReassignStatus?.desired === 'temp_role' && (
-              <Button type="default" onClick={onSelectRollbackMigration}>
-                Rollback
-              </Button>
-            )
+            <Button type="default" onClick={onSelectRollbackMigration}>
+              Rollback
+            </Button>
           )
         } else {
           return (
-            ownerReassignStatus?.desired === 'unmigrated' && (
-              <Button type="default" onClick={onSelectApplyMigration}>
-                Apply now
-              </Button>
-            )
+            <Button type="default" onClick={onSelectApplyMigration}>
+              Apply now
+            </Button>
           )
         }
     }

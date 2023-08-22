@@ -5,10 +5,12 @@ import { useRef } from 'react'
 import { timeout } from 'lib/helpers'
 import Connecting from '../Loading'
 import { alignEditor } from './CodeEditor.utils'
+import { cn } from 'ui'
 
 interface CodeEditorProps {
   id: string
   language: 'pgsql' | 'json' | 'html'
+  autofocus?: boolean
   defaultValue?: string
   isReadOnly?: boolean
   onInputChange?: (value?: string) => void
@@ -24,6 +26,7 @@ const CodeEditor = ({
   id,
   language,
   defaultValue,
+  autofocus = true,
   isReadOnly = false,
   hideLineNumbers = false,
   onInputChange = noop,
@@ -36,7 +39,9 @@ const CodeEditor = ({
   const editorRef = useRef()
 
   const onMount = async (editor: any, monaco: any) => {
+    editorRef.current = editor
     alignEditor(editor)
+
     editor.addAction({
       id: 'supabase',
       label: 'Run Query',
@@ -52,8 +57,7 @@ const CodeEditor = ({
     })
 
     await timeout(500)
-    editor?.focus()
-    editorRef.current = editor
+    if (autofocus) editor?.focus()
   }
 
   const optionsMerged = merge(
@@ -77,10 +81,10 @@ const CodeEditor = ({
 
   return (
     <Editor
-      value={value ?? undefined}
       path={id}
       theme="supabase"
-      className={`monaco-editor ${className}`}
+      className={cn(className, 'monaco-editor')}
+      value={value ?? undefined}
       defaultLanguage={language}
       defaultValue={defaultValue ?? undefined}
       loading={loading || <Connecting />}

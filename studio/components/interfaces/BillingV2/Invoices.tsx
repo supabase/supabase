@@ -1,92 +1,57 @@
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText, Loading } from 'ui'
+import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText } from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { getInvoice } from 'data/invoices/invoice-query'
+import { useProjectInvoicesCountQuery } from 'data/invoices/project-invoices-count-query'
+import { useProjectInvoicesQuery } from 'data/invoices/project-invoices-query'
 import { useStore } from 'hooks'
-import { get, head } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import InvoiceStatusBadge from './InvoiceStatusBadge'
-import { Invoice, InvoiceStatus } from './Invoices.types'
+import { InvoiceStatus } from './Invoices.types'
 
 const PAGE_LIMIT = 10
 
-interface InvoicesProps {
-  projectRef: string
-}
-
-const Invoices = ({ projectRef }: InvoicesProps) => {
+const Invoices = () => {
   const { ui } = useStore()
-  const [loading, setLoading] = useState<any>(false)
-
+  const { ref: projectRef } = useParams()
   const [page, setPage] = useState(1)
-  const [count, setCount] = useState(0)
-  const [invoices, setInvoices] = useState<Invoice[]>([])
 
   const offset = (page - 1) * PAGE_LIMIT
+  const { data: count, isError: isErrorCount } = useProjectInvoicesCountQuery({ projectRef })
+  const { data, error, isLoading, isError, isSuccess } = useProjectInvoicesQuery({
+    projectRef,
+    limit: PAGE_LIMIT,
+    offset,
+  })
+  const invoices = data || []
 
   useEffect(() => {
-    if (!projectRef) return
-
-    let cancel = false
-    const page = 1
-
-    const fetchInvoiceCount = async () => {
-      const res = await head(`${API_URL}/projects/${projectRef}/invoices`, ['X-Total-Count'])
-      if (!cancel) {
-        if (res.error) {
-          ui.setNotification({ category: 'error', message: res.error.message })
-        } else {
-          setCount(res['X-Total-Count'])
-        }
-      }
-    }
-
-    setPage(page)
-    fetchInvoices(page)
-    fetchInvoiceCount()
-
-    return () => {
-      cancel = true
-    }
+    setPage(1)
   }, [projectRef])
 
-  const fetchInvoices = async (page: number) => {
-    setLoading(true)
-    setPage(page)
-
-    const offset = (page - 1) * PAGE_LIMIT
-    const invoices = await get(
-      `${API_URL}/projects/${projectRef}/invoices?offset=${offset}&limit=${PAGE_LIMIT}`
-    )
-
-    if (invoices.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to fetch invoices: ${invoices.error.message}`,
-      })
-    } else {
-      setInvoices(invoices)
-    }
-
-    setLoading(false)
-  }
-
-  const fetchInvoice = async (invoiceId: string) => {
-    const invoice = await get(`${API_URL}/stripe/invoices/${invoiceId}`)
-    if (invoice?.invoice_pdf) {
-      window.open(invoice.invoice_pdf, '_blank')
-    } else {
+  const fetchInvoice = async (id: string) => {
+    try {
+      const invoice = await getInvoice({ id })
+      if (invoice?.invoice_pdf) window.open(invoice.invoice_pdf, '_blank')
+    } catch (error: any) {
       ui.setNotification({
         category: 'info',
-        message: `Failed to fetch the selected invoice: ${invoice.error.message}`,
+        message: `Failed to fetch the selected invoice: ${error.message}`,
       })
     }
   }
 
   return (
     <div className="container my-4 max-w-4xl space-y-1">
-      <Loading active={loading}>
+      {isLoading && <GenericSkeletonLoader />}
+
+      {isError && <AlertError error={error} subject="Failed to retrieve project invoices" />}
+
+      {isSuccess && (
         <Table
           head={[
             <Table.th key="header-icon"></Table.th>,
@@ -102,9 +67,7 @@ const Invoices = ({ projectRef }: InvoicesProps) => {
             invoices.length === 0 ? (
               <Table.tr>
                 <Table.td colSpan={6} className="p-3 py-12 text-center">
-                  <p className="text-scale-1000">
-                    {loading ? 'Checking for invoices' : 'No invoices for this project yet'}
-                  </p>
+                  <p className="text-scale-1000">No invoices for this project yet</p>
                 </Table.td>
               </Table.tr>
             ) : (
@@ -155,7 +118,11 @@ const Invoices = ({ projectRef }: InvoicesProps) => {
                   <Table.td colSpan={6}>
                     <div className="flex items-center justify-between">
                       <p className="text-sm opacity-50">
-                        Showing {offset + 1} to {offset + invoices.length} out of {count} invoices
+                        {isErrorCount
+                          ? 'Failed to retrieve total number of invoices'
+                          : `Showing ${offset + 1} to ${
+                              offset + invoices.length
+                            } out of ${count} invoices`}
                       </p>
                       <div className="flex items-center space-x-2">
                         <Button
@@ -163,14 +130,14 @@ const Invoices = ({ projectRef }: InvoicesProps) => {
                           type="default"
                           size="tiny"
                           disabled={page === 1}
-                          onClick={async () => await fetchInvoices(page - 1)}
+                          onClick={async () => setPage(page - 1)}
                         />
                         <Button
                           icon={<IconChevronRight />}
                           type="default"
                           size="tiny"
-                          disabled={page * PAGE_LIMIT >= count}
-                          onClick={async () => await fetchInvoices(page + 1)}
+                          disabled={page * PAGE_LIMIT >= (count ?? 0)}
+                          onClick={async () => setPage(page + 1)}
                         />
                       </div>
                     </div>
@@ -180,7 +147,7 @@ const Invoices = ({ projectRef }: InvoicesProps) => {
             )
           }
         />
-      </Loading>
+      )}
     </div>
   )
 }

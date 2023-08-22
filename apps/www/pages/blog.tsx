@@ -17,7 +17,7 @@ import BlogListItem from '~/components/Blog/BlogListItem'
 import { useParams } from '~/hooks/useParams'
 
 export async function getStaticProps() {
-  const allPostsData = getSortedPosts('_blog', undefined, undefined, '** BLOG PAGE **')
+  const allPostsData = getSortedPosts({ directory: '_blog', runner: '** BLOG PAGE **' })
   const categories = getAllCategories('_blog')
   const rss = generateRss(allPostsData)
 
