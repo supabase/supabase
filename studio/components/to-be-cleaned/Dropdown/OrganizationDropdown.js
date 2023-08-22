@@ -2,10 +2,10 @@ import { useRouter } from 'next/router'
 
 import { useFlag } from 'hooks'
 import { Button, Dropdown, IconPlus } from 'ui'
+import { EMPTY_ARR } from 'lib/void'
 
-const OrganizationDropdown = ({ organizations }) => {
+const OrganizationDropdown = ({ organizations = EMPTY_ARR }) => {
   const router = useRouter()
-
   const orgCreationV2 = useFlag('orgcreationv2')
 
   return (
