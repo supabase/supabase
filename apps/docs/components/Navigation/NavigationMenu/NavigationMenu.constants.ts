@@ -557,18 +557,19 @@ export const database: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Analyzing efficiency and performance',
-          url: '/guides/database/inspect',
-        },
-        {
           name: 'JSON and unstructured data',
           url: '/guides/database/json',
         },
-        { name: 'Implementing Full Text Search', url: '/guides/database/full-text-search' },
+        { name: 'Using Full Text Search', url: '/guides/database/full-text-search' },
         { name: 'Implementing Cascade Deletes', url: '/guides/database/postgres/cascade-deletes' },
-        { name: 'Implementing column encryption', url: '/guides/database/column-encryption' },
-        { name: 'Partitioning your tables', url: '/guides/database/partitions' },
         { name: 'Query Optimization', url: '/guides/database/query-optimization' },
+        {
+          name: 'Analyzing efficiency and performance',
+          url: '/guides/database/inspect',
+        },
+        { name: 'Managing Postgres Roles', url: '/guides/database/postgres-roles' },
+        { name: 'Partitioning your tables', url: '/guides/database/partitions' },
+        { name: 'Implementing column encryption', url: '/guides/database/column-encryption' },
         { name: 'Testing your database', url: '/guides/database/testing' },
         { name: 'Managing Timeouts', url: '/guides/database/timeouts' },
         { name: 'Managing Passwords', url: '/guides/database/managing-passwords' },
