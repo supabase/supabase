@@ -54,7 +54,7 @@ function TwitterSocialProof() {
         </div>
       </div>
       <div className="mt-6">
-        <div className="cursor-move lg:-mr-32 lg:-ml-32">
+        <div className="cursor-move lg:-mr-14 lg:-ml-14 xl:-mr-16 xl:-ml-16 min-[1208px]:-mx-28">
           <Swiper
             loop={true}
             initialSlide={3}
