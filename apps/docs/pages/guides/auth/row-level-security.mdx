@@ -437,44 +437,6 @@ postgres=> table public.profiles;
 
 </details>
 
-## Deprecated features
-
-We have deprecate some functions to ensure better performance and extensibilty of RLS policies.
-
-### `auth.role()`
-
-<Admonition type="caution">
-
-Deprecated: The `auth.role()` function has been deprecated in favour of using the `TO` field, natively supported within Postgres.
-
-</Admonition>
-
-```sql
--- DEPRECATED
-create policy "Public profiles are viewable by everyone."
-on profiles for select using (
-  auth.role() = 'authenticated' or auth.role() = 'anon'
-);
-
--- RECOMMENDED
-create policy "Public profiles are viewable by everyone."
-on profiles for select
-to authenticated, anon
-using (
-  true
-);
-```
-
-### `auth.email()`
-
-<Admonition type="caution">
-
-Deprecated. Use `auth.jwt() ->> 'email'` instead.
-
-</Admonition>
-
-Returns the email of the user making the request.
-
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page
