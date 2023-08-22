@@ -7,7 +7,7 @@ import BlogListItem from '~/components/Blog/BlogListItem'
 import PostTypes from '~/types/post'
 
 export async function getStaticProps({ params }: any) {
-  const posts = getSortedPosts('_blog', 0, [params.tag])
+  const posts = getSortedPosts({ directory: '_blog', limit: 0, tags: [params.tag] })
   return {
     props: {
       tag: params.tag,
