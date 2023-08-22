@@ -1,10 +1,10 @@
 import clsx from 'clsx'
 
-import Migrations from 'components/interfaces/Database/Migrations/Migrations'
+import Indexes from 'components/interfaces/Database/Indexes/Indexes'
 import { DatabaseLayout } from 'components/layouts'
 import { NextPageWithLayout } from 'types'
 
-const MigrationsPage: NextPageWithLayout = () => {
+const IndexesPage: NextPageWithLayout = () => {
   return (
     <div
       className={clsx(
@@ -12,11 +12,11 @@ const MigrationsPage: NextPageWithLayout = () => {
         'lg:pt-8 lg:px-14 1xl:px-28 2xl:px-32 h-full'
       )}
     >
-      <Migrations />
+      <Indexes />
     </div>
   )
 }
 
-MigrationsPage.getLayout = (page) => <DatabaseLayout title="Migrations">{page}</DatabaseLayout>
+IndexesPage.getLayout = (page) => <DatabaseLayout title="Indexes">{page}</DatabaseLayout>
 
-export default MigrationsPage
+export default IndexesPage

@@ -42,7 +42,7 @@ const ProjectsPage: NextPageWithLayout = () => {
 
   return (
     <>
-      {navLayoutV2 && isLoading && (
+      {(navLayoutV2 || isLoading) && (
         <div className={`flex items-center justify-center h-full`}>
           <Connecting />
         </div>
