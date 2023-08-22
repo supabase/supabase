@@ -49,7 +49,7 @@ const Index = ({ customerStories }: Props) => {
 }
 
 export async function getStaticProps() {
-  const customerStories = getSortedPosts('_customers', 3)
+  const customerStories = getSortedPosts({ directory: '_customers', limit: 3 })
 
   return {
     props: {
