@@ -4,8 +4,10 @@ import { Fragment, PropsWithChildren, ReactNode } from 'react'
 
 import { useParams } from 'common/hooks'
 import Connecting from 'components/ui/Loading'
+import UsageWarningBanner from 'components/ui/UsageWarnings/UsageWarningBanner'
 import { useFlag, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
-import { PROJECT_STATUS, IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import AppLayout from '../AppLayout/AppLayout'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import LayoutHeader from './LayoutHeader'
@@ -16,9 +18,6 @@ import { ProjectContextProvider } from './ProjectContext'
 import ProjectPausedState from './ProjectPausedState'
 import RestoringState from './RestoringState'
 import UpgradingState from './UpgradingState'
-import AppLayout from '../AppLayout/AppLayout'
-import UsageWarningBanner from 'components/ui/UsageWarnings/UsageWarningBanner'
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -179,8 +178,6 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
     selectedProject?.status === PROJECT_STATUS.PAUSING
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
 
-  const { data: resourceWarnings } = useResourceWarningsQuery()
-  console.log(resourceWarnings)
   return (
     <>
       {isLoading || (requiresProjectDetails && selectedProject === undefined) ? (

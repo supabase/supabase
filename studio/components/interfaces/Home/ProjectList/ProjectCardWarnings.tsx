@@ -39,6 +39,7 @@ export default function ProjectCardWarnings({ resourceWarnings }: ProjectCardWar
     (property) => resourceWarnings[property as keyof typeof resourceWarnings] === true
   )
   const hasHighPriorityWarning = activeWarnings.includes('is_readonly_mode_enabled')
+  // [Joshen] We should probably read readonly mode separately for multiple resource warnings, read only mode needs to take highest precedence
 
   return (
     <div>

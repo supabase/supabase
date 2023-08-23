@@ -246,6 +246,7 @@ const Infrastructure = ({
                   </div>
                 </>
               )}
+              {/* [Joshen TODO] Add the necessary alert warnings for CPU and RAM here as well */}
               <div className="space-y-1">
                 <div className="flex flex-row justify-between">
                   {attribute.key === 'disk_io_consumption' ? (

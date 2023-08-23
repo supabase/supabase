@@ -22,5 +22,9 @@ export const useResourceWarningsQuery = <TData = ResourceWarningsData>({
   useQuery<ResourceWarningsData, ResourceWarningsError, TData>(
     usageKeys.resourceWarnings(),
     ({ signal }) => getResourceWarnings(signal),
-    { enabled, ...options }
+    {
+      enabled,
+      staleTime: 1000 * 60 * 30, // default 30 minutes
+      ...options,
+    }
   )
