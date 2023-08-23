@@ -177,8 +177,7 @@ Based on a series of [tests](https://github.com/GaryAustin1/RLS-Performance), we
 Make sure you've added [indexes](/docs/guides/database/postgres/indexes) on any columns used within the Policies which are not already indexed (or primary keys). For a Policy like this:
 
 ```sql
-create policy "rls_test_select"
-on test_table
+create policy "rls_test_select" on test_table
 to authenticated
 using ( auth.uid() = user_id );
 ```
@@ -202,8 +201,7 @@ using btree (user_id);
 You can use `select` statement to improve Policies that use Functions. For example, instead of this:
 
 ```sql
-create policy "rls_test_select"
-on test_table
+create policy "rls_test_select" on test_table
 to authenticated
 using ( auth.uid() = user_id );
 ```
@@ -211,8 +209,7 @@ using ( auth.uid() = user_id );
 You can do:
 
 ```sql
-create policy "rls_test_select"
-on test_table
+create policy "rls_test_select" on test_table
 to authenticated
 using ( (select auth.uid()) = user_id );
 ```
@@ -238,25 +235,37 @@ You can only use this technique if the results of the query or function do not c
 
 Policies are "implicit where clauses", so it's common to run `select` statements without any filters. This is a bad pattern for performance. Instead of doing this (JS client example):
 
+{/* prettier-ignore */}
 ```js
-const { data } = supabase.from('table').select()
+const { data } = supabase
+  .from('table')
+  .select()
 ```
 
 You should always add a filter:
 
+{/* prettier-ignore */}
 ```js
-const { data } = supabase.from('table').select().eq('user_id', userId)
+const { data } = supabase
+  .from('table')
+  .select()
+  .eq('user_id', userId)
 ```
 
-Even if this duplicates the contents of the Policy, Postgres can use the to construct a better query plan.
+Even though this duplicates the contents of the Policy, Postgres can use the to construct a better query plan.
 
-## Use security definer functions
+#### Benchmarks
+
+| Test                                                                                              | Before (ms) | After (ms) | % Improvement | Change                                                                                                                                 |
+| ------------------------------------------------------------------------------------------------- | ----------- | ---------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| [test3-addfilter](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test3-addfilter) | 171         | 9          | 94.74%        | <details className="cursor-pointer">Before:<br/>`auth.uid() = user_id`<br/><br/>After:<br/>add `.eq` or `where` on `user_id`</details> |
+
+### Use security definer functions
 
 A "security definer" function runs using the same role that _created_ the function. This means that if you create a role with a superuser (like `postgres`), then that function will have `bypassrls` priveleges. For example, if you had a policy like this:
 
 ```sql
-create policy "rls_test_select"
-on test_table
+create policy "rls_test_select" on test_table
 to authenticated
 using (
   exists (
@@ -293,6 +302,76 @@ using ( private.has_good_role() );
 <Admonition type="caution">
 Security-definer functions should never be created in a schema in the "Exposed schemas" inside your [API settings](https://supabase.com/dashboard/project/_/settings/api)`. 
 </Admonition>
+
+### Minimize joins
+
+You can often rewrite your Policies to avoid joins between the source and the target table. Instead, try to organize your Policy to fetch all the relevant data from the target table into an array or set, then you can use an `IN` or `ANY` operation in your filter.
+
+For example, this is an example of a slow Policy which joins the source `test_table` to the target `team_user`:
+
+```sql
+create policy "rls_test_select" on test_table
+to authenticated
+using (
+  auth.uid() in (
+    select user_id
+    from team_user
+    where team_user.team_id = team_id -- joins to the source "test_table.team_id"
+  )
+);
+```
+
+We can rewrite this to avoid this join, and instead select the filter criteria into a set:
+
+```sql
+create policy "rls_test_select" on test_table
+to authenticated
+using (
+  team_id in (
+    select team_id
+    from team_user
+    where user_id = auth.uid() -- no join
+  )
+);
+```
+
+In this case you can also consider [using a `security definer` function](#use-security-definer-functions) to bypass RLS on the join table:
+
+{/* prettier-ignore */}
+<Admonition type="note">
+If the `in` list gets to be over 10K items, then extra analysis and a different approach may be needed.
+</Admonition>
+
+#### Benchmarks
+
+| Test                                                                                                | Before (ms) | After (ms) | % Improvement | Change                                                                                                                                            |
+| --------------------------------------------------------------------------------------------------- | ----------- | ---------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [test5-fixed-join](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test5-fixed-join) | 9,000       | 20         | 99.78%        | <details className="cursor-pointer">Before:<br/>`auth.uid()` in table join on col<br/><br/>After:<br/>col in table join on `auth.uid()`</details> |
+
+### Specify Roles in your Policies
+
+Always use the Role of inside your policies, specified by the `TO` operator. For example, instead of this query:
+
+```sql
+create policy "rls_test_select" on rls_test
+using ( auth.uid() = user_id );
+```
+
+Use:
+
+```sql
+create policy "rls_test_select" on rls_test
+to authenticated
+using ( auth.uid() = user_id );
+```
+
+This prevents the policy `( auth.uid() = user_id )` from running for any `anon` users, since the execution stops at the `to authenticated` step.
+
+#### Benchmarks
+
+| Test                                                                                          | Before (ms) | After (ms) | % Improvement | Change                                                                                                                           |
+| --------------------------------------------------------------------------------------------- | ----------- | ---------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| [test6-To-role](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test6-To-role) | 170         | < 0.1      | 99.78%        | <details className="cursor-pointer">Before:<br/>No `TO` policy<br/><br/>After:<br/>`TO authenticated` (anon accessing)</details> |
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
