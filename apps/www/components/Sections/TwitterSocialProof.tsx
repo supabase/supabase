@@ -1,31 +1,15 @@
-import { useRef } from 'react'
-
+import { useState } from 'react'
 import { useRouter } from 'next/router'
-
-import { Swiper, SwiperSlide } from 'swiper/react'
-// import Swiper core and required modules
-import SwiperCore, { Navigation, Pagination } from 'swiper'
-
-import { Button, IconMessageCircle, IconArrowLeft, IconArrowRight } from 'ui'
-
-import Examples from '../../data/tweets/Tweets.json'
+import { Button, IconMessageCircle } from 'ui'
+import Tweets from '../../data/tweets/Tweets.json'
 import TweetCard from '../TweetCard'
-
-// Import Swiper styles
-import 'swiper/swiper.min.css'
-import 'swiper/components/navigation/navigation.min.css'
-import 'swiper/components/pagination/pagination.min.css'
 import Link from 'next/link'
-
-// install Swiper modules
-SwiperCore.use([Navigation, Pagination])
 
 function TwitterSocialProof() {
   // base path for images
   const { basePath } = useRouter()
 
-  const prevRef = useRef(null)
-  const nextRef = useRef(null)
+  const [showAll, setShowAll] = useState(false)
 
   return (
     <>
@@ -53,70 +37,31 @@ function TwitterSocialProof() {
           </div>
         </div>
       </div>
-      <div className="mt-6">
-        <div className="cursor-move lg:-mr-32 lg:-ml-32">
-          <Swiper
-            loop={true}
-            initialSlide={3}
-            spaceBetween={0}
-            slidesPerView={4}
-            speed={300}
-            navigation={{
-              prevEl: prevRef.current,
-              nextEl: nextRef.current,
-              // prevEl: prevRef.current ? prevRef.current : undefined,
-              // nextEl: nextRef.current ? nextRef.current : undefined,
-            }}
-            onInit={(swiper: any) => {
-              swiper.params.navigation.prevEl = prevRef.current
-              swiper.params.navigation.nextEl = nextRef.current
-              // swiper.navigation.update()
-            }}
-            breakpoints={{
-              320: {
-                slidesPerView: 1,
-              },
-              720: {
-                slidesPerView: 2,
-              },
-              920: {
-                slidesPerView: 3,
-              },
-              1024: {
-                slidesPerView: 4,
-              },
-              1208: {
-                slidesPerView: 5,
-              },
-            }}
-          >
-            {Examples.map((tweet: any, i: number) => {
-              return (
-                <SwiperSlide key={i}>
-                  <div className="mr-3 ml-3">
-                    <Link href={tweet.url}>
-                      <a target="_blank" className="cursor-pointer">
-                        <TweetCard
-                          key={i}
-                          handle={`@${tweet.handle}`}
-                          quote={tweet.text}
-                          img_url={`${basePath}${tweet.img_url}`}
-                        />
-                      </a>
-                    </Link>
-                  </div>
-                </SwiperSlide>
-              )
-            })}
-            <div className="container mx-auto mt-3 hidden flex-row justify-between md:flex">
-              <div ref={prevRef} className="p ml-4 cursor-pointer">
-                <IconArrowLeft />
-              </div>
-              <div ref={nextRef} className="p mr-4 cursor-pointer">
-                <IconArrowRight />
-              </div>
+      <div className="lg:-mx-10 xl:-mx-18 mt-6">
+        <div className={`columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 overflow-hidden relative h-[${!showAll ? 800 : 2500}px]`}>
+          {!showAll && (
+            <div className={`absolute bottom-0 left-0 z-10 w-full h-[50%] bg-gradient-to-t from-[#1c1c1c] via-[#1c1c1c]`} />
+          )}
+          {Tweets.map((tweet: any, i: number) => (
+            <div className="mb-4 z-0 break-inside-avoid-column" key={i}>
+              <Link href={tweet.url}>
+                <a target="_blank">
+                  <TweetCard
+                    handle={`@${tweet.handle}`}
+                    quote={tweet.text}
+                    img_url={`${basePath}${tweet.img_url}`}
+                  />
+                </a>
+              </Link>
             </div>
-          </Swiper>
+          ))}
+          {!showAll && (
+            <div className="absolute bottom-[10%] left-1/2 transform -translate-x-1/2 z-20">
+              <Button type="default" size="small" onClick={() => setShowAll(true)}>
+                Show All
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </>

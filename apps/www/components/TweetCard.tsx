@@ -11,13 +11,9 @@ function TweetCard(props: TweetCard) {
   return (
     <div
       className="
-
       dark:bg-scale-300 border-scale-300 dark:border-scale-400
-
       rounded-2xl border bg-white p-6
       drop-shadow-sm
-
-
     "
     >
       <div className="relative">
@@ -35,11 +31,7 @@ function TweetCard(props: TweetCard) {
           ) : (
             <div className="w-6" />
           )}
-          <p
-            className={['text-scale-1200 text-sm font-medium -mt-1', props.img_url && 'mt-3'].join(
-              ' '
-            )}
-          >
+          <p className='text-scale-1200 text-sm font-medium'>
             {props.handle}
           </p>
           <div
