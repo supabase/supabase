@@ -461,7 +461,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                   </div>
                 )
               })}
-              <h3 className="bg-brand-500 border-[1px] border-brand-300 text-brand text-xl min-w-[44px] min-h-[40px] px-2 py-1 rounded-md grid justify-items-center items-center">
+              <h3 className="bg-brand-500 border-[1px] border-brand-300 text-brand text-xl w-[44px] lg:min-w-[40px] min-h-[40px] px-2 py-1 rounded-md grid justify-items-center items-center">
                 <IconCheck />
               </h3>
             </div>
