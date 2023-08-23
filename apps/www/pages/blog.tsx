@@ -7,7 +7,7 @@ import Link from 'next/link'
 
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
-import { getSortedPosts, getAllCategories } from '~/lib/posts'
+import { getSortedPosts } from '~/lib/posts'
 import authors from 'lib/authors.json'
 
 import PostTypes from '~/types/post'
@@ -17,7 +17,6 @@ import BlogFilters from '~/components/Blog/BlogFilters'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts({ directory: '_blog', runner: '** BLOG PAGE **' })
-  const categories = getAllCategories('_blog')
   const rss = generateRss(allPostsData)
 
   // create a rss feed in public directory
@@ -48,8 +47,8 @@ function Blog(props: any) {
   const [blogs, setBlogs] = useState(props.blogs)
   const [category, setCategory] = useState<string>('all')
 
-  // Using hard-coded categories here because
-  // - they serve as a reference
+  // Using hard-coded categories as they:
+  // - serve as a reference
   // - are easier to reorder
   const allCategories = [
     'all',
