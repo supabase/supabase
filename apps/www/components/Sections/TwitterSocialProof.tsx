@@ -54,11 +54,11 @@ function TwitterSocialProof() {
         </div>
       </div>
       <div className="mt-6">
-        <div className="cursor-move lg:-mr-32 lg:-ml-32">
+        <div className="cursor-move">
           <Swiper
             loop={true}
             initialSlide={3}
-            spaceBetween={0}
+            spaceBetween={24}
             slidesPerView={4}
             speed={300}
             navigation={{
@@ -85,7 +85,7 @@ function TwitterSocialProof() {
               1024: {
                 slidesPerView: 4,
               },
-              1208: {
+              1280: {
                 slidesPerView: 5,
               },
             }}
@@ -93,7 +93,6 @@ function TwitterSocialProof() {
             {Examples.map((tweet: any, i: number) => {
               return (
                 <SwiperSlide key={i}>
-                  <div className="mr-3 ml-3">
                     <Link href={tweet.url}>
                       <a target="_blank" className="cursor-pointer">
                         <TweetCard
@@ -104,7 +103,6 @@ function TwitterSocialProof() {
                         />
                       </a>
                     </Link>
-                  </div>
                 </SwiperSlide>
               )
             })}
