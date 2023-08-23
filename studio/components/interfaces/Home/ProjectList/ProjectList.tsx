@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { groupBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
-import { Badge, Button, IconPlus } from 'ui'
+import { Button, IconPlus } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
 import {
@@ -12,14 +12,13 @@ import {
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useResourceWarningQuery } from 'data/usage/resource-warnings-query'
 import { useCheckPermissions } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
 import { Organization, Project, ResponseError } from 'types'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useResourceWarningQuery } from 'data/usage/resource-warnings-query'
 
 export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string
@@ -104,10 +103,7 @@ const OrganizationProjects = ({
   return (
     <div className="space-y-3" key={makeRandomString(5)}>
       <div className="flex space-x-4 items-center">
-        <h4 className="text-lg flex items-center">
-          {name}
-          {subscription_id ? <Badge className="ml-3">V2</Badge> : <></>}
-        </h4>
+        <h4 className="text-lg flex items-center">{name}</h4>
 
         {!!overdueInvoices.length && (
           <div>

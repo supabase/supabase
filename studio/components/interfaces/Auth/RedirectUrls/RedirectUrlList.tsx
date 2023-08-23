@@ -1,37 +1,24 @@
 import { noop } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import { Button, IconGlobe, IconTrash } from 'ui'
 
-import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
 import { EmptyListState } from 'components/ui/States'
-import { useStore } from 'hooks'
 import ValueContainer from './ValueContainer'
 
 interface RedirectUrlListProps {
+  URI_ALLOW_LIST_ARRAY: string[]
   canUpdate: boolean
   onSelectUrlToDelete: (url: string) => void
 }
 
-const RedirectUrlList = ({ canUpdate, onSelectUrlToDelete = noop }: RedirectUrlListProps) => {
-  const { authConfig } = useStore()
-
-  const URI_ALLOW_LIST_ARRAY = authConfig.config.URI_ALLOW_LIST
-    ? authConfig.config.URI_ALLOW_LIST.split(',')
-    : []
-
+const RedirectUrlList = ({
+  URI_ALLOW_LIST_ARRAY,
+  canUpdate,
+  onSelectUrlToDelete = noop,
+}: RedirectUrlListProps) => {
   return (
     <div className="-space-y-px">
-      {!authConfig.isLoaded ? (
-        <>
-          <ValueContainer>
-            <HorizontalShimmerWithIcon />
-          </ValueContainer>
-          <ValueContainer>
-            <HorizontalShimmerWithIcon />
-          </ValueContainer>
-        </>
-      ) : URI_ALLOW_LIST_ARRAY.length > 0 ? (
-        URI_ALLOW_LIST_ARRAY.map((url: string) => {
+      {URI_ALLOW_LIST_ARRAY.length > 0 ? (
+        URI_ALLOW_LIST_ARRAY.map((url) => {
           return (
             <ValueContainer key={url}>
               <div className="flex items-center gap-4 font-mono">
@@ -69,4 +56,4 @@ const RedirectUrlList = ({ canUpdate, onSelectUrlToDelete = noop }: RedirectUrlL
   )
 }
 
-export default observer(RedirectUrlList)
+export default RedirectUrlList

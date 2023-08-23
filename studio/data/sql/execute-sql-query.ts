@@ -10,7 +10,6 @@ import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { sqlKeys } from './keys'
-import { noop } from 'lodash'
 
 export type Error = { code: number; message: string; requestId: string }
 

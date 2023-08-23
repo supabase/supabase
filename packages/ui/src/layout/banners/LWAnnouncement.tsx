@@ -53,7 +53,7 @@ const LWAnnouncement = ({
         className={['border hover:border-scale-800 transition-colors', cardClassName].join(' ')}
         innerClassName={['!bg-opacity-70', cardInnerClassName].join(' ')}
       >
-        <Link href={`${LW_SITE_URL}#today`}>
+        <Link href={LW_SITE_URL}>
           <a className="flex flex-row justify-between items-center w-full h-full gap-2 text-left no-underline">
             <div className="relative flex-shrink flex items-center p-2 w-2/3 md:w-auto">
               <div className="flex flex-col gap-1 sm:pl-2">
