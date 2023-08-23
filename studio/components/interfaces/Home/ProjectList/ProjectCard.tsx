@@ -8,7 +8,6 @@ import {
 } from 'ui'
 
 import CardButton from 'components/ui/CardButton'
-import { useProjectReadOnlyStatus } from 'hooks/misc/useProjectReadOnlyStatus'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { Project } from 'types'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
@@ -33,16 +32,10 @@ const ProjectCard = ({
   const { name, ref: projectRef } = project
   const desc = `${project.cloud_provider} | ${project.region}`
 
-  const isReadonly = useProjectReadOnlyStatus(projectRef)
-  // const isBranchingEnabled = project.preview_branch_refs.length > 0
-  // const isGithubIntegrated = githubIntegration !== undefined
-  // const isVercelIntegrated = vercelIntegration !== undefined
-  // const githubRepository = githubIntegration?.metadata.name ?? undefined
-
-  const isBranchingEnabled = true
-  const isGithubIntegrated = true
-  const isVercelIntegrated = true
-  const githubRepository = 'supabase/supabase-js'
+  const isBranchingEnabled = project.preview_branch_refs.length > 0
+  const isGithubIntegrated = githubIntegration !== undefined
+  const isVercelIntegrated = vercelIntegration !== undefined
+  const githubRepository = githubIntegration?.metadata.name ?? undefined
 
   // Project status should supersede its read only status
   const isHealthy = project.status === PROJECT_STATUS.ACTIVE_HEALTHY
@@ -98,22 +91,11 @@ const ProjectCard = ({
             <span className="text-xs lowercase text-scale-1000">{desc}</span>
 
             {isHealthy && (
-              <>
-                {isReadonly ? (
-                  <Badge color="yellow">
-                    <div className="flex items-center gap-2">
-                      <IconAlertTriangle size={14} strokeWidth={2} />
-                      <span className="truncate">Read-only mode</span>
-                    </div>
-                  </Badge>
-                ) : (
-                  <Badge color="green">
-                    <div className="flex items-center gap-2">
-                      <span className="truncate">Active</span>
-                    </div>
-                  </Badge>
-                )}
-              </>
+              <Badge color="green">
+                <div className="flex items-center gap-2">
+                  <span className="truncate">Active</span>
+                </div>
+              </Badge>
             )}
 
             {isRestoring && (
