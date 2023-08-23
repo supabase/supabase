@@ -5,12 +5,6 @@ export const meta = {
   description: 'Learn how to configure email authentication in your server-side rendering (SSR) application to work with the PKCE flow.',
 }
 
-- Install Supabase Auth Helpers
-- Set environment variables
-- Setting up the Auth Helpers
-- Create API endpoint for handling `token_hash`
-- Update email templates with URL for API endpoint
-
 ### Install Supabase Auth Helpers
 
 The Auth Helpers will assist you in implementing user authentication within your server-side rendering (SSR) framework.
@@ -101,11 +95,6 @@ export const handle: Handle = async ({ event, resolve }) => {
     event,
   })
 
-  /**
-   * a little helper that is written for convenience so that instead
-   * of calling `const { data: { session } } = await supabase.auth.getSession()`
-   * you just call this `await getSession()`
-   */
   event.locals.getSession = async () => {
     const {
       data: { session },
@@ -149,10 +138,14 @@ export async function GET(req) {
 
   if (token_hash && type) {
     const supabase = createRouteHandlerClient({ cookies });
-    await supabase.auth.verifyOtp({ type, token_hash });
+    const { error } = await supabase.auth.verifyOtp({ type, token_hash });
+    if (!error) {
+      return NextResponse.redirect(new URL(`/${next.slice(1)}`, req.url));
+    }
   }
 
-  return NextResponse.redirect(new URL(`/${next.slice(1)}`, req.url));
+  // return the user to an error page with some instructions
+  return NextResponse.redirect(new URL('/auth/auth-code-error', req.url));
 }
 ```
 </TabPanel>
@@ -178,8 +171,8 @@ export const GET = async (event) => {
     }
   }
 
-  // return to the sign in screen
-  throw redirect(303, '/auth/signin');
+  // return the user to an error page with some instructions
+  throw redirect(303, '/auth/auth-code-error');
 };
 ```
 </TabPanel>
