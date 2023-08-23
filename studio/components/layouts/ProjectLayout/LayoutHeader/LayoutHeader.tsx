@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { Badge } from 'ui'
 
 import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
-import { useProjectReadOnlyQuery } from 'data/config/project-read-only-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
@@ -16,14 +15,9 @@ import ProjectDropdown from './ProjectDropdown'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
-  const selectedOrganization = useSelectedOrganization()
-  const selectedProject = useSelectedProject()
-
   const { ref: projectRef } = useParams()
-  const { data: isReadOnlyMode } = useProjectReadOnlyQuery({
-    projectRef: selectedProject?.ref,
-    connectionString: selectedProject?.connectionString,
-  })
+  const selectedProject = useSelectedProject()
+  const selectedOrganization = useSelectedOrganization()
 
   // Skip with org-level-billing, as quota is for the entire org
   const { data: usage } = useProjectUsageQuery(
@@ -80,18 +74,6 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                 </span>
                 {/* Project Dropdown */}
                 <ProjectDropdown />
-
-                {/* [Terry] Temporary until we figure out how we want to display this permanently */}
-                {/* context: https://www.notion.so/supabase/DB-Disk-Size-Free-tier-Read-only-Critical-f2b8937c13a149e3ac769fe5888f6db0*/}
-                {isReadOnlyMode && (
-                  <div className="ml-2">
-                    <Link href={`/project/${projectRef}/settings/billing/usage`}>
-                      <a>
-                        <Badge color="red">Project is in read-only mode</Badge>
-                      </a>
-                    </Link>
-                  </div>
-                )}
 
                 {showOverUsageBadge && (
                   <div className="ml-2">
