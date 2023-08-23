@@ -445,10 +445,10 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                     className="flex lg:block items-start space-x-6 lg:space-x-0 lg:w-full"
                   >
                     <div className="lg:flex items-center">
-                      <h3 className="bg-brand-600 border-[1px] border-brand-300 text-brand text-md text-center w-[44px] px-2 py-1.5 rounded-md">
+                      <h3 className="bg-brand-500 border-[1px] border-brand-300 text-brand text-md text-center w-[44px] px-2 py-1.5 rounded-md">
                         {i + 1}
                       </h3>
-                      <div className="h-[100px] w-[1px] sm:h-[100px] mx-auto lg:h-[1px] lg:w-full bg-brand-300 lg:pr-6"></div>
+                      <div className="h-[100px] w-[1px] sm:h-[100px] mx-auto lg:h-[1px] lg:w-full bg-brand-500 lg:pr-6"></div>
                     </div>
                     <div className="lg:mt-6">
                       <h2 className="sm:text-lg max-w-[75%] xl:max-w-none xl:w-11/12 lg:max-w-none">
@@ -461,7 +461,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                   </div>
                 )
               })}
-              <h3 className="bg-brand-600 border-[1px] border-brand-300 text-brand text-xl w-[44px] min-h-[40px] px-2 py-1 rounded-md grid justify-items-center items-center">
+              <h3 className="bg-brand-500 border-[1px] border-brand-300 text-brand text-xl w-[44px] lg:min-w-[40px] min-h-[40px] px-2 py-1 rounded-md grid justify-items-center items-center">
                 <IconCheck />
               </h3>
             </div>
