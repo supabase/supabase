@@ -164,6 +164,8 @@ export {
 
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
+export { Textarea } from './src/components/shadcn/ui/textarea'
+
 // links
 
 export * from './src/components/TextLink'
