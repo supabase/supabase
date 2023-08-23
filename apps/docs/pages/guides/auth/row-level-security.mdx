@@ -271,6 +271,20 @@ for update using (
 );
 ```
 
+### Using Multi-factor Authentication
+
+RLS can be [combined with Multi-Factor Authentication](/docs/guides/auth/auth-mfa#enforce-rules-for-mfa-logins) in Supabase Auth. For example, you could restrict a user from updating their profile unless they have at least 2 levels of authentication (Assurance Level 2):
+
+```sql
+create policy "Restrict updates."
+on profiles
+as restrictive
+to authenticated
+for update using (
+  using (auth.jwt()->>'aal' = 'aal2')
+);
+```
+
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page
