@@ -231,4 +231,5 @@ const StorageExplorer = observer(({ bucket }) => {
   )
 })
 
+StorageExplorer.displayName = 'StorageExplorer'
 export default StorageExplorer

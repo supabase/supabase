@@ -159,8 +159,8 @@ interface ContentWrapperProps {
  * [TODO] Next iteration should scrape long polling and just listen to the project's status
  */
 const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
-  const selectedProject = useSelectedProject()
   const router = useRouter()
+  const selectedProject = useSelectedProject()
 
   const requiresDbConnection: boolean =
     (!router.pathname.includes('/project/[ref]/settings') &&
