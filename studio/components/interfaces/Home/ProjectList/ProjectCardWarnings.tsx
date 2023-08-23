@@ -34,12 +34,14 @@ const RESOURCE_WARNING_MESSAGES = {
   },
 }
 
-export default function ProjectCardWarnings({ resourceWarnings }: ProjectCardWarningsProps) {
-  const activeWarnings = Object.keys(resourceWarnings).filter(
-    (property) => resourceWarnings[property as keyof typeof resourceWarnings] === true
-  )
+const ProjectCardWarnings = ({ resourceWarnings }: ProjectCardWarningsProps) => {
+  // [Joshen] Read only takes higher precendence over multiple resource warnings
+  const activeWarnings = resourceWarnings.is_readonly_mode_enabled
+    ? ['is_readonly_mode_enabled']
+    : Object.keys(resourceWarnings).filter(
+        (property) => resourceWarnings[property as keyof typeof resourceWarnings] === true
+      )
   const hasHighPriorityWarning = activeWarnings.includes('is_readonly_mode_enabled')
-  // [Joshen] We should probably read readonly mode separately for multiple resource warnings, read only mode needs to take highest precedence
 
   return (
     <div>
@@ -66,3 +68,5 @@ export default function ProjectCardWarnings({ resourceWarnings }: ProjectCardWar
     </div>
   )
 }
+
+export default ProjectCardWarnings

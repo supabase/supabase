@@ -73,12 +73,15 @@ const UsageWarningBanner = () => {
     (warning) => warning.project === ref
   )
 
+  // [Joshen] Read only takes higher precendence over multiple resource warnings
   const activeWarnings =
     projectResourceWarnings !== undefined
-      ? Object.keys(projectResourceWarnings).filter(
-          (property) =>
-            projectResourceWarnings[property as keyof typeof projectResourceWarnings] === true
-        )
+      ? projectResourceWarnings.is_readonly_mode_enabled
+        ? ['is_readonly_mode_enabled']
+        : Object.keys(projectResourceWarnings).filter(
+            (property) =>
+              projectResourceWarnings[property as keyof typeof projectResourceWarnings] === true
+          )
       : []
 
   const hasHighPriorityWarning = activeWarnings.includes('is_readonly_mode_enabled')
