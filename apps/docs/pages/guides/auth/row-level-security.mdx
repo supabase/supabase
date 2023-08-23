@@ -279,9 +279,9 @@ RLS can be [combined with Multi-Factor Authentication](/docs/guides/auth/auth-mf
 create policy "Restrict updates."
 on profiles
 as restrictive
-to authenticated
-for update using (
-  using (auth.jwt()->>'aal' = 'aal2')
+for update
+to authenticated using (
+  auth.jwt()->>'aal' = 'aal2'
 );
 ```
 
