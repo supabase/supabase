@@ -1,40 +1,26 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get, isResponseOk } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { usageKeys } from './keys'
 
-export type ResourceWarningResponse = {
-  project: string
-  is_readonly_mode_enabled: boolean
-  is_disk_io_budget_below_threshold: boolean
-  is_disk_space_usage_beyond_threshold: boolean
-  is_cpu_load_beyond_threshold: boolean
-  is_memory_and_swap_usage_beyond_threshold: boolean
-}
+import { get } from 'data/fetchers'
+import { usageKeys } from './keys'
+import { ResponseError } from 'types'
+import { components } from 'data/api'
 
 export async function getResourceWarnings(signal?: AbortSignal) {
-  const response = await get<ResourceWarningResponse[]>(`${API_URL}/projects-resource-warnings`, {
-    signal,
-  })
-  if (!isResponseOk(response)) {
-    throw response.error
-  }
-
-  return response
+  const { data, error } = await get(`/platform/projects-resource-warnings`, { signal })
+  if (error) throw error
+  return data
 }
 
-export type ResourceWarningData = Awaited<ReturnType<typeof getResourceWarnings>>
-export type ResourceError = unknown
+export type ResourceWarning = components['schemas']['ProjectResourceWarningsResponse']
+export type ResourceWarningsData = Awaited<ReturnType<typeof getResourceWarnings>>
+export type ResourceWarningsError = ResponseError
 
-export const useResourceWarningQuery = <TData = ResourceWarningData>({
+export const useResourceWarningsQuery = <TData = ResourceWarningsData>({
   enabled = true,
   ...options
-}: UseQueryOptions<ResourceWarningData, ResourceError, TData> = {}) =>
-  useQuery<ResourceWarningData, ResourceError, TData>(
+}: UseQueryOptions<ResourceWarningsData, ResourceWarningsError, TData> = {}) =>
+  useQuery<ResourceWarningsData, ResourceWarningsError, TData>(
     usageKeys.resourceWarnings(),
     ({ signal }) => getResourceWarnings(signal),
-    {
-      enabled: enabled,
-      ...options,
-    }
+    { enabled, ...options }
   )

@@ -4,7 +4,6 @@ import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import { ProjectLayoutWithAuth } from 'components/layouts'
 import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
 import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner'
-import { useResourceWarningQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
@@ -17,9 +16,6 @@ const Home: NextPageWithLayout = () => {
       ? project?.name
       : 'Welcome to your project'
 
-  const { data: resourceWarnings } = useResourceWarningQuery()
-
-  console.log(resourceWarnings)
   return (
     <div className="mx-auto my-16 w-full max-w-7xl space-y-16">
       <div className="mx-6 flex items-center space-x-6">
