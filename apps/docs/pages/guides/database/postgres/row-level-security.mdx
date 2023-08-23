@@ -13,7 +13,7 @@ When you need granular authorization rules, nothing beats Postgres's [Row Level 
 
 RLS is incredibly powerful and flexible, allowing you to write complex SQL rules that fit your unique business needs. RLS can be [combined with Supabase Auth](/docs/guides/auth/row-level-security) for end-to-end user security from the browser to the database.
 
-Alternatively, RLS can provide "[defence in depth](<https://en.wikipedia.org/wiki/Defense_in_depth_(computing)>)" to protect your data from malicious actors if you're using your own tooling with the Postgres database we provide.
+Alternatively, RLS can provide "[defense in depth](<https://en.wikipedia.org/wiki/Defense_in_depth_(computing)>)" to protect your data from malicious actors if you're using your own tooling with the Postgres database we provide.
 
 ## Policies
 
@@ -158,13 +158,13 @@ using ( auth.id() = user_id );      -- the actual Policy
 
 ## Bypassing Row Level Security
 
-You can create [Postgres Roles](/docs/guides/database/postgres/roles) which can bypass Row Level Security using the "bypass RLS" privelege:
+You can create [Postgres Roles](/docs/guides/database/postgres/roles) which can bypass Row Level Security using the "bypass RLS" privilege:
 
 ```sql
 grant bypassrls on "table_name" to "role_name";
 ```
 
-This can be useful for system-level access. You should _never_ share login credentials for any Postgres Role with this privelege.
+This can be useful for system-level access. You should _never_ share login credentials for any Postgres Role with this privilege.
 
 ## RLS Performance Recommendations
 
@@ -262,7 +262,7 @@ Even though this duplicates the contents of the Policy, Postgres can use the to 
 
 ### Use security definer functions
 
-A "security definer" function runs using the same role that _created_ the function. This means that if you create a role with a superuser (like `postgres`), then that function will have `bypassrls` priveleges. For example, if you had a policy like this:
+A "security definer" function runs using the same role that _created_ the function. This means that if you create a role with a superuser (like `postgres`), then that function will have `bypassrls` privileges. For example, if you had a policy like this:
 
 ```sql
 create policy "rls_test_select" on test_table

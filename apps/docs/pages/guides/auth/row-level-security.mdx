@@ -74,9 +74,9 @@ Returns the ID of the user making the request.
 
 ### `auth.jwt()`
 
-Returns the JWT of the user making the request. Anything that you store in the user's `app_metadata` column or the `user_metadata` column will be accessible using this function. Be careful not to store too much data in both of these fields, becuase some browsers have a limitation of 4096 bytes for cookies.
+Returns the JWT of the user making the request. Anything that you store in the user's `app_metadata` column or the `user_metadata` column will be accessible using this function. Be careful not to store too much data in both of these fields, because some browsers have a limitation of 4096 bytes for cookies.
 
-It's important to know the distinciton between these two:
+It's important to know the distinction between these two:
 
 - `user_metadata` - can be updated by the authenticated user using the `supabase.auth.update()` function. It is not a good place to store authorization data.
 - `app_metadata` - cannot be updated by the user, so it's a good place to store authorization data.
@@ -210,7 +210,7 @@ create policy "Team members can update team details if they belong to the team"
   );
 ```
 
-An important note here: if RLS is also enabled for `members`, the user must also have read (`select`) access to members. Otherwise the joined query will not yield any results. Another alternative is to use a "security definer" function which is created by a user with [bypassrls](/docs/guides/database/postgres/row-level-security#specify-roles-in-your-policies) priveleges.
+An important note here: if RLS is also enabled for `members`, the user must also have read (`select`) access to members. Otherwise the joined query will not yield any results. Another alternative is to use a "security definer" function which is created by a user with [bypassrls](/docs/guides/database/postgres/row-level-security#specify-roles-in-your-policies) privileges.
 
 ### Using security definer functions
 
