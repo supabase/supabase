@@ -1,5 +1,5 @@
 import { NextSeo } from 'next-seo'
-import { getSortedPosts, getAllTags } from '~/lib/posts'
+import { getSortedPosts, getAllCategories } from '~/lib/posts'
 import Link from 'next/link'
 import { startCase } from 'lodash'
 
@@ -8,36 +8,36 @@ import BlogListItem from '~/components/Blog/BlogListItem'
 import PostTypes from '~/types/post'
 
 export async function getStaticProps({ params }: any) {
-  const posts = getSortedPosts({ directory: '_blog', limit: 0, tags: [params.tag] })
+  const posts = getSortedPosts({ directory: '_blog', limit: 0, categories: [params.category] })
   return {
     props: {
-      tag: params.tag,
+      category: params.category,
       blogs: posts,
     },
   }
 }
 
 export async function getStaticPaths() {
-  const tags = getAllTags('_blog')
+  const categories = getAllCategories('_blog')
   return {
-    paths: tags.map((tag: any) => ({ params: { tag: tag } })),
+    paths: categories.map((category: any) => ({ params: { category: category } })),
     fallback: false,
   }
 }
 
 interface Props {
-  tag: string
+  category: string
   blogs: PostTypes[]
 }
 
-function TagBlogsPage(props: Props) {
-  const { blogs, tag } = props
-  const capitalizedTag = startCase(tag.replaceAll('-', ' '))
+function CategoriesIndex(props: Props) {
+  const { blogs, category } = props
+  const capitalizedCategory = startCase(category.replaceAll('-', ' '))
 
   return (
     <>
       <NextSeo
-        title={`Blog | ${capitalizedTag}`}
+        title={`Blog | ${capitalizedCategory}`}
         description="Latest news from the Supabase team."
       />
       <DefaultLayout>
@@ -46,7 +46,7 @@ function TagBlogsPage(props: Props) {
             <h1 className="cursor-pointer">
               <Link href="/blog">Blog</Link>
               <span className="px-2">/</span>
-              <span>{`${capitalizedTag}`}</span>
+              <span>{`${capitalizedCategory}`}</span>
             </h1>
           </div>
           <ol className="grid grid-cols-12 gap-8 py-16 lg:gap-16">
@@ -65,4 +65,4 @@ function TagBlogsPage(props: Props) {
   )
 }
 
-export default TagBlogsPage
+export default CategoriesIndex
