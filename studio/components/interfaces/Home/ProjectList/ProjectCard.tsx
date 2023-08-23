@@ -12,7 +12,7 @@ import { useProjectReadOnlyStatus } from 'hooks/misc/useProjectReadOnlyStatus'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { Project } from 'types'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { ResourceWarningResponse } from 'data/usage/resource-warnings-query'
+import { ResourceWarning } from 'data/usage/resource-warnings-query'
 import ProjectCardWarnings from './ProjectCardWarnings'
 
 export interface ProjectCardProps {
@@ -20,7 +20,7 @@ export interface ProjectCardProps {
   rewriteHref?: string
   githubIntegration?: IntegrationProjectConnection
   vercelIntegration?: IntegrationProjectConnection
-  resourceWarnings?: ResourceWarningResponse
+  resourceWarnings?: ResourceWarning
 }
 
 const ProjectCard = ({
@@ -34,10 +34,15 @@ const ProjectCard = ({
   const desc = `${project.cloud_provider} | ${project.region}`
 
   const isReadonly = useProjectReadOnlyStatus(projectRef)
-  const isBranchingEnabled = project.preview_branch_refs.length > 0
-  const isGithubIntegrated = githubIntegration !== undefined
-  const isVercelIntegrated = vercelIntegration !== undefined
-  const githubRepository = githubIntegration?.metadata.name ?? undefined
+  // const isBranchingEnabled = project.preview_branch_refs.length > 0
+  // const isGithubIntegrated = githubIntegration !== undefined
+  // const isVercelIntegrated = vercelIntegration !== undefined
+  // const githubRepository = githubIntegration?.metadata.name ?? undefined
+
+  const isBranchingEnabled = true
+  const isGithubIntegrated = true
+  const isVercelIntegrated = true
+  const githubRepository = 'supabase/supabase-js'
 
   // Project status should supersede its read only status
   const isHealthy = project.status === PROJECT_STATUS.ACTIVE_HEALTHY
@@ -46,22 +51,21 @@ const ProjectCard = ({
   const isPaused = project.status === PROJECT_STATUS.INACTIVE
   const isRestoring = project.status === PROJECT_STATUS.RESTORING
 
-  const checkProjectResourceWarnings = (resourceWarnings: ResourceWarningResponse) => {
+  const checkProjectResourceWarnings = (resourceWarnings: ResourceWarning) => {
     return Object.values(resourceWarnings).some(
       (value) => typeof value === 'boolean' && value === true
     )
   }
 
-  // const projectHasResourceWarnings =
-  //   resourceWarnings !== undefined ? checkProjectResourceWarnings(resourceWarnings) : false
-  const projectHasResourceWarnings = true
+  const projectHasResourceWarnings =
+    resourceWarnings !== undefined ? checkProjectResourceWarnings(resourceWarnings) : false
 
   return (
     <li className="col-span-1 list-none">
       <CardButton
         linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
         title={
-          <div className="w-full justify-between space-y-1">
+          <div className="w-full justify-between space-y-1.5 px-6">
             <p className="flex-shrink truncate">{name}</p>
             <div className="flex items-center space-x-1.5">
               {isVercelIntegrated && (
@@ -87,61 +91,66 @@ const ProjectCard = ({
                 </>
               )}
             </div>
-            {resourceWarnings && projectHasResourceWarnings && (
-              <ProjectCardWarnings resourceWarnings={resourceWarnings} />
-            )}
           </div>
         }
         footer={
-          <div className="flex items-end justify-between">
-            <span className="text-sm lowercase text-scale-1000">{desc}</span>
+          <div className="flex items-end justify-between px-6">
+            <span className="text-xs lowercase text-scale-1000">{desc}</span>
 
-            {isHealthy && isReadonly && (
-              <div className="grow text-right">
-                <Badge color="yellow">
-                  <div className="flex items-center gap-2">
-                    <IconAlertTriangle size={14} strokeWidth={2} />
-                    <span className="truncate">Read-only mode</span>
-                  </div>
-                </Badge>
-              </div>
+            {isHealthy && (
+              <>
+                {isReadonly ? (
+                  <Badge color="yellow">
+                    <div className="flex items-center gap-2">
+                      <IconAlertTriangle size={14} strokeWidth={2} />
+                      <span className="truncate">Read-only mode</span>
+                    </div>
+                  </Badge>
+                ) : (
+                  <Badge color="green">
+                    <div className="flex items-center gap-2">
+                      <span className="truncate">Active</span>
+                    </div>
+                  </Badge>
+                )}
+              </>
             )}
 
             {isRestoring && (
-              <div className="grow text-right">
-                <Badge color="brand">
-                  <div className="flex items-center gap-2">
-                    <IconLoader className="animate-spin" size={14} strokeWidth={2} />
-                    <span className="truncate">Restoring</span>
-                  </div>
-                </Badge>
-              </div>
+              <Badge color="brand">
+                <div className="flex items-center gap-2">
+                  <IconLoader className="animate-spin" size={14} strokeWidth={2} />
+                  <span className="truncate">Restoring</span>
+                </div>
+              </Badge>
             )}
 
             {isPausing && (
-              <div className="grow text-right">
-                <Badge color="scale">
-                  <div className="flex items-center gap-2">
-                    <IconLoader className="animate-spin" size={14} strokeWidth={2} />
-                    <span className="truncate">Pausing</span>
-                  </div>
-                </Badge>
-              </div>
+              <Badge color="scale">
+                <div className="flex items-center gap-2">
+                  <IconLoader className="animate-spin" size={14} strokeWidth={2} />
+                  <span className="truncate">Pausing</span>
+                </div>
+              </Badge>
             )}
 
             {isPaused && (
-              <div className="grow text-right">
-                <Badge color="scale">
-                  <div className="flex items-center gap-2">
-                    <IconPauseCircle size={14} strokeWidth={2} />
-                    <span className="truncate">Paused</span>
-                  </div>
-                </Badge>
-              </div>
+              <Badge color="scale">
+                <div className="flex items-center gap-2">
+                  <IconPauseCircle size={14} strokeWidth={2} />
+                  <span className="truncate">Paused</span>
+                </div>
+              </Badge>
             )}
           </div>
         }
-      />
+      >
+        {resourceWarnings && projectHasResourceWarnings ? (
+          <ProjectCardWarnings resourceWarnings={resourceWarnings} />
+        ) : (
+          <div className="py-2" />
+        )}
+      </CardButton>
     </li>
   )
 }

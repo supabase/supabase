@@ -18,7 +18,7 @@ import RestoringState from './RestoringState'
 import UpgradingState from './UpgradingState'
 import AppLayout from '../AppLayout/AppLayout'
 import UsageWarningBanner from 'components/ui/UsageWarnings/UsageWarningBanner'
-import { useResourceWarningQuery } from 'data/usage/resource-warnings-query'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -179,7 +179,7 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
     selectedProject?.status === PROJECT_STATUS.PAUSING
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
 
-  const { data: resourceWarnings } = useResourceWarningQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery()
   console.log(resourceWarnings)
   return (
     <>

@@ -12,7 +12,7 @@ import {
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useResourceWarningQuery } from 'data/usage/resource-warnings-query'
+import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useCheckPermissions } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
@@ -37,6 +37,7 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
     isError: isErrorPermissions,
     error: permissionsError,
   } = usePermissionsQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery()
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({ enabled: IS_PLATFORM })
   const projectsByOrg = groupBy(allProjects, 'organization_id')
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
@@ -52,6 +53,7 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
             overdueInvoices={(allOverdueInvoices ?? []).filter(
               (it) => it.organization_id === organization.id
             )}
+            resourceWarnings={resourceWarnings ?? []}
             rewriteHref={rewriteHref}
             isLoadingPermissions={isLoadingPermissions}
             isErrorPermissions={isErrorPermissions}
@@ -72,6 +74,7 @@ type OrganizationProjectsProps = {
   organization: Organization
   projects: Project[]
   overdueInvoices: OverdueInvoicesResponse[]
+  resourceWarnings: ResourceWarning[]
   isLoadingPermissions: boolean
   isErrorPermissions: boolean
   permissionsError: ResponseError | null
@@ -82,9 +85,10 @@ type OrganizationProjectsProps = {
 }
 
 const OrganizationProjects = ({
-  organization: { id, name, slug, subscription_id },
+  organization: { id, name, slug },
   projects,
   overdueInvoices,
+  resourceWarnings,
   isLoadingPermissions,
   isErrorPermissions,
   permissionsError,
@@ -95,10 +99,6 @@ const OrganizationProjects = ({
 }: OrganizationProjectsProps) => {
   const isEmpty = !projects || projects.length === 0
   const canReadProjects = useCheckPermissions(PermissionAction.READ, 'projects', undefined, id)
-  const { data: resourceWarnings } = useResourceWarningQuery()
-
-  console.log(resourceWarnings)
-  console.log('one render')
 
   return (
     <div className="space-y-3" key={makeRandomString(5)}>
@@ -166,7 +166,7 @@ const OrganizationProjects = ({
                 key={makeRandomString(5)}
                 project={project}
                 rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
-                resourceWarnings={resourceWarnings?.find(
+                resourceWarnings={resourceWarnings.find(
                   (resourceWarning) => resourceWarning.project === project.ref
                 )}
               />
