@@ -110,7 +110,7 @@ const DateRangePicker = ({
             date: today,
             time_period: 'today',
           },
-          interval: '5m',
+          interval: '4m',
         })
         break
       case '1h':
@@ -123,7 +123,7 @@ const DateRangePicker = ({
             date: today,
             time_period: 'today',
           },
-          interval: '5m',
+          interval: '2m',
         })
         break
       case '7d':
