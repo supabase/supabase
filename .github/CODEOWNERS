@@ -1,5 +1,5 @@
-/studio/ @supabase/frontend
-/apps/www/ @supabase/frontend
+/studio/ @supabase/Dashboard
+/apps/www/ @supabase/Website
 /apps/docs/ @supabase/docs
 /spec/ @supabase/docs
 /docker/ @supabase/cli
