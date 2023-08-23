@@ -2,6 +2,7 @@ import clsx from 'clsx'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 
 import { useParams } from 'common'
+import { Markdown } from 'components/interfaces/Markdown'
 import {
   OAuthAppCreateResponse,
   useOAuthAppCreateMutation,
@@ -10,9 +11,21 @@ import { useOAuthAppUpdateMutation } from 'data/oauth/oauth-app-update-mutation'
 import { OAuthApp } from 'data/oauth/oauth-apps-query'
 import { useStore } from 'hooks'
 import { isValidHttpUrl, uuidv4 } from 'lib/helpers'
-import { Badge, Button, Dropdown, Form, IconEdit, IconUpload, Input, Modal, SidePanel } from 'ui'
 import { uploadAttachment } from 'lib/upload'
-import AuthorizeRequesterDetails from './AuthorizeRequesterDetails'
+import {
+  Badge,
+  Button,
+  Dropdown,
+  Form,
+  IconEdit,
+  IconUpload,
+  Input,
+  Modal,
+  SidePanel,
+  Tabs,
+} from 'ui'
+import AuthorizeRequesterDetails from '../AuthorizeRequesterDetails'
+import { DroppableTextArea } from './droppableTextArea'
 
 export interface PublishAppSidePanelProps {
   visible: boolean
@@ -75,6 +88,7 @@ const PublishAppSidePanel = ({
   const [iconUrl, setIconUrl] = useState<string>()
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [urls, setUrls] = useState<{ id: string; value: string }[]>([{ id: uuidv4(), value: '' }])
+  const [descriptionText, setDescriptionText] = useState('')
 
   useEffect(() => {
     if (visible) {
@@ -111,7 +125,6 @@ const PublishAppSidePanel = ({
   }
 
   const onFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    event.persist()
     const [file] = event.target.files || (event as any).dataTransfer.items
     setIconFile(file)
     setIconUrl(URL.createObjectURL(file))
@@ -321,6 +334,19 @@ const PublishAppSidePanel = ({
                       </div>
                     </SidePanel.Content>
                     <SidePanel.Separator />
+                    <SidePanel.Content className="py-4">
+                      <Tabs type="underlined" size="small">
+                        <Tabs.Panel id="write" label="Write">
+                          <DroppableTextArea
+                            value={descriptionText}
+                            onChange={setDescriptionText}
+                          />
+                        </Tabs.Panel>
+                        <Tabs.Panel id="preview" label="Preview">
+                          <Markdown content={descriptionText} />
+                        </Tabs.Panel>
+                      </Tabs>
+                    </SidePanel.Content>
                   </div>
 
                   <SidePanel.Separator />
