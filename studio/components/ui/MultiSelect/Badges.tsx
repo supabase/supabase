@@ -33,6 +33,7 @@ export const BadgeSelected = ({
       className="cursor-pointer opacity-50 transition hover:opacity-100"
       onClick={(e: any) => {
         e.preventDefault()
+        e.stopPropagation()
         handleRemove()
       }}
     />
