@@ -307,7 +307,7 @@ Security-definer functions should never be created in a schema in the "Exposed s
 
 You can often rewrite your Policies to avoid joins between the source and the target table. Instead, try to organize your Policy to fetch all the relevant data from the target table into an array or set, then you can use an `IN` or `ANY` operation in your filter.
 
-For example, this is an example of a slow Policy which joins the source `test_table` to the target `team_user`:
+For example, this is an example of a slow policy which joins the source `test_table` to the target `team_user`:
 
 ```sql
 create policy "rls_test_select" on test_table
