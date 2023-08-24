@@ -138,46 +138,7 @@ For working with JWT and Auth functions.
 
 ### Roles
 
-Supabase creates several default roles in your Postgres database. To restore defaults at any time you can run the commands inside the
-[schema initialization scripts](https://github.com/supabase/postgres/tree/develop/migrations/db/init-scripts). Remember to change your
-[role passwords](/docs/guides/self-hosting/docker#securing-your-setup) before deploying to production environments.
-
-##### `postgres`
-
-The default PostgreSQL role. This has admin privileges.
-
-##### `anon`
-
-For "anonymous access". This is the role which the API (PostgREST) will use when a user _is not_ logged in.
-
-##### `authenticator`
-
-A special role for the API (PostgREST). It has very limited access, and is used to validate a JWT and then
-"change into" another role determined by the JWT verification.
-
-##### `authenticated`
-
-For "authenticated access". This is the role which the API (PostgREST) will use when a user _is_ logged in.
-
-##### `service_role`
-
-For elevated access. This role is used by the API (PostgREST) to bypass Row Level Security.
-
-##### `supabase_auth_admin`
-
-Used by the Auth middleware to connect to the database and run migration. Access is scoped to the `auth` schema.
-
-##### `supabase_storage_admin`
-
-Used by the Auth middleware to connect to the database and run migration. Access is scoped to the `storage` schema.
-
-##### `dashboard_user`
-
-For running commands via the Supabase UI.
-
-##### `supabase_admin`
-
-Supabase Administrative role for maintaining your database.
+Supabase creates several [default roles](/docs/guides/database/postgres-roles) in your Postgres database. To restore defaults at any time you can run the commands inside the [schema initialization scripts](https://github.com/supabase/postgres/tree/develop/migrations/db/init-scripts). Remember to change your [role passwords](/docs/guides/self-hosting/docker#securing-your-setup) before deploying to production environments.
 
 ### Realtime Logs
 
