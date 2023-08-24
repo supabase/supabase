@@ -11,7 +11,7 @@ import Hero from '~/components/Hero/Hero'
 // Import Swiper styles if swiper used on page
 import 'swiper/swiper.min.css'
 
-const Products = dynamic(() => import('~/components/Products/index'))
+const Products = dynamic(() => import('~/components/ProductsSection/index'))
 const BackedBy = dynamic(() => import('~/components/BackedBy'))
 const BuiltExamples = dynamic(() => import('components/BuiltWithSupabase/index'))
 const MadeForDevelopers = dynamic(() => import('components/MadeForDevelopers/index'))
