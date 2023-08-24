@@ -4,41 +4,23 @@ export const meta = {
   id: 'storage-access-control',
   title: 'Access Control',
   description: 'Manage who can access your Supabase Storage files.',
-  video: 'https://www.youtube.com/v/4ERX__Y908k',
+  subtitle: 'Manage who can access your Supabase Storage files.',
+  tocVideo: '4ERX__Y908k',
 }
 
-Supabase Storage is integrated with your [Postgres Database](/docs/guides/database).
-This means that you can use the same [Row Level Security Policies](/docs/guides/auth#policies)
-for managing access to your files. Supabase Storage stores metadata in the `objects` and `buckets` table in the storage schema.
+Supabase Storage is integrated with your [Postgres Database](/docs/guides/database). This means that you can use the same [Row Level Security Policies](/docs/guides/auth#policies) for managing access to your files. Supabase Storage stores metadata in the `objects` and `buckets` table in the storage schema.
 
 To allow read access to files, the RLS policy must allow users to `SELECT` the `objects` table and for uploading a new object, the RLS policy must grant users access to `INSERT` into the `objects` table and so on. The mapping between the different API calls and the database permissions required is documented in the [Reference docs](/docs/reference/javascript/storage-createbucket).
 
-<Admonition type="note">
-
-Access control for Storage is mapped to CRUD operations on the `buckets` and `objects` table via RLS policies.
-
-</Admonition>
-
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/4ERX__Y908k"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
-
 ## Public and private buckets
 
-Storage buckets are private by default. For private buckets, you can access objects via the [download](/docs/reference/javascript/storage-from-download) method. This corresponds to `/object/auth/` API endpoint.
-Alternatively, you can create a publicly shareable URL with an expiry date using the [createSignedUrl](/docs/reference/javascript/storage-from-createsignedurl) method
-which calls the `/object/sign/` API.
+Storage buckets are private by default. For private buckets, you can access objects via the [download](/docs/reference/javascript/storage-from-download) method. This corresponds to `/object/auth/` API endpoint. Alternatively, you can create a publicly shareable URL with an expiry date using the [createSignedUrl](/docs/reference/javascript/storage-from-createsignedurl) method which calls the `/object/sign/` API.
 
-For public buckets, you can access the assets directly without a token or an Authorisation header. The [getPublicUrl](/docs/reference/javascript/storage-from-getpublicurl)
-helper method returns the full public URL for an asset. This calls the `/object/public/` API endpoint internally. While no authorization is required for accessing objects in a public bucket, proper [access control](#access-control) is required for other operations like uploading, deleting objects from public buckets as well. Public buckets also tend to have [better performance](/docs/guides/storage-cdn#public-vs-private-buckets).
+For public buckets, you can access the assets directly without a token or an Authorisation header. The [getPublicUrl](/docs/reference/javascript/storage-from-getpublicurl) helper method returns the full public URL for an asset. This calls the `/object/public/` API endpoint internally. While no authorization is required for accessing objects in a public bucket, proper [access control](#access-control) is required for other operations like uploading, deleting objects from public buckets as well. Public buckets also tend to have [better performance](/docs/guides/storage-cdn#public-vs-private-buckets).
 
-<details>
-<summary>Advanced: reverse proxy</summary>
+<details className="cursor-default">
+<summary className="cursor-pointer">Advanced: reverse proxy</summary>
+
 The URLs returned are proxied through the API Proxy. They are prefixed by <code>/storage/v1</code>.
 
 For example, on the hosted Platform they will be
@@ -54,9 +36,7 @@ You can access the storage API directly with the same endpoint. See the <a href=
 Supabase Storage provides SQL helper functions which you can use in your database queries and
 policies.
 
----
-
-#### `storage.filename()`
+### `storage.filename()`
 
 Returns the name of a file.
 
@@ -69,9 +49,7 @@ For example, if your file is stored in `public/subfolder/avatar.png` it would re
 
 `'avatar.png'`
 
----
-
-#### `storage.foldername()`
+### `storage.foldername()`
 
 Returns an array path, with all of the subfolders that a file belongs to.
 
@@ -84,9 +62,7 @@ For example, if your file is stored in `public/subfolder/avatar.png` it would re
 
 `[ 'public', 'subfolder' ]`
 
----
-
-#### `storage.extension()`
+### `storage.extension()`
 
 Returns the extension of a file.
 
