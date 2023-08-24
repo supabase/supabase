@@ -10,7 +10,7 @@ export const meta = {
 
 Supabase Storage is designed to work perfectly with [Postgres Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS).
 
-You can use RLS to create [Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) that are incredibly powerful and flexible, allowing you to write complex SQL rules which fit your unique business needs.
+You can use RLS to create [Security Access Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) that are incredibly powerful and flexible, allowing you to restrict access based on your business needs. 
 
 ## Policies
 
@@ -36,7 +36,7 @@ Storage buckets are private by default. For private buckets, you can access obje
 
 For public buckets, you can access the assets directly without a token or an Authorisation header. The [getPublicUrl](/docs/reference/javascript/storage-from-getpublicurl) helper method returns the full public URL for an asset. This calls the `/object/public/` API endpoint internally. While no authorization is required for accessing objects in a public bucket, proper [access control](#access-control) is required for other operations like uploading, deleting objects from public buckets as well. Public buckets also tend to have [better performance](/docs/guides/storage-cdn#public-vs-private-buckets).
 
-The URLs returned are proxied through the API Proxy. They are prefixed by <code>/storage/v1</code>. For example, on the hosted Platform they will be:
+The URLs to access storage endpoints are prefixed with <code>/storage/v1</code>. For example, on the hosted Platform they will be:
 
 <code>https://[project_ref].supabase.co/storage/v1/object/public/[id]</code>
 
