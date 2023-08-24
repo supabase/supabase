@@ -38,22 +38,14 @@ const BillingEmail = () => {
     }
 
     if (!slug) return console.error('Slug is required')
-    if (!name) return console.error('Organization name is required')
 
     updateOrganization(
-      {
-        slug,
-        name,
-        billing_email: values.billing_email,
-      },
+      { slug, billing_email: values.billing_email },
       {
         onSuccess: ({ billing_email }) => {
           resetForm({ values: { billing_email }, initialValues: { billing_email } })
           invalidateOrganizationsQuery(queryClient)
-          ui.setNotification({
-            category: 'success',
-            message: 'Successfully saved settings',
-          })
+          ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
         },
       }
     )
