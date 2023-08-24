@@ -50,7 +50,7 @@ Once you have enabled RLS, no data will be accessible until you create policies.
 
 Policies are simply SQL logic that you attach to a Postgres table. You can attach as many policies as you want to each table.
 
-Supabase provides some [helpers](/docs/guides/auth/row-level-security#helper-functions) that simplify RLS if you're using Supabase Auth. We'll use these helpers to illustrate some basic Policies:
+Supabase provides some [helpers](/docs/guides/auth/row-level-security#helper-functions) that simplify RLS if you're using Supabase Auth. We'll use these helpers to illustrate some basic policies:
 
 ### SELECT Policies
 
@@ -339,7 +339,9 @@ In this case you can also consider [using a `security definer` function](#use-se
 
 {/* prettier-ignore */}
 <Admonition type="note">
-If the `in` list gets to be over 10K items, then extra analysis and a different approach may be needed.
+
+If the list exceeds 1000 items, a different approach may be needed or you may need to analyze the approach to ensure that the performance is acceptable.
+
 </Admonition>
 
 #### Benchmarks
