@@ -21,7 +21,7 @@ Users with weak passwords or compromised social login accounts are prone to mali
 
 ## Overview
 
-Supabase Auth implements only Time-based One Time Factor(TOTP) multi-factor authentication. This type of multi-factor authentication uses a timed one-time password generated from an authenticator app in the control of users.
+Supabase Auth implements only Time-based One Time Password(TOTP) multi-factor authentication. This type of multi-factor authentication uses a timed one-time password generated from an authenticator app in the control of users.
 
 Applications using MFA require two important flows:
 
@@ -50,11 +50,11 @@ graph TD;
 `}
 />
 
-These sets of APIs let you control the MFA experience that works for you. You can create flows where MFA is optional, mandatory for all or only specific groups of users.
+These sets of APIs let you control the MFA experience that works for you. You can create flows where MFA is optional, mandatory for all, or only specific groups of users.
 
 Once users have enrolled or signed-in with a factor, Supabase Auth adds additional metadata to the user's access token (JWT) that your application can use to allow or deny access.
 
-This information is represented by an [Authenticator Assurance Level](https://pages.nist.gov/800-63-3-Implementation-Resources/63B/AAL/), a standard measure about the assurance Supabase Auth has of the user's identity for that particular session. There are two levels recognized today:
+This information is represented by an [Authenticator Assurance Level](https://pages.nist.gov/800-63-3-Implementation-Resources/63B/AAL/), a standard measure about the assurance of the user's identity Supabase Auth has for that particular session. There are two levels recognized today:
 
 1. **Assurance Level 1: `aal1`**
    Means that the user's identity was verified using a conventional login method
@@ -64,7 +64,7 @@ This information is represented by an [Authenticator Assurance Level](https://pa
    Means that the user's identity was additionally verified using at least one
    second factor, such as a TOTP code.
 
-This assurance level is encoded in the `aal` claim in the JWT associated with the user. By decoding this value you can create custom authorization rules in your frontend, backend and database that will enforce the MFA policy that works for your application. JWTs without an `aal` claim are at the `aal1` level.
+This assurance level is encoded in the `aal` claim in the JWT associated with the user. By decoding this value you can create custom authorization rules in your frontend, backend, and database that will enforce the MFA policy that works for your application. JWTs without an `aal` claim are at the `aal1` level.
 
 ## Adding to your app
 
@@ -225,7 +225,7 @@ When a user unenrolls a factor, call `supabase.auth.mfa.unenroll()` with the ID 
 
 #### Example: React
 
-Below is an example that creates a new `UnenrollMFA` component that illustrates the important pieces of the MFA enrollment flow. Note that users can only unenroll a factor after completing the enrollment flow and obtaining an `aal2` JWT claim.Here are some points of note:
+Below is an example that creates a new `UnenrollMFA` component that illustrates the important pieces of the MFA enrollment flow. Note that users can only unenroll a factor after completing the enrollment flow and obtaining an `aal2` JWT claim. Here are some points of note:
 
 - When the component appears on screen, the `supabase.auth.mfa.listFactors()` endpoint
   fetches all existing factors together with their details.
@@ -291,7 +291,7 @@ export function UnenrollMFA() {
 
 ### Add challenge step to login
 
-Once a user has logged in via their first factor (email+password, magic link, one time password, social login...) you need to perform a check if any additional factors need to be verified.
+Once a user has logged in via their first factor (email+password, magic link, one time password, social login etc.) you need to perform a check if any additional factors need to be verified.
 
 This can be done by using the `supabase.auth.mfa.getAuthenticatorAssuranceLevel()` API. When the user signs in and is redirected back to your app, you should call this method to extract the user's current and next authenticator assurance level (AAL).
 
@@ -431,7 +431,7 @@ function AuthMFA() {
 
 ### Enforce rules for MFA logins
 
-Adding MFA to your app's UI does not in-and-of-itself offer a higher level of security to your users. You also need to enforce the MFA rules in your application's database, APIs and server-side rendering.
+Adding MFA to your app's UI does not in-and-of-itself offer a higher level of security to your users. You also need to enforce the MFA rules in your application's database, APIs, and server-side rendering.
 
 Depending on your application's needs, there are three ways you can choose to enforce MFA.
 

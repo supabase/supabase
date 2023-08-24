@@ -13,7 +13,7 @@ When you need granular authorization rules, nothing beats Postgres's [Row Level 
 
 RLS is incredibly powerful and flexible, allowing you to write complex SQL rules that fit your unique business needs. RLS can be [combined with Supabase Auth](/docs/guides/auth/row-level-security) for end-to-end user security from the browser to the database.
 
-Alternatively, RLS can provide "[defense in depth](<https://en.wikipedia.org/wiki/Defense_in_depth_(computing)>)" to protect your data from malicious actors if you're using your own tooling with the Postgres database we provide.
+RLS is a Postgres primitive and can provide "[defense in depth](<https://en.wikipedia.org/wiki/Defense_in_depth_(computing)>)" to protect your data from malicious actors even when accessed through 3rd party tooling.
 
 ## Policies
 
@@ -38,7 +38,7 @@ where auth.uid() = todos.user_id;
 
 ## Enabling Row Level Security
 
-You can enable RLS for any table using the `enable row level security` command:
+You can enable RLS for any table using the `enable row level security` clause:
 
 ```sql
 alter table "table_name" enable row level security;
@@ -54,7 +54,7 @@ Supabase provides some [helpers](/docs/guides/auth/row-level-security#helper-fun
 
 ### SELECT Policies
 
-You can specify select policies with the `using` command.
+You can specify select policies with the `using` clause.
 
 Let's say you have a table called `profiles` in the public schema and you want enable read access to everyone.
 
@@ -76,7 +76,7 @@ to anon         -- the Postgres Role (recommended)
 using ( true ); -- the actual Policy
 ```
 
-Alternatively if you only wanted users to be able to see their own profiles:
+Alternatively, if you only wanted users to be able to see their own profiles:
 
 ```sql
 create policy "Profiles are viewable by everyone."
@@ -86,7 +86,7 @@ for select using ( auth.uid() = user_id );
 
 ### INSERT Policies
 
-You can specify select policies with the `with check` command.
+You can specify select policies with the `with check` clause.
 
 Let's say you have a table called `profiles` in the public schema and you only want users to be able to create a profile for themselves. In that case, we want to check their User ID matches the value that they are trying to insert:
 
@@ -110,7 +110,7 @@ using ( auth.id() = user_id );      -- the actual Policy
 
 ### UPDATE Policies
 
-You can specify select policies with the `using` command.
+You can specify select policies with the `using` clause.
 
 Let's say you have a table called `profiles` in the public schema and you only want users to be able to update their own profile:
 
@@ -134,7 +134,7 @@ using ( auth.id() = user_id );      -- the actual Policy
 
 ### DELETE Policies
 
-You can specify select policies with the `using` command.
+You can specify select policies with the `using` clause.
 
 Let's say you have a table called `profiles` in the public schema and you only want users to be able to delete their own profile:
 
@@ -168,7 +168,7 @@ This can be useful for system-level access. You should _never_ share login crede
 
 ## RLS Performance Recommendations
 
-Every authorization system has an impact on Performance. While Row Level Security is powerful, the performance impact is important to keep in mind. This is especially true for queries that scan every row in a table - like many `select` operations, including those using limit, offset, and ordering.
+Every authorization system has an impact on performance. While row level security is powerful, the performance impact is important to keep in mind. This is especially true for queries that scan every row in a table - like many `select` operations, including those using limit, offset, and ordering.
 
 Based on a series of [tests](https://github.com/GaryAustin1/RLS-Performance), we have a few recommendations for RLS:
 
@@ -198,7 +198,7 @@ using btree (user_id);
 
 ### Call functions with `select`
 
-You can use `select` statement to improve Policies that use Functions. For example, instead of this:
+You can use `select` statement to improve policies that use functions. For example, instead of this:
 
 ```sql
 create policy "rls_test_select" on test_table
@@ -305,9 +305,9 @@ Security-definer functions should never be created in a schema in the "Exposed s
 
 ### Minimize joins
 
-You can often rewrite your Policies to avoid joins between the source and the target table. Instead, try to organize your Policy to fetch all the relevant data from the target table into an array or set, then you can use an `IN` or `ANY` operation in your filter.
+You can often rewrite your Policies to avoid joins between the source and the target table. Instead, try to organize your policy to fetch all the relevant data from the target table into an array or set, then you can use an `IN` or `ANY` operation in your filter.
 
-For example, this is an example of a slow Policy which joins the source `test_table` to the target `team_user`:
+For example, this is an example of a slow policy which joins the source `test_table` to the target `team_user`:
 
 ```sql
 create policy "rls_test_select" on test_table
