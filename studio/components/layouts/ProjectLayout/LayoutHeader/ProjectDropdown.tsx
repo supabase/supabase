@@ -106,7 +106,7 @@ const ProjectDropdown = () => {
       }
     >
       <Button type="text">
-        <span className="text-sm">{selectedProject?.name}</span>
+        <span className="text-xs">{selectedProject?.name}</span>
       </Button>
     </Dropdown>
   ) : (
