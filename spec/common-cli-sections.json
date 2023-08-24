@@ -154,6 +154,12 @@
         "title": "Lint local database",
         "slug": "supabase-db-lint",
         "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-start",
+        "title": "Start only the local database",
+        "slug": "supabase-db-start",
+        "type": "cli-command"
       }
     ]
   },
