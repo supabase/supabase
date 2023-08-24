@@ -70,6 +70,10 @@
       {
         "text": "SOC2",
         "url": "https://forms.supabase.com/soc2"
+      },
+      {
+        "text": "HIPAA",
+        "url": "https://forms.supabase.com/hipaa"
       }
     ]
   },

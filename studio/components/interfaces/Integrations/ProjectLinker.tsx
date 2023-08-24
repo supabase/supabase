@@ -1,7 +1,7 @@
 import { ReactNode, useRef, useState } from 'react'
 
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { IntegrationConnectionsCreateVariables } from 'data/integrations/types'
+import { IntegrationConnectionsCreateVariables } from 'data/integrations/integrations.types'
 import { useSelectedOrganization } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { toast } from 'react-hot-toast'

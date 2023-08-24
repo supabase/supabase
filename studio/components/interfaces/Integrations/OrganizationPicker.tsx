@@ -74,7 +74,7 @@ const OrganizationPicker = ({
             disabled={disabled}
             iconRight={
               <span className="grow flex justify-end">
-                <IconChevronDown className={''} />
+                <IconChevronDown />
               </span>
             }
           >

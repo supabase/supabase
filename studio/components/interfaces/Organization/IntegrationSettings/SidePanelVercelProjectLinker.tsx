@@ -13,6 +13,7 @@ import { useSelectedOrganization } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
 import { SidePanel } from 'ui'
+import { useSidePanelsStateSnapshot } from 'state/side-panels'
 
 const VERCEL_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 512 512" className="w-6">
@@ -20,18 +21,10 @@ const VERCEL_ICON = (
   </svg>
 )
 
-export type SidePanelVercelProjectLinkerProps = {
-  isOpen?: boolean
-  onClose?: () => void
-  organizationIntegrationId?: string
-}
-
-const SidePanelVercelProjectLinker = ({
-  isOpen = false,
-  onClose,
-  organizationIntegrationId,
-}: SidePanelVercelProjectLinkerProps) => {
+const SidePanelVercelProjectLinker = () => {
   const selectedOrganization = useSelectedOrganization()
+  const sidePanelStateSnapshot = useSidePanelsStateSnapshot()
+  const organizationIntegrationId = sidePanelStateSnapshot.vercelConnectionsIntegrationId
 
   const { data: integrationData } = useOrgIntegrationsQuery({
     orgSlug: selectedOrganization?.slug,
@@ -94,7 +87,7 @@ const SidePanelVercelProjectLinker = ({
   const { mutate: createConnections, isLoading: isCreatingConnection } =
     useIntegrationVercelConnectionsCreateMutation({
       onSuccess() {
-        onClose?.()
+        sidePanelStateSnapshot.setVercelConnectionsOpen(false)
       },
     })
 
@@ -122,9 +115,9 @@ const SidePanelVercelProjectLinker = ({
     <SidePanel
       header={'Add new Vercel Project Connection'}
       size="large"
-      visible={isOpen}
+      visible={sidePanelStateSnapshot.vercelConnectionsOpen}
       hideFooter
-      onCancel={() => onClose?.()}
+      onCancel={() => sidePanelStateSnapshot.setVercelConnectionsOpen(false)}
     >
       <div className="py-10 flex flex-col gap-6 bg-body h-full">
         <SidePanel.Content>

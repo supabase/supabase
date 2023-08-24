@@ -43,15 +43,15 @@ const Subscription = () => {
     <>
       <ScaffoldSection>
         <ScaffoldSectionDetail>
-          <div className="sticky space-y-6 top-16">
-            <p className="text-base">Subscription Plan</p>
+          <div className="sticky space-y-6 top-12">
+            <p className="text-base m-0">Subscription Plan</p>
             <div className="space-y-2">
-              <p className="text-sm text-scale-1100">More information</p>
+              <p className="text-sm text-scale-1100 m-0">More information</p>
               <div>
                 <Link href="https://supabase.com/pricing">
                   <a target="_blank" rel="noreferrer">
                     <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                      <p className="text-sm">Pricing</p>
+                      <p className="text-sm m-0">Pricing</p>
                       <IconExternalLink size={16} strokeWidth={1.5} />
                     </div>
                   </a>

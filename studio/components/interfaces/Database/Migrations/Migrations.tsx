@@ -11,7 +11,7 @@ import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-
 import MigrationsEmptyState from './MigrationsEmptyState'
 import dayjs from 'dayjs'
 
-const Wrappers = () => {
+const Migrations = () => {
   const [search, setSearch] = useState('')
   const [selectedMigration, setSelectedMigration] = useState<DatabaseMigration>()
 
@@ -183,4 +183,4 @@ const Wrappers = () => {
   )
 }
 
-export default observer(Wrappers)
+export default observer(Migrations)
