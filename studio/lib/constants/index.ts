@@ -1,7 +1,7 @@
 export * from './infrastructure'
 export * from './metrics'
 
-export const ENV: 'prod' | 'staging' =
+export const ENVIRONMENT: 'prod' | 'staging' =
   (process.env.NEXT_PUBLIC_ENVIRONMENT as 'prod' | 'staging') ?? 'staging'
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
 export const DEFAULT_HOME = IS_PLATFORM ? '/projects' : '/project/default'

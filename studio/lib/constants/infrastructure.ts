@@ -1,4 +1,4 @@
-import { ENV } from '.'
+import { ENVIRONMENT } from '.'
 
 export type CloudProvider = 'FLY' | 'AWS'
 export type Region = typeof AWS_REGIONS | typeof FLY_REGIONS
@@ -28,7 +28,8 @@ export const FLY_REGIONS = {
   SOUTHEAST_ASIA: 'Singapore',
 } as const
 
-export const AWS_REGIONS_DEFAULT = ENV !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.WEST_US
+export const AWS_REGIONS_DEFAULT =
+  ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.WEST_US
 
 // TO DO, change default to US region for prod
 export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
@@ -55,7 +56,7 @@ export const PRICING_TIER_PRODUCT_IDS = {
 export const PRICING_TIER_FREE_KEY = 'FREE'
 export const PRICING_TIER_DEFAULT_KEY = 'FREE'
 
-export const DEFAULT_PROVIDER: CloudProvider = ENV !== 'prod' ? 'FLY' : 'AWS'
+export const DEFAULT_PROVIDER: CloudProvider = ENVIRONMENT !== 'prod' ? 'FLY' : 'AWS'
 
 export const PROVIDERS = {
   FLY: {
