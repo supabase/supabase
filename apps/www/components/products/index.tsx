@@ -10,40 +10,47 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import ProductCard from './ProductCard'
 import DatabaseVisual from './DatabaseVisual'
+import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 
 const Products = (props: any) => {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
 
-  const sendTelemetryEvent = async (product: any) => {
+  const sendTelemetryEvent = async (product: PRODUCT_SHORTNAMES) => {
     switch (product) {
-      case 'Database':
+      case PRODUCT_SHORTNAMES.DATABASE:
         return await Telemetry.sendEvent(
           gaEvents['www_hp_subhero_products_database'],
           telemetryProps,
           router
         )
-      case 'Authentication':
+      case PRODUCT_SHORTNAMES.AUTHENTICATION:
         return await Telemetry.sendEvent(
           gaEvents['www_hp_subhero_products_auth'],
           telemetryProps,
           router
         )
-      case 'Storage':
+      case PRODUCT_SHORTNAMES.STORAGE:
         return await Telemetry.sendEvent(
           gaEvents['www_hp_subhero_products_storage'],
           telemetryProps,
           router
         )
-      case 'Edge Functions':
+      case PRODUCT_SHORTNAMES.FUNCTIONS:
         return await Telemetry.sendEvent(
           gaEvents['www_hp_subhero_products_edgeFunctions'],
           telemetryProps,
           router
         )
-      case 'Realtime':
+      case PRODUCT_SHORTNAMES.REALTIME:
         return await Telemetry.sendEvent(
           gaEvents['www_hp_subhero_products_realtime'],
+          telemetryProps,
+          router
+        )
+      case PRODUCT_SHORTNAMES.VECTOR:
+        return await Telemetry.sendEvent(
+          gaEvents['www_hp_subhero_products_vector'],
           telemetryProps,
           router
         )
@@ -73,7 +80,7 @@ const Products = (props: any) => {
               </li>
             </ul>
           }
-          onClick={() => sendTelemetryEvent(name)}
+          onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.DATABASE)}
           image={<DatabaseVisual />}
           className="col-span-6"
         />
@@ -95,14 +102,14 @@ const Products = (props: any) => {
                 alt="Supabase Authentication"
                 layout="fill"
                 objectFit="cover"
-                objectPosition="right"
+                objectPosition="center"
                 className="antialiased"
                 quality={100}
               />
             </div>
           }
           className="col-span-6 xl:col-span-3"
-          onClick={() => sendTelemetryEvent(name)}
+          onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.AUTHENTICATION)}
         />
         <ProductCard
           url={props.products['functions'].url}
@@ -115,7 +122,7 @@ const Products = (props: any) => {
               servers.
             </>
           }
-          onClick={() => sendTelemetryEvent(name)}
+          onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.FUNCTIONS)}
           image={
             <div className="absolute inset-0 z-0">
               <Image
@@ -150,7 +157,7 @@ const Products = (props: any) => {
             </div>
           }
           className="col-span-6 xl:col-span-3"
-          onClick={() => sendTelemetryEvent(name)}
+          onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.STORAGE)}
         />
         <ProductCard
           url={props.products['realtime'].url}
@@ -163,6 +170,7 @@ const Products = (props: any) => {
               synchronization.
             </>
           }
+          onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.REALTIME)}
           image={
             <div className="absolute inset-0 z-0">
               <Image
@@ -194,7 +202,7 @@ const Products = (props: any) => {
               </li>
             </ul>
           }
-          onClick={() => sendTelemetryEvent(name)}
+          onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.VECTOR)}
           image={
             <div className="absolute inset-0 z-0">
               <Image

@@ -34,11 +34,11 @@ const ProductCard = ({
         onClick={onClick}
       >
         <Panel
-          hasShimmer
+          // hasShimmer
           hasActiveOnHover
           outerClassName="relative w-full h-full group/2 shadow-lg p-0"
           innerClassName="relative overflow-hidden flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
-                  w-full rounded-xl h-full !bg"
+                  w-full rounded-xl h-full bg"
         >
           <m.div
             className={[
@@ -56,7 +56,7 @@ const ProductCard = ({
                 alignLeft && 'lg:mx-0 lg:items-start lg:text-left lg:max-w-[200px]',
               ].join(' ')}
             >
-              <div className="flex items-center justify-center h-12 w-12 bg-slate-300 rounded-lg">
+              <div className="flex items-center justify-center h-12 w-12 bg-alternative rounded-lg">
                 {icon && (
                   <svg
                     width="25"
