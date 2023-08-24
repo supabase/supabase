@@ -16,7 +16,6 @@ function TweetCard(props: TweetCard) {
       rounded-2xl border bg-white p-6
       drop-shadow-sm
 
-
     "
     >
       <div className="relative">
@@ -45,13 +44,19 @@ function TweetCard(props: TweetCard) {
             className="absolute -left-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full"
             style={{ background: '#000' }}
           >
-           
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" version="1.1" className="h-[12px] w-[12px]"
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 32 32"
+              version="1.1"
+              className="h-[12px] w-[12px]"
               fill="currentColor"
-              aria-hidden="true">
-            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="#ffffff"></path>
-          </svg> 
-
+              aria-hidden="true"
+            >
+              <path
+                d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+                fill="#ffffff"
+              ></path>
+            </svg>
           </div>
         </div>
       </div>
