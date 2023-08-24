@@ -80,36 +80,45 @@ on:
 
 jobs:
   update:
+    permissions:
+      contents: write
+      pull-requests: write
     runs-on: ubuntu-latest
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       PROJECT_REF: <your-project-id>
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.5.3
         with:
-          persist-credentials: false
+          ref: ${{ github.head_ref }}
           fetch-depth: 0
-      - uses: actions/setup-node@v2.1.5
+
+      - name: Setup pnpm 7
+        uses: pnpm/action-setup@v2.4.0
+
+      - uses: actions/setup-node@v3.8.1
         with:
-          node-version: 16
-      - run: npm run update-types
+          node-version: 18.x
+
+      - run: pnpm update-types
+
       - name: check for file changes
         id: git_status
-        run: |
-          echo "::set-output name=status::$(git status -s)"
+        run: echo "status=$(git status -s)" >> $GITHUB_OUTPUT
+
       - name: Commit files
         if: ${{contains(steps.git_status.outputs.status, ' ')}}
         run: |
           git add types/database/index.ts
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git commit -m "Update database types" -a
+          git commit -a -m "Update database types"
+          
       - name: Push changes
         if: ${{contains(steps.git_status.outputs.status, ' ')}}
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
+          branch: ${{ github.head_ref }}
 ```
 
 Alternatively, you can use a community-supported GitHub action: [generate-supabase-db-types-github-action](https://github.com/lyqht/generate-supabase-db-types-github-action).
