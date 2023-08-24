@@ -9,6 +9,7 @@ const CHUNK_SIZE = 1024 * 1024 * 0.25 // 0.25MB
 export const parseSpreadsheetText: any = (text: string) => {
   const columnTypeMap: any = {}
   let previewRows: any[] = []
+  text = text.replaceAll(/(?<=,|^)[{[].+[}\]](?=,|\n|$)/g, (res) => `"${res.replaceAll('"', '""')}"`)
   return new Promise((resolve) => {
     Papa.parse(text, {
       header: true,
