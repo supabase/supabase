@@ -225,7 +225,7 @@ When a user unenrolls a factor, call `supabase.auth.mfa.unenroll()` with the ID 
 
 #### Example: React
 
-Below is an example that creates a new `UnenrollMFA` component that illustrates the important pieces of the MFA enrollment flow. Note that users can only unenroll a factor after completing the enrollment flow and obtaining an `aal2` JWT claim.Here are some points of note:
+Below is an example that creates a new `UnenrollMFA` component that illustrates the important pieces of the MFA enrollment flow. Note that users can only unenroll a factor after completing the enrollment flow and obtaining an `aal2` JWT claim. Here are some points of note:
 
 - When the component appears on screen, the `supabase.auth.mfa.listFactors()` endpoint
   fetches all existing factors together with their details.
