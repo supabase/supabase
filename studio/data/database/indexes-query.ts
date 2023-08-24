@@ -17,10 +17,8 @@ export const getIndexesQuery = ({ schema }: { schema: string }) => {
 SELECT schemaname as "schema",
   tablename as "table",
   indexname as "name",
-  indexdef as "definition",
-  indisvalid as "enabled"
-FROM pg_indexes a
-  LEFT JOIN pg_index b ON b.indexrelid = a.indexname::regclass
+  indexdef as "definition"
+FROM pg_indexes
 WHERE schemaname = '${schema}';
 `.trim()
 
