@@ -111,7 +111,7 @@ Initializing a client with a Service Key will not override RLS if a user token i
 
 ### Always enable RLS on public tables
 
-You should _always_ enable RLS on tables created in a public schemas. This is considered "default safe". Unfortunately this is not enabled by default on Postgres, so you will need to keep this in mind - especially if you are using the SQL Editor or database migrations. RLS is already enabled by default if you create a table using the Table Editor. If you want to allow public access to a table, just add a Policy with `true`:
+You should _always_ enable RLS on tables created in a public schema. This is considered "default safe". Unfortunately this is not enabled by default on Postgres, so you will need to keep this in mind - especially if you are using the SQL Editor or database migrations. RLS is already enabled by default if you create a table using the Table Editor. If you want to allow public access to a table, just add a Policy with `true`:
 
 ```sql
 create policy "Allow public access"
