@@ -8,17 +8,11 @@ export const meta = {
 }
 
 
-Multi-factor authentication (MFA), sometimes called two-factor
-authentication (2FA), adds an additional layer of security to your
-application by verifying their identity through
-additional verification steps.
+Multi-factor authentication (MFA), sometimes called two-factor authentication (2FA), adds an additional layer of security to your application by verifying their identity through additional verification steps.
 
 It is considered a best practice to use MFA for your applications.
 
-Users with weak passwords or compromised social login accounts are
-prone to malicious account takeovers. These can be prevented with
-MFA because they require the user to provide proof of
-both of these:
+Users with weak passwords or compromised social login accounts are prone to malicious account takeovers. These can be prevented with MFA because they require the user to provide proof of both of these:
 
 - Something they know.
   Password, or access to a social-login account.
@@ -27,9 +21,7 @@ both of these:
 
 ## Overview
 
-Supabase Auth implements only Time-based One Time Factor(TOTP) multi-factor authentication. This type of
-multi-factor authentication uses a timed one-time password generated from an
-authenticator app in the control of users.
+Supabase Auth implements only Time-based One Time Password(TOTP) multi-factor authentication. This type of multi-factor authentication uses a timed one-time password generated from an authenticator app in the control of users.
 
 Applications using MFA require two important flows:
 
@@ -44,8 +36,7 @@ Supabase Auth provides:
 - **Challenge and Verify APIs** - securely verify that the user has access to a factor.
 - **List Factors API** - build rich user interfaces for signing in with additional factors.
 
-Below is a flow chart illustrating how these APIs work together to enable MFA
-features in your app.
+Below is a flow chart illustrating how these APIs work together to enable MFA features in your app.
 
 <Mermaid
   chart={`
@@ -59,18 +50,11 @@ graph TD;
 `}
 />
 
-These sets of APIs let you control the MFA experience that works for you. You
-can create flows where MFA is optional, mandatory for all or only specific
-groups of users.
+These sets of APIs let you control the MFA experience that works for you. You can create flows where MFA is optional, mandatory for all, or only specific groups of users.
 
-Once users have enrolled or signed-in with a factor, Supabase Auth adds
-additional metadata to the user's access token (JWT) that your application can
-use to allow or deny access.
+Once users have enrolled or signed-in with a factor, Supabase Auth adds additional metadata to the user's access token (JWT) that your application can use to allow or deny access.
 
-This information is represented by an [Authenticator Assurance
-Level](https://pages.nist.gov/800-63-3-Implementation-Resources/63B/AAL/), a
-standard measure about the assurance Supabase Auth has of the user's identity
-for that particular session. There are two levels recognized today:
+This information is represented by an [Authenticator Assurance Level](https://pages.nist.gov/800-63-3-Implementation-Resources/63B/AAL/), a standard measure about the assurance of the user's identity Supabase Auth has for that particular session. There are two levels recognized today:
 
 1. **Assurance Level 1: `aal1`**
    Means that the user's identity was verified using a conventional login method
@@ -80,10 +64,7 @@ for that particular session. There are two levels recognized today:
    Means that the user's identity was additionally verified using at least one
    second factor, such as a TOTP code.
 
-This assurance level is encoded in the `aal` claim in the JWT associated with
-the user. By decoding this value you can create custom authorization rules in
-your frontend, backend and database that will enforce the MFA policy that works
-for your application. JWTs without an `aal` claim are at the `aal1` level.
+This assurance level is encoded in the `aal` claim in the JWT associated with the user. By decoding this value you can create custom authorization rules in your frontend, backend, and database that will enforce the MFA policy that works for your application. JWTs without an `aal` claim are at the `aal1` level.
 
 ## Adding to your app
 
@@ -107,8 +88,7 @@ Adding MFA to your app involves these four steps:
 
 ### Add enrollment flow
 
-An enrollment flow provides a UI for users to set up additional authentication factors.
-Most applications add the enrollment flow in two places within their app:
+An enrollment flow provides a UI for users to set up additional authentication factors. Most applications add the enrollment flow in two places within their app:
 
 1. Right after login or sign up.
    This lets users quickly set up MFA immediately after they log in or create an
@@ -118,8 +98,7 @@ Most applications add the enrollment flow in two places within their app:
 2. From within a settings page.
    Allows users to set up, disable or modify their MFA settings.
 
-We recommend building one generic flow that you can reuse in both cases with
-minor modifications.
+We recommend building one generic flow that you can reuse in both cases with minor modifications.
 
 Enrolling a factor for use with MFA takes three steps:
 
@@ -140,8 +119,7 @@ Enrolling a factor for use with MFA takes three steps:
 
 #### Example: React
 
-Below is an example that creates a new `EnrollMFA` component that illustrates
-the important pieces of the MFA enrollment flow.
+Below is an example that creates a new `EnrollMFA` component that illustrates the important pieces of the MFA enrollment flow.
 
 - When the component appears on screen, the `supabase.auth.mfa.enroll()` API is
   called once to start the process of enrolling a new factor for the current
@@ -240,18 +218,14 @@ export function EnrollMFA({
 
 ### Add unenrollment flow
 
-An unenrollment flow provides a UI for users to manage and unenroll factors linked to their accounts.
-Most applications do so via a factor management page where users can view and unlink selected factors.
+An unenrollment flow provides a UI for users to manage and unenroll factors linked to their accounts. Most applications do so via a factor management page where users can view and unlink selected factors.
 
-When a user unenrolls a factor, call `supabase.auth.mfa.unenroll()` with the ID of the factor.
-For example, call `supabase.auth.mfa.unenroll({factorId: "d30fd651-184e-4748-a928-0a4b9be1d429"})` to unenroll a factor with ID `d30fd651-184e-4748-a928-0a4b9be1d429`.
+When a user unenrolls a factor, call `supabase.auth.mfa.unenroll()` with the ID of the factor. For example, call `supabase.auth.mfa.unenroll({factorId: "d30fd651-184e-4748-a928-0a4b9be1d429"})` to unenroll a factor with ID `d30fd651-184e-4748-a928-0a4b9be1d429`.
 
 
 #### Example: React
 
-Below is an example that creates a new `UnenrollMFA` component that illustrates
-the important pieces of the MFA enrollment flow. Note that users can only unenroll a factor after completing the enrollment flow and obtaining
-an `aal2` JWT claim.Here are some points of note:
+Below is an example that creates a new `UnenrollMFA` component that illustrates the important pieces of the MFA enrollment flow. Note that users can only unenroll a factor after completing the enrollment flow and obtaining an `aal2` JWT claim. Here are some points of note:
 
 - When the component appears on screen, the `supabase.auth.mfa.listFactors()` endpoint
   fetches all existing factors together with their details.
@@ -317,17 +291,11 @@ export function UnenrollMFA() {
 
 ### Add challenge step to login
 
-Once a user has logged in via their first factor (email+password, magic link,
-one time password, social login...) you need to perform a check if any
-additional factors need to be verified.
+Once a user has logged in via their first factor (email+password, magic link, one time password, social login etc.) you need to perform a check if any additional factors need to be verified.
 
-This can be done by using the
-`supabase.auth.mfa.getAuthenticatorAssuranceLevel()` API. When the user signs
-in and is redirected back to your app, you should call this method to extract
-the user's current and next authenticator assurance level (AAL).
+This can be done by using the `supabase.auth.mfa.getAuthenticatorAssuranceLevel()` API. When the user signs in and is redirected back to your app, you should call this method to extract the user's current and next authenticator assurance level (AAL).
 
-Therefore if you receive a `currentLevel` which is `aal1` but a `nextLevel`
-of `aal2`, the user should be given the option to go through MFA.
+Therefore if you receive a `currentLevel` which is `aal1` but a `nextLevel` of `aal2`, the user should be given the option to go through MFA.
 
 Below is a table that explains the combined meaning.
 
@@ -340,14 +308,9 @@ Below is a table that explains the combined meaning.
 
 #### Example: React
 
-Adding the challenge step to login depends heavily on the architecture of your
-app. However, a fairly common way to structure React apps is to have a large
-component (often named `App`) which contains most of the authenticated
-application logic.
+Adding the challenge step to login depends heavily on the architecture of your app. However, a fairly common way to structure React apps is to have a large component (often named `App`) which contains most of the authenticated application logic.
 
-This example will wrap this component with logic that will show an MFA
-challenge screen if necessary, before showing the full application. This is
-illustrated in the `AppWithMFA` example below.
+This example will wrap this component with logic that will show an MFA challenge screen if necessary, before showing the full application. This is illustrated in the `AppWithMFA` example below.
 
 ```tsx
 function AppWithMFA() {
@@ -468,12 +431,9 @@ function AuthMFA() {
 
 ### Enforce rules for MFA logins
 
-Adding MFA to your app's UI does not in-and-of-itself offer a higher level of
-security to your users. You also need to enforce the MFA rules in your
-application's database, APIs and server-side rendering.
+Adding MFA to your app's UI does not in-and-of-itself offer a higher level of security to your users. You also need to enforce the MFA rules in your application's database, APIs, and server-side rendering.
 
-Depending on your application's needs, there are three ways you can choose to
-enforce MFA.
+Depending on your application's needs, there are three ways you can choose to enforce MFA.
 
 1. **Enforce for all users (new and existing).**
    Any user account will have to enroll MFA to continue using your app.
@@ -489,21 +449,17 @@ enforce MFA.
 
 #### Database
 
-Your app should sufficiently deny or allow access to tables or rows based on
-the user's current and possible authenticator levels.
+Your app should sufficiently deny or allow access to tables or rows based on the user's current and possible authenticator levels.
 
 <Admonition type="caution">
 
-PostgreSQL has two types of policies: permissive and restrictive. This guide
-uses restrictive policies. Make sure you don't omit the `as restrictive`
-clause.
+PostgreSQL has two types of policies: permissive and restrictive. This guide uses restrictive policies. Make sure you don't omit the `as restrictive` clause.
 
 </Admonition>
 
 ##### Enforce for all users (new and existing)
 
-If your app falls under this case, this is a template Row Level Security policy
-you can apply to all your tables:
+If your app falls under this case, this is a template Row Level Security policy you can apply to all your tables:
 
 ```sql
 create policy "Policy name."
@@ -520,9 +476,7 @@ create policy "Policy name."
 
 ##### Enforce for new users only
 
-If your app falls under this case, the rules get more complex. User accounts
-created past a certain timestamp must have a `aal2` level to access the
-database.
+If your app falls under this case, the rules get more complex. User accounts created past a certain timestamp must have a `aal2` level to access the database.
 
 ```sql
 create policy "Policy name."
@@ -582,23 +536,15 @@ create policy "Policy name."
 
 <Admonition type="tip">
 
-When using the Supabase JavaScript library in a server-side rendering context,
-make sure you always create a new object for each request! This will prevent
-you from accidentally rendering and serving content belonging to different
-users.
+When using the Supabase JavaScript library in a server-side rendering context, make sure you always create a new object for each request! This will prevent you from accidentally rendering and serving content belonging to different users.
 
 </Admonition>
 
-It is possible to enforce MFA on the Server-Side Rendering level. However, this
-can be tricky do to well.
+It is possible to enforce MFA on the Server-Side Rendering level. However, this can be tricky do to well.
 
-You can use the `supabase.auth.mfa.getAuthenticatorAssuranceLevel()` and
-`supabase.auth.mfa.listFactors()` APIs to identify the AAL level of the session
-and any factors that are enabled for a user, similar to how you would use these
-on the browser.
+You can use the `supabase.auth.mfa.getAuthenticatorAssuranceLevel()` and `supabase.auth.mfa.listFactors()` APIs to identify the AAL level of the session and any factors that are enabled for a user, similar to how you would use these on the browser.
 
-However, encountering a different AAL level on the server may not actually be a
-security problem. Consider these likely scenarios:
+However, encountering a different AAL level on the server may not actually be a security problem. Consider these likely scenarios:
 
 1. User signed-in with a conventional method but closed their tab on the MFA
    flow.
@@ -607,16 +553,11 @@ security problem. Consider these likely scenarios:
 3. User has lost their authenticator device and is confused about the next
    steps.
 
-We thus recommend you redirect users to a page where they can authenticate
-using their additional factor, instead of rendering a HTTP 401 Unauthorized or
-HTTP 403 Forbidden content.
+We thus recommend you redirect users to a page where they can authenticate using their additional factor, instead of rendering a HTTP 401 Unauthorized or HTTP 403 Forbidden content.
 
 ### APIs
 
-If your application uses the Supabase Database, Storage or Edge Functions, just
-using Row Level Security policies will give you sufficient protection. In the
-event that you have other APIs that you wish to protect, follow these general
-guidelines:
+If your application uses the Supabase Database, Storage or Edge Functions, just using Row Level Security policies will give you sufficient protection. In the event that you have other APIs that you wish to protect, follow these general guidelines:
 
 1. **Use a good JWT verification and parsing library for your language.**
    This will let you securely parse JWTs and extract their claims.
@@ -632,28 +573,17 @@ guidelines:
 
 ### Why is there a challenge and verify API when challenge does not do much?
 
-TOTP is not going to be the only MFA factor Supabase Auth is going to support
-in the future. By separating out the challenge and verify steps, we're making
-the library forward compatible with new factors we may add in the future --
-such as SMS or WebAuthn. For example, for SMS the `challenge` endpoint would
-actually send out the SMS with the authentication code.
+TOTP is not going to be the only MFA factor Supabase Auth is going to support in the future. By separating out the challenge and verify steps, we're making the library forward compatible with new factors we may add in the future -- such as SMS or WebAuthn. For example, for SMS the `challenge` endpoint would actually send out the SMS with the authentication code.
 
 ### What's inside the QR code?
 
-The TOTP QR code encodes a URI with the `otpauth` scheme. It was [initially
-introduced by Google
-Authenticator](https://github.com/google/google-authenticator/wiki/Key-Uri-Format)
-but is now universally accepted by all authenticator apps.
+The TOTP QR code encodes a URI with the `otpauth` scheme. It was [initially introduced by Google Authenticator](https://github.com/google/google-authenticator/wiki/Key-Uri-Format) but is now universally accepted by all authenticator apps.
 
 ### How do I check _when_ a user went through MFA?
 
-Access tokens issued by Supabase Auth contain an `amr` (Authentication Methods
-Reference) claim. It is an array of objects that indicate what authentication
-methods the user has used so far.
+Access tokens issued by Supabase Auth contain an `amr` (Authentication Methods Reference) claim. It is an array of objects that indicate what authentication methods the user has used so far.
 
-For example, the following structure describes a user that first signed in with
-a password-based method, and then went through TOTP MFA 2 minutes and 12
-seconds later. The entries are ordered most recent method first!
+For example, the following structure describes a user that first signed in with a password-based method, and then went through TOTP MFA 2 minutes and 12 seconds later. The entries are ordered most recent method first!
 
 ```json
 {
@@ -670,8 +600,7 @@ seconds later. The entries are ordered most recent method first!
 }
 ```
 
-Use the `supabase.auth.getAuthenticatorAssuranceLevel()` method to get easy
-access to this information in your browser app.
+Use the `supabase.auth.getAuthenticatorAssuranceLevel()` method to get easy access to this information in your browser app.
 
 You can use this PostgreSQL snippet in RLS policies, too:
 
@@ -686,8 +615,7 @@ json_query_path(auth.jwt(), '$.amr[0]')
 - `$.amr[0]` is a SQL/JSON path expression that fetches the most recent
   authentication method in the JWT.
 
-Once you have extracted the most recent entry in the array, you can compare the
-`method` and `timestamp` to enforce stricter rules. For instance, you can mandate that access will be only be granted on a table to users who have recently signed in with a password.
+Once you have extracted the most recent entry in the array, you can compare the `method` and `timestamp` to enforce stricter rules. For instance, you can mandate that access will be only be granted on a table to users who have recently signed in with a password.
 
 Currently recognized authentication methods are:
 
