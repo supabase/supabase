@@ -9,13 +9,17 @@ import {
   Popover_Shadcn_,
 } from 'ui'
 
-const BranchingWaitlistPopover = () => {
+interface BranchingWaitlistPopoverProps {
+  alt?: boolean
+}
+
+const BranchingWaitlistPopover = ({ alt = false }: BranchingWaitlistPopoverProps) => {
   const [open, setOpen] = useState(false)
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button type="default" icon={<IconGitBranch strokeWidth={1.5} />}>
+        <Button type={alt ? 'text' : 'default'} icon={<IconGitBranch strokeWidth={1.5} />}>
           Enable branching
         </Button>
       </PopoverTrigger_Shadcn_>

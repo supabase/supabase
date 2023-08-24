@@ -17,6 +17,7 @@ import ProjectPausedState from './ProjectPausedState'
 import RestoringState from './RestoringState'
 import UpgradingState from './UpgradingState'
 import AppLayout from '../AppLayout/AppLayout'
+import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -115,6 +116,8 @@ const ProjectLayout = ({
             )}
           </main>
         </div>
+
+        <EnableBranchingModal />
       </ProjectContextProvider>
     </AppLayout>
   )
@@ -253,6 +256,8 @@ export const ProjectLayoutNonBlocking = ({
             )}
           </main>
         </div>
+
+        <EnableBranchingModal />
       </ProjectContextProvider>
     </AppLayout>
   )

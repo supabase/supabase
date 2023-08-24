@@ -63,7 +63,11 @@ const BranchLink = ({
   )
 }
 
-const BranchDropdown = () => {
+interface BranchDropdownProps {
+  alt?: boolean
+}
+
+const BranchDropdown = ({ alt = false }: BranchDropdownProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
@@ -97,11 +101,13 @@ const BranchDropdown = () => {
                 type="text"
                 className="pr-2"
                 iconRight={
-                  <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />
+                  !alt ? (
+                    <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />
+                  ) : null
                 }
               >
                 <div className="flex items-center space-x-2">
-                  <p className="text-sm">{selectedBranch?.name}</p>
+                  <p className={alt ? 'text-xs' : 'text-sm'}>{selectedBranch?.name}</p>
                   {selectedBranch?.is_default ? (
                     <Badge color="amber">Production</Badge>
                   ) : (

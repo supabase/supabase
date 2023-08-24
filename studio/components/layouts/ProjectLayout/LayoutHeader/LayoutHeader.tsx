@@ -14,10 +14,16 @@ import NotificationsPopover from './NotificationsPopover'
 import OrgDropdown from './OrgDropdown'
 import ProjectDropdown from './ProjectDropdown'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
+import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
-  const selectedOrganization = useSelectedOrganization()
   const selectedProject = useSelectedProject()
+  const selectedOrganization = useSelectedOrganization()
+  const hasAccessToBranching =
+    selectedOrganization?.opt_in_tags?.includes('PREVIEW_BRANCHES_OPT_IN') ?? false
+  const isBranchingEnabled =
+    selectedProject?.is_branch_enabled === true || selectedProject?.parent_project_ref !== undefined
 
   const { ref: projectRef } = useParams()
   const { data: isReadOnlyMode } = useProjectReadOnlyQuery({
@@ -57,10 +63,8 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
         {/* Organization is selected */}
         {projectRef && selectedOrganization ? (
           <>
-            {/* Org Dropdown */}
             <OrgDropdown />
 
-            {/* Project is selected */}
             {selectedProject && (
               <>
                 <span className="text-scale-800 dark:text-scale-700">
@@ -78,7 +82,6 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                     <path d="M16 3.549L7.12 20.600"></path>
                   </svg>
                 </span>
-                {/* Project Dropdown */}
                 <ProjectDropdown />
 
                 {/* [Terry] Temporary until we figure out how we want to display this permanently */}
@@ -102,6 +105,27 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                     </Link>
                   </div>
                 )}
+              </>
+            )}
+
+            {hasAccessToBranching && (
+              <>
+                <span className="text-scale-800 dark:text-scale-700">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    fill="none"
+                    shapeRendering="geometricPrecision"
+                  >
+                    <path d="M16 3.549L7.12 20.600"></path>
+                  </svg>
+                </span>
+                {isBranchingEnabled ? <BranchDropdown alt /> : <EnableBranchingButton alt />}
               </>
             )}
           </>
