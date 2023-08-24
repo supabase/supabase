@@ -19,7 +19,7 @@ const Hero = () => {
 
   return (
     <div className="relative -mt-[65px]">
-      <SectionContainer className="py-12 md:py-16 lg:py-20 overflow-hidden">
+      <SectionContainer className="pt-12 md:pt-16 lg:pt-24 pb-0 lg:pb-6 overflow-hidden">
         <div className="relative">
           <div className="mx-auto">
             <div className="mx-auto max-w-2xl lg:col-span-6 lg:flex lg:items-center justify-center text-center">
@@ -108,7 +108,6 @@ const Hero = () => {
         />
       </div>
       <div className="absolute top-0 left-0 right-0 h-screen bg-gradient-to-b from-[#020405] to-transparent -z-10" />
-      <div className="w-1/2 container mx-auto h-px bg-gradient-to-r from-transparent via-scale-600 to-transparent" />
     </div>
   )
 }

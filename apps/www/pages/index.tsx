@@ -8,8 +8,10 @@ import { useTheme } from 'common'
 
 // Import Swiper styles if swiper used on page
 import 'swiper/swiper.min.css'
+import content from '../data/home/content'
 
 const Features = dynamic(() => import('~/components/Features/index'))
+const Products = dynamic(() => import('~/components/Products/index'))
 const BackedBy = dynamic(() => import('~/components/BackedBy'))
 const BuiltExamples = dynamic(() => import('components/BuiltWithSupabase/index'))
 const MadeForDevelopers = dynamic(() => import('components/MadeForDevelopers/index'))
@@ -36,6 +38,7 @@ const Index = ({ customerStories }: Props) => {
   return (
     <Layout>
       <Hero />
+      <Products {...content.productsSection} />
       <Features />
       <BackedBy className="pt-8 sm:pb-18 pb-16 md:pb-24 lg:pb-24" />
       <TwitterSocialSection />
