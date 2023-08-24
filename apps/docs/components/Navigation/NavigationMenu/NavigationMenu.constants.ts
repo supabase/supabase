@@ -738,6 +738,7 @@ export const api: NavMenuConstant = {
           url: '/guides/api/joins-and-nesting',
           items: [],
         },
+        { name: 'Using custom schemas', url: '/guides/api/using-custom-schemas', items: [] },
       ],
     },
     {
