@@ -181,7 +181,7 @@ using (
 
 ### Using joins
 
-Policies can include table joins. This example shows how you can query "external" tables to build more advanced rules.
+Policies can include table joins. This example shows how you can query "external" tables to build more advanced rules. RLS policies are executed on every access of the table, so be careful to make sure that policies are efficient.
 
 ```sql
 -- 1. Create a table of teams
