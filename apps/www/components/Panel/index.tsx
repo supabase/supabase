@@ -24,30 +24,46 @@ const Panel = ({
   const innerRef = useRef(null)
 
   const handleGlow = (event: any) => {
-    if (!hasShimmer || !outerRef.current || !innerRef.current) return null
+    if (!outerRef.current || !innerRef.current) return null
     const outerElement = outerRef.current as HTMLDivElement
     const innerElement = innerRef.current as HTMLDivElement
     let x: any
     let y: any
+    let isActive: boolean = false
 
-    const { x: elX, y: elY, width, height } = outerElement.getBoundingClientRect()
-    x = event.clientX - elX
-    y = event.clientY - elY
-    const isActive = x > -3 && x < width + 3 && y > -3 && y < height + 3
-    const activeGlow =
-      hasActiveOnHover && isActive
-        ? `radial-gradient(65rem circle at ${x}px ${y}px, var(--colors-brand9), transparent), `
-        : ''
-    outerElement.style.background = isActive ? `var(--colors-brand9)` : `var(--colors-scale3)`
-    outerElement.style.backgroundImage = `
+    if (hasShimmer || hasActiveOnHover || hasInnerShimmer) {
+      const { x: elX, y: elY, width, height } = outerElement.getBoundingClientRect()
+      x = event.clientX - elX
+      y = event.clientY - elY
+      isActive = x > -3 && x < width + 3 && y > -3 && y < height + 3
+    }
+
+    if (isActive) {
+      outerElement.classList.remove('!bg-surface-200')
+      // outerElement.classList.remove('bg-gradient-to-b')
+      outerElement.classList.add('!bg-brand')
+    } else {
+      outerElement.classList.remove('!bg-brand')
+      // outerElement.classList.add('bg-gradient-to-b')
+      outerElement.classList.add('!bg-surface-200')
+    }
+
+    if (hasShimmer) {
+      const activeGlow =
+        hasActiveOnHover && isActive
+          ? `radial-gradient(65rem circle at ${x}px ${y}px, var(--colors-brand9), transparent), `
+          : ''
+      outerElement.style.backgroundImage = `
       ${activeGlow}radial-gradient(30rem circle at ${x}px ${y}px, ${
-      shimmerFromColor ?? 'var(--colors-scale8)'
-    }, ${shimmerToColor ?? 'var(--colors-scale3)'})`
+        shimmerFromColor ?? 'var(--colors-scale8)'
+      }, ${shimmerToColor ?? 'var(--colors-scale3)'})`
+    }
 
-    innerElement.style.backgroundImage =
-      hasInnerShimmer && isActive
+    if (hasInnerShimmer) {
+      innerElement.style.backgroundImage = isActive
         ? `radial-gradient(7rem circle at ${x}px ${y}px, var(--colors-scale5), transparent), radial-gradient(20rem circle at ${x}px ${y}px, var(--colors-scale4), transparent)`
         : ''
+    }
   }
 
   useEffect(() => {
@@ -63,7 +79,7 @@ const Panel = ({
     <div
       ref={outerRef}
       className={[
-        'relative z-0 rounded-xl bg-gradient-to-b !from-background-surface-300 !to-background-surface-100 p-px transition-all shadow-md',
+        'relative z-0 rounded-xl bg-gradient-to-b hover:bg-none from-background-surface-300 to-background-surface-100 p-px transition-all shadow-md',
         outerClassName,
       ].join(' ')}
     >
