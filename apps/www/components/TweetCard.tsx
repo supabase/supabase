@@ -1,4 +1,3 @@
-import { IconTwitter } from 'ui'
 import Image from 'next/image'
 
 interface TweetCard {
@@ -44,11 +43,16 @@ function TweetCard(props: TweetCard) {
           </p>
           <div
             className="absolute -left-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full"
-            style={{ background: '#00acee' }}
+            style={{ background: '#000' }}
           >
-            <div className="text-white">
-              <IconTwitter fill={'white'} size={12} />
-            </div>
+            <svg
+              className="h-[12px] w-[12px]"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
           </div>
         </div>
       </div>
