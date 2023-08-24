@@ -104,7 +104,9 @@ We recommend reading the [Row Level Security](/docs/guides/database/postgres/row
 Supabase provides special "Service" keys, which can be used to bypass RLS. These should never be used in the browser or exposed to customers, but they are useful for administrative tasks.
 
 <Admonition type="note">
-Initializing a client with a Service Key will not override RLS if a user token is set. If a user is signed in with a client, Supabase will adhere to the RLS policy of the user.
+
+Supabase will adhere to the RLS policy of the signed-in user, even if the client library is initialized with a Service Key.
+
 </Admonition>
 
 ### Always enable RLS on public tables
