@@ -64,7 +64,7 @@ This information is represented by an [Authenticator Assurance Level](https://pa
    Means that the user's identity was additionally verified using at least one
    second factor, such as a TOTP code.
 
-This assurance level is encoded in the `aal` claim in the JWT associated with the user. By decoding this value you can create custom authorization rules in your frontend, backend and database that will enforce the MFA policy that works for your application. JWTs without an `aal` claim are at the `aal1` level.
+This assurance level is encoded in the `aal` claim in the JWT associated with the user. By decoding this value you can create custom authorization rules in your frontend, backend, and database that will enforce the MFA policy that works for your application. JWTs without an `aal` claim are at the `aal1` level.
 
 ## Adding to your app
 
