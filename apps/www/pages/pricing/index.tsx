@@ -307,49 +307,6 @@ export default function IndexPage() {
           </div>
         </div>
 
-        {/* <div className="mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-md lg:max-w-6xl grid grid-cols-1 lg:grid-cols-3 mx-auto border bg-scale-100 rounded-md p-8 lg:px-0 mt-8 gap-x-5">
-            <div className="flex flex-col justify-center lg:px-8">
-              <div>
-                <h3
-                  className="gradient-text-brand-300 dark:gradient-text-brand-100 text-2xl font-normal
-                           uppercase flex items-center gap-4 font-mono"
-                >
-                  {planEnterprise.name}
-                </h3>
-                <p className="text-scale-1100 my-4 text-sm pb-2 2xl:pr-4">
-                  {planEnterprise.description}
-                </p>
-
-                <a href={planEnterprise.href} className="hidden lg:block">
-                  <Button type="default" size="small">
-                    {planEnterprise.cta}
-                  </Button>
-                </a>
-              </div>
-            </div>
-            <div className="flex flex-col justify-center lg:col-span-2">
-              <ul
-                role="list"
-                className="text-[13px] text-scale-1000 lg:grid lg:grid-cols-2 lg:gap-x-5"
-              >
-                {planEnterprise.features.map((feature) => (
-                  <li key={feature} className="flex items-center py-2 first:mt-0">
-                    <IconCheck className="text-brand h-4 w-4 " aria-hidden="true" strokeWidth={3} />
-                    <span className="dark:text-scale-1200 mb-0 ml-3 ">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <a href={planEnterprise.href} className="visible lg:hidden mt-8">
-                <Button block type="default" size="small">
-                  {planEnterprise.cta}
-                </Button>
-              </a>
-            </div>
-          </div>
-        </div> */}
-
         <div className="text-center mt-20">
           <a href="#compare-plans">
             <Button size="tiny" type="default">
