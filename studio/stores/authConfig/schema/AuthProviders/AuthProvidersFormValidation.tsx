@@ -404,7 +404,7 @@ const EXTERNAL_PROVIDER_APPLE = {
         then: (schema) =>
           schema
             .required('Secret key is required when using the OAuth flow.')
-            .matches(/^[a-zA-Z0-9_-]+([.][a-zA-Z0-9_-]+){2}$/i, 'Secret key should be a JWT.')
+            .matches(/^[a-z0-9_-]+([.][a-z0-9_-]+){2}$/i, 'Secret key should be a JWT.')
             .test({
               message: 'Secret key is not a correctly generated JWT.',
               test: (value?: string): boolean => {
@@ -420,7 +420,6 @@ const EXTERNAL_PROVIDER_APPLE = {
                     typeof body === 'object' &&
                     header &&
                     body &&
-                    header.typ === 'JWT' &&
                     header.alg === 'ES256' &&
                     body.aud === 'https://appleid.apple.com'
                   )
