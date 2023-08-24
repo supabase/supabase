@@ -6,24 +6,13 @@ export const meta = {
   description: 'Use Supabase to store and serve files.',
   subtitle: 'Use Supabase to store and serve files.',
   sidebar_label: 'Overview',
-  tocVideo: 'J9mTPY8rIXE',
 }
 
-Supabase Storage makes it simple to store and serve large files.
+Supabase Storage makes it simple to store and serve large files, providing a robust framework for file access controls.
 
-## Concepts
+## Features
 
-### Files
-
-Files can be any sort of media file. This includes images, GIFs, and videos. It is best practice to store files outside of your database because of their sizes. For security, HTML files are returned as plain text.
-
-### Folders
-
-Folders are a way to organize your files (just like on your computer). There is no right or wrong way to organize your files. You can store them in whichever folder structure suits your project.
-
-### Buckets
-
-Buckets are distinct containers for files and folders. You can think of them like "super folders". Generally you would create distinct buckets for different Security and Access Rules. For example, you might keep all video files in a "video" bucket, and profile pictures in an "avatar" bucket.
+You can use Supabase Storage to store images, videos, documents, and any other file type. It provides includes a global CDN to reduce latency, serving your files from over 285 cities globally. Supabase Storage includes a built-in image resizer, so you can resize and compress your media files on the fly.
 
 ## Examples
 
@@ -81,6 +70,6 @@ export const integrations = [
   },
 ]
 
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
+export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
 
 export default Page
