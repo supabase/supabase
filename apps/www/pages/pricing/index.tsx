@@ -171,13 +171,13 @@ export default function IndexPage() {
             lg:px-8
           "
           >
-            <div className="mx-auto max-w-md grid lg:max-w-none lg:grid-cols-2 xl:grid-cols-4 gap-20 md:gap-4 xl:gap-2 2xl:gap-5">
+            <div className="mx-auto max-w-md grid lg:max-w-none lg:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-2 2xl:gap-5">
               {plans.map((plan) => (
                 <div
                   key={`row-${plan.name}`}
                   className={[
                     plan.name === 'Pro'
-                      ? 'bg-brand-600 dark:bg-brand border px-0.5 -mt-8 rounded-[6px]'
+                      ? 'bg-brand-600 dark:bg-brand border px-0.5 lg:-mt-8 rounded-[6px]'
                       : '',
                   ].join(' ')}
                 >
