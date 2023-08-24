@@ -42,12 +42,12 @@ where auth.uid() = todos.user_id; -- Policy is implicitly added.
 
 ## Authenticated and anonymous roles 
 
-Supabase Auth maps every request to either of these roles:
+Supabase Auth maps every request to one of the roles:
 
 - `anon`: an anonymous request (the user is not logged in)
 - `authenticated`: an authenticated request (the user is logged in)
 
-These are actually [Postgres Roles](/docs/guides/database/postgres/roles), and so they have significant value for the [performance](/docs/guides/database/postgres/row-level-security#specify-roles-in-your-policies) of your RLS Policies. You can use these roles within your Policies using the `TO` parameter:
+These are actually [Postgres Roles](/docs/guides/database/postgres/roles), and so they have significant value for the [performance](/docs/guides/database/postgres/row-level-security#specify-roles-in-your-policies) of your RLS Policies. You can use these roles within your Policies using the `TO` clause:
 
 ```sql
 create policy "Profiles are viewable by everyone"
@@ -70,7 +70,7 @@ Supabase provides some helper functions that make it easier to write Policies.
 
 ### `auth.uid()`
 
-Returns the ID of the user making the request. 
+Returns the ID of the user making the request.
 
 ### `auth.jwt()`
 
@@ -111,7 +111,7 @@ Supabase will adhere to the RLS policy of the signed-in user, even if the client
 
 ### Always enable RLS on public tables
 
-You should _always_ enable RLS on tables created in a public schemas. This is considered "default safe". Unfortunately this is not enabled by default on Postgres, so you will need to keep this in mind - especially if you are using the SQL Editor or database migrations. RLS is already enabled by default if you create a table using the Table Editor. If you want to allow public access to a table, just add a Policy with `true`:
+You should _always_ enable RLS on tables created in a public schema. This is considered "default safe". Unfortunately this is not enabled by default on Postgres, so you will need to keep this in mind - especially if you are using the SQL Editor or database migrations. RLS is already enabled by default if you create a table using the Table Editor. If you want to allow public access to a table, just add a Policy with `true`:
 
 ```sql
 create policy "Allow public access"
@@ -143,7 +143,7 @@ create table profiles (
 alter table profiles enable row level security;
 ```
 
-This makes the tables inaccessible via the [Serverless APIs](/docs/guides/api).
+This makes the tables inaccessible via the [APIs](/docs/guides/api).
 
 
 ## Usage
@@ -181,7 +181,7 @@ using (
 
 ### Using joins
 
-Policies can include table joins. This example shows how you can query "external" tables to build more advanced rules.
+Policies can include table joins. This example shows how you can query "external" tables to build more advanced rules. RLS policies are executed on every access of the table, so be careful to make sure that policies are efficient.
 
 ```sql
 -- 1. Create a table of teams
@@ -279,9 +279,9 @@ RLS can be [combined with Multi-Factor Authentication](/docs/guides/auth/auth-mf
 create policy "Restrict updates."
 on profiles
 as restrictive
-to authenticated
-for update using (
-  using (auth.jwt()->>'aal' = 'aal2')
+for update
+to authenticated using (
+  auth.jwt()->>'aal' = 'aal2'
 );
 ```
 
