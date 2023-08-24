@@ -5,12 +5,10 @@ import gaEvents from '~/lib/gaEvents'
 import { IconCheck } from 'ui'
 import { useBreakpoint } from 'common'
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
+import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
-
 import ProductCard from './ProductCard'
-import DatabaseVisual from './DatabaseVisual'
-import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 
 const Products = (props: any) => {
   const router = useRouter()
@@ -57,6 +55,7 @@ const Products = (props: any) => {
     }
   }
   const isSm = useBreakpoint(640)
+  const isTablet = useBreakpoint(1023)
 
   return (
     <SectionContainer>
@@ -81,8 +80,22 @@ const Products = (props: any) => {
             </ul>
           }
           onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.DATABASE)}
-          image={<DatabaseVisual />}
-          className="col-span-6"
+          image={
+            <div className="absolute inset-0 z-0">
+              <div className="absolute w-full lg:w-auto h-full lg:aspect-square flex items-end lg:items-center justify-center lg:justify-end right-0 top-auto lg:top-0 bottom-0 my-auto">
+                <Image
+                  src={`/images/index/products/database${isTablet ? '-mobile' : ''}.svg`}
+                  alt="Supabase Postgres Database"
+                  layout="fill"
+                  objectFit="cover"
+                  objectPosition={isTablet ? 'center' : 'right'}
+                  className="antialiased"
+                  quality={100}
+                />
+              </div>
+            </div>
+          }
+          className="col-span-6 lg:col-span-12 xl:col-span-6"
         />
         <ProductCard
           url={props.products['authentication'].url}
@@ -206,16 +219,17 @@ const Products = (props: any) => {
           image={
             <div className="absolute inset-0 z-0">
               <Image
-                src={'/images/index/products/vector.svg'}
-                alt="Supabase Vector AI"
+                src={`/images/index/products/vector${isTablet ? '-mobile' : ''}.svg`}
+                alt="Supabase Postgres Vector AI"
                 layout="fill"
-                objectPosition="50% 50%"
                 objectFit="cover"
-                quality={95}
+                objectPosition={isTablet ? 'center' : 'right'}
+                className="antialiased"
+                quality={100}
               />
             </div>
           }
-          className="col-span-6"
+          className="col-span-6 lg:col-span-12 xl:col-span-6"
         />
       </dl>
     </SectionContainer>
