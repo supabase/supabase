@@ -44,7 +44,6 @@ import {
   CloudProvider,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   DEFAULT_PROVIDER,
-  ENVIRONMENT,
   FLY_REGIONS,
   PRICING_TIER_DEFAULT_KEY,
   PRICING_TIER_FREE_KEY,
@@ -116,7 +115,7 @@ const Wizard: NextPageWithLayout = () => {
   const isSelectFreeTier = dbPricingTierKey === PRICING_TIER_FREE_KEY
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
-  const showNonProdFields = ENVIRONMENT !== 'prod'
+  const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
   const freePlanWithExceedingLimits =
     ((isSelectFreeTier && !billedViaOrg) || orgSubscription?.plan?.id === 'free') &&
@@ -237,7 +236,7 @@ const Wizard: NextPageWithLayout = () => {
   // [Fran] Enforce APSE1 region on staging
   function getAvailableRegions(cloudProvider: CloudProvider): Region {
     if (cloudProvider === 'AWS') {
-      return ENVIRONMENT === 'staging'
+      return process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
         ? pluckObjectFields(AWS_REGIONS, ['SOUTHEAST_ASIA'])
         : AWS_REGIONS
       // to do - may need to pluck regions for staging for FLY also
