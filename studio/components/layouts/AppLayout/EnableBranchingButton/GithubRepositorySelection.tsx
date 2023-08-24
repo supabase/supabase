@@ -28,7 +28,6 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useGithubBranchesQuery } from 'data/integrations/integrations-github-branches-query'
 import { Integration } from 'data/integrations/integrations.types'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { ENVIRONMENT } from 'lib/constants'
 
 interface GithubRepositorySelectionProps {
   integration?: Integration
@@ -54,7 +53,7 @@ const GithubRepositorySelection = ({
 
   const sidePanels = useSidePanelsStateSnapshot()
   const githubIntegrationAppUrl =
-    ENVIRONMENT === 'prod'
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
       ? ' https://github.com/apps/supabase'
       : 'https://github.com/apps/supabase-local-testing'
 
