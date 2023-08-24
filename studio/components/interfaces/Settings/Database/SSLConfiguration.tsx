@@ -16,6 +16,7 @@ import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
 import { useCheckPermissions, useFlag, useStore } from 'hooks'
+import { ENV } from 'lib/constants'
 
 const SSLConfiguration = () => {
   const { ui } = useStore()
@@ -57,7 +58,7 @@ const SSLConfiguration = () => {
     : false
 
   const hasAccessToSSLEnforcement = !sslEnforcementConfiguration?.isNotAllowed
-  const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
+  const env = ENV === 'prod' ? 'prod' : 'staging'
   const hasSSLCertificate =
     projectSettings?.project !== undefined &&
     new Date(projectSettings.project.inserted_at) >= new Date('2021-04-30')

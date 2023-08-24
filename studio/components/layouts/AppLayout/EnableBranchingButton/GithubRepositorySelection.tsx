@@ -28,6 +28,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useGithubBranchesQuery } from 'data/integrations/integrations-github-branches-query'
 import { Integration } from 'data/integrations/integrations.types'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
+import { ENV } from 'lib/constants'
 
 interface GithubRepositorySelectionProps {
   integration?: Integration
@@ -52,6 +53,10 @@ const GithubRepositorySelection = ({
   const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') ?? []
 
   const sidePanels = useSidePanelsStateSnapshot()
+  const githubIntegrationAppUrl =
+    ENV === 'prod'
+      ? ' https://github.com/apps/supabase'
+      : 'https://github.com/apps/supabase-local-testing'
 
   const {
     data: githubBranches,
@@ -91,7 +96,7 @@ const GithubRepositorySelection = ({
               : 'Your database preview branches will be based on the branches in the Git repository that your project is connected with.'}
           </p>
           {!hasGithubIntegrationInstalled && (
-            <Link passHref href="/">
+            <Link passHref href={githubIntegrationAppUrl}>
               <a target="_blank" rel="noreferrer">
                 <Button type="default" className="!mt-3">
                   Install Github Integration

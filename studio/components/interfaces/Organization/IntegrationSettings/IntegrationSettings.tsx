@@ -21,7 +21,7 @@ import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/int
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { IntegrationName, IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useSelectedOrganization, useStore } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, ENV } from 'lib/constants'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
@@ -166,7 +166,7 @@ You can change the scope of the access for Supabase by configuring
       : ''
 
   const integrationUrl =
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+    ENV === 'staging'
       ? 'https://vercel.com/integrations/supabase-v2-staging'
       : 'https://vercel.com/integrations/supabase-v2'
 
