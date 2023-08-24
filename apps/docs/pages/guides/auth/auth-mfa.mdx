@@ -54,7 +54,7 @@ These sets of APIs let you control the MFA experience that works for you. You ca
 
 Once users have enrolled or signed-in with a factor, Supabase Auth adds additional metadata to the user's access token (JWT) that your application can use to allow or deny access.
 
-This information is represented by an [Authenticator Assurance Level](https://pages.nist.gov/800-63-3-Implementation-Resources/63B/AAL/), a standard measure about the assurance Supabase Auth has of the user's identity for that particular session. There are two levels recognized today:
+This information is represented by an [Authenticator Assurance Level](https://pages.nist.gov/800-63-3-Implementation-Resources/63B/AAL/), a standard measure about the assurance of the user's identity Supabase Auth has for that particular session. There are two levels recognized today:
 
 1. **Assurance Level 1: `aal1`**
    Means that the user's identity was verified using a conventional login method
