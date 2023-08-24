@@ -291,7 +291,7 @@ export function UnenrollMFA() {
 
 ### Add challenge step to login
 
-Once a user has logged in via their first factor (email+password, magic link, one time password, social login...) you need to perform a check if any additional factors need to be verified.
+Once a user has logged in via their first factor (email+password, magic link, one time password, social login etc.) you need to perform a check if any additional factors need to be verified.
 
 This can be done by using the `supabase.auth.mfa.getAuthenticatorAssuranceLevel()` API. When the user signs in and is redirected back to your app, you should call this method to extract the user's current and next authenticator assurance level (AAL).
 
