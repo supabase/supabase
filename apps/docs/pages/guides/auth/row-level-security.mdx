@@ -74,9 +74,7 @@ Returns the ID of the user making the request.
 
 ### `auth.jwt()`
 
-Returns the JWT of the user making the request. Anything that you store in the user's `app_metadata` column or the `user_metadata` column will be accessible using this function. Be careful not to store too much data in both of these fields, because some browsers have a limitation of 4096 bytes for cookies.
-
-It's important to know the distinction between these two:
+Returns the JWT of the user making the request. Anything that you store in the user's `app_metadata` column or the `user_metadata` column will be accessible using this function. It's important to know the distinction between these two:
 
 - `user_metadata` - can be updated by the authenticated user using the `supabase.auth.update()` function. It is not a good place to store authorization data.
 - `app_metadata` - cannot be updated by the user, so it's a good place to store authorization data.
