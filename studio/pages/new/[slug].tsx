@@ -363,7 +363,7 @@ const Wizard: NextPageWithLayout = () => {
                           This is only applicable for local/staging projects
                         </p>
                       }
-                      type="text"
+                      type="number"
                       placeholder="Postgres Version"
                       value={postgresVersion}
                       onChange={(event: any) => setPostgresVersion(event.target.value)}
