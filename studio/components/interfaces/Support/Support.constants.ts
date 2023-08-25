@@ -36,7 +36,7 @@ export const CATEGORY_OPTIONS = [
     query: undefined,
   },
   {
-    value: 'Problem',
+    value: 'Abuse',
     label: 'Abuse report',
     description: 'Report abuse of a Supabase project or Supabase brand',
     query: undefined,
