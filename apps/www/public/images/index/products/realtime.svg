@@ -37,10 +37,6 @@
 <rect x="150.286" y="308.466" width="43.0015" height="43.0012" rx="21.5006" fill="#3FCF8E"/>
 <path d="M168.917 327.799H166.035V335.236H164.246V327.799H161.364V326.114H168.917V327.799ZM180.344 335.236H178.594V328.842L175.97 335.236H174.49L171.865 328.893V335.236H170.167V326.114H172.508L175.249 332.702L177.925 326.114H180.344V335.236Z" fill="#1C1C1C"/>
 </g>
-<path d="M74.8695 296.985L67.3997 277.358C67.2175 276.882 67.6615 276.41 68.1255 276.578L87.7412 283.678C88.2416 283.86 88.2615 284.582 87.771 284.791L79.7047 288.223C79.5655 288.282 79.4528 288.398 79.3932 288.542L75.9367 296.999C75.7345 297.492 75.0584 297.482 74.8695 296.985Z" fill="#15593B"/>
-<g filter="url(#filter3_d_410_1821)">
-<path d="M112.005 392.255L104.535 372.628C104.353 372.152 104.797 371.679 105.261 371.847L124.877 378.948C125.377 379.129 125.397 379.852 124.907 380.061L116.84 383.493C116.701 383.551 116.588 383.668 116.529 383.811L113.072 392.268C112.87 392.762 112.194 392.751 112.005 392.255Z" fill="#3FCF8E"/>
-</g>
 </g>
 <defs>
 <filter id="filter0_f_410_1821" x="-218.209" y="109.254" width="566.739" height="561.792" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
@@ -58,16 +54,6 @@
 <feFlood flood-opacity="0" result="BackgroundImageFix"/>
 <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
 <feGaussianBlur stdDeviation="37.8787" result="effect1_foregroundBlur_410_1821"/>
-</filter>
-<filter id="filter3_d_410_1821" x="96.4935" y="363.812" width="36.7701" height="36.8203" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-<feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset/>
-<feGaussianBlur stdDeviation="4"/>
-<feComposite in2="hardAlpha" operator="out"/>
-<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
-<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_410_1821"/>
-<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_410_1821" result="shape"/>
 </filter>
 <clipPath id="clip0_410_1821">
 <rect width="298" height="430" fill="white" transform="translate(0 0.046875)"/>

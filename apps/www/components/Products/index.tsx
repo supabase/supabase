@@ -9,6 +9,7 @@ import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductCard from './ProductCard'
+import RealtimeVisual from './RealtimeVisual'
 
 const Products = (props: any) => {
   const router = useRouter()
@@ -215,20 +216,8 @@ const Products = (props: any) => {
             </>
           }
           onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.REALTIME)}
-          image={
-            <div className="absolute inset-0 z-0">
-              <Image
-                src="/images/index/products/realtime.svg"
-                alt="Supabase Realtime"
-                layout="fill"
-                objectPosition="50% 50%"
-                objectFit="cover"
-                className="antialiased"
-                quality={100}
-              />
-            </div>
-          }
-          className="col-span-6 xl:col-span-3"
+          image={<RealtimeVisual />}
+          className="col-span-6 xl:col-span-3 hover:!cursor-[url('/images/index/products/realtime-cursor.svg'),_auto]"
         />
         <ProductCard
           alignLeft
