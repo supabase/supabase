@@ -8,7 +8,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import HeroFrameworks from './HeroFrameworks'
 import styles from './hero.module.css'
 import Image from 'next/image'
-import LWAnnouncement from '../LaunchWeek/8/Releases/LWAnnouncement'
+import AnnouncementBadge from '../Announcement/Badge'
 
 const Hero = () => {
   const router = useRouter()
@@ -30,8 +30,8 @@ const Hero = () => {
                 ].join(' ')}
               >
                 <div className="flex flex-col items-center">
-                  <div className="z-40 w-full flex justify-center mb-8 lg:mb-12">
-                    <LWAnnouncement />
+                  <div className="z-40 w-full flex justify-center mb-8 lg:mb-8">
+                    <AnnouncementBadge />
                   </div>
                   <h1 className="text-scale-1200 text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
                     <span className="block text-[#F4FFFA00] bg-clip-text bg-gradient-to-b from-scale-1200 to-scale-1200 dark:to-scale-1100">
@@ -75,7 +75,7 @@ const Hero = () => {
           </div>
         </div>
         <div className="absolute -top-2 md:top-0 -left-10 -right-10 md:left-0 md:right-0 h-[500px] lg:h-[550px] z-0 flex items-center justify-center">
-          <div className="relative w-full aspect-[1.65/1] mb-14 max-w-sm md:max-w-md opacity-0 !animate-[fadeIn_0.5s_cubic-bezier(0.25,0.25,0,1)_0.5s_both]">
+          {/* <div className="relative w-full aspect-[1.65/1] mb-14 max-w-sm md:max-w-md opacity-0 !animate-[fadeIn_0.5s_cubic-bezier(0.25,0.25,0,1)_0.5s_both]">
             <Image
               src="/images/launchweek/8/lw8-visual.png"
               alt="launch week 8 shape"
@@ -84,7 +84,7 @@ const Hero = () => {
               quality={100}
               draggable={false}
             />
-          </div>
+          </div> */}
           <div className="absolute inset-0">
             <Image
               src="/images/launchweek/8/stars.svg"
