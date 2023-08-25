@@ -34,7 +34,7 @@ const ProductCard = ({
         onClick={onClick}
       >
         <Panel
-          // hasShimmer
+          hasShimmer
           hasActiveOnHover
           outerClassName="relative w-full h-full group/2 shadow-lg p-0"
           innerClassName="relative overflow-hidden flex-1 flex flex-col items-center gap-5 lg:items-start justify-between
