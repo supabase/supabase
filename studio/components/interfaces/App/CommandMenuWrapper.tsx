@@ -13,6 +13,7 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { createSqlSnippetSkeleton } from '../SQLEditor/SQLEditor.utils'
+import { OPT_IN_TAGS } from 'lib/constants'
 
 const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
@@ -22,7 +23,7 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
   const opt_in_tags = selectedOrganization?.opt_in_tags
 
   const snap = useSqlEditorStateSnapshot()
-  const isOptedInToAI = opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
+  const isOptedInToAI = opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
 
   const { profile } = useProfile()
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
