@@ -7,7 +7,6 @@
   "private": true,
   "workspaces": [
     "apps/www",
-    "apps/docs",
     "studio",
     "tests",
     "packages/*"
