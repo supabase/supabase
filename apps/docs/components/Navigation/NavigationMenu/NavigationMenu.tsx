@@ -95,7 +95,7 @@ const menus: Menu[] = [
   },
   {
     id: 'supabase_cli',
-    // TODO: Add path '/reference/cli/config'
+    // TODO: Add path '/guides/cli/config'
     path: '/guides/cli',
     type: 'guide',
   },

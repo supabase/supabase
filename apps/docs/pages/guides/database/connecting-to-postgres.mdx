@@ -51,6 +51,22 @@ Every Supabase project comes with PgBouncer for connection pooling. A connection
   />
 </video>
 
+## Supavisor
+
+<Admonition type="note">
+
+Supavisor is currently in beta and is slowly being made available to all projects. [Contact support](https://supabase.com/dashboard/support/new) if you'd like to request early access.
+
+</Admonition>
+
+Supavisor is a new connection pooler by Supabase. It can provide a more scalable connection pool than PgBouncer, and runs on a high-availability cluster segregated from your database.
+
+This can free up some CPU cycles for your database to use for queries. It also makes connecting to Postgres in a serverless environment much easier.
+
+We're building compatibility with PgBouncer, and application changes will not be required to switch from PgBouncer to Supavisor. When a project is switched from PgBouncer to Supavisor, the appropriate connection string will be made available under the Connection Pooling section on [Database settings](https://supabase.com/dashboard/project/_/settings/database). Note that while PgBouncer remains accessible for use, it will no longer be available for configuration from the dashboard. The PgBouncer connection string will also be similarly inaccessible from the dashboard.
+
+Supavisor is open source and compatible with any Postgres deployment. Check out [the Github repository](https://github.com/supabase/supavisor).
+
 ## Choosing a connection method
 
 - The Serverless APIs provide programmatic access and have [built-in connection pooling](https://postgrest.org/en/stable/references/connection_pool.html). You can use these for all browser and application interactions. We recommend using these wherever possible.

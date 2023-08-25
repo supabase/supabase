@@ -1,17 +1,10 @@
 import clsx from 'clsx'
+
 import Migrations from 'components/interfaces/Database/Migrations/Migrations'
 import { DatabaseLayout } from 'components/layouts'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useMigrationsQuery } from 'data/database/migrations-query'
 import { NextPageWithLayout } from 'types'
 
 const MigrationsPage: NextPageWithLayout = () => {
-  const { project } = useProjectContext()
-  const { data, isLoading, isSuccess, isError } = useMigrationsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
   return (
     <div
       className={clsx(

@@ -6,6 +6,9 @@ import { useMemo, useRef, useState } from 'react'
 
 import { Organization } from 'types'
 import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Badge,
   Button,
   CommandEmpty_Shadcn_,
@@ -14,11 +17,13 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
+  IconAlertCircle,
   IconChevronDown,
   IconHexagon,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  cn,
 } from 'ui'
 
 export interface OrganizationPickerProps {
@@ -26,6 +31,7 @@ export interface OrganizationPickerProps {
   configurationId?: string
   selectedOrg: Organization | null
   onSelectedOrgChange: (organization: Organization) => void
+  disabled?: boolean
 }
 
 const OrganizationPicker = ({
@@ -33,6 +39,7 @@ const OrganizationPicker = ({
   configurationId,
   selectedOrg,
   onSelectedOrgChange,
+  disabled,
 }: OrganizationPickerProps) => {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLButtonElement>(null)
@@ -63,21 +70,22 @@ const OrganizationPicker = ({
             size="medium"
             block
             className="justify-start"
-            icon={<IconHexagon />}
             loading={isLoadingOrganization}
-            disabled={isLoadingOrganization}
+            disabled={disabled}
             iconRight={
               <span className="grow flex justify-end">
-                <IconChevronDown className={''} />
+                <IconChevronDown />
               </span>
             }
           >
-            <span className="flex gap-2">
-              <span className="truncate">{selectedOrg?.name}</span>
+            <div className="flex gap-2">
+              <span className={cn('truncate', !selectedOrg && 'text-light')}>
+                {selectedOrg?.name ? selectedOrg?.name : 'Choose an organization'}
+              </span>
               {selectedOrg && configurationId && installed[selectedOrg.slug] && (
                 <Badge color="scale">Integration Installed</Badge>
               )}
-            </span>
+            </div>
           </Button>
         </PopoverTrigger_Shadcn_>
         <PopoverContent_Shadcn_
@@ -108,7 +116,6 @@ const OrganizationPicker = ({
                         setOpen(false)
                       }}
                     >
-                      <IconHexagon />
                       <span className="truncate">{org.name}</span>{' '}
                       {configurationId && installed[org.slug] && (
                         <Badge color="scale" className="!flex-none">

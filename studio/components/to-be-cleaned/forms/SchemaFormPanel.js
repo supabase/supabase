@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { Button } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import SchemaForm from './SchemaForm'
 
 export default function SchemaFormPanel({
@@ -21,6 +20,7 @@ export default function SchemaFormPanel({
   let formRef
   const [submitButtonLoading, setSubmitButtonLoading] = useState(false)
   const [hasChanged, setHasChanged] = useState(false)
+  const isLoading = loading !== undefined ? loading : submitButtonLoading
 
   function onClickCancel() {
     formRef.reset()
@@ -60,13 +60,13 @@ export default function SchemaFormPanel({
               hasChanged ? 'opacity-100' : 'cursor-default opacity-0'
             }`}
           >
-            <Button onClick={onClickCancel} type="default" disabled={!hasChanged}>
+            <Button onClick={onClickCancel} type="default" disabled={!hasChanged || isLoading}>
               {cancelLabel || 'Cancel'}
             </Button>
             <Button
               onClick={onClickSubmit}
-              loading={loading !== undefined ? loading : submitButtonLoading}
-              disabled={disabled || !hasChanged}
+              loading={isLoading}
+              disabled={disabled || !hasChanged || isLoading}
               type="primary"
               className="ml-2 hover:border-green-500"
             >

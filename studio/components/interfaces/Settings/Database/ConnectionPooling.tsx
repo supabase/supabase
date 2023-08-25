@@ -10,9 +10,8 @@ import Divider from 'components/ui/Divider'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
+import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
-import { patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import { pluckObjectFields } from 'lib/helpers'
 
 const ConnectionPooling = () => {
@@ -34,6 +33,7 @@ const ConnectionPooling = () => {
     'ignore_startup_parameters',
     'pool_mode',
     'pgbouncer_enabled',
+    'supavisor_enabled',
     'max_client_conn',
     'connectionString',
   ]
@@ -88,7 +88,13 @@ const ConnectionPooling = () => {
           ) : (
             <PgbouncerConfig
               projectRef={projectRef}
-              bouncerInfo={bouncerInfo}
+              // [Joshen TODO] remove this check once API PR has been deployed:
+              // https://github.com/supabase/infrastructure/pull/14173
+              bouncerInfo={{
+                ...bouncerInfo,
+                supavisor_enabled:
+                  poolingConfiguration.connectionString.includes('pooler.supabase.com'),
+              }}
               connectionInfo={connectionInfo}
             />
           )}
@@ -109,6 +115,7 @@ interface ConfigProps {
     pgbouncer_enabled: boolean
     max_client_conn: number
     connectionString: string
+    supavisor_enabled: boolean
   }
   connectionInfo: {
     db_host: string
@@ -121,12 +128,6 @@ interface ConfigProps {
 
 export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: ConfigProps) => {
   const { ui } = useStore()
-
-  const canUpdateConnectionPoolingConfiguration = useCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects'
-  )
-
   const [updates, setUpdates] = useState({
     pool_mode: bouncerInfo.pool_mode || 'transaction',
     default_pool_size: bouncerInfo.default_pool_size || undefined,
@@ -135,26 +136,30 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
     max_client_conn: bouncerInfo.max_client_conn || undefined,
   })
 
+  const { mutateAsync: updateConfiguration, isLoading: isUpdating } =
+    usePoolingConfigurationUpdateMutation({
+      onSuccess: (res) => {
+        setUpdates({ ...(res as any) })
+        ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
+      },
+    })
+
+  const canUpdateConnectionPoolingConfiguration = useCheckPermissions(
+    PermissionAction.UPDATE,
+    'projects'
+  )
+
   const updateConfig = async (updatedConfig: any) => {
     try {
-      const response = await patch(`${API_URL}/projects/${projectRef}/config/pgbouncer`, {
+      await updateConfiguration({
+        ref: projectRef,
         pgbouncer_enabled: updatedConfig.pgbouncer_enabled,
         default_pool_size: updatedConfig.default_pool_size,
         ignore_startup_parameters: updatedConfig.ignore_startup_parameters,
         pool_mode: updatedConfig.pool_mode,
         max_client_conn: updatedConfig.max_client_conn,
       })
-      if (response.error) {
-        throw response.error
-      } else {
-        setUpdates({ ...response })
-        ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
-      }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to update config: ${error.message}`,
-      })
+    } finally {
     }
   }
 
@@ -202,7 +207,7 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
         model={updates}
         submitLabel="Save"
         cancelLabel="Cancel"
-        loading={undefined}
+        loading={isUpdating}
         onChangeModel={(model: any) => setUpdates(model)}
         onSubmit={(model: any) => updateConfig(model)}
         onReset={() => setUpdates(bouncerInfo)}
@@ -232,12 +237,16 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
                   .
                 </p>
               </div>
-              <Divider light />
-              <AutoField name="ignore_startup_parameters" />
-              <Divider light />
-              <AutoField name="max_client_conn" />
-              <Divider light />
-              <AutoField name="default_pool_size" />
+              {!bouncerInfo.supavisor_enabled && (
+                <>
+                  <Divider light />
+                  <AutoField name="ignore_startup_parameters" />
+                  <Divider light />
+                  <AutoField name="max_client_conn" />
+                  <Divider light />
+                  <AutoField name="default_pool_size" />
+                </>
+              )}
             </>
           )}
           <Divider light />

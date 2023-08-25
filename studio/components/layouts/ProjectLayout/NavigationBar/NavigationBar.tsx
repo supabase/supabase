@@ -1,10 +1,9 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { useParams, useTheme } from 'common'
 import { isUndefined } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { useTheme } from 'common'
-import { useParams } from 'common/hooks'
 import { useFlag } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
@@ -26,21 +25,22 @@ import {
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
 
-const NavigationBar = ({}) => {
+const NavigationBar = () => {
   const router = useRouter()
   const { isDarkMode, toggleTheme } = useTheme()
   const { ref: projectRef } = useParams()
 
-  const { project } = useProjectContext()
-  const navLayoutV2 = useFlag('navigationLayoutV2')
-
-  const activeRoute = router.pathname.split('/')[3]
-  const toolRoutes = generateToolRoutes(projectRef, project)
-  const productRoutes = generateProductRoutes(projectRef, project)
-  const otherRoutes = generateOtherRoutes(projectRef, project)
-  const showCmdkHelper = useFlag('dashboardCmdk')
   const os = detectOS()
   const { setIsOpen } = useCommandMenu()
+
+  const { project } = useProjectContext()
+  const navLayoutV2 = useFlag('navigationLayoutV2')
+  const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
+
+  const activeRoute = router.pathname.split('/')[3]
+  const toolRoutes = generateToolRoutes(projectRef, project, supabaseAIEnabled)
+  const productRoutes = generateProductRoutes(projectRef, project)
+  const otherRoutes = generateOtherRoutes(projectRef, project)
   return (
     <div
       className={[
@@ -97,7 +97,7 @@ const NavigationBar = ({}) => {
       </ul>
       {!navLayoutV2 && (
         <ul className="flex flex-col space-y-4 items-center">
-          {IS_PLATFORM && showCmdkHelper && (
+          {IS_PLATFORM && (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger asChild>
                 <Button

@@ -41,8 +41,8 @@ const BillingEmail = () => {
     try {
       const { billing_email } = await updateOrganization({
         slug,
-        billing_email: values.billing_email,
         name,
+        billing_email: values.billing_email,
       })
       resetForm({ values: { billing_email }, initialValues: { billing_email } })
       invalidateOrganizationsQuery(queryClient)
@@ -50,19 +50,18 @@ const BillingEmail = () => {
         category: 'success',
         message: 'Successfully saved settings',
       })
-    } catch (error) {}
+    } finally {
+    }
   }
 
   return (
     <ScaffoldSection>
       <ScaffoldSectionDetail>
-        <div className="sticky space-y-6 top-16">
-          <div>
-            <p className="text-base">Email Recipient</p>
-            <p className="text-sm text-scale-1000">
-              All billing correspondence will go to this email
-            </p>
-          </div>
+        <div className="sticky space-y-2 top-12">
+          <p className="text-base m-0">Email Recipient</p>
+          <p className="text-sm text-scale-1000 m-0">
+            All billing correspondence will go to this email
+          </p>
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>

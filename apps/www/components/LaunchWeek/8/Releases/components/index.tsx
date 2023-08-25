@@ -97,6 +97,35 @@ export const TwitterSpacesSvg = () => (
   </svg>
 )
 
+export const ProductHuntSvg = () => (
+  <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_3061_22934)">
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M8.00078 15.5094C12.0787 15.5094 15.3844 12.2037 15.3844 8.12578C15.3844 4.04782 12.0787 0.742188 8.00078 0.742188C3.92282 0.742188 0.617188 4.04782 0.617188 8.12578C0.617188 12.2037 3.92282 15.5094 8.00078 15.5094ZM6.89312 8.12578H8.98527C9.279 8.12578 9.56071 8.00909 9.76841 7.80139C9.97612 7.59369 10.0928 7.31198 10.0928 7.01824C10.0928 6.7245 9.97612 6.4428 9.76841 6.23509C9.56071 6.02739 9.279 5.9107 8.98527 5.9107H6.89312V8.12578ZM5.41641 4.43398H8.98527C9.67065 4.43398 10.328 4.70625 10.8126 5.1909C11.2973 5.67554 11.5695 6.33285 11.5695 7.01824C11.5695 7.70363 11.2973 8.36095 10.8126 8.84559C10.328 9.33023 9.67065 9.6025 8.98527 9.6025H6.89312V11.8176H5.41641V4.43398Z"
+        fill="#8F8F8F"
+      />
+    </g>
+    <defs>
+      <clipPath id="clip0_3061_22934">
+        <rect width="16" height="16" fill="currentColor" transform="translate(0 0.378906)" />
+      </clipPath>
+    </defs>
+  </svg>
+)
+
+export const CheckCircleSolidIcon = () => (
+  <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M8.00156 14.7805C11.5362 14.7805 14.4016 11.9151 14.4016 8.38047C14.4016 4.84585 11.5362 1.98047 8.00156 1.98047C4.46694 1.98047 1.60156 4.84585 1.60156 8.38047C1.60156 11.9151 4.46694 14.7805 8.00156 14.7805ZM10.9672 7.34615C11.2797 7.03373 11.2797 6.5272 10.9672 6.21478C10.6548 5.90236 10.1483 5.90236 9.83588 6.21478L7.20156 8.8491L6.16725 7.81478C5.85483 7.50236 5.3483 7.50236 5.03588 7.81478C4.72346 8.1272 4.72346 8.63373 5.03588 8.94615L6.63588 10.5462C6.9483 10.8586 7.45483 10.8586 7.76725 10.5462L10.9672 7.34615Z"
+      fill="currentColor"
+    />
+  </svg>
+)
+
 export const SmallCard = ({
   className,
   innerClassName,
@@ -196,25 +225,20 @@ export const AccordionHeader = ({
           </Badge>
         )}
         {shippable && shipped && youtube_id && (
-          <div
-            className={[
-              'hover:cursor-pointer hover:!opacity-100',
-              day === 2 ? 'animate-pulse' : '',
-            ].join(' ')}
-          >
+          <div className={['hover:cursor-pointer hover:!opacity-100'].join(' ')}>
             <ExpandableVideo
               videoId={youtube_id}
               trigger={
                 <VideoPreviewTrigger
                   title={`Watch: Day ${day}`}
-                  thumbnail={videoThumbnail ?? '/images/launchweek/8/day2/yt_d2.jpg'}
+                  thumbnail={videoThumbnail ?? '/images/launchweek/8/day5/yt_d5.jpg'}
                 />
               }
             />
           </div>
         )}
       </div>
-      {shippable && !shipped && (
+      {/* {shippable && !shipped && (
         <span className="text-sm font-normal text-[#A0A0A0] mt-1 sm:mt-0 flex items-center gap-1 md:gap-4">
           <svg
             width="17"
@@ -233,9 +257,9 @@ export const AccordionHeader = ({
             </g>
           </svg>
 
-          {day === 3 && <CountdownComponent date={publishedAt} showCard={false} />}
+          {day === 5 && <CountdownComponent date={publishedAt} showCard={false} />}
         </span>
-      )}
+      )} */}
     </div>
   </div>
 )
@@ -257,13 +281,7 @@ export const VideoPreviewTrigger = ({
           />
         </svg>
       </div>
-      <Image
-        src={thumbnail}
-        alt="Video thumbnail"
-        layout="fill"
-        objectFit="cover"
-        // className="blur-[.5px]"
-      />
+      <Image src={thumbnail} alt="Video thumbnail" layout="fill" objectFit="cover" />
     </div>
     {title && <span>{title}</span>}
   </div>
@@ -332,6 +350,7 @@ export const SectionButtons = ({
   url,
   hackernews,
   twitter_spaces,
+  product_hunt,
   mobileGrid,
 }: {
   blog?: string
@@ -341,6 +360,7 @@ export const SectionButtons = ({
   url?: string
   hackernews?: string
   twitter_spaces?: string
+  product_hunt?: string
   mobileGrid?: boolean
 }) => {
   return (
@@ -395,6 +415,14 @@ export const SectionButtons = ({
           Hacker News
           <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
             <HackernewsSvg />
+          </div>
+        </ChipLink>
+      )}
+      {product_hunt && (
+        <ChipLink href={product_hunt} target="_blank" className="col-span-full">
+          Product Hunt
+          <div className="bg-[#313131] rounded-full hidden sm:inline-block p-1 ml-2">
+            <ProductHuntSvg />
           </div>
         </ChipLink>
       )}

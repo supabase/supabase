@@ -27,13 +27,13 @@ import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useGithubBranchesQuery } from 'data/integrations/integrations-github-branches-query'
 import { Integration } from 'data/integrations/integrations.types'
+import { useSidePanelsStateSnapshot } from 'state/side-panels'
 
 interface GithubRepositorySelectionProps {
   integration?: Integration
   selectedBranch?: string
   hasGithubIntegrationInstalled: boolean
   setSelectedBranch: (name: string) => void
-  onSelectConnectRepo: () => void
 }
 
 const GithubRepositorySelection = ({
@@ -41,7 +41,6 @@ const GithubRepositorySelection = ({
   selectedBranch,
   hasGithubIntegrationInstalled,
   setSelectedBranch,
-  onSelectConnectRepo,
 }: GithubRepositorySelectionProps) => {
   const { ref } = useParams()
   const [open, setOpen] = useState(false)
@@ -51,6 +50,8 @@ const GithubRepositorySelection = ({
     (connection) => connection.supabase_project_ref === ref
   )
   const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') ?? []
+
+  const sidePanels = useSidePanelsStateSnapshot()
 
   const {
     data: githubBranches,
@@ -63,6 +64,13 @@ const GithubRepositorySelection = ({
     repoOwner,
     repoName,
   })
+
+  function onSelectConnectRepo() {
+    if (integration) {
+      sidePanels.setGithubConnectionsOpen(true)
+      sidePanels.setGithubConnectionsIntegrationId(integration.id)
+    }
+  }
 
   return (
     <div

@@ -13,6 +13,7 @@ import { useAppUiStateSnapshot } from 'state/app'
 import BranchingWaitlistPopover from './BranchingWaitlistPopover'
 import GithubRepositorySelection from './GithubRepositorySelection'
 import VercelProjectSelection from './VercelProjectSelection'
+import { OPT_IN_TAGS } from 'lib/constants'
 
 const EnableBranchingButton = () => {
   const { ui } = useStore()
@@ -45,7 +46,7 @@ const EnableBranchingButton = () => {
   })
 
   const hasAccessToBranching =
-    selectedOrg?.opt_in_tags?.includes('PREVIEW_BRANCHES_OPT_IN') ?? false
+    selectedOrg?.opt_in_tags?.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) ?? false
 
   const hasGithubIntegrationInstalled =
     integrations?.some((integration) => integration.integration.name === 'GitHub') ?? false
@@ -125,12 +126,8 @@ const EnableBranchingButton = () => {
               selectedBranch={selectedBranch}
               hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
               setSelectedBranch={setSelectedBranch}
-              onSelectConnectRepo={() => setAddConnectionType('GitHub')}
             />
-
             {/* <VercelProjectSelection integration={vercelIntegration} /> */}
-
-            {/* <Modal.Separator /> */}
           </>
         )}
 
@@ -183,12 +180,7 @@ const EnableBranchingButton = () => {
         </Modal.Content>
       </Modal>
 
-      <SidePanelGitHubRepoLinker
-        isOpen={addConnectionType === 'GitHub'}
-        projectRef={ref}
-        organizationIntegrationId={githubIntegration?.id}
-        onClose={() => setAddConnectionType(undefined)}
-      />
+      <SidePanelGitHubRepoLinker projectRef={ref} />
     </>
   )
 }

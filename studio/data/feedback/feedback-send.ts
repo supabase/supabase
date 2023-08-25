@@ -1,26 +1,34 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { post } from 'data/fetchers'
 import { ResponseError } from 'types'
 
 export type SendFeedbackVariables = {
-  projectRef: string
   message: string
-  pathname: string
+  pathname?: string
+  projectRef?: string
+  organizationSlug?: string
 }
 
-export async function sendFeedback({ projectRef, message, pathname }: SendFeedbackVariables) {
-  const response = await post(`${API_URL}/feedback/send`, {
-    projectRef,
-    message,
-    pathname,
-    category: 'Feedback',
-    tags: ['dashboard-feedback'],
+export async function sendFeedback({
+  message,
+  pathname,
+  projectRef,
+  organizationSlug,
+}: SendFeedbackVariables) {
+  const { data, error } = await post(`/platform/feedback/send`, {
+    body: {
+      message,
+      category: 'Feedback',
+      tags: ['dashboard-feedback'],
+      projectRef,
+      organizationSlug,
+      pathname,
+    },
   })
-  if (response.error) throw response.error
-  return response
+  if (error) throw error
+  return data
 }
 
 type SendFeedbackData = Awaited<ReturnType<typeof sendFeedback>>
