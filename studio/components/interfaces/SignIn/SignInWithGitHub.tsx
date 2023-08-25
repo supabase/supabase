@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import * as Sentry from '@sentry/nextjs'
 import { BASE_PATH } from 'lib/constants'
 import { auth, getReturnToPath } from 'lib/gotrue'
 import { incrementSignInClicks } from 'lib/local-storage'
+import { useState } from 'react'
 import { Button, IconGitHub } from 'ui'
-import * as Sentry from '@sentry/nextjs'
 
 const SignInWithGitHub = () => {
   const [loading, setLoading] = useState(false)
@@ -24,7 +24,7 @@ const SignInWithGitHub = () => {
             process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
               ? location.origin
               : process.env.NEXT_PUBLIC_SITE_URL
-          }${BASE_PATH}${getReturnToPath()}`,
+          }${BASE_PATH}${getReturnToPath('/')}`,
         },
       })
       if (error) throw error

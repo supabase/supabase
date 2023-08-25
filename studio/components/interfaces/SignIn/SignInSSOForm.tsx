@@ -38,7 +38,7 @@ const SignInSSOForm = () => {
           process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
             ? location.origin
             : process.env.NEXT_PUBLIC_SITE_URL
-        }${BASE_PATH}${getReturnToPath()}`,
+        }${BASE_PATH}${getReturnToPath('/')}`,
       },
     })
 
