@@ -26,7 +26,9 @@ export interface DatePickerProps {
   maxDate?: Date
   hideTime?: boolean
   hideClear?: boolean
+  selectsRange?: boolean
   renderFooter?: (args: DatePickerToFrom) => React.ReactNode | void
+  children?: React.ReactNode | React.ReactNode[] | null
 }
 
 const START_DATE_DEFAULT = new Date()
@@ -46,7 +48,9 @@ function _DatePicker({
   maxDate,
   hideTime = false,
   hideClear = false,
+  selectsRange = true,
   renderFooter = () => null,
+  children,
 }: DatePickerProps) {
   const [open, setOpen] = useState<boolean>(false)
   const [appliedStartDate, setAppliedStartDate] = useState<null | Date>(null)
@@ -65,9 +69,9 @@ function _DatePicker({
       setAppliedStartDate(startDate)
       setStartDate(startDate)
       setStartTime({
-        HH: start.format("HH"),
-        mm: start.format("mm"),
-        ss: start.format("ss"),
+        HH: start.format('HH'),
+        mm: start.format('mm'),
+        ss: start.format('ss'),
       })
     }
 
@@ -79,18 +83,26 @@ function _DatePicker({
       setAppliedEndDate(endDate)
       setEndDate(endDate)
       setEndTime({
-        HH: end.format("HH"),
-        mm: end.format("mm"),
-        ss: end.format("ss"),
+        HH: end.format('HH'),
+        mm: end.format('mm'),
+        ss: end.format('ss'),
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [to, from])
 
-  function handleDatePickerChange(dates: [from: Date | null, to: Date | null]) {
-    const [from, to] = dates
-    setStartDate(from)
-    setEndDate(to)
+  function handleDatePickerChange(dates: Date | [from: Date | null, to: Date | null] | null) {
+    if (!dates) {
+      setStartDate(null)
+      setEndDate(null)
+    } else if (dates instanceof Date) {
+      setStartDate(dates)
+      setEndDate(dates)
+    } else {
+      const [from, to] = dates
+      setStartDate(from)
+      setEndDate(to)
+    }
   }
 
   function handleSubmit() {
@@ -124,6 +136,8 @@ function _DatePicker({
 
     setAppliedStartDate(null)
     setAppliedEndDate(null)
+
+    if (onChange) onChange({ from: null, to: null })
   }
   return (
     <Popover
@@ -136,30 +150,34 @@ function _DatePicker({
         hideTime ? null : (
           <>
             <div className="flex items-stretch justify-between py-2">
-              <div className="flex grow flex-col gap-1">
-                <TimeSplitInput
-                  type="start"
-                  startTime={startTime}
-                  endTime={endTime}
-                  time={startTime}
-                  setTime={setStartTime}
-                  setStartTime={setStartTime}
-                  setEndTime={setEndTime}
-                  startDate={startDate}
-                  endDate={endDate}
-                />
-              </div>
-              <div
-                className={`
+              {!selectsRange ? null : (
+                <>
+                  <div className="flex grow flex-col gap-1">
+                    <TimeSplitInput
+                      type="start"
+                      startTime={startTime}
+                      endTime={endTime}
+                      time={startTime}
+                      setTime={setStartTime}
+                      setStartTime={setStartTime}
+                      setEndTime={setEndTime}
+                      startDate={startDate}
+                      endDate={endDate}
+                    />
+                  </div>
+                  <div
+                    className={`
                       flex 
                       w-12 
                       items-center 
                       justify-center
                       text-scale-900
                     `}
-              >
-                <IconArrowRight strokeWidth={1.5} size={14} />
-              </div>
+                  >
+                    <IconArrowRight strokeWidth={1.5} size={14} />
+                  </div>
+                </>
+              )}
               <div className="flex grow flex-col gap-1">
                 <TimeSplitInput
                   type="end"
@@ -182,7 +200,7 @@ function _DatePicker({
           <div className="px-3 py-4">
             <DatePicker
               inline
-              selectsRange
+              selectsRange={selectsRange}
               selected={startDate}
               onChange={(dates) => {
                 handleDatePickerChange(dates)
@@ -253,19 +271,26 @@ function _DatePicker({
         icon={<IconCalendar />}
         className={triggerButtonClassName}
       >
-        <span>
-          {/* Custom */}
-          {appliedStartDate && appliedEndDate && appliedStartDate !== appliedEndDate ? (
-            <>
-              {format(new Date(appliedStartDate), 'dd MMM')} -{' '}
-              {format(new Date(appliedEndDate), 'dd MMM')}
-            </>
-          ) : appliedStartDate || appliedEndDate ? (
-            format(new Date((appliedStartDate || appliedEndDate)!), 'dd MMM')
-          ) : (
-            'Custom'
-          )}
-        </span>
+        {children !== undefined ? (
+          children
+        ) : (
+          <span>
+            {/* Custom */}
+            {selectsRange &&
+            appliedStartDate &&
+            appliedEndDate &&
+            appliedStartDate !== appliedEndDate ? (
+              <>
+                {format(new Date(appliedStartDate), 'dd MMM')} -{' '}
+                {format(new Date(appliedEndDate), 'dd MMM')}
+              </>
+            ) : appliedStartDate || appliedEndDate ? (
+              format(new Date((appliedStartDate || appliedEndDate)!), 'dd MMM')
+            ) : (
+              'Custom'
+            )}
+          </span>
+        )}
       </Button>
     </Popover>
   )
