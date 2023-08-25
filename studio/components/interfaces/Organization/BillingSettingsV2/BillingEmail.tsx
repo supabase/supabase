@@ -41,8 +41,8 @@ const BillingEmail = () => {
     try {
       const { billing_email } = await updateOrganization({
         slug,
-        billing_email: values.billing_email,
         name,
+        billing_email: values.billing_email,
       })
       resetForm({ values: { billing_email }, initialValues: { billing_email } })
       invalidateOrganizationsQuery(queryClient)
@@ -50,7 +50,8 @@ const BillingEmail = () => {
         category: 'success',
         message: 'Successfully saved settings',
       })
-    } catch (error) {}
+    } finally {
+    }
   }
 
   return (
