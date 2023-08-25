@@ -157,16 +157,47 @@ const Products = (props: any) => {
           title={props.products['storage'].name}
           subtitle={<>Store, organize, and serve large files, from videos to images.</>}
           image={
-            <div className="absolute inset-0 z-0">
-              <Image
-                src="/images/index/products/storage.svg"
-                alt="Supabase Storage"
-                layout="fill"
-                objectPosition="50% 50%"
-                objectFit="cover"
-                className="antialiased"
-                quality={100}
-              />
+            <div className="absolute inset-0 overflow-hidden flex nowrap">
+              <div className="relative h-full left-0 w-auto items-center z-0 flex pause animate-marquee group-hover:run will-change-transform transition-transform">
+                <div className="relative h-full aspect-[1/1.44]">
+                  <Image
+                    src="/images/index/products/storage.svg"
+                    alt="Supabase Storage"
+                    layout="fill"
+                    objectFit="cover"
+                    className="antialiased"
+                  />
+                </div>
+                <div className="relative h-full aspect-[1/1.44]">
+                  <Image
+                    src="/images/index/products/storage.svg"
+                    alt="Supabase Storage"
+                    layout="fill"
+                    objectFit="cover"
+                    className="antialiased"
+                  />
+                </div>
+              </div>
+              <div className="relative h-full left-0 w-auto items-center z-0 flex pause animate-marquee group-hover:run will-change-transform transition-transform">
+                <div className="relative h-full aspect-[1/1.44]">
+                  <Image
+                    src="/images/index/products/storage.svg"
+                    alt="Supabase Storage"
+                    layout="fill"
+                    objectFit="cover"
+                    className="antialiased"
+                  />
+                </div>
+                <div className="relative h-full aspect-[1/1.44]">
+                  <Image
+                    src="/images/index/products/storage.svg"
+                    alt="Supabase Storage"
+                    layout="fill"
+                    objectFit="cover"
+                    className="antialiased"
+                  />
+                </div>
+              </div>
             </div>
           }
           className="col-span-6 xl:col-span-3"

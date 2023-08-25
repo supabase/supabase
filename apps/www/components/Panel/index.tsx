@@ -34,16 +34,6 @@ const Panel = ({
     const y = event.clientY - elY
     const isActive = x > -3 && x < width + 3 && y > -3 && y < height + 3
 
-    // if (isActive) {
-    //   outerElement.classList.remove('!bg-surface-200')
-    //   // outerElement.classList.remove('bg-gradient-to-b')
-    //   outerElement.classList.add('!bg-brand')
-    // } else {
-    //   outerElement.classList.remove('!bg-brand')
-    //   // outerElement.classList.add('bg-gradient-to-b')
-    //   outerElement.classList.add('!bg-surface-200')
-    // }
-
     if (hasShimmer) {
       const activeGlow =
         hasActiveOnHover && isActive
@@ -52,7 +42,7 @@ const Panel = ({
       outerElement.style.backgroundImage = `
       ${activeGlow}radial-gradient(30rem circle at ${x}px ${y}px, ${
         shimmerFromColor ?? 'var(--colors-scale8)'
-      }, ${shimmerToColor ?? 'var(--colors-scale3)'})`
+      }, ${shimmerToColor ?? 'var(--colors-scale5)'})`
     }
 
     if (hasInnerShimmer) {
@@ -71,14 +61,12 @@ const Panel = ({
     }
   }, [])
 
-  console.log('trackCursor', trackCursor, 'hasActiveOnHover', hasActiveOnHover)
-
   return (
     <div
       ref={outerRef}
       className={[
-        'relative z-0 rounded-xl bg-gradient-to-b from-background-surface-300 to-background-surface-100 p-px shadow-md',
-        !trackCursor && hasActiveOnHover ? 'bg-none hover:!bg-brand' : '',
+        'relative z-0 rounded-xl bg-gradient-to-b from-background-surface-300 to-scale-400 p-px shadow-md',
+        !trackCursor && hasActiveOnHover ? 'hover:bg-none hover:!bg-brand' : '',
         outerClassName,
       ].join(' ')}
     >
