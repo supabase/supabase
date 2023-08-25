@@ -104,13 +104,16 @@ export default function IndexPage() {
   }) => {
     return (
       <div className="mt-8 px-4 mobile-header">
-        <h2 className="gradient-text-brand-300 dark:gradient-text-brand-100 text-3xl font-medium uppercase font-mono">
+        <h2 className="text-brand-600 dark:text-brand text-3xl font-medium uppercase font-mono">
           {plan}
         </h2>
         <div className="flex items-baseline gap-2">
           {from && <span className="text-scale-1200 text-base">From</span>}
           {showDollarSign ? (
-            <span className="h1">${price}</span>
+            <span className="h1">
+              {plan !== 'Enterprise' ? '$' : ''}
+              {price}
+            </span>
           ) : (
             <span className="text-scale-1100">{price}</span>
           )}
@@ -153,13 +156,13 @@ export default function IndexPage() {
               <h1 className="text-brand text-base">Pricing</h1>
               <h2 className="h1">Predictable pricing, no surprises</h2>
               <p className="p text-lg">
-                Start building for free, collaborate with a team, then scale to millions of users
+                Start building for free, collaborate with a team, then scale to millions of users.
               </p>
             </div>
           </div>
         </div>
 
-        <div className="mx-auto max-w-7xl flex flex-col">
+        <div className="mx-auto lg:container lg:px-16 xl:px-12 flex flex-col">
           {/* <div className="absolute inset-0 shadow-sm bg-scale-200 h-3/5" /> */}
 
           <div
@@ -168,13 +171,13 @@ export default function IndexPage() {
             lg:px-8
           "
           >
-            <div className="mx-auto max-w-md grid lg:max-w-6xl lg:grid-cols-3 gap-24 lg:gap-5">
-              {plansExceptEnterprise.map((plan) => (
+            <div className="mx-auto max-w-md grid lg:max-w-none lg:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-2 2xl:gap-5">
+              {plans.map((plan) => (
                 <div
                   key={`row-${plan.name}`}
                   className={[
                     plan.name === 'Pro'
-                      ? 'bg-brand-600 dark:bg-brand border px-0.5 -mt-8 rounded-[6px]'
+                      ? 'bg-brand-600 dark:bg-brand border px-0.5 lg:-mt-8 rounded-[6px]'
                       : '',
                   ].join(' ')}
                 >
@@ -191,14 +194,14 @@ export default function IndexPage() {
                     ].join(' ')}
                   >
                     <div
-                      className={`dark:bg-scale-300 bg-white px-8 pt-6 rounded-tr-[4px] rounded-tl-[4px] ${
+                      className={`dark:bg-scale-300 bg-white px-8 xl:px-4 2xl:px-8 pt-6 rounded-tr-[4px] rounded-tl-[4px] ${
                         plan.name === 'Pro' ? 'rounded-tr-[4px] rounded-tl-[4px]' : ''
                       }`}
                     >
                       <div className="mb-2 flex items-center gap-2">
                         <div className="flex items-center gap-2">
                           <h3
-                            className="gradient-text-brand-300 dark:gradient-text-brand-100 text-2xl font-normal
+                            className="text-brand-600 dark:text-brand text-2xl font-normal
                            uppercase flex items-center gap-4 font-mono"
                           >
                             {plan.name}
@@ -240,7 +243,8 @@ export default function IndexPage() {
                                     plan.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
                                   }`}
                                 >
-                                  ${plan.priceMonthly}
+                                  {plan.name !== 'Enterprise' ? '$' : ''}
+                                  {plan.priceMonthly}
                                 </p>
                                 <p className="text-scale-900 mb-1.5 ml-1 text-[13px] leading-4">
                                   {plan.costUnit}
@@ -261,7 +265,7 @@ export default function IndexPage() {
                     </div>
                     <div
                       className={[
-                        `dark:border-scale-400 dark:bg-scale-300 flex h-full rounded-bl-[4px] rounded-br-[4px] flex-1 flex-col bg-white px-8 py-6`,
+                        `dark:border-scale-400 dark:bg-scale-300 flex h-full rounded-bl-[4px] rounded-br-[4px] flex-1 flex-col bg-white px-8 xl:px-4 2xl:px-8 py-6`,
                         plan.name === 'Pro' ? 'mb-0.5 rounded-bl-[4px] rounded-br-[4px]' : '',
                       ].join(' ')}
                     >
@@ -303,50 +307,7 @@ export default function IndexPage() {
           </div>
         </div>
 
-        <div className="mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-md lg:max-w-6xl grid grid-cols-1 lg:grid-cols-3 mx-auto border bg-scale-100 rounded-md p-8 lg:px-0 mt-8 gap-x-5">
-            <div className="flex flex-col justify-center lg:px-8">
-              <div>
-                <h3
-                  className="gradient-text-brand-300 dark:gradient-text-brand-100 text-2xl font-normal
-                           uppercase flex items-center gap-4 font-mono"
-                >
-                  {planEnterprise.name}
-                </h3>
-                <p className="text-scale-1100 my-4 text-sm pb-2 2xl:pr-4">
-                  {planEnterprise.description}
-                </p>
-
-                <a href={planEnterprise.href} className="hidden lg:block">
-                  <Button type="default" size="small">
-                    {planEnterprise.cta}
-                  </Button>
-                </a>
-              </div>
-            </div>
-            <div className="flex flex-col justify-center lg:col-span-2">
-              <ul
-                role="list"
-                className="text-[13px] text-scale-1000 lg:grid lg:grid-cols-2 lg:gap-x-5"
-              >
-                {planEnterprise.features.map((feature) => (
-                  <li key={feature} className="flex items-center py-2 first:mt-0">
-                    <IconCheck className="text-brand h-4 w-4 " aria-hidden="true" strokeWidth={3} />
-                    <span className="dark:text-scale-1200 mb-0 ml-3 ">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <a href={planEnterprise.href} className="visible lg:hidden mt-8">
-                <Button block type="default" size="small">
-                  {planEnterprise.cta}
-                </Button>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div className="text-center mt-24">
+        <div className="text-center mt-20">
           <a href="#compare-plans">
             <Button size="tiny" type="default">
               Compare Plans
@@ -731,7 +692,7 @@ export default function IndexPage() {
                         scope="col"
                         key={plan.name}
                       >
-                        <h3 className="gradient-text-brand-300 dark:gradient-text-brand-100 text-2xl font-mono font-normal uppercase flex items-center gap-4">
+                        <h3 className="text-brand-600 dark:text-brand text-2xl font-mono font-normal uppercase flex items-center gap-4">
                           {plan.name}
                         </h3>
                         <div
@@ -945,15 +906,15 @@ export default function IndexPage() {
                 </Accordion>
               </div>
               <p className="p text-center">
-                Can&apos;t find the answer to your question, you can{' '}
+                Can&apos;t find the answer to your question?{' '}
                 <a
                   target="_blank"
                   href="https://supabase.com/dashboard/support/new"
                   className="transition text-brand hover:text-brand-600"
                 >
-                  open a support ticket
+                  Open a support ticket
                 </a>{' '}
-                and our team of experts will be able to help.
+                to receive help from our team of experts.
               </p>
               <p className="p text-center">
                 For enterprise enquries,{' '}
