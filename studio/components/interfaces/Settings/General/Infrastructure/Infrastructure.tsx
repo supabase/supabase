@@ -59,7 +59,7 @@ const Infrastructure = ({}: InfrastructureProps) => {
                   </p>
                 </div>
               </div>
-              {project && <RestartServerButton project={project} />}
+              {project && <RestartServerButton />}
             </div>
 
             {isFreeProject && (
@@ -74,9 +74,7 @@ const Infrastructure = ({}: InfrastructureProps) => {
                       </p>
                     </div>
                   </div>
-                  {project && (
-                    <PauseProjectButton projectId={project.id} projectRef={project.ref} />
-                  )}
+                  {project && <PauseProjectButton />}
                 </div>
               </>
             )}

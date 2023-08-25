@@ -34,6 +34,7 @@ import APIKeys from './APIKeys'
 import SearchableStudioItems from './SearchableStudioItems'
 import CommandMenuShortcuts from './CommandMenuShortcuts'
 import { BadgeExperimental } from './Command.Badges'
+import { AiIconAnimation } from '@ui/layout/ai-icon-animation'
 
 export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI, // this one is temporary
@@ -66,6 +67,12 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
     useCommandMenu()
   const showCommandInput = !currentPage || !CHAT_ROUTES.includes(currentPage)
 
+  // This function has been added to prevent the use of double quotes in the search docs input due to an issue with the cmdk-supabase module. This function can be removed when we transition to using cmdk.
+  const handleInputChange = (value: string) => {
+    const newValue = value.replace(/"/g, '') // Remove double quotes
+    setSearch(newValue)
+  }
+
   return (
     <>
       <CommandDialog
@@ -87,7 +94,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
             ref={commandInputRef}
             placeholder="Type a command or search..."
             value={search}
-            onValueChange={setSearch}
+            onValueChange={handleInputChange}
           />
         )}
         <CommandList className={['my-2', showCommandInput && 'max-h-[300px]'].join(' ')}>
@@ -121,8 +128,8 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                   }}
                   forceMount
                 >
-                  <AiIcon />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-900 to-brand-1100">
+                  <AiIconAnimation />
+                  <span className="text-brand">
                     Ask Supabase AI
                     {search ? (
                       <>
@@ -254,7 +261,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
 
               <CommandGroup heading="Settings">
                 <CommandItem type="link" onSelect={() => setPages([...pages, 'Theme'])}>
-                  <IconMonitor className="mr-2" />
+                  <IconMonitor />
                   Change theme
                 </CommandItem>
               </CommandGroup>

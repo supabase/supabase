@@ -1,29 +1,37 @@
 import { FC } from 'react'
-import { includes, uniqBy, map as lodashMap } from 'lodash'
+import { includes, uniqBy, map as lodashMap, noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Input, IconSearch, IconLoader } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import SchemaTable from './SchemaTable'
 import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 
-const TriggersList: FC<any> = ({
+interface TriggersListProps {
+  filterString: string
+  setFilterString: (value: string) => void
+  createTrigger: () => void
+  editTrigger: (trigger: any) => void
+  deleteTrigger: (trigger: any) => void
+}
+
+const TriggersList = ({
   filterString,
-  setFilterString = () => {},
-  createTrigger = () => {},
-  editTrigger = () => {},
-  deleteTrigger = () => {},
-}) => {
+  setFilterString = noop,
+  createTrigger = noop,
+  editTrigger = noop,
+  deleteTrigger = noop,
+}: TriggersListProps) => {
   const { meta } = useStore()
   const triggers = meta.triggers.list()
   const filteredTriggers = triggers.filter((x: any) =>
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
   const filteredTriggerSchemas = lodashMap(uniqBy(filteredTriggers, 'schema'), 'schema')
-  const canCreateTriggers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
+  const canCreateTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   if (meta.triggers.isLoading) {
     return (

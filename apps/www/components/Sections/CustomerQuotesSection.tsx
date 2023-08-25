@@ -74,7 +74,7 @@ const CustomerQuotesSection = (props: Props) => {
             {customer.author}, {customer.role}
           </p>
           {customer.url && (
-            <div className="text-brand-900 border-t mt-4 pt-4 cursor-pointer text-sm flex items-center justify-between">
+            <div className="text-brand border-t mt-4 pt-4 cursor-pointer text-sm flex items-center justify-between">
               <span>Read Customer Story</span>
               <IconArrowUpRight />
             </div>

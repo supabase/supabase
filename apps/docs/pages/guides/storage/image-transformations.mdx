@@ -4,8 +4,9 @@ export const meta = {
   id: 'storage-image-transformations',
   title: 'Storage Image Transformations',
   description: 'Transform images with Storage',
+  subtitle: 'Transform images with Storage',
   sidebar_label: 'Image Transformations',
-  video: 'https://www.youtube.com/v/dLqSmxX3r7I',
+  tocVideo: 'dLqSmxX3r7I',
 }
 
 Supabase Storage offers the functionality to transform and resize images dynamically. Any image stored in your buckets can be transformed and optimized for fast delivery.
@@ -13,15 +14,6 @@ Supabase Storage offers the functionality to transform and resize images dynamic
 <Admonition type="note">
   Image Resizing is currently enabled for [Pro plan and above](https://supabase.com/pricing).
 </Admonition>
-
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/dLqSmxX3r7I"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
 
 ## Get a public URL for a transformed image
 
@@ -70,8 +62,7 @@ supabase.storage.from('bucket').download('image.jpg', {
 
 ## Automatic Image Optimisation (WebP)
 
-When using the image transformation API we will automatically find the best format supported by the browser and return that to the client, without any code change.
-For instance, if you use Chrome when viewing a jpeg image and using transformation options, you'll see that the content-type returned is `webp`.
+When using the image transformation API we will automatically find the best format supported by the browser and return that to the client, without any code change. For instance, if you use Chrome when viewing a jpeg image and using transformation options, you'll see that the content-type returned is `webp`.
 
 As a result, this will lower the bandwidth that you send to your users and your application will load much faster.
 
@@ -81,8 +72,7 @@ As a result, this will lower the bandwidth that you send to your users and your 
 
 **Disabling automatic optimisation:**
 
-In case you'd like to return the original format of the image and **opt-out** from the automatic image optimization detection, you can pass the `format=origin` parameter when requesting a transformed image,
-this is also supported in the JavaScript SDK starting from v2.2.0
+In case you'd like to return the original format of the image and **opt-out** from the automatic image optimization detection, you can pass the `format=origin` parameter when requesting a transformed image, this is also supported in the JavaScript SDK starting from v2.2.0
 
 ```ts
 await storage.from('bucket').download('image.jpeg', {
@@ -186,8 +176,7 @@ supabase.storage.from('bucket').download('image.jpg', {
 
 ## Self Hosting
 
-Our solution to image resizing and optimisation can be self-hosted as with any other Supabase product.
-Under the hood we use the awesome [Imgproxy](https://imgproxy.net/)
+Our solution to image resizing and optimisation can be self-hosted as with any other Supabase product. Under the hood we use the awesome [Imgproxy](https://imgproxy.net/)
 
 #### Imgproxy Configuration:
 
@@ -211,6 +200,17 @@ Once [Imgproxy](https://imgproxy.net/) is deployed we need to configure a couple
 ENABLE_IMAGE_TRANSFORMATION=true
 IMGPROXY_URL=yourinternalimgproxyurl.internal.com
 ```
+
+{/* Finish with a video. This also appears in the Sidebar via the "tocVideo" metadata */}
+
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/dLqSmxX3r7I"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

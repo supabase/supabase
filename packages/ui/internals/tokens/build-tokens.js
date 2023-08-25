@@ -52,8 +52,24 @@ StyleDictionary.registerTransform({
   type: 'value',
   matcher: (prop) => prop.type === 'color',
   transformer: (prop) => {
-    const color = Color(prop.original.value).hsl()
-    return color.string()
+    if (!prop.original.value) {
+      console.error(`No colorvalue detected for ${prop.name}.`)
+    }
+
+    if (prop.original.value === '#') {
+      console.error(`Only "#" as value for ${prop.name}. Must use a correct format like "#FFF"`)
+    }
+
+    const color = Color(prop?.original?.value)
+
+    if (!color) {
+      console.error('No color')
+    }
+
+    console.log(color)
+
+    const hsl = Color(prop?.original?.value).hsl()
+    return hsl.string()
   },
 })
 
@@ -98,13 +114,14 @@ function getConfigTailwindFilesByType(typeList) {
 }
 
 function getStyleDictionaryConfig(
-  sourceFiles,
+  source,
   fileName,
   type,
   buildTailwindFiles = false,
-  rootTheme = false
+  rootTheme = false,
+  filePath
 ) {
-  console.log(sourceFiles)
+  console.log('about to run', source, fileName)
 
   let configTailwindFilesByType = []
 
@@ -115,7 +132,7 @@ function getStyleDictionaryConfig(
   }
 
   return {
-    source: sourceFiles,
+    source: [...source],
     platforms: {
       css: {
         // transformGroup: 'tokens-studio',
@@ -144,8 +161,7 @@ function getStyleDictionaryConfig(
               selector: rootTheme ? ':root' : `.${fileName}`,
               outputReferences: true,
             },
-            // filter: (token) =>
-            //   [sourceFiles.slice(-1)[0], ...semanticFiles, ...sourceFiles].includes(token.filePath),
+            filter: (token) => token.filePath === filePath,
           },
           ...configTailwindFilesByType,
         ],
@@ -165,7 +181,7 @@ function fileNameCleaner(fileName) {
 sourceFiles.map(function (filePath) {
   const fileName = fileNameCleaner(filePath)
   const SD = StyleDictionary.extend(
-    getStyleDictionaryConfig([filePath], fileName, 'source', true, true)
+    getStyleDictionaryConfig([filePath], fileName, 'source', true, true, filePath)
   )
   SD.buildAllPlatforms()
 })
@@ -175,17 +191,18 @@ sourceFiles.map(function (filePath) {
  */
 
 themeFiles.map(function (filePath, i) {
-  const buildTailwindFiles = filePath.includes('root') // i === 0
+  const buildTailwindFiles = filePath.includes('dark') // i === 0
   const fileName = fileNameCleaner(filePath)
-  const rootTheme = filePath.includes('root')
+  const rootTheme = filePath.includes('dark')
   const SD = StyleDictionary.extend(
     getStyleDictionaryConfig(
       // determine whether to include the root theme properties with each theme
-      rootTheme ? [filePath] : ['tokens/themes/root.json', filePath],
+      [...sourceFiles, filePath],
       rootTheme ? 'dark' : fileName,
       'themes',
       buildTailwindFiles,
-      false
+      false,
+      filePath
     )
   )
   SD.buildAllPlatforms()

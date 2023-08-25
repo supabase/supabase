@@ -2,10 +2,10 @@ import { useRouter } from 'next/router'
 
 import { useFlag } from 'hooks'
 import { Button, Dropdown, IconPlus } from 'ui'
+import { EMPTY_ARR } from 'lib/void'
 
-const OrganizationDropdown = ({ organizations }) => {
+const OrganizationDropdown = ({ organizations = EMPTY_ARR }) => {
   const router = useRouter()
-
   const orgCreationV2 = useFlag('orgcreationv2')
 
   return (
@@ -27,17 +27,12 @@ const OrganizationDropdown = ({ organizations }) => {
               </Dropdown.Item>
             ))}
           <Dropdown.Separator />
-          <Dropdown.Item icon={<IconPlus size="tiny" />} onClick={() => router.push(`/new`)}>
+          <Dropdown.Item
+            icon={<IconPlus size="tiny" />}
+            onClick={() => router.push(orgCreationV2 ? `/new-with-subscription` : `/new`)}
+          >
             New organization
           </Dropdown.Item>
-          {orgCreationV2 && (
-            <Dropdown.Item
-              icon={<IconPlus size="tiny" />}
-              onClick={() => router.push(`/new-with-subscription`)}
-            >
-              New organization V2
-            </Dropdown.Item>
-          )}
         </>
       }
     >

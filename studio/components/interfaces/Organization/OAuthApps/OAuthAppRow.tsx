@@ -32,26 +32,36 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
           {!!app.icon ? '' : `${app.name[0]}`}
         </div>
       </Table.td>
-      <Table.td>{app.name}</Table.td>
       <Table.td>
-        <span className="font-mono truncate">{app.client_id}</span>
-        <Button
-          type="default"
-          icon={
-            isCopied ? <IconCheck className="text-brand-900" strokeWidth={3} /> : <IconClipboard />
-          }
-          className="ml-2 px-1"
-          onClick={() => {
-            copyToClipboard(app.client_id)
-            setIsCopied(true)
-            setTimeout(() => {
-              setIsCopied(false)
-            }, 3000)
-          }}
-        />
+        <p title={app.name} className="truncate">
+          {app.name}
+        </p>
       </Table.td>
       <Table.td>
-        <span className="font-mono">{app.client_secret_alias}...</span>
+        <div className="flex items-center">
+          <p className="font-mono truncate w-[220px]" title={app.client_id}>
+            {app.client_id}
+          </p>
+          <Button
+            type="default"
+            icon={
+              isCopied ? <IconCheck className="text-brand" strokeWidth={3} /> : <IconClipboard />
+            }
+            className="ml-2 px-1"
+            onClick={() => {
+              copyToClipboard(app.client_id)
+              setIsCopied(true)
+              setTimeout(() => {
+                setIsCopied(false)
+              }, 3000)
+            }}
+          />
+        </div>
+      </Table.td>
+      <Table.td>
+        <span className="font-mono" title={app.client_secret_alias}>
+          {app.client_secret_alias}...
+        </span>
       </Table.td>
       <Table.td>{dayjs(app.created_at).format('DD/MM/YYYY, HH:mm:ss')}</Table.td>
       <Table.td align="right">
