@@ -104,7 +104,7 @@ export default function IndexPage() {
   }) => {
     return (
       <div className="mt-8 px-4 mobile-header">
-        <h2 className="gradient-text-brand-300 dark:gradient-text-brand-100 text-3xl font-medium uppercase font-mono">
+        <h2 className="text-brand-600 dark:text-brand text-3xl font-medium uppercase font-mono">
           {plan}
         </h2>
         <div className="flex items-baseline gap-2">
@@ -201,7 +201,7 @@ export default function IndexPage() {
                       <div className="mb-2 flex items-center gap-2">
                         <div className="flex items-center gap-2">
                           <h3
-                            className="gradient-text-brand-300 dark:gradient-text-brand-100 text-2xl font-normal
+                            className="text-brand-600 dark:text-brand text-2xl font-normal
                            uppercase flex items-center gap-4 font-mono"
                           >
                             {plan.name}
@@ -692,7 +692,7 @@ export default function IndexPage() {
                         scope="col"
                         key={plan.name}
                       >
-                        <h3 className="gradient-text-brand-300 dark:gradient-text-brand-100 text-2xl font-mono font-normal uppercase flex items-center gap-4">
+                        <h3 className="text-brand-600 dark:text-brand text-2xl font-mono font-normal uppercase flex items-center gap-4">
                           {plan.name}
                         </h3>
                         <div
