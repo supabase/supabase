@@ -1,58 +1,50 @@
-import { useRouter } from 'next/router'
-
-import { useParams } from 'common/hooks'
-import { BillingSettings } from 'components/interfaces/Organization'
+import { useParams } from 'common'
+import { BillingSettings, BillingSettingsV2 } from 'components/interfaces/Organization'
 import { OrganizationLayout } from 'components/layouts'
 import Loading from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useFlag, useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks'
+import { useEffect } from 'react'
+import {
+  ORG_SETTINGS_PANEL_KEYS,
+  useOrgSettingsPageStateSnapshot,
+} from 'state/organization-settings'
 import { NextPageWithLayout } from 'types'
-import { Tabs } from 'ui'
 
 const OrgBillingSettings: NextPageWithLayout = () => {
-  const { data: permissions } = usePermissionsQuery()
+  const { panel } = useParams()
+  const snap = useOrgSettingsPageStateSnapshot()
+  const { isLoading: isLoadingPermissions } = usePermissionsQuery()
   const selectedOrganization = useSelectedOrganization()
-  const { slug } = useParams()
-  const router = useRouter()
-  const showOAuthApps = useFlag('oauthApps')
+  const isOrgBilling = !!selectedOrganization?.subscription_id
+
+  useEffect(() => {
+    const allowedValues = ['subscriptionPlan', 'costControl']
+    if (panel && typeof panel === 'string' && allowedValues.includes(panel)) {
+      snap.setPanelKey(panel as ORG_SETTINGS_PANEL_KEYS)
+      document.getElementById('billing-page-top')?.scrollIntoView({ behavior: 'smooth' })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [panel])
 
   return (
     <>
-      {selectedOrganization === undefined && (permissions ?? []).length === 0 ? (
+      {selectedOrganization === undefined && isLoadingPermissions ? (
         <Loading />
       ) : (
-        <div className="p-4 pt-0">
-          <div className="space-y-3">
-            <section className="mt-4">
-              <h1 className="text-3xl">{selectedOrganization?.name ?? 'Organization'} settings</h1>
-            </section>
-            <nav>
-              <Tabs
-                size="small"
-                type="underlined"
-                activeId="billing"
-                onChange={(id: any) => {
-                  if (id !== 'billing') router.push(`/org/${slug}/${id}`)
-                }}
-              >
-                <Tabs.Panel id="general" label="General" />
-                <Tabs.Panel id="team" label="Team" />
-                <Tabs.Panel id="billing" label="Billing" />
-                <Tabs.Panel id="invoices" label="Invoices" />
-                {showOAuthApps && <Tabs.Panel id="apps" label="OAuth Apps" />}
-              </Tabs>
-            </nav>
-          </div>
-
-          <div className="mb-8">
-            <BillingSettings />
-          </div>
-        </div>
+        <>
+          {isOrgBilling ? (
+            <BillingSettingsV2 />
+          ) : (
+            <div className="px-4">
+              <BillingSettings />
+            </div>
+          )}
+        </>
       )}
     </>
   )
 }
 
 OrgBillingSettings.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
-
 export default OrgBillingSettings

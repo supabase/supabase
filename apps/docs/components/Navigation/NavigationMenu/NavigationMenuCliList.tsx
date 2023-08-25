@@ -23,7 +23,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
     return (
       <li key={id} className="function-link-item text-scale-1000 leading-3">
         <Link href={`#${id}`} passHref>
-          <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand-900 flex gap-3">
+          <a className="cursor-pointer transition text-scale-1000 text-sm hover:text-brand flex gap-3">
             {icon && <img className="w-3" src={`${router.basePath}${icon}`} />}
             {title}
           </a>
@@ -100,7 +100,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
           <a
             className={[
               'flex items-center gap-1 text-xs group mb-3',
-              'text-base transition-all duration-200 text-brand-900 hover:text-brand-1200 hover:cursor-pointer ',
+              'text-base transition-all duration-200 text-brand hover:text-brand-600 hover:cursor-pointer ',
             ].join(' ')}
           >
             <div className="relative w-2">

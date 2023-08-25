@@ -4,7 +4,7 @@ import 'react-contexify/dist/ReactContexify.css'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IconClipboard, IconEdit, IconMove, IconDownload, IconTrash2, IconChevronRight } from 'ui'
 
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { noop } from 'lodash'
@@ -26,7 +26,7 @@ const ItemContextMenu = ({ id = '', onCopyUrl = noop }: ItemContextMenuProps) =>
     setSelectedFileCustomExpiry,
   } = storageExplorerStore
   const isPublic = selectedBucket.public
-  const canUpdateFiles = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const onHandleClick = async (event: any, item: any, expiresIn?: number) => {
     if (item.isCorrupted) return

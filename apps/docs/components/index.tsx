@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { Alert, Button, CodeBlock, GlassPanel, markdownComponents, Tabs } from 'ui'
 import StepHikeCompact from '~/components/StepHikeCompact'
 // Common components
-import Admonition from './Admonition'
 import ButtonCard from './ButtonCard'
 import JwtGenerator from './JwtGenerator'
 
@@ -22,6 +21,7 @@ import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supabase.mdx'
 import SocialProviderSetup from './MDX/social_provider_setup.mdx'
 import StorageManagement from './MDX/storage_management.mdx'
+import KotlinProjectSetup from './MDX/kotlin_project_setup.mdx'
 import { CH } from '@code-hike/mdx/components'
 import RefHeaderSection from './reference/RefHeaderSection'
 
@@ -31,6 +31,7 @@ import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlo
 import Options from '~/components/Options'
 import Param from '~/components/Params'
 
+import { Admonition } from 'ui'
 import {
   IconMenuJavascript,
   IconMenuHome,
@@ -70,6 +71,7 @@ const components = {
   QuickstartIntro,
   DatabaseSetup,
   ProjectSetup,
+  KotlinProjectSetup,
   SocialProviderSetup,
   SocialProviderSettingsSupabase,
   StepHikeCompact,

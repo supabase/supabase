@@ -10,10 +10,17 @@ import { useMemo } from 'react'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconChevronRight, IconExternalLink } from 'ui'
 import { getAddons } from '../Subscription.utils'
-import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
-import CustomDomainSidePanel from './CustomDomainSidePanel'
-import PITRSidePanel from './PITRSidePanel'
-import ProjectUpdateDisabledTooltip from '../../ProjectUpdateDisabledTooltip'
+import {
+  ComputeInstanceSidePanel,
+  CustomDomainSidePanel,
+  PITRSidePanel,
+} from 'components/interfaces/Settings/Addons'
+import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
+import {
+  useIsProjectActive,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
+import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 
 export interface AddOnsProps {}
 
@@ -22,6 +29,10 @@ const AddOns = ({}: AddOnsProps) => {
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { isDarkMode } = useTheme()
+
+  const { project: selectedProject } = useProjectContext()
+  const isProjectActive = useIsProjectActive()
+  const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
 
   // [Joshen] We could possibly look into reducing the interval to be more "realtime"
   // I tried setting the interval to 1m but no data was returned, may need to experiment
@@ -129,12 +140,15 @@ const AddOns = ({}: AddOnsProps) => {
                 <div className="flex-grow">
                   <p className="text-sm text-scale-1000">Optimized compute</p>
                   <p className="">{computeInstance?.variant.name ?? 'Micro'}</p>
-                  <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
+                  <ProjectUpdateDisabledTooltip
+                    projectUpdateDisabled={projectUpdateDisabled}
+                    projectNotActive={!isProjectActive}
+                  >
                     <Button
                       type="default"
-                      className="mt-2"
+                      className="mt-2 pointer-events-auto"
                       onClick={() => snap.setPanelKey('computeInstance')}
-                      disabled={projectUpdateDisabled}
+                      disabled={!isProjectActive || projectUpdateDisabled}
                     >
                       Change optimized compute
                     </Button>
@@ -212,7 +226,7 @@ const AddOns = ({}: AddOnsProps) => {
                       </a>
                     </Link>
                     <p className="text-sm">
-                      {computeInstance?.variant?.meta?.cpu_cores ?? 2}-core ARM{' '}
+                      {computeInstance?.variant?.meta?.cpu_cores ?? 2}-core {cpuArchitecture}{' '}
                       {computeInstance?.variant?.meta?.cpu_dedicated ? '(Dedicated)' : '(Shared)'}
                     </p>
                   </div>
@@ -296,12 +310,15 @@ const AddOns = ({}: AddOnsProps) => {
                       ? `Point in time recovery of ${pitr.variant.meta?.backup_duration_days} days is enabled`
                       : 'Point in time recovery is not enabled'}
                   </p>
-                  <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
+                  <ProjectUpdateDisabledTooltip
+                    projectUpdateDisabled={projectUpdateDisabled}
+                    projectNotActive={!isProjectActive}
+                  >
                     <Button
                       type="default"
-                      className="mt-2"
+                      className="mt-2 pointer-events-auto"
                       onClick={() => snap.setPanelKey('pitr')}
-                      disabled={projectUpdateDisabled}
+                      disabled={!isProjectActive || projectUpdateDisabled}
                     >
                       Change point in time recovery
                     </Button>
@@ -334,12 +351,15 @@ const AddOns = ({}: AddOnsProps) => {
                       ? 'Custom domain is enabled'
                       : 'Custom domain is not enabled'}
                   </p>
-                  <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
+                  <ProjectUpdateDisabledTooltip
+                    projectUpdateDisabled={projectUpdateDisabled}
+                    projectNotActive={!isProjectActive}
+                  >
                     <Button
                       type="default"
-                      className="mt-2"
+                      className="mt-2 pointer-events-auto"
                       onClick={() => snap.setPanelKey('customDomain')}
-                      disabled={projectUpdateDisabled}
+                      disabled={!isProjectActive || projectUpdateDisabled}
                     >
                       Change custom domain
                     </Button>

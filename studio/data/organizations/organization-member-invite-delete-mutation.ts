@@ -1,6 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationMemberInviteDeleteVariables = {
@@ -16,10 +19,7 @@ export async function deleteOrganizationMemberInvite({
     `${API_URL}/organizations/${slug}/members/invite?invited_id=${invitedId}`,
     {}
   )
-  if (response.error) {
-    throw response.error
-  }
-
+  if (response.error) throw response.error
   return response
 }
 
@@ -27,11 +27,12 @@ type OrganizationMemberInviteDeleteData = Awaited<ReturnType<typeof deleteOrgani
 
 export const useOrganizationMemberInviteDeleteMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
   UseMutationOptions<
     OrganizationMemberInviteDeleteData,
-    unknown,
+    ResponseError,
     OrganizationMemberInviteDeleteVariables
   >,
   'mutationFn'
@@ -40,7 +41,7 @@ export const useOrganizationMemberInviteDeleteMutation = ({
 
   return useMutation<
     OrganizationMemberInviteDeleteData,
-    unknown,
+    ResponseError,
     OrganizationMemberInviteDeleteVariables
   >((vars) => deleteOrganizationMemberInvite(vars), {
     async onSuccess(data, variables, context) {
@@ -52,6 +53,13 @@ export const useOrganizationMemberInviteDeleteMutation = ({
       ])
 
       await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to revoke invitation: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
     },
     ...options,
   })

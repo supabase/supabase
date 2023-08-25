@@ -195,7 +195,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
                 The disk is expanded to be 50% larger. Auto-scaling can only take place once every 6
                 hours. You can also{' '}
                 <Link passHref href={`/project/${ref}/settings/database#diskManagement`}>
-                  <a className="text-brand-900 transition hover:text-brand-1000">preprovision</a>
+                  <a className="text-brand transition hover:text-brand-600">preprovision</a>
                 </Link>{' '}
                 disk for loading larger amounts of data.
               </p>
@@ -229,7 +229,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         key: 'storage_size',
         attribute: 'total_storage_size_bytes',
         name: 'Storage Size',
-        chartPrefix: 'Max ',
+        chartPrefix: 'Average ',
         unit: 'bytes',
         description:
           'Sum of all objects in your storage buckets.\nBilling is based on the average daily size in GB throughout your billing period.',

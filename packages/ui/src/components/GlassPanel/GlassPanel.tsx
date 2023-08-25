@@ -37,7 +37,9 @@ const GlassPanel = ({
     <div
       className={[
         'shrink-0',
-        showIconBg ? 'bg-green-600 w-8 h-8 flex items-center justify-center rounded' : '',
+        showIconBg
+          ? 'bg-brand-300 border border-brand-400 w-8 h-8 flex items-center justify-center rounded'
+          : '',
       ].join(' ')}
     >
       {props.children}
@@ -114,7 +116,7 @@ const GlassPanel = ({
         </div>
 
         {children && <span className="text-sm text-scale-1100 flex-grow">{children}</span>}
-        {showLink && <span className="text-brand-900 justify-end text-sm">Learn more</span>}
+        {showLink && <span className="text-brand justify-end text-sm">Learn more</span>}
       </div>
     </div>
   )

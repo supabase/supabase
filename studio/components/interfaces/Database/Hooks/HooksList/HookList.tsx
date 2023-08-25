@@ -7,7 +7,7 @@ import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import { useDatabaseHooks } from 'data/database-triggers/database-triggers-query'
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { Badge, Button, Dropdown, IconEdit3, IconMoreVertical, IconTrash } from 'ui'
 
@@ -35,7 +35,7 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
       x.schema === schema &&
       x.function_args.length >= 2
   )
-  const canUpdateWebhook = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
+  const canUpdateWebhook = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   return (
     <>

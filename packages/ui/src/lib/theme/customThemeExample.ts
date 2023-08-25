@@ -35,7 +35,7 @@ const default__padding_and_text = {
 export default {
   button: {
     type: {
-      primary: `${defaults.brandBackground} text-white hover:bg-brand-600 dark:hover:bg-brand-900`,
+      primary: `${defaults.brandBackground} text-white hover:bg-brand-600 dark:hover:bg-brand`,
     },
   },
 }

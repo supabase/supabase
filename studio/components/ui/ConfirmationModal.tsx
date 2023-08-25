@@ -4,6 +4,7 @@ import { Button, Modal } from 'ui'
 export interface ConfirmationModalProps {
   visible: boolean
   danger?: boolean
+  loading?: boolean
   header: string | JSX.Element
   description?: string
   size?: 'small' | 'tiny' | 'medium' | 'large'
@@ -15,6 +16,7 @@ export interface ConfirmationModalProps {
 
 const ConfirmationModal = ({
   visible = false,
+  loading: loading_ = false,
   danger = false,
   header = '',
   description = '',
@@ -30,6 +32,10 @@ const ConfirmationModal = ({
       setLoading(false)
     }
   }, [visible])
+
+  useEffect(() => {
+    setLoading(loading_)
+  }, [loading_])
 
   const [loading, setLoading] = useState(false)
 

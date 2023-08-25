@@ -38,6 +38,14 @@ const Frameworks = () => {
       href: '/reference/javascript/installing#javascript',
     },
     {
+      name: 'Kotlin',
+      logo: {
+        light: '/docs/img/icons/kotlin-icon.svg',
+        dark: '/docs/img/icons/kotlin-icon.svg',
+      },
+      href: '/guides/with-kotlin',
+    },
+    {
       name: 'Next.js',
       logo: {
         light: '/docs/img/icons/nextjs-light-icon.svg',
@@ -84,6 +92,14 @@ const Frameworks = () => {
         dark: '/docs/img/icons/vuejs-icon.svg',
       },
       href: '/guides/with-vue-3',
+    },
+    {
+      name: 'refine',
+      logo: {
+        light: '/docs/img/icons/refine-icon.svg',
+        dark: '/docs/img/icons/refine-icon.svg',
+      },
+      href: '/guides/getting-started/tutorials/with-refine',
     },
   ]
   return (

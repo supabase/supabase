@@ -1,7 +1,6 @@
 import { ReactNode, useEffect } from 'react'
 
 import { useParams } from 'common/hooks'
-import DeleteBucketModal from 'components/to-be-cleaned/Storage/DeleteBucketModal'
 import { AutoApiService, useProjectApiQuery } from 'data/config/project-api-query'
 import { useSelectedProject, useStore, withAuth } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
@@ -18,10 +17,7 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const project = useSelectedProject()
-
   const storageExplorerStore = useStorageStore()
-  const { selectedBucketToEdit, closeDeleteBucketModal, showDeleteBucketModal } =
-    storageExplorerStore || {}
 
   const { data: settings, isLoading } = useProjectApiQuery({ projectRef })
   const apiService = settings?.autoApiService
@@ -55,11 +51,6 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
   return (
     <ProjectLayout title={title || 'Storage'} product="Storage" productMenu={<StorageMenu />}>
       {children}
-      <DeleteBucketModal
-        visible={showDeleteBucketModal}
-        bucket={selectedBucketToEdit}
-        onClose={closeDeleteBucketModal}
-      />
     </ProjectLayout>
   )
 }

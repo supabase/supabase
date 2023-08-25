@@ -15,7 +15,8 @@ const ProjectUpgradeFailedBanner = () => {
   const { target_version, status, initiated_at, error } = data?.databaseUpgradeStatus ?? {}
 
   const key = `supabase-upgrade-${ref}-${initiated_at}`
-  const isAcknowledged = localStorage?.getItem(key) === 'true' ?? false
+  const isAcknowledged =
+    typeof window !== 'undefined' ? localStorage?.getItem(key) === 'true' ?? false : false
   const [showMessage, setShowMessage] = useState(!isAcknowledged)
 
   const isFailed = status === DatabaseUpgradeStatus.Failed

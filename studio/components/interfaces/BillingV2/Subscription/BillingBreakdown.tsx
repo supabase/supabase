@@ -1,24 +1,20 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import clsx from 'clsx'
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
 import { useUpcomingInvoiceQuery } from 'data/invoices/invoice-upcoming-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import {
-  ProjectUsageResponse,
-  UsageMetric,
-  useProjectUsageQuery,
-} from 'data/usage/project-usage-query'
+import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import dayjs from 'dayjs'
 import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { partition } from 'lodash'
+import Link from 'next/link'
 import { useState } from 'react'
+import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, Collapsible, IconAlertTriangle, IconChevronRight, IconInfo } from 'ui'
 import { BILLING_BREAKDOWN_METRICS } from './Subscription.constants'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import Link from 'next/link'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
 export interface BillingBreakdownProps {}
 
@@ -127,22 +123,18 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
           ) : (
             <div className="grid grid-cols-12">
               {BILLING_BREAKDOWN_METRICS.map((metric, i) => {
-                const usageMeta =
-                  (usage?.[metric.key as keyof ProjectUsageResponse] as UsageMetric) ?? undefined
-                const usageRatio =
-                  typeof usageMeta !== 'number'
-                    ? (usageMeta?.usage ?? 0) / (usageMeta?.limit ?? 0)
-                    : 0
+                const usageMeta = usage?.[metric.key]
+                const usageRatio = (usageMeta?.usage ?? 0) / (usageMeta?.limit ?? 0)
 
-                const hasLimit = usageMeta.limit > 0
+                const hasLimit = (usageMeta?.limit ?? 0) > 0
                 const usageCurrentLabel =
                   metric.units === 'bytes'
-                    ? formatBytes(usageMeta.usage)
-                    : usageMeta.usage?.toLocaleString()
+                    ? formatBytes(usageMeta?.usage)
+                    : usageMeta?.usage?.toLocaleString()
                 const usageLimitLabel =
                   metric.units === 'bytes'
-                    ? formatBytes(usageMeta.limit)
-                    : usageMeta.limit.toLocaleString()
+                    ? formatBytes(usageMeta?.limit)
+                    : usageMeta?.limit.toLocaleString()
                 const usageLabel = `${usageCurrentLabel} ${hasLimit ? `of ${usageLimitLabel}` : ''}`
                 const percentageLabel = `${(usageRatio * 100).toFixed(2)}%`
 
@@ -177,7 +169,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                           </div>
                         </a>
                       </Link>
-                      {isUsageBillingEnabled && usageFee && (
+                      {isUsageBillingEnabled && hasLimit && usageFee && (
                         <Tooltip.Root delayDuration={0}>
                           <Tooltip.Trigger>
                             <div className="flex items-center">
@@ -282,44 +274,55 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                           </Tooltip.Root>
                         )}
                     </div>
-                    {usageMeta.available_in_plan ? (
-                      <SparkBar
-                        type="horizontal"
-                        // If the limit is 0, it means that the usage is unlimited and not billed
-                        // By setting "1" as max, the bar is only filled if the metric has any usage
-                        // This is only the case for Enterprise plans
-                        max={usageMeta.limit || 1}
-                        value={usageMeta.usage ?? 0}
-                        barClass={
-                          !hasLimit && usageMeta.usage > 0
-                            ? 'bg-scale-1100'
-                            : isExceededLimit && !isUsageBillingEnabled
-                            ? 'bg-red-900'
-                            : isApproachingLimit && !isUsageBillingEnabled
-                            ? 'bg-amber-900'
-                            : 'bg-scale-1100'
-                        }
-                        bgClass="bg-gray-300 dark:bg-gray-600"
-                        labelBottom={usageLabel}
-                        labelBottomClass="!text-scale-1000"
-                        labelTop={hasLimit ? percentageLabel : undefined}
-                        labelTopClass={
-                          !hasLimit
-                            ? ''
-                            : isExceededLimit && !isUsageBillingEnabled
-                            ? '!text-red-900'
-                            : isApproachingLimit && !isUsageBillingEnabled
-                            ? '!text-amber-900'
-                            : ''
-                        }
-                      />
+                    {usageMeta ? (
+                      usageMeta.available_in_plan ? (
+                        <SparkBar
+                          type="horizontal"
+                          // If the limit is 0, it means that the usage is unlimited and not billed
+                          // By setting "1" as max, the bar is only filled if the metric has any usage
+                          // This is only the case for Enterprise plans
+                          max={usageMeta.limit || 1}
+                          value={usageMeta.usage ?? 0}
+                          barClass={
+                            !hasLimit && usageMeta.usage > 0
+                              ? 'bg-scale-1100'
+                              : isExceededLimit && !isUsageBillingEnabled
+                              ? 'bg-red-900'
+                              : isApproachingLimit && !isUsageBillingEnabled
+                              ? 'bg-amber-900'
+                              : 'bg-scale-1100'
+                          }
+                          bgClass="bg-gray-300 dark:bg-gray-600"
+                          labelBottom={usageLabel}
+                          labelBottomClass="!text-scale-1000"
+                          labelTop={hasLimit ? percentageLabel : undefined}
+                          labelTopClass={
+                            !hasLimit
+                              ? ''
+                              : isExceededLimit && !isUsageBillingEnabled
+                              ? '!text-red-900'
+                              : isApproachingLimit && !isUsageBillingEnabled
+                              ? '!text-amber-900'
+                              : ''
+                          }
+                        />
+                      ) : (
+                        // [Joshen] Needs a better CTA here
+                        <div className="flex items-center justify-between flex-grow">
+                          <p className="text-sm text-scale-1000">Unavailable in your plan</p>
+                          <Button
+                            type="default"
+                            onClick={() => snap.setPanelKey('subscriptionPlan')}
+                          >
+                            Upgrade
+                          </Button>
+                        </div>
+                      )
                     ) : (
-                      // [Joshen] Needs a better CTA here
                       <div className="flex items-center justify-between flex-grow">
-                        <p className="text-sm text-scale-1000">Unavailable in your plan</p>
-                        <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
-                          Upgrade
-                        </Button>
+                        <p className="text-sm text-scale-1000">
+                          The usage for this metric is missing.
+                        </p>
                       </div>
                     )}
                   </div>

@@ -119,7 +119,7 @@ function CodeBlock(props: CodeBlockProps) {
                 type="text"
                 icon={
                   copied ? (
-                    <span className="text-brand-900">
+                    <span className="text-brand">
                       <IconCheck strokeWidth={3} />
                     </span>
                   ) : (
