@@ -210,7 +210,7 @@ const authProviders = [
     platform: true,
     selfHosted: true,
     authType: 'phone',
-    hasLighIcon: true,
+    hasLightIcon: true,
   },
 ]
 
