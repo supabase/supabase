@@ -1,17 +1,16 @@
-import { FC } from 'react'
+import type { PostgresRole } from '@supabase/postgres-meta'
 import { Modal } from 'ui'
 
-import PolicyName from './PolicyName'
-import PolicyDefinition from './PolicyDefinition'
 import PolicyAllowedOperation from './PolicyAllowedOperation'
-import PolicyRoles from './PolicyRoles'
+import PolicyDefinition from './PolicyDefinition'
 import PolicyEditorFooter from './PolicyEditorFooter'
-import type { PostgresRole } from '@supabase/postgres-meta'
+import PolicyName from './PolicyName'
+import PolicyRoles from './PolicyRoles'
 
 // Exposed for StoragePoliciesEditor.js
 export { PolicyName, PolicyRoles }
 
-interface Props {
+interface PolicyEditorProps {
   isNewPolicy: boolean
   roles: PostgresRole[]
   policyFormFields: any
@@ -20,14 +19,14 @@ interface Props {
   onReviewPolicy: () => void
 }
 
-const PolicyEditor: FC<Props> = ({
+const PolicyEditor = ({
   isNewPolicy = true,
   roles = [],
   policyFormFields = {},
   onUpdatePolicyFormFields = () => {},
   onViewTemplates = () => {},
   onReviewPolicy = () => {},
-}) => {
+}: PolicyEditorProps) => {
   const operation = policyFormFields?.command ?? ''
   const definition = policyFormFields?.definition ?? ''
   const check = policyFormFields?.check ?? ''

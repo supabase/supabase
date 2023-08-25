@@ -57,6 +57,7 @@ const nextConfig = {
       'weweb-changelog.ghost.io',
       'img.youtube.com',
       'archbee-image-uploads.s3.amazonaws.com',
+      'obuldanrptloktxcffvn.supabase.co',
     ],
   },
   experimental: {

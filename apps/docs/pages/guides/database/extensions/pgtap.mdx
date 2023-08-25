@@ -25,7 +25,7 @@ Let's cover some basic concepts:
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for "pgtap" and enable the extension.
 
@@ -72,8 +72,8 @@ API:
 begin;
 select plan( 2 );
 
-select has_column( 'profiles', 'id' );  # test that the "id" column exists in the "profiles" table
-select col_is_pk( 'profiles', 'id' );   # test that the "id" column is a primary key
+select has_column( 'profiles', 'id' ); -- test that the "id" column exists in the "profiles" table
+select col_is_pk( 'profiles', 'id' ); -- test that the "id" column is a primary key
 
 select * from finish();
 rollback;
@@ -94,8 +94,8 @@ select policies_are(
   'public',
   'profiles',
   ARRAY [
-    'Profiles are public', # Test that there is a policy called  "Profiles are public" on the "profiles" table.
-    'Profiles can only be updated by the owner'  # Test that there is a policy called  "Profiles can only be updated by the owner" on the "profiles" table.
+    'Profiles are public', -- Test that there is a policy called  "Profiles are public" on the "profiles" table.
+    'Profiles can only be updated by the owner'  -- Test that there is a policy called  "Profiles can only be updated by the owner" on the "profiles" table.
   ]
 );
 

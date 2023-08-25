@@ -6,7 +6,7 @@ import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink } from 'ui'
 import SpendCapSidePanel from './SpendCapSidePanel'
 import Link from 'next/link'
-import ProjectUpdateDisabledTooltip from '../../ProjectUpdateDisabledTooltip'
+import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import { useFlag } from 'hooks'
 
 export interface CostControlProps {}
@@ -129,7 +129,7 @@ const CostControl = ({}: CostControlProps) => {
                 <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
                   <Button
                     type="default"
-                    className="mt-4"
+                    className="mt-4 pointer-events-auto"
                     disabled={!canChangeTier}
                     onClick={() => snap.setPanelKey('costControl')}
                   >

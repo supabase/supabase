@@ -1,25 +1,25 @@
-import { useState, FC } from 'react'
-import { isEmpty } from 'lodash'
-import { IconHelpCircle } from 'ui'
-import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
+import type { PostgresRole, PostgresTable } from '@supabase/postgres-meta'
 import { useParams } from 'common/hooks'
 import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Auth/Policies'
-import type { PostgresRole, PostgresTable } from '@supabase/postgres-meta'
+import { useStore } from 'hooks'
+import { isEmpty } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { IconHelpCircle } from 'ui'
 
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import InformationBox from 'components/ui/InformationBox'
 
-interface Props {
+interface PoliciesProps {
   tables: PostgresTable[]
   hasTables: boolean
   isLocked: boolean
 }
 
-const Policies: FC<Props> = ({ tables, hasTables, isLocked }) => {
+const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
   const router = useRouter()
   const { ref } = useParams()
 

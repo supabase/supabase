@@ -1,7 +1,8 @@
-import { FC, useEffect, useState } from 'react'
-import { Modal, Button, Input } from 'ui'
+import { noop } from 'lodash'
+import { useEffect, useState } from 'react'
+import { Button, Input, Modal } from 'ui'
 
-interface Props {
+interface MoveItemsModalProps {
   bucketName: string
   visible: boolean
   selectedItemsToMove: any[]
@@ -9,13 +10,13 @@ interface Props {
   onSelectMove: (path: string) => void
 }
 
-const MoveItemsModal: FC<Props> = ({
+const MoveItemsModal = ({
   bucketName = '',
   visible = false,
   selectedItemsToMove = [],
-  onSelectCancel = () => {},
-  onSelectMove = () => {},
-}) => {
+  onSelectCancel = noop,
+  onSelectMove = noop,
+}: MoveItemsModalProps) => {
   const [moving, setMoving] = useState(false)
   const [newPath, setNewPath] = useState('')
 
