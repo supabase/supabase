@@ -118,7 +118,7 @@ const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
   const response = await post(`${PG_META_URL}/query`, query, { headers })
 
   if (response.error) {
-    console.error('Publication POST:', response.error)
+    console.error('Delete Users POST:', response.error)
     return res.status(400).json({ error: response.error })
   }
 
