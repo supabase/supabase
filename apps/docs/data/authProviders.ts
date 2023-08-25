@@ -68,7 +68,7 @@ const authProviders = [
     platform: true,
     selfHosted: true,
     authType: 'social',
-    hasLighIcon: true,
+    hasLightIcon: true,
   },
   {
     name: 'GitLab',
@@ -169,6 +169,7 @@ const authProviders = [
     platform: true,
     selfHosted: true,
     authType: 'social',
+    hasLightIcon: true,
   },
   {
     name: 'Twitch',
