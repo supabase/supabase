@@ -1,4 +1,5 @@
 import React, { PropsWithChildren, useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
 
 interface Props {
   outerClassName?: string
@@ -62,13 +63,16 @@ const Panel = ({
   }, [])
 
   return (
-    <div
+    <motion.div
       ref={outerRef}
       className={[
         'relative z-0 rounded-xl bg-gradient-to-b from-background-surface-300 to-scale-400 p-px shadow-md',
         !trackCursor && hasActiveOnHover ? 'hover:bg-none hover:!bg-brand' : '',
         outerClassName,
       ].join(' ')}
+      initial="rest"
+      whileHover="hover"
+      animate="hover"
     >
       <div
         className={[
@@ -82,7 +86,7 @@ const Panel = ({
         />
         <div className="relative z-0 w-full h-full">{children}</div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
