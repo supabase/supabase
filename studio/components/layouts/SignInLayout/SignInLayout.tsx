@@ -1,13 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useTheme } from 'common'
-import { useFlag, useStore } from 'hooks'
+import { useFlag } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { auth, getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
+import { BASE_PATH } from 'lib/constants'
+import { auth } from 'lib/gotrue'
 import { observer } from 'mobx-react-lite'
-import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { tweets } from 'shared-data'
 import { Button, IconFileText } from 'ui'
@@ -26,6 +26,7 @@ const SignInLayout = ({
   logoLinkToMarketingSite = false,
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
+  const router = useRouter()
   const pushNext = usePushNext()
   const queryClient = useQueryClient()
   const { isDarkMode } = useTheme()
@@ -42,24 +43,34 @@ const SignInLayout = ({
       return
     }
 
-    ;(async () => {
-      const { error } = await auth.initialize()
-
+    auth.initialize().then(({ error }) => {
       if (error) {
         // if there was a problem signing in via the url, don't redirect
         return
       }
 
-      const {
-        data: { session },
-      } = await auth.getSession()
+      auth.getSession().then(async ({ data: { session } }) => {
+        try {
+          const { data, error } = await auth.mfa.getAuthenticatorAssuranceLevel()
+          if (error) {
+            // if there was a problem signing in via the url, don't redirect
+            return
+          }
 
-      if (session) {
-        await queryClient.resetQueries()
+          if (data) {
+            if (data.currentLevel !== data.nextLevel) {
+              router.replace('/sign-in-mfa')
+              return
+            }
+          }
 
-        await pushNext()
-      }
-    })()
+          if (session) {
+            await queryClient.resetQueries()
+            await pushNext()
+          }
+        } catch {}
+      })
+    })
   }, [])
 
   const [quote, setQuote] = useState<{
@@ -77,20 +88,12 @@ const SignInLayout = ({
 
   return (
     <>
-      {IS_PLATFORM && (
-        <Head>
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (localStorage.getItem('${STORAGE_KEY}') && !(new URLSearchParams(location.search).has('next'))) {location.replace('${
-                BASE_PATH ?? ''
-              }' + window._getReturnToPath())}`,
-            }}
-          />
-        </Head>
-      )}
-
       <div className="flex flex-col flex-1 bg-scale-100">
-        <div className={`absolute top-0 w-full px-8 mx-auto sm:px-6 lg:px-8 ${ongoingIncident ? 'pt-16' : 'pt-6'}`}>
+        <div
+          className={`absolute top-0 w-full px-8 mx-auto sm:px-6 lg:px-8 ${
+            ongoingIncident ? 'pt-16' : 'pt-6'
+          }`}
+        >
           <nav className="relative flex items-center justify-between sm:h-10">
             <div className="flex items-center flex-grow flex-shrink-0 lg:flex-grow-0">
               <div className="flex items-center justify-between w-full md:w-auto">
