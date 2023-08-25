@@ -68,6 +68,7 @@ const authProviders = [
     platform: true,
     selfHosted: true,
     authType: 'social',
+    hasLighIcon: true,
   },
   {
     name: 'GitLab',
@@ -208,6 +209,7 @@ const authProviders = [
     platform: true,
     selfHosted: true,
     authType: 'phone',
+    hasLighIcon: true,
   },
 ]
 
