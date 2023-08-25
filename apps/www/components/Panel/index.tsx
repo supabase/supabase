@@ -22,31 +22,27 @@ const Panel = ({
 }: PropsWithChildren<Props>) => {
   const outerRef = useRef(null)
   const innerRef = useRef(null)
+  const trackCursor = hasShimmer || hasInnerShimmer
 
   const handleGlow = (event: any) => {
-    if (!outerRef.current || !innerRef.current) return null
+    if (!trackCursor || !outerRef.current || !innerRef.current) return null
+
     const outerElement = outerRef.current as HTMLDivElement
     const innerElement = innerRef.current as HTMLDivElement
-    let x: any
-    let y: any
-    let isActive: boolean = false
+    const { x: elX, y: elY, width, height } = outerElement.getBoundingClientRect()
+    const x = event.clientX - elX
+    const y = event.clientY - elY
+    const isActive = x > -3 && x < width + 3 && y > -3 && y < height + 3
 
-    if (hasShimmer || hasActiveOnHover || hasInnerShimmer) {
-      const { x: elX, y: elY, width, height } = outerElement.getBoundingClientRect()
-      x = event.clientX - elX
-      y = event.clientY - elY
-      isActive = x > -3 && x < width + 3 && y > -3 && y < height + 3
-    }
-
-    if (isActive) {
-      outerElement.classList.remove('!bg-surface-200')
-      // outerElement.classList.remove('bg-gradient-to-b')
-      outerElement.classList.add('!bg-brand')
-    } else {
-      outerElement.classList.remove('!bg-brand')
-      // outerElement.classList.add('bg-gradient-to-b')
-      outerElement.classList.add('!bg-surface-200')
-    }
+    // if (isActive) {
+    //   outerElement.classList.remove('!bg-surface-200')
+    //   // outerElement.classList.remove('bg-gradient-to-b')
+    //   outerElement.classList.add('!bg-brand')
+    // } else {
+    //   outerElement.classList.remove('!bg-brand')
+    //   // outerElement.classList.add('bg-gradient-to-b')
+    //   outerElement.classList.add('!bg-surface-200')
+    // }
 
     if (hasShimmer) {
       const activeGlow =
@@ -75,11 +71,14 @@ const Panel = ({
     }
   }, [])
 
+  console.log('trackCursor', trackCursor, 'hasActiveOnHover', hasActiveOnHover)
+
   return (
     <div
       ref={outerRef}
       className={[
-        'relative z-0 rounded-xl bg-gradient-to-b hover:bg-none from-background-surface-300 to-background-surface-100 p-px transition-all shadow-md',
+        'relative z-0 rounded-xl bg-gradient-to-b from-background-surface-300 to-background-surface-100 p-px shadow-md',
+        !trackCursor && hasActiveOnHover ? 'bg-none hover:!bg-brand' : '',
         outerClassName,
       ].join(' ')}
     >

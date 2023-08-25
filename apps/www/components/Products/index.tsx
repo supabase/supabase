@@ -207,11 +207,18 @@ const Products = (props: any) => {
           subtitle={props.products['vector'].description}
           highlights={
             <ul className="flex flex-col gap-1 text-sm">
-              <li>
-                <IconCheck className="inline h-4 w-4" /> OpenAI
+              <li className="flex items-center gap-2">
+                <Image src="/images/logos/openai.svg" alt="OpenAI logo" width="25" height="25" />
+                <span>OpenAI</span>
               </li>
-              <li>
-                <IconCheck className="inline h-4 w-4" /> Hugging Face
+              <li className="flex items-center gap-2">
+                <Image
+                  src="/images/logos/hugging-face.svg"
+                  alt="Hugging Face logo"
+                  width="25"
+                  height="25"
+                />
+                <span>Hugging Face</span>
               </li>
             </ul>
           }
