@@ -24,7 +24,12 @@ export const useMfaChallengeAndVerifyMutation = ({
 
   return useMutation((vars) => mfaChallengeAndVerify(vars), {
     async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries(profileKeys.mfaFactors())
+      // when a MFA is added, the aaLevel is bumped up
+      await Promise.all([
+        queryClient.invalidateQueries(profileKeys.mfaFactors()),
+        queryClient.invalidateQueries(profileKeys.aaLevel()),
+      ])
+
       await onSuccess?.(data, variables, context)
     },
     ...options,
