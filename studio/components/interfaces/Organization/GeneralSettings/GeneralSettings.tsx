@@ -19,6 +19,7 @@ import {
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { OPT_IN_TAGS } from 'lib/constants'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
 
 const GeneralSettings = () => {
@@ -30,14 +31,14 @@ const GeneralSettings = () => {
   const { name, opt_in_tags } = selectedOrganization ?? {}
 
   const formId = 'org-general-settings'
-  const isOptedIntoAi = opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN')
+  const isOptedIntoAi = opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL)
   const initialValues = { name: name ?? '', isOptedIntoAi }
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
-  const onUpdateOrganization = async (values: any, { setSubmitting, resetForm }: any) => {
+  const onUpdateOrganization = async (values: any, { resetForm }: any) => {
     if (!canUpdateOrganization) {
       return ui.setNotification({
         category: 'error',
@@ -48,9 +49,12 @@ const GeneralSettings = () => {
     if (!slug) return console.error('Slug is required')
 
     const existingOptInTags = selectedOrganization?.opt_in_tags ?? []
-    const updatedOptInTags = values.isOptedIntoAi
-      ? existingOptInTags.concat(['AI_SQL_GENERATOR_OPT_IN'])
-      : existingOptInTags.filter((x) => x !== 'AI_SQL_GENERATOR_OPT_IN')
+    const updatedOptInTags =
+      values.isOptedIntoAi && !existingOptInTags.includes(OPT_IN_TAGS.AI_SQL)
+        ? existingOptInTags.concat([OPT_IN_TAGS.AI_SQL])
+        : !values.isOptedIntoAi && existingOptInTags.includes(OPT_IN_TAGS.AI_SQL)
+        ? existingOptInTags.filter((x) => x !== OPT_IN_TAGS.AI_SQL)
+        : existingOptInTags
 
     updateOrganization(
       { slug, name: values.name, opt_in_tags: updatedOptInTags },
