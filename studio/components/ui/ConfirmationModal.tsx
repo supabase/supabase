@@ -10,6 +10,7 @@ export interface ConfirmationModalProps {
   size?: 'small' | 'tiny' | 'medium' | 'large'
   buttonLabel: string
   buttonLoadingLabel?: string
+  buttonDisabled?: boolean
   onSelectCancel: () => void
   onSelectConfirm: () => void
 }
@@ -23,6 +24,7 @@ const ConfirmationModal = ({
   size = 'small',
   buttonLabel = '',
   buttonLoadingLabel = '',
+  buttonDisabled = false,
   onSelectCancel = () => {},
   onSelectConfirm = () => {},
   children,
@@ -62,7 +64,7 @@ const ConfirmationModal = ({
           <Button
             type={danger ? 'danger' : 'primary'}
             loading={loading}
-            disabled={loading}
+            disabled={loading || buttonDisabled}
             onClick={onConfirm}
           >
             {loading ? buttonLoadingLabel : buttonLabel}
