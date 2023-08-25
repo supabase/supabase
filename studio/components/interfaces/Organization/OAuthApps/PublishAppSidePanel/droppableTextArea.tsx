@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { uuidv4 } from 'lib/helpers'
 import { uploadAttachment } from 'lib/upload'
 import { Dispatch, DragEventHandler, SetStateAction, useState } from 'react'
 import { cn, Textarea } from 'ui'
@@ -61,13 +62,15 @@ export const DroppableTextArea = ({ value, onChange }: DroppableTextAreaProps) =
       const files = await getFilesDataTransferItems(items)
 
       files.forEach((file) => {
+        const generatedId = uuidv4()
         onChange((v) => {
           return v + `\n![Uploading ${file.name}…]()\n`
         })
-        uploadAttachment('temp-for-testing-integrations', `${slug}/${file.name}`, file).then(
+
+        uploadAttachment('temp-for-testing-integrations', `${slug}/${generatedId}`, file).then(
           (url) => {
             onChange((v) => {
-              return v.replace(`![Uploading ${file.name}…]()`, `![${file.name}(${url})`)
+              return v.replace(`![Uploading ${file.name}…]()`, `![${file.name}](${url})`)
             })
           }
         )
