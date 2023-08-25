@@ -1123,10 +1123,7 @@ class StorageExplorerStore {
         },
         index
       )
-    } else if (
-      !res.error.message.includes('The user aborted a request') &&
-      !res.error.message.includes('Request signal is aborted')
-    ) {
+    } else if (!res.error.message.includes('aborted')) {
       this.ui.setNotification({
         error: res.error,
         category: 'error',
@@ -1166,10 +1163,7 @@ class StorageExplorerStore {
         }
         return col
       })
-    } else if (
-      !res.error.message.includes('The user aborted a request') &&
-      !res.error.message.includes('Request signal is aborted')
-    ) {
+    } else if (!res.error.message.includes('aborted')) {
       this.ui.setNotification({
         error: res.error,
         category: 'error',
