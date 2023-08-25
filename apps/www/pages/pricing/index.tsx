@@ -156,7 +156,7 @@ export default function IndexPage() {
               <h1 className="text-brand text-base">Pricing</h1>
               <h2 className="h1">Predictable pricing, no surprises</h2>
               <p className="p text-lg">
-                Start building for free, collaborate with a team, then scale to millions of users
+                Start building for free, collaborate with a team, then scale to millions of users.
               </p>
             </div>
           </div>
@@ -906,15 +906,15 @@ export default function IndexPage() {
                 </Accordion>
               </div>
               <p className="p text-center">
-                Can&apos;t find the answer to your question, you can{' '}
+                Can&apos;t find the answer to your question?{' '}
                 <a
                   target="_blank"
                   href="https://supabase.com/dashboard/support/new"
                   className="transition text-brand hover:text-brand-600"
                 >
-                  open a support ticket
+                  Open a support ticket
                 </a>{' '}
-                and our team of experts will be able to help.
+                to receive help from our team of experts.
               </p>
               <p className="p text-center">
                 For enterprise enquries,{' '}
