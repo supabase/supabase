@@ -9,6 +9,8 @@ export type GenerateTypesVariables = { ref?: string }
 export async function generateTypes({ ref }: GenerateTypesVariables, signal?: AbortSignal) {
   if (!ref) throw new Error('Project ref is required')
 
+  // TODO: Something wrong with the typescript endpoint on local dev and self-hosted
+
   const { data, error } = await get(`/v1/projects/{ref}/types/typescript`, {
     params: { path: { ref } },
     signal,
