@@ -18,6 +18,7 @@ import {
 } from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
+import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions, useStore } from 'hooks'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
@@ -162,17 +163,19 @@ const TableList = ({
           <ShimmeringLoader className="w-1/2" />
         </div>
       ) : tables.length === 0 ? (
-        <div className="flex h-full w-full items-center justify-center mt-48">
-          <ProductEmptyState
-            title="Tables"
-            ctaButtonLabel="Create a new table"
-            onClickCta={() => onAddTable()}
-            disabled={!canUpdateTables}
-            disabledMessage="You need additional permissions to create tables"
-          >
-            <p className="text-sm text-scale-1100">No tables found in this schema.</p>
-          </ProductEmptyState>
-        </div>
+        filterString ? <NoSearchResults /> : (
+          <div className="flex h-full w-full items-center justify-center mt-48">
+            <ProductEmptyState
+              title="Tables"
+              ctaButtonLabel="Create a new table"
+              onClickCta={() => onAddTable()}
+              disabled={!canUpdateTables}
+              disabledMessage="You need additional permissions to create tables"
+            >
+              <p className="text-sm text-scale-1100">No tables found in this schema.</p>
+            </ProductEmptyState>
+          </div>
+        )
       ) : (
         <div className="my-4 w-full">
           <Table
