@@ -70,9 +70,8 @@ const Panel = ({
         !trackCursor && hasActiveOnHover ? 'hover:bg-none hover:!bg-brand' : '',
         outerClassName,
       ].join(' ')}
-      initial="rest"
       whileHover="hover"
-      animate="hover"
+      animate="initial"
     >
       <div
         className={[
