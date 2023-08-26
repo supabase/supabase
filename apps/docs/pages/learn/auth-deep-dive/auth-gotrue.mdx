@@ -57,7 +57,7 @@ You'll have to make sure your google app is verified of course in order to reque
 But all the functionality of gotrue-js is also available in supabase-js, which uses gotrue-js internally when you do things like:
 
 ```jsx
-const { user, session, error } = await supabase.auth.signIn({
+const { user, session, error } = await supabase.auth.signInWithPassword({
   email: 'example@email.com',
   password: 'example-password',
 })
