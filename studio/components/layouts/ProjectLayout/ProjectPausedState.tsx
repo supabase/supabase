@@ -12,8 +12,9 @@ import { useProjectRestoreMutation } from 'data/projects/project-restore-mutatio
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
-import { PROJECT_STATUS } from 'lib/constants'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useProjectContext } from './ProjectContext'
+import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 
 export interface ProjectPausedStateProps {
   product?: string
@@ -29,6 +30,8 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: ref })
   const isFreePlan = subscription?.plan?.id === 'free'
   const billedViaOrg = Boolean(selectedOrganization?.subscription_id)
+  const { data: allOverdueInvoices } = useOverdueInvoicesQuery({ enabled: IS_PLATFORM })
+  const haveOverdueInvoices: boolean = (allOverdueInvoices?.length ?? 0) > 1
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug: orgSlug })
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
@@ -95,56 +98,64 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     'Restore this project and get back to building the next big thing!'
                   )}
                 </p>
-                {isFreePlan && (
+                {!haveOverdueInvoices ? (
+                  isFreePlan ? (
+                    <p className="text-sm text-scale-1100 text-center">
+                      You can also prevent project pausing in the future by upgrading to Pro.
+                    </p>
+                  ) : (
+                    <p className="text-sm text-scale-1100 text-center">
+                      Unpaused projects count towards compute usage. For every hour your instance is
+                      active, we'll bill you based on the instance size of your project. See{' '}
+                      <Link href="https://www.notion.so/supabase/Organization-Level-Billing-707638e35c92489995dc3ac991a324d1">
+                        <a target="_blank" rel="noreferrer" className="underline">
+                          Compute Instance Usage Billing
+                        </a>
+                      </Link>{' '}
+                      for more details.
+                    </p>
+                  )
+                ) : (
                   <p className="text-sm text-scale-1100 text-center">
-                    You can also prevent project pausing in the future by upgrading to Pro.
-                  </p>
-                )}
-                {!isFreePlan && (
-                  <p className="text-sm text-scale-1100 text-center">
-                    Unpaused projects count towards compute usage. For every hour your instance is
-                    active, we'll bill you based on the instance size of your project. See{' '}
-                    <Link href="https://www.notion.so/supabase/Organization-Level-Billing-707638e35c92489995dc3ac991a324d1">
-                      <a target="_blank" rel="noreferrer" className="underline">
-                        Compute Instance Usage Billing
-                      </a>
-                    </Link>{' '}
-                    for more details.
+                    You have outstanding invoices that need to be paid before you’re able to resume
+                    this project. Please contact support if you need more help.
                   </p>
                 )}
               </div>
 
               <div className="flex items-center justify-center gap-4">
-                <Tooltip.Root delayDuration={0}>
-                  <Tooltip.Trigger>
-                    <Button
-                      size="tiny"
-                      type="primary"
-                      disabled={!canResumeProject}
-                      onClick={onSelectRestore}
-                    >
-                      Restore project
-                    </Button>
-                  </Tooltip.Trigger>
-                  {!canResumeProject && (
-                    <Tooltip.Portal>
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
-                            'border border-scale-200 ', //border
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-scale-1200">
-                            You need additional permissions to resume this project
-                          </span>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  )}
-                </Tooltip.Root>
-                {isFreePlan ? (
+                {!haveOverdueInvoices && (
+                  <Tooltip.Root delayDuration={0}>
+                    <Tooltip.Trigger>
+                      <Button
+                        size="tiny"
+                        type="primary"
+                        disabled={!canResumeProject}
+                        onClick={onSelectRestore}
+                      >
+                        Restore project
+                      </Button>
+                    </Tooltip.Trigger>
+                    {!canResumeProject && (
+                      <Tooltip.Portal>
+                        <Tooltip.Content side="bottom">
+                          <Tooltip.Arrow className="radix-tooltip-arrow" />
+                          <div
+                            className={[
+                              'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                              'border border-scale-200 ', //border
+                            ].join(' ')}
+                          >
+                            <span className="text-xs text-scale-1200">
+                              You need additional permissions to resume this project
+                            </span>
+                          </div>
+                        </Tooltip.Content>
+                      </Tooltip.Portal>
+                    )}
+                  </Tooltip.Root>
+                )}
+                {isFreePlan && !haveOverdueInvoices ? (
                   <Link
                     href={
                       billedViaOrg
