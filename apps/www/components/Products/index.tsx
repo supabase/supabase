@@ -114,7 +114,16 @@ const Products = (props: any) => {
           image={
             <div className="absolute inset-0 z-0">
               <Image
-                src="/images/index/products/auth.svg"
+                src="/images/index/products/auth2.svg"
+                alt="Supabase Authentication hover state"
+                layout="fill"
+                objectFit="cover"
+                objectPosition="center"
+                className="absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+                quality={100}
+              />
+              <Image
+                src="/images/index/products/auth1.svg"
                 alt="Supabase Authentication"
                 layout="fill"
                 objectFit="cover"
