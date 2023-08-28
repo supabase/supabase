@@ -26,13 +26,13 @@ const ProductCard = ({
   <Link href={url}>
     <a
       className={[
-        'group relative w-full h-[400px] sm:aspect-square md:aspect-auto sm:h-[400px] flex flex-col gap-5 lg:flex-row focus:outline-none focus:border-none focus:ring-brand-600 focus:ring-2 focus:rounded-xl',
+        'group relative w-full h-[400px] flex flex-col gap-5 lg:flex-row focus:outline-none focus:border-none focus:ring-brand-600 focus:ring-2 focus:rounded-xl',
         className,
       ].join(' ')}
       onClick={onClick}
     >
       <Panel
-        // hasShimmer
+        hasShimmer
         hasActiveOnHover
         outerClassName="relative w-full h-full shadow-lg p-0"
         innerClassName="relative overflow-hidden flex-1 flex flex-col items-center gap-5 lg:items-start justify-between w-full rounded-xl h-full bg"

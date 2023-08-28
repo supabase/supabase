@@ -5,6 +5,7 @@ interface Props {
   outerClassName?: string
   innerClassName?: string
   hasActiveOnHover?: boolean
+  activeColor?: 'default' | 'brand'
   hasShimmer?: boolean
   hasInnerShimmer?: boolean
   shimmerFromColor?: string
@@ -15,6 +16,7 @@ const Panel = ({
   outerClassName,
   innerClassName,
   hasActiveOnHover = false,
+  activeColor = 'default',
   hasShimmer = false,
   hasInnerShimmer = false,
   shimmerFromColor,
@@ -38,7 +40,9 @@ const Panel = ({
     if (hasShimmer) {
       const activeGlow =
         hasActiveOnHover && isActive
-          ? `radial-gradient(65rem circle at ${x}px ${y}px, var(--colors-brand9), transparent), `
+          ? `radial-gradient(65rem circle at ${x}px ${y}px, var(${
+              activeColor === 'brand' ? '--colors-brand9' : '--colors-scale9'
+            }), transparent), `
           : ''
       outerElement.style.backgroundImage = `
       ${activeGlow}radial-gradient(30rem circle at ${x}px ${y}px, ${
@@ -67,7 +71,7 @@ const Panel = ({
       ref={outerRef}
       className={[
         'relative z-0 rounded-xl bg-gradient-to-b from-background-surface-300 to-scale-400 p-px shadow-md',
-        !trackCursor && hasActiveOnHover ? 'hover:bg-none hover:!bg-brand' : '',
+        !trackCursor && hasActiveOnHover ? 'hover:bg-none hover:!bg-scale-800' : '',
         outerClassName,
       ].join(' ')}
       whileHover="hover"
