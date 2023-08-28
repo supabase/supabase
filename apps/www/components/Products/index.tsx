@@ -62,7 +62,7 @@ const Products = (props: any) => {
   const isTablet = useBreakpoint(1023)
 
   return (
-    <SectionContainer>
+    <SectionContainer className="!pt-0">
       <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-4 lg:gap-6 md:grid-cols-12">
         <ProductCard
           alignLeft
