@@ -142,7 +142,12 @@ const Products = (props: any) => {
           url={props.products['storage'].url}
           icon={props.products['storage'].icon}
           title={props.products['storage'].name}
-          subtitle={<>Store, organize, and serve large files, from videos to images.</>}
+          subtitle={
+            <>
+              Store, organize, and serve large files,
+              <br className="inline-block xl:hidden 2xl:inline-block" /> from videos to images.
+            </>
+          }
           image={<StorageVisual />}
           className="col-span-6 xl:col-span-3"
           onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.STORAGE)}
@@ -154,7 +159,7 @@ const Products = (props: any) => {
           subtitle={
             <>
               Build multiplayer experiences
-              <br className="inline-block sm:hidden lg:inline-block" /> with realtime data
+              <br className="inline-block md:hidden 2xl:inline-block" /> with realtime data
               synchronization.
             </>
           }
@@ -167,7 +172,12 @@ const Products = (props: any) => {
           url={props.products['vector'].url}
           icon={props.products['vector'].icon}
           title={props.products['vector'].name}
-          subtitle={props.products['vector'].description}
+          subtitle={
+            <>
+              Integrate your favorite ML-models to store,
+              <br className="inline-block md:hidden" /> index and search vector embeddings.
+            </>
+          }
           highlights={
             <ul className="flex flex-col gap-1 text-sm">
               <li className="flex items-center gap-2">
