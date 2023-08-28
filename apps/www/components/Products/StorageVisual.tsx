@@ -12,7 +12,7 @@ const StorageVisual = () => {
   return (
     <div className="absolute inset-0 overflow-hidden flex nowrap">
       {range(0, 2).map((_rangeCol) => (
-        <div className="relative h-full left-0 w-auto items-end pb-3 z-10 flex pause animate-marquee group-hover:run will-change-transform transition-transform">
+        <div className="relative h-full left-0 w-auto items-end pb-2 z-10 flex pause animate-marquee group-hover:run will-change-transform transition-transform">
           {range(0, 10).map((_rangeCol) => (
             <div className="flex flex-col ml-2 gap-2 md:gap-2">
               {cols.map((col: any) => (
