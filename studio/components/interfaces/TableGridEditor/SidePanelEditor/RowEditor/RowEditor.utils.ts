@@ -198,9 +198,18 @@ export const generateUpdateRowPayload = (originalRow: any, field: RowField[]) =>
   const payload = {} as any
   const properties = Object.keys(rowObject)
   properties.forEach((property) => {
-    if (!isEqual(originalRow[property], rowObject[property])) {
+    const type = field.find((x) => x.name === property)?.format
+    if (type !== undefined && DATETIME_TYPES.includes(type)) {
+      // Just to ensure that the value are in the correct and consistent format for value comparison
+      const originalFormatted = convertPostgresDatetimeToInputDatetime(type, originalRow[property])
+      const originalFormattedOut = convertInputDatetimeToPostgresDatetime(type, originalFormatted)
+      if (originalFormattedOut !== rowObject[property]) {
+        payload[property] = rowObject[property]
+      }
+    } else if (!isEqual(originalRow[property], rowObject[property])) {
       payload[property] = rowObject[property]
     }
   })
+
   return payload
 }

@@ -7,6 +7,10 @@ export const generateReadingTime = (text: string) => {
   const readTime = Math.ceil(minutes)
   return `${readTime} minute read`
 }
+// Helps with the TypeScript issue where filtering doesn't narrows undefined nor null types, check https://github.com/microsoft/TypeScript/issues/16069
+export function isNotNullOrUndefined<T>(value: T | null | undefined): value is T {
+  return value !== null && value !== undefined
+}
 
 export function capitalize(word: string) {
   return word[0].toUpperCase() + word.substring(1).toLowerCase()

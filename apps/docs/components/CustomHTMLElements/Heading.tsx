@@ -26,7 +26,7 @@ interface Props {
  *
  * In tsx files, we can generate this tocList directly. For these files, we don't
  * need to parse the <a> and generate anchors. Custom anchors are used in tsx files.
- * (see: /pages/reference/cli/config.tsx)
+ * (see: /pages/guides/cli/config.tsx)
  */
 const Heading: React.FC<Props> = ({ tag, customAnchor, children }) => {
   const HeadingTag = `${tag}` as any
