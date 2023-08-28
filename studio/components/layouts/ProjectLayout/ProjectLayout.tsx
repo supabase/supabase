@@ -191,7 +191,7 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
       ) : requiresDbConnection && isProjectRestoring ? (
         <RestoringState />
       ) : requiresDbConnection && isProjectBuilding ? (
-        <BuildingState project={selectedProject} />
+        <BuildingState />
       ) : (
         <>
           <UsageWarningBanner />

@@ -35,7 +35,7 @@ const RESOURCE_WARNING_MESSAGES = {
 }
 
 const ProjectCardWarnings = ({ resourceWarnings }: ProjectCardWarningsProps) => {
-  // [Joshen] Read only takes higher precendence over multiple resource warnings
+  // [Joshen] Read only takes higher precedence over multiple resource warnings
   const activeWarnings = resourceWarnings.is_readonly_mode_enabled
     ? ['is_readonly_mode_enabled']
     : Object.keys(resourceWarnings).filter(
