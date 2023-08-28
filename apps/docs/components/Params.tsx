@@ -1,4 +1,5 @@
 import { FC } from 'react'
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
 type IParamProps = any
 
@@ -21,7 +22,9 @@ const Param: FC<IParamProps> = (paramItem) => {
         <span className="text-scale-900 text-xs">{paramItem.type ?? 'no type'}</span>
       </div>
       {paramItem.description && (
-        <p className="text-sm text-scale-1000 m-0">{paramItem.description} </p>
+        <ReactMarkdown className="text-sm text-scale-1000 m-0">
+          {paramItem.description}
+        </ReactMarkdown>
       )}
       {paramItem.children}
     </li>

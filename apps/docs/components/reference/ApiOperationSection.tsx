@@ -1,6 +1,7 @@
 import { CodeBlock, Tabs } from 'ui'
 import Param from '~/components/Params'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
 const ApiOperationSection = (props) => {
   const operation = props.spec.operations.find((x: any) => x.operationId === props.funcData.id)
@@ -95,7 +96,7 @@ const ApiOperationSection = (props) => {
           >
             {operation.responseList.map((response: any) => (
               <Tabs.Panel id={response.responseCode} label={response.responseCode}>
-                <p className="text-scale-1000">{response.description}</p>
+                <ReactMarkdown className="text-scale-1000">{response.description}</ReactMarkdown>
                 {response?.content && response?.content['application/json'] && (
                   <div className="mt-8">
                     <CodeBlock language="bash" className="relative">
