@@ -41,7 +41,7 @@ const DatabaseVisual = () => {
 
   return (
     <div className="absolute inset-0 z-0" ref={containerRef}>
-      <div className="absolute w-full lg:w-auto h-full lg:aspect-square flex items-end lg:items-center justify-center lg:justify-end right-0 left-0 lg:left-auto top-20 md:top-24 lg:top-0 lg:bottom-0 my-auto">
+      <div className="absolute w-full lg:w-auto h-full lg:aspect-square flex items-end lg:items-center justify-center lg:justify-end right-0 left-0 lg:left-auto top-24 md:top-24 lg:top-0 lg:bottom-0 my-auto">
         <svg
           ref={ref}
           width="390"
