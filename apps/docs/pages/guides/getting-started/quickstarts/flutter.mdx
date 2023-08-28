@@ -189,6 +189,21 @@ export const meta = {
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
+<StepHikeCompact.Step step={7}>
+  <StepHikeCompact.Details title="Configuring Network Access for Android">
+    If you encounter connectivity issues when deploying your Flutter app on Android, make sure you have included the necessary permissions in your AndroidManifest.xml file to enable network access. This is important for the app to communicate with external services like Supabase.
+
+    To grant network access, open the `android/app/src/main/AndroidManifest.xml` file in your Flutter project and ensure that the following permission is included within the `<manifest>` element:
+
+    ```xml
+    <uses-permission android:name="android.permission.INTERNET" />
+    ```
+
+    Adding this permission allows your app to access the internet and interact with external APIs, databases, and services like Supabase.
+
+    Remember that these configurations are essential for both development and production environments to ensure seamless network connectivity.
+  </StepHikeCompact.Details>
+</StepHikeCompact.Step>
 
 </StepHikeCompact>
 
