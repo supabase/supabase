@@ -34,6 +34,7 @@ const AnnouncementBadge = () => (
         <div
           className="absolute inset-0 -z-10 bg-gradient-to-br
             opacity-70
+            overflow-hidden rounded-full
             from-background-surface-100
             to-background-surface-300
             backdrop-blur-md
