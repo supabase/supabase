@@ -45,7 +45,7 @@ import { useRootQueryClient } from 'data/query-client'
 import { StoreProvider } from 'hooks'
 import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
 import { AuthProvider } from 'lib/auth'
-import { IS_PLATFORM } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { dart } from 'lib/constants/prism'
 import { ProfileProvider } from 'lib/profile'
 import { RootStore } from 'stores'
@@ -64,7 +64,7 @@ loader.config({
   // while using monaco). If we end up facing more effort trying to maintain this, probably to either
   // use cloudflare or find some way to pull all the files from a CDN via a CLI, rather than tracking individual files
   // The alternative was to import * as monaco from 'monaco-editor' but i couldn't get it working
-  paths: { vs: '/monaco-editor' },
+  paths: { vs: `${BASE_PATH}/monaco-editor` },
   // paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.37.0/min/vs' },
 })
 
