@@ -218,9 +218,10 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
         END IF;
         IF bPartition THEN
           --v17 fix for case-sensitive tables
+          -- SELECT count(*) INTO v_cnt FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s 
+          -- WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = quote_ident(in_schema) AND t.table_name = quote_ident(in_table) AND t.table_type = 'BASE TABLE');      
           SELECT count(*) INTO v_cnt FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s 
-          WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = quote_ident(in_schema) AND t.table_type = 'BASE TABLE');      
-        
+          WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = in_schema AND t.table_name = in_table AND t.table_type = 'BASE TABLE');      		  
           IF bInheritance THEN
             -- inheritance-based
             IF v_cnt > 0 THEN
@@ -265,8 +266,10 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
         -- start the create definition for regular tables unless we are in progress creating an inheritance-based child table
         IF NOT bPartition THEN
           --v17 fix for case-sensitive tables
+          -- SELECT count(*) INTO v_cnt FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s 
+          -- WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = quote_ident(in_schema) AND t.table_name = quote_ident(in_table) AND t.table_type = 'BASE TABLE');   
           SELECT count(*) INTO v_cnt FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s 
-          WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = quote_ident(in_schema) AND t.table_type = 'BASE TABLE');      
+          WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = in_schema AND t.table_name = in_table AND t.table_type = 'BASE TABLE');         
           IF v_cnt > 0 THEN
             v_table_ddl := 'CREATE ' || v_temp || ' TABLE ' || in_schema || '."' || in_table || '" (' || E'\\n';
           ELSE
