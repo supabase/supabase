@@ -22,9 +22,7 @@ import {
 } from 'components/layouts/ProjectLayout/ProjectContext'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 
-export interface AddOnsProps {}
-
-const AddOns = ({}: AddOnsProps) => {
+const AddOns = () => {
   const { ref: projectRef } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')

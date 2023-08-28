@@ -12,14 +12,18 @@ import {
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { RESOURCE_WARNING_MESSAGES } from './UsageWarningBanner.constants'
 import { useRouter } from 'next/router'
+import { useSelectedOrganization } from 'hooks'
 
 const UsageWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
+  const organization = useSelectedOrganization()
   const { data: resourceWarnings } = useResourceWarningsQuery()
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
     (warning) => warning.project === ref
   )
+
+  const isOrgBilling = !!organization?.subscription_id
 
   // [Joshen] Read only takes higher precedence over multiple resource warnings
   const activeWarnings =
@@ -49,19 +53,35 @@ const UsageWarningBanner = () => {
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.docsUrl
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
           ?.docsUrl
-  const correctionUrl = (
+  const metric =
     activeWarnings.length > 1
-      ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.correctionUrl
+      ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.metric
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
-          ?.correctionUrl
-  )?.replace('[ref]', ref ?? 'default')
+          ?.metric
+
+  const correctionUrl = (
+    metric === undefined
+      ? undefined
+      : metric === null
+      ? '/project/[ref]/settings/[infra-path]'
+      : `/project/[ref]/settings/[infra-path]#${metric}`
+  )
+    ?.replace('[ref]', ref ?? 'default')
+    ?.replace('[infra-path]', isOrgBilling ? 'infrastructure' : 'billing/usage')
+
   const buttonText =
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.buttonText
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
           ?.buttonText
 
-  if (activeWarnings.length === 0 || router.pathname.includes('/usage')) return null
+  // Don't show banner if no warnings, or on usage/infra page
+  if (
+    activeWarnings.length === 0 ||
+    router.pathname.endsWith('/usage') ||
+    router.pathname.endsWith('/infrastructure')
+  )
+    return null
 
   return (
     <Alert_Shadcn_

@@ -3,13 +3,15 @@ import Link from 'next/link'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button, IconAlertCircle } from 'ui'
 
 interface RAMWarningsProps {
-  isFreeTier: boolean
+  isFreePlan: boolean
   upgradeUrl: string
+  isBeyondThreshold: boolean
 }
 
-// [Joshen TODO] Need to implement the necessary conditionals for rendering the warnings
-const RAMWarnings = ({ isFreeTier, upgradeUrl }: RAMWarningsProps) => {
-  const isApproaching = true
+const RAMWarnings = ({ isFreePlan, upgradeUrl, isBeyondThreshold }: RAMWarningsProps) => {
+  // [Joshen TODO] Need to implement the necessary conditionals for rendering the warnings once
+  // endpoint is updated to return text instead of boolean
+  const isApproaching = isBeyondThreshold
   const isExceeded = false
 
   if (isApproaching) {
@@ -31,7 +33,7 @@ const RAMWarnings = ({ isFreeTier, upgradeUrl }: RAMWarningsProps) => {
           <Link href={upgradeUrl}>
             <a>
               <Button type="warning">
-                {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
+                {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
               </Button>
             </a>
           </Link>
@@ -59,7 +61,7 @@ const RAMWarnings = ({ isFreeTier, upgradeUrl }: RAMWarningsProps) => {
           <Link href={upgradeUrl}>
             <a>
               <Button type="danger">
-                {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
+                {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
               </Button>
             </a>
           </Link>

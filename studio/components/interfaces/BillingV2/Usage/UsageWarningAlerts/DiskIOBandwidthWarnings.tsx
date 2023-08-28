@@ -3,7 +3,7 @@ import { Alert, Button } from 'ui'
 
 // [Joshen] In the future, conditionals should be from resource exhaustion endpoint as single source of truth
 interface DiskIOBandwidthWarningsProps {
-  isFreeTier: boolean
+  isFreePlan: boolean
   hasLatest: boolean
   upgradeUrl: string
   currentBillingCycleSelected: boolean
@@ -12,7 +12,7 @@ interface DiskIOBandwidthWarningsProps {
 }
 
 const DiskIOBandwidthWarnings = ({
-  isFreeTier,
+  isFreePlan,
   hasLatest,
   currentBillingCycleSelected,
   upgradeUrl,
@@ -30,7 +30,7 @@ const DiskIOBandwidthWarnings = ({
         <Link href={upgradeUrl}>
           <a>
             <Button type="danger">
-              {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
+              {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
             </Button>
           </a>
         </Link>
@@ -49,7 +49,7 @@ const DiskIOBandwidthWarnings = ({
         <Link href={upgradeUrl}>
           <a>
             <Button type="danger">
-              {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
+              {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
             </Button>
           </a>
         </Link>
@@ -68,7 +68,7 @@ const DiskIOBandwidthWarnings = ({
         <Link href={upgradeUrl}>
           <a>
             <Button type="warning">
-              {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
+              {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
             </Button>
           </a>
         </Link>
@@ -92,7 +92,7 @@ const DiskIOBandwidthWarnings = ({
         <Link href={upgradeUrl}>
           <a>
             <Button type="warning">
-              {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
+              {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
             </Button>
           </a>
         </Link>
