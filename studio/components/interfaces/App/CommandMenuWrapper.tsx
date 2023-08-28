@@ -8,11 +8,12 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { createSqlSnippetSkeleton } from '../SQLEditor/SQLEditor.utils'
+import { OPT_IN_TAGS } from 'lib/constants'
 
 const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
@@ -22,8 +23,7 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
   const opt_in_tags = selectedOrganization?.opt_in_tags
 
   const snap = useSqlEditorStateSnapshot()
-  const allowCMDKDataOptIn = useFlag('dashboardCmdkDataOptIn')
-  const isOptedInToAI = opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
+  const isOptedInToAI = opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
 
   const { profile } = useProfile()
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
@@ -48,9 +48,9 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
   const cmdkMetadata = useMemo(() => {
     return {
       definitions: (data ?? []).map((def) => def.sql.trim()).join('\n\n'),
-      flags: { allowCMDKDataOptIn },
+      flags: {},
     }
-  }, [data, allowCMDKDataOptIn])
+  }, [data])
 
   const onSaveGeneratedSQL = async (answer: string, title: string) => {
     if (!ref) return console.error('Project ref is required')
@@ -101,7 +101,7 @@ const CommandMenuWrapper = ({ children }: PropsWithChildren<{}>) => {
       projectRef={ref}
       apiKeys={apiKeys}
       metadata={cmdkMetadata}
-      isOptedInToAI={allowCMDKDataOptIn && isOptedInToAI}
+      isOptedInToAI={isOptedInToAI}
       saveGeneratedSQL={onSaveGeneratedSQL}
     >
       {children}
