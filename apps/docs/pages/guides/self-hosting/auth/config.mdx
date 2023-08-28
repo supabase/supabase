@@ -1,18 +1,19 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 import { getAuthConfigV1 } from '~/lib/mdx/getConfig'
 import Param from '~/components/Params'
-
-export const spec = getAuthConfigV1()
+import { serialize } from 'next-mdx-remote/serialize'
+import components from '~/components'
+import { MDXRemote } from 'next-mdx-remote'
 
 export const meta = {
   title: 'Auth Self-hosting Config',
   description: 'How to configure and deploy Supabase.',
 }
 
-<div>{spec.info.description}</div>
+<MDXRemote {...props.descriptionSource} components={components} />
 
 <div>
-{spec.info.tags.map(tag => {
+{props.spec.info.tags.map(tag => {
     return (
         <>
             <h2 className="text-scale-1200">{tag.title}</h2>
@@ -20,7 +21,7 @@ export const meta = {
             <div className="not-prose">
             <h5 className="text-base text-scale-1200 mb-3">Parameters</h5>
             <ul>
-                {spec.parameters.filter(param => param.tags.includes(tag.id)).map((param) => {
+                {props.spec.parameters.filter(param => param.tags.includes(tag.id)).map((param) => {
                     return <Param name={param.title} type={param.type} description={param.description} required={param.required} />
                 })}
 
@@ -36,3 +37,14 @@ export const meta = {
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page
+
+export const getStaticProps = async () => {
+  const spec = getAuthConfigV1()
+  const descriptionSource = await serialize(spec.info.description)
+  return {
+    props: {
+      descriptionSource,
+      spec,
+    },
+  }
+}
