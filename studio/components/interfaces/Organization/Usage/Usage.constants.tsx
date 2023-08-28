@@ -134,7 +134,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         key: PricingMetric.STORAGE_SIZE,
         attributes: [{ key: PricingMetric.STORAGE_SIZE.toLowerCase(), color: 'white' }],
         name: 'Storage Size',
-        chartPrefix: 'Max',
+        chartPrefix: 'Average',
         unit: 'bytes',
         description:
           'Sum of all objects in your storage buckets.\nBilling is based on the average daily size in GB throughout your billing period.',

@@ -82,8 +82,7 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
           ui.setNotification({ category: 'success', message: `Successfully deleted ${user.email}` })
           PageState.users = PageState.users.filter((x: any) => x.id != user.id)
           PageState.totalUsers -= 1
-        } finally {
-        }
+        } catch (error) {}
       },
     })
   }
@@ -129,7 +128,7 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
           ) : null}
           <Dropdown.Separator />
           <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger >
+            <Tooltip.Trigger>
               <Dropdown.Item
                 onClick={handleDeleteFactors}
                 icon={<IconShieldOff size="tiny" />}

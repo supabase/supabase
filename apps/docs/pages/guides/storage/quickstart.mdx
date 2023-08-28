@@ -4,10 +4,28 @@ export const meta = {
   id: 'storage-quickstart',
   title: 'Storage Quickstart',
   description: 'Learn how to use Supabase to store and serve files.',
+  subtitle: 'Learn how to use Supabase to store and serve files.',
   sidebar_label: 'Quickstart',
+  tocVideo: 'J9mTPY8rIXE',
 }
 
 This guide shows the basic functionality of Supabase Storage. Find a full [example application on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-user-management).
+
+## Concepts
+
+Supabase Storage consists of Files, Folders, and Buckets.
+
+### Files
+
+Files can be any sort of media file. This includes images, GIFs, and videos. It is best practice to store files outside of your database because of their sizes. For security, HTML files are returned as plain text.
+
+### Folders
+
+Folders are a way to organize your files (just like on your computer). There is no right or wrong way to organize your files. You can store them in whichever folder structure suits your project.
+
+### Buckets
+
+Buckets are distinct containers for files and folders. You can think of them like "super folders". Generally you would create distinct buckets for different Security and Access Rules. For example, you might keep all video files in a "video" bucket, and profile pictures in an "avatar" bucket.
 
 <Admonition type="note">
 
@@ -17,8 +35,7 @@ File, Folder, and Bucket names **must follow** [AWS object key naming guidelines
 
 ## Create a bucket
 
-You can create a bucket using the Supabase Dashboard.
-Since the storage is interoperable with your Postgres database, you can also use SQL or our
+You can create a bucket using the Supabase Dashboard. Since the storage is interoperable with your Postgres database, you can also use SQL or our
 client libraries. Here we create a bucket called "avatars":
 
 <Tabs
@@ -205,11 +222,18 @@ create policy "Public Access"
 </TabPanel>
 </Tabs>
 
-## See also
+---
 
-- [Supabase Storage on GitHub](https://github.com/supabase/storage-api)
-- [Swagger API documentation](https://supabase.github.io/storage-api)
-- Official [JavaScript](/docs/reference/javascript/storage-createbucket) and [Dart](/docs/reference/dart/storage-createbucket) documentation
+{/* Finish with a video. This also appears in the Sidebar via the "tocVideo" metadata */}
+
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/J9mTPY8rIXE"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

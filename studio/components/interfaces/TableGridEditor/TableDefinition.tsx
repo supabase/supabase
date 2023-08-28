@@ -1,16 +1,16 @@
 import Editor from '@monaco-editor/react'
+import { useTheme } from 'common'
+import { observer } from 'mobx-react-lite'
+import { useMemo, useRef } from 'react'
+import { format } from 'sql-formatter'
+
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useTableDefinitionQuery } from 'data/database/table-definition-query'
 import { useViewDefinitionQuery } from 'data/database/view-definition-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { useStore } from 'hooks'
 import useEntityType from 'hooks/misc/useEntityType'
 import { timeout } from 'lib/helpers'
-import { observer } from 'mobx-react-lite'
-import { useMemo, useRef } from 'react'
-import { format } from 'sql-formatter'
-import { useTheme } from 'common/Providers'
 
 export interface TableDefinitionProps {
   id?: number
