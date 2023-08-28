@@ -1,8 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
-import { patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { patch } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { resourceKeys } from './keys'
 
@@ -13,14 +12,14 @@ export type ResourceUpdateVariables = {
 }
 
 export async function updateResource({ projectRef, id, updatedParam }: ResourceUpdateVariables) {
-  const response = await patch(`${API_URL}/projects/${projectRef}/resources/${id}`, {
-    updated_param: updatedParam,
+  // @ts-ignore Just sample, TS lint will validate if the endpoint is valid
+  const { data, error } = await patch('/platform/projects/{ref}/resources/{id}', {
+    params: { path: { ref: projectRef, id } },
+    body: { updatedParam },
   })
-  if (response.error) {
-    throw response.error
-  }
 
-  return response
+  if (error) throw error
+  return data
 }
 
 type ResourceUpdateData = Awaited<ReturnType<typeof updateResource>>
