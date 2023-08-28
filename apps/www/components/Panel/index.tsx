@@ -35,7 +35,7 @@ const Panel = ({
     const { x: elX, y: elY, width, height } = outerElement.getBoundingClientRect()
     const x = event.clientX - elX
     const y = event.clientY - elY
-    const isActive = x > -3 && x < width + 3 && y > -3 && y < height + 3
+    const isActive = x > -0 && x < width + 0 && y > -0 && y < height + 0
 
     if (hasShimmer) {
       const activeGlow =
