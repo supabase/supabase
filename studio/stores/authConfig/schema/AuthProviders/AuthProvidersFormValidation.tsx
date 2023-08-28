@@ -420,7 +420,6 @@ const EXTERNAL_PROVIDER_APPLE = {
                     typeof body === 'object' &&
                     header &&
                     body &&
-                    header.typ === 'JWT' &&
                     header.alg === 'ES256' &&
                     body.aud === 'https://appleid.apple.com'
                   )
