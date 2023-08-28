@@ -341,12 +341,14 @@ export const SocialLoginItems = [
     name: 'Twitter',
     icon: '/docs/img/icons/twitter-icon',
     url: '/guides/auth/social-login/auth-twitter',
+    hasLightIcon: true,
   },
   {
     name: 'GitHub',
     icon: '/docs/img/icons/github-icon',
     url: '/guides/auth/social-login/auth-github',
     isDarkMode: true,
+    hasLightIcon: true,
   },
   {
     name: 'Gitlab',
@@ -435,6 +437,7 @@ export const PhoneLoginsItems = [
     linkDescription:
       'Vonage is a communication platform as a service (CPaaS) provider for consumers and businesses.',
     isDarkMode: true,
+    hasLightIcon: true,
   },
 ]
 
@@ -545,33 +548,35 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Connecting to your database', url: '/guides/database/connecting-to-postgres' },
         { name: 'Managing tables, views, and data', url: '/guides/database/tables' },
+        { name: 'JSON and unstructured data', url: '/guides/database/json' },
         { name: 'Managing database functions', url: '/guides/database/functions' },
         { name: 'Managing indexes', url: '/guides/database/postgres/indexes' },
+        { name: 'Managing database triggers', url: '/guides/database/postgres/triggers' },
         { name: 'Managing database webhooks', url: '/guides/database/webhooks' },
-        { name: 'Managing database replication', url: '/guides/database/replication' },
+        { name: 'Using Full Text Search', url: '/guides/database/full-text-search' },
+      ],
+    },
+    {
+      name: 'Access and security',
+      url: undefined,
+      items: [
+        { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
+        { name: 'Managing Postgres Roles', url: '/guides/database/postgres/roles' },
         { name: 'Managing secrets with Vault', url: '/guides/database/vault' },
+        { name: 'Column encryption', url: '/guides/database/column-encryption' },
       ],
     },
     {
       name: 'Postgres Guides',
       url: undefined,
       items: [
-        {
-          name: 'Analyzing efficiency and performance',
-          url: '/guides/database/inspect',
-        },
-        {
-          name: 'JSON and unstructured data',
-          url: '/guides/database/json',
-        },
-        { name: 'Implementing Full Text Search', url: '/guides/database/full-text-search' },
-        { name: 'Implementing Cascade Deletes', url: '/guides/database/postgres/cascade-deletes' },
-        { name: 'Implementing column encryption', url: '/guides/database/column-encryption' },
+        { name: 'Query Optimization', url: '/guides/database/query-optimization' },
+        { name: 'Debugging and monitoring', url: '/guides/database/inspect' },
         { name: 'Partitioning your tables', url: '/guides/database/partitions' },
+        { name: 'Implementing Cascade Deletes', url: '/guides/database/postgres/cascade-deletes' },
+        { name: 'Managing database replication', url: '/guides/database/replication' },
         { name: 'Testing your database', url: '/guides/database/testing' },
-        { name: 'Managing Timeouts', url: '/guides/database/timeouts' },
-        { name: 'Managing Passwords', url: '/guides/database/managing-passwords' },
-        { name: 'Configuring Timezones', url: '/guides/database/managing-timezones' },
+        { name: 'Database Configuration', url: '/guides/database/postgres/configuration' },
       ],
     },
     {
@@ -588,6 +593,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/plv8',
         },
         { name: 'http: RESTful Client', url: '/guides/database/extensions/http' },
+        {
+          name: 'index_advisor: Query optimization',
+          url: '/guides/database/extensions/index_advisor',
+        },
         {
           name: 'PGAudit: Postgres Auditing',
           url: '/guides/database/extensions/pgaudit',
@@ -732,6 +741,7 @@ export const api: NavMenuConstant = {
           url: '/guides/api/joins-and-nesting',
           items: [],
         },
+        { name: 'Using custom schemas', url: '/guides/api/using-custom-schemas', items: [] },
       ],
     },
     {
@@ -896,10 +906,20 @@ export const storage: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/storage' },
     { name: 'Quickstart', url: '/guides/storage/quickstart' },
-    { name: 'Uploads', url: '/guides/storage/uploads' },
-    { name: 'Access Control', url: '/guides/storage/access-control' },
-    { name: 'CDN', url: '/guides/storage/cdn' },
-    { name: 'Image Transformations', url: '/guides/storage/image-transformations' },
+    {
+      name: 'Fundamentals',
+      url: undefined,
+      items: [
+        { name: 'Uploading files to Storage', url: '/guides/storage/uploads' },
+        { name: 'Image Transformations', url: '/guides/storage/image-transformations' },
+        { name: 'How caching works', url: '/guides/storage/cdn' },
+      ],
+    },
+    {
+      name: 'Access and security',
+      url: undefined,
+      items: [{ name: 'Access Control', url: '/guides/storage/access-control' }],
+    },
   ],
 }
 
@@ -1036,6 +1056,10 @@ export const supabase_cli: NavMenuConstant = {
         {
           name: 'Testing and linting',
           url: '/guides/cli/testing-and-linting',
+        },
+        {
+          name: 'Customizing email templates',
+          url: '/guides/cli/customizing-email-templates',
         },
       ],
     },

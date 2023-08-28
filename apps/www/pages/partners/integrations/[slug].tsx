@@ -49,6 +49,11 @@ function Partner({
   const [focusedImage, setFocusedImage] = useState<string | null>(null)
 
   if (!partner) return <Error404 />
+
+  const videoThumbnail = partner.video
+    ? `http://img.youtube.com/vi/${partner.video}/0.jpg`
+    : undefined
+
   return (
     <>
       <NextSeo
@@ -184,6 +189,7 @@ function Partner({
                     <div className="mb-6">
                       <ExpandableVideo
                         videoId={partner.video}
+                        imgUrl={videoThumbnail}
                         imgOverlayText="Watch an introductory video"
                         triggerContainerClassName="w-full"
                       />

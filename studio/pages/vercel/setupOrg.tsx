@@ -2,13 +2,11 @@ import { runInAction } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { ChangeEvent, createContext, useContext, useEffect, useState } from 'react'
+import { Button, Input, Select } from 'ui'
 
 import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
+import { useOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { Button, Input, Select } from 'ui'
 
 const PageContext = createContext(null)
 function SetupOrg() {
@@ -74,38 +72,19 @@ function SetupOrg() {
 export default observer(SetupOrg)
 
 const CreateOrganization = observer(({}) => {
-  const PageState: any = useContext(PageContext)
   const router = useRouter()
-
-  const { ui, app } = useStore()
+  const PageState: any = useContext(PageContext)
   const { data: organizations } = useOrganizationsQuery()
 
   const [orgName, setOrgName] = useState('')
-  const [loading, setLoading] = useState(false)
 
-  async function onClick() {
-    setLoading(true)
-    const response = await post(`${API_URL}/organizations`, {
-      name: orgName,
-    })
-    if (response.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to set up organization: ${response.error.message}`,
-      })
-      setLoading(false)
-    } else {
-      const org = response
+  const { mutate: createOrganization, isLoading: isCreating } = useOrganizationCreateMutation({
+    onSuccess: (org) => {
       PageState.selectedOrg = org
-
       const query = new URLSearchParams(PageState.queryParams).toString()
       router.push(`/vercel/setupProject?${query}`)
-    }
-  }
-
-  function onOrgNameChange(e: any) {
-    setOrgName(e.target.value)
-  }
+    },
+  })
 
   return (
     <div className="">
@@ -126,10 +105,14 @@ const CreateOrganization = observer(({}) => {
           placeholder="Organization name"
           descriptionText="What's the name of your company or team?"
           value={orgName}
-          onChange={onOrgNameChange}
+          onChange={(e: any) => setOrgName(e.target.value)}
         />
       </div>
-      <Button disabled={loading || orgName == ''} loading={loading} onClick={onClick}>
+      <Button
+        disabled={isCreating || orgName === ''}
+        loading={isCreating}
+        onClick={() => createOrganization({ name: orgName })}
+      >
         Create organization
       </Button>
     </div>
