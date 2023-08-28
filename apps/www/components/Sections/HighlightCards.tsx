@@ -3,7 +3,6 @@ import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import InteractiveShimmerCard from '~/components/InteractiveShimmerCard'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
-import Image from 'next/image'
 
 interface Highlight {
   image?: React.ReactNode

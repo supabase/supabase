@@ -3,16 +3,17 @@ import Image from 'next/image'
 import Telemetry from '~/lib/telemetry'
 import gaEvents from '~/lib/gaEvents'
 import { IconCheck } from 'ui'
-import { useBreakpoint } from 'common'
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductCard from './ProductCard'
-import RealtimeVisual from './RealtimeVisual'
-import FunctionsVisual from './FunctionsVisual'
-import StorageVisual from './StorageVisual'
+import AuthVisual from './AuthVisual'
 import DatabaseVisual from './DatabaseVisual'
+import FunctionsVisual from './FunctionsVisual'
+import RealtimeVisual from './RealtimeVisual'
+import StorageVisual from './StorageVisual'
+import VectorVisual from './VectorVisual'
 
 const Products = (props: any) => {
   const router = useRouter()
@@ -58,8 +59,6 @@ const Products = (props: any) => {
         )
     }
   }
-  const isSm = useBreakpoint(640)
-  const isTablet = useBreakpoint(1023)
 
   return (
     <SectionContainer className="!pt-0">
@@ -98,28 +97,7 @@ const Products = (props: any) => {
               Level Security.
             </>
           }
-          image={
-            <div className="absolute inset-0 z-0">
-              <Image
-                src="/images/index/products/auth2.svg"
-                alt="Supabase Authentication hover state"
-                layout="fill"
-                objectFit="cover"
-                objectPosition="center"
-                className="absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
-                quality={100}
-              />
-              <Image
-                src="/images/index/products/auth1.svg"
-                alt="Supabase Authentication"
-                layout="fill"
-                objectFit="cover"
-                objectPosition="center"
-                className="antialiased"
-                quality={100}
-              />
-            </div>
-          }
+          image={<AuthVisual />}
           className="col-span-6 xl:col-span-3"
           onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.AUTHENTICATION)}
         />
@@ -196,28 +174,7 @@ const Products = (props: any) => {
             </ul>
           }
           onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.VECTOR)}
-          image={
-            <div className="absolute inset-0 z-0">
-              <Image
-                src={`/images/index/products/vector${isTablet ? '-mobile' : ''}2.svg`}
-                alt="Supabase Postgres Vector AI"
-                layout="fill"
-                objectFit="cover"
-                objectPosition={isTablet ? 'center' : 'right'}
-                className="absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
-                quality={100}
-              />
-              <Image
-                src={`/images/index/products/vector${isTablet ? '-mobile' : ''}1.svg`}
-                alt="Supabase Postgres Vector AI"
-                layout="fill"
-                objectFit="cover"
-                objectPosition={isTablet ? 'center' : 'right'}
-                className="absolute inset-0"
-                quality={100}
-              />
-            </div>
-          }
+          image={<VectorVisual />}
           className="col-span-6 lg:col-span-12 xl:col-span-6"
         />
       </dl>
