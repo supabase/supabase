@@ -14,6 +14,7 @@ import { USAGE_CATEGORIES } from './Usage.constants'
 import { getUpgradeUrl } from './Usage.utils'
 import UsageBarChart from './UsageBarChart'
 import { CPUWarnings, DiskIOBandwidthWarnings, RAMWarnings } from './UsageWarningAlerts'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 
 export interface InfrastructureProps {
   projectRef: string
@@ -29,10 +30,12 @@ const Infrastructure = ({
   currentBillingCycleSelected,
 }: InfrastructureProps) => {
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
+  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const projectResourceWarnings = resourceWarnings?.find((x) => x.project === projectRef)
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'infra')
 
   const upgradeUrl = getUpgradeUrl(projectRef, subscription)
-  const isFreeTier = subscription?.plan?.id === 'free'
+  const isFreePlan = subscription?.plan?.id === 'free'
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const selectedAddons = addons?.selected_addons ?? []
@@ -127,7 +130,7 @@ const Infrastructure = ({
                 <>
                   <DiskIOBandwidthWarnings
                     upgradeUrl={upgradeUrl}
-                    isFreeTier={isFreeTier}
+                    isFreePlan={isFreePlan}
                     hasLatest={hasLatest}
                     currentBillingCycleSelected={currentBillingCycleSelected}
                     latestIoBudgetConsumption={latestIoBudgetConsumption}
@@ -180,10 +183,20 @@ const Infrastructure = ({
                 </>
               )}
               {attribute.key === 'max_cpu_usage' && (
-                <CPUWarnings isFreeTier={isFreeTier} upgradeUrl={upgradeUrl} />
+                <CPUWarnings
+                  isFreePlan={isFreePlan}
+                  upgradeUrl={upgradeUrl}
+                  isBeyondThreshold={projectResourceWarnings?.is_cpu_load_beyond_threshold ?? false}
+                />
               )}
               {attribute.key === 'ram_usage' && (
-                <RAMWarnings isFreeTier={isFreeTier} upgradeUrl={upgradeUrl} />
+                <RAMWarnings
+                  isFreePlan={isFreePlan}
+                  upgradeUrl={upgradeUrl}
+                  isBeyondThreshold={
+                    projectResourceWarnings?.is_memory_and_swap_usage_beyond_threshold ?? false
+                  }
+                />
               )}
 
               <div className="space-y-1">

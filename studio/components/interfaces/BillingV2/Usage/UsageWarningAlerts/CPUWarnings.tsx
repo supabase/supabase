@@ -3,13 +3,15 @@ import Link from 'next/link'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button, IconAlertCircle } from 'ui'
 
 interface CPUWarningsProps {
-  isFreeTier: boolean
+  isFreePlan: boolean
   upgradeUrl: string
+  isBeyondThreshold: boolean
 }
 
-const CPUWarnings = ({ isFreeTier, upgradeUrl }: CPUWarningsProps) => {
-  // [Joshen TODO] Need to implement the necessary conditionals for rendering the warnings
-  const isApproaching = false
+const CPUWarnings = ({ isFreePlan, upgradeUrl, isBeyondThreshold }: CPUWarningsProps) => {
+  // [Joshen TODO] Need to implement the necessary conditionals for rendering the warnings once
+  // endpoint is updated to return text instead of boolean
+  const isApproaching = isBeyondThreshold
   const isExceeded = false
 
   if (isApproaching) {
@@ -18,8 +20,8 @@ const CPUWarnings = ({ isFreeTier, upgradeUrl }: CPUWarningsProps) => {
         <IconAlertCircle />
         <AlertTitle>Your max CPU usage has exceeded 80%</AlertTitle>
         <AlertDescription_Shadcn_>
-          High CPU usage could result in slower queries, disruption of daily back routines, and in
-          rare cases, your instance may become unresponsive. If you need more resources, consider
+          High CPU usage could result in slower queries, disruption of daily back up routines, and
+          in rare cases, your instance may become unresponsive. If you need more resources, consider
           upgrading to a larger compute add-on.
         </AlertDescription_Shadcn_>
         <div className="mt-3 flex items-center space-x-2">
@@ -31,7 +33,7 @@ const CPUWarnings = ({ isFreeTier, upgradeUrl }: CPUWarningsProps) => {
           <Link href={upgradeUrl}>
             <a>
               <Button type="warning">
-                {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
+                {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
               </Button>
             </a>
           </Link>
@@ -46,8 +48,8 @@ const CPUWarnings = ({ isFreeTier, upgradeUrl }: CPUWarningsProps) => {
         <IconAlertCircle />
         <AlertTitle>Your max CPU usage has reached 100%</AlertTitle>
         <AlertDescription_Shadcn_>
-          High CPU usage could result in slower queries, disruption of daily back routines, and in
-          rare cases, your instance may become unresponsive. If you need more resources, consider
+          High CPU usage could result in slower queries, disruption of daily back up routines, and
+          in rare cases, your instance may become unresponsive. If you need more resources, consider
           upgrading to a larger compute add-on.
         </AlertDescription_Shadcn_>
         <div className="mt-3 flex items-center space-x-2">
@@ -59,7 +61,7 @@ const CPUWarnings = ({ isFreeTier, upgradeUrl }: CPUWarningsProps) => {
           <Link href={upgradeUrl}>
             <a>
               <Button type="danger">
-                {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
+                {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
               </Button>
             </a>
           </Link>
