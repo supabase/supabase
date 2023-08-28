@@ -22,7 +22,9 @@ const AnnouncementBadge = () => (
           border
           border-background-surface-100
           hover:border-background-surface-300
-          overflow-hidden"
+          overflow-hidden
+          focus:outline-none focus:ring-brand-600 focus:ring-2 focus:rounded-full
+          "
       >
         <Badge color="brand" size="large" className="py-1">
           Explore
