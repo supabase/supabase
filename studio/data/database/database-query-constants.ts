@@ -298,8 +298,8 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
             END IF;
             
             --v17 put double-quotes around case-sensitive column names
-            SELECT COUNT(*) INTO v_cnt FROM information_schema.columns t WHERE EXISTS (SELECT REGEXP_MATCHES(s.column_name, '([A-Z]+)','g') FROM information_schema.columns s 
-            WHERE t.table_schema=s.table_schema and t.table_name=s.table_name and t.column_name=s.column_name AND t.table_schema = quote_ident(in_schema) AND column_name = v_colrec.column_name);         
+            SELECT COUNT(*) INTO v_cnt FROM information_schema.columns t WHERE EXISTS (SELECT s.column_name FROM information_schema.columns s
+            WHERE t.table_schema=s.table_schema and t.table_name=s.table_name and t.column_name=s.column_name AND t.table_schema = quote_ident(in_schema) AND column_name = v_colrec.column_name AND (s.column_name ~ '[A-Z]+' OR s.column_name IN (SELECT word FROM pg_get_keywords() WHERE catdesc = 'reserved')));
             IF v_cnt > 0 THEN
               v_table_ddl := v_table_ddl || '  "' || v_colrec.column_name || '" ';
             ELSE
