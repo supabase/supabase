@@ -12,6 +12,7 @@ import ProductCard from './ProductCard'
 import RealtimeVisual from './RealtimeVisual'
 import FunctionsVisual from './FunctionsVisual'
 import StorageVisual from './StorageVisual'
+import DatabaseVisual from './DatabaseVisual'
 
 const Products = (props: any) => {
   const router = useRouter()
@@ -83,21 +84,7 @@ const Products = (props: any) => {
             </ul>
           }
           onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.DATABASE)}
-          image={
-            <div className="absolute inset-0 z-0">
-              <div className="absolute w-full lg:w-auto h-full lg:aspect-square flex items-end lg:items-center justify-center lg:justify-end right-0 top-auto lg:top-0 bottom-0 my-auto">
-                <Image
-                  src={`/images/index/products/database${isTablet ? '-mobile' : ''}.svg`}
-                  alt="Supabase Postgres Database"
-                  layout="fill"
-                  objectFit="cover"
-                  objectPosition={isTablet ? 'center' : 'right'}
-                  className="antialiased"
-                  quality={100}
-                />
-              </div>
-            </div>
-          }
+          image={<DatabaseVisual />}
           className="col-span-6 lg:col-span-12 xl:col-span-6"
         />
         <ProductCard
