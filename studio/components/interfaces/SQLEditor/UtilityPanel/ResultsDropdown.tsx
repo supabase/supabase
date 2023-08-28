@@ -3,7 +3,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useStore } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
-import { compact, isString, map } from 'lodash'
+import { compact, isObject, isString, map } from 'lodash'
 import { useRouter } from 'next/router'
 import { useMemo, useRef } from 'react'
 import { CSVLink } from 'react-csv'
@@ -33,6 +33,10 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
             // replace all newlines with the character \n
             // escape all quotation marks
             return v.replaceAll(/\n/g, '\\n').replaceAll(/"/g, '""')
+          }
+          if (isObject(v)) {
+            // replace all quotation marks with two quotation marks to escape them.
+            return JSON.stringify(v).replaceAll(/\"/g, '""')
           }
           return v
         })
