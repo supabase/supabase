@@ -75,16 +75,6 @@ const Hero = () => {
           </div>
         </div>
         <div className="absolute -top-2 md:top-0 -left-10 -right-10 md:left-0 md:right-0 h-[500px] lg:h-[550px] z-0 flex items-center justify-center">
-          {/* <div className="relative w-full aspect-[1.65/1] mb-14 max-w-sm md:max-w-md opacity-0 !animate-[fadeIn_0.5s_cubic-bezier(0.25,0.25,0,1)_0.5s_both]">
-            <Image
-              src="/images/launchweek/8/lw8-visual.png"
-              alt="launch week 8 shape"
-              layout="fill"
-              objectFit="contain"
-              quality={100}
-              draggable={false}
-            />
-          </div> */}
           <div className="absolute inset-0">
             <Image
               src="/images/launchweek/8/stars.svg"
