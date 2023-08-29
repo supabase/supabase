@@ -6,7 +6,6 @@ import { profileKeys } from './keys'
 const mfaUnenroll = async (params: MFAUnenrollParams) => {
   const { error, data } = await auth.mfa.unenroll(params)
 
-  auth.mfa.listFactors
   if (error) throw error
   return data
 }
