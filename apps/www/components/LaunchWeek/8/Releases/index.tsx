@@ -210,7 +210,7 @@ export default function LW8Releases() {
                   />
                   <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
                     <Link href={day1.steps[0].blog!}>
-                      <a className="m-0">
+                      <a className="m-0 focus-base focus-rounded-sm">
                         <CartTitle>{day1.steps[0].title}</CartTitle>
                       </a>
                     </Link>
@@ -269,7 +269,7 @@ export default function LW8Releases() {
                   />
                   <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
                     <Link href={day2.steps[0].blog!}>
-                      <a className="m-0">
+                      <a className="m-0 focus-base focus-rounded-sm">
                         <CartTitle>{day2.steps[0].title}</CartTitle>
                       </a>
                     </Link>
@@ -327,7 +327,7 @@ export default function LW8Releases() {
                   />
                   <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
                     <Link href={day3.steps[0].blog!}>
-                      <a className="m-0">
+                      <a className="m-0 focus-base focus-rounded-sm">
                         <CartTitle>{day3.steps[0].title}</CartTitle>
                       </a>
                     </Link>
@@ -397,7 +397,7 @@ export default function LW8Releases() {
                   />
                   <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
                     <Link href={day4.steps[0].blog!}>
-                      <a className="m-0">
+                      <a className="m-0 focus-base focus-rounded-sm">
                         <CartTitle>{day4.steps[0].title}</CartTitle>
                       </a>
                     </Link>
@@ -436,7 +436,7 @@ export default function LW8Releases() {
                   />
                   <div className="flex flex-col items-center gap-2 min-w-[300px] w-full text-center lg:text-left">
                     <Link href={day4.steps[1].blog!}>
-                      <a className="m-0">
+                      <a className="m-0 focus-base focus-rounded-sm">
                         <CartTitle>{day4.steps[1].title}</CartTitle>
                       </a>
                     </Link>
@@ -491,7 +491,7 @@ export default function LW8Releases() {
                   />
                   <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
                     <Link href={day5.steps[0].blog!}>
-                      <a className="m-0">
+                      <a className="m-0 focus-base focus-rounded-sm">
                         <CartTitle>{day5.steps[0].title}</CartTitle>
                       </a>
                     </Link>
@@ -530,7 +530,7 @@ export default function LW8Releases() {
                   />
                   <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
                     <Link href={day5.steps[1].blog!}>
-                      <a className="m-0">
+                      <a className="m-0 focus-base focus-rounded-sm">
                         <CartTitle>{day5.steps[1].title}</CartTitle>
                       </a>
                     </Link>
@@ -569,7 +569,7 @@ export default function LW8Releases() {
                   />
                   <div className="flex flex-col items-center lg:items-start gap-2 min-w-[300px] w-full text-center lg:text-left">
                     <Link href={day5.steps[2].blog!}>
-                      <a className="m-0">
+                      <a className="m-0 focus-base focus-rounded-sm">
                         <CartTitle>{day5.steps[2].title}</CartTitle>
                       </a>
                     </Link>

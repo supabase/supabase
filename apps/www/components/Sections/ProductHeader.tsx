@@ -44,7 +44,7 @@ const ProductHeader = (props: Types) => (
         </div>
         <div className="flex flex-row md:flex-row md:items-center">
           <Link href="https://supabase.com/dashboard" as="https://supabase.com/dashboard">
-            <a>
+            <a tabIndex={-1}>
               <Button size="medium" className="text-white">
                 Start a project
               </Button>
@@ -52,7 +52,7 @@ const ProductHeader = (props: Types) => (
           </Link>
           {props.documentation_url && (
             <Link href={props.documentation_url} as={props.documentation_url}>
-              <a className="ml-2">
+              <a className="ml-2" tabIndex={-1}>
                 <Button type="default" size="medium" icon={<IconBookOpen />}>
                   See documentation
                 </Button>

@@ -47,7 +47,7 @@ function ExampleCard(props: any) {
         >
           <Link href={props.repo_url} as={props.repo_url} passHref>
             <a
-              className="text-scale-1100 hover:text-scale-1200 flex flex-row items-center text-sm"
+              className="text-scale-1100 hover:text-scale-1200 flex flex-row items-center text-sm focus-base focus-rounded-sm"
               target="_blank"
             >
               <span>{props.repo_name}</span>
@@ -59,7 +59,11 @@ function ExampleCard(props: any) {
 
           <div className="mt-3 flex items-stretch gap-2 h-[26px]">
             {props.vercel_deploy_url && (
-              <a target="_blank" href={props.vercel_deploy_url}>
+              <a
+                target="_blank"
+                href={props.vercel_deploy_url}
+                className="focus-brand focus-rounded-md focus:ring-offset-2"
+              >
                 <Image src="https://vercel.com/button" alt="vercel button" width={75} height={26} />
               </a>
             )}

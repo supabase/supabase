@@ -125,7 +125,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
                 <Space className="justify-between">
                   {extension.url && (
                     <Link href={extension.url} as={extension.url}>
-                      <a className="ml-px">
+                      <a className="ml-px" tabIndex={-1}>
                         <Button type="default">View documentation</Button>
                       </a>
                     </Link>

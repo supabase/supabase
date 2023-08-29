@@ -26,7 +26,7 @@ const BlogListItem = ({ post }: Props) => {
   return (
     <div>
       <Link href={post.path}>
-        <a className="group inline-block min-w-full">
+        <a className="group inline-block min-w-full focus-brand focus-rounded-sm">
           <div className="flex flex-col space-y-6">
             <div className="flex flex-col space-y-3">
               <div

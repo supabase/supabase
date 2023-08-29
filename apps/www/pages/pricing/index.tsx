@@ -122,7 +122,7 @@ export default function IndexPage() {
         </div>
         <p className="p">{description}</p>
         <Link href="https://supabase.com/dashboard" passHref>
-          <a>
+          <a tabIndex={-1}>
             <Button size="medium" block>
               Get started
             </Button>
@@ -293,7 +293,7 @@ export default function IndexPage() {
                             <p className="text-[13px] whitespace-pre-wrap">{plan.footer}</p>
                           )}
                         </div>
-                        <a href={plan.href}>
+                        <a href={plan.href} tabIndex={-1}>
                           <Button block size="small">
                             {plan.cta}
                           </Button>
@@ -308,7 +308,7 @@ export default function IndexPage() {
         </div>
 
         <div className="text-center mt-20">
-          <a href="#compare-plans">
+          <a href="#compare-plans" tabIndex={-1}>
             <Button size="tiny" type="default">
               Compare Plans
             </Button>
@@ -356,7 +356,7 @@ export default function IndexPage() {
                   </p>
                   <div className="flex items-center justify-between mt-4 mb-4 lg:mb-8">
                     <Link href={addon.leftCtaLink} as={addon.leftCtaLink}>
-                      <a>
+                      <a tabIndex={-1}>
                         <Button size="tiny" type="default">
                           {addon.leftCtaText}
                         </Button>
@@ -364,7 +364,7 @@ export default function IndexPage() {
                     </Link>
                     {addon.name === 'Optimized Compute' ? (
                       <button
-                        className="text-brand-600 text-[13px] leading-4 hover:underline "
+                        className="text-brand-600 text-[13px] leading-4 hover:underline focus-brand focus-rounded-sm"
                         onClick={() => setShowComputeModal(true)}
                       >
                         {addon.rightCtaText}
@@ -383,7 +383,7 @@ export default function IndexPage() {
               href="https://github.com/supabase/supabase/discussions/categories/feature-requests"
               as="https://github.com/supabase/supabase/discussions/categories/feature-requests"
             >
-              <a target="_blank">
+              <a target="_blank" tabIndex={-1}>
                 <Button size="tiny" type="default">
                   Request a feature
                 </Button>
@@ -761,7 +761,7 @@ export default function IndexPage() {
 
                             <div className={plan.name === 'Enterprise' ? 'mt-auto' : 'mt-8'}>
                               <Link href={plan.href} as={plan.href}>
-                                <a>
+                                <a tabIndex={-1}>
                                   <Button
                                     size="tiny"
                                     type={plan.name === 'Enterprise' ? 'default' : 'primary'}
@@ -830,7 +830,7 @@ export default function IndexPage() {
                         href="https://supabase.com/dashboard"
                         as="https://supabase.com/dashboard"
                       >
-                        <a>
+                        <a tabIndex={-1}>
                           <Button size="tiny" type="primary" block>
                             Get started
                           </Button>
@@ -843,7 +843,7 @@ export default function IndexPage() {
                         href="https://supabase.com/dashboard"
                         as="https://supabase.com/dashboard"
                       >
-                        <a>
+                        <a tabIndex={-1}>
                           <Button size="tiny" type="primary" block>
                             Get started
                           </Button>
@@ -853,7 +853,7 @@ export default function IndexPage() {
 
                     <td className="px-6 pt-5">
                       <Link href="https://forms.supabase.com/team">
-                        <a>
+                        <a tabIndex={-1}>
                           <Button size="tiny" type="primary" block>
                             Contact us
                           </Button>
@@ -863,7 +863,7 @@ export default function IndexPage() {
 
                     <td className="px-6 pt-5">
                       <Link href="https://forms.supabase.com/enterprise">
-                        <a>
+                        <a tabIndex={-1}>
                           <Button size="tiny" type="default" block>
                             Contact us
                           </Button>
@@ -910,7 +910,7 @@ export default function IndexPage() {
                 <a
                   target="_blank"
                   href="https://supabase.com/dashboard/support/new"
-                  className="transition text-brand hover:text-brand-600"
+                  className="transition text-brand hover:text-brand-600 focus-brand focus-rounded-sm"
                 >
                   Open a support ticket
                 </a>{' '}
@@ -921,7 +921,7 @@ export default function IndexPage() {
                 <a
                   target="_blank"
                   href="https://supabase.com/dashboard/support/new"
-                  className="transition text-brand hover:text-brand-600"
+                  className="transition text-brand hover:text-brand-600 focus-brand focus-rounded-sm"
                 >
                   you can contact the team here
                 </a>

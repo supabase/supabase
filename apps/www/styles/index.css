@@ -8,6 +8,33 @@
 @import './../../../packages/ui/build/css/themes/dark.css';
 @import './../../../packages/ui/build/css/themes/light.css';
 
+@layer components {
+  .focus-base {
+    @apply focus:outline-none focus:ring-2 focus:ring-scale-900 ring-0 transition-all focus:ring-offset-transparent;
+  }
+  .focus-brand {
+    @apply focus-base focus:!ring-brand-600;
+  }
+  .focus-rounded-sm {
+    @apply rounded-sm focus:rounded-sm;
+  }
+  .focus-rounded-md {
+    @apply rounded focus:rounded;
+  }
+  .focus-rounded-lg {
+    @apply rounded-lg focus:rounded-lg;
+  }
+  .focus-rounded-xl {
+    @apply rounded-xl focus:rounded-xl;
+  }
+  .focus-rounded-2xl {
+    @apply rounded-2xl focus:rounded-2xl;
+  }
+  .focus-rounded-full {
+    @apply rounded-full focus:rounded-full;
+  }
+}
+
 @layer utilities {
   .run {
     animation-play-state: running;

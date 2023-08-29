@@ -26,7 +26,7 @@ const ProductCard = ({
   <Link href={url}>
     <a
       className={[
-        'group relative w-full h-[400px] flex flex-col gap-5 lg:flex-row focus:outline-none focus:border-none focus:ring-brand-600 focus:ring-2 focus:rounded-xl',
+        'group relative w-full h-[400px] flex flex-col gap-5 lg:flex-row focus-brand focus-rounded-xl',
         className,
       ].join(' ')}
       onClick={onClick}

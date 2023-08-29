@@ -97,7 +97,7 @@ function TwitterSocialProof() {
                     <Link href={tweet.url}>
                       <a
                         target="_blank"
-                        className="block cursor-pointer focus:outline-none focus:border-none focus:ring-brand-600 focus:ring-2 focus:rounded-2xl"
+                        className="block cursor-pointer focus-brand focus-rounded-2xl"
                       >
                         <TweetCard
                           key={i}

@@ -30,7 +30,7 @@ const CustomerStories = ({ customerStories }: any) => {
       <div className="mx-auto mt-5 grid grid-cols-12 gap-8 lg:gap-12">
         {caseStudyThumbs.map((caseStudy: any, i: number) => (
           <Link href={`${caseStudy.link}`} key={caseStudy.title} passHref>
-            <a className="col-span-12 md:col-span-4">
+            <a className="col-span-12 md:col-span-4 focus-brand focus-rounded-lg">
               <GlassPanel
                 {...caseStudy}
                 background={true}

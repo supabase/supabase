@@ -298,7 +298,7 @@ function Database() {
                 text="We only show a few of the extensions supported by supabase here, but we preinstall many more that you can use right away."
               />
               <Link href="/docs/guides/database" passHref>
-                <a>
+                <a tabIndex={-1}>
                   <Button size="small" type="default" icon={<IconArrowUpRight />}>
                     Explore documentation
                   </Button>

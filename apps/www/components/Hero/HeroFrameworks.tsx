@@ -70,7 +70,7 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
           <Link href={framework.docs} key={framework.name}>
             <a
               key={framework.name}
-              className="block focus:outline-none focus:border-none focus:ring-brand-600 focus:ring-2 focus:rounded-lg"
+              className="block focus-brand focus-rounded-lg"
               data-tip={framework.name}
               aria-label={framework.name}
               onClick={() => sendTelemetryEvent(framework.gaEvent)}

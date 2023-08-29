@@ -31,7 +31,7 @@ const Footer = (props: Props) => {
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">
             <Link href="#" as="/">
-              <a className="w-40">
+              <a className="block w-fit h-[30px] focus-brand focus-rounded-sm">
                 <Image
                   src={
                     isLaunchWeekPage
@@ -46,7 +46,7 @@ const Footer = (props: Props) => {
                 />
               </a>
             </Link>
-            <div className="flex space-x-5">
+            <div className="flex space-x-5 [&_a]:focus-base [&_a]:focus-rounded-sm">
               <a
                 href="https://twitter.com/supabase"
                 className="text-scale-900 hover:text-scale-1200 transition"
@@ -101,7 +101,7 @@ const Footer = (props: Props) => {
               </a>
             </div>
           </div>
-          <div className="mt-12 grid grid-cols-1 gap-8 xl:col-span-2 xl:mt-0">
+          <div className="mt-12 grid grid-cols-1 gap-8 xl:col-span-2 xl:mt-0 [&_a]:focus-base [&_a]:focus-rounded-sm [&_a]:!border-none [&_a]:outline-none">
             <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
               {FooterLinks.map((segment) => {
                 return (

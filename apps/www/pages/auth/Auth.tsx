@@ -219,7 +219,7 @@ function AuthPage() {
               <p className="p">Policies can be written in SQL or using the dashboard online.</p>
 
               <Link href="/docs/guides/auth#policy-examples">
-                <a>
+                <a tabIndex={-1}>
                   <Button size="small" type="default" className="mt-4" icon={<IconArrowUpRight />}>
                     Explore documentation
                   </Button>

@@ -12,7 +12,7 @@ const LW8CalloutsSection = () => {
           <Link href="https://twitter.com/supabase/status/1688544202643111936">
             <a
               target="_blank"
-              className="flex flex-row justify-between items-center w-full h-full gap-2"
+              className="flex flex-row justify-between items-center w-full h-full gap-2 focus-base focus-rounded-md"
             >
               <div className="relative flex-shrink flex items-center p-2 w-2/3 lg:w-1/2 md:w-auto">
                 <div className="flex flex-col gap-1 sm:pl-4">
@@ -33,7 +33,7 @@ const LW8CalloutsSection = () => {
         </SmallCard>
         <SmallCard className="hover:from-scale-900 hover:to-scale-900">
           <Link href="/blog/supabase-lw8-hackathon">
-            <a className="flex flex-row justify-between items-center w-full h-full gap-2">
+            <a className="flex flex-row justify-between items-center w-full h-full gap-2 focus-base focus-rounded-md">
               <div className="relative flex-shrink flex items-center p-2 w-2/3 lg:w-1/2 md:w-auto">
                 <div className="flex flex-col gap-1 sm:pl-4">
                   <div className="flex items-center gap-3">

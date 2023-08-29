@@ -16,7 +16,7 @@ const BuiltExamples = () => {
         <p className="p">There are many example apps and starter projects to get you started.</p>
         <div className="flex justify-center gap-2 py-4">
           <Link href="/docs/guides/examples" as="/docs/guides/examples" passHref>
-            <a>
+            <a tabIndex={-1}>
               <Button type="default" size="small" className="h-full">
                 View all examples
               </Button>
@@ -27,7 +27,7 @@ const BuiltExamples = () => {
             as="https://github.com/supabase/supabase/tree/master/examples"
             passHref
           >
-            <a>
+            <a tabIndex={-1}>
               <Button type="default" icon={<IconGitHub />} size="small">
                 Official GitHub library
               </Button>

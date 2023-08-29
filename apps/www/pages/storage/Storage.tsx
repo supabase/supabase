@@ -251,7 +251,7 @@ function StoragePage() {
                       </p>
 
                       <Link href="/docs/reference/javascript/storage-createbucket" passHref>
-                        <a>
+                        <a tabIndex={-1}>
                           <Button
                             size="small"
                             type="default"

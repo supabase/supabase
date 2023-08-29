@@ -108,7 +108,12 @@ export function ExpandableVideo({
           if (onOpenCallback) onOpenCallback()
           setExpandVideo(true)
         }}
-        className={['w-full', triggerContainerClassName].join(' ').trim()}
+        className={[
+          'w-full focus:outline-none focus:ring-2 focus:ring-scale-900 ring-0 transition-all focus:ring-offset-transparent rounded focus:rounded',
+          triggerContainerClassName,
+        ]
+          .join(' ')
+          .trim()}
       >
         {trigger ?? <CliccablePreview />}
       </button>

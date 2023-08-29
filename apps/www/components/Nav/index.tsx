@@ -226,7 +226,7 @@ const Nav = () => {
               <div className="flex items-center">
                 <div className="flex items-center flex-shrink-0">
                   <Link href="/" as="/">
-                    <a className="block w-auto h-6">
+                    <a className="block w-auto h-6 focus-brand focus-rounded-sm">
                       <Image
                         src={isDarkMode ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight}
                         width={124}
@@ -238,7 +238,7 @@ const Nav = () => {
 
                   {isLaunchWeekPage && (
                     <Link href="/launch-week" as="/launch-week">
-                      <a className="hidden ml-2 xl:block font-mono text-sm uppercase leading-4">
+                      <a className="hidden ml-2 xl:block font-mono text-sm uppercase leading-4 focus-base focus-rounded-sm">
                         Launch Week
                       </a>
                     </Link>
@@ -260,7 +260,7 @@ const Nav = () => {
                       className={[
                         `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
-                        text-sm font-medium`,
+                        text-sm font-medium focus-base focus-rounded-sm`,
                         showLaunchWeekNavMode && '!text-white',
                       ].join(' ')}
                     >
@@ -272,7 +272,7 @@ const Nav = () => {
                       className={[
                         `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
-                        text-sm font-medium`,
+                        text-sm font-medium focus-base focus-rounded-sm`,
                         showLaunchWeekNavMode && '!text-white',
                       ].join(' ')}
                     >
@@ -284,7 +284,7 @@ const Nav = () => {
                       className={[
                         `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
-                        text-sm font-medium`,
+                        text-sm font-medium focus-base focus-rounded-sm`,
                         showLaunchWeekNavMode && '!text-white',
                       ].join(' ')}
                     >
@@ -294,7 +294,7 @@ const Nav = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <a href="https://github.com/supabase/supabase" target="_blank">
+                <a href="https://github.com/supabase/supabase" target="_blank" tabIndex={-1}>
                   <Button
                     className="hidden group lg:flex"
                     type="text"
@@ -320,31 +320,27 @@ const Nav = () => {
                       </div>
                     }
                   >
-                    <span
-                    // className={isLaunchWeekPage ? '!text-white' : ''}
-                    >
-                      Star us on GitHub
-                    </span>
+                    <span>Star us on GitHub</span>
                   </Button>
                 </a>
 
                 {isLoggedIn ? (
                   <Link href="/dashboard/projects">
-                    <a>
+                    <a tabIndex={-1}>
                       <Button className="hidden text-white lg:block">Dashboard</Button>
                     </a>
                   </Link>
                 ) : (
                   <>
                     <Link href="https://supabase.com/dashboard">
-                      <a>
+                      <a tabIndex={-1}>
                         <Button type="default" className="hidden lg:block">
                           Sign in
                         </Button>
                       </a>
                     </Link>
                     <Link href="https://supabase.com/dashboard">
-                      <a>
+                      <a tabIndex={-1}>
                         <Button className="hidden text-white lg:block">Start your project</Button>
                       </a>
                     </Link>

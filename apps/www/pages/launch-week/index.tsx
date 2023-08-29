@@ -144,7 +144,7 @@ export default function TicketHome({ users, meetups }: Props) {
                     <AnimatedParticles />
                     <Image
                       src="/images/launchweek/8/stars.svg"
-                      alt="starts background"
+                      alt="stars background"
                       layout="fill"
                       objectFit="cover"
                       className="opacity-70 pointer-events-none"
@@ -156,6 +156,7 @@ export default function TicketHome({ users, meetups }: Props) {
               <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0">
                 <Image
                   src="/images/launchweek/8/LW8-gradient.png"
+                  alt="Launch Week 8 purple background gradient"
                   layout="fill"
                   objectFit="cover"
                   objectPosition="top"
