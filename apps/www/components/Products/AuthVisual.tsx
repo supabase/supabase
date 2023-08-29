@@ -3,7 +3,11 @@ import React from 'react'
 
 const AuthVisual = () => {
   return (
-    <div className="absolute inset-0 z-0">
+    <span
+      className="absolute inset-0 z-0"
+      role="img"
+      aria-label="Supabase Authentication provides Row Level Security which enables you to define custom Policies to restrict access to your database"
+    >
       <Image
         src="/images/index/products/auth2.svg"
         alt="Supabase Authentication hover state"
@@ -22,7 +26,7 @@ const AuthVisual = () => {
         className="antialiased"
         quality={100}
       />
-    </div>
+    </span>
   )
 }
 

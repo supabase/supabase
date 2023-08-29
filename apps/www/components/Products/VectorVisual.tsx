@@ -43,8 +43,13 @@ const VectorVisual = () => {
   }, [])
 
   return (
-    <div className="absolute inset-0 z-0" ref={containerRef}>
-      <div className="absolute w-full lg:w-auto h-full lg:aspect-square flex items-end lg:items-center justify-center lg:justify-end right-0 left-0 lg:left-auto top-24 md:top-24 lg:top-0 lg:bottom-0 my-auto lg:scale-110">
+    <span
+      className="absolute inset-0 z-0"
+      ref={containerRef}
+      role="img"
+      aria-label="Supabase Vector uses pgvector to store, index, and access embeddings"
+    >
+      <span className="absolute w-full lg:w-auto h-full lg:aspect-square flex items-end lg:items-center justify-center lg:justify-end right-0 left-0 lg:left-auto top-24 md:top-24 lg:top-0 lg:bottom-0 my-auto lg:scale-110">
         <svg
           ref={ref}
           viewBox="0 0 390 430"
@@ -73,7 +78,7 @@ const VectorVisual = () => {
 
         <Image
           src={`/images/index/products/vector2.svg`}
-          alt="Supabase Postgres Vector AI"
+          alt="Supabase Vector graph"
           layout="fill"
           objectFit="contain"
           objectPosition="center"
@@ -82,15 +87,15 @@ const VectorVisual = () => {
         />
         <Image
           src={`/images/index/products/vector1.svg`}
-          alt="Supabase Postgres Vector AI"
+          alt="Supabase Vector graph"
           layout="fill"
           objectFit="contain"
           objectPosition="center"
           className="absolute inset-0"
           quality={100}
         />
-      </div>
-    </div>
+      </span>
+    </span>
   )
 }
 

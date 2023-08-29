@@ -73,6 +73,7 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
                 key={framework.name}
                 className="m-0"
                 data-tip={framework.name}
+                aria-label={framework.name}
                 onClick={() => sendTelemetryEvent(framework.gaEvent)}
               >
                 <svg
