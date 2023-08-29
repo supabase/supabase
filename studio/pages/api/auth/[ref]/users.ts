@@ -116,5 +116,9 @@ const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
   const query = { query: `DELETE from auth.users where id='${payload.id}';` }
 
   const response = await post(`${PG_META_URL}/query`, query, { headers })
+  if (response.error) {
+    return res.status(400).json({ error: response.error })
+  }
   return res.status(200).json(response)
+  
 }
