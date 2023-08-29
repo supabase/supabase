@@ -46,11 +46,11 @@ const ProductCard = ({
         >
           <dl
             className={[
-              'relative z-10 flex flex-col lg:h-full gap-2 text-scale-1200 mx-auto items-center text-center',
+              'relative z-10 flex flex-col lg:h-full gap-1 text-scale-1200 mx-auto items-center text-center',
               alignLeft && 'lg:mx-0 lg:items-start lg:text-left lg:max-w-[200px]',
             ].join(' ')}
           >
-            <div className="flex items-center justify-center h-12 w-12 bg-alternative rounded-lg">
+            <div className="flex items-center justify-center h-12 w-12 bg-alternative rounded-lg mb-3">
               {icon && (
                 <svg
                   width="25"
