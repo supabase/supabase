@@ -1235,7 +1235,7 @@ $$;
   {
     id: 24,
     type: 'template',
-    title: 'dbdev',
+    title: 'Install dbdev',
     description: 'dbdev is a client for installing 3rd party packages into your database.',
     sql: `
 create extension if not exists http with schema extensions;
