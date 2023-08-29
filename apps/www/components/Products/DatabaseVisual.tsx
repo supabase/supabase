@@ -12,15 +12,15 @@ const DatabaseVisual = () => {
     const svgElement = ref.current as SVGElement
     const containerRefElement = containerRef.current as HTMLDivElement
 
-    const { x: elX, y: elY, width, height } = svgElement.getBoundingClientRect()
+    const { x: svgX, y: svgY } = svgElement.getBoundingClientRect()
     const {
       x: contX,
       y: contY,
       width: containerWidth,
       height: containerHeight,
     } = containerRefElement.getBoundingClientRect()
-    const x = event.clientX - elX
-    const y = event.clientY - elY
+    const x = event.clientX - svgX
+    const y = event.clientY - svgY
     const xCont = event.clientX - contX
     const yCont = event.clientY - contY
 
@@ -127,7 +127,7 @@ const DatabaseVisual = () => {
                 shapeRendering="crispEdges"
               />
             </g>
-            <g filter="url(#filter6_d_467_4905)">
+            <g>
               <path
                 d="M192.144 125.816H138.679C130.173 125.816 122.52 130.986 119.345 138.877L99.0045 189.43C95.9432 197.038 97.6597 205.736 103.382 211.611L113.614 222.117C118.406 227.036 121.088 233.633 121.088 240.501L121.087 254.974C121.087 275.171 137.46 291.543 157.656 291.543C163.816 291.543 168.81 286.55 168.81 280.39L168.811 194.149C168.811 175.52 176.252 157.663 189.479 144.547C192.225 141.824 196.657 141.843 199.379 144.588C202.101 147.333 202.082 151.766 199.337 154.488C188.76 164.976 182.811 179.254 182.811 194.149L182.81 280.39C182.81 294.282 171.548 305.543 157.656 305.543C129.728 305.543 107.087 282.903 107.087 254.974L107.088 240.5C107.088 237.282 105.831 234.191 103.585 231.885L93.353 221.38C83.7626 211.533 80.8857 196.956 86.0164 184.204L106.357 133.651C111.665 120.459 124.458 111.816 138.679 111.816H194.408V111.9H204.747C253.851 111.9 293.657 151.706 293.657 200.81V251.652C293.657 255.518 290.523 258.652 286.657 258.652C282.791 258.652 279.657 255.518 279.657 251.652V200.81C279.657 159.438 246.119 125.9 204.747 125.9H193.23C192.86 125.9 192.498 125.871 192.144 125.816Z"
                 stroke="url(#paint4_radial_467_4905)"
@@ -252,41 +252,6 @@ const DatabaseVisual = () => {
                 result="shape"
               />
             </filter>
-            <filter
-              id="filter6_d_467_4905"
-              x="81.0066"
-              y="109.316"
-              width="246.732"
-              height="229.05"
-              filterUnits="userSpaceOnUse"
-              colorInterpolationFilters="sRGB"
-            >
-              <feFlood floodOpacity="0" result="BackgroundImageFix" />
-              <feColorMatrix
-                in="SourceAlpha"
-                type="matrix"
-                values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-                result="hardAlpha"
-              />
-              <feOffset />
-              <feGaussianBlur stdDeviation="1" />
-              <feComposite in2="hardAlpha" operator="out" />
-              <feColorMatrix
-                type="matrix"
-                values="0 0 0 0 0.247059 0 0 0 0 0.811765 0 0 0 0 0.556863 0 0 0 1 0"
-              />
-              <feBlend
-                mode="normal"
-                in2="BackgroundImageFix"
-                result="effect1_dropShadow_467_4905"
-              />
-              <feBlend
-                mode="normal"
-                in="SourceGraphic"
-                in2="effect1_dropShadow_467_4905"
-                result="shape"
-              />
-            </filter>
             <radialGradient
               id="paint0_radial_467_4905"
               cx="0"
@@ -364,7 +329,6 @@ const DatabaseVisual = () => {
                   gradientTransform={`translate(${gradientPos?.x} ${gradientPos.y}) rotate(45) scale(166 180)`}
                 >
                   <stop stopColor="#3FCF8E" />
-
                   <stop offset="1" stopColor="#7C7C7C" />
                 </radialGradient>
               </>

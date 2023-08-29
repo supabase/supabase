@@ -65,8 +65,8 @@ const VectorVisual = () => {
               gradientUnits="userSpaceOnUse"
               gradientTransform={`translate(${gradientPos?.x} ${gradientPos.y}) rotate(56.4303) scale(132.019)`}
             >
-              <stop stop-color="#3FCF8E" />
-              <stop offset="1" stop-color="#3FCF8E" stop-opacity="0" />
+              <stop stopColor="#3FCF8E" />
+              <stop offset="1" stopColor="#3FCF8E" stopOpacity="0" />
             </radialGradient>
           </defs>
         </svg>
@@ -76,7 +76,7 @@ const VectorVisual = () => {
           alt="Supabase Postgres Vector AI"
           layout="fill"
           objectFit="contain"
-          objectPosition={isTablet ? 'center' : 'center'}
+          objectPosition="center"
           className="absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
           quality={100}
         />
@@ -85,7 +85,7 @@ const VectorVisual = () => {
           alt="Supabase Postgres Vector AI"
           layout="fill"
           objectFit="contain"
-          objectPosition={isTablet ? 'center' : 'center'}
+          objectPosition="center"
           className="absolute inset-0"
           quality={100}
         />
