@@ -4,9 +4,9 @@ import { IconFile, IconImage, IconVideo } from 'ui'
 
 const StorageVisual = () => {
   const cols = [
-    <IconImage className="w-6 h-6 md:w-4 md:h-4" />,
-    <IconFile className="w-6 h-6 md:w-4 md:h-4" />,
-    <IconVideo className="w-6 h-6 md:w-4 md:h-4" />,
+    <IconImage className="w-6 h-6 md:w-6 md:h-6 text-muted" />,
+    <IconFile className="w-6 h-6 md:w-6 md:h-6 text-muted" />,
+    <IconVideo className="w-6 h-6 md:w-6 md:h-6 text-muted" />,
   ]
 
   return (
@@ -16,7 +16,7 @@ const StorageVisual = () => {
           {range(0, 10).map((_rangeCol) => (
             <div className="flex flex-col ml-2 gap-2 md:gap-2">
               {cols.map((col: any) => (
-                <div className="w-[60px] h-[60px] md:min-w-14 md:w-14 md:h-14 flex items-center justify-center rounded-lg border bg hover:border-brand">
+                <div className="w-[60px] h-[60px] md:min-w-[62px] md:w-[62px] md:h-[62px] flex items-center justify-center rounded-lg border bg hover:border-brand">
                   {col}
                 </div>
               ))}
