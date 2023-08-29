@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
+import { IconInfo, Tabs } from 'ui'
 
 import { BackupsList } from 'components/interfaces/Database'
 import { DatabaseLayout } from 'components/layouts'
@@ -10,16 +11,24 @@ import InformationBox from 'components/ui/InformationBox'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
-import { IconInfo, Tabs } from 'ui'
+import { useBackupsQuery } from 'data/database/backups-query'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import AlertError from 'components/ui/AlertError'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
   const router = useRouter()
-  const { backups } = useStore()
   const { project } = useProjectContext()
   const ref = project?.ref
 
-  const isPitrEnabled = backups?.configuration?.walg_enabled
+  const {
+    data: backups,
+    error,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useBackupsQuery({ projectRef: ref })
 
+  const isPitrEnabled = backups?.walg_enabled ?? false
   const canReadScheduledBackups = useCheckPermissions(PermissionAction.READ, 'back_ups')
 
   return (
@@ -44,42 +53,49 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
           <Tabs.Panel id="pitr" label="Point in Time" />
         </Tabs>
 
-        <div className="space-y-4">
-          {!isPitrEnabled && (
-            <p className="text-sm text-scale-1100">
-              Projects are backed up daily around midnight of your project's region and can be
-              restored at any time.
-            </p>
-          )}
+        {canReadScheduledBackups ? (
+          <div className="space-y-4">
+            {isLoading && <GenericSkeletonLoader />}
 
-          {isPitrEnabled && (
-            <InformationBox
-              hideCollapse
-              defaultVisibility
-              icon={<IconInfo strokeWidth={2} />}
-              title="Point-In-Time-Recovery (PITR) enabled"
-              description={
-                <div>
-                  Your project uses PITR and full daily backups are no longer taken. They're not
-                  needed, as PITR supports a superset of functionality, in terms of the granular
-                  recovery that can be performed.{' '}
-                  <a
-                    className="text-brand transition-colors hover:text-brand-600"
-                    href="https://supabase.com/docs/guides/platform/backups"
-                  >
-                    Learn more
-                  </a>
-                </div>
-              }
-            />
-          )}
+            {isError && <AlertError error={error} subject="Failed to retrieve scheduled backups" />}
 
-          {canReadScheduledBackups ? (
-            <BackupsList />
-          ) : (
-            <NoPermission resourceText="view scheduled backups" />
-          )}
-        </div>
+            {isSuccess && (
+              <>
+                {isPitrEnabled ? (
+                  <InformationBox
+                    hideCollapse
+                    defaultVisibility
+                    icon={<IconInfo strokeWidth={2} />}
+                    title="Point-In-Time-Recovery (PITR) enabled"
+                    description={
+                      <div>
+                        Your project uses PITR and full daily backups are no longer taken. They're
+                        not needed, as PITR supports a superset of functionality, in terms of the
+                        granular recovery that can be performed.{' '}
+                        <a
+                          className="text-brand transition-colors hover:text-brand-600"
+                          href="https://supabase.com/docs/guides/platform/backups"
+                        >
+                          Learn more
+                        </a>
+                      </div>
+                    }
+                  />
+                ) : (
+                  <>
+                    <p className="text-sm text-scale-1100">
+                      Projects are backed up daily around midnight of your project's region and can
+                      be restored at any time.
+                    </p>
+                    <BackupsList />
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        ) : (
+          <NoPermission resourceText="view scheduled backups" />
+        )}
       </div>
     </div>
   )
