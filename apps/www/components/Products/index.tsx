@@ -61,130 +61,122 @@ const Products = (props: any) => {
   }
 
   return (
-    <SectionContainer className="!pt-0">
-      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-4 lg:gap-6 md:grid-cols-12">
-        <li className="col-span-6 lg:col-span-12 xl:col-span-6">
-          <ProductCard
-            alignLeft
-            url={props.products['database'].url}
-            icon={props.products['database'].icon}
-            title={props.products['database'].name}
-            subtitle={props.products['database'].description}
-            highlights={
-              <ul className="flex flex-col gap-1 text-sm">
-                <li>
-                  <IconCheck className="inline h-4 w-4" /> 100% portable
-                </li>
-                <li>
-                  <IconCheck className="inline h-4 w-4" /> Built-in Auth with RLS
-                </li>
-                <li>
-                  <IconCheck className="inline h-4 w-4" /> Easy to extend
-                </li>
-              </ul>
-            }
-            onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.DATABASE)}
-            image={<DatabaseVisual />}
-          />
-        </li>
-        <li className="col-span-6 xl:col-span-3">
-          <ProductCard
-            url={props.products['authentication'].url}
-            icon={props.products['authentication'].icon}
-            title={props.products['authentication'].name}
-            subtitle={
-              <>
-                Add user sign ups and logins,
-                <br className="inline-block sm:hidden lg:inline-block" /> securing your data with
-                Row Level Security.
-              </>
-            }
-            image={<AuthVisual />}
-            onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.AUTHENTICATION)}
-          />
-        </li>
-        <li className="col-span-6 xl:col-span-3">
-          <ProductCard
-            url={props.products['functions'].url}
-            icon={props.products['functions'].icon}
-            title={props.products['functions'].name}
-            subtitle={
-              <>
-                Easily write custom code
-                <br className="inline-block sm:hidden lg:inline-block" /> without deploying or
-                scaling servers.
-              </>
-            }
-            onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.FUNCTIONS)}
-            image={<FunctionsVisual />}
-          />
-        </li>
-        <li className="col-span-6 xl:col-span-3">
-          <ProductCard
-            url={props.products['storage'].url}
-            icon={props.products['storage'].icon}
-            title={props.products['storage'].name}
-            subtitle={
-              <>
-                Store, organize, and serve large files,
-                <br className="inline-block xl:hidden 2xl:inline-block" /> from videos to images.
-              </>
-            }
-            image={<StorageVisual />}
-            onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.STORAGE)}
-          />
-        </li>
-        <li className="col-span-6 xl:col-span-3">
-          <ProductCard
-            url={props.products['realtime'].url}
-            icon={props.products['realtime'].icon}
-            title={props.products['realtime'].name}
-            subtitle={
-              <>
-                Build multiplayer experiences
-                <br className="inline-block md:hidden 2xl:inline-block" /> with realtime data
-                synchronization.
-              </>
-            }
-            onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.REALTIME)}
-            image={<RealtimeVisual />}
-            className="hover:!cursor-[url('/images/index/products/realtime-cursor.svg'),_auto]"
-          />
-        </li>
-        <li className="col-span-6 lg:col-span-12 xl:col-span-6">
-          <ProductCard
-            alignLeft
-            url={props.products['vector'].url}
-            icon={props.products['vector'].icon}
-            title={props.products['vector'].name}
-            subtitle={
-              <>
-                Integrate your favorite ML-models to store,
-                <br className="inline-block md:hidden" /> index and search vector embeddings.
-              </>
-            }
-            highlights={
-              <ul className="flex flex-col gap-1 text-sm">
-                <li className="flex items-center gap-2">
-                  <Image src="/images/logos/openai.svg" alt="OpenAI logo" width="25" height="25" />
-                  <span>OpenAI</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Image
-                    src="/images/logos/hugging-face.svg"
-                    alt="Hugging Face logo"
-                    width="25"
-                    height="25"
-                  />
-                  <span>Hugging Face</span>
-                </li>
-              </ul>
-            }
-            onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.VECTOR)}
-            image={<VectorVisual />}
-          />
-        </li>
-      </ul>
+    <SectionContainer className="!pt-0 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-4 lg:gap-6 md:grid-cols-12">
+      <ProductCard
+        className="col-span-6 lg:col-span-12 xl:col-span-6"
+        alignLeft
+        url={props.products['database'].url}
+        icon={props.products['database'].icon}
+        title={props.products['database'].name}
+        subtitle={props.products['database'].description}
+        highlights={
+          <ul className="flex flex-col gap-1 text-sm">
+            <li>
+              <IconCheck className="inline h-4 w-4" /> 100% portable
+            </li>
+            <li>
+              <IconCheck className="inline h-4 w-4" /> Built-in Auth with RLS
+            </li>
+            <li>
+              <IconCheck className="inline h-4 w-4" /> Easy to extend
+            </li>
+          </ul>
+        }
+        onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.DATABASE)}
+        image={<DatabaseVisual />}
+      />
+      <ProductCard
+        className="col-span-6 xl:col-span-3"
+        url={props.products['authentication'].url}
+        icon={props.products['authentication'].icon}
+        title={props.products['authentication'].name}
+        subtitle={
+          <>
+            Add user sign ups and logins,
+            <br className="inline-block sm:hidden lg:inline-block" /> securing your data with Row
+            Level Security.
+          </>
+        }
+        image={<AuthVisual />}
+        onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.AUTHENTICATION)}
+      />
+      <ProductCard
+        className="col-span-6 xl:col-span-3"
+        url={props.products['functions'].url}
+        icon={props.products['functions'].icon}
+        title={props.products['functions'].name}
+        subtitle={
+          <>
+            Easily write custom code
+            <br className="inline-block sm:hidden lg:inline-block" /> without deploying or scaling
+            servers.
+          </>
+        }
+        onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.FUNCTIONS)}
+        image={<FunctionsVisual />}
+      />
+      <ProductCard
+        className="col-span-6 xl:col-span-3"
+        url={props.products['storage'].url}
+        icon={props.products['storage'].icon}
+        title={props.products['storage'].name}
+        subtitle={
+          <>
+            Store, organize, and serve large files,
+            <br className="inline-block xl:hidden 2xl:inline-block" /> from videos to images.
+          </>
+        }
+        image={<StorageVisual />}
+        onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.STORAGE)}
+      />
+      <ProductCard
+        url={props.products['realtime'].url}
+        icon={props.products['realtime'].icon}
+        title={props.products['realtime'].name}
+        subtitle={
+          <>
+            Build multiplayer experiences
+            <br className="inline-block md:hidden 2xl:inline-block" /> with realtime data
+            synchronization.
+          </>
+        }
+        onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.REALTIME)}
+        image={<RealtimeVisual />}
+        className="col-span-6 xl:col-span-3 hover:!cursor-[url('/images/index/products/realtime-cursor.svg'),_auto]"
+      />
+
+      <ProductCard
+        alignLeft
+        className="col-span-6 lg:col-span-12 xl:col-span-6"
+        url={props.products['vector'].url}
+        icon={props.products['vector'].icon}
+        title={props.products['vector'].name}
+        subtitle={
+          <>
+            Integrate your favorite ML-models to store,
+            <br className="inline-block md:hidden" /> index and search vector embeddings.
+          </>
+        }
+        highlights={
+          <ul className="flex flex-col gap-1 text-sm">
+            <li className="flex items-center gap-2">
+              <Image src="/images/logos/openai.svg" alt="OpenAI logo" width="25" height="25" />
+              <span>OpenAI</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <Image
+                src="/images/logos/hugging-face.svg"
+                alt="Hugging Face logo"
+                width="25"
+                height="25"
+              />
+              <span>Hugging Face</span>
+            </li>
+          </ul>
+        }
+        onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.VECTOR)}
+        image={<VectorVisual />}
+      />
     </SectionContainer>
   )
 }
