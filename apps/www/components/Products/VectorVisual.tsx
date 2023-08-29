@@ -1,30 +1,95 @@
 import { useBreakpoint } from 'common'
 import Image from 'next/image'
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 const VectorVisual = () => {
   const isTablet = useBreakpoint(1023)
+  const containerRef = useRef(null)
+  const ref = useRef(null)
+  const [isActive, setIsActive] = useState(false)
+  const [gradientPos, setGradientPos] = useState({ x: 0, y: 0 })
+
+  const handleGlow = (event: any) => {
+    if (!ref.current || !containerRef.current) return null
+
+    const svgElement = ref.current as SVGElement
+    const containerRefElement = containerRef.current as HTMLDivElement
+
+    const { x: elX, y: elY, width, height } = svgElement.getBoundingClientRect()
+    const {
+      x: contX,
+      y: contY,
+      width: containerWidth,
+      height: containerHeight,
+    } = containerRefElement.getBoundingClientRect()
+    const x = event.clientX - elX
+    const y = event.clientY - elY
+    const xCont = event.clientX - contX
+    const yCont = event.clientY - contY
+
+    setIsActive(
+      xCont > -3 && xCont < containerWidth + 3 && yCont > -3 && yCont < containerHeight + 3
+    )
+    setGradientPos({ x, y })
+  }
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    window.addEventListener('mousemove', handleGlow)
+    return () => {
+      window.removeEventListener('mousemove', handleGlow)
+    }
+  }, [])
 
   return (
-    <div className="absolute inset-0 z-0">
-      <Image
-        src={`/images/index/products/vector${isTablet ? '-mobile' : ''}2.svg`}
-        alt="Supabase Postgres Vector AI"
-        layout="fill"
-        objectFit="cover"
-        objectPosition={isTablet ? 'center' : 'right'}
-        className="absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
-        quality={100}
-      />
-      <Image
-        src={`/images/index/products/vector${isTablet ? '-mobile' : ''}1.svg`}
-        alt="Supabase Postgres Vector AI"
-        layout="fill"
-        objectFit="cover"
-        objectPosition={isTablet ? 'center' : 'right'}
-        className="absolute inset-0"
-        quality={100}
-      />
+    <div className="absolute inset-0 z-0" ref={containerRef}>
+      <div className="absolute w-full lg:w-auto h-full lg:aspect-square flex items-end lg:items-center justify-center lg:justify-end right-0 left-0 lg:left-auto top-24 md:top-24 lg:top-0 lg:bottom-0 my-auto lg:scale-110">
+        <svg
+          ref={ref}
+          viewBox="0 0 390 430"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="absolute w-full h-full z-20 m-auto"
+        >
+          <path
+            d="M195.918 125.344L276.779 172.029V265.399L195.918 312.084L115.057 265.399V172.029L195.918 125.344Z"
+            stroke="url(#paint0_radial_484_53266)"
+          />
+          <defs>
+            <radialGradient
+              id="paint0_radial_484_53266"
+              cx="0"
+              cy="0"
+              r="2"
+              gradientUnits="userSpaceOnUse"
+              gradientTransform={`translate(${gradientPos?.x} ${gradientPos.y}) rotate(56.4303) scale(132.019)`}
+            >
+              <stop stop-color="#3FCF8E" />
+              <stop offset="1" stop-color="#3FCF8E" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+        </svg>
+
+        <Image
+          src={`/images/index/products/vector2.svg`}
+          alt="Supabase Postgres Vector AI"
+          layout="fill"
+          objectFit="contain"
+          objectPosition={isTablet ? 'center' : 'center'}
+          className="absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+          quality={100}
+        />
+        <Image
+          src={`/images/index/products/vector1.svg`}
+          alt="Supabase Postgres Vector AI"
+          layout="fill"
+          objectFit="contain"
+          objectPosition={isTablet ? 'center' : 'center'}
+          className="absolute inset-0"
+          quality={100}
+        />
+      </div>
     </div>
   )
 }
