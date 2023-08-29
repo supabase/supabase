@@ -57,10 +57,10 @@ const DatabaseVisual = () => {
               stroke="#282828"
             />
             <g filter="url(#filter0_f_467_4905)">
-              <ellipse cx="0.312866" cy="214.736" rx="78.8492" ry="311.736" fill="#1C1C1C" />
+              <ellipse cx="0.312866" cy="214.736" rx="78.8492" ry="311.736" fill="#232323" />
             </g>
             <g filter="url(#filter1_f_467_4905)">
-              <ellipse cx="390.849" cy="214.736" rx="78.8492" ry="311.736" fill="#1C1C1C" />
+              <ellipse cx="390.849" cy="214.736" rx="78.8492" ry="311.736" fill="#232323" />
             </g>
             <g filter="url(#filter2_f_467_4905)">
               <ellipse
@@ -69,7 +69,7 @@ const DatabaseVisual = () => {
                 rx="78.8492"
                 ry="311.736"
                 transform="rotate(-90 194.736 -0.0142959)"
-                fill="#1C1C1C"
+                fill="#232323"
               />
             </g>
             <g filter="url(#filter3_f_467_4905)">
@@ -79,7 +79,7 @@ const DatabaseVisual = () => {
                 rx="78.8492"
                 ry="311.736"
                 transform="rotate(-90 194.736 430.849)"
-                fill="#1C1C1C"
+                fill="#232323"
               />
             </g>
             <path
