@@ -7,7 +7,7 @@ interface Props {
 }
 
 const SectionContainer = ({ children, className, id }: Props) => (
-  <div
+  <section
     id={id}
     className={classNames(
       `sm:py-18 container relative mx-auto px-6 py-16 md:py-24 lg:px-16 lg:py-24 xl:px-20`,
@@ -15,7 +15,7 @@ const SectionContainer = ({ children, className, id }: Props) => (
     )}
   >
     {children}
-  </div>
+  </section>
 )
 
 export default SectionContainer
