@@ -40,15 +40,20 @@ const DatabaseVisual = () => {
   }, [])
 
   return (
-    <div className="absolute inset-0 z-0" ref={containerRef}>
-      <div className="absolute w-full lg:w-auto h-full lg:aspect-square flex items-end lg:items-center justify-center lg:justify-end right-0 left-0 lg:left-auto top-24 md:top-24 lg:top-0 lg:bottom-0 my-auto">
+    <span
+      className="absolute inset-0 z-0"
+      ref={containerRef}
+      role="img"
+      aria-label="Supabase Postgres database visual composition"
+    >
+      <span className="absolute w-full lg:w-auto h-full lg:aspect-square flex items-end lg:items-center justify-center lg:justify-end right-0 left-0 lg:left-auto top-24 md:top-24 lg:top-0 lg:bottom-0 my-auto">
         <svg
           ref={ref}
           width="390"
           height="430"
           viewBox="0 0 390 430"
           fill="none"
-          className="scale-75 lg:scale-100"
+          className="scale-75 lg:scale-90"
           xmlns="http://www.w3.org/2000/svg"
         >
           <g clipPath="url(#clip0_467_4905)">
@@ -338,8 +343,8 @@ const DatabaseVisual = () => {
             </clipPath>
           </defs>
         </svg>
-      </div>
-    </div>
+      </span>
+    </span>
   )
 }
 

@@ -75,7 +75,7 @@ const Hero = () => {
           </div>
         </div>
         <div className="absolute -top-2 md:top-0 -left-10 -right-10 md:left-0 md:right-0 h-[500px] lg:h-[550px] z-0 flex items-center justify-center">
-          <div className="absolute inset-0">
+          <span className="absolute inset-0">
             <Image
               src="/images/launchweek/8/stars.svg"
               alt="stars background"
@@ -84,12 +84,14 @@ const Hero = () => {
               className="opacity-70"
               draggable={false}
             />
-          </div>
+          </span>
         </div>
       </SectionContainer>
       <div className="absolute w-full max-w-[1600px] mx-auto h-[500px] lg:h-[750px] inset-0 z-0 flex items-center justify-center">
         <Image
           src="/images/launchweek/8/LW8-gradient.png"
+          alt="Launch Week 8 purple background gradient"
+          className="not-sr-only"
           layout="fill"
           objectFit="cover"
           objectPosition="top"

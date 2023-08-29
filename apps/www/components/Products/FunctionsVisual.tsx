@@ -23,7 +23,11 @@ const FunctionsVisual = () => {
     },
   }
   return (
-    <div className="absolute inset-0 z-0">
+    <span
+      className="absolute inset-0 z-0"
+      role="img"
+      aria-label="Supabase Edge Functions visual composition"
+    >
       <svg
         viewBox="0 0 289 430"
         xmlns="http://www.w3.org/2000/svg"
@@ -127,7 +131,7 @@ const FunctionsVisual = () => {
         className="antialiased"
         quality={100}
       />
-    </div>
+    </span>
   )
 }
 
