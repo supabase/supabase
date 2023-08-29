@@ -10,6 +10,7 @@ import { detectOS } from 'lib/helpers'
 import {
   Button,
   Dropdown,
+  IconBookOpen,
   IconCommand,
   IconHome,
   IconSearch,
@@ -144,6 +145,14 @@ const NavigationBar = () => {
                         icon={<IconSettings size={14} strokeWidth={1.5} />}
                       >
                         Account Preferences
+                      </Dropdown.Item>
+                    </Link>
+                    <Link href="/account/audit">
+                      <Dropdown.Item
+                        key="header"
+                        icon={<IconBookOpen size={14} strokeWidth={1.5} />}
+                      >
+                        Audit Logs
                       </Dropdown.Item>
                     </Link>
                     <Dropdown.Separator />
