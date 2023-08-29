@@ -1,10 +1,10 @@
+import { useIsLoggedIn } from 'common'
 import jsonLogic from 'json-logic-js'
 
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { Permission } from 'types'
 import { useSelectedOrganization } from './useSelectedOrganization'
-import { useAuth } from 'common'
 
 const toRegexpString = (actionOrResource: string) =>
   `^${actionOrResource.replace('.', '\\.').replace('%', '.*')}$`
@@ -68,8 +68,7 @@ export function useCheckPermissions(
   organizationId?: number,
   permissions?: Permission[]
 ) {
-  const { session } = useAuth()
-  const isLoggedIn = Boolean(session)
+  const isLoggedIn = useIsLoggedIn()
 
   const { permissions: allPermissions, organizationId: orgId } = useGetPermissions(
     permissions,

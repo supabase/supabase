@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useAuth, useTelemetryProps } from 'common'
+import { useIsLoggedIn, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 
@@ -34,8 +34,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   const queryClient = useQueryClient()
   const telemetryProps = useTelemetryProps()
 
-  const { session } = useAuth()
-  const isLoggedIn = Boolean(session)
+  const isLoggedIn = useIsLoggedIn()
 
   const { mutate: createProfile, isLoading: isCreatingProfile } = useProfileCreateMutation({
     async onSuccess() {
