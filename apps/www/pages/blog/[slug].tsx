@@ -157,23 +157,19 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
 
   const toc = props.blog.toc && (
     <div className="space-y-8 py-8 lg:py-0">
-      <div>
-        <div className="flex flex-wrap gap-2">
-          {props.blog.tags?.map((tag: string) => {
-            return (
-              <a href={`/blog/tags/${tag}`} key={`category-badge-${tag}`}>
-                <Badge>{tag}</Badge>
-              </a>
-            )
-          })}
-        </div>
+      <div className="flex flex-wrap gap-2">
+        {props.blog.tags?.map((tag: string) => {
+          return (
+            <a href={`/blog/tags/${tag}`} key={`category-badge-${tag}`}>
+              <Badge>{tag}</Badge>
+            </a>
+          )
+        })}
       </div>
       <div>
-        <div>
-          <p className="text-scale-1200 mb-4">On this page</p>
-          <div className="prose-toc">
-            <ReactMarkdown>{props.blog.toc.content}</ReactMarkdown>
-          </div>
+        <p className="text-scale-1200 mb-4">On this page</p>
+        <div className="prose-toc">
+          <ReactMarkdown>{props.blog.toc.content}</ReactMarkdown>
         </div>
       </div>
     </div>
@@ -348,7 +344,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                   </div>
                 </div>
                 {/* Sidebar */}
-                <div className="col-span-12 space-y-8 lg:col-span-5 xl:col-span-3 xl:col-start-9">
+                <aside className="col-span-12 space-y-8 lg:col-span-5 xl:col-span-3 xl:col-start-9">
                   <div className="space-y-6 lg:sticky lg:top-24 lg:mb-48">
                     <div className="hidden lg:block">{toc}</div>
                     <div>
@@ -387,7 +383,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                       </div>
                     </div>
                   </div>
-                </div>
+                </aside>
               </div>
             </div>
           </div>
