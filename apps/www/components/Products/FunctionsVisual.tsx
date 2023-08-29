@@ -23,7 +23,7 @@ const FunctionsVisual = () => {
     },
   }
   return (
-    <span
+    <figure
       className="absolute inset-0 z-0"
       role="img"
       aria-label="Supabase Edge Functions visual composition"
@@ -131,7 +131,7 @@ const FunctionsVisual = () => {
         className="antialiased"
         quality={100}
       />
-    </span>
+    </figure>
   )
 }
 

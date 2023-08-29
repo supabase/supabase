@@ -71,7 +71,7 @@ const Panel = ({
       ref={outerRef}
       className={[
         'relative z-0 rounded-xl bg-gradient-to-b from-background-surface-300 to-scale-400 p-px shadow-md',
-        !trackCursor && hasActiveOnHover ? 'hover:bg-none hover:!bg-scale-800' : '',
+        !trackCursor && hasActiveOnHover ? 'hover:bg-none hover:!bg-scale-700' : '',
         outerClassName,
       ].join(' ')}
       whileHover="hover"
