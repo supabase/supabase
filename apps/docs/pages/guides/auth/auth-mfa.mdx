@@ -605,10 +605,10 @@ Use the `supabase.auth.getAuthenticatorAssuranceLevel()` method to get easy acce
 You can use this PostgreSQL snippet in RLS policies, too:
 
 ```sql
-json_query_path(auth.jwt(), '$.amr[0]')
+jsonb_path_query(auth.jwt(), '$.amr[0]')
 ```
 
-- [`json_query_path(json, path)`](https://www.postgresql.org/docs/current/functions-json.html#FUNCTIONS-JSON-PROCESSING-TABLE)
+- [`jsonb_path_query(json, path)`](https://www.postgresql.org/docs/current/functions-json.html#FUNCTIONS-JSON-PROCESSING-TABLE)
   is a function that allows access to elements in a JSON object according to a
   [SQL/JSON
   path](https://www.postgresql.org/docs/current/functions-json.html#FUNCTIONS-SQLJSON-PATH).
