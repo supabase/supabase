@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
-import { useParams } from 'common'
+import { useAuth, useParams } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useFlag, useStore } from 'hooks'
@@ -15,6 +15,9 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const { ref, slug } = useParams()
   const navLayoutV2 = useFlag('navigationLayoutV2')
+
+  const { session } = useAuth()
+  const isLoggedIn = Boolean(session)
 
   /**
    * Array of urls/routes that should be ignored
@@ -37,12 +40,14 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     return excemptUrls.includes(router?.pathname)
   }
 
-  const { data: organizations, isSuccess: orgsInitialized } = useOrganizationsQuery()
+  const { data: organizations, isSuccess: orgsInitialized } = useOrganizationsQuery({
+    enabled: isLoggedIn,
+  })
   const organizationsRef = useLatest(organizations)
 
   useEffect(() => {
     // check if current route is excempted from route validation check
-    if (isExceptUrl()) return
+    if (isExceptUrl() || !isLoggedIn) return
 
     if (orgsInitialized && slug) {
       // Check validity of organization that user is trying to access
@@ -57,12 +62,14 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     }
   }, [orgsInitialized])
 
-  const { data: projects, isSuccess: projectsInitialized } = useProjectsQuery()
+  const { data: projects, isSuccess: projectsInitialized } = useProjectsQuery({
+    enabled: isLoggedIn,
+  })
   const projectsRef = useLatest(projects)
 
   useEffect(() => {
     // check if current route is excempted from route validation check
-    if (isExceptUrl()) return
+    if (isExceptUrl() || !isLoggedIn) return
 
     if (projectsInitialized && ref) {
       // Check validity of project that the user is trying to access

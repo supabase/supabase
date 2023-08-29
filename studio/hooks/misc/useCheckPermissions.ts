@@ -4,6 +4,7 @@ import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { Permission } from 'types'
 import { useSelectedOrganization } from './useSelectedOrganization'
+import { useAuth } from 'common'
 
 const toRegexpString = (actionOrResource: string) =>
   `^${actionOrResource.replace('.', '\\.').replace('%', '.*')}$`
@@ -67,11 +68,16 @@ export function useCheckPermissions(
   organizationId?: number,
   permissions?: Permission[]
 ) {
+  const { session } = useAuth()
+  const isLoggedIn = Boolean(session)
+
   const { permissions: allPermissions, organizationId: orgId } = useGetPermissions(
     permissions,
-    organizationId
+    organizationId,
+    isLoggedIn
   )
 
+  if (!isLoggedIn) return false
   if (!IS_PLATFORM) return true
 
   return doPermissionsCheck(allPermissions, action, resource, data, orgId)
