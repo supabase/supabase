@@ -163,7 +163,8 @@ const Nav = () => {
   )
 
   const FlyOutNavButton = (props: any) => (
-    <div
+    <button
+      role="tab"
       className={[
         `
         inline-flex cursor-pointer items-center
@@ -171,6 +172,7 @@ const Nav = () => {
         border-transparent
         px-1
         text-sm font-medium
+        focus-base focus-rounded-sm
         transition-colors`,
         showLaunchWeekNavMode && '!text-white',
         props.active ? 'text-brand' : 'hover:text-brand',
@@ -193,7 +195,7 @@ const Nav = () => {
           />
         </div>
       </>
-    </div>
+    </button>
   )
 
   return (
@@ -244,7 +246,7 @@ const Nav = () => {
                     </Link>
                   )}
                 </div>
-                <div className="hidden pl-4 sm:ml-6 sm:space-x-4 lg:flex">
+                <div className="hidden pl-4 sm:ml-6 sm:space-x-4 lg:flex" role="tablist">
                   <FlyOutNavButton
                     title={'Product'}
                     onClick={() => handleToggle(() => setOpenProduct(!openProduct))}
