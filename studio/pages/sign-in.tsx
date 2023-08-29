@@ -6,14 +6,17 @@ import SignInWithSSO from 'components/interfaces/SignIn/SignInWithSSO'
 import { SignInLayout } from 'components/layouts'
 import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { NextPageWithLayout } from 'types'
 
 const SignInPage: NextPageWithLayout = () => {
   const router = useRouter()
-  if (!IS_PLATFORM) {
-    // on selfhosted instance just redirect to projects page
-    router.replace('/project/default')
-  }
+  useEffect(() => {
+    if (!IS_PLATFORM) {
+      // on selfhosted instance just redirect to projects page
+      router.replace('/project/default')
+    }
+  }, [router])
 
   return (
     <>
