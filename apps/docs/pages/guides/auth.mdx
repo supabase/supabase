@@ -68,7 +68,11 @@ When using third-party providers, the [Supabase client library](/docs/reference/
 
 You can use wildcard match patterns to support preview URLs from providers like Netlify and Vercel. See the [full list of supported patterns](https://pkg.go.dev/github.com/gobwas/glob#Compile). Use [this tool](https://www.digitalocean.com/community/tools/glob?comments=true&glob=http%3A%2F%2Flocalhost%3A3000%2F%2A%2A&matches=false&tests=http%3A%2F%2Flocalhost%3A3000&tests=http%3A%2F%2Flocalhost%3A3000%2F&tests=http%3A%2F%2Flocalhost%3A3000%2F%3Ftest%3Dtest&tests=http%3A%2F%2Flocalhost%3A3000%2Ftest-test%3Ftest%3Dtest&tests=http%3A%2F%2Flocalhost%3A3000%2Ftest%2Ftest%3Ftest%3Dtest) to test your patterns.
 
-> ⚠️ WARNING: While the "globstar" (`**`) is useful for local development and preview URLs, we recommend setting the exact redirect URL path for your site URL in production.
+<Admonition type="note" label="Recommendation">
+
+While the "globstar" (`**`) is useful for local development and preview URLs, we recommend setting the exact redirect URL path for your site URL in production.
+
+</Admonition>
 
 #### Netlify preview URLs
 
