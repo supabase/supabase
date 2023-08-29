@@ -18,7 +18,6 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
   const { ui, meta } = useStore()
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
-  
 
   // billing pages live under /billing/invoices and /billing/subscription, etc
   // so we need to pass the [5]th part of the url to the menu
@@ -26,8 +25,7 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     ? router.pathname.split('/')[5]
     : router.pathname.split('/')[4]
 
-  const isVaultEnabled = useFlag('vaultExtension')
-  const menuRoutes = generateSettingsMenu(ref, project, organization, isVaultEnabled)
+  const menuRoutes = generateSettingsMenu(ref, project, organization)
 
   useEffect(() => {
     if (ui.selectedProjectRef) {
