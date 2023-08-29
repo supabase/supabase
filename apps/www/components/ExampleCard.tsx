@@ -62,7 +62,7 @@ function ExampleCard(props: any) {
               <a
                 target="_blank"
                 href={props.vercel_deploy_url}
-                className="focus-brand focus-rounded-md focus:ring-offset-2"
+                className="focus-brand focus-rounded-md focus-visible:ring-offset-2"
               >
                 <Image src="https://vercel.com/button" alt="vercel button" width={75} height={26} />
               </a>

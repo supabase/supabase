@@ -175,7 +175,7 @@ function FeaturedThumb(blog: PostTypes) {
   return (
     <div key={blog.slug} className="w-full cursor-pointer">
       <Link href={`${blog.path}`}>
-        <a className="grid gap-8 lg:grid-cols-2 lg:gap-16 focus-brand focus-rounded-sm focus:ring-offset-2">
+        <a className="grid gap-8 lg:grid-cols-2 lg:gap-16 focus-brand focus-rounded-sm focus-visible:ring-offset-2">
           <div className="relative h-96 w-full overflow-auto rounded-lg border">
             <Image
               src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}

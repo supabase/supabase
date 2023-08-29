@@ -10,28 +10,28 @@
 
 @layer components {
   .focus-base {
-    @apply focus:outline-none focus:ring-2 focus:ring-scale-900 ring-0 transition-all focus:ring-offset-transparent;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-scale-900 ring-0 transition-all focus-visible:ring-offset-transparent;
   }
   .focus-brand {
-    @apply focus-base focus:!ring-brand-600;
+    @apply focus-base focus-visible:!ring-brand-600;
   }
   .focus-rounded-sm {
-    @apply rounded-sm focus:rounded-sm;
+    @apply rounded-sm focus-visible:rounded-sm;
   }
   .focus-rounded-md {
-    @apply rounded focus:rounded;
+    @apply rounded focus-visible:rounded;
   }
   .focus-rounded-lg {
-    @apply rounded-lg focus:rounded-lg;
+    @apply rounded-lg focus-visible:rounded-lg;
   }
   .focus-rounded-xl {
-    @apply rounded-xl focus:rounded-xl;
+    @apply rounded-xl focus-visible:rounded-xl;
   }
   .focus-rounded-2xl {
-    @apply rounded-2xl focus:rounded-2xl;
+    @apply rounded-2xl focus-visible:rounded-2xl;
   }
   .focus-rounded-full {
-    @apply rounded-full focus:rounded-full;
+    @apply rounded-full focus-visible:rounded-full;
   }
 }
 
