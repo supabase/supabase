@@ -108,7 +108,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         payment_method: paymentMethodId,
         V2: true,
       })
-    } finally {
+    } catch (error) {
       setNewOrgLoading(false)
     }
   }
