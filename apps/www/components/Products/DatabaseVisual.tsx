@@ -9,24 +9,27 @@ const DatabaseVisual = () => {
   const handleGlow = (event: any) => {
     if (!ref.current || !containerRef.current) return null
 
-    const svgElement = ref.current as SVGElement
     const containerRefElement = containerRef.current as HTMLDivElement
 
-    const { x: svgX, y: svgY } = svgElement.getBoundingClientRect()
     const {
       x: contX,
       y: contY,
       width: containerWidth,
       height: containerHeight,
     } = containerRefElement.getBoundingClientRect()
-    const x = event.clientX - svgX
-    const y = event.clientY - svgY
     const xCont = event.clientX - contX
     const yCont = event.clientY - contY
 
-    setIsActive(
+    const isContainerHovered =
       xCont > -3 && xCont < containerWidth + 3 && yCont > -3 && yCont < containerHeight + 3
-    )
+    setIsActive(isContainerHovered)
+
+    if (!isContainerHovered) return
+
+    const svgElement = ref.current as SVGElement
+    const { x: svgX, y: svgY } = svgElement.getBoundingClientRect()
+    const x = event.clientX - svgX
+    const y = event.clientY - svgY
     setGradientPos({ x, y })
   }
 
@@ -40,7 +43,7 @@ const DatabaseVisual = () => {
   }, [])
 
   return (
-    <span
+    <figure
       className="absolute inset-0 z-0"
       ref={containerRef}
       role="img"
@@ -344,7 +347,7 @@ const DatabaseVisual = () => {
           </defs>
         </svg>
       </span>
-    </span>
+    </figure>
   )
 }
 

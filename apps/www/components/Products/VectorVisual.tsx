@@ -1,9 +1,7 @@
-import { useBreakpoint } from 'common'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
 
 const VectorVisual = () => {
-  const isTablet = useBreakpoint(1023)
   const containerRef = useRef(null)
   const ref = useRef(null)
   const [isActive, setIsActive] = useState(false)
@@ -12,24 +10,27 @@ const VectorVisual = () => {
   const handleGlow = (event: any) => {
     if (!ref.current || !containerRef.current) return null
 
-    const svgElement = ref.current as SVGElement
     const containerRefElement = containerRef.current as HTMLDivElement
 
-    const { x: elX, y: elY, width, height } = svgElement.getBoundingClientRect()
     const {
       x: contX,
       y: contY,
       width: containerWidth,
       height: containerHeight,
     } = containerRefElement.getBoundingClientRect()
-    const x = event.clientX - elX
-    const y = event.clientY - elY
     const xCont = event.clientX - contX
     const yCont = event.clientY - contY
 
-    setIsActive(
+    const isContainerHovered =
       xCont > -3 && xCont < containerWidth + 3 && yCont > -3 && yCont < containerHeight + 3
-    )
+    setIsActive(isContainerHovered)
+
+    if (!isContainerHovered) return
+
+    const svgElement = ref.current as SVGElement
+    const { x: svgX, y: svgY } = svgElement.getBoundingClientRect()
+    const x = event.clientX - svgX
+    const y = event.clientY - svgY
     setGradientPos({ x, y })
   }
 
@@ -43,7 +44,7 @@ const VectorVisual = () => {
   }, [])
 
   return (
-    <span
+    <figure
       className="absolute inset-0 z-0"
       ref={containerRef}
       role="img"
@@ -62,17 +63,19 @@ const VectorVisual = () => {
             stroke="url(#paint0_radial_484_53266)"
           />
           <defs>
-            <radialGradient
-              id="paint0_radial_484_53266"
-              cx="0"
-              cy="0"
-              r="2"
-              gradientUnits="userSpaceOnUse"
-              gradientTransform={`translate(${gradientPos?.x} ${gradientPos.y}) rotate(56.4303) scale(132.019)`}
-            >
-              <stop stopColor="#3FCF8E" />
-              <stop offset="1" stopColor="#3FCF8E" stopOpacity="0" />
-            </radialGradient>
+            {isActive && (
+              <radialGradient
+                id="paint0_radial_484_53266"
+                cx="0"
+                cy="0"
+                r="2"
+                gradientUnits="userSpaceOnUse"
+                gradientTransform={`translate(${gradientPos?.x} ${gradientPos.y}) rotate(56.4303) scale(132.019)`}
+              >
+                <stop stopColor="#3FCF8E" />
+                <stop offset="1" stopColor="#3FCF8E" stopOpacity="0" />
+              </radialGradient>
+            )}
           </defs>
         </svg>
 
@@ -95,7 +98,7 @@ const VectorVisual = () => {
           quality={100}
         />
       </span>
-    </span>
+    </figure>
   )
 }
 

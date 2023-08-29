@@ -10,7 +10,7 @@ const StorageVisual = () => {
   ]
 
   return (
-    <span
+    <figure
       className="absolute inset-0 overflow-hidden flex nowrap"
       role="img"
       aria-label="Supabase Storage supports images, documents and videos"
@@ -28,7 +28,7 @@ const StorageVisual = () => {
           ))}
         </div>
       ))}
-    </span>
+    </figure>
   )
 }
 

@@ -3,7 +3,7 @@ import React from 'react'
 
 const RealtimeVisual = () => {
   return (
-    <span
+    <figure
       className="absolute inset-0 z-0 overflow-hidden"
       style={{
         background: 'radial-gradient(320px 320px at 30% 100%, #85E0B740, transparent)',
@@ -28,7 +28,7 @@ const RealtimeVisual = () => {
         objectPosition="50% 50%"
         objectFit="cover"
       />
-    </span>
+    </figure>
   )
 }
 
