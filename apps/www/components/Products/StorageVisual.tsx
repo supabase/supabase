@@ -16,7 +16,7 @@ const StorageVisual = () => {
           {range(0, 10).map((_rangeCol) => (
             <div className="flex flex-col ml-2 gap-2 md:gap-2">
               {cols.map((col: any) => (
-                <div className="w-[60px] h-[60px] md:min-w-14 md:w-14 md:h-14 flex items-center justify-center rounded-lg border bg-alternative hover:border-brand">
+                <div className="w-[60px] h-[60px] md:min-w-14 md:w-14 md:h-14 flex items-center justify-center rounded-lg border bg hover:border-brand">
                   {col}
                 </div>
               ))}
