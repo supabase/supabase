@@ -12,6 +12,7 @@ import {
 } from '@supabase/shared-types/out/notifications'
 import { IconArrowRight, IconExternalLink, Button } from 'ui'
 import Link from 'next/link'
+import { Markdown } from 'components/interfaces/Markdown'
 
 export const formatNotificationText = (project: Project, notification: Notification) => {
   const projectName = project.name
@@ -128,7 +129,7 @@ export const formatNotificationText = (project: Project, notification: Notificat
     const buttons = notification.data.linked_buttons ?? []
     return (
       <>
-        <p className="text-sm">{notification.data.message}</p>{' '}
+        <Markdown content={notification.data.message} className="text" />
         {buttons.map((button, index) => {
           return (
             <a href={button.url} key={index} target="_blank">

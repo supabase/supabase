@@ -289,6 +289,34 @@ async function handleSignInWithGoogle(response) {
 
 Use of nonce is recommended, though optional. Make sure each nonce is generated randomly and available both in the `data-nonce` attribute as well as in the `handleSignInWithGoogle` callback function; otherwise the ID token will not be accepted.
 
+### Important Note on Nonce Validation
+
+Supabase Auth expects the nonce in Google's ID token to be hashed (specifically with SHA-256 and represented as a hexadecimal string).
+
+To succeed with nonce validation, you will need to provide a hashed version of the nonce to Google and the non-hashed version to the `signInWithIdToken` method.
+
+The following code snippet provides an example of how to create both versions in a web application:
+
+```js
+// Adapted from https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest#converting_a_digest_to_a_hex_string
+
+import crypto from 'crypto'
+
+// ...
+
+const nonce = crypto.randomBytes(16).toString('base64') // Generate a random nonce
+const encoder = new TextEncoder()
+const encodedNonce = encoder.encode(nonce) // Encode the nonce
+const hash = await crypto.subtle.digest('SHA-256', encodedNonce) // Hash it with SHA-256
+const bytes = new Uint8Array(hash)
+const hashedNonce = Array.from(bytes)
+  .map((b) => b.toString(16).padStart(2, '0')) // Convert the hash to a hexadecimal string
+  .join('')
+
+// Use 'hashedNonce' when making the authentication request to Google
+// Use 'nonce' when invoking the supabase.auth.signInWithIdToken() method
+```
+
 ### Configuration [#configuration-personalized-sign-in-button]
 
 1. Obtain OAuth credentials for your Google Cloud project in the [Credentials](https://console.developers.google.com/apis/credentials) page of the console. When creating a new credential, choose _Web application_. As you're using the Google sign in button, you should configure the _Authorized JavaScript origins_ and _Authorized redirect URIs_ to the website where the buttons appear. You should not use your Supabase project domain name. For this use case, the client secret provided is not needed and can be ignored.

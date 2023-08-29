@@ -420,7 +420,6 @@ const EXTERNAL_PROVIDER_APPLE = {
                     typeof body === 'object' &&
                     header &&
                     body &&
-                    header.typ === 'JWT' &&
                     header.alg === 'ES256' &&
                     body.aud === 'https://appleid.apple.com'
                   )
@@ -544,7 +543,7 @@ const EXTERNAL_PROVIDER_AZURE = {
     }),
     EXTERNAL_AZURE_SECRET: string().when('EXTERNAL_AZURE_ENABLED', {
       is: true,
-      then: (schema) => schema.required('Secret ID is required'),
+      then: (schema) => schema.required('Secret Value is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_AZURE_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
@@ -884,7 +883,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
     iconKey: 'google-icon',
     requiresRedirect: true,
     helper: `Register this callback URL when using Sign-in with Google on the web using OAuth.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-google#configure-your-services-id)`,
   },
 }
 

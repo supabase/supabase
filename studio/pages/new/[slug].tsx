@@ -94,7 +94,11 @@ const Wizard: NextPageWithLayout = () => {
     enabled: currentOrg?.subscription_id != undefined,
   })
 
-  const { mutate: createProject, isLoading: isCreatingNewProject } = useProjectCreateMutation({
+  const {
+    mutate: createProject,
+    isLoading: isCreatingNewProject,
+    isSuccess: isSuccessNewProject,
+  } = useProjectCreateMutation({
     onSuccess: (res) => {
       router.push(`/project/${res.ref}/building`)
     },
@@ -260,7 +264,7 @@ const Wizard: NextPageWithLayout = () => {
         <div key="panel-footer" className="flex items-center justify-between w-full">
           <Button
             type="default"
-            disabled={isCreatingNewProject}
+            disabled={isCreatingNewProject || isSuccessNewProject}
             onClick={() => router.push('/projects')}
           >
             Cancel
@@ -271,8 +275,8 @@ const Wizard: NextPageWithLayout = () => {
             )}
             <Button
               onClick={onClickNext}
-              loading={isCreatingNewProject}
-              disabled={isCreatingNewProject || !canSubmit}
+              loading={isCreatingNewProject || isSuccessNewProject}
+              disabled={isCreatingNewProject || isSuccessNewProject || !canSubmit}
             >
               Create new project
             </Button>
