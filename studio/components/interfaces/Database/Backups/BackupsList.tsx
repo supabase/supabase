@@ -1,35 +1,33 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
+import { IconAlertCircle, IconClock } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import InformationBox from 'components/ui/InformationBox'
-import Loading from 'components/ui/Loading'
 import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
-import { useCheckPermissions, useStore } from 'hooks'
-import { IconAlertCircle, IconClock } from 'ui'
+import { useBackupsQuery } from 'data/database/backups-query'
+import { useCheckPermissions } from 'hooks'
 import BackupItem from './BackupItem'
 import BackupsEmpty from './BackupsEmpty'
-import BackupsError from './BackupsError'
 
 const BackupsList = () => {
   const { project: selectedProject } = useProjectContext()
-  const { backups } = useStore()
   const projectRef = selectedProject?.ref || 'default'
+
+  const { data: backups } = useBackupsQuery({ projectRef })
+
   const canTriggerScheduledBackups = useCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
   )
 
-  const isPitrEnabled = backups?.configuration?.walg_enabled
+  const planKey = backups?.tierKey ?? ''
+  const sortedBackups = (backups?.backups ?? []).sort(
+    (a: any, b: any) => new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
+  )
 
-  if (backups.isLoading) return <Loading />
-  if (backups.error) return <BackupsError />
-
-  const { tierKey } = backups.configuration
-  const sortedBackups = backups.list()
-
-  if (tierKey === 'FREE') {
+  if (planKey === 'FREE') {
     return (
       <UpgradeToPro
         icon={<IconClock size="large" />}
@@ -41,13 +39,9 @@ const BackupsList = () => {
     )
   }
 
-  if (isPitrEnabled) {
-    return null
-  }
-
   return (
     <div className="space-y-6">
-      {!sortedBackups?.length && tierKey !== 'FREE' ? (
+      {sortedBackups.length === 0 && planKey !== 'FREE' ? (
         <BackupsEmpty />
       ) : (
         <>
