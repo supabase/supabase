@@ -192,6 +192,21 @@ export const meta = {
 
 </StepHikeCompact>
 
+## Going to production
+
+### Android
+
+In production, your Android app needs explicit permission to use the internet connection on the user's device which is required to communicate with Supabase APIs.
+To do this, add the following line to the `android/app/src/main/AndroidManifest.xml` file.
+
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- Required to fetch data from the internet. -->
+  <uses-permission android:name="android.permission.INTERNET" />
+  <!-- ... -->
+</manifest>
+```
+
 export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
 
 export default Page
