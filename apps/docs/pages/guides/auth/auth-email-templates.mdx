@@ -25,6 +25,7 @@ The templating system provides the following variables for use:
 | `{{ .TokenHash }}`       | Contains a hashed version of the `{{ .Token }}`. This is useful for constructing your own email link in the email template.                                                                                       |
 | `{{ .SiteURL }}`         | Contains your application's Site URL. This can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration).                                                                                                           |
 | `{{ .RedirectTo }}`      | Contains the redirect URL passed when `signUp`, `signInWithOtp`, `signInWithOAuth`, `resetPasswordForEmail` or `inviteUserByEmail` is called. The redirect URL allow list can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration).                                                                                                           |
+| `{{ .Data }}`            | Contains Metadata linked to a user. This can be used to provide customize the email message on a per user basis.
 
 ## Limitations
 
@@ -72,6 +73,39 @@ const { data: { session }, error } = await supabase.auth.verifyOtp({ token_hash,
 // ...
 
 ```
+
+## Customization
+
+Supabase Auth makes use of [Go Templates](https://pkg.go.dev/text/template). This means it is possible to conditionally render information based on template properties.You may wish to checkout this [guide by Hugo](https://gohugo.io/templates/introduction/) for a guide on the templating language.
+
+Let's demonstrate some ways of using the templating system below:
+
+### Different Email Based on Signup Domain
+
+Send users different emails based on the domain that they signed up for your service with.
+
+```
+{{ if eq .Data.Domain "http://www.example.com" }}
+<insert content for Pro Tier users>
+{{ else if eq .Data.Domain "http://www.specialsite.com" }}
+<insert content for Free Tier users>
+{{end }}
+```
+
+
+### Custom Email Content For Secure Email Change Flow
+
+Send two distinct emails: one customized for the new email account and another for the email the user is currently using.
+```
+{{ if eq .Email .SendingTo }}
+<insert content which will be received by current email>
+{{ else }}
+<insert content which will be received by new email>
+{{end}}
+
+```
+
+
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
