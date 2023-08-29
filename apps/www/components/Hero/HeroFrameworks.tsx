@@ -66,27 +66,29 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
     <div className={['flex text-center flex-col items-center', className].join(' ')}>
       <small className="small !text-scale-1100">Works seamlessly with 20+ frameworks</small>
       <div className="w-full sm:max-w-lg mt-4 md:mt-3 lg:ml-0">
-        <div className="flex flex-wrap items-center justify-center gap-1 xs:gap-2 sm:flex-nowrap">
+        <ul className="flex flex-wrap items-center justify-center gap-1 xs:gap-2 sm:flex-nowrap">
           {frameworks.map((framework) => (
-            <Link href={framework.docs} key={framework.name}>
-              <a
-                key={framework.name}
-                className="m-0"
-                data-tip={framework.name}
-                aria-label={framework.name}
-                onClick={() => sendTelemetryEvent(framework.gaEvent)}
-              >
-                <svg
-                  width={isXs ? 35 : 45}
-                  height={isXs ? 35 : 45}
-                  viewBox="0 0 61 61"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+            <li key={framework.name}>
+              <Link href={framework.docs}>
+                <a
+                  key={framework.name}
+                  className="block focus:outline-none focus:border-none focus:ring-brand-600 focus:ring-2 focus:rounded-lg"
+                  data-tip={framework.name}
+                  aria-label={framework.name}
+                  onClick={() => sendTelemetryEvent(framework.gaEvent)}
                 >
-                  <path d={framework.icon} fill="#7E7E7E" />
-                </svg>
-              </a>
-            </Link>
+                  <svg
+                    width={isXs ? 35 : 45}
+                    height={isXs ? 35 : 45}
+                    viewBox="0 0 61 61"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d={framework.icon} fill="#7E7E7E" />
+                  </svg>
+                </a>
+              </Link>
+            </li>
           ))}
           <ReactTooltip
             effect={'solid'}
@@ -95,7 +97,7 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
             textColor="white"
             className="!py-2 !px-4"
           />
-        </div>
+        </ul>
       </div>
     </div>
   )
