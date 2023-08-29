@@ -15,7 +15,7 @@ const SignInMfaPage: NextPageWithLayout = () => {
 SignInMfaPage.getLayout = (page) => (
   <SignInLayout
     heading="Two-factor authentication"
-    subheading="Enter the authentication code from your  two-factor authentication (TOTP) app"
+    subheading="Enter the authentication code from your two-factor authentication (TOTP) app"
     logoLinkToMarketingSite={true}
   >
     {page}

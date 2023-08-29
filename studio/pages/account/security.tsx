@@ -16,6 +16,7 @@ import {
   Alert_Shadcn_,
   Badge,
   Button,
+  IconAlertCircle,
   IconAlertTriangle,
   IconSmartphone,
   IconTrash,
@@ -103,15 +104,26 @@ const ProfileCard = () => {
         )}
         {isSuccess && (
           <>
+            {data.totp.length === 1 && (
+              <Alert_Shadcn_ variant="default" className="mt-2">
+                <IconAlertCircle className="h-4 w-4" />
+                <AlertTitle_Shadcn_>
+                  We recommend configuring two authenticator apps across different devices
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                  The two authenticator apps will serve as a backup for each other.
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            )}
             <div className="py-2">
               {data.totp.map((factor) => {
                 return (
                   <div key={factor.id} className="flex flex-row justify-between py-2">
                     <div className="flex flex-col">
-                      <span className="text-sm text-white">Factor ID: {factor.id}</span>
-                      <span className="text-sm text-scale-900">
+                      <span className="text-sm text-white">
                         Name: {factor.friendly_name ?? 'No name provided'}
                       </span>
+                      <span className="text-sm text-scale-900">Factor ID: {factor.id}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-scale-900">
