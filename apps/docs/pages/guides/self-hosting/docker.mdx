@@ -112,7 +112,12 @@ You will need to [restart](#restarting-all-services) the services for the change
 
 ### Dashboard Authentication
 
-The dashboard is protected with Basic Authentication. The default user and password MUST be updated before using Supabase in production. You can update the `./docker/volumes/api/kong.yml` file with your own credentials. For example:
+The dashboard is protected with Basic Authentication. The default user and password MUST be updated before using Supabase in production.
+Update the following values in the `.env` file:
+ - `DASHBOARD_USERNAME`: The default username for the Dashboard 
+ - `DASHBOARD_PASSWORD`: The default password for the Dashboard 
+
+You can also add more credentials in `./docker/volumes/api/kong.yml`. For example:
 
 ```yaml docker/volumes/api/kong.yml
 basicauth_credentials:
