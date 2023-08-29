@@ -2,11 +2,10 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
-import { useAuth, useParams } from 'common'
+import { useIsLoggedIn, useParams } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useFlag, useStore } from 'hooks'
-import useLatest from 'hooks/misc/useLatest'
+import { useFlag, useStore, useLatest } from 'hooks'
 import { DEFAULT_HOME, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 // Ideally these could all be within a _middleware when we use Next 12
@@ -16,8 +15,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { ref, slug } = useParams()
   const navLayoutV2 = useFlag('navigationLayoutV2')
 
-  const { session } = useAuth()
-  const isLoggedIn = Boolean(session)
+  const isLoggedIn = useIsLoggedIn()
 
   /**
    * Array of urls/routes that should be ignored
