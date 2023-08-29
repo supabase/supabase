@@ -82,7 +82,8 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
           ui.setNotification({ category: 'success', message: `Successfully deleted ${user.email}` })
           PageState.users = PageState.users.filter((x: any) => x.id != user.id)
           PageState.totalUsers -= 1
-        } finally {
+        } catch(err) {
+          return;
         }
       },
     })
