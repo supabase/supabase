@@ -279,9 +279,9 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
           if (isReady) {
             const updatedValues = {
               projectRef: ref,
-              subject,
+              subject: subject ?? '',
               category: selectedCategoryFromUrl?.value,
-              message,
+              message: message ?? '',
             }
             resetForm({ values: updatedValues, initialValues: updatedValues })
           }
