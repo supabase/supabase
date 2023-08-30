@@ -42,17 +42,19 @@ export const RESOURCE_WARNING_MESSAGES = {
       warning: {
         title:
           'Your project is about to exhaust its disk space budget, and your instance may become unresponsive once fully exhausted',
-        description: 'Some CTA description here',
+        description:
+          'You can opt to increase your disk size up to 200GB if required on the database settings page.',
       },
       critical: {
         title:
           'Your project has exhausted its disk space budget, and your instance may become unresponsive',
-        description: 'Some CTA description here',
+        description:
+          'You can opt to increase your disk size up to 200GB if required on the database settings page.',
       },
     },
-    docsUrl: undefined,
+    docsUrl: 'https://supabase.com/docs/guides/platform/database-size#disk-management',
     buttonText: undefined,
-    metric: undefined,
+    metric: 'disk_space',
   },
   cpu_exhaustion: {
     content: {
