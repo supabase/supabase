@@ -214,8 +214,12 @@ export interface paths {
   "/platform/organizations/{slug}/billing/subscription": {
     /** Gets the current subscription */
     get: operations["SubscriptionController_getSubscription"];
-    /** Updates subscription */
+    /** Previews subscription change */
     put: operations["SubscriptionController_updateSubscription"];
+  };
+  "/platform/organizations/{slug}/billing/subscription/preview": {
+    /** Updates subscription */
+    post: operations["SubscriptionController_previewSubscriptionChange"];
   };
   "/platform/organizations/{slug}/billing/plans": {
     /** Gets subscription plans */
@@ -1643,12 +1647,16 @@ export interface components {
       redirectTo?: string;
     };
     ProjectResourceWarningsResponse: {
+      /** @enum {string|null} */
+      disk_io_exhaustion: "critical" | "warning" | null;
+      /** @enum {string|null} */
+      disk_space_exhaustion: "critical" | "warning" | null;
+      /** @enum {string|null} */
+      cpu_exhaustion: "critical" | "warning" | null;
+      /** @enum {string|null} */
+      memory_and_swap_exhaustion: "critical" | "warning" | null;
       project: string;
       is_readonly_mode_enabled: boolean;
-      is_disk_io_budget_below_threshold: boolean;
-      is_disk_space_usage_beyond_threshold: boolean;
-      is_cpu_load_beyond_threshold: boolean;
-      is_memory_and_swap_usage_beyond_threshold: boolean;
     };
     GetGoTrueConfigResponse: {
       SITE_URL: string;
@@ -1818,6 +1826,8 @@ export interface components {
       SMS_PROVIDER?: string;
       SMS_MESSAGEBIRD_ACCESS_KEY?: string;
       SMS_MESSAGEBIRD_ORIGINATOR?: string;
+      SMS_TEST_OTP?: string;
+      SMS_TEST_OTP_VALID_UNTIL?: string;
       SMS_TEXTLOCAL_API_KEY?: string;
       SMS_TEXTLOCAL_SENDER?: string;
       SMS_TWILIO_ACCOUNT_SID?: string;
@@ -5458,6 +5468,26 @@ export interface operations {
     };
     responses: {
       200: never;
+      403: never;
+      /** @description Failed to update subscription */
+      500: never;
+    };
+  };
+  /** Updates subscription */
+  SubscriptionController_previewSubscriptionChange: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateSubscriptionBody"];
+      };
+    };
+    responses: {
+      201: never;
       403: never;
       /** @description Failed to update subscription */
       500: never;

@@ -44,15 +44,6 @@ const ProjectCard = ({
   const isPaused = project.status === PROJECT_STATUS.INACTIVE
   const isRestoring = project.status === PROJECT_STATUS.RESTORING
 
-  const checkProjectResourceWarnings = (resourceWarnings: ResourceWarning) => {
-    return Object.values(resourceWarnings).some(
-      (value) => typeof value === 'boolean' && value === true
-    )
-  }
-
-  const projectHasResourceWarnings =
-    resourceWarnings !== undefined ? checkProjectResourceWarnings(resourceWarnings) : false
-
   return (
     <li className="col-span-1 list-none">
       <CardButton
@@ -127,7 +118,7 @@ const ProjectCard = ({
           </div>
         }
       >
-        {resourceWarnings && projectHasResourceWarnings ? (
+        {resourceWarnings ? (
           <ProjectCardWarnings resourceWarnings={resourceWarnings} />
         ) : (
           <div className="py-2" />
