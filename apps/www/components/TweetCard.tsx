@@ -31,9 +31,7 @@ function TweetCard(props: TweetCard) {
           ) : (
             <div className="w-6" />
           )}
-          <p className='text-scale-1200 text-sm font-medium'>
-            {props.handle}
-          </p>
+          <p className="text-scale-1200 text-sm font-medium">{props.handle}</p>
           <div
             className="absolute -left-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full"
             style={{ background: '#00acee' }}
