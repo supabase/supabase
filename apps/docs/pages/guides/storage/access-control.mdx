@@ -60,7 +60,7 @@ on storage.objects
 for select
 to public
 using (
-  storage.filename(name)) = 'favicon.ico'
+  storage.filename(name) = 'favicon.ico'
 );
 ```
 
@@ -78,7 +78,7 @@ on storage.objects
 for insert
 to authenticated
 with check (
-  storage.foldername(name))[1] = 'private'
+  storage.foldername(name)[1] = 'private'
 );
 ```
 
