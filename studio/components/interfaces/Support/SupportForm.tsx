@@ -282,6 +282,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
               subject: subject ?? initialValues.subject,
               category: selectedCategoryFromUrl?.value ?? initialValues.category,
               message: message ?? initialValues.message,
+              severity: initialValues.severity,
             }
             resetForm({ values: updatedValues, initialValues: updatedValues })
           }
