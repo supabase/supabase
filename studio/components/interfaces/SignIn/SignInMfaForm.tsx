@@ -21,16 +21,17 @@ const SignInMfaForm = () => {
   const { mutateAsync: mfaChallengeAndVerify, isLoading } = useMfaChallengeAndVerifyMutation()
   const [selectedFactor, setSelectedFactor] = useState<Factor | null>(null)
 
-  // if the user wanders into this page and he has no MFA setup, send the user to the next screen
-  if (factorsSuccess && factors.totp.length === 0) {
-    queryClient.resetQueries().then(() => pushNext())
-  }
-
   useEffect(() => {
     if (factorsSuccess) {
-      setSelectedFactor(factors.totp[0])
+      // if the user wanders into this page and he has no MFA setup, send the user to the next screen
+      if (factors.totp.length === 0) {
+        queryClient.resetQueries().then(() => pushNext())
+      }
+      if (factors.totp.length > 0) {
+        setSelectedFactor(factors.totp[0])
+      }
     }
-  }, [factors?.totp, factorsSuccess])
+  }, [factors?.totp, factorsSuccess, pushNext, queryClient])
 
   const onSignIn = async ({ code }: { code: string }) => {
     const toastId = ui.setNotification({
@@ -78,6 +79,7 @@ const SignInMfaForm = () => {
             id="code"
             name="code"
             type="text"
+            autoFocus
             icon={<IconLock />}
             placeholder="XXXXXX"
             disabled={isLoading}

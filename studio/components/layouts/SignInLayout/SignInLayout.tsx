@@ -3,7 +3,7 @@ import { useTheme } from 'common'
 import { useFlag } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
 import { BASE_PATH } from 'lib/constants'
-import { auth } from 'lib/gotrue'
+import { auth, getAccessToken } from 'lib/gotrue'
 import { observer } from 'mobx-react-lite'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -43,14 +43,17 @@ const SignInLayout = ({
       return
     }
 
-    auth.initialize().then(({ error }) => {
-      if (error) {
-        // if there was a problem signing in via the url, don't redirect
-        return
-      }
+    auth
+      .initialize()
+      .then(async ({ error }) => {
+        if (error) {
+          // if there was a problem signing in via the url, don't redirect
+          return
+        }
 
-      auth.getSession().then(async ({ data: { session } }) => {
-        try {
+        const token = await getAccessToken()
+
+        if (token) {
           const { data, error } = await auth.mfa.getAuthenticatorAssuranceLevel()
           if (error) {
             // if there was a problem signing in via the url, don't redirect
@@ -58,20 +61,22 @@ const SignInLayout = ({
           }
 
           if (data) {
+            // we're already where we need to be
+            if (router.pathname === '/sign-in-mfa') {
+              return
+            }
             if (data.currentLevel !== data.nextLevel) {
               router.replace('/sign-in-mfa')
               return
             }
           }
 
-          if (session) {
-            await queryClient.resetQueries()
-            await pushNext()
-          }
-        } catch {}
+          await queryClient.resetQueries()
+          await pushNext()
+        }
       })
-    })
-  }, [])
+      .catch(() => {}) // catch all errors thrown by auth methods
+  }, [pushNext, queryClient, router])
 
   const [quote, setQuote] = useState<{
     text: string
