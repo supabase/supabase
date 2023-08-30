@@ -20,11 +20,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
-  const includedSchema = 'public,graphql_public,storage'
-  const excludedSchema =
-    'auth,cron,extensions,graphql,net,pgsodium,pgsodium_masks,realtime,supabase_functions,supabase_migrations,vault,_analytics,_realtime'
+  const includedSchema = ['public', 'graphql_public', 'storage'].join(',')
+
+  const excludedSchema = [
+    'auth',
+    'cron',
+    'extensions',
+    'graphql',
+    'net',
+    'pgsodium',
+    'pgsodium_masks',
+    'realtime',
+    'supabase_functions',
+    'supabase_migrations',
+    'vault',
+    '_analytics',
+    '_realtime',
+  ].join(',')
 
   const headers = constructHeaders(req.headers)
+
   const response = await get(
     `${PG_META_URL}/generators/typescript?included_schema=${includedSchema}&excluded_schemas=${excludedSchema}`,
     { headers }
