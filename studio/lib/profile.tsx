@@ -1,8 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { useIsLoggedIn, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 
-import { useTelemetryProps } from 'common'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
@@ -29,10 +29,12 @@ export const ProfileContext = createContext<ProfileContextType>({
 })
 
 export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
-  const queryClient = useQueryClient()
   const { ui } = useStore()
   const router = useRouter()
+  const queryClient = useQueryClient()
   const telemetryProps = useTelemetryProps()
+
+  const isLoggedIn = useIsLoggedIn()
 
   const { mutate: createProfile, isLoading: isCreatingProfile } = useProfileCreateMutation({
     async onSuccess() {
@@ -60,6 +62,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
     isError,
     isSuccess,
   } = useProfileQuery({
+    enabled: isLoggedIn,
     onSuccess(profile) {
       Telemetry.sendIdentify(profile, telemetryProps)
     },
@@ -71,7 +74,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
     },
   })
 
-  const { isInitialLoading: isLoadingPermissions } = usePermissionsQuery()
+  const { isInitialLoading: isLoadingPermissions } = usePermissionsQuery({ enabled: isLoggedIn })
 
   const value = useMemo(() => {
     const isLoading = isLoadingProfile || isCreatingProfile || isLoadingPermissions

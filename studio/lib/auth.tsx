@@ -16,7 +16,6 @@ import { clearLocalStorage, resetSignInClicks } from './local-storage'
 export const AuthContext = AuthContextInternal
 
 export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
-  const queryClient = useQueryClient()
   const { ui } = useStore()
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
