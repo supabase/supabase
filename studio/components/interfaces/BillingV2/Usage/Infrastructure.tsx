@@ -186,16 +186,14 @@ const Infrastructure = ({
                 <CPUWarnings
                   isFreePlan={isFreePlan}
                   upgradeUrl={upgradeUrl}
-                  isBeyondThreshold={projectResourceWarnings?.is_cpu_load_beyond_threshold ?? false}
+                  severity={projectResourceWarnings?.cpu_exhaustion}
                 />
               )}
               {attribute.key === 'ram_usage' && (
                 <RAMWarnings
                   isFreePlan={isFreePlan}
                   upgradeUrl={upgradeUrl}
-                  isBeyondThreshold={
-                    projectResourceWarnings?.is_memory_and_swap_usage_beyond_threshold ?? false
-                  }
+                  severity={projectResourceWarnings?.memory_and_swap_exhaustion}
                 />
               )}
 
