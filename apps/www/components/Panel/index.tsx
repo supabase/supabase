@@ -1,22 +1,23 @@
 import React, { PropsWithChildren, useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
 
 interface Props {
   outerClassName?: string
   innerClassName?: string
+  hasActiveOnHover?: boolean
   activeColor?: 'default' | 'brand'
   hasShimmer?: boolean
-  hasActiveOnHover?: boolean
   hasInnerShimmer?: boolean
   shimmerFromColor?: string
   shimmerToColor?: string
 }
 
-const InteractiveShimmerCard = ({
+const Panel = ({
   outerClassName,
   innerClassName,
+  hasActiveOnHover = false,
   activeColor = 'default',
   hasShimmer = false,
-  hasActiveOnHover = false,
   hasInnerShimmer = false,
   shimmerFromColor,
   shimmerToColor,
@@ -66,29 +67,30 @@ const InteractiveShimmerCard = ({
   }, [])
 
   return (
-    <div
+    <motion.div
       ref={outerRef}
       className={[
-        'relative rounded-xl bg-scale-400 from-scale-800 to-scale-800 p-px transition-all shadow-md',
-        !trackCursor && hasActiveOnHover
-          ? activeColor === 'brand'
-            ? 'hover:bg-none hover:!bg-brand'
-            : 'hover:bg-none hover:!bg-scale-900'
-          : '',
+        'relative z-0 rounded-xl bg-gradient-to-b from-background-surface-300 to-scale-400 p-px shadow-md',
+        !trackCursor && hasActiveOnHover ? 'hover:bg-none hover:!bg-scale-700' : '',
         outerClassName,
       ].join(' ')}
+      whileHover="hover"
+      animate="initial"
     >
       <div
         className={[
-          'relative h-full rounded-xl bg-scale-200 dark:bg-scale-300 overflow-hidden transition-all text-scale-1100',
+          'relative z-10 h-full rounded-xl bg overflow-hidden transition-all text-scale-1100',
           innerClassName,
         ].join(' ')}
       >
-        <div className="relative z-10 w-full h-full">{children}</div>
-        <div ref={innerRef} className="absolute z-0 inset-0 w-full h-full" />
+        <div
+          ref={innerRef}
+          className="absolute z-10 inset-0 w-full h-full pointer-events-none opacity-20"
+        />
+        <div className="relative z-0 w-full h-full">{children}</div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
-export default InteractiveShimmerCard
+export default Panel
