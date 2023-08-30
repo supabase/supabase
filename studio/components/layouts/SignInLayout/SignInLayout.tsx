@@ -3,7 +3,7 @@ import { useTheme } from 'common'
 import { useFlag } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
 import { BASE_PATH } from 'lib/constants'
-import { auth, getAccessToken } from 'lib/gotrue'
+import { auth, buildPathWithParams, getAccessToken } from 'lib/gotrue'
 import { observer } from 'mobx-react-lite'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -32,17 +32,8 @@ const SignInLayout = ({
   const { isDarkMode } = useTheme()
   const ongoingIncident = useFlag('ongoingIncident')
 
+  // This useEffect redirects the user to MFA if they're already halfway signed in
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search)
-    const hasReturnTo = searchParams.has('returnTo')
-    const hasNext = searchParams.has('next')
-    const shouldRedirect = !hasReturnTo && !hasNext
-
-    if (!shouldRedirect) {
-      // If there's a returnTo or next, then this redirect will be handled by useAutoAuthRedirect() in _app.tsx
-      return
-    }
-
     auth
       .initialize()
       .then(async ({ error }) => {
@@ -66,7 +57,8 @@ const SignInLayout = ({
               return
             }
             if (data.currentLevel !== data.nextLevel) {
-              router.replace('/sign-in-mfa')
+              const redirectTo = buildPathWithParams('/sign-in-mfa')
+              router.replace(redirectTo)
               return
             }
           }
@@ -76,7 +68,7 @@ const SignInLayout = ({
         }
       })
       .catch(() => {}) // catch all errors thrown by auth methods
-  }, [pushNext, queryClient, router])
+  }, [])
 
   const [quote, setQuote] = useState<{
     text: string

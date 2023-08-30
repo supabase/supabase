@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { getMfaAuthenticatorAssuranceLevel } from 'data/profile/mfa-authenticator-assurance-level-query'
 import { useStore } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
-import { auth } from 'lib/gotrue'
+import { auth, buildPathWithParams } from 'lib/gotrue'
 import { incrementSignInClicks } from 'lib/local-storage'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -60,7 +60,8 @@ const SignInForm = () => {
               category: 'success',
               message: `You need to provide your second factor authentication.`,
             })
-            router.replace('/sign-in-mfa')
+            const url = buildPathWithParams('/sign-in-mfa')
+            router.replace(url)
             return
           }
         }
