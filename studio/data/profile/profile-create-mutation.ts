@@ -1,6 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
+import { organizationKeys } from 'data/organizations/keys'
+import { permissionKeys } from 'data/permissions/keys'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { ResponseError } from 'types'
@@ -29,7 +31,11 @@ export const useProfileCreateMutation = ({
 
   return useMutation<ProfileCreateData, ResponseError, void>(() => createProfile(), {
     async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries(profileKeys.profile())
+      await Promise.all([
+        queryClient.invalidateQueries(profileKeys.profile()),
+        queryClient.invalidateQueries(organizationKeys.list()),
+        queryClient.invalidateQueries(permissionKeys.list()),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
