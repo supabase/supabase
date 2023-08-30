@@ -1,0 +1,27 @@
+# We are using Playwright but you may use your E2E framework of choice
+name: Smoke Tests
+
+on:
+  deployment_status:
+  workflow_dispatch:
+
+jobs:
+  trigger_tests:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success' && github.event.deployment_status.environment == 'Production – studio'
+    name: Run tests from supabase/tests repo
+    runs-on: ubuntu-20.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Emit repository_dispatch to tests repo
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          # You should provide either:
+          # * Personal access tokens with repo scope. For more information, see
+          #     "https://docs.github.com/articles/creating-a-personal-access-token-for-the-command-line".
+          # * GitHub Apps with both metadata:read and contents:read&write permissions.
+          token: ${{ secrets.CI_TESTS_PAT }}
+          repository: supabase/tests
+          event-type: 'run-frontend-tests-prod'
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+          # result will be posted to #test-alerts channel if tests fail
