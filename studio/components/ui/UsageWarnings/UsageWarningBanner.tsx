@@ -86,6 +86,8 @@ const UsageWarningBanner = () => {
       ? undefined
       : metric === null
       ? '/project/[ref]/settings/[infra-path]'
+      : metric === 'disk_space'
+      ? '/project/[ref]/settings/database'
       : `/project/[ref]/settings/[infra-path]#${metric}`
   )
     ?.replace('[ref]', ref ?? 'default')
