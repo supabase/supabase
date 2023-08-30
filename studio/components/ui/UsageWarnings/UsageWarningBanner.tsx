@@ -100,8 +100,8 @@ const UsageWarningBanner = () => {
   // Don't show banner if no warnings, or on usage/infra page
   if (
     activeWarnings.length === 0 ||
-    router.pathname.endsWith('/usage') ||
-    router.pathname.endsWith('/infrastructure')
+    ((router.pathname.endsWith('/usage') || router.pathname.endsWith('/infrastructure')) &&
+      !activeWarnings.includes('is_readonly_mode_enabled'))
   )
     return null
 

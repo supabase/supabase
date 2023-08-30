@@ -5,16 +5,11 @@ import { AlertDescription_Shadcn_, Alert_Shadcn_, Button, IconAlertCircle } from
 interface CPUWarningsProps {
   isFreePlan: boolean
   upgradeUrl: string
-  isBeyondThreshold: boolean
+  severity?: 'warning' | 'critical' | null
 }
 
-const CPUWarnings = ({ isFreePlan, upgradeUrl, isBeyondThreshold }: CPUWarningsProps) => {
-  // [Joshen TODO] Need to implement the necessary conditionals for rendering the warnings once
-  // endpoint is updated to return text instead of boolean
-  const isApproaching = isBeyondThreshold
-  const isExceeded = false
-
-  if (isApproaching) {
+const CPUWarnings = ({ isFreePlan, upgradeUrl, severity }: CPUWarningsProps) => {
+  if (severity === 'warning') {
     return (
       <Alert_Shadcn_ variant="warning">
         <IconAlertCircle />
@@ -42,7 +37,7 @@ const CPUWarnings = ({ isFreePlan, upgradeUrl, isBeyondThreshold }: CPUWarningsP
     )
   }
 
-  if (isExceeded) {
+  if (severity === 'critical') {
     return (
       <Alert_Shadcn_ variant="destructive">
         <IconAlertCircle />

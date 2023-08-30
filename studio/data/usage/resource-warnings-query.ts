@@ -8,25 +8,6 @@ import { components } from 'data/api'
 export async function getResourceWarnings(signal?: AbortSignal) {
   const { data, error } = await get(`/platform/projects-resource-warnings`, { signal })
   if (error) throw error
-
-  return [
-    {
-      project: 'iqixcyokaezexqncgirb',
-      is_readonly_mode_enabled: false,
-      disk_io_exhaustion: null,
-      disk_space_exhaustion: null,
-      cpu_exhaustion: null,
-      memory_and_swap_exhaustion: null,
-    },
-    {
-      project: 'yhkgeeesimzjzbigwxwv',
-      is_readonly_mode_enabled: false,
-      disk_io_exhaustion: null,
-      disk_space_exhaustion: null,
-      cpu_exhaustion: 'critical',
-      memory_and_swap_exhaustion: null,
-    },
-  ] as ResourceWarning[]
   return data
 }
 
