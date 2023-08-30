@@ -1,7 +1,8 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useCallback } from 'react'
+
 import { get } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { useCallback } from 'react'
 import { Permission, ResponseError } from 'types'
 import { permissionKeys } from './keys'
 
