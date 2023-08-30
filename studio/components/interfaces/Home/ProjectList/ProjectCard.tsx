@@ -46,6 +46,8 @@ const ProjectCard = ({
     project.status === PROJECT_STATUS.GOING_DOWN || project.status === PROJECT_STATUS.PAUSING
   const isPaused = project.status === PROJECT_STATUS.INACTIVE
   const isRestoring = project.status === PROJECT_STATUS.RESTORING
+  const isComingUp =
+    project.status === PROJECT_STATUS.UNKNOWN || project.status === PROJECT_STATUS.COMING_UP
 
   return (
     <li className="col-span-1 list-none">
@@ -115,6 +117,15 @@ const ProjectCard = ({
                 <div className="flex items-center gap-2">
                   <IconPauseCircle size={14} strokeWidth={2} />
                   <span className="truncate">Paused</span>
+                </div>
+              </Badge>
+            )}
+
+            {isComingUp && (
+              <Badge color="scale">
+                <div className="flex items-center gap-2">
+                  <IconLoader className="animate-spin" size={14} strokeWidth={2} />
+                  <span className="truncate">Coming up</span>
                 </div>
               </Badge>
             )}
