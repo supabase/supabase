@@ -3,7 +3,6 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 
 import { useTelemetryProps } from 'common'
-import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
@@ -41,8 +40,6 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
         telemetryProps,
         router
       )
-
-      await invalidateOrganizationsQuery(queryClient)
     },
     onError() {
       ui.setNotification({
