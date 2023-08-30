@@ -51,6 +51,7 @@ const nextConfig = {
       'https://s3-us-west-2.amazonaws.com',
       'images.unsplash.com',
       'img.youtube.com',
+      'vercel.com',
       'obuldanrptloktxcffvn.supabase.co',
       'pbs.twimg.com',
       'res.cloudinary.com',
