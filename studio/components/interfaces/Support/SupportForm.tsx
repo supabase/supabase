@@ -35,6 +35,7 @@ import { Project } from 'types'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
+import { useRouter } from 'next/router'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -45,6 +46,7 @@ export interface SupportFormProps {
 
 const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   const { ui } = useStore()
+  const { isReady } = useRouter()
   const { ref, subject, category, message } = useParams()
 
   const uploadButtonRef = useRef()
@@ -269,6 +271,21 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
             resetForm({ values: updatedValues, initialValues: updatedValues })
           }
         }, [isSuccessProjects, isSuccessOrganizations])
+
+        // Populate fields when router is ready, required when navigating to
+        // support form on a refresh browser session
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        useEffect(() => {
+          if (isReady) {
+            const updatedValues = {
+              projectRef: ref,
+              subject,
+              category: selectedCategoryFromUrl?.value,
+              message,
+            }
+            resetForm({ values: updatedValues, initialValues: updatedValues })
+          }
+        }, [isReady])
 
         return (
           <div className="space-y-8 w-[620px]">
