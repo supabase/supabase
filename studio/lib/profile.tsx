@@ -1,9 +1,7 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { useIsLoggedIn, useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 
-import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useIsLoggedIn, useTelemetryProps } from 'common'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
@@ -31,7 +29,6 @@ export const ProfileContext = createContext<ProfileContextType>({
 export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   const { ui } = useStore()
   const router = useRouter()
-  const queryClient = useQueryClient()
   const telemetryProps = useTelemetryProps()
 
   const isLoggedIn = useIsLoggedIn()
@@ -43,8 +40,6 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
         telemetryProps,
         router
       )
-
-      await invalidateOrganizationsQuery(queryClient)
     },
     onError() {
       ui.setNotification({
