@@ -296,15 +296,15 @@ const Nav = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <a href="https://github.com/supabase/supabase" target="_blank" tabIndex={-1}>
-                  <Button
-                    className="hidden group lg:flex"
-                    type="text"
-                    icon={
-                      <div className="flex items-center justify-center w-4 h-4 text-brand-300">
-                        <div
-                          className={[
-                            `text-scale-900 flex h-3 w-3 items-center justify-center
+                <Button
+                  asChild
+                  className="hidden group lg:flex"
+                  type="text"
+                  icon={
+                    <div className="flex items-center justify-center w-4 h-4 text-brand-300">
+                      <div
+                        className={[
+                          `text-scale-900 flex h-3 w-3 items-center justify-center
 
                             transition-all
                             group-hover:h-4
@@ -314,37 +314,36 @@ const Nav = () => {
                             group-focus:w-4
 
                             group-focus:text-yellow-900`,
-                            showLaunchWeekNavMode && '!text-white',
-                          ].join(' ')}
-                        >
-                          <IconStar strokeWidth={2} />
-                        </div>
+                          showLaunchWeekNavMode && '!text-white',
+                        ].join(' ')}
+                      >
+                        <IconStar strokeWidth={2} />
                       </div>
-                    }
-                  >
+                    </div>
+                  }
+                >
+                  <a href="https://github.com/supabase/supabase" target="_blank">
                     <span>Star us on GitHub</span>
-                  </Button>
-                </a>
+                  </a>
+                </Button>
 
                 {isLoggedIn ? (
-                  <Link href="/dashboard/projects">
-                    <a tabIndex={-1}>
-                      <Button className="hidden text-white lg:block">Dashboard</Button>
-                    </a>
+                  <Link href="/dashboard/projects" passHref>
+                    <Button className="hidden text-white lg:block" asChild>
+                      <a>Dashboard</a>
+                    </Button>
                   </Link>
                 ) : (
                   <>
-                    <Link href="https://supabase.com/dashboard">
-                      <a tabIndex={-1}>
-                        <Button type="default" className="hidden lg:block">
-                          Sign in
-                        </Button>
-                      </a>
+                    <Link href="https://supabase.com/dashboard" passHref>
+                      <Button type="default" className="hidden lg:block" asChild>
+                        <a>Sign in</a>
+                      </Button>
                     </Link>
-                    <Link href="https://supabase.com/dashboard">
-                      <a tabIndex={-1}>
-                        <Button className="hidden text-white lg:block">Start your project</Button>
-                      </a>
+                    <Link href="https://supabase.com/dashboard" passHref>
+                      <Button className="hidden text-white lg:block" asChild>
+                        <a>Start your project</a>
+                      </Button>
                     </Link>
                   </>
                 )}

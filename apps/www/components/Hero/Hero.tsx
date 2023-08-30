@@ -54,24 +54,18 @@ const Hero = () => {
                     as="https://supabase.com/dashboard"
                     passHref
                   >
-                    <a
-                      onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}
-                      tabIndex={-1}
-                    >
-                      <Button size="medium" className="text-white">
+                    <Button size="medium" className="text-white" asChild>
+                      <a onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}>
                         Start your project
-                      </Button>
-                    </a>
+                      </a>
+                    </Button>
                   </Link>
                   <Link href="/docs" as="/docs" passHref>
-                    <a
-                      onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_documentation'])}
-                      tabIndex={-1}
-                    >
-                      <Button size="medium" type="default" icon={<IconBookOpen />}>
+                    <Button size="medium" type="default" icon={<IconBookOpen />} asChild>
+                      <a onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_documentation'])}>
                         Documentation
-                      </Button>
-                    </a>
+                      </a>
+                    </Button>
                   </Link>
                 </div>
 

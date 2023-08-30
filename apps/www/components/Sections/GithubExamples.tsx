@@ -1,7 +1,5 @@
 import { useRef } from 'react'
 
-import { useRouter } from 'next/router'
-
 import { Swiper, SwiperSlide } from 'swiper/react'
 // import Swiper core and required modules
 import SwiperCore, { Navigation, Pagination } from 'swiper'
@@ -16,9 +14,6 @@ import ExampleCard from '../ExampleCard'
 SwiperCore.use([Navigation, Pagination])
 
 function GithubExamples() {
-  // base path for images
-  const { basePath } = useRouter()
-
   const prevRef = useRef(null)
   const nextRef = useRef(null)
 
@@ -32,22 +27,18 @@ function GithubExamples() {
           </p>
           <div className="flex items-center justify-center gap-2 py-4">
             <Link href="/docs/guides/auth/overview" passHref>
-              <a tabIndex={-1}>
-                <Button size="small" type="default" icon={<IconBookOpen size={12} />}>
-                  View guides
-                </Button>
-              </a>
+              <Button size="small" type="default" icon={<IconBookOpen size={12} />} asChild>
+                <a>View guides</a>
+              </Button>
             </Link>
             <Link
               href="https://github.com/supabase/supabase/tree/master/examples"
               as="https://github.com/supabase/supabase/tree/master/examples"
               passHref
             >
-              <a tabIndex={-1}>
-                <Button size="small" type="default" icon={<IconGitHub size={12} />}>
-                  Official GitHub library
-                </Button>
-              </a>
+              <Button size="small" type="default" icon={<IconGitHub size={12} />} asChild>
+                <a>Official GitHub library</a>
+              </Button>
             </Link>
           </div>
         </div>

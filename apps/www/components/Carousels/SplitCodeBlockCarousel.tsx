@@ -124,10 +124,10 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
                 <p className="p mb-6 block">{extension.detail_text}</p>
                 <Space className="justify-between">
                   {extension.url && (
-                    <Link href={extension.url} as={extension.url}>
-                      <a className="ml-px" tabIndex={-1}>
-                        <Button type="default">View documentation</Button>
-                      </a>
+                    <Link href={extension.url} as={extension.url} passHref>
+                      <Button type="default" asChild>
+                        <a className="ml-px">View documentation</a>
+                      </Button>
                     </Link>
                   )}
                   <div>

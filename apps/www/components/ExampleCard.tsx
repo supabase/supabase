@@ -68,21 +68,22 @@ function ExampleCard(props: any) {
               </a>
             )}
             {props.demo_url && (
-              <Link href={props.demo_url} as={props.demo_url}>
-                <a target="_blank" tabIndex={-1}>
-                  <Button size="tiny" type="default" iconRight={<IconArrowUpRight />}>
+              <Link href={props.demo_url} as={props.demo_url} passHref>
+                <Button size="tiny" type="default" iconRight={<IconArrowUpRight />} asChild>
+                  <a
+                    target="_blank"
+                    className="focus-brand focus-rounded-md focus-visible:ring-offset-2"
+                  >
                     Launch Demo
-                  </Button>
-                </a>
+                  </a>
+                </Button>
               </Link>
             )}
             {!props.demo_url && (
-              <Link href={props.repo_url} as={props.repo_url}>
-                <a target="_blank" tabIndex={-1}>
-                  <Button size="tiny" type="default" iconRight={<IconArrowUpRight />}>
-                    View Code
-                  </Button>
-                </a>
+              <Link href={props.repo_url} as={props.repo_url} passHref>
+                <Button size="tiny" type="default" iconRight={<IconArrowUpRight />} asChild>
+                  <a target="_blank">View Code</a>
+                </Button>
               </Link>
             )}
           </div>

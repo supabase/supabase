@@ -43,20 +43,16 @@ const ProductHeader = (props: Types) => (
             })}
         </div>
         <div className="flex flex-row md:flex-row md:items-center">
-          <Link href="https://supabase.com/dashboard" as="https://supabase.com/dashboard">
-            <a tabIndex={-1}>
-              <Button size="medium" className="text-white">
-                Start a project
-              </Button>
-            </a>
+          <Link href="https://supabase.com/dashboard" as="https://supabase.com/dashboard" passHref>
+            <Button size="medium" className="text-white" asChild>
+              <a>Start a project</a>
+            </Button>
           </Link>
           {props.documentation_url && (
-            <Link href={props.documentation_url} as={props.documentation_url}>
-              <a className="ml-2" tabIndex={-1}>
-                <Button type="default" size="medium" icon={<IconBookOpen />}>
-                  See documentation
-                </Button>
-              </a>
+            <Link href={props.documentation_url} as={props.documentation_url} passHref>
+              <Button type="default" size="medium" icon={<IconBookOpen />} asChild>
+                <a className="ml-2">See documentation</a>
+              </Button>
             </Link>
           )}
         </div>

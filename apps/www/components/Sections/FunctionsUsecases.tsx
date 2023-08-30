@@ -73,12 +73,16 @@ function FunctionsUsecases(props: Props) {
             )
           })}
           {props.documentation_link && (
-            <Link href={props.documentation_link} as={props.documentation_link}>
-              <a tabIndex={-1}>
-                <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
-                  Explore documentation
-                </Button>
-              </a>
+            <Link href={props.documentation_link} as={props.documentation_link} passHref>
+              <Button
+                size="small"
+                className="mt-4"
+                type="default"
+                icon={<IconArrowUpRight />}
+                asChild
+              >
+                <a>Explore documentation</a>
+              </Button>
             </Link>
           )}
         </div>

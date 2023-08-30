@@ -122,11 +122,9 @@ export default function IndexPage() {
         </div>
         <p className="p">{description}</p>
         <Link href="https://supabase.com/dashboard" passHref>
-          <a tabIndex={-1}>
-            <Button size="medium" block>
-              Get started
-            </Button>
-          </a>
+          <Button size="medium" block asChild>
+            <a>Get started</a>
+          </Button>
         </Link>
       </div>
     )
@@ -293,11 +291,9 @@ export default function IndexPage() {
                             <p className="text-[13px] whitespace-pre-wrap">{plan.footer}</p>
                           )}
                         </div>
-                        <a href={plan.href} tabIndex={-1}>
-                          <Button block size="small">
-                            {plan.cta}
-                          </Button>
-                        </a>
+                        <Button block size="small" asChild>
+                          <a href={plan.href}>{plan.cta}</a>
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -308,11 +304,9 @@ export default function IndexPage() {
         </div>
 
         <div className="text-center mt-20">
-          <a href="#compare-plans" tabIndex={-1}>
-            <Button size="tiny" type="default">
-              Compare Plans
-            </Button>
-          </a>
+          <Button size="tiny" type="default" asChild>
+            <a href="#compare-plans">Compare Plans</a>
+          </Button>
         </div>
       </div>
 
@@ -355,12 +349,10 @@ export default function IndexPage() {
                     {addon.description}
                   </p>
                   <div className="flex items-center justify-between mt-4 mb-4 lg:mb-8">
-                    <Link href={addon.leftCtaLink} as={addon.leftCtaLink}>
-                      <a tabIndex={-1}>
-                        <Button size="tiny" type="default">
-                          {addon.leftCtaText}
-                        </Button>
-                      </a>
+                    <Link href={addon.leftCtaLink} as={addon.leftCtaLink} passHref>
+                      <Button size="tiny" type="default" asChild>
+                        <a>{addon.leftCtaText}</a>
+                      </Button>
                     </Link>
                     {addon.name === 'Optimized Compute' ? (
                       <button
@@ -382,12 +374,11 @@ export default function IndexPage() {
             <Link
               href="https://github.com/supabase/supabase/discussions/categories/feature-requests"
               as="https://github.com/supabase/supabase/discussions/categories/feature-requests"
+              passHref
             >
-              <a target="_blank" tabIndex={-1}>
-                <Button size="tiny" type="default">
-                  Request a feature
-                </Button>
-              </a>
+              <Button size="tiny" type="default" asChild>
+                <a target="_blank">Request a feature</a>
+              </Button>
             </Link>
           </div>
         </div>
@@ -760,16 +751,15 @@ export default function IndexPage() {
                             )}
 
                             <div className={plan.name === 'Enterprise' ? 'mt-auto' : 'mt-8'}>
-                              <Link href={plan.href} as={plan.href}>
-                                <a tabIndex={-1}>
-                                  <Button
-                                    size="tiny"
-                                    type={plan.name === 'Enterprise' ? 'default' : 'primary'}
-                                    block
-                                  >
-                                    {plan.cta}
-                                  </Button>
-                                </a>
+                              <Link href={plan.href} as={plan.href} passHref>
+                                <Button
+                                  size="tiny"
+                                  type={plan.name === 'Enterprise' ? 'default' : 'primary'}
+                                  block
+                                  asChild
+                                >
+                                  <a>{plan.cta}</a>
+                                </Button>
                               </Link>
                             </div>
                           </div>
@@ -829,12 +819,11 @@ export default function IndexPage() {
                       <Link
                         href="https://supabase.com/dashboard"
                         as="https://supabase.com/dashboard"
+                        passHref
                       >
-                        <a tabIndex={-1}>
-                          <Button size="tiny" type="primary" block>
-                            Get started
-                          </Button>
-                        </a>
+                        <Button size="tiny" type="primary" block asChild>
+                          <a>Get started</a>
+                        </Button>
                       </Link>
                     </td>
 
@@ -842,32 +831,27 @@ export default function IndexPage() {
                       <Link
                         href="https://supabase.com/dashboard"
                         as="https://supabase.com/dashboard"
+                        passHref
                       >
-                        <a tabIndex={-1}>
-                          <Button size="tiny" type="primary" block>
-                            Get started
-                          </Button>
-                        </a>
+                        <Button size="tiny" type="primary" block asChild>
+                          <a>Get started</a>
+                        </Button>
                       </Link>
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://forms.supabase.com/team">
-                        <a tabIndex={-1}>
-                          <Button size="tiny" type="primary" block>
-                            Contact us
-                          </Button>
-                        </a>
+                      <Link href="https://forms.supabase.com/team" passHref>
+                        <Button size="tiny" type="primary" block asChild>
+                          <a>Contact us</a>
+                        </Button>
                       </Link>
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://forms.supabase.com/enterprise">
-                        <a tabIndex={-1}>
-                          <Button size="tiny" type="default" block>
-                            Contact us
-                          </Button>
-                        </a>
+                      <Link href="https://forms.supabase.com/enterprise" passHref>
+                        <Button size="tiny" type="default" block asChild>
+                          <a>Contact us</a>
+                        </Button>
                       </Link>
                     </td>
                   </tr>

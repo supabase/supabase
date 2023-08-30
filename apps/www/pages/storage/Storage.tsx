@@ -251,16 +251,15 @@ function StoragePage() {
                       </p>
 
                       <Link href="/docs/reference/javascript/storage-createbucket" passHref>
-                        <a tabIndex={-1}>
-                          <Button
-                            size="small"
-                            type="default"
-                            className="mt-4"
-                            icon={<IconArrowUpRight />}
-                          >
-                            Explore documentation
-                          </Button>
-                        </a>
+                        <Button
+                          size="small"
+                          type="default"
+                          className="mt-4"
+                          icon={<IconArrowUpRight />}
+                          asChild
+                        >
+                          <a>Explore documentation</a>
+                        </Button>
                       </Link>
                     </div>
                     <div className="col-span-12 lg:col-span-6 lg:col-start-7">

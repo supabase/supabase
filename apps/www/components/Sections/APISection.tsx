@@ -38,12 +38,16 @@ function APISection(props: Props) {
         <h2 className="h3">{props.title}</h2>
         <div className="p">{props.text}</div>
         {props.documentation_link && (
-          <Link href={props.documentation_link} as={props.documentation_link}>
-            <a tabIndex={-1}>
-              <Button size="small" className="mt-4" type="default" icon={<IconArrowUpRight />}>
-                Explore documentation
-              </Button>
-            </a>
+          <Link href={props.documentation_link} as={props.documentation_link} passHref>
+            <Button
+              size="small"
+              className="mt-4"
+              type="default"
+              icon={<IconArrowUpRight />}
+              asChild
+            >
+              <a>Explore documentation</a>
+            </Button>
           </Link>
         )}
         {props.footer && <div className="py-8">{props.footer}</div>}

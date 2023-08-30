@@ -37,18 +37,24 @@ function TwitterSocialProof() {
           </p>
           <div className="my-8 flex justify-center gap-2">
             <Link href={'https://github.com/supabase/supabase/discussions'} passHref>
-              <a target="_blank" tabIndex={-1}>
-                <Button size="small" iconRight={<IconMessageCircle size={14} />} type="default">
-                  GitHub discussions
-                </Button>
-              </a>
+              <Button
+                size="small"
+                iconRight={<IconMessageCircle size={14} />}
+                type="default"
+                asChild
+              >
+                <a target="_blank">GitHub discussions</a>
+              </Button>
             </Link>
             <Link href={'https://discord.supabase.com/'} passHref>
-              <a target="_blank" tabIndex={-1}>
-                <Button type="default" size="small" iconRight={<IconMessageCircle size={14} />}>
-                  Discord
-                </Button>
-              </a>
+              <Button
+                type="default"
+                size="small"
+                iconRight={<IconMessageCircle size={14} />}
+                asChild
+              >
+                <a target="_blank">Discord</a>
+              </Button>
             </Link>
           </div>
         </div>

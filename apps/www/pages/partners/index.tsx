@@ -240,10 +240,10 @@ const Partners = () => {
               Reach out to partner with Supabase
             </h2>
             <div className="w-full mt-4 flex items-center justify-center text-center gap-4">
-              <Link href="https://forms.supabase.com/partner">
-                <a tabIndex={-1}>
-                  <Button size="medium">Become a Partner</Button>
-                </a>
+              <Link href="https://forms.supabase.com/partner" passHref>
+                <Button size="medium" asChild>
+                  <a>Become a Partner</a>
+                </Button>
               </Link>
             </div>
           </div>
