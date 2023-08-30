@@ -116,6 +116,42 @@ Now when you run a local development docs server you will see the new docs site.
 
 ---
 
+## Running Docker
+
+To effectively test your changes, it's essential to run Supabase using Docker. Docker enables you to access and utilize various features of your locally modified Supabase version.
+
+#### Prerequsites
+
+Before you begin, ensure that you have the Docker application installed on your device. If you haven't installed Docker yet, you can download and install it from [here](https://docs.docker.com/get-docker/).
+
+#### Getting Started
+
+1. Navigate to the `docker` directory in your forked repo
+
+   ```sh
+   cd docker
+   ```
+   
+2. Copy the example `env` file
+
+   ```sh
+   cp .env.example .env
+   ```
+
+3. Run docker
+
+   ```sh
+   docker-compose up
+   ```
+
+This command initializes the containers specified in the docker-compose.yml file. It might take a few moments to complete, depending on your system's speed and internet connection.
+
+Once the docker-compose up process completes, you should have your local version of Supabase up and running within Docker containers. You can access and test the features you've modified or added.
+
+Remember to keep the Docker application open as long as you're working with your local Supabase instance. This will ensure that the containers remain active and accessible for testing.
+
+---
+
 ## Create a pull request
 
 After making your changes, open a pull request (PR). Once you submit your pull request, others from the Supabase team/community will review it with you.
