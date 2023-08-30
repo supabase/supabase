@@ -13,6 +13,7 @@ import { Project } from 'types'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { ResourceWarning } from 'data/usage/resource-warnings-query'
 import ProjectCardWarnings from './ProjectCardWarnings'
+import { useFlag } from 'hooks'
 
 export interface ProjectCardProps {
   project: Project
@@ -31,6 +32,8 @@ const ProjectCard = ({
 }: ProjectCardProps) => {
   const { name, ref: projectRef } = project
   const desc = `${project.cloud_provider} | ${project.region}`
+
+  const showResourceExhaustionWarnings = useFlag('resourceExhaustionWarnings')
 
   const isBranchingEnabled = project.preview_branch_refs.length > 0
   const isGithubIntegrated = githubIntegration !== undefined
@@ -118,7 +121,7 @@ const ProjectCard = ({
           </div>
         }
       >
-        {resourceWarnings ? (
+        {showResourceExhaustionWarnings && resourceWarnings ? (
           <ProjectCardWarnings resourceWarnings={resourceWarnings} />
         ) : (
           <div className="py-2" />

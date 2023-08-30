@@ -4,7 +4,7 @@ import { Fragment, PropsWithChildren, ReactNode } from 'react'
 
 import { useParams } from 'common/hooks'
 import Connecting from 'components/ui/Loading'
-import UsageWarningBanner from 'components/ui/UsageWarnings/UsageWarningBanner'
+import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { useFlag, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import AppLayout from '../AppLayout/AppLayout'
@@ -69,6 +69,7 @@ const ProjectLayout = ({
   const organizationName = selectedOrganization?.name
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
+  const showResourceExhaustionWarnings = useFlag('resourceExhaustionWarnings')
 
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
   const ignorePausedState =
@@ -110,7 +111,10 @@ const ProjectLayout = ({
                 </div>
               </div>
             ) : (
-              <ContentWrapper isLoading={isLoading}>{children}</ContentWrapper>
+              <ContentWrapper isLoading={isLoading}>
+                {showResourceExhaustionWarnings && <ResourceExhaustionWarningBanner />}
+                {children}
+              </ContentWrapper>
             )}
           </main>
         </div>
@@ -193,10 +197,7 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
       ) : requiresDbConnection && isProjectBuilding ? (
         <BuildingState />
       ) : (
-        <>
-          <UsageWarningBanner />
-          <Fragment key={selectedProject?.ref}>{children}</Fragment>
-        </>
+        <Fragment key={selectedProject?.ref}>{children}</Fragment>
       )}
     </>
   )
@@ -224,6 +225,7 @@ export const ProjectLayoutNonBlocking = ({
   const showPausedState = isPaused && !ignorePausedState
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
+  const showResourceExhaustionWarnings = useFlag('resourceExhaustionWarnings')
 
   return (
     <AppLayout>
@@ -251,7 +253,10 @@ export const ProjectLayoutNonBlocking = ({
                 </div>
               </div>
             ) : (
-              children
+              <>
+                {showResourceExhaustionWarnings && <ResourceExhaustionWarningBanner />}
+                {children}
+              </>
             )}
           </main>
         </div>
