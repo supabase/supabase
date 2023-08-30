@@ -63,7 +63,10 @@ export function withAuth<T>(WrappedComponent: ComponentType<T> | NextPageWithLay
     useEffect(() => {
       // This should run after setting store data
       if (isRedirecting) {
-        router.push(redirectTo)
+        const searchParams = new URLSearchParams(location.search)
+        searchParams.set('returnTo', location.pathname)
+        const url = `${redirectTo}?${searchParams.toString()}`
+        router.push(url)
       }
     }, [isRedirecting, redirectTo])
 

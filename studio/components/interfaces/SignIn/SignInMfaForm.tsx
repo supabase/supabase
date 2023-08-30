@@ -1,6 +1,7 @@
 import { AuthError } from '@supabase/gotrue-js'
 import { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
+import Loading from 'components/ui/Loading'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { useStore } from 'hooks'
@@ -63,6 +64,10 @@ const SignInMfaForm = () => {
         }
       )
     }
+  }
+
+  if (!selectedFactor) {
+    return <Loading />
   }
 
   return (
