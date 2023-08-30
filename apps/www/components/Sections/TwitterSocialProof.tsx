@@ -37,14 +37,14 @@ function TwitterSocialProof() {
           </p>
           <div className="my-8 flex justify-center gap-2">
             <Link href={'https://github.com/supabase/supabase/discussions'} passHref>
-              <a target="_blank">
+              <a target="_blank" tabIndex={-1}>
                 <Button size="small" iconRight={<IconMessageCircle size={14} />} type="default">
                   GitHub discussions
                 </Button>
               </a>
             </Link>
             <Link href={'https://discord.supabase.com/'} passHref>
-              <a target="_blank">
+              <a target="_blank" tabIndex={-1}>
                 <Button type="default" size="small" iconRight={<IconMessageCircle size={14} />}>
                   Discord
                 </Button>
@@ -93,9 +93,12 @@ function TwitterSocialProof() {
             {Examples.map((tweet: any, i: number) => {
               return (
                 <SwiperSlide key={i}>
-                  <div className="mr-3 ml-3">
+                  <div className="mr-3 ml-3 mt-1">
                     <Link href={tweet.url}>
-                      <a target="_blank" className="cursor-pointer">
+                      <a
+                        target="_blank"
+                        className="block cursor-pointer focus:outline-none focus:border-none focus:ring-brand-600 focus:ring-2 focus:rounded-2xl"
+                      >
                         <TweetCard
                           key={i}
                           handle={`@${tweet.handle}`}

@@ -99,7 +99,8 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
         constraintelement text;
         bSkip boolean;
         bVerbose boolean := False;
-        v_cnt   integer;
+        v_cnt1   integer;
+        v_cnt2   integer;
     
         -- assume defaults for ENUMs at the getgo	
         pkcnt            int := 0;
@@ -217,14 +218,18 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
           END IF;
         END IF;
         IF bPartition THEN
-          --v17 fix for case-sensitive tables
-          -- SELECT count(*) INTO v_cnt FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s 
+          --Issue#17 fix for case-sensitive tables
+          -- SELECT count(*) INTO v_cnt1 FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s 
           -- WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = quote_ident(in_schema) AND t.table_name = quote_ident(in_table) AND t.table_type = 'BASE TABLE');      
-          SELECT count(*) INTO v_cnt FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s 
+          SELECT count(*) INTO v_cnt1 FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s 
           WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = in_schema AND t.table_name = in_table AND t.table_type = 'BASE TABLE');      		  
+          
+          --Issue#19 put double-quotes around SQL keyword column names
+          SELECT COUNT(*) INTO v_cnt2 FROM pg_get_keywords() WHERE word = v_colrec.column_name AND catcode = 'R';
+          
           IF bInheritance THEN
             -- inheritance-based
-            IF v_cnt > 0 THEN
+            IF v_cnt1 > 0 OR v_cnt2 > 0 THEN
               v_table_ddl := 'CREATE TABLE ' || in_schema || '."' || in_table || '"( '|| E'\\n';        
             ELSE
               v_table_ddl := 'CREATE TABLE ' || in_schema || '.' || in_table || '( '|| E'\\n';                
@@ -234,13 +239,13 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
           ELSE
             -- declarative-based
             IF v_relopts <> '' THEN
-              IF v_cnt > 0 THEN
+              IF v_cnt1 > 0 OR v_cnt2 > 0 THEN
                 v_table_ddl := 'CREATE TABLE ' || in_schema || '."' || in_table || '" PARTITION OF ' || in_schema || '.' || v_parent || ' ' || v_partbound || v_relopts || ' ' || v_tablespace || '; ' || E'\\n';
               ELSE
                 v_table_ddl := 'CREATE TABLE ' || in_schema || '.' || in_table || ' PARTITION OF ' || in_schema || '.' || v_parent || ' ' || v_partbound || v_relopts || ' ' || v_tablespace || '; ' || E'\\n';
               END IF;
             ELSE
-              IF v_cnt > 0 THEN
+              IF v_cnt1 > 0 OR v_cnt2 > 0 THEN
                 v_table_ddl := 'CREATE TABLE ' || in_schema || '."' || in_table || '" PARTITION OF ' || in_schema || '.' || v_parent || ' ' || v_partbound || ' ' || v_tablespace || '; ' || E'\\n';
               ELSE
                 v_table_ddl := 'CREATE TABLE ' || in_schema || '.' || in_table || ' PARTITION OF ' || in_schema || '.' || v_parent || ' ' || v_partbound || ' ' || v_tablespace || '; ' || E'\\n';
@@ -265,12 +270,12 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
         
         -- start the create definition for regular tables unless we are in progress creating an inheritance-based child table
         IF NOT bPartition THEN
-          --v17 fix for case-sensitive tables
-          -- SELECT count(*) INTO v_cnt FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s 
+          --Issue#17 fix for case-sensitive tables
+          -- SELECT count(*) INTO v_cnt1 FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s 
           -- WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = quote_ident(in_schema) AND t.table_name = quote_ident(in_table) AND t.table_type = 'BASE TABLE');   
-          SELECT count(*) INTO v_cnt FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s 
+          SELECT count(*) INTO v_cnt1 FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s 
           WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = in_schema AND t.table_name = in_table AND t.table_type = 'BASE TABLE');         
-          IF v_cnt > 0 THEN
+          IF v_cnt1 > 0 THEN
             v_table_ddl := 'CREATE ' || v_temp || ' TABLE ' || in_schema || '."' || in_table || '" (' || E'\\n';
           ELSE
             v_table_ddl := 'CREATE ' || v_temp || ' TABLE ' || in_schema || '.' || in_table || ' (' || E'\\n';
@@ -297,10 +302,14 @@ export const CREATE_PG_GET_TABLEDEF_SQL = minify(
               --RAISE NOTICE 'DEBUG tabledef: %', v_table_ddl;
             END IF;
             
-            --v17 put double-quotes around case-sensitive column names
-            SELECT COUNT(*) INTO v_cnt FROM information_schema.columns t WHERE EXISTS (SELECT REGEXP_MATCHES(s.column_name, '([A-Z]+)','g') FROM information_schema.columns s 
+            --Issue#17 put double-quotes around case-sensitive column names
+            SELECT COUNT(*) INTO v_cnt1 FROM information_schema.columns t WHERE EXISTS (SELECT REGEXP_MATCHES(s.column_name, '([A-Z]+)','g') FROM information_schema.columns s 
             WHERE t.table_schema=s.table_schema and t.table_name=s.table_name and t.column_name=s.column_name AND t.table_schema = quote_ident(in_schema) AND column_name = v_colrec.column_name);         
-            IF v_cnt > 0 THEN
+    
+            --Issue#19 put double-quotes around SQL keyword column names         
+            SELECT COUNT(*) INTO v_cnt2 FROM pg_get_keywords() WHERE word = v_colrec.column_name AND catcode = 'R';
+            
+            IF v_cnt1 > 0 OR v_cnt2 > 0 THEN
               v_table_ddl := v_table_ddl || '  "' || v_colrec.column_name || '" ';
             ELSE
               v_table_ddl := v_table_ddl || '  ' || v_colrec.column_name || ' ';
