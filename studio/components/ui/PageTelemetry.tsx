@@ -1,4 +1,4 @@
-import { useParams, useTelemetryProps } from 'common'
+import { useIsLoggedIn, useParams, useTelemetryProps } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
@@ -12,6 +12,8 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
   const telemetryProps = useTelemetryProps()
   const selectedOrganization = useSelectedOrganization()
+
+  const isLoggedIn = useIsLoggedIn()
 
   useEffect(() => {
     function handleRouteChange(url: string) {
@@ -59,14 +61,16 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
         },
       })
 
-      post(`${API_URL}/telemetry/pageview`, {
-        ...(ref && { projectRef: ref }),
-        ...(selectedOrganization && { orgSlug: selectedOrganization.slug }),
-        referrer: referrer,
-        title: document.title,
-        path: router.route,
-        location: router.asPath,
-      })
+      if (isLoggedIn) {
+        post(`${API_URL}/telemetry/pageview`, {
+          ...(ref && { projectRef: ref }),
+          ...(selectedOrganization && { orgSlug: selectedOrganization.slug }),
+          referrer: referrer,
+          title: document.title,
+          path: router.route,
+          location: router.asPath,
+        })
+      }
     }
   }
 
