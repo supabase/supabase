@@ -12,9 +12,9 @@ import {
 
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganization } from 'hooks'
-import { RESOURCE_WARNING_MESSAGES } from './UsageWarningBanner.constants'
+import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
 
-const UsageWarningBanner = () => {
+const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
   const organization = useSelectedOrganization()
@@ -137,4 +137,4 @@ const UsageWarningBanner = () => {
   )
 }
 
-export default UsageWarningBanner
+export default ResourceExhaustionWarningBanner
