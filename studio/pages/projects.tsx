@@ -48,7 +48,7 @@ const ProjectsPage: NextPageWithLayout = () => {
         </div>
       )}
 
-      {isError && (
+      {true && (
         <div
           className={`py-4 px-5 ${navLayoutV2 ? 'h-full flex items-center justify-center' : ''}`}
         >

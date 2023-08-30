@@ -1,5 +1,6 @@
-import Link from 'next/link'
 import { useParams } from 'common'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -10,9 +11,8 @@ import {
 } from 'ui'
 
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { RESOURCE_WARNING_MESSAGES } from './UsageWarningBanner.constants'
-import { useRouter } from 'next/router'
 import { useSelectedOrganization } from 'hooks'
+import { RESOURCE_WARNING_MESSAGES } from './UsageWarningBanner.constants'
 
 const UsageWarningBanner = () => {
   const { ref } = useParams()
@@ -32,22 +32,44 @@ const UsageWarningBanner = () => {
         ? ['is_readonly_mode_enabled']
         : Object.keys(projectResourceWarnings).filter(
             (property) =>
-              projectResourceWarnings[property as keyof typeof projectResourceWarnings] === true
+              property !== 'project' &&
+              property !== 'is_readonly_mode_enabled' &&
+              projectResourceWarnings[property as keyof typeof projectResourceWarnings] !== null
           )
       : []
 
-  const hasHighPriorityWarning = activeWarnings.includes('is_readonly_mode_enabled')
+  const hasCriticalWarning =
+    projectResourceWarnings !== undefined
+      ? activeWarnings.some(
+          (x) => projectResourceWarnings[x as keyof typeof projectResourceWarnings] === 'critical'
+        )
+      : false
+  const isCritical = activeWarnings.includes('is_readonly_mode_enabled') || hasCriticalWarning
+
+  const getContent = (metric: string) => {
+    if (projectResourceWarnings === undefined) return undefined
+    if (metric === 'is_readonly_mode_enabled') {
+      return RESOURCE_WARNING_MESSAGES.is_readonly_mode_enabled.content.warning
+    }
+    const severity = projectResourceWarnings[metric as keyof typeof projectResourceWarnings]
+    if (typeof severity !== 'string') return undefined
+    return RESOURCE_WARNING_MESSAGES[metric as keyof typeof RESOURCE_WARNING_MESSAGES].content[
+      severity as 'warning' | 'critical'
+    ]
+  }
 
   const title =
     activeWarnings.length > 1
-      ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.title
-      : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
-          ?.title
+      ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.content[
+          hasCriticalWarning ? 'critical' : 'warning'
+        ].title
+      : getContent(activeWarnings[0])?.title
   const description =
     activeWarnings.length > 1
-      ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.description
-      : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
-          ?.description
+      ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.content[
+          hasCriticalWarning ? 'critical' : 'warning'
+        ].description
+      : getContent(activeWarnings[0])?.description
   const learnMoreUrl =
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.docsUrl
@@ -85,7 +107,7 @@ const UsageWarningBanner = () => {
 
   return (
     <Alert_Shadcn_
-      variant={hasHighPriorityWarning ? 'destructive' : 'warning'}
+      variant={isCritical ? 'destructive' : 'warning'}
       className="border-l-0 border-r-0 rounded-none"
     >
       <IconAlertTriangle />
