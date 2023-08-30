@@ -4,11 +4,9 @@ import { NextPageWithLayout } from 'types'
 
 const SignInMfaPage: NextPageWithLayout = () => {
   return (
-    <>
-      <div className="flex flex-col gap-5">
-        <SignInMfaForm />
-      </div>
-    </>
+    <div className="flex flex-col gap-5">
+      <SignInMfaForm />
+    </div>
   )
 }
 

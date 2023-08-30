@@ -1,6 +1,6 @@
 import AccessTokenList from './AccessTokenList'
-import AddNewFactorModal from './AddNewFactorModal'
 import NewAccessTokenButton from './NewAccessTokenButton'
 import NewTokenBanner from './NewTokenBanner'
+import TOTPFactors from './TOTPFactors'
 
-export { AccessTokenList, NewTokenBanner, NewAccessTokenButton, AddNewFactorModal }
+export { AccessTokenList, NewTokenBanner, NewAccessTokenButton, TOTPFactors }
