@@ -10,6 +10,7 @@ the S3 backend. Instead, invoke the storage API within Postgres via the `http` e
 Enable the [http extension for the `extensions` schema](https://supabase.com/dashboard/project/_/database/extensions) in the Dashboard.
 Then, define the following SQL functions in the SQL Editor to delete
 storage objects via the API:
+Note: replace `<YOURPROJECTURL>` with your project URL, and `<YOURSERVICEROLEKEY>` with your service role key.
 
 ```sql
 create or replace function delete_storage_object(bucket text, object text, out status int, out content text)
