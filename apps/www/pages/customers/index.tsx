@@ -1,12 +1,11 @@
 import fs from 'fs'
-import { useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
-import { getSortedPosts, getAllCategories } from '~/lib/posts'
+import { getSortedPosts } from '~/lib/posts'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import PostTypes from '~/types/post'
@@ -17,7 +16,6 @@ import { GlassPanel } from 'ui'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts({ directory: '_customers' })
-  const categories = getAllCategories('_customers')
   const rss = generateRss(allPostsData)
 
   // create a rss feed in public directory
@@ -27,14 +25,11 @@ export async function getStaticProps() {
   return {
     props: {
       blogs: allPostsData,
-      categories,
     },
   }
 }
 
 function CustomerStoriesPage(props: any) {
-  const [category, setCategory] = useState('all')
-  const [blogs, setBlogs] = useState(props.blogs)
   const { basePath } = useRouter()
 
   const meta = {
@@ -44,19 +39,7 @@ function CustomerStoriesPage(props: any) {
       'See how Supabase empowers companies of all sizes to accelerate their growth and streamline their work.',
   }
 
-  useEffect(() => {
-    // Update the document title using the browser API
-    setBlogs(
-      category === 'all'
-        ? props.blogs
-        : props.blogs.filter((post: any) => {
-            const found = post.tags?.includes(category)
-            return found
-          })
-    )
-  }, [category])
-
-  const caseStudyThumbs = blogs.map((blog: PostTypes, idx: number) => {
+  const caseStudyThumbs = props.blogs?.map((blog: PostTypes, idx: number) => {
     return {
       logo: blog.logo,
       logoInverse: blog.logo_inverse,

@@ -94,7 +94,11 @@ const Wizard: NextPageWithLayout = () => {
     enabled: currentOrg?.subscription_id != undefined,
   })
 
-  const { mutate: createProject, isLoading: isCreatingNewProject } = useProjectCreateMutation({
+  const {
+    mutate: createProject,
+    isLoading: isCreatingNewProject,
+    isSuccess: isSuccessNewProject,
+  } = useProjectCreateMutation({
     onSuccess: (res) => {
       router.push(`/project/${res.ref}/building`)
     },
@@ -260,7 +264,7 @@ const Wizard: NextPageWithLayout = () => {
         <div key="panel-footer" className="flex items-center justify-between w-full">
           <Button
             type="default"
-            disabled={isCreatingNewProject}
+            disabled={isCreatingNewProject || isSuccessNewProject}
             onClick={() => router.push('/projects')}
           >
             Cancel
@@ -271,8 +275,8 @@ const Wizard: NextPageWithLayout = () => {
             )}
             <Button
               onClick={onClickNext}
-              loading={isCreatingNewProject}
-              disabled={isCreatingNewProject || !canSubmit}
+              loading={isCreatingNewProject || isSuccessNewProject}
+              disabled={isCreatingNewProject || isSuccessNewProject || !canSubmit}
             >
               Create new project
             </Button>
@@ -466,7 +470,7 @@ const Wizard: NextPageWithLayout = () => {
                   description={
                     <div className="space-y-3">
                       <p className="text-sm leading-normal">
-                        This organization uses the new organization-level-billing and is on the{' '}
+                        This organization uses the new organization-based billing and is on the{' '}
                         <span className="text-brand">{orgSubscription?.plan?.name} plan</span>.
                       </p>
 
@@ -485,7 +489,7 @@ const Wizard: NextPageWithLayout = () => {
                       )}
 
                       <div>
-                        <Link href="https://www.notion.so/supabase/Org-Level-Billing-Public-Docs-f059a154beb743a19199d05bab4acb08">
+                        <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
                           <a target="_blank" rel="noreferrer">
                             <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                               Documentation

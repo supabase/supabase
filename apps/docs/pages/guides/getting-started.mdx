@@ -43,7 +43,13 @@ export const meta = {
     return (
       <Link href={`${item.href}`} key={item.title} passHref>
         <a className={'col-span-4'}>
-          <GlassPanel title={item.title} span="col-span-6" background={false} icon={item.icon}>
+          <GlassPanel
+            title={item.title}
+            span="col-span-6"
+            background={false}
+            icon={item.icon}
+            hasLightIcon={item.hasLightIcon}
+          >
             {item.description}
           </GlassPanel>
         </a>
@@ -106,6 +112,7 @@ export const useCases = [
     href: '/docs/guides/ai#examples',
     description: `Build AI-enabled applications using our Vector toolkit.`,
     icon: '/docs/img/icons/openai_logo',
+    hasLightIcon: true,
   },
   {
     title: 'Subscription Payments (SaaS)',
