@@ -9,14 +9,14 @@ const OrganizationBillingMigrationPanel = observer(() => {
   return (
     <div className="space-y-2">
       <div className="flex gap-4 items-center">
-        <h4>Organization-level billing</h4>
+        <h4>Organization-based billing</h4>
         <Badge color="green">
           <span className="flex gap-2 items-center text-xs uppercase">
             <IconTruck width={12} /> New
           </span>
         </Badge>
       </div>
-      <p className="text-sm opacity-50">Migrate this project to organization-level billing</p>
+      <p className="text-sm opacity-50">Migrate this project to organization-based billing</p>
       <Panel>
         <Panel.Content>
           <div className="flex justify-between gap-12">
@@ -30,7 +30,7 @@ const OrganizationBillingMigrationPanel = observer(() => {
               </p>
             </div>
             <div className="flex items-center gap-4 ml-12">
-              <Link href="https://www.notion.so/supabase/Org-Level-Billing-Public-Docs-f059a154beb743a19199d05bab4acb08">
+              <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
                 <a target="_blank" rel="noreferrer">
                   <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                     Documentation
