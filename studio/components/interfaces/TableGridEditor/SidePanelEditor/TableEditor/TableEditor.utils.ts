@@ -21,6 +21,9 @@ export const validateFields = (field: TableField) => {
   if (some(field.columns, (column: ColumnField) => column.name.length === 0)) {
     errors['columns'] = 'Ensure that all your columns are named'
   }
+  if (some(field.columns, (column: ColumnField) => column.name.startsWith('$'))) {
+    errors['columns'] = 'Ensure that a column name doesn\'t begin with $'
+  }
   return errors
 }
 
