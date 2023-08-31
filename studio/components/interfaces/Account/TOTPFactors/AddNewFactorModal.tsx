@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react'
 import { Input, Modal } from 'ui'
 
 import ConfirmationModal from 'components/ui/ConfirmationModal'
@@ -15,33 +15,9 @@ interface AddNewFactorModalProps {
 }
 
 const AddNewFactorModal = ({ onClose }: AddNewFactorModalProps) => {
-  const [verificationComplete, setVerificationComplete] = useState(false)
   // Generate a name with a number between 0 and 1000
   const [name, setName] = useState(`App ${Math.floor(Math.random() * 1000)}`)
-
-  const {
-    data,
-    mutate: enroll,
-    reset: resetEnrollment,
-    isLoading: isEnrolling,
-  } = useMfaEnrollMutation()
-  const { mutate: unenroll } = useMfaUnenrollMutation()
-
-  useEffect(() => {
-    return () => {
-      // when the modal is closed, if there's a factor id which hasn't been verified, unenroll it
-      if (data?.id && !verificationComplete) {
-        // delete the internal state of enroll mutation so that the next time enroll is called,
-        // it makes an API call
-        resetEnrollment()
-        unenroll({ factorId: data.id })
-      }
-    }
-  }, [data])
-
-  useEffect(() => {
-    // unenroll({ factorId: '599d65b7-8efe-4295-9baf-6e1bf5360c20' })
-  }, [])
+  const { data, mutate: enroll, isLoading: isEnrolling } = useMfaEnrollMutation()
 
   return !data ? (
     <FirstStep
@@ -56,10 +32,7 @@ const AddNewFactorModal = ({ onClose }: AddNewFactorModalProps) => {
       factorName={name}
       factor={data}
       isLoading={isEnrolling}
-      onSuccess={() => {
-        setVerificationComplete(true)
-        onClose()
-      }}
+      onSuccess={() => onClose()}
       onClose={onClose}
     />
   )
@@ -92,16 +65,14 @@ const FirstStep = ({ name, enroll, setName, isEnrolling, onClose }: FirstStepPro
       }}
     >
       <Modal.Content>
-        <>
-          <div className="pt-6 pb-5">
-            <Input
-              label="Provide a name to identify this app"
-              descriptionText="A string will be randomly generated if a name is not provided"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-        </>
+        <div className="pt-6 pb-5">
+          <Input
+            label="Provide a name to identify this app"
+            descriptionText="A string will be randomly generated if a name is not provided"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
       </Modal.Content>
     </ConfirmationModal>
   )
@@ -127,9 +98,7 @@ const SecondStep = ({ factorName, factor, isLoading, onSuccess, onClose }: Secon
   const { ui } = useStore()
   const [code, setCode] = useState('')
 
-  const { mutate: unenroll, isLoading: isDeleting } = useMfaUnenrollMutation({
-    onSuccess: () => onClose(),
-  })
+  const { mutate: unenroll } = useMfaUnenrollMutation({ onSuccess: () => onClose() })
 
   const { mutate: challengeAndVerify, isLoading: isVerifying } = useMfaChallengeAndVerifyMutation({
     onError: (error) => {
@@ -155,10 +124,7 @@ const SecondStep = ({ factorName, factor, isLoading, onSuccess, onClose }: Secon
       buttonLabel="Confirm"
       buttonLoadingLabel="Confirming"
       loading={isVerifying}
-      onSelectCancel={() => {
-        // unenroll({ factorId: factor.id })
-        onClose()
-      }}
+      onSelectCancel={() => unenroll({ factorId: factor.id })}
       onSelectConfirm={() => challengeAndVerify({ factorId: factor.id, code })}
     >
       <Modal.Content>
