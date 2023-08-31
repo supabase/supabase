@@ -1,3 +1,7 @@
+import Image from 'next/image'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Input, Modal } from 'ui'
+
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import InformationBox from 'components/ui/InformationBox'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -5,18 +9,19 @@ import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and
 import { useMfaEnrollMutation } from 'data/profile/mfa-enroll-mutation'
 import { useMfaUnenrollMutation } from 'data/profile/mfa-unenroll-mutation'
 import { useStore } from 'hooks'
-import Image from 'next/image'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { Input, Modal } from 'ui'
 
-const AddNewFactorModal = ({ onClose }: { onClose: () => void }) => {
+interface AddNewFactorModalProps {
+  onClose: () => void
+}
+
+const AddNewFactorModal = ({ onClose }: AddNewFactorModalProps) => {
   const [verificationComplete, setVerificationComplete] = useState(false)
   // Generate a name with a number between 0 and 1000
   const [name, setName] = useState(`App ${Math.floor(Math.random() * 1000)}`)
 
   const {
-    mutate: enroll,
     data,
+    mutate: enroll,
     reset: resetEnrollment,
     isLoading: isEnrolling,
   } = useMfaEnrollMutation()
@@ -32,10 +37,20 @@ const AddNewFactorModal = ({ onClose }: { onClose: () => void }) => {
         unenroll({ factorId: data.id })
       }
     }
+  }, [data])
+
+  useEffect(() => {
+    // unenroll({ factorId: '599d65b7-8efe-4295-9baf-6e1bf5360c20' })
   }, [])
 
   return !data ? (
-    <FirstStep name={name} setName={setName} enroll={enroll} onClose={onClose} />
+    <FirstStep
+      name={name}
+      setName={setName}
+      enroll={enroll}
+      isEnrolling={isEnrolling}
+      onClose={onClose}
+    />
   ) : (
     <SecondStep
       factorName={name}
@@ -50,17 +65,15 @@ const AddNewFactorModal = ({ onClose }: { onClose: () => void }) => {
   )
 }
 
-const FirstStep = ({
-  name,
-  setName,
-  enroll,
-  onClose,
-}: {
+interface FirstStepProps {
   name: string
   setName: Dispatch<SetStateAction<string>>
   enroll: (params: { factorType: 'totp'; friendlyName?: string }) => void
+  isEnrolling: boolean
   onClose: () => void
-}) => {
+}
+
+const FirstStep = ({ name, enroll, setName, isEnrolling, onClose }: FirstStepProps) => {
   return (
     <ConfirmationModal
       size="medium"
@@ -69,6 +82,7 @@ const FirstStep = ({
       buttonLabel="Generate QR"
       buttonLoadingLabel="Generating QR"
       buttonDisabled={name.length === 0}
+      loading={isEnrolling}
       onSelectCancel={onClose}
       onSelectConfirm={() => {
         enroll({
@@ -93,13 +107,7 @@ const FirstStep = ({
   )
 }
 
-const SecondStep = ({
-  factorName,
-  factor,
-  isLoading,
-  onSuccess,
-  onClose,
-}: {
+interface SecondStepProps {
   factorName: string
   factor: {
     id: string
@@ -113,16 +121,17 @@ const SecondStep = ({
   isLoading: boolean
   onSuccess: () => void
   onClose: () => void
-}) => {
+}
+
+const SecondStep = ({ factorName, factor, isLoading, onSuccess, onClose }: SecondStepProps) => {
+  const { ui } = useStore()
   const [code, setCode] = useState('')
 
-  const { ui } = useStore()
+  const { mutate: unenroll, isLoading: isDeleting } = useMfaUnenrollMutation({
+    onSuccess: () => onClose(),
+  })
 
-  const {
-    mutate: challengeAndVerify,
-    isLoading: isVerifying,
-    isSuccess: verificationComplete,
-  } = useMfaChallengeAndVerifyMutation({
+  const { mutate: challengeAndVerify, isLoading: isVerifying } = useMfaChallengeAndVerifyMutation({
     onError: (error) => {
       ui.setNotification({
         category: 'error',
@@ -146,7 +155,10 @@ const SecondStep = ({
       buttonLabel="Confirm"
       buttonLoadingLabel="Confirming"
       loading={isVerifying}
-      onSelectCancel={onClose}
+      onSelectCancel={() => {
+        // unenroll({ factorId: factor.id })
+        onClose()
+      }}
       onSelectConfirm={() => challengeAndVerify({ factorId: factor.id, code })}
     >
       <Modal.Content>
@@ -187,6 +199,7 @@ const SecondStep = ({
                 <Input
                   label="Authentication code"
                   value={code}
+                  placeholder="XXXXXX"
                   onChange={(e) => setCode(e.target.value)}
                 />
               </div>
