@@ -470,7 +470,7 @@ const Wizard: NextPageWithLayout = () => {
                   description={
                     <div className="space-y-3">
                       <p className="text-sm leading-normal">
-                        This organization uses the new organization-level-billing and is on the{' '}
+                        This organization uses the new organization-based billing and is on the{' '}
                         <span className="text-brand">{orgSubscription?.plan?.name} plan</span>.
                       </p>
 
@@ -489,7 +489,7 @@ const Wizard: NextPageWithLayout = () => {
                       )}
 
                       <div>
-                        <Link href="https://www.notion.so/supabase/Org-Level-Billing-Public-Docs-f059a154beb743a19199d05bab4acb08">
+                        <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
                           <a target="_blank" rel="noreferrer">
                             <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                               Documentation

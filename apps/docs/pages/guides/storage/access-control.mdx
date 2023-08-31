@@ -24,6 +24,26 @@ to anon, authenticated                  -- Allow access to anonymous and authent
 using ( bucket_id = 'my_bucket_id' );   -- Identify the bucket
 ```
 
+An easy way to get started would be to create RLS policies for `SELECT`, `INSERT`, `UPDATE`, `DELETE` operations and restrict the policies to meet your security requirements. For example, one can start with the following `INSERT` policy:
+
+```sql
+create policy "policy_name"
+ON storage.objects
+for insert using (
+  true
+);
+```
+
+and modify it to only allow authenticated users to upload assets to a specific bucket by changing it to:
+
+```sql
+create policy "policy_name"
+on storage.objects for insert to authenticated using (
+    -- restrict bucket
+    bucket_id = 'my_bucket_id'
+);
+```
+
 ## Metadata storage
 
 Supabase Storage stores metadata in the `objects` and `buckets` table in the storage schema.
@@ -34,7 +54,9 @@ To allow read access to files, the RLS policy must allow users to `SELECT` the `
 
 Storage buckets are private by default. For private buckets, you can access objects via the [download](/docs/reference/javascript/storage-from-download) method. This corresponds to `/object/auth/` API endpoint. Alternatively, you can create a publicly shareable URL with an expiry date using the [createSignedUrl](/docs/reference/javascript/storage-from-createsignedurl) method which calls the `/object/sign/` API.
 
-For public buckets, you can access the assets directly without a token or an Authorisation header. The [getPublicUrl](/docs/reference/javascript/storage-from-getpublicurl) helper method returns the full public URL for an asset. This calls the `/object/public/` API endpoint internally. While no authorization is required for accessing objects in a public bucket, proper [access control](#access-control) is required for other operations like uploading, deleting objects from public buckets as well. Public buckets also tend to have [better performance](/docs/guides/storage-cdn#public-vs-private-buckets).
+For public buckets, you can access the assets directly without a token or an Authorisation header. The [getPublicUrl](/docs/reference/javascript/storage-from-getpublicurl) helper method returns the full public URL for an asset. This calls the `/object/public/` API endpoint internally. While no authorization is required for accessing objects in a public bucket, [proper access control](#policies) is required for other operations like uploading, deleting objects from public buckets as well.
+
+Public buckets also tend to have [better performance](/docs/guides/storage-cdn#public-vs-private-buckets).
 
 The URLs to access storage endpoints are prefixed with <code>/storage/v1</code>. For example, on the hosted Platform they will be:
 

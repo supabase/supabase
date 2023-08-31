@@ -1112,6 +1112,10 @@ export const platform: NavMenuConstant = {
           name: 'Migrating and Upgrading',
           url: '/guides/platform/migrating-and-upgrading-projects',
         },
+        {
+          name: 'Transfer Project',
+          url: '/guides/platform/project-transfer',
+        },
         { name: 'Network Restrictions', url: '/guides/platform/network-restrictions' },
         { name: 'Performance Tuning', url: '/guides/platform/performance' },
         { name: 'Permissions', url: '/guides/platform/permissions' },
@@ -1121,7 +1125,11 @@ export const platform: NavMenuConstant = {
     {
       name: 'Billing',
       url: undefined,
-      items: [{ name: 'Spend cap', url: '/guides/platform/spend-cap' }],
+      items: [
+        { name: 'How billing works', url: '/guides/platform/org-based-billing' },
+        { name: 'Spend caps and cost-controls', url: '/guides/platform/spend-cap' },
+        { name: 'Enterprise Billing', url: '/guides/platform/enterprise-billing' },
+      ],
     },
     {
       name: 'Single sign-on',
