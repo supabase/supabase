@@ -366,12 +366,12 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
               description={
                 <div className="space-y-3">
                   <p className="text-sm leading-normal">
-                    This organization will use the new organization level billing, which gives you a
+                    This organization will use the new organization-based billing, which gives you a
                     single subscription for your entire organization, instead of having individual
                     subscriptions per project.{' '}
                   </p>
                   <div>
-                    <Link href="https://www.notion.so/supabase/Org-Level-Billing-Public-Docs-f059a154beb743a19199d05bab4acb08">
+                    <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
                       <a target="_blank" rel="noreferrer">
                         <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                           Documentation
