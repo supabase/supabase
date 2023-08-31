@@ -1,8 +1,4 @@
-import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import dayjs from 'dayjs'
-import { DATETIME_FORMAT } from 'lib/constants'
 import { useState } from 'react'
 import {
   AlertDescription_Shadcn_,
@@ -12,8 +8,13 @@ import {
   IconAlertCircle,
   IconTrash,
 } from 'ui'
+
+import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
+import { DATETIME_FORMAT } from 'lib/constants'
 import AddNewFactorModal from './AddNewFactorModal'
-import { DeleteFactorModal } from './DeleteFactorModal'
+import DeleteFactorModal from './DeleteFactorModal'
 
 const TOTPFactors = () => {
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
@@ -22,12 +23,12 @@ const TOTPFactors = () => {
 
   return (
     <>
-      <section>
-        <span className="text-sm prose color-slate-1000">
+      <section className="space-y-3">
+        <p className="text-sm text-light">
           Generate one-time passwords via authenticator apps like 1Password, Authy, etc. as a second
-          factor to verify your identity when prompted during sign-in.
-        </span>
-        <div className="py-2">
+          factor to verify your identity during sign-in.
+        </p>
+        <div>
           {isLoading && <GenericSkeletonLoader />}
           {isError && (
             <AlertError error={error} subject="Failed to retrieve account security information" />
@@ -35,7 +36,7 @@ const TOTPFactors = () => {
           {isSuccess && (
             <>
               {data.totp.length === 1 && (
-                <Alert_Shadcn_ variant="default">
+                <Alert_Shadcn_ variant="default" className="mb-2">
                   <IconAlertCircle className="h-4 w-4" />
                   <AlertTitle_Shadcn_>
                     We recommend configuring two authenticator apps across different devices
@@ -45,23 +46,24 @@ const TOTPFactors = () => {
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>
               )}
-              <div className="py-2">
+              <div>
                 {data.totp.map((factor) => {
                   return (
                     <div key={factor.id} className="flex flex-row justify-between py-2">
-                      <div className="flex flex-col">
-                        <span className="text-sm text-white">
+                      <div className="flex flex-col space-y-0.5">
+                        <span className="text-sm text">
                           Name: {factor.friendly_name ?? 'No name provided'}
                         </span>
-                        <span className="text-sm text-scale-900">Factor ID: {factor.id}</span>
+                        <span className="text-sm text-light">Factor ID: {factor.id}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-scale-900">
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-light">
                           Created at {dayjs(factor.updated_at).format(DATETIME_FORMAT)}
                         </span>
                         <Button
                           size="tiny"
-                          type="default"
+                          type="text"
+                          className="px-1"
                           icon={<IconTrash />}
                           onClick={() => setFactorToBeDeleted(factor.id)}
                         />
@@ -73,14 +75,7 @@ const TOTPFactors = () => {
               {data.totp.length < 2 ? (
                 <>
                   <div className="pt-2">
-                    <Button
-                      size="small"
-                      onClick={() => {
-                        setIsAddNewFactorOpen(true)
-                      }}
-                    >
-                      Add new app
-                    </Button>
+                    <Button onClick={() => setIsAddNewFactorOpen(true)}>Add new app</Button>
                   </div>
                 </>
               ) : null}

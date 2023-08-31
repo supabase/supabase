@@ -1,6 +1,3 @@
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useMfaUnenrollMutation } from 'data/profile/mfa-unenroll-mutation'
-import { useStore } from 'hooks'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -9,29 +6,25 @@ import {
   Modal,
 } from 'ui'
 
-export const DeleteFactorModal = ({
-  factorId,
-  lastFactorToBeDeleted,
-  onClose,
-}: {
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useMfaUnenrollMutation } from 'data/profile/mfa-unenroll-mutation'
+import { useStore } from 'hooks'
+
+interface DeleteFactorModalProps {
   factorId: string
   lastFactorToBeDeleted: boolean
   onClose: () => void
-}) => {
-  const { ui } = useStore()
+}
 
+const DeleteFactorModal = ({
+  factorId,
+  lastFactorToBeDeleted,
+  onClose,
+}: DeleteFactorModalProps) => {
+  const { ui } = useStore()
   const { mutate: unenroll, isLoading } = useMfaUnenrollMutation({
-    onError: (error) => {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete a second factor authentication:  ${error?.message}`,
-      })
-    },
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully deleted a second factor authentication.`,
-      })
+      ui.setNotification({ category: 'success', message: `Successfully deleted factor` })
       onClose()
     },
   })
@@ -46,9 +39,7 @@ export const DeleteFactorModal = ({
       buttonLoadingLabel="Deleting"
       loading={isLoading}
       onSelectCancel={onClose}
-      onSelectConfirm={() => {
-        unenroll({ factorId })
-      }}
+      onSelectConfirm={() => unenroll({ factorId })}
     >
       <Modal.Content className="py-6">
         <Alert_Shadcn_ variant="warning">
@@ -65,8 +56,8 @@ export const DeleteFactorModal = ({
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>
         <div className="text-sm px-1 pt-4">
-          <span className="font-bold">Before deleting this factor, consider:</span>
-          <ul className="text-scale-900 py-1 list-disc mx-4 space-y-1">
+          <p>Before deleting this factor, consider:</p>
+          <ul className="text-light py-1 list-disc mx-4 space-y-1">
             {lastFactorToBeDeleted ? (
               <>
                 <li>Adding another authenticator app as a factor prior to deleting</li>
@@ -84,3 +75,5 @@ export const DeleteFactorModal = ({
     </ConfirmationModal>
   )
 }
+
+export default DeleteFactorModal
