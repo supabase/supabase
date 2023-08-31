@@ -177,6 +177,9 @@ export const validateFields = (field: ColumnField) => {
   if (field.name.length === 0) {
     errors['name'] = `Please assign a name for your column`
   }
+  if (field.name.startsWith('$')) {
+    errors['name'] = `Column name must not begin with $`
+  }
   if (field.format.length === 0) {
     errors['format'] = `Please select a type for your column`
   }
