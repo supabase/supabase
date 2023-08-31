@@ -278,14 +278,11 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
         useEffect(() => {
           if (isReady) {
             const updatedValues = {
+              ...initialValues,
               projectRef: ref ?? initialValues.projectRef,
               subject: subject ?? initialValues.subject,
               category: selectedCategoryFromUrl?.value ?? initialValues.category,
               message: message ?? initialValues.message,
-              severity: initialValues.severity,
-              allowSupportAccess: false,
-              library: 'no-library',
-              organizationSlug: selectedOrganizationSlug,
             }
             resetForm({ values: updatedValues, initialValues: updatedValues })
           }
