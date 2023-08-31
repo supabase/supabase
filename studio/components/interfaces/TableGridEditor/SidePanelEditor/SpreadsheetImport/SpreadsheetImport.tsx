@@ -69,15 +69,17 @@ const SpreadsheetImport = ({
   const isTypeCompatible = selectedTable !== undefined ? wrongColumnTypes.length === 0 : true
 
   const checkInferredColumnTypes = (columnTypeMap: any) => {
+    // all of the other types can in theory be casted into a string
+    // e.g. a column with type of text can still contain the value "1", but inferColumnType() will 
+    // still infer it as an int8
+    const stringTypes = ['text', 'varchar']
     const lookup: { [key: string]: string[] } = {
-      // since int values can be cast to float
-      int8: ['int2', 'int4', 'int8', 'float4', 'float8', 'numeric'],
-      float8: ['float4', 'float8', 'numeric'],
-      jsonb: ['json', 'jsonb'],
-      text: ['text', 'varchar', 'uuid'],
-      timestamptz: ['date', 'time', 'timetz', 'timestamp', 'timestamptz'],
-      // true/false can be values for text columns
-      bool: ['bool', 'text', 'varchar', 'uuid'],
+      int8: ['int2', 'int4', 'int8', 'float4', 'float8', 'numeric', ...stringTypes],
+      float8: ['float4', 'float8', 'numeric', ...stringTypes],
+      jsonb: ['json', 'jsonb', ...stringTypes],
+      text: ['uuid', ...stringTypes],
+      timestamptz: ['date', 'time', 'timetz', 'timestamp', 'timestamptz', ...stringTypes],
+      bool: ['bool', ...stringTypes],
     }
     return selectedTable?.columns
       ?.map((c) => ({ name: c.name, format: c.format }))
