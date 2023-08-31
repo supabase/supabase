@@ -1,5 +1,6 @@
 import React, { PropsWithChildren, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import { detectBrowser } from 'common'
 
 interface Props {
   outerClassName?: string
@@ -26,9 +27,10 @@ const Panel = ({
   const outerRef = useRef(null)
   const innerRef = useRef(null)
   const trackCursor = hasShimmer || hasInnerShimmer
+  const isFirefox = typeof window !== 'undefined' && detectBrowser() === 'Firefox'
 
   const handleGlow = (event: any) => {
-    if (!trackCursor || !outerRef.current || !innerRef.current) return null
+    if (!outerRef.current || !innerRef.current) return null
 
     const outerElement = outerRef.current as HTMLDivElement
     const innerElement = innerRef.current as HTMLDivElement
@@ -58,7 +60,7 @@ const Panel = ({
   }
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined' || !trackCursor) return
 
     window.addEventListener('mousemove', handleGlow)
     return () => {
@@ -71,7 +73,7 @@ const Panel = ({
       ref={outerRef}
       className={[
         'relative z-0 rounded-xl bg-gradient-to-b from-background-surface-300 to-scale-400 p-px shadow-md',
-        !trackCursor && hasActiveOnHover ? 'hover:bg-none hover:!bg-scale-700' : '',
+        (isFirefox || !trackCursor) && hasActiveOnHover ? 'hover:bg-none hover:!bg-scale-700' : '',
         outerClassName,
       ].join(' ')}
       whileHover="hover"

@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { detectBrowser } from 'common'
 
 const DatabaseVisual = () => {
   const containerRef = useRef(null)
   const ref = useRef(null)
-  const [isActive, setIsActive] = useState(false)
   const [gradientPos, setGradientPos] = useState({ x: 0, y: 0 })
+  const isFirefox = typeof window !== 'undefined' && detectBrowser() === 'Firefox'
 
   const handleGlow = (event: any) => {
     if (!ref.current || !containerRef.current) return null
@@ -22,9 +23,8 @@ const DatabaseVisual = () => {
 
     const isContainerHovered =
       xCont > -3 && xCont < containerWidth + 3 && yCont > -3 && yCont < containerHeight + 3
-    setIsActive(isContainerHovered)
 
-    if (!isContainerHovered) return
+    if (!isContainerHovered || isFirefox) return
 
     const svgElement = ref.current as SVGElement
     const { x: svgX, y: svgY } = svgElement.getBoundingClientRect()
@@ -34,13 +34,17 @@ const DatabaseVisual = () => {
   }
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined' || isFirefox) return
 
     window.addEventListener('mousemove', handleGlow)
     return () => {
       window.removeEventListener('mousemove', handleGlow)
     }
   }, [])
+
+  const gradientTransform = `translate(${
+    isFirefox ? '150 150' : `${gradientPos?.x} ${gradientPos?.y}`
+  }) rotate(45) scale(166 180)`
 
   return (
     <figure
@@ -64,32 +68,40 @@ const DatabaseVisual = () => {
               d="M0.183357 -10.5469L0.183377 446.906M14.1834 -10.5469L14.1834 446.906M28.1834 -10.5469L28.1834 446.906M42.1834 -10.5469L42.1834 446.906M56.1834 -10.5469L56.1835 446.906M70.1835 -10.5469L70.1835 446.906M84.1835 -10.5469L84.1835 446.906M98.1835 -10.5469L98.1835 446.906M112.184 -10.5469L112.184 446.906M126.184 -10.5469L126.184 446.906M140.184 -10.5469L140.184 446.906M154.184 -10.5469L154.184 446.906M168.184 -10.5469L168.184 446.906M182.184 -10.5469L182.184 446.906M196.184 -10.5469L196.184 446.906M210.184 -10.5469L210.184 446.906M224.184 -10.5469L224.184 446.906M238.184 -10.5469L238.184 446.906M252.184 -10.5469L252.184 446.906M266.184 -10.5469L266.184 446.906M280.184 -10.5469L280.184 446.906M294.184 -10.5469L294.184 446.906M308.184 -10.5469L308.184 446.906M322.184 -10.5469L322.184 446.906M336.184 -10.5469L336.184 446.906M350.184 -10.5469L350.184 446.906M364.184 -10.5469L364.184 446.906M378.184 -10.5469L378.184 446.906M392.184 -10.5469L392.184 446.906M457.341 -0.25H-0.11253M457.341 13.75H-0.11253M457.341 27.75H-0.112531M457.341 41.7501H-0.112532M457.341 55.7501H-0.112532M457.341 69.7501H-0.112533M457.341 83.7501H-0.112534M457.341 97.7501H-0.112534M457.341 111.75H-0.112535M457.341 125.75H-0.112535M457.341 139.75H-0.112536M457.341 153.75H-0.112537M457.341 167.75H-0.112537M457.341 181.75H-0.112538M457.341 195.75H-0.112538M457.341 209.75H-0.112539M457.341 223.75H-0.11254M457.341 237.75H-0.11254M457.341 251.75H-0.112541M457.341 265.75H-0.112541M457.341 279.75H-0.112542M457.341 293.75H-0.112543M457.341 307.75H-0.112543M457.341 321.75H-0.112544M457.341 335.751H-0.112545M457.341 349.751H-0.112545M457.341 363.751H-0.112546M457.341 377.751H-0.112546M457.341 391.751H-0.112547M457.341 405.751H-0.112548M457.341 419.751H-0.112548M457.341 433.751H-0.112549"
               stroke="#282828"
             />
-            <g filter="url(#filter0_f_467_4905)">
-              <ellipse cx="0.312866" cy="214.736" rx="78.8492" ry="311.736" fill="#232323" />
-            </g>
-            <g filter="url(#filter1_f_467_4905)">
-              <ellipse cx="390.849" cy="214.736" rx="78.8492" ry="311.736" fill="#232323" />
-            </g>
-            <g filter="url(#filter2_f_467_4905)">
-              <ellipse
-                cx="194.736"
-                cy="-0.0142959"
-                rx="78.8492"
-                ry="311.736"
-                transform="rotate(-90 194.736 -0.0142959)"
-                fill="#232323"
-              />
-            </g>
-            <g filter="url(#filter3_f_467_4905)">
-              <ellipse
-                cx="194.736"
-                cy="430.849"
-                rx="78.8492"
-                ry="311.736"
-                transform="rotate(-90 194.736 430.849)"
-                fill="#232323"
-              />
-            </g>
+            <ellipse
+              cx="0.312866"
+              cy="214.736"
+              rx="78.8492"
+              ry="311.736"
+              fill="#232323"
+              filter="url(#filter0_f_467_4905)"
+            />
+            <ellipse
+              cx="390.849"
+              cy="214.736"
+              rx="78.8492"
+              ry="311.736"
+              fill="#232323"
+              filter="url(#filter1_f_467_4905)"
+            />
+            <ellipse
+              cx="194.736"
+              cy="-0.0142959"
+              rx="78.8492"
+              ry="311.736"
+              transform="rotate(-90 194.736 -0.0142959)"
+              fill="#232323"
+              filter="url(#filter2_f_467_4905)"
+            />
+            <ellipse
+              cx="194.736"
+              cy="430.849"
+              rx="78.8492"
+              ry="311.736"
+              transform="rotate(-90 194.736 430.849)"
+              fill="#232323"
+              filter="url(#filter3_f_467_4905)"
+            />
             <path
               opacity="0.2"
               fillRule="evenodd"
@@ -119,23 +131,23 @@ const DatabaseVisual = () => {
               <path
                 d="M192.144 125.816H138.679C130.173 125.816 122.52 130.986 119.345 138.877L99.0045 189.43C95.9432 197.038 97.6597 205.736 103.382 211.611L113.614 222.117C118.406 227.036 121.088 233.633 121.088 240.501L121.087 254.974C121.087 275.171 137.46 291.543 157.656 291.543C163.816 291.543 168.81 286.55 168.81 280.39L168.811 194.149C168.811 175.52 176.252 157.663 189.479 144.547C192.225 141.824 196.657 141.843 199.379 144.588C202.101 147.333 202.082 151.766 199.337 154.488C188.76 164.976 182.811 179.254 182.811 194.149L182.81 280.39C182.81 294.282 171.548 305.543 157.656 305.543C129.728 305.543 107.087 282.903 107.087 254.974L107.088 240.5C107.088 237.282 105.831 234.191 103.585 231.885L93.353 221.38C83.7626 211.533 80.8857 196.956 86.0164 184.204L106.357 133.651C111.665 120.459 124.458 111.816 138.679 111.816H194.408V111.9H204.747C253.851 111.9 293.657 151.706 293.657 200.81V251.652C293.657 255.518 290.523 258.652 286.657 258.652C282.791 258.652 279.657 255.518 279.657 251.652V200.81C279.657 159.438 246.119 125.9 204.747 125.9H193.23C192.86 125.9 192.498 125.871 192.144 125.816Z"
                 stroke="#A0A0A0"
-                strokeWidth="0.5"
+                strokeWidth="0.55"
                 shapeRendering="crispEdges"
               />
               <path
                 d="M210.03 283.94C210.03 280.074 206.896 276.94 203.03 276.94C199.164 276.94 196.03 280.074 196.03 283.94V287.053C196.03 314.012 217.884 335.867 244.843 335.867C271.194 335.867 292.668 314.988 293.624 288.871H318.238C322.104 288.871 325.238 285.737 325.238 281.871C325.238 278.005 322.104 274.871 318.238 274.871H291.397C260.653 274.871 231.141 262.788 209.224 241.228C206.468 238.517 202.036 238.553 199.325 241.309C196.614 244.065 196.65 248.497 199.406 251.209C221.131 272.58 249.522 285.632 279.634 288.343C278.955 306.972 263.639 321.867 244.843 321.867C225.616 321.867 210.03 306.28 210.03 287.053V283.94Z"
                 stroke="#A0A0A0"
-                strokeWidth="0.5"
+                strokeWidth="0.55"
                 shapeRendering="crispEdges"
               />
               <path
                 d="M238.03 202.145C238.03 206.937 241.915 210.822 246.707 210.822C251.499 210.822 255.383 206.937 255.383 202.145C255.383 197.353 251.499 193.469 246.707 193.469C241.915 193.469 238.03 197.353 238.03 202.145Z"
                 stroke="#A0A0A0"
-                strokeWidth="0.5"
+                strokeWidth="0.55"
                 shapeRendering="crispEdges"
               />
             </g>
-            <g>
+            <g className="opacity-0 transition-opacity group-hover:opacity-100">
               <path
                 d="M192.144 125.816H138.679C130.173 125.816 122.52 130.986 119.345 138.877L99.0045 189.43C95.9432 197.038 97.6597 205.736 103.382 211.611L113.614 222.117C118.406 227.036 121.088 233.633 121.088 240.501L121.087 254.974C121.087 275.171 137.46 291.543 157.656 291.543C163.816 291.543 168.81 286.55 168.81 280.39L168.811 194.149C168.811 175.52 176.252 157.663 189.479 144.547C192.225 141.824 196.657 141.843 199.379 144.588C202.101 147.333 202.082 151.766 199.337 154.488C188.76 164.976 182.811 179.254 182.811 194.149L182.81 280.39C182.81 294.282 171.548 305.543 157.656 305.543C129.728 305.543 107.087 282.903 107.087 254.974L107.088 240.5C107.088 237.282 105.831 234.191 103.585 231.885L93.353 221.38C83.7626 211.533 80.8857 196.956 86.0164 184.204L106.357 133.651C111.665 120.459 124.458 111.816 138.679 111.816H194.408V111.9H204.747C253.851 111.9 293.657 151.706 293.657 200.81V251.652C293.657 255.518 290.523 258.652 286.657 258.652C282.791 258.652 279.657 255.518 279.657 251.652V200.81C279.657 159.438 246.119 125.9 204.747 125.9H193.23C192.86 125.9 192.498 125.871 192.144 125.816Z"
                 stroke="url(#paint4_radial_467_4905)"
@@ -304,43 +316,39 @@ const DatabaseVisual = () => {
               <stop stopColor="white" />
               <stop offset="1" stopColor="#7C7C7C" />
             </linearGradient>
-            {isActive && (
-              <>
-                <radialGradient
-                  id="paint4_radial_467_4905"
-                  cx="0"
-                  cy="0"
-                  r="1"
-                  gradientUnits="userSpaceOnUse"
-                  gradientTransform={`translate(${gradientPos?.x} ${gradientPos.y}) rotate(45) scale(166 180)`}
-                >
-                  <stop stopColor="#3FCF8E" />
-                  <stop offset="1" stopColor="#7C7C7C" />
-                </radialGradient>
-                <radialGradient
-                  id="paint5_radial_467_4905"
-                  cx="0"
-                  cy="0"
-                  r="1"
-                  gradientUnits="userSpaceOnUse"
-                  gradientTransform={`translate(${gradientPos?.x} ${gradientPos.y}) rotate(45) scale(166 180)`}
-                >
-                  <stop stopColor="#3FCF8E" />
-                  <stop offset="1" stopColor="#7C7C7C" />{' '}
-                </radialGradient>
-                <radialGradient
-                  id="paint6_radial_467_4905"
-                  cx="0"
-                  cy="0"
-                  r="1"
-                  gradientUnits="userSpaceOnUse"
-                  gradientTransform={`translate(${gradientPos?.x} ${gradientPos.y}) rotate(45) scale(166 180)`}
-                >
-                  <stop stopColor="#3FCF8E" />
-                  <stop offset="1" stopColor="#7C7C7C" />
-                </radialGradient>
-              </>
-            )}
+            <radialGradient
+              id="paint4_radial_467_4905"
+              cx="0"
+              cy="0"
+              r="1"
+              gradientUnits="userSpaceOnUse"
+              gradientTransform={gradientTransform}
+            >
+              <stop stopColor="#3FCF8E" />
+              <stop offset="1" stopColor="#7C7C7C" />
+            </radialGradient>
+            <radialGradient
+              id="paint5_radial_467_4905"
+              cx="0"
+              cy="0"
+              r="1"
+              gradientUnits="userSpaceOnUse"
+              gradientTransform={gradientTransform}
+            >
+              <stop stopColor="#3FCF8E" />
+              <stop offset="1" stopColor="#7C7C7C" />
+            </radialGradient>
+            <radialGradient
+              id="paint6_radial_467_4905"
+              cx="0"
+              cy="0"
+              r="1"
+              gradientUnits="userSpaceOnUse"
+              gradientTransform={gradientTransform}
+            >
+              <stop stopColor="#3FCF8E" />
+              <stop offset="1" stopColor="#7C7C7C" />
+            </radialGradient>
             <clipPath id="clip0_467_4905">
               <rect width="390" height="430" fill="white" />
             </clipPath>
