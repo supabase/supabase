@@ -46,7 +46,7 @@ const TOTPFactors = () => {
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>
               )}
-              <div className="">
+              <div>
                 {data.totp.map((factor) => {
                   return (
                     <div key={factor.id} className="flex flex-row justify-between py-2">
