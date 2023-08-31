@@ -8,7 +8,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { useCheckPermissions } from 'hooks'
 import SchemaTable from './SchemaTable'
-import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
