@@ -36,6 +36,7 @@ import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
 import { useRouter } from 'next/router'
+import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -201,13 +202,11 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     }
 
     if (values.projectRef !== 'no-project') {
-      const URL = `${API_URL}/auth/${values.projectRef}/config`
-      // [Joshen] Will refactor another time once
-      // https://github.com/supabase/supabase/pull/16227 goes in
-      const authConfig = await get(URL)
-      if (!authConfig.error) {
+      try {
+        const authConfig = await getProjectAuthConfig({ projectRef: values.projectRef })
         payload.siteUrl = authConfig.SITE_URL
         payload.additionalRedirectUrls = authConfig.URI_ALLOW_LIST
+      } finally {
       }
     }
 
