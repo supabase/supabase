@@ -7,7 +7,10 @@ import { useEffect, useState } from 'react'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { SubscriptionTier, useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
+import {
+  SubscriptionTier,
+  useOrgSubscriptionUpdateMutation,
+} from 'data/subscriptions/org-subscription-update-mutation'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
@@ -21,6 +24,9 @@ import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
+import InformationBox from 'components/ui/InformationBox'
+import AlertError from 'components/ui/AlertError'
 
 // [Joshen TODO] Need to remove all contexts of "projects"
 
@@ -68,12 +74,16 @@ const PlanUpdateSidePanel = () => {
     }
   )
 
+  const {
+    data: subscriptionPreview,
+    error: subscriptionPreviewError,
+    isLoading: subscriptionPreviewIsLoading,
+    isSuccess: subscriptionPreviewInitialized,
+  } = useOrganizationBillingSubscriptionPreview({ tier: selectedTier, organizationSlug: slug })
+
   const availablePlans = plans ?? []
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
   const subscriptionPlanMeta = subscriptionsPlans.find((tier) => tier.id === selectedTier)
-  const selectedPlanMeta = availablePlans.find(
-    (plan) => plan.id === selectedTier?.split('tier_')[1]
-  )
 
   useEffect(() => {
     if (visible) {
@@ -110,13 +120,18 @@ const PlanUpdateSidePanel = () => {
       return ui.setNotification({ category: 'error', message: 'Please select a payment method' })
     }
 
-    // If the user is downgrading from team, should have spend cap disabled by default 
-    const tier = subscription?.plan?.id === 'team' && selectedTier === PRICING_TIER_PRODUCT_IDS.PRO ? PRICING_TIER_PRODUCT_IDS.PAYG as SubscriptionTier : selectedTier
+    // If the user is downgrading from team, should have spend cap disabled by default
+    const tier =
+      subscription?.plan?.id === 'team' && selectedTier === PRICING_TIER_PRODUCT_IDS.PRO
+        ? (PRICING_TIER_PRODUCT_IDS.PAYG as SubscriptionTier)
+        : selectedTier
 
     updateOrgSubscription({ slug, tier, paymentMethod: selectedPaymentMethod })
   }
 
-  const planMeta = selectedTier ? availablePlans.find((p) => p.id === selectedTier.split('tier_')[1]) : null
+  const planMeta = selectedTier
+    ? availablePlans.find((p) => p.id === selectedTier.split('tier_')[1])
+    : null
 
   return (
     <>
@@ -289,25 +304,101 @@ const PlanUpdateSidePanel = () => {
       <Modal
         loading={isUpdating}
         alignFooter="right"
-        className="!w-[450px]"
+        className="!w-[550px]"
         visible={selectedTier !== undefined && selectedTier !== 'tier_free'}
         onCancel={() => setSelectedTier(undefined)}
         onConfirm={onUpdateSubscription}
         overlayClassName="pointer-events-none"
-        header={`Confirm ${planMeta?.change_type === 'downgrade' ? 'downgrade' : 'upgrade'} to ${subscriptionPlanMeta?.name}`}
+        header={`Confirm ${planMeta?.change_type === 'downgrade' ? 'downgrade' : 'upgrade'} to ${
+          subscriptionPlanMeta?.name
+        }`}
       >
+        <Modal.Content className="mt-4">
+          {subscriptionPreviewError && (
+            <AlertError
+              error={subscriptionPreviewError}
+              subject="Failed to preview subscription."
+            />
+          )}
+          {subscriptionPreviewIsLoading && (
+            <span className="text-sm">Estimating monthly costs...</span>
+          )}
+          {subscriptionPreviewInitialized && (
+            <InformationBox
+              defaultVisibility={false}
+              title={
+                <span>
+                  Estimated monthly price is $
+                  {Math.round(
+                    subscriptionPreview.breakdown.reduce((prev, cur) => prev + cur.total_price, 0)
+                  )}{' '}
+                  + usage
+                </span>
+              }
+              hideCollapse={false}
+              description={
+                <div>
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="py-2 font-normal text-left text-sm text-scale-1000 w-1/2">
+                          Item
+                        </th>
+                        <th className="py-2 font-normal text-left text-sm text-scale-1000">
+                          Count
+                        </th>
+                        <th className="py-2 font-normal text-left text-sm text-scale-1000">
+                          Unit Price
+                        </th>
+                        <th className="py-2 font-normal text-right text-sm text-scale-1000">
+                          Price
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {subscriptionPreview.breakdown.map((item) => (
+                        <tr key={item.description} className="border-b">
+                          <td className="py-2 text-sm">{item.description ?? 'Unknown'}</td>
+                          <td className="py-2 text-sm">{item.quantity}</td>
+                          <td className="py-2 text-sm">
+                            {item.unit_price === 0 ? 'FREE' : `$${item.unit_price}`}
+                          </td>
+                          <td className="py-2 text-sm text-right">${item.total_price}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+
+                    <tbody>
+                      <tr>
+                        <td className="py-2 text-sm">Total</td>
+                        <td className="py-2 text-sm" />
+                        <td className="py-2 text-sm" />
+                        <td className="py-2 text-sm text-right">
+                          $
+                          {Math.round(
+                            subscriptionPreview.breakdown.reduce(
+                              (prev, cur) => prev + cur.total_price,
+                              0
+                            )
+                          ) ?? 0}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              }
+            />
+          )}
+        </Modal.Content>
+
         <Modal.Content>
-          <div className="py-6 space-y-2">
+          <div className="py-4 space-y-2">
             <p className="text-sm">
-              Upon clicking confirm, the amount of ${selectedPlanMeta?.price ?? 'Unknown'} will be
-              added to your monthly invoice and your credit card will be charged immediately.
-              Changing the plan resets your billing cycle and may result in a prorated charge for
-              previous usage.
+              Upon clicking confirm, your monthly invoice will be adjusted and your credit card will
+              be charged immediately. Changing the plan resets your billing cycle and may result in
+              a prorated charge for previous usage.
             </p>
-            <p className="text-sm text-scale-1000">
-              You will also be able to change your project's add-ons after upgrading your plan.
-            </p>
-            <div className="!mt-6">
+            <div className="!mt-4">
               <PaymentMethodSelection
                 selectedPaymentMethod={selectedPaymentMethod}
                 onSelectPaymentMethod={setSelectedPaymentMethod}
