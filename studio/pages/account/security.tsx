@@ -37,16 +37,18 @@ const Security: NextPageWithLayout = () => {
             type="button"
             className="group flex w-full items-center justify-between rounded py-3 px-6 text-scale-1200"
           >
-            <div className="flex flex-row gap-2 items-center p-2">
-              <IconSmartphone />
-              <span className="text-lg">Authenticator app</span>
+            <div className="flex flex-row gap-4 items-center py-1">
+              <IconSmartphone strokeWidth={1.5} />
+              <span className="text-sm">Authenticator app</span>
             </div>
 
             {data ? (
               <Badge
-                color={data.totp.length === 0 ? 'red' : data.totp.length === 1 ? 'yellow' : 'green'}
+                color={
+                  data.totp.length === 0 ? 'gray' : data.totp.length === 1 ? 'yellow' : 'green'
+                }
               >
-                {data.totp.length} apps configured
+                {data.totp.length} app{data.totp.length === 1 ? '' : 's'} configured
               </Badge>
             ) : null}
           </button>

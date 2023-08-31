@@ -1,3 +1,7 @@
+import Image from 'next/image'
+import { Dispatch, SetStateAction, useState } from 'react'
+import { Input, Modal } from 'ui'
+
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import InformationBox from 'components/ui/InformationBox'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -5,62 +9,44 @@ import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and
 import { useMfaEnrollMutation } from 'data/profile/mfa-enroll-mutation'
 import { useMfaUnenrollMutation } from 'data/profile/mfa-unenroll-mutation'
 import { useStore } from 'hooks'
-import Image from 'next/image'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { Input, Modal } from 'ui'
 
-const AddNewFactorModal = ({ onClose }: { onClose: () => void }) => {
-  const [verificationComplete, setVerificationComplete] = useState(false)
+interface AddNewFactorModalProps {
+  onClose: () => void
+}
+
+const AddNewFactorModal = ({ onClose }: AddNewFactorModalProps) => {
   // Generate a name with a number between 0 and 1000
   const [name, setName] = useState(`App ${Math.floor(Math.random() * 1000)}`)
-
-  const {
-    mutate: enroll,
-    data,
-    reset: resetEnrollment,
-    isLoading: isEnrolling,
-  } = useMfaEnrollMutation()
-  const { mutate: unenroll } = useMfaUnenrollMutation()
-
-  useEffect(() => {
-    return () => {
-      // when the modal is closed, if there's a factor id which hasn't been verified, unenroll it
-      if (data?.id && !verificationComplete) {
-        // delete the internal state of enroll mutation so that the next time enroll is called,
-        // it makes an API call
-        resetEnrollment()
-        unenroll({ factorId: data.id })
-      }
-    }
-  }, [])
+  const { data, mutate: enroll, isLoading: isEnrolling } = useMfaEnrollMutation()
 
   return !data ? (
-    <FirstStep name={name} setName={setName} enroll={enroll} onClose={onClose} />
+    <FirstStep
+      name={name}
+      setName={setName}
+      enroll={enroll}
+      isEnrolling={isEnrolling}
+      onClose={onClose}
+    />
   ) : (
     <SecondStep
       factorName={name}
       factor={data}
       isLoading={isEnrolling}
-      onSuccess={() => {
-        setVerificationComplete(true)
-        onClose()
-      }}
+      onSuccess={() => onClose()}
       onClose={onClose}
     />
   )
 }
 
-const FirstStep = ({
-  name,
-  setName,
-  enroll,
-  onClose,
-}: {
+interface FirstStepProps {
   name: string
   setName: Dispatch<SetStateAction<string>>
   enroll: (params: { factorType: 'totp'; friendlyName?: string }) => void
+  isEnrolling: boolean
   onClose: () => void
-}) => {
+}
+
+const FirstStep = ({ name, enroll, setName, isEnrolling, onClose }: FirstStepProps) => {
   return (
     <ConfirmationModal
       size="medium"
@@ -69,6 +55,7 @@ const FirstStep = ({
       buttonLabel="Generate QR"
       buttonLoadingLabel="Generating QR"
       buttonDisabled={name.length === 0}
+      loading={isEnrolling}
       onSelectCancel={onClose}
       onSelectConfirm={() => {
         enroll({
@@ -78,28 +65,20 @@ const FirstStep = ({
       }}
     >
       <Modal.Content>
-        <>
-          <div className="pt-6 pb-5">
-            <Input
-              label="Provide a name to identify this app"
-              descriptionText="A string will be randomly generated if a name is not provided"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-        </>
+        <div className="pt-6 pb-5">
+          <Input
+            label="Provide a name to identify this app"
+            descriptionText="A string will be randomly generated if a name is not provided"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
       </Modal.Content>
     </ConfirmationModal>
   )
 }
 
-const SecondStep = ({
-  factorName,
-  factor,
-  isLoading,
-  onSuccess,
-  onClose,
-}: {
+interface SecondStepProps {
   factorName: string
   factor: {
     id: string
@@ -113,16 +92,15 @@ const SecondStep = ({
   isLoading: boolean
   onSuccess: () => void
   onClose: () => void
-}) => {
+}
+
+const SecondStep = ({ factorName, factor, isLoading, onSuccess, onClose }: SecondStepProps) => {
+  const { ui } = useStore()
   const [code, setCode] = useState('')
 
-  const { ui } = useStore()
+  const { mutate: unenroll } = useMfaUnenrollMutation({ onSuccess: () => onClose() })
 
-  const {
-    mutate: challengeAndVerify,
-    isLoading: isVerifying,
-    isSuccess: verificationComplete,
-  } = useMfaChallengeAndVerifyMutation({
+  const { mutate: challengeAndVerify, isLoading: isVerifying } = useMfaChallengeAndVerifyMutation({
     onError: (error) => {
       ui.setNotification({
         category: 'error',
@@ -146,7 +124,7 @@ const SecondStep = ({
       buttonLabel="Confirm"
       buttonLoadingLabel="Confirming"
       loading={isVerifying}
-      onSelectCancel={onClose}
+      onSelectCancel={() => unenroll({ factorId: factor.id })}
       onSelectConfirm={() => challengeAndVerify({ factorId: factor.id, code })}
     >
       <Modal.Content>
@@ -187,6 +165,7 @@ const SecondStep = ({
                 <Input
                   label="Authentication code"
                   value={code}
+                  placeholder="XXXXXX"
                   onChange={(e) => setCode(e.target.value)}
                 />
               </div>

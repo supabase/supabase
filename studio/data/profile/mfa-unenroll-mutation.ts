@@ -2,6 +2,7 @@ import { AuthMFAUnenrollResponse, MFAUnenrollParams } from '@supabase/supabase-j
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { auth } from 'lib/gotrue'
 import { profileKeys } from './keys'
+import { toast } from 'react-hot-toast'
 
 const mfaUnenroll = async (params: MFAUnenrollParams) => {
   const { error, data } = await auth.mfa.unenroll(params)
@@ -15,6 +16,7 @@ type CustomMFAUnenrollError = NonNullable<AuthMFAUnenrollResponse['error']>
 
 export const useMfaUnenrollMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
   UseMutationOptions<CustomMFAUnenrollResponse, CustomMFAUnenrollError, MFAUnenrollParams>,
@@ -31,6 +33,13 @@ export const useMfaUnenrollMutation = ({
       ])
 
       await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete factor: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
     },
     ...options,
   })
