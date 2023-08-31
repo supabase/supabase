@@ -1,4 +1,4 @@
-import { AuthMFAListFactorsResponse } from '@supabase/supabase-js'
+import { AuthMFAListFactorsResponse, Factor } from '@supabase/supabase-js'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { auth } from 'lib/gotrue'
 import { profileKeys } from './keys'
@@ -10,6 +10,7 @@ export async function getMfaListFactors() {
   return data
 }
 
+export type MFAFactor = Factor
 type CustomMFAListFactorsData = NonNullable<AuthMFAListFactorsResponse['data']>
 type CustomMFAListFactorsError = NonNullable<AuthMFAListFactorsResponse['error']>
 
