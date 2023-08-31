@@ -20,8 +20,21 @@ const PLATFORM_ONLY_PAGES = [
   'auth/url-configuration',
 ]
 
-export function withAuth<T>(WrappedComponent: ComponentType<T> | NextPageWithLayout<T, T>) {
-  const WithAuthHOC: ComponentType<T> = (props: any) => {
+export function withAuth<T>(
+  WrappedComponent: ComponentType<T> | NextPageWithLayout<T, T>,
+  options: {
+    /**
+     * The auth level used to check the user credentials. In most cases, if the user has MFA enabled
+     * we want the highest level (which is 2) for all pages. For certain pages, the user should be
+     * able to access them even if he didn't finished his login (typed in his MFA code), for example
+     * the support page: We want the user to be able to submit a ticket even if he's not fully
+     * signed in.
+     * @default true
+     */
+    useHighestAAL: boolean
+  } = { useHighestAAL: true }
+) {
+  const WithAuthHOC: ComponentType<T> = (props: T) => {
     const router = useRouter()
     const { basePath } = router
     const { ref } = useParams()
@@ -45,7 +58,9 @@ export function withAuth<T>(WrappedComponent: ComponentType<T> | NextPageWithLay
     })
 
     const isLoggedIn = Boolean(session)
-    const isCorrectLevel = aalData?.currentLevel === aalData?.nextLevel
+    const isCorrectLevel = options.useHighestAAL
+      ? aalData?.currentLevel === aalData?.nextLevel
+      : true
 
     const isAccessingBlockedPage =
       !IS_PLATFORM &&
