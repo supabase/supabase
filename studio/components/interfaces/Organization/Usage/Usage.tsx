@@ -165,13 +165,13 @@ const Usage = () => {
                 <p>
                   You are currently viewing usage for the "
                   {selectedProject?.name || selectedProjectRef}" project. Since your organization is
-                  using the new organization-level billing, the included quota is for your whole
+                  using the new organization-based billing, the included quota is for your whole
                   organization and not just this project. For billing purposes, we sum up usage from
                   all your projects. To view your usage quota, set the project filter above back to
                   "All Projects".
                 </p>
                 <div>
-                  <Link href="https://www.notion.so/supabase/Org-Level-Billing-Public-Docs-f059a154beb743a19199d05bab4acb08">
+                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
                     <a target="_blank" rel="noreferrer">
                       <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                         Documentation
