@@ -24,7 +24,7 @@ interface SpreadsheetImportPreviewProps {
   errors?: any[]
   selectedHeaders: string[]
   incompatibleHeaders: string[]
-  wrongColumnTypes: any[]
+  incompatibeTypeColumns: any[]
 }
 
 const SpreadsheetImportPreview = ({
@@ -33,7 +33,7 @@ const SpreadsheetImportPreview = ({
   errors = [],
   selectedHeaders,
   incompatibleHeaders,
-  wrongColumnTypes,
+  incompatibeTypeColumns,
 }: SpreadsheetImportPreviewProps) => {
   const [expandPreview, setExpandPreview] = useState(false)
   const [expandedErrors, setExpandedErrors] = useState<string[]>([])
@@ -45,7 +45,7 @@ const SpreadsheetImportPreview = ({
   const previewRows = rows.slice(0, MAX_ROWS)
 
   const isCompatible = selectedTable !== undefined ? incompatibleHeaders.length === 0 : true
-  const isTypeCompatible = selectedTable !== undefined ? wrongColumnTypes.length === 0 : true
+  const isTypeCompatible = selectedTable !== undefined ? incompatibeTypeColumns.length === 0 : true
 
   useEffect(() => {
     setExpandPreview(true)
@@ -157,7 +157,7 @@ const SpreadsheetImportPreview = ({
                         This CSV <span className="text-red-900">cannot</span> be imported into your
                         table due to incompatible types in these columns:
                         <br />
-                        {wrongColumnTypes.map((c) => (
+                        {incompatibeTypeColumns.map((c) => (
                           <div className="flex items-start space-x-2">
                             <div className="w-[14px] h-[14px] flex items-center justify-center translate-y-[3px]">
                               <div className="w-[6px] h-[6px] rounded-full bg-scale-1000" />
