@@ -60,16 +60,12 @@ function ExampleCard(props: any) {
           <div className="mt-3 flex items-stretch gap-2 h-[26px]">
             {props.vercel_deploy_url && (
               <a target="_blank" href={props.vercel_deploy_url}>
-                <img
-                  className="h-full w-auto"
-                  src="https://vercel.com/button"
-                  alt="vercel button"
-                />
+                <Image src="https://vercel.com/button" alt="vercel button" width={75} height={26} />
               </a>
             )}
             {props.demo_url && (
               <Link href={props.demo_url} as={props.demo_url}>
-                <a target="_blank">
+                <a target="_blank" tabIndex={-1}>
                   <Button size="tiny" type="default" iconRight={<IconArrowUpRight />}>
                     Launch Demo
                   </Button>
@@ -78,7 +74,7 @@ function ExampleCard(props: any) {
             )}
             {!props.demo_url && (
               <Link href={props.repo_url} as={props.repo_url}>
-                <a target="_blank">
+                <a target="_blank" tabIndex={-1}>
                   <Button size="tiny" type="default" iconRight={<IconArrowUpRight />}>
                     View Code
                   </Button>
