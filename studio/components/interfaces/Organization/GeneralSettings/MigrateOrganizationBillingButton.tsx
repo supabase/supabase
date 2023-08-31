@@ -52,7 +52,7 @@ const MigrateOrganizationBillingButton = observer(() => {
   } = useOrganizationBillingMigrationMutation({
     onSuccess: () => {
       ui.setNotification({
-        message: 'Successfully migrated to organization-level billing',
+        message: 'Successfully migrated to organization-based billing',
         category: 'success',
         duration: 5000,
       })
@@ -131,7 +131,7 @@ const MigrateOrganizationBillingButton = observer(() => {
                 <IconAlertCircle strokeWidth={2} />
                 <AlertTitle_Shadcn_>Irreversible</AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
-                  Once migrated to the new organization-level billing, you cannot go back to the old
+                  Once migrated to the new organization-based billing, you cannot go back to the old
                   project-level billing.
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
@@ -168,13 +168,13 @@ const MigrateOrganizationBillingButton = observer(() => {
           <Modal.Content>
             <div className="text-scale-1000 text-sm space-y-2">
               <p>
-                Migrating to new organization-level billing combines subscriptions for all projects
+                Migrating to new organization-based billing combines subscriptions for all projects
                 in the organization into a single subscription.
               </p>
 
               <p>
                 For a detailed breakdown of changes, see{' '}
-                <Link href="https://www.notion.so/supabase/Org-Level-Billing-Public-Docs-f059a154beb743a19199d05bab4acb08">
+                <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
                   <a target="_blank" rel="noreferrer" className="underline">
                     Billing Migration Docs
                   </a>
@@ -230,7 +230,7 @@ const MigrateOrganizationBillingButton = observer(() => {
                 <p className="text-sm text-scale-1000">
                   Paid plans come with one compute instance included. Additional projects will at
                   least cost the compute instance hours used (min $7/month). See{' '}
-                  <Link href="https://www.notion.so/supabase/Organization-Level-Billing-707638e35c92489995dc3ac991a324d1">
+                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute">
                     <a target="_blank" rel="noreferrer" className="underline">
                       Compute Instance Usage Billing
                     </a>
