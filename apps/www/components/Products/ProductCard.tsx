@@ -1,6 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import Panel from '~/components/Panel'
+import { detectBrowser } from 'common'
 
 const ProductCard = ({
   className,
