@@ -59,12 +59,32 @@ const SpreadsheetImport = ({
   })
   const [errors, setErrors] = useState<any>([])
   const [selectedHeaders, setSelectedHeaders] = useState<string[]>([])
+  const [wrongColumnTypes, setWrongColumnTypes] = useState<any>([])
 
   const selectedTableColumns = (selectedTable?.columns ?? []).map((column) => column.name)
   const incompatibleHeaders = selectedHeaders.filter(
     (header) => !selectedTableColumns.includes(header)
   )
   const isCompatible = selectedTable !== undefined ? incompatibleHeaders.length === 0 : true
+  const isTypeCompatible = selectedTable !== undefined ? wrongColumnTypes.length === 0 : true
+
+  const checkInferredColumnTypes = (columnTypeMap: any) => {
+    const lookup: { [key: string]: string[] } = {
+      // since int values can be cast to float
+      int8: ['int2', 'int4', 'int8', 'float4', 'float8', 'numeric'],
+      float8: ['float4', 'float8', 'numeric'],
+      jsonb: ['json', 'jsonb'],
+      text: ['text', 'varchar', 'uuid'],
+      timestamptz: ['date', 'time', 'timetz', 'timestamp', 'timestamptz'],
+      // true/false can be values for text columns
+      bool: ['bool', 'text', 'varchar', 'uuid'],
+    }
+    return selectedTable?.columns
+      ?.map((c) => ({ name: c.name, format: c.format }))
+      .filter((c) => Object.keys(columnTypeMap).includes(c.name))
+      .filter((c) => !lookup[columnTypeMap[c.name]].includes(c.format))
+      .map((c) => ({ name: c.name, format: columnTypeMap[c.name], expectedFormat: c.format }))
+  }
 
   const onProgressUpdate = (progress: number) => {
     setParseProgress(progress)
@@ -97,6 +117,7 @@ const SpreadsheetImport = ({
 
       setErrors(errors)
       setSelectedHeaders(headers)
+      setWrongColumnTypes(checkInferredColumnTypes(columnTypeMap))
       setSpreadsheetData({ headers, rows: previewRows, rowCount, columnTypeMap })
     }
     event.target.value = ''
@@ -123,6 +144,7 @@ const SpreadsheetImport = ({
       }
       setErrors(errors)
       setSelectedHeaders(headers)
+      setWrongColumnTypes(checkInferredColumnTypes(columnTypeMap))
       setSpreadsheetData({ headers, rows, rowCount: rows.length, columnTypeMap })
     } else {
       setSpreadsheetData(EMPTY_SPREADSHEET_DATA)
@@ -155,7 +177,7 @@ const SpreadsheetImport = ({
         message: 'Please select at least one header from your CSV',
       })
       resolve()
-    } else if (!isCompatible) {
+    } else if (!(isCompatible && isTypeCompatible)) {
       ui.setNotification({
         category: 'error',
         message: 'The data that you are trying to import is incompatible with your table structure',
@@ -227,6 +249,7 @@ const SpreadsheetImport = ({
             errors={errors}
             selectedHeaders={selectedHeaders}
             incompatibleHeaders={incompatibleHeaders}
+            wrongColumnTypes={wrongColumnTypes}
           />
           <SidePanel.Separator />
         </>
