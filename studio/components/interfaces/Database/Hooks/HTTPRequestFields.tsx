@@ -99,19 +99,34 @@ const HTTPRequestFields = ({
               {errors.http_url && <p className="text-sm text-red-900">{errors.http_url}</p>}
             </div>
           ) : type === 'supabase_function' && edgeFunctions.length > 0 ? (
-            <Listbox id="http_url" name="http_url" label="Select which edge function to trigger">
-              {edgeFunctions.map((fn) => {
-                const restUrl = selectedProject?.restUrl
-                const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
-                const functionUrl = `https://${ref}.functions.supabase.${restUrlTld}/${fn.slug}`
+            <>
+              <Listbox id="http_url" name="http_url" label="Select which edge function to trigger">
+                {edgeFunctions.map((fn) => {
+                  const restUrl = selectedProject?.restUrl
+                  const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
+                  const functionUrl = `https://${ref}.functions.supabase.${restUrlTld}/${fn.slug}`
 
-                return (
-                  <Listbox.Option key={fn.id} id={functionUrl} value={functionUrl} label={fn.name}>
-                    {fn.name}
-                  </Listbox.Option>
-                )
-              })}
-            </Listbox>
+                  return (
+                    <Listbox.Option
+                      key={fn.id}
+                      id={functionUrl}
+                      value={functionUrl}
+                      label={fn.name}
+                    >
+                      {fn.name}
+                    </Listbox.Option>
+                  )
+                })}
+              </Listbox>
+              <Input
+                id="timeout_ms"
+                name="timeout_ms"
+                label="Timeout"
+                labelOptional="Between 1000ms to 5000ms"
+                type="number"
+                actions={<p className="text-light pr-2">ms</p>}
+              />
+            </>
           ) : null}
         </FormSectionContent>
       </FormSection>
