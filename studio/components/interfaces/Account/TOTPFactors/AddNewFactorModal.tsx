@@ -1,5 +1,4 @@
-import Image from 'next/image'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Input, Modal } from 'ui'
 
 import ConfirmationModal from 'components/ui/ConfirmationModal'
@@ -11,34 +10,47 @@ import { useMfaUnenrollMutation } from 'data/profile/mfa-unenroll-mutation'
 import { useStore } from 'hooks'
 
 interface AddNewFactorModalProps {
+  visible: boolean
   onClose: () => void
 }
 
-const AddNewFactorModal = ({ onClose }: AddNewFactorModalProps) => {
+const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) => {
   // Generate a name with a number between 0 and 1000
   const [name, setName] = useState(`App ${Math.floor(Math.random() * 1000)}`)
-  const { data, mutate: enroll, isLoading: isEnrolling } = useMfaEnrollMutation()
+  const { data, mutate: enroll, isLoading: isEnrolling, reset } = useMfaEnrollMutation()
 
-  return !data ? (
-    <FirstStep
-      name={name}
-      setName={setName}
-      enroll={enroll}
-      isEnrolling={isEnrolling}
-      onClose={onClose}
-    />
-  ) : (
-    <SecondStep
-      factorName={name}
-      factor={data}
-      isLoading={isEnrolling}
-      onSuccess={() => onClose()}
-      onClose={onClose}
-    />
+  useEffect(() => {
+    // reset has to be called because the state is kept between if the process is cancelled during
+    // the second step.
+    if (!visible) {
+      reset()
+    }
+  }, [reset, visible])
+
+  return (
+    <>
+      <FirstStep
+        visible={visible && !Boolean(data)}
+        name={name}
+        setName={setName}
+        enroll={enroll}
+        isEnrolling={isEnrolling}
+        onClose={onClose}
+      />
+      <SecondStep
+        visible={visible && Boolean(data)}
+        factorName={name}
+        factor={data!}
+        isLoading={isEnrolling}
+        onSuccess={() => onClose()}
+        onClose={onClose}
+      />
+    </>
   )
 }
 
 interface FirstStepProps {
+  visible: boolean
   name: string
   setName: Dispatch<SetStateAction<string>>
   enroll: (params: { factorType: 'totp'; friendlyName?: string }) => void
@@ -46,11 +58,11 @@ interface FirstStepProps {
   onClose: () => void
 }
 
-const FirstStep = ({ name, enroll, setName, isEnrolling, onClose }: FirstStepProps) => {
+const FirstStep = ({ visible, name, enroll, setName, isEnrolling, onClose }: FirstStepProps) => {
   return (
     <ConfirmationModal
       size="medium"
-      visible
+      visible={visible}
       header="Add a new authenticator app as a factor"
       buttonLabel="Generate QR"
       buttonLoadingLabel="Generating QR"
@@ -79,8 +91,9 @@ const FirstStep = ({ name, enroll, setName, isEnrolling, onClose }: FirstStepPro
 }
 
 interface SecondStepProps {
+  visible: boolean
   factorName: string
-  factor: {
+  factor?: {
     id: string
     type: 'totp'
     totp: {
@@ -94,7 +107,14 @@ interface SecondStepProps {
   onClose: () => void
 }
 
-const SecondStep = ({ factorName, factor, isLoading, onSuccess, onClose }: SecondStepProps) => {
+const SecondStep = ({
+  visible,
+  factorName,
+  factor: outerFactor,
+  isLoading,
+  onSuccess,
+  onClose,
+}: SecondStepProps) => {
   const { ui } = useStore()
   const [code, setCode] = useState('')
 
@@ -116,16 +136,35 @@ const SecondStep = ({ factorName, factor, isLoading, onSuccess, onClose }: Secon
     },
   })
 
+  const [factor, setFactor] = useState<{
+    id: string
+    type: 'totp'
+    totp: {
+      qr_code: string
+      secret: string
+      uri: string
+    }
+  } | null>(null)
+
+  // this useEffect is to keep the factor until a new one comes. This is a fix to an issue which
+  // happens when closing the modal, the outer factor is reset to null too soon and the modal
+  // removes a big div mid transition.
+  useEffect(() => {
+    if (outerFactor && factor?.id !== outerFactor.id) {
+      setFactor(outerFactor)
+    }
+  }, [outerFactor])
+
   return (
     <ConfirmationModal
       size="medium"
-      visible
+      visible={visible}
       header={`Verify new factor ${factorName}`}
       buttonLabel="Confirm"
       buttonLoadingLabel="Confirming"
       loading={isVerifying}
-      onSelectCancel={() => unenroll({ factorId: factor.id })}
-      onSelectConfirm={() => challengeAndVerify({ factorId: factor.id, code })}
+      onSelectCancel={() => factor && unenroll({ factorId: factor.id })}
+      onSelectConfirm={() => factor && challengeAndVerify({ factorId: factor.id, code })}
     >
       <Modal.Content>
         <>
@@ -135,15 +174,16 @@ const SecondStep = ({ factorName, factor, isLoading, onSuccess, onClose }: Secon
               app to complete the enrolment.
             </span>
           </div>
-          {isLoading ? (
+          {isLoading && (
             <div className="pb-4 px-4">
               <GenericSkeletonLoader />
             </div>
-          ) : (
+          )}
+          {factor && (
             <>
               <div className="flex justify-center py-3">
                 <div className="h-48 w-48 bg-white rounded">
-                  <Image width={190} height={190} src={factor.totp.qr_code} alt={factor.totp.uri} />
+                  <img width={190} height={190} src={factor.totp.qr_code} alt={factor.totp.uri} />
                 </div>
               </div>
               <div>
