@@ -11,12 +11,14 @@ import { useMfaUnenrollMutation } from 'data/profile/mfa-unenroll-mutation'
 import { useStore } from 'hooks'
 
 interface DeleteFactorModalProps {
-  factorId: string
+  visible: boolean
+  factorId: string | null
   lastFactorToBeDeleted: boolean
   onClose: () => void
 }
 
 const DeleteFactorModal = ({
+  visible,
   factorId,
   lastFactorToBeDeleted,
   onClose,
@@ -32,14 +34,14 @@ const DeleteFactorModal = ({
   return (
     <ConfirmationModal
       size="medium"
-      visible
+      visible={visible}
       danger
       header="Confirm to delete factor"
       buttonLabel="Delete"
       buttonLoadingLabel="Deleting"
       loading={isLoading}
       onSelectCancel={onClose}
-      onSelectConfirm={() => unenroll({ factorId })}
+      onSelectConfirm={() => factorId && unenroll({ factorId })}
     >
       <Modal.Content className="py-6">
         <Alert_Shadcn_ variant="warning">

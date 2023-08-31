@@ -83,14 +83,16 @@ const TOTPFactors = () => {
           )}
         </div>
       </section>
-      {isAddNewFactorOpen && <AddNewFactorModal onClose={() => setIsAddNewFactorOpen(false)} />}
-      {factorToBeDeleted && (
-        <DeleteFactorModal
-          factorId={factorToBeDeleted}
-          lastFactorToBeDeleted={data?.totp.length === 1}
-          onClose={() => setFactorToBeDeleted(null)}
-        />
-      )}
+      <AddNewFactorModal
+        visible={isAddNewFactorOpen}
+        onClose={() => setIsAddNewFactorOpen(false)}
+      />
+      <DeleteFactorModal
+        visible={factorToBeDeleted !== null}
+        factorId={factorToBeDeleted}
+        lastFactorToBeDeleted={data?.totp.length === 1}
+        onClose={() => setFactorToBeDeleted(null)}
+      />
     </>
   )
 }
