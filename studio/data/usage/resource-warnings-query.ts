@@ -8,6 +8,7 @@ import { components } from 'data/api'
 export async function getResourceWarnings(signal?: AbortSignal) {
   const { data, error } = await get(`/platform/projects-resource-warnings`, { signal })
   if (error) throw error
+
   return data
 }
 
