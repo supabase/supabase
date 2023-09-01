@@ -159,7 +159,6 @@ const Layout: FC<Props> = (props) => {
               <div className="border-l">
                 {props.meta?.tocVideo && !!tocVideoPreview && (
                   <div className="relative mb-6 pl-5">
-                    <h1>{props.meta.tocVideo}</h1>
                     <ExpandableVideo imgUrl={tocVideoPreview} videoId={props.meta.tocVideo} />
                   </div>
                 )}

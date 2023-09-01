@@ -341,12 +341,14 @@ export const SocialLoginItems = [
     name: 'Twitter',
     icon: '/docs/img/icons/twitter-icon',
     url: '/guides/auth/social-login/auth-twitter',
+    hasLightIcon: true,
   },
   {
     name: 'GitHub',
     icon: '/docs/img/icons/github-icon',
     url: '/guides/auth/social-login/auth-github',
     isDarkMode: true,
+    hasLightIcon: true,
   },
   {
     name: 'Gitlab',
@@ -435,6 +437,7 @@ export const PhoneLoginsItems = [
     linkDescription:
       'Vonage is a communication platform as a service (CPaaS) provider for consumers and businesses.',
     isDarkMode: true,
+    hasLightIcon: true,
   },
 ]
 
@@ -903,10 +906,20 @@ export const storage: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/storage' },
     { name: 'Quickstart', url: '/guides/storage/quickstart' },
-    { name: 'Uploads', url: '/guides/storage/uploads' },
-    { name: 'Access Control', url: '/guides/storage/access-control' },
-    { name: 'CDN', url: '/guides/storage/cdn' },
-    { name: 'Image Transformations', url: '/guides/storage/image-transformations' },
+    {
+      name: 'Fundamentals',
+      url: undefined,
+      items: [
+        { name: 'Uploading files to Storage', url: '/guides/storage/uploads' },
+        { name: 'Image Transformations', url: '/guides/storage/image-transformations' },
+        { name: 'How caching works', url: '/guides/storage/cdn' },
+      ],
+    },
+    {
+      name: 'Access and security',
+      url: undefined,
+      items: [{ name: 'Access Control', url: '/guides/storage/access-control' }],
+    },
   ],
 }
 
@@ -1099,6 +1112,10 @@ export const platform: NavMenuConstant = {
           name: 'Migrating and Upgrading',
           url: '/guides/platform/migrating-and-upgrading-projects',
         },
+        {
+          name: 'Transfer Project',
+          url: '/guides/platform/project-transfer',
+        },
         { name: 'Network Restrictions', url: '/guides/platform/network-restrictions' },
         { name: 'Performance Tuning', url: '/guides/platform/performance' },
         { name: 'Permissions', url: '/guides/platform/permissions' },
@@ -1108,7 +1125,11 @@ export const platform: NavMenuConstant = {
     {
       name: 'Billing',
       url: undefined,
-      items: [{ name: 'Spend cap', url: '/guides/platform/spend-cap' }],
+      items: [
+        { name: 'How billing works', url: '/guides/platform/org-based-billing' },
+        { name: 'Spend caps and cost-controls', url: '/guides/platform/spend-cap' },
+        { name: 'Enterprise Billing', url: '/guides/platform/enterprise-billing' },
+      ],
     },
     {
       name: 'Single sign-on',
