@@ -3,11 +3,12 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   title: 'OAuth with PKCE flow for SSR',
   description: 'Learn how to configure OAuth authentication in your server-side rendering (SSR) application to work with the PKCE flow.',
+  subtitle: 'Learn how to configure OAuth authentication in your server-side rendering (SSR) application to work with the PKCE flow.',
 }
 
 ### Install Supabase Auth Helpers
 
-The Auth Helpers will assist you in implementing user authentication within your server-side rendering (SSR) framework.
+The Auth Helpers assist with user authentication within server-side rendering (SSR) frameworks.
 
 <Tabs
   scrollable
@@ -53,7 +54,7 @@ PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ### Setting up the Auth Helpers
 
-When using the Supabase client on the server, you must perform extra steps to ensure the user's auth session remains active. Since the user's session is tracked in a cookie, we need to read this cookie and update it if necessary.
+For SSR, the Supabase client requires extra steps to ensure the user's auth session remains active. Since the user's session is tracked in a cookie, we need to read this cookie and update it if necessary.
 
 <Tabs
   scrollable
