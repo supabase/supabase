@@ -7,11 +7,15 @@ import {
   IconChevronDown,
   IconEdit,
   IconLock,
+  IconThumbsDown,
+  IconThumbsUp,
   IconTrash,
   IconUnlock,
 } from 'ui'
 
 import { useDispatch, useTrackedState } from '../../store'
+import { useUrlState } from 'hooks'
+import { useState } from 'react'
 
 interface ColumnMenuProps {
   column: CalculatedColumn<any, unknown>
@@ -22,7 +26,8 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
   const state = useTrackedState()
   const dispatch = useDispatch()
   const { onEditColumn: onEditColumnFunc, onDeleteColumn: onDeleteColumnFunc } = state
-
+  const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
+  const [ascendingMap, setAscendingMap] = useState<{ [key: string]: boolean }>({})
   const columnKey = column.key
 
   function onFreezeColumn() {
@@ -44,6 +49,37 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
   function renderMenu() {
     return (
       <>
+        <Dropdown.Item
+          onClick={() => {
+            let columnAscending = true
+            if (ascendingMap[columnKey] === undefined) {
+              setAscendingMap((prevMap) => {
+                return { ...prevMap, [columnKey]: true }
+              })
+            } else {
+              columnAscending = !ascendingMap[columnKey]
+              setAscendingMap((prevMap) => {
+                return { ...prevMap, [columnKey]: columnAscending }
+              })
+            }
+            setParams((prevParams) => {
+              console.log(prevParams)
+              return {
+                ...prevParams,
+                sort: [`${columnKey}:${columnAscending ? 'asc' : 'desc'}`],
+              }
+            })
+          }}
+          icon={
+            ascendingMap[columnKey] ? <IconThumbsDown size="tiny" /> : <IconThumbsUp size="tiny" />
+          }
+        >
+          {ascendingMap[columnKey] === undefined
+            ? 'Sort by ascending'
+            : ascendingMap[columnKey]
+            ? 'Sort by descending'
+            : 'Sort by ascending'}
+        </Dropdown.Item>
         {state.editable && onEditColumn !== undefined && (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
@@ -74,6 +110,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
             )}
           </Tooltip.Root>
         )}
+
         <Dropdown.Item
           onClick={column.frozen ? onUnfreezeColumn : onFreezeColumn}
           icon={column.frozen ? <IconUnlock size="tiny" /> : <IconLock size="tiny" />}
@@ -91,7 +128,6 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
       </>
     )
   }
-
   return (
     <>
       <Dropdown align="end" side="bottom" overlay={renderMenu()}>
