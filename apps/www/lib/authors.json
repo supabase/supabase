@@ -335,5 +335,12 @@
     "position": "Engineering",
     "author_url": "https://github.com/egor-romanov",
     "author_image_url": "https://github.com/egor-romanov.png"
+  },
+  {
+    "author_id": "kevcodez",
+    "author": "Kevin Grüneberg",
+    "position": "Engineering",
+    "author_url": "https://github.com/kevcodez",
+    "author_image_url": "https://github.com/kevcodez.png"
   }
 ]
