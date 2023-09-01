@@ -1,10 +1,10 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
+import { ResponseError } from 'types'
 import { profileKeys } from './keys'
 import { Profile } from './types'
-import { ResponseError } from 'types'
 
 export type ProfileResponse = Profile
 
@@ -30,14 +30,7 @@ export const useProfileQuery = <TData = ProfileData>({
     {
       staleTime: 1000 * 60 * 30, // default good for 30 mins
       ...options,
+      enabled,
     }
   )
-}
-
-export const useProfilePrefetch = () => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    client.prefetchQuery(profileKeys.profile(), ({ signal }) => getProfile(signal))
-  }, [])
 }

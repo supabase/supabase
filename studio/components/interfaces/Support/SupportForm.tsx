@@ -35,6 +35,8 @@ import { Project } from 'types'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
+import { useRouter } from 'next/router'
+import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -45,6 +47,7 @@ export interface SupportFormProps {
 
 const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   const { ui } = useStore()
+  const { isReady } = useRouter()
   const { ref, subject, category, message } = useParams()
 
   const uploadButtonRef = useRef()
@@ -199,13 +202,11 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     }
 
     if (values.projectRef !== 'no-project') {
-      const URL = `${API_URL}/auth/${values.projectRef}/config`
-      // [Joshen] Will refactor another time once
-      // https://github.com/supabase/supabase/pull/16227 goes in
-      const authConfig = await get(URL)
-      if (!authConfig.error) {
+      try {
+        const authConfig = await getProjectAuthConfig({ projectRef: values.projectRef })
         payload.siteUrl = authConfig.SITE_URL
         payload.additionalRedirectUrls = authConfig.URI_ALLOW_LIST
+      } finally {
       }
     }
 
@@ -269,6 +270,22 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
             resetForm({ values: updatedValues, initialValues: updatedValues })
           }
         }, [isSuccessProjects, isSuccessOrganizations])
+
+        // Populate fields when router is ready, required when navigating to
+        // support form on a refresh browser session
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        useEffect(() => {
+          if (isReady) {
+            const updatedValues = {
+              ...initialValues,
+              projectRef: ref ?? initialValues.projectRef,
+              subject: subject ?? initialValues.subject,
+              category: selectedCategoryFromUrl?.value ?? initialValues.category,
+              message: message ?? initialValues.message,
+            }
+            resetForm({ values: updatedValues, initialValues: updatedValues })
+          }
+        }, [isReady])
 
         return (
           <div className="space-y-8 w-[620px]">
