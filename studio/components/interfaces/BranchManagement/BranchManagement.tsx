@@ -26,6 +26,7 @@ import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutat
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
+import { OPT_IN_TAGS } from 'lib/constants'
 import { useAppUiStateSnapshot } from 'state/app'
 import { MainBranchPanel } from './BranchPanels'
 import CreateBranchSidePanel from './CreateBranchSidePanel'
@@ -40,7 +41,7 @@ const BranchManagement = () => {
   const selectedOrg = useSelectedOrganization()
 
   const hasAccessToBranching =
-    selectedOrg?.opt_in_tags?.includes('PREVIEW_BRANCHES_OPT_IN') ?? false
+    selectedOrg?.opt_in_tags?.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) ?? false
   const hasBranchEnabled = project?.is_branch_enabled
 
   const isBranch = project?.parent_project_ref !== undefined

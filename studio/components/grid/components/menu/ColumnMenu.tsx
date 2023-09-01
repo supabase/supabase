@@ -46,7 +46,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
       <>
         {state.editable && onEditColumn !== undefined && (
           <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger className={`${isEncrypted ? 'opacity-50' : ''}`}>
+            <Tooltip.Trigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
               <Dropdown.Item
                 onClick={onEditColumn}
                 disabled={isEncrypted}
@@ -84,7 +84,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
           <>
             <Divider light />
             <Dropdown.Item onClick={onDeleteColumn} icon={<IconTrash size="tiny" stroke="red" />}>
-              Delete Column
+              Delete column
             </Dropdown.Item>
           </>
         )}

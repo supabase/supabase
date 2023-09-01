@@ -8,6 +8,15 @@
 @import './../../../packages/ui/build/css/themes/dark.css';
 @import './../../../packages/ui/build/css/themes/light.css';
 
+@layer utilities {
+  .run {
+    animation-play-state: running;
+  }
+  .pause {
+    animation-play-state: paused;
+  }
+}
+
 @font-face {
   font-family: 'custom-font';
   src: url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),
@@ -778,4 +787,23 @@ launch week
 .dg.ac {
   z-index: 9999 !important;
   margin-top: 65px !important;
+}
+
+/* Zoomable image */
+
+[data-rmiz-modal]:focus,
+[data-rmiz-modal-overlay]:focus {
+  outline: none !important;
+}
+
+[data-rmiz-modal-overlay],
+[data-rmiz-modal-img] {
+  transition-timing-function: cubic-bezier(0.24, 0.25, 0.05, 1) !important;
+}
+[data-rmiz-modal-overlay='visible'] {
+  @apply !bg-scale-100 dark:!bg-scale-200;
+  opacity: 0.8;
+}
+[data-rmiz-modal-img] {
+  image-rendering: high-quality;
 }

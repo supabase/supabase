@@ -1,13 +1,15 @@
-import { useParams } from 'common'
+import { useIsLoggedIn, useParams } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useMemo } from 'react'
 
-import { useSelectedProject } from './useSelectedProject'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useSelectedProject } from './useSelectedProject'
 
 export function useSelectedOrganization({ enabled = true } = {}) {
+  const isLoggedIn = useIsLoggedIn()
+
   const { slug } = useParams()
-  const { data } = useOrganizationsQuery({ enabled })
+  const { data } = useOrganizationsQuery({ enabled: isLoggedIn && enabled })
   const selectedProject = useSelectedProject()
 
   const localStorageSlug = useMemo(() => {

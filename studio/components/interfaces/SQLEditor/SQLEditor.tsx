@@ -35,8 +35,8 @@ import {
   useSelectedProject,
   useStore,
 } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
+import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
+import { removeCommentsFromSql, uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import Telemetry from 'lib/telemetry'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
@@ -122,8 +122,7 @@ const SQLEditor = () => {
 
   const selectedOrganization = useSelectedOrganization()
   const selectedProject = useSelectedProject()
-  const isOptedInToAI =
-    selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
+  const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
   const [hasEnabledAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema-enabled', true)
   const [isAcceptDiffLoading, setIsAcceptDiffLoading] = useState(false)
   const [, setAiQueryCount] = useLocalStorageQuery('supabase_sql-editor-ai-query-count', 0)
@@ -221,7 +220,9 @@ const SQLEditor = () => {
           ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
           : selectedValue || editorRef.current?.getValue()
 
-        const containsDestructiveOperations = destructiveSqlRegex.some((regex) => regex.test(sql))
+        const containsDestructiveOperations = destructiveSqlRegex.some((regex) =>
+          regex.test(removeCommentsFromSql(sql))
+        )
 
         if (!force && containsDestructiveOperations) {
           setIsConfirmModalOpen(true)

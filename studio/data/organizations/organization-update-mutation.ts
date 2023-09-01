@@ -1,21 +1,37 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { patch } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import { components } from 'data/api'
 
 export type OrganizationUpdateVariables = {
   slug: string
-  name: string
-  billing_email: string
+  name?: string
+  billing_email?: string
+  opt_in_tags?: string[]
 }
 
-export async function updateOrganization({ slug, billing_email }: OrganizationUpdateVariables) {
-  const response = await patch(`${API_URL}/organizations/${slug}`, { name, billing_email })
-  if (response.error) throw response.error
-  return response
+export async function updateOrganization({
+  slug,
+  name,
+  billing_email,
+  opt_in_tags,
+}: OrganizationUpdateVariables) {
+  // @ts-ignore [Joshen] API spec is wrong
+  const payload: components['schemas']['UpdateOrganizationBody'] = {}
+  if (name) payload.name = name
+  if (billing_email) payload.billing_email = billing_email
+  if (opt_in_tags) payload.opt_in_tags = opt_in_tags
+
+  const { data, error } = await patch('/platform/organizations/{slug}', {
+    params: { path: { slug } },
+    body: payload,
+  })
+
+  if (error) throw error
+  return data
 }
 
 type OrganizationUpdateData = Awaited<ReturnType<typeof updateOrganization>>
@@ -40,7 +56,7 @@ export const useOrganizationUpdateMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to update billing email: ${data.message}`)
+          toast.error(`Failed to update organization: ${data.message}`)
         } else {
           onError(data, variables, context)
         }

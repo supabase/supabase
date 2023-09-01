@@ -380,12 +380,12 @@ const ComputeInstanceSidePanel = () => {
                   time.
                 </p>
               ) : selectedCategory !== 'micro' ? (
-                // Hourly usage-billing with org-level subscription
+                // Hourly usage-billing with org-based subscription
                 <p className="text-sm text-scale-1100">
                   There are no immediate charges when changing compute. Compute Hours are a
                   usage-based item and you're billed at the end of your billing cycle based on your
                   compute usage. Read more about{' '}
-                  <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
+                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute">
                     <a target="_blank" rel="noreferrer" className="underline">
                       Compute Billing
                     </a>

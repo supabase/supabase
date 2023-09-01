@@ -8,7 +8,7 @@ import {
   useStore,
   useFlag,
 } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import { format } from 'sql-formatter'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIconAnimation, Button } from 'ui'
@@ -30,8 +30,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   const { setDebugSolution, setAiInput, setSqlDiff, sqlDiff } = useSqlEditor()
   const selectedOrganization = useSelectedOrganization()
   const selectedProject = useSelectedProject()
-  const isOptedInToAI =
-    selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
+  const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
   const [hasEnabledAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema-enabled', true)
 
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema

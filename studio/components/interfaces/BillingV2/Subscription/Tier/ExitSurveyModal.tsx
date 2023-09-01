@@ -118,6 +118,8 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   }
 
+  if (!visible) return null
+
   return (
     <>
       <div className="self-center">

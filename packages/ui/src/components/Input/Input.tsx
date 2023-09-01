@@ -81,7 +81,11 @@ function Input({
   if (values && !value) value = values[id || name]
 
   function handleBlurEvent(e: React.FocusEvent<HTMLInputElement>) {
-    if (handleBlur) handleBlur(e)
+    if (handleBlur) {
+      setTimeout(() => {
+        handleBlur(e)
+      }, 100)
+    }
     if (onBlur) onBlur(e)
   }
 
@@ -267,7 +271,11 @@ function TextArea({
   if (values && !value) value = values[id || name]
 
   function handleBlurEvent(e: React.FocusEvent<HTMLTextAreaElement>) {
-    if (handleBlur) handleBlur(e)
+    if (handleBlur) {
+      setTimeout(() => {
+        handleBlur(e)
+      }, 100)
+    }
     if (onBlur) onBlur(e)
   }
 
