@@ -2,7 +2,17 @@ import type { PostgresColumn, PostgresSchema, PostgresTable } from '@supabase/po
 import { Dictionary } from 'components/grid'
 import { find, get, isEmpty, sortBy } from 'lodash'
 import { useEffect, useState } from 'react'
-import { IconDatabase, IconHelpCircle, Input, Listbox, SidePanel } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  IconAlertTriangle,
+  IconDatabase,
+  IconHelpCircle,
+  Input,
+  Listbox,
+  SidePanel,
+} from 'ui'
 
 import InformationBox from 'components/ui/InformationBox'
 import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
@@ -153,6 +163,8 @@ const ForeignKeySelector = ({
     resolve()
   }
 
+  const matchingColumnTypes = selectedColumn?.format === column?.format
+
   return (
     <SidePanel
       key="ForeignKeySelector"
@@ -173,6 +185,8 @@ const ForeignKeySelector = ({
       customFooter={
         <ActionBar
           backButtonLabel="Cancel"
+          // if the type of the two columns don't match, disable the save button
+          disableApply={!matchingColumnTypes}
           applyButtonLabel="Save"
           closePanel={closePanel}
           applyFunction={onSaveChanges}
@@ -284,6 +298,22 @@ const ForeignKeySelector = ({
                     </Listbox.Option>
                   ))}
                 </Listbox>
+              )}
+              {!matchingColumnTypes && (
+                <Alert_Shadcn_ variant="warning">
+                  <IconAlertTriangle strokeWidth={2} />
+                  <AlertTitle_Shadcn_>The column types don't match</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    The referenced column <span className="text-code">{column.name}</span> is of
+                    type <span className="text-code">{column.format}</span> while the selected
+                    foreign column
+                    <span className="text-code">
+                      {selectedTable?.name}.{selectedColumn?.name}
+                    </span>
+                    has<span className="text-code">{selectedColumn?.data_type}</span>type. These two
+                    columns can't be referenced until one of them change its type.
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
               )}
               <SidePanel.Separator />
               <InformationBox
