@@ -1,15 +1,13 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-
-import { Button, Badge, IconStar, IconChevronDown } from 'ui'
+import { Button, Badge, cn } from 'ui'
 import FlyOut from '~/components/UI/FlyOut'
+import Announcement from '~/components/Announcement/Announcement'
 import Transition from 'lib/Transition'
 
 import SolutionsData from 'data/Solutions'
-
-import Solutions from '~/components/Nav/Product'
-import Developers from '~/components/Nav/Developers'
+import { links as DevelopersData } from 'data/Developers'
 
 import ScrollProgress from '~/components/ScrollProgress'
 
@@ -20,6 +18,52 @@ import Image from 'next/image'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import GitHubButton from './GitHubButton'
+
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from 'ui/src/components/shadcn/ui/navigation-menu'
+import HamburgerButton from './HamburgerMenu'
+
+const ListItem = React.forwardRef<React.ElementRef<'a'>, React.ComponentPropsWithoutRef<'a'>>(
+  ({ className, title, href, children, ...props }, ref) => {
+    return (
+      <li>
+        <NavigationMenuLink asChild>
+          {href ? (
+            <Link href={href}>
+              <a
+                ref={ref}
+                className={cn(
+                  'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+                  className
+                )}
+                {...props}
+              >
+                <div className="text-sm font-medium leading-none">{title}</div>
+                <p className="line-clamp-2 text-sm leading-snug text-muted">{children}</p>
+              </a>
+            </Link>
+          ) : (
+            <div
+              className={cn(
+                'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+                className
+              )}
+            >
+              <div className="text-sm font-medium leading-none">{title}</div>
+              <p className="line-clamp-2 text-sm leading-snug text-muted">{children}</p>
+            </div>
+          )}
+        </NavigationMenuLink>
+      </li>
+    )
+  }
+)
 
 const Nav = () => {
   const { theme, resolvedTheme } = useTheme()
@@ -43,16 +87,6 @@ const Nav = () => {
       document.body.style.overflow = 'auto'
     }
   }, [open])
-
-  function handleToggle(callback: any) {
-    handleCancel()
-    callback()
-  }
-
-  function handleCancel() {
-    setOpenProduct(false)
-    setOpenDevelopers(false)
-  }
 
   const iconSections = Object.values(SolutionsData).map((solution: any, idx: number) => {
     const { name, description, icon, label, url } = solution
@@ -110,94 +144,6 @@ const Nav = () => {
     )
   })
 
-  type HamburgerButtonProps = {
-    toggleFlyOut: Function
-    showLaunchWeekNavMode?: boolean
-  }
-
-  const HamburgerButton = (props: HamburgerButtonProps) => (
-    <div
-      className="absolute inset-y-0 left-0 flex items-center px-4 lg:hidden"
-      onClick={() => props.toggleFlyOut()}
-    >
-      <button
-        className={[
-          'text-scale-900 focus:ring-brand dark:bg-scale-200 dark:hover:bg-scale-300 inline-flex items-center justify-center rounded-md bg-gray-50 p-2 hover:bg-white focus:outline-none focus:ring-2 focus:ring-inset',
-          showLaunchWeekNavMode && '!bg-transparent border border-[#be9eea]',
-        ].join(' ')}
-        aria-expanded="false"
-      >
-        <span className="sr-only">Open main menu</span>
-
-        <svg
-          className="block w-6 h-6"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke={showLaunchWeekNavMode ? '#be9eea' : 'currentColor'}
-          aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M4 6h16M4 12h16M4 18h16"
-          />
-        </svg>
-
-        <svg
-          className="hidden w-6 h-6"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M6 18L18 6M6 6l12 12"
-          />
-        </svg>
-      </button>
-    </div>
-  )
-
-  const FlyOutNavButton = (props: any) => (
-    <div
-      className={[
-        `
-        inline-flex cursor-pointer items-center
-        border-b-2
-        border-transparent
-        px-1
-        text-sm font-medium
-        text-scale-1200 transition-colors`,
-        showLaunchWeekNavMode && '!text-white',
-        props.active ? 'text-brand' : 'hover:text-brand',
-        props.active,
-      ].join(' ')}
-      onClick={props.onClick}
-    >
-      <>
-        <span>{props.title}</span>
-        <div
-          className={
-            'text-scale-900 group-hover:text-scale-900 ml-2 flex h-5 w-5 items-center justify-center transition duration-150 ease-in-out' +
-            (props.active && ' rotate-180 transform transition-all duration-100')
-          }
-        >
-          <IconChevronDown
-            size={14}
-            strokeWidth={2}
-            className={showLaunchWeekNavMode ? 'text-white' : ''}
-          />
-        </div>
-      </>
-    </div>
-  )
-
   return (
     <>
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
@@ -215,7 +161,6 @@ const Nav = () => {
             isLaunchWeekPage && showLaunchWeekNavMode ? '!border-b-0' : '',
           ].join(' ')}
         >
-          {/* <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-10 xl:px-0"> */}
           <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-16 xl:px-20">
             <HamburgerButton
               toggleFlyOut={() => setOpen(true)}
@@ -248,16 +193,46 @@ const Nav = () => {
                   )}
                 </div>
                 <div className="hidden pl-4 sm:ml-6 sm:space-x-4 lg:flex">
-                  <FlyOutNavButton
-                    title={'Product'}
-                    onClick={() => handleToggle(() => setOpenProduct(!openProduct))}
-                    active={openProduct}
-                  />
-                  <FlyOutNavButton
-                    title={'Developers'}
-                    onClick={() => handleToggle(() => setOpenDevelopers(!openDevelopers))}
-                    active={openDevelopers}
-                  />
+                  <NavigationMenu>
+                    <NavigationMenuList>
+                      <NavigationMenuItem>
+                        <NavigationMenuTrigger className="bg-transparent">
+                          Product
+                        </NavigationMenuTrigger>
+                        <NavigationMenuContent>
+                          <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                            {Object.values(SolutionsData).map((component) => (
+                              <ListItem
+                                key={component.name}
+                                title={component.name}
+                                href={component.url}
+                              >
+                                {component.description_short}
+                              </ListItem>
+                            ))}
+                          </ul>
+                        </NavigationMenuContent>
+                      </NavigationMenuItem>
+                      <NavigationMenuItem>
+                        <NavigationMenuTrigger className="bg-transparent">
+                          Developers
+                        </NavigationMenuTrigger>
+                        <NavigationMenuContent>
+                          <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                            {Object.values(DevelopersData).map((component) => (
+                              <ListItem
+                                key={component.text}
+                                title={component.text}
+                                href={component.url}
+                              >
+                                {component.description}
+                              </ListItem>
+                            ))}
+                          </ul>
+                        </NavigationMenuContent>
+                      </NavigationMenuItem>
+                    </NavigationMenuList>
+                  </NavigationMenu>
                   <Link href="/pricing">
                     <a
                       className={[
@@ -423,12 +398,7 @@ const Nav = () => {
             </div>
           </Transition>
         </nav>
-        <FlyOut open={openProduct} handleCancel={handleCancel}>
-          <Solutions />
-        </FlyOut>
-        <FlyOut open={openDevelopers} handleCancel={handleCancel}>
-          <Developers />
-        </FlyOut>
+
         <ScrollProgress />
       </div>
     </>
