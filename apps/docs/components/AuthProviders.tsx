@@ -11,7 +11,7 @@ export default function AuthProviders({ type }: { type: string }) {
         {filterProviders.map((x) => (
           <Link href={`${x.href}`} key={x.name} passHref>
             <a className="col-span-6 lg:col-span-4 xl:col-span-3">
-              <IconPanel title={x.name} icon={x.logo} />
+              <IconPanel title={x.name} icon={x.logo} hasLightIcon={x.hasLightIcon} />
             </a>
           </Link>
         ))}

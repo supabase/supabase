@@ -6,20 +6,15 @@ import { useSelectedOrganization } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 const OrgTeamSettings: NextPageWithLayout = () => {
-  const { data: permissions } = usePermissionsQuery()
+  const { isLoading: isLoadingPermissions } = usePermissionsQuery()
   const selectedOrganization = useSelectedOrganization()
 
   return (
     <>
-      {selectedOrganization === undefined && (permissions ?? []).length === 0 ? (
-        <Loading />
-      ) : (
-        <TeamSettings />
-      )}
+      {selectedOrganization === undefined && isLoadingPermissions ? <Loading /> : <TeamSettings />}
     </>
   )
 }
 
 OrgTeamSettings.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
-
 export default OrgTeamSettings

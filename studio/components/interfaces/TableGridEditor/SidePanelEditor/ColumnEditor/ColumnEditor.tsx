@@ -1,31 +1,21 @@
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { isEmpty, noop } from 'lodash'
-import { Dictionary } from 'components/grid'
-import { Checkbox, SidePanel, Input, Button, IconExternalLink, Toggle } from 'ui'
 import type {
   PostgresColumn,
   PostgresExtension,
   PostgresTable,
   PostgresType,
 } from '@supabase/postgres-meta'
+import { useParams } from 'common'
+import { Dictionary } from 'components/grid'
+import { isEmpty, noop } from 'lodash'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { Button, Checkbox, IconExternalLink, Input, SidePanel, Toggle } from 'ui'
 
-import { useFlag, useStore } from 'hooks'
-import { useParams } from 'common/hooks'
-import ActionBar from '../ActionBar'
-import HeaderTitle from './HeaderTitle'
-import ColumnType from './ColumnType'
-import ColumnForeignKey from './ColumnForeignKey'
-import ColumnDefaultValue from './ColumnDefaultValue'
+import { EncryptionKeySelector } from 'components/interfaces/Settings/Vault'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
+import { useStore } from 'hooks'
 import { ForeignKeySelector } from '..'
-import {
-  generateColumnField,
-  generateColumnFieldFromPostgresColumn,
-  getColumnForeignKey,
-  validateFields,
-  generateCreateColumnPayload,
-  generateUpdateColumnPayload,
-} from './ColumnEditor.utils'
+import ActionBar from '../ActionBar'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
 import {
   ColumnField,
@@ -33,8 +23,18 @@ import {
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from '../SidePanelEditor.types'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
-import { EncryptionKeySelector } from 'components/interfaces/Settings/Vault'
+import ColumnDefaultValue from './ColumnDefaultValue'
+import {
+  generateColumnField,
+  generateColumnFieldFromPostgresColumn,
+  generateCreateColumnPayload,
+  generateUpdateColumnPayload,
+  getColumnForeignKey,
+  validateFields,
+} from './ColumnEditor.utils'
+import ColumnForeignKey from './ColumnForeignKey'
+import ColumnType from './ColumnType'
+import HeaderTitle from './HeaderTitle'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
@@ -70,7 +70,6 @@ const ColumnEditor = ({
   const { ref } = useParams()
   const { meta, vault } = useStore()
   const { project } = useProjectContext()
-  const isTCEEnabled = useFlag('transparentColumnEncryption')
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
@@ -243,18 +242,20 @@ const ColumnEditor = ({
           <FormSectionLabel
             className="lg:!col-span-4"
             description={
-              <Link href="https://supabase.com/docs/guides/database/tables#data-types" passHref>
-                <Button
-                  asChild
-                  type="default"
-                  size="tiny"
-                  icon={<IconExternalLink size={14} strokeWidth={2} />}
-                >
-                  <a target="_blank" rel="noreferrer">
-                    About data types
-                  </a>
-                </Button>
-              </Link>
+              <div>
+                <Link href="https://supabase.com/docs/guides/database/tables#data-types" passHref>
+                  <Button
+                    asChild
+                    type="default"
+                    size="tiny"
+                    icon={<IconExternalLink size={14} strokeWidth={2} />}
+                  >
+                    <a target="_blank" rel="noreferrer">
+                      About data types
+                    </a>
+                  </Button>
+                </Link>
+              </div>
             }
           >
             Data Type
@@ -344,7 +345,7 @@ const ColumnEditor = ({
           />
         </FormSectionContent>
       </FormSection>
-      {isNewRecord && isTCEEnabled && (
+      {isNewRecord && (
         <>
           <SidePanel.Separator />
           <FormSection
@@ -367,7 +368,7 @@ const ColumnEditor = ({
                       <p>
                         You will need to{' '}
                         <Link href={`/project/${ref}/database/extensions?filter=pgsodium`}>
-                          <a className="text-brand-800 hover:text-brand-900 transition">install</a>
+                          <a className="text-brand-300 hover:text-brand transition">install</a>
                         </Link>{' '}
                         the extension <code className="text-xs">pgsodium</code> first before being
                         able to encrypt your column.

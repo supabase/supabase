@@ -6,12 +6,12 @@ import { useSelectedOrganization } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 const OrgInvoices: NextPageWithLayout = () => {
-  const { data: permissions } = usePermissionsQuery()
+  const { isLoading: isLoadingPermissions } = usePermissionsQuery()
   const selectedOrganization = useSelectedOrganization()
 
   return (
     <>
-      {selectedOrganization === undefined && (permissions ?? []).length === 0 ? (
+      {selectedOrganization === undefined && isLoadingPermissions ? (
         <Loading />
       ) : (
         <InvoicesSettings />
@@ -21,5 +21,4 @@ const OrgInvoices: NextPageWithLayout = () => {
 }
 
 OrgInvoices.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
-
 export default OrgInvoices

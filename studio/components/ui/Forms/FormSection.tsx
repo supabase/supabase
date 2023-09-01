@@ -2,12 +2,14 @@ import { Children } from 'react'
 
 const FormSection = ({
   children,
+  id,
   header,
   disabled,
   visible = true,
   className,
 }: {
   children: React.ReactNode
+  id?: string
   header?: React.ReactNode
   disabled?: boolean
   visible?: boolean
@@ -21,7 +23,7 @@ const FormSection = ({
   ]
 
   return (
-    <div className={classes.join(' ')}>
+    <div id={id} className={classes.join(' ')}>
       {header}
       {children}
     </div>

@@ -42,7 +42,7 @@ Migrating projects can be achieved using the Supabase CLI. This is particularly 
 ```bash
 supabase db dump --db-url "$OLD_DB_URL" -f roles.sql --role-only
 supabase db dump --db-url "$OLD_DB_URL" -f schema.sql
-supabase db dump --db-url "$OLD_DB_URL" -f data.sql --data-only
+supabase db dump --db-url "$OLD_DB_URL" -f data.sql --use-copy --data-only
 ```
 
 ### Restore to your new project

@@ -1,3 +1,4 @@
+import { useIsLoggedIn } from 'common'
 import jsonLogic from 'json-logic-js'
 
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
@@ -15,7 +16,11 @@ export function doPermissionsCheck(
   data?: object,
   organizationId?: number
 ) {
-  return (permissions ?? [])
+  if (!permissions || !Array.isArray(permissions)) {
+    return false
+  }
+
+  return permissions
     .filter(
       (permission) =>
         permission.organization_id === organizationId &&
@@ -63,11 +68,15 @@ export function useCheckPermissions(
   organizationId?: number,
   permissions?: Permission[]
 ) {
+  const isLoggedIn = useIsLoggedIn()
+
   const { permissions: allPermissions, organizationId: orgId } = useGetPermissions(
     permissions,
-    organizationId
+    organizationId,
+    isLoggedIn
   )
 
+  if (!isLoggedIn) return false
   if (!IS_PLATFORM) return true
 
   return doPermissionsCheck(allPermissions, action, resource, data, orgId)
