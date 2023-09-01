@@ -13,12 +13,23 @@ export const meta = {
 The Auth Helpers will assist you in implementing user authentication within your server-side rendering (SSR) framework.
 
 <Tabs scrollable size="small" type="underlined" defaultActiveId="nextjs">
-  <TabPanel id="nextjs" label="NextJS">
-    ```bash npm install @supabase/auth-helpers-nextjs @supabase/supabase-js ```
-  </TabPanel>
-  <TabPanel id="sveltekit" label="SvelteKit">
-    ```bash npm install @supabase/auth-helpers-sveltekit @supabase/supabase-js ```
-  </TabPanel>
+
+<TabPanel id="nextjs" label="NextJS">
+
+```bash
+npm install @supabase/auth-helpers-nextjs @supabase/supabase-js
+```
+
+</TabPanel>
+
+<TabPanel id="sveltekit" label="SvelteKit">
+
+```bash
+npm install @supabase/auth-helpers-sveltekit @supabase/supabase-js
+```
+
+</TabPanel>
+
 </Tabs>
 
 ### Set environment variables
@@ -26,14 +37,23 @@ The Auth Helpers will assist you in implementing user authentication within your
 Create an `.env.local` file in your project root directory. You can get your `SITE_URL` and `ANON_KEY` from inside of the [dashboard](https://supabase.com/dashboard/project/_/settings/api).
 
 <Tabs scrollable size="small" type="underlined" defaultActiveId="nextjs">
-  <TabPanel id="nextjs" label="NextJS">
-    ```bash .env.local NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key ```
-  </TabPanel>
-  <TabPanel id="sveltekit" label="SvelteKit">
-    ```bash .env.local PUBLIC_SUPABASE_URL=your_supabase_project_url
-    PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key ```
-  </TabPanel>
+
+<TabPanel id="nextjs" label="NextJS">
+
+```bash .env.local
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+</TabPanel>
+<TabPanel id="sveltekit" label="SvelteKit">
+
+```bash .env.local
+PUBLIC_SUPABASE_URL=your_supabase_project_url
+PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+</TabPanel>
 </Tabs>
 
 ### Setting up the Auth Helpers
