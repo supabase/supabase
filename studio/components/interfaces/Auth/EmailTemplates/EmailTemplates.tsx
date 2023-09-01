@@ -14,6 +14,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { TEMPLATES_SCHEMAS } from 'stores/authConfig/schema'
 import TemplateEditor from './TemplateEditor'
+import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 
 const EmailTemplates = () => {
   const { ref: projectRef } = useParams()
@@ -24,6 +25,11 @@ const EmailTemplates = () => {
     isError,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
+
+  const builtInSMTP =
+    isSuccess &&
+    authConfig &&
+    (!authConfig.SMTP_HOST || !authConfig.SMTP_USER || !authConfig.SMTP_PASS)
 
   return (
     <div>
@@ -65,6 +71,11 @@ const EmailTemplates = () => {
               const panelId = template.title.trim().replace(/\s+/g, '-')
               return (
                 <Tabs.Panel id={panelId} label={template.title} key={panelId}>
+                  {builtInSMTP ? (
+                    <div className="mx-8">
+                      <EmailRateLimitsAlert />
+                    </div>
+                  ) : null}
                   <TemplateEditor
                     key={template.title}
                     template={template}
