@@ -214,7 +214,7 @@ const InfrastructureActivity = () => {
                   <div className="sticky top-32 space-y-6">
                     <div className="space-y-1">
                       <div className="flex items-center space-x-2">
-                        <p className="text-base capitalize m-0">{attribute.name}</p>
+                        <h4 className="text-base capitalize m-0">{attribute.name}</h4>
                       </div>
                       <div className="grid gap-4">
                         {attribute.description.split('\n').map((value, idx) => (

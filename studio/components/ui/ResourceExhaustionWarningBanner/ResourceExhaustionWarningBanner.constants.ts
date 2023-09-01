@@ -3,13 +3,13 @@ export const RESOURCE_WARNING_MESSAGES = {
     content: {
       warning: {
         title:
-          'Your project is currently in readonly mode and is no longer accepting write requests',
+          'Your project is currently in read-only mode and is no longer accepting write requests',
         description:
           'You will need to manually override read-only mode and reduce the disk size to below 95%.',
       },
       critical: {
         title:
-          'Your project is currently in readonly mode and is no longer accepting write requests',
+          'Your project is currently in read-only mode and is no longer accepting write requests',
         description:
           'You will need to manually override read-only mode and reduce the disk size to below 95%.',
       },
@@ -22,15 +22,14 @@ export const RESOURCE_WARNING_MESSAGES = {
     content: {
       warning: {
         title:
-          'Your project is about to deplete its Disk IO Budget, and your instance may become unresponsive once fully exhausted',
+          'Your project is about to deplete its Disk IO Budget, and may become unresponsive once fully exhausted',
         description:
-          'You will need to either optimize your performance, or upgrade your compute to a larger instance.',
+          'You will need to either optimize your performance, or upgrade your compute to a larger plan.',
       },
       critical: {
-        title:
-          'Your project has depleted its Disk IO Budget, and your instance may become unresponsive',
+        title: 'Your project has depleted its Disk IO Budget, and may become unresponsive',
         description:
-          'You will need to either optimize your performance, or upgrade your compute to a larger instance.',
+          'You will need to either optimize your performance, or upgrade your compute to a larger plan.',
       },
     },
     docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-disk-io',
@@ -41,15 +40,14 @@ export const RESOURCE_WARNING_MESSAGES = {
     content: {
       warning: {
         title:
-          'Your project is about to exhaust its disk space budget, and your instance may become unresponsive once fully exhausted',
+          'Your project is about to exhaust its disk space budget, and may become unresponsive once fully exhausted',
         description:
-          'You can opt to increase your disk size up to 200GB if required on the database settings page.',
+          'You can opt to increase your disk size up to 200GB on the database settings page.',
       },
       critical: {
-        title:
-          'Your project has exhausted its disk space budget, and your instance may become unresponsive',
+        title: 'Your project has exhausted its disk space budget, and may become unresponsive',
         description:
-          'You can opt to increase your disk size up to 200GB if required on the database settings page.',
+          'You can opt to increase your disk size up to 200GB on the database settings page.',
       },
     },
     docsUrl: 'https://supabase.com/docs/guides/platform/database-size#disk-management',
@@ -59,15 +57,14 @@ export const RESOURCE_WARNING_MESSAGES = {
   cpu_exhaustion: {
     content: {
       warning: {
-        title:
-          "Your project is currently facing high CPU usage, and your instance's performance is affected",
+        title: 'Your project is currently facing high CPU usage, and its performance is affected',
         description:
           'You will need to either optimize your performance or upgrade your compute to a larger instance',
       },
       critical: {
-        title: "Your project's CPU usage is at 100% and your instance's performance is affected",
+        title: "Your project's CPU usage is at 100% and its performance is affected",
         description:
-          'You will need to either optimize your performance or upgrade your compute to a larger instance',
+          'You will need to either optimize your performance or upgrade your compute to a larger plan',
       },
     },
     docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-cpu',
@@ -78,15 +75,14 @@ export const RESOURCE_WARNING_MESSAGES = {
     content: {
       warning: {
         title:
-          "Your project is currently facing high memory usage, and your instance's performance is affected",
+          'Your project is currently facing high memory usage, and its performance is affected',
         description:
-          'You will need to either optimize your performance or upgrade your compute to a larger instance',
+          'You will need to either optimize your performance or upgrade your compute to a larger plan',
       },
       critical: {
-        title:
-          "Your project's memory usage is at 100%, and your instance's performance is affected",
+        title: "Your project's memory usage is at 100%, and its performance is affected",
         description:
-          'You will need to either optimize your performance or upgrade your compute to a larger instance',
+          'You will need to either optimize your performance or upgrade your compute to a larger plan',
       },
     },
     docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-ram',
@@ -97,13 +93,12 @@ export const RESOURCE_WARNING_MESSAGES = {
     content: {
       warning: {
         title:
-          "Your project is currently exhausting multiple resources, and your instance's performance is affected",
+          'Your project is currently exhausting multiple resources, and its performance is affected',
         description:
           "Check which resources are reaching their threshold on your project's usage page.",
       },
       critical: {
-        title:
-          "Your project has exhausted at least one resource, and your instance's performance is affected",
+        title: 'Your project has exhausted at least one resource, and its performance is affected',
         description:
           "Check which resources have reached their threshold on your project's usage page.",
       },

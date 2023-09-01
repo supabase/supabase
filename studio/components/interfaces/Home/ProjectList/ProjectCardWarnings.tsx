@@ -102,7 +102,8 @@ const ProjectCardWarnings = ({ resourceWarnings }: ProjectCardWarningsProps) => 
     <div>
       <Alert_Shadcn_
         variant={isCritical ? 'destructive' : 'warning'}
-        className="border-r-0 border-l-0 rounded-none my-2 mb-2.5"
+        className="border-0 rounded-none my-2 mb-2.5 [&>svg]:w-[28px]
+[&>svg]:h-[28px] [&>svg]:p-1.5 [&>svg]:left-6 pl-6"
       >
         <IconAlertTriangle strokeWidth={2} />
 
