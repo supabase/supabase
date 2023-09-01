@@ -40,7 +40,7 @@ supabase.auth.signInWithOAuth({
 
 This call takes the user to Apple's consent screen. Once the flow ends, the user's profile information is exchanged and validated with Supabase Auth before it redirects back to your web application with an access and refresh token representing the user's session.
 
-### Configuration
+### Configuration [#configuration-web]
 
 You will require the following information:
 
@@ -113,7 +113,7 @@ Please take a look at these open-source projects which may help you obtain an ID
 
 For apps written in Swift, please consult the [community maintained library](/docs/reference/swift/introduction).
 
-### Configuration
+### Configuration [#configuration-native-app]
 
 Native sign in requires less configuration steps than OAuth flow. You will need to perform these steps:
 
@@ -155,7 +155,7 @@ document.addEventListener('AppleIDSignInOnSuccess', async (event) => {
 
 Please make sure you request for the scope `name email` when initializing the library.
 
-### Configuration
+### Configuration [#configuration-apple-js]
 
 To use Sign in with Apple JS you need to configure these options:
 

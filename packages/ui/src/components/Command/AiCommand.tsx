@@ -16,6 +16,7 @@ import {
 import { SSE } from 'sse.js'
 
 import {
+  AiIconAnimation,
   Button,
   IconAlertTriangle,
   IconCornerDownLeft,
@@ -410,7 +411,12 @@ const AiCommand = () => {
               return (
                 <div key={index} className="px-4 [overflow-anchor:none] mb-6">
                   <div className="flex gap-6 [overflow-anchor:none] mb-6">
-                    <AiIconChat />
+                    <AiIconChat
+                      loading={
+                        message.status === MessageStatus.Pending ||
+                        message.status === MessageStatus.InProgress
+                      }
+                    />
                     <>
                       {message.status === MessageStatus.Pending ? (
                         <div className="bg-scale-700 h-[21px] w-[13px] mt-1 animate-pulse animate-bounce"></div>
@@ -456,7 +462,7 @@ const AiCommand = () => {
                   forceMount
                   key={key}
                 >
-                  <AiIcon />
+                  <AiIconAnimation />
                   {question}
                 </CommandItem>
               )

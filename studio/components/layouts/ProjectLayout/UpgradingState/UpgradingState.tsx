@@ -17,15 +17,17 @@ import {
 
 import { useParams } from 'common/hooks'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
-import { getProjectDetail } from 'data/projects/project-detail-query'
+import { getProjectDetail, invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProjectContext } from '../ProjectContext'
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
+import { useQueryClient } from '@tanstack/react-query'
 
 const UpgradingState = () => {
   const { ref } = useParams()
   const { meta } = useStore()
+  const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const [loading, setLoading] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -55,9 +57,8 @@ const UpgradingState = () => {
     setLoading(true)
 
     const projectDetail = await getProjectDetail({ ref })
-    if (projectDetail) {
-      meta.setProjectDetails(projectDetail)
-    }
+    if (projectDetail) meta.setProjectDetails(projectDetail)
+    if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
   }
 
   const subject = 'Upgrade%20failed%20for%20project'
@@ -74,7 +75,7 @@ const UpgradingState = () => {
             {isCompleted ? (
               <div className="grid gap-4">
                 <div className="relative mx-auto max-w-[300px]">
-                  <IconCheckCircle className="text-brand-900" size={40} strokeWidth={1.5} />
+                  <IconCheckCircle className="text-brand" size={40} strokeWidth={1.5} />
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">Upgrade completed!</p>
@@ -176,7 +177,7 @@ const UpgradingState = () => {
                                 />
                               </div>
                             ) : isCompleted ? (
-                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand-800 border-brand-700">
+                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand-300 border-brand-400">
                                 <IconCheck size={12} className="text-white" strokeWidth={2} />
                               </div>
                             ) : (

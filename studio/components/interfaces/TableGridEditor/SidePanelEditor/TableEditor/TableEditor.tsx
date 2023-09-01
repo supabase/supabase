@@ -1,29 +1,29 @@
-import Link from 'next/link'
-import { FC, useEffect, useState } from 'react'
-import { isUndefined, isEmpty } from 'lodash'
-import { Badge, Checkbox, SidePanel, Input, Alert, IconBookOpen, Button, Modal } from 'ui'
 import type { PostgresTable, PostgresType } from '@supabase/postgres-meta'
+import { isEmpty, isUndefined, noop } from 'lodash'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { Alert, Badge, Button, Checkbox, IconBookOpen, Input, Modal, SidePanel } from 'ui'
 
-import { useStore } from 'hooks'
-import ActionBar from '../ActionBar'
-import HeaderTitle from './HeaderTitle'
-import ColumnManagement from './ColumnManagement'
-import { SpreadsheetImport } from '../'
-import { ColumnField, CreateTablePayload, UpdateTablePayload } from '../SidePanelEditor.types'
-import { DEFAULT_COLUMNS } from './TableEditor.constants'
-import { TableField, ImportContent } from './TableEditor.types'
-import {
-  validateFields,
-  generateTableField,
-  generateTableFieldFromPostgresTable,
-  formatImportedContentToColumnFields,
-} from './TableEditor.utils'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import { useStore } from 'hooks'
+import { SpreadsheetImport } from '../'
+import ActionBar from '../ActionBar'
+import { ColumnField, CreateTablePayload, UpdateTablePayload } from '../SidePanelEditor.types'
+import ColumnManagement from './ColumnManagement'
+import HeaderTitle from './HeaderTitle'
 import RLSDisableModalContent from './RLSDisableModal'
+import { DEFAULT_COLUMNS } from './TableEditor.constants'
+import { ImportContent, TableField } from './TableEditor.types'
+import {
+  formatImportedContentToColumnFields,
+  generateTableField,
+  generateTableFieldFromPostgresTable,
+  validateFields,
+} from './TableEditor.utils'
 
-interface Props {
+interface TableEditorProps {
   table?: PostgresTable
   selectedSchema: string
   isDuplicating: boolean
@@ -45,15 +45,15 @@ interface Props {
   updateEditorDirty: () => void
 }
 
-const TableEditor: FC<Props> = ({
+const TableEditor = ({
   table,
   selectedSchema,
   isDuplicating,
   visible = false,
-  closePanel = () => {},
-  saveChanges = () => {},
-  updateEditorDirty = () => {},
-}) => {
+  closePanel = noop,
+  saveChanges = noop,
+  updateEditorDirty = noop,
+}: TableEditorProps) => {
   const { ui, meta } = useStore()
   const { project } = useProjectContext()
   const isNewRecord = isUndefined(table)

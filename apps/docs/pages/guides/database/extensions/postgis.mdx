@@ -157,7 +157,7 @@ Sorting datasets from closest to farthest, sometimes called nearest-neighbor sor
 
 ```sql
 create or replace function nearby_restaurants(lat float, long float)
-returns setof record
+returns table (id public.restaurants.id%TYPE, name public.restaurants.name%TYPE, location text, dist_meters float)
 language sql
 as $$
   select id, name, st_astext(location) as location, st_distance(location, st_point(long, lat)::geography) as dist_meters
@@ -230,7 +230,7 @@ When you are working on a map-based application where the user scrolls through y
 
 ```sql
 create or replace function restaurants_in_view(min_lat float, min_long float, max_lat float, max_long float)
-returns setof record
+returns table (id public.restaurants.id%TYPE, name public.restaurants.name%TYPE, location text)
 language sql
 as $$
 	select id, name, st_astext(location) as location

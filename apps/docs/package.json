@@ -97,6 +97,7 @@
     "remark-admonitions": "^1.2.1",
     "remark-gfm": "^3.0.1",
     "remark-slug": "^7.0.1",
+    "remark-emoji": "^3.1.2",
     "shiki": "^0.11.1",
     "sse.js": "^0.6.1",
     "ui": "*",

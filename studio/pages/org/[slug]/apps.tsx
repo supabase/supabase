@@ -7,20 +7,12 @@ import { NextPageWithLayout } from 'types'
 
 const OrgOAuthApps: NextPageWithLayout = () => {
   const selectedOrganization = useSelectedOrganization()
-  // const { isLoading: isLoadingPermissions } = usePermissionsQuery()
-  const { data: permissions } = usePermissionsQuery()
+  const { isLoading: isLoadingPermissions } = usePermissionsQuery()
 
   return (
-    <>
-      {selectedOrganization === undefined && (permissions ?? []).length === 0 ? (
-        <Loading />
-      ) : (
-        <OAuthApps />
-      )}
-    </>
+    <>{selectedOrganization === undefined && isLoadingPermissions ? <Loading /> : <OAuthApps />}</>
   )
 }
 
 OrgOAuthApps.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
-
 export default OrgOAuthApps

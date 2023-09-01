@@ -1,25 +1,24 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+
+import { get } from 'data/fetchers'
+import { ResponseError } from 'types'
 import { integrationKeys } from './keys'
-import { IntegrationsVariables, Integration } from './integrations.types'
 
-export type IntegrationsResponse = Integration[]
-
-export async function getIntegrations({}: {}, signal?: AbortSignal) {
-  const response = await get(`${API_URL}/integrations`, {
+export async function getIntegrations(signal?: AbortSignal) {
+  const { data, error } = await get('/platform/integrations', {
+    params: { query: { integration_name: '' } },
     signal,
   })
-  if (response.error) {
-    throw response.error
+  if (error) {
+    throw error
   }
 
-  return response as IntegrationsResponse
+  return data
 }
 
 export type IntegrationsData = Awaited<ReturnType<typeof getIntegrations>>
 export type ProjectIntegrationConnectionsData = Awaited<ReturnType<typeof getIntegrations>>
-export type IntegrationsError = unknown
+export type IntegrationsError = ResponseError
 
 export const useIntegrationsQuery = <TData = IntegrationsData>({
   enabled = true,
@@ -27,6 +26,6 @@ export const useIntegrationsQuery = <TData = IntegrationsData>({
 }: UseQueryOptions<IntegrationsData, IntegrationsError, TData> = {}) =>
   useQuery<IntegrationsData, IntegrationsError, TData>(
     integrationKeys.integrationsList(),
-    ({ signal }) => getIntegrations({}, signal),
+    ({ signal }) => getIntegrations(signal),
     { enabled: enabled, ...options }
   )

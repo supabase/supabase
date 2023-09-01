@@ -31,10 +31,10 @@ Jos haluat nähdä, miten osallistuminen tapahtuu, käy osoitteessa [Getting Sta
 
 ## Yhteisö ja tuki
 
-- [Yhteisön foorumi](https://github.com/supabase/supabase/discussions). Paras: Apua rakentamiseen, keskustelua tietokannan parhaista käytännöistä.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). Parasta: Supabasea käytettäessä kohdatut viat ja virheet.
-- [Sähköpostituki](https://supabase.com/docs/support#business-support). Paras: tietokantaan tai infrastruktuuriin liittyvät ongelmat.
-- [Discord](https://discord.supabase.com). Paras: sovellusten jakamiseen ja yhteisön kanssa hengailuun.
+- [Yhteisön foorumi](https://github.com/supabase/supabase/discussions). Sopii parhaiten: Apua rakentamiseen, keskustelua tietokannan parhaista käytännöistä.
+- [GitHub Issues](https://github.com/supabase/supabase/issues). Sopii parhaiten: Supabasea käytettäessä kohdatut viat ja virheet.
+- [Sähköpostituki](https://supabase.com/docs/support#business-support). Sopii parhaiten: Tietokantaan tai infrastruktuuriin liittyvät ongelmat.
+- [Discord](https://discord.supabase.com). Sopii parhaiten: Sovellusten jakamiseen ja yhteisön kanssa hengailuun.
 
 ## Status
 
