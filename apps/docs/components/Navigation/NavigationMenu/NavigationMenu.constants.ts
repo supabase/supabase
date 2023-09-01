@@ -484,7 +484,6 @@ export const auth = {
         },
         { name: 'Password Reset', url: '/guides/auth/auth-password-reset' },
         { name: 'Email Templates', url: '/guides/auth/auth-email-templates' },
-        { name: 'OAuth with PKCE flow for SSR', url: '/guides/auth/oauth-with-pkce-flow-for-ssr' },
       ],
     },
     {
@@ -513,6 +512,10 @@ export const auth = {
         {
           name: 'Email Auth with PKCE flow for SSR',
           url: '/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr',
+        },
+        {
+          name: 'OAuth with PKCE flow for SSR',
+          url: '/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
         },
       ],
     },
