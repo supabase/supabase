@@ -15,7 +15,7 @@ interface JsonEditProps {
   backButtonLabel?: string
   applyButtonLabel?: string
   closePanel: () => void
-  onSaveJSON: (value: string | number) => void
+  onSaveJSON: (value: string | number | null) => void
 }
 
 const JsonEdit = ({

@@ -14,9 +14,15 @@ export const tryParseJson = (jsonString: any) => {
 
 export const minifyJSON = (prettifiedJSON: string) => {
   try {
-    const res = JSON.stringify(JSON.parse(prettifiedJSON))
-    if (!isNaN(Number(res))) return Number(res)
-    else return res
+    if (prettifiedJSON.trim() === '') {
+      return null;
+    }
+    const res = JSON.stringify(JSON.parse(prettifiedJSON));
+    if (!isNaN(Number(res))) {
+      return Number(res)
+    } else {
+      return res
+    }
   } catch (err) {
     throw err
   }
