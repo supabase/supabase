@@ -112,6 +112,7 @@ const Partners = () => {
             </div>
             <div className="col-span-1 lg:col-span-3 w-full max-w-4xl grid gap-8 rounded md:grid-cols-2">
               <InteractiveShimmerCard
+                hasShimmer
                 hasInnerShimmer={false}
                 hasActiveOnHover={true}
                 innerClassName="px-8 py-6 group flex flex-col gap-4"

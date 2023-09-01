@@ -472,13 +472,6 @@
         "type": "function"
       },
       {
-        "id": "session",
-        "title": "Retrieve a session",
-        "slug": "auth-session",
-        "product": "auth",
-        "type": "function"
-      },
-      {
         "id": "auth-update",
         "title": "Update a user",
         "slug": "auth-update",

@@ -214,8 +214,12 @@ export interface paths {
   "/platform/organizations/{slug}/billing/subscription": {
     /** Gets the current subscription */
     get: operations["SubscriptionController_getSubscription"];
-    /** Updates subscription */
+    /** Previews subscription change */
     put: operations["SubscriptionController_updateSubscription"];
+  };
+  "/platform/organizations/{slug}/billing/subscription/preview": {
+    /** Updates subscription */
+    post: operations["SubscriptionController_previewSubscriptionChange"];
   };
   "/platform/organizations/{slug}/billing/plans": {
     /** Gets subscription plans */
@@ -1818,6 +1822,8 @@ export interface components {
       SMS_PROVIDER?: string;
       SMS_MESSAGEBIRD_ACCESS_KEY?: string;
       SMS_MESSAGEBIRD_ORIGINATOR?: string;
+      SMS_TEST_OTP?: string;
+      SMS_TEST_OTP_VALID_UNTIL?: string;
       SMS_TEXTLOCAL_API_KEY?: string;
       SMS_TEXTLOCAL_SENDER?: string;
       SMS_TWILIO_ACCOUNT_SID?: string;
@@ -5458,6 +5464,26 @@ export interface operations {
     };
     responses: {
       200: never;
+      403: never;
+      /** @description Failed to update subscription */
+      500: never;
+    };
+  };
+  /** Updates subscription */
+  SubscriptionController_previewSubscriptionChange: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateSubscriptionBody"];
+      };
+    };
+    responses: {
+      201: never;
       403: never;
       /** @description Failed to update subscription */
       500: never;
