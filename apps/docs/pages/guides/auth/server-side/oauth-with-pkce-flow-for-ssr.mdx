@@ -2,8 +2,10 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   title: 'OAuth with PKCE flow for SSR',
-  description: 'Learn how to configure OAuth authentication in your server-side rendering (SSR) application to work with the PKCE flow.',
-  subtitle: 'Learn how to configure OAuth authentication in your server-side rendering (SSR) application to work with the PKCE flow.',
+  description:
+    'Learn how to configure OAuth authentication in your server-side rendering (SSR) application to work with the PKCE flow.',
+  subtitle:
+    'Learn how to configure OAuth authentication in your server-side rendering (SSR) application to work with the PKCE flow.',
 }
 
 ### Install Supabase Auth Helpers
@@ -17,14 +19,18 @@ The Auth Helpers assist with user authentication within server-side rendering (S
   defaultActiveId="nextjs"
 >
 <TabPanel id="nextjs" label="NextJS">
+
 ```bash
 npm install @supabase/auth-helpers-nextjs @supabase/supabase-js
 ```
+
 </TabPanel>
 <TabPanel id="sveltekit" label="SvelteKit">
+
 ```bash
 npm install @supabase/auth-helpers-sveltekit @supabase/supabase-js
 ```
+
 </TabPanel>
 </Tabs>
 
@@ -39,16 +45,20 @@ Create an `.env.local` file in your project root directory. You can get your `SI
   defaultActiveId="nextjs"
 >
 <TabPanel id="nextjs" label="NextJS">
+
 ```bash .env.local
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
+
 </TabPanel>
 <TabPanel id="sveltekit" label="SvelteKit">
+
 ```bash .env.local
 PUBLIC_SUPABASE_URL=your_supabase_project_url
 PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
+
 </TabPanel>
 </Tabs>
 
@@ -80,6 +90,7 @@ export async function middleware(req) {
   return res
 }
 ```
+
 </TabPanel>
 <TabPanel id="sveltekit" label="SvelteKit">
 Create a new `hooks.server.js` file in the root of your project and populate with the following:
@@ -110,6 +121,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   })
 }
 ```
+
 </TabPanel>
 </Tabs>
 
@@ -127,27 +139,28 @@ In order to use OAuth we will need to setup a endpoint for the `code` exchange, 
 Create a new file at `app/auth/callback/route.js` and populate with the following:
 
 ```js app/auth/callback/route.js
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
 
 export async function GET(req) {
-  const { searchParams } = new URL(req.url);
-  const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/";
+  const { searchParams } = new URL(req.url)
+  const code = searchParams.get('code')
+  const next = searchParams.get('next') ?? '/'
 
   if (code) {
-    const supabase = createRouteHandlerClient({ cookies: () => cookies() });
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const supabase = createRouteHandlerClient({ cookies: () => cookies() })
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      return NextResponse.redirect(new URL(`/${next.slice(1)}`, req.url));
+      return NextResponse.redirect(new URL(`/${next.slice(1)}`, req.url))
     }
   }
 
   // return the user to an error page with instructions
-  return NextResponse.redirect(new URL('/auth/auth-code-error', req.url));
+  return NextResponse.redirect(new URL('/auth/auth-code-error', req.url))
 }
 ```
+
 </TabPanel>
 <TabPanel id="sveltekit" label="SvelteKit">
 Create a new file at `src/routes/auth/callback/+server.js` and populate with the following:
@@ -174,17 +187,18 @@ export const GET = async (event) => {
   throw redirect(303, '/auth/auth-code-error');
 };
 ```
+
 </TabPanel>
 </Tabs>
 
 Let's point our `.signInWithOAuth` method's redirect to the callback route we create above:
 
 ```js
-await supabase.auth.signInWithOAuth({ 
-	email,
-	options: {
-		redirectTo: `http://example.com/auth/callback`
-	}
+await supabase.auth.signInWithOAuth({
+  email,
+  options: {
+    redirectTo: `http://example.com/auth/callback`,
+  },
 })
 ```
 
