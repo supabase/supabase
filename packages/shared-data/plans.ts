@@ -122,7 +122,6 @@ export const plans: PricingInformation[] = [
     description: 'For large-scale applications managing serious workloads.',
     features: [
       `Designated Support manager & SLAs`,
-      `Enterprise OAuth providers`,
       `SSO/SAML`,
       `On-premise support`,
       `24×7×365 premium enterprise support`,
