@@ -57,10 +57,7 @@ This will serve as the `client_secret` when you make API calls to authenticate t
 
 This will allow your users to use your custom Azure login page when logging in.
 
-- Select the Directory (Tenant) ID value.
-- The Azure Tenant URL should look like this: `https://login.microsoftonline.com/<tenant-id>`
-
-![Obtain the tenant url](/docs/img/guides/auth-azure/azure-tenant-url.png)
+Set the tenant URL in your Supabase Azure Provider settings to `https://login.microsoftonline.com/common`
 
 ## Add login code to your client app
 
@@ -77,7 +74,7 @@ async function signInWithAzure() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'azure',
     options: {
-      scopes: 'email',
+      scopes: 'email', // this is important
     },
   })
 }
