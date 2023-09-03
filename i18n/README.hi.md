@@ -1,6 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727234-cda046d6-28c6-491a-b284-b86c5cede25d.png#gh-light-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
 </p>
 
 ---
@@ -12,9 +12,9 @@
 - [x] होस्टेड पोस्टग्रेज डेटाबेस। [प्रलेखन](https://supabase.com/docs/guides/database)
 - [x] प्रमाणीकरण और प्राधिकरण। [प्रलेखन](https://supabase.com/docs/guides/auth)
 - [x] उत्पन्न एपीआईस।
-  - [x] रेस्ट। [प्रलेखन](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] रीयलटाइम सदस्यता। [प्रलेखन](https://supabase.com/docs/guides/database/api#realtime-api)
-  - [x] ग्राफ़क्यूएल (प्रयोगात्मक)। [प्रलेखन](https://supabase.com/docs/guides/database/api#graphql-api)
+  - [x] रेस्ट। [प्रलेखन](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] रीयलटाइम सदस्यता। [प्रलेखन](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] ग्राफ़क्यूएल (प्रयोगात्मक)। [प्रलेखन](https://supabase.com/docs/guides/api#graphql-api-overview)
 - [x] फ़ंक्शंस।
   - [x] डेटाबेस फ़ंक्शंस। [प्रलेखन](https://supabase.com/docs/guides/database/functions)
   - [x] एज फ़ंक्शंस। [प्रलेखन](https://supabase.com/docs/guides/functions)
@@ -27,19 +27,19 @@
 
 पूर्ण प्रलेखन के लिए, [supabase.com/docs](https://supabase.com/docs) पर जाएँ
 
-योगदान करने के लिए, [गेट्टिंग स्टार्टेड](https://github.com/supabase/supabase/blob/master/DEVELOPERS.md) पेज पर जाएँ
+योगदान करने के लिए, [गेट्टिंग स्टार्टेड](../DEVELOPERS.md) पेज पर जाएँ
 
-## सामुदायिक तथा सहयोग
+## समुदाय तथा समर्थन
 
 - [सामुदायिक मंच](https://github.com/supabase/supabase/discussions)। निर्माण में मदद और डेटाबेस की सर्वोत्तम प्रथाओं के बारे में चर्चा के लिए उचित है।
-- [गिटहब इश्यूस](https://github.com/supabase/supabase/issues)। सुपाबेस का उपयोग करते समय बगस और त्रुटियां के लिए उचित है।
+- [गिटहब इश्यूस](https://github.com/supabase/supabase/issues)। सुपाबेस का उपयोग करते समय बग्स​ और त्रुटियां के लिए उचित है।
 - [ई-मेल समर्थन](https://supabase.com/docs/support#business-support)। आपके डेटाबेस और इंफ़्रास्ट्रक्चर के साथ समस्याएं के लिए उचित है।
 - [डिस्कॉर्ड](https://discord.supabase.com/)। अपने प्रोजेक्ट्स शेयर करने के लिए और हमारी सुपाबेस समुदाय के साथ बातचीत करने के लिए उचित है।
 
 ## स्थिति
 
 - [x] अल्फा: हम चुनिंदा ग्राहकों के साथ सुपरबास का परीक्षण कर रहे हैं
-- [x] सार्वजनिक अल्फा: कोई भी [app.supabase.com](https://app.supabase.com) के जरिए शामिल हो सकता है। लेकिन हम पर आसान हो जाओ, कुछ मोड़ हैं।
+- [x] सार्वजनिक अल्फा: कोई भी [supabase.com/dashboard](https://supabase.com/dashboard) के जरिए शामिल हो सकता है। लेकिन हम पर आसान हो जाओ, कुछ मोड़ हैं।
 - [x] सार्वजनिक बीटा: अधिकांश गैर-एंटरप्राइज़ उपयोग-मामलों के लिए पर्याप्त स्थिर
 - [ ] सार्वजनिक: उत्पादन-तैयार
 
@@ -55,9 +55,9 @@
 
 **वर्तमान वास्तुकला**
 
-सुपाबसे [होस्टेड प्लेटफार्म](https://app.supabase.com). आप साइन अप कर सकते हैं और कुछ भी स्थापित किए बिना सुपाबसे का उपयोग करना शुरू कर सकते हैं। हम अभी भी स्थानीय विकास का अनुभव पैदा कर रहे हैं - यह अब मंच स्थिरता के साथ-साथ हमारा मुख्य फोकस है।
+सुपाबसे [होस्टेड प्लेटफार्म](https://supabase.com/dashboard). आप साइन अप कर सकते हैं और कुछ भी स्थापित किए बिना सुपाबसे का उपयोग करना शुरू कर सकते हैं। हम अभी भी स्थानीय विकास का अनुभव पैदा कर रहे हैं - यह अब मंच स्थिरता के साथ-साथ हमारा मुख्य फोकस है।
 
-![आर्किटेक्चर](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
+![आर्किटेक्चर](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) 30 से अधिक वर्षों के सक्रिय विकास के साथ एक वस्तु-संबंधपरक डेटाबेस प्रणाली है जिसने इसे विश्वसनीयता, सुविधा मजबूती और प्रदर्शन के लिए एक मजबूत प्रतिष्ठा अर्जित की है।
 - [Realtime](https://github.com/supabase/realtime) एक एलिक्जिर सर्वर है जो आपको पोस्टग्रॉसीक्यूएल आवेषण, अपडेट्स को सुनने की अनुमति देता है और वेबसोकेट का उपयोग करके हटाता है। सुपबेस पोस्टग्रेज की अंतर्निहित प्रतिकृति कार्यक्षमता को सुनता है, प्रतिकृति बाइट स्ट्रीम को JSON में परिवर्तित करता है, फिर JSON को वेबस्कॉक पर प्रसारित करता है।

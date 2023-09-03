@@ -1,23 +1,20 @@
-import Link from 'next/link'
-import { observer } from 'mobx-react-lite'
-import { FC, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams, useTheme } from 'common'
+import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
+import { useState } from 'react'
 import { Button, IconExternalLink } from 'ui'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { checkPermissions, useStore } from 'hooks'
-import { useParams } from 'common/hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import { useTheme } from 'common'
 
-interface Props {}
-
-const VaultToggle: FC<Props> = () => {
+const VaultToggle = () => {
   const { meta, ui } = useStore()
   const { ref } = useParams()
   const { isDarkMode } = useTheme()
   const [isEnabling, setIsEnabling] = useState(false)
-  const canToggleVault = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
+  const canToggleVault = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
 
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isNotAvailable = vaultExtension === undefined

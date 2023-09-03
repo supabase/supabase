@@ -6,7 +6,7 @@ import { IconAlertCircle, IconLoader, Input } from 'ui'
 
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
 import Snippets from 'components/to-be-cleaned/Docs/Snippets'
 import Panel from 'components/ui/Panel'
@@ -36,7 +36,7 @@ const APIKeys = () => {
   } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
-  const canReadAPIKeys = checkPermissions(PermissionAction.READ, 'service_api_keys')
+  const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
 
   // Get the API service
   const apiService = settings?.autoApiService
@@ -139,7 +139,7 @@ const APIKeys = () => {
                   for your tables and configured policies. You may also use the service key which
                   can be found{' '}
                   <Link href={`/project/${projectRef}/settings/api`}>
-                    <a className="transition text-brand-800 hover:text-brand-900">here</a>
+                    <a className="transition text-brand hover:text-brand-600">here</a>
                   </Link>{' '}
                   to bypass RLS.
                 </p>

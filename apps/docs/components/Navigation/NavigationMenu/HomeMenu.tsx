@@ -3,8 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Fragment } from 'react'
-import { Badge } from '~/../../packages/ui'
-import { cn } from 'ui/src/utils/cn'
+import { Badge, cn } from 'ui'
 import { HOMEPAGE_MENU_ITEMS } from './NavigationMenu.constants'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
 
@@ -51,7 +50,11 @@ const NavigationMenuHome = () => {
                             >
                               {link?.icon && <HomeMenuIconPicker icon={link.icon} />}
                               {link.label}
-                              {link.community && <Badge size="small">Community</Badge>}
+                              {link.community && (
+                                <Badge size="small" color="scale">
+                                  Community
+                                </Badge>
+                              )}
                             </li>
                           </a>
                         </Link>

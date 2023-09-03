@@ -7,8 +7,9 @@
 	export let form
 
 	let { session, supabase, profile } = data
+	$: ({ session, supabase, profile } = data)
 
-	let profileForm: any
+	let profileForm: HTMLFormElement
 	let loading = false
 	let fullName: string = profile?.full_name ?? ''
 	let username: string = profile?.username ?? ''
@@ -49,7 +50,7 @@
 		/>
 		<div>
 			<label for="email">Email</label>
-			<input id="email" type="text" value={session?.user.email} disabled />
+			<input name="email" id="email" type="text" value={session?.user.email} disabled />
 		</div>
 
 		<div>

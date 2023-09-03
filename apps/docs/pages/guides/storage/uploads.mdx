@@ -4,6 +4,7 @@ export const meta = {
   id: 'storage-uploads',
   title: 'Storage Uploads',
   description: 'Learn how to upload files to Supabase Storage.',
+  subtitle: 'Learn how to upload files to Supabase Storage.',
   sidebar_label: 'Uploads',
 }
 
@@ -51,8 +52,7 @@ async function uploadFile(file) {
 
 The Resumable upload method is recommended for uploading large files that may exceed 6MB in size or for scenarios where network stability is a concern or if you simply want to have a progress bar for your uploads.
 
-Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resumable uploads. TUS stands for The Upload Server and is an open protocol for supporting resumable uploads. The protocol allows the upload process to be resumed from where it left off in case of interruptions.
-This method can be implemented using the tus-js-client library, or other client-side libraries like [Uppy-js](https://uppy.io/docs/tus/) that support the TUS protocol.
+Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resumable uploads. TUS stands for The Upload Server and is an open protocol for supporting resumable uploads. The protocol allows the upload process to be resumed from where it left off in case of interruptions. This method can be implemented using the tus-js-client library, or other client-side libraries like [Uppy-js](https://uppy.io/docs/tus/) that support the TUS protocol.
 
 Here's an example of how to upload a file using `tus-js-client`:
 

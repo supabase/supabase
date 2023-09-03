@@ -1,51 +1,58 @@
-import { FC, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from 'ui'
 
-import { useStore, checkPermissions } from 'hooks'
+import { useParams } from 'common'
+import { components } from 'data/api'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import { Provider } from './AuthProvidersForm.types'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
+import { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
 
-interface Props {
+export interface ProviderFormProps {
+  config: components['schemas']['GetGoTrueConfigResponse']
   provider: Provider
 }
 
-const ProviderForm: FC<Props> = ({ provider }) => {
+const ProviderForm = ({ config, provider }: ProviderFormProps) => {
   const [open, setOpen] = useState(false)
-  const { authConfig, ui } = useStore()
-
+  const { ui } = useStore()
+  const { ref: projectRef } = useParams()
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
-  const canUpdateConfig = checkPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 
   const generateInitialValues = () => {
     const initialValues: { [x: string]: string } = {}
+    // the config is already loaded through the parent component
     Object.keys(provider.properties).forEach((key) => {
       // When the key is a 'double negative' key, we must reverse the boolean before adding it to the form
       const isDoubleNegative = doubleNegativeKeys.includes(key)
 
       if (provider.title === 'SAML 2.0') {
-        initialValues[key] = authConfig.config[key] ?? false
+        initialValues[key] = (config as any)[key] ?? false
       } else {
-        initialValues[key] = isDoubleNegative
-          ? !authConfig.config[key]
-          : authConfig.config[key] ?? ''
+        initialValues[key] = isDoubleNegative ? !(config as any)[key] : (config as any)[key] ?? ''
       }
     })
     return initialValues
   }
 
   // [Joshen] Doing this check as SAML doesn't follow the same naming structure as the other provider options
-  const isActive =
+  const isActive: boolean =
     provider.title === 'SAML 2.0'
-      ? authConfig.config['SAML_ENABLED'] || false
-      : authConfig.config[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]
+      ? (config && (config as any)['SAML_ENABLED']) ?? false
+      : (config && (config as any)[`EXTERNAL_${provider?.title?.toUpperCase()}_ENABLED`]) ?? false
   const INITIAL_VALUES = generateInitialValues()
 
-  const onSubmit = async (values: any, { setSubmitting, resetForm }: any) => {
+  const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
 
     // When the key is a 'double negative' key, we must reverse the boolean before the payload can be sent
@@ -55,21 +62,23 @@ const ProviderForm: FC<Props> = ({ provider }) => {
       }
     })
 
-    const { error } = await authConfig.update(payload)
-
-    if (!error) {
-      resetForm({ values: { ...values }, initialValues: { ...values } })
-      setOpen(false)
-      ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
-    } else {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to update settings:  ${error?.message}`,
-      })
-    }
-
-    setSubmitting(false)
+    updateAuthConfig(
+      { projectRef: projectRef!, config: payload },
+      {
+        onError: (error) => {
+          ui.setNotification({
+            error,
+            category: 'error',
+            message: `Failed to update settings:  ${error?.message}`,
+          })
+        },
+        onSuccess: () => {
+          resetForm({ values: { ...values }, initialValues: { ...values } })
+          setOpen(false)
+          ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
+        },
+      }
+    )
   }
 
   return (
@@ -98,8 +107,8 @@ const ProviderForm: FC<Props> = ({ provider }) => {
           </div>
           <div className="flex items-center gap-3">
             {isActive ? (
-              <div className="flex items-center gap-1 rounded-full border border-brand-700 bg-brand-200 py-1 px-1 text-xs text-brand-900">
-                <span className="rounded-full bg-brand-900 p-0.5 text-xs text-brand-200">
+              <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
+                <span className="rounded-full bg-brand p-0.5 text-xs text-brand-200">
                   <IconCheck strokeWidth={2} size={12} />
                 </span>
                 <span className="px-1">Enabled</span>
@@ -118,7 +127,7 @@ const ProviderForm: FC<Props> = ({ provider }) => {
         validationSchema={provider.validationSchema}
         onSubmit={onSubmit}
       >
-        {({ isSubmitting, handleReset, initialValues, values }: any) => {
+        {({ handleReset, initialValues, values }: any) => {
           const noChanges = JSON.stringify(initialValues) === JSON.stringify(values)
           return (
             <Collapsible.Content>
@@ -145,15 +154,21 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                   )}
                   {provider.misc.requiresRedirect && (
                     <>
-                      <ReactMarkdown className="text-xs text-scale-900">
-                        {provider.misc.helper}
-                      </ReactMarkdown>
                       <Input
                         copy
                         readOnly
                         disabled
-                        label="Redirect URL"
-                        value={`https://${ui.selectedProjectRef}.supabase.co/auth/v1/callback`}
+                        label="Callback URL (for OAuth)"
+                        value={
+                          customDomainData?.customDomain?.status === 'active'
+                            ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
+                            : `https://${projectRef}.supabase.co/auth/v1/callback`
+                        }
+                        descriptionText={
+                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                            {provider.misc.helper}
+                          </ReactMarkdown>
+                        }
                       />
                     </>
                   )}
@@ -165,7 +180,7 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                         handleReset()
                         setOpen(false)
                       }}
-                      disabled={isSubmitting}
+                      disabled={isUpdatingConfig}
                     >
                       Cancel
                     </Button>
@@ -173,8 +188,8 @@ const ProviderForm: FC<Props> = ({ provider }) => {
                       <Tooltip.Trigger type="button">
                         <Button
                           htmlType="submit"
-                          loading={isSubmitting}
-                          disabled={isSubmitting || !canUpdateConfig || noChanges}
+                          loading={isUpdatingConfig}
+                          disabled={isUpdatingConfig || !canUpdateConfig || noChanges}
                         >
                           Save
                         </Button>

@@ -25,11 +25,11 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
     aria-selected={isActive}
     role="tab"
   >
-    <div className="relative w-full h-[2px] bg-scale-700 group-hover:bg-scale-800 rounded-full overflow-hidden">
+    <div className="relative w-full h-[2px] bg-scale-700 opacity-80 group-hover:opacity-100 rounded-full overflow-hidden">
       {isActive && (
         <motion.div
           className={[
-            'absolute inset-0 w-full right-full bg-brand-900 h-full transition-opacity',
+            'absolute inset-0 w-full right-full bg-brand h-full transition-opacity',
             progress! > 99.7 ? 'opacity-0' : 'opacity-100',
           ].join(' ')}
           style={{ x: `${progress! - 100}%` }}

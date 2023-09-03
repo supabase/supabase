@@ -1,5 +1,6 @@
-import { marked } from 'marked'
 import { GetStaticPaths, GetStaticProps } from 'next'
+import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { serialize } from 'next-mdx-remote/serialize'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -12,7 +13,13 @@ import supabase from '~/lib/supabase'
 import { Partner } from '~/types/partners'
 import Error404 from '../../404'
 
-function Partner({ partner }: { partner: Partner }) {
+function Partner({
+  partner,
+  overview,
+}: {
+  partner: Partner
+  overview: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>
+}) {
   if (!partner) return <Error404 />
   return (
     <>
@@ -25,7 +32,7 @@ function Partner({ partner }: { partner: Partner }) {
           url: `https://supabase.com/partners/experts/${partner.slug}`,
           images: [
             {
-              url: partner.images[0] ?? partner.logo,
+              url: partner.images ? partner.images[0] : partner.logo,
             },
           ],
         }}
@@ -85,7 +92,7 @@ function Partner({ partner }: { partner: Partner }) {
                   },
                 }}
               >
-                {partner.images.map((image: any, i: number) => {
+                {partner.images?.map((image: any, i: number) => {
                   return (
                     <SwiperSlide key={i}>
                       <div className="relative ml-3 mr-3 block cursor-move overflow-hidden rounded-md">
@@ -129,7 +136,9 @@ function Partner({ partner }: { partner: Partner }) {
                   </div>
                 )}
 
-                <div className="prose" dangerouslySetInnerHTML={{ __html: partner.overview }} />
+                <div className="prose">
+                  <MDXRemote {...overview} />
+                </div>
               </div>
 
               <div>
@@ -151,7 +160,7 @@ function Partner({ partner }: { partner: Partner }) {
                   <div className="flex items-center justify-between py-2">
                     <span className="text-scale-900">Category</span>
                     <Link href={`/partners/experts#${partner.category.toLowerCase()}`}>
-                      <a className="text-brand-900 hover:text-brand-800 transition-colors">
+                      <a className="text-brand hover:text-brand-300 transition-colors">
                         {partner.category}
                       </a>
                     </Link>
@@ -163,20 +172,20 @@ function Partner({ partner }: { partner: Partner }) {
                       href={partner.website}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-brand-900 hover:text-brand-800 transition-colors"
+                      className="text-brand hover:text-brand-300 transition-colors"
                     >
                       {new URL(partner.website).host}
                     </a>
                   </div>
 
-                  {partner.type === 'technology' && (
+                  {partner.type === 'technology' && partner.docs && (
                     <div className="flex items-center justify-between py-2">
                       <span className="text-scale-900">Documentation</span>
                       <a
                         href={partner.docs}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-brand-900 hover:text-brand-800 transition-colors"
+                        className="text-brand hover:text-brand-300 transition-colors"
                       >
                         <span className="flex items-center space-x-1">
                           <span>Learn</span>
@@ -197,7 +206,11 @@ function Partner({ partner }: { partner: Partner }) {
 
 // This function gets called at build time
 export const getStaticPaths: GetStaticPaths = async () => {
-  const { data: slugs } = await supabase.from('partners').select('slug')
+  const { data: slugs } = await supabase
+    .from('partners')
+    .select('slug')
+    .eq('approved', true)
+    .eq('type', 'expert')
 
   const paths: {
     params: { slug: string }
@@ -231,10 +244,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   // Parse markdown
-  partner.overview = marked.parse(partner.overview)
+  const overview = await serialize(partner.overview)
 
   return {
-    props: { partner },
+    props: { partner, overview },
     revalidate: 18000, // In seconds - refresh every 5 hours
   }
 }

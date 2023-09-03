@@ -7,9 +7,76 @@ export const meta = {
 
 There are several ways to use Supabase:
 
-- [Supabase Cloud](https://app.supabase.com): you don't need to deploy anything. We will manage and scale your infrastructure.
+- [Supabase Cloud](https://supabase.com/dashboard): you don't need to deploy anything. We will manage and scale your infrastructure.
 - [Docker](/docs/guides/self-hosting/docker): deploy to your own infrastructure.
-- Kubernetes: coming soon.
+
+### Community
+
+There are several community-driven projects to help you deploy Supabase. We encourage you to try them out and contribute back to the community.
+
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {community.map((x) => (
+    <div className="md:col-span-6 xl:col-span-3" key={x.href}>
+      <Link href={x.href} passHref>
+        <a>
+          <GlassPanel title={x.name}>{x.description}</GlassPanel>
+        </a>
+      </Link>
+    </div>
+  ))}
+</div>
+
+export const community = [
+  {
+    name: 'Kubernetes',
+    description: 'Helm charts to deploy a Supabase on Kubernetes.',
+    href: 'https://github.com/supabase-community/supabase-kubernetes',
+  },
+  {
+    name: 'Terraform',
+    description: 'A community-driven Terraform Provider for Supabase.',
+    href: 'https://github.com/supabase-community/supabase-terraform',
+  },
+  {
+    name: 'Traefik',
+    description: 'A self-hosted Supabase setup with Traefik as a reverse proxy.',
+    href: 'https://github.com/supabase-community/supabase-traefik',
+  },
+  {
+    name: 'AWS',
+    description: 'A CloudFormation template for Supabase.',
+    href: 'https://github.com/supabase-community/supabase-on-aws',
+  },
+]
+
+### Third-party
+
+The following third-party providers have shown consistent support for the self-hosted version of Supabase:.
+
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {external.map((x) => (
+    <div className="md:col-span-6" key={x.href}>
+      <Link href={x.href} passHref>
+        <a>
+          <GlassPanel title={x.name}>{x.description}</GlassPanel>
+        </a>
+      </Link>
+    </div>
+  ))}
+</div>
+
+export const external = [
+  {
+    name: 'Digital Ocean',
+    description: 'Deploys using Terraform.',
+    href: 'https://supabase-on-do.product-docs.pages.dev/developer-center/hosting-supabase-on-digitalocean/',
+  },
+  {
+    name: 'StackGres',
+    description: 'Deploys using Kubernetes.',
+    href: 'https://stackgres.io/blog/running-supabase-on-top-of-stackgres/',
+  },
+]
 
 ## Architecture
 
@@ -53,8 +120,8 @@ to run automatically when starting the database container.
 We recommend installing all extensions into an `extensions` schema. This will keep your API clean,
 since all tables in the `public` schema are exposed via the API.
 
-```sql
 {/* prettier-ignore */}
+```sql
 create schema if not exists extensions;
 create extension if not exists "uuid-ossp" with schema extensions;
 create extension if not exists pgcrypto with schema extensions;
@@ -71,46 +138,7 @@ For working with JWT and Auth functions.
 
 ### Roles
 
-Supabase creates several default roles in your Postgres database. To restore defaults at any time you can run the commands inside the
-[schema initialization scripts](https://github.com/supabase/postgres/tree/develop/migrations/db/init-scripts). Remember to change your
-[role passwords](/docs/guides/self-hosting/docker#securing-your-setup) before deploying to production environments.
-
-##### `postgres`
-
-The default PostgreSQL role. This has admin privileges.
-
-##### `anon`
-
-For "anonymous access". This is the role which the API (PostgREST) will use when a user _is not_ logged in.
-
-##### `authenticator`
-
-A special role for the API (PostgREST). It has very limited access, and is used to validate a JWT and then
-"change into" another role determined by the JWT verification.
-
-##### `authenticated`
-
-For "authenticated access". This is the role which the API (PostgREST) will use when a user _is_ logged in.
-
-##### `service_role`
-
-For elevated access. This role is used by the API (PostgREST) to bypass Row Level Security.
-
-##### `supabase_auth_admin`
-
-Used by the Auth middleware to connect to the database and run migration. Access is scoped to the `auth` schema.
-
-##### `supabase_storage_admin`
-
-Used by the Auth middleware to connect to the database and run migration. Access is scoped to the `storage` schema.
-
-##### `dashboard_user`
-
-For running commands via the Supabase UI.
-
-##### `supabase_admin`
-
-Supabase Administrative role for maintaining your database.
+Supabase creates several [default roles](/docs/guides/database/postgres-roles) in your Postgres database. To restore defaults at any time you can run the commands inside the [schema initialization scripts](https://github.com/supabase/postgres/tree/develop/migrations/db/init-scripts). Remember to change your [role passwords](/docs/guides/self-hosting/docker#securing-your-setup) before deploying to production environments.
 
 ### Realtime Logs
 
@@ -145,15 +173,6 @@ If you have decoupled your database from the middleware, then you should be able
 Supabase is evolving fast, and we'll continue to improve the migration strategy as part of our core offering.
 
 We realize that database migrations are difficult, and this is one of the problems we plan to make easy for developers.
-
-## Deployment options
-
-While Supabase officially supports Docker, we have several other deployment strategies managed by the community:
-
-- [supabase-docker](/docs/guides/self-hosting/docker) (Official)
-- [supabase-kubernetes](https://github.com/supabase-community/supabase-kubernetes) (Unofficial)
-- [supabase-terraform](https://github.com/supabase-community/supabase-terraform) (Unofficial)
-- [supabase-traefik](https://github.com/supabase-community/supabase-traefik) (Unofficial)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

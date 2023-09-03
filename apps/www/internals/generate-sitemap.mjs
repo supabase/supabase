@@ -101,6 +101,27 @@ async function generate() {
     parser: 'html',
   })
 
+  /**
+   * generate sitemap router
+   *
+   * this points to www and docs sitemaps
+   */
+  const sitemapRouter = `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://supabase.com/sitemap_www.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://supabase.com/docs/sitemap.xml</loc>
+  </sitemap>
+</sitemapindex>
+`
+
+  /**
+   * write sitemaps
+   */
+  // eslint-disable-next-line no-sync
+  writeFileSync('public/sitemap.xml', sitemapRouter)
   // eslint-disable-next-line no-sync
   writeFileSync('public/sitemap_www.xml', formatted)
 }

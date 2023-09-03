@@ -190,7 +190,7 @@ export default {
         rotate-0
         group-state-open:rotate-180
         group-data-[state=open]:rotate-180
-        ease-[cubic-bezier(0.87,_0,_0.13,_1)]
+        ease-&lsqb;cubic-bezier(0.87,_0,_0.13,_1)&rsqb;
         transition-transform duration-300
         duration-200
       `,
@@ -210,13 +210,13 @@ export default {
    */
 
   badge: {
-    base: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-opacity-10',
+    base: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-normal bg-opacity-10',
     size: {
       large: 'px-3 py-0.5 rounded-full text-sm',
     },
     dot: '-ml-0.5 mr-1.5 h-2 w-2 rounded-full',
     color: {
-      brand: 'bg-brand-200 text-brand-1100 border border-brand-700',
+      brand: 'bg-brand-500 text-brand-600 border border-brand-400',
       scale: 'bg-scale-200 text-scale-1100 border border-scale-700',
       tomato: `bg-tomato-200 text-tomato-1100 border border-tomato-700`,
       red: `bg-red-200 text-red-1100 border border-red-700`,
@@ -269,10 +269,10 @@ export default {
         description: `text-scale-1100`,
       },
       success: {
-        base: `bg-brand-300 dark:bg-brand-100 border-brand-700`,
-        icon: `text-brand-900`,
-        header: `text-brand-1200`,
-        description: `text-brand-1100`,
+        base: `bg-brand-300 dark:bg-brand-100 border-brand-400`,
+        icon: `text-brand`,
+        header: `text-brand-600`,
+        description: `text-brand-600`,
       },
       neutral: {
         base: `bg-scale-300 dark:bg-scale-300 border-scale-500`,
@@ -408,121 +408,6 @@ export default {
     },
     scrollable: `overflow-auto whitespace-nowrap no-scrollbar mask-fadeout-right`,
     content: `focus:outline-none transition-height`,
-  },
-
-  /*
-   * Button
-   */
-
-  // button: {
-  //   base : 'border border-4'
-  // }
-
-  button: {
-    base: `
-      relative
-      cursor-pointer
-      inline-flex items-center space-x-2
-      text-center
-      font-regular
-      transition ease-out duration-200
-      rounded
-      ${defaults['focus-visible']}
-
-    `,
-    label: `truncate`,
-    container: 'inline-flex font-medium',
-    type: {
-      primary: `
-        bg-brand-fixed-1100 hover:bg-brand-fixed-1000
-        text-white
-        bordershadow-brand-fixed-1000 hover:bordershadow-brand-fixed-900 dark:bordershadow-brand-fixed-1000 dark:hover:bordershadow-brand-fixed-1000
-        focus-visible:outline-brand-600
-      `,
-      secondary: `
-        bg-scale-1200
-        text-scale-100 hover:text-scale-800
-        focus-visible:text-scale-600
-
-        bordershadow-scale-1100 hover:bordershadow-scale-900
-
-        focus-visible:outline-scale-700
-      `,
-      default: `
-        text-scale-1200
-        bg-scale-100 hover:bg-scale-300
-        bordershadow-scale-600 hover:bordershadow-scale-700
-        dark:bordershadow-scale-700 hover:dark:bordershadow-scale-800
-        dark:bg-scale-500 dark:hover:bg-scale-600
-        focus-visible:outline-brand-600
-
-      `,
-      alternative: `
-        text-brand-1100
-        bg-brand-200 hover:bg-brand-400
-        bordershadow-brand-600 hover:bordershadow-brand-800
-        dark:bordershadow-brand-700 hover:dark:bordershadow-brand-800
-        focus-visible:border-brand-800
-        focus-visible:outline-brand-600
-      `,
-      outline: `
-        text-scale-1200
-        bg-transparent
-        bordershadow-scale-600 hover:bordershadow-scale-700
-        dark:bordershadow-scale-800 hover:dark:bordershadow-scale-900
-        focus-visible:outline-scale-700
-      `,
-      dashed: `
-        text-scale-1200
-        border
-        border-dashed
-        border-scale-700 hover:border-scale-900
-        bg-transparent
-        focus-visible:outline-scale-700
-      `,
-      link: `
-        text-brand-1100
-        border
-        border-transparent
-        hover:bg-brand-400
-        border-opacity-0
-        bg-opacity-0 dark:bg-opacity-0
-        shadow-none
-        focus-visible:outline-scale-700
-      `,
-      text: `
-        text-scale-1200
-        hover:bg-scale-500
-        shadow-none
-        focus-visible:outline-scale-700
-      `,
-      danger: `
-        text-red-1100
-        bg-red-200
-        bordershadow-red-700 hover:bordershadow-red-900
-        hover:bg-red-900
-        hover:text-lo-contrast
-        focus-visible:outline-red-700
-      `,
-      warning: `
-        text-amber-1100
-        bg-amber-200
-        bordershadow-amber-700 hover:bordershadow-amber-900
-        hover:bg-amber-900
-        hover:text-hi-contrast
-        focus-visible:outline-amber-700
-      `,
-    },
-    block: 'w-full flex items-center justify-center',
-    shadow: 'shadow-sm',
-    size: {
-      ...default__padding_and_text,
-    },
-    loading: 'animate-spin',
-    // disabled prefix is disabled (lol..) by default in tailwind
-    // so we apply normal utilities instead, however you can add disabled prefixes if you enabled them in tailwind config.
-    // see more: https://tailwindcss.com/docs/hover-focus-and-other-states#disabled
-    disabled: 'opacity-50 cursor-not-allowed pointer-events-none',
   },
 
   /*
@@ -683,7 +568,7 @@ export default {
       bg-transparent
       ${defaults.focus}
       focus:ring-scale-400
-      text-brand-900
+      text-brand
       border-scale-700
       shadow-sm
       rounded
@@ -744,7 +629,7 @@ export default {
       focus:ring-brand-400
       border-scale-700
 
-      text-brand-900
+      text-brand
       shadow-sm
       cursor-pointer
       peer
@@ -1049,8 +934,8 @@ export default {
       hover:bg-scale-700
     `,
     active: `
-      !bg-brand-900
-      !hover:bg-brand-900
+      !bg-brand
+      !hover:bg-brand
     `,
     handle_container: {
       tiny: 'h-4 w-7',
@@ -1200,7 +1085,7 @@ export default {
     `,
     content: `
       z-40
-      bg
+      bg-overlay
       border
       rounded
       shadow-lg
@@ -1383,8 +1268,8 @@ export default {
             z-10
 
             border-l
-            border-brand-900
-            group-hover:border-brand-900
+            border-brand
+            group-hover:border-brand
           `,
           rounded: `rounded-md`,
         },
@@ -1570,8 +1455,8 @@ export default {
     option_active: `text-scale-1200 bg-scale-600`,
     option_disabled: `cursor-not-allowed opacity-50`,
     option_inner: `flex items-center space-x-3`,
-    option_check: `absolute inset-y-0 right-0 flex items-center pr-3 text-brand-900`,
-    option_check_active: `text-brand-900`,
+    option_check: `absolute inset-y-0 right-0 flex items-center pr-3 text-brand`,
+    option_check_active: `text-brand`,
     option_check_icon: `h-5 w-5`,
   },
 
@@ -1615,7 +1500,7 @@ export default {
     },
     spinner: `
       absolute
-      text-brand-900 animate-spin
+      text-brand animate-spin
       inset-0
       m-auto
     `,

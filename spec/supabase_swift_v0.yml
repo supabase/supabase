@@ -44,7 +44,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          let city: CityModel = try await client.database
+          let cities: [CityModel] = try await client.database
                       .from("cities")
                       .execute().value
           ```
@@ -53,7 +53,7 @@ functions:
         description: You can select specific fields from your tables.
         code: |
           ```js
-          let city: CityModel = try await client.database
+          let cities: [CityModel] = try await client.database
                       .from("cities")
                       .select(columns:"name")
                       .execute().value
@@ -63,7 +63,7 @@ functions:
         description: If your database has foreign key relationships, you can query related tables too.
         code: |
           ```js
-          let country: CountryModel = try await client.database
+          let countries: [CountryModel] = try await client.database
                       .from("countries")
                       .select(columns:"""
                                       id,
@@ -92,7 +92,7 @@ functions:
           (both in the users) table
         code: |
           ```js
-          let message: MessageModel = try await client.database
+          let messages: [MessageModel] = try await client.database
                       .from("messages")
                       .select(columns:"""
                                       content,
@@ -123,7 +123,7 @@ functions:
           [PostgREST docs](http://postgrest.org/en/v7.0.0/api.html#json-columns) for more details.
         code: |
           ```js
-          let country: UserModel = try await client.database
+          let users: [UserModel] = try await client.database
                       .from("users")
                       .select(columns:"""
                                       id, name
@@ -2148,7 +2148,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          let url = try await supabase.auth.signOut()
+          try await supabase.auth.signOut()
           ```
   - id: verify-otp
     title: 'verifyOtp()'

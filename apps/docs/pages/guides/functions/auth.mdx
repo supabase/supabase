@@ -19,7 +19,7 @@ By creating a supabase client with the auth context from the function, you can d
 1. Get the user object.
 2. Run queries in the context of the user with [Row Level Security (RLS)](/docs/guides/auth/row-level-security) policies enforced.
 
-```js lines=14,17-19,22-23 title=supabase/functions/select-from-table-with-auth-rls/index.ts
+```js mark=14,17:19,22:23 supabase/functions/select-from-table-with-auth-rls/index.ts
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 

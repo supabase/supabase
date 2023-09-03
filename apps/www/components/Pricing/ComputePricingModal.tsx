@@ -88,9 +88,9 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                       <td key={column.key} className="p-3">
                         {column.key === 'dedicated' ? (
                           column.value ? (
-                            <IconPricingIncludedCheck tier="Pro plan" />
+                            <IconPricingIncludedCheck plan="Pro plan" />
                           ) : (
-                            <IconPricingMinus tier="Free plan" />
+                            <IconPricingMinus plan="Free plan" />
                           )
                         ) : (
                           column.value
@@ -119,14 +119,14 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                     </th>
                     <td
                       className={`px-4 py-3 ${
-                        column.key === 'plan' ? 'text-brand-900 pt-16 lg:pt-3' : ''
+                        column.key === 'plan' ? 'text-brand pt-16 lg:pt-3' : ''
                       }`}
                     >
                       {column.key === 'dedicated' ? (
                         column.value ? (
-                          <IconPricingIncludedCheck tier="Pro plan" />
+                          <IconPricingIncludedCheck plan="Pro plan" />
                         ) : (
-                          <IconPricingMinus tier="Free plan" />
+                          <IconPricingMinus plan="Free plan" />
                         )
                       ) : (
                         column.value

@@ -1,6 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { patch } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
+import { ResponseError } from 'types'
 import { edgeFunctionsKeys } from './keys'
 
 export type EdgeFunctionsUpdateVariables = {
@@ -30,20 +33,28 @@ type EdgeFunctionsUpdateData = Awaited<ReturnType<typeof updateEdgeFunction>>
 
 export const useEdgeFunctionUpdateMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<EdgeFunctionsUpdateData, unknown, EdgeFunctionsUpdateVariables>,
+  UseMutationOptions<EdgeFunctionsUpdateData, ResponseError, EdgeFunctionsUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<EdgeFunctionsUpdateData, unknown, EdgeFunctionsUpdateVariables>(
+  return useMutation<EdgeFunctionsUpdateData, ResponseError, EdgeFunctionsUpdateVariables>(
     (vars) => updateEdgeFunction(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef, slug } = variables
         await queryClient.invalidateQueries(edgeFunctionsKeys.detail(projectRef, slug))
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to update edge function: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

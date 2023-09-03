@@ -1,8 +1,44 @@
-import { User } from '@supabase/gotrue-js'
+import { IS_PLATFORM } from './constants'
+import { User, Session } from '@supabase/gotrue-js'
 import { gotrueClient } from 'common'
+
+import { getFlags } from './configcat'
+
 export { STORAGE_KEY } from 'common'
 
 export const auth = gotrueClient
+
+let currentSession: Session | null = null
+
+auth.onAuthStateChange((event, session) => {
+  currentSession = session
+})
+
+/**
+ * Grabs the currently available access token, or calls getSession.
+ */
+export async function getAccessToken() {
+  // ignore if server-side
+  if (typeof window === 'undefined') return undefined
+
+  const aboutToExpire = currentSession?.expires_at
+    ? currentSession.expires_at - Math.ceil(Date.now() / 1000) < 30
+    : false
+
+  if (!currentSession || aboutToExpire) {
+    const {
+      data: { session },
+      error,
+    } = await auth.getSession()
+    if (error) {
+      throw error
+    }
+
+    return session?.access_token
+  }
+
+  return currentSession.access_token
+}
 
 export const getAuthUser = async (token: String): Promise<any> => {
   try {
@@ -34,15 +70,31 @@ export const getIdentity = (gotrueUser: User) => {
   }
 }
 
-// NOTE: do not use any imports in this function,
-// as it is used standalone in the documents head
+// NOTE: do not use any imports in this function as it is used standalone in the documents head
+// [Joshen] Potentially can remove after full move over to /dashboard
 export const getReturnToPath = (fallback = '/projects') => {
   const searchParams = new URLSearchParams(location.search)
-  let returnTo = searchParams.get('returnTo') ?? fallback
+
+  // [Joshen] Remove base path value ("/dashboard") from returnTo
+  // because we're having this in the document's head, we won't have access
+  // to process.env, hardcoding the value as a workaround
+  const returnTo = (searchParams.get('returnTo') ?? fallback).replace('/dashboard', '')
 
   searchParams.delete('returnTo')
 
   const remainingSearchParams = searchParams.toString()
 
-  return returnTo + (remainingSearchParams ? `?${remainingSearchParams}` : '')
+  let validReturnTo
+
+  // only allow returning to internal pages. e.g. /dashboard
+  try {
+    // if returnTo is a relative path, this will throw an error
+    new URL(returnTo)
+    // if no error, returnTo is a valid URL and NOT an internal page
+    validReturnTo = fallback
+  } catch (_) {
+    validReturnTo = returnTo
+  }
+
+  return validReturnTo + (remainingSearchParams ? `?${remainingSearchParams}` : '')
 }

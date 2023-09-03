@@ -1,36 +1,31 @@
-import { useState } from 'react'
-import { Button, Modal, IconTrash } from 'ui'
-import { useStore } from 'hooks'
-import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-delete-mutation'
+import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
+import { Button, IconTrash, Modal } from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useStore } from 'hooks'
 
 const AccessTokenList = observer(() => {
   const { ui } = useStore()
   const { data: tokens, isLoading } = useAccessTokensQuery()
-  const { mutateAsync: deleteToken } = useAccessTokenDeleteMutation()
+  const { mutate: deleteToken } = useAccessTokenDeleteMutation({
+    onSuccess: () => {
+      ui.setNotification({ category: 'success', message: 'Successfully deleted access token' })
+      setIsOpen(false)
+    },
+  })
 
   const [isOpen, setIsOpen] = useState(false)
   const [token, setToken] = useState<AccessToken | undefined>(undefined)
 
-  async function onDeleteToken(tokenId: number) {
-    try {
-      await deleteToken({ id: tokenId })
-      setIsOpen(false)
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete token: ${error.message}`,
-      })
-    }
-  }
+  const onDeleteToken = async (tokenId: number) => deleteToken({ id: tokenId })
 
   return (
     <>
-      <div className="max-w-7xl">
+      <div>
         <Table
           head={[
             <Table.th key="header-token">Token</Table.th>,
@@ -61,7 +56,7 @@ const AccessTokenList = observer(() => {
                       </Table.td>
                       <Table.td>
                         <Button
-                          as="span"
+                          asChild
                           type="default"
                           title="Delete token"
                           className="px-1"
@@ -70,7 +65,9 @@ const AccessTokenList = observer(() => {
                             setIsOpen(true)
                           }}
                           icon={<IconTrash />}
-                        ></Button>
+                        >
+                          <span></span>
+                        </Button>
                       </Table.td>
                     </Table.tr>
                   )
@@ -85,6 +82,7 @@ const AccessTokenList = observer(() => {
         danger={true}
         header="Confirm to delete"
         buttonLabel="Delete"
+        buttonLoadingLabel="Deleting"
         onSelectCancel={() => setIsOpen(false)}
         onSelectConfirm={() => {
           if (token) onDeleteToken(token.id)

@@ -3,9 +3,10 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { organizationKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type OrganizationPaymentMethodsVariables = { slug?: string }
-export type OrganizationPaymentMethodsResponse = {
+export type OrganizationPaymentMethod = {
   id: string
   customer: string
   type: string
@@ -29,9 +30,9 @@ export type OrganizationPaymentMethodsResponse = {
     name: string | null
     phone: string | null
   }
-}[]
+}
 
-export async function getOrganizations(
+export async function getOrganizationPaymentMethods(
   { slug }: OrganizationPaymentMethodsVariables,
   signal?: AbortSignal
 ) {
@@ -40,11 +41,13 @@ export async function getOrganizations(
   const response = await get(`${API_URL}/organizations/${slug}/payments`, { signal })
   if (response.error) throw response.error
 
-  return response.data as OrganizationPaymentMethodsResponse
+  return response.data as OrganizationPaymentMethod[]
 }
 
-export type OrganizationPaymentMethodsData = Awaited<ReturnType<typeof getOrganizations>>
-export type OrganizationPaymentMethodsError = unknown
+export type OrganizationPaymentMethodsData = Awaited<
+  ReturnType<typeof getOrganizationPaymentMethods>
+>
+export type OrganizationPaymentMethodsError = ResponseError
 
 export const useOrganizationPaymentMethodsQuery = <TData = OrganizationPaymentMethodsData>(
   { slug }: OrganizationPaymentMethodsVariables,
@@ -55,7 +58,7 @@ export const useOrganizationPaymentMethodsQuery = <TData = OrganizationPaymentMe
 ) =>
   useQuery<OrganizationPaymentMethodsData, OrganizationPaymentMethodsError, TData>(
     organizationKeys.paymentMethods(slug),
-    ({ signal }) => getOrganizations({ slug }, signal),
+    ({ signal }) => getOrganizationPaymentMethods({ slug }, signal),
     { enabled: enabled, ...options }
   )
 
@@ -67,7 +70,7 @@ export const useOrganizationPaymentMethodsPrefetch = ({
   return useCallback(
     () =>
       client.prefetchQuery(organizationKeys.paymentMethods(slug), ({ signal }) =>
-        getOrganizations({ slug }, signal)
+        getOrganizationPaymentMethods({ slug }, signal)
       ),
     []
   )
