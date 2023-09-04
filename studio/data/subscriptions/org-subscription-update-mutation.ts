@@ -4,6 +4,7 @@ import { API_URL } from 'lib/constants'
 import { toast } from 'react-hot-toast'
 import { ResponseError } from 'types/base'
 import { subscriptionKeys } from './keys'
+import { usageKeys } from 'data/usage/keys'
 
 export type SubscriptionTier =
   | 'tier_free'
@@ -54,7 +55,17 @@ export const useOrgSubscriptionUpdateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { slug } = variables
-        await queryClient.invalidateQueries(subscriptionKeys.orgSubscription(slug))
+
+        // [Kevin] Backend can return stale data as it's waiting for the Stripe-sync to complete. Until that's solved in the backend
+        // we are going back to monkey here and delay the invalidation
+        await new Promise((resolve) => setTimeout(resolve, 2000))
+
+        await Promise.all([
+          queryClient.invalidateQueries(subscriptionKeys.orgSubscription(slug)),
+          queryClient.invalidateQueries(subscriptionKeys.orgPlans(slug)),
+          queryClient.invalidateQueries(usageKeys.orgUsage(slug)),
+        ])
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
