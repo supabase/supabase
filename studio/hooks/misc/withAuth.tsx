@@ -20,7 +20,7 @@ const PLATFORM_ONLY_PAGES = [
   'auth/url-configuration',
 ]
 
-export function withAuth<T extends JSX.IntrinsicAttributes>(
+export function withAuth<T>(
   WrappedComponent: ComponentType<T> | NextPageWithLayout<T, T>,
   options: {
     /**
@@ -34,7 +34,7 @@ export function withAuth<T extends JSX.IntrinsicAttributes>(
     useHighestAAL: boolean
   } = { useHighestAAL: true }
 ) {
-  const WithAuthHOC: ComponentType<T> = (props: T) => {
+  const WithAuthHOC: ComponentType<T> = (props) => {
     const router = useRouter()
     const { basePath } = router
     const { ref } = useParams()
