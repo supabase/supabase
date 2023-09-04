@@ -61,13 +61,16 @@ as $$
 declare
   status int;
   content text;
+  avatar_name text;
 begin
   if coalesce(old.avatar_url, '') <> ''
       and (tg_op = 'DELETE' or (old.avatar_url <> new.avatar_url)) then
+    -- extract avatar name
+    avatar_name := substring(old.avatar_url from '/([^\/]+)\?.*$');
     select
       into status, content
       result.status, result.content
-      from public.delete_avatar(old.avatar_url) as result;
+      from public.delete_avatar(avatar_name) as result;
     if status <> 200 then
       raise warning 'Could not delete avatar: % %', status, content;
     end if;
