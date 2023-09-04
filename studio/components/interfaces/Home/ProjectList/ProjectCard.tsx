@@ -31,7 +31,7 @@ const ProjectCard = ({
   const desc = `${project.cloud_provider} | ${project.region}`
 
   const isReadonly = useProjectReadOnlyStatus(projectRef)
-  const isBranchingEnabled = project.preview_branch_refs.length > 0
+  const isBranchingEnabled = project.preview_branch_refs?.length > 0
   const isGithubIntegrated = githubIntegration !== undefined
   const isVercelIntegrated = vercelIntegration !== undefined
   const githubRepository = githubIntegration?.metadata.name ?? undefined

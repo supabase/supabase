@@ -30,7 +30,7 @@ const TransferProjectButton = () => {
 
   const organizations = (allOrganizations || [])
     .filter((it) => it.id !== projectOrgId)
-    // Only orgs with org-level subscription
+    // Only orgs with org-based subscription
     .filter((it) => it.subscription_id)
 
   const [isOpen, setIsOpen] = useState(false)
@@ -185,7 +185,7 @@ const TransferProjectButton = () => {
               <div className="mt-8 mx-4 border-t pt-4 space-y-2">
                 {organizations.length === 0 ? (
                   <div className="flex items-center gap-2 bg-scale-400 p-3 text-sm">
-                    <IconAlertCircle /> You do not have any organizations with an organization-level
+                    <IconAlertCircle /> You do not have any organizations with an organization-based
                     subscription.
                   </div>
                 ) : (
@@ -214,9 +214,9 @@ const TransferProjectButton = () => {
 
                 <p className="text-scale-1000 text-sm">
                   The target organization needs to use{' '}
-                  <Link href="https://www.notion.so/supabase/Org-Level-Billing-Public-Docs-f059a154beb743a19199d05bab4acb08">
+                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
                     <a target="_blank" rel="noreferrer" className="underline">
-                      organization-level-billing
+                      organization-based billing
                     </a>
                   </Link>
                   . To migrate an organization to the new billing, head to your{' '}
