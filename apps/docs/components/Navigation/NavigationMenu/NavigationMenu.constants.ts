@@ -495,22 +495,36 @@ export const auth = {
         { name: 'Managing User Data', url: '/guides/auth/managing-user-data' },
         { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
         { name: 'Row Level Security', url: '/guides/auth/row-level-security' },
-        { name: 'Server-side Rendering', url: '/guides/auth/server-side-rendering' },
       ],
     },
     {
-      name: 'Auth Helpers',
+      name: 'Server-side Auth',
       url: undefined,
       items: [
         { name: 'Overview', url: '/guides/auth/auth-helpers' },
-        { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui' },
-        { name: 'Flutter Auth UI', url: '/guides/auth/auth-helpers/flutter-auth-ui' },
         {
           name: 'Next.js',
           url: '/guides/auth/auth-helpers/nextjs',
         },
         { name: 'Remix', url: '/guides/auth/auth-helpers/remix' },
         { name: 'SvelteKit', url: '/guides/auth/auth-helpers/sveltekit' },
+        { name: 'Server-side Rendering', url: '/guides/auth/server-side-rendering' },
+        {
+          name: 'Email Auth with PKCE flow for SSR',
+          url: '/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr',
+        },
+        {
+          name: 'OAuth with PKCE flow for SSR',
+          url: '/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
+        },
+      ],
+    },
+    {
+      name: 'Auth UI',
+      url: undefined,
+      items: [
+        { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui' },
+        { name: 'Flutter Auth UI', url: '/guides/auth/auth-helpers/flutter-auth-ui' },
       ],
     },
     {
