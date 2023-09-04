@@ -32,7 +32,7 @@ const FunctionsVisual = () => {
         viewBox="0 0 289 430"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
-        className="absolute w-full aspect-[1/1.44] inset-0 z-10 m-auto"
+        className="absolute w-[calc(100%+8px)] aspect-[1/1.44] inset-y-0 -inset-x-2 z-10 m-auto"
       >
         <g clipPath="url(#clip0_444_4697)">
           <g filter="url(#filter0_f_444_4697)">

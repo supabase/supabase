@@ -23,11 +23,6 @@ services:
       timeout: 5s
       interval: 5s
       retries: 3
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "tcp://localhost:${VECTOR_PORT}"
-        tag: studio
     depends_on:
       analytics:
         condition: service_healthy
@@ -60,11 +55,6 @@ services:
     ports:
       - ${KONG_HTTP_PORT}:8000/tcp
       - ${KONG_HTTPS_PORT}:8443/tcp
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "tcp://localhost:${VECTOR_PORT}"
-        tag: kong
     depends_on:
       analytics:
         condition: service_healthy
@@ -107,11 +97,6 @@ services:
       interval: 5s
       retries: 3
     restart: unless-stopped
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "tcp://localhost:${VECTOR_PORT}"
-        tag: auth
     environment:
       GOTRUE_API_HOST: 0.0.0.0
       GOTRUE_API_PORT: 9999
@@ -159,11 +144,6 @@ services:
       analytics:
         condition: service_healthy
     restart: unless-stopped
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "tcp://localhost:${VECTOR_PORT}"
-        tag: rest
     environment:
       PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS}
@@ -194,11 +174,6 @@ services:
       interval: 5s
       retries: 3
     restart: unless-stopped
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "tcp://localhost:${VECTOR_PORT}"
-        tag: realtime
     environment:
       PORT: 4000
       DB_HOST: ${POSTGRES_HOST}
@@ -287,11 +262,6 @@ services:
       analytics:
         condition: service_healthy
     restart: unless-stopped
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "tcp://localhost:${VECTOR_PORT}"
-        tag: meta
     environment:
       PG_META_PORT: 8080
       PG_META_DB_HOST: ${POSTGRES_HOST}
@@ -307,11 +277,6 @@ services:
     depends_on:
       analytics:
         condition: service_healthy
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "tcp://localhost:${VECTOR_PORT}"
-        tag: functions
     environment:
       JWT_SECRET: ${JWT_SECRET}
       SUPABASE_URL: http://kong:8000
@@ -368,6 +333,8 @@ services:
       # Uncomment to use Big Query backend for analytics
       # GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID}
       # GOOGLE_PROJECT_NUMBER: ${GOOGLE_PROJECT_NUMBER}
+    ports:
+      - 4000:4000
     entrypoint: |
                   sh -c `cat <<'EOF' > run.sh && sh run.sh
                   ./logflare eval Logflare.Release.migrate
@@ -387,11 +354,6 @@ services:
     depends_on:
       vector:
         condition: service_healthy
-    logging:
-      driver: syslog
-      options:
-        syslog-address: "tcp://localhost:${VECTOR_PORT}"
-        tag: db
     command:
       - postgres
       - -c
@@ -433,14 +395,13 @@ services:
           "--no-verbose",
           "--tries=1",
           "--spider",
-          "http://localhost:${VECTOR_API_PORT}/health"
+          "http://vector:${VECTOR_API_PORT}/health"
         ]
       timeout: 5s
       interval: 5s
       retries: 3
-    ports:
-      - ${VECTOR_PORT}:${VECTOR_PORT}
-      - ${VECTOR_API_PORT}:${VECTOR_API_PORT}
     volumes:
       - ./volumes/logs/vector.yml:/etc/vector/vector.yml:ro
+      - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro
+
     command: [ "--config", "etc/vector/vector.yml" ]
