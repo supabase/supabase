@@ -18,7 +18,7 @@ import {
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
-import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useSelectedProject, useStore } from 'hooks'
 
 const TransferProjectButton = () => {
   const { ui } = useStore()
@@ -27,6 +27,7 @@ const TransferProjectButton = () => {
   const projectRef = project?.ref
   const projectOrgId = project?.organization_id
   const { data: allOrganizations } = useOrganizationsQuery()
+  const disableProjectTransfer = useFlag('disableProjectTransfer')
 
   const organizations = (allOrganizations || [])
     .filter((it) => it.id !== projectOrgId)
@@ -87,11 +88,15 @@ const TransferProjectButton = () => {
     <>
       <Tooltip.Root delayDuration={0}>
         <Tooltip.Trigger>
-          <Button onClick={toggle} type="default" disabled={!canTransferProject}>
+          <Button
+            onClick={toggle}
+            type="default"
+            disabled={!canTransferProject || disableProjectTransfer}
+          >
             Transfer project
           </Button>
         </Tooltip.Trigger>
-        {!canTransferProject && (
+        {(!canTransferProject || disableProjectTransfer) && (
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -102,7 +107,9 @@ const TransferProjectButton = () => {
                 ].join(' ')}
               >
                 <span className="text-xs text-scale-1200">
-                  You need additional permissions to transfer this project
+                  {!canTransferProject
+                    ? 'You need additional permissions to transfer this project'
+                    : 'Project transfers are temporarily disabled, please try again later.'}
                 </span>
               </div>
             </Tooltip.Content>

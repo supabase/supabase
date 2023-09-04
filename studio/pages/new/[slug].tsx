@@ -474,16 +474,24 @@ const Wizard: NextPageWithLayout = () => {
                         <span className="text-brand">{orgSubscription?.plan?.name} plan</span>.
                       </p>
 
+                      {/* Show info when launching a new project in a paid org that has no project yet */}
+                      {orgSubscription?.plan?.id !== 'free' && orgProjectCount === 0 && (
+                        <div>
+                          <p>
+                            As this is the first project you're launching in this organization, it
+                            comes with no additional compute costs.
+                          </p>
+                        </div>
+                      )}
+
                       {/* Show info when launching a new project in a paid org that already has at least one project */}
                       {orgSubscription?.plan?.id !== 'free' && orgProjectCount > 0 && (
                         <div>
                           <p>
                             Launching another project incurs additional compute costs, starting at
-                            $0.01344 per hour (~$10/month).
-                          </p>
-                          <p>
-                            You can also create a new organization under the free plan (unless you
-                            have exceeded your 2 free project limit).
+                            $0.01344 per hour (~$10/month). You can also create a new organization
+                            under the free plan in case you have not exceeded your 2 free project
+                            limit.
                           </p>
                         </div>
                       )}
