@@ -304,14 +304,23 @@ const ForeignKeySelector = ({
                   <IconAlertTriangle strokeWidth={2} />
                   <AlertTitle_Shadcn_>The column types don't match</AlertTitle_Shadcn_>
                   <AlertDescription_Shadcn_>
-                    The referenced column <span className="text-code">{column.name}</span> is of
-                    type <span className="text-code">{column.format}</span> while the selected
-                    foreign column
+                    <span>The referenced column</span>
+                    {column?.name && <span className="text-code">{column.name}</span>}
+                    {column?.format ? (
+                      <>
+                        <span> is of type </span>
+                        <span className="text-code">{column.format}</span>
+                      </>
+                    ) : (
+                      <span> has no type</span>
+                    )}
+                    <span> while the selected foreign column </span>
                     <span className="text-code">
                       {selectedTable?.name}.{selectedColumn?.name}
                     </span>
-                    has<span className="text-code">{selectedColumn?.data_type}</span>type. These two
-                    columns can't be referenced until one of them change its type.
+                    <span> has </span>
+                    <span className="text-code">{selectedColumn?.data_type}</span>type. These two
+                    columns can't be referenced until they of the same type.
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>
               )}
