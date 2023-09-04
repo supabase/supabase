@@ -1,8 +1,13 @@
+import { useParams } from 'common'
 import { compact, get, isEmpty, uniqBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
 
-import { useParams } from 'common'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { useStore } from 'hooks'
+import { DEFAULT_PROJECT_API_SERVICE_ID, IS_PLATFORM } from 'lib/constants'
+import { copyToClipboard } from 'lib/helpers'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { STORAGE_ROW_TYPES } from '../Storage.constants'
 import ConfirmDeleteModal from './ConfirmDeleteModal'
@@ -12,11 +17,6 @@ import FileExplorerHeader from './FileExplorerHeader'
 import FileExplorerHeaderSelection from './FileExplorerHeaderSelection'
 import MoveItemsModal from './MoveItemsModal'
 import PreviewPane from './PreviewPane'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
-import { copyToClipboard } from 'lib/helpers'
-import { useStore } from 'hooks'
 
 const StorageExplorer = observer(({ bucket }) => {
   const storageExplorerStore = useStorageStore()
@@ -51,7 +51,10 @@ const StorageExplorer = observer(({ bucket }) => {
 
   const { ui } = useStore()
   const { ref } = useParams()
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
+  const { data: customDomainData } = useCustomDomainsQuery(
+    { projectRef: ref },
+    { enabled: IS_PLATFORM }
+  )
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
   const apiService = (projectSettings?.services ?? []).find(
     (x) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
