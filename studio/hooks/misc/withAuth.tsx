@@ -20,7 +20,7 @@ const PLATFORM_ONLY_PAGES = [
   'auth/url-configuration',
 ]
 
-export function withAuth<T>(
+export function withAuth<T extends JSX.IntrinsicAttributes>(
   WrappedComponent: ComponentType<T> | NextPageWithLayout<T, T>,
   options: {
     /**
