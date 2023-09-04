@@ -20,7 +20,7 @@ const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) => {
   const { data, mutate: enroll, isLoading: isEnrolling, reset } = useMfaEnrollMutation()
 
   useEffect(() => {
-    // reset has to be called because the state is kept between if the process is cancelled during
+    // reset has to be called because the state is kept between if the process is canceled during
     // the second step.
     if (!visible) {
       reset()
