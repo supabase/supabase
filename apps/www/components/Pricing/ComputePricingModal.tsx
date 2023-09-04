@@ -1,9 +1,10 @@
 import React, { Fragment, useMemo } from 'react'
 import { useRouter } from 'next/router'
 import { useTheme } from 'common/Providers'
-import { IconCheckCircle, IconXCircle, Modal } from 'ui'
+import { IconXCircle, Modal } from 'ui'
 import pricingAddOn from '~/data/PricingAddOnTable.json'
 import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
+import Link from 'next/link'
 
 interface Props {
   showComputeModal: boolean
@@ -47,11 +48,32 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
             </div>
             <div className="max-w-4xl prose">
               <h2 className="text-lg">Choose best compute setup for you</h2>
-              <p className="text-sm lg:max-w-3xl">
+              <p className="text-sm">
                 Every project on the Supabase Platform comes with its own dedicated Postgres
                 instance running inside a virtual machine (VM). The following table describes the
                 base instance with additional compute add-ons available if you need extra
                 performance when scaling up Supabase.
+              </p>
+              <p className="text-sm">
+                Compute instances are billed hourly and you can scale up or down at any time if you
+                need extra performance. You'll only be charged at the end of the month for the hours
+                you've used. Paid plans come with $10 in Compute Credits to cover one Starter
+                instance or parts of any other instance. Read more on{' '}
+                <Link
+                  href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                  passHref
+                >
+                  <a target="_blank" className="transition text-brand hover:text-brand-600">
+                    usage-based billing for compute
+                  </a>
+                </Link>{' '}
+                or{' '}
+                <Link href="https://supabase.com/docs/guides/platform/compute-add-ons" passHref>
+                  <a target="_blank" className="transition text-brand hover:text-brand-600">
+                    Compute Add-ons
+                  </a>
+                </Link>
+                .
               </p>
             </div>
           </div>
@@ -73,7 +95,7 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                   {i === 0 && (
                     <tr className="">
                       <td className="pb-1 bg-scale-700 px-3 py-1 -mr-1 border-l-4 border-scale-700">
-                        <span className="">Included in Free and Pro plan</span>
+                        <span className="">First instance is free on paid plans</span>
                       </td>
                     </tr>
                   )}

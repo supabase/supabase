@@ -1,3 +1,4 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
@@ -20,7 +21,7 @@ import {
 import { SpendCapModal } from 'components/interfaces/BillingV2'
 import { useOrganizationBillingMigrationMutation } from 'data/organizations/organization-migrate-billing-mutation'
 import { useOrganizationBillingMigrationPreview } from 'data/organizations/organization-migrate-billing-preview-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import PaymentMethodSelection from '../BillingSettingsV2/Subscription/PaymentMethodSelection'
 import InformationBox from 'components/ui/InformationBox'
@@ -29,6 +30,9 @@ const MigrateOrganizationBillingButton = observer(() => {
   const { ui } = useStore()
   const router = useRouter()
   const organization = useSelectedOrganization()
+
+  const disableOrgBillingMigration = useFlag('disableOrgBillingMigration')
+  const canMigrateOrg = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
   const [isOpen, setIsOpen] = useState(false)
   const [tier, setTier] = useState('')
@@ -65,6 +69,7 @@ const MigrateOrganizationBillingButton = observer(() => {
     data: migrationPreviewData,
     error: migrationPreviewError,
     isLoading: migrationPreviewIsLoading,
+    isSuccess: migrationPreviewIsSuccess,
     remove,
     refetch: previewMigration,
   } = useOrganizationBillingMigrationPreview(
@@ -108,9 +113,37 @@ const MigrateOrganizationBillingButton = observer(() => {
   return (
     <>
       <div>
-        <Button loading={!organization?.slug} onClick={() => setIsOpen(true)} type="primary">
-          Migrate organization
-        </Button>
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger>
+            <Button
+              loading={!organization?.slug}
+              onClick={toggle}
+              type="primary"
+              disabled={!canMigrateOrg || disableOrgBillingMigration}
+            >
+              Migrate organization
+            </Button>
+          </Tooltip.Trigger>
+          {(!canMigrateOrg || disableOrgBillingMigration) && (
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
+                    'border border-scale-200 ', //border
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">
+                    {!canMigrateOrg
+                      ? 'You need additional permissions to migrate this organization'
+                      : 'Migrations are temporarily disabled, please try again later.'}
+                  </span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          )}
+        </Tooltip.Root>
       </div>
       <Modal
         closable
@@ -125,48 +158,41 @@ const MigrateOrganizationBillingButton = observer(() => {
         }
       >
         <div className="space-y-4 py-3">
+          {migrationPreviewData?.addons_to_be_removed &&
+            migrationPreviewData.addons_to_be_removed.length > 0 && (
+              <>
+                <Modal.Content>
+                  <div className="space-y-2">
+                    <Alert_Shadcn_ variant="warning">
+                      <IconAlertTriangle strokeWidth={2} />
+                      <AlertTitle_Shadcn_>Project addons will be removed</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        <div>
+                          The following project addons will be removed when downgrading
+                          <ul className="list-disc list-inside pl-4">
+                            {migrationPreviewData.addons_to_be_removed.map((addon) =>
+                              addon.addons.map((variant) => (
+                                <li key={`${addon.projectRef}-${variant.variant}`}>
+                                  {variant.type === 'pitr'
+                                    ? 'PITR - '
+                                    : variant.type === 'compute_instance'
+                                    ? 'Compute Instance - '
+                                    : ''}
+                                  {variant.name} for project {addon.projectName || addon.projectRef}
+                                </li>
+                              ))
+                            )}
+                          </ul>
+                        </div>
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  </div>
+                </Modal.Content>
+                <Modal.Separator />
+              </>
+            )}
           <Modal.Content>
-            <div className="space-y-2">
-              <Alert_Shadcn_ variant="destructive">
-                <IconAlertCircle strokeWidth={2} />
-                <AlertTitle_Shadcn_>Irreversible</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  Once migrated to the new organization-based billing, you cannot go back to the old
-                  project-level billing.
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-
-              {migrationPreviewData?.addons_to_be_removed &&
-                migrationPreviewData.addons_to_be_removed.length > 0 && (
-                  <Alert_Shadcn_ variant="warning">
-                    <IconAlertTriangle strokeWidth={2} />
-                    <AlertTitle_Shadcn_>Project addons will be removed</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      <div>
-                        The following project addons will be removed when downgrading
-                        <ul className="list-disc list-inside pl-4">
-                          {migrationPreviewData.addons_to_be_removed.map((addon) =>
-                            addon.addons.map((variant) => (
-                              <li key={`${addon.projectRef}-${variant.variant}`}>
-                                {variant.type === 'pitr'
-                                  ? 'PITR - '
-                                  : variant.type === 'compute_instance'
-                                  ? 'Compute Instance - '
-                                  : ''}
-                                {variant.name} for project {addon.projectName || addon.projectRef}
-                              </li>
-                            ))
-                          )}
-                        </ul>
-                      </div>
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                )}
-            </div>
-          </Modal.Content>
-          <Modal.Separator />
-          <Modal.Content>
-            <div className="text-scale-1000 text-sm space-y-2">
+            <div className="text-scale-1100 text-sm space-y-2">
               <p>
                 Migrating to new organization-based billing combines subscriptions for all projects
                 in the organization into a single subscription.
@@ -180,7 +206,7 @@ const MigrateOrganizationBillingButton = observer(() => {
                   </a>
                 </Link>
                 . To transfer projects to a different organization, visit{' '}
-                <Link href="/projects/_/settings/general">
+                <Link href="/project/_/settings/general">
                   <a target="_blank" rel="noreferrer" className="underline">
                     General settings
                   </a>
@@ -211,7 +237,7 @@ const MigrateOrganizationBillingButton = observer(() => {
               })}
             </Listbox>
 
-            <p className="text-sm text-scale-1000 mt-4">
+            <p className="text-sm text-scale-1100 mt-4">
               The pricing plan, along with included usage limits will apply to your entire
               organization. See{' '}
               <a
@@ -229,7 +255,7 @@ const MigrateOrganizationBillingButton = observer(() => {
               <div className="my-2 space-y-1 pb-4">
                 <p className="text-sm text-scale-1000">
                   Paid plans come with one compute instance included. Additional projects will at
-                  least cost the compute instance hours used (min $7/month). See{' '}
+                  least cost the compute instance hours used (min $10/month). See{' '}
                   <Link href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute">
                     <a target="_blank" rel="noreferrer" className="underline">
                       Compute Instance Usage Billing
@@ -320,7 +346,7 @@ const MigrateOrganizationBillingButton = observer(() => {
             )}
           </Modal.Content>
 
-          {!migrationPreviewIsLoading && migrationPreviewData && dbTier !== 'tier_free' && (
+          {migrationPreviewIsSuccess && dbTier !== 'tier_free' && (
             <Modal.Content>
               <InformationBox
                 defaultVisibility={false}
@@ -389,13 +415,23 @@ const MigrateOrganizationBillingButton = observer(() => {
           )}
 
           <Modal.Content>
+            <p className="mb-4 text-sm text-scale-1100">
+              The migration can take up to 30 seconds, please do not cancel the request or close
+              your browser.
+            </p>
+
             <Button
               block
               size="small"
               type="primary"
               htmlType="submit"
               loading={isMigrating}
-              disabled={migrationPreviewData === undefined || isMigrating || !tier}
+              disabled={
+                migrationPreviewData === undefined ||
+                isMigrating ||
+                !tier ||
+                disableOrgBillingMigration
+              }
               onClick={() => onConfirmMigrate()}
             >
               I understand, migrate this organization
