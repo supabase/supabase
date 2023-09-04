@@ -15,10 +15,12 @@ const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastProps) =
     <div className="space-y-3">
       <div className="text-sm">
         <p>
-          By default, we don't track you. This site{' '}
-          <span className="underline font-medium">does not</span> use cookies 🍪
+          <span className="underline font-medium">No cookies. 🍪</span>
         </p>
-        <p>Would you like to provide telemetry to improve your experience?</p>
+        <p>
+          We only collect the essential analytics that help us build and improve the amazing open
+          source product you love.
+        </p>
       </div>
       <div className="flex items-center space-x-2">
         <Button type="default" onClick={onAccept}>
