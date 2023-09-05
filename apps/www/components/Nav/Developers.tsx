@@ -125,6 +125,7 @@ const Developers = () => (
           <label className="text-muted text-xs font-mono">{column.label}</label>
           {column.links.map((link: Props) => (
             <TextLink
+              hasChevron={false}
               key={link.text}
               url={link.url}
               label={link.text}
@@ -136,7 +137,7 @@ const Developers = () => (
     </ul>
     <ul className="p-2 flex justify-between bg-alternative text-sm">
       <Link href={DevelopersData['footer']['support'].url}>
-        <a className="p-2 hover:bg-[#101010] rounded text-foreground-light flex items-center gap-1">
+        <a className="p-2 hover:bg-[#101010] rounded text-foreground-light flex items-center gap-1 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:text-foreground-strong">
           <svg
             width="14"
             height="14"
@@ -156,7 +157,7 @@ const Developers = () => (
         </a>
       </Link>
       <Link href={DevelopersData['footer']['systemStatus'].url}>
-        <a className="p-2 hover:bg-[#101010] rounded text-foreground-light">
+        <a className="p-2 hover:bg-[#101010] rounded text-foreground-light focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:text-foreground-strong">
           {DevelopersData['footer']['systemStatus'].text}
         </a>
       </Link>
