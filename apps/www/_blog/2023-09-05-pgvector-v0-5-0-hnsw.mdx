@@ -250,7 +250,7 @@ The index build time has decreased by over 50%, and this ratio remains consisten
 
 ## When should you use HNSW vs IVF?
 
-In most cases today, HNSW offers a more performant and robust index over IVFFlat. It's worth noting though that HNSW indexes will almost always be slower to build and use more memory than IVFFlat, so if your system is memory constrained and you don't foresee the need to rebuild your index often, you may find IVFFlat to be more suitable. It's also worth noting that product quantization (compressing high dimensional vectors) is expected for IVF in the next versions of pgvector which should significantly improve performance and lower resource requirements. Regardless of the type of index you use, we still recommend [reducing the number of dimensions](https://supabase.com/blog/fewer-dimensions-are-better-pgvector) in your embeddings when possible.
+In most cases today, HNSW offers a more performant and robust index over IVFFlat. It's worth noting though that HNSW indexes will almost always be slower to build and use more memory than IVFFlat, so if your system is memory constrained and you don't foresee the need to rebuild your index often, you may find IVFFlat to be more suitable. It's also worth noting that product quantization (compressing index entries for vectors) is expected for IVF in the next versions of pgvector which should significantly improve performance and lower resource requirements. Regardless of the type of index you use, we still recommend [reducing the number of dimensions](https://supabase.com/blog/fewer-dimensions-are-better-pgvector) in your embeddings when possible.
 
 ## Start using HNSW
 
