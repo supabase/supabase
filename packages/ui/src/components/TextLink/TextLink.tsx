@@ -1,11 +1,14 @@
-import { IconChevronRight } from 'ui'
+import { IconChevronRight, cn } from 'ui'
 import Link from 'next/link'
 
-function TextLink({ url = '', label, ...props }: any) {
+function TextLink({ url = '', label, className, ...props }: any) {
   return (
     <Link href={url} passHref>
       <a
-        className="text-scale-1100 hover:text-scale-1200 mt-3 block cursor-pointer text-sm"
+        className={cn(
+          'text-scale-1100 hover:text-scale-1200 mt-3 block cursor-pointer text-sm',
+          className
+        )}
         {...props}
       >
         <div className="group flex items-center gap-1">
