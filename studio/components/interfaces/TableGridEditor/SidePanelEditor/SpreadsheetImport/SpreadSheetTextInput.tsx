@@ -1,7 +1,7 @@
 import { Button, Input } from 'ui'
 
 interface SpreadSheetTextInputProps {
-  input: string;
+  input: string
   onInputChange: (event: any) => void
 }
 
@@ -11,9 +11,9 @@ export const replaceCommaByTabulation = (string: string): string => {
 
 const SpreadSheetTextInput = ({ input, onInputChange }: SpreadSheetTextInputProps) => {
   const handleBeautifyClick = () => {
-    const beautifiedInput = replaceCommaByTabulation(input);
+    const beautifiedInput = replaceCommaByTabulation(input)
     if (onInputChange) {
-      onInputChange({ target: { value: beautifiedInput } });
+      onInputChange({ target: { value: beautifiedInput } })
     }
   }
 
@@ -43,4 +43,4 @@ const SpreadSheetTextInput = ({ input, onInputChange }: SpreadSheetTextInputProp
   )
 }
 
-export default SpreadSheetTextInput;
+export default SpreadSheetTextInput
