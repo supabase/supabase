@@ -148,7 +148,7 @@ Ultimately the choice of embedding model will depend on your specific use case a
 - **Dimension size:** What is the operational cost of storing and comparing embeddings?
 - **Language:** Which written languages do you need to support? Many of the smaller models only support English.
 
-The goal is to maximize similarity performance and sequence length, while minimizing model size and dimension size. Notably, if we can find a model that performs well while producing as few dimensions as possible, we can immediately improve many of the above challenges developers are facing with pgvector.
+The goal is to maximize similarity performance and sequence length while minimizing model size and dimension size. Notably, if we can find a model that performs well while producing as few dimensions as possible, we can immediately improve many of the above challenges developers are facing with pgvector.
 
 For example [gte-small](https://huggingface.co/thenlper/gte-small), a model recently trained by the [Alibaba DAMO Academy,](https://damo.alibaba.com/) produces only 384 dimensions while ranking higher than `text-embedding-ada-002` on the MTEB leaderboard.
 
@@ -162,10 +162,18 @@ It's important to keep in mind that using an alternative embedding model doesn't
 
 While dimensionality reduction techniques like Principal Component Analysis ([PCA](https://en.wikipedia.org/wiki/Principal_component_analysis)) or t-Distributed Stochastic Neighbor Embedding ([t-SNE](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding)) may seem like a good alternative to trim down the size of text embedding vectors, there is some risk to consider.
 
-First, these tools may not appropriately model the relationships in high dimensional space. Both PCA and t-SNE are likely to oversimplify the multivariate relationships among different dimensions, leading to loss of important semantic information. This is particularly the case with PCA, which assumes linearity and would fail to preserve nonlinear interactions found in high-dimensional text embeddings.
+First, these tools may not appropriately model the relationships in high-dimensional space. Both PCA and t-SNE are likely to oversimplify the multivariate relationships among different dimensions, leading to the loss of important semantic information. This is particularly the case with PCA, which assumes linearity and would fail to preserve nonlinear interactions found in high-dimensional text embeddings.
 
 Additionally, the validity of the dimensionality reduction models could change over time if the distribution of text data shifts. If the model was trained on older data, it might not accurately reflect or accommodate these shifts. For example, if your company gets a large new customer in the legal field and your embedding dataset contained no legal documents when the dimensionality reduction model was trained, otherwise exploitable structure may be destructively compressed. Both PCA and t-SNE are not inherently adaptable to such changes, which could result in an increasingly poor fit over time. In summary, the derived low-dimensional representations may not maintain semantic coherence of the original high-dimensional vectors.
 
 ## What's next?
 
 At Supabase we are working on ways to make it easy to generate embeddings using open source, high performance, and low dimension embedding models. Stay tuned for [Launch Week 8](/launch-week) next week!
+
+## More pgvector and AI resources
+
+- [Hugging Face is now supported in Supabase](https://supabase.com/blog/hugging-face-supabase)
+- [How to build ChatGPT Plugin from scratch with Supabase Edge Runtime](https://supabase.com/blog/building-chatgpt-plugins-template)
+- [Docs pgvector: Embeddings and vector similarity](https://supabase.com/docs/guides/database/extensions/pgvector)
+- [Choosing Compute Add-on for AI workloads](https://supabase.com/docs/guides/ai/choosing-compute-addon)
+- [pgvector v0.5.0: Faster semantic search with HNSW indexes](https://supabase.com/blog/pgvector-v0-5-0-hnsw)
