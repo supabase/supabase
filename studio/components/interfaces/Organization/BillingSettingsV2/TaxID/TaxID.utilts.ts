@@ -1,6 +1,6 @@
-import { TaxId } from 'data/organizations/organization-tax-ids-query'
-import { TAX_IDS } from './TaxID.constants'
 import { TaxIdValue } from 'data/organizations/organization-tax-ids-update-mutation'
+import { TAX_IDS } from './TaxID.constants'
+import { isEqual, sortBy } from 'lodash'
 
 /**
  * Sanitize EU VAT ids so they get prepended with the country code
@@ -21,4 +21,15 @@ export const sanitizeTaxID = (taxId: TaxIdValue) => {
   }
 
   return newID
+}
+
+/** Ignore id property amongst tax ids */
+export const checkTaxIdsEqual = (a: any[], b: any[]) => {
+  const aExcludeId = a.map((x) => {
+    return { type: x.type, value: x.value, name: x.name }
+  })
+  const bExcludeId = b.map((x) => {
+    return { type: x.type, value: x.value, name: x.name }
+  })
+  return isEqual(sortBy(aExcludeId, 'name'), sortBy(bExcludeId, 'name'))
 }

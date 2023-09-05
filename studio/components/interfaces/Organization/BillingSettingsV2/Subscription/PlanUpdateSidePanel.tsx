@@ -7,18 +7,26 @@ import { useEffect, useState } from 'react'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
+import {
+  SubscriptionTier,
+  useOrgSubscriptionUpdateMutation,
+} from 'data/subscriptions/org-subscription-update-mutation'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
 import { useRouter } from 'next/router'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, Button, IconCheck, IconExternalLink, Modal, SidePanel } from 'ui'
+import { Button, IconCheck, IconExternalLink, Modal, SidePanel } from 'ui'
+import DowngradeModal from './DowngradeModal'
 import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
+import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
+import InformationBox from 'components/ui/InformationBox'
+import AlertError from 'components/ui/AlertError'
 
 // [Joshen TODO] Need to remove all contexts of "projects"
 
@@ -28,7 +36,6 @@ const PlanUpdateSidePanel = () => {
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showExitSurvey, setShowExitSurvey] = useState(false)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [showDowngradeError, setShowDowngradeError] = useState(false)
@@ -45,18 +52,38 @@ const PlanUpdateSidePanel = () => {
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
   const { data: plans, isLoading: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
-  const { mutateAsync: updateOrgSubscription } = useOrgSubscriptionUpdateMutation()
-  // const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug }) // [Joshen] Still need?
+  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
+  const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
+    {
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully updated subscription to ${subscriptionPlanMeta?.name}!`,
+        })
+        setSelectedTier(undefined)
+        onClose()
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+      },
+      onError: (error) => {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Unable to update subscription: ${error.message}`,
+        })
+      },
+    }
+  )
+
+  const {
+    data: subscriptionPreview,
+    error: subscriptionPreviewError,
+    isLoading: subscriptionPreviewIsLoading,
+    isSuccess: subscriptionPreviewInitialized,
+  } = useOrganizationBillingSubscriptionPreview({ tier: selectedTier, organizationSlug: slug })
 
   const availablePlans = plans ?? []
-  const subscriptionAddons: any[] = [] // [Joshen] Still need?
-
-  // const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
-  const hasMembersExceedingFreeTierLimit = false // [Joshen] Still need?
-  const selectedTierMeta = subscriptionsPlans.find((tier) => tier.id === selectedTier)
-  const selectedPlanMeta = availablePlans.find(
-    (plan) => plan.id === selectedTier?.split('tier_')[1]
-  )
+  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
+  const subscriptionPlanMeta = subscriptionsPlans.find((tier) => tier.id === selectedTier)
 
   useEffect(() => {
     if (visible) {
@@ -69,6 +96,7 @@ const PlanUpdateSidePanel = () => {
             title: 'Change Subscription Plan',
             section: 'Subscription plan',
           },
+          ...(slug && { orgSlug: slug }),
         },
         router
       )
@@ -92,30 +120,18 @@ const PlanUpdateSidePanel = () => {
       return ui.setNotification({ category: 'error', message: 'Please select a payment method' })
     }
 
-    try {
-      setIsSubmitting(true)
-      await updateOrgSubscription({
-        slug,
-        tier: selectedTier,
-        paymentMethod: selectedPaymentMethod,
-      })
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated subscription to ${selectedTierMeta?.name}!`,
-      })
-      setSelectedTier(undefined)
-      onClose()
-      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to update subscription: ${error.message}`,
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+    // If the user is downgrading from team, should have spend cap disabled by default
+    const tier =
+      subscription?.plan?.id === 'team' && selectedTier === PRICING_TIER_PRODUCT_IDS.PRO
+        ? (PRICING_TIER_PRODUCT_IDS.PAYG as SubscriptionTier)
+        : selectedTier
+
+    updateOrgSubscription({ slug, tier, paymentMethod: selectedPaymentMethod })
   }
+
+  const planMeta = selectedTier
+    ? availablePlans.find((p) => p.id === selectedTier.split('tier_')[1])
+    : null
 
   return (
     <>
@@ -126,7 +142,7 @@ const PlanUpdateSidePanel = () => {
         onCancel={() => onClose()}
         header={
           <div className="flex items-center justify-between">
-            <h4>Change subscription plan</h4>
+            <h4>Change subscription plan for {selectedOrganization?.name}</h4>
             <Link href="https://supabase.com/pricing">
               <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
@@ -161,13 +177,13 @@ const PlanUpdateSidePanel = () => {
                 >
                   <div className="w-full">
                     <div className="flex items-center space-x-2">
-                      <p className={clsx('text-brand-900 text-sm uppercase')}>{plan.name}</p>
+                      <p className={clsx('text-brand text-sm uppercase')}>{plan.name}</p>
                       {isCurrentPlan ? (
                         <div className="text-xs bg-scale-500 text-scale-1000 rounded px-2 py-0.5">
                           Current plan
                         </div>
                       ) : plan.nameBadge ? (
-                        <div className="text-xs bg-brand-400 text-brand-900 rounded px-2 py-0.5">
+                        <div className="text-xs bg-brand-400 text-brand rounded px-2 py-0.5">
                           {plan.nameBadge}
                         </div>
                       ) : (
@@ -183,10 +199,10 @@ const PlanUpdateSidePanel = () => {
                       ) : (
                         <p className="text-scale-1200 text-lg">${price}</p>
                       )}
-                      <p className="text-scale-1000 text-sm">{tierMeta?.costUnit}</p>
+                      <p className="text-scale-1000 text-sm">{tierMeta?.costUnitOrg}</p>
                     </div>
                     <div className={clsx('flex mt-1 mb-4', !tierMeta?.warning && 'opacity-0')}>
-                      <div className="bg-scale-200 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
+                      <div className="bg-scale-200 text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
                         {tierMeta?.warning}
                       </div>
                     </div>
@@ -194,17 +210,15 @@ const PlanUpdateSidePanel = () => {
                       <Button block disabled type="default">
                         Current plan
                       </Button>
-                    ) : plan.id !== PRICING_TIER_PRODUCT_IDS.TEAM ? (
+                    ) : (
                       <Tooltip.Root delayDuration={0}>
                         <Tooltip.Trigger asChild>
                           <div>
                             <Button
                               block
                               disabled={
-                                // no self-serve downgrades from team plan right now
-                                (plan.id !== PRICING_TIER_PRODUCT_IDS.TEAM &&
-                                  ['team', 'enterprise'].includes(subscription?.plan?.id || '')) ||
-                                !canUpdateSubscription
+                                // No self-serve downgrades from Enterprise
+                                subscription?.plan?.id === 'enterprise' || !canUpdateSubscription
                               }
                               type={isDowngradeOption ? 'default' : 'primary'}
                               onClick={() => {
@@ -219,6 +233,7 @@ const PlanUpdateSidePanel = () => {
                                         : 'Upgrade' + ' to ' + plan.name,
                                       section: 'Subscription plan',
                                     },
+                                    ...(slug && { orgSlug: slug }),
                                   },
                                   router
                                 )
@@ -246,24 +261,16 @@ const PlanUpdateSidePanel = () => {
                           </Tooltip.Portal>
                         ) : null}
                       </Tooltip.Root>
-                    ) : (
-                      <Link href={plan.href} passHref className="hidden md:block">
-                        <a target="_blank">
-                          <Button block type="primary">
-                            Contact Us
-                          </Button>
-                        </a>
-                      </Link>
                     )}
 
                     <div className="border-t my-6" />
 
                     <ul role="list">
-                      {plan.features.map((feature) => (
+                      {(plan.features).map((feature) => (
                         <li key={feature} className="flex py-2">
                           <div className="w-[12px]">
                             <IconCheck
-                              className="h-3 w-3 text-brand-900 translate-y-[2.5px]"
+                              className="h-3 w-3 text-brand translate-y-[2.5px]"
                               aria-hidden="true"
                               strokeWidth={3}
                             />
@@ -286,73 +293,112 @@ const PlanUpdateSidePanel = () => {
         </SidePanel.Content>
       </SidePanel>
 
-      <Modal
-        size="medium"
-        alignFooter="right"
+      <DowngradeModal
         visible={selectedTier === 'tier_free'}
-        onCancel={() => setSelectedTier(undefined)}
+        selectedPlan={subscriptionPlanMeta}
+        subscription={subscription}
+        onClose={() => setSelectedTier(undefined)}
         onConfirm={onConfirmDowngrade}
-        header={`Confirm to downgrade to ${selectedTierMeta?.name}`}
-      >
-        {/* [JOSHEN] We could make this better by only showing a danger warning if the project is already above the free plan limits */}
-        <Modal.Content>
-          <div className="py-6">
-            <Alert
-              withIcon
-              variant="warning"
-              title="Downgrading to the free plan will lead to reductions in your project's capacity"
-            >
-              <p>
-                If you're already past the limits of the free plan, your project could become
-                unresponsive or enter read only mode.
-              </p>
-              {subscriptionAddons.length > 0 && (
-                <>
-                  <p className="mt-2">
-                    Your project's add ons will also be removed, which includes:
-                  </p>
-                  <ul className="list-disc pl-6">
-                    {subscriptionAddons.map((addon) => (
-                      <li key={addon.type} className="mt-0.5">
-                        {addon.variant.name}{' '}
-                        {addon.type === 'compute_instance'
-                          ? 'compute instance'
-                          : addon.type === 'pitr'
-                          ? 'PITR'
-                          : ''}
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-            </Alert>
-          </div>
-        </Modal.Content>
-      </Modal>
+      />
 
       <Modal
-        loading={isSubmitting}
+        loading={isUpdating}
         alignFooter="right"
-        className="!w-[450px]"
+        className="!w-[550px]"
         visible={selectedTier !== undefined && selectedTier !== 'tier_free'}
         onCancel={() => setSelectedTier(undefined)}
         onConfirm={onUpdateSubscription}
         overlayClassName="pointer-events-none"
-        header={`Confirm to upgrade to ${selectedTierMeta?.name}`}
+        header={`Confirm ${planMeta?.change_type === 'downgrade' ? 'downgrade' : 'upgrade'} to ${
+          subscriptionPlanMeta?.name
+        }`}
       >
+        <Modal.Content className="mt-4">
+          {subscriptionPreviewError && (
+            <AlertError
+              error={subscriptionPreviewError}
+              subject="Failed to preview subscription."
+            />
+          )}
+          {subscriptionPreviewIsLoading && (
+            <span className="text-sm">Estimating monthly costs...</span>
+          )}
+          {subscriptionPreviewInitialized && (
+            <InformationBox
+              defaultVisibility={false}
+              title={
+                <span>
+                  Estimated monthly price is $
+                  {Math.round(
+                    subscriptionPreview.breakdown.reduce((prev, cur) => prev + cur.total_price, 0)
+                  )}{' '}
+                  + usage
+                </span>
+              }
+              hideCollapse={false}
+              description={
+                <div>
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="py-2 font-normal text-left text-sm text-scale-1000 w-1/2">
+                          Item
+                        </th>
+                        <th className="py-2 font-normal text-left text-sm text-scale-1000">
+                          Count
+                        </th>
+                        <th className="py-2 font-normal text-left text-sm text-scale-1000">
+                          Unit Price
+                        </th>
+                        <th className="py-2 font-normal text-right text-sm text-scale-1000">
+                          Price
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {subscriptionPreview.breakdown.map((item) => (
+                        <tr key={item.description} className="border-b">
+                          <td className="py-2 text-sm">{item.description ?? 'Unknown'}</td>
+                          <td className="py-2 text-sm">{item.quantity}</td>
+                          <td className="py-2 text-sm">
+                            {item.unit_price === 0 ? 'FREE' : `$${item.unit_price}`}
+                          </td>
+                          <td className="py-2 text-sm text-right">${item.total_price}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+
+                    <tbody>
+                      <tr>
+                        <td className="py-2 text-sm">Total</td>
+                        <td className="py-2 text-sm" />
+                        <td className="py-2 text-sm" />
+                        <td className="py-2 text-sm text-right">
+                          $
+                          {Math.round(
+                            subscriptionPreview.breakdown.reduce(
+                              (prev, cur) => prev + cur.total_price,
+                              0
+                            )
+                          ) ?? 0}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              }
+            />
+          )}
+        </Modal.Content>
+
         <Modal.Content>
-          <div className="py-6 space-y-2">
+          <div className="py-4 space-y-2">
             <p className="text-sm">
-              Upon clicking confirm, the amount of ${selectedPlanMeta?.price ?? 'Unknown'} will be
-              added to your monthly invoice and your credit card will be charged immediately.
-              Changing the plan resets your billing cycle and may result in a prorated charge for
-              previous usage.
+              Upon clicking confirm, your monthly invoice will be adjusted and your credit card will
+              be charged immediately. Changing the plan resets your billing cycle and may result in
+              a prorated charge for previous usage.
             </p>
-            <p className="text-sm text-scale-1000">
-              You will also be able to change your project's add-ons after upgrading your project's
-              plan.
-            </p>
-            <div className="!mt-6">
+            <div className="!mt-4">
               <PaymentMethodSelection
                 selectedPaymentMethod={selectedPaymentMethod}
                 onSelectPaymentMethod={setSelectedPaymentMethod}
@@ -369,6 +415,7 @@ const PlanUpdateSidePanel = () => {
 
       <ExitSurveyModal
         visible={showExitSurvey}
+        subscription={subscription}
         onClose={(success?: boolean) => {
           setShowExitSurvey(false)
           if (success) onClose()

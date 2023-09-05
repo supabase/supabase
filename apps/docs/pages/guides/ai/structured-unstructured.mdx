@@ -23,7 +23,7 @@ create table docs (
 );
 
 insert into docs
-  (id, content, url, embedding)
+  (id, embedding, content, url)
 values
   ('79409372-7556-4ccc-ab8f-5786a6cfa4f7', array[0.1, 0.2, 0.3], 'Hello world', '/hello-world');
 ```
@@ -89,7 +89,7 @@ create table docs (
 );
 
 insert into docs
-  (id, embedding, meta)
+  (id, embedding, content, url, meta)
 values
   (
     '79409372-7556-4ccc-ab8f-5786a6cfa4f7',

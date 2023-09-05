@@ -18,13 +18,13 @@ const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => {
     >
       <div className="flex flex-col justify-center px-4">
         <div className="flex items-center space-x-2">
-          <p className={clsx('text-brand-900 text-sm uppercase')}>{plan.name}</p>
+          <p className={clsx('text-brand text-sm uppercase')}>{plan.name}</p>
           {isCurrentPlan ? (
             <div className="text-xs bg-scale-500 text-scale-1000 rounded px-2 py-0.5">
               Current plan
             </div>
           ) : plan.nameBadge ? (
-            <div className="text-xs bg-brand-400 text-brand-900 rounded px-2 py-0.5">
+            <div className="text-xs bg-brand-400 text-brand rounded px-2 py-0.5">
               {plan.nameBadge}
             </div>
           ) : null}
@@ -43,7 +43,7 @@ const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => {
         <ul role="list" className="text-xs text-scale-1000 md:grid md:grid-cols-2 md:gap-x-10">
           {plan.features.map((feature) => (
             <li key={feature} className="flex items-center py-2 first:mt-0">
-              <IconCheck className="text-brand-900 h-4 w-4" aria-hidden="true" strokeWidth={3} />
+              <IconCheck className="text-brand h-4 w-4" aria-hidden="true" strokeWidth={3} />
               <span className="dark:text-scale-1200 mb-0 ml-3 ">{feature}</span>
             </li>
           ))}

@@ -1,6 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import { delete_ } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { ResponseError } from 'types'
 import { subscriptionKeys } from './keys'
 
 export type ProjectAddonRemoveVariables = {
@@ -31,14 +34,15 @@ type ProjectAddonRemoveData = Awaited<ReturnType<typeof removeSubscriptionAddon>
 
 export const useProjectAddonRemoveMutation = ({
   onSuccess,
+  onError,
   ...options
 }: Omit<
-  UseMutationOptions<ProjectAddonRemoveData, unknown, ProjectAddonRemoveVariables>,
+  UseMutationOptions<ProjectAddonRemoveData, ResponseError, ProjectAddonRemoveVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProjectAddonRemoveData, unknown, ProjectAddonRemoveVariables>(
+  return useMutation<ProjectAddonRemoveData, ResponseError, ProjectAddonRemoveVariables>(
     (vars) => removeSubscriptionAddon(vars),
     {
       async onSuccess(data, variables, context) {
@@ -47,6 +51,13 @@ export const useProjectAddonRemoveMutation = ({
         // subscription page is using AddOn react query
         await queryClient.invalidateQueries(subscriptionKeys.addons(projectRef))
         await onSuccess?.(data, variables, context)
+      },
+      async onError(data, variables, context) {
+        if (onError === undefined) {
+          toast.error(`Failed to remove addon: ${data.message}`)
+        } else {
+          onError(data, variables, context)
+        }
       },
       ...options,
     }

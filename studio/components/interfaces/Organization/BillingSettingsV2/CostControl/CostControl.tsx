@@ -42,10 +42,10 @@ const CostControl = ({}: CostControlProps) => {
     <>
       <ScaffoldSection>
         <ScaffoldSectionDetail>
-          <div className="sticky space-y-6 top-16">
-            <div>
-              <p className="text-base">Cost Control</p>
-              <p className="text-sm text-scale-1000">
+          <div className="sticky space-y-6 top-12">
+            <div className="space-y-2">
+              <p className="text-base m-0">Cost Control</p>
+              <p className="text-sm text-scale-1000 m-0">
                 Control whether to use beyond your plans included quota
               </p>
             </div>
@@ -55,7 +55,7 @@ const CostControl = ({}: CostControlProps) => {
                 <Link href="https://supabase.com/docs/guides/platform/spend-cap">
                   <a target="_blank" rel="noreferrer">
                     <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                      <p className="text-sm">Spend cap</p>
+                      <p className="text-sm m-0">Spend cap</p>
                       <IconExternalLink size={16} strokeWidth={1.5} />
                     </div>
                   </a>
@@ -88,7 +88,7 @@ const CostControl = ({}: CostControlProps) => {
                   {currentPlan?.name || ''} plan requires you to have spend cap off at all times.
                   Your projects will never become unresponsive. Only when your{' '}
                   <Link href="#breakdown">
-                    <a className="text-sm text-green-900 transition hover:text-green-1000">
+                    <a className="text-green-900 transition hover:text-green-1000">
                       included usage
                     </a>
                   </Link>{' '}
@@ -99,7 +99,7 @@ const CostControl = ({}: CostControlProps) => {
                   You can control whether your organization is charged for additional usage beyond
                   the{' '}
                   <Link href="#breakdown">
-                    <a className="text-sm text-green-900 transition hover:text-green-1000">
+                    <a className="text-green-900 transition hover:text-green-1000">
                       included quota
                     </a>
                   </Link>{' '}
@@ -147,7 +147,7 @@ const CostControl = ({}: CostControlProps) => {
                   <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
                     <Button
                       type="default"
-                      className="mt-4"
+                      className="mt-4 pointer-events-auto"
                       disabled={!canChangeTier}
                       onClick={() => snap.setPanelKey('costControl')}
                     >

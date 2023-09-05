@@ -1,119 +1,121 @@
-import { useDailyStatsQuery } from 'data/analytics/daily-stats-query'
 import { DataPoint } from 'data/analytics/constants'
-import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
-import UsageSection from './UsageSection'
+import { PricingMetric, useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
+import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
+import UsageSection from './UsageSection/UsageSection'
 
 export interface ActivityProps {
-  projectRef: string
+  orgSlug: string
+  projectRef?: string
   startDate: string | undefined
   endDate: string | undefined
-  subscription: ProjectSubscriptionResponse | undefined
+  subscription: OrgSubscription | undefined
   currentBillingCycleSelected: boolean
 }
 
 const Activity = ({
+  orgSlug,
   projectRef,
   subscription,
   startDate,
   endDate,
   currentBillingCycleSelected,
 }: ActivityProps) => {
-  const { data: mauData, isLoading: isLoadingMauData } = useDailyStatsQuery({
+  const { data: mauData, isLoading: isLoadingMauData } = useOrgDailyStatsQuery({
+    orgSlug,
     projectRef,
-    attribute: 'total_auth_billing_period_mau',
+    metric: PricingMetric.MONTHLY_ACTIVE_USERS,
     interval: '1d',
     startDate,
     endDate,
   })
 
-  const { data: mauSSOData, isLoading: isLoadingMauSSOData } = useDailyStatsQuery({
+  const { data: mauSSOData, isLoading: isLoadingMauSSOData } = useOrgDailyStatsQuery({
+    orgSlug,
     projectRef,
-    attribute: 'total_auth_billing_period_sso_mau',
+    metric: PricingMetric.MONTHLY_ACTIVE_SSO_USERS,
     interval: '1d',
     startDate,
     endDate,
   })
 
   const { data: assetTransformationsData, isLoading: isLoadingAssetTransformationsData } =
-    useDailyStatsQuery({
+    useOrgDailyStatsQuery({
+      orgSlug,
       projectRef,
-      attribute: 'total_storage_image_render_count',
+      metric: PricingMetric.STORAGE_IMAGES_TRANSFORMED,
       interval: '1d',
       startDate,
       endDate,
     })
 
-  const { data: funcInvocationsData, isLoading: isLoadingFuncInvocationsData } = useDailyStatsQuery(
-    {
+  const { data: funcInvocationsData, isLoading: isLoadingFuncInvocationsData } =
+    useOrgDailyStatsQuery({
+      orgSlug,
       projectRef,
-      attribute: 'total_func_invocations',
+      metric: PricingMetric.FUNCTION_INVOCATIONS,
       interval: '1d',
       startDate,
       endDate,
-    }
-  )
+    })
 
   const { data: realtimeMessagesData, isLoading: isLoadingRealtimeMessagesData } =
-    useDailyStatsQuery({
+    useOrgDailyStatsQuery({
+      orgSlug,
       projectRef,
-      attribute: 'total_realtime_message_count',
+      metric: PricingMetric.REALTIME_MESSAGE_COUNT,
       interval: '1d',
       startDate,
       endDate,
     })
 
   const { data: realtimeConnectionsData, isLoading: isLoadingRealtimeConnectionsData } =
-    useDailyStatsQuery({
+    useOrgDailyStatsQuery({
+      orgSlug,
       projectRef,
-      attribute: 'total_realtime_peak_connection',
+      metric: PricingMetric.REALTIME_PEAK_CONNECTIONS,
       interval: '1d',
       startDate,
       endDate,
     })
 
   const chartMeta: {
-    [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean; hasNoData: boolean }
+    [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
   } = {
-    monthly_active_users: {
+    [PricingMetric.MONTHLY_ACTIVE_USERS]: {
       data: mauData?.data ?? [],
       margin: 18,
       isLoading: isLoadingMauData,
-      hasNoData: mauData?.hasNoData ?? false,
     },
-    monthly_active_sso_users: {
+    [PricingMetric.MONTHLY_ACTIVE_SSO_USERS]: {
       data: mauSSOData?.data ?? [],
       margin: 20,
       isLoading: isLoadingMauSSOData,
-      hasNoData: mauSSOData?.hasNoData ?? false,
     },
-    storage_image_render_count: {
+    [PricingMetric.STORAGE_IMAGES_TRANSFORMED]: {
       data: assetTransformationsData?.data ?? [],
       margin: 0,
-      isLoading: isLoadingMauSSOData,
-      hasNoData: assetTransformationsData?.hasNoData ?? false,
+      isLoading: isLoadingAssetTransformationsData,
     },
-    func_invocations: {
+    [PricingMetric.FUNCTION_INVOCATIONS]: {
       data: funcInvocationsData?.data ?? [],
       margin: 26,
       isLoading: isLoadingFuncInvocationsData,
-      hasNoData: funcInvocationsData?.hasNoData ?? false,
     },
-    realtime_message_count: {
+    [PricingMetric.REALTIME_MESSAGE_COUNT]: {
       data: realtimeMessagesData?.data ?? [],
       margin: 38,
       isLoading: isLoadingRealtimeMessagesData,
-      hasNoData: realtimeMessagesData?.hasNoData ?? false,
     },
-    realtime_peak_connection: {
+    [PricingMetric.REALTIME_PEAK_CONNECTIONS]: {
       data: realtimeConnectionsData?.data ?? [],
       margin: 0,
       isLoading: isLoadingRealtimeConnectionsData,
-      hasNoData: realtimeConnectionsData?.hasNoData ?? false,
     },
   }
 
   return (
     <UsageSection
+      orgSlug={orgSlug}
       projectRef={projectRef}
       categoryKey="activity"
       chartMeta={chartMeta}

@@ -2,7 +2,7 @@ import { toJS } from 'mobx'
 import { useRouter } from 'next/router'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useFlag, useSelectedOrganization, useStore } from 'hooks'
+import { useSelectedOrganization, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { Button, Dropdown, IconPlus } from 'ui'
 
@@ -12,8 +12,6 @@ const OrgDropdown = () => {
 
   const { data: organizations } = useOrganizationsQuery()
   const selectedOrganization = useSelectedOrganization()
-
-  const orgCreationV2 = useFlag('orgcreationv2')
 
   return IS_PLATFORM ? (
     <Dropdown
@@ -53,17 +51,10 @@ const OrgDropdown = () => {
               )
             })}
           <Dropdown.Separator />
+
           <Dropdown.Item icon={<IconPlus size="tiny" />} onClick={() => router.push(`/new`)}>
             New organization
           </Dropdown.Item>
-          {orgCreationV2 && (
-            <Dropdown.Item
-              icon={<IconPlus size="tiny" />}
-              onClick={() => router.push(`/new-with-subscription`)}
-            >
-              New organization V2
-            </Dropdown.Item>
-          )}
         </>
       }
     >

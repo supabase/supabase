@@ -34,14 +34,14 @@ export const getUsageStatus = (attributes: CategoryAttribute[], usage?: ProjectU
   else return USAGE_STATUS.NORMAL
 }
 
-export const getUpgradeUrl = (projectRef: string, subscription?: ProjectSubscriptionResponse) => {
+export const getUpgradeUrl = (slug: string, subscription?: ProjectSubscriptionResponse) => {
   if (!subscription) {
-    return `/project/${projectRef}/settings/billing/subscription`
+    return `/org/${slug}/billing`
   }
 
   return subscription?.plan?.id === 'pro' && subscription?.usage_billing_enabled === false
-    ? `/project/${projectRef}/settings/billing/subscription#cost-control`
-    : `/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`
+    ? `/org/${slug}/billing#cost-control`
+    : `/org/${slug}/billing?panel=subscriptionPlan`
 }
 
 const compactNumberFormatter = new Intl.NumberFormat('en-US', {
