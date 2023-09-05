@@ -185,16 +185,6 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: 'Enterprise OAuth providers',
-        plans: {
-          free: false,
-          pro: false,
-          team: false,
-          enterprise: true,
-        },
-        usage_based: false,
-      },
-      {
         title: 'Audit trails',
         plans: {
           free: '1 hour',

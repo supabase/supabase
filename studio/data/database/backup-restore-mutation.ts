@@ -16,7 +16,7 @@ export type Backup = components['schemas']['Backup']
 export async function restoreFromBackup({ ref, backup }: BackupRestoreVariables) {
   const { data, error } = await post('/platform/database/{ref}/backups/restore', {
     params: { path: { ref } },
-    body: { ...backup, status: backup.status as unknown as string },
+    body: { id: backup.id },
   })
   if (error) throw error
   return data

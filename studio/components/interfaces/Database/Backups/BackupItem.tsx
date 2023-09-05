@@ -55,15 +55,13 @@ const BackupItem = ({ projectRef, backup, index }: BackupItemProps) => {
     if (backup.status === 'COMPLETED')
       return (
         <div className="flex space-x-4">
-          {backup.data.canRestore && (
-            <Button
-              type="default"
-              disabled={!canTriggerScheduledBackups || isRestoring}
-              onClick={onRestoreClick}
-            >
-              Restore
-            </Button>
-          )}
+          <Button
+            type="default"
+            disabled={!canTriggerScheduledBackups || isRestoring}
+            onClick={onRestoreClick}
+          >
+            Restore
+          </Button>
         </div>
       )
     return <Badge color="yellow">Backup In Progress...</Badge>

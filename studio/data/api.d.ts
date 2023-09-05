@@ -97,6 +97,10 @@ export interface paths {
     /** Restore project backup */
     post: operations["BackupsController_restoreBackup"];
   };
+  "/platform/database/{ref}/backups/restore-physical": {
+    /** Restore project with a physical backup */
+    post: operations["BackupsController_restorePhysicalBackup"];
+  };
   "/platform/database/{ref}/backups/pitr": {
     /** Restore project to a previous point in time */
     post: operations["BackupsController_restorePointInTimeBackup"];
@@ -929,6 +933,10 @@ export interface paths {
     /** Restore project backup */
     post: operations["BackupsController_restoreBackup"];
   };
+  "/v0/database/{ref}/backups/restore-physical": {
+    /** Restore project with a physical backup */
+    post: operations["BackupsController_restorePhysicalBackup"];
+  };
   "/v0/database/{ref}/backups/pitr": {
     /** Restore project to a previous point in time */
     post: operations["BackupsController_restorePointInTimeBackup"];
@@ -1573,6 +1581,10 @@ export interface paths {
     /** Create an organization */
     post: operations["OrganizationsController_createOrganization"];
   };
+  "/v1/organizations/{slug}/members": {
+    /** List members of an organization */
+    get: operations["V1OrganizationMembersController_v1ListOrganizationMembers"];
+  };
   "/v1/oauth/authorize": {
     /** Authorize user through oauth */
     get: operations["OAuthController_authorize"];
@@ -1580,6 +1592,14 @@ export interface paths {
   "/v1/oauth/token": {
     /** Exchange auth code for user's access and refresh token */
     post: operations["OAuthController_token"];
+  };
+  "/v1/snippets": {
+    /** Lists SQL snippets for the logged in user */
+    get: operations["SnippetsController_listSnippets"];
+  };
+  "/v1/snippets/{id}": {
+    /** Gets a specific SQL snippet */
+    get: operations["SnippetsController_getSnippet"];
   };
 }
 
@@ -1647,12 +1667,16 @@ export interface components {
       redirectTo?: string;
     };
     ProjectResourceWarningsResponse: {
+      /** @enum {string|null} */
+      disk_io_exhaustion: "critical" | "warning" | null;
+      /** @enum {string|null} */
+      disk_space_exhaustion: "critical" | "warning" | null;
+      /** @enum {string|null} */
+      cpu_exhaustion: "critical" | "warning" | null;
+      /** @enum {string|null} */
+      memory_and_swap_exhaustion: "critical" | "warning" | null;
       project: string;
       is_readonly_mode_enabled: boolean;
-      is_disk_io_budget_below_threshold: boolean;
-      is_disk_space_usage_beyond_threshold: boolean;
-      is_cpu_load_beyond_threshold: boolean;
-      is_memory_and_swap_usage_beyond_threshold: boolean;
     };
     GetGoTrueConfigResponse: {
       SITE_URL: string;
@@ -2064,11 +2088,9 @@ export interface components {
     };
     Backup: {
       id: number;
-      data: Record<string, never>;
+      isPhysicalBackup: boolean;
       project_id: number;
       status: Record<string, never>;
-      s3_path: string;
-      s3_bucket: string;
       inserted_at: string;
     };
     BackupsResponse: {
@@ -2076,6 +2098,7 @@ export interface components {
       tierKey: string;
       region: string;
       walg_enabled: boolean;
+      pitr_enabled: boolean;
       backups: (components["schemas"]["Backup"])[];
       physicalBackupData: {
         earliestPhysicalBackupDateUnix?: number;
@@ -2094,14 +2117,12 @@ export interface components {
     DownloadBackupResponse: {
       fileUrl: string;
     };
-    RestoreBackupBody: {
+    RestoreLogicalBackupBody: {
       id: number;
-      data: Record<string, never>;
-      inserted_at: string;
-      project_id: number;
-      s3_bucket: string;
-      s3_path: string;
-      status: string;
+    };
+    RestorePhysicalBackupBody: {
+      id: number;
+      recovery_time_target: string;
     };
     PointInTimeRestoreBody: {
       recovery_time_target_unix: number;
@@ -4289,6 +4310,12 @@ export interface components {
       entrypoint_path?: string;
       import_map_path?: string;
     };
+    V1OrganizationMemberResponse: {
+      user_id: string;
+      user_name: string;
+      email?: string;
+      role_name: string;
+    };
     OAuthTokenBody: {
       /** @enum {string} */
       grant_type: "authorization_code" | "refresh_token";
@@ -4305,6 +4332,51 @@ export interface components {
       access_token: string;
       refresh_token: string;
       expires_in: number;
+    };
+    SnippetProject: {
+      id: number;
+      name: string;
+    };
+    SnippetUser: {
+      id: number;
+      username: string;
+    };
+    SnippetMeta: {
+      id: string;
+      inserted_at: string;
+      updated_at: string;
+      /** @enum {string} */
+      type: "sql";
+      /** @enum {string} */
+      visibility: "user" | "project" | "org" | "public";
+      name: string;
+      description: string | null;
+      project: components["schemas"]["SnippetProject"];
+      owner: components["schemas"]["SnippetUser"];
+      updated_by: components["schemas"]["SnippetUser"];
+    };
+    SnippetList: {
+      data: (components["schemas"]["SnippetMeta"])[];
+    };
+    SnippetContent: {
+      favorite: boolean;
+      schema_version: string;
+      sql: string;
+    };
+    SnippetResponse: {
+      id: string;
+      inserted_at: string;
+      updated_at: string;
+      /** @enum {string} */
+      type: "sql";
+      /** @enum {string} */
+      visibility: "user" | "project" | "org" | "public";
+      name: string;
+      description: string | null;
+      project: components["schemas"]["SnippetProject"];
+      owner: components["schemas"]["SnippetUser"];
+      updated_by: components["schemas"]["SnippetUser"];
+      content: components["schemas"]["SnippetContent"];
     };
   };
   responses: never;
@@ -4735,7 +4807,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["RestoreBackupBody"];
+        "application/json": components["schemas"]["RestoreLogicalBackupBody"];
       };
     };
     responses: {
@@ -4745,6 +4817,29 @@ export interface operations {
         };
       };
       /** @description Failed to restore project backup */
+      500: never;
+    };
+  };
+  /** Restore project with a physical backup */
+  BackupsController_restorePhysicalBackup: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RestorePhysicalBackupBody"];
+      };
+    };
+    responses: {
+      201: {
+        content: {
+          "application/json": Record<string, never>;
+        };
+      };
+      /** @description Failed to restore project with physical backup */
       500: never;
     };
   };
@@ -10298,6 +10393,21 @@ export interface operations {
       500: never;
     };
   };
+  /** List members of an organization */
+  V1OrganizationMembersController_v1ListOrganizationMembers: {
+    parameters: {
+      path: {
+        slug: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": (components["schemas"]["V1OrganizationMemberResponse"])[];
+        };
+      };
+    };
+  };
   /** Authorize user through oauth */
   OAuthController_authorize: {
     parameters: {
@@ -10305,7 +10415,7 @@ export interface operations {
         client_id: string;
         response_type: "code" | "token" | "id_token token";
         redirect_uri: string;
-        scope: string;
+        scope?: string;
         state?: string;
         response_mode?: string;
         code_challenge?: string;
@@ -10329,6 +10439,40 @@ export interface operations {
           "application/json": components["schemas"]["OAuthTokenResponse"];
         };
       };
+    };
+  };
+  /** Lists SQL snippets for the logged in user */
+  SnippetsController_listSnippets: {
+    parameters: {
+      query?: {
+        project_ref?: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["SnippetList"];
+        };
+      };
+      /** @description Failed to list user's SQL snippets */
+      500: never;
+    };
+  };
+  /** Gets a specific SQL snippet */
+  SnippetsController_getSnippet: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["SnippetResponse"];
+        };
+      };
+      /** @description Failed to retrieve SQL snippet */
+      500: never;
     };
   };
 }
