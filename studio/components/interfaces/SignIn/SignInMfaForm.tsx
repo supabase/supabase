@@ -6,7 +6,9 @@ import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { useStore } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
+import { useSignOut } from 'lib/auth'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Button, Form, IconLock, Input } from 'ui'
 import { object, string } from 'yup'
@@ -19,9 +21,16 @@ const SignInMfaForm = () => {
   const { ui } = useStore()
   const pushNext = usePushNext()
   const queryClient = useQueryClient()
+  const router = useRouter()
   const { data: factors, isSuccess: factorsSuccess } = useMfaListFactorsQuery()
   const { mutateAsync: mfaChallengeAndVerify, isLoading } = useMfaChallengeAndVerifyMutation()
   const [selectedFactor, setSelectedFactor] = useState<Factor | null>(null)
+  const signOut = useSignOut()
+
+  const onClickLogout = async () => {
+    await signOut()
+    await router.replace('/sign-in')
+  }
 
   useEffect(() => {
     if (factorsSuccess) {
@@ -130,15 +139,22 @@ const SignInMfaForm = () => {
           </div>
         )}
       </Form>
+      <div>
+        <a
+          className="underline transition text-scale-1100 hover:text-scale-1200 cursor-pointer"
+          onClick={onClickLogout}
+        >
+          Cancel signing in?
+        </a>
+      </div>
+
       <div className="self-center my-8 text-sm">
-        <div>
-          <span className="text-scale-1000">Unable to log in?</span>{' '}
-          <Link href="/support/new?subject=Unable%20to%20log%20in%20via%20MFA">
-            <a className="underline transition text-scale-1100 hover:text-scale-1200">
-              Reach out via support
-            </a>
-          </Link>
-        </div>
+        <span className="text-scale-1000">Unable to log in?</span>{' '}
+        <Link href="/support/new?subject=Unable%20to%20log%20in%20via%20MFA">
+          <a className="underline transition text-scale-1100 hover:text-scale-1200">
+            Reach out via support
+          </a>
+        </Link>
       </div>
     </>
   )
