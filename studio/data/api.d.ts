@@ -2117,6 +2117,15 @@ export interface components {
     DownloadBackupResponse: {
       fileUrl: string;
     };
+    RestoreBackupBody: {
+      id: number;
+      data: Record<string, never>;
+      inserted_at: string;
+      project_id: number;
+      s3_bucket: string;
+      s3_path: string;
+      status: string;
+    };
     RestorePhysicalBackupBody: {
       recovery_time_target: string;
       id: number;
@@ -4800,6 +4809,11 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RestoreBackupBody"];
       };
     };
     responses: {
