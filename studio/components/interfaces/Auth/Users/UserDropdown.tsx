@@ -128,7 +128,7 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
           ) : null}
           <Dropdown.Separator />
           <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
+            <Tooltip.Trigger asChild>
               <Dropdown.Item
                 onClick={handleDeleteFactors}
                 icon={<IconShieldOff size="tiny" />}
@@ -160,7 +160,7 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
             )}
           </Tooltip.Root>
           <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
+            <Tooltip.Trigger asChild>
               <Dropdown.Item
                 onClick={handleDelete}
                 icon={<IconTrash size="tiny" />}
