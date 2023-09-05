@@ -5,9 +5,16 @@
       <link>https://supabase.com/blog</link>
       <description>Latest Postgres news from Greg Richardson at Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 02 Aug 2023 06:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Tue, 05 Sep 2023 06:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/planetpg-gregnr-rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/increase-performance-pgvector-hnsw</guid>
+  <title>pgvector v0.5.0: Faster semantic search with HNSW indexes</title>
+  <link>https://supabase.com/blog/increase-performance-pgvector-hnsw</link>
+  <description>Increase performance in pgvector using HNSW indexes</description>
+  <pubDate>Tue, 05 Sep 2023 06:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/fewer-dimensions-are-better-pgvector</guid>
   <title>pgvector: Fewer dimensions are better</title>
   <link>https://supabase.com/blog/fewer-dimensions-are-better-pgvector</link>
