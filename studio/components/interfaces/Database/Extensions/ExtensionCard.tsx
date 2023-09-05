@@ -8,6 +8,7 @@ import { useCheckPermissions, useStore } from 'hooks'
 import { isResponseOk } from 'lib/common/fetch'
 import EnableExtensionModal from './EnableExtensionModal'
 import Link from 'next/link'
+import { extensions } from 'shared-data'
 
 interface ExtensionCardProps {
   extension: any
@@ -19,6 +20,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
   const isOn = extension.installed_version !== null
   const [loading, setLoading] = useState(false)
   const [showConfirmEnableModal, setShowConfirmEnableModal] = useState(false)
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || ''
 
   const canUpdateExtensions = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -74,26 +76,35 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
             'flex justify-between w-full border-b p-4 px-6 dark:border-panel-border-dark',
           ].join(' ')}
         >
-          <Link
-            href={
-              extension.link ||
-              `https://supabase.com/docs/guides/database/extensions/${extension.name}`
-            }
-          >
-            <a className="max-w-[85%] cursor-default" target="_blank" rel="noreferrer">
-              <div className="flex flex-row items-center">
-                <h3
-                  title={extension.name}
-                  className="h-5 m-0 text-base uppercase truncate cursor-pointer text-scale-1200"
-                >
-                  {extension.name}
-                </h3>
-
-                <IconExternalLink className="ml-2.5 cursor-pointer" size={14} />
-              </div>
-            </a>
-          </Link>
-
+          <div className="flex items-center gap-1">
+            <h3
+              title={extension.name}
+              className="h-5 m-0 text-base uppercase truncate cursor-pointer text-scale-1200"
+            >
+              {extension.name}
+            </h3>
+            {extensions.find((item: any) => item.name === extension.name) ? (
+              <Link
+                href={
+                  extensions
+                    .find((item: any) => item.name === extension.name)
+                    ?.link.startsWith('/guides')
+                    ? siteUrl === 'http://localhost:8082'
+                      ? `http://localhost:3001/docs${
+                          extensions.find((item: any) => item.name === extension.name)?.link
+                        }`
+                      : `https://supabase.com/docs${
+                          extensions.find((item: any) => item.name === extension.name)?.link
+                        }`
+                    : extensions.find((item: any) => item.name === extension.name)?.link ?? ''
+                }
+              >
+                <a className="max-w-[85%] cursor-default zans" target="_blank" rel="noreferrer">
+                  <IconExternalLink className="ml-2.5 cursor-pointer" size={14} />
+                </a>
+              </Link>
+            ) : null}
+          </div>
           {loading ? (
             <IconLoader className="animate-spin" size={16} />
           ) : (
