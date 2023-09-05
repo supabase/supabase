@@ -6,7 +6,7 @@ function TextLink({ url = '', label, className, ...props }: any) {
     <Link href={url} passHref>
       <a
         className={cn(
-          'text-scale-1100 hover:text-scale-1200 mt-3 block cursor-pointer text-sm',
+          'text-scale-1100 hover:text-scale-1200 mt-3 block cursor-pointer text-sm focus-visible:ring-2 focus-visible:outline-none focus-visible:rounded focus-visible:ring-foreground-lighter focus-visible:text-foreground-strong',
           className
         )}
         {...props}
