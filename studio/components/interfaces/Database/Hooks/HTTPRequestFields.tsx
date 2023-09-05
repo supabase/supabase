@@ -113,6 +113,14 @@ const HTTPRequestFields = ({
               })}
             </Listbox>
           ) : null}
+          <Input
+            id="timeout_ms"
+            name="timeout_ms"
+            label="Timeout"
+            labelOptional="Between 1000ms to 5000ms"
+            type="number"
+            actions={<p className="text-light pr-2">ms</p>}
+          />
         </FormSectionContent>
       </FormSection>
       <SidePanel.Separator />
