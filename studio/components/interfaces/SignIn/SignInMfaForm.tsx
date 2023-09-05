@@ -154,7 +154,7 @@ const SignInMfaForm = () => {
 
       <div className="self-center my-8 text-sm">
         <span className="text-scale-1000">Unable to log in?</span>{' '}
-        <Link href="/support/new?subject=Unable%20to%20log%20in%20via%20MFA">
+        <Link href="/support/new?subject=Unable+to+log+in+via+MFA&category=Login_issues">
           <a className="underline transition text-scale-1100 hover:text-scale-1200">
             Reach out via support
           </a>
