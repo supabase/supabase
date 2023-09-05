@@ -25,11 +25,12 @@ import {
 import HamburgerButton from './HamburgerMenu'
 import Developers from './Developers'
 import Product from './Product'
+import ProductIcon from '../ProductIcon'
 
 export const ListItem = React.forwardRef<
   React.ElementRef<'a'>,
-  React.ComponentPropsWithoutRef<'a'> & { description?: string }
->(({ className, title, href = '', description, children, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<'a'> & { description?: string; icon?: string }
+>(({ className, title, href = '', description, icon, children, ...props }, ref) => {
   return (
     <li>
       <NavigationMenuLink asChild>
@@ -37,17 +38,20 @@ export const ListItem = React.forwardRef<
           <a
             ref={ref}
             className={cn(
-              'flex flex-col select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-overlay-hover hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+              'group flex flex-row select-none space-x-2 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-overlay-hover focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground-strong',
               className
             )}
             {...props}
           >
             {children ?? (
               <>
-                <div className="text-sm font-medium leading-none">{title}</div>
-                {description && (
-                  <p className="line-clamp-2 text-sm leading-snug text-muted">{description}</p>
-                )}
+                {icon && <ProductIcon icon={icon} color="alt" />}
+                <div className="flex flex-col space-y-1">
+                  <div className="text-sm font-medium leading-none">{title}</div>
+                  {description && (
+                    <p className="line-clamp-2 text-sm leading-snug text-light">{description}</p>
+                  )}
+                </div>
               </>
             )}
           </a>
@@ -128,64 +132,47 @@ const Nav = () => {
                     </Link>
                   )}
                 </div>
-                <div className="hidden pl-4 sm:ml-6 sm:space-x-4 lg:flex">
-                  <NavigationMenu>
-                    <NavigationMenuList>
-                      <NavigationMenuItem>
-                        <NavigationMenuTrigger className="bg-transparent data-[state=open]:text-brand">
-                          Product
-                        </NavigationMenuTrigger>
-                        <NavigationMenuContent>
-                          <Product />
-                        </NavigationMenuContent>
-                      </NavigationMenuItem>
-                      <NavigationMenuItem>
-                        <NavigationMenuTrigger className="bg-transparent data-[state=open]:text-brand">
-                          Developers
-                        </NavigationMenuTrigger>
-                        <NavigationMenuContent>
-                          <Developers />
-                        </NavigationMenuContent>
-                      </NavigationMenuItem>
-                    </NavigationMenuList>
-                  </NavigationMenu>
-                  <Link href="/pricing">
-                    <a
-                      className={[
-                        `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
-                        border-b-2 border-transparent p-5 px-1
-                        text-sm font-medium`,
-                        showLaunchWeekNavMode && '!text-white',
-                      ].join(' ')}
-                    >
-                      Pricing
-                    </a>
-                  </Link>
-                  <Link href="/docs">
-                    <a
-                      className={[
-                        `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
-                        border-b-2 border-transparent p-5 px-1
-                        text-sm font-medium`,
-                        showLaunchWeekNavMode && '!text-white',
-                      ].join(' ')}
-                    >
-                      Docs
-                    </a>
-                  </Link>
-                  <Link href="/blog">
-                    <a
-                      className={[
-                        `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
-                        border-b-2 border-transparent p-5 px-1
-                        text-sm font-medium`,
-                        showLaunchWeekNavMode && '!text-white',
-                      ].join(' ')}
-                    >
-                      Blog
-                    </a>
-                  </Link>
-                </div>
+                <NavigationMenu className="hidden pl-4 sm:ml-4 sm:space-x-4 lg:flex h-16">
+                  <NavigationMenuList>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger className="bg-transparent data-[state=open]:text-brand data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground-strong">
+                        Product
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent className="rounded-lg">
+                        <Product />
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger className="bg-transparent text-sm font-medium data-[state=open]:text-brand data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground-strong">
+                        Developers
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent className="rounded-lg">
+                        <Developers />
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem className=" text-sm font-medium">
+                      <ListItem
+                        href="/pricing"
+                        title="Pricing"
+                        className="group-hover:bg-transparent hover:text-brand"
+                      />
+                    </NavigationMenuItem>
+                    <NavigationMenuItem className=" text-sm font-medium">
+                      <ListItem
+                        href="/docs"
+                        title="Docs"
+                        className="group-hover:bg-transparent hover:text-brand"
+                      />
+                    </NavigationMenuItem>
+                    <NavigationMenuItem className=" text-sm font-medium">
+                      <ListItem
+                        href="/blog"
+                        title="Blog"
+                        className="group-hover:bg-transparent hover:text-brand"
+                      />
+                    </NavigationMenuItem>
+                  </NavigationMenuList>
+                </NavigationMenu>
               </div>
               <div className="flex items-center gap-2">
                 <GitHubButton />
@@ -220,7 +207,7 @@ const Nav = () => {
               </div>
             </div>
           </div>
-          {/* </div> */}
+
           {/* Mobile Nav Menu */}
           <Transition
             appear={true}
