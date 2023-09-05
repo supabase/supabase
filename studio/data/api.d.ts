@@ -2117,18 +2117,12 @@ export interface components {
     DownloadBackupResponse: {
       fileUrl: string;
     };
-    RestoreBackupBody: {
+    RestoreLogicalBackupBody: {
       id: number;
-      data: Record<string, never>;
-      inserted_at: string;
-      project_id: number;
-      s3_bucket: string;
-      s3_path: string;
-      status: string;
     };
     RestorePhysicalBackupBody: {
-      recovery_time_target: string;
       id: number;
+      recovery_time_target: string;
     };
     PointInTimeRestoreBody: {
       recovery_time_target_unix: number;
@@ -4813,7 +4807,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["RestoreBackupBody"];
+        "application/json": components["schemas"]["RestoreLogicalBackupBody"];
       };
     };
     responses: {
