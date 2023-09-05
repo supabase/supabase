@@ -5,13 +5,7 @@ import { toast } from 'react-hot-toast'
 import { ResponseError } from 'types/base'
 import { subscriptionKeys } from './keys'
 import { usageKeys } from 'data/usage/keys'
-
-export type SubscriptionTier =
-  | 'tier_free'
-  | 'tier_pro'
-  | 'tier_payg'
-  | 'tier_team'
-  | 'tier_enterprise'
+import { SubscriptionTier } from './types'
 
 export type OrgSubscriptionUpdateVariables = {
   slug: string

@@ -144,7 +144,13 @@ const TransferProjectButton = () => {
           <Modal.Content>
             <p className="text-sm">
               To transfer projects, the owner must be a member of both the source and target
-              organizations.
+              organizations. For further information see our{' '}
+              <Link href="https://supabase.com/docs/guides/platform/project-transfer">
+                <a className="text-brand hover:underline" target="_blank" rel="noreferrer">
+                  Documentation
+                </a>
+              </Link>
+              .
             </p>
 
             <p className="font-bold mt-6 text-sm">Transferring considerations:</p>
