@@ -1,41 +1,43 @@
 api:
   enabled: true
-  address: '0.0.0.0:9001'
+  address: 0.0.0.0:9001
 
 sources:
-  docker_syslog:
-    type: 'syslog'
-    address: '0.0.0.0:9000'
-    mode: 'tcp'
-    path: '/tmp/socket'
+  docker_host:
+    type: docker_logs
+    exclude_containers:
+      - supabase-vector
 
 transforms:
   project_logs:
     type: remap
     inputs:
-      - docker_syslog
+      - docker_host
     source: |-
       .project = "default"
       .event_message = del(.message)
-      del(.procid)
-      del(.source_id)
+      .appname = del(.container_name)
+      del(.container_created_at)
+      del(.container_id)
       del(.source_type)
-      del(.facility)
+      del(.stream)
+      del(.label)
+      del(.image)
       del(.host)
-      del(.id)
+      del(.stream)
   router:
     type: route
     inputs:
       - project_logs
     route:
-      kong: '.appname == "kong"'
-      auth: '.appname == "auth"'
-      rest: '.appname == "rest"'
-      realtime: '.appname == "realtime"'
-      storage: '.appname == "storage"'
-      functions: '.appname == "functions"'
-      db: '.appname == "db"'
-  # Kong logs only include api requests
+      kong: '.appname == "supabase-kong"'
+      auth: '.appname == "supabase-auth"'
+      rest: '.appname == "supabase-rest"'
+      realtime: '.appname == "supabase-realtime"'
+      storage: '.appname == "supabase-storage"'
+      functions: '.appname == "supabase-functions"'
+      db: '.appname == "supabase-db"'
+  # Ignores non nginx errors since they are related with kong booting up
   kong_logs:
     type: remap
     inputs:
@@ -52,7 +54,10 @@ transforms:
           .metadata.request.protocol = req.protocol
           .metadata.response.status_code = req.status
       }
-  # TODO: create a separate page and filter for kong error logs
+      if err != null {
+        abort
+      }
+  # Ignores non nginx errors since they are related with kong booting up
   kong_err:
     type: remap
     inputs:
@@ -72,6 +77,9 @@ transforms:
               .metadata.request.path = url[1]
               .metadata.request.protocol = url[2]
           }
+      }
+      if err != null {
+        abort
       }
   # Gotrue logs are structured json strings which frontend parses directly. But we keep metadata for consistency.
   auth_logs:
@@ -126,7 +134,6 @@ transforms:
           .metadata.context[0].pid = parsed.pid
       }
   # Postgres logs some messages to stderr which we map to warning severity level
-  # TODO: parse raw postgres logs via regex
   db_logs:
     type: remap
     inputs:
@@ -134,7 +141,16 @@ transforms:
     source: |-
       .metadata.host = "db-default"
       .metadata.parsed.timestamp = .timestamp
-      .metadata.parsed.error_severity = replace!(.severity, r'^err$', "warning")
+      parsed, err = parse_regex(.event_message, r'.*(?P<level>INFO|NOTICE|WARNING|ERROR|LOG|FATAL|PANIC?):.*', numeric_groups: true)
+
+      if err != null || parsed == null {
+        .metadata.parsed.error_severity = "info"
+      }
+      if parsed != null {
+       .metadata.parsed.error_severity = parsed.level
+      }
+
+
 
 sinks:
   logflare_auth:
@@ -204,6 +220,7 @@ sinks:
     type: 'http'
     inputs:
       - kong_logs
+      - kong_err
     encoding:
       codec: 'json'
     method: 'post'
