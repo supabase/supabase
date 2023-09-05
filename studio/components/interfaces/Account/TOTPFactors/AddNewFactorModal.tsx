@@ -163,7 +163,12 @@ const SecondStep = ({
       buttonLabel="Confirm"
       buttonLoadingLabel="Confirming"
       loading={isVerifying}
-      onSelectCancel={() => factor && unenroll({ factorId: factor.id })}
+      onSelectCancel={() => {
+        // If a factor has been created (but not verified), unenroll it. This will be run as a
+        // side effect so that it's not confusing to the user why the modal stays open while
+        // unenrolling.
+        if (factor) unenroll({ factorId: factor.id })
+      }}
       onSelectConfirm={() => factor && challengeAndVerify({ factorId: factor.id, code })}
     >
       <Modal.Content>
