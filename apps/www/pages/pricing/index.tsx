@@ -873,7 +873,7 @@ export default function IndexPage() {
                       >
                         <a>
                           <Button size="tiny" type="primary" block>
-                            Get started
+                            Get Started
                           </Button>
                         </a>
                       </Link>
@@ -886,7 +886,7 @@ export default function IndexPage() {
                       >
                         <a>
                           <Button size="tiny" type="primary" block>
-                            Get started
+                            Get Started
                           </Button>
                         </a>
                       </Link>
@@ -906,7 +906,7 @@ export default function IndexPage() {
                       <Link href="https://forms.supabase.com/enterprise">
                         <a>
                           <Button size="tiny" type="default" block>
-                            Contact us
+                            Contact Us
                           </Button>
                         </a>
                       </Link>
