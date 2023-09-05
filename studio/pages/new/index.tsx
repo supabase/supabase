@@ -1,161 +1,106 @@
+import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
+import { useParams, useTheme } from 'common'
 import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-import { Button, Input, Listbox } from 'ui'
+import { useCallback, useEffect, useState } from 'react'
 
+import { NewOrgForm } from 'components/interfaces/Organization'
 import { WizardLayout } from 'components/layouts'
-import Panel from 'components/ui/Panel'
-import { useOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
-import { useStore } from 'hooks'
+import { useSetupIntent } from 'data/stripe/setup-intent-mutation'
+import { STRIPE_PUBLIC_KEY } from 'lib/constants'
+import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import { NextPageWithLayout } from 'types'
 
-const ORG_KIND_TYPES = {
-  PERSONAL: 'Personal',
-  EDUCATIONAL: 'Educational',
-  STARTUP: 'Startup',
-  AGENCY: 'Agency',
-  COMPANY: 'Company',
-  UNDISCLOSED: 'N/A',
-}
-const ORG_KIND_DEFAULT = 'PERSONAL'
-
-const ORG_SIZE_TYPES = {
-  '1': '1 - 10',
-  '10': '10 - 49',
-  '50': '50 - 99',
-  '100': '100 - 299',
-  '300': 'More than 300',
-}
-const ORG_SIZE_DEFAULT = '1'
+const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 /**
  * No org selected yet, create a new one
  */
 const Wizard: NextPageWithLayout = () => {
-  const { ui } = useStore()
-  const router = useRouter()
+  const { isDarkMode } = useTheme()
 
-  const [orgName, setOrgName] = useState('')
-  const [orgKind, setOrgKind] = useState(ORG_KIND_DEFAULT)
-  const [orgSize, setOrgSize] = useState(ORG_SIZE_DEFAULT)
+  const [intent, setIntent] = useState<any>()
+  const captchaLoaded = useIsHCaptchaLoaded()
 
-  const { mutate: createOrganization, isLoading: newOrgLoading } = useOrganizationCreateMutation({
-    onSuccess: async (org: any) => {
-      // [Joshen] API spec is wrong? its returning org type as only having id and name
-      router.push(`/new/${org.slug}`)
-    },
-  })
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
 
-  function validateOrgName(name: any) {
-    return name.length >= 1
+  const { mutate: setupIntent } = useSetupIntent({ onSuccess: (res) => setIntent(res) })
+
+  const captchaRefCallback = useCallback((node) => {
+    setCaptchaRef(node)
+  }, [])
+
+  const initSetupIntent = async (hcaptchaToken: string | undefined) => {
+    if (!hcaptchaToken) return console.error('Hcaptcha token is required')
+
+    // Force a reload of Elements, necessary for Stripe
+    setIntent(undefined)
+    setupIntent({ hcaptchaToken })
   }
 
-  function onOrgNameChange(e: any) {
-    setOrgName(e.target.value)
-  }
+  const options = {
+    clientSecret: intent ? intent.client_secret : '',
+    appearance: { theme: isDarkMode ? 'night' : 'flat', labels: 'floating' },
+  } as any
 
-  function onOrgKindChange(value: any) {
-    setOrgKind(value)
-  }
+  const loadPaymentForm = async () => {
+    if (captchaRef && captchaLoaded) {
+      let token = captchaToken
 
-  function onOrgSizeChange(value: any) {
-    setOrgSize(value)
-  }
+      try {
+        if (!token) {
+          const captchaResponse = await captchaRef.execute({ async: true })
+          token = captchaResponse?.response ?? null
+        }
+      } catch (error) {
+        return
+      }
 
-  async function onClickSubmit(e: any) {
-    e.preventDefault()
-    const trimmedOrgName = orgName ? orgName.trim() : ''
-    const isOrgNameValid = validateOrgName(trimmedOrgName)
-    if (!isOrgNameValid) {
-      return ui.setNotification({ category: 'error', message: 'Organization name is empty' })
+      await initSetupIntent(token ?? undefined)
+      resetCaptcha()
     }
+  }
 
-    createOrganization({
-      name: trimmedOrgName,
-      kind: orgKind,
-      ...(orgKind == 'COMPANY' ? { size: orgSize } : {}),
-    })
+  useEffect(() => {
+    loadPaymentForm()
+  }, [captchaRef, captchaLoaded])
+
+  const resetSetupIntent = () => {
+    return loadPaymentForm()
+  }
+
+  const onLocalCancel = () => {
+    setIntent(undefined)
+  }
+
+  const resetCaptcha = () => {
+    setCaptchaToken(null)
+    captchaRef?.resetCaptcha()
   }
 
   return (
-    <Panel
-      hideHeaderStyling
-      title={
-        <div key="panel-title">
-          <h4>Create a new organization</h4>
-        </div>
-      }
-      footer={
-        <div key="panel-footer" className="flex w-full items-center justify-between">
-          <Button type="default" onClick={() => router.push('/projects')}>
-            Cancel
-          </Button>
-          <div className="flex items-center space-x-3">
-            <p className="text-xs text-scale-900">You can rename your organization later</p>
-            <Button onClick={onClickSubmit} loading={newOrgLoading} disabled={newOrgLoading}>
-              Create organization
-            </Button>
-          </div>
-        </div>
-      }
-    >
-      <Panel.Content className="pt-0">
-        <p className="text-sm">This is your organization within Supabase.</p>
-        <p className="text-sm text-scale-1100">
-          For example, you can use the name of your company or department.
-        </p>
-      </Panel.Content>
-      <Panel.Content className="Form section-block--body has-inputs-centered">
-        <Input
-          autoFocus
-          label="Name"
-          type="text"
-          layout="horizontal"
-          placeholder="Organization name"
-          descriptionText="What's the name of your company or team?"
-          value={orgName}
-          onChange={onOrgNameChange}
-        />
-      </Panel.Content>
-      <Panel.Content className="Form section-block--body has-inputs-centered">
-        <Listbox
-          label="Type of organization"
-          layout="horizontal"
-          value={orgKind}
-          onChange={onOrgKindChange}
-          descriptionText="What would best describe your organization?"
-        >
-          {Object.entries(ORG_KIND_TYPES).map(([k, v]) => {
-            return (
-              <Listbox.Option key={k} label={v} value={k}>
-                {v}
-              </Listbox.Option>
-            )
-          })}
-        </Listbox>
-      </Panel.Content>
-      {orgKind == 'COMPANY' ? (
-        <Panel.Content className="Form section-block--body has-inputs-centered">
-          <Listbox
-            label="Company size"
-            layout="horizontal"
-            value={orgSize}
-            onChange={onOrgSizeChange}
-            descriptionText="How many people are in your company?"
-          >
-            {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => {
-              return (
-                <Listbox.Option key={k} label={v} value={k}>
-                  {v}
-                </Listbox.Option>
-              )
-            })}
-          </Listbox>
-        </Panel.Content>
-      ) : (
-        <></>
+    <>
+      <HCaptcha
+        ref={captchaRefCallback}
+        sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+        size="invisible"
+        onVerify={(token) => {
+          setCaptchaToken(token)
+        }}
+        onClose={onLocalCancel}
+        onExpire={() => {
+          setCaptchaToken(null)
+        }}
+      />
+
+      {intent && (
+        <Elements stripe={stripePromise} options={options}>
+          <NewOrgForm onPaymentMethodReset={() => resetSetupIntent()} />
+        </Elements>
       )}
-    </Panel>
+    </>
   )
 }
 

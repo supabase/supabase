@@ -25,14 +25,14 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     connectionString: selectedProject?.connectionString,
   })
 
-  // Skip with org-level-billing, as quota is for the entire org
+  // Skip with org-based-billing, as quota is for the entire org
   const { data: usage } = useProjectUsageQuery(
     { projectRef },
     { enabled: selectedOrganization && !selectedOrganization.subscription_id }
   )
   const resourcesExceededLimits = getResourcesExceededLimits(usage)
 
-  // Skip with org-level-billing, as quota is for the entire org
+  // Skip with org-based-billing, as quota is for the entire org
   const { data: subscription } = useProjectSubscriptionV2Query(
     { projectRef },
     { enabled: selectedOrganization && !selectedOrganization.subscription_id }
