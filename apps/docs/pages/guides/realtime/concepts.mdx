@@ -18,11 +18,11 @@ Supabase Realtime lets you to build real-time applications with collaborative/mu
 When you initialize your Supabase Realtime client, you define a `topic` that uniquely references a channel. Everyone connected to the same Channel `topic` receives the same messages.
 
 ```js
-const { createClient } = require('@supabase/supabase-js')
+import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
+const client = createClient('https://<project>.supabase.co', '<your-anon-key>')
 
-const channel = supabase.channel('my-topic') // set your topic here
+const channel = client.channel('my-topic') // set your topic here
 ```
 
 Clients can bi-directionally send and receive messages over a Channel. The Realtime backend can also push messages to all clients connected to the same Channel.

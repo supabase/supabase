@@ -91,7 +91,7 @@ const { data, error } = await supabase.from('countries').select(`
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final data = await supabase.from('todos').select('id, name, cities(id, name)');
+final data = await supabase.from('countries').select('id, name, cities(id, name)');
 ```
 
 </TabPanel>

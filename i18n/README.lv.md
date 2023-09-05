@@ -39,7 +39,7 @@ Lai uzzinātu, kā veikt iemaksas, apmeklējiet [Getting Started](../DEVELOPERS.
 ## Statuss
 
 - [x] Alfa: Mēs testējam Supabase ar slēgtu klientu kopu
-- [x] Publiskā alfa versija: [app.supabase.com](https://app.supabase.com). Bet nesteidzieties, ir dažas nepilnības
+- [x] Publiskā alfa versija: [supabase.com/dashboard](https://supabase.com/dashboard). Bet nesteidzieties, ir dažas nepilnības
 - [x] Publiskā beta versija: Pietiekami stabila lielākajai daļai ar uzņēmumu nesaistītu lietošanas gadījumu
 - [ ] Publisks: Vispārēja pieejamība [[statuss](https://supabase.com/docs/guides/getting-started/features#feature-status)]]
 
@@ -55,7 +55,7 @@ Supabase ir atvērtā koda rīku kombinācija. Mēs veidojam Firebase funkcijas,
 
 **Arhitektūra**
 
-Supabase ir [izvietota platforma](https://app.supabase.com). Jūs varat reģistrēties un sākt izmantot Supabase, neko neinstalējot.
+Supabase ir [izvietota platforma](https://supabase.com/dashboard). Jūs varat reģistrēties un sākt izmantot Supabase, neko neinstalējot.
 Jūs varat arī [pašmāju resursus](https://supabase.com/docs/guides/hosting/overview) un [izstrādāt lokāli](https://supabase.com/docs/guides/local-development).
 
 ![Arhitektūra](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)

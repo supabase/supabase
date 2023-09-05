@@ -2,7 +2,7 @@ import SVG from 'react-inlinesvg'
 import Link from 'next/link'
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Button, IconLoader } from 'ui'
+import { Button, IconLoader, IconTool } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { withAuth, useFlag } from 'hooks'
@@ -33,6 +33,13 @@ const SupportPage = () => {
               <h1 className="m-0 text-lg">Supabase support</h1>
             </div>
             <div className="flex items-center space-x-3">
+              <Link passHref href="https://supabase.com/docs/guides/platform/troubleshooting">
+                <a target="_blank" rel="noreferrer">
+                  <Button type="default" icon={<IconTool />}>
+                    Troubleshooting
+                  </Button>
+                </a>
+              </Link>
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
                   <Link href="https://status.supabase.com/">
@@ -43,7 +50,7 @@ const SupportPage = () => {
                           isLoading ? (
                             <IconLoader className="animate-spin" />
                           ) : isHealthy ? (
-                            <div className="h-2 w-2 bg-brand-900 rounded-full" />
+                            <div className="h-2 w-2 bg-brand rounded-full" />
                           ) : (
                             <div className="h-2 w-2 bg-yellow-900 rounded-full" />
                           )

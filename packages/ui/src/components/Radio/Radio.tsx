@@ -1,13 +1,12 @@
-import React, { useEffect, useState, createRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FormLayout } from '../../lib/Layout/FormLayout'
 import { RadioContext } from './RadioContext'
 
 import { useFormContext } from '../Form/FormContext'
 
-import defaultTheme from '../../lib/theme/defaultTheme'
 import styleHandler from '../../lib/theme/styleHandler'
 
-import randomIdGenerator from './../../lib/utils/randomIdGenerator'
+import { generateUID } from './../../lib/utils/randomIdGenerator'
 
 interface GroupProps {
   allowedValues?: any
@@ -148,7 +147,7 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
 }
 
 function Radio({
-  id = randomIdGenerator(),
+  id = generateUID(),
   disabled,
   value,
   label,

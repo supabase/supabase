@@ -1,16 +1,16 @@
-import { FC } from 'react'
-import { IconChevronRight, useTheme } from 'ui'
 import Link from 'next/link'
+import { IconChevronRight, useTheme } from 'ui'
+
 import { BASE_PATH } from 'lib/constants'
 
-interface Props {
+interface ExampleProjectProps {
   framework: string
   title: string
   description: string
   url: string
 }
 
-const ExampleProject: FC<Props> = ({ framework, title, description, url }) => {
+const ExampleProject = ({ framework, title, description, url }: ExampleProjectProps) => {
   const { isDarkMode } = useTheme()
 
   return (

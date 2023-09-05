@@ -22,7 +22,7 @@ The templating system provides the following variables for use:
 | `{{ .ConfirmationURL }}` | Contains the confirmation URL. For example, a signup confirmation URL would look like: `https://project-ref.supabase.co/auth/v1/verify?token={{ .TokenHash }}&type=signup&redirect_to=https://example.com/path` . |
 | `{{ .Token }}`           | Contains a 6-digit One-Time-Password (OTP) that can be used instead of the `{{. ConfirmationURL }}` .                                                                                                             |
 | `{{ .TokenHash }}`       | Contains a hashed version of the `{{ .Token }}`. This is useful for constructing your own email link in the email template.                                                                                       |
-| `{{ .SiteURL }}`         | Contains your application's Site URL. This can be configured in your project's [authentication settings](https://app.supabase.com/project/_/auth/url-configuration).                                                                                                           |
+| `{{ .SiteURL }}`         | Contains your application's Site URL. This can be configured in your project's [authentication settings](https://supabase.com/dashboard/project/_/auth/url-configuration).                                                                                                           |
 
 ## Limitations
 
@@ -44,6 +44,32 @@ To guard against this:
 
   The user should be brought to a page on your site where they can confirm the action by clicking a button.
   The button should contain the actual confirmation link which can be obtained from parsing the `confirmation_url={{ .ConfirmationURL }}` query parameter in the URL.
+
+### Email Tracking
+
+If you are using an external email provider that enables "email tracking", the links inside the Supabase email templates will be overwritten and won't perform as expected. We recommend disabling email tracking to ensure email links are not overwritten.
+
+### Redirecting the user to a server-side endpoint
+
+If you intend to use [Server-side rendering](/docs/guides/auth/server-side-rendering), you might want the email link to redirect the user to a server-side endpoint to check if they are authenticated before returning the page. However, the default email link will redirect the user after verification to the redirect URL with the session in the query fragments. Since the session is returned in the query fragments by default, you won't be able to access it on the server-side.
+
+You can customize the email link in the email template to redirect the user to a server-side endpoint successfully. For example:
+
+```html
+<a href="https://api.example.com/v1/authenticate?token_hash={{ .TokenHash }}&type=invite"
+    >Accept the invite
+  </a>
+```
+When the user clicks on the link, the request will hit `https://api.example.com/v1/authenticate` and you can grab the `token_hash` and `type` query parameters from the URL. Then, you can call the [`verifyOtp`](/docs/reference/javascript/auth-verifyotp) method to get back an authenticated session before redirecting the user back to the client. Since the `verifyOtp` method makes a `POST` request to Supabase Auth to verify the user, the session will be returned in the response body, which can be read by the server. For example:
+
+```js
+const { token_hash, type } = Object.fromEntries(new URLSearchParams(window.location.search))
+const { data: { session }, error } = supabase.auth.verifyOtp({ token_hash, type })
+
+// subsequently redirect the user back to the client
+// ...
+
+```
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
