@@ -1,20 +1,21 @@
-import { FC } from 'react'
+import { noop } from 'lodash'
 import { Menu } from 'ui'
+
 import { PolicyTemplate } from './PolicyTemplates.constants'
 
-interface Props {
+interface TemplatesListProps {
   templates: PolicyTemplate[]
   templatesNote: string
   selectedTemplate: PolicyTemplate
   setSelectedTemplate: (template: PolicyTemplate) => void
 }
 
-const TemplatesList: FC<Props> = ({
+const TemplatesList = ({
   templates = [],
   templatesNote = '',
   selectedTemplate,
-  setSelectedTemplate = () => {},
-}) => (
+  setSelectedTemplate = noop,
+}: TemplatesListProps) => (
   <div className="flex flex-col justify-between border-r dark:border-dark" style={{ width: '30%' }}>
     <div
       className="hide-scrollbar  divide-border-primary space-y-0 divide-y divide-solid overflow-y-auto"

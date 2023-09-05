@@ -2,15 +2,14 @@ import { ClientLibrary, ExampleProject } from 'components/interfaces/Home'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import { ProjectLayoutWithAuth } from 'components/layouts'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
 import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner'
+import { useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
 
 const Home: NextPageWithLayout = () => {
-  const { project } = useProjectContext()
-  const projectTier = project?.subscription_tier
+  const project = useSelectedProject()
 
   const projectName =
     project?.ref !== 'default' && project?.name !== undefined

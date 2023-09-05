@@ -10,7 +10,7 @@ export type TableColumn = {
   columns: any[]
 }
 
-export const getTableColumnsQuery = () => {
+export const getTableColumnsQuery = (table?: string) => {
   const sql = /* SQL */ `
   SELECT
     tbl.schemaname,
@@ -67,6 +67,7 @@ export const getTableColumnsQuery = () => {
       AND NOT a.attisdropped
       AND has_column_privilege(tbl.quoted_name, a.attname, 'SELECT, INSERT, UPDATE, REFERENCES')
     )
+  ${table !== undefined ? `WHERE tablename = '${table}'` : ''}
   GROUP BY schemaname, tablename, quoted_name, is_table;
 `.trim()
 
@@ -76,37 +77,23 @@ export const getTableColumnsQuery = () => {
 export type TableColumnsVariables = {
   projectRef?: string
   connectionString?: string
+  table?: string
 }
 
 export type TableColumnsData = { result: TableColumn[] }
 export type TableColumnsError = unknown
 
 export const useTableColumnsQuery = <TData extends TableColumnsData = TableColumnsData>(
-  { projectRef, connectionString }: TableColumnsVariables,
+  { projectRef, connectionString, table }: TableColumnsVariables,
   options: UseQueryOptions<ExecuteSqlData, TableColumnsError, TData> = {}
 ) => {
   return useExecuteSqlQuery(
     {
       projectRef,
       connectionString,
-      sql: getTableColumnsQuery(),
-      queryKey: ['table-columns'],
+      sql: getTableColumnsQuery(table),
+      queryKey: ['table-columns', table],
     },
     options
-  )
-}
-
-export const useTableColumnsPrefetch = () => {
-  const prefetch = useExecuteSqlPrefetch()
-
-  return useCallback(
-    ({ projectRef, connectionString }: TableColumnsVariables) =>
-      prefetch({
-        projectRef,
-        connectionString,
-        sql: getTableColumnsQuery(),
-        queryKey: ['table-columns'],
-      }),
-    [prefetch]
   )
 }

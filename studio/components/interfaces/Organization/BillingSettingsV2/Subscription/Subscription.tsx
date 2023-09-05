@@ -8,6 +8,7 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useFlag } from 'hooks'
@@ -15,7 +16,6 @@ import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Alert, Button, IconExternalLink } from 'ui'
 import ProjectUpdateDisabledTooltip from '../../BillingSettings/ProjectUpdateDisabledTooltip'
 import PlanUpdateSidePanel from './PlanUpdateSidePanel'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 const Subscription = () => {
   const { slug } = useParams()
@@ -37,22 +37,21 @@ const Subscription = () => {
   const daysToCycleEnd = billingCycleEnd.diff(dayjs(), 'days')
   const daysWithinCycle = billingCycleEnd.diff(billingCycleStart, 'days')
 
-  const canChangeTier =
-    !projectUpdateDisabled && !['team', 'enterprise'].includes(currentPlan?.id ?? '')
+  const canChangeTier = !projectUpdateDisabled && !['enterprise'].includes(currentPlan?.id ?? '')
 
   return (
     <>
       <ScaffoldSection>
         <ScaffoldSectionDetail>
-          <div className="sticky space-y-6 top-16">
-            <p className="text-base">Subscription Plan</p>
+          <div className="sticky space-y-6 top-12">
+            <p className="text-base m-0">Subscription Plan</p>
             <div className="space-y-2">
-              <p className="text-sm text-scale-1100">More information</p>
+              <p className="text-sm text-scale-1100 m-0">More information</p>
               <div>
                 <Link href="https://supabase.com/pricing">
                   <a target="_blank" rel="noreferrer">
                     <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                      <p className="text-sm">Pricing</p>
+                      <p className="text-sm m-0">Pricing</p>
                       <IconExternalLink size={16} strokeWidth={1.5} />
                     </div>
                   </a>
@@ -76,15 +75,14 @@ const Subscription = () => {
             <div className="space-y-6">
               <div>
                 <p className="text-sm">This organization is currently on the plan:</p>
-                <p className="text-2xl text-brand-900 uppercase">
-                  {currentPlan?.name ?? 'Unknown'}
-                </p>
+                <p className="text-2xl text-brand uppercase">{currentPlan?.name ?? 'Unknown'}</p>
               </div>
 
               <div>
                 <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
                   <Button
                     type="default"
+                    className="pointer-events-auto"
                     disabled={!canChangeTier}
                     onClick={() => snap.setPanelKey('subscriptionPlan')}
                   >
@@ -93,13 +91,19 @@ const Subscription = () => {
                 </ProjectUpdateDisabledTooltip>
                 {!canChangeTier &&
                   (projectUpdateDisabled ? (
-                    <Alert withIcon variant="info" title={`Unable to update plan from ${planName}`}>
+                    <Alert
+                      className="mt-2"
+                      withIcon
+                      variant="info"
+                      title={`Unable to update plan from ${planName}`}
+                    >
                       We have temporarily disabled project and subscription changes - our engineers
                       are working on a fix.
                     </Alert>
                   ) : (
                     <Alert
                       withIcon
+                      className="mt-2"
                       variant="info"
                       title={`Unable to update plan from ${planName}`}
                       actions={[
@@ -136,7 +140,7 @@ const Subscription = () => {
                     )
                   }
                 >
-                  <p className="text-sm text-scale-1000 mr-2">
+                  <div className="text-sm text-scale-1000 mr-2">
                     When this organization exceeds its{' '}
                     <Link href="#breakdown">
                       <a className="text-sm text-green-900 transition hover:text-green-1000">
@@ -155,7 +159,7 @@ const Subscription = () => {
                         over-usage, you can adjust your Cost Control settings.
                       </p>
                     )}
-                  </p>
+                  </div>
                 </Alert>
               )}
 

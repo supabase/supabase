@@ -4,45 +4,72 @@ export const meta = {
   id: 'storage',
   title: 'Storage',
   description: 'Use Supabase to store and serve files.',
+  subtitle: 'Use Supabase to store and serve files.',
   sidebar_label: 'Overview',
-  video: 'https://www.youtube.com/v/J9mTPY8rIXE',
 }
 
-Supabase Storage makes it simple to store and serve large files.
+Supabase Storage makes it simple to upload and serve files of any size, providing a robust framework for file access controls.
 
-## Files
+## Features
 
-Files can be any sort of media file. This includes images, GIFs, and videos. It is best practice to store files outside of your database because of their sizes. For security, HTML files are returned as plain text.
+You can use Supabase Storage to store images, videos, documents, and any other file type. Serve your assets with a global CDN to reduce latency from over 285 cities globally. Supabase Storage includes a built-in image optimizer, so you can resize and compress your media files on the fly.
 
-## Folders
+## Examples
 
-Folders are a way to organize your files (just like on your computer).
-There is no right or wrong way to
-organize your files. You can store them in whichever folder structure suits your project.
+Check out all of the Storage [templates and examples](https://github.com/supabase/supabase/tree/master/examples/storage) in our GitHub repository.
 
-## Buckets
-
-Buckets are distinct containers for files and folders. You can think of them like "super folders".
-Generally you would create distinct buckets for different Security and Access Rules. For example, you might
-keep all video files in a "video" bucket, and profile pictures in an "avatar" bucket.
-
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/J9mTPY8rIXE"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {examples.map((x) => (
+    <div className="col-span-12" key={x.href}>
+      <Link href={x.href} passHref>
+        <a>
+          <GlassPanel icon={'/docs/img/icons/github-icon'} hasLightIcon={true} title={x.name}>
+            {x.description}
+          </GlassPanel>
+        </a>
+      </Link>
+    </div>
+  ))}
 </div>
 
-## See also
+export const examples = [
+  {
+    name: 'Resumable Uploads with Uppy',
+    description:
+      'Use Uppy to upload files to Supabase Storage using the TUS protocol (resumable uploads).',
+    href: 'https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-uppy',
+  },
+]
 
-- Read more about Supabase Storage in the [blog post](https://supabase.com/blog/supabase-storage)
-- [Supabase Storage on GitHub](https://github.com/supabase/storage-api)
-- [Swagger API documentation](https://supabase.github.io/storage-api)
-- Official [JavaScript](/docs/reference/javascript/storage-createbucket) and [Dart](/docs/reference/dart/storage-createbucket) documentation
-- [Community libraries](https://github.com/supabase-community)
+## Resources
 
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
+Find the source code and documentation in the Supabase GitHub repository.
+
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {integrations.map((x) => (
+    <div className="col-span-6" key={x.href}>
+      <Link href={x.href} passHref>
+        <a>
+          <GlassPanel title={x.name}>{x.description}</GlassPanel>
+        </a>
+      </Link>
+    </div>
+  ))}
+</div>
+
+export const integrations = [
+  {
+    name: 'Supabase Storage API',
+    description: 'See the OpenAPI Spec for Supabase Storage.',
+    href: 'https://github.com/supabase/storage-api',
+  },
+  {
+    name: 'OpenAPI Spec',
+    description: 'See the Swagger Documentation for Supabase Storage.',
+    href: 'https://supabase.github.io/storage-api/',
+  },
+]
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
 
 export default Page

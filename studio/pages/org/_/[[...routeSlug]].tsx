@@ -77,7 +77,7 @@ const GenericOrganizationPage: NextPage = () => {
                 </p>
               </div>
               <div>
-                <Link href={`/new`}>
+                <Link href="/new">
                   <a>
                     <Button icon={<IconPlus />}>New organization</Button>
                   </a>

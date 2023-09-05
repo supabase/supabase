@@ -1,4 +1,7 @@
-import { FC, useEffect, useMemo, useState } from 'react'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import {
   Alert,
   Button,
@@ -11,34 +14,43 @@ import {
   Loading,
   Modal,
 } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, useSelectedProject, useCheckPermissions } from 'hooks'
-import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
-import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import Link from 'next/link'
+import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
+import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
+import { useCheckPermissions, useFlag, useSelectedProject, useStore } from 'hooks'
 
-const TransferProjectButton: FC<{}> = () => {
+const TransferProjectButton = () => {
   const { ui } = useStore()
 
   const project = useSelectedProject()
   const projectRef = project?.ref
   const projectOrgId = project?.organization_id
   const { data: allOrganizations } = useOrganizationsQuery()
+  const disableProjectTransfer = useFlag('disableProjectTransfer')
 
   const organizations = (allOrganizations || [])
     .filter((it) => it.id !== projectOrgId)
-    // Only orgs with org-level subscription
+    // Only orgs with org-based subscription
     .filter((it) => it.subscription_id)
 
   const [isOpen, setIsOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-
   const [selectedOrg, setSelectedOrg] = useState()
 
-  const { error: transferError, mutateAsync: transferProject } = useProjectTransferMutation()
+  const {
+    mutate: transferProject,
+    error: transferError,
+    isLoading: isTransferring,
+  } = useProjectTransferMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        duration: 5000,
+        message: `Successfully transferred project ${project?.name}.`,
+      })
+      setIsOpen(false)
+    },
+  })
 
   const {
     data: transferPreviewData,
@@ -47,21 +59,20 @@ const TransferProjectButton: FC<{}> = () => {
     remove,
   } = useProjectTransferPreviewQuery(
     { projectRef, targetOrganizationSlug: selectedOrg },
-    { enabled: !isLoading && isOpen }
+    { enabled: !isTransferring && isOpen }
   )
 
   useEffect(() => {
     if (isOpen) {
       // reset state
       setSelectedOrg(undefined)
-      setIsLoading(false)
     } else {
       // Invalidate cache
       remove()
     }
   }, [isOpen])
 
-  const canTransferProject = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const canTransferProject = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
   const toggle = () => {
     setIsOpen(!isOpen)
@@ -70,33 +81,22 @@ const TransferProjectButton: FC<{}> = () => {
   async function handleTransferProject() {
     if (project === undefined) return
     if (selectedOrg === undefined) return
-
-    setIsLoading(true)
-
-    try {
-      await transferProject({ projectRef, targetOrganizationSlug: selectedOrg })
-      ui.setNotification({
-        category: 'success',
-
-        duration: 5000,
-        message: `Successfully transferred project ${project?.name}.`,
-      })
-      setIsOpen(false)
-    } catch {
-    } finally {
-      setIsLoading(false)
-    }
+    transferProject({ projectRef, targetOrganizationSlug: selectedOrg })
   }
 
   return (
     <>
       <Tooltip.Root delayDuration={0}>
         <Tooltip.Trigger>
-          <Button onClick={toggle} type="default" disabled={!canTransferProject}>
+          <Button
+            onClick={toggle}
+            type="default"
+            disabled={!canTransferProject || disableProjectTransfer}
+          >
             Transfer project
           </Button>
         </Tooltip.Trigger>
-        {!canTransferProject && (
+        {(!canTransferProject || disableProjectTransfer) && (
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -107,7 +107,9 @@ const TransferProjectButton: FC<{}> = () => {
                 ].join(' ')}
               >
                 <span className="text-xs text-scale-1200">
-                  You need additional permissions to delete this project
+                  {!canTransferProject
+                    ? 'You need additional permissions to transfer this project'
+                    : 'Project transfers are temporarily disabled, please try again later.'}
                 </span>
               </div>
             </Tooltip.Content>
@@ -119,7 +121,7 @@ const TransferProjectButton: FC<{}> = () => {
         closable
         onCancel={() => toggle()}
         visible={isOpen}
-        loading={isLoading}
+        loading={isTransferring}
         size={'xlarge'}
         header={`Transfer project ${project?.name}`}
         customFooter={
@@ -130,7 +132,7 @@ const TransferProjectButton: FC<{}> = () => {
             <Button
               onClick={() => handleTransferProject()}
               disabled={
-                !transferPreviewData || !transferPreviewData.valid || isLoading || !selectedOrg
+                !transferPreviewData || !transferPreviewData.valid || isTransferring || !selectedOrg
               }
             >
               Transfer Project
@@ -190,7 +192,7 @@ const TransferProjectButton: FC<{}> = () => {
               <div className="mt-8 mx-4 border-t pt-4 space-y-2">
                 {organizations.length === 0 ? (
                   <div className="flex items-center gap-2 bg-scale-400 p-3 text-sm">
-                    <IconAlertCircle /> You do not have any organizations with an organization-level
+                    <IconAlertCircle /> You do not have any organizations with an organization-based
                     subscription.
                   </div>
                 ) : (
@@ -219,9 +221,9 @@ const TransferProjectButton: FC<{}> = () => {
 
                 <p className="text-scale-1000 text-sm">
                   The target organization needs to use{' '}
-                  <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
+                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
                     <a target="_blank" rel="noreferrer" className="underline">
-                      organization-level-billing
+                      organization-based billing
                     </a>
                   </Link>
                   . To migrate an organization to the new billing, head to your{' '}
@@ -267,7 +269,7 @@ const TransferProjectButton: FC<{}> = () => {
                         <span>
                           {' '}
                           Your current organization will be granted{' '}
-                          <span className="text-brand-900">
+                          <span className="text-brand">
                             ${transferPreviewData.credits_on_source_organization}
                           </span>{' '}
                           in credits as proration.
@@ -282,7 +284,7 @@ const TransferProjectButton: FC<{}> = () => {
                         <span>
                           {' '}
                           The target organization will be billed{' '}
-                          <span className="text-brand-900">
+                          <span className="text-brand">
                             ${transferPreviewData.costs_on_target_organization}
                           </span>{' '}
                           immediately to prorate for the remainder of the billing period.

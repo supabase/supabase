@@ -60,17 +60,29 @@ function _DatePicker({
     if (!from) {
       setAppliedStartDate(null)
     } else if (from !== appliedStartDate?.toISOString()) {
-      const start = dayjs(from).toDate()
-      setAppliedStartDate(start)
-      setStartDate(start)
+      const start = dayjs(from)
+      const startDate = start.toDate()
+      setAppliedStartDate(startDate)
+      setStartDate(startDate)
+      setStartTime({
+        HH: start.format("HH"),
+        mm: start.format("mm"),
+        ss: start.format("ss"),
+      })
     }
 
     if (!to) {
       setAppliedEndDate(null)
     } else if (to !== appliedEndDate?.toISOString()) {
-      const end = dayjs(to).toDate()
-      setAppliedEndDate(end)
-      setEndDate(end)
+      const end = dayjs(to)
+      const endDate = end.toDate()
+      setAppliedEndDate(endDate)
+      setEndDate(endDate)
+      setEndTime({
+        HH: end.format("HH"),
+        mm: end.format("mm"),
+        ss: end.format("ss"),
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [to, from])
@@ -88,14 +100,12 @@ function _DatePicker({
     setAppliedEndDate(endDate)
 
     const payload = {
-      from: dayjs
-        .utc(startDate)
+      from: dayjs(startDate)
         .second(Number(startTime.ss))
         .minute(Number(startTime.mm))
         .hour(Number(startTime.HH))
         .toISOString(),
-      to: dayjs
-        .utc(endDate || startDate)
+      to: dayjs(endDate || startDate)
         .second(Number(endTime.ss))
         .minute(Number(endTime.mm))
         .hour(Number(endTime.HH))

@@ -3,6 +3,8 @@ import React, { PropsWithChildren, useEffect, useRef } from 'react'
 interface Props {
   outerClassName?: string
   innerClassName?: string
+  activeColor?: 'default' | 'brand'
+  hasShimmer?: boolean
   hasActiveOnHover?: boolean
   hasInnerShimmer?: boolean
   shimmerFromColor?: string
@@ -12,6 +14,8 @@ interface Props {
 const InteractiveShimmerCard = ({
   outerClassName,
   innerClassName,
+  activeColor = 'default',
+  hasShimmer = false,
   hasActiveOnHover = false,
   hasInnerShimmer = false,
   shimmerFromColor,
@@ -20,32 +24,36 @@ const InteractiveShimmerCard = ({
 }: PropsWithChildren<Props>) => {
   const outerRef = useRef(null)
   const innerRef = useRef(null)
+  const trackCursor = hasShimmer || hasInnerShimmer
 
   const handleGlow = (event: any) => {
-    if (!outerRef.current || !innerRef.current) return null
+    if (!trackCursor || !outerRef.current || !innerRef.current) return null
+
     const outerElement = outerRef.current as HTMLDivElement
     const innerElement = innerRef.current as HTMLDivElement
-    let x: any
-    let y: any
-
     const { x: elX, y: elY, width, height } = outerElement.getBoundingClientRect()
-    x = event.clientX - elX
-    y = event.clientY - elY
-    const isActive = x > -3 && x < width + 3 && y > -3 && y < height + 3
-    const activeGlow =
-      hasActiveOnHover && isActive
-        ? `radial-gradient(65rem circle at ${x}px ${y}px, var(--colors-brand9), transparent), `
-        : ''
-    outerElement.style.background = isActive ? `var(--colors-brand9)` : `var(--colors-scale3)`
-    outerElement.style.backgroundImage = `
-      ${activeGlow}radial-gradient(30rem circle at ${x}px ${y}px, ${
-      shimmerFromColor ?? 'var(--colors-scale8)'
-    }, ${shimmerToColor ?? 'var(--colors-scale3)'})`
+    const x = event.clientX - elX
+    const y = event.clientY - elY
+    const isActive = x > -0 && x < width + 0 && y > -0 && y < height + 0
 
-    innerElement.style.backgroundImage =
-      hasInnerShimmer && isActive
+    if (hasShimmer) {
+      const activeGlow =
+        hasActiveOnHover && isActive
+          ? `radial-gradient(65rem circle at ${x}px ${y}px, var(${
+              activeColor === 'brand' ? '--colors-brand9' : '--colors-scale9'
+            }), transparent), `
+          : ''
+      outerElement.style.backgroundImage = `
+      ${activeGlow}radial-gradient(30rem circle at ${x}px ${y}px, ${
+        shimmerFromColor ?? 'var(--colors-scale8)'
+      }, ${shimmerToColor ?? 'var(--colors-scale5)'})`
+    }
+
+    if (hasInnerShimmer) {
+      innerElement.style.backgroundImage = isActive
         ? `radial-gradient(7rem circle at ${x}px ${y}px, var(--colors-scale5), transparent), radial-gradient(20rem circle at ${x}px ${y}px, var(--colors-scale4), transparent)`
         : ''
+    }
   }
 
   useEffect(() => {
@@ -62,6 +70,11 @@ const InteractiveShimmerCard = ({
       ref={outerRef}
       className={[
         'relative rounded-xl bg-scale-400 from-scale-800 to-scale-800 p-px transition-all shadow-md',
+        !trackCursor && hasActiveOnHover
+          ? activeColor === 'brand'
+            ? 'hover:bg-none hover:!bg-brand'
+            : 'hover:bg-none hover:!bg-scale-900'
+          : '',
         outerClassName,
       ].join(' ')}
     >

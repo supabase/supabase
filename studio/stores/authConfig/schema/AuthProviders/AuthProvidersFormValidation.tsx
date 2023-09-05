@@ -30,7 +30,7 @@ const PROVIDER_EMAIL = {
     },
     SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: {
       title: 'Secure password change',
-      description: `Users will need to be recently logged in to change their password.
+      description: `Users will need to be recently logged in to change their password without requiring reauthentication.
       If disabled, a user can change their password at any time.`,
       type: 'boolean',
     },
@@ -81,6 +81,7 @@ const PROVIDER_PHONE = {
         { label: 'Messagebird', value: 'messagebird', icon: 'messagebird-icon.svg' },
         { label: 'Textlocal', value: 'textlocal', icon: 'textlocal-icon.png' },
         { label: 'Vonage', value: 'vonage', icon: 'vonage-icon.svg' },
+        { label: 'Twilio Verify', value: 'twilio_verify', icon: 'twilio-icon.svg' },
       ],
     },
     RATE_LIMIT_SMS_SENT: {
@@ -122,7 +123,7 @@ const PROVIDER_PHONE = {
       title: 'Twilio Account Sid',
       show: {
         key: 'SMS_PROVIDER',
-        matches: ['twilio-verify'],
+        matches: ['twilio_verify'],
       },
     },
     SMS_TWILIO_VERIFY_AUTH_TOKEN: {
@@ -131,15 +132,15 @@ const PROVIDER_PHONE = {
       isSecret: true,
       show: {
         key: 'SMS_PROVIDER',
-        matches: ['twilio-verify'],
+        matches: ['twilio_verify'],
       },
     },
     SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: {
       type: 'string',
-      title: 'Twilio Message Service Sid',
+      title: 'Twilio Verify Service Sid',
       show: {
         key: 'SMS_PROVIDER',
-        matches: ['twilio-verify'],
+        matches: ['twilio_verify'],
       },
     },
 
@@ -220,8 +221,8 @@ const PROVIDER_PHONE = {
       units: 'seconds',
       show: {
         key: 'SMS_PROVIDER',
-        matches: ['twilio', 'messagebird', 'textlocal', 'vonage']
-      }
+        matches: ['twilio', 'messagebird', 'textlocal', 'vonage'],
+      },
     },
     SMS_OTP_LENGTH: {
       title: 'SMS OTP Length',
@@ -230,8 +231,8 @@ const PROVIDER_PHONE = {
       units: 'digits',
       show: {
         key: 'SMS_PROVIDER',
-        matches: ['twilio', 'messagebird', 'textlocal', 'vonage']
-      }
+        matches: ['twilio', 'messagebird', 'textlocal', 'vonage'],
+      },
     },
     SMS_TEMPLATE: {
       title: 'SMS Message',
@@ -239,8 +240,8 @@ const PROVIDER_PHONE = {
       description: 'To format the OTP code use `{{ .Code }}`',
       show: {
         key: 'SMS_PROVIDER',
-        matches: ['twilio', 'messagebird', 'textlocal', 'vonage']
-      }
+        matches: ['twilio', 'messagebird', 'textlocal', 'vonage'],
+      },
     },
   },
   validationSchema: object().shape({
@@ -285,13 +286,16 @@ const PROVIDER_PHONE = {
       then: (schema) => schema.required('Twilio Verify Auth Token is required'),
       otherwise: (schema) => schema,
     }),
-    SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
-      is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
-        return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
-      },
-      then: (schema) => schema.required('Twilio Verify Service SID is required'),
-      otherwise: (schema) => schema,
-    }),
+    SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string().when(
+      ['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'],
+      {
+        is: (EXTERNAL_PHONE_ENABLED: boolean, SMS_PROVIDER: string) => {
+          return EXTERNAL_PHONE_ENABLED && SMS_PROVIDER === 'twilio-verify'
+        },
+        then: (schema) => schema.required('Twilio Verify Service SID is required'),
+        otherwise: (schema) => schema,
+      }
+    ),
 
     // Messagebird
     SMS_MESSAGEBIRD_ACCESS_KEY: string().when(['EXTERNAL_PHONE_ENABLED', 'SMS_PROVIDER'], {
@@ -416,7 +420,6 @@ const EXTERNAL_PROVIDER_APPLE = {
                     typeof body === 'object' &&
                     header &&
                     body &&
-                    header.typ === 'JWT' &&
                     header.alg === 'ES256' &&
                     body.aud === 'https://appleid.apple.com'
                   )
@@ -540,7 +543,7 @@ const EXTERNAL_PROVIDER_AZURE = {
     }),
     EXTERNAL_AZURE_SECRET: string().when('EXTERNAL_AZURE_ENABLED', {
       is: true,
-      then: (schema) => schema.required('Secret ID is required'),
+      then: (schema) => schema.required('Secret Value is required'),
       otherwise: (schema) => schema,
     }),
     EXTERNAL_AZURE_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
@@ -661,6 +664,44 @@ const EXTERNAL_PROVIDER_FACEBOOK = {
   }),
   misc: {
     iconKey: 'facebook-icon',
+    requiresRedirect: true,
+  },
+}
+
+const EXTERNAL_PROVIDER_FIGMA = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'Figma',
+  properties: {
+    EXTERNAL_FIGMA_ENABLED: {
+      title: 'Figma enabled',
+      type: 'boolean',
+    },
+    EXTERNAL_FIGMA_CLIENT_ID: {
+      title: 'Client ID',
+      type: 'string',
+    },
+    EXTERNAL_FIGMA_SECRET: {
+      title: 'Client Secret',
+      type: 'string',
+      isSecret: true,
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_FIGMA_ENABLED: boolean().required(),
+    EXTERNAL_FIGMA_CLIENT_ID: string().when('EXTERNAL_FIGMA_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client ID is required'),
+      otherwise: (schema) => schema,
+    }),
+    EXTERNAL_FIGMA_SECRET: string().when('EXTERNAL_FIGMA_ENABLED', {
+      is: true,
+      then: (schema) => schema.required('Client Secret is required'),
+      otherwise: (schema) => schema,
+    }),
+  }),
+  misc: {
+    iconKey: 'figma-icon',
     requiresRedirect: true,
   },
 }
@@ -842,7 +883,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
     iconKey: 'google-icon',
     requiresRedirect: true,
     helper: `Register this callback URL when using Sign-in with Google on the web using OAuth.
-            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-google#configure-your-services-id)`,
   },
 }
 
@@ -1282,6 +1323,7 @@ export const PROVIDERS_SCHEMAS = [
   EXTERNAL_PROVIDER_BITBUCKET,
   EXTERNAL_PROVIDER_DISCORD,
   EXTERNAL_PROVIDER_FACEBOOK,
+  EXTERNAL_PROVIDER_FIGMA,
   EXTERNAL_PROVIDER_GITHUB,
   EXTERNAL_PROVIDER_GITLAB,
   EXTERNAL_PROVIDER_GOOGLE,

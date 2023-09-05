@@ -112,14 +112,14 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: 'Database egress',
+        title: 'Bandwidth',
         tooltips: {
-          main: 'Billing is based on the total sum of outgoing traffic of your database in GB throughout your billing period.',
+          main: 'Billing is based on the total sum of outgoing traffic (includes Database, Storage, Realtime, Auth) in GB throughout your billing period.',
         },
         plans: {
-          free: '2GB included',
-          pro: '50 GB included, then $0.09 per GB',
-          team: '50 GB included, then $0.09 per GB',
+          free: '5GB included',
+          pro: '250 GB included, then $0.09 per GB',
+          team: '250 GB included, then $0.09 per GB',
           enterprise: 'Unlimited',
         },
         usage_based: true,
@@ -185,33 +185,12 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: 'Enterprise OAuth providers',
-        plans: {
-          free: false,
-          pro: false,
-          team: false,
-          enterprise: true,
-        },
-        usage_based: false,
-      },
-      {
         title: 'Audit trails',
         plans: {
           free: '1 hour',
           pro: '7 days',
           team: '28 days',
           enterprise: true,
-        },
-        usage_based: false,
-      },
-      {
-        title: 'Supabase Auth emails',
-        tooltips: { main: 'Rate limits do not apply to Custom SMTP' },
-        plans: {
-          free: '30 / hour',
-          pro: '100 / hour',
-          team: '100 / hour',
-          enterprise: 'Contact Us',
         },
         usage_based: false,
       },
@@ -256,19 +235,6 @@ export const pricing: Pricing = {
         usage_based: true,
       },
       {
-        title: 'Storage egress',
-        tooltips: {
-          main: 'All requests to view and download your storage items go through our CDN. We sum up all outgoing traffic (egress) for storage related requests through our CDN. We do not differentiate between cache and no cache hits.\nBilling is based on the total amount of egress in GB throughout your billing period.',
-        },
-        plans: {
-          free: '2 GB included',
-          pro: '200 GB included, then $0.09 per GB',
-          team: '200 GB included, then $0.09 per GB',
-          enterprise: 'Unlimited',
-        },
-        usage_based: true,
-      },
-      {
         title: 'Custom access controls',
         plans: {
           free: true,
@@ -301,6 +267,16 @@ export const pricing: Pricing = {
           enterprise: 'Unlimited',
         },
         usage_based: true,
+      },
+      {
+        title: 'Bring your own storage provider',
+        plans: {
+          free: false,
+          pro: false,
+          team: false,
+          enterprise: true,
+        },
+        usage_based: false,
       },
     ],
   },
@@ -489,6 +465,19 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
+        title: 'HIPAA',
+        plans: {
+          free: false,
+          pro: false,
+          team: true,
+          enterprise: true,
+        },
+        tooltips: {
+          main: 'Available as a paid add-on on Team plan and above.',
+        },
+        usage_based: false,
+      },
+      {
         title: 'SSO',
         plans: {
           free: false,
@@ -538,6 +527,19 @@ export const pricing: Pricing = {
           pro: '$10 per domain per month per project add on',
           team: '$10 per domain per month per project add on',
           enterprise: '1, additional $10/domain/month',
+        },
+        usage_based: false,
+      },
+      {
+        title: 'Bring your own cloud deployment options',
+        tooltips: {
+          main: 'On-Premises, single tenant, and managed dedicated cloud provider instance options',
+        },
+        plans: {
+          free: false,
+          pro: false,
+          team: false,
+          enterprise: true,
         },
         usage_based: false,
       },
