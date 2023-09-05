@@ -78,7 +78,7 @@ HNSW combines these two concepts. From the hierarchical perspective, the bottom 
 
 Just like skip lists, search starts at the top layer and works its way down until it finds the target element. However instead of comparing a scalar value at each layer to determine whether or not to descend to the layer below, a multi-dimensional distance measure (such as Euclidean distance) is used.
 
-## Comparing queries per second
+## HNSW performance: 1536 dimensions
 
 To understand the performance improvements that HNSW offers, we decided to expand upon our previous benchmarks and include results for the HNSW index in addition to IVF and compare the queries per second (QPS) for both.
 
