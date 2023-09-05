@@ -1,31 +1,37 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 
-import { useTelemetryProps } from 'common'
-import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useIsLoggedIn, useTelemetryProps } from 'common'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
 import { Profile } from 'data/profile/types'
 import { useStore } from 'hooks'
 import Telemetry from 'lib/telemetry'
+import { ResponseError } from 'types'
 
 export type ProfileContextType = {
   profile: Profile | undefined
+  error: ResponseError | null
   isLoading: boolean
+  isError: boolean
+  isSuccess: boolean
 }
 
 export const ProfileContext = createContext<ProfileContextType>({
   profile: undefined,
+  error: null,
   isLoading: true,
+  isError: false,
+  isSuccess: false,
 })
 
 export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
-  const queryClient = useQueryClient()
   const { ui } = useStore()
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
+
+  const isLoggedIn = useIsLoggedIn()
 
   const { mutate: createProfile, isLoading: isCreatingProfile } = useProfileCreateMutation({
     async onSuccess() {
@@ -34,10 +40,8 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
         telemetryProps,
         router
       )
-
-      await invalidateOrganizationsQuery(queryClient)
     },
-    onError(err) {
+    onError() {
       ui.setNotification({
         category: 'error',
         message: 'Failed to create your profile. Please refresh to try again.',
@@ -46,7 +50,14 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   })
 
   // Track telemetry for the current user
-  const { data: profile, isLoading: isLoadingProfile } = useProfileQuery({
+  const {
+    error,
+    data: profile,
+    isLoading: isLoadingProfile,
+    isError,
+    isSuccess,
+  } = useProfileQuery({
+    enabled: isLoggedIn,
     onSuccess(profile) {
       Telemetry.sendIdentify(profile, telemetryProps)
     },
@@ -58,16 +69,27 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
     },
   })
 
-  const { isLoading: isLoadingPermissions } = usePermissionsQuery()
+  const { isInitialLoading: isLoadingPermissions } = usePermissionsQuery({ enabled: isLoggedIn })
 
   const value = useMemo(() => {
     const isLoading = isLoadingProfile || isCreatingProfile || isLoadingPermissions
 
     return {
+      error,
       profile,
       isLoading,
+      isError,
+      isSuccess,
     }
-  }, [isLoadingProfile, isCreatingProfile, isLoadingPermissions, profile])
+  }, [
+    isLoadingProfile,
+    isCreatingProfile,
+    isLoadingPermissions,
+    profile,
+    error,
+    isError,
+    isSuccess,
+  ])
 
   return <ProfileContext.Provider value={value}>{children}</ProfileContext.Provider>
 }

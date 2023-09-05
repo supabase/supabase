@@ -66,7 +66,7 @@ supabase functions deploy
 
 Since Supabase CLI [v1.62.0](https://github.com/supabase/cli/releases/tag/v1.62.0) you can deploy all functions with a single command. This is useful for example when [deploying with GitHub Actions](/docs/guides/functions/cicd-workflow).
 
-Individual function configuration like [JWT verification](/docs/reference/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/reference/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
+Individual function configuration like [JWT verification](/docs/guides/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/guides/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
 
 ```toml
 [functions.hello-world]
@@ -199,7 +199,8 @@ For use-cases which require low-latency we recommend [Edge Functions](/docs/guid
 
 ## Organizing your Edge Functions
 
-We recommend developing “fat functions”. This means that you should develop few large functions, rather than many small functions. One common pattern when developing Functions is that you need to share code between two or more Functions. To do this, you can store any shared code in a folder prefixed with an underscore (`_`). We recommend this folder structure:
+We recommend developing “fat functions”. This means that you should develop few large functions, rather than many small functions. One common pattern when developing Functions is that you need to share code between two or more Functions. To do this, you can store any shared code in a folder prefixed with an underscore (`_`). We also recommend a separate folder for [Unit Tests](/docs/guides/functions/unit-test) including the name of the function followed by a `-test` suffix.
+We recommend this folder structure:
 
 ```bash
 └── supabase
@@ -212,7 +213,10 @@ We recommend developing “fat functions”. This means that you should develop 
     │   ├── function-one # Use hyphens to name functions.
     │   │   └── index.ts
     │   └── function-two
-    │       └── index.ts
+    │   │   └── index.ts
+    │   └── tests
+    │       └── function-one-test.ts
+    │       └── function-two-test.ts
     ├── migrations
     └── config.toml
 ```

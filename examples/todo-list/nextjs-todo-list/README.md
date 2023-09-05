@@ -5,19 +5,19 @@
   - [Tailwind](https://tailwindcss.com/) for styling and layout.
   - [Supabase.js](https://supabase.com/docs/library/getting-started) for user management and realtime data syncing.
 - Backend:
-  - [app.supabase.com](https://app.supabase.com/): hosted Postgres database with restful API for usage with Supabase.js.
+  - [supabase.com/dashboard](https://supabase.com/dashboard/): hosted Postgres database with restful API for usage with Supabase.js.
 
 ## Deploy with Vercel
 
 The Vercel deployment will guide you through creating a Supabase account and project. After installation of the Supabase integration, all relevant environment variables will be set up so that the project is usable immediately after deployment 🚀
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fexamples%2Ftree%2Fmain%2Fsupabase-js-v1%2Ftodo-list%2Fnextjs-todo-list&project-name=supabase-todo-list&repository-name=supabase-todo-list&demo-title=Todo%20list&demo-description=An%20example%20web%20app%20using%20Supabase%20and%20Next.js&demo-url=https%3A%2F%2Fsupabase-nextjs-todo-list.vercel.app&demo-image=https%3A%2F%2Fi.imgur.com%2FGJauPlN.png&integration-ids=oac_jUduyjQgOyzev1fjrW83NYOv&external-id=supabase-todo-list)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Ftodo-list%2Fnextjs-todo-list&project-name=supabase-nextjs-todo-list&repository-name=supabase-nextjs-todo-list&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6&external-id=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Ftodo-list%2Fnextjs-todo-list)
 
 ## Build from scratch
 
 ### 1. Create new project
 
-Sign up to Supabase - [https://app.supabase.com](https://app.supabase.com) and create a new project. Wait for your database to start.
+Sign up to Supabase - [https://supabase.com/dashboard](https://supabase.com/dashboard) and create a new project. Wait for your database to start.
 
 ### 2. Run "Todo List" Quickstart
 

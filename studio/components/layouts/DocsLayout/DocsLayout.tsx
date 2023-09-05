@@ -11,7 +11,7 @@ import { generateDocsMenu } from './DocsLayout.utils'
 
 function DocsLayout({ title, children }: { title: string; children: ReactElement }) {
   const router = useRouter()
-  const { meta } = useStore()
+  const { ui, meta } = useStore()
   const { data, isLoading, error } = meta.openApi
   const selectedProject = useSelectedProject()
 
@@ -26,10 +26,10 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
   }
 
   useEffect(() => {
-    if (selectedProject?.ref && !isPaused) {
+    if (ui.selectedProjectRef && !isPaused) {
       meta.openApi.load()
     }
-  }, [selectedProject?.ref])
+  }, [ui.selectedProjectRef])
 
   if (error) {
     return (

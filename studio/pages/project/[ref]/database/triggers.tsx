@@ -7,7 +7,7 @@ import TriggersList from 'components/interfaces/Database/Triggers/TriggersList/T
 import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoPermission from 'components/ui/NoPermission'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 const TriggersPage: NextPageWithLayout = () => {
@@ -19,7 +19,7 @@ const TriggersPage: NextPageWithLayout = () => {
   const [showCreateTriggerForm, setShowCreateTriggerForm] = useState<boolean>(false)
   const [showDeleteTriggerForm, setShowDeleteTriggerForm] = useState<boolean>(false)
 
-  const canReadTriggers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
+  const canReadTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
 
   useEffect(() => {
     if (project?.ref) {

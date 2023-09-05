@@ -416,6 +416,13 @@
         "type": "function"
       },
       {
+        "id": "sign-in-with-id-token",
+        "title": "Sign in with ID Token",
+        "slug": "auth-signinwithidtoken",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "sign-in-with-otp",
         "title": "Sign in a user through OTP",
         "slug": "auth-signinwithotp",
@@ -461,13 +468,6 @@
         "id": "reset-password-for-email",
         "title": "Send a password reset request",
         "slug": "auth-resetpasswordforemail",
-        "product": "auth",
-        "type": "function"
-      },
-      {
-        "id": "session",
-        "title": "Retrieve a session",
-        "slug": "auth-session",
         "product": "auth",
         "type": "function"
       },
@@ -715,11 +715,11 @@
   },
   {
     "type": "category",
-    "title": "Functions",
+    "title": "Edge Functions",
     "items": [
       {
         "id": "invoke",
-        "title": "Invoke a function",
+        "title": "Invokes a Supabase Edge Function.",
         "slug": "functions-invoke",
         "product": "functions",
         "type": "function"

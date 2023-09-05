@@ -33,6 +33,13 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id, public: isPublicBucket } = req.body
 
+  // To validate bucket name, can be removed once the issue is fixed in supabase lib
+  const regex = /^[a-z0-9.-]+$/
+  if (!regex.test(id)) {
+    return res.status(400).json({ error: { message: 'Bucket name invalid' } })
+  }
+  // Bucket name validation ends here
+
   const { data, error } = await supabase.storage.createBucket(id, { public: isPublicBucket })
   if (error) {
     return res.status(400).json({ error: { message: error.message } })

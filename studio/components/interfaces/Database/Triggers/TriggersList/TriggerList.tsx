@@ -1,21 +1,20 @@
-import { FC } from 'react'
-import { includes } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Badge, Button, Dropdown, IconMoreVertical, IconTrash, IconEdit3 } from 'ui'
+import { includes } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { Badge, Button, Dropdown, IconEdit3, IconMoreVertical, IconTrash } from 'ui'
 
-import { useStore, checkPermissions } from 'hooks'
 import Table from 'components/to-be-cleaned/Table'
+import { useCheckPermissions, useStore } from 'hooks'
 
-interface Props {
+interface TriggerListProps {
   filterString: string
   schema: string
   editTrigger: (trigger: any) => void
   deleteTrigger: (trigger: any) => void
 }
 
-const TriggerList: FC<Props> = ({ filterString, schema, editTrigger, deleteTrigger }) => {
+const TriggerList = ({ filterString, schema, editTrigger, deleteTrigger }: TriggerListProps) => {
   const { meta } = useStore()
   const triggers = meta.triggers.list()
   const filteredTriggers = triggers.filter((x: any) =>
@@ -23,7 +22,7 @@ const TriggerList: FC<Props> = ({ filterString, schema, editTrigger, deleteTrigg
   )
 
   const _triggers = filteredTriggers.filter((x: any) => x.schema == schema)
-  const canUpdateTriggers = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
+  const canUpdateTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   function onEdit(trigger: any) {
     editTrigger(trigger)
