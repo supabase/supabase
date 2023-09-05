@@ -93,7 +93,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   const projects = [...(allProjects ?? []), ...projectDefaults]
   const selectedProjectFromUrl = projects.find((project) => project.ref === ref)
   const selectedCategoryFromUrl = CATEGORY_OPTIONS.find((option) => {
-    if (option.value?.toLowerCase() === ((category as string) ?? '').toLowerCase()) return option
+    if (option.value.toLowerCase() === ((category as string) ?? '').toLowerCase()) return option
   })
 
   const [selectedProjectRef, setSelectedProjectRef] = useState(
