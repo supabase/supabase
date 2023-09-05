@@ -5,9 +5,30 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 10 Aug 2023 22:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Mon, 04 Sep 2023 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/pgvector-v0-5-0-hnsw</guid>
+  <title>pgvector v0.5.0: Faster semantic search with HNSW indexes</title>
+  <link>https://supabase.com/blog/pgvector-v0-5-0-hnsw</link>
+  <description>Increase performance in pgvector using HNSW indexes</description>
+  <pubDate>Mon, 04 Sep 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/organization-based-billing</guid>
+  <title>Organization-based Billing, Project Transfers, Team plan</title>
+  <link>https://supabase.com/blog/organization-based-billing</link>
+  <description>Introducing the new Organization-based Billing</description>
+  <pubDate>Wed, 30 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-8-hackathon-winners</guid>
+  <title>Launch Week 8 Hackathon Winners</title>
+  <link>https://supabase.com/blog/launch-week-8-hackathon-winners</link>
+  <description>Announcing the winners of the Launch Week 8 Hackathon!</description>
+  <pubDate>Wed, 23 Aug 2023 22:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supavisor-1-million</guid>
   <title>Supavisor: Scaling Postgres to 1 Million Connections</title>
   <link>https://supabase.com/blog/supavisor-1-million</link>

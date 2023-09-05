@@ -1,0 +1,207 @@
+import Layout from '~/layouts/DefaultGuideLayout'
+
+export const meta = {
+  title: 'OAuth with PKCE flow for SSR',
+  description:
+    'Learn how to configure OAuth authentication in your server-side rendering (SSR) application to work with the PKCE flow.',
+  subtitle:
+    'Learn how to configure OAuth authentication in your server-side rendering (SSR) application to work with the PKCE flow.',
+}
+
+### Install Supabase Auth Helpers
+
+The Auth Helpers assist with user authentication within server-side rendering (SSR) frameworks.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="nextjs"
+>
+<TabPanel id="nextjs" label="NextJS">
+
+```bash
+npm install @supabase/auth-helpers-nextjs @supabase/supabase-js
+```
+
+</TabPanel>
+<TabPanel id="sveltekit" label="SvelteKit">
+
+```bash
+npm install @supabase/auth-helpers-sveltekit @supabase/supabase-js
+```
+
+</TabPanel>
+</Tabs>
+
+### Set environment variables
+
+Create an `.env.local` file in your project root directory. You can get your `SITE_URL` and `ANON_KEY` from inside of the [dashboard](https://supabase.com/dashboard/project/_/settings/api).
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="nextjs"
+>
+<TabPanel id="nextjs" label="NextJS">
+
+```bash .env.local
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+</TabPanel>
+<TabPanel id="sveltekit" label="SvelteKit">
+
+```bash .env.local
+PUBLIC_SUPABASE_URL=your_supabase_project_url
+PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+</TabPanel>
+</Tabs>
+
+### Setting up the Auth Helpers
+
+For SSR, the Supabase client requires extra steps to ensure the user's auth session remains active. Since the user's session is tracked in a cookie, we need to read this cookie and update it if necessary.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="nextjs"
+>
+<TabPanel id="nextjs" label="NextJS">
+Next.js Server Components allow you to read a cookie but not write back to it. Middleware on the other hand allow you to both read and write to cookies.
+
+Next.js [Middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware) runs immediately before each route is rendered. We'll use Middleware to refresh the user's session before loading Server Component routes.
+
+Create a new `middleware.js` file in the root of your project and populate with the following:
+
+```js middleware.js
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server'
+
+export async function middleware(req) {
+  const res = NextResponse.next()
+  const supabase = createMiddlewareClient({ req, res })
+  await supabase.auth.getSession()
+  return res
+}
+```
+
+</TabPanel>
+<TabPanel id="sveltekit" label="SvelteKit">
+Create a new `hooks.server.js` file in the root of your project and populate with the following:
+
+```ts src/hooks.server.js
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
+import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
+import type { Handle } from '@sveltejs/kit'
+
+export const handle: Handle = async ({ event, resolve }) => {
+  event.locals.supabase = createSupabaseServerClient({
+    supabaseUrl: PUBLIC_SUPABASE_URL,
+    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+    event,
+  })
+
+  event.locals.getSession = async () => {
+    const {
+      data: { session },
+    } = await event.locals.supabase.auth.getSession()
+    return session
+  }
+
+  return resolve(event, {
+    filterSerializedResponseHeaders(name) {
+      return name === 'content-range'
+    },
+  })
+}
+```
+
+</TabPanel>
+</Tabs>
+
+### Create API endpoint for handling the `code` exchange
+
+In order to use OAuth we will need to setup a endpoint for the `code` exchange, to exchange an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="nextjs"
+>
+<TabPanel id="nextjs" label="NextJS">
+Create a new file at `app/auth/callback/route.js` and populate with the following:
+
+```js app/auth/callback/route.js
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
+
+export async function GET(req) {
+  const { searchParams } = new URL(req.url)
+  const code = searchParams.get('code')
+  const next = searchParams.get('next') ?? '/'
+
+  if (code) {
+    const supabase = createRouteHandlerClient({ cookies: () => cookies() })
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error) {
+      return NextResponse.redirect(new URL(`/${next.slice(1)}`, req.url))
+    }
+  }
+
+  // return the user to an error page with instructions
+  return NextResponse.redirect(new URL('/auth/auth-code-error', req.url))
+}
+```
+
+</TabPanel>
+<TabPanel id="sveltekit" label="SvelteKit">
+Create a new file at `src/routes/auth/callback/+server.js` and populate with the following:
+
+```js src/routes/auth/callback/+server.js
+import { redirect } from '@sveltejs/kit';
+
+export const GET = async (event) => {
+	const {
+		url,
+		locals: { supabase }
+	} = event;
+	const code = url.searchParams.get('code') as string;
+	const next = url.searchParams.get('next') ?? '/';
+
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error) {
+      throw redirect(303, `/${next.slice(1)}`);
+    }
+  }
+
+  // return the user to an error page with instructions
+  throw redirect(303, '/auth/auth-code-error');
+};
+```
+
+</TabPanel>
+</Tabs>
+
+Let's point our `.signInWithOAuth` method's redirect to the callback route we create above:
+
+```js
+await supabase.auth.signInWithOAuth({
+  email,
+  options: {
+    redirectTo: `http://example.com/auth/callback`,
+  },
+})
+```
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page

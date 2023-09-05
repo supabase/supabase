@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
@@ -16,17 +17,17 @@ import {
   Listbox,
 } from 'ui'
 
-import { useParams } from 'common'
 import Divider from 'components/ui/Divider'
 import InformationBox from 'components/ui/InformationBox'
 import MultiSelect from 'components/ui/MultiSelect'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useFlag, useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
-import { get, isResponseOk, post } from 'lib/common/fetch'
+import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -34,6 +35,8 @@ import { Project } from 'types'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
+import { useRouter } from 'next/router'
+import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -44,10 +47,12 @@ export interface SupportFormProps {
 
 const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   const { ui } = useStore()
+  const { isReady } = useRouter()
   const { ref, subject, category, message } = useParams()
 
   const uploadButtonRef = useRef()
   const enableFreeSupport = useFlag('enableFreeSupport')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [uploadedDataUrls, setUploadedDataUrls] = useState<string[]>([])
   const [selectedServices, setSelectedServices] = useState<string[]>([])
@@ -67,6 +72,21 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     isError: isErrorProjects,
     isSuccess: isSuccessProjects,
   } = useProjectsQuery()
+
+  const { mutate: submitSupportTicket } = useSendSupportTicketMutation({
+    onSuccess: (res, variables) => {
+      ui.setNotification({ category: 'success', message: 'Support request sent. Thank you!' })
+      setSentCategory(variables.category)
+    },
+    onError: (error) => {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to submit support ticket: ${error.message}`,
+      })
+      setIsSubmitting(false)
+    },
+  })
 
   const projectDefaults: Partial<Project>[] = [{ ref: 'no-project', name: 'No specific project' }]
 
@@ -160,8 +180,8 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     return errors
   }
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
-    setSubmitting(true)
+  const onSubmit = async (values: any) => {
+    setIsSubmitting(true)
     const attachments =
       uploadedFiles.length > 0 ? await uploadAttachments(values.projectRef, uploadedFiles) : []
     const selectedLibrary = CLIENT_LIBRARIES.find((library) => library.language === values.library)
@@ -182,30 +202,20 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     }
 
     if (values.projectRef !== 'no-project') {
-      const URL = `${API_URL}/auth/${values.projectRef}/config`
-      const authConfig = await get(URL)
-      if (!authConfig.error) {
+      try {
+        const authConfig = await getProjectAuthConfig({ projectRef: values.projectRef })
         payload.siteUrl = authConfig.SITE_URL
         payload.additionalRedirectUrls = authConfig.URI_ALLOW_LIST
+      } finally {
       }
     }
 
-    const response = await post<void>(`${API_URL}/feedback/send`, payload)
-    if (!isResponseOk(response)) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to submit support ticket: ${response.error.message}`,
-      })
-      setSubmitting(false)
-    } else {
-      ui.setNotification({ category: 'success', message: 'Support request sent. Thank you!' })
-      setSentCategory(values.category)
-    }
+    submitSupportTicket(payload)
   }
 
   return (
     <Form id="support-form" initialValues={initialValues} validate={onValidate} onSubmit={onSubmit}>
-      {({ isSubmitting, resetForm, values }: any) => {
+      {({ resetForm, values }: any) => {
         const selectedCategory = CATEGORY_OPTIONS.find(
           (category) => category.value === values.category
         )
@@ -260,6 +270,22 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
             resetForm({ values: updatedValues, initialValues: updatedValues })
           }
         }, [isSuccessProjects, isSuccessOrganizations])
+
+        // Populate fields when router is ready, required when navigating to
+        // support form on a refresh browser session
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        useEffect(() => {
+          if (isReady) {
+            const updatedValues = {
+              ...initialValues,
+              projectRef: ref ?? initialValues.projectRef,
+              subject: subject ?? initialValues.subject,
+              category: selectedCategoryFromUrl?.value ?? initialValues.category,
+              message: message ?? initialValues.message,
+            }
+            resetForm({ values: updatedValues, initialValues: updatedValues })
+          }
+        }, [isReady])
 
         return (
           <div className="space-y-8 w-[620px]">

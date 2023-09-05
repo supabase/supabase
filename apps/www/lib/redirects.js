@@ -1864,6 +1864,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/supasquad',
+    destination: '/open-source/contributing/supasquad',
+  },
+  {
+    permanent: true,
     source: '/contact/enterprise',
     destination: 'https://forms.supabase.com/enterprise',
   },
@@ -2273,4 +2278,19 @@ module.exports = [
     destination: '/docs/guides/platform/oauth-apps/build-a-supabase-integration',
   },
   { permanent: true, source: '/docs/reference/cli/config', destination: '/docs/guides/cli/config' },
+  {
+    permanent: true,
+    source: '/docs/guides/database/timeouts',
+    destination: '/docs/guides/database/postgres/configuration',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/managing-timezones',
+    destination: '/docs/guides/database/postgres/configuration',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/managing-passwords',
+    destination: '/docs/guides/database/postgres/roles#passwords',
+  },
 ]
