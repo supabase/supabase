@@ -32,32 +32,30 @@ export const ListItem = React.forwardRef<
   React.ComponentPropsWithoutRef<'a'> & { description?: string; icon?: string }
 >(({ className, title, href = '', description, icon, children, ...props }, ref) => {
   return (
-    <li>
-      <NavigationMenuLink asChild>
-        <Link href={href}>
-          <a
-            ref={ref}
-            className={cn(
-              'group flex flex-row select-none space-x-2 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-overlay-hover focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground-strong',
-              className
-            )}
-            {...props}
-          >
-            {children ?? (
-              <>
-                {icon && <ProductIcon icon={icon} color="alt" />}
-                <div className="flex flex-col space-y-1">
-                  <div className="text-sm font-medium leading-none">{title}</div>
-                  {description && (
-                    <p className="line-clamp-2 text-sm leading-snug text-light">{description}</p>
-                  )}
-                </div>
-              </>
-            )}
-          </a>
-        </Link>
-      </NavigationMenuLink>
-    </li>
+    <NavigationMenuLink asChild>
+      <Link href={href} passHref>
+        <a
+          ref={ref}
+          className={cn(
+            'group flex flex-row select-none space-x-2 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-overlay-hover focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground-strong',
+            className
+          )}
+          {...props}
+        >
+          {children ?? (
+            <>
+              {icon && <ProductIcon icon={icon} color="alt" />}
+              <div className="flex flex-col space-y-1">
+                <div className="text-sm font-medium leading-none">{title}</div>
+                {description && (
+                  <p className="line-clamp-2 text-sm leading-snug text-light">{description}</p>
+                )}
+              </div>
+            </>
+          )}
+        </a>
+      </Link>
+    </NavigationMenuLink>
   )
 })
 
@@ -138,7 +136,7 @@ const Nav = () => {
                       <NavigationMenuTrigger className="bg-transparent data-[state=open]:text-brand data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground-strong">
                         Product
                       </NavigationMenuTrigger>
-                      <NavigationMenuContent className="rounded-lg">
+                      <NavigationMenuContent className="rounded-lg flex flex-row">
                         <Product />
                       </NavigationMenuContent>
                     </NavigationMenuItem>
