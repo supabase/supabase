@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
-import { Button, IconMessageCircle } from 'ui'
+import { Button, IconMessageCircle, TweetCard } from 'ui'
 import Tweets from '../../data/tweets/Tweets.json'
-import TweetCard from '../TweetCard'
 import Link from 'next/link'
 
 function TwitterSocialProof() {
@@ -63,7 +62,7 @@ function TwitterSocialProof() {
         >
           {showButton && (
             <div
-              className={`absolute bottom-0 left-0 z-10 w-full h-[25%] bg-gradient-to-t from-[#1c1c1c] via-[#1c1c1c]`}
+              className={`absolute bottom-4 left-0 z-10 w-full h-[25%] bg-gradient-to-t from-[#1c1c1c] via-[#1c1c1c]`}
             />
           )}
           {Tweets.map((tweet: any, i: number) => (
