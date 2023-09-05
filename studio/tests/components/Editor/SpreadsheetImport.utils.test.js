@@ -1,4 +1,5 @@
 import { inferColumnType } from 'components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadsheetImport.utils'
+import { replaceCommaByTabulation } from 'components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadSheetTextInput'
 
 describe('SpreadsheedImport.utils: inferColumnType', () => {
   test('should default column type to text if no rows to infer from', () => {
@@ -63,4 +64,16 @@ describe('SpreadsheedImport.utils: inferColumnType', () => {
     const type4 = inferColumnType('date', mockData4)
     expect(type4).toBe('timestamptz')
   })
+  test('should transform  string to format google sheet', () => {
+    const mockData = `reference,status,cargo
+    abc123,offline,[ { "age": 23, "name": "Jane" }, { "age": 25, "name": "John" } ]
+    `
+
+    // example of copying from a google sheet    
+    const expectedMock = `reference status  cargo
+    abc123  offline [{ "age": 23, "name": "Jane" }, { "age": 25, "name": "John" } ]`
+
+    expect(replaceCommaByTabulation(mockData)).toEqual(expectedMock)
+  }) 
 })
+
