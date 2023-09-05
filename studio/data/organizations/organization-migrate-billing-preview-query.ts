@@ -2,6 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { organizationKeys } from './keys'
+import { SubscriptionTier } from 'data/subscriptions/types'
 
 export type OrganizationBillingMigrationPreviewVariables = {
   organizationSlug?: string
@@ -21,6 +22,7 @@ export type OrganizationBillingMigrationPreviewResponse = {
     quantity: number
     total_price: number
   }[]
+  old_tiers: SubscriptionTier[]
 }
 
 export async function previewOrganizationBillingMigration(

@@ -1,4 +1,4 @@
-import { Accordion, Button, IconCheck, Select } from 'ui'
+import { Accordion, Badge, Button, IconCheck, Select } from 'ui'
 import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
@@ -13,6 +13,7 @@ import pricingFaq from '~/data/PricingFAQ.json'
 import { useTheme } from 'common/Providers'
 import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
 import { plans } from 'shared-data/plans'
+import { ArrowNarrowRightIcon } from '@heroicons/react/outline'
 
 export default function IndexPage() {
   const router = useRouter()
@@ -121,7 +122,7 @@ export default function IndexPage() {
           <p className="p">{priceDescription}</p>
         </div>
         <p className="p">{description}</p>
-        <Link href="https://supabase.com/dashboard" passHref>
+        <Link href="https://supabase.com/dashboard/new" passHref>
           <a>
             <Button size="medium" block>
               Get started
@@ -158,6 +159,46 @@ export default function IndexPage() {
               <p className="p text-lg">
                 Start building for free, collaborate with a team, then scale to millions of users.
               </p>
+              <div className="w-full flex justify-center items-center opacity-0 !animate-[fadeIn_0.5s_cubic-bezier(0.25,0.25,0,1)_0.5s_both]">
+                <Link href="/blog/organization-based-billing" passHref>
+                  <a
+                    target="_blank"
+                    className="
+          group
+          relative
+          flex flex-row
+          items-center
+          pr-3 p-1
+          text-sm
+          w-auto
+          gap-2
+          text-left
+          rounded-full
+          bg-opacity-20
+          border
+          border-background-surface-100
+          hover:border-background-surface-300
+          overflow-hidden
+          focus:outline-none focus:ring-brand-600 focus:ring-2 focus:rounded-full
+          "
+                  >
+                    <Badge color="brand" size="large" className="py-1">
+                      Update
+                    </Badge>
+                    <span className="text-foreground">Changes to how we bill</span>
+                    <ArrowNarrowRightIcon className="h-4 ml-2 -translate-x-1 transition-transform group-hover:translate-x-0" />
+                    <div
+                      className="absolute inset-0 -z-10 bg-gradient-to-br
+            opacity-70
+            overflow-hidden rounded-full
+            from-background-surface-100
+            to-background-surface-300
+            backdrop-blur-md
+            "
+                    />
+                  </a>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -404,7 +445,7 @@ export default function IndexPage() {
             <p className="mt-3 prose lg:max-w-lg">
               The Pro plan has a usage quota included and a spend cap turned on by default. If you
               need to go beyond the inclusive limits, simply switch off your spend cap to pay for
-              additional usage and scale seamlessly. Note that your project will run into
+              additional usage and scale seamlessly. Note that your projects will run into
               restrictions if you have the spend cap enabled and exhaust your quota.
             </p>
           </div>
@@ -456,7 +497,7 @@ export default function IndexPage() {
                   <MobileHeader
                     plan="Free"
                     price={'0'}
-                    priceDescription={'/mo'}
+                    priceDescription={'/month'}
                     description={'Perfect for hobby projects and experiments'}
                   />
                   <PricingTableRowMobile
@@ -516,7 +557,7 @@ export default function IndexPage() {
                     plan="Pro"
                     from={false}
                     price={'25'}
-                    priceDescription={'/mo + additional use'}
+                    priceDescription={'/month + additional use'}
                     description={'Everything you need to scale your project into production'}
                   />
                   <PricingTableRowMobile
@@ -568,7 +609,7 @@ export default function IndexPage() {
                     plan="Team"
                     from={false}
                     price={'599'}
-                    priceDescription={'/mo + additional use'}
+                    priceDescription={'/month + additional use'}
                     description={'Collaborate with different permissions and access patterns'}
                   />
                   <PricingTableRowMobile
@@ -744,10 +785,10 @@ export default function IndexPage() {
                                 {plan.priceMonthly}
                               </span>
                               {['Pro', 'Free'].includes(plan.name) && (
-                                <p className="p text-[13px] leading-4 mt-1">per month</p>
+                                <p className="p text-[13px] leading-4 mt-1">/ month / org</p>
                               )}
                               {['Team'].includes(plan.name) && (
-                                <p className="p text-[13px] leading-4 mt-1">per month</p>
+                                <p className="p text-[13px] leading-4 mt-1">/ month / org</p>
                               )}
                             </>
 
@@ -827,8 +868,8 @@ export default function IndexPage() {
 
                     <td className="px-6 pt-5">
                       <Link
-                        href="https://supabase.com/dashboard"
-                        as="https://supabase.com/dashboard"
+                        href="https://supabase.com/dashboard/new?plan=free"
+                        as="https://supabase.com/dashboard/new?plan=free"
                       >
                         <a>
                           <Button size="tiny" type="primary" block>
@@ -840,8 +881,8 @@ export default function IndexPage() {
 
                     <td className="px-6 pt-5">
                       <Link
-                        href="https://supabase.com/dashboard"
-                        as="https://supabase.com/dashboard"
+                        href="https://supabase.com/dashboard/new?plan=pro"
+                        as="https://supabase.com/dashboard/new?plan=pro"
                       >
                         <a>
                           <Button size="tiny" type="primary" block>
@@ -852,10 +893,10 @@ export default function IndexPage() {
                     </td>
 
                     <td className="px-6 pt-5">
-                      <Link href="https://forms.supabase.com/team">
+                      <Link href="https://supabase.com/dashboard/new?plan=team">
                         <a>
                           <Button size="tiny" type="primary" block>
-                            Contact us
+                            Get Started
                           </Button>
                         </a>
                       </Link>

@@ -112,14 +112,14 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: 'Database egress',
+        title: 'Bandwidth',
         tooltips: {
-          main: 'Billing is based on the total sum of outgoing traffic of your database in GB throughout your billing period.',
+          main: 'Billing is based on the total sum of outgoing traffic (includes Database, Storage, Realtime, Auth) in GB throughout your billing period.',
         },
         plans: {
-          free: '2GB included',
-          pro: '50 GB included, then $0.09 per GB',
-          team: '50 GB included, then $0.09 per GB',
+          free: '5GB included',
+          pro: '250 GB included, then $0.09 per GB',
+          team: '250 GB included, then $0.09 per GB',
           enterprise: 'Unlimited',
         },
         usage_based: true,
@@ -230,19 +230,6 @@ export const pricing: Pricing = {
           free: '1 GB included',
           pro: '100 GB included, then $0.021 per GB',
           team: '100 GB included, then $0.021 per GB',
-          enterprise: 'Unlimited',
-        },
-        usage_based: true,
-      },
-      {
-        title: 'Storage egress',
-        tooltips: {
-          main: 'All requests to view and download your storage items go through our CDN. We sum up all outgoing traffic (egress) for storage related requests through our CDN. We do not differentiate between cache and no cache hits.\nBilling is based on the total amount of egress in GB throughout your billing period.',
-        },
-        plans: {
-          free: '2 GB included',
-          pro: '200 GB included, then $0.09 per GB',
-          team: '200 GB included, then $0.09 per GB',
           enterprise: 'Unlimited',
         },
         usage_based: true,
