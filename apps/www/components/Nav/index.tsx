@@ -1,16 +1,11 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Button, Badge, cn } from 'ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Announcement from '~/components/Announcement/Announcement'
+import { Button, cn } from 'ui'
 import Transition from 'lib/Transition'
-
-import SolutionsData from 'data/Solutions'
-import { links as DevelopersData } from 'data/Developers'
-
 import ScrollProgress from '~/components/ScrollProgress'
-
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { useTheme } from 'next-themes'
 import TextLink from '../TextLink'
@@ -28,42 +23,39 @@ import {
   NavigationMenuTrigger,
 } from 'ui/src/components/shadcn/ui/navigation-menu'
 import HamburgerButton from './HamburgerMenu'
+import Developers from './Developers'
+import Product from './Product'
 
-const ListItem = React.forwardRef<React.ElementRef<'a'>, React.ComponentPropsWithoutRef<'a'>>(
-  ({ className, title, href, children, ...props }, ref) => {
-    return (
-      <li>
-        <NavigationMenuLink asChild>
-          {href ? (
-            <Link href={href}>
-              <a
-                ref={ref}
-                className={cn(
-                  'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
-                  className
-                )}
-                {...props}
-              >
+export const ListItem = React.forwardRef<
+  React.ElementRef<'a'>,
+  React.ComponentPropsWithoutRef<'a'> & { description?: string }
+>(({ className, title, href = '', description, children, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <Link href={href}>
+          <a
+            ref={ref}
+            className={cn(
+              'flex flex-col select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-overlay-hover hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+              className
+            )}
+            {...props}
+          >
+            {children ?? (
+              <>
                 <div className="text-sm font-medium leading-none">{title}</div>
-                <p className="line-clamp-2 text-sm leading-snug text-muted">{children}</p>
-              </a>
-            </Link>
-          ) : (
-            <div
-              className={cn(
-                'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
-                className
-              )}
-            >
-              <div className="text-sm font-medium leading-none">{title}</div>
-              <p className="line-clamp-2 text-sm leading-snug text-muted">{children}</p>
-            </div>
-          )}
-        </NavigationMenuLink>
-      </li>
-    )
-  }
-)
+                {description && (
+                  <p className="line-clamp-2 text-sm leading-snug text-muted">{description}</p>
+                )}
+              </>
+            )}
+          </a>
+        </Link>
+      </NavigationMenuLink>
+    </li>
+  )
+})
 
 const Nav = () => {
   const { theme, resolvedTheme } = useTheme()
@@ -87,62 +79,6 @@ const Nav = () => {
       document.body.style.overflow = 'auto'
     }
   }, [open])
-
-  const iconSections = Object.values(SolutionsData).map((solution: any, idx: number) => {
-    const { name, description, icon, label, url } = solution
-
-    const content = (
-      <div className="flex mb-3 md:h-full lg:flex-col">
-        <div className="flex-shrink-0">
-          <div className="inline-flex items-center justify-center w-10 h-10 text-white bg-gray-800 rounded-md dark:bg-white dark:text-gray-800 sm:h-12 sm:w-12">
-            {/* <!-- Heroicon name: chart-bar --> */}
-            <svg
-              className="w-6 h-6"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              aria-hidden="true"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon} />
-            </svg>
-          </div>
-        </div>
-        <div className="ml-4 md:flex md:flex-1 md:flex-col md:justify-between lg:ml-0 lg:mt-4">
-          <div>
-            <p className="space-x-2 text-base font-medium text-gray-900 dark:text-white">
-              <span>{name}</span>
-              {label && (
-                <Badge dot color="green">
-                  {label}
-                </Badge>
-              )}
-            </p>
-            <p className="mt-1 text-sm text-scale-1100 dark:text-dark-100">{description}</p>
-          </div>
-          {url && (
-            <p className="mt-2 text-sm font-medium text-brand lg:mt-4">
-              <TextLink label={label ? 'Get notified' : 'Learn more'} url={url} />
-            </p>
-          )}
-        </div>
-      </div>
-    )
-    return url ? (
-      <Link href={url} key={`solution_${idx}`}>
-        <a className="flex flex-col justify-between p-3 my-2 -m-3 transition duration-150 ease-in-out rounded-lg dark:hover:bg-scale-600 hover:bg-gray-50">
-          {content}
-        </a>
-      </Link>
-    ) : (
-      <div
-        key={`solution_${idx}`}
-        className="flex flex-col justify-between p-3 -m-3 transition duration-150 ease-in-out rounded-lg"
-      >
-        {content}
-      </div>
-    )
-  })
 
   return (
     <>
@@ -196,39 +132,19 @@ const Nav = () => {
                   <NavigationMenu>
                     <NavigationMenuList>
                       <NavigationMenuItem>
-                        <NavigationMenuTrigger className="bg-transparent">
+                        <NavigationMenuTrigger className="bg-transparent data-[state=open]:text-brand">
                           Product
                         </NavigationMenuTrigger>
                         <NavigationMenuContent>
-                          <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                            {Object.values(SolutionsData).map((component) => (
-                              <ListItem
-                                key={component.name}
-                                title={component.name}
-                                href={component.url}
-                              >
-                                {component.description_short}
-                              </ListItem>
-                            ))}
-                          </ul>
+                          <Product />
                         </NavigationMenuContent>
                       </NavigationMenuItem>
                       <NavigationMenuItem>
-                        <NavigationMenuTrigger className="bg-transparent">
+                        <NavigationMenuTrigger className="bg-transparent data-[state=open]:text-brand">
                           Developers
                         </NavigationMenuTrigger>
                         <NavigationMenuContent>
-                          <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                            {Object.values(DevelopersData).map((component) => (
-                              <ListItem
-                                key={component.text}
-                                title={component.text}
-                                href={component.url}
-                              >
-                                {component.description}
-                              </ListItem>
-                            ))}
-                          </ul>
+                          <Developers />
                         </NavigationMenuContent>
                       </NavigationMenuItem>
                     </NavigationMenuList>
@@ -389,10 +305,6 @@ const Nav = () => {
                       Support
                     </a>
                   </Link>
-                </div>
-                <div className="p-3">
-                  <p className="mb-6 text-sm text-scale-900">Products available:</p>
-                  {iconSections}
                 </div>
               </div>
             </div>
