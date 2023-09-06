@@ -172,7 +172,7 @@ function Database() {
                 marginBottom: 0,
                 // borderBottom: '1px solid #dedede',
               }}
-            // block
+              // block
             >
               <Tabs.Panel id="0" label="Table editor">
                 <span></span>
