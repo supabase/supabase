@@ -23,6 +23,7 @@ const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) => {
     // reset has to be called because the state is kept between if the process is canceled during
     // the second step.
     if (!visible) {
+      setName(`App ${Math.floor(Math.random() * 1000)}`)
       reset()
     }
   }, [reset, visible])
