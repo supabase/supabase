@@ -1,12 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import { Badge, IconLoader, Toggle } from 'ui'
+import { Badge, IconExternalLink, IconLoader, Toggle } from 'ui'
 
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useCheckPermissions, useStore } from 'hooks'
 import { isResponseOk } from 'lib/common/fetch'
 import EnableExtensionModal from './EnableExtensionModal'
+import Link from 'next/link'
+import { extensions } from 'shared-data'
 
 interface ExtensionCardProps {
   extension: any
@@ -18,6 +20,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
   const isOn = extension.installed_version !== null
   const [loading, setLoading] = useState(false)
   const [showConfirmEnableModal, setShowConfirmEnableModal] = useState(false)
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || ''
 
   const canUpdateExtensions = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -70,15 +73,38 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
         <div
           className={[
             'border-panel-border-light bg-panel-header-light dark:bg-panel-header-dark',
-            'flex border-b p-4 px-6 dark:border-panel-border-dark',
+            'flex justify-between w-full border-b p-4 px-6 dark:border-panel-border-dark',
           ].join(' ')}
         >
-          <h3
-            title={extension.name}
-            className="m-0 h-5 flex-1 truncate text-base uppercase text-scale-1200"
-          >
-            {extension.name}
-          </h3>
+          <div className="flex items-center gap-1">
+            <h3
+              title={extension.name}
+              className="h-5 m-0 text-base uppercase truncate cursor-pointer text-scale-1200"
+            >
+              {extension.name}
+            </h3>
+            {extensions.find((item: any) => item.name === extension.name) ? (
+              <Link
+                href={
+                  extensions
+                    .find((item: any) => item.name === extension.name)
+                    ?.link.startsWith('/guides')
+                    ? siteUrl === 'http://localhost:8082'
+                      ? `http://localhost:3001/docs${
+                          extensions.find((item: any) => item.name === extension.name)?.link
+                        }`
+                      : `https://supabase.com/docs${
+                          extensions.find((item: any) => item.name === extension.name)?.link
+                        }`
+                    : extensions.find((item: any) => item.name === extension.name)?.link ?? ''
+                }
+              >
+                <a className="max-w-[85%] cursor-default zans" target="_blank" rel="noreferrer">
+                  <IconExternalLink className="ml-2.5 cursor-pointer" size={14} />
+                </a>
+              </Link>
+            ) : null}
+          </div>
           {loading ? (
             <IconLoader className="animate-spin" size={16} />
           ) : (
@@ -101,7 +127,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
           </div>
           {isOn && extension.schema && (
             <div className="p-4 px-6">
-              <div className="flex flex-grow items-center space-x-2 text-sm text-scale-1100">
+              <div className="flex items-center flex-grow space-x-2 text-sm text-scale-1100">
                 <span>Schema:</span>
                 <Badge>{`${extension.schema}`}</Badge>
               </div>
