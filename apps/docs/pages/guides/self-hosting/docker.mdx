@@ -47,12 +47,12 @@ You can access the Supabase Dashboard through the API gateway on port `8000`. Fo
 
 You will be prompted for a username and password. By default, the credentials are:
 
-- Username: `supabase` 
+- Username: `supabase`
 - Password: `this_password_is_insecure_and_should_be_updated`
 
 You should change these credentials as soon as possible using the [instructions](#dashboard-authentication) below.
 
-### Accessing the APIs 
+### Accessing the APIs
 
 Each of the APIs are available through the the same API gateway:
 
@@ -61,9 +61,9 @@ Each of the APIs are available through the the same API gateway:
 - Storage: `http://<your-domain>:8000/storage/v1/`
 - Realtime: `http://<your-domain>:8000/realtime/v1/`
 
-### Accessing your Edge Functions 
+### Accessing your Edge Functions
 
-Edge Functions are stored in `volumes/functions`. The default setup has a `hello` Function that you can invoke on `http://<your-domain>:8000/functions/v1/hello`. 
+Edge Functions are stored in `volumes/functions`. The default setup has a `hello` Function that you can invoke on `http://<your-domain>:8000/functions/v1/hello`.
 
 You can add new Functions as `volumes/functions/<FUNCTION_NAME>/index.ts`. Restart the `functions` service to pick up the changes: `docker compose restart functions --no-deps`
 
@@ -84,7 +84,7 @@ While we provided you with some example secrets for getting started, you should 
 
 ### Generate API Keys
 
-Create a new `JWT_SECRET` and store it securely. 
+Create a new `JWT_SECRET` and store it securely.
 
 We can use your JWT Secret to generate new `anon` and `service` API keys using the form below. Update the "JWT Secret" and then run "Generate JWT" once for the `SERVICE_KEY` and once for the `ANON_KEY`:
 
@@ -114,8 +114,8 @@ You will need to [restart](#restarting-all-services) the services for the change
 
 The dashboard is protected with Basic Authentication. The default user and password MUST be updated before using Supabase in production.
 Update the following values in the `.env` file:
- - `DASHBOARD_USERNAME`: The default username for the Dashboard 
- - `DASHBOARD_PASSWORD`: The default password for the Dashboard 
+ - `DASHBOARD_USERNAME`: The default username for the Dashboard
+ - `DASHBOARD_PASSWORD`: The default password for the Dashboard
 
 You can also add more credentials in `./docker/volumes/api/kong.yml`. For example:
 
@@ -149,13 +149,13 @@ You can stop Supabase by running `docker compose stop` in same directory as your
 
 You can stop Supabase by running the following in same directory as your `docker-compose.yml` file:
 
-```sh 
+```sh
 # Stop docker and remove volumes:
 docker compose down -v
 
 # Remove Postgres data:
 rm -rf volumes/db/data/
-``` 
+```
 
 This will destroy all data in the database and storage volumes, so be careful!
 
@@ -163,7 +163,7 @@ This will destroy all data in the database and storage volumes, so be careful!
 
 Each system can be [configured](../self-hosting#configuration) independently. Some of the most common configuration options are listed below.
 
-### Configuring an email server 
+### Configuring an email server
 
 You will need to use a production-ready SMTP server for sending emails. You can configure the SMTP server by updating the the following environment variables:
 
@@ -178,7 +178,7 @@ SMTP_SENDER_NAME=
 
 We recommend using [AWS SES](https://aws.amazon.com/ses/). It's extremely cheap and reliable. Restart all services to pick up the new configuration.
 
-### Configuring S3 Storage 
+### Configuring S3 Storage
 
 By default all files are stored locally on the server. You can connfigure the Storage service to use S3 by updating the following environment variables:
 
@@ -216,7 +216,29 @@ By default, Storage backend is set to `file`, which is to use local files as the
 
 Additional configuration is required for self-hosting the Analytics server. For the full setup instructions, see [Self Hosting Analytics](https://supabase.com/docs/reference/self-hosting-analytics/introduction#getting-started).
 
+### Upgrading Analytics
+
+Due to the changes in the Analytics server, you will need to run the following commands to upgrade your Analytics server:
+
+<Admonition type="warning">
+
+- All data in analytics will be deleted when you run the above commands.
+
+</Admonition>
+
+
+```sh
+### Destroy analytics to transition to postgres self hosted solution without other data loss
+
+# Enter the container and use your .env POSTGRES_PASSWORD value to login
+docker exec -it $(docker ps | grep supabase-db | awk '{print $1}') psql -U supabase_admin --password
+# Drop all the data in the _analytics schema
+DROP PUBLICATION logflare_pub; DROP SCHEMA _analytics CASCADE; CREATE SCHEMA _analytics;\q
+# Drop the analytics container
+docker rm supabase-db
+```
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page
+
