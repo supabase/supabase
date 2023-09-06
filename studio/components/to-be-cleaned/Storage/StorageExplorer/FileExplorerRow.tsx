@@ -436,7 +436,7 @@ const FileExplorerRow = ({
                         >
                           <div className="flex items-center space-x-2">
                             {option.icon}
-                            <p className="text-white">{option.name}</p>
+                            <p className="text">{option.name}</p>
                           </div>
                           <IconChevronRight size="tiny" />
                         </div>
