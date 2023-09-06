@@ -82,6 +82,13 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
                 key: `/account/me`,
               },
               {
+                isActive: router.pathname === `/account/audit`,
+                icon: `${router.basePath}/img/user.svg`,
+                label: 'Audit Logs',
+                href: `/account/audit`,
+                key: `/account/audit`,
+              },
+              {
                 isActive: router.pathname === `/account/tokens`,
                 icon: `${router.basePath}/img/user.svg`,
                 label: 'Access Tokens',
