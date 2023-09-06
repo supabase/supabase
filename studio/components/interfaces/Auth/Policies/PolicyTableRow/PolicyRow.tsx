@@ -39,11 +39,30 @@ const PolicyRow = ({
               {role}
             </code>
           ))}
-          {policy.roles.length > 3 && (
-            <code key={`policy-etc`} className="text-scale-1000 text-xs">
-              + {policy.roles.length - 3} more roles
-            </code>
-          )}
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger>
+              {policy.roles.length > 3 && (
+                <code key={`policy-etc`} className="text-scale-1000 text-xs">
+                  + {policy.roles.length - 3} more roles
+                </code>
+              )}
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content side="bottom">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                    'border border-scale-200 max-w-[220px] text-center',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-scale-1200">
+                    {policy.roles.slice(3).join(', ')}
+                  </span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
         </div>
       </div>
       <div>
