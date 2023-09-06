@@ -29,7 +29,7 @@ Without indexes, pgvector performs a full table scan when you run a similarity q
 
 To solve this, pgvector offers indexes. Indexes reorganize the data into data structures that exploit internal structure and enable approximate similarity search without referring to every record. Currently, pgvector supports an IVF index, with HNSW expected in the next release.
 
-IVF [indexes](https://supabase.com/docs/guides/ai/managing-indexes) work by clustering vectors into `lists`, and then querying only vectors within the same list (or multiple nearby lists, depending on the value of `probes`).
+IVF [indexes](https://supabase.com/docs/guides/ai/vector-indexes/ivf-indexes#how-does-ivfflat-work) work by clustering vectors into `lists`, and then querying only vectors within the same list (or multiple nearby lists, depending on the value of `probes`).
 
 ### Scaling indexes
 
