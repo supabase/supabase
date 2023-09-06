@@ -214,7 +214,7 @@ HNSW indexes use graphs which inherently are not affected by this limitation, so
 IVFFlat indexes also saw some improvements in v0.5.0. Index build times are now significantly faster for large datasets thanks to 2 new improvements:
 
 - Parallelization during the assignment build step (assigning records to lists)
-- Switching from [double to float](https://github.com/pgvector/pgvector/pull/180) accuracy for select distance calculations which unlocks the [fused multiply-add](https://en.wikipedia.org/wiki/Multiply%E2%80%93accumulate_operation#Fused_multiply%E2%80%93add) instruction on CPUs
+- Switching from [double to float](https://github.com/pgvector/pgvector/pull/180) precision for select distance calculations which unlocks the [fused multiply-add](https://en.wikipedia.org/wiki/Multiply%E2%80%93accumulate_operation#Fused_multiply%E2%80%93add) instruction on CPUs
 
 Below we compare the index build times between v0.4.0 and v0.5.0 for the inner product distance measure over 1,000,000 vectors on a Supabase project with 4XL compute add-on (with a 16-core CPU and 64GB of RAM).
 
