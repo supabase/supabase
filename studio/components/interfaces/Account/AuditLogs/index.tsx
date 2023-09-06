@@ -19,12 +19,6 @@ import { Alert, Button, IconArrowDown, IconArrowUp, IconRefreshCw, IconUser } fr
 import FilterPopover from './FilterPopover'
 import LogDetailsPanel from './LogDetailsPanel'
 
-// [Joshen considerations]
-// - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
-// - We'll need pagination as well if the audit logs get too large, but that needs to be implemented on the API side first if possible
-// - I've hidden time input in the date picker for now cause the time support in the component is a bit iffy, need to investigate
-//   - Maybe a rule to follow from here is just everytime we call dayjs, use UTC(), one TZ to rule them all
-
 const AuditLogs = () => {
   const { slug } = useParams()
   const currentTime = dayjs().utc().set('millisecond', 0)
@@ -34,8 +28,7 @@ const AuditLogs = () => {
     to: currentTime.toISOString(),
   })
   const [selectedLog, setSelectedLog] = useState<OrganizationAuditLog>()
-  const [filters, setFilters] = useState<{ users: string[]; projects: string[] }>({
-    users: [], // gotrue_id[]
+  const [filters, setFilters] = useState<{ projects: string[] }>({
     projects: [], // project_ref[]
   })
 
@@ -61,13 +54,6 @@ const AuditLogs = () => {
         : Number(new Date(a.occurred_at)) - Number(new Date(b.occurred_at))
     )
     ?.filter((log) => {
-      if (filters.users.length > 0) {
-        return filters.users.includes(log.actor.id)
-      } else {
-        return log
-      }
-    })
-    ?.filter((log) => {
       if (filters.projects.length > 0) {
         return filters.projects.includes(log.target.metadata.project_ref || '')
       } else {
@@ -82,14 +68,6 @@ const AuditLogs = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <p className="text-xs prose">Filter by</p>
-              <FilterPopover
-                name="Users"
-                options={members ?? []}
-                labelKey="username"
-                valueKey="gotrue_id"
-                activeOptions={filters.users}
-                onSaveFilters={(values) => setFilters({ ...filters, users: values })}
-              />
               <FilterPopover
                 name="Projects"
                 options={projects ?? []}

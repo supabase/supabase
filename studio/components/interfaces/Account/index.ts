@@ -1,5 +1,5 @@
 import AccessTokenList from './AccessTokenList'
-import AuditLogs from './AuditLogs/AuditLogs'
+import AuditLogs from './AuditLogs'
 import NewAccessTokenButton from './NewAccessTokenButton'
 import NewTokenBanner from './NewTokenBanner'
 import TOTPFactors from './TOTPFactors'
