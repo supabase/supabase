@@ -1,6 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
 import dayjs from 'dayjs'
+
+import { get } from 'data/fetchers'
+import { AuditLog } from 'data/organizations/organization-audit-logs-query'
 import { ResponseError } from 'types'
 import { profileKeys } from './keys'
 
@@ -24,11 +26,14 @@ export async function getProfileAuditLogs(
   })
 
   if (error) throw error
-  return data
+  return data as unknown as ProfileAuditLogsData
 }
 
-export type ProfileAuditLogsData = Awaited<ReturnType<typeof getProfileAuditLogs>>
 export type ProfileAuditLogsError = ResponseError
+export type ProfileAuditLogsData = {
+  result: AuditLog[]
+  retention_period: number
+}
 
 export const useProfileAuditLogsQuery = <TData = ProfileAuditLogsData>(
   vars: ProfileAuditLogsVariables,
