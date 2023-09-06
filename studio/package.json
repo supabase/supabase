@@ -35,7 +35,7 @@
     "@supabase/auth-helpers-nextjs": "^0.5.6",
     "@supabase/auth-helpers-react": "^0.3.1",
     "@supabase/react-data-grid": "^7.1.0-beta.7",
-    "@supabase/shared-types": "^0.1.43",
+    "@supabase/shared-types": "^0.1.46",
     "@supabase/supabase-js": "^2.23.0",
     "@tanstack/react-query": "^4.22.0",
     "@tanstack/react-query-devtools": "^4.22.0",
