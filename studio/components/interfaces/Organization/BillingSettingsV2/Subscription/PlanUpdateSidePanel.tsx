@@ -7,10 +7,7 @@ import { useEffect, useState } from 'react'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import {
-  SubscriptionTier,
-  useOrgSubscriptionUpdateMutation,
-} from 'data/subscriptions/org-subscription-update-mutation'
+import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
@@ -27,6 +24,7 @@ import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-l
 import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
 import InformationBox from 'components/ui/InformationBox'
 import AlertError from 'components/ui/AlertError'
+import { SubscriptionTier } from 'data/subscriptions/types'
 
 // [Joshen TODO] Need to remove all contexts of "projects"
 
@@ -266,7 +264,7 @@ const PlanUpdateSidePanel = () => {
                     <div className="border-t my-6" />
 
                     <ul role="list">
-                      {(plan.features).map((feature) => (
+                      {plan.features.map((feature) => (
                         <li key={feature} className="flex py-2">
                           <div className="w-[12px]">
                             <IconCheck
@@ -304,7 +302,7 @@ const PlanUpdateSidePanel = () => {
       <Modal
         loading={isUpdating}
         alignFooter="right"
-        className="!w-[550px]"
+        size="large"
         visible={selectedTier !== undefined && selectedTier !== 'tier_free'}
         onCancel={() => setSelectedTier(undefined)}
         onConfirm={onUpdateSubscription}
