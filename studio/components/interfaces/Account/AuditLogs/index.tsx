@@ -1,33 +1,29 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
-import Image from 'next/image'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import { useParams } from 'common'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { DatePicker } from 'components/ui/DatePicker'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { OrganizationAuditLog } from 'data/organizations/organization-audit-logs-query'
-import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
-import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
+import { AuditLog } from 'data/organizations/organization-audit-logs-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProfileAuditLogsQuery } from 'data/profile/profile-audit-logs-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { Alert, Button, IconArrowDown, IconArrowUp, IconRefreshCw, IconUser } from 'ui'
+import { Alert, Button, IconArrowDown, IconArrowUp, IconRefreshCw } from 'ui'
 import FilterPopover from './FilterPopover'
 import LogDetailsPanel from './LogDetailsPanel'
 
 const AuditLogs = () => {
-  const { slug } = useParams()
   const currentTime = dayjs().utc().set('millisecond', 0)
   const [dateSortDesc, setDateSortDesc] = useState(true)
   const [dateRange, setDateRange] = useState({
     from: currentTime.subtract(1, 'day').toISOString(),
     to: currentTime.toISOString(),
   })
-  const [selectedLog, setSelectedLog] = useState<OrganizationAuditLog>()
+
+  const [selectedLog, setSelectedLog] = useState<AuditLog>()
   const [filters, setFilters] = useState<{ projects: string[] }>({
     projects: [], // project_ref[]
   })
@@ -40,8 +36,22 @@ const AuditLogs = () => {
       iso_timestamp_end: dateRange.to,
     })
 
-  const members = detailData?.members ?? []
-  const roles = rolesData?.roles ?? []
+  // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
+  // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
+  // viewed for more than 5 minutes, the call parameters needs to be updated. This also works with
+  // higher tiers (7 days of logs).The user will see a loading shimmer.
+  useEffect(() => {
+    const duration = dayjs(dateRange.from).diff(dayjs(dateRange.to))
+    const interval = setInterval(() => {
+      const currentTime = dayjs().utc().set('millisecond', 0)
+      setDateRange({
+        from: currentTime.add(duration).toISOString(),
+        to: currentTime.toISOString(),
+      })
+    }, 5 * 60000)
+
+    return () => clearInterval(interval)
+  }, [dateRange.from, dateRange.to])
 
   const retentionPeriod = data?.retention_period ?? 0
   const logs = data?.result ?? []
