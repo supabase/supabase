@@ -34,8 +34,6 @@ const AuditLogs = () => {
 
   const { data: projects } = useProjectsQuery()
   const { data: organizations } = useOrganizationsQuery()
-  const { data: detailData } = useOrganizationDetailQuery({ slug })
-  const { data: rolesData } = useOrganizationRolesQuery({ slug })
   const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
     useProfileAuditLogsQuery({
       iso_timestamp_start: dateRange.from,
@@ -106,7 +104,7 @@ const AuditLogs = () => {
                 renderFooter={() => {
                   return (
                     <Alert title="" variant="info" className="mx-3 pl-2 pr-2 pt-1 pb-2">
-                      Your organization has a log retention period of{' '}
+                      You have a log retention period of{' '}
                       <span className="text-brand">
                         {retentionPeriod} day
                         {retentionPeriod > 1 ? 's' : ''}
@@ -149,9 +147,7 @@ const AuditLogs = () => {
             <>
               {logs.length === 0 ? (
                 <div className="bg-scale-100 dark:bg-scale-300 border rounded p-4 flex items-center justify-between">
-                  <p className="prose text-sm">
-                    Your organization does not have any audit logs available yet
-                  </p>
+                  <p className="prose text-sm">You do not have any audit logs available yet</p>
                 </div>
               ) : logs.length > 0 && sortedLogs.length === 0 ? (
                 <div className="bg-scale-100 dark:bg-scale-300 border rounded p-4 flex items-center justify-between">
@@ -160,9 +156,6 @@ const AuditLogs = () => {
               ) : (
                 <Table
                   head={[
-                    <Table.th key="user" className="py-2">
-                      User
-                    </Table.th>,
                     <Table.th key="action" className="py-2">
                       Action
                     </Table.th>,
@@ -212,8 +205,6 @@ const AuditLogs = () => {
                   ]}
                   body={
                     sortedLogs?.map((log) => {
-                      const user = members.find((member) => member.gotrue_id === log.actor.id)
-                      const role = roles.find((role) => user?.role_ids?.[0] === role.id)
                       const project = projects?.find(
                         (project) => project.ref === log.target.metadata.project_ref
                       )
@@ -222,24 +213,6 @@ const AuditLogs = () => {
                       )
 
                       const hasStatusCode = log.action.metadata[0]?.status !== undefined
-                      const userIcon =
-                        user === undefined ? (
-                          <div className="flex h-[30px] w-[30px] flex items-center justify-center border-2 rounded-full border-scale-700">
-                            <p>?</p>
-                          </div>
-                        ) : user?.invited_id || user?.username === user?.primary_email ? (
-                          <div className="flex h-[30px] w-[30px] flex items-center justify-center border-2 rounded-full border-scale-700">
-                            <IconUser size={18} strokeWidth={2} />
-                          </div>
-                        ) : (
-                          <Image
-                            alt={user?.username}
-                            src={`https://github.com/${user?.username ?? ''}.png?size=80`}
-                            width="30"
-                            height="30"
-                            className="border rounded-full"
-                          />
-                        )
 
                       return (
                         <Table.tr
@@ -247,17 +220,6 @@ const AuditLogs = () => {
                           onClick={() => setSelectedLog(log)}
                           className="cursor-pointer hover:!bg-scale-100 transition duration-100"
                         >
-                          <Table.td>
-                            <div className="flex items-center space-x-4">
-                              <div>{userIcon}</div>
-                              <div>
-                                <p className="text-scale-1100">{user?.username ?? 'Unknown'}</p>
-                                {role && (
-                                  <p className="mt-0.5 text-xs text-scale-1000">{role?.name}</p>
-                                )}
-                              </div>
-                            </div>
-                          </Table.td>
                           <Table.td>
                             <div className="flex items-center space-x-2">
                               {hasStatusCode && (
