@@ -7,12 +7,13 @@ import { useEffect, useState } from 'react'
 import { Button, Form, IconLock, Input } from 'ui'
 import { object, string } from 'yup'
 
-import Loading from 'components/ui/Loading'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { useStore } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
 import { useSignOut } from 'lib/auth'
+import AlertError from 'components/ui/AlertError'
 
 const signInSchema = object({
   code: string().required('MFA Code is required'),
@@ -25,8 +26,11 @@ const SignInMfaForm = () => {
   const router = useRouter()
   const {
     data: factors,
-    isSuccess: factorsSuccess,
-    isLoading: areFactorsLoading,
+    error: factorsError,
+    isError: isErrorFactors,
+    isSuccess: isSuccessFactors,
+    isInitialLoading: isInitialLoadingFactors,
+    isLoading: isLoadingFactors,
   } = useMfaListFactorsQuery()
   const {
     mutateAsync: mfaChallengeAndVerify,
@@ -41,8 +45,10 @@ const SignInMfaForm = () => {
     await router.replace('/sign-in')
   }
 
+  console.log({ isLoadingFactors, factors })
+
   useEffect(() => {
-    if (factorsSuccess) {
+    if (isSuccessFactors) {
       // if the user wanders into this page and he has no MFA setup, send the user to the next screen
       if (factors.totp.length === 0) {
         queryClient.resetQueries().then(() => pushNext())
@@ -51,7 +57,7 @@ const SignInMfaForm = () => {
         setSelectedFactor(factors.totp[0])
       }
     }
-  }, [factors?.totp, factorsSuccess, pushNext, queryClient])
+  }, [factors?.totp, isSuccessFactors, pushNext, queryClient])
 
   const onSignIn = async ({ code }: { code: string }) => {
     const toastId = ui.setNotification({
@@ -87,9 +93,11 @@ const SignInMfaForm = () => {
 
   return (
     <>
-      {areFactorsLoading ? (
-        <Loading />
-      ) : (
+      {isLoadingFactors && <GenericSkeletonLoader />}
+
+      {isErrorFactors && <AlertError error={factorsError} subject="Failed to retrieve factors" />}
+
+      {isSuccessFactors && (
         <Form
           validateOnBlur
           id="sign-in-mfa-form"
