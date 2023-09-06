@@ -25,7 +25,7 @@ At Supabase, we support storing embeddings in Postgres using the [pgvector](http
 
 ## Challenges with pgvector
 
-Without indexes, pgvector performs a full table scan when you run a similarity query. This means distance has to be computed against every row in your table. This is manageable at a small scale, but becomes problematic as your table grows.
+Without indexes, pgvector performs a full table scan when you run a similarity query. This means distance has to be computed against every row in your table. This is manageable at a small scale but becomes problematic as your table grows.
 
 To solve this, pgvector offers indexes. Indexes reorganize the data into data structures that exploit internal structure and enable approximate similarity search without referring to every record. Currently, pgvector supports an IVF index, with HNSW expected in the next release.
 
@@ -35,7 +35,7 @@ IVF [indexes](https://supabase.com/docs/guides/ai/managing-indexes) work by clus
 
 98% of our customers are generating text embeddings using OpenAI's `text-embedding-ada-002` model. At an initial glance, there's good reason for this - these embeddings perform quite well for information retrieval and are economical to produce. `text-embedding-ada-002` produces vectors with 1536 dimensions which is among the largest in the industry. IVF indexes help address some scaling challenges, but there are still some pitfalls.
 
-First, vectors are large. A 1536 dimensional vector is ~12.3 kilobytes. Scaling that up to 1M vectors, the raw data tops 11 gigabytes. Experienced SQL users know that for best performance, indexes should fit within system memory. Moreover unlike traditional workloads, there is a significant compute component when performing vector similarity queries.
+First, vectors are large. A 1536 dimensional vector is ~12.3 kilobytes. Scaling that up to 1M vectors, the raw data tops 11 gigabytes. Experienced SQL users know that for best performance, indexes should fit within system memory. Moreover, unlike traditional workloads, there is a significant compute component when performing vector similarity queries.
 
 In the real-world it's common for an index to reduce the number of distance computations needed to estimate nearest neighbors from 100% of the dataset to 5-20%. At 1M records, that's still 50k-200k distance calculations being performed for a single query. Given how different the [resource requirements](https://supabase.com/docs/guides/ai/choosing-compute-addon) are to support heavy vector workloads, it's not surprising that one of the most common issues we see is significant under provisioning of hardware.
 
@@ -54,7 +54,7 @@ Text embeddings are one of the most common types of embeddings today. Our friend
 
 Models are ranked per task by taking their average score produced over each task's datasets. Each model also has an overall (general purpose) score, calculated by taking the average score produced across all datasets. You can find the results on their [MTEB leaderboard](https://huggingface.co/spaces/mteb/leaderboard).
 
-It's worth pointing out that each model's dimension size has little-to-no correlation with its performance. In fact there are a number of models that perform comparably with`text-embedding-ada-002`, all of which produce embeddings with fewer dimensions than 1536.
+It's worth pointing out that each model's dimension size has little-to-no correlation with its performance. In fact, there are a number of models that perform comparably with`text-embedding-ada-002`, all of which produce embeddings with fewer dimensions than 1536.
 
 | Rank | Model                                                                                              | Dimensions | Average | Model Size (GB) |
 | ---- | -------------------------------------------------------------------------------------------------- | ---------- | ------- | --------------- |
@@ -68,7 +68,7 @@ It's worth pointing out that each model's dimension size has little-to-no correl
 
 ## Benefits of fewer dimensions
 
-What specifically do we gain when we have fewer dimensions? Faster queries and less RAM: Fewer dimensions means less computation while more of the dataset or index is able to fit in memory.
+What specifically do we gain when we have fewer dimensions? Faster queries and less RAM: Fewer dimensions mean less computation while more of the dataset or index is able to fit in memory.
 
 Take a look at dot product for example:
 
@@ -85,9 +85,9 @@ Take a look at dot product for example:
   />
 </div>
 
-Dot product is the product of each vector element pair summed together into a single result. Fewer dimensions in the vector means fewer calculations for every computed distance .
+Dot product is the product of each vector element pair summed together into a single result. Fewer dimensions in the vector means fewer calculations for every computed distance.
 
-We compared the performance of `text-embedding-ada-002` from OpenAI (1536 dimensions) with open-source `all-MiniLM-L6-v2` (384 dimensions) by measuring requests per second at a constant precision and configuration:
+We compared the performance of `text-embedding-ada-002` from OpenAI (1536 dimensions) with open-source `all-MiniLM-L6-v2` (384 dimensions) by measuring queries per second at a constant accuracy and configuration:
 
 - **Database size:** with 2vCPU (ARM) and 8GB RAM - `large` add-on for Supabase project.
 - **Version:** Postgres v15 and pgvector v0.4.0
@@ -95,7 +95,7 @@ We compared the performance of `text-embedding-ada-002` from OpenAI (1536 dimens
 - **Index:** The index was generated for `inner-product` (dot product) distance function with `lists=1000`.
 - **Process:** We followed [our optimization guide and tips](https://supabase.com/docs/guides/ai/going-to-prod#performance-tips-when-using-indexes).
 
-We observed pgvector with `all-MiniLM-L6-v2` outperforming `text-embedding-ada-002` by 78% when holding the precision@10 constant at 0.99. This gap increases as you lower the precision. Postgres was using just 4GB of RAM with 384d vectors generated by `all-MiniLM-L6-v2` compared to 7.5GB with `text-embedding-ada-002`.
+We observed pgvector with `all-MiniLM-L6-v2` outperforming `text-embedding-ada-002` by 78% when holding the accuracy@10 constant at 0.99. This gap increases as you lower the accuracy. Postgres was using just 4GB of RAM with 384d vectors generated by `all-MiniLM-L6-v2` compared to 7.5GB with `text-embedding-ada-002`.
 
 <div>
   <img
@@ -123,7 +123,7 @@ We observed pgvector with `all-MiniLM-L6-v2` outperforming `text-embedding-ada-0
   />
 </div>
 
-After that, we decided to try the recently published [gte-small](https://huggingface.co/thenlper/gte-small) (also 384 dimensions), and the results were even more astonishing. With `gte-small`, we could set `probes=10` to achieve the same level of `precision@10 = 0.99`. Consequently, we observed more than a 200% improvement in requests per second for pgvector with embeddings generated by `gte-small` compared to `all-MiniLM-L6-v2`.
+After that, we decided to try the recently published [gte-small](https://huggingface.co/thenlper/gte-small) (also 384 dimensions), and the results were even more astonishing. With `gte-small`, we could set `probes=10` to achieve the same level of `accuracy@10 = 0.99`. Consequently, we observed more than a 200% improvement in queries per second for pgvector with embeddings generated by `gte-small` compared to `all-MiniLM-L6-v2`.
 
 <div>
   <img
@@ -176,4 +176,4 @@ At Supabase we are working on ways to make it easy to generate embeddings using 
 - [How to build ChatGPT Plugin from scratch with Supabase Edge Runtime](https://supabase.com/blog/building-chatgpt-plugins-template)
 - [Docs pgvector: Embeddings and vector similarity](https://supabase.com/docs/guides/database/extensions/pgvector)
 - [Choosing Compute Add-on for AI workloads](https://supabase.com/docs/guides/ai/choosing-compute-addon)
-- [pgvector v0.5.0: Faster semantic search with HNSW indexes](https://supabase.com/blog/pgvector-v0-5-0-hnsw)
+- [pgvector v0.5.0: Faster semantic search with HNSW indexes](https://supabase.com/blog/increase-performance-pgvector-hnsw)
