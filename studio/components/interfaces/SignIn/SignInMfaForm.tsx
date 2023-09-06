@@ -66,7 +66,7 @@ const SignInMfaForm = () => {
     })
     if (selectedFactor) {
       await mfaChallengeAndVerify(
-        { factorId: selectedFactor.id, code },
+        { factorId: selectedFactor.id, code, refreshFactors: false },
         {
           onSuccess: async () => {
             ui.setNotification({
