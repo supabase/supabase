@@ -216,11 +216,6 @@ By default, Storage backend is set to `file`, which is to use local files as the
 
 Additional configuration is required for self-hosting the Analytics server. For the full setup instructions, see [Self Hosting Analytics](https://supabase.com/docs/reference/self-hosting-analytics/introduction#getting-started).
 
-
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page
-
 ### Upgrading Analytics
 
 Due to the changes in the Analytics server, you will need to run the following commands to upgrade your Analytics server:
@@ -238,4 +233,7 @@ DROP PUBLICATION logflare_pub; DROP SCHEMA _analytics CASCADE; CREATE SCHEMA _an
 docker rm supabase-db
 ```
 
+export const Page = ({ children }) => <Layout meta={meta} children={children} />
+
+export default Page
 
