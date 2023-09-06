@@ -1,19 +1,12 @@
-import {
-  Badge,
-  IconAlertTriangle,
-  IconGitBranch,
-  IconGitHub,
-  IconLoader,
-  IconPauseCircle,
-} from 'ui'
+import { IconGitBranch, IconGitHub } from 'ui'
 
 import CardButton from 'components/ui/CardButton'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { Project } from 'types'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { ResourceWarning } from 'data/usage/resource-warnings-query'
-import ProjectCardWarnings from './ProjectCardWarnings'
 import { useFlag } from 'hooks'
+import { ProjectCardStatus } from './ProjectCardStatus'
 
 export interface ProjectCardProps {
   project: Project
@@ -21,6 +14,32 @@ export interface ProjectCardProps {
   githubIntegration?: IntegrationProjectConnection
   vercelIntegration?: IntegrationProjectConnection
   resourceWarnings?: ResourceWarning
+}
+
+const getProjetStatus = (project: Project) => {
+  let status
+  switch (project.status) {
+    case PROJECT_STATUS.ACTIVE_HEALTHY:
+      status = 'isHealthy'
+      break
+    case PROJECT_STATUS.GOING_DOWN:
+    case PROJECT_STATUS.PAUSING:
+      status = 'isPausing'
+      break
+    case PROJECT_STATUS.INACTIVE:
+      status = 'isPaused'
+      break
+    case PROJECT_STATUS.RESTORING:
+      status = 'isRestoring'
+      break
+    case PROJECT_STATUS.UNKNOWN:
+    case PROJECT_STATUS.COMING_UP:
+      status = 'isComingUp'
+      break
+    default:
+      status = ''
+  }
+  return status
 }
 
 const ProjectCard = ({
@@ -33,21 +52,11 @@ const ProjectCard = ({
   const { name, ref: projectRef } = project
   const desc = `${project.cloud_provider} | ${project.region}`
 
-  const showResourceExhaustionWarnings = useFlag('resourceExhaustionWarnings')
-
   const isBranchingEnabled = project.preview_branch_refs.length > 0
   const isGithubIntegrated = githubIntegration !== undefined
   const isVercelIntegrated = vercelIntegration !== undefined
   const githubRepository = githubIntegration?.metadata.name ?? undefined
-
-  // Project status should supersede its read only status
-  const isHealthy = project.status === PROJECT_STATUS.ACTIVE_HEALTHY
-  const isPausing =
-    project.status === PROJECT_STATUS.GOING_DOWN || project.status === PROJECT_STATUS.PAUSING
-  const isPaused = project.status === PROJECT_STATUS.INACTIVE
-  const isRestoring = project.status === PROJECT_STATUS.RESTORING
-  const isComingUp =
-    project.status === PROJECT_STATUS.UNKNOWN || project.status === PROJECT_STATUS.COMING_UP
+  const projectStatus = getProjetStatus(project)
 
   return (
     <li className="col-span-1 list-none">
@@ -56,7 +65,8 @@ const ProjectCard = ({
         containerHeightClassName="h-48"
         title={
           <div className="w-full justify-between space-y-1.5 px-6">
-            <p className="flex-shrink truncate">{name}</p>
+            <p className="flex-shrink truncate text-sm">{name}</p>
+            <span className="text-xs lowercase text-scale-1000">{desc}</span>
             <div className="flex items-center space-x-1.5">
               {isVercelIntegrated && (
                 <div className="w-fit p-1 border rounded-md flex items-center border-scale-600">
@@ -84,61 +94,16 @@ const ProjectCard = ({
           </div>
         }
         footer={
-          <div className="flex items-end justify-between px-6">
-            <span className="text-xs lowercase text-scale-1000">{desc}</span>
-
-            {isHealthy && (
-              <Badge color="green">
-                <div className="flex items-center gap-2">
-                  <span className="truncate">Active</span>
-                </div>
-              </Badge>
-            )}
-
-            {isRestoring && (
-              <Badge color="brand">
-                <div className="flex items-center gap-2">
-                  <IconLoader className="animate-spin" size={14} strokeWidth={2} />
-                  <span className="truncate">Restoring</span>
-                </div>
-              </Badge>
-            )}
-
-            {isPausing && (
-              <Badge color="scale">
-                <div className="flex items-center gap-2">
-                  <IconLoader className="animate-spin" size={14} strokeWidth={2} />
-                  <span className="truncate">Pausing</span>
-                </div>
-              </Badge>
-            )}
-
-            {isPaused && (
-              <Badge color="scale">
-                <div className="flex items-center gap-2">
-                  <IconPauseCircle size={14} strokeWidth={2} />
-                  <span className="truncate">Paused</span>
-                </div>
-              </Badge>
-            )}
-
-            {isComingUp && (
-              <Badge color="scale">
-                <div className="flex items-center gap-2">
-                  <IconLoader className="animate-spin" size={14} strokeWidth={2} />
-                  <span className="truncate">Coming up</span>
-                </div>
-              </Badge>
+          <div className="mb-[-26px]">
+            {resourceWarnings && (
+              <ProjectCardStatus
+                projectStatus={projectStatus}
+                resourceWarnings={resourceWarnings}
+              />
             )}
           </div>
         }
-      >
-        {showResourceExhaustionWarnings && resourceWarnings ? (
-          <ProjectCardWarnings resourceWarnings={resourceWarnings} />
-        ) : (
-          <div className="py-2" />
-        )}
-      </CardButton>
+      ></CardButton>
     </li>
   )
 }
