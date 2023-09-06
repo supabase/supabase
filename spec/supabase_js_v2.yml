@@ -431,12 +431,12 @@ functions:
           ```js
           const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email'})
           ```
-     - id: verify-signup-one-time-password(otp)
-        name: Verify Signup One-Time Password (OTP)
+      - id: verify-email-auth(tokenhash)
+        name: Verify Email Auth (Token Hash)
         isSpotlight: false
         code: |
           ```js
-          const { data, error } = await supabase.auth.verifyOtp({ tokenHash, type: 'email'})
+          const { data, error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'email'})
           ```
   - id: get-session
     title: 'getSession()'
