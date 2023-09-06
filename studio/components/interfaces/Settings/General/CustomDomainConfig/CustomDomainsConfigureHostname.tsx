@@ -1,11 +1,10 @@
-import Link from 'next/link'
-import * as yup from 'yup'
-import { observer } from 'mobx-react-lite'
-import { Button, Form, IconExternalLink, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
+import { Button, Form, IconExternalLink, Input } from 'ui'
+import * as yup from 'yup'
 
-import { useCheckPermissions, useStore } from 'hooks'
-import { useParams } from 'common/hooks'
 import {
   FormActions,
   FormPanel,
@@ -15,6 +14,8 @@ import {
 } from 'components/ui/Forms'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
+import { useCheckPermissions, useStore } from 'hooks'
+import { verifyCNAME } from './CustomDomainConfig.utils'
 
 const schema = yup.object({
   domain: yup.string().required('A value for your custom domain is required'),
@@ -29,15 +30,6 @@ const CustomDomainsConfigureHostname = () => {
   const FORM_ID = 'custom-domains-form'
   const endpoint = settings?.autoApiService.endpoint
   const canConfigureCustomDomain = useCheckPermissions(PermissionAction.UPDATE, 'projects')
-
-  const verifyCNAME = async (domain: string): Promise<boolean> => {
-    const res = await fetch(`https://1.1.1.1/dns-query?name=${domain}`, {
-      method: 'GET',
-      headers: { accept: 'application/dns-json' },
-    })
-    const verification = await res.json()
-    return verification.Status === 0
-  }
 
   const onCreateCustomDomain = async (values: yup.InferType<typeof schema>) => {
     if (!ref) return console.error('Project ref is required')
