@@ -43,11 +43,7 @@ const Security: NextPageWithLayout = () => {
             </div>
 
             {data ? (
-              <Badge
-                color={
-                  data.totp.length === 0 ? 'gray' : data.totp.length === 1 ? 'yellow' : 'green'
-                }
-              >
+              <Badge color={data.totp.length === 0 ? 'gray' : 'green'}>
                 {data.totp.length} app{data.totp.length === 1 ? '' : 's'} configured
               </Badge>
             ) : null}
