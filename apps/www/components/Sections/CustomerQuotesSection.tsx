@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -6,8 +7,7 @@ import { IconArrowUpRight } from 'ui'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import CustomersVisual from '~/components/products/vector/CustomersVisual'
-import { useRef } from 'react'
+import CustomersVisual from '~/components/Products/VectorAI/CustomersVisual'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 
 interface Customer {

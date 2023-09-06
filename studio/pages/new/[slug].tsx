@@ -470,26 +470,41 @@ const Wizard: NextPageWithLayout = () => {
                   description={
                     <div className="space-y-3">
                       <p className="text-sm leading-normal">
-                        This organization uses the new organization-level-billing and is on the{' '}
+                        This organization uses the new organization-based billing and is on the{' '}
                         <span className="text-brand">{orgSubscription?.plan?.name} plan</span>.
                       </p>
+
+                      {/* Show info when launching a new project in a paid org that has no project yet */}
+                      {orgSubscription?.plan?.id !== 'free' && orgProjectCount === 0 && (
+                        <div>
+                          <p>
+                            As this is the first project you're launching in this organization, it
+                            comes with no additional compute costs.
+                          </p>
+                        </div>
+                      )}
 
                       {/* Show info when launching a new project in a paid org that already has at least one project */}
                       {orgSubscription?.plan?.id !== 'free' && orgProjectCount > 0 && (
                         <div>
                           <p>
                             Launching another project incurs additional compute costs, starting at
-                            $0.01344 per hour (~$10/month).
-                          </p>
-                          <p>
-                            You can also create a new organization under the free plan (unless you
-                            have exceeded your 2 free project limit).
+                            $0.01344 per hour (~$10/month). You can also create a new organization
+                            under the free plan in case you have not exceeded your 2 free project
+                            limit.
                           </p>
                         </div>
                       )}
 
-                      <div>
-                        <Link href="https://www.notion.so/supabase/Org-Level-Billing-Public-Docs-f059a154beb743a19199d05bab4acb08">
+                      <div className="space-x-3">
+                        <Link href="https://supabase.com/blog/organization-based-billing">
+                          <a target="_blank" rel="noreferrer">
+                            <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                              Announcement
+                            </Button>
+                          </a>
+                        </Link>
+                        <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
                           <a target="_blank" rel="noreferrer">
                             <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                               Documentation
@@ -562,6 +577,51 @@ const Wizard: NextPageWithLayout = () => {
                 {!billedViaOrg && !isSelectFreeTier && isEmptyPaymentMethod && (
                   <EmptyPaymentMethodWarning onPaymentMethodAdded={() => refetchPaymentMethods()} />
                 )}
+              </Panel.Content>
+            )}
+
+            {!billedViaOrg && (
+              <Panel.Content>
+                <InformationBox
+                  icon={<IconInfo size="large" strokeWidth={1.5} />}
+                  defaultVisibility={true}
+                  hideCollapse
+                  title="Legacy Billing"
+                  description={
+                    <div className="space-y-3">
+                      <p className="text-sm leading-normal">
+                        This organization uses the legacy project-based billing. We’ve recently made
+                        some big improvements to our billing system. To opt-in to the new
+                        organization-based billing, head over to your{' '}
+                        <Link href={`/org/${slug}/billing`}>
+                          <a>
+                            <span className="text-sm text-green-900 transition hover:text-green-1000">
+                              organization billing settings
+                            </span>
+                          </a>
+                        </Link>
+                        .
+                      </p>
+
+                      <div className="space-x-3">
+                        <Link href="https://supabase.com/blog/organization-based-billing">
+                          <a target="_blank" rel="noreferrer">
+                            <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                              Announcement
+                            </Button>
+                          </a>
+                        </Link>
+                        <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
+                          <a target="_blank" rel="noreferrer">
+                            <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                              Documentation
+                            </Button>
+                          </a>
+                        </Link>
+                      </div>
+                    </div>
+                  }
+                />
               </Panel.Content>
             )}
 

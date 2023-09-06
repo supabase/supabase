@@ -1,18 +1,18 @@
 [
   {
     "type": "Announcement",
-    "title": "Flutter Hackathon",
-    "description": "Build Flutter apps and win limited edition swag.",
-    "imgUrl": "/images/blog/flutter-hackathon/thumbnail.jpg",
-    "logoUrl": "/images/blog/flutter-hackathon/thumbnail.jpg",
+    "title": "Launch Week 8 Hackathon Winners",
+    "description": "Announcing the winners of the Launch Week 8 Hackathon!",
+    "imgUrl": "/images/blog/lw8-hackathon-winners/hackathon-winners.png",
+    "logoUrl": "/images/blog/lw8-hackathon-winners/hackathon-winners.png",
     "organization": "Supabase",
-    "url": "/blog/flutter-hackathon",
+    "url": "/blog/launch-week-8-hackathon-winners",
     "postMeta": {
-      "name": "Tyler",
-      "publishDate": "May 12, 2023",
+      "name": "Andrew Smith",
+      "publishDate": "August 28, 2023",
       "readLength": 3
     },
-    "ctaText": "See how to join"
+    "ctaText": "See the winners"
   },
   {
     "type": "Announcement",
