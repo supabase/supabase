@@ -1,5 +1,4 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import dayjs from 'dayjs'
 
 import { get } from 'data/fetchers'
 import { AuditLog } from 'data/organizations/organization-audit-logs-query'
@@ -7,14 +6,15 @@ import { ResponseError } from 'types'
 import { profileKeys } from './keys'
 
 export type ProfileAuditLogsVariables = {
-  iso_timestamp_start?: string
-  iso_timestamp_end?: string
+  iso_timestamp_start: string
+  iso_timestamp_end: string
 }
 
 export async function getProfileAuditLogs(
   { iso_timestamp_start, iso_timestamp_end }: ProfileAuditLogsVariables,
   signal?: AbortSignal
 ) {
+  console.log(iso_timestamp_start, iso_timestamp_end)
   const { data, error } = await get('/platform/profile/audit', {
     params: {
       query: {
@@ -40,11 +40,8 @@ export const useProfileAuditLogsQuery = <TData = ProfileAuditLogsData>(
   options: UseQueryOptions<ProfileAuditLogsData, ProfileAuditLogsError, TData> = {}
 ) => {
   const { iso_timestamp_start, iso_timestamp_end } = vars
-  const date_start = dayjs(iso_timestamp_start).utc().format('YYYY-MM-DD')
-  const date_end = dayjs(iso_timestamp_end).utc().format('YYYY-MM-DD')
-
   return useQuery<ProfileAuditLogsData, ProfileAuditLogsError, TData>(
-    profileKeys.auditLogs({ date_start, date_end }),
+    profileKeys.auditLogs({ date_start: iso_timestamp_start, date_end: iso_timestamp_end }),
     ({ signal }) => getProfileAuditLogs(vars, signal),
     {
       ...options,
