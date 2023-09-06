@@ -937,7 +937,18 @@ export const storage: NavMenuConstant = {
   ],
 }
 
-export const ai: NavMenuConstant = {
+export const vectorIndexItems = [
+  {
+    name: 'HNSW indexes',
+    url: '/guides/ai/vector-indexes/hnsw-indexes',
+  },
+  {
+    name: 'IVFFlat indexes',
+    url: '/guides/ai/vector-indexes/ivf-indexes',
+  },
+]
+
+export const ai = {
   icon: 'ai',
   title: 'AI & Vectors',
   url: '/guides/ai',
@@ -978,7 +989,7 @@ export const ai: NavMenuConstant = {
       items: [
         { name: 'Managing collections', url: '/guides/ai/managing-collections' },
         { name: 'Vector columns', url: '/guides/ai/vector-columns' },
-        { name: 'Vector indexes', url: '/guides/ai/vector-indexes' },
+        { name: 'Vector indexes', url: '/guides/ai/vector-indexes', items: vectorIndexItems },
         { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
         { name: 'Choosing Compute Add-on', url: '/guides/ai/choosing-compute-addon' },
         { name: 'Going to Production', url: '/guides/ai/going-to-prod' },
