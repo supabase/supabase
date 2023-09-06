@@ -109,13 +109,13 @@ const ResourceExhaustionWarningBanner = () => {
   return (
     <Alert_Shadcn_
       variant={isCritical ? 'destructive' : 'warning'}
-      className="border-l-0 border-r-0 rounded-none [&>svg]:left-6 pl-6 [&>svg]:w-[26px]
+      className="border-0 border-r-0 rounded-none [&>svg]:left-6 px-6 [&>svg]:w-[26px]
 [&>svg]:h-[26px]"
     >
       <IconAlertTriangle />
       <AlertTitle_Shadcn_>{title}</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
-      <div className="absolute top-5 right-4 flex items-center space-x-2">
+      <div className="absolute top-5 right-5 flex items-center space-x-2">
         {learnMoreUrl !== undefined && (
           <Link passHref href={learnMoreUrl}>
             <a>
