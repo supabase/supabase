@@ -2,10 +2,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
-import { Badge, Button, IconDownload } from 'ui'
+import { Badge, Button } from 'ui'
 
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import { useBackupRestoreMutation } from 'data/database/backup-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useCheckPermissions, useStore } from 'hooks'
@@ -42,19 +41,6 @@ const BackupItem = ({ projectRef, backup, index }: BackupItemProps) => {
     },
   })
 
-  const { mutate: downloadBackup, isLoading: isDownloading } = useBackupDownloadMutation({
-    onSuccess: (res) => {
-      const { fileUrl } = res
-
-      // Trigger browser download by create,trigger and remove tempLink
-      const tempLink = document.createElement('a')
-      tempLink.href = fileUrl
-      document.body.appendChild(tempLink)
-      tempLink.click()
-      document.body.removeChild(tempLink)
-    },
-  })
-
   const onRestoreClick = () => {
     confirmAlert({
       title: 'Confirm to restore',
@@ -69,24 +55,12 @@ const BackupItem = ({ projectRef, backup, index }: BackupItemProps) => {
     if (backup.status === 'COMPLETED')
       return (
         <div className="flex space-x-4">
-          {backup.data.canRestore && (
-            <Button
-              type="default"
-              disabled={!canTriggerScheduledBackups || isRestoring || isDownloading}
-              onClick={onRestoreClick}
-            >
-              Restore
-            </Button>
-          )}
-
           <Button
             type="default"
-            disabled={!canTriggerScheduledBackups || isRestoring || isDownloading}
-            onClick={() => downloadBackup({ ref: projectRef, backup })}
-            loading={isDownloading}
-            icon={<IconDownload />}
+            disabled={!canTriggerScheduledBackups || isRestoring}
+            onClick={onRestoreClick}
           >
-            Download
+            Restore
           </Button>
         </div>
       )

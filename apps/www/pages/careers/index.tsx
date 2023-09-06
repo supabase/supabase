@@ -432,7 +432,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
               <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1.5px]">How we hire</h2>
               <p className="text-xs sm:text-sm lg:text-base text-scale-1100 pt-3">
                 The entire process is fully remote and all communication happens over email or via
-                video chat in Google. Meet. The calls are all 1:1 and usually take between 20-45
+                video chat in Google Meet. The calls are all 1:1 and usually take between 20-45
                 minutes. We know you are interviewing us too, so please ask questions. We are happy
                 to answer.
               </p>

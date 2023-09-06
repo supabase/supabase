@@ -64,8 +64,11 @@ loader.config({
   // while using monaco). If we end up facing more effort trying to maintain this, probably to either
   // use cloudflare or find some way to pull all the files from a CDN via a CLI, rather than tracking individual files
   // The alternative was to import * as monaco from 'monaco-editor' but i couldn't get it working
-  paths: { vs: `${BASE_PATH}/monaco-editor` },
-  // paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.37.0/min/vs' },
+  paths: {
+    vs: IS_PLATFORM
+      ? 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.37.0/min/vs'
+      : `${BASE_PATH}/monaco-editor`,
+  },
 })
 
 // [Joshen TODO] Once we settle on the new nav layout - we'll need a lot of clean up in terms of our layout components
