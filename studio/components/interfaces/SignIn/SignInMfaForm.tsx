@@ -7,13 +7,13 @@ import { useEffect, useState } from 'react'
 import { Button, Form, IconLock, Input } from 'ui'
 import { object, string } from 'yup'
 
+import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { useStore } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
 import { useSignOut } from 'lib/auth'
-import AlertError from 'components/ui/AlertError'
 
 const signInSchema = object({
   code: string().required('MFA Code is required'),
@@ -44,8 +44,6 @@ const SignInMfaForm = () => {
     await signOut()
     await router.replace('/sign-in')
   }
-
-  console.log({ isLoadingFactors, factors })
 
   useEffect(() => {
     if (isSuccessFactors) {
