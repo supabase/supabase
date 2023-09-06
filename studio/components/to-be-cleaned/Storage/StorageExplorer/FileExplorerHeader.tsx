@@ -96,9 +96,7 @@ const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }: any) => {
 }
 
 interface FileExplorerHeader {
-  isSearching: boolean
   itemSearchString: string
-  setIsSearching: (value: boolean) => void
   setItemSearchString: (value: string) => void
   onFilesUpload: (event: any, columnIndex: number) => void
 }

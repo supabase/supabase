@@ -18,7 +18,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
   const { project } = useProjectContext()
   const ref = project?.ref
 
-  const isPitrEnabled = backups?.configuration?.walg_enabled
+  const isPitrEnabled = backups?.configuration?.pitr_enabled
 
   const canReadScheduledBackups = useCheckPermissions(PermissionAction.READ, 'back_ups')
 

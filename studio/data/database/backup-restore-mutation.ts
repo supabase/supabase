@@ -14,6 +14,15 @@ export type BackupRestoreVariables = {
 export type Backup = components['schemas']['Backup']
 
 export async function restoreFromBackup({ ref, backup }: BackupRestoreVariables) {
+  if (backup.isPhysicalBackup) {
+    const { data, error } = await post('/platform/database/{ref}/backups/restore-physical', {
+      params: { path: { ref } },
+      body: { id: backup.id, recovery_time_target: backup.inserted_at },
+    })
+    if (error) throw error
+    return data
+  }
+
   const { data, error } = await post('/platform/database/{ref}/backups/restore', {
     params: { path: { ref } },
     body: { id: backup.id },

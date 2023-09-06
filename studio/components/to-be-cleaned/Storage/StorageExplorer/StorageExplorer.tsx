@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { Bucket } from 'data/storage/buckets-query'
 import { useStore } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID, IS_PLATFORM } from 'lib/constants'
 import { copyToClipboard } from 'lib/helpers'
@@ -18,7 +19,11 @@ import FileExplorerHeaderSelection from './FileExplorerHeaderSelection'
 import MoveItemsModal from './MoveItemsModal'
 import PreviewPane from './PreviewPane'
 
-const StorageExplorer = observer(({ bucket }) => {
+interface StorageExplorerProps {
+  bucket: Bucket
+}
+
+const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   const storageExplorerStore = useStorageStore()
   const {
     columns,
@@ -70,30 +75,35 @@ const StorageExplorer = observer(({ bucket }) => {
   // Requires a fixed height to ensure that explorer is constrained to the viewport
   const fileExplorerHeight = window.innerHeight - 122
 
-  useEffect(async () => {
-    const currentFolderIdx = openedFolders.length - 1
-    const currentFolder = openedFolders[currentFolderIdx]
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const fetchContents = async () => {
+      const currentFolderIdx = openedFolders.length - 1
+      const currentFolder = openedFolders[currentFolderIdx]
 
-    if (itemSearchString) {
-      if (!currentFolder) {
-        // At root of bucket
-        await fetchFolderContents(bucket.id, bucket.name, -1, itemSearchString)
+      if (itemSearchString) {
+        if (!currentFolder) {
+          // At root of bucket
+          await fetchFolderContents(bucket.id, bucket.name, -1, itemSearchString)
+        } else {
+          await fetchFolderContents(
+            currentFolder.id,
+            currentFolder.name,
+            currentFolderIdx,
+            itemSearchString
+          )
+        }
       } else {
-        await fetchFolderContents(
-          currentFolder.id,
-          currentFolder.name,
-          currentFolderIdx,
-          itemSearchString
-        )
-      }
-    } else {
-      if (!currentFolder) {
-        // At root of bucket
-        await fetchFolderContents(bucket.id, bucket.name, -1)
-      } else {
-        await fetchFolderContents(currentFolder.id, currentFolder.name, currentFolderIdx)
+        if (!currentFolder) {
+          // At root of bucket
+          await fetchFolderContents(bucket.id, bucket.name, -1)
+        } else {
+          await fetchFolderContents(currentFolder.id, currentFolder.name, currentFolderIdx)
+        }
       }
     }
+
+    fetchContents()
   }, [itemSearchString])
 
   useEffect(() => {
@@ -108,18 +118,22 @@ const StorageExplorer = observer(({ bucket }) => {
   /** Checkbox selection methods */
   /** [Joshen] We'll only support checkbox selection for files ONLY */
 
-  const onSelectAllItemsInColumn = (columnIndex) => {
+  const onSelectAllItemsInColumn = (columnIndex: number) => {
     const columnFiles = columns[columnIndex].items
-      .filter((item) => item.type === STORAGE_ROW_TYPES.FILE)
-      .map((item) => {
+      .filter((item: any) => item.type === STORAGE_ROW_TYPES.FILE)
+      .map((item: any) => {
         return { ...item, columnIndex }
       })
-    const columnFilesId = compact(columnFiles.map((item) => item.id))
-    const selectedItemsFromColumn = selectedItems.filter((item) => columnFilesId.includes(item.id))
+    const columnFilesId = compact(columnFiles.map((item: any) => item.id))
+    const selectedItemsFromColumn = selectedItems.filter((item: any) =>
+      columnFilesId.includes(item.id)
+    )
 
     if (selectedItemsFromColumn.length === columnFiles.length) {
       // Deselect all items from column
-      const updatedSelectedItems = selectedItems.filter((item) => !columnFilesId.includes(item.id))
+      const updatedSelectedItems = selectedItems.filter(
+        (item: any) => !columnFilesId.includes(item.id)
+      )
       setSelectedItems(updatedSelectedItems)
     } else {
       // Select all items from column
@@ -130,7 +144,7 @@ const StorageExplorer = observer(({ bucket }) => {
 
   /** File manipulation methods */
 
-  const onFilesUpload = async (event, columnIndex = -1) => {
+  const onFilesUpload = async (event: any, columnIndex = -1) => {
     event.persist()
     const items = event.target.files || event.dataTransfer.items
     const isDrop = !isEmpty(get(event, ['dataTransfer', 'items'], []))
@@ -138,7 +152,7 @@ const StorageExplorer = observer(({ bucket }) => {
     event.target.value = ''
   }
 
-  const onMoveSelectedFiles = async (newPath) => {
+  const onMoveSelectedFiles = async (newPath: string) => {
     await moveFiles(newPath)
   }
 
@@ -161,14 +175,14 @@ const StorageExplorer = observer(({ bucket }) => {
   }
 
   /** Misc UI methods */
-  const onSelectColumnEmptySpace = (columnIndex) => {
+  const onSelectColumnEmptySpace = (columnIndex: number) => {
     popColumnAtIndex(columnIndex)
     popOpenedFoldersAtIndex(columnIndex - 1)
     closeFilePreview()
     clearSelectedItems()
   }
 
-  const onCopyUrl = (name, url) => {
+  const onCopyUrl = (name: string, url: string) => {
     const formattedUrl =
       customDomainData?.customDomain?.status === 'active'
         ? url.replace(apiUrl, `https://${customDomainData.customDomain.hostname}`)
@@ -232,7 +246,7 @@ const StorageExplorer = observer(({ bucket }) => {
       <CustomExpiryModal onCopyUrl={onCopyUrl} />
     </div>
   )
-})
+}
 
 StorageExplorer.displayName = 'StorageExplorer'
-export default StorageExplorer
+export default observer(StorageExplorer)
