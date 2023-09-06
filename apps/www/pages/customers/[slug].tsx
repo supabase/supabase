@@ -66,8 +66,7 @@ function CaseStudyPage(props: any) {
   const content = props.blog.content
 
   const meta = {
-    title:
-      props.blog.meta_title ?? props.blog.title ?? `${props.blog.name} | Supabase Customer Stories`,
+    title: props.blog.meta_title ?? `${props.blog.name} | Supabase Customer Stories`,
     description: props.blog.meta_description ?? props.blog.description,
     image:
       `${SITE_ORIGIN}${props.blog.og_image}` ??
