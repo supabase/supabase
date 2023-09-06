@@ -390,44 +390,46 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
               </div>
             )}
 
-            {isSuccessProjects && values.projectRef === 'no-project' && (
-              <div className="px-6">
-                {isLoadingOrganizations && (
-                  <div className="space-y-2">
-                    <p className="text-sm prose">Which organization is affected?</p>
-                    <ShimmeringLoader className="!py-[19px]" />
-                  </div>
-                )}
-                {isErrorOrganizations && (
-                  <div className="space-y-2">
-                    <p className="text-sm prose">Which organization is affected?</p>
-                    <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
-                      <IconAlertCircle strokeWidth={2} className="text-scale-1000" />
-                      <p className="text-sm prose">Failed to retrieve organizations</p>
+            {isSuccessProjects &&
+              values.projectRef === 'no-project' &&
+              values.category !== 'Login_issues' && (
+                <div className="px-6">
+                  {isLoadingOrganizations && (
+                    <div className="space-y-2">
+                      <p className="text-sm prose">Which organization is affected?</p>
+                      <ShimmeringLoader className="!py-[19px]" />
                     </div>
-                  </div>
-                )}
-                {isSuccessOrganizations && (
-                  <Listbox
-                    id="organizationSlug"
-                    layout="vertical"
-                    label="Which organization is affected?"
-                  >
-                    {organizations?.map((option) => {
-                      return (
-                        <Listbox.Option
-                          key={`option-${option.slug}`}
-                          label={option.name || ''}
-                          value={option.slug}
-                        >
-                          <span>{option.name}</span>
-                        </Listbox.Option>
-                      )
-                    })}
-                  </Listbox>
-                )}
-              </div>
-            )}
+                  )}
+                  {isErrorOrganizations && (
+                    <div className="space-y-2">
+                      <p className="text-sm prose">Which organization is affected?</p>
+                      <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
+                        <IconAlertCircle strokeWidth={2} className="text-scale-1000" />
+                        <p className="text-sm prose">Failed to retrieve organizations</p>
+                      </div>
+                    </div>
+                  )}
+                  {isSuccessOrganizations && (
+                    <Listbox
+                      id="organizationSlug"
+                      layout="vertical"
+                      label="Which organization is affected?"
+                    >
+                      {organizations?.map((option) => {
+                        return (
+                          <Listbox.Option
+                            key={`option-${option.slug}`}
+                            label={option.name || ''}
+                            value={option.slug}
+                          >
+                            <span>{option.name}</span>
+                          </Listbox.Option>
+                        )
+                      })}
+                    </Listbox>
+                  )}
+                </div>
+              )}
 
             {subscription?.plan.id === 'free' && values.category !== 'Login_issues' && (
               <div className="px-6">

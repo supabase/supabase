@@ -50,23 +50,23 @@ const TOTPFactors = () => {
                 {data.totp.map((factor) => {
                   return (
                     <div key={factor.id} className="flex flex-row justify-between py-2">
-                      <div className="flex flex-col space-y-0.5">
-                        <span className="text-sm text">
-                          Name: {factor.friendly_name ?? 'No name provided'}
-                        </span>
-                        <span className="text-sm text-light">Factor ID: {factor.id}</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm text-light">
-                          Created at {dayjs(factor.updated_at).format(DATETIME_FORMAT)}
-                        </span>
+                      <p className="text-sm text flex items-center space-x-2">
+                        <span className="text-light">Name:</span>{' '}
+                        <span>{factor.friendly_name ?? 'No name provided'}</span>
+                      </p>
+                      <div className="flex items-center gap-4">
+                        <p className="text-sm text-light">
+                          Added on {dayjs(factor.updated_at).format(DATETIME_FORMAT)}
+                        </p>
                         <Button
                           size="tiny"
-                          type="text"
-                          className="px-1"
-                          icon={<IconTrash />}
+                          type="default"
+                          // className="px-1"
+                          // icon={<IconTrash />}
                           onClick={() => setFactorToBeDeleted(factor.id)}
-                        />
+                        >
+                          Remove
+                        </Button>
                       </div>
                     </div>
                   )

@@ -173,7 +173,7 @@ const SecondStep = ({
     >
       <Modal.Content>
         <>
-          <div className="py-4 px-4 text-sm">
+          <div className="py-4 pb-0 text-sm">
             <span>
               Use an authenticator app to scan the following QR code, and provide the code from the
               app to complete the enrolment.
@@ -186,7 +186,7 @@ const SecondStep = ({
           )}
           {factor && (
             <>
-              <div className="flex justify-center py-3">
+              <div className="flex justify-center py-6">
                 <div className="h-48 w-48 bg-white rounded">
                   <img width={190} height={190} src={factor.totp.qr_code} alt={factor.totp.uri} />
                 </div>

@@ -81,6 +81,13 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
                 href: `/account/me`,
                 key: `/account/me`,
               },
+              {
+                isActive: router.pathname === `/account/tokens`,
+                icon: `${router.basePath}/img/user.svg`,
+                label: 'Access Tokens',
+                href: `/account/tokens`,
+                key: `/account/tokens`,
+              },
               // show the MFA page only if the feature flag is set or the user has already MFA setup.
               // He should be able to edit/revoke his MFA even if MFA feature flag is disabled.
               ...(mfaSetup || (factors?.all || []).length > 0
@@ -94,13 +101,6 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
                     },
                   ]
                 : []),
-              {
-                isActive: router.pathname === `/account/tokens`,
-                icon: `${router.basePath}/img/user.svg`,
-                label: 'Access Tokens',
-                href: `/account/tokens`,
-                key: `/account/tokens`,
-              },
             ],
           },
         ]
