@@ -122,7 +122,9 @@ const Developers = () => (
     <ul className="grid gap-3 p-2 md:grid-cols-3 w-[650px] border-b">
       {DevelopersData['navigation'].map((column) => (
         <li key={column.label} className="p-2">
-          <label className="text-muted text-xs font-mono">{column.label}</label>
+          <label className="text-muted text-xs uppercase tracking-widest font-mono">
+            {column.label}
+          </label>
           {column.links.map((link: Props) => (
             <TextLink
               hasChevron={false}
