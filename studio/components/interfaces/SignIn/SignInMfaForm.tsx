@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button, Form, IconExternalLink, IconLock, Input } from 'ui'
+import { Button, Form, IconLock, Input } from 'ui'
 import { object, string } from 'yup'
 
 import Loading from 'components/ui/Loading'
@@ -141,21 +141,6 @@ const SignInMfaForm = () => {
                     {isLoading ? 'Verifying' : 'Verify'}
                   </Button>
                 </div>
-                {/* {factors?.totp.length === 2 && (
-                  <div className="text-sm flex flex-col items-center w-full gap-1">
-                    <div>
-                      <span className="text-scale-900">Having problems?</span>{' '}
-                      <a
-                        className="text hover:border-b border-white cursor-pointer"
-                        onClick={() =>
-                          setSelectedFactor(factors.totp.find((f) => f.id !== selectedFactor?.id)!)
-                        }
-                      >{`Authenticate using ${
-                        factors.totp.find((f) => f.id !== selectedFactor?.id)?.friendly_name
-                      }?`}</a>
-                    </div>
-                  </div>
-                )} */}
               </div>
             </>
           )}
