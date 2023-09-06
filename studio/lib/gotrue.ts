@@ -1,8 +1,5 @@
-import { IS_PLATFORM } from './constants'
-import { User, Session } from '@supabase/gotrue-js'
+import { Session, User } from '@supabase/gotrue-js'
 import { gotrueClient } from 'common'
-
-import { getFlags } from './configcat'
 
 export { STORAGE_KEY } from 'common'
 
@@ -68,6 +65,14 @@ export const getIdentity = (gotrueUser: User) => {
   } catch (err) {
     return { identity: null, error: err }
   }
+}
+
+/**
+ * Transfers the search params from the current location path to a newly built path
+ */
+export const buildPathWithParams = (pathname: string) => {
+  const searchParams = new URLSearchParams(location.search)
+  return `${pathname}?${searchParams.toString()}`
 }
 
 // NOTE: do not use any imports in this function as it is used standalone in the documents head
