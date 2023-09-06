@@ -10,8 +10,7 @@ const aside = [CustomersData, ComparisonsData]
 
 const Product = () => (
   <>
-    {/* <ul className="grid gap-2 p-2 xl:grid-cols-2 w-[300px] xl:w-[600px] "> */}
-    <ul className="grid gap-2 p-2 w-[300px]">
+    <ul className="grid gap-2 xl:grid-cols-2 p-2 w-[300px] xl:w-[600px]">
       {Object.values(SolutionsData).map((component) => (
         <ListItem
           key={component.name}
@@ -24,7 +23,9 @@ const Product = () => (
     </ul>
     <div className="bg-alternative flex flex-col gap-6 p-4 w-[250px]">
       <div>
-        <p className="text-muted text-xs font-mono mb-1 block">Customer Stories</p>
+        <p className="text-muted text-xs uppercase tracking-widest font-mono mb-1 block">
+          Customer Stories
+        </p>
         <ul>
           {CustomersData.slice(0, 3).map((customer) => (
             <li key={customer.organization}>
@@ -39,7 +40,9 @@ const Product = () => (
         </ul>
       </div>
       <div>
-        <p className="text-muted text-xs font-mono mb-1">{ComparisonsData.label}</p>
+        <p className="text-muted text-xs uppercase tracking-widest font-mono mb-1">
+          {ComparisonsData.label}
+        </p>
         <ul>
           {ComparisonsData.comparisons.map((link) => (
             <li key={link.text}>
