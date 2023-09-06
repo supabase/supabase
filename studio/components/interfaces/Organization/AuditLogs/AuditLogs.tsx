@@ -4,12 +4,13 @@ import Image from 'next/image'
 import { useState } from 'react'
 
 import { useParams } from 'common'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { DatePicker } from 'components/ui/DatePicker'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import {
-  OrganizationAuditLog,
+  AuditLog,
   useOrganizationAuditLogsQuery,
 } from 'data/organizations/organization-audit-logs-query'
 import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
@@ -19,7 +20,6 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { Alert, Button, IconArrowDown, IconArrowUp, IconRefreshCw, IconUser } from 'ui'
 import FilterPopover from './FilterPopover'
 import LogDetailsPanel from './LogDetailsPanel'
-import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
@@ -35,7 +35,7 @@ const AuditLogs = () => {
     from: currentTime.subtract(1, 'day').toISOString(),
     to: currentTime.toISOString(),
   })
-  const [selectedLog, setSelectedLog] = useState<OrganizationAuditLog>()
+  const [selectedLog, setSelectedLog] = useState<AuditLog>()
   const [filters, setFilters] = useState<{ users: string[]; projects: string[] }>({
     users: [], // gotrue_id[]
     projects: [], // project_ref[]
