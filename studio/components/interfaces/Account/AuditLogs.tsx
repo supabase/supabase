@@ -12,8 +12,7 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProfileAuditLogsQuery } from 'data/profile/profile-audit-logs-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { Alert, Button, IconArrowDown, IconArrowUp, IconRefreshCw } from 'ui'
-import FilterPopover from './FilterPopover'
-import LogDetailsPanel from './LogDetailsPanel'
+import FilterPopover from '../Organization/AuditLogs/FilterPopover'
 
 const AuditLogs = () => {
   const currentTime = dayjs().utc().set('millisecond', 0)
