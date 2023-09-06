@@ -2,7 +2,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
-import { Button, Dropdown, IconEdit, IconMoreVertical, IconTrash } from 'ui'
+import { Button, Dropdown, IconEdit, IconMoreVertical, IconTrash, ScrollArea } from 'ui'
 
 import Panel from 'components/ui/Panel'
 import { useCheckPermissions } from 'hooks'
@@ -34,11 +34,16 @@ const PolicyRow = ({
         </div>
         <div className="flex items-center space-x-2">
           <p className="text-scale-1000 text-sm">Applied to:</p>
-          {policy.roles.map((role, i) => (
+          {policy.roles.slice(0, 3).map((role, i) => (
             <code key={`policy-${role}-${i}`} className="text-scale-1000 text-xs">
               {role}
             </code>
           ))}
+          {policy.roles.length > 3 && (
+            <code key={`policy-etc`} className="text-scale-1000 text-xs">
+              + {policy.roles.length - 3} more roles
+            </code>
+          )}
         </div>
       </div>
       <div>
