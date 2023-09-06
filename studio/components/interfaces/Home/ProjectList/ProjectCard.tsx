@@ -62,7 +62,7 @@ const ProjectCard = ({
     <li className="col-span-1 list-none">
       <CardButton
         linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
-        containerHeightClassName="h-48"
+        containerHeightClassName="h-40"
         title={
           <div className="w-full justify-between space-y-1.5 px-6">
             <p className="flex-shrink truncate text-sm">{name}</p>
