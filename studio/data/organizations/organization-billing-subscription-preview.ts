@@ -2,10 +2,11 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { post } from 'data/fetchers'
 import { organizationKeys } from './keys'
 import { ResponseError } from 'types'
+import { SubscriptionTier } from 'data/subscriptions/types'
 
 export type OrganizationBillingSubscriptionPreviewVariables = {
   organizationSlug?: string
-  tier?: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
+  tier?: SubscriptionTier
 }
 
 export type OrganizationBillingSubscriptionPreviewResponse = {
