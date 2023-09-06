@@ -49,24 +49,23 @@ const ResourceExhaustionWarningBanner = () => {
   const getContent = (metric: string) => {
     if (projectResourceWarnings === undefined) return undefined
     if (metric === 'is_readonly_mode_enabled') {
-      return RESOURCE_WARNING_MESSAGES.is_readonly_mode_enabled.content.warning
+      return RESOURCE_WARNING_MESSAGES.is_readonly_mode_enabled.bannerContent.warning
     }
     const severity = projectResourceWarnings[metric as keyof typeof projectResourceWarnings]
     if (typeof severity !== 'string') return undefined
-    return RESOURCE_WARNING_MESSAGES[metric as keyof typeof RESOURCE_WARNING_MESSAGES].content[
-      severity as 'warning' | 'critical'
-    ]
+    return RESOURCE_WARNING_MESSAGES[metric as keyof typeof RESOURCE_WARNING_MESSAGES]
+      .bannerContent[severity as 'warning' | 'critical']
   }
 
   const title =
     activeWarnings.length > 1
-      ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.content[
+      ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
           hasCriticalWarning ? 'critical' : 'warning'
         ].title
       : getContent(activeWarnings[0])?.title
   const description =
     activeWarnings.length > 1
-      ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.content[
+      ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
           hasCriticalWarning ? 'critical' : 'warning'
         ].description
       : getContent(activeWarnings[0])?.description
@@ -129,7 +128,7 @@ const ResourceExhaustionWarningBanner = () => {
         {correctionUrl !== undefined && (
           <Link passHref href={correctionUrl}>
             <a>
-              <Button type="default">{buttonText}</Button>
+              <Button type="default">{buttonText ?? 'Check'}</Button>
             </a>
           </Link>
         )}

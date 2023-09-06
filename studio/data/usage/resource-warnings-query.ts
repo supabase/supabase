@@ -9,6 +9,25 @@ export async function getResourceWarnings(signal?: AbortSignal) {
   const { data, error } = await get(`/platform/projects-resource-warnings`, { signal })
   if (error) throw error
 
+  // return [
+  //   {
+  //     project: 'qahowvikfwlkdqvvbfzd',
+  //     is_readonly_mode_enabled: false,
+  //     disk_io_exhaustion: null,
+  //     disk_space_exhaustion: null,
+  //     cpu_exhaustion: null,
+  //     memory_and_swap_exhaustion: 'critical',
+  //   },
+  //   {
+  //     project: 'pkxlobkdgearimcwwgxk',
+  //     is_readonly_mode_enabled: false,
+  //     disk_io_exhaustion: 'critical',
+  //     disk_space_exhaustion: null,
+  //     cpu_exhaustion: null,
+  //     memory_and_swap_exhaustion: null,
+  //   },
+  // ] as ResourceWarning[]
+
   return data
 }
 
