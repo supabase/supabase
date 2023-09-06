@@ -66,7 +66,7 @@ export function useSignOut() {
 
     const result = await gotrueClient.signOut()
     clearLocalStorage()
-    await queryClient.resetQueries()
+    await queryClient.clear()
 
     return result
   }, [queryClient])
