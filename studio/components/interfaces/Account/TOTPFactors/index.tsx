@@ -6,7 +6,6 @@ import {
   Alert_Shadcn_,
   Button,
   IconAlertCircle,
-  IconTrash,
 } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
