@@ -37,9 +37,9 @@ function ProductIcon({ icon, color }: ProductIcon) {
       className={[
         'inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md',
         !color || color === 'black' ? 'bg-scale-1200 text-scale-100' : '',
-        color && color === 'gray' ? 'bg-surface-200 text-light' : '',
+        color && color === 'gray' ? 'bg-scale-700 text-light' : '',
         color && color === 'green' ? 'bg-brand dark:bg-brand-500 text-brand-100' : '',
-        color && color === 'alt' ? 'bg-brand-200 border border-brand-500 text-brand' : '',
+        color && color === 'alt' ? 'bg-alternative text-brand' : '',
         // color && color === 'alt' ? 'bg-surface-300 text-brand' : '',
       ].join(' ')}
     >
