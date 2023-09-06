@@ -1,11 +1,10 @@
 import React from 'react'
 import Link from 'next/link'
-import { IconAlertCircle, IconArrowRight, IconChevronRight, TextLink } from 'ui'
+import { IconChevronRight, TextLink } from 'ui'
 import { ListItem } from '.'
 
 import { data as DevelopersData } from 'data/Developers'
 import ProductIcon from '../ProductIcon'
-import { ChevronRightIcon } from '@heroicons/react/outline'
 
 type Props = {
   text: string
