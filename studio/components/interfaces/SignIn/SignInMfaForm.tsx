@@ -138,7 +138,7 @@ const SignInMfaForm = () => {
                     disabled={isLoading || isSuccess}
                     loading={isLoading || isSuccess}
                   >
-                    {isLoading ? 'Verifying' : 'Verify'}
+                    {isLoading ? 'Verifying' : isSuccess ? 'Signing in' : 'Verify'}
                   </Button>
                 </div>
               </div>
