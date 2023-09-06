@@ -3,8 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import FlyOut from '~/components/UI/FlyOut'
 import Announcement from '~/components/Announcement/Announcement'
-import { Button, cn } from 'ui'
-import Transition from 'lib/Transition'
+import { Button, LW8CountdownBanner, cn } from 'ui'
 import ScrollProgress from '~/components/ScrollProgress'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { useTheme } from 'next-themes'
@@ -26,6 +25,39 @@ import HamburgerButton from './HamburgerMenu'
 import Developers from './Developers'
 import Product from './Product'
 import ProductIcon from '../ProductIcon'
+import { data as DevelopersData } from 'data/Developers'
+import MobileMenu from './MobileMenu'
+
+const menu = {
+  primaryNav: [
+    {
+      title: 'Product',
+      hasDropdown: true,
+      dropdown: <Product />,
+      dropdownContainerClassName: 'rounded-lg flex flex-row',
+      subMenu: DevelopersData,
+    },
+    {
+      title: 'Developers',
+      hasDropdown: true,
+      dropdown: <Developers />,
+      dropdownContainerClassName: 'rounded-lg',
+      subMenu: [],
+    },
+    {
+      title: 'Pricing',
+      url: '/pricing',
+    },
+    {
+      title: 'Docs',
+      url: '/docs',
+    },
+    {
+      title: 'Blog',
+      url: '/blog',
+    },
+  ],
+}
 
 export const ListItem = React.forwardRef<
   React.ElementRef<'a'>,
@@ -132,43 +164,26 @@ const Nav = () => {
                 </div>
                 <NavigationMenu className="hidden pl-4 sm:ml-4 sm:space-x-4 lg:flex h-16">
                   <NavigationMenuList>
-                    <NavigationMenuItem>
-                      <NavigationMenuTrigger className="bg-transparent data-[state=open]:text-brand data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground-strong">
-                        Product
-                      </NavigationMenuTrigger>
-                      <NavigationMenuContent className="rounded-lg flex flex-row">
-                        <Product />
-                      </NavigationMenuContent>
-                    </NavigationMenuItem>
-                    <NavigationMenuItem>
-                      <NavigationMenuTrigger className="bg-transparent text-sm font-medium data-[state=open]:text-brand data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground-strong">
-                        Developers
-                      </NavigationMenuTrigger>
-                      <NavigationMenuContent className="rounded-lg">
-                        <Developers />
-                      </NavigationMenuContent>
-                    </NavigationMenuItem>
-                    <NavigationMenuItem className=" text-sm font-medium">
-                      <ListItem
-                        href="/pricing"
-                        title="Pricing"
-                        className="group-hover:bg-transparent hover:text-brand"
-                      />
-                    </NavigationMenuItem>
-                    <NavigationMenuItem className=" text-sm font-medium">
-                      <ListItem
-                        href="/docs"
-                        title="Docs"
-                        className="group-hover:bg-transparent hover:text-brand"
-                      />
-                    </NavigationMenuItem>
-                    <NavigationMenuItem className=" text-sm font-medium">
-                      <ListItem
-                        href="/blog"
-                        title="Blog"
-                        className="group-hover:bg-transparent hover:text-brand"
-                      />
-                    </NavigationMenuItem>
+                    {menu.primaryNav.map((menuItem) =>
+                      menuItem.hasDropdown ? (
+                        <NavigationMenuItem className="text-sm font-medium">
+                          <NavigationMenuTrigger className="bg-transparent data-[state=open]:text-brand data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground-strong">
+                            {menuItem.title}
+                          </NavigationMenuTrigger>
+                          <NavigationMenuContent className={menuItem.dropdownContainerClassName}>
+                            {menuItem.dropdown}
+                          </NavigationMenuContent>
+                        </NavigationMenuItem>
+                      ) : (
+                        <NavigationMenuItem className="text-sm font-medium">
+                          <ListItem
+                            href={menuItem.url}
+                            title={menuItem.title}
+                            className="group-hover:bg-transparent hover:text-brand"
+                          />
+                        </NavigationMenuItem>
+                      )
+                    )}
                   </NavigationMenuList>
                 </NavigationMenu>
               </div>
@@ -206,94 +221,7 @@ const Nav = () => {
             </div>
           </div>
 
-          {/* Mobile Nav Menu */}
-          <Transition
-            appear={true}
-            show={open}
-            enter="transition ease-out duration-200"
-            enterFrom="opacity-0 translate-y-1"
-            enterTo="opacity-100 translate-y-0"
-            leave="transition ease-in duration-150"
-            leaveFrom="opacity-100 translate-y-0"
-            leaveTo="opacity-0 translate-y-1"
-          >
-            <div
-              className={[
-                'dark:bg-scale-300 fixed -inset-y-0 z-50 h-screen w-screen transform overflow-y-scroll bg-white p-4 md:p-8',
-                open && '!bg-scale-300',
-              ].join(' ')}
-            >
-              <div className="absolute items-center justify-between right-4 top-4">
-                <div className="-mr-2">
-                  <button
-                    onClick={() => setOpen(false)}
-                    type="button"
-                    className="inline-flex items-center justify-center p-2 bg-white rounded-md text-scale-900 focus:ring-brand dark:bg-scale-300 dark:hover:bg-scale-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset"
-                  >
-                    <span className="sr-only">Close menu</span>
-                    <svg
-                      className="w-6 h-6"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              {/* </div> */}
-              <div className="mt-6 mb-12">
-                <div className="pt-2 pb-4 space-y-1">
-                  <Link href="https://supabase.com/dashboard">
-                    <a className="block pl-3 pr-4 text-base font-medium text-scale-900 dark:text-white">
-                      Sign in
-                    </a>
-                  </Link>
-                </div>
-                <div className="pt-2 pb-4 space-y-1">
-                  <Link href="/docs">
-                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      Developers
-                    </a>
-                  </Link>
-                  <Link href="/pricing">
-                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      Pricing
-                    </a>
-                  </Link>
-                  <Link href="/docs">
-                    <a
-                      target="_blank"
-                      className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
-                    >
-                      Docs
-                    </a>
-                  </Link>
-                  <Link href="/blog">
-                    <a
-                      target="_blank"
-                      className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
-                    >
-                      Blog
-                    </a>
-                  </Link>
-                  <Link href="/support">
-                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      Support
-                    </a>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </Transition>
+          <MobileMenu open={open} setOpen={setOpen} menu={menu} />
         </nav>
 
         <ScrollProgress />
