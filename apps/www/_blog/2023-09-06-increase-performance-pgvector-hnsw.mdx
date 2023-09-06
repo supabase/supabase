@@ -106,7 +106,7 @@ In this test, we used a Supabase project with a large compute add-on (2-core CPU
   />
 </div>
 
-HNSW has 3 times better performance than IVFFlat and with better precision.
+HNSW has 3 times better performance than IVFFlat and with better accuracy.
 
 ### dbpedia-entities-openai-1M
 
@@ -130,7 +130,7 @@ Here we used the Supabase project with a 2XL compute add-on (8-core CPU and 32GB
   />
 </div>
 
-When we maintain fixed HNSW build parameters, we can adjust the select query parameter `ef_search` to balance query speed and precision. To achieve precision@10 of 0.98, we increased it from the default 40 to 100. For precision@10 of 0.99, we further raised it to 250. Remarkably, HNSW demonstrated over six times better performance while maintaining the same level of precision. With higher precision@10 of 0.99 HNSW even outperforms [qdrant](https://nirantk.com/writing/pgvector-vs-qdrant/) on equivalent compute resources.
+When we maintain fixed HNSW build parameters, we can adjust the select query parameter `ef_search` to balance query speed and accuracy. To achieve accuracy@10 of 0.98, we increased it from the default 40 to 100. For accuracy@10 of 0.99, we further raised it to 250. Remarkably, HNSW demonstrated over six times better performance while maintaining the same level of accuracy. With higher accuracy@10 of 0.99 HNSW even outperforms [qdrant](https://nirantk.com/writing/pgvector-vs-qdrant/) on equivalent compute resources.
 
 <div>
   <img
@@ -162,7 +162,7 @@ Performance scales predictably with the size of the database for the HNSW index,
   />
 </div>
 
-Switching to a 4XL compute add-on (with a 16-core CPU and 64GB of RAM) resulted in a 69% increase in QPS for a precision@10 of 0.99 compared to 2XL instance.
+Switching to a 4XL compute add-on (with a 16-core CPU and 64GB of RAM) resulted in a 69% increase in QPS for an accuracy@10 of 0.99 compared to the 2XL instance.
 
 <div>
   <img
@@ -181,12 +181,12 @@ Furthermore, having 64GB of RAM is better suited for this dataset because Postgr
 
 ### HNSW build parameters
 
-We conducted a small experiment to assess the impact of HNSW index parameters on precision and QPS. In this experiment, we utilized the same 4XL instance as in the previous test but modified the building parameters:
+We conducted a small experiment to assess the impact of HNSW index parameters on accuracy and QPS. In this experiment, we utilized the same 4XL instance as in the previous test but modified the building parameters:
 
 - `m`: 32
 - `ef_construction`: 80
 
-This adjustment enabled us to achieve the same level of precision@10 of 0.99 with an `ef_search` = 100 instead of the previous 250, resulting in a 35% increase in QPS.
+This adjustment enabled us to achieve the same level of accuracy@10 of 0.99 with an `ef_search` = 100 instead of the previous 250, resulting in a 35% increase in QPS.
 
 <div>
   <img
@@ -214,7 +214,7 @@ HNSW indexes use graphs which inherently are not affected by this limitation, so
 IVFFlat indexes also saw some improvements in v0.5.0. Index build times are now significantly faster for large datasets thanks to 2 new improvements:
 
 - Parallelization during the assignment build step (assigning records to lists)
-- Switching from [double to float](https://github.com/pgvector/pgvector/pull/180) precision for select distance calculations which unlocks the [fused multiply-add](https://en.wikipedia.org/wiki/Multiply%E2%80%93accumulate_operation#Fused_multiply%E2%80%93add) instruction on CPUs
+- Switching from [double to float](https://github.com/pgvector/pgvector/pull/180) accuracy for select distance calculations which unlocks the [fused multiply-add](https://en.wikipedia.org/wiki/Multiply%E2%80%93accumulate_operation#Fused_multiply%E2%80%93add) instruction on CPUs
 
 Below we compare the index build times between v0.4.0 and v0.5.0 for the inner product distance measure over 1,000,000 vectors on a Supabase project with 4XL compute add-on (with a 16-core CPU and 64GB of RAM).
 
