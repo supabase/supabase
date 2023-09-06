@@ -163,7 +163,7 @@ function Partner({
             </div>
 
             <div className="grid lg:grid-cols-8 lg:space-x-12">
-              <div className="lg:col-span-5">
+              <div className="lg:col-span-5 overflow-hidden">
                 <h2
                   className="text-scale-1200"
                   style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
