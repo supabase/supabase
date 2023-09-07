@@ -94,8 +94,6 @@ const Nav = () => {
         <LW8CountdownBanner />
       </Announcement>
 
-      <MobileMenu open={open} setOpen={setOpen} isDarkMode={resolvedTheme === 'dark'} menu={menu} />
-
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
@@ -202,6 +200,12 @@ const Nav = () => {
               showLaunchWeekNavMode={showLaunchWeekNavMode}
             />
           </div>
+          <MobileMenu
+            open={open}
+            setOpen={setOpen}
+            isDarkMode={resolvedTheme === 'dark'}
+            menu={menu}
+          />
         </nav>
 
         <ScrollProgress />
