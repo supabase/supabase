@@ -66,7 +66,7 @@ const PITR = observer(() => {
 
   const ref = project?.ref ?? 'default'
   const plan = subscription?.plan?.id
-  const isEnabled = configuration.walg_enabled
+  const isEnabled = configuration.pitr_enabled
 
   const canReadPhysicalBackups = useCheckPermissions(PermissionAction.READ, 'physical_backups')
   if (!canReadPhysicalBackups) return <NoPermission resourceText="view PITR backups" />

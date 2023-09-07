@@ -296,6 +296,13 @@ functions:
           ```js
           const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'signup'})
           ```
+      - id: verify-email-auth(tokenhash)
+        name: Verify Email Auth (Token Hash)
+        isSpotlight: false
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'email'})
+          ```
   - id: auth.getSession()
     title: 'getSession()'
     $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
