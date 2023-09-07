@@ -1,54 +1,50 @@
-import { FC } from 'react'
-import { includes, uniqBy, map as lodashMap, noop } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Input, IconSearch, IconLoader } from 'ui'
+import { PostgresSchema } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { noop, partition } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
+import { Button, IconLock, IconSearch, Input, Listbox } from 'ui'
 
-import { useCheckPermissions, useStore } from 'hooks'
-import SchemaTable from './SchemaTable'
 import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useCheckPermissions, useStore } from 'hooks'
+import TriggerList from './TriggerList'
 
 interface TriggersListProps {
-  filterString: string
-  setFilterString: (value: string) => void
   createTrigger: () => void
   editTrigger: (trigger: any) => void
   deleteTrigger: (trigger: any) => void
 }
 
 const TriggersList = ({
-  filterString,
-  setFilterString = noop,
   createTrigger = noop,
   editTrigger = noop,
   deleteTrigger = noop,
 }: TriggersListProps) => {
   const { meta } = useStore()
-  const triggers = meta.triggers.list()
-  const filteredTriggers = triggers.filter((x: any) =>
-    includes(x.name.toLowerCase(), filterString.toLowerCase())
+  const [selectedSchema, setSelectedSchema] = useState<string>('public')
+  const [filterString, setFilterString] = useState<string>('')
+
+  const schemas: PostgresSchema[] = meta.schemas.list()
+  const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
+    meta.excludedSchemas.includes(schema?.name ?? '')
   )
-  const filteredTriggerSchemas = lodashMap(uniqBy(filteredTriggers, 'schema'), 'schema')
+  const schema = schemas.find((schema) => schema.name === selectedSchema)
+  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+
+  const triggers = meta.triggers.list()
   const canCreateTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   if (meta.triggers.isLoading) {
-    return (
-      <div className="flex h-full w-full items-center justify-center space-x-2">
-        <IconLoader className="animate-spin" size={14} />
-        <p className="text-sm text-scale-1000">Loading triggers...</p>
-      </div>
-    )
+    return <GenericSkeletonLoader />
   }
 
   if (meta.triggers.hasError) {
-    return (
-      <div className="px-6 py-4 text-scale-1000">
-        <p>Error connecting to API</p>
-        <p>{`${meta.triggers.error?.message ?? 'Unknown error'}`}</p>
-      </div>
-    )
+    return <AlertError error={meta.triggers.error} subject="Failed to retrieve database triggers" />
   }
 
   return (
@@ -72,15 +68,64 @@ const TriggersList = ({
           </ProductEmptyState>
         </div>
       ) : (
-        <div className="w-full space-y-4 py-4">
-          <div className="flex items-center justify-between px-6">
-            <Input
-              placeholder="Filter by name"
-              size="small"
-              icon={<IconSearch size="tiny" />}
-              value={filterString}
-              onChange={(e) => setFilterString(e.target.value)}
-            />
+        <div className="w-full space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-[260px]">
+                <Listbox
+                  size="small"
+                  value={selectedSchema}
+                  onChange={setSelectedSchema}
+                  icon={isLocked && <IconLock size={14} strokeWidth={2} />}
+                >
+                  <Listbox.Option
+                    disabled
+                    key="normal-schemas"
+                    value="normal-schemas"
+                    label="Schemas"
+                  >
+                    <p className="text-sm">Schemas</p>
+                  </Listbox.Option>
+                  {/* @ts-ignore */}
+                  {openSchemas.map((schema) => (
+                    <Listbox.Option
+                      key={schema.id}
+                      value={schema.name}
+                      label={schema.name}
+                      addOnBefore={() => <span className="text-scale-900">schema</span>}
+                    >
+                      <span className="text-scale-1200 text-sm">{schema.name}</span>
+                    </Listbox.Option>
+                  ))}
+                  <Listbox.Option
+                    disabled
+                    key="protected-schemas"
+                    value="protected-schemas"
+                    label="Protected schemas"
+                  >
+                    <p className="text-sm">Protected schemas</p>
+                  </Listbox.Option>
+                  {protectedSchemas.map((schema) => (
+                    <Listbox.Option
+                      key={schema.id}
+                      value={schema.name}
+                      label={schema.name}
+                      addOnBefore={() => <span className="text-scale-900">schema</span>}
+                    >
+                      <span className="text-scale-1200 text-sm">{schema.name}</span>
+                    </Listbox.Option>
+                  ))}
+                </Listbox>
+              </div>
+              <Input
+                placeholder="Filter by name"
+                size="small"
+                icon={<IconSearch size="tiny" />}
+                value={filterString}
+                onChange={(e) => setFilterString(e.target.value)}
+              />
+            </div>
+
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger>
                 <Button disabled={!canCreateTriggers} onClick={() => createTrigger()}>
@@ -106,23 +151,36 @@ const TriggersList = ({
               )}
             </Tooltip.Root>
           </div>
-          {filteredTriggers.length <= 0 && (
-            <div className="mx-auto flex max-w-lg items-center justify-center space-x-3 rounded border p-6 shadow-md dark:border-dark">
-              <p>No results match your filter query</p>
-              <Button type="outline" onClick={() => setFilterString('')}>
-                Reset filter
-              </Button>
-            </div>
-          )}
-          {filteredTriggerSchemas.map((schema: any) => (
-            <SchemaTable
-              key={schema}
-              filterString={filterString}
-              schema={schema}
-              editTrigger={editTrigger}
-              deleteTrigger={deleteTrigger}
-            />
-          ))}
+
+          <Table
+            className="table-fixed"
+            head={
+              <>
+                <Table.th key="name" className="w-[25%] space-x-4">
+                  Name
+                </Table.th>
+                <Table.th key="table" className="hidden w-[13%] lg:table-cell">
+                  Table
+                </Table.th>
+                <Table.th key="function" className="hidden xl:table-cell">
+                  Function
+                </Table.th>
+                <Table.th key="rows" className="hidden xl:table-cell xl:w-1/3">
+                  Events
+                </Table.th>
+                <Table.th key="buttons" className="w-1/12"></Table.th>
+              </>
+            }
+            body={
+              <TriggerList
+                schema={selectedSchema}
+                filterString={filterString}
+                isLocked={isLocked}
+                editTrigger={editTrigger}
+                deleteTrigger={deleteTrigger}
+              />
+            }
+          />
         </div>
       )}
     </>

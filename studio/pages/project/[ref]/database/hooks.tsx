@@ -14,6 +14,7 @@ import NoPermission from 'components/ui/NoPermission'
 import { useHooksEnableMutation } from 'data/database/hooks-enable-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 
 const HooksPage: NextPageWithLayout = () => {
   const { meta, ui } = useStore()
@@ -102,13 +103,14 @@ const HooksPage: NextPageWithLayout = () => {
   }
 
   return (
-    <div
-      className={clsx(
-        'mx-auto flex flex-col px-5 pt-6 pb-14',
-        'lg:pt-8 lg:px-14 1xl:px-28 2xl:px-32 h-full'
-      )}
-    >
-      <HooksList createHook={createHook} editHook={editHook} deleteHook={deleteHook} />
+    <>
+      <ScaffoldContainer>
+        <ScaffoldSection>
+          <div className="col-span-12">
+            <HooksList createHook={createHook} editHook={editHook} deleteHook={deleteHook} />
+          </div>
+        </ScaffoldSection>
+      </ScaffoldContainer>
       <EditHookPanel
         visible={showCreateHookForm}
         selectedHook={selectedHook}
@@ -119,7 +121,7 @@ const HooksPage: NextPageWithLayout = () => {
         selectedHook={selectedHook}
         onClose={() => setShowDeleteHookForm(false)}
       />
-    </div>
+    </>
   )
 }
 
