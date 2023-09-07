@@ -68,7 +68,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
               </svg>
             </button>
           </div>
-          <div className="max-h-screen overflow-y-auto py-8 px-4">
+          <div className="max-h-screen supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-[100svh] overflow-y-auto py-8 px-4">
             <div className="mt-10 mb-20 space-y-1">
               <Accordion
                 type="default"
