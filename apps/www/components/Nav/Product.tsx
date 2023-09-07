@@ -15,7 +15,7 @@ const Product = () => {
 
   return (
     <>
-      <ul className="grid gap-2 p-6 w-[350px]">
+      <ul className="grid gap-2 p-6 grid-cols-2 w-[700px]">
         {Object.values(SolutionsData).map((component) => (
           <NavigationMenuLink key={component.name} asChild>
             <MenuItem
@@ -28,7 +28,7 @@ const Product = () => {
           </NavigationMenuLink>
         ))}
       </ul>
-      <div className="border-l flex flex-col w-[500px]">
+      {/* <div className="border-l flex flex-col w-[500px]">
         <div className="p-8">
           <Link href="/customers">
             <a className="inline-flex items-center gap-1 text-muted hover:text-brand text-xs uppercase tracking-widest font-mono mb-6">
@@ -54,7 +54,6 @@ const Product = () => {
                       <h4 className="text-light group-hover:text-brand text-normal mb-0 text-sm">
                         {customer.title}
                       </h4>
-                      {/* <p className="p text-sm !mb-0">{customer.description}</p> */}
                     </div>
                   </a>
                 </Link>
@@ -79,7 +78,7 @@ const Product = () => {
             ))}
           </ul>
         </div>
-      </div>
+      </div> */}
     </>
   )
 }
