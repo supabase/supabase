@@ -20,7 +20,7 @@ const MenuItem = React.forwardRef<
         {children ?? (
           <>
             {icon && <ProductIcon icon={icon} color="alt" />}
-            <div className="flex flex-col space-y-1">
+            <div className="flex flex-col gap-1">
               <div className="text-sm font-medium leading-none">{title}</div>
               {description && (
                 <p className="line-clamp-2 text-sm leading-snug text-light">{description}</p>
