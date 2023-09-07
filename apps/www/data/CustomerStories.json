@@ -1,6 +1,40 @@
 [
   {
     "type": "Customer Story",
+    "title": "Bootstrapped founder builds an AI app with Supabase and scales to $1M in 5 months.",
+    "description": "How Yasser leveraged Supabase to build Chatbase and became one of the most successful single-founder AI products.",
+    "imgUrl": "images/customers/logos/chatbase.png",
+    "logoUrl": "images/customers/logos/chatbase.png",
+    "organization": "Chatbase",
+    "url": "/customers/chatbase",
+    "path": "/customers/chatbase",
+    "postMeta": {
+      "name": "Paul Copplestone",
+      "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
+      "publishDate": "Sep 10, 2023",
+      "readLength": 6
+    },
+    "ctaText": "View story"
+  },
+  {
+    "type": "Customer Story",
+    "title": "Quivr launch 5,000 Vector databases on Supabase.",
+    "description": "Learn how one of the most popular Generative AI projects uses Supabase as their Vector Store.",
+    "imgUrl": "images/customers/logos/quivr.png",
+    "logoUrl": "images/customers/logos/quivr.png",
+    "organization": "Quivr",
+    "url": "/customers/quivr",
+    "path": "/customers/quivr",
+    "postMeta": {
+      "name": "Paul Copplestone",
+      "avatarUrl": "https://avatars0.githubusercontent.com/u/10214025?v=4",
+      "publishDate": "Sep 6, 2023",
+      "readLength": 6
+    },
+    "ctaText": "View story"
+  },
+  {
+    "type": "Customer Story",
     "title": "Berri AI Boosts Productivity by Migrating from AWS RDS to Supabase with pgvector.",
     "description": "Learn how Berri AI overcame challenges with self-hosting their vector database on AWS RDS and successfully migrated to Supabase.",
     "imgUrl": "images/customers/logos/berriai.png",
