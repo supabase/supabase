@@ -118,7 +118,7 @@ const FeedbackWidget = ({
           pathname: router.asPath,
         })
         setFeedback('')
-        ui.setNotification({ category: 'success', message: 'Feedback sent. Thank you!\n\nPlease note this channel is unmonitored, so you will not receive a reply.' })
+        ui.setNotification({ category: 'success', message: 'Feedback sent. Thank you!\n\nKindly be aware that we do not provide responses to feedback. If you require assistance or a reply, kindly consider initiating a support ticket.' })
       } finally {
         setSending(false)
       }
