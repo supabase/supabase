@@ -37,7 +37,7 @@ USING hnsw (embedding vector_ip_ops);
 
 ## How does HNSW work?
 
-Compared to inverted file (IVF) indexes which use [clusters](https://supabase.com/docs/guides/ai/managing-indexes#ivfflat-indexes) to approximate nearest-neighbor search, HNSW uses proximity graphs (graphs connecting nodes based on distance between them). To understand HNSW, we can break it down into 2 parts:
+Compared to inverted file (IVF) indexes which use [clusters](https://supabase.com/docs/guides/ai/vector-indexes/ivf-indexes#how-does-ivfflat-work) to approximate nearest-neighbor search, HNSW uses proximity graphs (graphs connecting nodes based on distance between them). To understand HNSW, we can break it down into 2 parts:
 
 - **Hierarchical (H):** The algorithm operates over multiple layers
 - **Navigable Small World (NSW):** Each vector is a node within a graph and is connected to several other nodes
