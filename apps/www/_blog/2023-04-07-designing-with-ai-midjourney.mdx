@@ -5,6 +5,8 @@ author: marijana,thor_schaeff
 image: launch-week-7/designing-with-ai-midjourney/header.png
 thumb: launch-week-7/designing-with-ai-midjourney/header.png
 launchweek: 7
+categories:
+  - launch-week
 tags:
   - launch-week
 date: '2023-04-07'
@@ -57,7 +59,7 @@ And voila, we had a baseline for generating variations:
 
 The final visual that you see everywhere won us over because of its vibrant swirls. While each swirl looks slightly different, a consistent style is still maintained throughout.
 
-Fortunately, we didn't require full-width images for each ticket. Upscaled MidJourney images sufficed. Nevertheless, we had to recreate the main visual on the landing page in vectors to use it effectively. You can view it in full glory at [https://supabase.com/launch-week](https://supabase.com/launch-week).
+Fortunately, we didn't require full-width images for each ticket. Upscaled MidJourney images sufficed. Nevertheless, we had to recreate the main visual on the landing page in vectors to use it effectively. You can view it in full glory at [https://supabase.com/launch-week/7](https://supabase.com/launch-week/7).
 
 ![Screenshot 2023-04-06 at 09.47.47.png](/images/blog/launch-week-7/designing-with-ai-midjourney/launch-week-7-ticket-home.png)
 
@@ -111,49 +113,42 @@ Since this table includes email addresses, we secure it using [RLS](https://supa
 By creating a view, we can selectively publicize parts of our table and also compute some additional values on the fly:
 
 ```sql
-drop
-  view if exists lw7_tickets_golden;
+drop view if exists lw7_tickets_golden;
 
-create
-or replace view lw7_tickets_golden as
-with
-  lw7_referrals as (
-    select
-      referred_by,
-      count(*) as referrals
-    from
-      lw7_tickets
-    where
-      referred_by is not null
-    group by
-      referred_by
-  )
-select
-  lw7_tickets."id",
-  lw7_tickets."name",
-  lw7_tickets."username",
-  lw7_tickets."ticketNumber",
-  lw7_tickets."createdAt",
-  lw7_tickets."sharedOnTwitter",
-  lw7_tickets."sharedOnLinkedIn",
-  lw7_tickets."bg_image_id",
-  case
-    when lw7_referrals.referrals is null then 0
-    ELSE lw7_referrals.referrals
-  end as referrals,
-  case
-    when lw7_tickets."sharedOnTwitter" is not null
-    and lw7_tickets."sharedOnLinkedIn" is not null then true
-    else false
-  end as golden
-from
-  lw7_tickets
-  left outer join lw7_referrals on lw7_tickets.username = lw7_referrals.referred_by;
+create or replace view lw7_tickets_golden as
+  with
+    lw7_referrals as (
+      select
+        referred_by,
+        count(*) as referrals
+      from lw7_tickets
+      where referred_by is not null
+      group by referred_by
+    )
+  select
+    lw7_tickets."id",
+    lw7_tickets."name",
+    lw7_tickets."username",
+    lw7_tickets."ticketNumber",
+    lw7_tickets."createdAt",
+    lw7_tickets."sharedOnTwitter",
+    lw7_tickets."sharedOnLinkedIn",
+    lw7_tickets."bg_image_id",
+    case
+      when lw7_referrals.referrals is null then 0
+      else lw7_referrals.referrals
+    end as referrals,
+    case
+      when lw7_tickets."sharedOnTwitter" is not null
+      and lw7_tickets."sharedOnLinkedIn" is not null then true
+      else false
+    end as golden
+  from
+    lw7_tickets
+    left outer join lw7_referrals on lw7_tickets.username = lw7_referrals.referred_by;
 
-select
-  *
-from
-  lw7_tickets_golden
+select *
+from lw7_tickets_golden;
 ```
 
 We can now retrieve that username by using the following code:
@@ -265,13 +260,13 @@ const channel = supabase
   .subscribe()
 ```
 
-Interested to know how this fits within your Next.js application? Find the code [here](https://github.com/supabase/supabase/blob/master/apps/www/components/LaunchWeek/Ticket/TicketForm.tsx#L70-L102).
+Interested to know how this fits within your Next.js application? Find the code [here](https://github.com/supabase/supabase/blob/master/apps/www/components/LaunchWeek/7/Ticket/TicketForm.tsx#L70-L102).
 
 ## Displaying the images
 
-We have some images, so how can we now display them somewhere? [@Francesco Sansalvadore](https://twitter.com/frnk_snslvdr) saw one of our team members trying to “swipe” on the tickets slider component on the [launch week page](https://supabase.com/launch-week/tickets) and he thought, why not feature all the fantastic people who generated tickets on a single page?
+We have some images, so how can we now display them somewhere? [@Francesco Sansalvadore](https://twitter.com/frnk_snslvdr) saw one of our team members trying to “swipe” on the tickets slider component on the [launch week page](https://supabase.com/launch-week/7/tickets) and he thought, why not feature all the fantastic people who generated tickets on a single page?
 
-We built a [ticket wall](https://supabase.com/launch-week/tickets) that you can scroll endlessly. We approached it with an infinite scroll technique, lazy-loading a few tickets at a time.
+We built a [ticket wall](https://supabase.com/launch-week/7/tickets) that you can scroll endlessly. We approached it with an infinite scroll technique, lazy-loading a few tickets at a time.
 
 ![launch week 7 ticket wall](/images/blog/launch-week-7/designing-with-ai-midjourney/launch-week-7-ticket-wall.png)
 

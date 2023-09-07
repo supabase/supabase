@@ -23,11 +23,15 @@
         "url": "/storage"
       },
       {
+        "text": "Vector",
+        "url": "/vector"
+      },
+      {
         "text": "Pricing",
         "url": "/pricing"
       },
       {
-        "text": "Launch Week 7",
+        "text": "Launch Week 8",
         "url": "/launch-week"
       }
     ]
@@ -42,6 +46,10 @@
       {
         "text": "System Status",
         "url": "https://status.supabase.com/"
+      },
+      {
+        "text": "Become a Partner",
+        "url": "/partners"
       },
       {
         "text": "Integrations",
@@ -62,6 +70,10 @@
       {
         "text": "SOC2",
         "url": "https://forms.supabase.com/soc2"
+      },
+      {
+        "text": "HIPAA",
+        "url": "https://forms.supabase.com/hipaa"
       }
     ]
   },
@@ -82,7 +94,7 @@
       },
       {
         "text": "Open Source",
-        "url": "/oss"
+        "url": "/open-source"
       },
       {
         "text": "SupaSquad",
@@ -128,6 +140,10 @@
       {
         "text": "Acceptable Use Policy",
         "url": "/aup"
+      },
+      {
+        "text": "Support Policy",
+        "url": "/support-policy"
       },
       {
         "text": "Service Level Agreement",

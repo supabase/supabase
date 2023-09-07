@@ -1,6 +1,205 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/v1/branches/{branch_id}": {
+      "get": {
+        "operationId": "getBranchDetails",
+        "summary": "Get database branch config",
+        "description": "Fetches configurations of the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "db_port": {
+                      "type": "integer"
+                    },
+                    "ref": {
+                      "type": "string"
+                    },
+                    "postgres_version": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "ACTIVE_HEALTHY",
+                        "ACTIVE_UNHEALTHY",
+                        "COMING_UP",
+                        "GOING_DOWN",
+                        "INACTIVE",
+                        "INIT_FAILED",
+                        "REMOVED",
+                        "RESTORING",
+                        "UNKNOWN",
+                        "UPGRADING",
+                        "PAUSING"
+                      ],
+                      "type": "string"
+                    },
+                    "db_host": {
+                      "type": "string"
+                    },
+                    "db_user": {
+                      "type": "string"
+                    },
+                    "db_pass": {
+                      "type": "string"
+                    },
+                    "jwt_secret": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["db_port", "ref", "postgres_version", "status", "db_host"]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to update database branch"
+          }
+        },
+        "tags": ["database branches (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "updateBranch",
+        "summary": "Update database branch config",
+        "description": "Updates the configuration of the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "branch_name": {
+                    "type": "string"
+                  },
+                  "git_branch": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "project_ref": {
+                      "type": "string"
+                    },
+                    "parent_project_ref": {
+                      "type": "string"
+                    },
+                    "is_default": {
+                      "type": "boolean"
+                    },
+                    "git_branch": {
+                      "type": "string"
+                    },
+                    "created_at": {
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "project_ref",
+                    "parent_project_ref",
+                    "is_default",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to update database branch"
+          }
+        },
+        "tags": ["database branches (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteBranch",
+        "summary": "Delete a database branch",
+        "description": "Deletes the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to delete database branch"
+          }
+        },
+        "tags": ["database branches (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/v1/projects": {
       "get": {
         "operationId": "getProjects",
@@ -327,100 +526,122 @@
         ]
       }
     },
-    "/v1/projects/{ref}/functions": {
-      "post": {
-        "operationId": "createFunction",
-        "summary": "Create a function",
-        "description": "Creates a function and adds it to the specified project.",
+    "/v1/oauth/authorize": {
+      "get": {
+        "operationId": "authorize",
+        "summary": "Authorize user through oauth",
         "parameters": [
           {
-            "name": "ref",
+            "name": "client_id",
             "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          },
-          {
-            "name": "slug",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "pattern": "/^[A-Za-z0-9_-]+$/",
-              "type": "string"
-            }
-          },
-          {
-            "name": "name",
-            "required": false,
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "verify_jwt",
-            "required": false,
+            "name": "response_type",
+            "required": true,
             "in": "query",
             "schema": {
-              "type": "boolean"
+              "enum": ["code", "token", "id_token token"],
+              "type": "string"
             }
           },
           {
-            "name": "import_map",
+            "name": "redirect_uri",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "scope",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
             "required": false,
             "in": "query",
             "schema": {
-              "type": "boolean"
+              "type": "string"
+            }
+          },
+          {
+            "name": "response_mode",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code_challenge",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code_challenge_method",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": ["plain", "sha256", "S256"],
+              "type": "string"
             }
           }
         ],
+        "responses": {
+          "303": {
+            "description": ""
+          }
+        },
+        "tags": ["oauth (beta)"]
+      }
+    },
+    "/v1/oauth/token": {
+      "post": {
+        "operationId": "token",
+        "summary": "Exchange auth code for user's access and refresh token",
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "application/x-www-form-urlencoded": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "slug": {
-                    "type": "string",
-                    "pattern": "/^[A-Za-z0-9_-]+$/"
-                  },
-                  "name": {
+                  "grant_type": {
+                    "enum": ["authorization_code", "refresh_token"],
                     "type": "string"
                   },
-                  "body": {
+                  "client_id": {
                     "type": "string"
                   },
-                  "verify_jwt": {
-                    "type": "boolean"
+                  "client_secret": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  },
+                  "code_verifier": {
+                    "type": "string"
+                  },
+                  "redirect_uri": {
+                    "type": "string"
+                  },
+                  "refresh_token": {
+                    "type": "string"
                   }
                 },
-                "required": ["slug", "name", "body"]
-              }
-            },
-            "application/vnd.denoland.eszip": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "slug": {
-                    "type": "string",
-                    "pattern": "/^[A-Za-z0-9_-]+$/"
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "body": {
-                    "type": "string"
-                  },
-                  "verify_jwt": {
-                    "type": "boolean"
-                  }
-                },
-                "required": ["slug", "name", "body"]
+                "required": ["grant_type", "client_id", "client_secret"]
               }
             }
           }
@@ -433,70 +654,85 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "id": {
+                    "token_type": {
+                      "type": "string",
+                      "enum": ["Bearer"]
+                    },
+                    "access_token": {
                       "type": "string"
                     },
-                    "slug": {
+                    "refresh_token": {
                       "type": "string"
                     },
-                    "name": {
-                      "type": "string"
-                    },
-                    "status": {
-                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-                      "type": "string"
-                    },
-                    "version": {
+                    "expires_in": {
                       "type": "number"
-                    },
-                    "created_at": {
-                      "type": "number"
-                    },
-                    "updated_at": {
-                      "type": "number"
-                    },
-                    "verify_jwt": {
-                      "type": "boolean"
-                    },
-                    "import_map": {
-                      "type": "boolean"
                     }
                   },
-                  "required": [
-                    "id",
-                    "slug",
-                    "name",
-                    "status",
-                    "version",
-                    "created_at",
-                    "updated_at"
-                  ]
+                  "required": ["token_type", "access_token", "refresh_token", "expires_in"]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["oauth (beta)"]
+      }
+    },
+    "/v1/projects/{ref}/api-keys": {
+      "get": {
+        "operationId": "getProjectApiKeys",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "api_key": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["name", "api_key"]
+                  }
                 }
               }
             }
           },
           "403": {
             "description": ""
-          },
-          "500": {
-            "description": "Failed to create project's function"
           }
         },
-        "tags": ["functions"],
+        "tags": ["projects"],
         "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
           {
             "bearer": []
           }
         ]
-      },
+      }
+    },
+    "/v1/projects/{ref}/branches": {
       "get": {
-        "operationId": "getFunctions",
-        "summary": "List all functions",
-        "description": "Returns all functions you've previously added to the specified project.",
+        "operationId": "getBranches",
+        "summary": "List all database branches",
+        "description": "Returns all database branches of the specified project.",
         "parameters": [
           {
             "name": "ref",
@@ -523,38 +759,34 @@
                       "id": {
                         "type": "string"
                       },
-                      "slug": {
-                        "type": "string"
-                      },
                       "name": {
                         "type": "string"
                       },
-                      "status": {
-                        "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+                      "project_ref": {
                         "type": "string"
                       },
-                      "version": {
-                        "type": "number"
+                      "parent_project_ref": {
+                        "type": "string"
+                      },
+                      "is_default": {
+                        "type": "boolean"
+                      },
+                      "git_branch": {
+                        "type": "string"
                       },
                       "created_at": {
-                        "type": "number"
+                        "type": "string"
                       },
                       "updated_at": {
-                        "type": "number"
-                      },
-                      "verify_jwt": {
-                        "type": "boolean"
-                      },
-                      "import_map": {
-                        "type": "boolean"
+                        "type": "string"
                       }
                     },
                     "required": [
                       "id",
-                      "slug",
                       "name",
-                      "status",
-                      "version",
+                      "project_ref",
+                      "parent_project_ref",
+                      "is_default",
                       "created_at",
                       "updated_at"
                     ]
@@ -563,125 +795,21 @@
               }
             }
           },
-          "403": {
-            "description": ""
-          },
           "500": {
-            "description": "Failed to retrieve project's functions"
+            "description": "Failed to retrieve database branches"
           }
         },
-        "tags": ["functions"],
+        "tags": ["database branches (beta)"],
         "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/v1/projects/{ref}/functions/{function_slug}": {
-      "get": {
-        "operationId": "getFunction",
-        "summary": "Retrieve a function",
-        "description": "Retrieves a function with the specified slug and project.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          },
-          {
-            "name": "function_slug",
-            "required": true,
-            "in": "path",
-            "description": "Function slug",
-            "schema": {
-              "pattern": "/^[A-Za-z0-9_-]+$/",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "slug": {
-                      "type": "string"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "status": {
-                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-                      "type": "string"
-                    },
-                    "version": {
-                      "type": "number"
-                    },
-                    "created_at": {
-                      "type": "number"
-                    },
-                    "updated_at": {
-                      "type": "number"
-                    },
-                    "verify_jwt": {
-                      "type": "boolean"
-                    },
-                    "import_map": {
-                      "type": "boolean"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "slug",
-                    "name",
-                    "status",
-                    "version",
-                    "created_at",
-                    "updated_at"
-                  ]
-                }
-              }
-            }
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to retrieve function with given slug"
-          }
-        },
-        "tags": ["functions"],
-        "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
           {
             "bearer": []
           }
         ]
       },
-      "patch": {
-        "operationId": "updateFunction",
-        "summary": "Update a function",
-        "description": "Updates a function with the specified slug and project.",
+      "post": {
+        "operationId": "createBranch",
+        "summary": "Create a database branch",
+        "description": "Creates a database branch from the specified project.",
         "parameters": [
           {
             "name": "ref",
@@ -692,49 +820,6 @@
               "minLength": 20,
               "maxLength": 20,
               "type": "string"
-            }
-          },
-          {
-            "name": "function_slug",
-            "required": true,
-            "in": "path",
-            "description": "Function slug",
-            "schema": {
-              "pattern": "/^[A-Za-z0-9_-]+$/",
-              "type": "string"
-            }
-          },
-          {
-            "name": "slug",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "pattern": "/^[A-Za-z0-9_-]+$/",
-              "type": "string"
-            }
-          },
-          {
-            "name": "name",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "verify_jwt",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "import_map",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
             }
           }
         ],
@@ -745,38 +830,23 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name": {
+                  "branch_name": {
                     "type": "string"
                   },
-                  "body": {
+                  "git_branch": {
                     "type": "string"
                   },
-                  "verify_jwt": {
-                    "type": "boolean"
+                  "region": {
+                    "type": "string"
                   }
-                }
-              }
-            },
-            "application/vnd.denoland.eszip": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "body": {
-                    "type": "string"
-                  },
-                  "verify_jwt": {
-                    "type": "boolean"
-                  }
-                }
+                },
+                "required": ["branch_name"]
               }
             }
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "",
             "content": {
               "application/json": {
@@ -786,38 +856,34 @@
                     "id": {
                       "type": "string"
                     },
-                    "slug": {
-                      "type": "string"
-                    },
                     "name": {
                       "type": "string"
                     },
-                    "status": {
-                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+                    "project_ref": {
                       "type": "string"
                     },
-                    "version": {
-                      "type": "number"
+                    "parent_project_ref": {
+                      "type": "string"
+                    },
+                    "is_default": {
+                      "type": "boolean"
+                    },
+                    "git_branch": {
+                      "type": "string"
                     },
                     "created_at": {
-                      "type": "number"
+                      "type": "string"
                     },
                     "updated_at": {
-                      "type": "number"
-                    },
-                    "verify_jwt": {
-                      "type": "boolean"
-                    },
-                    "import_map": {
-                      "type": "boolean"
+                      "type": "string"
                     }
                   },
                   "required": [
                     "id",
-                    "slug",
                     "name",
-                    "status",
-                    "version",
+                    "project_ref",
+                    "parent_project_ref",
+                    "is_default",
                     "created_at",
                     "updated_at"
                   ]
@@ -825,28 +891,21 @@
               }
             }
           },
-          "403": {
-            "description": ""
-          },
           "500": {
-            "description": "Failed to update function with given slug"
+            "description": "Failed to create database branch"
           }
         },
-        "tags": ["functions"],
+        "tags": ["database branches (beta)"],
         "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
           {
             "bearer": []
           }
         ]
       },
       "delete": {
-        "operationId": "deleteFunction",
-        "summary": "Delete a function",
-        "description": "Deletes a function with the specified slug from the specified project.",
+        "operationId": "disableBranch",
+        "summary": "Disables preview branching",
+        "description": "Disables preview branching for the specified project",
         "parameters": [
           {
             "name": "ref",
@@ -858,86 +917,18 @@
               "maxLength": 20,
               "type": "string"
             }
-          },
-          {
-            "name": "function_slug",
-            "required": true,
-            "in": "path",
-            "description": "Function slug",
-            "schema": {
-              "pattern": "/^[A-Za-z0-9_-]+$/",
-              "type": "string"
-            }
           }
         ],
         "responses": {
           "200": {
             "description": ""
           },
-          "403": {
-            "description": ""
-          },
           "500": {
-            "description": "Failed to delete function with given slug"
+            "description": "Failed to disable preview branching"
           }
         },
-        "tags": ["functions"],
+        "tags": ["database branches (beta)"],
         "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/v1/projects/{ref}/functions/{function_slug}/body": {
-      "get": {
-        "operationId": "getFunctionBody",
-        "summary": "Retrieve a function body",
-        "description": "Retrieves a function body for the specified slug and project.",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          },
-          {
-            "name": "function_slug",
-            "required": true,
-            "in": "path",
-            "description": "Function slug",
-            "schema": {
-              "pattern": "/^[A-Za-z0-9_-]+$/",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "403": {
-            "description": ""
-          },
-          "500": {
-            "description": "Failed to retrieve function body with given slug"
-          }
-        },
-        "tags": ["functions"],
-        "security": [
-          {
-            "apiKeyHeader": [],
-            "apiKeyParam": []
-          },
           {
             "bearer": []
           }
@@ -1526,7 +1517,7 @@
     },
     "/v1/projects/{ref}/pgsodium": {
       "get": {
-        "operationId": "getConfig",
+        "operationId": "getPgsodiumConfig",
         "summary": "Gets project's pgsodium config",
         "parameters": [
           {
@@ -1573,7 +1564,7 @@
         ]
       },
       "put": {
-        "operationId": "updateConfig",
+        "operationId": "updatePgsodiumConfig",
         "summary": "Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.",
         "parameters": [
           {
@@ -1668,6 +1659,9 @@
                       "type": "string"
                     },
                     "db_extra_search_path": {
+                      "type": "string"
+                    },
+                    "jwt_secret": {
                       "type": "string"
                     }
                   },
@@ -2173,8 +2167,8 @@
                   "type": "object",
                   "properties": {
                     "status": {
-                      "type": "string",
-                      "enum": ["not-used", "custom-domain-used", "active"]
+                      "enum": ["not-used", "custom-domain-used", "active"],
+                      "type": "string"
                     },
                     "custom_domain": {
                       "type": "string"
@@ -2708,19 +2702,13 @@
                   "type": "object",
                   "properties": {
                     "statement_timeout": {
-                      "type": "integer",
-                      "minimum": 0,
-                      "maximum": 2147483647
+                      "type": "string"
                     },
                     "effective_cache_size": {
-                      "type": "integer",
-                      "minimum": 1,
-                      "maximum": 2147483647
+                      "type": "string"
                     },
                     "maintenance_work_mem": {
-                      "type": "integer",
-                      "minimum": 1024,
-                      "maximum": 2147483647
+                      "type": "string"
                     },
                     "max_connections": {
                       "type": "integer",
@@ -2748,33 +2736,16 @@
                       "maximum": 262143
                     },
                     "shared_buffers": {
-                      "type": "integer",
-                      "minimum": 16,
-                      "maximum": 1073741823
+                      "type": "string"
                     },
                     "work_mem": {
-                      "type": "integer",
-                      "minimum": 64,
-                      "maximum": 2147483647
+                      "type": "string"
                     },
                     "session_replication_role": {
                       "enum": ["origin", "replica", "local"],
                       "type": "string"
                     }
-                  },
-                  "required": [
-                    "statement_timeout",
-                    "effective_cache_size",
-                    "maintenance_work_mem",
-                    "max_connections",
-                    "max_parallel_maintenance_workers",
-                    "max_parallel_workers",
-                    "max_parallel_workers_per_gather",
-                    "max_worker_processes",
-                    "shared_buffers",
-                    "work_mem",
-                    "session_replication_role"
-                  ]
+                  }
                 }
               }
             }
@@ -2817,19 +2788,13 @@
                 "type": "object",
                 "properties": {
                   "statement_timeout": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "maximum": 2147483647
+                    "type": "string"
                   },
                   "effective_cache_size": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 2147483647
+                    "type": "string"
                   },
                   "maintenance_work_mem": {
-                    "type": "integer",
-                    "minimum": 1024,
-                    "maximum": 2147483647
+                    "type": "string"
                   },
                   "max_connections": {
                     "type": "integer",
@@ -2857,33 +2822,16 @@
                     "maximum": 262143
                   },
                   "shared_buffers": {
-                    "type": "integer",
-                    "minimum": 16,
-                    "maximum": 1073741823
+                    "type": "string"
                   },
                   "work_mem": {
-                    "type": "integer",
-                    "minimum": 64,
-                    "maximum": 2147483647
+                    "type": "string"
                   },
                   "session_replication_role": {
                     "enum": ["origin", "replica", "local"],
                     "type": "string"
                   }
-                },
-                "required": [
-                  "statement_timeout",
-                  "effective_cache_size",
-                  "maintenance_work_mem",
-                  "max_connections",
-                  "max_parallel_maintenance_workers",
-                  "max_parallel_workers",
-                  "max_parallel_workers_per_gather",
-                  "max_worker_processes",
-                  "shared_buffers",
-                  "work_mem",
-                  "session_replication_role"
-                ]
+                }
               }
             }
           }
@@ -2897,19 +2845,13 @@
                   "type": "object",
                   "properties": {
                     "statement_timeout": {
-                      "type": "integer",
-                      "minimum": 0,
-                      "maximum": 2147483647
+                      "type": "string"
                     },
                     "effective_cache_size": {
-                      "type": "integer",
-                      "minimum": 1,
-                      "maximum": 2147483647
+                      "type": "string"
                     },
                     "maintenance_work_mem": {
-                      "type": "integer",
-                      "minimum": 1024,
-                      "maximum": 2147483647
+                      "type": "string"
                     },
                     "max_connections": {
                       "type": "integer",
@@ -2937,33 +2879,16 @@
                       "maximum": 262143
                     },
                     "shared_buffers": {
-                      "type": "integer",
-                      "minimum": 16,
-                      "maximum": 1073741823
+                      "type": "string"
                     },
                     "work_mem": {
-                      "type": "integer",
-                      "minimum": 64,
-                      "maximum": 2147483647
+                      "type": "string"
                     },
                     "session_replication_role": {
                       "enum": ["origin", "replica", "local"],
                       "type": "string"
                     }
-                  },
-                  "required": [
-                    "statement_timeout",
-                    "effective_cache_size",
-                    "maintenance_work_mem",
-                    "max_connections",
-                    "max_parallel_maintenance_workers",
-                    "max_parallel_workers",
-                    "max_parallel_workers_per_gather",
-                    "max_worker_processes",
-                    "shared_buffers",
-                    "work_mem",
-                    "session_replication_role"
-                  ]
+                  }
                 }
               }
             }
@@ -2976,6 +2901,1165 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/config/database/pgbouncer": {
+      "get": {
+        "operationId": "getPgbouncerConfig",
+        "summary": "Gets project's pgbouncer config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "db_dns_name": {
+                      "type": "string"
+                    },
+                    "db_host": {
+                      "type": "string"
+                    },
+                    "db_name": {
+                      "type": "string"
+                    },
+                    "db_port": {
+                      "type": "number"
+                    },
+                    "db_ssl": {
+                      "type": "boolean"
+                    },
+                    "db_user": {
+                      "type": "string"
+                    },
+                    "default_pool_size": {
+                      "type": "number"
+                    },
+                    "ignore_startup_parameters": {
+                      "type": "string"
+                    },
+                    "inserted_at": {
+                      "type": "string"
+                    },
+                    "pgbouncer_enabled": {
+                      "type": "boolean"
+                    },
+                    "supavisor_enabled": {
+                      "type": "boolean"
+                    },
+                    "pgbouncer_status": {
+                      "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
+                      "type": "string"
+                    },
+                    "pool_mode": {
+                      "enum": ["transaction", "session", "statement"],
+                      "type": "string"
+                    },
+                    "max_client_conn": {
+                      "type": "number",
+                      "nullable": true
+                    },
+                    "connectionString": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "db_dns_name",
+                    "db_host",
+                    "db_name",
+                    "db_port",
+                    "db_ssl",
+                    "db_user",
+                    "ignore_startup_parameters",
+                    "inserted_at",
+                    "pgbouncer_enabled",
+                    "supavisor_enabled",
+                    "pgbouncer_status",
+                    "pool_mode",
+                    "connectionString"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to retrieve project's pgbouncer config"
+          }
+        },
+        "tags": ["projects config"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "updatePgbouncerConfig",
+        "summary": "Updates project's pgbouncer config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "default_pool_size": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000
+                  },
+                  "max_client_conn": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 0,
+                    "maximum": 18000
+                  },
+                  "ignore_startup_parameters": {
+                    "type": "string"
+                  },
+                  "pgbouncer_enabled": {
+                    "type": "boolean"
+                  },
+                  "pool_mode": {
+                    "enum": ["transaction", "session", "statement"],
+                    "type": "string"
+                  }
+                },
+                "required": ["ignore_startup_parameters", "pgbouncer_enabled", "pool_mode"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "default_pool_size": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000
+                    },
+                    "max_client_conn": {
+                      "type": "integer",
+                      "nullable": true,
+                      "minimum": 0,
+                      "maximum": 18000
+                    },
+                    "ignore_startup_parameters": {
+                      "type": "string"
+                    },
+                    "pgbouncer_enabled": {
+                      "type": "boolean"
+                    },
+                    "pool_mode": {
+                      "enum": ["transaction", "session", "statement"],
+                      "type": "string"
+                    },
+                    "pgbouncer_status": {
+                      "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "ignore_startup_parameters",
+                    "pgbouncer_enabled",
+                    "pool_mode",
+                    "pgbouncer_status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update project's pgbouncer config"
+          }
+        },
+        "tags": ["projects config"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/config/auth": {
+      "get": {
+        "operationId": "getV1AuthConfig",
+        "summary": "Gets project's auth config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "smtp_admin_email": {
+                      "type": "string"
+                    },
+                    "smtp_host": {
+                      "type": "string"
+                    },
+                    "smtp_port": {
+                      "type": "string"
+                    },
+                    "smtp_user": {
+                      "type": "string"
+                    },
+                    "smtp_pass": {
+                      "type": "string"
+                    },
+                    "smtp_max_frequency": {
+                      "type": "number"
+                    },
+                    "smtp_sender_name": {
+                      "type": "string"
+                    },
+                    "rate_limit_email_sent": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 2147483647
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's auth config"
+          }
+        },
+        "tags": ["projects config"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "updateV1AuthConfig",
+        "summary": "Updates a project's auth config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "smtp_admin_email": {
+                    "type": "string"
+                  },
+                  "smtp_host": {
+                    "type": "string"
+                  },
+                  "smtp_port": {
+                    "type": "string"
+                  },
+                  "smtp_user": {
+                    "type": "string"
+                  },
+                  "smtp_pass": {
+                    "type": "string"
+                  },
+                  "smtp_max_frequency": {
+                    "type": "number"
+                  },
+                  "smtp_sender_name": {
+                    "type": "string"
+                  },
+                  "rate_limit_email_sent": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 2147483647
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "smtp_admin_email": {
+                      "type": "string"
+                    },
+                    "smtp_host": {
+                      "type": "string"
+                    },
+                    "smtp_port": {
+                      "type": "string"
+                    },
+                    "smtp_user": {
+                      "type": "string"
+                    },
+                    "smtp_pass": {
+                      "type": "string"
+                    },
+                    "smtp_max_frequency": {
+                      "type": "number"
+                    },
+                    "smtp_sender_name": {
+                      "type": "string"
+                    },
+                    "rate_limit_email_sent": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 2147483647
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update project's auth config"
+          }
+        },
+        "tags": ["projects config"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/database/query": {
+      "post": {
+        "operationId": "v1RunQuery",
+        "summary": "Run sql query",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string"
+                  }
+                },
+                "required": ["query"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to run sql query"
+          }
+        },
+        "tags": ["projects (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/database/webhooks/enable": {
+      "post": {
+        "operationId": "v1EnableDatabaseWebhooks",
+        "summary": "Enables Database Webhooks on the project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to enable Database Webhooks on the project"
+          }
+        },
+        "tags": ["projects (beta)"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/functions": {
+      "post": {
+        "operationId": "createFunction",
+        "summary": "Create a function",
+        "description": "Creates a function and adds it to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "pattern": "/^[A-Za-z0-9_-]+$/",
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "verify_jwt",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "import_map",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "entrypoint_path",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "import_map_path",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "slug": {
+                    "type": "string",
+                    "pattern": "/^[A-Za-z0-9_-]+$/"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "verify_jwt": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["slug", "name", "body"]
+              }
+            },
+            "application/vnd.denoland.eszip": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "slug": {
+                    "type": "string",
+                    "pattern": "/^[A-Za-z0-9_-]+$/"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "verify_jwt": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["slug", "name", "body"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "number"
+                    },
+                    "created_at": {
+                      "type": "number"
+                    },
+                    "updated_at": {
+                      "type": "number"
+                    },
+                    "verify_jwt": {
+                      "type": "boolean"
+                    },
+                    "import_map": {
+                      "type": "boolean"
+                    },
+                    "entrypoint_path": {
+                      "type": "string"
+                    },
+                    "import_map_path": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "status",
+                    "version",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to create project's function"
+          }
+        },
+        "tags": ["functions"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getFunctions",
+        "summary": "List all functions",
+        "description": "Returns all functions you've previously added to the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "slug": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+                        "type": "string"
+                      },
+                      "version": {
+                        "type": "number"
+                      },
+                      "created_at": {
+                        "type": "number"
+                      },
+                      "updated_at": {
+                        "type": "number"
+                      },
+                      "verify_jwt": {
+                        "type": "boolean"
+                      },
+                      "import_map": {
+                        "type": "boolean"
+                      },
+                      "entrypoint_path": {
+                        "type": "string"
+                      },
+                      "import_map_path": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "slug",
+                      "name",
+                      "status",
+                      "version",
+                      "created_at",
+                      "updated_at"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve project's functions"
+          }
+        },
+        "tags": ["functions"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/functions/{function_slug}": {
+      "get": {
+        "operationId": "getFunction",
+        "summary": "Retrieve a function",
+        "description": "Retrieves a function with the specified slug and project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "description": "Function slug",
+            "schema": {
+              "pattern": "/^[A-Za-z0-9_-]+$/",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "number"
+                    },
+                    "created_at": {
+                      "type": "number"
+                    },
+                    "updated_at": {
+                      "type": "number"
+                    },
+                    "verify_jwt": {
+                      "type": "boolean"
+                    },
+                    "import_map": {
+                      "type": "boolean"
+                    },
+                    "entrypoint_path": {
+                      "type": "string"
+                    },
+                    "import_map_path": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "status",
+                    "version",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve function with given slug"
+          }
+        },
+        "tags": ["functions"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "updateFunction",
+        "summary": "Update a function",
+        "description": "Updates a function with the specified slug and project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "description": "Function slug",
+            "schema": {
+              "pattern": "/^[A-Za-z0-9_-]+$/",
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "pattern": "/^[A-Za-z0-9_-]+$/",
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "verify_jwt",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "import_map",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "entrypoint_path",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "import_map_path",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "verify_jwt": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            },
+            "application/vnd.denoland.eszip": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "verify_jwt": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "number"
+                    },
+                    "created_at": {
+                      "type": "number"
+                    },
+                    "updated_at": {
+                      "type": "number"
+                    },
+                    "verify_jwt": {
+                      "type": "boolean"
+                    },
+                    "import_map": {
+                      "type": "boolean"
+                    },
+                    "entrypoint_path": {
+                      "type": "string"
+                    },
+                    "import_map_path": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "status",
+                    "version",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update function with given slug"
+          }
+        },
+        "tags": ["functions"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteFunction",
+        "summary": "Delete a function",
+        "description": "Deletes a function with the specified slug from the specified project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "description": "Function slug",
+            "schema": {
+              "pattern": "/^[A-Za-z0-9_-]+$/",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to delete function with given slug"
+          }
+        },
+        "tags": ["functions"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/functions/{function_slug}/body": {
+      "get": {
+        "operationId": "getFunctionBody",
+        "summary": "Retrieve a function body",
+        "description": "Retrieves a function body for the specified slug and project.",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "description": "Function slug",
+            "schema": {
+              "pattern": "/^[A-Za-z0-9_-]+$/",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to retrieve function body with given slug"
+          }
+        },
+        "tags": ["functions"],
+        "security": [
+          {
+            "apiKeyHeader": [],
+            "apiKeyParam": []
           },
           {
             "bearer": []
@@ -3032,6 +4116,22 @@
                         "additionalProperties": {
                           "type": "object",
                           "properties": {
+                            "default": {
+                              "oneOf": [
+                                {
+                                  "type": "object"
+                                },
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "boolean"
+                                }
+                              ]
+                            },
                             "name": {
                               "type": "string"
                             },
@@ -3040,9 +4140,6 @@
                               "items": {
                                 "type": "string"
                               }
-                            },
-                            "default": {
-                              "type": "object"
                             }
                           }
                         }
@@ -3090,6 +4187,22 @@
                               "additionalProperties": {
                                 "type": "object",
                                 "properties": {
+                                  "default": {
+                                    "oneOf": [
+                                      {
+                                        "type": "object"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      }
+                                    ]
+                                  },
                                   "name": {
                                     "type": "string"
                                   },
@@ -3098,9 +4211,6 @@
                                     "items": {
                                       "type": "string"
                                     }
-                                  },
-                                  "default": {
-                                    "type": "object"
                                   }
                                 }
                               }
@@ -3213,6 +4323,22 @@
                                     "additionalProperties": {
                                       "type": "object",
                                       "properties": {
+                                        "default": {
+                                          "oneOf": [
+                                            {
+                                              "type": "object"
+                                            },
+                                            {
+                                              "type": "number"
+                                            },
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "boolean"
+                                            }
+                                          ]
+                                        },
                                         "name": {
                                           "type": "string"
                                         },
@@ -3221,9 +4347,6 @@
                                           "items": {
                                             "type": "string"
                                           }
-                                        },
-                                        "default": {
-                                          "type": "object"
                                         }
                                       }
                                     }
@@ -3345,6 +4468,22 @@
                               "additionalProperties": {
                                 "type": "object",
                                 "properties": {
+                                  "default": {
+                                    "oneOf": [
+                                      {
+                                        "type": "object"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      }
+                                    ]
+                                  },
                                   "name": {
                                     "type": "string"
                                   },
@@ -3353,9 +4492,6 @@
                                     "items": {
                                       "type": "string"
                                     }
-                                  },
-                                  "default": {
-                                    "type": "object"
                                   }
                                 }
                               }
@@ -3464,6 +4600,22 @@
                         "additionalProperties": {
                           "type": "object",
                           "properties": {
+                            "default": {
+                              "oneOf": [
+                                {
+                                  "type": "object"
+                                },
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "boolean"
+                                }
+                              ]
+                            },
                             "name": {
                               "type": "string"
                             },
@@ -3472,9 +4624,6 @@
                               "items": {
                                 "type": "string"
                               }
-                            },
-                            "default": {
-                              "type": "object"
                             }
                           }
                         }
@@ -3521,6 +4670,22 @@
                               "additionalProperties": {
                                 "type": "object",
                                 "properties": {
+                                  "default": {
+                                    "oneOf": [
+                                      {
+                                        "type": "object"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      }
+                                    ]
+                                  },
                                   "name": {
                                     "type": "string"
                                   },
@@ -3529,9 +4694,6 @@
                                     "items": {
                                       "type": "string"
                                     }
-                                  },
-                                  "default": {
-                                    "type": "object"
                                   }
                                 }
                               }
@@ -3647,6 +4809,22 @@
                               "additionalProperties": {
                                 "type": "object",
                                 "properties": {
+                                  "default": {
+                                    "oneOf": [
+                                      {
+                                        "type": "object"
+                                      },
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      }
+                                    ]
+                                  },
                                   "name": {
                                     "type": "string"
                                   },
@@ -3655,9 +4833,6 @@
                                     "items": {
                                       "type": "string"
                                     }
-                                  },
-                                  "default": {
-                                    "type": "object"
                                   }
                                 }
                               }
@@ -3743,6 +4918,98 @@
       }
     },
     "schemas": {
+      "BranchDetailResponse": {
+        "type": "object",
+        "properties": {
+          "db_port": {
+            "type": "integer"
+          },
+          "ref": {
+            "type": "string"
+          },
+          "postgres_version": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ACTIVE_HEALTHY",
+              "ACTIVE_UNHEALTHY",
+              "COMING_UP",
+              "GOING_DOWN",
+              "INACTIVE",
+              "INIT_FAILED",
+              "REMOVED",
+              "RESTORING",
+              "UNKNOWN",
+              "UPGRADING",
+              "PAUSING"
+            ],
+            "type": "string"
+          },
+          "db_host": {
+            "type": "string"
+          },
+          "db_user": {
+            "type": "string"
+          },
+          "db_pass": {
+            "type": "string"
+          },
+          "jwt_secret": {
+            "type": "string"
+          }
+        },
+        "required": ["db_port", "ref", "postgres_version", "status", "db_host"]
+      },
+      "UpdateBranchBody": {
+        "type": "object",
+        "properties": {
+          "branch_name": {
+            "type": "string"
+          },
+          "git_branch": {
+            "type": "string"
+          }
+        }
+      },
+      "BranchResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "project_ref": {
+            "type": "string"
+          },
+          "parent_project_ref": {
+            "type": "string"
+          },
+          "is_default": {
+            "type": "boolean"
+          },
+          "git_branch": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "project_ref",
+          "parent_project_ref",
+          "is_default",
+          "created_at",
+          "updated_at"
+        ]
+      },
       "DatabaseResponse": {
         "type": "object",
         "properties": {
@@ -3868,106 +5135,79 @@
         },
         "required": ["name"]
       },
-      "CreateFunctionBody": {
+      "OAuthTokenBody": {
         "type": "object",
         "properties": {
-          "slug": {
+          "grant_type": {
+            "enum": ["authorization_code", "refresh_token"],
+            "type": "string"
+          },
+          "client_id": {
+            "type": "string"
+          },
+          "client_secret": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "code_verifier": {
+            "type": "string"
+          },
+          "redirect_uri": {
+            "type": "string"
+          },
+          "refresh_token": {
+            "type": "string"
+          }
+        },
+        "required": ["grant_type", "client_id", "client_secret"]
+      },
+      "OAuthTokenResponse": {
+        "type": "object",
+        "properties": {
+          "token_type": {
             "type": "string",
-            "pattern": "/^[A-Za-z0-9_-]+$/"
+            "enum": ["Bearer"]
           },
-          "name": {
+          "access_token": {
             "type": "string"
           },
-          "body": {
+          "refresh_token": {
             "type": "string"
           },
-          "verify_jwt": {
-            "type": "boolean"
+          "expires_in": {
+            "type": "number"
           }
         },
-        "required": ["slug", "name", "body"]
+        "required": ["token_type", "access_token", "refresh_token", "expires_in"]
       },
-      "FunctionResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "slug": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "status": {
-            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-            "type": "string"
-          },
-          "version": {
-            "type": "number"
-          },
-          "created_at": {
-            "type": "number"
-          },
-          "updated_at": {
-            "type": "number"
-          },
-          "verify_jwt": {
-            "type": "boolean"
-          },
-          "import_map": {
-            "type": "boolean"
-          }
-        },
-        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
-      },
-      "FunctionSlugResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "slug": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "status": {
-            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-            "type": "string"
-          },
-          "version": {
-            "type": "number"
-          },
-          "created_at": {
-            "type": "number"
-          },
-          "updated_at": {
-            "type": "number"
-          },
-          "verify_jwt": {
-            "type": "boolean"
-          },
-          "import_map": {
-            "type": "boolean"
-          }
-        },
-        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
-      },
-      "UpdateFunctionBody": {
+      "ApiKeyResponse": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string"
           },
-          "body": {
+          "api_key": {
+            "type": "string"
+          }
+        },
+        "required": ["name", "api_key"]
+      },
+      "CreateBranchBody": {
+        "type": "object",
+        "properties": {
+          "branch_name": {
             "type": "string"
           },
-          "verify_jwt": {
-            "type": "boolean"
+          "git_branch": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
           }
-        }
+        },
+        "required": ["branch_name"]
       },
       "UpdateCustomHostnameResponse": {
         "type": "object",
@@ -4092,7 +5332,7 @@
         },
         "required": ["root_key"]
       },
-      "PostgrestConfigResponse": {
+      "PostgrestConfigWithJWTSecretResponse": {
         "type": "object",
         "properties": {
           "max_rows": {
@@ -4102,6 +5342,9 @@
             "type": "string"
           },
           "db_extra_search_path": {
+            "type": "string"
+          },
+          "jwt_secret": {
             "type": "string"
           }
         },
@@ -4122,6 +5365,21 @@
             "type": "string"
           }
         }
+      },
+      "PostgrestConfigResponse": {
+        "type": "object",
+        "properties": {
+          "max_rows": {
+            "type": "integer"
+          },
+          "db_schema": {
+            "type": "string"
+          },
+          "db_extra_search_path": {
+            "type": "string"
+          }
+        },
+        "required": ["max_rows", "db_schema", "db_extra_search_path"]
       },
       "SecretResponse": {
         "type": "object",
@@ -4203,8 +5461,8 @@
         "type": "object",
         "properties": {
           "status": {
-            "type": "string",
-            "enum": ["not-used", "custom-domain-used", "active"]
+            "enum": ["not-used", "custom-domain-used", "active"],
+            "type": "string"
           },
           "custom_domain": {
             "type": "string"
@@ -4423,19 +5681,13 @@
         "type": "object",
         "properties": {
           "statement_timeout": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 2147483647
+            "type": "string"
           },
           "effective_cache_size": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 2147483647
+            "type": "string"
           },
           "maintenance_work_mem": {
-            "type": "integer",
-            "minimum": 1024,
-            "maximum": 2147483647
+            "type": "string"
           },
           "max_connections": {
             "type": "integer",
@@ -4463,51 +5715,28 @@
             "maximum": 262143
           },
           "shared_buffers": {
-            "type": "integer",
-            "minimum": 16,
-            "maximum": 1073741823
+            "type": "string"
           },
           "work_mem": {
-            "type": "integer",
-            "minimum": 64,
-            "maximum": 2147483647
+            "type": "string"
           },
           "session_replication_role": {
             "enum": ["origin", "replica", "local"],
             "type": "string"
           }
-        },
-        "required": [
-          "statement_timeout",
-          "effective_cache_size",
-          "maintenance_work_mem",
-          "max_connections",
-          "max_parallel_maintenance_workers",
-          "max_parallel_workers",
-          "max_parallel_workers_per_gather",
-          "max_worker_processes",
-          "shared_buffers",
-          "work_mem",
-          "session_replication_role"
-        ]
+        }
       },
       "UpdatePostgresConfigBody": {
         "type": "object",
         "properties": {
           "statement_timeout": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 2147483647
+            "type": "string"
           },
           "effective_cache_size": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 2147483647
+            "type": "string"
           },
           "maintenance_work_mem": {
-            "type": "integer",
-            "minimum": 1024,
-            "maximum": 2147483647
+            "type": "string"
           },
           "max_connections": {
             "type": "integer",
@@ -4535,37 +5764,351 @@
             "maximum": 262143
           },
           "shared_buffers": {
-            "type": "integer",
-            "minimum": 16,
-            "maximum": 1073741823
+            "type": "string"
           },
           "work_mem": {
-            "type": "integer",
-            "minimum": 64,
-            "maximum": 2147483647
+            "type": "string"
           },
           "session_replication_role": {
             "enum": ["origin", "replica", "local"],
             "type": "string"
           }
+        }
+      },
+      "ProjectPgBouncerConfig": {
+        "type": "object",
+        "properties": {
+          "db_dns_name": {
+            "type": "string"
+          },
+          "db_host": {
+            "type": "string"
+          },
+          "db_name": {
+            "type": "string"
+          },
+          "db_port": {
+            "type": "number"
+          },
+          "db_ssl": {
+            "type": "boolean"
+          },
+          "db_user": {
+            "type": "string"
+          },
+          "default_pool_size": {
+            "type": "number"
+          },
+          "ignore_startup_parameters": {
+            "type": "string"
+          },
+          "inserted_at": {
+            "type": "string"
+          },
+          "pgbouncer_enabled": {
+            "type": "boolean"
+          },
+          "supavisor_enabled": {
+            "type": "boolean"
+          },
+          "pgbouncer_status": {
+            "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
+            "type": "string"
+          },
+          "pool_mode": {
+            "enum": ["transaction", "session", "statement"],
+            "type": "string"
+          },
+          "max_client_conn": {
+            "type": "number",
+            "nullable": true
+          },
+          "connectionString": {
+            "type": "string"
+          }
         },
         "required": [
-          "statement_timeout",
-          "effective_cache_size",
-          "maintenance_work_mem",
-          "max_connections",
-          "max_parallel_maintenance_workers",
-          "max_parallel_workers",
-          "max_parallel_workers_per_gather",
-          "max_worker_processes",
-          "shared_buffers",
-          "work_mem",
-          "session_replication_role"
+          "db_dns_name",
+          "db_host",
+          "db_name",
+          "db_port",
+          "db_ssl",
+          "db_user",
+          "ignore_startup_parameters",
+          "inserted_at",
+          "pgbouncer_enabled",
+          "supavisor_enabled",
+          "pgbouncer_status",
+          "pool_mode",
+          "connectionString"
         ]
+      },
+      "UpdatePgbouncerConfigBody": {
+        "type": "object",
+        "properties": {
+          "default_pool_size": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "max_client_conn": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0,
+            "maximum": 18000
+          },
+          "ignore_startup_parameters": {
+            "type": "string"
+          },
+          "pgbouncer_enabled": {
+            "type": "boolean"
+          },
+          "pool_mode": {
+            "enum": ["transaction", "session", "statement"],
+            "type": "string"
+          }
+        },
+        "required": ["ignore_startup_parameters", "pgbouncer_enabled", "pool_mode"]
+      },
+      "UpdatePoolingConfigResponse": {
+        "type": "object",
+        "properties": {
+          "default_pool_size": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "max_client_conn": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0,
+            "maximum": 18000
+          },
+          "ignore_startup_parameters": {
+            "type": "string"
+          },
+          "pgbouncer_enabled": {
+            "type": "boolean"
+          },
+          "pool_mode": {
+            "enum": ["transaction", "session", "statement"],
+            "type": "string"
+          },
+          "pgbouncer_status": {
+            "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
+            "type": "string"
+          }
+        },
+        "required": [
+          "ignore_startup_parameters",
+          "pgbouncer_enabled",
+          "pool_mode",
+          "pgbouncer_status"
+        ]
+      },
+      "AuthConfigResponse": {
+        "type": "object",
+        "properties": {
+          "smtp_admin_email": {
+            "type": "string"
+          },
+          "smtp_host": {
+            "type": "string"
+          },
+          "smtp_port": {
+            "type": "string"
+          },
+          "smtp_user": {
+            "type": "string"
+          },
+          "smtp_pass": {
+            "type": "string"
+          },
+          "smtp_max_frequency": {
+            "type": "number"
+          },
+          "smtp_sender_name": {
+            "type": "string"
+          },
+          "rate_limit_email_sent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 2147483647
+          }
+        }
+      },
+      "UpdateAuthConfigBody": {
+        "type": "object",
+        "properties": {
+          "smtp_admin_email": {
+            "type": "string"
+          },
+          "smtp_host": {
+            "type": "string"
+          },
+          "smtp_port": {
+            "type": "string"
+          },
+          "smtp_user": {
+            "type": "string"
+          },
+          "smtp_pass": {
+            "type": "string"
+          },
+          "smtp_max_frequency": {
+            "type": "number"
+          },
+          "smtp_sender_name": {
+            "type": "string"
+          },
+          "rate_limit_email_sent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 2147483647
+          }
+        }
+      },
+      "RunQueryBody": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          }
+        },
+        "required": ["query"]
+      },
+      "CreateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "pattern": "/^[A-Za-z0-9_-]+$/"
+          },
+          "name": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "verify_jwt": {
+            "type": "boolean"
+          }
+        },
+        "required": ["slug", "name", "body"]
+      },
+      "FunctionResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+            "type": "string"
+          },
+          "version": {
+            "type": "number"
+          },
+          "created_at": {
+            "type": "number"
+          },
+          "updated_at": {
+            "type": "number"
+          },
+          "verify_jwt": {
+            "type": "boolean"
+          },
+          "import_map": {
+            "type": "boolean"
+          },
+          "entrypoint_path": {
+            "type": "string"
+          },
+          "import_map_path": {
+            "type": "string"
+          }
+        },
+        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
+      },
+      "FunctionSlugResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
+            "type": "string"
+          },
+          "version": {
+            "type": "number"
+          },
+          "created_at": {
+            "type": "number"
+          },
+          "updated_at": {
+            "type": "number"
+          },
+          "verify_jwt": {
+            "type": "boolean"
+          },
+          "import_map": {
+            "type": "boolean"
+          },
+          "entrypoint_path": {
+            "type": "string"
+          },
+          "import_map_path": {
+            "type": "string"
+          }
+        },
+        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
+      },
+      "UpdateFunctionBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "verify_jwt": {
+            "type": "boolean"
+          }
+        }
       },
       "AttributeValue": {
         "type": "object",
         "properties": {
+          "default": {
+            "oneOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          },
           "name": {
             "type": "string"
           },
@@ -4574,9 +6117,6 @@
             "items": {
               "type": "string"
             }
-          },
-          "default": {
-            "type": "object"
           }
         }
       },
@@ -4588,6 +6128,22 @@
             "additionalProperties": {
               "type": "object",
               "properties": {
+                "default": {
+                  "oneOf": [
+                    {
+                      "type": "object"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
                 "name": {
                   "type": "string"
                 },
@@ -4596,9 +6152,6 @@
                   "items": {
                     "type": "string"
                   }
-                },
-                "default": {
-                  "type": "object"
                 }
               }
             }
@@ -4634,6 +6187,22 @@
                 "additionalProperties": {
                   "type": "object",
                   "properties": {
+                    "default": {
+                      "oneOf": [
+                        {
+                          "type": "object"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    },
                     "name": {
                       "type": "string"
                     },
@@ -4642,9 +6211,6 @@
                       "items": {
                         "type": "string"
                       }
-                    },
-                    "default": {
-                      "type": "object"
                     }
                   }
                 }
@@ -4678,6 +6244,22 @@
                 "additionalProperties": {
                   "type": "object",
                   "properties": {
+                    "default": {
+                      "oneOf": [
+                        {
+                          "type": "object"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    },
                     "name": {
                       "type": "string"
                     },
@@ -4686,9 +6268,6 @@
                       "items": {
                         "type": "string"
                       }
-                    },
-                    "default": {
-                      "type": "object"
                     }
                   }
                 }
@@ -4746,6 +6325,22 @@
                     "additionalProperties": {
                       "type": "object",
                       "properties": {
+                        "default": {
+                          "oneOf": [
+                            {
+                              "type": "object"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "boolean"
+                            }
+                          ]
+                        },
                         "name": {
                           "type": "string"
                         },
@@ -4754,9 +6349,6 @@
                           "items": {
                             "type": "string"
                           }
-                        },
-                        "default": {
-                          "type": "object"
                         }
                       }
                     }
@@ -4826,6 +6418,22 @@
                     "additionalProperties": {
                       "type": "object",
                       "properties": {
+                        "default": {
+                          "oneOf": [
+                            {
+                              "type": "object"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "boolean"
+                            }
+                          ]
+                        },
                         "name": {
                           "type": "string"
                         },
@@ -4834,9 +6442,6 @@
                           "items": {
                             "type": "string"
                           }
-                        },
-                        "default": {
-                          "type": "object"
                         }
                       }
                     }
@@ -4911,6 +6516,22 @@
                           "additionalProperties": {
                             "type": "object",
                             "properties": {
+                              "default": {
+                                "oneOf": [
+                                  {
+                                    "type": "object"
+                                  },
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "boolean"
+                                  }
+                                ]
+                              },
                               "name": {
                                 "type": "string"
                               },
@@ -4919,9 +6540,6 @@
                                 "items": {
                                   "type": "string"
                                 }
-                              },
-                              "default": {
-                                "type": "object"
                               }
                             }
                           }
@@ -4995,6 +6613,22 @@
                     "additionalProperties": {
                       "type": "object",
                       "properties": {
+                        "default": {
+                          "oneOf": [
+                            {
+                              "type": "object"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "boolean"
+                            }
+                          ]
+                        },
                         "name": {
                           "type": "string"
                         },
@@ -5003,9 +6637,6 @@
                           "items": {
                             "type": "string"
                           }
-                        },
-                        "default": {
-                          "type": "object"
                         }
                       }
                     }
@@ -5069,6 +6700,22 @@
                 "additionalProperties": {
                   "type": "object",
                   "properties": {
+                    "default": {
+                      "oneOf": [
+                        {
+                          "type": "object"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    },
                     "name": {
                       "type": "string"
                     },
@@ -5077,9 +6724,6 @@
                       "items": {
                         "type": "string"
                       }
-                    },
-                    "default": {
-                      "type": "object"
                     }
                   }
                 }
@@ -5118,6 +6762,22 @@
                     "additionalProperties": {
                       "type": "object",
                       "properties": {
+                        "default": {
+                          "oneOf": [
+                            {
+                              "type": "object"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "boolean"
+                            }
+                          ]
+                        },
                         "name": {
                           "type": "string"
                         },
@@ -5126,9 +6786,6 @@
                           "items": {
                             "type": "string"
                           }
-                        },
-                        "default": {
-                          "type": "object"
                         }
                       }
                     }
@@ -5198,6 +6855,22 @@
                     "additionalProperties": {
                       "type": "object",
                       "properties": {
+                        "default": {
+                          "oneOf": [
+                            {
+                              "type": "object"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "boolean"
+                            }
+                          ]
+                        },
                         "name": {
                           "type": "string"
                         },
@@ -5206,9 +6879,6 @@
                           "items": {
                             "type": "string"
                           }
-                        },
-                        "default": {
-                          "type": "object"
                         }
                       }
                     }

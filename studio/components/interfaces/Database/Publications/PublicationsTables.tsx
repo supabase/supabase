@@ -8,12 +8,12 @@ import Table from 'components/to-be-cleaned/Table'
 import InformationBox from 'components/ui/InformationBox'
 import Connecting from 'components/ui/Loading/Loading'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { Button, IconAlertCircle, IconChevronLeft, IconSearch, Input } from 'ui'
 import PublicationsTableItem from './PublicationsTableItem'
 
-export interface PublicationsTablesProps {
+interface PublicationsTablesProps {
   selectedPublication: PostgresPublication
   onSelectBack: () => void
 }
@@ -22,7 +22,7 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
   const { project } = useProjectContext()
   const [filterString, setFilterString] = useState<string>('')
 
-  const canUpdatePublications = checkPermissions(
+  const canUpdatePublications = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'publications'
   )

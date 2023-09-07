@@ -80,6 +80,12 @@ You also have the option of requesting additional scopes from the oauth provider
 https://<your-ref>.supabase.co/auth/v1/authorize?provider=google&https://www.googleapis.com/auth/gmail.send
 ```
 
+Alternatively, if you're using the `supabase-js` client library, you can call the [`signInWithOAuth()` method](/docs/reference/javascript/auth-signinwithoauth):
+
+```js
+const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google' })
+```
+
 Note however that your app will usually have to be verified by Google before you can request advanced scopes such as this.
 
 The only thing left to implement is the UI, but if you prefer to use something pre-built, we have a handy [Auth Widget](https://github.com/supabase/ui/#using-supabase-ui-auth), where you can enable/disable whichever auth providers you want to support.
@@ -89,6 +95,7 @@ For any support please get in touch at beta at [supabase.com](https://supabase.c
 ### Resources
 
 - [JWT debugger](https://jwt.io)
+- [Supabase Auth API Reference](/docs/reference/javascript/auth-api)
 
 ### Next steps
 
@@ -97,7 +104,7 @@ For any support please get in touch at beta at [supabase.com](https://supabase.c
 - Watch [Part Three: Policies](../../learn/auth-deep-dive/auth-policies)
 - Watch [Part Four: GoTrue](../../learn/auth-deep-dive/auth-gotrue)
   {/* <!-- - Watch [Part Five: Google Oauth](../../learn/auth-deep-dive/auth-google-oauth) --> */}
-- Sign up for Supabase: [app.supabase.com](https://app.supabase.com)
+- Sign up for Supabase: [supabase.com/dashboard](https://supabase.com/dashboard)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

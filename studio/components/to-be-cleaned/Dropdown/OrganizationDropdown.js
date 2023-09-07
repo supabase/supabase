@@ -1,15 +1,10 @@
-import React from 'react'
 import { useRouter } from 'next/router'
-import { toJS } from 'mobx'
+
 import { Button, Dropdown, IconPlus } from 'ui'
-import { observer } from 'mobx-react-lite'
+import { EMPTY_ARR } from 'lib/void'
 
-const OrganizationDropdown = ({ organizations }) => {
+const OrganizationDropdown = ({ organizations = EMPTY_ARR }) => {
   const router = useRouter()
-
-  const organizationList = Object.values(toJS(organizations.data)).sort((a, b) =>
-    a.name.localeCompare(b.name)
-  )
 
   return (
     <Dropdown
@@ -18,7 +13,7 @@ const OrganizationDropdown = ({ organizations }) => {
       overlay={
         <>
           <Dropdown.Label>Choose organization</Dropdown.Label>
-          {organizationList
+          {organizations
             .sort((a, b) => a.name.localeCompare(b.name))
             .map((x) => (
               <Dropdown.Item
@@ -30,14 +25,19 @@ const OrganizationDropdown = ({ organizations }) => {
               </Dropdown.Item>
             ))}
           <Dropdown.Separator />
-          <Dropdown.Item icon={<IconPlus size="tiny" />} onClick={() => router.push(`/new`)}>
+          <Dropdown.Item
+            icon={<IconPlus size="tiny" />}
+            onClick={() => router.push(`/new`)}
+          >
             New organization
           </Dropdown.Item>
         </>
       }
     >
-      <Button as="span">New project</Button>
+      <Button asChild>
+        <span>New project</span>
+      </Button>
     </Dropdown>
   )
 }
-export default observer(OrganizationDropdown)
+export default OrganizationDropdown

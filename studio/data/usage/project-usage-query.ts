@@ -8,49 +8,28 @@ export type ProjectUsageVariables = {
   projectRef?: string
 }
 
-export interface DbSize {
-  usage: number | null
-  limit: number
-  cost: number
-  current: number
-  available_in_plan: boolean
-}
-
-export interface DbEgress {
+export interface UsageMetric {
   usage: number
   limit: number
   cost: number
   available_in_plan: boolean
-}
-
-export interface StorageSize {
-  usage: number | null
-  limit: number
-  cost: number
-  current: number
-  available_in_plan: boolean
-}
-
-export interface StorageEgress {
-  usage: number
-  limit: number
-  cost: number
-  available_in_plan: boolean
-}
-
-export interface MonthlyActiveUsers {
-  usage: number
-  limit: number
-  cost: number
-  available_in_plan: boolean
+  // [Joshen] can we verify if this is still getting passed?
+  // Only for database and storage size
+  current?: number
 }
 
 export type ProjectUsageResponse = {
-  db_size: DbSize
-  db_egress: DbEgress
-  storage_size: StorageSize
-  storage_egress: StorageEgress
-  monthly_active_users: MonthlyActiveUsers
+  db_size: UsageMetric
+  db_egress: UsageMetric
+  storage_size: UsageMetric
+  storage_egress: UsageMetric
+  storage_image_render_count: UsageMetric
+  monthly_active_users: UsageMetric
+  monthly_active_sso_users: UsageMetric
+  realtime_message_count: UsageMetric
+  realtime_peak_connection: UsageMetric
+  func_count: UsageMetric
+  func_invocations: UsageMetric
   disk_volume_size_gb: number
 }
 
@@ -83,6 +62,22 @@ export const useProjectUsageQuery = <TData = ProjectUsageData>(
     ({ signal }) => getProjectUsage({ projectRef }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
+      select(data) {
+        return Object.fromEntries(
+          Object.entries(data).map(([key, value]) => {
+            if (typeof value === 'object') {
+              const formattedValue = {
+                ...value,
+                usage: Number(value.usage),
+              }
+
+              return [key, formattedValue]
+            } else {
+              return [key, value]
+            }
+          })
+        )
+      },
       ...options,
     }
   )

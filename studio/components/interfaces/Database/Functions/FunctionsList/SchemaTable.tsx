@@ -1,22 +1,22 @@
-import { FC } from 'react'
+import { noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
 import Table from 'components/to-be-cleaned/Table'
 import FunctionList from './FunctionList'
 
-interface Props {
+interface SchemaTableProps {
   schema: string
   filterString: string
   editFunction: (fn: any) => void
   deleteFunction: (fn: any) => void
 }
 
-const SchemaTable: FC<Props> = ({
+const SchemaTable = ({
   schema,
   filterString,
-  editFunction = () => {},
-  deleteFunction = () => {},
-}) => {
+  editFunction = noop,
+  deleteFunction = noop,
+}: SchemaTableProps) => {
   return (
     <div key={schema} className="">
       <div className="sticky top-0 backdrop-blur backdrop-filter">

@@ -1,44 +1,45 @@
 import Head from 'next/head'
-import { FC, ReactNode } from 'react'
 import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
+import { PropsWithChildren } from 'react'
 
-import { auth, STORAGE_KEY } from 'lib/gotrue'
-import { useStore, withAuth, useFlag } from 'hooks'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
+import { useFlag, useSelectedOrganization, withAuth } from 'hooks'
+import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
-import WithSidebar from './WithSidebar'
+import SettingsLayout from '../SettingsLayout/SettingsLayout'
 import { SidebarSection } from './AccountLayout.types'
-import { useQueryClient } from '@tanstack/react-query'
+import WithSidebar from './WithSidebar'
 
-interface Props {
+export interface AccountLayoutProps {
   title: string
   breadcrumbs: {
     key: string
     label: string
   }[]
-  children: ReactNode
 }
 
-const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
+const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<AccountLayoutProps>) => {
   const router = useRouter()
-  const { app, ui } = useStore()
-  const queryClient = useQueryClient()
+  const { data: organizations } = useOrganizationsQuery()
+  const selectedOrganization = useSelectedOrganization()
+  const { data: factors } = useMfaListFactorsQuery()
 
   const ongoingIncident = useFlag('ongoingIncident')
+  const navLayoutV2 = useFlag('navigationLayoutV2')
+  const mfaSetup = useFlag('mfaSetup')
   const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
+  const signOut = useSignOut()
   const onClickLogout = async () => {
-    await auth.signOut()
-    localStorage.removeItem(STORAGE_KEY)
+    await signOut()
     await router.push('/sign-in')
-    await queryClient.resetQueries()
   }
 
-  const organizationsLinks = app.organizations
-    .list()
+  const organizationsLinks = (organizations ?? [])
     .map((organization) => ({
       isActive:
-        router.pathname.startsWith('/org/') && ui.selectedOrganization?.slug === organization.slug,
+        router.pathname.startsWith('/org/') && selectedOrganization?.slug === organization.slug,
       label: organization.name,
       href: `/org/${organization.slug}/general`,
       key: organization.slug,
@@ -87,6 +88,19 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
                 href: `/account/tokens`,
                 key: `/account/tokens`,
               },
+              // show the MFA page only if the feature flag is set or the user has already MFA setup.
+              // He should be able to edit/revoke his MFA even if MFA feature flag is disabled.
+              ...(mfaSetup || (factors?.all || []).length > 0
+                ? [
+                    {
+                      isActive: router.pathname === `/account/security`,
+                      icon: `${router.basePath}/img/user.svg`,
+                      label: 'Security',
+                      href: `/account/security`,
+                      key: `/account/security`,
+                    },
+                  ]
+                : []),
             ],
           },
         ]
@@ -129,6 +143,10 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
       : []),
   ]
 
+  if (navLayoutV2) {
+    return <SettingsLayout>{children}</SettingsLayout>
+  }
+
   return (
     <>
       <Head>
@@ -140,7 +158,12 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
           style={{ height: maxHeight, maxHeight }}
           className="flex flex-col flex-1 w-full overflow-y-auto"
         >
-          <WithSidebar title={title} breadcrumbs={breadcrumbs} sections={sectionsWithHeaders}>
+          <WithSidebar
+            hideSidebar={navLayoutV2}
+            title={title}
+            breadcrumbs={breadcrumbs}
+            sections={sectionsWithHeaders}
+          >
             {children}
           </WithSidebar>
         </main>
@@ -149,6 +172,6 @@ const AccountLayout: FC<Props> = ({ children, title, breadcrumbs }) => {
   )
 }
 
-export default withAuth(observer(AccountLayout))
+export default withAuth(AccountLayout)
 
-export const AccountLayoutWithoutAuth = observer(AccountLayout)
+export const AccountLayoutWithoutAuth = AccountLayout

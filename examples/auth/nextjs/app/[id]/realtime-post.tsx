@@ -1,40 +1,41 @@
-"use client";
+'use client'
 
-import { Database } from "@/lib/database.types";
-import { useEffect, useState } from "react";
-import { useSupabase } from "../supabase-provider";
+import { useEffect, useState } from 'react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
-type Post = Database["public"]["Tables"]["posts"]["Row"];
+import type { Database } from '@/lib/database.types'
+
+type Post = Database['public']['Tables']['posts']['Row']
 
 export default function RealtimePost({ serverPost }: { serverPost: Post }) {
-  const { supabase } = useSupabase();
-  const [post, setPost] = useState(serverPost);
+  const supabase = createClientComponentClient<Database>()
+  const [post, setPost] = useState(serverPost)
 
   useEffect(() => {
-    setPost(serverPost);
-  }, [serverPost]);
+    setPost(serverPost)
+  }, [serverPost])
 
   useEffect(() => {
     const channel = supabase
-      .channel("realtime post")
+      .channel('realtime post')
       .on(
-        "postgres_changes",
+        'postgres_changes',
         {
-          event: "UPDATE",
-          schema: "public",
-          table: "posts",
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'posts',
           filter: `id=eq.${post.id}`,
         },
         (payload) => {
-          setPost(payload.new as Post);
+          setPost(payload.new as Post)
         }
       )
-      .subscribe();
+      .subscribe()
 
     return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase, post, setPost]);
+      supabase.removeChannel(channel)
+    }
+  }, [supabase, post, setPost])
 
-  return <pre>{JSON.stringify(post, null, 2)}</pre>;
+  return <pre>{JSON.stringify(post, null, 2)}</pre>
 }

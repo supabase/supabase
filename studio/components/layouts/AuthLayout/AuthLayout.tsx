@@ -1,30 +1,33 @@
-import { useEffect, PropsWithChildren } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect } from 'react'
 
-import ProjectLayout from '../'
-import { useStore, withAuth } from 'hooks'
-import ProductMenu from 'components/ui/ProductMenu'
-import { generateAuthMenu } from './AuthLayout.utils'
 import { useParams } from 'common'
+import ProductMenu from 'components/ui/ProductMenu'
+import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
+import { useStore, withAuth } from 'hooks'
+import ProjectLayout from '../'
+import { generateAuthMenu } from './AuthLayout.utils'
 
 export interface AuthLayoutProps {
   title?: string
 }
 
 const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => {
-  const { ref: projectRef } = useParams()
+  const { ref: projectRef = 'default' } = useParams()
   const { ui, meta } = useStore()
+
+  useAuthConfigPrefetch({ projectRef })
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
 
   useEffect(() => {
-    if (ui.selectedProject?.ref) {
+    if (ui.selectedProjectRef) {
       meta.policies.load()
       meta.roles.load()
     }
-  }, [ui.selectedProject?.ref])
+  }, [ui.selectedProjectRef])
 
   return (
     <ProjectLayout

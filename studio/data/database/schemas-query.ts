@@ -1,7 +1,8 @@
-import { PostgresSchema } from '@supabase/postgres-meta'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+
+import { components } from 'data/api'
+import { get } from 'data/fetchers'
+import { ResponseError } from 'types'
 import { databaseKeys } from './keys'
 
 export type SchemasVariables = {
@@ -9,9 +10,7 @@ export type SchemasVariables = {
   connectionString?: string
 }
 
-export type Schema = PostgresSchema
-
-export type SchemasResponse = Schema[] | { error?: any }
+export type Schema = components['schemas']['PostgresSchema']
 
 export async function getSchemas(
   { projectRef, connectionString }: SchemasVariables,
@@ -24,20 +23,28 @@ export async function getSchemas(
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const response = (await get(`${API_URL}/pg-meta/${projectRef}/schemas`, {
+  const { data, error } = await get('/platform/pg-meta/{ref}/schemas', {
+    params: {
+      header: {
+        'x-connection-encrypted': connectionString!,
+      },
+      path: {
+        ref: projectRef,
+      },
+    },
     headers: Object.fromEntries(headers),
     signal,
-  })) as SchemasResponse
+  })
 
-  if (!Array.isArray(response) && response.error) {
-    throw response.error
+  if (error) {
+    throw error
   }
 
-  return response as PostgresSchema[]
+  return data
 }
 
 export type SchemasData = Awaited<ReturnType<typeof getSchemas>>
-export type SchemasError = unknown
+export type SchemasError = ResponseError
 
 export const useSchemasQuery = <TData = SchemasData>(
   { projectRef, connectionString }: SchemasVariables,
@@ -48,3 +55,7 @@ export const useSchemasQuery = <TData = SchemasData>(
     ({ signal }) => getSchemas({ projectRef, connectionString }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
+
+export function invalidateSchemasQuery(client: QueryClient, projectRef: string | undefined) {
+  return client.invalidateQueries(databaseKeys.schemaList(projectRef))
+}

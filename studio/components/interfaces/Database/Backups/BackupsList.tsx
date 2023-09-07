@@ -1,29 +1,27 @@
-import { FC } from 'react'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { observer } from 'mobx-react-lite'
 
-import { useStore, checkPermissions } from 'hooks'
-import Loading from 'components/ui/Loading'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
-import Panel from 'components/ui/Panel'
-
-import BackupItem from './BackupItem'
-import BackupsError from './BackupsError'
-import BackupsEmpty from './BackupsEmpty'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import InformationBox from 'components/ui/InformationBox'
+import Loading from 'components/ui/Loading'
+import Panel from 'components/ui/Panel'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { useCheckPermissions, useStore } from 'hooks'
 import { IconAlertCircle, IconClock } from 'ui'
+import BackupItem from './BackupItem'
+import BackupsEmpty from './BackupsEmpty'
+import BackupsError from './BackupsError'
 
-interface Props {}
-
-const BackupsList: FC<Props> = ({}) => {
-  const { ui, backups } = useStore()
-  const projectRef = ui.selectedProject?.ref || 'default'
-  const canTriggerScheduledBackups = checkPermissions(
+const BackupsList = () => {
+  const { project: selectedProject } = useProjectContext()
+  const { backups } = useStore()
+  const projectRef = selectedProject?.ref || 'default'
+  const canTriggerScheduledBackups = useCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
   )
 
-  const isPitrEnabled = backups?.configuration?.walg_enabled
+  const isPitrEnabled = backups?.configuration?.pitr_enabled
 
   if (backups.isLoading) return <Loading />
   if (backups.error) return <BackupsError />
@@ -38,18 +36,19 @@ const BackupsList: FC<Props> = ({}) => {
         primaryText="Free Plan does not include project backups."
         projectRef={projectRef}
         secondaryText="Upgrade to the Pro plan for up to 7 days of scheduled backups."
+        addon="pitr"
       />
     )
+  }
+
+  if (isPitrEnabled) {
+    return null
   }
 
   return (
     <div className="space-y-6">
       {!sortedBackups?.length && tierKey !== 'FREE' ? (
-        !isPitrEnabled ? (
-          <BackupsEmpty />
-        ) : (
-          <></>
-        )
+        <BackupsEmpty />
       ) : (
         <>
           {!canTriggerScheduledBackups && (

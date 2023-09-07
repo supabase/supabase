@@ -12,6 +12,7 @@ export const PricingTableRowDesktop = (props: any) => {
       <tr
         className="divide-scale-600 dark:divide-scale-400 bg-scale-200"
         style={{ borderTop: 'none' }}
+        id={`${props.sectionId}-desktop`}
       >
         <th
           className="border-b border-scale-600 bg-scale-200 bg-scale-50 dark:bg-scale-200 text-scale-1200 sticky top-[62px] z-10 py-3 pl-6 text-left text-sm font-medium dark:text-white"
@@ -47,35 +48,35 @@ export const PricingTableRowDesktop = (props: any) => {
                 )}
               </th>
 
-              {Object.entries(feat.tiers).map((entry: any, i) => {
-                const tierName = entry[0]
-                const tierValue = entry[1]
+              {Object.entries(feat.plans).map((entry: any, i) => {
+                const planName = entry[0]
+                const planValue = entry[1]
 
                 return (
                   <td
                     key={i}
                     className={[
-                      `px-6 tier-${tierName}`,
-                      typeof tierValue === 'boolean' ? 'text-center' : '',
+                      `px-6 tier-${planName}`,
+                      typeof planValue === 'boolean' ? 'text-center' : '',
                     ].join(' ')}
                   >
-                    {typeof tierValue === 'boolean' && tierValue === true ? (
-                      <IconPricingIncludedCheck tier={tierValue} />
-                    ) : typeof tierValue === 'boolean' && tierValue === false ? (
+                    {typeof planValue === 'boolean' && planValue === true ? (
+                      <IconPricingIncludedCheck plan={planValue} />
+                    ) : typeof planValue === 'boolean' && planValue === false ? (
                       <div className="text-scale-900">
-                        <IconPricingMinus tier={tierValue} />
+                        <IconPricingMinus plan={planValue} />
                       </div>
                     ) : (
                       <span className="text-scale-1200 text-xs dark:text-white flex items-center gap-3">
-                        {feat.tooltips?.[tierName] && (
+                        {feat.tooltips?.[planName] && (
                           <span
                             className="shrink-0 hover:text-scale-300 cursor-pointer transition-colors"
-                            data-tip={feat.tooltips[tierName]}
+                            data-tip={feat.tooltips[planName]}
                           >
                             <IconPricingInfo />
                           </span>
                         )}
-                        {tierValue}
+                        {planValue}
                       </span>
                     )}
                   </td>
@@ -88,18 +89,18 @@ export const PricingTableRowDesktop = (props: any) => {
           </Fragment>
         )
       })}
-      <ReactTooltip effect={'solid'} className="!max-w-[320px]" />
+      <ReactTooltip effect={'solid'} className="!max-w-[320px] whitespace-pre-line" />
     </>
   )
 }
 
 export const PricingTableRowMobile = (props: any) => {
   const category = props.category
-  const tier = props.tier
+  const plan = props.plan
 
   return (
     <>
-      <table className="mt-8 w-full">
+      <table className="mt-8 w-full" id={`${props.sectionId}-mobile`}>
         <caption className="bg-scale-50 dark:bg-dark-900 border-scale-400 border-t px-4 py-3 text-left text-sm font-medium dark:text-white">
           <div className="flex items-center gap-2">
             {category.icon ? <ProductIcon icon={props.icon} /> : null}
@@ -126,16 +127,16 @@ export const PricingTableRowMobile = (props: any) => {
                   </span>
                 </th>
                 <td className="py-3 pr-4 text-right">
-                  {typeof feat.tiers[tier] === 'boolean' && feat.tiers[tier] === true ? (
+                  {typeof feat.plans[plan] === 'boolean' && feat.plans[plan] === true ? (
                     <div className="inline-block">
-                      <IconPricingIncludedCheck tier={tier} />
+                      <IconPricingIncludedCheck plan={plan} />
                     </div>
-                  ) : typeof feat.tiers[tier] === 'boolean' && feat.tiers[tier] === false ? (
+                  ) : typeof feat.plans[plan] === 'boolean' && feat.plans[plan] === false ? (
                     <div className="inline-block">
-                      <IconPricingMinus tier={tier} />
+                      <IconPricingMinus plan={plan} />
                     </div>
                   ) : (
-                    <span className="text-scale-1200 block text-sm">{feat.tiers[tier]}</span>
+                    <span className="text-scale-1200 block text-sm">{feat.plans[plan]}</span>
                   )}
                 </td>
               </tr>
@@ -143,7 +144,7 @@ export const PricingTableRowMobile = (props: any) => {
           })}
         </tbody>
       </table>
-      <ReactTooltip effect={'solid'} className="!max-w-[320px]" />
+      <ReactTooltip effect={'solid'} className="!max-w-[320px] whitespace-pre-line" />
     </>
   )
 }

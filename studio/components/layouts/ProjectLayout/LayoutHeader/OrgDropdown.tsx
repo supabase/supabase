@@ -1,17 +1,17 @@
-import { useRouter } from 'next/router'
 import { toJS } from 'mobx'
-import { observer } from 'mobx-react-lite'
-import { Button, Dropdown, IconPlus } from 'ui'
+import { useRouter } from 'next/router'
 
-import { useStore } from 'hooks'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useSelectedOrganization, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
+import { Button, Dropdown, IconPlus } from 'ui'
 
 const OrgDropdown = () => {
   const router = useRouter()
-  const { app, ui } = useStore()
+  const { ui } = useStore()
 
-  const sortedOrganizations: any[] = app.organizations.list()
-  const selectedOrganization: any = ui.selectedOrganization
+  const { data: organizations } = useOrganizationsQuery()
+  const selectedOrganization = useSelectedOrganization()
 
   return IS_PLATFORM ? (
     <Dropdown
@@ -19,8 +19,8 @@ const OrgDropdown = () => {
       align="start"
       overlay={
         <>
-          {sortedOrganizations
-            .sort((a, b) => a.name.localeCompare(b.name))
+          {organizations
+            ?.sort((a, b) => a.name.localeCompare(b.name))
             .map((x) => {
               const slug = toJS(x.slug)
 
@@ -51,21 +51,22 @@ const OrgDropdown = () => {
               )
             })}
           <Dropdown.Separator />
+
           <Dropdown.Item icon={<IconPlus size="tiny" />} onClick={() => router.push(`/new`)}>
             New organization
           </Dropdown.Item>
         </>
       }
     >
-      <Button as="span" type="text" size="tiny">
-        {selectedOrganization.name}
+      <Button asChild type="text" size="tiny">
+        <span>{selectedOrganization?.name}</span>
       </Button>
     </Dropdown>
   ) : (
-    <Button as="span" type="text" size="tiny">
-      {selectedOrganization.name}
+    <Button asChild type="text" size="tiny">
+      <span>{selectedOrganization?.name}</span>
     </Button>
   )
 }
 
-export default observer(OrgDropdown)
+export default OrgDropdown

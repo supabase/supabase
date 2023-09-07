@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './../../packages/ui/build/css/source/global.css';
+@import './../../packages/ui/build/css/themes/dark.css';
+@import './../../packages/ui/build/css/themes/light.css';
+
 @layer utilities {
   .btn-primary {
     @apply inline-block rounded border border-green-500 bg-green-500 py-1 px-3 text-sm;
@@ -21,13 +25,13 @@ html,
 body,
 #__next,
 .main {
+  @apply bg-scale-200;
+  @apply text-scale-1200;
   height: 100%;
   padding: 0;
   margin: 0;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
-  @apply bg-bg-primary-light dark:bg-bg-primary-dark;
-  @apply text-scale-1200;
 }
 
 * {
@@ -150,8 +154,19 @@ a {
   }
 }
 
+.input-xs {
+  input,
+  textarea {
+    @apply text-xs;
+  }
+}
+
 input[type='radio'] {
   @apply p-0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield; /* Firefox, Not included in tailwind styles reset */
 }
 
 // TODO: It doesnt' work, need to check

@@ -7,12 +7,12 @@ import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { useTableQuery } from 'data/tables/table-query'
 import { snakeToCamel } from 'lib/helpers'
 import { IconBookOpen, SidePanel } from 'ui'
-import { GeneralContent, ResourceContent } from '../Docs'
+import { ResourceContent } from '../Docs'
 import GeneratingTypes from '../Docs/GeneratingTypes'
 import LangSelector from '../Docs/LangSelector'
 import ActionBar from './SidePanelEditor/ActionBar'
 
-interface APIDocumentationPanelProps {
+export interface APIDocumentationPanelProps {
   visible: boolean
   onClose: () => void
 }
@@ -113,14 +113,6 @@ const APIDocumentationPanel = ({ visible, onClose }: APIDocumentationPanelProps)
                       autoApiService={autoApiService}
                     />
                   </div>
-                  <GeneralContent
-                    autoApiService={autoApiService}
-                    selectedLang={selectedLang}
-                    showApiKey={true}
-                    page={page}
-                  />
-
-                  <GeneratingTypes selectedLang={selectedLang} />
 
                   {jsonSchema?.definitions && (
                     <ResourceContent
@@ -134,6 +126,9 @@ const APIDocumentationPanel = ({ visible, onClose }: APIDocumentationPanelProps)
                       refreshDocs={async () => await refetch()}
                     />
                   )}
+                  <div className="mt-8">
+                    <GeneratingTypes selectedLang={selectedLang} />
+                  </div>
                 </>
               ) : (
                 <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
