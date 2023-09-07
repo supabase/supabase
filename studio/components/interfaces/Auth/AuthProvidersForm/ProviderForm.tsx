@@ -55,23 +55,17 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
   const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
 
-    // When the key is a 'double negative' key, we must reverse the boolean before the payload can be sent
+    // Format payload for the following checks:
+    // 1. Convert all empty string values to null
+    // 2. When the key is a 'double negative' key, we must reverse the boolean before the payload can be sent
     Object.keys(values).map((x: string) => {
-      if (doubleNegativeKeys.includes(x)) {
-        payload[x] = !values[x]
-      }
+      if (doubleNegativeKeys.includes(x)) payload[x] = !values[x]
+      if (payload[x] === '') payload[x] = null
     })
 
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
       {
-        onError: (error) => {
-          ui.setNotification({
-            error,
-            category: 'error',
-            message: `Failed to update settings:  ${error?.message}`,
-          })
-        },
         onSuccess: () => {
           resetForm({ values: { ...values }, initialValues: { ...values } })
           setOpen(false)

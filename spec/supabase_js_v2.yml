@@ -415,6 +415,7 @@ functions:
     notes: |
       - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `email`, `recovery`, `invite` or `email_change` (`signup` and `magiclink` types are deprecated).
       - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
+      - The `TokenHash` is contained in the [email templates](/docs/guides/auth/auth-email-templates) and can be used to sign in. You may wish to use the hash with Magic Links for the PKCE flow for Server Side Auth. See [this guide](/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr) for more details.
     examples:
       - id: verify-sms-one-time-password(otp)
         name: Verify Sms One-Time Password (OTP)
@@ -429,6 +430,13 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email'})
+          ```
+      - id: verify-email-auth(tokenhash)
+        name: Verify Email Auth (Token Hash)
+        isSpotlight: false
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'email'})
           ```
   - id: get-session
     title: 'getSession()'
