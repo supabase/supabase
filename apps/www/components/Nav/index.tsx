@@ -35,14 +35,14 @@ const menu = {
       hasDropdown: true,
       dropdown: <Product />,
       dropdownContainerClassName: 'rounded-lg flex flex-row',
-      subMenu: DevelopersData,
+      subMenu: null,
     },
     {
       title: 'Developers',
       hasDropdown: true,
       dropdown: <Developers />,
       dropdownContainerClassName: 'rounded-lg',
-      subMenu: [],
+      subMenu: DevelopersData,
     },
     {
       title: 'Pricing',
@@ -64,30 +64,28 @@ export const ListItem = React.forwardRef<
   React.ComponentPropsWithoutRef<'a'> & { description?: string; icon?: string }
 >(({ className, title, href = '', description, icon, children, ...props }, ref) => {
   return (
-    <NavigationMenuLink asChild>
-      <Link href={href} passHref>
-        <a
-          ref={ref}
-          className={cn(
-            'group flex flex-row select-none space-x-2 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-overlay-hover focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground-strong',
-            className
-          )}
-          {...props}
-        >
-          {children ?? (
-            <>
-              {icon && <ProductIcon icon={icon} color="alt" />}
-              <div className="flex flex-col space-y-1">
-                <div className="text-sm font-medium leading-none">{title}</div>
-                {description && (
-                  <p className="line-clamp-2 text-sm leading-snug text-light">{description}</p>
-                )}
-              </div>
-            </>
-          )}
-        </a>
-      </Link>
-    </NavigationMenuLink>
+    <Link href={href} passHref>
+      <a
+        ref={ref}
+        className={cn(
+          'group flex flex-row select-none space-x-2 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-overlay-hover focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground-strong',
+          className
+        )}
+        {...props}
+      >
+        {children ?? (
+          <>
+            {icon && <ProductIcon icon={icon} color="alt" />}
+            <div className="flex flex-col space-y-1">
+              <div className="text-sm font-medium leading-none">{title}</div>
+              {description && (
+                <p className="line-clamp-2 text-sm leading-snug text-light">{description}</p>
+              )}
+            </div>
+          </>
+        )}
+      </a>
+    </Link>
   )
 })
 
@@ -132,11 +130,7 @@ const Nav = () => {
           ].join(' ')}
         >
           <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-16 xl:px-20">
-            <HamburgerButton
-              toggleFlyOut={() => setOpen(true)}
-              showLaunchWeekNavMode={showLaunchWeekNavMode}
-            />
-            <div className="flex items-center justify-center flex-1 sm:items-stretch lg:justify-between">
+            <div className="flex items-center px-6 flex-1 sm:items-stretch justify-between">
               <div className="flex items-center">
                 <div className="flex items-center flex-shrink-0">
                   <Link href="/" as="/">
@@ -176,11 +170,13 @@ const Nav = () => {
                         </NavigationMenuItem>
                       ) : (
                         <NavigationMenuItem className="text-sm font-medium">
-                          <ListItem
-                            href={menuItem.url}
-                            title={menuItem.title}
-                            className="group-hover:bg-transparent hover:text-brand"
-                          />
+                          <NavigationMenuLink asChild>
+                            <ListItem
+                              href={menuItem.url}
+                              title={menuItem.title}
+                              className="group-hover:bg-transparent hover:text-brand"
+                            />
+                          </NavigationMenuLink>
                         </NavigationMenuItem>
                       )
                     )}
@@ -219,9 +215,13 @@ const Nav = () => {
                 )}
               </div>
             </div>
+            <HamburgerButton
+              toggleFlyOut={() => setOpen(true)}
+              showLaunchWeekNavMode={showLaunchWeekNavMode}
+            />
           </div>
 
-          <MobileMenu open={open} setOpen={setOpen} menu={menu} />
+          <MobileMenu open={open} setOpen={setOpen} isDarkMode={isDarkMode} />
         </nav>
 
         <ScrollProgress />

@@ -5,6 +5,7 @@ import SolutionsData from 'data/Solutions'
 import ComparisonsData from 'data/Comparisons'
 import CustomersData from 'data/CustomerStories'
 import { TextLink } from 'ui'
+import { NavigationMenuLink } from 'ui/src/components/shadcn/ui/navigation-menu'
 
 const aside = [CustomersData, ComparisonsData]
 
@@ -12,13 +13,14 @@ const Product = () => (
   <>
     <ul className="grid gap-2 xl:grid-cols-2 p-2 w-[300px] xl:w-[600px]">
       {Object.values(SolutionsData).map((component) => (
-        <ListItem
-          key={component.name}
-          title={component.name}
-          href={component.url}
-          description={component.description_short}
-          icon={component.icon}
-        />
+        <NavigationMenuLink key={component.name} asChild>
+          <ListItem
+            title={component.name}
+            href={component.url}
+            description={component.description_short}
+            icon={component.icon}
+          />
+        </NavigationMenuLink>
       ))}
     </ul>
     <div className="bg-alternative flex flex-col gap-6 p-4 w-[250px]">
