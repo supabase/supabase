@@ -16,7 +16,7 @@ const CTABanner = dynamic(() => import('components/CTABanner/index'))
 const CustomerStories = dynamic(() => import('components/CustomerStories'))
 const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
 
-type Props = { customerStories: PostTypes[] }
+type Props = { customerStories: PostTypes[]; blogPosts: PostTypes[] }
 
 const Index = ({ customerStories }: Props) => {
   return (
@@ -35,10 +35,12 @@ const Index = ({ customerStories }: Props) => {
 
 export async function getStaticProps() {
   const customerStories = getSortedPosts({ directory: '_customers', limit: 3 })
+  const blogPosts = getSortedPosts({ directory: '_blog', runner: '** BLOG PAGE **', limit: 1 })
 
   return {
     props: {
       customerStories,
+      blogPosts,
     },
   }
 }

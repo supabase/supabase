@@ -30,6 +30,7 @@ import Product from './Product'
 
 import SolutionsData from 'data/Solutions'
 import { useWindowSize } from 'react-use'
+import PostTypes from '../../types/post'
 
 const menu = {
   primaryNav: [
@@ -62,7 +63,7 @@ const menu = {
   ],
 }
 
-const Nav = () => {
+const Nav = ({ blogPosts }: { blogPosts?: PostTypes[] }) => {
   const { theme, resolvedTheme } = useTheme()
   const router = useRouter()
   const { width } = useWindowSize()
@@ -87,6 +88,37 @@ const Nav = () => {
   React.useEffect(() => {
     if (width >= 1024) setOpen(false)
   }, [width])
+
+  const menu = {
+    primaryNav: [
+      {
+        title: 'Product',
+        hasDropdown: true,
+        dropdown: <Product />,
+        dropdownContainerClassName: 'rounded-lg flex flex-row',
+        subMenu: SolutionsData,
+      },
+      {
+        title: 'Developers',
+        hasDropdown: true,
+        dropdown: <Developers />,
+        dropdownContainerClassName: 'rounded-lg',
+        subMenu: DevelopersData,
+      },
+      {
+        title: 'Pricing',
+        url: '/pricing',
+      },
+      {
+        title: 'Docs',
+        url: '/docs',
+      },
+      {
+        title: 'Blog',
+        url: '/blog',
+      },
+    ],
+  }
 
   return (
     <>
