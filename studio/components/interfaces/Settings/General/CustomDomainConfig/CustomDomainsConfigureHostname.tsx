@@ -14,9 +14,9 @@ import {
   FormSectionLabel,
 } from 'components/ui/Forms'
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
-import { verifyCNAME } from './CustomDomainConfig.utils'
 
 const schema = yup.object({
   domain: yup.string().required('A value for your custom domain is required'),
@@ -27,6 +27,14 @@ const CustomDomainsConfigureHostname = () => {
   const { ref } = useParams()
   const { project } = useProjectContext()
 
+  const { mutate: checkCNAMERecord, isLoading: isCheckingRecord } = useCheckCNAMERecordMutation({
+    onError: (error, variables) => {
+      return ui.setNotification({
+        category: 'error',
+        message: `Your CNAME record for ${variables.domain} cannot be found - if you've just added the CNAME record, do check back in a bit.`,
+      })
+    },
+  })
   const { mutate: createCustomDomain, isLoading: isCreating } = useCustomDomainCreateMutation()
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
 
@@ -41,15 +49,14 @@ const CustomDomainsConfigureHostname = () => {
   const onCreateCustomDomain = async (values: yup.InferType<typeof schema>) => {
     if (!ref) return console.error('Project ref is required')
 
-    const cnameVerified = await verifyCNAME(values.domain)
-    if (!cnameVerified) {
-      return ui.setNotification({
-        category: 'error',
-        message: `Your CNAME record for ${values.domain} cannot be found - if you've just added the CNAME record, do check back in a bit.`,
-      })
-    }
-
-    createCustomDomain({ projectRef: ref, customDomain: values.domain })
+    checkCNAMERecord(
+      { domain: values.domain },
+      {
+        onSuccess: () => {
+          createCustomDomain({ projectRef: ref, customDomain: values.domain })
+        },
+      }
+    )
   }
 
   return (
@@ -70,7 +77,7 @@ const CustomDomainsConfigureHostname = () => {
                 <div className="flex py-4 px-8">
                   <FormActions
                     form={FORM_ID}
-                    isSubmitting={isCreating}
+                    isSubmitting={isCheckingRecord || isCreating}
                     submitText="Add"
                     hasChanges={hasChanges}
                     handleReset={handleReset}
