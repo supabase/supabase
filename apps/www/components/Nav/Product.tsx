@@ -1,20 +1,18 @@
 import React from 'react'
-import { ListItem } from '.'
 
 import SolutionsData from 'data/Solutions'
 import ComparisonsData from 'data/Comparisons'
 import CustomersData from 'data/CustomerStories'
 import { TextLink } from 'ui'
 import { NavigationMenuLink } from 'ui/src/components/shadcn/ui/navigation-menu'
-
-const aside = [CustomersData, ComparisonsData]
+import MenuItem from './MenuItem'
 
 const Product = () => (
   <>
     <ul className="grid gap-2 xl:grid-cols-2 p-2 w-[300px] xl:w-[600px]">
       {Object.values(SolutionsData).map((component) => (
         <NavigationMenuLink key={component.name} asChild>
-          <ListItem
+          <MenuItem
             title={component.name}
             href={component.url}
             description={component.description_short}

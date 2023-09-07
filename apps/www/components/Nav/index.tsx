@@ -1,18 +1,9 @@
 import React, { useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import FlyOut from '~/components/UI/FlyOut'
-import Announcement from '~/components/Announcement/Announcement'
-import { Button, LW8CountdownBanner, cn } from 'ui'
-import ScrollProgress from '~/components/ScrollProgress'
-import { useIsLoggedIn, useIsUserLoading } from 'common'
-import { useTheme } from 'next-themes'
-import TextLink from '../TextLink'
-import Image from 'next/image'
-import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
-import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
-import GitHubButton from './GitHubButton'
 
+import { Button, LW8CountdownBanner } from 'ui'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -21,12 +12,24 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from 'ui/src/components/shadcn/ui/navigation-menu'
-import HamburgerButton from './HamburgerMenu'
-import Developers from './Developers'
-import Product from './Product'
-import ProductIcon from '../ProductIcon'
+import Announcement from '~/components/Announcement/Announcement'
+import ScrollProgress from '~/components/ScrollProgress'
+
+import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { useTheme } from 'next-themes'
+import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
+import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+
 import { data as DevelopersData } from 'data/Developers'
+import Developers from './Developers'
+import GitHubButton from './GitHubButton'
+import HamburgerButton from './HamburgerMenu'
 import MobileMenu from './MobileMenu'
+import MenuItem from './MenuItem'
+import Product from './Product'
+
+import SolutionsData from 'data/Solutions'
+import { useWindowSize } from 'react-use'
 
 const menu = {
   primaryNav: [
@@ -35,7 +38,7 @@ const menu = {
       hasDropdown: true,
       dropdown: <Product />,
       dropdownContainerClassName: 'rounded-lg flex flex-row',
-      subMenu: null,
+      subMenu: SolutionsData,
     },
     {
       title: 'Developers',
@@ -59,49 +62,17 @@ const menu = {
   ],
 }
 
-export const ListItem = React.forwardRef<
-  React.ElementRef<'a'>,
-  React.ComponentPropsWithoutRef<'a'> & { description?: string; icon?: string }
->(({ className, title, href = '', description, icon, children, ...props }, ref) => {
-  return (
-    <Link href={href} passHref>
-      <a
-        ref={ref}
-        className={cn(
-          'group flex flex-row select-none space-x-2 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-overlay-hover focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground-strong',
-          className
-        )}
-        {...props}
-      >
-        {children ?? (
-          <>
-            {icon && <ProductIcon icon={icon} color="alt" />}
-            <div className="flex flex-col space-y-1">
-              <div className="text-sm font-medium leading-none">{title}</div>
-              {description && (
-                <p className="line-clamp-2 text-sm leading-snug text-light">{description}</p>
-              )}
-            </div>
-          </>
-        )}
-      </a>
-    </Link>
-  )
-})
-
 const Nav = () => {
   const { theme, resolvedTheme } = useTheme()
   const router = useRouter()
+  const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
-  const [openProduct, setOpenProduct] = useState(false)
-  const [openDevelopers, setOpenDevelopers] = useState(false)
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
 
   const isHomePage = router.pathname === '/'
   const isLaunchWeekPage = router.pathname.includes('launch-week')
-  const showLaunchWeekNavMode =
-    (isLaunchWeekPage || isHomePage) && !open && !openProduct && !openDevelopers
+  const showLaunchWeekNavMode = (isLaunchWeekPage || isHomePage) && !open
 
   React.useEffect(() => {
     if (open) {
@@ -112,8 +83,19 @@ const Nav = () => {
     }
   }, [open])
 
+  // Close mobile menu when desktop
+  React.useEffect(() => {
+    if (width >= 1024) setOpen(false)
+  }, [width])
+
   return (
     <>
+      <Announcement link="/launch-week">
+        <LW8CountdownBanner />
+      </Announcement>
+
+      <MobileMenu open={open} setOpen={setOpen} isDarkMode={resolvedTheme === 'dark'} menu={menu} />
+
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
@@ -171,7 +153,7 @@ const Nav = () => {
                       ) : (
                         <NavigationMenuItem className="text-sm font-medium">
                           <NavigationMenuLink asChild>
-                            <ListItem
+                            <MenuItem
                               href={menuItem.url}
                               title={menuItem.title}
                               className="group-hover:bg-transparent hover:text-brand"
@@ -220,8 +202,6 @@ const Nav = () => {
               showLaunchWeekNavMode={showLaunchWeekNavMode}
             />
           </div>
-
-          <MobileMenu open={open} setOpen={setOpen} isDarkMode={isDarkMode} />
         </nav>
 
         <ScrollProgress />

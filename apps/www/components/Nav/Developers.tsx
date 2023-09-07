@@ -1,11 +1,11 @@
 import React from 'react'
 import Link from 'next/link'
 import { IconChevronRight, TextLink } from 'ui'
-import { ListItem } from '.'
 
 import { data as DevelopersData } from 'data/Developers'
 import ProductIcon from '../ProductIcon'
 import { NavigationMenuLink } from 'ui/src/components/shadcn/ui/navigation-menu'
+import MenuItem from './MenuItem'
 
 type Props = {
   text: string
@@ -106,7 +106,7 @@ const Developers = () => (
     <div className="border-b p-2">
       {DevelopersData['header'].map((link) => (
         <NavigationMenuLink asChild>
-          <ListItem key={link.text} href={link.url} className="py-4 items-center group">
+          <MenuItem key={link.text} href={link.url} className="py-4 items-center group">
             {link.icon && <ProductIcon icon={link.icon} color="gray" />}
             <div className="flex flex-col space-y-1 flex-1">
               <div className="leading-none">{link.text}</div>
@@ -117,7 +117,7 @@ const Developers = () => (
             <div className="shrink-0 flex items-center">
               <IconChevronRight className="-translate-x-1 transition-transform group-hover:translate-x-0" />
             </div>
-          </ListItem>
+          </MenuItem>
         </NavigationMenuLink>
       ))}
     </div>
