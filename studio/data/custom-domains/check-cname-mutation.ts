@@ -27,7 +27,12 @@ export async function checkCNAMERecord({ domain }: CheckCNAMERecordVariables) {
   })
   const verification = (await res.json()) as CheckCNAMERecordResponse
 
-  if (verification.Answer === undefined) return false
+  if (verification.Answer === undefined) {
+    throw new Error(
+      `Your CNAME record for ${domain} cannot be found - if you've just added the record, do check back in a bit.`
+    )
+  }
+
   return verification.Answer.some((x) => x.type === 5)
 }
 

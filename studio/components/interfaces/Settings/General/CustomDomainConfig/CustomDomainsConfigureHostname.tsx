@@ -27,14 +27,7 @@ const CustomDomainsConfigureHostname = () => {
   const { ref } = useParams()
   const { project } = useProjectContext()
 
-  const { mutate: checkCNAMERecord, isLoading: isCheckingRecord } = useCheckCNAMERecordMutation({
-    onError: (error, variables) => {
-      return ui.setNotification({
-        category: 'error',
-        message: `Your CNAME record for ${variables.domain} cannot be found - if you've just added the CNAME record, do check back in a bit.`,
-      })
-    },
-  })
+  const { mutate: checkCNAMERecord, isLoading: isCheckingRecord } = useCheckCNAMERecordMutation()
   const { mutate: createCustomDomain, isLoading: isCreating } = useCustomDomainCreateMutation()
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
 
