@@ -25,7 +25,7 @@ const DatabasePhysicalBackups: NextPageWithLayout = () => {
       <ScaffoldSection>
         <div className="col-span-12">
           <div className="space-y-6">
-            <h3 className="text-xl text-scale-1200">Backups</h3>
+            <h3 className="text-xl text-scale-1200">Database Backups</h3>
 
             <Tabs
               type="underlined"

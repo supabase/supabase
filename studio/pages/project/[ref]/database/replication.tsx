@@ -33,6 +33,9 @@ const DatabaseReplication: NextPageWithLayout = () => {
     <ScaffoldContainer>
       <ScaffoldSection>
         <div className="col-span-12">
+          <div className="mb-4">
+            <h3 className="mb-1 text-xl text-scale-1200">Database Replications</h3>
+          </div>
           {selectedPublicationId === undefined ? (
             <PublicationsList onSelectPublication={setSelectedPublicationId} />
           ) : (

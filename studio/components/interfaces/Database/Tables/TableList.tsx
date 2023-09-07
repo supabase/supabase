@@ -20,6 +20,7 @@ import {
 import Table from 'components/to-be-cleaned/Table'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions, useStore } from 'hooks'
+import { ScaffoldHeader } from 'components/layouts/Scaffold'
 
 interface TableListProps {
   selectedSchema: string
@@ -67,6 +68,10 @@ const TableList = ({
 
   return (
     <>
+      <div className="mb-4">
+        <h3 className="mb-1 text-xl text-scale-1200">Database Tables</h3>
+      </div>
+
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <div className="w-[260px]">
