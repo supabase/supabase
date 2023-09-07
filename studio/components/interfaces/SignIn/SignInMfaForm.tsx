@@ -29,7 +29,6 @@ const SignInMfaForm = () => {
     error: factorsError,
     isError: isErrorFactors,
     isSuccess: isSuccessFactors,
-    isInitialLoading: isInitialLoadingFactors,
     isLoading: isLoadingFactors,
   } = useMfaListFactorsQuery()
   const {
