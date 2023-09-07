@@ -8,9 +8,8 @@ import { Button, IconLoader, IconLock, IconSearch, Input, Listbox } from 'ui'
 
 import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import { useCheckPermissions, useStore } from 'hooks'
-import SchemaTable from './SchemaTable'
 import Table from 'components/to-be-cleaned/Table'
+import { useCheckPermissions, useStore } from 'hooks'
 import TriggerList from './TriggerList'
 
 interface TriggersListProps {
@@ -194,16 +193,6 @@ const TriggersList = ({
               />
             }
           />
-
-          {/* {filteredTriggerSchemas.map((schema: any) => (
-            <SchemaTable
-              key={schema}
-              filterString={filterString}
-              schema={schema}
-              editTrigger={editTrigger}
-              deleteTrigger={deleteTrigger}
-            />
-          ))} */}
         </div>
       )}
     </>
