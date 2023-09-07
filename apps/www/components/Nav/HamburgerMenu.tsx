@@ -7,7 +7,7 @@ type HamburgerButtonProps = {
 
 const HamburgerButton = (props: HamburgerButtonProps) => (
   <div
-    className="absolute inset-y-0 left-0 flex items-center px-4 lg:hidden"
+    className="inset-y-0 flex mr-2 items-center px-4 lg:hidden"
     onClick={() => props.toggleFlyOut()}
   >
     <button

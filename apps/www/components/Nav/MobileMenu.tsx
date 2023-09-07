@@ -1,15 +1,58 @@
 import React, { Dispatch, SetStateAction } from 'react'
-import Transition from 'lib/Transition'
+import Image from 'next/image'
 import Link from 'next/link'
-import { Accordion, Button } from 'ui'
+import Transition from 'lib/Transition'
+import { Accordion, Button, TextLink } from 'ui'
+
+import Developers from './Developers'
+import Product from './Product'
+import SolutionsData from 'data/Solutions'
+import ComparisonsData from 'data/Comparisons'
+import CustomersData from 'data/CustomerStories'
+import { data as DevelopersData } from 'data/Developers'
+import { ListItem } from '.'
+
+import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
+import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  menu: any
+  isDarkMode: boolean
 }
 
-const MobileMenu = ({ open, setOpen, menu }: Props) => {
+const menu = {
+  primaryNav: [
+    {
+      title: 'Product',
+      hasDropdown: true,
+      dropdown: <Product />,
+      dropdownContainerClassName: 'rounded-lg flex flex-row',
+      subMenu: SolutionsData,
+    },
+    {
+      title: 'Developers',
+      hasDropdown: true,
+      dropdown: <Developers />,
+      dropdownContainerClassName: 'rounded-lg',
+      subMenu: DevelopersData,
+    },
+    {
+      title: 'Pricing',
+      url: '/pricing',
+    },
+    {
+      title: 'Docs',
+      url: '/docs',
+    },
+    {
+      title: 'Blog',
+      url: '/blog',
+    },
+  ],
+}
+
+const MobileMenu = ({ open, setOpen, isDarkMode }: Props) => {
   return (
     <Transition
       appear={true}
@@ -23,37 +66,45 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
     >
       <div
         className={[
-          'dark:bg-scale-300 fixed overflow-y-auto inset-0 z-50 h-screen max-h-screen w-screen supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-[100svh] transform bg-white',
+          'bg-overlay fixed overflow-hidden inset-0 z-50 h-screen max-h-screen w-screen supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-[100svh] transform',
           open && '!bg-scale-300',
         ].join(' ')}
       >
-        <div className="absolute items-center justify-between right-4 top-4">
-          <div className="-mr-2">
-            <button
-              onClick={() => setOpen(false)}
-              type="button"
-              className="inline-flex items-center justify-center p-2 bg-white rounded-md text-scale-900 focus:ring-brand dark:bg-scale-300 dark:hover:bg-scale-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset"
+        <div className="absolute h-16 px-6 flex items-center justify-between w-screen left-0 top-0 z-50 bg-overlay">
+          <Link href="/" as="/">
+            <a className="block w-auto h-6">
+              <Image
+                src={isDarkMode ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight}
+                width={124}
+                height={24}
+                alt="Supabase Logo"
+              />
+            </a>
+          </Link>
+          <button
+            onClick={() => setOpen(false)}
+            type="button"
+            className="inline-flex items-center justify-center p-2 bg-white rounded-md text-scale-900 focus:ring-brand dark:bg-scale-300 dark:hover:bg-scale-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset"
+          >
+            <span className="sr-only">Close menu</span>
+            <svg
+              className="w-6 h-6"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
             >
-              <span className="sr-only">Close menu</span>
-              <svg
-                className="w-6 h-6"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
         </div>
-        <div className="max-h-screen overflow-y-auto p-4">
+        <div className="max-h-screen overflow-y-auto py-8 px-4">
           <div className="mt-10 mb-20 space-y-1">
             <Accordion
               type="default"
@@ -63,86 +114,74 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
               justified={false}
               chevronAlign="right"
             >
-              {menu.primaryNav.map((menuItem: any) =>
-                menuItem.hasDropdown ? (
-                  <Accordion.Item
-                    header={menuItem.title}
-                    key={menuItem.title}
-                    id={menuItem.title}
-                    className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
-                  >
-                    <div className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      submenu
-                    </div>
-                  </Accordion.Item>
-                ) : (
-                  <Link href={menuItem.url}>
-                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      {menuItem.title}
-                    </a>
-                  </Link>
-                )
-              )}
-              {menu.primaryNav.map((menuItem: any) =>
-                menuItem.hasDropdown ? (
-                  <Accordion.Item
-                    header={menuItem.title}
-                    key={menuItem.title}
-                    id={menuItem.title}
-                    className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
-                  >
-                    <div className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      submenu
-                    </div>
-                  </Accordion.Item>
-                ) : (
-                  <Link href={menuItem.url}>
-                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      {menuItem.title}
-                    </a>
-                  </Link>
-                )
-              )}
-              {menu.primaryNav.map((menuItem: any) =>
-                menuItem.hasDropdown ? (
-                  <Accordion.Item
-                    header={menuItem.title}
-                    key={menuItem.title}
-                    id={menuItem.title}
-                    className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
-                  >
-                    <div className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      submenu
-                    </div>
-                  </Accordion.Item>
-                ) : (
-                  <Link href={menuItem.url}>
-                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      {menuItem.title}
-                    </a>
-                  </Link>
-                )
-              )}
-              {menu.primaryNav.map((menuItem: any) =>
-                menuItem.hasDropdown ? (
-                  <Accordion.Item
-                    header={menuItem.title}
-                    key={menuItem.title}
-                    id={menuItem.title}
-                    className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
-                  >
-                    <div className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      submenu
-                    </div>
-                  </Accordion.Item>
-                ) : (
-                  <Link href={menuItem.url}>
-                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      {menuItem.title}
-                    </a>
-                  </Link>
-                )
-              )}
+              {menu.primaryNav.map((menuItem: any) => (
+                <div className="border-b [&>div]:!rounded-none" key={menuItem.title}>
+                  {menuItem.hasDropdown ? (
+                    <Accordion.Item
+                      header={<div className="w-full flex-1">{menuItem.title}</div>}
+                      id={menuItem.title}
+                      className="block relative py-2 pl-3 pr-4 text-base font-medium text-foreground hover:bg-overlay-hover hover:border-gray-300"
+                    >
+                      {menuItem.title === 'Product' ? (
+                        Object.values(menuItem.subMenu)?.map((component: any) => (
+                          <ListItem
+                            key={component.name}
+                            title={component.name}
+                            href={component.url}
+                            description={component.description_short}
+                            icon={component.icon}
+                          />
+                        ))
+                      ) : menuItem.title === 'Developers' ? (
+                        <div className="px-3 mb-2 flex flex-col gap-4">
+                          {menuItem.subMenu['navigation'].map((column: any) => (
+                            <div key={column.label}>
+                              {column.label !== 'Developers' && (
+                                <label className="text-muted text-xs uppercase tracking-widest font-mono">
+                                  {column.label}
+                                </label>
+                              )}
+                              {column.links.map((link: any) => (
+                                <TextLink
+                                  hasChevron={false}
+                                  key={link.text}
+                                  url={link.url}
+                                  label={link.text}
+                                  className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay"
+                                />
+                              ))}
+                            </div>
+                          ))}
+
+                          <div className="flex flex-col py-2">
+                            <label className="text-muted text-xs uppercase tracking-widest font-mono">
+                              Troubleshooting
+                            </label>
+                            <TextLink
+                              hasChevron={false}
+                              url={menuItem.subMenu['footer']['support'].url}
+                              label={menuItem.subMenu['footer']['support'].text}
+                              className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay"
+                            />
+                            <TextLink
+                              hasChevron={false}
+                              url={menuItem.subMenu['footer']['systemStatus'].url}
+                              label={menuItem.subMenu['footer']['systemStatus'].text}
+                              className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay"
+                            />
+                          </div>
+                        </div>
+                      ) : null}
+                    </Accordion.Item>
+                  ) : (
+                    <Link href={menuItem.url}>
+                      <a className="block py-2 pl-3 pr-4 text-base font-medium text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
+                        {menuItem.title}
+                      </a>
+                    </Link>
+                  )}
+                </div>
+              ))}
             </Accordion>
           </div>
         </div>

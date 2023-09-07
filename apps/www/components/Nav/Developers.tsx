@@ -5,6 +5,7 @@ import { ListItem } from '.'
 
 import { data as DevelopersData } from 'data/Developers'
 import ProductIcon from '../ProductIcon'
+import { NavigationMenuLink } from 'ui/src/components/shadcn/ui/navigation-menu'
 
 type Props = {
   text: string
@@ -102,22 +103,24 @@ const Developers = () => {
 =======
 const Developers = () => (
   <>
-    <ul className="border-b p-2">
+    <div className="border-b p-2">
       {DevelopersData['header'].map((link) => (
-        <ListItem key={link.text} href={link.url} className="py-4 items-center group">
-          {link.icon && <ProductIcon icon={link.icon} color="gray" />}
-          <div className="flex flex-col space-y-1 flex-1">
-            <div className="leading-none">{link.text}</div>
-            {link.description && (
-              <p className="line-clamp-2 text-sm leading-snug text-light">{link.description}</p>
-            )}
-          </div>
-          <div className="shrink-0 flex items-center">
-            <IconChevronRight className="-translate-x-1 transition-transform group-hover:translate-x-0" />
-          </div>
-        </ListItem>
+        <NavigationMenuLink asChild>
+          <ListItem key={link.text} href={link.url} className="py-4 items-center group">
+            {link.icon && <ProductIcon icon={link.icon} color="gray" />}
+            <div className="flex flex-col space-y-1 flex-1">
+              <div className="leading-none">{link.text}</div>
+              {link.description && (
+                <p className="line-clamp-2 text-sm leading-snug text-light">{link.description}</p>
+              )}
+            </div>
+            <div className="shrink-0 flex items-center">
+              <IconChevronRight className="-translate-x-1 transition-transform group-hover:translate-x-0" />
+            </div>
+          </ListItem>
+        </NavigationMenuLink>
       ))}
-    </ul>
+    </div>
     <ul className="grid gap-3 p-2 md:grid-cols-3 w-[650px] border-b">
       {DevelopersData['navigation'].map((column) => (
         <li key={column.label} className="p-2">
@@ -136,7 +139,7 @@ const Developers = () => (
         </li>
       ))}
     </ul>
-    <ul className="p-2 flex justify-between bg-alternative text-sm">
+    <div className="p-2 flex justify-between bg-alternative text-sm">
       <Link href={DevelopersData['footer']['support'].url}>
         <a className="p-2 hover:bg-[#101010] rounded text-foreground-light flex items-center gap-1 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:text-foreground-strong">
           <svg
@@ -162,7 +165,7 @@ const Developers = () => (
           {DevelopersData['footer']['systemStatus'].text}
         </a>
       </Link>
-    </ul>
+    </div>
   </>
 )
 >>>>>>> 6e67410ae (setup developers nav dropdown layout)
