@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Button, Form, IconExternalLink, Input } from 'ui'
 import * as yup from 'yup'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   FormActions,
   FormPanel,
@@ -24,12 +25,18 @@ const schema = yup.object({
 const CustomDomainsConfigureHostname = () => {
   const { ui } = useStore()
   const { ref } = useParams()
+  const { project } = useProjectContext()
+
   const { mutate: createCustomDomain, isLoading: isCreating } = useCustomDomainCreateMutation()
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
 
   const FORM_ID = 'custom-domains-form'
   const endpoint = settings?.autoApiService.endpoint
-  const canConfigureCustomDomain = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const canConfigureCustomDomain = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const onCreateCustomDomain = async (values: yup.InferType<typeof schema>) => {
     if (!ref) return console.error('Project ref is required')
