@@ -6,24 +6,22 @@ import { ColumnList, TableList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import { DatabaseLayout } from 'components/layouts'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Table } from 'data/tables/table-query'
 import { useStore } from 'hooks'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { NextPageWithLayout } from 'types'
 
 const DatabaseTables: NextPageWithLayout = () => {
-  const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
-  const { meta } = useStore()
+  const { ui, meta } = useStore()
 
   const { ref: projectRef } = useParams()
 
   useEffect(() => {
-    if (project?.ref) {
+    if (ui.selectedProjectRef) {
       meta.types.load()
     }
-  }, [project?.ref])
+  }, [ui.selectedProjectRef])
 
   const [selectedTable, setSelectedTable] = useState<Table | undefined>(undefined)
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<Table | undefined>(undefined)

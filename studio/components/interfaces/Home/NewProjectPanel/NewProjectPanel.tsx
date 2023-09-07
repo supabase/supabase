@@ -1,18 +1,17 @@
 import Link from 'next/link'
-import { FC } from 'react'
-import SVG from 'react-inlinesvg'
 import { useRouter } from 'next/router'
-import { Button, IconKey, IconArchive, IconExternalLink, IconCode, IconActivity } from 'ui'
+import SVG from 'react-inlinesvg'
+import { Button, IconActivity, IconArchive, IconCode, IconExternalLink, IconKey } from 'ui'
 
 import Panel from 'components/ui/Panel'
+import { useFlag } from 'hooks'
 import APIKeys from './APIKeys'
 import GetStartedHero from './GetStartedHero'
 
-interface Props {}
-
-const NewProjectPanel: FC<Props> = ({}) => {
+const NewProjectPanel = () => {
   const router = useRouter()
   const { ref } = router.query
+  const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
 
   return (
     <div className="grid grid-cols-12 gap-4 lg:gap-20">
@@ -59,7 +58,11 @@ const NewProjectPanel: FC<Props> = ({}) => {
                     </Button>
                   </a>
                 </Link>
-                <Link href={`/project/${ref}/sql`}>
+                <Link
+                  href={
+                    supabaseAIEnabled ? `/project/${ref}/sql/new` : `/project/${ref}/sql/templates`
+                  }
+                >
                   <a>
                     <Button
                       type="default"
@@ -212,7 +215,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
                   </div>
                   <div className="flex md:min-h-[50px] xl:min-h-[75px]">
                     <p className="text-sm text-scale-1000">
-                      Listen to your to PostgreSQL database in realtime via websockets.
+                      Listen to your PostgreSQL database in realtime via websockets.
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -242,7 +245,7 @@ const NewProjectPanel: FC<Props> = ({}) => {
             <p className="text-base text-scale-1100 lg:max-w-sm">
               Interact with your database through the{' '}
               <Link href="https://supabase.com/docs/reference">
-                <a className="text-brand-900">Supabase client libraries</a>
+                <a className="text-brand">Supabase client libraries</a>
               </Link>{' '}
               with your API keys.
             </p>

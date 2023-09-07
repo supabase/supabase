@@ -92,9 +92,15 @@ export default class ProjectBackupsStore implements IProjectBackupsStore {
   list(filter?: any) {
     const arr = Object.values(this.data)
     if (!!filter) {
-      return arr.filter(filter).sort((a: any, b: any) => b.id - a.id)
+      return arr
+        .filter(filter)
+        .sort(
+          (a: any, b: any) => new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
+        )
     } else {
-      return arr.sort((a: any, b: any) => b.id - a.id)
+      return arr.sort(
+        (a: any, b: any) => new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
+      )
     }
   }
 

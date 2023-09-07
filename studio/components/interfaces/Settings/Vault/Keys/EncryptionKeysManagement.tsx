@@ -1,32 +1,31 @@
-import dayjs from 'dayjs'
-import Link from 'next/link'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { FC, Fragment, useEffect, useState } from 'react'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import dayjs from 'dayjs'
+import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
+import { Fragment, useEffect, useState } from 'react'
 import {
   Alert,
-  Input,
-  IconSearch,
-  Listbox,
   Button,
-  Modal,
   Form,
-  IconTrash,
+  IconExternalLink,
   IconKey,
   IconLoader,
+  IconSearch,
+  IconTrash,
   IconX,
-  IconExternalLink,
+  Input,
+  Listbox,
+  Modal,
 } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useStore, checkPermissions } from 'hooks'
-import { useParams } from 'common/hooks'
+
 import Divider from 'components/ui/Divider'
+import { useCheckPermissions, useStore } from 'hooks'
 
 const DEFAULT_KEY_NAME = 'No description provided'
 
-interface Props {}
-
-const EncryptionKeysManagement: FC<Props> = ({}) => {
+const EncryptionKeysManagement = () => {
   const { vault, ui } = useStore()
   const { id } = useParams()
 
@@ -36,7 +35,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
   const [selectedKeyToRemove, setSelectedKeyToRemove] = useState<any>()
   const [isDeletingKey, setIsDeletingKey] = useState(false)
 
-  const canManageKeys = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canManageKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   useEffect(() => {
     if (id !== undefined) setSearchValue(id)

@@ -83,5 +83,23 @@ FOR DELETE USING (
     check: '',
     command: 'DELETE',
     roles: [],
+  },  {
+    id: 'policy-5',
+    templateName: 'Enable insert access for users based on their user ID *',
+    description:
+      'This policy assumes that your table has a column "user_id", and allows users to insert rows which the "user_id" column matches their ID',
+    statement: `
+CREATE POLICY "policy_name"
+ON ${schema}.${table}
+FOR INSERT USING (
+  auth.uid() = user_id
+)  WITH CHECK (
+  auth.uid() = user_id
+);`.trim(),
+    name: 'Enable insert for users based on user_id',
+    definition: 'auth.uid() = user_id',
+    check: 'true',
+    command: 'INSERT',
+    roles: [],
   },
 ]

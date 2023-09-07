@@ -1,23 +1,24 @@
-import { CalculatedColumn } from '@supabase/react-data-grid'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { CalculatedColumn } from '@supabase/react-data-grid'
 import {
   Button,
+  Divider,
   Dropdown,
   IconChevronDown,
-  Divider,
   IconEdit,
-  IconTrash,
   IconLock,
+  IconTrash,
   IconUnlock,
 } from 'ui'
+
 import { useDispatch, useTrackedState } from '../../store'
 
-type ColumnMenuProps = {
+interface ColumnMenuProps {
   column: CalculatedColumn<any, unknown>
   isEncrypted?: boolean
 }
 
-const ColumnMenu: React.FC<ColumnMenuProps> = ({ column, isEncrypted }) => {
+const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
   const state = useTrackedState()
   const dispatch = useDispatch()
   const { onEditColumn: onEditColumnFunc, onDeleteColumn: onDeleteColumnFunc } = state
@@ -45,7 +46,7 @@ const ColumnMenu: React.FC<ColumnMenuProps> = ({ column, isEncrypted }) => {
       <>
         {state.editable && onEditColumn !== undefined && (
           <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger className={`w-full ${isEncrypted ? 'opacity-50' : ''}`}>
+            <Tooltip.Trigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
               <Dropdown.Item
                 onClick={onEditColumn}
                 disabled={isEncrypted}
@@ -83,7 +84,7 @@ const ColumnMenu: React.FC<ColumnMenuProps> = ({ column, isEncrypted }) => {
           <>
             <Divider light />
             <Dropdown.Item onClick={onDeleteColumn} icon={<IconTrash size="tiny" stroke="red" />}>
-              Delete Column
+              Delete column
             </Dropdown.Item>
           </>
         )}
@@ -95,12 +96,14 @@ const ColumnMenu: React.FC<ColumnMenuProps> = ({ column, isEncrypted }) => {
     <>
       <Dropdown align="end" side="bottom" overlay={renderMenu()}>
         <Button
-          as={'span'}
+          asChild
           className="opacity-50"
           type="text"
           icon={<IconChevronDown />}
           style={{ padding: '3px' }}
-        />
+        >
+          <span></span>
+        </Button>
       </Dropdown>
     </>
   )

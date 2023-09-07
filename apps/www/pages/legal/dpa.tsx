@@ -52,7 +52,7 @@ const DPA = () => {
                 <p>You can download our latest DPA document by submitting your email here.</p>
 
                 {formSubmitted ? (
-                  <p className="text-brand-900">
+                  <p className="text-brand">
                     Thank you for your submission! A new tab should have opened with the DPA
                     document
                   </p>

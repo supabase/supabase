@@ -9,10 +9,23 @@ import redirects from './lib/redirects.js'
 
 import withTM from 'next-transpile-modules'
 
+import { remarkCodeHike } from '@code-hike/mdx'
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [remarkGfm],
+    remarkPlugins: [
+      [
+        remarkCodeHike,
+        {
+          theme: codeHikeTheme,
+          lineNumbers: true,
+          showCopyButton: true,
+        },
+      ],
+      remarkGfm,
+    ],
     rehypePlugins: [rehypeSlug],
     // This is required for `MDXProvider` component
     providerImportSource: '@mdx-js/react',
@@ -30,20 +43,21 @@ const nextConfig = {
   images: {
     dangerouslyAllowSVG: true,
     domains: [
-      'avatars.githubusercontent.com',
-      'github.com',
-      'ca.slack-edge.com',
-      'res.cloudinary.com',
-      'images.unsplash.com',
-      'supabase.com',
-      'obuldanrptloktxcffvn.supabase.co',
-      'avatars.githubusercontent.com',
-      'colab.research.google.com',
       'api.producthunt.com',
+      'avatars.githubusercontent.com',
+      'ca.slack-edge.com',
+      'colab.research.google.com',
+      'github.com',
       'https://s3-us-west-2.amazonaws.com',
-      's3-us-west-2.amazonaws.com',
-      'user-images.githubusercontent.com',
+      'images.unsplash.com',
+      'img.youtube.com',
+      'vercel.com',
+      'obuldanrptloktxcffvn.supabase.co',
       'pbs.twimg.com',
+      'res.cloudinary.com',
+      's3-us-west-2.amazonaws.com',
+      'supabase.com',
+      'user-images.githubusercontent.com',
     ],
   },
   async headers() {
@@ -77,6 +91,6 @@ const nextConfig = {
 
 // next.config.js.
 export default () => {
-  const plugins = [withMDX, withBundleAnalyzer, withTM(['ui', 'common'])]
+  const plugins = [withMDX, withBundleAnalyzer, withTM(['ui', 'common', 'shared-data'])]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }

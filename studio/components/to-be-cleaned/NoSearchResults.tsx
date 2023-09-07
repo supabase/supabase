@@ -13,7 +13,7 @@ export const NoSearchResults = () => {
         }
       />
       <p className="w-64 text-center text-sm opacity-50">
-        Hmm, we couldn't find any results that matches your query. Try another?
+        Hmm, we couldn't find any results that match your query.
       </p>
     </div>
   )

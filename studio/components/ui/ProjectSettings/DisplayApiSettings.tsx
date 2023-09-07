@@ -1,12 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { IconAlertCircle, IconLoader, Input } from 'ui'
+import { Button, IconAlertCircle, IconBookOpen, IconLoader, Input } from 'ui'
 
-import Panel from 'components/ui/Panel'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { checkPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
+import Panel from 'components/ui/Panel'
+import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
+import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useCheckPermissions } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 
 const DisplayApiSettings = () => {
@@ -24,7 +24,7 @@ const DisplayApiSettings = () => {
   } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
-  const canReadAPIKeys = checkPermissions(PermissionAction.READ, 'service_api_keys')
+  const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
 
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
@@ -44,7 +44,13 @@ const DisplayApiSettings = () => {
           <p className="text-sm text-scale-1000">
             Your API is secured behind an API gateway which requires an API Key for every request.
             <br />
-            You can use the keys below to use Supabase client libraries.
+            You can use the keys below in the Supabase client libraries.
+            <br />
+            <a href="https://supabase.com/docs#client-libraries" target="_blank" rel="noreferrer">
+              <Button icon={<IconBookOpen />} type="default" className="mt-4">
+                Client Docs
+              </Button>
+            </a>
           </p>
         </div>
       }

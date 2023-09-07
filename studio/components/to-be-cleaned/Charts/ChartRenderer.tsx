@@ -214,7 +214,7 @@ export function BarChart({
                     interval={data ? data.length - 2 : 0}
                     angle={0}
                     // stroke="#4B5563"
-                    tick={{ fontSize: '0px', color: CHART_COLORS.TICK }}
+                    tick={false}
                     axisLine={{ stroke: CHART_COLORS.AXIS }}
                     tickLine={{ stroke: CHART_COLORS.AXIS }}
                   />

@@ -1,16 +1,16 @@
-import { FC, useState, useEffect } from 'react'
-import { Modal, Form, Input, IconHelpCircle, Button, IconEyeOff, IconEye } from 'ui'
+import { useEffect, useState } from 'react'
+import { Button, Form, IconEye, IconEyeOff, IconHelpCircle, Input, Modal } from 'ui'
 
+import InformationBox from 'components/ui/InformationBox'
 import { useStore } from 'hooks'
 import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
-import InformationBox from 'components/ui/InformationBox'
 
-interface Props {
+interface AddNewSecretModalProps {
   visible: boolean
   onClose: () => void
 }
 
-const AddNewSecretModal: FC<Props> = ({ visible, onClose }) => {
+const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
   const { vault, ui } = useStore()
   const [showSecretValue, setShowSecretValue] = useState(false)
   const [selectedKeyId, setSelectedKeyId] = useState<string>()
@@ -126,7 +126,7 @@ const AddNewSecretModal: FC<Props> = ({ visible, onClose }) => {
                   />
                   <InformationBox
                     icon={<IconHelpCircle size={18} strokeWidth={2} />}
-                    url="https://supabase.com/docs/guides/database/vault"
+                    url="https://github.com/supabase/vault"
                     urlLabel="Vault documentation"
                     title="What is a key?"
                     description={

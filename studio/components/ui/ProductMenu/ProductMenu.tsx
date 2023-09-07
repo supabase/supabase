@@ -1,14 +1,14 @@
-import { FC } from 'react'
 import { Badge, Menu } from 'ui'
-import ProductMenuItem from './ProductMenuItem'
-import { ProductMenuGroup, ProductMenuGroupItem } from './ProductMenu.types'
 
-interface Props {
+import { ProductMenuGroup, ProductMenuGroupItem } from './ProductMenu.types'
+import ProductMenuItem from './ProductMenuItem'
+
+interface ProductMenuProps {
   page?: string
   menu: ProductMenuGroup[]
 }
 
-const ProductMenu: FC<Props> = ({ page, menu }) => {
+const ProductMenu = ({ page, menu }: ProductMenuProps) => {
   return (
     <div className="flex flex-col space-y-8 overflow-y-auto">
       <Menu type="pills">

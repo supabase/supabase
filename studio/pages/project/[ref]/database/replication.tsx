@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import { DatabaseLayout } from 'components/layouts'
 import { PublicationsList, PublicationsTables } from 'components/interfaces/Database'
@@ -16,7 +16,7 @@ const DatabaseReplication: NextPageWithLayout = () => {
   const { meta } = useStore()
   const publications = meta.publications.list()
 
-  const canViewPublications = checkPermissions(
+  const canViewPublications = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_READ,
     'publications'
   )

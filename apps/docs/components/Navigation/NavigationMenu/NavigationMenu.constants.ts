@@ -1,4 +1,165 @@
-import { References } from '../Navigation.types'
+import type { HomepageMenuItems, NavMenuConstant, References } from '../Navigation.types'
+
+export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
+  [
+    {
+      label: 'Home',
+      icon: 'home',
+      href: '/',
+      level: 'home',
+    },
+    {
+      label: 'Getting Started',
+      icon: 'getting-started',
+      href: '/guides/getting-started',
+      level: 'gettingstarted',
+    },
+  ],
+  [
+    {
+      label: 'Database',
+      icon: 'database',
+      href: '/guides/database',
+      level: 'database',
+    },
+    {
+      label: 'Serverless APIs',
+      icon: 'serverless-apis',
+      href: '/guides/api',
+      level: 'api',
+    },
+    {
+      label: 'Auth',
+      icon: 'auth',
+      href: '/guides/auth',
+      level: 'auth',
+    },
+    {
+      label: 'Edge Functions',
+      icon: 'edge-functions',
+      href: '/guides/functions',
+      level: 'functions',
+    },
+    {
+      label: 'Realtime',
+      icon: 'realtime',
+      href: '/guides/realtime',
+      level: 'realtime',
+    },
+    {
+      label: 'Storage',
+      icon: 'storage',
+      href: '/guides/storage',
+      level: 'storage',
+    },
+    {
+      label: 'AI & Vectors',
+      icon: 'ai',
+      href: '/guides/ai',
+      level: 'ai',
+    },
+  ],
+  [
+    {
+      label: 'Local Dev / CLI',
+      icon: 'reference-cli',
+      href: '/guides/cli',
+      level: 'reference_javascript',
+    },
+    {
+      label: 'Platform',
+      icon: 'platform',
+      href: '/guides/platform',
+      level: 'platform',
+    },
+    {
+      label: 'Self-Hosting',
+      icon: 'self-hosting',
+      href: '/guides/self-hosting',
+      level: 'self_hosting',
+    },
+  ],
+  [
+    {
+      label: 'Client Library Reference',
+    },
+    {
+      label: 'JavaScript',
+      icon: 'reference-javascript',
+      href: '/reference/javascript/introduction',
+      level: 'reference_javascript',
+    },
+    {
+      label: 'Flutter',
+      icon: 'reference-dart',
+      href: '/reference/dart/introduction',
+      level: 'reference_dart',
+    },
+    {
+      label: 'Python',
+      icon: 'reference-python',
+      href: '/reference/python/introduction',
+      level: 'reference_python',
+      community: true,
+    },
+    {
+      label: 'C#',
+      icon: 'reference-csharp',
+      href: '/reference/csharp/introduction',
+      level: 'reference_csharp',
+      community: true,
+    },
+    {
+      label: 'Swift',
+      icon: 'reference-swift',
+      href: '/reference/swift/introduction',
+      level: 'reference_swift',
+      community: true,
+    },
+    {
+      label: 'Kotlin',
+      icon: 'reference-kotlin',
+      href: '/reference/kotlin/introduction',
+      level: 'reference_kotlin',
+      community: true,
+    },
+    {
+      label: 'Resources',
+    },
+    {
+      label: 'CLI Commands',
+      icon: 'reference-cli',
+      href: '/reference/cli/introduction',
+      level: 'reference_javascript',
+    },
+    {
+      label: 'Management API',
+      icon: 'reference-api',
+      href: '/reference/api/introduction',
+      level: 'reference_javascript',
+    },
+    {
+      label: 'Guides and Examples',
+      icon: 'resources',
+      href: '/guides/resources',
+      level: 'resources',
+    },
+    {
+      label: 'Integrations',
+      icon: 'integrations',
+      hasLightIcon: true,
+      href: 'https://supabase.com/partners/integrations',
+      level: 'integrations',
+    },
+  ],
+  [
+    {
+      label: 'Status',
+      icon: 'status',
+      href: 'https://status.supabase.com/',
+    },
+  ],
+]
 
 export const REFERENCES: References = {
   javascript: {
@@ -22,8 +183,14 @@ export const REFERENCES: References = {
   swift: {
     name: 'Swift',
     library: 'supabase-swift',
-    versions: ['v1'],
+    versions: ['v0'],
     icon: '/docs/img/libraries/swift-icon.svg',
+  },
+  kotlin: {
+    name: 'Kotlin',
+    library: 'supabase-kt',
+    versions: ['v0'],
+    icon: '/docs/img/libraries/kotlin-icon.svg',
   },
   cli: {
     name: 'CLI',
@@ -39,30 +206,32 @@ export const REFERENCES: References = {
   },
 }
 
-export const gettingstarted = {
+export const gettingstarted: NavMenuConstant = {
   icon: 'getting-started',
   title: 'Getting Started',
   items: [
     { name: 'Features', url: '/guides/getting-started/features' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
-    { name: 'Local Development', url: '/guides/getting-started/local-development' },
     {
       name: 'Framework Quickstarts',
       items: [
+        { name: 'Next.js', url: '/guides/getting-started/quickstarts/nextjs' },
         { name: 'React', url: '/guides/getting-started/quickstarts/reactjs' },
-        { name: 'NextJS', url: '/guides/getting-started/quickstarts/nextjs' },
+        { name: 'NuxtJS', url: '/guides/getting-started/quickstarts/nuxtjs' },
         { name: 'RedwoodJS', url: '/guides/getting-started/quickstarts/redwoodjs' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
+        { name: 'Android Kotlin', url: '/guides/getting-started/quickstarts/kotlin' },
         { name: 'SvelteKit', url: '/guides/getting-started/quickstarts/sveltekit' },
         { name: 'SolidJS', url: '/guides/getting-started/quickstarts/solidjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
+        { name: 'refine', url: '/guides/getting-started/quickstarts/refine' },
       ],
     },
     {
       name: 'Web app tutorials',
       items: [
         {
-          name: 'NextJS',
+          name: 'Next.js',
           url: '/guides/getting-started/tutorials/with-nextjs',
         },
         {
@@ -97,6 +266,10 @@ export const gettingstarted = {
           name: 'SvelteKit',
           url: '/guides/getting-started/tutorials/with-sveltekit',
         },
+        {
+          name: 'refine',
+          url: '/guides/getting-started/tutorials/with-refine',
+        },
       ],
     },
     {
@@ -110,7 +283,10 @@ export const gettingstarted = {
           name: 'Expo',
           url: '/guides/getting-started/tutorials/with-expo',
         },
-
+        {
+          name: 'Android Kotlin',
+          url: '/guides/getting-started/tutorials/with-kotlin',
+        },
         {
           name: 'Ionic React',
           url: '/guides/getting-started/tutorials/with-ionic-react',
@@ -125,15 +301,6 @@ export const gettingstarted = {
         },
       ],
     },
-    {
-      name: 'AI & ML',
-      items: [
-        {
-          name: 'Vector Search with OpenAI',
-          url: '/guides/getting-started/openai/vector-search',
-        },
-      ],
-    },
   ],
 }
 
@@ -142,6 +309,10 @@ export const cli = {
   items: [
     { name: 'Overview', url: '/guides/cli' },
     { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
+    {
+      name: 'Using environment variables in config.toml',
+      url: '/guides/cli/using-environment-variables-in-config',
+    },
   ],
 }
 
@@ -162,7 +333,7 @@ export const SocialLoginItems = [
     url: '/guides/auth/social-login/auth-apple',
   },
   {
-    name: 'Azure',
+    name: 'Azure (Microsoft)',
     icon: '/docs/img/icons/microsoft-icon',
     url: '/guides/auth/social-login/auth-azure',
   },
@@ -170,12 +341,14 @@ export const SocialLoginItems = [
     name: 'Twitter',
     icon: '/docs/img/icons/twitter-icon',
     url: '/guides/auth/social-login/auth-twitter',
+    hasLightIcon: true,
   },
   {
     name: 'GitHub',
     icon: '/docs/img/icons/github-icon',
     url: '/guides/auth/social-login/auth-github',
     isDarkMode: true,
+    hasLightIcon: true,
   },
   {
     name: 'Gitlab',
@@ -191,6 +364,16 @@ export const SocialLoginItems = [
     name: 'Discord',
     icon: '/docs/img/icons/discord-icon',
     url: '/guides/auth/social-login/auth-discord',
+  },
+  {
+    name: 'Figma',
+    icon: '/docs/img/icons/figma-icon',
+    url: '/guides/auth/social-login/auth-figma',
+  },
+  {
+    name: 'Kakao',
+    icon: '/docs/img/icons/kakao-icon',
+    url: '/guides/auth/social-login/auth-kakao',
   },
   {
     name: 'Keycloak',
@@ -254,6 +437,7 @@ export const PhoneLoginsItems = [
     linkDescription:
       'Vonage is a communication platform as a service (CPaaS) provider for consumers and businesses.',
     isDarkMode: true,
+    hasLightIcon: true,
   },
 ]
 
@@ -267,7 +451,10 @@ export const auth = {
     },
     {
       name: 'Quickstarts',
-      items: [{ name: 'Auth with React', url: '/guides/auth/quickstarts/react', items: [] }],
+      items: [
+        { name: 'Next.js', url: '/guides/auth/quickstarts/nextjs', items: [] },
+        { name: 'React', url: '/guides/auth/quickstarts/react', items: [] },
+      ],
     },
     {
       name: 'Authentication',
@@ -295,6 +482,7 @@ export const auth = {
             },
           ],
         },
+        { name: 'Password Reset', url: '/guides/auth/auth-password-reset' },
         { name: 'Email Templates', url: '/guides/auth/auth-email-templates' },
       ],
     },
@@ -303,25 +491,40 @@ export const auth = {
       url: undefined,
       items: [
         { name: 'Enable Captcha Protection', url: '/guides/auth/auth-captcha' },
+        { name: 'Configuring Custom SMTP', url: '/guides/auth/auth-smtp' },
         { name: 'Managing User Data', url: '/guides/auth/managing-user-data' },
         { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
         { name: 'Row Level Security', url: '/guides/auth/row-level-security' },
-        { name: 'Server-side Rendering', url: '/guides/auth/server-side-rendering' },
       ],
     },
     {
-      name: 'Auth Helpers',
+      name: 'Server-side Auth',
       url: undefined,
       items: [
         { name: 'Overview', url: '/guides/auth/auth-helpers' },
-        { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui' },
-        { name: 'Next.js (pages)', url: '/guides/auth/auth-helpers/nextjs' },
         {
-          name: 'Next.js (app)',
-          url: '/guides/auth/auth-helpers/nextjs-server-components',
+          name: 'Next.js',
+          url: '/guides/auth/auth-helpers/nextjs',
         },
         { name: 'Remix', url: '/guides/auth/auth-helpers/remix' },
         { name: 'SvelteKit', url: '/guides/auth/auth-helpers/sveltekit' },
+        { name: 'Server-side Rendering', url: '/guides/auth/server-side-rendering' },
+        {
+          name: 'Email Auth with PKCE flow for SSR',
+          url: '/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr',
+        },
+        {
+          name: 'OAuth with PKCE flow for SSR',
+          url: '/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
+        },
+      ],
+    },
+    {
+      name: 'Auth UI',
+      url: undefined,
+      items: [
+        { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui' },
+        { name: 'Flutter Auth UI', url: '/guides/auth/auth-helpers/flutter-auth-ui' },
       ],
     },
     {
@@ -347,17 +550,49 @@ export const auth = {
   ],
 }
 
-export const database = {
+export const database: NavMenuConstant = {
   icon: 'database',
   title: 'Database',
   url: '/guides/database',
   items: [
-    { name: 'Database Connections', url: '/guides/database/connecting-to-postgres' },
-    { name: 'Tables and Data', url: '/guides/database/tables' },
-    { name: 'Database Functions', url: '/guides/database/functions' },
-    { name: 'Database Webhooks', url: '/guides/database/webhooks' },
-    { name: 'Full Text Search', url: '/guides/database/full-text-search' },
-    { name: 'Database Testing', url: '/guides/database/testing' },
+    { name: 'Overview', url: '/guides/database' },
+    {
+      name: 'Fundamentals',
+      url: undefined,
+      items: [
+        { name: 'Connecting to your database', url: '/guides/database/connecting-to-postgres' },
+        { name: 'Managing tables, views, and data', url: '/guides/database/tables' },
+        { name: 'JSON and unstructured data', url: '/guides/database/json' },
+        { name: 'Managing database functions', url: '/guides/database/functions' },
+        { name: 'Managing indexes', url: '/guides/database/postgres/indexes' },
+        { name: 'Managing database triggers', url: '/guides/database/postgres/triggers' },
+        { name: 'Managing database webhooks', url: '/guides/database/webhooks' },
+        { name: 'Using Full Text Search', url: '/guides/database/full-text-search' },
+      ],
+    },
+    {
+      name: 'Access and security',
+      url: undefined,
+      items: [
+        { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
+        { name: 'Managing Postgres Roles', url: '/guides/database/postgres/roles' },
+        { name: 'Managing secrets with Vault', url: '/guides/database/vault' },
+        { name: 'Column encryption', url: '/guides/database/column-encryption' },
+      ],
+    },
+    {
+      name: 'Postgres Guides',
+      url: undefined,
+      items: [
+        { name: 'Query Optimization', url: '/guides/database/query-optimization' },
+        { name: 'Debugging and monitoring', url: '/guides/database/inspect' },
+        { name: 'Partitioning your tables', url: '/guides/database/partitions' },
+        { name: 'Implementing Cascade Deletes', url: '/guides/database/postgres/cascade-deletes' },
+        { name: 'Managing database replication', url: '/guides/database/replication' },
+        { name: 'Testing your database', url: '/guides/database/testing' },
+        { name: 'Database Configuration', url: '/guides/database/postgres/configuration' },
+      ],
+    },
     {
       name: 'Extensions',
       url: undefined,
@@ -372,6 +607,10 @@ export const database = {
           url: '/guides/database/extensions/plv8',
         },
         { name: 'http: RESTful Client', url: '/guides/database/extensions/http' },
+        {
+          name: 'index_advisor: Query optimization',
+          url: '/guides/database/extensions/index_advisor',
+        },
         {
           name: 'PGAudit: Postgres Auditing',
           url: '/guides/database/extensions/pgaudit',
@@ -457,24 +696,29 @@ export const database = {
           name: 'RUM: inverted index for full-text search',
           url: '/guides/database/extensions/rum',
         },
-        {
-          name: 'wrappers: 3rd Party Integrations',
-          url: '/guides/database/extensions/wrappers',
-        },
       ],
     },
     {
-      name: 'Postgres resources',
+      name: 'Foreign Data Wrappers',
       url: undefined,
       items: [
+        { name: 'Overview', url: '/guides/database/extensions/wrappers/overview' },
+        { name: 'Connecting to Airtable', url: '/guides/database/extensions/wrappers/airtable' },
+        { name: 'Connecting to AWS S3', url: '/guides/database/extensions/wrappers/s3' },
+        { name: 'Connecting to BigQuery', url: '/guides/database/extensions/wrappers/bigquery' },
         {
-          name: 'Managing Indexes',
-          url: '/guides/database/postgres/indexes',
+          name: 'Connecting to ClickHouse',
+          url: '/guides/database/extensions/wrappers/clickhouse',
         },
-        {
-          name: 'Cascade Deletes',
-          url: '/guides/database/postgres/cascade-deletes',
-        },
+        { name: 'Connecting to Firebase', url: '/guides/database/extensions/wrappers/firebase' },
+        { name: 'Connecting to Logflare', url: '/guides/database/extensions/wrappers/logflare' },
+        { name: 'Connecting to Stripe', url: '/guides/database/extensions/wrappers/stripe' },
+      ],
+    },
+    {
+      name: 'Examples',
+      url: undefined,
+      items: [
         {
           name: 'Drop All Tables in Schema',
           url: '/guides/database/postgres/dropping-all-tables-in-schema',
@@ -489,21 +733,11 @@ export const database = {
         },
       ],
     },
-    {
-      name: 'Configuration',
-      url: undefined,
-      items: [
-        { name: 'Timeouts', url: '/guides/database/timeouts' },
-        { name: 'Replication', url: '/guides/database/replication' },
-        { name: 'Passwords', url: '/guides/database/managing-passwords' },
-        { name: 'Timezones', url: '/guides/database/managing-timezones' },
-      ],
-    },
   ],
 }
 
-export const api = {
-  icon: 'reference',
+export const api: NavMenuConstant = {
+  icon: 'serverless-apis',
   title: 'Serverless APIs',
   url: '/guides/api',
   items: [
@@ -521,6 +755,7 @@ export const api = {
           url: '/guides/api/joins-and-nesting',
           items: [],
         },
+        { name: 'Using custom schemas', url: '/guides/api/using-custom-schemas', items: [] },
       ],
     },
     {
@@ -540,8 +775,8 @@ export const api = {
   ],
 }
 
-export const functions = {
-  icon: 'functions',
+export const functions: NavMenuConstant = {
+  icon: 'edge-functions',
   title: 'Edge Functions',
   url: '/guides/functions',
   items: [
@@ -568,7 +803,7 @@ export const functions = {
       url: undefined,
       items: [
         { name: 'Developing Functions locally', url: '/guides/functions/local-development' },
-        { name: 'Deploying with Git', url: '/guides/functions/cicd-workflow' },
+        { name: 'Deploying with GitHub', url: '/guides/functions/cicd-workflow' },
         { name: 'Managing Secrets and Environment Variables', url: '/guides/functions/secrets' },
         { name: 'Integrating With Supabase Auth', url: '/guides/functions/auth' },
         {
@@ -581,6 +816,8 @@ export const functions = {
           name: 'Connecting directly to Postgres',
           url: '/guides/functions/connect-to-postgres',
         },
+        { name: 'Testing your Edge Functions', url: '/guides/functions/unit-test' },
+        { name: 'Troubleshooting', url: '/guides/functions/troubleshooting' },
       ],
     },
     {
@@ -589,15 +826,18 @@ export const functions = {
       items: [
         { name: 'Dart Edge on Supabase', url: '/guides/functions/dart-edge' },
         { name: 'Browserless.io', url: '/guides/functions/examples/screenshots' },
-        { name: 'OpenAI API', url: '/guides/functions/examples/openai' },
+        { name: 'Hugging Face', url: '/guides/ai/examples/huggingface-image-captioning' },
+        { name: 'OpenAI API', url: '/guides/ai/examples/openai' },
+        { name: 'Sending Emails with Resend', url: '/guides/functions/examples/send-emails' },
         { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
+        { name: 'Type-Safe SQL with Kysely', url: '/guides/functions/kysely-postgres' },
       ],
     },
     {
       name: 'Examples',
       url: '/guides/functions/examples',
       items: [
-        { name: 'Generating OpenAI GPT3 completions', url: '/guides/functions/examples/openai' },
+        { name: 'Generating OpenAI GPT3 completions', url: '/guides/ai/examples/openai' },
         { name: 'Generating OG images ', url: '/guides/functions/examples/og-image' },
         {
           name: 'CAPTCHA support with Cloudflare Turnstile',
@@ -617,7 +857,7 @@ export const functions = {
   ],
 }
 
-export const realtime = {
+export const realtime: NavMenuConstant = {
   icon: 'realtime',
   title: 'Realtime',
   url: '/guides/realtime',
@@ -627,25 +867,18 @@ export const realtime = {
       url: '/guides/realtime',
     },
     {
-      name: 'Quickstart',
-      url: '/guides/realtime/quickstart',
+      name: 'Concepts',
+      url: '/guides/realtime/concepts',
     },
     {
       name: 'Features',
       url: undefined,
       items: [
-        { name: 'Channels', url: '/guides/realtime/channels' },
+        { name: 'Broadcast', url: '/guides/realtime/broadcast' },
+        { name: 'Presence', url: '/guides/realtime/presence' },
         {
-          name: 'Extensions',
-          url: '/guides/realtime/extensions',
-          items: [
-            { name: 'Broadcast', url: '/guides/realtime/extensions/broadcast' },
-            { name: 'Presence', url: '/guides/realtime/extensions/presence' },
-            {
-              name: 'Postgres Changes',
-              url: '/guides/realtime/extensions/postgres-changes',
-            },
-          ],
+          name: 'Postgres Changes',
+          url: '/guides/realtime/postgres-changes',
         },
       ],
     },
@@ -672,7 +905,7 @@ export const realtime = {
       name: 'Deep dive',
       url: undefined,
       items: [
-        { name: 'Rate Limits', url: '/guides/realtime/rate-limits' },
+        { name: 'Quotas', url: '/guides/realtime/quotas' },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
         { name: 'Protocol', url: '/guides/realtime/protocol' },
       ],
@@ -680,39 +913,203 @@ export const realtime = {
   ],
 }
 
-export const storage = {
+export const storage: NavMenuConstant = {
   icon: 'storage',
   title: 'Storage',
   url: '/guides/storage',
   items: [
     { name: 'Overview', url: '/guides/storage' },
     { name: 'Quickstart', url: '/guides/storage/quickstart' },
-    { name: 'Uploads', url: '/guides/storage/uploads' },
-    { name: 'Access Control', url: '/guides/storage/access-control' },
-    { name: 'CDN', url: '/guides/storage/cdn' },
-    { name: 'Image Transformations', url: '/guides/storage/image-transformations' },
+    {
+      name: 'Fundamentals',
+      url: undefined,
+      items: [
+        { name: 'Uploading files to Storage', url: '/guides/storage/uploads' },
+        { name: 'Image Transformations', url: '/guides/storage/image-transformations' },
+        { name: 'How caching works', url: '/guides/storage/cdn' },
+      ],
+    },
+    {
+      name: 'Access and security',
+      url: undefined,
+      items: [{ name: 'Access Control', url: '/guides/storage/access-control' }],
+    },
   ],
 }
 
-export const supabase_cli = {
-  icon: 'reference-cli',
-  title: 'Supabase CLI',
-  url: '/guides/cli',
+export const vectorIndexItems = [
+  {
+    name: 'HNSW indexes',
+    url: '/guides/ai/vector-indexes/hnsw-indexes',
+  },
+  {
+    name: 'IVFFlat indexes',
+    url: '/guides/ai/vector-indexes/ivf-indexes',
+  },
+]
+
+export const ai = {
+  icon: 'ai',
+  title: 'AI & Vectors',
+  url: '/guides/ai',
   items: [
-    { name: 'Overview', url: '/guides/cli' },
-    { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
+    { name: 'Overview', url: '/guides/ai' },
+    { name: 'Concepts', url: '/guides/ai/concepts' },
     {
-      name: 'Reference',
+      name: 'Structured & unstructured',
+      url: '/guides/ai/structured-unstructured',
+    },
+    {
+      name: 'Quickstarts',
       url: undefined,
       items: [
-        { name: 'Commands', url: '/reference/cli/introduction' },
-        { name: 'Configuration', url: '/reference/cli/config' },
+        { name: 'Developing locally with Vecs', url: '/guides/ai/vecs-python-client' },
+        { name: 'Creating and managing collections', url: '/guides/ai/quickstarts/hello-world' },
+        {
+          name: 'Generate Embeddings',
+          url: '/guides/ai/quickstarts/generate-text-embeddings',
+        },
+        { name: 'Text Deduplication', url: '/guides/ai/quickstarts/text-deduplication' },
+        { name: 'Face similarity search', url: '/guides/ai/quickstarts/face-similarity' },
+      ],
+    },
+    {
+      name: 'Python Client',
+      url: undefined,
+      items: [
+        { name: 'API', url: '/guides/ai/python/api' },
+        { name: 'Collections', url: '/guides/ai/python/collections' },
+        { name: 'Indexes', url: '/guides/ai/python/indexes' },
+        { name: 'Metadata', url: '/guides/ai/python/metadata' },
+      ],
+    },
+    {
+      name: 'Guides',
+      url: undefined,
+      items: [
+        { name: 'Managing collections', url: '/guides/ai/managing-collections' },
+        { name: 'Vector columns', url: '/guides/ai/vector-columns' },
+        { name: 'Vector indexes', url: '/guides/ai/vector-indexes', items: vectorIndexItems },
+        { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
+        { name: 'Choosing Compute Add-on', url: '/guides/ai/choosing-compute-addon' },
+        { name: 'Going to Production', url: '/guides/ai/going-to-prod' },
+      ],
+    },
+    {
+      name: 'Examples',
+      url: undefined,
+      items: [
+        {
+          name: 'OpenAI completions using Edge Functions',
+          url: '/guides/ai/examples/openai',
+        },
+        {
+          name: 'Image search with OpenAI CLIP',
+          url: '/guides/ai/examples/image-search-openai-clip',
+        },
+        {
+          name: 'Generate image captions using Hugging Face',
+          url: '/guides/ai/examples/huggingface-image-captioning',
+        },
+        {
+          name: 'Building ChatGPT Plugins',
+          url: '/guides/ai/examples/building-chatgpt-plugins',
+        },
+        {
+          name: 'Adding generative Q&A to your documentation',
+          url: '/guides/ai/examples/headless-vector-search',
+        },
+        {
+          name: 'Adding generative Q&A to your Next.js site',
+          url: '/guides/ai/examples/nextjs-vector-search',
+        },
+      ],
+    },
+    {
+      name: 'Third-Party Tools',
+      url: undefined,
+      items: [
+        {
+          name: 'LangChain',
+          url: '/guides/ai/langchain',
+        },
+        {
+          name: 'Hugging Face',
+          url: '/guides/ai/hugging-face',
+        },
+        {
+          name: 'Google Colab',
+          url: '/guides/ai/google-colab',
+        },
+        {
+          name: 'LlamaIndex',
+          url: '/guides/ai/integrations/llamaindex',
+        },
       ],
     },
   ],
 }
 
-export const platform = {
+export const supabase_cli: NavMenuConstant = {
+  icon: 'reference-cli',
+  title: 'Local Dev / CLI',
+  url: '/guides/cli',
+  items: [
+    { name: 'Overview', url: '/guides/cli' },
+    {
+      name: 'Using the CLI',
+      url: undefined,
+      items: [
+        { name: 'Getting started', url: '/guides/cli/getting-started' },
+        { name: 'CLI Configuration', url: '/guides/cli/config' },
+      ],
+    },
+    {
+      name: 'Developing with Supabase',
+      url: undefined,
+      items: [
+        { name: 'Local Development', url: '/guides/cli/local-development' },
+        { name: 'Managing environments', url: '/guides/cli/managing-environments' },
+        {
+          name: 'Managing config and secrets',
+          url: '/guides/cli/managing-config',
+        },
+        {
+          name: 'Seeding your database',
+          url: '/guides/cli/seeding-your-database',
+        },
+        {
+          name: 'Testing and linting',
+          url: '/guides/cli/testing-and-linting',
+        },
+        {
+          name: 'Customizing email templates',
+          url: '/guides/cli/customizing-email-templates',
+        },
+      ],
+    },
+    {
+      name: 'GitHub Action',
+      url: undefined,
+      items: [
+        {
+          name: 'Generate types from your database',
+          url: '/guides/cli/github-action/generating-types',
+        },
+        {
+          name: 'Automated testing',
+          url: '/guides/cli/github-action/testing',
+        },
+        {
+          name: 'Backup your database',
+          url: '/guides/cli/github-action/backups',
+        },
+      ],
+    },
+  ],
+}
+
+export const platform: NavMenuConstant = {
   icon: 'platform',
   title: 'Platform',
   url: '/guides/platform',
@@ -731,6 +1128,7 @@ export const platform = {
       url: undefined,
       items: [
         { name: 'Access Control', url: '/guides/platform/access-control' },
+        { name: 'Custom Postgres Config', url: '/guides/platform/custom-postgres-config' },
         { name: 'Database Size', url: '/guides/platform/database-size' },
         { name: 'HTTP Status Codes', url: '/guides/platform/http-status-codes' },
         { name: 'Logging', url: '/guides/platform/logs' },
@@ -738,6 +1136,10 @@ export const platform = {
         {
           name: 'Migrating and Upgrading',
           url: '/guides/platform/migrating-and-upgrading-projects',
+        },
+        {
+          name: 'Transfer Project',
+          url: '/guides/platform/project-transfer',
         },
         { name: 'Network Restrictions', url: '/guides/platform/network-restrictions' },
         { name: 'Performance Tuning', url: '/guides/platform/performance' },
@@ -748,7 +1150,11 @@ export const platform = {
     {
       name: 'Billing',
       url: undefined,
-      items: [{ name: 'Spend cap', url: '/guides/platform/spend-cap' }],
+      items: [
+        { name: 'How billing works', url: '/guides/platform/org-based-billing' },
+        { name: 'Spend caps and cost-controls', url: '/guides/platform/spend-cap' },
+        { name: 'Enterprise Billing', url: '/guides/platform/enterprise-billing' },
+      ],
     },
     {
       name: 'Single sign-on',
@@ -767,9 +1173,33 @@ export const platform = {
       ],
     },
     {
-      name: 'Go-live Checklist',
+      name: 'Production Readiness',
       url: undefined,
-      items: [{ name: 'Production Readiness', url: '/guides/platform/going-into-prod' }],
+      items: [
+        {
+          name: 'Shared Responsibility Model',
+          url: '/guides/platform/shared-responsibility-model',
+        },
+        {
+          name: 'Maturity Model',
+          url: '/guides/platform/maturity-model',
+        },
+        { name: 'Production Checklist', url: '/guides/platform/going-into-prod' },
+      ],
+    },
+    {
+      name: 'Integrations',
+      url: undefined,
+      items: [
+        {
+          name: 'Integrations Marketplace',
+          url: '/guides/platform/marketplace',
+        },
+        {
+          name: 'Build a Supabase Integration',
+          url: '/guides/platform/oauth-apps/build-a-supabase-integration',
+        },
+      ],
     },
     {
       name: 'Troubleshooting',
@@ -779,12 +1209,24 @@ export const platform = {
           name: 'HTTP and Project Issues',
           url: '/guides/platform/troubleshooting',
         },
+        {
+          name: 'High Disk IO Consumption',
+          url: '/guides/platform/exhaust-disk-io',
+        },
+        {
+          name: 'High CPU Usage',
+          url: '/guides/platform/exhaust-cpu',
+        },
+        {
+          name: 'High RAM Usage',
+          url: '/guides/platform/exhaust-ram',
+        },
       ],
     },
   ],
 }
 
-export const resources = {
+export const resources: NavMenuConstant = {
   icon: 'resources',
   title: 'Resources',
   url: '/guides/resources',
@@ -825,9 +1267,9 @@ export const resources = {
   ],
 }
 
-export const self_hosting = {
+export const self_hosting: NavMenuConstant = {
   title: 'Self-Hosting',
-  icon: 'resources',
+  icon: 'self-hosting',
   url: '/guides/self-hosting',
   items: [
     { name: 'Overview', url: '/guides/self-hosting' },
@@ -882,70 +1324,6 @@ export const migrate = {
   ],
 }
 
-export const integrations = {
-  icon: 'integrations',
-  title: 'Integrations',
-  url: '/guides/integrations',
-  items: [
-    { name: 'Overview', url: '/guides/integrations/integrations' },
-    {
-      name: 'Auth',
-      url: undefined,
-      items: [
-        {
-          name: 'Auth0',
-          url: '/guides/integrations/auth0',
-        },
-        { name: 'Authsignal', url: '/guides/integrations/authsignal' },
-        { name: 'Clerk', url: '/guides/integrations/clerk' },
-        { name: 'keyri', url: '/guides/integrations/keyri' },
-        { name: 'Passage', url: '/guides/integrations/passage' },
-        { name: 'Stytch', url: '/guides/integrations/stytch' },
-        { name: 'SuperTokens', url: '/guides/integrations/supertokens' },
-      ],
-    },
-    {
-      name: 'Caching / Offline-first',
-      url: undefined,
-      items: [{ name: 'Polyscale', url: '/guides/integrations/polyscale' }],
-    },
-    {
-      name: 'Developer Tools',
-      url: undefined,
-      items: [
-        { name: 'Estuary', url: '/guides/integrations/estuary' },
-        { name: 'OpenAI', url: '/guides/functions/examples/openai' },
-        { name: 'pgMustard', url: '/guides/integrations/pgmustard' },
-        { name: 'Prisma', url: '/guides/integrations/prisma' },
-        { name: 'Sequin', url: '/guides/integrations/sequin' },
-        { name: 'Snaplet', url: '/guides/integrations/snaplet' },
-        { name: 'Vercel', url: '/guides/integrations/vercel' },
-        { name: 'Upstash Redis', url: '/guides/functions/examples/upstash-redis' },
-        { name: 'WeWeb', url: '/guides/integrations/weweb' },
-        { name: 'Zuplo', url: '/guides/integrations/zuplo' },
-      ],
-    },
-    {
-      name: 'Low-code',
-      url: undefined,
-      items: [
-        { name: 'Appsmith', url: '/guides/integrations/appsmith' },
-        { name: 'DhiWise', url: '/guides/integrations/dhiwise' },
-        { name: 'Directus', url: '/guides/integrations/directus' },
-        { name: 'Draftbit', url: '/guides/integrations/draftbit' },
-        { name: 'FlutterFlow', url: '/guides/integrations/flutterflow' },
-        { name: 'Plasmic', url: '/guides/integrations/plasmic' },
-        { name: 'ILLA', url: '/guides/integrations/illa' },
-      ],
-    },
-    {
-      name: 'Messaging',
-      url: undefined,
-      items: [{ name: 'OneSignal', url: '/guides/integrations/onesignal' }],
-    },
-  ],
-}
-
 export const reference = {
   title: 'API Reference',
   icon: 'reference',
@@ -983,6 +1361,13 @@ export const reference = {
           level: 'reference_swift',
           items: [],
           icon: '/img/icons/menu/reference-swift',
+        },
+        {
+          name: 'supabase-kt',
+          url: '/reference/kotlin/start',
+          level: 'reference_kotlin',
+          items: [],
+          icon: '/img/icons/menu/reference-kotlin',
         },
         // {
         //   name: 'supabase-python',
@@ -1053,10 +1438,17 @@ export const reference_python_v2 = {
   parent: '/reference',
 }
 
-export const reference_swift_v1 = {
+export const reference_swift_v0 = {
   icon: 'reference-swift',
   title: 'swift',
   url: 'guides/reference/swift',
+  parent: '/reference',
+}
+
+export const reference_kotlin_v0 = {
+  icon: 'reference-kotlin',
+  title: 'kotlin',
+  url: 'guides/reference/kotlin',
   parent: '/reference',
 }
 
@@ -1176,10 +1568,17 @@ export const references = [
       },
       {
         label: 'supabase-swift',
-        versions: ['v1'],
+        versions: ['v0'],
         description: 'something about the reference',
         icon: '/docs/img/icons/swift-icon.svg',
         url: '/reference/swift/start',
+      },
+      {
+        label: 'supabase-kt',
+        versions: ['v0'],
+        description: 'something about the reference',
+        icon: '/docs/img/icons/kotlin-icon.svg',
+        url: '/reference/kotlin/start',
       },
     ],
   },

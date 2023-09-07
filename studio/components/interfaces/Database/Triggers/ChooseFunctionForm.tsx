@@ -159,7 +159,7 @@ const Function = ({ id, completeStatement, name, onClick }: FunctionProps) => {
   const [visible, setVisible] = useState(false)
   return (
     <div
-      className="cursor-pointer rounded p-3 px-6 hover:bg-bg-alt-light dark:hover:bg-bg-alt-dark"
+      className="cursor-pointer rounded p-3 px-6 hover:bg-scale-200 dark:hover:bg-scale-200"
       onClick={() => onClick(id)}
     >
       <div className="flex items-center justify-between space-x-3">

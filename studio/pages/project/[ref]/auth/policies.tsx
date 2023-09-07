@@ -12,7 +12,7 @@ import Connecting from 'components/ui/Loading/Loading'
 import NoPermission from 'components/ui/NoPermission'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { NextPageWithLayout } from 'types'
@@ -88,7 +88,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
   const filteredTables = onFilterTables(tables ?? [], policies, searchString)
 
-  const canReadPolicies = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
+  const canReadPolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
 
   if (!canReadPolicies) {
     return <NoPermission isFullPage resourceText="view this project's RLS policies" />

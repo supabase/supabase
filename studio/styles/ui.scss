@@ -192,20 +192,12 @@
 /* Docs */
 .Docs {
   &--inner-wrapper {
-    background: linear-gradient(
-      90deg,
-      var(--colors-scale1) 50%,
-      var(--colors-scale3) 50%
-    ); /* bg-white bg-coolGray-100 */
+    background: linear-gradient(90deg, var(--colors-scale1) 50%, var(--colors-scale3) 50%);
     width: 100%;
   }
 
   .dark &--inner-wrapper {
-    background: linear-gradient(
-      90deg,
-      var(--colors-scale3) 50%,
-      var(--colors-scale2) 50%
-    ); /* bg-gray-700 bg-gray-600 */
+    background: linear-gradient(90deg, var(--colors-scale3) 50%, var(--colors-scale2) 50%);
   }
 
   // h1,
@@ -255,7 +247,7 @@
   }
 
   &.Docs--table-editor .doc-section__table-name {
-    @apply mt-12;
+    @apply mt-4;
   }
 
   .text {
@@ -271,7 +263,7 @@
     }
 
     a:hover {
-      @apply text-brand-1000;
+      @apply text-brand-600;
     }
 
     p:last-child {
@@ -297,7 +289,7 @@
     }
 
     .is-highlighted {
-      @apply text-brand-900;
+      @apply text-brand;
     }
   }
   .codeblock-container + .codeblock-container {
@@ -307,7 +299,7 @@
 
 ::-moz-selection {
   /* Code for Firefox */
-  @apply bg-brand-900;
+  @apply bg-brand;
   color: #333 !important;
 }
 
@@ -416,7 +408,7 @@
 
 .form-field-markdown {
   a {
-    @apply text-brand-900 transition opacity-75 hover:opacity-100 underline;
+    @apply text-brand transition opacity-75 hover:opacity-100 underline;
   }
 }
 
@@ -436,5 +428,16 @@
   }
   line {
     @apply stroke-green-500;
+  }
+}
+
+.recharts-cartesian-axis-tick {
+  text {
+    @apply text-xs;
+  }
+}
+.recharts-reference-line {
+  line {
+    @apply stroke-scale-1000;
   }
 }

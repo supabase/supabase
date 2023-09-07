@@ -16,6 +16,8 @@ const nonGeneratedReferencePages = [
   'docs/reference/csharp',
   'docs/reference/csharp/installing',
   'docs/reference/csharp/initializing',
+  'docs/reference/kotlin/installing',
+  'docs/reference/kotlin/initializing',
   'docs/reference/api',
   'docs/reference/api/release-notes',
   'docs/reference/cli',

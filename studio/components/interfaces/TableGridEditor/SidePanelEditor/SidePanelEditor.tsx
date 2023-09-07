@@ -64,7 +64,6 @@ const SidePanelEditor = ({
       snap.closeSidePanel()
 
       const primaryKeyColumns = new Set(Object.keys(configuration.identifiers))
-
       const queryKey = sqlKeys.query(projectRef, [
         table.schema,
         table.name,
@@ -72,9 +71,7 @@ const SidePanelEditor = ({
       ])
 
       await queryClient.cancelQueries(queryKey)
-
       const previousRowsQueries = queryClient.getQueriesData<{ result: any[] }>(queryKey)
-
       queryClient.setQueriesData<{ result: any[] }>(queryKey, (old) => {
         return {
           result:
@@ -114,6 +111,8 @@ const SidePanelEditor = ({
         }
         queryClient.invalidateQueries(queryKey)
       })
+
+      ui.setNotification({ error, category: 'error', message: error.message })
     },
   })
 
@@ -137,32 +136,26 @@ const SidePanelEditor = ({
           payload,
           enumArrayColumns,
         })
-
         onRowCreated(result[0])
       } catch (error: any) {
         saveRowError = true
-        ui.setNotification({ category: 'error', message: error?.message })
       }
     } else {
       const hasChanges = !isEmpty(payload)
       if (hasChanges) {
         if (selectedTable.primary_keys.length > 0) {
-          if (selectedTable!.primary_keys.length > 0) {
-            try {
-              const result = await updateTableRow({
-                projectRef: project.ref,
-                connectionString: project.connectionString,
-                table: selectedTable as any,
-                configuration,
-                payload,
-                enumArrayColumns,
-              })
-
-              onRowUpdated(result[0], configuration.rowIdx)
-            } catch (error: any) {
-              saveRowError = true
-              ui.setNotification({ category: 'error', message: error?.message })
-            }
+          try {
+            const result = await updateTableRow({
+              projectRef: project.ref,
+              connectionString: project.connectionString,
+              table: selectedTable as any,
+              configuration,
+              payload,
+              enumArrayColumns,
+            })
+            onRowUpdated(result[0], configuration.rowIdx)
+          } catch (error) {
+            saveRowError = true
           }
         } else {
           saveRowError = true

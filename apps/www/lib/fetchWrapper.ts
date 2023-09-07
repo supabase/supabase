@@ -1,7 +1,5 @@
 interface DataProps {
-  referrer?: string
-  title: string
-  route?: string
+  [prop: string]: any
 }
 
 export const post = (url: string, data: DataProps, options = {}) => {

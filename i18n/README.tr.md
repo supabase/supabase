@@ -1,76 +1,85 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727234-cda046d6-28c6-491a-b284-b86c5cede25d.png#gh-light-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
 </p>
 
 ---
 
 # Supabase
 
-[Supabase](https://supabase.com) açık kaynaklı bir Firebase alternatifidir. Firebase'in özelliklerini kurumsal düzeyde açık kaynak araçları kullanarak oluşturuyoruz.
+[Supabase](https://supabase.com) açık kaynaklı bir Firebase alternatifidir. Kurumsal düzeyde açık kaynak araçları kullanarak Firebase'in özelliklerini geliştiriyoruz.
 
-- [x] Barındırılan Postgres Veritabanı
-- [x] Gerçek zamanlı abonelikler
-- [x] Kimlik doğrulama ve yetkilendirme
-- [x] Otomatik oluşturulan API'ler
-- [x] Gösterge Paneli
-- [x] Depolama
-- [x] Fonksiyonlar
+- [x] Barındırılan Postgres Veritabanı. [Dokümanlar](https://supabase.com/docs/guides/database)
+- [x] Kimlik Doğrulama ve Yetkilendirme. [Dokümanlar](https://supabase.com/docs/guides/auth)
+- [x] Otomatik oluşturulan API'ler.
+  - [x] REST. [Dokümanlar](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Gerçek zamanlı abonelikler. [Dokümanlar](https://supabase.com/docs/guides/api#realtime-api-overview)
+- [x] Fonksiyonlar.
+  - [x] Veritabanı Fonksiyonları. [Dokümanlar](https://supabase.com/docs/guides/database/functions)
+  - [x] Kenar İşlevleri [Dokümanlar](https://supabase.com/docs/guides/functions)
+- [x] Dosya Depolama. [Docs](https://supabase.com/docs/guides/storage)
+- [x] Gösterge Tablosu
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokümantasyon
 
-Tam dokümantasyon için, ziyaret et [supabase.com/docs](https://supabase.com/docs)
+Belgelerin tamamı için [supabase.com/docs](https://supabase.com/docs) adresini ziyaret edin
 
-## Topluluk & Destek
+Nasıl Katkıda bulunacağınızı görmek için [Başlarken](../DEVELOPERS.md) adresini ziyaret edin
 
-- [Topluluk Forumu](https://github.com/supabase/supabase/discussions). Şunun için en iyisi: yapı ile ilgili yardım, veritabanı için en iyi pratikleri tartışmak.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). Şunun için en iyisi: Supabase kullanırken karşılaştığınız problem ve hatalar.
-- [Email Desteği](https://supabase.com/docs/support#business-support). Şunun için en iyisi:
-  veritabanınız veya altyapınızla ilgili sorunlar.
+## Topluluk ve Destek
+
+- [Topluluk Forumu](https://github.com/supabase/supabase/discussions). Şunlar için en iyisi: oluşturma konusunda yardım, veritabanı en iyi uygulamaları hakkında tartışma.
+- [GitHub Sorunları](https://github.com/supabase/supabase/issues). Supabase'i kullanırken karşılaştığınız hatalar ve hatalar için en iyisi.
+- [E-posta Desteği](https://supabase.com/docs/support#business-support). Veritabanınız veya altyapınızla ilgili sorunlar için en iyisi.
+- [Discord](https://discord.supabase.com). Uygulamalarınızı paylaşmak ve toplulukla takılmak için en iyisi.
 
 ## Durum
 
-- [x] Alfa: Supabase'i kapalı bir müşteri grubuyla test ediyoruz
-- [x] Herkese Açık Alfa: [app.supabase.com](https://app.supabase.com) adresinden herkes kaydolabilir. Ama anlayış gösterin, birkaç karışıklık var.
-- [x] Herkese Açık Beta: Kurumsal olmayan çoğu kullanım durumu için yeterince kararlı
-- [ ] Herkese açık: Üretime hazır
+- [Alfa: Supabase'i kapalı bir müşteri grubuyla test ediyoruz
+- [Halka Açık Alfa: Herkes [supabase.com/dashboard](https://supabase.com/dashboard) adresinden kaydolabilir. Ama bize karşı sakin olun, birkaç karışıklık var
+- [x] Genel Beta: Kurumsal olmayan kullanım durumlarının çoğu için yeterince kararlı
+- [ ] Genel: Genel Kullanılabilirlik [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
-Şu anda Herkese Açık Beta sürümündeyiz. Önemli güncellemelerden haberdar olmak için bu deponun "sürümlerini" izleyin.
+Şu anda Genel Beta aşamasındayız. Önemli güncellemelerden haberdar olmak için bu deponun "sürümlerini" izleyin.
 
 <kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
-## Nasıl Çalışır
+## Nasıl çalışır
 
-Supabase, açık kaynaklı araçların bir kombinasyonudur. Firebase'in özelliklerini kurumsal sınıf, açık kaynaklı ürünler kullanarak oluşturuyoruz. Araçlar ve topluluklar bir MIT, Apache 2 veya eşdeğer bir açık lisansla mevcutsa, bu aracı kullanacak ve destekleyeceğiz. Araç mevcut değilse, onu kendimiz oluşturur ve açarız. Supabase, Firebase'in 1'e 1 eşlemesi değildir. Amacımız, geliştiricilere açık kaynak araçları kullanarak Firebase benzeri bir geliştirici deneyimi sunmaktır.
+Supabase açık kaynak araçlarının bir birleşimidir. Firebase'in özelliklerini kurumsal düzeyde, açık kaynaklı ürünler kullanarak oluşturuyoruz. Araçlar ve topluluklar MIT, Apache 2 veya eşdeğer bir açık lisansla mevcutsa, bu aracı kullanacak ve destekleyeceğiz. Araç mevcut değilse, kendimiz oluşturur ve açık kaynak kullanırız. Supabase, Firebase'in bire bir eşlemesi değildir. Amacımız, geliştiricilere açık kaynak araçları kullanarak Firebase benzeri bir geliştirici deneyimi sunmaktır.
 
-**Güncel Mimari**
+**Mimari**
 
-Supabase [barındırılan bir platformdur](https://app.supabase.com). Hiçbir şey yüklemeden Supabase'e kaydolabilir ve kullanmaya başlayabilirsiniz. Hala yerel geliştirme deneyimini yaratıyoruz - bu, artık platform kararlılığı ile birlikte temel odak noktamız.
+Supabase [barındırılan bir platformdur](https://supabase.com/dashboard). Supabase'e kaydolabilir ve hiçbir şey yüklemeden kullanmaya başlayabilirsiniz.
+Ayrıca [self-host](https://supabase.com/docs/guides/hosting/overview) ve [yerel olarak geliştirebilirsiniz](https://supabase.com/docs/guides/local-development).
 
-![Architecture](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
+![Mimarlık](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
-- [PostgreSQL](https://www.postgresql.org/) güvenilirlik, özellik sağlamlığı ve performans açısından güçlü bir üne kavuşan 30 yılı aşkın aktif geliştirmeye sahip bir nesne ilişkisel veritabanı sistemidir.
-- [Realtime](https://github.com/supabase/realtime) Web soketleri kullanarak PostgreSQL eklerini, güncellemelerini ve silmelerini dinlemenizi sağlayan bir Elixir sunucusudur. Supabase, Postgres'in yerleşik çoğaltma işlevini dinler, çoğaltma bayt akışını JSON'a dönüştürür ve ardından JSON'yi web yuvaları üzerinden yayınlar.
-- [PostgREST](http://postgrest.org/) PostgreSQL veritabanınızı doğrudan bir RESTful API'ye dönüştüren bir web sunucusudur.
-- [Storage](https://github.com/supabase/storage-api) , izinleri yönetmek için Postgres kullanarak S3'te depolanan Dosyaları yönetmek için RESTful bir arayüz sağlar.
-- [postgres-meta](https://github.com/supabase/postgres-meta) Postgres'inizi yönetmeye yarayan RESTful bir API'dir ve tabloları getirmenize, roller eklemenize ve sorgu çalıştırmanıza vb. izin verir.
+- [PostgreSQL](https://www.postgresql.org/), 30 yılı aşkın süredir aktif olarak geliştirilmekte olan ve güvenilirlik, özellik sağlamlığı ve performans açısından güçlü bir üne sahip olan nesne ilişkisel bir veritabanı sistemidir.
+- [Realtime](https://github.com/supabase/realtime), websockets kullanarak PostgreSQL ekleme, güncelleme ve silme işlemlerini dinlemenizi sağlayan bir Elixir sunucusudur. Realtime, veritabanı değişiklikleri için Postgres'in yerleşik çoğaltma işlevini yoklar, değişiklikleri JSON'a dönüştürür ve ardından JSON'u web soketleri üzerinden yetkili istemcilere yayınlar.
+- [PostgREST](http://postgrest.org/), PostgreSQL veritabanınızı doğrudan RESTful API'ye dönüştüren bir web sunucusudur
+- [pg_graphql](http://github.com/supabase/pg_graphql/) GraphQL API'si sunan bir PostgreSQL uzantısı
+- [Storage](https://github.com/supabase/storage-api), izinleri yönetmek için Postgres kullanarak S3'te depolanan Dosyaları yönetmek için RESTful bir arayüz sağlar.
+- [postgres-meta](https://github.com/supabase/postgres-meta) Postgres'inizi yönetmek için RESTful bir API'dir ve tabloları getirmenize, roller eklemenize ve sorgular çalıştırmanıza vb. olanak tanır.
 - [GoTrue](https://github.com/netlify/gotrue) kullanıcıları yönetmek ve SWT belirteçleri vermek için SWT tabanlı bir API'dir.
-- [Kong](https://github.com/Kong/kong) bulutta yerel bir API ağ geçididir.
+- [Kong](https://github.com/Kong/kong) bulut tabanlı bir API ağ geçididir.
 
-#### İstemci kitaplıkları
+#### İstemci kütüphaneleri
 
-Müşteri kitaplığımız modülerdir. Her bir alt kütüphane, tek bir harici sistem için bağımsız bir uygulamadır. Bu, mevcut araçları desteklememizin yollarından biridir.
+İstemci kütüphaneleri için yaklaşımımız modülerdir. Her bir alt kütüphane, tek bir harici sistem için bağımsız bir uygulamadır. Bu, mevcut araçları destekleme yöntemlerimizden biridir.
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>
     <th>Dil</th>
-    <th>İstemci</th>
-    <th colspan="4">Özellik-İstemciler (Supabase istemcisinde paketlenmiştir)</th>
+    <th>Müşteri</th>
+    <th colspan="5">Özellik İstemcileri (Supabase istemcisinde paketlenmiştir)</th>
   </tr>
+  
   <tr>
     <th></th>
     <th>Supabase</th>
@@ -78,6 +87,7 @@ Müşteri kitaplığımız modülerdir. Her bir alt kütüphane, tek bir harici 
     <th><a href="https://github.com/supabase/gotrue" target="_blank" rel="noopener noreferrer">GoTrue</a></th>
     <th><a href="https://github.com/supabase/realtime" target="_blank" rel="noopener noreferrer">Realtime</a></th>
     <th><a href="https://github.com/supabase/storage-api" target="_blank" rel="noopener noreferrer">Storage</a></th>
+    <th>Functions</th>
   </tr>
   <!-- TEMPLATE FOR NEW ROW -->
   <!-- START ROW
@@ -90,7 +100,9 @@ Müşteri kitaplığımız modülerdir. Her bir alt kütüphane, tek bir harici 
     <td><a href="https://github.com/supabase-community/storage-lang" target="_blank" rel="noopener noreferrer">storage-lang</a></td>
   </tr>
   END ROW -->
-  <th colspan="6">⚡️ Resmi ⚡️</th>
+  
+  <th colspan="7">⚡️ Resmi ⚡️</th>
+  
   <tr>
     <td>JavaScript (TypeScript)</td>
     <td><a href="https://github.com/supabase/supabase-js" target="_blank" rel="noopener noreferrer">supabase-js</a></td>
@@ -98,8 +110,20 @@ Müşteri kitaplığımız modülerdir. Her bir alt kütüphane, tek bir harici 
     <td><a href="https://github.com/supabase/gotrue-js" target="_blank" rel="noopener noreferrer">gotrue-js</a></td>
     <td><a href="https://github.com/supabase/realtime-js" target="_blank" rel="noopener noreferrer">realtime-js</a></td>
     <td><a href="https://github.com/supabase/storage-js" target="_blank" rel="noopener noreferrer">storage-js</a></td>
+    <td><a href="https://github.com/supabase/functions-js" target="_blank" rel="noopener noreferrer">functions-js</a></td>
   </tr>
-  <th colspan="6">💚 Topluluk 💚</th>
+    <tr>
+    <td>Flutter</td>
+    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
+    <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
+    <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
+    <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
+    <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
+    <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
+  </tr>
+  
+  <th colspan="7">💚 Topluluk 💚</th>
+  
   <tr>
     <td>C#</td>
     <td><a href="https://github.com/supabase-community/supabase-csharp" target="_blank" rel="noopener noreferrer">supabase-csharp</a></td>
@@ -107,22 +131,16 @@ Müşteri kitaplığımız modülerdir. Her bir alt kütüphane, tek bir harici 
     <td><a href="https://github.com/supabase-community/gotrue-csharp" target="_blank" rel="noopener noreferrer">gotrue-csharp</a></td>
     <td><a href="https://github.com/supabase-community/realtime-csharp" target="_blank" rel="noopener noreferrer">realtime-csharp</a></td>
     <td><a href="https://github.com/supabase-community/storage-csharp" target="_blank" rel="noopener noreferrer">storage-csharp</a></td>
-  </tr>
-  <tr>
-    <td>Flutter</td>
-    <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-dart</a></td>
-    <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
-    <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
-    <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
-    <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
+    <td><a href="https://github.com/supabase-community/functions-csharp" target="_blank" rel="noopener noreferrer">functions-csharp</a></td>
   </tr>
   <tr>
     <td>Go</td>
     <td>-</td>
     <td><a href="https://github.com/supabase-community/postgrest-go" target="_blank" rel="noopener noreferrer">postgrest-go</a></td>
+    <td><a href="https://github.com/supabase-community/gotrue-go" target="_blank" rel="noopener noreferrer">gotrue-go</a></td>
     <td>-</td>
-    <td>-</td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/storage-go" target="_blank" rel="noopener noreferrer">storage-go</a></td>
+    <td><a href="https://github.com/supabase-community/functions-go" target="_blank" rel="noopener noreferrer">functions-go</a></td>
   </tr>
   <tr>
     <td>Java</td>
@@ -130,15 +148,17 @@ Müşteri kitaplığımız modülerdir. Her bir alt kütüphane, tek bir harici 
     <td>-</td>
     <td><a href="https://github.com/supabase-community/gotrue-java" target="_blank" rel="noopener noreferrer">gotrue-java</a></td>
     <td>-</td>
+    <td><a href="https://github.com/supabase-community/storage-java" target="_blank" rel="noopener noreferrer">storage-java</a></td>
     <td>-</td>
   </tr>
   <tr>
     <td>Kotlin</td>
-    <td>-</td>
-    <td><a href="https://github.com/supabase-community/postgrest-kt" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
-    <td><a href="https://github.com/supabase-community/gotrue-kt" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
-    <td>-</td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/supabase-kt" target="_blank" rel="noopener noreferrer">supabase-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Postgrest" target="_blank" rel="noopener noreferrer">postgrest-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/GoTrue" target="_blank" rel="noopener noreferrer">gotrue-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Realtime" target="_blank" rel="noopener noreferrer">realtime-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Storage" target="_blank" rel="noopener noreferrer">storage-kt</a></td>
+    <td><a href="https://github.com/supabase-community/supabase-kt/tree/master/Functions" target="_blank" rel="noopener noreferrer">functions-kt</a></td>
   </tr>
   <tr>
     <td>Python</td>
@@ -146,12 +166,14 @@ Müşteri kitaplığımız modülerdir. Her bir alt kütüphane, tek bir harici 
     <td><a href="https://github.com/supabase-community/postgrest-py" target="_blank" rel="noopener noreferrer">postgrest-py</a></td>
     <td><a href="https://github.com/supabase-community/gotrue-py" target="_blank" rel="noopener noreferrer">gotrue-py</a></td>
     <td><a href="https://github.com/supabase-community/realtime-py" target="_blank" rel="noopener noreferrer">realtime-py</a></td>
-    <td>-</td>
+    <td><a href="https://github.com/supabase-community/storage-py" target="_blank" rel="noopener noreferrer">storage-py</a></td>
+    <td><a href="https://github.com/supabase-community/functions-py" target="_blank" rel="noopener noreferrer">functions-py</a></td>
   </tr>
   <tr>
     <td>Ruby</td>
     <td><a href="https://github.com/supabase-community/supabase-rb" target="_blank" rel="noopener noreferrer">supabase-rb</a></td>
     <td><a href="https://github.com/supabase-community/postgrest-rb" target="_blank" rel="noopener noreferrer">postgrest-rb</a></td>
+    <td>-</td>
     <td>-</td>
     <td>-</td>
     <td>-</td>
@@ -163,6 +185,7 @@ Müşteri kitaplığımız modülerdir. Her bir alt kütüphane, tek bir harici 
     <td>-</td>
     <td>-</td>
     <td>-</td>
+    <td>-</td>
   </tr>
   <tr>
     <td>Swift</td>
@@ -171,18 +194,67 @@ Müşteri kitaplığımız modülerdir. Her bir alt kütüphane, tek bir harici 
     <td><a href="https://github.com/supabase-community/gotrue-swift" target="_blank" rel="noopener noreferrer">gotrue-swift</a></td>
     <td><a href="https://github.com/supabase-community/realtime-swift" target="_blank" rel="noopener noreferrer">realtime-swift</a></td>
     <td><a href="https://github.com/supabase-community/storage-swift" target="_blank" rel="noopener noreferrer">storage-swift</a></td>
+    <td><a href="https://github.com/supabase-community/functions-swift" target="_blank" rel="noopener noreferrer">functions-swift</a></td>
   </tr>
+  <tr>
+    <td>Godot Engine (GDScript)</td>
+    <td><a href="https://github.com/supabase-community/godot-engine.supabase" target="_blank" rel="noopener noreferrer">supabase-gdscript</a></td>
+    <td><a href="https://github.com/supabase-community/postgrest-gdscript" target="_blank" rel="noopener noreferrer">postgrest-gdscript</a></td>
+    <td><a href="https://github.com/supabase-community/gotrue-gdscript" target="_blank" rel="noopener noreferrer">gotrue-gdscript</a></td>
+    <td><a href="https://github.com/supabase-community/realtime-gdscript" target="_blank" rel="noopener noreferrer">realtime-gdscript</a></td>
+    <td><a href="https://github.com/supabase-community/storage-gdscript" target="_blank" rel="noopener noreferrer">storage-gdscript</a></td>
+    <td><a href="https://github.com/supabase-community/functions-gdscript" target="_blank" rel="noopener noreferrer">functions-gdscript</a></td>
+  </tr>
+  
 </table>
 
-<!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
+<!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
 
 ## Çeviriler
 
-- [Çeviriler](/i18n/languages.md) <!--- Keep only the this-->
+- [Arapça | العربية](/i18n/README.ar.md)
+- [Arnavutça / Shqip](/i18n/README.sq.md)
+- [Bangla / বাংলা](/i18n/README.bn.md)
+- [Bulgarca / Български](/i18n/README.bg.md)
+- [Katalanca / Català](/i18n/README.ca.md)
+- [Danca / Dansk](/i18n/README.da.md)
+- [Hollandaca / Nederlands](/i18n/README.nl.md)
+- [İngilizce](https://github.com/supabase/supabase)
+- [Fince / Suomalainen](/i18n/README.fi.md)
+- [Fransızca / Français](/i18n/README.fr.md)
+- [Almanca / Deutsch](/i18n/README.de.md)
+- [Yunanca / Ελληνικά](/i18n/README.gr.md)
+- [İbranice / עברית](/i18n/README.he.md)
+- [Hintçe / हिंदी](/i18n/README.hi.md)
+- [Macarca / Magyar](/i18n/README.hu.md)
+- [Nepalce / नेपाली](/i18n/README.ne.md)
+- [Endonezce / Bahasa Endonezya](/i18n/README.id.md)
+- [İtalyanca / Italiano](/i18n/README.it.md)
+- [Japonca / 日本語](/i18n/README.jp.md)
+- [Korece / 한국어](/i18n/README.ko.md)
+- [Malayca / Bahasa Malezya](/i18n/README.ms.md)
+- [Norveççe (Bokmål) / Norsk (Bokmål)](/i18n/README.nb-no.md)
+- [Farsça / فارسی](/i18n/README.fa.md)
+- [Lehçe / Polski](/i18n/README.pl.md)
+- [Portekizce / Português](/i18n/README.pt.md)
+- [Portekizce (Brezilya) / Português Brasileiro](/i18n/README.pt-br.md)
+- [Rumence / Română](/i18n/README.ro.md)
+- [Rusça / Pусский](/i18n/README.ru.md)
+- [Sırpça / Srpski](/i18n/README.sr.md)
+- [Sinhala / සිංහල](/i18n/README.si.md)
+- [İspanyolca / Español](/i18n/README.es.md)
+- [Basitleştirilmiş Çince / 简体中文](/i18n/README.zh-cn.md)
+- [İsveççe / Svenska](/i18n/README.sv.md)
+- [Thai / ไทย](/i18n/README.th.md)
+- [Geleneksel Çince / 繁体中文](/i18n/README.zh-tw.md)
+- [Türkçe / Turkish](/i18n/README.tr.md)
+- [Ukraynaca / Українська](/i18n/README.uk.md)
+- [Vietnamca / Tiếng Việt](/i18n/README.vi-vn.md)
+- [Çevirilerin listesi](/i18n/languages.md) <!--- Keep only this -->
 
 ---
 
 ## Sponsorlar
 
-[![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
+[![Yeni Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)

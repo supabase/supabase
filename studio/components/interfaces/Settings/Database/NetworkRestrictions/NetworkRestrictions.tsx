@@ -1,24 +1,27 @@
-import Link from 'next/link'
-import { FC, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconAlertCircle, IconExternalLink, IconGlobe, IconLock } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import Link from 'next/link'
+import { useState } from 'react'
+import { Button, IconAlertCircle, IconExternalLink, IconGlobe, IconLock } from 'ui'
 
-import { checkPermissions } from 'hooks'
-import { useParams } from 'common/hooks'
+import { FormHeader, FormPanel } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
-import { FormPanel, FormHeader } from 'components/ui/Forms'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import AddRestrictionModal from './AddRestrictionModal'
-import RemoveRestrictionModal from './RemoveRestrictionModal'
-import DisallowAllModal from './DisallowAllModal'
-import AllowAllModal from './AllowAllModal'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useCheckPermissions } from 'hooks'
+import AddRestrictionModal from './AddRestrictionModal'
+import AllowAllModal from './AllowAllModal'
+import DisallowAllModal from './DisallowAllModal'
+import RemoveRestrictionModal from './RemoveRestrictionModal'
 
-const AllowAllAccessButton: FC<{ disabled: boolean; onClick: (value: boolean) => void }> = ({
-  disabled,
-  onClick,
-}) => (
+interface AccessButtonProps {
+  disabled: boolean
+  onClick: (value: boolean) => void
+}
+
+const AllowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
   <Tooltip.Root delayDuration={0}>
     <Tooltip.Trigger>
       <Button type="default" disabled={disabled} onClick={() => onClick(true)}>
@@ -45,10 +48,7 @@ const AllowAllAccessButton: FC<{ disabled: boolean; onClick: (value: boolean) =>
   </Tooltip.Root>
 )
 
-const DisallowAllAccessButton: FC<{ disabled: boolean; onClick: (value: boolean) => void }> = ({
-  disabled,
-  onClick,
-}) => (
+const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
   <Tooltip.Root delayDuration={0}>
     <Tooltip.Trigger>
       <Button type="default" disabled={disabled} onClick={() => onClick(true)}>
@@ -77,14 +77,18 @@ const DisallowAllAccessButton: FC<{ disabled: boolean; onClick: (value: boolean)
 
 const NetworkRestrictions = ({}) => {
   const { ref } = useParams()
-
+  const { project } = useProjectContext()
   const [isAddingAddress, setIsAddingAddress] = useState(false)
   const [isAllowingAll, setIsAllowingAll] = useState(false)
   const [isDisallowingAll, setIsDisallowingAll] = useState(false)
   const [selectedRestrictionToRemove, setSelectedRestrictionToRemove] = useState<string>()
   const { data, isLoading } = useNetworkRestrictionsQuery({ projectRef: ref })
 
-  const canUpdateNetworkRestrictions = checkPermissions(PermissionAction.UPDATE, 'projects')
+  const canUpdateNetworkRestrictions = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const hasAccessToRestrictions = data?.entitlement === 'allowed'
   const restrictedIps = data?.config?.dbAllowedCidrs ?? []

@@ -48,6 +48,7 @@ import { getQueryClient } from 'data/query-client'
 import { tableKeys } from 'data/tables/keys'
 import { getTables } from 'data/tables/tables-query'
 import { getTable } from 'data/tables/table-query'
+import { getCachedProjectDetail } from 'data/projects/project-detail-query'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -319,8 +320,9 @@ export default class MetaStore implements IMetaStore {
     const publications = this.publications.list()
 
     const queryClient = getQueryClient()
-    const projectRef = this.rootStore.ui.selectedProject?.ref
-    const connectionString = this.rootStore.ui.selectedProject?.connectionString
+    const project = await getCachedProjectDetail(queryClient, this.rootStore.ui.selectedProjectRef)
+    const projectRef = project?.ref
+    const connectionString = project?.connectionString
     const publicTables = await queryClient.fetchQuery({
       queryKey: tableKeys.list(projectRef, 'public'),
       queryFn: ({ signal }) =>
@@ -391,7 +393,6 @@ export default class MetaStore implements IMetaStore {
     try {
       // Once pg-meta supports composite keys, we can remove this logic
       const { isPrimaryKey, ...formattedPayload } = payload
-
       const column: any = await this.columns.create(formattedPayload)
       if (column.error) throw column.error
 
@@ -573,8 +574,9 @@ export default class MetaStore implements IMetaStore {
     }
 
     const queryClient = getQueryClient()
-    const projectRef = this.rootStore.ui.selectedProject?.ref
-    const connectionString = this.rootStore.ui.selectedProject?.connectionString
+    const project = await getCachedProjectDetail(queryClient, this.rootStore.ui.selectedProjectRef)
+    const projectRef = project?.ref
+    const connectionString = project?.connectionString
     const tables = await queryClient.fetchQuery({
       queryKey: tableKeys.list(projectRef, 'public'),
       queryFn: ({ signal }) => getTables({ projectRef, connectionString }, signal),
@@ -848,8 +850,9 @@ export default class MetaStore implements IMetaStore {
     await this.updateTableRealtime(table, isRealtimeEnabled)
 
     const queryClient = getQueryClient()
-    const projectRef = this.rootStore.ui.selectedProject?.ref
-    const connectionString = this.rootStore.ui.selectedProject?.connectionString
+    const project = await getCachedProjectDetail(queryClient, this.rootStore.ui.selectedProjectRef)
+    const projectRef = project?.ref
+    const connectionString = project?.connectionString
 
     queryClient.invalidateQueries(tableKeys.table(projectRef, table.id))
 

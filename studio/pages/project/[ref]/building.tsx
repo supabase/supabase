@@ -1,6 +1,6 @@
-import { FC, useEffect } from 'react'
-import { useRouter } from 'next/router'
 import { ProjectLayoutWithAuth } from 'components/layouts'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { NextPageWithLayout } from 'types'
 
 const ProjectBuildingPage: NextPageWithLayout = () => {
@@ -13,7 +13,7 @@ ProjectBuildingPage.getLayout = (page) => (
 
 export default ProjectBuildingPage
 
-const RedirectToDashboard: FC = () => {
+const RedirectToDashboard = () => {
   const router = useRouter()
   const { ref } = router.query
 

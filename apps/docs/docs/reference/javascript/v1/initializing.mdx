@@ -5,9 +5,6 @@ slug: initializing
 custom_edit_url: https://github.com/supabase/supabase/edit/master/spec/supabase_js_v1.yml
 ---
 
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
-
 You can initialize a new Supabase client using the `createClient()` method.
 
 The Supabase client is your entrypoint to the rest of the Supabase functionality
@@ -117,7 +114,7 @@ const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key
 ```
 
 By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
-Go to `Settings > API > Schema` and add the schema which you want to expose to the API. You also need to grant `USAGE` on your new schema with the grants you desire, such as `SELECT, INSERT, UPDATE, DELETE`. 
+Go to `Settings > API > Schema` and add the schema which you want to expose to the API. You also need to grant `USAGE` on your new schema with the grants you desire, such as `SELECT, INSERT, UPDATE, DELETE`.
 
 Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
 

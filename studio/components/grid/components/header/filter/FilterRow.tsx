@@ -35,7 +35,7 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete }: FilterRowPr
         onSelect={(nextColumn) => onChange(filterIdx, { ...filter, column: nextColumn as string })}
       >
         <Button
-          as="span"
+          asChild
           type="outline"
           icon={
             <div className="text-scale-900">
@@ -44,7 +44,7 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete }: FilterRowPr
           }
           className="w-32"
         >
-          {column?.name ?? ''}
+          <span>{column?.name ?? ''}</span>
         </Button>
       </DropdownControl>
       <DropdownControl
@@ -58,7 +58,7 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete }: FilterRowPr
         }
       >
         <Button
-          as="span"
+          asChild
           type="outline"
           icon={
             <div className="text-scale-900">
@@ -66,7 +66,7 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete }: FilterRowPr
             </div>
           }
         >
-          {filter.operator}
+          <span>{filter.operator}</span>
         </Button>
       </DropdownControl>
       <Input

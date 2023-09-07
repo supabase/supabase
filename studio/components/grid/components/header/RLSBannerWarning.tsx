@@ -1,13 +1,14 @@
+import Link from 'next/link'
+import { useCallback, useState } from 'react'
+
 import { useParams } from 'common/hooks'
-import { RLS_ACKNOWLEDGED_KEY } from 'components/grid/constants'
+import { rlsAcknowledgedKey } from 'components/grid/constants'
 import RLSDisableModalContent from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/RLSDisableModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useTableQuery } from 'data/tables/table-query'
 import useEntityType from 'hooks/misc/useEntityType'
-import Link from 'next/link'
-import { useState } from 'react'
 import { Button, IconAlertCircle, Modal } from 'ui'
 
 export default function RLSBannerWarning() {
@@ -15,8 +16,8 @@ export default function RLSBannerWarning() {
   const { ref: projectRef, id: _id } = useParams()
   const tableID = _id ? Number(_id) : undefined
 
-  const isAcknowledged =
-    localStorage?.getItem(`${RLS_ACKNOWLEDGED_KEY}-${tableID}`) === 'true' ?? false
+  const rlsKey = rlsAcknowledgedKey(tableID)
+  const isAcknowledged = localStorage?.getItem(rlsKey) === 'true' ?? false
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -35,10 +36,11 @@ export default function RLSBannerWarning() {
   const rlsEnabled = currentTable?.rls_enabled
   const isPublicTable = currentTable?.schema === 'public'
 
-  function handleDismissWarning() {
-    localStorage.setItem(`${RLS_ACKNOWLEDGED_KEY}-${tableID}`, 'true')
+  const handleDismissWarning = useCallback(() => {
+    new BroadcastChannel(rlsKey).postMessage({ type: 'dismiss' })
+    localStorage.setItem(rlsKey, 'true')
     setIsOpen(false)
-  }
+  }, [rlsKey])
 
   return (
     <>

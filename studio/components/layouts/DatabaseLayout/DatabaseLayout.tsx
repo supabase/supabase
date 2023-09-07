@@ -1,31 +1,30 @@
-import { FC, ReactNode, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect } from 'react'
 
-import { useFlag, useStore, withAuth } from 'hooks'
-import ProjectLayout from '../'
 import ProductMenu from 'components/ui/ProductMenu'
-import { generateDatabaseMenu } from './DatabaseMenu.utils'
+import { useSelectedProject, useStore, withAuth } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
+import ProjectLayout from '../'
+import { generateDatabaseMenu } from './DatabaseMenu.utils'
 
-interface Props {
+export interface DatabaseLayoutProps {
   title?: string
-  children: ReactNode
 }
 
-const DatabaseLayout: FC<Props> = ({ title, children }) => {
-  const { meta, ui, vault, backups } = useStore()
-  const project = ui.selectedProject
+const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
+  const { ui, meta, vault, backups } = useStore()
+  const project = useSelectedProject()
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
 
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
-  const foreignDataWrappersEnabled = useFlag('foreignDataWrappers')
+  const pgNetExtensionExists = meta.extensions.byId('pg_net') !== undefined
 
   useEffect(() => {
-    if (ui.selectedProject?.ref) {
+    if (ui.selectedProjectRef) {
       meta.roles.load()
       meta.triggers.load()
       meta.extensions.load()
@@ -35,19 +34,19 @@ const DatabaseLayout: FC<Props> = ({ title, children }) => {
         backups.load()
       }
     }
-  }, [ui.selectedProject?.ref])
+  }, [ui.selectedProjectRef])
 
   useEffect(() => {
     if (isVaultEnabled) {
       vault.load()
     }
-  }, [ui.selectedProject?.ref, isVaultEnabled])
+  }, [ui.selectedProjectRef, isVaultEnabled])
 
   return (
     <ProjectLayout
       product="Database"
       productMenu={
-        <ProductMenu page={page} menu={generateDatabaseMenu(project, foreignDataWrappersEnabled)} />
+        <ProductMenu page={page} menu={generateDatabaseMenu(project, { pgNetExtensionExists })} />
       }
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">

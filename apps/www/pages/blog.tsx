@@ -7,17 +7,16 @@ import Link from 'next/link'
 
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
-import { getSortedPosts, getAllCategories } from '~/lib/posts'
+import { getSortedPosts } from '~/lib/posts'
 import authors from 'lib/authors.json'
 
-import DefaultLayout from '~/components/Layouts/Default'
-import { Tabs } from 'ui'
 import PostTypes from '~/types/post'
+import DefaultLayout from '~/components/Layouts/Default'
 import BlogListItem from '~/components/Blog/BlogListItem'
+import BlogFilters from '~/components/Blog/BlogFilters'
 
 export async function getStaticProps() {
-  const allPostsData = getSortedPosts('_blog', undefined, undefined, '** BLOG PAGE **')
-  const categories = getAllCategories('_blog')
+  const allPostsData = getSortedPosts({ directory: '_blog', runner: '** BLOG PAGE **' })
   const rss = generateRss(allPostsData)
 
   // create a rss feed in public directory
@@ -25,7 +24,7 @@ export async function getStaticProps() {
   fs.writeFileSync('./public/rss.xml', rss)
 
   // generate a series of rss feeds for each author (for PlanetPG)
-  const planetPgPosts = allPostsData.filter((post: any) => post.tags.includes('planetpg'))
+  const planetPgPosts = allPostsData.filter((post: any) => post.tags?.includes('planetpg'))
   const planetPgAuthors = planetPgPosts.map((post: any) => post.author.split(','))
   const uniquePlanetPgAuthors = new Set([].concat(...planetPgAuthors))
 
@@ -40,41 +39,57 @@ export async function getStaticProps() {
   return {
     props: {
       blogs: allPostsData,
-      categories,
     },
   }
 }
 
 function Blog(props: any) {
-  const [category, setCategory] = useState('all')
   const [blogs, setBlogs] = useState(props.blogs)
+  const [category, setCategory] = useState<string>('all')
 
+  // Using hard-coded categories as they:
+  // - serve as a reference
+  // - are easier to reorder
+  const allCategories = [
+    'all',
+    'product',
+    'company',
+    'postgres',
+    'developers',
+    'engineering',
+    'launch-week',
+  ]
   const router = useRouter()
 
+  const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
+  const meta_description = 'Get all your Supabase News on the Supabase blog.'
+
   useEffect(() => {
+    handlePosts()
+  }, [category])
+
+  const handlePosts = () => {
     // construct an array of blog posts
     // not inluding the first blog post
     const shiftedBlogs = [...props.blogs]
     shiftedBlogs.shift()
 
+    if (category === 'all') {
+      router.replace('/blog', undefined, { shallow: true, scroll: false })
+    } else {
+      router.query.category = category
+      router.replace(router, undefined, { shallow: true, scroll: false })
+    }
+
     setBlogs(
       category === 'all'
         ? shiftedBlogs
         : props.blogs.filter((post: any) => {
-            const found = post.tags.includes(category)
+            const found = post.categories?.includes(category)
             return found
           })
     )
-  }, [category])
-
-  useEffect(() => {
-    return props.categories.unshift('all')
-  }, [])
-
-  // append 'all' category
-  // const categories = props.categories.push('all')
-  const meta_title = 'Supabase Blog: Open Source Firebase alternative Blog'
-  const meta_description = 'Get all your Supabase News on the Supabase blog.'
+  }
 
   return (
     <>
@@ -87,7 +102,7 @@ function Blog(props: any) {
           url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image.jpg`,
+              url: `https://supabase.com/images/og/og-image-v2.jpg`,
             },
           ],
         }}
@@ -113,29 +128,29 @@ function Blog(props: any) {
 
         <div className="border-scale-600 border-t">
           <div className="container mx-auto mt-16 px-8 sm:px-16 xl:px-20">
-            <div className="mx-auto ">
-              <div className="grid grid-cols-12">
-                <div className="col-span-12 lg:col-span-12">
-                  <Tabs scrollable size="medium" onChange={setCategory} defaultActiveId={'all'}>
-                    {props.categories.map((categoryId: string) => (
-                      <Tabs.Panel id={categoryId} key={categoryId} label={categoryId} />
-                    ))}
-                  </Tabs>
-                </div>
-              </div>
-            </div>
+            <BlogFilters
+              posts={blogs}
+              setPosts={setBlogs}
+              setCategory={setCategory}
+              allCategories={allCategories}
+              handlePosts={handlePosts}
+            />
 
             <ol className="grid grid-cols-12 py-16 lg:gap-16">
-              {blogs.map((blog: PostTypes, idx: number) => (
-                <div
-                  className="col-span-12 mb-16 md:col-span-12 lg:col-span-6 xl:col-span-4"
-                  key={idx}
-                >
-                  <BlogListItem post={blog} />
-                </div>
-              ))}
+              {blogs?.length ? (
+                blogs?.map((blog: PostTypes, idx: number) => (
+                  <div
+                    className="col-span-12 mb-16 md:col-span-12 lg:col-span-6 xl:col-span-4"
+                    key={idx}
+                  >
+                    <BlogListItem post={blog} />
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-scale-800 col-span-full">No results</p>
+              )}
             </ol>
-          </div>{' '}
+          </div>
         </div>
       </DefaultLayout>
     </>

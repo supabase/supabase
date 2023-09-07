@@ -1,7 +1,6 @@
 import clsx from 'clsx'
-import { FC } from 'react'
 
-interface Props {
+interface TwoOptionToggleProps {
   options: any
   width?: number
   activeOption: any
@@ -9,13 +8,13 @@ interface Props {
   borderOverride: string
 }
 
-const TwoOptionToggle: FC<Props> = ({
+const TwoOptionToggle = ({
   options,
   width = 50,
   activeOption,
   onClickOption,
   borderOverride = 'border-gray-600 dark:border-gray-800',
-}) => {
+}: TwoOptionToggleProps) => {
   const buttonStyle = (
     isActive: boolean
   ) => `absolute top-0 z-1 text-xs inline-flex h-full items-center justify-center font-medium

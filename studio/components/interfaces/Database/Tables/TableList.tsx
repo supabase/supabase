@@ -1,8 +1,18 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
+import Table from 'components/to-be-cleaned/Table'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useCheckPermissions, useStore } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
   IconCheck,
@@ -15,18 +25,9 @@ import {
   Input,
   Listbox,
 } from 'ui'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import Table from 'components/to-be-cleaned/Table'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { checkPermissions, useStore } from 'hooks'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 
-export interface TableListProps {
+interface TableListProps {
   onAddTable: () => void
   onEditTable: (table: any) => void
   onDeleteTable: (table: any) => void
@@ -39,11 +40,12 @@ const TableList = ({
   onDeleteTable = noop,
   onOpenTable = noop,
 }: TableListProps) => {
+  const { meta } = useStore()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
-  const { meta } = useStore()
+
   const [filterString, setFilterString] = useState<string>('')
-  const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canUpdateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
@@ -84,7 +86,7 @@ const TableList = ({
     <>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="w-[230px]">
+          <div className="w-[260px]">
             <Listbox
               size="small"
               value={snap.selectedSchemaName}
@@ -175,6 +177,7 @@ const TableList = ({
           <ShimmeringLoader className="w-1/2" />
         </div>
       )}
+
       {isSuccess &&
         (tables.length === 0 ? (
           <NoSearchResults />
@@ -233,7 +236,7 @@ const TableList = ({
                         style={{ paddingTop: 3, paddingBottom: 3 }}
                         onClick={() => onOpenTable(x)}
                       >
-                        {x.columns.length} columns
+                        {x.columns?.length} columns
                       </Button>
 
                       <Tooltip.Root delayDuration={0}>

@@ -2,7 +2,7 @@ import { Badge, Button, IconArrowUpRight, IconShuffle, IconWifi, IconX, Space } 
 import ApiExamples from 'data/products/storage/api-examples'
 import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
 import StoragePermissionsData from 'data/products/storage/permissions-examples'
-import Solutions from 'data/Solutions.json'
+import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
@@ -153,12 +153,12 @@ function StoragePage() {
                   author={'supabase'}
                   author_url={'https://github.com/supabase'}
                   author_img={'https://avatars.githubusercontent.com/u/54469796'}
-                  repo_name={'nextjs-ts-user-management'}
+                  repo_name={'nextjs-user-management'}
                   repo_url={
-                    'https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-ts-user-management'
+                    'https://github.com/supabase/supabase/tree/master/examples/user-management/nextjs-user-management'
                   }
                   vercel_deploy_url={
-                    'https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fuser-mangement%2Fnextjs-ts-user-management&project-name=supabase-user-management&repository-name=supabase-user-management&demo-title=Supabase%20User%20Management&demo-description=An%20example%20web%20app%20using%20Supabase%20and%20Next.js&demo-url=https%3A%2F%2Fsupabase-nextjs-ts-user-management.vercel.app&demo-image=https%3A%2F%2Fi.imgur.com%2FZ3HkQqe.png&integration-ids=oac_jUduyjQgOyzev1fjrW83NYOv&external-id=nextjs-user-management'
+                    'https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fuser-management%2Fnextjs-user-management&project-name=supabase-nextjs-user-management&repository-name=supabase-nextjs-user-management&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6&external-id=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fuser-management%2Fnextjs-user-management'
                   }
                   demo_url={''}
                 />
@@ -174,10 +174,7 @@ function StoragePage() {
             content={ApiExamples}
             text={[
               <p key={0}>Built from the ground up for interoperable authentication.</p>,
-              <p key={1}>
-                Fast and easy to implement using our powerful library clients. Asset optimization
-                and image transformation coming soon!
-              </p>,
+              <p key={1}>Fast and easy to implement using our powerful library clients.</p>,
             ]}
             footer={[
               <div className="my-8 grid grid-cols-12 gap-8 lg:gap-0 xl:gap-16" key={0}>
@@ -185,7 +182,7 @@ function StoragePage() {
                   <FeatureColumn
                     icon={<IconWifi />}
                     title="CDN"
-                    text="Serve from the edge to reduce latency."
+                    text="Serve from over 285 cities globally to reduce latency."
                   />
                   <Link href="/docs/guides/storage/cdn" passHref>
                     <a>
@@ -203,8 +200,8 @@ function StoragePage() {
                 <div className="col-span-6 lg:col-span-12 xl:col-span-4">
                   <FeatureColumn
                     icon={<IconShuffle />}
-                    title="Transformations"
-                    text="Resize and compress your media before you serve it."
+                    title="Image Optimizations and Transformations"
+                    text="Resize and compress your media files on the fly."
                   />
                   <Link href="/docs/guides/storage/image-transformations" passHref>
                     <a>

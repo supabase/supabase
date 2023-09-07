@@ -1,21 +1,21 @@
 import clientLibsCommonSections from '~/../../spec/common-client-libs-sections.json'
-// @ts-expect-error
-import spec from '~/../../spec/supabase_swift_v1.yml' assert { type: 'yml' }
+import spec from '~/../../spec/supabase_swift_v0.yml' assert { type: 'yml' }
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
 
 const sections = flattenSections(clientLibsCommonSections)
+const libraryPath = '/swift'
 
-export default function JSReference(props) {
+export default function SwiftReference(props) {
   return <RefSectionHandler sections={sections} spec={spec} pageProps={props} type="client-lib" />
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/swift')
+  return handleRefStaticProps(sections, libraryPath)
 }
 
-export function getStaticPaths() {
-  return handleRefGetStaticPaths()
+export async function getStaticPaths() {
+  return handleRefGetStaticPaths(sections)
 }
