@@ -14,7 +14,6 @@ const TriggersPage: NextPageWithLayout = () => {
   const { meta } = useStore()
   const { project } = useProjectContext()
 
-  const [filterString, setFilterString] = useState<string>('')
   const [selectedTrigger, setSelectedTrigger] = useState<any>()
   const [showCreateTriggerForm, setShowCreateTriggerForm] = useState<boolean>(false)
   const [showDeleteTriggerForm, setShowDeleteTriggerForm] = useState<boolean>(false)
@@ -53,8 +52,6 @@ const TriggersPage: NextPageWithLayout = () => {
   return (
     <>
       <TriggersList
-        filterString={filterString}
-        setFilterString={setFilterString}
         createTrigger={createTrigger}
         editTrigger={editTrigger}
         deleteTrigger={deleteTrigger}

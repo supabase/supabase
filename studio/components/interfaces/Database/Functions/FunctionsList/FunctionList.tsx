@@ -36,27 +36,19 @@ const FunctionList = ({
   const isApiDocumentAvailable = schema == 'public'
   const projectRef = selectedProject?.ref
 
-  console.log({ filteredFunctions })
-
   const canUpdateFunctions = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'functions'
   )
-
-  function onEdit(func: any) {
-    editFunction(func)
-  }
-
-  function onDelete(func: any) {
-    deleteFunction(func)
-  }
 
   if (_functions.length === 0 && filterString.length === 0) {
     return (
       <Table.tr key={schema}>
         <Table.td colSpan={4}>
           <p className="text-sm text-scale-1200">No functions created yet</p>
-          <p className="text-sm text-light">There are no indexes found in the schema "{schema}"</p>
+          <p className="text-sm text-light">
+            There are no functions found in the schema "{schema}"
+          </p>
         </Table.td>
       </Table.tr>
     )
@@ -104,12 +96,15 @@ const FunctionList = ({
                             Client API docs
                           </Dropdown.Item>
                         )}
-                        <Dropdown.Item icon={<IconEdit3 size="tiny" />} onClick={() => onEdit(x)}>
+                        <Dropdown.Item
+                          icon={<IconEdit3 size="tiny" />}
+                          onClick={() => editFunction(x)}
+                        >
                           Edit function
                         </Dropdown.Item>
                         <Dropdown.Item
                           icon={<IconTrash stroke="red" size="tiny" />}
-                          onClick={() => onDelete(x)}
+                          onClick={() => deleteFunction(x)}
                         >
                           Delete function
                         </Dropdown.Item>
