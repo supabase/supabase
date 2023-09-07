@@ -42,7 +42,11 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
     }
   }, [isOpen])
 
-  const canDeleteProject = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const canDeleteProject = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const toggle = () => {
     if (isSubmitting) return

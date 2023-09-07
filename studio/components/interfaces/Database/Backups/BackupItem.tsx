@@ -67,15 +67,20 @@ const BackupItem = ({ projectRef, backup, index }: BackupItemProps) => {
     return <Badge color="yellow">Backup In Progress...</Badge>
   }
 
+  const generateBackupName = (backup: any) => {
+    if (backup.status == 'COMPLETED') {
+      return `${dayjs(backup.inserted_at).format('DD MMM YYYY HH:mm:ss')} UTC`
+    }
+    return dayjs(backup.inserted_at).format('DD MMM YYYY')
+  }
+
   return (
     <div
       className={`flex h-12 items-center justify-between px-6 ${
         index ? 'border-t dark:border-dark' : ''
       }`}
     >
-      <p className="text-sm text-scale-1200 ">
-        {dayjs(backup.inserted_at).format('DD MMM YYYY HH:mm:ss')}
-      </p>
+      <p className="text-sm text-scale-1200 ">{generateBackupName(backup)}</p>
       <div className="">{generateSideButtons(backup)}</div>
     </div>
   )
