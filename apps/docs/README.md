@@ -1,6 +1,6 @@
 # Reference Docs
 
-Supabase Reference Docs a
+Supabase Reference Docs a s
 
 ## Maintainers
 
