@@ -49,6 +49,12 @@ export const CATEGORY_OPTIONS = [
     description: 'Formal enquiry form for requesting refunds',
     query: undefined,
   },
+  {
+    value: SupportCategories.LOGIN_ISSUES,
+    label: 'Issues with logging in',
+    description: 'Issues with logging in and MFA',
+    query: undefined,
+  },
 ]
 
 export const SEVERITY_OPTIONS = [
