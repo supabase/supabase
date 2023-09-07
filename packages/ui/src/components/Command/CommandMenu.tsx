@@ -97,7 +97,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
             onValueChange={handleInputChange}
           />
         )}
-        <CommandList className={['my-2', showCommandInput && 'max-h-[300px]'].join(' ')}>
+        <CommandList className={['my-2', showCommandInput && 'max-h-[300px] max-w-[350px]'].join(' ')}>
           {!currentPage && (
             <>
               <CommandGroup heading="Documentation" forceMount>
