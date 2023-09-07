@@ -2,15 +2,9 @@ import React, { Dispatch, SetStateAction } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Transition from 'lib/Transition'
-import { Accordion, Button, TextLink } from 'ui'
 
-import Developers from './Developers'
-import Product from './Product'
-import SolutionsData from 'data/Solutions'
-import ComparisonsData from 'data/Comparisons'
-import CustomersData from 'data/CustomerStories'
-import { data as DevelopersData } from 'data/Developers'
-import { ListItem } from '.'
+import { Accordion, Button, TextLink } from 'ui'
+import MenuItem from './MenuItem'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
@@ -19,40 +13,10 @@ interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   isDarkMode: boolean
+  menu: any
 }
 
-const menu = {
-  primaryNav: [
-    {
-      title: 'Product',
-      hasDropdown: true,
-      dropdown: <Product />,
-      dropdownContainerClassName: 'rounded-lg flex flex-row',
-      subMenu: SolutionsData,
-    },
-    {
-      title: 'Developers',
-      hasDropdown: true,
-      dropdown: <Developers />,
-      dropdownContainerClassName: 'rounded-lg',
-      subMenu: DevelopersData,
-    },
-    {
-      title: 'Pricing',
-      url: '/pricing',
-    },
-    {
-      title: 'Docs',
-      url: '/docs',
-    },
-    {
-      title: 'Blog',
-      url: '/blog',
-    },
-  ],
-}
-
-const MobileMenu = ({ open, setOpen, isDarkMode }: Props) => {
+const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
   return (
     <Transition
       appear={true}
@@ -124,7 +88,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode }: Props) => {
                     >
                       {menuItem.title === 'Product' ? (
                         Object.values(menuItem.subMenu)?.map((component: any) => (
-                          <ListItem
+                          <MenuItem
                             key={component.name}
                             title={component.name}
                             href={component.url}
