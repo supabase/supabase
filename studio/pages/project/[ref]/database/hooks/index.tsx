@@ -25,7 +25,7 @@ const HooksPage: NextPageWithLayout = () => {
 
   const {
     data: schemas,
-    isLoading: isSchemasLoading,
+    isLoading: isLoadingSchemas,
     refetch,
   } = useSchemasQuery({
     projectRef: project?.ref,
@@ -78,7 +78,7 @@ const HooksPage: NextPageWithLayout = () => {
     return <NoPermission isFullPage resourceText="view database webhooks" />
   }
 
-  if (isSchemasLoading) {
+  if (isLoadingSchemas) {
     return (
       <div className="w-full h-full flex items-center justify-center space-x-2">
         <IconLoader className="animate-spin" size="tiny" strokeWidth={1.5} />

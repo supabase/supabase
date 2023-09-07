@@ -1,4 +1,4 @@
-import type { PostgresExtension, PostgresSchema } from '@supabase/postgres-meta'
+import type { PostgresExtension } from '@supabase/postgres-meta'
 import { useEffect, useState } from 'react'
 import { Button, Form, IconDatabase, IconPlus, Input, Listbox, Modal } from 'ui'
 
@@ -162,7 +162,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                       Create a new schema "{extension.name}"
                     </Listbox.Option>
                     <Modal.Separator />
-                    {schemas?.map((schema: PostgresSchema) => {
+                    {schemas?.map((schema) => {
                       return (
                         <Listbox.Option
                           key={schema.id}
