@@ -26,7 +26,7 @@ import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { sqlKeys } from 'data/sql/keys'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
-import { useCheckPermissions, useFlag, useStore, useUrlState } from 'hooks'
+import { useCheckPermissions, useStore, useUrlState } from 'hooks'
 import useEntityType from 'hooks/misc/useEntityType'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
@@ -103,7 +103,6 @@ const TableGridEditor = ({
   const { ref: projectRef, id } = useParams()
   const gridRef = useRef<SupabaseGridRef>(null)
 
-  const isVaultEnabled = useFlag('vaultExtension')
   const [encryptedColumns, setEncryptedColumns] = useState([])
   const [apiPreviewPanelOpen, setApiPreviewPanelOpen] = useState(false)
 
