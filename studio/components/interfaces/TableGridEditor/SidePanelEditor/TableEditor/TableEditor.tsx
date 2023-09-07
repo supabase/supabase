@@ -170,11 +170,7 @@ const TableEditor = ({
       key="TableEditor"
       visible={visible}
       header={
-        <HeaderTitle
-          schema={snap.selectedSchemaName}
-          table={table as any}
-          isDuplicating={isDuplicating}
-        />
+        <HeaderTitle schema={snap.selectedSchemaName} table={table} isDuplicating={isDuplicating} />
       }
       className={`transition-all duration-100 ease-in ${isImportingSpreadsheet ? ' mr-32' : ''}`}
       onCancel={closePanel}
