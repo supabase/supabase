@@ -1,5 +1,6 @@
 import { Button, Divider, IconArrowUpRight, IconGitHub, IconTriangle, Space } from 'ui'
 import Link from 'next/link'
+import Image from 'next/image'
 
 function ExampleCard(props: any) {
   return (
@@ -19,12 +20,15 @@ function ExampleCard(props: any) {
         <div className="mb-4">
           <h4 className="h6">{props.title}</h4>
           <p className="p text-sm">{props.description}</p>
-          <div>
-            <img
-              src={props.author_img}
-              alt={props.author + ' GitHub profile picture'}
-              className="border-scale-500 inline w-6 rounded-full"
-            />
+          <div className="flex items-center">
+            <div className="relative border-scale-500 inline !w-6 !h-6 rounded-full overflow-hidden">
+              <Image
+                src={props.author_img}
+                alt={props.author + ' GitHub profile picture'}
+                layout="fill"
+                objectFit="cover"
+              />
+            </div>
             <span className="text-scale-1200 ml-2 text-sm">{props.author}</span>
           </div>
         </div>
@@ -53,15 +57,15 @@ function ExampleCard(props: any) {
             </a>
           </Link>
 
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-3 flex items-stretch gap-2 h-[26px]">
             {props.vercel_deploy_url && (
               <a target="_blank" href={props.vercel_deploy_url}>
-                <img className="h-6" src="https://vercel.com/button" alt="vercel button" />
+                <Image src="https://vercel.com/button" alt="vercel button" width={75} height={26} />
               </a>
             )}
             {props.demo_url && (
               <Link href={props.demo_url} as={props.demo_url}>
-                <a target="_blank">
+                <a target="_blank" tabIndex={-1}>
                   <Button size="tiny" type="default" iconRight={<IconArrowUpRight />}>
                     Launch Demo
                   </Button>
@@ -70,7 +74,7 @@ function ExampleCard(props: any) {
             )}
             {!props.demo_url && (
               <Link href={props.repo_url} as={props.repo_url}>
-                <a target="_blank">
+                <a target="_blank" tabIndex={-1}>
                   <Button size="tiny" type="default" iconRight={<IconArrowUpRight />}>
                     View Code
                   </Button>

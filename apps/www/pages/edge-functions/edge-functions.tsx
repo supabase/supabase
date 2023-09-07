@@ -1,6 +1,6 @@
 import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw } from 'ui'
 import UseCaseExamples from 'data/products/functions/usecase-examples'
-import Solutions from 'data/Solutions.json'
+import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -104,8 +104,8 @@ function Database() {
       />
       <DefaultLayout>
         <ProductHeader
-          icon={Solutions['edge-functions'].icon}
-          title={Solutions['edge-functions'].name}
+          icon={Solutions['functions'].icon}
+          title={Solutions['functions'].name}
           h1={[
             <span key={'database-h1'}>
               Serverless Edge Functions
@@ -145,7 +145,7 @@ function Database() {
                     className="bg-scale-100 dark:bg-scale-300 group flex flex-col gap-4 rounded border px-8 py-6"
                     key={i}
                   >
-                    <div className="bg-scale-300 dark:bg-scale-500 text-scale-1200 group-hover:text-brand-900 flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
+                    <div className="bg-scale-300 dark:bg-scale-500 text-scale-1200 group-hover:text-brand flex h-12 w-12 items-center justify-center rounded-md border transition-all group-hover:scale-105">
                       {item.icon ? item.icon : <IconCode strokeWidth={2} />}
                     </div>
 

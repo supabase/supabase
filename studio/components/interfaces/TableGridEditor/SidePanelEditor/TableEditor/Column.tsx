@@ -1,25 +1,25 @@
-import { FC } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import {
-  Checkbox,
-  Input,
-  IconX,
-  IconMenu,
-  Popover,
-  IconLink,
-  IconSettings,
-  Button,
-  IconArrowRight,
-} from 'ui'
 import type { PostgresType } from '@supabase/postgres-meta'
+import {
+  Button,
+  Checkbox,
+  IconArrowRight,
+  IconLink,
+  IconMenu,
+  IconSettings,
+  IconX,
+  Input,
+  Popover,
+} from 'ui'
 
-import { ColumnField } from '../SidePanelEditor.types'
+import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { noop } from 'lodash'
+import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
+import { Suggestion } from '../ColumnEditor/ColumnEditor.types'
+import { getForeignKeyDeletionAction } from '../ColumnEditor/ColumnEditor.utils'
 import ColumnType from '../ColumnEditor/ColumnType'
 import InputWithSuggestions from '../ColumnEditor/InputWithSuggestions'
-import { Suggestion } from '../ColumnEditor/ColumnEditor.types'
-import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
-import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
-import { getForeignKeyDeletionAction } from '../ColumnEditor/ColumnEditor.utils'
+import { ColumnField } from '../SidePanelEditor.types'
 
 /**
  * [Joshen] For context:
@@ -39,7 +39,7 @@ import { getForeignKeyDeletionAction } from '../ColumnEditor/ColumnEditor.utils'
  * - Cannot be both identity AND array, still checkboxes as they can be toggled off
  */
 
-interface Props {
+interface ColumnProps {
   column: ColumnField
   enumTypes: PostgresType[]
   isNewRecord: boolean
@@ -50,16 +50,16 @@ interface Props {
   onRemoveColumn: () => void
 }
 
-const Column: FC<Props> = ({
+const Column = ({
   column = {} as ColumnField,
   enumTypes = [] as PostgresType[],
   isNewRecord = false,
   hasImportContent = false,
   dragHandleProps = {},
-  onEditRelation = () => {},
-  onUpdateColumn = () => {},
-  onRemoveColumn = () => {},
-}) => {
+  onEditRelation = noop,
+  onUpdateColumn = noop,
+  onRemoveColumn = noop,
+}: ColumnProps) => {
   const suggestions: Suggestion[] = typeExpressionSuggestions?.[column.format] ?? []
 
   const settingsCount = [
@@ -150,7 +150,8 @@ const Column: FC<Props> = ({
             className="table-editor-column-type lg:gap-0 "
             disabled={column.foreignKey !== undefined}
             onOptionSelect={(format: string) => {
-              onUpdateColumn({ format, defaultValue: null })
+              const defaultValue = format === 'uuid' ? 'gen_random_uuid()' : null
+              onUpdateColumn({ format, defaultValue })
             }}
           />
         </div>

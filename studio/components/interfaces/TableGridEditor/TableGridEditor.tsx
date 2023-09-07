@@ -1,43 +1,43 @@
-import { useRef, useEffect, useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
-import { find, isUndefined, noop } from 'lodash'
 import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
+import { find, isUndefined, noop } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import { useEffect, useRef, useState } from 'react'
 
-import { SchemaView } from 'types'
-import { checkPermissions, useFlag, useStore, useUrlState } from 'hooks'
-import useEntityType from 'hooks/misc/useEntityType'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { useParams } from 'common/hooks'
-import GridHeaderActions from './GridHeaderActions'
-import NotFoundState from './NotFoundState'
-import SidePanelEditor from './SidePanelEditor'
+import { useParams } from 'common'
 import {
   Dictionary,
-  parseSupaTable,
+  SupaTable,
   SupabaseGrid,
   SupabaseGridRef,
-  SupaTable,
+  parseSupaTable,
 } from 'components/grid'
-import { sqlKeys } from 'data/sql/keys'
-import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
-import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import TwoOptionToggle from 'components/ui/TwoOptionToggle'
+import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
 import {
   ForeignKeyConstraint,
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
-import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { sqlKeys } from 'data/sql/keys'
+import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
+import { useCheckPermissions, useFlag, useStore, useUrlState } from 'hooks'
+import useEntityType from 'hooks/misc/useEntityType'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
-import { ForeignRowSelectorProps } from './SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
-import TableDefinition from './TableDefinition'
+import { SchemaView } from 'types'
 import APIDocumentationPanel from './APIDocumentationPanel'
+import GridHeaderActions from './GridHeaderActions'
+import NotFoundState from './NotFoundState'
+import SidePanelEditor from './SidePanelEditor'
+import { ForeignRowSelectorProps } from './SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
+import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
+import TableDefinition from './TableDefinition'
 
 export interface TableGridEditorProps {
   /** Theme for the editor */
@@ -116,9 +116,10 @@ const TableGridEditor = ({
     }
   }
 
-  const isReadOnly =
-    !checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables') &&
-    !checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+  const canEditTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canEditColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+
+  const isReadOnly = !canEditTables && !canEditColumns
 
   const getEncryptedColumns = async (table: any) => {
     const columns = await vault.listEncryptedColumns(table.schema, table.name)
@@ -195,7 +196,7 @@ const TableGridEditor = ({
   const foreignKeyMeta = data || []
 
   useEffect(() => {
-    if (selectedTable !== undefined && selectedTable.id !== undefined && isVaultEnabled) {
+    if (selectedTable !== undefined && selectedTable.id !== undefined) {
       getEncryptedColumns(selectedTable)
     }
   }, [selectedTable?.id])
@@ -214,7 +215,6 @@ const TableGridEditor = ({
   const isTableSelected = entityType?.type === ENTITY_TYPE.TABLE
   const isForeignTableSelected = entityType?.type === ENTITY_TYPE.FOREIGN_TABLE
   const isLocked = EXCLUDED_SCHEMAS.includes(entityType?.schema ?? '')
-  const canUpdateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
   const canEditViaTableEditor = isTableSelected && !isLocked
 
   // [Joshen] We can tweak below to eventually support composite keys as the data
@@ -351,7 +351,7 @@ const TableGridEditor = ({
         theme={theme}
         gridProps={{ height: '100%' }}
         storageRef={projectRef}
-        editable={!isReadOnly && canUpdateTables && canEditViaTableEditor}
+        editable={!isReadOnly && canEditTables && canEditViaTableEditor}
         schema={selectedTable.schema}
         table={gridTable}
         refreshDocs={refreshDocs}

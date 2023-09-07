@@ -13,7 +13,7 @@ To enable Slack Auth for your project, you need to set up a Slack OAuth applicat
 Setting up Slack logins for your application consists of 3 parts:
 
 - Create and configure a Slack Project and App on the [Slack Developer Dashboard](https://api.slack.com/apps).
-- Add your Slack `API Key` and `API Secret Key` to your [Supabase Project](https://app.supabase.com).
+- Add your Slack `API Key` and `API Secret Key` to your [Supabase Project](https://supabase.com/dashboard).
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
 ## Access your Slack Developer account
@@ -30,7 +30,7 @@ Setting up Slack logins for your application consists of 3 parts:
 ## Create a Slack OAuth app
 
 - Go to [api.slack.com](https://api.slack.com/apps).
-- Click on `Create an App`
+- Click on `Create New App`
 
 Under `Create an app...`:
 
@@ -43,13 +43,16 @@ Under `App Credentials`:
 
 - Copy and save your newly-generated `Client ID`
 - Copy and save your newly-generated `Client Secret`
-- Click `Permissions`
 
-Under `Redirect URLs`:
+Under the sidebar, select `OAuth & Permissions` and look for `Redirect URLs`:
 
 - Click `Add New Redirect URL`
 - Paste your `Callback URL` then click `Add`
 - Click `Save URLs`
+
+Under `Scopes`:
+
+- Add the following scopes under the `User Token Scopes`: `profile`, `email`, `openid`. These scopes are the default scopes that Supabase Auth uses to request for user information. You can add any additional scopes that you may need as well.
 
 ## Enter your Slack credentials into your Supabase Project
 
@@ -77,7 +80,7 @@ async function signout() {
 
 ## Resources
 
-- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase Account - Free Plan OK](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Slack Developer Dashboard](https://api.slack.com/apps)
 

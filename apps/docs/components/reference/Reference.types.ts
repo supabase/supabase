@@ -33,19 +33,61 @@ export interface IFunctionDefinition {
   examples?: []
 }
 
-export interface ICommonFunc {
-  id?: string
+export interface ICommonBase {
+  type: string
   title: string
-  slug?: string
-  product?: string
-  type?: string
-  parent?: string
-  items?: ICommonFunc[]
+  summary?: string
 }
+
+export interface ICommonBaseSection extends ICommonBase {
+  id: string
+  slug: string
+  excludes?: string[]
+}
+
+export interface ICommonCategory extends ICommonBase {
+  type: 'category'
+  items: ICommonSection[]
+  excludes?: string[]
+}
+
+export interface ICommonMarkdown extends ICommonBaseSection {
+  type: 'markdown'
+}
+
+export interface ICommonFunctionGroup extends ICommonBaseSection {
+  type: 'function'
+  isFunc: false
+  product: string
+  items: ICommonFunction[]
+}
+
+export interface ICommonFunction extends ICommonBaseSection {
+  type: 'function'
+  product: string
+  parent?: string
+}
+
+export interface ICommonCliCommand extends ICommonBaseSection {
+  type: 'cli-command'
+}
+
+export interface ICommonApiOperation extends ICommonBaseSection {
+  type: 'operation'
+}
+
+export type ICommonSection =
+  | ICommonMarkdown
+  | ICommonFunctionGroup
+  | ICommonFunction
+  | ICommonCliCommand
+  | ICommonApiOperation
+
+export type ICommonItem = ICommonCategory | ICommonSection
 
 export interface IRefFunctionSection {
   funcData: any
-  commonFuncData: ICommonFunc
+  commonFuncData: ICommonFunction
   spec: any
   typeSpec?: TypeSpec
 }

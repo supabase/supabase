@@ -1,28 +1,28 @@
-import { FC } from 'react'
+import { noop } from 'lodash'
 import { Badge, Button } from 'ui'
 
 import { Project } from 'types'
 
-interface Props {
+interface PausedProjectCardProps {
   project: Project
   onSelectRestore: () => void
   onSelectDelete: () => void
 }
 
-const PausedProjectCard: FC<Props> = ({
+const PausedProjectCard = ({
   project,
-  onSelectRestore = () => {},
-  onSelectDelete = () => {},
-}) => {
+  onSelectRestore = noop,
+  onSelectDelete = noop,
+}: PausedProjectCardProps) => {
   return (
     <li className="col-span-1 flex rounded-md shadow-sm">
       <a className="col-span-3 w-full md:col-span-1 ">
         <div
           className={[
             'bg-panel-header-light dark:bg-panel-header-dark',
-            'hover:bg-bg-alt-light dark:hover:bg-bg-alt-dark',
-            'border border-border-secondary-light dark:border-border-secondary-dark',
-            'hover:border-border-secondary-hover-light dark:hover:border-border-secondary-hover-dark',
+            'hover:bg-scale-200 dark:hover:bg-scale-200',
+            'border border-scale-700',
+            'hover:border-scale-900',
             'h-32 rounded p-4',
             'flex flex-col justify-between transition duration-150 ease-in-out',
           ].join(' ')}

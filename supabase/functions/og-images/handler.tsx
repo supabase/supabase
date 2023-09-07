@@ -30,7 +30,7 @@ export async function handler(req: Request) {
 
   switch (site) {
     case 'docs':
-      return new ImageResponse(( <Docs title={title} description={description} type={type} icon={icon} /> ),
+      return new ImageResponse(( <Docs title={title} description={description !== 'undefined' ? description : ''} type={type} icon={icon} /> ),
         {
           width: 1200,
           height: 630,

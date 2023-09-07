@@ -7,15 +7,16 @@ import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
 import { gen_v3 } from '~/lib/refGenerator/helpers'
 
 const sections = flattenSections(selfHostingFunctionsCommonSections)
+const libraryPath = '/self-hosting-functions'
 
-export default function JSReference(props) {
+export default function SelfHostFunctionsReference(props) {
   return <RefSectionHandler sections={sections} pageProps={props} type="api" />
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, '/self-hosting-functions')
+  return handleRefStaticProps(sections, libraryPath)
 }
 
-export function getStaticPaths() {
-  return handleRefGetStaticPaths()
+export async function getStaticPaths() {
+  return handleRefGetStaticPaths(sections)
 }

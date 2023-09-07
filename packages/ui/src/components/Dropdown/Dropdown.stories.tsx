@@ -25,8 +25,13 @@ const DemoContainer = ({ children }: { children: React.ReactNode }) => (
   >
     <div
       className="
+      bg border 
+
       p-3 px-5 
-      bg-scale-300 border border-scale-600 rounded flex gap-4 
+      shadow-sm 
+      rounded-md 
+      flex 
+      gap-4 
       justify-between
       items-center
       w-3/4
@@ -53,9 +58,9 @@ export const DefaultFull = (args: any) => {
         overlay={[
           <Dropdown.Misc>
             <div>
-              <span className="block">Signed in as </span>
+              <span className="block text-body">Signed in as </span>
 
-              <span>tom@example.com </span>
+              <span className="text-body-light">tom@example.com </span>
             </div>
           </Dropdown.Misc>,
           <Dropdown.Separator />,
@@ -102,8 +107,8 @@ export const DefaultFull = (args: any) => {
           <Dropdown.Item icon={<IconLogIn size="tiny" />}>Log out</Dropdown.Item>,
         ]}
       >
-        <Button as="span" type="default" iconRight={<IconChevronDown />}>
-          Click for dropdown
+        <Button asChild type="default" iconRight={<IconChevronDown />}>
+          <span>Click for dropdown</span>
         </Button>
       </Dropdown>
     </DemoContainer>
@@ -132,8 +137,8 @@ export const Default = (args: any) => (
         <Dropdown.Item icon={<IconLogIn size="tiny" />}>Log out</Dropdown.Item>,
       ]}
     >
-      <Button as="span" type="secondary" iconRight={<IconChevronDown />}>
-        Click for dropdown
+      <Button asChild type="secondary" iconRight={<IconChevronDown />}>
+        <span>Click for dropdown</span>
       </Button>
     </Dropdown>
   </div>
@@ -158,8 +163,8 @@ export const doNotcloseOverlay = (args: any) => (
         </Dropdown.Item>,
       ]}
     >
-      <Button as="span" type="outline" iconRight={<IconChevronDown />}>
-        Click for dropdown
+      <Button asChild type="outline" iconRight={<IconChevronDown />}>
+        <span>Click for dropdown</span>
       </Button>
     </Dropdown>
   </div>
@@ -196,8 +201,8 @@ export const withCustomStyles = (args: any) => (
         </Dropdown.Item>,
       ]}
     >
-      <Button as="span" type="outline" iconRight={<IconChevronDown />}>
-        Click for dropdown
+      <Button asChild type="outline" iconRight={<IconChevronDown />}>
+        <span>Click for dropdown</span>
       </Button>
     </Dropdown>
   </div>
@@ -227,8 +232,8 @@ export const SearchList = (args: any) => (
         </Dropdown.Item>,
       ]}
     >
-      <Button as="span" type="outline" iconRight={<IconChevronDown />}>
-        Click for dropdown
+      <Button asChild type="outline" iconRight={<IconChevronDown />}>
+        <span>Click for dropdown</span>
       </Button>
     </Dropdown>
   </div>
@@ -252,8 +257,8 @@ export const Checkbox = (args: any) => {
           </Dropdown.Checkbox>,
         ]}
       >
-        <Button as="span" type="outline" iconRight={<IconChevronDown />}>
-          Click for dropdown
+        <Button asChild type="outline" iconRight={<IconChevronDown />}>
+          <span>Click for dropdown</span>
         </Button>
       </Dropdown>
     </div>
@@ -275,8 +280,8 @@ export const Radio = (args: any) => {
           </Dropdown.RadioGroup>,
         ]}
       >
-        <Button as="span" type="outline" iconRight={<IconChevronDown />}>
-          Click for dropdown
+        <Button asChild type="outline" iconRight={<IconChevronDown />}>
+          <span>Click for dropdown</span>
         </Button>
       </Dropdown>
     </div>
@@ -314,8 +319,8 @@ export const Nested = (args: any) => {
           </>
         }
       >
-        <Button as="span" type="outline" iconRight={<IconChevronDown />}>
-          Click for dropdown
+        <Button asChild type="outline" iconRight={<IconChevronDown />}>
+          <span>Click for dropdown</span>
         </Button>
       </Dropdown>
     </div>

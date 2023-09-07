@@ -16,7 +16,7 @@ import {
   UseAiChatOptions,
 } from 'ui'
 
-import { cn } from '../../../utils/cn'
+import { cn } from './../../../lib/utils'
 import { AiIcon, AiIconChat } from '../Command.icons'
 import { CommandItem, useAutoInputFocus, useHistoryKeys } from '../Command.utils'
 import { useCommandMenu } from '../CommandMenuProvider'
@@ -74,6 +74,9 @@ const GenerateSQL = () => {
     if (search) handleSubmit(search)
   }, [])
 
+  // Detect an IME composition (so that we can ignore Enter keypress)
+  const [isImeComposing, setIsImeComposing] = useState(false)
+
   const formatAnswer = (answer: string) => {
     try {
       return format(answer, {
@@ -129,7 +132,12 @@ const GenerateSQL = () => {
                 <div className="px-4 [overflow-anchor:none] mb-6">
                   <div className="flex gap-6 [overflow-anchor:none] mb-6">
                     <div>
-                      <AiIconChat />
+                      <AiIconChat
+                        loading={
+                          message.status === MessageStatus.Pending ||
+                          message.status === MessageStatus.InProgress
+                        }
+                      />
                     </div>
                     <>
                       {message.status === MessageStatus.Pending ? (
@@ -175,7 +183,6 @@ const GenerateSQL = () => {
               )
           }
         })}
-
         {messages.length === 0 && !hasError && (
           <div>
             <div className="px-4">
@@ -210,7 +217,9 @@ const GenerateSQL = () => {
                           onKeyDown={(e) => {
                             switch (e.key) {
                               case 'Enter':
-                                if (!search || isLoading || isResponding) return
+                                if (!search || isLoading || isResponding || isImeComposing) {
+                                  return
+                                }
                                 return handleSubmit(query)
                               default:
                                 return
@@ -219,10 +228,8 @@ const GenerateSQL = () => {
                           forceMount
                           key={query.replace(/\s+/g, '_')}
                         >
-                          <div className="flex">
-                            <div>
-                              <AiIcon />
-                            </div>
+                          <div className="flex flex-row gap-2">
+                            <AiIcon />
                             <p>{query}</p>
                           </div>
                         </CommandItem>
@@ -234,7 +241,6 @@ const GenerateSQL = () => {
             </div>
           </div>
         )}
-
         {hasError && (
           <div className="p-6 flex flex-col items-center gap-6 mt-4">
             <IconAlertTriangle className="text-amber-900" strokeWidth={1.5} size={21} />
@@ -247,7 +253,6 @@ const GenerateSQL = () => {
             </Button>
           </div>
         )}
-
         <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
 
@@ -311,10 +316,14 @@ const GenerateSQL = () => {
               setSearch(e.target.value)
             }
           }}
+          onCompositionStart={() => setIsImeComposing(true)}
+          onCompositionEnd={() => setIsImeComposing(false)}
           onKeyDown={(e) => {
             switch (e.key) {
               case 'Enter':
-                if (!search || isLoading || isResponding) return
+                if (!search || isLoading || isResponding || isImeComposing) {
+                  return
+                }
                 return handleSubmit(search)
               default:
                 return

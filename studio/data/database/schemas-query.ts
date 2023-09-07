@@ -1,7 +1,8 @@
 import { PostgresSchema } from '@supabase/postgres-meta'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
+import { ResponseError } from 'types'
 import { databaseKeys } from './keys'
 
 export type SchemasVariables = {
@@ -37,7 +38,7 @@ export async function getSchemas(
 }
 
 export type SchemasData = Awaited<ReturnType<typeof getSchemas>>
-export type SchemasError = unknown
+export type SchemasError = ResponseError
 
 export const useSchemasQuery = <TData = SchemasData>(
   { projectRef, connectionString }: SchemasVariables,
@@ -48,3 +49,7 @@ export const useSchemasQuery = <TData = SchemasData>(
     ({ signal }) => getSchemas({ projectRef, connectionString }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
+
+export function invalidateSchemasQuery(client: QueryClient, projectRef: string | undefined) {
+  return client.invalidateQueries(databaseKeys.schemaList(projectRef))
+}

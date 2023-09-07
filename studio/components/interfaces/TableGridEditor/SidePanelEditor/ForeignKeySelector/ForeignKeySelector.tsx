@@ -1,21 +1,21 @@
+import type { PostgresColumn, PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
+import { find, get, isEmpty, sortBy } from 'lodash'
 import { useEffect, useState } from 'react'
-import { get, find, isEmpty, sortBy } from 'lodash'
-import { Dictionary } from 'components/grid'
-import { SidePanel, Input, Listbox, IconHelpCircle, IconDatabase } from 'ui'
-import type { PostgresTable, PostgresColumn, PostgresSchema } from '@supabase/postgres-meta'
 
-import { useStore } from 'hooks'
+import { Dictionary } from 'components/grid'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import InformationBox from 'components/ui/InformationBox'
 import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import InformationBox from 'components/ui/InformationBox'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useStore } from 'hooks'
+import { IconDatabase, IconHelpCircle, Input, Listbox, SidePanel } from 'ui'
 import ActionBar from '../ActionBar'
-import { ForeignKey } from './ForeignKeySelector.types'
 import { ColumnField } from '../SidePanelEditor.types'
 import { FOREIGN_KEY_DELETION_OPTIONS } from './ForeignKeySelector.constants'
+import { ForeignKey } from './ForeignKeySelector.types'
 import { generateDeletionActionDescription } from './ForeignKeySelector.utils'
 
-export interface ForeignKeySelectorProps {
+interface ForeignKeySelectorProps {
   column: ColumnField
   metadata?: any
   visible: boolean
@@ -109,10 +109,13 @@ const ForeignKeySelector = ({
     }
     const table = find(tables, { id: tableId })
     if (table) {
+      const primaryColumn = table.primary_keys[0].name
+      const firstColumn = table.columns?.length ? table.columns[0].name : undefined
+
       setSelectedForeignKey({
         schema: table.schema,
         table: table.name,
-        column: table.columns?.length ? table.columns[0].name : undefined,
+        column: primaryColumn ?? firstColumn,
         deletionAction: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
       })
     }
@@ -341,7 +344,7 @@ const ForeignKeySelector = ({
                         href="https://supabase.com/docs/guides/database/postgres/cascade-deletes"
                         target="_blank"
                         rel="noreferrer"
-                        className="text-brand-900 opacity-75"
+                        className="text-brand opacity-75"
                       >
                         Learn more about cascade deletes
                       </a>

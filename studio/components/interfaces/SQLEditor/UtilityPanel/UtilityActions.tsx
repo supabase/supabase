@@ -8,10 +8,16 @@ import { detectOS } from 'lib/helpers'
 export type UtilityActionsProps = {
   id: string
   isExecuting?: boolean
-  executeQuery?: (overrideSql?: string) => void
+  isDisabled?: boolean
+  executeQuery: () => void
 }
 
-const UtilityActions = ({ id, isExecuting = false, executeQuery }: UtilityActionsProps) => {
+const UtilityActions = ({
+  id,
+  isExecuting = false,
+  isDisabled = false,
+  executeQuery,
+}: UtilityActionsProps) => {
   const os = detectOS()
 
   return (
@@ -20,12 +26,11 @@ const UtilityActions = ({ id, isExecuting = false, executeQuery }: UtilityAction
       {IS_PLATFORM && <FavoriteButton id={id} />}
       <SizeToggleButton id={id} />
       <Button
-        onClick={() => executeQuery?.()}
-        disabled={isExecuting}
+        onClick={() => executeQuery()}
+        disabled={isDisabled || isExecuting}
         loading={isExecuting}
         type="default"
         size="tiny"
-        shadow={false}
         className="mx-2"
         iconRight={
           <div className="flex items-center space-x-1">

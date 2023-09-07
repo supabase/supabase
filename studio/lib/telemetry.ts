@@ -1,8 +1,9 @@
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { User } from 'types'
+import { NextRouter } from 'next/router'
 
-export interface GoogleAnalyticsProps {
+export interface TelemetryProps {
   screenResolution?: string
   language: string
 }
@@ -14,7 +15,8 @@ const sendEvent = (
     label: string
     value?: string
   },
-  gaProps?: GoogleAnalyticsProps
+  gaProps: TelemetryProps,
+  router: NextRouter
 ) => {
   if (!IS_PLATFORM) return
 
@@ -25,6 +27,9 @@ const sendEvent = (
     category: category,
     label: label,
     value: value,
+    page_referrer: document?.referrer,
+    page_title: document?.title,
+    page_location: router.asPath,
     ga: {
       screen_resolution: gaProps?.screenResolution,
       language: gaProps?.language,
@@ -36,7 +41,7 @@ const sendEvent = (
  * TODO: GA4 doesn't have identify method.
  * We may or may not need gaClientId here. Confirm later
  */
-const sendIdentify = (user: User, gaProps?: GoogleAnalyticsProps) => {
+const sendIdentify = (user: User, gaProps?: TelemetryProps) => {
   if (!IS_PLATFORM) return
 
   return post(`${API_URL}/telemetry/identify`, {
@@ -48,7 +53,38 @@ const sendIdentify = (user: User, gaProps?: GoogleAnalyticsProps) => {
   })
 }
 
+const sendActivity = (
+  event: {
+    activity: string
+    source: string
+    projectRef?: string
+    orgSlug?: string
+    data?: object
+  },
+  router: NextRouter
+) => {
+  if (!IS_PLATFORM) return
+
+  const { activity, source, projectRef, orgSlug, data } = event
+
+  const properties = {
+    activity,
+    source,
+    page: {
+      path: router.route,
+      location: router.asPath,
+      referrer: document?.referrer || '',
+      title: document?.title || '',
+    },
+    ...(data && { data }),
+    ...(projectRef && { projectRef }),
+    ...(orgSlug && { orgSlug }),
+  }
+  return post(`${API_URL}/telemetry/activity`, properties)
+}
+
 export default {
   sendEvent,
   sendIdentify,
+  sendActivity,
 }

@@ -1,15 +1,22 @@
-import { FC } from 'react'
-import { IconAlertCircle } from 'ui'
+import Link from 'next/link'
+import { Button, IconAlertCircle } from 'ui'
+
 import InformationBox from 'components/ui/InformationBox'
 import { MemberWithFreeProjectLimit } from 'data/organizations/free-project-limit-check-query'
 
-interface Props {
+interface FreeProjectLimitWarningProps {
   membersExceededLimit: MemberWithFreeProjectLimit[]
+  orgLevelBilling: boolean
+  orgSlug: string
 }
 
-const FreeProjectLimitWarning: FC<Props> = ({ membersExceededLimit }) => {
+const FreeProjectLimitWarning = ({
+  membersExceededLimit,
+  orgLevelBilling,
+  orgSlug,
+}: FreeProjectLimitWarningProps) => {
   return (
-    <div className="mt-4">
+    <div>
       <InformationBox
         icon={<IconAlertCircle className="text-scale-1200" size="large" strokeWidth={1.5} />}
         defaultVisibility={true}
@@ -19,7 +26,7 @@ const FreeProjectLimitWarning: FC<Props> = ({ membersExceededLimit }) => {
           <div className="space-y-3">
             <p className="text-sm leading-normal">
               The following members have reached their maximum limits for the number of active free
-              tier projects within organizations where they are an administrator or owner:
+              plan projects within organizations where they are an administrator or owner:
             </p>
             <ul className="pl-5 list-disc">
               {membersExceededLimit.map((member, idx: number) => (
@@ -33,6 +40,16 @@ const FreeProjectLimitWarning: FC<Props> = ({ membersExceededLimit }) => {
               These members will need to either delete, pause, or upgrade one or more of these
               projects before you're able to create a free project within this organization.
             </p>
+
+            {orgLevelBilling && (
+              <div>
+                <Link href={`/org/${orgSlug}/billing?panel=subscriptionPlan`} passHref>
+                  <a target="_blank">
+                    <Button type="primary">Upgrade plan</Button>
+                  </a>
+                </Link>
+              </div>
+            )}
           </div>
         }
       />

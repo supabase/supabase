@@ -14,6 +14,7 @@ export const Collapsible = ({
 }: CollapsibleProps) => {
   return (
     <RadixCollapsible.Root
+      asChild={props.asChild}
       defaultOpen={props.defaultOpen}
       open={open}
       onOpenChange={props.onOpenChange}
@@ -30,15 +31,17 @@ export function Trigger({ children, asChild }: { children: React.ReactNode; asCh
 }
 
 export function Content({
+  asChild,
   children,
   className,
 }: {
+  asChild?: boolean
   children: React.ReactNode
   className?: string
 }) {
   const __styles = styleHandler('collapsible')
   return (
-    <RadixCollapsible.Content className={[__styles.content, className].join(' ')}>
+    <RadixCollapsible.Content asChild={asChild} className={[__styles.content, className].join(' ')}>
       {children}
     </RadixCollapsible.Content>
   )

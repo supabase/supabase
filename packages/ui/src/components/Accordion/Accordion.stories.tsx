@@ -13,17 +13,14 @@ export const OneItem = (args: AccordionProps) => (
     <Accordion.Item
       header={
         <>
-          <span className="text-scale-900 group-hover:text-scale-1200">
-            Title of the thing
-          </span>
+          <span className="text-scale-900 group-hover:text-scale-1200">Title of the thing</span>
           <Badge>Test badge</Badge>
         </>
       }
       id="first"
     >
       <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
       </span>
     </Accordion.Item>
   </Accordion>
@@ -33,54 +30,42 @@ export const MultipleItems = (args: AccordionProps) => (
   <Accordion {...args} openBehaviour="multiple">
     <Accordion.Item
       header={
-        <span className="text-scale-900 group-hover:text-scale-1200">
-          Title of the thing
-        </span>
+        <span className="text-scale-900 group-hover:text-scale-1200">Title of the thing</span>
       }
       id={'1'}
     >
       <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
       </span>
     </Accordion.Item>
     <Accordion.Item
       header={
-        <span className="text-scale-900 group-hover:text-scale-1200">
-          Title of the thing
-        </span>
+        <span className="text-scale-900 group-hover:text-scale-1200">Title of the thing</span>
       }
       id={'2'}
     >
       <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
       </span>
     </Accordion.Item>
     <Accordion.Item
       header={
-        <span className="text-scale-900 group-hover:text-scale-1200">
-          Title of the thing
-        </span>
+        <span className="text-scale-900 group-hover:text-scale-1200">Title of the thing</span>
       }
       id={'3'}
     >
       <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
       </span>
     </Accordion.Item>
     <Accordion.Item
       header={
-        <span className="text-scale-900 group-hover:text-scale-1200">
-          Title of the thing
-        </span>
+        <span className="text-scale-900 group-hover:text-scale-1200">Title of the thing</span>
       }
       id={'4'}
     >
       <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
       </span>
     </Accordion.Item>
   </Accordion>
@@ -90,54 +75,42 @@ export const Bordered = (args: AccordionProps) => (
   <Accordion {...args}>
     <Accordion.Item
       header={
-        <span className="text-scale-900 group-hover:text-scale-1200">
-          Title of the thing
-        </span>
+        <span className="text-scale-900 group-hover:text-scale-1200">Title of the thing</span>
       }
       id={'1'}
     >
       <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
       </span>
     </Accordion.Item>
     <Accordion.Item
       header={
-        <span className="text-scale-900 group-hover:text-scale-1200">
-          Title of the thing
-        </span>
+        <span className="text-scale-900 group-hover:text-scale-1200">Title of the thing</span>
       }
       id={'2'}
     >
       <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
       </span>
     </Accordion.Item>
     <Accordion.Item
       header={
-        <span className="text-scale-900 group-hover:text-scale-1200">
-          Title of the thing
-        </span>
+        <span className="text-scale-900 group-hover:text-scale-1200">Title of the thing</span>
       }
       id={'3'}
     >
       <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
       </span>
     </Accordion.Item>
     <Accordion.Item
       header={
-        <span className="text-scale-900 group-hover:text-scale-1200">
-          Title of the thing
-        </span>
+        <span className="text-scale-900 group-hover:text-scale-1200">Title of the thing</span>
       }
       id={'4'}
     >
       <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
       </span>
     </Accordion.Item>
   </Accordion>
@@ -152,32 +125,26 @@ export const LeftAlignedChevron = (args: AccordionProps) => (
     <Accordion.Item
       header={
         <>
-          <span className="text-scale-900 group-hover:text-scale-1200">
-            First item
-          </span>
+          <span className="text-scale-900 group-hover:text-scale-1200">First item</span>
           <Badge>Test badge</Badge>
         </>
       }
       id="first"
     >
       <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
       </span>
     </Accordion.Item>
     <Accordion.Item
       header={
         <>
-          <span className="text-scale-900 group-hover:text-scale-1200">
-            Second item
-          </span>
+          <span className="text-scale-900 group-hover:text-scale-1200">Second item</span>
         </>
       }
       id="second"
     >
       <span className="text-scale-900">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        amet labore.
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur amet labore.
       </span>
     </Accordion.Item>
   </Accordion>

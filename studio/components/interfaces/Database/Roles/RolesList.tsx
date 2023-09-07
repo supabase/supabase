@@ -6,7 +6,7 @@ import { PostgresRole } from '@supabase/postgres-meta'
 import { Button, Input, IconPlus, IconSearch, IconX, Badge } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useStore } from 'hooks'
 import SparkBar from 'components/ui/SparkBar'
 import { FormHeader } from 'components/ui/Forms'
 import RoleRow from './RoleRow'
@@ -24,7 +24,7 @@ const RolesList = ({}) => {
   const [isCreatingRole, setIsCreatingRole] = useState(false)
   const [selectedRoleToDelete, setSelectedRoleToDelete] = useState<any>()
 
-  const canUpdateRoles = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'roles')
+  const canUpdateRoles = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'roles')
 
   useEffect(() => {
     const getMaxConnectionLimit = async () => {

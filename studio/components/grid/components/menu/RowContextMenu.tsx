@@ -19,7 +19,18 @@ const RowContextMenu = ({ table, rows }: RowContextMenuProps) => {
   const dispatch = useDispatch()
 
   const { project } = useProjectContext()
-  const { mutateAsync: deleteRows } = useTableRowDeleteMutation()
+  const { mutate: deleteRows } = useTableRowDeleteMutation({
+    onSuccess: (res, variables) => {
+      dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs: [variables.rows[0].idx] } })
+      dispatch({
+        type: 'SELECTED_ROWS_CHANGE',
+        payload: { selectedRows: new Set() },
+      })
+    },
+    onError: (error) => {
+      if (state.onError) state.onError(error)
+    },
+  })
 
   function onDeleteRow(p: ItemParams) {
     confirmAlert({
@@ -31,22 +42,12 @@ const RowContextMenu = ({ table, rows }: RowContextMenuProps) => {
         const row = rows[rowIdx]
         if (!row || !project) return
 
-        try {
-          await deleteRows({
-            projectRef: project.ref,
-            connectionString: project.connectionString,
-            table,
-            rows: [row],
-          })
-
-          dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs: [row.idx] } })
-          dispatch({
-            type: 'SELECTED_ROWS_CHANGE',
-            payload: { selectedRows: new Set() },
-          })
-        } catch (error) {
-          if (state.onError) state.onError(error)
-        }
+        deleteRows({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table,
+          rows: [row],
+        })
       },
     })
   }

@@ -4,6 +4,7 @@ export const meta = {
   id: 'functions',
   title: 'Edge Functions',
   description: 'Globally distributed TypeScript functions.',
+  subtitle: 'Globally distributed TypeScript functions.',
   sidebar_label: 'Overview',
   hide_table_of_contents: true,
 }
@@ -16,8 +17,8 @@ Edge Functions are server-side TypeScript functions, distributed globally at the
 - Edge Functions are globally distributed for low-latency.
 
 <div className="not-prose">
-  <Button as="a" href="/docs/guides/functions/quickstart" size="medium">
-    Get started
+  <Button size="medium" asChild>
+    <a href="/docs/guides/functions/quickstart">Get started</a>
   </Button>
 </div>
 
@@ -44,6 +45,12 @@ export const examples = [
     name: 'With supabase-js',
     description: 'Use the Supabase client inside your Edge Function.',
     href: '/guides/functions/auth',
+  },
+  {
+    name: 'Type-Safe SQL with Kysely',
+    description:
+      'Combining Kysely with Deno Postgres gives you a convenient developer experience for interacting directly with your Postgres database.',
+    href: '/guides/functions/kysely-postgres',
   },
   {
     name: 'With CORS headers',
@@ -107,9 +114,14 @@ export const examples = [
     href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/oak-server',
   },
   {
+    name: 'Hugging Face',
+    description: `Access 100,000+ Machine Learning models.`,
+    href: '/guides/ai/examples/huggingface-image-captioning',
+  },
+  {
     name: 'OpenAI',
     description: `Using OpenAI in Edge Functions.`,
-    href: '/guides/functions/examples/openai',
+    href: '/guides/ai/examples/openai',
   },
   {
     name: 'Stripe Webhooks',
@@ -118,8 +130,8 @@ export const examples = [
   },
   {
     name: 'Send emails',
-    description: `Send emails in Edge Functions.`,
-    href: 'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/send-email-smtp',
+    description: `Send emails in Edge Functions with Resend.`,
+    href: '/guides/functions/examples/send-emails',
   },
   {
     name: 'Web Stream',
@@ -153,7 +165,7 @@ export const examples = [
   },
   {
     name: 'Rate Limiting',
-    description: `Rate Limiting Egde Functions with Upstash Redis.`,
+    description: `Rate Limiting Edge Functions with Upstash Redis.`,
     href: '/guides/functions/examples/rate-limiting',
   },
 ]

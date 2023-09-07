@@ -22,18 +22,16 @@ This creates a corresponding route `todos` which can accept `GET`, `POST`, `PATC
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Table editor](https://app.supabase.com/project/_/editor) page in the Dashboard.
+1. Go to the [Table editor](https://supabase.com/dashboard/project/_/editor) page in the Dashboard.
 1. Click **New Table** and create a table with the name `todos`.
 1. Click **Save**.
 1. Click **New Column** and create a column with the name `task` and type `text`.
 1. Click **Save**.
 
-<video width="99%" muted playsInline controls="true">
+<video width="99%" muted playsInline controls={true}>
   <source
     src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-create-table-sm.mp4"
     type="video/mp4"
-    muted
-    playsInline
   />
 </video>
 
@@ -56,16 +54,14 @@ create table
 
 Every Supabase project has a unique API URL. Your API is secured behind an API gateway which requires an API Key for every request.
 
-1. Go to the [Settings](https://app.supabase.com/project/_/settings/general) page in the Dashboard.
+1. Go to the [Settings](https://supabase.com/dashboard/project/_/settings/general) page in the Dashboard.
 2. Click **API** in the sidebar.
 3. Find your API `URL`, `anon`, and `service_role` keys on this page.
 
-<video width="99%" muted playsInline controls="true">
+<video width="99%" muted playsInline controls={true}>
   <source
     src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-url-and-key.mp4"
     type="video/mp4"
-    muted
-    playsInline
   />
 </video>
 
@@ -202,17 +198,15 @@ By default Realtime is disabled on your database. Let's turn on Realtime for the
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://app.supabase.com/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Replication** in the sidebar.
 3. Control which database events are sent by toggling **Insert**, **Update**, and **Delete**.
 4. Control which tables broadcast changes by selecting **Source** and toggling each table.
 
-<video width="99%" muted playsInline controls="true">
+<video width="99%" muted playsInline controls={true}>
   <source
     src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-realtime.mp4"
     type="video/mp4"
-    muted
-    playsInline
   />
 </video>
 

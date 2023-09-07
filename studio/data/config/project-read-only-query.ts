@@ -40,21 +40,9 @@ export const useProjectReadOnlyQuery = (
         return data.result[0]?.default_transaction_read_only === 'on'
       },
       enabled: typeof projectRef !== 'undefined' && typeof connectionString !== 'undefined',
+      retry: (failureCount) => {
+        return failureCount < 3
+      },
       ...options,
     }
   )
-
-export const useProjectReadOnlyPrefetch = () => {
-  const prefetch = useExecuteSqlPrefetch()
-
-  return useCallback(
-    ({ projectRef, connectionString }: ProjectReadOnlyVariables) =>
-      prefetch({
-        projectRef,
-        connectionString,
-        sql: getProjectReadOnlySql(),
-        queryKey: ['project-read-only'],
-      }),
-    [prefetch]
-  )
-}

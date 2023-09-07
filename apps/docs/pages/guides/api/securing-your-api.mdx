@@ -22,7 +22,7 @@ To enable RLS on any table:
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Authentication](https://app.supabase.com/project/_/auth/users) page in the Dashboard.
+1. Go to the [Authentication](https://supabase.com/dashboard/project/_/auth/users) page in the Dashboard.
 2. Click on **Policies** in the sidebar.
 3. Select **Enable RLS** to enable Row Level Security.
 
@@ -49,10 +49,8 @@ To confirm that safeupdate is enabled for API queries, run the following query:
 select
   usename,
   useconfig
-from
-  pg_shadow
-where
-  usename = 'authenticator';
+from pg_shadow
+where usename = 'authenticator';
 ```
 
 The expected value for `useconfig` should be:
