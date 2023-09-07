@@ -93,7 +93,6 @@ const OrganizationProjects = ({
   rewriteHref,
 }: OrganizationProjectsProps) => {
   const isEmpty = !projects || projects.length === 0
-  const canReadProjects = useCheckPermissions(PermissionAction.READ, 'projects', undefined, id)
 
   return (
     <div className="space-y-3" key={makeRandomString(5)}>
@@ -131,15 +130,6 @@ const OrganizationProjects = ({
                 subject={`Failed to retrieve projects under ${name}`}
                 error={projectsError}
               />
-            </div>
-          ) : !canReadProjects ? (
-            <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 py-8 px-6 text-center">
-              <div className="space-y-1">
-                <p>You need additional permissions to view projects from this organization</p>
-                <p className="text-sm text-scale-1100">
-                  Contact your organization owner or administrator for assistance.
-                </p>
-              </div>
             </div>
           ) : isEmpty ? (
             <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
