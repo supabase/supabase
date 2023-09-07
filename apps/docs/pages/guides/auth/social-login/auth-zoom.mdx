@@ -13,7 +13,7 @@ To enable Zoom Auth for your project, you need to set up a Zoom OAuth applicatio
 Setting up Zoom logins for your application consists of 3 parts:
 
 - Create and configure a Zoom OAuth App on [Zoom App Marketplace](https://marketplace.zoom.us/)
-- Add your Zoom OAuth keys to your [Supabase Project](https://app.supabase.com)
+- Add your Zoom OAuth keys to your [Supabase Project](https://supabase.com/dashboard)
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
 
 ## Access your Zoom Developer account
@@ -41,10 +41,18 @@ Under `App credentials`
 
 - Copy and save your `Client ID`.
 - Copy and save your `Client secret`.
+- Add your `Callback URL` in the OAuth allow list.
 
 Under `Redirect URL for OAuth`
 
 - Paste your `Callback URL`
+
+Under `Scopes`
+
+- Click on `Add scopes`
+- Click on `User`
+- Choose `user:read`
+- Click `Done`
 - Click `Continue`
 
 ## Enter your Zoom credentials into your Supabase Project
@@ -73,7 +81,7 @@ async function signout() {
 
 ## Resources
 
-- [Supabase Account - Free Tier OK](https://supabase.com)
+- [Supabase Account - Free Plan OK](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Zoom App Marketplace](https://marketplace.zoom.us/)
 

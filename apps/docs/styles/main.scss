@@ -2,12 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './../../../packages/ui/build/css/source/global.css';
+@import './../../../packages/ui/build/css/themes/dark.css';
+@import './../../../packages/ui/build/css/themes/light.css';
+
 @font-face {
   font-family: 'custom-font';
   src: url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),
     url(../../../packages/common/assets/fonts/CustomFont-Book.woff) format('woff');
   font-weight: 400;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -16,6 +21,7 @@
     url(../../../packages/common/assets/fonts/CustomFont-Medium.woff) format('woff');
   font-weight: 500;
   font-style: normal;
+  font-display: swap;
 }
 
 :root {
@@ -23,14 +29,14 @@
 }
 
 body {
-  @apply bg-scale-200 dark:bg-[#1c1c1c] #{!important};
+  @apply bg-scale-200;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
-  background-color: #6ee7b7;
+  background-color: #6ee7b7 !important;
   color: #333 !important;
 }
 
@@ -62,7 +68,7 @@ article h1 {
 
 .table-of-contents-height {
   max-height: calc(100vh - 3.75rem - 2rem);
-  top: calc(3.75rem + 1rem);
+  top: calc(4rem + 60px); // padding height + navbar height
 }
 
 .width-full {
@@ -76,6 +82,10 @@ article h1 {
 
 .small:not(.prose *):not(.overwrite) {
   @apply text-scale-900 text-xs;
+}
+
+.prose :where(p):not(:where([class~='not-prose'] *)) {
+  white-space: pre-line;
 }
 
 code[class*='language-'],
@@ -159,7 +169,7 @@ pre[class*='language-'] {
 
 // ToC styles
 .toc__menu-item--active {
-  color: var(--colors-brand9) !important;
+  color: hsl(var(--brand-default)) !important;
 }
 
 .video-container {

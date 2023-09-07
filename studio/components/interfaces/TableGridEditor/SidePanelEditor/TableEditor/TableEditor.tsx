@@ -1,29 +1,29 @@
+import type { PostgresTable, PostgresType } from '@supabase/postgres-meta'
+import { isEmpty, isUndefined, noop } from 'lodash'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { isUndefined, isEmpty, noop } from 'lodash'
-import { Badge, Checkbox, SidePanel, Input, Alert, IconBookOpen, Button, Modal } from 'ui'
-import type { PostgresTable, PostgresType } from '@supabase/postgres-meta'
 
-import { useStore } from 'hooks'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
-import ActionBar from '../ActionBar'
-import HeaderTitle from './HeaderTitle'
-import ColumnManagement from './ColumnManagement'
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import { useStore } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { Alert, Badge, Button, Checkbox, IconBookOpen, Input, Modal, SidePanel } from 'ui'
 import { SpreadsheetImport } from '../'
+import ActionBar from '../ActionBar'
 import { ColumnField, CreateTablePayload, UpdateTablePayload } from '../SidePanelEditor.types'
+import ColumnManagement from './ColumnManagement'
+import HeaderTitle from './HeaderTitle'
+import RLSDisableModalContent from './RLSDisableModal'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
-import { TableField, ImportContent } from './TableEditor.types'
+import { ImportContent, TableField } from './TableEditor.types'
 import {
-  validateFields,
+  formatImportedContentToColumnFields,
   generateTableField,
   generateTableFieldFromPostgresTable,
-  formatImportedContentToColumnFields,
+  validateFields,
 } from './TableEditor.utils'
-import RLSDisableModalContent from './RLSDisableModal'
 
 export interface TableEditorProps {
   table?: PostgresTable

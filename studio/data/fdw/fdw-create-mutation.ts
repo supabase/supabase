@@ -1,4 +1,6 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-hot-toast'
+
 import {
   AvailableColumn,
   WrapperMeta,
@@ -7,6 +9,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { useStore } from 'hooks'
+import { ResponseError } from 'types'
 
 export type FDWCreateVariables = {
   projectRef?: string
@@ -88,25 +91,23 @@ export function getCreateFDWSql({
 
   const createTablesSql = tables
     .map((newTable) => {
-      const table = wrapperMeta.tables[newTable.index]
-
       const columns: AvailableColumn[] = newTable.columns
-        .map((name: string) => table.availableColumns.find((c) => c.name === name))
-        .filter(Boolean)
 
       return /* SQL */ `
-        create foreign table ${newTable.schema_name}.${newTable.table_name} (
-          ${columns.map((column) => `${column.name} ${column.type}`).join(',\n          ')}
+        create foreign table "${newTable.schema_name}"."${newTable.table_name}" (
+          ${columns.map((column) => `"${column.name}" ${column.type}`).join(',\n          ')}
         )
         server ${formState.server_name}
         options (
           ${Object.entries(newTable)
             .filter(
-              ([key]) =>
+              ([key, value]) =>
                 key !== 'table_name' &&
                 key !== 'schema_name' &&
                 key !== 'columns' &&
-                key !== 'index'
+                key !== 'index' &&
+                key !== 'is_new_schema' &&
+                Boolean(value)
             )
             .map(([key, value]) => `${key} '${value}'`)
             .join(',\n          ')}
@@ -138,9 +139,7 @@ export async function createFDW({
   tables,
 }: FDWCreateVariables) {
   const sql = wrapWithTransaction(getCreateFDWSql({ wrapperMeta, formState, tables }))
-
   const { result } = await executeSql({ projectRef, connectionString, sql })
-
   return result
 }
 
@@ -148,12 +147,16 @@ type FDWCreateData = Awaited<ReturnType<typeof createFDW>>
 
 export const useFDWCreateMutation = ({
   onSuccess,
+  onError,
   ...options
-}: Omit<UseMutationOptions<FDWCreateData, unknown, FDWCreateVariables>, 'mutationFn'> = {}) => {
+}: Omit<
+  UseMutationOptions<FDWCreateData, ResponseError, FDWCreateVariables>,
+  'mutationFn'
+> = {}) => {
   const queryClient = useQueryClient()
   const { vault } = useStore()
 
-  return useMutation<FDWCreateData, unknown, FDWCreateVariables>((vars) => createFDW(vars), {
+  return useMutation<FDWCreateData, ResponseError, FDWCreateVariables>((vars) => createFDW(vars), {
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 
@@ -163,6 +166,15 @@ export const useFDWCreateMutation = ({
       ])
 
       await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(
+          `Failed to create ${variables.wrapperMeta.label} foreign data wrapper: ${data.message}`
+        )
+      } else {
+        onError(data, variables, context)
+      }
     },
     ...options,
   })

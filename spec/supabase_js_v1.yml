@@ -82,10 +82,10 @@ functions:
     title: 'signUp()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
     notes: |
-      - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
+      - By default, the user will need to verify their email address before logging in. If you would like to change this, you can disable "Email Confirmations" by going to Authentication -> Settings on [supabase.com/dashboard](https://supabase.com/dashboard)
       - If "Email Confirmations" is turned on, a `user` is returned but `session` will be null
       - If "Email Confirmations" is turned off, both a `user` and a `session` will be returned
-      - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
+      - When the user confirms their email address, they will be redirected to localhost:3000 by default. To change this, you can go to Authentication -> Settings on [supabase.com/dashboard](https://supabase.com/dashboard)
       - If signUp() is called for an existing confirmed user:
           - If "Enable email confirmations" is enabled on the "Authentication" -> "Settings" page, an obfuscated / fake user object will be returned.
           - If "Enable email confirmations" is disabled, an error with a message "User already registered" will be returned.
@@ -147,7 +147,7 @@ functions:
     notes: |
       - A user can sign up either via email or OAuth.
       - If you provide `email` without a `password`, the user will be sent a magic link.
-      - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [app.supabase.com](https://app.supabase.com)
+      - The magic link's destination URL is determined by the SITE_URL config variable. To change this, you can go to Authentication -> Settings on [supabase.com/dashboard](https://supabase.com/dashboard)
       - Specifying a `provider` will open the browser to the relevant login page.
     examples:
       - id: sign-in-with-email-and-password
@@ -196,7 +196,7 @@ functions:
           the Auth server. If you are using email/phone logins you should set up your own redirects (within the email/sms template).
 
           Sometimes you want to control where the user is redirected to after they are logged in. Supabase supports this for
-          any URL path on your website (the URL must either be on the same domain as your [Site URL](https://app.supabase.com/project/_/auth/url-configuration) or match one of the Redirect URLs).
+          any URL path on your website (the URL must either be on the same domain as your [Site URL](https://supabase.com/dashboard/project/_/auth/url-configuration) or match one of the Redirect URLs).
 
           See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
         code: |
@@ -285,7 +285,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.update'
     notes: |
       User email: By Default, email updates sends a confirmation link to both the user's current and new email.
-      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://app.supabase.com/project/_/auth/providers).
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
 
       User metadata: It's generally better to store user data in a table within your public schema (i.e., `public.users`).
       Use the `update()` method if you have data which rarely changes or is specific only to the logged in user.
@@ -707,7 +707,7 @@ functions:
   - id: invoke
     title: 'invoke()'
     description: |
-      Invokes a Supabase Function.
+      Invokes a Supabase Edge Function.
     $ref: '@supabase/functions-js.FunctionsClient.invoke'
     notes: |
       - Requires an Authorization header.
@@ -736,7 +736,7 @@ functions:
       - id: passing-custom-headers
         name: Passing custom headers.
         description: |
-          You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
+          You can pass custom headers to your Edge Function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
         isSpotlight: true
         code: |
           ```js
@@ -1521,7 +1521,7 @@ functions:
     title: 'from.getPublicUrl()'
     $ref: '@supabase/storage-js."lib/StorageFileApi".StorageFileApi.getPublicUrl'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [app.supabase.com](https://app.supabase.com), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: none

@@ -63,12 +63,12 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
         }
       >
         <Button
-          as="span"
+          asChild
           type={helperValue ? 'secondary' : 'default'}
           icon={<IconClock size={12} />}
           className="rounded-r-none"
         >
-          {selectedHelper?.text || defaultHelper.text}
+          <span>{selectedHelper?.text || defaultHelper.text}</span>
         </Button>
       </Dropdown>
       <DatePicker

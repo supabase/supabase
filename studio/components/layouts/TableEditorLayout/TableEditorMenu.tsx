@@ -1,7 +1,19 @@
-import { useMemo, useState } from 'react'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
+import { useMemo, useState } from 'react'
+
+import { useParams } from 'common/hooks'
+import InfiniteList from 'components/ui/InfiniteList'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { Entity } from 'data/entity-types/entity-type-query'
+import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useCheckPermissions, useLocalStorage, useStore } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
+  Alert,
   Button,
   Dropdown,
   IconCheck,
@@ -15,17 +27,6 @@ import {
   Listbox,
   Menu,
 } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import { useParams } from 'common/hooks'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { checkPermissions, useLocalStorage, useStore } from 'hooks'
-import InfiniteList from 'components/ui/InfiniteList'
-import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { Entity } from 'data/entity-types/entity-type-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
 
@@ -85,13 +86,16 @@ const TableEditorMenu = ({
     data: schemas,
     isLoading: isSchemasLoading,
     isSuccess: isSchemasSuccess,
+    isError: isSchemasError,
+    error: schemasError,
+    refetch: refetchSchemas,
   } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
   const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
-  const canCreateTables = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canCreateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const isLoadingTableMetadata = id ? !meta.tables.byId(id) : true
 
@@ -116,6 +120,15 @@ const TableEditorMenu = ({
             <IconLoader className="animate-spin" size={12} />
             <span className="text-xs text-scale-900">Loading schemas...</span>
           </div>
+        )}
+
+        {isSchemasError && (
+          <Alert variant="warning" title="Failed to load schemas" className="!px-3 !py-3">
+            <p className="mb-2">Error: {schemasError.message}</p>
+            <Button type="default" size="tiny" onClick={() => refetchSchemas()}>
+              Reload schemas
+            </Button>
+          </Alert>
         )}
 
         {isSchemasSuccess && (
@@ -178,8 +191,8 @@ const TableEditorMenu = ({
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger className="w-full">
                 <Button
+                  asChild
                   block
-                  as="span"
                   disabled={!canCreateTables}
                   size="tiny"
                   icon={
@@ -191,7 +204,7 @@ const TableEditorMenu = ({
                   style={{ justifyContent: 'start' }}
                   onClick={onAddTable}
                 >
-                  New table
+                  <span>New table</span>
                 </Button>
               </Tooltip.Trigger>
               {!canCreateTables && (

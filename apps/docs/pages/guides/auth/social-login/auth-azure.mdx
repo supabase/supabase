@@ -2,11 +2,11 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'auth-azure',
-  title: 'Login with Azure',
-  description: 'Add Azure OAuth to your Supabase project',
+  title: 'Login with Azure (Microsoft)',
+  description: 'Add Azure (Microsoft) OAuth to your Supabase project',
 }
 
-To enable Azure Auth for your project, you need to set up an Azure OAuth application and add the application credentials to your Supabase Dashboard.
+To enable Azure (Microsoft) Auth for your project, you need to set up an Azure OAuth application and add the application credentials to your Supabase Dashboard.
 
 ## Overview
 
@@ -88,6 +88,21 @@ When your user signs out, call [signOut()](/docs/reference/javascript/auth-signo
 ```js
 async function signout() {
   const { error } = await supabase.auth.signOut()
+}
+```
+
+## Obtain the provider refresh token
+
+Azure OAuth2.0 doesn't return the `provider_refresh_token` by default. If you need the `provider_refresh_token` returned, you will need to include the following scope:
+
+```js
+async function signInWithAzure() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'azure',
+    options: {
+      scopes: 'offline_access',
+    },
+  })
 }
 ```
 

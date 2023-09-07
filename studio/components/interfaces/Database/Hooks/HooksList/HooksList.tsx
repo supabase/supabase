@@ -6,9 +6,8 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { Button, Input, IconSearch, IconExternalLink } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import SchemaTable from './SchemaTable'
-import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -44,7 +43,7 @@ const HooksList = ({
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
   const filteredHookSchemas = lodashMap(uniqBy(filteredHooks, 'schema'), 'schema')
-  const canCreateWebhooks = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
+  const canCreateWebhooks = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   return (
     <>

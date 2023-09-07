@@ -1,6 +1,5 @@
 import ReactMarkdown from 'react-markdown'
 import { CodeBlock, IconChevronRight, Tabs } from 'ui'
-// @ts-expect-error
 import spec from '~/../../spec/cli_v1_commands.yaml' assert { type: 'yml' }
 import Options from '~/components/Options'
 import Param from '~/components/Params'
@@ -97,7 +96,7 @@ const CliCommandSection = (props) => {
                       </div>
                       <a
                         href={`#${subcommand}`}
-                        className="transition text-scale-1100 hover:text-brand-900"
+                        className="transition text-scale-1100 hover:text-brand"
                       >
                         $ {subcommand.replace(/-/g, ' ')}
                       </a>

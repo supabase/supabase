@@ -6,5 +6,8 @@
 </template>
 
 <script setup>
-	const user = useSupabaseUser()
+useHead({
+	title: 'User Management'
+})
+const user = useSupabaseUser()
 </script>

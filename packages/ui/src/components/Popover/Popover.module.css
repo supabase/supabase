@@ -1,5 +1,5 @@
 .sbui-popover__content {
-  @apply bg-bg-primary-light dark:bg-bg-secondary-dark p-0;
+  @apply bg-scale-200 p-0;
   @apply border;
   @apply rounded;
   @apply shadow;
@@ -46,7 +46,7 @@
 } */
 
 .sbui-popover__arrow {
-  @apply fill-current text-bg-primary-light dark:text-bg-secondary-dark;
+  @apply fill-current text-scale-200;
   @apply border-0 border-t;
   border-style: solid;
 }

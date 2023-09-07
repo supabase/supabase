@@ -22,12 +22,12 @@ Create a separate organization if you need to restrict access to certain project
 ## Manage team members
 
 To invite others to collaborate, visit your organization's team settings in the
-[Dashboard](https://app.supabase.com/projects) to send an invite link to
+[Dashboard](https://supabase.com/dashboard/projects) to send an invite link to
 another user's email. The invite expires after 24 hours.
 
 ### Transferring ownership of an organization
 
-Each Supabase organization can have one or more owners. If you no longer want be an owner of an organization, click **Leave team** in the members view (`https://app.supabase.com/org/<org-slug>/settings#team`) of your organization.
+Each Supabase organization can have one or more owners. If you no longer want be an owner of an organization, click **Leave team** in the members view (`https://supabase.com/dashboard/org/<org-slug>/settings#team`) of your organization.
 However, you can only leave an organization when there is _at least one other owner_.
 
 If you are transferring ownership of your organization to someone else, you will need to invite the new member with the **Owner** role. You can leave the organization after they've accepted the invitation.
@@ -36,8 +36,8 @@ If you are transferring ownership of your organization to someone else, you will
 
 The table below shows the corresponding permissions for each available role you can assign a team member in the Dashboard.
 
-| Permissions              | Owner                   | Administrator           | Developer               |
-| ------------------------ | ----------------------- | ----------------------- | ----------------------- |
+| Permissions              | Owner                   | Administrator           | Developer               | Read only [^2]          |
+| ------------------------ | ----------------------- | ----------------------- | ----------------------- | ----------------------- |
 | **Organization**         |
 | Change organization name | <IconCheck size={14} /> |                         |                         |
 | Delete organization      | <IconCheck size={14} /> |                         |                         |
@@ -70,12 +70,16 @@ The table below shows the corresponding permissions for each available role you 
 | Pause a project          | <IconCheck size={14} /> | <IconCheck size={14} /> |                         |
 | Resume a project         | <IconCheck size={14} /> | <IconCheck size={14} /> |                         |
 | Restart a project        | <IconCheck size={14} /> | <IconCheck size={14} /> | <IconCheck size={14} /> |
+| Manage tables            | <IconCheck size={14} /> | <IconCheck size={14} /> | <IconCheck size={14} /> |
+| View Data                | <IconCheck size={14} /> | <IconCheck size={14} /> | <IconCheck size={14} /> | <IconCheck size={14} /> |
 
 [^1]:
     Invites sent from a SSO account can only be accepted by another SSO account
     coming from the same identity provider. This is a security measure that
     prevents accidental invites to accounts not managed by your company's
     enterprise systems.
+
+[^2]: Available on the Teams and Enterprise Plans.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

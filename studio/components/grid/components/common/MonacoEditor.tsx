@@ -1,4 +1,3 @@
-import * as React from 'react'
 import Editor from '@monaco-editor/react'
 
 type MonacoEditorProps = {
@@ -10,14 +9,14 @@ type MonacoEditorProps = {
   onMount?: (editor: any) => void
 }
 
-export const MonacoEditor: React.FC<MonacoEditorProps> = ({
+export const MonacoEditor = ({
   width,
   height,
   value,
   language,
   onChange,
   onMount,
-}) => {
+}: MonacoEditorProps) => {
   function handleEditorOnMount(editor: any) {
     // add margin above first line
     editor.changeViewZones((accessor: any) => {

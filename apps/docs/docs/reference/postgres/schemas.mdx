@@ -1,18 +1,14 @@
 ---
 id: schemas
-title: "Schemas"
+title: 'Schemas'
 slug: schemas
 custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/postgres.yml
 ---
 
-import Tabs from '@theme/Tabs';
-import TabsPanel from '@theme/TabsPanel';
+Schemas are like "folders". They help to keep your database organized.
 
-Schemas are like "folders". They help to keep your database organized. 
-
-Schemas are particularly useful for security. You can set different permissions on each schema. 
+Schemas are particularly useful for security. You can set different permissions on each schema.
 For example, you might want to use a `public` schema for user-facing data, and an `auth` schema for all logins and secured data.
-
 
 <Tabs
   defaultActiveId="sql"
@@ -25,14 +21,9 @@ For example, you might want to use a `public` schema for user-facing data, and a
 create schema schema_name;
 ```
 
-
 </TabsPanel>
 
 </Tabs>
-
-
-
-
 
 ## Notes
 
@@ -40,20 +31,9 @@ create schema schema_name;
 - Postgres comes with a `public` schema set up by default.
 - It is best practice to use lowercase and underscores when naming schemas. For example: `schema_name`, not `Schema Name`.
 
-
-
-
-
-
-
-
-
-
 ## Examples
 
 ### Creating a schema
-
-
 
 <Tabs
   defaultActiveId="sql"
@@ -66,14 +46,11 @@ create schema schema_name;
 create schema schema_name;
 ```
 
-
 </TabsPanel>
 
 </Tabs>
 
 ### Removing a schema
-
-
 
 <Tabs
   defaultActiveId="sql"
@@ -86,7 +63,6 @@ create schema schema_name;
 drop schema if exists schema_name;
 ```
 
-
 </TabsPanel>
 
 </Tabs>
@@ -95,7 +71,6 @@ drop schema if exists schema_name;
 
 Although it's not recommended, you can use uppercase and spaces when naming your schema by wrapping the name with double-quotes.
 As a result, you will always need to use double-quotes when referencing your schema.
-
 
 <Tabs
   defaultActiveId="sql"
@@ -107,7 +82,6 @@ As a result, you will always need to use double-quotes when referencing your sch
 ```sql
 create schema "Schema Name";
 ```
-
 
 </TabsPanel>
 

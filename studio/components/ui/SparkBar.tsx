@@ -1,18 +1,19 @@
 import clsx from 'clsx'
-import { FC } from 'react'
 
-interface Props {
+interface SparkBarProps {
   value: number
   max?: number
   type?: 'horizontal' | 'vertical'
   labelTop?: string
+  labelTopClass?: string
   labelBottom?: string
+  labelBottomClass?: string
   barClass?: string
   bgClass?: string
   borderClass?: string
 }
 
-const SparkBar: FC<Props> = ({
+const SparkBar = ({
   max = 100,
   value = 0,
   barClass = '',
@@ -20,8 +21,10 @@ const SparkBar: FC<Props> = ({
   type = 'vertical',
   borderClass = '',
   labelBottom = '',
+  labelBottomClass = 'tabular-nums',
   labelTop = '',
-}) => {
+  labelTopClass = '',
+}: SparkBarProps) => {
   if (type === 'horizontal') {
     const width = Number((value / max) * 100)
     const widthCss = `${width}%`
@@ -34,12 +37,13 @@ const SparkBar: FC<Props> = ({
             <p
               className={clsx(
                 'text-scale-1200 text-sm truncate capitalize-sentence',
-                labelTop.length > 0 && 'max-w-[75%]'
+                labelTop.length > 0 && 'max-w-[75%]',
+                labelBottomClass
               )}
             >
               {labelBottom}
             </p>
-            <p className="text-scale-1100 text-sm tabular-nums">{labelTop}</p>
+            <p className={clsx('text-scale-1100 text-sm', labelTopClass)}>{labelTop}</p>
           </div>
         )}
         <div

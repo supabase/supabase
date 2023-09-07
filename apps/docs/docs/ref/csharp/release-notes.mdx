@@ -3,6 +3,174 @@ id: release-notes
 title: Release Notes
 ---
 
+## 0.11.0 - 2023-05-24
+
+- Update dependency: postgrest-csharp@3.2.0
+  - General codebase and QOL improvements. Exceptions are generally thrown through `PostgrestException` now instead
+    of `Exception`. A `FailureHint.Reason` is provided with failures if possible to parse.
+  - `AddDebugListener` is now available on the client to help with debugging
+  - Merges [#65](https://github.com/supabase-community/postgrest-csharp/pull/65) Cleanup + Add better exception handling
+  - Merges [#66](https://github.com/supabase-community/postgrest-csharp/pull/66) Local test Fixes
+  - Fixes [#67](https://github.com/supabase-community/postgrest-csharp/issues/67) Postgrest Reference attribute is
+    producing StackOverflow for circular references
+- Update dependency: gotrue-csharp@4.0.2
+  - [#58](https://github.com/supabase-community/gotrue-csharp/issues/58) - Add support for the `reauthentication` endpoint which allows for secure password changes.
+- Update dependency: realtime-csharp@6.0.1
+  - Updates publishing action for future packages, includes README and icon.
+  - Merges [#28](https://github.com/supabase-community/realtime-csharp/pull/28) and [#30](https://github.com/supabase-community/realtime-csharp/pull/30)
+  - The realtime client now takes a "fail-fast" approach. On establishing an initial connection, client will throw
+    a `RealtimeException` in `ConnectAsync()` if the socket server is unreachable. After an initial connection has been
+    established, the **client will continue attempting reconnections indefinitely until disconnected.**
+  - [Major, New] C# `EventHandlers` have been changed to `delegates`. This should allow for cleaner event data access over
+    the previous subclassed `EventArgs` setup. Events are scoped accordingly. For example, the `RealtimeSocket` error
+    handlers will receive events regarding socket connectivity; whereas the `RealtimeChannel` error handlers will receive
+    events according to `Channel` joining/leaving/etc. This is implemented with the following methods prefixed by (
+    Add/Remove/Clear):
+    - `RealtimeBroadcast.AddBroadcastEventHandler`
+    - `RealtimePresence.AddPresenceEventHandler`
+    - `RealtimeSocket.AddStateChangedHandler`
+    - `RealtimeSocket.AddMessageReceivedHandler`
+    - `RealtimeSocket.AddHeartbeatHandler`
+    - `RealtimeSocket.AddErrorHandler`
+    - `RealtimeClient.AddDebugHandler`
+    - `RealtimeClient.AddStateChangedHandler`
+    - `RealtimeChannel.AddPostgresChangeHandler`
+    - `RealtimeChannel.AddMessageReceivedHandler`
+    - `RealtimeChannel.AddErrorHandler`
+    - `Push.AddMessageReceivedHandler`
+  - [Major, new] `ClientOptions.Logger` has been removed in favor of `Client.AddDebugHandler()` which allows for
+    implementing custom logging solutions if desired.
+    - A simple logger can be set up with the following:
+    ```c#
+    client.AddDebugHandler((sender, message, exception) => Debug.WriteLine(message));
+    ```
+  - [Major] `Connect()` has been marked `Obsolete` in favor of `ConnectAsync()`
+  - Custom reconnection logic has been removed in favor of using the built-in logic from `Websocket.Client@4.6.1`.
+  - Exceptions that are handled within this library have been marked as `RealtimeException`s.
+  - The local, docker-composed test suite has been brought back (as opposed to remotely testing on live supabase servers)
+    to test against.
+  - Comments have been added throughout the entire codebase and an `XML` file is now generated on build.
+
+## 0.10.0 - 2023-05-14
+
+- Changes options to require `Supabase.SupabaseOptions.SessionPersistor` from using `ISupabaseSessionHandler`
+  to `IGotrueSessionPersistance<Session>` (these are now synchronous operations).
+- Update dependency: gotrue-csharp@4.0.1
+  - [#60](https://github.com/supabase-community/gotrue-csharp/pull/60) - Add interfaces, bug fixes, additional error
+    reason detection. Thanks [@wiverson](https://github.com/wiverson)!
+  - [#57](https://github.com/supabase-community/gotrue-csharp/pull/57) Refactor exceptions, code cleanup, and move to
+    delegate auth state changes
+    - Huge thank you to [@wiverson](https://github.com/wiverson) for his help on this refactor and release!
+    - Changes
+      - Exceptions have been simplified to a single `GotrueException`. A `Reason` field has been added
+        to `GotrueException` to clarify what happened. This should also be easier to manage as the Gotrue
+        server API & messages evolve.
+      - The session delegates for `Save`/`Load`/`Destroy` have been simplified to no longer require `async`.
+      - Console logging in a few places (most notable the background refresh thread) has been removed
+        in favor of a notification method. See `Client.AddDebugListener()` and the test cases for examples.
+        This will allow you to implement your own logging strategy (write to temp file, console, user visible
+        err console, etc).
+      - The client now more reliably emits AuthState changes.
+      - There is now a single source of truth for headers in the stateful Client - the `Options` headers.
+    - New feature:
+      - Added a `Settings` request to the stateless API only - you can now query the server instance to
+        determine if it's got the settings you need. This might allow for things like a visual
+        component in a tool to verify the GoTrue settings are working correctly, or tests that run differently
+        depending on the server configuration.
+    - Implementation notes:
+      - Test cases have been added to help ensure reliability of auth state change notifications
+        and persistence.
+      - Persistence is now managed via the same notifications as auth state change
+
+## 0.9.1 - 2023-04-28
+
+- Update dependency: gotrue-csharp@3.1.1
+  - Implements `SignInWithIdToken` for Apple/Google signing from LW7. A HUGE thank you
+    to [@wiverson](https://github.com/wiverson)!
+- Update dependency: realtime-csharp@5.0.5
+  - Re: [#27](https://github.com/supabase-community/realtime-csharp/issues/27) `PostgresChangesOptions` was not
+    setting `listenType` in constructor. Thanks [@Kuffs2205](https://github.com/Kuffs2205)
+- Update dependency: supabase-storage-csharp@1.2.10
+  - Re: [#7](https://github.com/supabase-community/storage-csharp/issues/7) Implements a `DownloadPublicFile` method.
+
+## 0.9.0 - 2023-04-12
+
+- Update dependency: gotrue-csharp@3.1.0
+
+  - [Minor] Implements PKCE auth flow. SignIn using a provider now returns an instance of `ProviderAuthState` rather
+    than a `string`.
+
+- Update dependency: supabase-storage-csharp@1.2.9
+  - Implements storage features from LW7:
+    - feat: custom file size limit and mime types at bucket
+      level [supabase/storage-js#151](https://github.com/supabase/storage-js/pull/151) file size and mime type
+      limits per bucket
+    - feat: quality option, image
+      transformation [supabase/storage-js#145](https://github.com/supabase/storage-js/pull/152) quality option for
+      image transformations
+    - feat: format option for webp
+      support [supabase/storage-js#142](https://github.com/supabase/storage-js/pull/142) format option for image
+      transformation
+
+## 0.8.8 - 2023-03-29
+
+- Update dependency: gotrue-csharp@3.0.6
+  - Supports adding `SignInOptions` (i.e. `RedirectTo`) on `OAuth Provider` SignIn requests.
+
+## 0.8.7 - 2023-03-23
+
+- Update dependency: realtime-csharp@5.0.4
+  - Re: [#26](https://github.com/supabase-community/realtime-csharp/pull/26) - Fixes Connect() not returning callback
+    result when the socket isn't null. Thanks [@BlueWaterCrystal](https://github.com/BlueWaterCrystal)!
+
+## 0.8.6 - 2023-03-23
+
+- Update dependency: supabase-storage-csharp@1.2.8
+  - [Merge #5](https://github.com/supabase-community/storage-csharp/pull/5) Added search string as an optional search
+    parameter. Thanks [@ElectroKnight22](https://github.com/ElectroKnight22)!
+
+## 0.8.5 - 2023-03-10
+
+- Update dependency: realtime-csharp@5.0.3
+  - Re: [#25](https://github.com/supabase-community/realtime-csharp/issues/25) - Support Channel being resubscribed
+    after having been unsubscribed, fixes rejoin timer being erroneously called on channel `Unsubscribe`.
+    Thanks [@Kuffs2205](https://github.com/Kuffs2205)!
+
+## 0.8.4 - 2023-03-03
+
+- Update dependency: supabase-storage-csharp@1.2.7
+  - Re: [#4](https://github.com/supabase-community/storage-csharp/issues/4) Implementation for `ClientOptions` which
+    supports specifying Upload, Download, and Request timeouts.
+- Update dependency: realtime-csharp@5.0.2
+  - Re: [#24](https://github.com/supabase-community/realtime-csharp/issues/24) - Fixes join failing until reconnect
+    happened + adds access token push on channel join. Big thank you to [@Honeyhead](https://github.com/honeyhead) for
+    the help debugging and identifying!
+
+## 0.8.3 - 2023-02-26
+
+- Update dependency: supabase-storage-csharp@1.2.5
+  - Provides fix
+    for [supabase-community/supabase-csharp#54](https://github.com/supabase-community/supabase-csharp/issues/54) -
+    Dynamic headers were always being overwritten by initialized token headers, so the storage client would not
+    receive user's access token as expected.
+  - Provides fix for upload progress not reporting
+    in [supabase-community/storage-csharp#3](https://github.com/supabase-community/storage-csharp/issues/3)
+- Update dependency: gotrue-csharp@3.0.5
+  - Fixes [#44](https://github.com/supabase-community/gotrue-csharp/issues/44) - refresh timer should automatically
+    reattempt (interval of 5s) for HTTP exceptions - gracefully exits on invalid refresh and triggers
+    an `AuthState.Changed` event
+
+## 0.8.2 - 2023-02-26
+
+- Update dependency: supabase-storage-csharp@1.2.4
+  - `UploadOrUpdate` now appropriately throws request exceptions
+
+## 0.8.1 - 2023-02-06
+
+- Update dependency: realtime-csharp@5.0.1
+  - Re: [#22](https://github.com/supabase-community/realtime-csharp/issues/22) - `SerializerSettings` were not being
+    passed to `PostgresChangesResponse` - Thanks [@Shenrak](https://github.com/Shenrak) for the help debugging!
+
 ## 0.8.0 - 2023-01-31
 
 - Update dependency: realtime-csharp@5.0.0

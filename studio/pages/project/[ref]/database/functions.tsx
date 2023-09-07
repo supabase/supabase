@@ -1,27 +1,29 @@
-import { useState, useEffect } from 'react'
-import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useState } from 'react'
 
-import { useStore, checkPermissions } from 'hooks'
-import { DatabaseLayout } from 'components/layouts'
 import { CreateFunction, DeleteFunction } from 'components/interfaces/Database'
-import { NextPageWithLayout } from 'types'
-import NoPermission from 'components/ui/NoPermission'
 import FunctionsList from 'components/interfaces/Database/Functions/FunctionsList/FunctionsList'
+import { DatabaseLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import NoPermission from 'components/ui/NoPermission'
+import { useCheckPermissions, useStore } from 'hooks'
+import { NextPageWithLayout } from 'types'
 
 const FunctionsPage: NextPageWithLayout = () => {
-  const { meta, ui } = useStore()
+  const { meta } = useStore()
+  const { project } = useProjectContext()
   const [selectedFunction, setSelectedFunction] = useState<any>()
   const [showCreateFunctionForm, setShowCreateFunctionForm] = useState<boolean>(false)
   const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState<boolean>(false)
 
-  const canReadFunctions = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'functions')
+  const canReadFunctions = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'functions')
 
   useEffect(() => {
-    if (ui.selectedProject?.ref) {
+    if (project?.ref) {
       fetchFunctions()
     }
-  }, [ui.selectedProject?.ref])
+  }, [project?.ref])
 
   const fetchFunctions = async () => {
     meta.functions.load()

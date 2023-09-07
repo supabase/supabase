@@ -29,7 +29,7 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
       overlay={<FilterOverlay table={table} filters={filters} setParams={setParams} />}
     >
       <Button
-        as="span"
+        asChild
         type={(filters || []).length > 0 ? 'link' : 'text'}
         icon={
           <div className="text-scale-1000">
@@ -37,7 +37,7 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
           </div>
         }
       >
-        {btnText}
+        <span>{btnText}</span>
       </Button>
     </Popover>
   )

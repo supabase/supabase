@@ -1,14 +1,14 @@
-import clsx from 'clsx'
-import Link from 'next/link'
-import { noop } from 'lodash'
-import { Badge, Button, Dropdown, IconChevronDown, IconEdit2, IconLoader, IconTrash } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import clsx from 'clsx'
+import { noop } from 'lodash'
+import Link from 'next/link'
+import { Badge, Button, Dropdown, IconChevronDown, IconEdit2, IconLoader, IconTrash } from 'ui'
 
-import { checkPermissions } from 'hooks'
-import { STORAGE_ROW_STATUS } from 'components/to-be-cleaned/Storage/Storage.constants'
+import { Bucket } from 'data/storage/buckets-query'
+import { useCheckPermissions } from 'hooks'
 
-interface BucketRowProps {
-  bucket: any
+export interface BucketRowProps {
+  bucket: Bucket
   projectRef?: string
   isSelected: boolean
   onSelectDeleteBucket: (bucket: any) => void
@@ -16,13 +16,13 @@ interface BucketRowProps {
 }
 
 const BucketRow = ({
-  bucket = {},
+  bucket,
   projectRef = '',
   isSelected = false,
   onSelectDeleteBucket = noop,
   onSelectEditBucket = noop,
 }: BucketRowProps) => {
-  const canUpdateBuckets = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canUpdateBuckets = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   return (
     <div
@@ -46,9 +46,10 @@ const BucketRow = ({
         </a>
       </Link>
       <div className="pr-3">
-        {bucket.status === STORAGE_ROW_STATUS.LOADING ? (
+        {/* [JOSHEN TODO] need to change this */}
+        {false ? (
           <IconLoader className="animate-spin" size={16} strokeWidth={2} />
-        ) : canUpdateBuckets && bucket.status === STORAGE_ROW_STATUS.READY && isSelected ? (
+        ) : canUpdateBuckets && isSelected ? (
           <Dropdown
             side="bottom"
             align="start"
@@ -71,11 +72,13 @@ const BucketRow = ({
             ]}
           >
             <Button
-              as="span"
+              asChild
               type="text"
               icon={<IconChevronDown size="tiny" strokeWidth={2} className="text-scale-1100" />}
               style={{ padding: '3px' }}
-            />
+            >
+              <span></span>
+            </Button>
           </Dropdown>
         ) : (
           <div className="w-5" />

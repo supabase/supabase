@@ -37,15 +37,15 @@ These settings let Supabase use SAML 2.0 properly with your Okta application.
 Make sure you enter this information exactly as shown on in this table and
 screenshot.
 
-| Setting                                        | Value                                                |
-| ---------------------------------------------- | ---------------------------------------------------- |
-| Single sign-on URL                             | `https://app.supabase.com/auth/v1/sso/saml/acs`      |
-| Use this for Recipient URL and Destination URL | ✔️                                                   |
-| Audience URI (SP Entity ID)                    | `https://app.supabase.com/auth/v1/sso/saml/metadata` |
-| Default RelayState                             | `https://app.supabase.com`                           |
-| Name ID format                                 | EmailAddress                                         |
-| Application username                           | Email                                                |
-| Update application username on                 | Create and update                                    |
+| Setting                                        | Value                                                      |
+| ---------------------------------------------- | ---------------------------------------------------------- |
+| Single sign-on URL                             | `https://supabase.com/dashboard/auth/v1/sso/saml/acs`      |
+| Use this for Recipient URL and Destination URL | ✔️                                                         |
+| Audience URI (SP Entity ID)                    | `https://supabase.com/dashboard/auth/v1/sso/saml/metadata` |
+| Default RelayState                             | `https://supabase.com/dashboard`                           |
+| Name ID format                                 | EmailAddress                                               |
+| Application username                           | Email                                                      |
+| Update application username on                 | Create and update                                          |
 
 ![Okta dashboard: Create SAML Integration
 wizard, Configure SAML step](/docs/img/sso-okta-step-04.png)
@@ -102,7 +102,7 @@ SSO setup has been completed for your enterprise, you can ask some of your
 users to sign in via their Okta account.
 
 You ask them to enter their email address on the [Sign in with
-SSO](https://app.supabase.com/sign-in-sso) page.
+SSO](https://supabase.com/dashboard/sign-in-sso) page.
 
 If sign in is not working correctly, please reach out to your support contact
 at Supabase for further guidance.

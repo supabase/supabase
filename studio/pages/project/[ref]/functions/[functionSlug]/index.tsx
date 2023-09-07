@@ -1,10 +1,10 @@
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/router'
 import { Button } from 'ui'
 import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
 import { ChartIntervals, NextPageWithLayout } from 'types'
 import NoPermission from 'components/ui/NoPermission'
@@ -17,18 +17,20 @@ import AreaChart from 'components/ui/Charts/AreaChart'
 import { isUnixMicro, unixMicroToIsoTimestamp } from 'components/interfaces/Settings/Logs'
 import meanBy from 'lodash/meanBy'
 import sumBy from 'lodash/sumBy'
+import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
     key: '5min',
     label: '5 min',
-    startValue: 1,
-    startUnit: 'hour',
+    startValue: 5,
+    startUnit: 'minute',
+    format: 'MMM D, h:mm:ssa',
   },
-  { key: '15min', label: '15 min', startValue: 15, startUnit: 'min' },
-  { key: '1hr', label: '1 hour', startValue: 1, startUnit: 'hour' },
-  { key: '1day', label: '1 day', startValue: 1, startUnit: 'day' },
-  { key: '7day', label: '7 days', startValue: 7, startUnit: 'day' },
+  { key: '15min', label: '15 min', startValue: 15, startUnit: 'minute', format: 'MMM D, h:mma' },
+  { key: '1hr', label: '1 hour', startValue: 1, startUnit: 'hour', format: 'MMM D, h:mma' },
+  { key: '1day', label: '1 day', startValue: 1, startUnit: 'hour', format: 'MMM D, h:mma' },
+  { key: '7day', label: '7 days', startValue: 7, startUnit: 'day', format: 'MMM D' },
 ]
 
 const PageLayout: NextPageWithLayout = () => {
@@ -45,18 +47,34 @@ const PageLayout: NextPageWithLayout = () => {
     interval: selectedInterval.key,
   })
   const isChartLoading = !data?.result && !error ? true : false
-  const chartData = useMemo(() => {
+  const normalizedData = useMemo(() => {
     return (data?.result || []).map((d: any) => ({
       ...d,
       timestamp: isUnixMicro(d.timestamp) ? unixMicroToIsoTimestamp(d.timestamp) : d.timestamp,
     }))
   }, [data?.result])
 
-  const startDate = dayjs().subtract(
-    selectedInterval.startValue,
-    selectedInterval.startUnit as dayjs.ManipulateType
+  const [startDate, endDate]: [Dayjs, Dayjs] = useMemo(() => {
+    const start = dayjs()
+      .subtract(selectedInterval.startValue, selectedInterval.startUnit as dayjs.ManipulateType)
+      .startOf(selectedInterval.startUnit as dayjs.ManipulateType)
+
+    const end = dayjs().startOf(selectedInterval.startUnit as dayjs.ManipulateType)
+    return [start, end]
+  }, [selectedInterval])
+  const chartData = useFillTimeseriesSorted(
+    normalizedData,
+    'timestamp',
+    ['avg_execution_time', 'count'],
+    0,
+    startDate.toISOString(),
+    endDate.toISOString()
   )
-  const canReadFunction = checkPermissions(PermissionAction.FUNCTIONS_READ, functionSlug as string)
+
+  const canReadFunction = useCheckPermissions(
+    PermissionAction.FUNCTIONS_READ,
+    functionSlug as string
+  )
   if (!canReadFunction) {
     return <NoPermission isFullPage resourceText="access this edge function" />
   }
@@ -99,16 +117,24 @@ const PageLayout: NextPageWithLayout = () => {
             tooltip="Average execution time of function invocations"
             data={chartData}
             isLoading={isChartLoading}
-            renderer={(props) => (
-              <AreaChart
-                className="w-full"
-                xAxisKey="timestamp"
-                yAxisKey="avg_execution_time"
-                data={props.data}
-                format="ms"
-                highlightedValue={meanBy(props.data, 'avg_execution_time')}
-              />
-            )}
+            renderer={(props) => {
+              const latest = normalizedData[normalizedData.length - 1]
+              let highlightedValue
+              if (latest) {
+                highlightedValue = latest['avg_execution_time']
+              }
+              return (
+                <AreaChart
+                  className="w-full"
+                  xAxisKey="timestamp"
+                  customDateFormat={selectedInterval.format}
+                  yAxisKey="avg_execution_time"
+                  data={props.data}
+                  format="ms"
+                  highlightedValue={highlightedValue}
+                />
+              )
+            }}
           />
           <ReportWidget
             title="Invocations"
@@ -121,6 +147,7 @@ const PageLayout: NextPageWithLayout = () => {
                 yAxisKey="count"
                 data={props.data}
                 highlightedValue={sumBy(props.data, 'count')}
+                customDateFormat={selectedInterval.format}
                 onBarClick={(v) => {
                   router.push(
                     `/project/${projectRef}/functions/${functionSlug}/invocations?its=${startDate.toISOString()}&ite=${

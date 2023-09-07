@@ -1,12 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { checkPermissions, useLocalStorage } from 'hooks'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useCheckPermissions, useLocalStorage } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
-export interface EmptyStateProps {
+interface EmptyStateProps {
   onAddTable: () => void
 }
 
@@ -14,7 +15,7 @@ const EmptyState = ({ onAddTable }: EmptyStateProps) => {
   const snap = useTableEditorStateSnapshot()
   const isProtectedSchema = EXCLUDED_SCHEMAS.includes(snap.selectedSchemaName)
   const canCreateTables =
-    !isProtectedSchema && checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+    useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables') && !isProtectedSchema
 
   const [sort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
     'table-editor-sort',

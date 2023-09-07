@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button, IconLoader } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, checkPermissions } from 'hooks'
+import { useStore, useCheckPermissions } from 'hooks'
 import AutoTextArea from 'components/to-be-cleaned/forms/AutoTextArea'
 import { timeout } from 'lib/helpers'
 
@@ -32,7 +32,7 @@ export default function Description({ content, metadata, onChange = () => {} }) 
   const hasChanged = value != contentText
   const animateCss = `transition duration-150`
 
-  const canUpdateDescription = checkPermissions(PermissionAction.TENANT_SQL_QUERY, '*')
+  const canUpdateDescription = useCheckPermissions(PermissionAction.TENANT_SQL_QUERY, '*')
 
   const updateDescription = async () => {
     if (isUpdating || !canUpdateDescription) return false

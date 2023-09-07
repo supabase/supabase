@@ -1,17 +1,17 @@
-import { useState } from 'react'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { noop } from 'lodash'
-import { Input, Button, IconSearch, IconPlus, IconChevronLeft, IconEdit3, IconTrash } from 'ui'
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { noop } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
 
-import { useStore, checkPermissions } from 'hooks'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
+import Table from 'components/to-be-cleaned/Table'
+import { useCheckPermissions, useStore } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { Button, IconChevronLeft, IconEdit3, IconPlus, IconSearch, IconTrash, Input } from 'ui'
 
-export interface ColumnListProps {
+interface ColumnListProps {
   selectedTable: PostgresTable
   onSelectBack: () => void
   onAddColumn: () => void
@@ -34,7 +34,7 @@ const ColumnList = ({
       : selectedTable.columns?.filter((column: any) => column.name.includes(filterString))) ?? []
 
   const isLocked = EXCLUDED_SCHEMAS.includes(selectedTable.schema ?? '')
-  const canUpdateColumns = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+  const canUpdateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
   return (
     <>
