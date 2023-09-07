@@ -7,6 +7,7 @@ import { NextPageWithLayout } from 'types'
 import { DatabaseLayout } from 'components/layouts'
 import { PublicationsList, PublicationsTables } from 'components/interfaces/Database'
 import NoPermission from 'components/ui/NoPermission'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 
 // [Joshen] Technically, best that we have these as separate URLs
 // makes it easier to manage state, but foresee that this page might
@@ -29,16 +30,20 @@ const DatabaseReplication: NextPageWithLayout = () => {
   }
 
   return (
-    <div className="p-4">
-      {selectedPublicationId === undefined ? (
-        <PublicationsList onSelectPublication={setSelectedPublicationId} />
-      ) : (
-        <PublicationsTables
-          selectedPublication={selectedPublication}
-          onSelectBack={() => setSelectedPublicationId(undefined)}
-        />
-      )}
-    </div>
+    <ScaffoldContainer>
+      <ScaffoldSection>
+        <div className="col-span-12">
+          {selectedPublicationId === undefined ? (
+            <PublicationsList onSelectPublication={setSelectedPublicationId} />
+          ) : (
+            <PublicationsTables
+              selectedPublication={selectedPublication}
+              onSelectBack={() => setSelectedPublicationId(undefined)}
+            />
+          )}
+        </div>
+      </ScaffoldSection>
+    </ScaffoldContainer>
   )
 }
 

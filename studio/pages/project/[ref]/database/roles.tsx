@@ -1,20 +1,21 @@
-import Indexes from 'components/interfaces/Database/Indexes/Indexes'
+import { RolesList } from 'components/interfaces/Database'
 import { DatabaseLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { observer } from 'mobx-react-lite'
 import { NextPageWithLayout } from 'types'
 
-const IndexesPage: NextPageWithLayout = () => {
+const DatabaseRoles: NextPageWithLayout = () => {
   return (
     <ScaffoldContainer>
       <ScaffoldSection>
         <div className="col-span-12">
-          <Indexes />
+          <RolesList />
         </div>
       </ScaffoldSection>
     </ScaffoldContainer>
   )
 }
 
-IndexesPage.getLayout = (page) => <DatabaseLayout title="Indexes">{page}</DatabaseLayout>
+DatabaseRoles.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
 
-export default IndexesPage
+export default observer(DatabaseRoles)

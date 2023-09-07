@@ -1,15 +1,17 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresFunction, PostgresSchema } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { includes, map as lodashMap, noop, partition, uniqBy } from 'lodash'
+import { noop, partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import { Button, IconLoader, IconLock, IconSearch, Input, Listbox } from 'ui'
+import { Button, IconLock, IconSearch, Input, Listbox } from 'ui'
 
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import Table from 'components/to-be-cleaned/Table'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions, useStore } from 'hooks'
 import FunctionList from './FunctionList'
+import AlertError from 'components/ui/AlertError'
 
 interface FunctionsListProps {
   createFunction: () => void
@@ -39,29 +41,14 @@ const FunctionsList = ({
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
   const functions = meta.functions.list()
-  const filteredFunctions = functions.filter(
-    (x: PostgresFunction) =>
-      x.schema === selectedSchema && includes(x.name?.toLowerCase(), filterString.toLowerCase())
-  )
-  const filteredFunctionSchemas = lodashMap(uniqBy(filteredFunctions, 'schema'), 'schema')
-
-  console.log({ functions, filteredFunctions })
 
   if (meta.functions.isLoading) {
-    return (
-      <div className="flex h-full w-full items-center justify-center space-x-2">
-        <IconLoader className="animate-spin" size={14} />
-        <p>Loading functions...</p>
-      </div>
-    )
+    return <GenericSkeletonLoader />
   }
 
   if (meta.functions.hasError) {
     return (
-      <p className="px-6 py-4">
-        <p>Error connecting to API</p>
-        <p>{`${meta.functions.error?.message ?? 'Unknown error'}`}</p>
-      </p>
+      <AlertError error={meta.functions.error} subject="Failed to retrieve database functions" />
     )
   }
 
@@ -86,8 +73,8 @@ const FunctionsList = ({
           </ProductEmptyState>
         </div>
       ) : (
-        <div className="w-full space-y-4 py-4">
-          <div className="flex items-center justify-between px-4">
+        <div className="w-full space-y-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="w-[260px]">
                 <Listbox
@@ -173,7 +160,7 @@ const FunctionsList = ({
           </div>
 
           <Table
-            className="table-fixed px-4"
+            className="table-fixed"
             head={
               <>
                 <Table.th key="name" className="w-1/3 space-x-4">

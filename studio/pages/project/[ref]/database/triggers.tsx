@@ -9,6 +9,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 
 const TriggersPage: NextPageWithLayout = () => {
   const { meta } = useStore()
@@ -51,11 +52,17 @@ const TriggersPage: NextPageWithLayout = () => {
 
   return (
     <>
-      <TriggersList
-        createTrigger={createTrigger}
-        editTrigger={editTrigger}
-        deleteTrigger={deleteTrigger}
-      />
+      <ScaffoldContainer>
+        <ScaffoldSection>
+          <div className="col-span-12">
+            <TriggersList
+              createTrigger={createTrigger}
+              editTrigger={editTrigger}
+              deleteTrigger={deleteTrigger}
+            />
+          </div>
+        </ScaffoldSection>
+      </ScaffoldContainer>
       <CreateTrigger
         trigger={selectedTrigger}
         visible={showCreateTriggerForm}
