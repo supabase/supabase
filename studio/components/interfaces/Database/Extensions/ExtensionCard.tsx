@@ -73,13 +73,13 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
         <div
           className={[
             'border-panel-border-light bg-panel-header-light dark:bg-panel-header-dark',
-            'flex justify-between w-full border-b p-4 px-6 dark:border-panel-border-dark',
+            'flex justify-between w-full border-b py-3 px-4 dark:border-panel-border-dark',
           ].join(' ')}
         >
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 max-w-[85%]">
             <h3
               title={extension.name}
-              className="h-5 m-0 text-base uppercase truncate cursor-pointer text-scale-1200"
+              className="h-5 m-0 text-sm uppercase truncate cursor-pointer text-scale-1200"
             >
               {extension.name}
             </h3>
@@ -122,11 +122,11 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
             'bg-panel-secondary-light dark:bg-panel-secondary-dark flex h-full flex-col justify-between',
           ].join(' ')}
         >
-          <div className="p-4 px-6">
+          <div className="py-3 px-4">
             <p className="text-sm text-scale-1100 capitalize-sentence">{extension.comment}</p>
           </div>
           {isOn && extension.schema && (
-            <div className="p-4 px-6">
+            <div className="py-3 px-4">
               <div className="flex items-center flex-grow space-x-2 text-sm text-scale-1100">
                 <span>Schema:</span>
                 <Badge>{`${extension.schema}`}</Badge>

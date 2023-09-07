@@ -1,14 +1,16 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresSchema } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { includes, map as lodashMap, noop, partition, uniqBy } from 'lodash'
+import { noop, partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import { Button, IconLoader, IconLock, IconSearch, Input, Listbox } from 'ui'
+import { Button, IconLock, IconSearch, Input, Listbox } from 'ui'
 
 import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions, useStore } from 'hooks'
 import TriggerList from './TriggerList'
 
@@ -35,28 +37,14 @@ const TriggersList = ({
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
   const triggers = meta.triggers.list()
-  const filteredTriggers = triggers.filter((x: any) =>
-    includes(x.name.toLowerCase(), filterString.toLowerCase())
-  )
-  const filteredTriggerSchemas = lodashMap(uniqBy(filteredTriggers, 'schema'), 'schema')
   const canCreateTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
   if (meta.triggers.isLoading) {
-    return (
-      <div className="flex h-full w-full items-center justify-center space-x-2">
-        <IconLoader className="animate-spin" size={14} />
-        <p className="text-sm text-scale-1000">Loading triggers...</p>
-      </div>
-    )
+    return <GenericSkeletonLoader />
   }
 
   if (meta.triggers.hasError) {
-    return (
-      <div className="px-6 py-4 text-scale-1000">
-        <p>Error connecting to API</p>
-        <p>{`${meta.triggers.error?.message ?? 'Unknown error'}`}</p>
-      </div>
-    )
+    return <AlertError error={meta.triggers.error} subject="Failed to retrieve database triggers" />
   }
 
   return (
@@ -80,8 +68,8 @@ const TriggersList = ({
           </ProductEmptyState>
         </div>
       ) : (
-        <div className="w-full space-y-4 py-4">
-          <div className="flex items-center justify-between px-6">
+        <div className="w-full space-y-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="w-[260px]">
                 <Listbox
@@ -165,7 +153,7 @@ const TriggersList = ({
           </div>
 
           <Table
-            className="table-fixed px-6"
+            className="table-fixed"
             head={
               <>
                 <Table.th key="name" className="w-[25%] space-x-4">
