@@ -33,7 +33,7 @@ export type AuditLog = {
 }
 
 export type OrganizationAuditLogsResponse = {
-  result: OrganizationAuditLog[]
+  result: AuditLog[]
   retention_period: number
 }
 
