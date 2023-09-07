@@ -188,7 +188,7 @@ const TaxID = () => {
                           <div className="w-full space-y-2">
                             {taxIdValues.map((taxId, idx: number) => {
                               const selectedTaxId = TAX_IDS.find(
-                                (option) => option.code === taxId.type
+                                (option) => option.name === taxId.name
                               )
                               return (
                                 <div key={`tax-id-${idx}`} className="flex items-center space-x-2">
