@@ -1,6 +1,6 @@
 # Supabase Studio
 
-A dashboard for managing your self-hosted Supabase project, and used on our [hosted platform](https://supabase.com/dashboard). Built with: test
+A dashboard for managing your self-hosted Supabase project, and used on our [hosted platform](https://supabase.com/dashboard). Built with: test 
 
 - [Next.js](https://nextjs.org/)
 - [Tailwind](https://tailwindcss.com/)
