@@ -125,7 +125,8 @@ const CustomDomainsConfigureHostname = () => {
                   ) : (
                     "your project's API URL"
                   )}
-                  , with as low a TTL as possible.
+                  , with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
+                  do disable the proxy option.
                 </p>
               </FormSection>
             </FormPanel>

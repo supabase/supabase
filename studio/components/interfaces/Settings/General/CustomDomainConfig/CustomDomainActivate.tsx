@@ -94,7 +94,8 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
                   ) : (
                     "your project's API URL"
                   )}
-                  , with as low a TTL as possible.
+                  , with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
+                  do disable the proxy option.
                 </p>
               </AlertDescription_Shadcn_>
             </Alert_Shadcn_>
