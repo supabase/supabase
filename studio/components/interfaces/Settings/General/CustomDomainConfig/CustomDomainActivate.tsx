@@ -14,11 +14,11 @@ import {
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import Panel from 'components/ui/Panel'
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
 import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-domains-activate-mutation'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import { useStore } from 'hooks'
-import { verifyCNAME } from './CustomDomainConfig.utils'
 
 export type CustomDomainActivateProps = {
   projectRef?: string
@@ -27,43 +27,34 @@ export type CustomDomainActivateProps = {
 
 const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivateProps) => {
   const { ui } = useStore()
-  const [isActivating, setIsActivating] = useState(false)
   const [isActivateConfirmModalVisible, setIsActivateConfirmModalVisible] = useState(false)
 
   const { data: settings } = useProjectApiQuery({ projectRef })
-  const { mutate: activateCustomDomain } = useCustomDomainActivateMutation({
-    onSuccess: () => {
-      ui.setNotification({ category: 'success', message: `Successfully activated custom domain` })
-      setIsActivateConfirmModalVisible(false)
+  const { mutate: checkCNAMERecord, isLoading: isCheckingRecord } = useCheckCNAMERecordMutation({
+    onError: () => {
+      return ui.setNotification({
+        category: 'error',
+        message: `Your CNAME record for ${customDomain.hostname} cannot be found - if you've just added the CNAME record, do check back in a bit.`,
+      })
     },
   })
+  const { mutate: activateCustomDomain, isLoading: isActivating } = useCustomDomainActivateMutation(
+    {
+      onSuccess: () => {
+        ui.setNotification({ category: 'success', message: `Successfully activated custom domain` })
+        setIsActivateConfirmModalVisible(false)
+      },
+    }
+  )
   const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
 
   const endpoint = settings?.autoApiService.endpoint
 
   const onActivateCustomDomain = async () => {
     if (!projectRef) return console.error('Project ref is required')
-
-    setIsActivating(true)
-
-    const cnameVerified = await verifyCNAME(customDomain.hostname)
-    if (!cnameVerified) {
-      setIsActivating(false)
-      return ui.setNotification({
-        category: 'error',
-        message: `Your CNAME record for ${customDomain.hostname} cannot be found - if you've just added the CNAME record, do check back in a bit.`,
-      })
-    }
-    activateCustomDomain(
-      { projectRef },
-      {
-        onSuccess: () => {
-          setIsActivating(false)
-        },
-        onError: () => {
-          setIsActivating(false)
-        },
-      }
+    checkCNAMERecord(
+      { domain: customDomain.hostname },
+      { onSuccess: () => activateCustomDomain({ projectRef }) }
     )
   }
 
@@ -161,7 +152,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
 
       <ConfirmationModal
         size="small"
-        loading={isActivating}
+        loading={isCheckingRecord || isActivating}
         visible={isActivateConfirmModalVisible}
         header={
           <div>
