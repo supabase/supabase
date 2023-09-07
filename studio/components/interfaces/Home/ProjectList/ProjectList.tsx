@@ -24,7 +24,7 @@ export interface ProjectListProps {
 }
 
 const ProjectList = ({ rewriteHref }: ProjectListProps) => {
-  const { data: organizations } = useOrganizationsQuery()
+  const { data: organizations, isSuccess } = useOrganizationsQuery()
   const {
     data: allProjects,
     isLoading: isLoadingProjects,
@@ -40,7 +40,7 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
   const projectsByOrg = groupBy(allProjects, 'organization_id')
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
-  return organizations && organizations?.length > 0 ? (
+  return isSuccess && organizations && organizations?.length > 0 ? (
     <>
       {organizations?.map((organization) => {
         return (
