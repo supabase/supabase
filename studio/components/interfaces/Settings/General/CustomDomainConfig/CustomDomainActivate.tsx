@@ -30,14 +30,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
   const [isActivateConfirmModalVisible, setIsActivateConfirmModalVisible] = useState(false)
 
   const { data: settings } = useProjectApiQuery({ projectRef })
-  const { mutate: checkCNAMERecord, isLoading: isCheckingRecord } = useCheckCNAMERecordMutation({
-    onError: () => {
-      return ui.setNotification({
-        category: 'error',
-        message: `Your CNAME record for ${customDomain.hostname} cannot be found - if you've just added the CNAME record, do check back in a bit.`,
-      })
-    },
-  })
+  const { mutate: checkCNAMERecord, isLoading: isCheckingRecord } = useCheckCNAMERecordMutation()
   const { mutate: activateCustomDomain, isLoading: isActivating } = useCustomDomainActivateMutation(
     {
       onSuccess: () => {
