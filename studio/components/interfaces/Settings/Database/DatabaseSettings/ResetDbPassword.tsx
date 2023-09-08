@@ -14,13 +14,19 @@ import { getProjectDetail } from 'data/projects/project-detail-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const ResetDbPassword = ({ disabled = false }) => {
   const { ref } = useParams()
   const { ui, meta } = useStore()
 
   const isProjectActive = useIsProjectActive()
-  const canResetDbPassword = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const { project } = useProjectContext()
+  const canResetDbPassword = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
 

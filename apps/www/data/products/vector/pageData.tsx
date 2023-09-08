@@ -1,9 +1,9 @@
 import Link from 'next/link'
-import IntegrationsImage from '~/components/products/vector/IntegrationsImage'
-import OpenAIImage from '~/components/products/vector/OpenAIImage'
-import SecureAndScalableImg from '~/components/products/vector/SecureAndScalableImg'
-import PGvectorImg from '~/components/products/vector/PGvectorImg'
-import DeployGlobally from '~/components/products/vector/DeployGlobally'
+import IntegrationsImage from '~/components/Products/VectorAI/IntegrationsImage'
+import OpenAIImage from '~/components/Products/VectorAI/OpenAIImage'
+import SecureAndScalableImg from '~/components/Products/VectorAI/SecureAndScalableImg'
+import PGvectorImg from '~/components/Products/VectorAI/PGvectorImg'
+import DeployGlobally from '~/components/Products/VectorAI/DeployGlobally'
 
 export default {
   metaTitle: '',

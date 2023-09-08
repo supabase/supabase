@@ -96,6 +96,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
     function_type: isEdgeFunction(selectedHook?.function_args?.[0] ?? '')
       ? 'supabase_function'
       : 'http_request',
+    timeout_ms: Number(selectedHook?.function_args?.[4] ?? 1000),
   }
 
   useEffect(() => {
@@ -168,6 +169,10 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       }
     }
 
+    if (values.timeout_ms < 1000 || values.timeout_ms > 5000) {
+      errors['timeout_ms'] = 'Timeout should be between 1000ms and 5000ms'
+    }
+
     if (JSON.stringify(values) !== JSON.stringify(initialValues)) setIsEdited(true)
     return errors
   }
@@ -185,7 +190,6 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       return ui.setNotification({ category: 'error', message: 'Unable to find selected table' })
     }
 
-    const serviceTimeoutMs = '1000'
     const headers = httpHeaders
       .filter((header) => header.name && header.value)
       .reduce((a: any, b: any) => {
@@ -215,7 +219,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
         values.http_method,
         JSON.stringify(headers),
         JSON.stringify(parameters),
-        serviceTimeoutMs,
+        values.timeout_ms.toString(),
       ],
     }
 
