@@ -274,7 +274,7 @@ function _DatePicker({
         {children !== undefined ? (
           children
         ) : (
-          <span>
+          <>
             {/* Custom */}
             {selectsRange &&
             appliedStartDate &&
@@ -289,7 +289,7 @@ function _DatePicker({
             ) : (
               'Custom'
             )}
-          </span>
+          </>
         )}
       </Button>
     </Popover>
