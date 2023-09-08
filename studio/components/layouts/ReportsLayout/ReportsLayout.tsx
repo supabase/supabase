@@ -4,7 +4,6 @@ import { PropsWithChildren } from 'react'
 import ProductMenu from 'components/ui/ProductMenu'
 import { useSelectedProject, withAuth } from 'hooks'
 import ProjectLayout from '../'
-import { generateReportsMenu } from './ReportsMenu.utils'
 import { useFlag } from 'hooks'
 
 interface ReportsLayoutProps {
