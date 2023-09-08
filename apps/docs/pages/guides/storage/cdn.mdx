@@ -74,6 +74,7 @@ A high cache hit rate is desirable to reduce storage egress costs.
 
 The [Logs Explorer](https://supabase.com/dashboard/project/_/logs/explorer) can also be used to debug cache misses.
 
+Cache hits can be determined via the `metadata.response.headers.cf_cache_status` key. Any value corresponding to either `HIT`, `STALE`, `REVALIDATED`, or `UPDATING` would be considered a cache hit.
 The following example query will show the top cache misses from the `edge_logs`:
 
 ```sql
@@ -94,6 +95,23 @@ where
 group by path, search
 order by count desc
 limit 50;
+```
+
+Your cache hit ratio over time can then be determined using the following query:
+
+```sql
+select
+  timestamp_trunc(timestamp, hour) as timestamp,
+  countif(h.cf_cache_status in ('HIT', 'STALE', 'REVALIDATED', 'UPDATING')) / count(f.id) as ratio
+from
+  edge_logs as f
+  cross join unnest(f.metadata) as m
+  cross join unnest(m.request) as r
+  cross join unnest(m.response) as res
+  cross join unnest(res.headers) as h
+where starts_with(r.path, '/storage/v1/object') and r.method = 'GET'
+group by timestamp
+order by timestamp desc;
 ```
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
