@@ -110,7 +110,9 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
       }
     >
       <Button asChild type="text" iconRight={<IconChevronDown />}>
-        <span>Results</span>
+        <span>
+          Results {result && result.rows.length > 0 && `(${result.rows.length.toLocaleString()})`}
+        </span>
       </Button>
       <CSVLink
         ref={csvRef}
