@@ -13,3 +13,5 @@ window.matchMedia = jest.fn().mockReturnValue({
 export const StoreProvider = _StoreProvider
 
 export const withAuth = jest.fn()
+
+export const useSelectedOrganization = jest.fn()
