@@ -63,7 +63,8 @@ export const StorageReport: NextPageWithLayout = () => {
       <ReportWidget
         isLoading={report.isLoading}
         params={report.params.cacheHitRate}
-        title="Cache Hits"
+        title="Request Caching"
+        tooltip="The number of storage requests that are cached at the edge level. A higher number of hits is better."
         data={report.data.cacheHitRate || []}
         renderer={CacheHitRateChartRenderer}
         append={TopCacheMissesRenderer}
