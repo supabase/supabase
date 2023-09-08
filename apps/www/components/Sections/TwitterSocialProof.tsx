@@ -20,14 +20,6 @@ function TwitterSocialProof() {
     if (tweets.length >= Tweets.length) {
       setShowButton(false)
     }
-
-    const container = document.querySelector('.tweet-container')
-    // @ts-ignore
-    container.style.height = `${container.clientHeight + 400}px`
-
-    const button = document.querySelector('.show-button')
-    // @ts-ignore
-    button.style.marginBottom = `${parseInt(button.style.marginBottom) + 20}px`
   }
 
   return (
@@ -56,16 +48,16 @@ function TwitterSocialProof() {
           </div>
         </div>
       </div>
-      <div className="lg:-mx-10 xl:-mx-18 mt-6">
+      <div className="mt-6">
         <div
-          className={`tweet-container columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 overflow-hidden relative h-[1000px]`}
+          className={`columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 overflow-hidden relative transition-all`}
         >
           {showButton && (
             <div
-              className={`absolute bottom-4 left-0 z-10 w-full h-[25%] bg-gradient-to-t from-[#1c1c1c] via-[#1c1c1c]`}
+              className={`absolute bottom-0 left-0 z-10 w-full h-[25%] bg-gradient-to-t from-[#1c1c1c] via-[#1c1c1c]`}
             />
           )}
-          {Tweets.map((tweet: any, i: number) => (
+          {tweets.map((tweet: any, i: number) => (
             <div className="mb-4 z-0 break-inside-avoid-column" key={i}>
               <Link href={tweet.url}>
                 <a target="_blank">
@@ -79,10 +71,7 @@ function TwitterSocialProof() {
             </div>
           ))}
           {showButton && (
-            <div
-              className="show-button absolute bottom-[2.5%] left-1/2 transform -translate-x-1/2 z-20"
-              style={{ marginBottom: '20px' }}
-            >
+            <div className="absolute flex justify-center bottom-0 left-0 right-0 z-20 mb-10">
               <Button type="default" size="small" onClick={() => handleShowMore()}>
                 Show More
               </Button>
