@@ -24,7 +24,7 @@ const BackupsList = () => {
 
   const planKey = backups?.tierKey ?? ''
   const sortedBackups = (backups?.backups ?? []).sort(
-    (a: any, b: any) => new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
+    (a, b) => new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
   )
   const isPitrEnabled = backups?.pitr_enabled
 
