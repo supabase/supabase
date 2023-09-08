@@ -3,13 +3,13 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Button, IconPause } from 'ui'
+import { Button, IconPause, Modal } from 'ui'
 
 import {
   useIsProjectActive,
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useProjectPauseMutation } from 'data/projects/project-pause-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useCheckPermissions, useStore } from 'hooks'
@@ -86,16 +86,24 @@ const PauseProjectButton = () => {
           </Tooltip.Portal>
         ) : null}
       </Tooltip.Root>
-      <ConfirmModal
+      <ConfirmationModal
         danger
         visible={isModalOpen}
-        title="Pause this project?"
-        description="Are you sure you want to pause this project? It will not be accessible until you unpause it."
+        loading={isPausing}
+        header="Pause this project?"
+        description=""
         buttonLabel="Pause project"
         buttonLoadingLabel="Pausing project"
         onSelectCancel={() => setIsModalOpen(false)}
         onSelectConfirm={requestPauseProject}
-      />
+      >
+        <Modal.Content className="py-4">
+          <p className="text-light text-sm">
+            Are you sure you want to pause this project? It will not be accessible until you unpause
+            it.
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
     </>
   )
 }

@@ -1,11 +1,11 @@
-import Link from 'next/link'
-import * as yup from 'yup'
-import { observer } from 'mobx-react-lite'
-import { Button, Form, IconExternalLink, Input } from 'ui'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
+import { Button, Form, IconExternalLink, Input } from 'ui'
+import * as yup from 'yup'
 
-import { useCheckPermissions, useStore } from 'hooks'
-import { useParams } from 'common/hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   FormActions,
   FormPanel,
@@ -14,7 +14,9 @@ import {
   FormSectionLabel,
 } from 'components/ui/Forms'
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
 import { useCustomDomainCreateMutation } from 'data/custom-domains/custom-domains-create-mutation'
+import { useCheckPermissions, useStore } from 'hooks'
 
 const schema = yup.object({
   domain: yup.string().required('A value for your custom domain is required'),
@@ -23,34 +25,31 @@ const schema = yup.object({
 const CustomDomainsConfigureHostname = () => {
   const { ui } = useStore()
   const { ref } = useParams()
+  const { project } = useProjectContext()
+
+  const { mutate: checkCNAMERecord, isLoading: isCheckingRecord } = useCheckCNAMERecordMutation()
   const { mutate: createCustomDomain, isLoading: isCreating } = useCustomDomainCreateMutation()
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
 
   const FORM_ID = 'custom-domains-form'
   const endpoint = settings?.autoApiService.endpoint
-  const canConfigureCustomDomain = useCheckPermissions(PermissionAction.UPDATE, 'projects')
-
-  const verifyCNAME = async (domain: string): Promise<boolean> => {
-    const res = await fetch(`https://1.1.1.1/dns-query?name=${domain}`, {
-      method: 'GET',
-      headers: { accept: 'application/dns-json' },
-    })
-    const verification = await res.json()
-    return verification.Status === 0
-  }
+  const canConfigureCustomDomain = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const onCreateCustomDomain = async (values: yup.InferType<typeof schema>) => {
     if (!ref) return console.error('Project ref is required')
 
-    const cnameVerified = await verifyCNAME(values.domain)
-    if (!cnameVerified) {
-      return ui.setNotification({
-        category: 'error',
-        message: `Your CNAME record for ${values.domain} cannot be found - if you've just added the CNAME record, do check back in a bit.`,
-      })
-    }
-
-    createCustomDomain({ projectRef: ref, customDomain: values.domain })
+    checkCNAMERecord(
+      { domain: values.domain },
+      {
+        onSuccess: () => {
+          createCustomDomain({ projectRef: ref, customDomain: values.domain })
+        },
+      }
+    )
   }
 
   return (
@@ -71,7 +70,7 @@ const CustomDomainsConfigureHostname = () => {
                 <div className="flex py-4 px-8">
                   <FormActions
                     form={FORM_ID}
-                    isSubmitting={isCreating}
+                    isSubmitting={isCheckingRecord || isCreating}
                     submitText="Add"
                     hasChanges={hasChanges}
                     handleReset={handleReset}
@@ -119,7 +118,8 @@ const CustomDomainsConfigureHostname = () => {
                   ) : (
                     "your project's API URL"
                   )}
-                  , with as low a TTL as possible.
+                  , with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
+                  do disable the proxy option.
                 </p>
               </FormSection>
             </FormPanel>
