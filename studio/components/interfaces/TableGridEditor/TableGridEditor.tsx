@@ -239,7 +239,10 @@ const TableGridEditor = ({
     if (column) {
       snap.onEditColumn(column)
     } else {
-      console.error(`Unable to find column ${name} in ${selectedTable?.name}`)
+      ui.setNotification({
+        category: 'error',
+        message: `Unable to find column ${name} in ${selectedTable?.name}`,
+      })
     }
   }
 
@@ -248,7 +251,10 @@ const TableGridEditor = ({
     if (column) {
       snap.onDeleteColumn(column)
     } else {
-      console.error(`Unable to find column ${name} in ${selectedTable?.name}`)
+      ui.setNotification({
+        category: 'error',
+        message: `Unable to find column ${name} in ${selectedTable?.name}`,
+      })
     }
   }
 
