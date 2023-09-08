@@ -275,7 +275,7 @@ const AuditLogs = () => {
                             <div className="flex items-center space-x-4">
                               <div>{userIcon}</div>
                               <div>
-                                <p className="text-scale-1100">{user?.username ?? 'Unknown'}</p>
+                                <p className="text-scale-1100">{user?.username ?? '-'}</p>
                                 {role && (
                                   <p className="mt-0.5 text-xs text-scale-1000">{role?.name}</p>
                                 )}
@@ -297,7 +297,7 @@ const AuditLogs = () => {
                           <Table.td>
                             <p
                               className="text-scale-1100 max-w-[230px] truncate"
-                              title={project?.name ?? organization?.name ?? 'Unknown'}
+                              title={project?.name ?? organization?.name ?? '-'}
                             >
                               {project?.name
                                 ? 'Project: '
