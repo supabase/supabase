@@ -223,6 +223,28 @@ limit 100
 `,
     for: ['api'],
   },
+  {
+    label: 'Storage Top Cache Misses',
+    description: 'The top Storage requests that miss caching',
+    mode: 'custom',
+    searchString: `select
+    r.path as path,
+    r.search as search,
+    count(id) as count
+  from edge_logs f
+    cross join unnest(f.metadata) as m
+    cross join unnest(m.request) as r
+    cross join unnest(m.response) as res
+    cross join unnest(res.headers) as h
+  where starts_with(r.path, '/storage/v1/object') 
+    and r.method = 'GET'
+    and h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')
+  group by path, search
+  order by count desc
+  limit 100
+`,
+    for: ['api'],
+  },
 ]
 
 export const LOG_TYPE_LABEL_MAPPING: { [k: string]: string } = {
