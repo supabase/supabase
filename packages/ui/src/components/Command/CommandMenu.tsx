@@ -12,6 +12,7 @@ import { IconMonitor } from './../Icon/icons/IconMonitor'
 import { IconPhone } from './../Icon/icons/IconPhone'
 import { IconUser } from './../Icon/icons/IconUser'
 import { IconKey } from './../Icon/icons/IconKey'
+import { IconLink } from './../Icon/icons/IconLink'
 
 import AiCommand from './AiCommand'
 import sharedItems from './utils/shared-nav-items.json'
@@ -23,6 +24,7 @@ import {
   CommandItem,
   CommandLabel,
   CommandList,
+  copyToClipboard,
 } from './Command.utils'
 import { COMMAND_ROUTES } from './Command.constants'
 import { useCommandMenu } from './CommandMenuProvider'
@@ -35,6 +37,7 @@ import SearchableStudioItems from './SearchableStudioItems'
 import CommandMenuShortcuts from './CommandMenuShortcuts'
 import { BadgeExperimental } from './Command.Badges'
 import { AiIconAnimation } from '@ui/layout/ai-icon-animation'
+import ChildItem from './ChildItem'
 
 export const CHAT_ROUTES = [
   COMMAND_ROUTES.AI, // this one is temporary
@@ -63,7 +66,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
   const router = useRouter()
 
   const commandInputRef = useRef<ElementRef<typeof CommandInput>>(null)
-  const { isOpen, setIsOpen, search, setSearch, pages, setPages, currentPage, site } =
+  const { isOpen, setIsOpen, search, setSearch, pages, setPages, currentPage, site, project } =
     useCommandMenu()
   const showCommandInput = !currentPage || !CHAT_ROUTES.includes(currentPage)
 
@@ -201,11 +204,27 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                   <CommandItem
                     forceMount
                     type="command"
-                    onSelect={() => setPages([...pages, COMMAND_ROUTES.API_KEYS])}
+                    onSelect={() => {
+                      setSearch('')
+                      setPages([...pages, COMMAND_ROUTES.API_KEYS])
+                    }}
                   >
                     <IconKey className="text-scale-1100" />
                     <CommandLabel>Get API keys</CommandLabel>
                   </CommandItem>
+                  {project?.apiUrl !== undefined && (
+                    <ChildItem
+                      isSubItem={false}
+                      onSelect={() => {
+                        copyToClipboard(project?.apiUrl ?? '')
+                        setIsOpen(false)
+                      }}
+                      className="space-x-2"
+                    >
+                      <IconLink className="text-scale-1100" />
+                      <CommandLabel>Copy API URL</CommandLabel>
+                    </ChildItem>
+                  )}
                 </CommandGroup>
               )}
 
@@ -221,7 +240,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                         key={item.url}
                         type="link"
                         onSelect={() => {
-                          router.push(item.url)
+                          router.push(itemUrl)
                           setIsOpen(false)
                         }}
                       >
@@ -260,7 +279,13 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
               )}
 
               <CommandGroup heading="Settings">
-                <CommandItem type="link" onSelect={() => setPages([...pages, 'Theme'])}>
+                <CommandItem
+                  type="link"
+                  onSelect={() => {
+                    setSearch('')
+                    setPages([...pages, 'Theme'])
+                  }}
+                >
                   <IconMonitor />
                   Change theme
                 </CommandItem>
