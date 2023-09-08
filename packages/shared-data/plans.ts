@@ -48,7 +48,7 @@ export const plans: PricingInformation[] = [
     cta: 'Get Started',
   },
   {
-    id: 'tier_pro',
+    id: 'tier_prso',
     name: 'Pro',
     nameBadge: '',
     costUnit: '/ month / project',
