@@ -14,9 +14,10 @@ import MarkdownTable from 'markdown-table'
 
 export type ResultsDropdownProps = {
   id: string
+  isExecuting?: boolean
 }
 
-const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
+const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
   const { project } = useProjectContext()
   const snap = useSqlEditorStateSnapshot()
   const telemetryProps = useTelemetryProps()
@@ -111,7 +112,11 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
     >
       <Button asChild type="text" iconRight={<IconChevronDown />}>
         <span>
-          Results {result && result.rows.length > 0 && `(${result.rows.length.toLocaleString()})`}
+          Results{' '}
+          {!isExecuting &&
+            result &&
+            result.rows.length > 0 &&
+            `(${result.rows.length.toLocaleString()})`}
         </span>
       </Button>
       <CSVLink
