@@ -329,11 +329,7 @@ const EncryptionKeysManagement = () => {
                     Provide a name for your key for easier identification.
                   </p>
                   <div className="space-y-4 pb-4">
-                    <Input
-                      id="name"
-                      label="Key Name"
-                      descriptionText="Keys are of standard UUID types."
-                    />
+                    <Input id="name" label="Key Name" />
                   </div>
                 </Modal.Content>
                 <Modal.Separator />

@@ -70,9 +70,9 @@ const Success = ({ sentCategory = '' }: SuccessProps) => {
         <Divider light />
       </div>
       <div className="w-full pb-4 px-4 flex items-center justify-end">
-        <Link href="/projects">
+        <Link href="/">
           <a>
-            <Button>Go back to dashboard</Button>
+            <Button>Go back</Button>
           </a>
         </Link>
       </div>
