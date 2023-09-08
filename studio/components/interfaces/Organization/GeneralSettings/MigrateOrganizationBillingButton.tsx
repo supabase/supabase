@@ -37,7 +37,7 @@ const MigrateOrganizationBillingButton = observer(() => {
   const [isOpen, setIsOpen] = useState(false)
   const [tier, setTier] = useState('')
   const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
-  const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(true)
+  const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(false)
   const [paymentMethodId, setPaymentMethodId] = useState('')
 
   const dbTier = useMemo(() => {
@@ -94,6 +94,23 @@ const MigrateOrganizationBillingButton = observer(() => {
   }, [isOpen])
 
   const canMigrateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+
+  const selectedLimitedUsage = useMemo(
+    () => tier === 'PRO' && isSpendCapEnabled,
+    [tier, isSpendCapEnabled]
+  )
+
+  const downgradingToLimitedUsage = useMemo(() => {
+    if (migrationPreviewData) {
+      const hadUsageBillingEnabled = migrationPreviewData.old_tiers.some((it) =>
+        ['tier_payg', 'tier_team', 'tier_enterprise'].includes(it)
+      )
+
+      return hadUsageBillingEnabled && selectedLimitedUsage
+    } else {
+      return false
+    }
+  }, [migrationPreviewData, selectedLimitedUsage])
 
   const toggle = () => {
     setIsOpen(!isOpen)
@@ -297,8 +314,8 @@ const MigrateOrganizationBillingButton = observer(() => {
                   <div className="col-span-12">
                     <p className="text-sm text-scale-1000">
                       When enabled, usage is limited to the plan's quota, with restrictions when
-                      limits are exceeded. To scale beyond Pro limits without restrictions, disable
-                      the spend cap and pay for over-usage beyond the quota.
+                      limits are exceeded. When disabled, you scale beyond Pro limits without
+                      restrictions and pay for over-usage beyond the quota.
                     </p>
                   </div>
 
@@ -326,15 +343,46 @@ const MigrateOrganizationBillingButton = observer(() => {
 
           <Modal.Content>
             <Loading active={tier !== '' && migrationPreviewIsLoading}>
-              {migrationPreviewError && (
-                <Alert_Shadcn_ variant="destructive">
-                  <IconAlertCircle strokeWidth={2} />
-                  <AlertTitle_Shadcn_>Organization cannot be migrated</AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
-                    {migrationPreviewError.message}
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
-              )}
+              <div className="space-y-3">
+                {migrationPreviewError && (
+                  <Alert_Shadcn_ variant="destructive">
+                    <IconAlertCircle strokeWidth={2} />
+                    <AlertTitle_Shadcn_>Organization cannot be migrated</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      {migrationPreviewError.message}
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
+
+                {(downgradingToLimitedUsage ||
+                  (!downgradingToLimitedUsage && selectedLimitedUsage)) && (
+                  <Alert_Shadcn_ variant="warning">
+                    <IconAlertCircle strokeWidth={2} />
+                    <AlertTitle_Shadcn_>Spend Cap is enabled</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      <div className="space-y-2">
+                        {downgradingToLimitedUsage ? (
+                          <p>
+                            You previously had the spend cap disabled to scale seamlessly beyond the
+                            included quota. You will run into restrictions in case you exceed the
+                            included quota.
+                          </p>
+                        ) : (
+                          <p>
+                            With the Spend Cap enabled, your projects will be restricted once you
+                            exhaust the included quota. To scale seamlessly beyond the included
+                            quota, disable the Spend Cap.
+                          </p>
+                        )}
+
+                        <Button type="outline" onClick={() => setIsSpendCapEnabled(false)}>
+                          Disable Spend Cap
+                        </Button>
+                      </div>
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
+              </div>
             </Loading>
 
             {migrationError && (

@@ -12,6 +12,7 @@ import { useCheckPermissions, useStore } from 'hooks'
 interface FunctionListProps {
   schema: string
   filterString: string
+  isLocked: boolean
   editFunction: (fn: any) => void
   deleteFunction: (fn: any) => void
 }
@@ -19,13 +20,15 @@ interface FunctionListProps {
 const FunctionList = ({
   schema,
   filterString,
+  isLocked,
   editFunction = noop,
   deleteFunction = noop,
 }: FunctionListProps) => {
-  const { project: selectedProject } = useProjectContext()
   const router = useRouter()
   const { meta } = useStore()
-  const functions = meta.functions.list((fn: any) => !meta.excludedSchemas.includes(fn.schema))
+  const { project: selectedProject } = useProjectContext()
+
+  const functions = meta.functions.list()
   const filteredFunctions = functions.filter((x: any) =>
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
@@ -38,12 +41,30 @@ const FunctionList = ({
     'functions'
   )
 
-  function onEdit(func: any) {
-    editFunction(func)
+  if (_functions.length === 0 && filterString.length === 0) {
+    return (
+      <Table.tr key={schema}>
+        <Table.td colSpan={4}>
+          <p className="text-sm text-scale-1200">No functions created yet</p>
+          <p className="text-sm text-light">
+            There are no functions found in the schema "{schema}"
+          </p>
+        </Table.td>
+      </Table.tr>
+    )
   }
 
-  function onDelete(func: any) {
-    deleteFunction(func)
+  if (_functions.length === 0 && filterString.length > 0) {
+    return (
+      <Table.tr key={schema}>
+        <Table.td colSpan={4}>
+          <p className="text-sm text-scale-1200">No results found</p>
+          <p className="text-sm text-light">
+            Your search for "{filterString}" did not return any results
+          </p>
+        </Table.td>
+      </Table.tr>
+    )
   }
 
   return (
@@ -60,59 +81,64 @@ const FunctionList = ({
             <p>{x.return_type}</p>
           </Table.td>
           <Table.td className="text-right">
-            <div className="flex items-center justify-end">
-              {canUpdateFunctions ? (
-                <Dropdown
-                  side="left"
-                  overlay={
-                    <>
-                      {isApiDocumentAvailable && (
+            {!isLocked && (
+              <div className="flex items-center justify-end">
+                {canUpdateFunctions ? (
+                  <Dropdown
+                    side="left"
+                    overlay={
+                      <>
+                        {isApiDocumentAvailable && (
+                          <Dropdown.Item
+                            icon={<IconFileText size="tiny" />}
+                            onClick={() => router.push(`/project/${projectRef}/api?rpc=${x.name}`)}
+                          >
+                            Client API docs
+                          </Dropdown.Item>
+                        )}
                         <Dropdown.Item
-                          icon={<IconFileText size="tiny" />}
-                          onClick={() => router.push(`/project/${projectRef}/api?rpc=${x.name}`)}
+                          icon={<IconEdit3 size="tiny" />}
+                          onClick={() => editFunction(x)}
                         >
-                          Client API docs
+                          Edit function
                         </Dropdown.Item>
-                      )}
-                      <Dropdown.Item icon={<IconEdit3 size="tiny" />} onClick={() => onEdit(x)}>
-                        Edit function
-                      </Dropdown.Item>
-                      <Dropdown.Item
-                        icon={<IconTrash stroke="red" size="tiny" />}
-                        onClick={() => onDelete(x)}
-                      >
-                        Delete function
-                      </Dropdown.Item>
-                    </>
-                  }
-                >
-                  <Button asChild type="default" icon={<IconMoreVertical />}>
-                    <span></span>
-                  </Button>
-                </Dropdown>
-              ) : (
-                <Tooltip.Root delayDuration={0}>
-                  <Tooltip.Trigger asChild>
-                    <Button disabled type="default" icon={<IconMoreVertical />} />
-                  </Tooltip.Trigger>
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="left">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                          'border border-scale-200',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-scale-1200">
-                          You need additional permissions to update functions
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                </Tooltip.Root>
-              )}
-            </div>
+                        <Dropdown.Item
+                          icon={<IconTrash stroke="red" size="tiny" />}
+                          onClick={() => deleteFunction(x)}
+                        >
+                          Delete function
+                        </Dropdown.Item>
+                      </>
+                    }
+                  >
+                    <Button asChild type="default" icon={<IconMoreVertical />}>
+                      <span></span>
+                    </Button>
+                  </Dropdown>
+                ) : (
+                  <Tooltip.Root delayDuration={0}>
+                    <Tooltip.Trigger asChild>
+                      <Button disabled type="default" icon={<IconMoreVertical />} />
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="left">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                            'border border-scale-200',
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-scale-1200">
+                            You need additional permissions to update functions
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                )}
+              </div>
+            )}
           </Table.td>
         </Table.tr>
       ))}

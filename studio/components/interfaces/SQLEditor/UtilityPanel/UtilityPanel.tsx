@@ -13,7 +13,7 @@ const UtilityPanel = ({ id, isExecuting, isDisabled, executeQuery }: UtilityPane
   return (
     <>
       <div className="flex justify-between overflow-visible px-6 py-2">
-        <ResultsDropdown id={id} />
+        <ResultsDropdown id={id} isExecuting={isExecuting} />
 
         <div className="inline-flex items-center justify-end">
           <UtilityActions
