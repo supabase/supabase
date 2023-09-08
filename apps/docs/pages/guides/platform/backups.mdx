@@ -41,15 +41,11 @@ For security purposes, passwords for custom roles are not stored in daily backup
 
 The PostgreSQL utility [pg_dumpall](https://www.postgresql.org/docs/current/app-pg-dumpall.html) is used to perform daily backups. An SQL file is generated, zipped up, and sent to our storage servers for safe keeping.
 
-![Scheduled backups dashboard](/docs/img/backups-daily-dashboard.png)
-
-You can access daily backups in the [Scheduled backups](https://supabase.com/dashboard/project/_/database/backups/scheduled) settings in the Dashboard. Pro plan projects can access the last 7 days' worth of daily backups while Enterprise plan projects can access up to 30 days' worth of daily backups. Users can restore their project to any one of the backups or download them as a zipped SQL file.
+You can access daily backups in the [Scheduled backups](https://supabase.com/dashboard/project/_/database/backups/scheduled) settings in the Dashboard. Pro plan projects can access the last 7 days' worth of daily backups while Enterprise plan projects can access up to 30 days' worth of daily backups. Users can restore their project to any one of the backups. If you wish to generate a logical backup on your own, you can do so through the [Supabase CLI](/docs/reference/cli/supabase-db-dump).
 
 ### Restoration Process [#daily-backups-restoration-process]
 
 When selecting a backup to restore to, select the closest available one made before the desired point in time to restore to. Earlier backups can always be chosen too but do consider the number of days' worth of data that could be lost.
-
-![Scheduled backups: Confirmation modal](/docs/img/backups-daily-confirmation-modal.png)
 
 The Dashboard will then prompt for a confirmation before proceeding with the restoration. The project will be inaccessible following this. As such, do ensure to allot downtime beforehand. This is dependent on the size of the database. The larger it is, the longer the downtime will be. Once the confirmation has been given, the underlying SQL of the chosen backup is then run against the project. The PostgreSQL utility [psql](https://www.postgresql.org/docs/current/app-psql.html) is used to facilitate the restoration. The Dashboard will display a notification once the restoration completes.
 

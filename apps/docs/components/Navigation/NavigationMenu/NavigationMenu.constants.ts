@@ -495,22 +495,36 @@ export const auth = {
         { name: 'Managing User Data', url: '/guides/auth/managing-user-data' },
         { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
         { name: 'Row Level Security', url: '/guides/auth/row-level-security' },
-        { name: 'Server-side Rendering', url: '/guides/auth/server-side-rendering' },
       ],
     },
     {
-      name: 'Auth Helpers',
+      name: 'Server-side Auth',
       url: undefined,
       items: [
         { name: 'Overview', url: '/guides/auth/auth-helpers' },
-        { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui' },
-        { name: 'Flutter Auth UI', url: '/guides/auth/auth-helpers/flutter-auth-ui' },
         {
           name: 'Next.js',
           url: '/guides/auth/auth-helpers/nextjs',
         },
         { name: 'Remix', url: '/guides/auth/auth-helpers/remix' },
         { name: 'SvelteKit', url: '/guides/auth/auth-helpers/sveltekit' },
+        { name: 'Server-side Rendering', url: '/guides/auth/server-side-rendering' },
+        {
+          name: 'Email Auth with PKCE flow for SSR',
+          url: '/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr',
+        },
+        {
+          name: 'OAuth with PKCE flow for SSR',
+          url: '/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
+        },
+      ],
+    },
+    {
+      name: 'Auth UI',
+      url: undefined,
+      items: [
+        { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui' },
+        { name: 'Flutter Auth UI', url: '/guides/auth/auth-helpers/flutter-auth-ui' },
       ],
     },
     {
@@ -923,7 +937,18 @@ export const storage: NavMenuConstant = {
   ],
 }
 
-export const ai: NavMenuConstant = {
+export const vectorIndexItems = [
+  {
+    name: 'HNSW indexes',
+    url: '/guides/ai/vector-indexes/hnsw-indexes',
+  },
+  {
+    name: 'IVFFlat indexes',
+    url: '/guides/ai/vector-indexes/ivf-indexes',
+  },
+]
+
+export const ai = {
   icon: 'ai',
   title: 'AI & Vectors',
   url: '/guides/ai',
@@ -963,8 +988,8 @@ export const ai: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Managing collections', url: '/guides/ai/managing-collections' },
-        { name: 'Managing indexes', url: '/guides/ai/managing-indexes' },
         { name: 'Vector columns', url: '/guides/ai/vector-columns' },
+        { name: 'Vector indexes', url: '/guides/ai/vector-indexes', items: vectorIndexItems },
         { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
         { name: 'Choosing Compute Add-on', url: '/guides/ai/choosing-compute-addon' },
         { name: 'Going to Production', url: '/guides/ai/going-to-prod' },
@@ -1112,6 +1137,10 @@ export const platform: NavMenuConstant = {
           name: 'Migrating and Upgrading',
           url: '/guides/platform/migrating-and-upgrading-projects',
         },
+        {
+          name: 'Transfer Project',
+          url: '/guides/platform/project-transfer',
+        },
         { name: 'Network Restrictions', url: '/guides/platform/network-restrictions' },
         { name: 'Performance Tuning', url: '/guides/platform/performance' },
         { name: 'Permissions', url: '/guides/platform/permissions' },
@@ -1121,7 +1150,11 @@ export const platform: NavMenuConstant = {
     {
       name: 'Billing',
       url: undefined,
-      items: [{ name: 'Spend cap', url: '/guides/platform/spend-cap' }],
+      items: [
+        { name: 'How billing works', url: '/guides/platform/org-based-billing' },
+        { name: 'Spend caps and cost-controls', url: '/guides/platform/spend-cap' },
+        { name: 'Enterprise Billing', url: '/guides/platform/enterprise-billing' },
+      ],
     },
     {
       name: 'Single sign-on',

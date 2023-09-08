@@ -26,6 +26,7 @@ const BackupsList = () => {
   const sortedBackups = (backups?.backups ?? []).sort(
     (a: any, b: any) => new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
   )
+  const isPitrEnabled = backups?.pitr_enabled
 
   if (planKey === 'FREE') {
     return (
@@ -38,6 +39,8 @@ const BackupsList = () => {
       />
     )
   }
+
+  if (isPitrEnabled) return null
 
   return (
     <div className="space-y-6">
