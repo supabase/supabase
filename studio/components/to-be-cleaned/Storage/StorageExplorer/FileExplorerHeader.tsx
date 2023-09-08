@@ -25,7 +25,7 @@ import { useCheckPermissions } from 'hooks'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
 
-const HeaderPathEdit = ({ loading, breadcrumbs, togglePathEdit }: any) => {
+const HeaderPathEdit = ({ loading, isSearching, breadcrumbs, togglePathEdit }: any) => {
   return (
     <div
       className={`group ${!loading ? 'cursor-pointer' : ''}`}
@@ -39,18 +39,20 @@ const HeaderPathEdit = ({ loading, breadcrumbs, togglePathEdit }: any) => {
       ) : (
         <div className="flex cursor-pointer items-center">
           <p className="ml-3 text-sm truncate">{breadcrumbs[breadcrumbs.length - 1] || ''}</p>
-          <div className="ml-3 flex items-center space-x-2 opacity-0 transition group-hover:opacity-100">
-            <Button type="text" icon={<IconEdit2 />}>
-              Navigate
-            </Button>
-          </div>
+          {!isSearching && (
+            <div className="ml-3 flex items-center space-x-2 opacity-0 transition group-hover:opacity-100">
+              <Button type="text" icon={<IconEdit2 />}>
+                Navigate
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
   )
 }
 
-const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }: any) => {
+const HeaderBreadcrumbs = ({ loading, isSearching, breadcrumbs, selectBreadcrumb }: any) => {
   // Max 5 crumbs, otherwise replace middle segment with ellipsis and only
   // have the first 2 and last 2 crumbs visible
   const ellipsis = '...'
@@ -77,7 +79,7 @@ const HeaderBreadcrumbs = ({ loading, breadcrumbs, selectBreadcrumb }: any) => {
       <p className="ml-3 text-sm">{loading.message}</p>
     </div>
   ) : (
-    <div className="ml-3 flex items-center">
+    <div className={`ml-3 flex items-center ${isSearching && 'max-w-[140px] overflow-x-auto'}`}>
       {formattedBreadcrumbs.map((crumb: any, idx: number) => (
         <div className="flex items-center" key={crumb.name}>
           {idx !== 0 && <IconChevronRight size={10} strokeWidth={2} className="mx-3" />}
@@ -258,6 +260,7 @@ const FileExplorerHeader = ({
             }}
           />
         )}
+        {!isSearching && <></>}
         {isEditingPath ? (
           <form className="ml-2 flex-grow">
             <Input
@@ -291,12 +294,14 @@ const FileExplorerHeader = ({
         ) : view === STORAGE_VIEWS.COLUMNS ? (
           <HeaderPathEdit
             loading={loading}
+            isSearching={isSearching}
             breadcrumbs={breadcrumbs}
             togglePathEdit={togglePathEdit}
           />
         ) : (
           <HeaderBreadcrumbs
             loading={loading}
+            isSearching={isSearching}
             breadcrumbs={breadcrumbs}
             selectBreadcrumb={selectBreadcrumb}
           />
@@ -455,42 +460,38 @@ const FileExplorerHeader = ({
           </Tooltip.Root>
         </div>
 
-        {/* Search: Disabled for now */}
-        {view === STORAGE_VIEWS.LIST && (
-          <>
-            <div className="h-6 border-r border-panel-border-light dark:border-panel-border-dark" />
-            <div className="flex items-center">
-              {isSearching ? (
-                <Input
+        <div className="h-6 border-r border-scale-600" />
+        <div className="flex items-center pr-1.5">
+          {isSearching ? (
+            <Input
+              size="tiny"
+              autoFocus
+              className="w-52"
+              icon={<IconSearch size={'tiny'} strokeWidth={2} />}
+              actions={[
+                <IconX
+                  key="close"
+                  className="mx-2 cursor-pointer text-scale-1200"
                   size="tiny"
-                  autoFocus
-                  className="w-52"
-                  icon={<IconSearch size={'tiny'} strokeWidth={2} />}
-                  actions={[
-                    <IconX
-                      key="close"
-                      className="mx-2 cursor-pointer text-scale-1200"
-                      size="tiny"
-                      strokeWidth={2}
-                      onClick={onCancelSearch}
-                    />,
-                  ]}
-                  placeholder="Search for a file or folder"
-                  type="text"
-                  value={searchString}
-                  onChange={onSearchInputUpdate}
-                />
-              ) : (
-                <Button
-                  icon={<IconSearch size={16} strokeWidth={2} />}
-                  size="tiny"
-                  type="text"
-                  onClick={toggleSearch}
-                />
-              )}
-            </div>
-          </>
-        )}
+                  strokeWidth={2}
+                  onClick={onCancelSearch}
+                />,
+              ]}
+              placeholder="Search for a file or folder"
+              type="text"
+              value={searchString}
+              onChange={onSearchInputUpdate}
+            />
+          ) : (
+            <Button
+              icon={<IconSearch size={16} strokeWidth={2} />}
+              size="tiny"
+              type="text"
+              className="px-1"
+              onClick={toggleSearch}
+            />
+          )}
+        </div>
       </div>
     </div>
   )
