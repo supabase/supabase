@@ -212,7 +212,7 @@ const CommandMenu = ({ projectRef }: CommandMenuProps) => {
                     <IconKey className="text-scale-1100" />
                     <CommandLabel>Get API keys</CommandLabel>
                   </CommandItem>
-                  {true && (
+                  {project?.apiUrl !== undefined && (
                     <ChildItem
                       isSubItem={false}
                       onSelect={() => {
