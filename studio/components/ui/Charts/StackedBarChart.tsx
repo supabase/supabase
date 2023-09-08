@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { BarChart, Bar, XAxis, Tooltip, Legend, Cell, TooltipProps } from 'recharts'
 import ChartHeader from './ChartHeader'
-import { CHART_COLORS, STACK_COLORS, DateTimeFormats, DEFAULT_STACK_COLORS, genStackColorScales } from './Charts.constants'
+import { CHART_COLORS, DateTimeFormats, DEFAULT_STACK_COLORS, genStackColorScales, ValidStackColor } from './Charts.constants'
 import { CommonChartProps } from './Charts.types'
 import { timestampFormatter, useChartSize, useStacked } from './Charts.utils'
 import { precisionFormatter } from './Charts.utils'
@@ -16,7 +16,7 @@ interface Props extends CommonChartProps<any> {
   displayDateInUtc?: boolean
   hideLegend?: boolean
   hideHeader?: boolean
-  stackColors?: ValidStackColor
+  stackColors?: ValidStackColor[]
 }
 const StackedBarChart: React.FC<Props> = ({
   size,
