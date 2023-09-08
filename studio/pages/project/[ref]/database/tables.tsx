@@ -3,16 +3,17 @@ import { useQueryClient } from '@tanstack/react-query'
 import { isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
+import { Modal } from 'ui'
 
 import { ColumnList, TableList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { sqlKeys } from 'data/sql/keys'
 import { useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
-import { Modal } from 'ui'
 
 const DatabaseTables: NextPageWithLayout = () => {
   const { meta, ui } = useStore()
@@ -142,26 +143,31 @@ const DatabaseTables: NextPageWithLayout = () => {
 
   return (
     <>
-      <div className="p-4">
-        {isUndefined(selectedTable) ? (
-          <TableList
-            selectedSchema={selectedSchema}
-            onSelectSchema={setSelectedSchema}
-            onAddTable={onAddTable}
-            onEditTable={onEditTable}
-            onDeleteTable={onDeleteTable}
-            onOpenTable={setSelectedTable}
-          />
-        ) : (
-          <ColumnList
-            selectedTable={selectedTable}
-            onAddColumn={onAddColumn}
-            onEditColumn={onEditColumn}
-            onDeleteColumn={onDeleteColumn}
-            onSelectBack={() => setSelectedTable(undefined)}
-          />
-        )}
-      </div>
+      <ScaffoldContainer>
+        <ScaffoldSection>
+          <div className="col-span-12">
+            {isUndefined(selectedTable) ? (
+              <TableList
+                selectedSchema={selectedSchema}
+                onSelectSchema={setSelectedSchema}
+                onAddTable={onAddTable}
+                onEditTable={onEditTable}
+                onDeleteTable={onDeleteTable}
+                onOpenTable={setSelectedTable}
+              />
+            ) : (
+              <ColumnList
+                selectedTable={selectedTable}
+                onAddColumn={onAddColumn}
+                onEditColumn={onEditColumn}
+                onDeleteColumn={onDeleteColumn}
+                onSelectBack={() => setSelectedTable(undefined)}
+              />
+            )}
+          </div>
+        </ScaffoldSection>
+      </ScaffoldContainer>
+
       <ConfirmationModal
         danger
         visible={isDeleting && !isUndefined(selectedTableToDelete)}
@@ -179,6 +185,7 @@ const DatabaseTables: NextPageWithLayout = () => {
           </p>
         </Modal.Content>
       </ConfirmationModal>
+
       <ConfirmationModal
         danger
         visible={isDeleting && !isUndefined(selectedColumnToDelete)}
@@ -194,6 +201,7 @@ const DatabaseTables: NextPageWithLayout = () => {
           </p>
         </Modal.Content>
       </ConfirmationModal>
+
       <SidePanelEditor
         sidePanelKey={sidePanelKey}
         selectedSchema={selectedSchema}
