@@ -1,7 +1,7 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
-import { MutableRefObject, useRef, useState } from 'react'
+import { MutableRefObject, useRef } from 'react'
 import { cn } from 'ui'
 
 import { SqlSnippet } from 'data/content/sql-snippets-query'
@@ -27,7 +27,7 @@ const MonacoEditor = ({
   className,
   executeQuery,
 }: MonacoEditorProps) => {
-  const { ref } = useParams()
+  const { ref, content } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
   const project = useSelectedProject()
@@ -102,7 +102,7 @@ const MonacoEditor = ({
       onMount={handleEditorOnMount}
       onChange={handleEditorChange}
       defaultLanguage="pgsql"
-      defaultValue={snippet?.snippet.content.sql}
+      defaultValue={snippet?.snippet.content.sql ?? content}
       path={id}
       options={{
         tabSize: 2,

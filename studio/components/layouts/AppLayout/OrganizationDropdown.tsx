@@ -22,11 +22,10 @@ import {
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useFlag, useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks'
 
 const OrganizationDropdown = () => {
   const router = useRouter()
-  const orgCreationV2 = useFlag('orgcreationv2')
   const selectedOrganization = useSelectedOrganization()
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
 
@@ -97,13 +96,13 @@ const OrganizationDropdown = () => {
                 </ScrollArea>
               </CommandGroup_Shadcn_>
               <CommandGroup_Shadcn_ className="border-t">
-                <Link passHref href={orgCreationV2 ? `/new-with-subscription` : `/new`}>
+                <Link passHref href="new">
                   <CommandItem_Shadcn_
                     asChild
                     className="cursor-pointer flex items-center space-x-2 w-full"
                     onSelect={(e) => {
                       setOpen(false)
-                      router.push(orgCreationV2 ? `/new-with-subscription` : `/new`)
+                      router.push(`/new`)
                     }}
                     onClick={() => setOpen(false)}
                   >

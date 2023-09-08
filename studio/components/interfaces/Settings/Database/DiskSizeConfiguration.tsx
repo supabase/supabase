@@ -36,7 +36,6 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
         } minute(s)`
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
-  const { project } = useProjectContext()
   const canUpdateDiskSizeConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: {
       project_id: project?.id,

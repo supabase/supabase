@@ -1,4 +1,5 @@
 import { NextSeo } from 'next-seo'
+import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -10,13 +11,55 @@ import { Badge, Divider, IconChevronLeft } from 'ui'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import BlogLinks from '~/components/LaunchWeek/7/BlogLinks'
-import { generateReadingTime } from '~/lib/helpers'
+import { generateReadingTime, isNotNullOrUndefined } from '~/lib/helpers'
 import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 import useActiveAnchors from '~/hooks/useActiveAnchors'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
+
+type Post = ReturnType<typeof getSortedPosts>[number]
+
+type BlogData = {
+  title: string
+  description: string
+  tags?: string[]
+  date: string
+  toc_depth?: number
+  author: string
+  image?: string
+  thumb?: string
+  youtubeHero?: string
+  author_url?: string
+  launchweek?: number
+  meta_title?: string
+  meta_description?: string
+  video?: string
+}
+
+type MatterReturn = {
+  data: BlogData
+  content: string
+}
+
+type Blog = {
+  slug: string
+  source: string
+  content: any
+  toc: any
+}
+
+type BlogPostPageProps = {
+  prevPost: Post | null
+  nextPost: Post | null
+  relatedPosts: (Post & BlogData)[]
+  blog: Blog & BlogData
+}
+
+type Params = {
+  slug: string
+}
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -29,16 +72,25 @@ export async function getStaticPaths() {
   }
 }
 
-export async function getStaticProps({ params }: any) {
+export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async ({ params }) => {
+  if (params?.slug === undefined) {
+    throw new Error('Missing slug for pages/blog/[slug].tsx')
+  }
+
   const filePath = `${params.slug}`
   const postContent = await getPostdata(filePath, '_blog')
-  const { data, content } = matter(postContent)
+  const { data, content } = matter(postContent) as unknown as MatterReturn
 
   const mdxSource: any = await mdxSerialize(content)
 
-  const relatedPosts = getSortedPosts('_blog', 5, mdxSource.scope.tags)
+  const relatedPosts = getSortedPosts({
+    directory: '_blog',
+    limit: 5,
+    tags: mdxSource.scope.tags,
+    currentPostSlug: filePath,
+  }) as unknown as (BlogData & Post)[]
 
-  const allPosts = getSortedPosts('_blog')
+  const allPosts = getSortedPosts({ directory: '_blog' })
 
   const currentIndex = allPosts
     .map(function (e) {
@@ -65,22 +117,19 @@ export async function getStaticProps({ params }: any) {
   }
 }
 
-function BlogPostPage(props: any) {
+function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   const content = props.blog.content
   const authorArray = props.blog.author.split(',')
   useActiveAnchors('h2, h3, h4', '.prose-toc a')
   const isLaunchWeek7 = props.blog.launchweek === 7
 
-  const author = []
-  for (let i = 0; i < authorArray.length; i++) {
-    author.push(
-      // @ts-ignore
-      authors.find((authors: string) => {
-        // @ts-ignore
-        return authors.author_id === authorArray[i]
-      })
-    )
-  }
+  const author = authorArray
+    .map((authorId) => {
+      return authors.find((author) => author.author_id === authorId)
+    })
+    .filter(isNotNullOrUndefined)
+
+  const authorUrls = author.map((author) => author?.author_url).filter(isNotNullOrUndefined)
 
   const { basePath } = useRouter()
 
@@ -132,7 +181,7 @@ function BlogPostPage(props: any) {
 
   const meta = {
     title: props.blog.meta_title ?? props.blog.title,
-    description: props.blog.meat_description ?? props.blog.description,
+    description: props.blog.meta_description ?? props.blog.description,
     url: `https://supabase.com/blog/${props.blog.slug}`,
   }
 
@@ -146,15 +195,17 @@ function BlogPostPage(props: any) {
           description: meta.description,
           url: meta.url,
           type: 'article',
-          videos: props.blog.video && [
-            {
-              // youtube based video meta
-              url: props.blog.video,
-              type: 'application/x-shockwave-flash',
-              width: 640,
-              height: 385,
-            },
-          ],
+          videos: props.blog.video
+            ? [
+                {
+                  // youtube based video meta
+                  url: props.blog.video,
+                  type: 'application/x-shockwave-flash',
+                  width: 640,
+                  height: 385,
+                },
+              ]
+            : undefined,
           article: {
             //
             // to do: add expiration and modified dates
@@ -163,7 +214,7 @@ function BlogPostPage(props: any) {
             //
             // to do: author urls should be internal in future
             // currently we have external links to github profiles
-            authors: [props.blog.author_url],
+            authors: authorUrls,
             tags: props.blog.tags?.map((cat: string) => {
               return cat
             }),
@@ -305,8 +356,8 @@ function BlogPostPage(props: any) {
                         <p className="text-scale-1200 text-sm">Related articles</p>
                       </div>
                       <div className="space-y-2">
-                        {props.relatedPosts.map((post: any, i: number) => (
-                          <Link href={`${post.path}`} as={`${post.path}`} key={i}>
+                        {props.relatedPosts.map((post) => (
+                          <Link href={`${post.path}`} as={`${post.path}`} key={post.slug}>
                             <div>
                               <p className="cursor-pointer">
                                 <div className="flex gap-2">

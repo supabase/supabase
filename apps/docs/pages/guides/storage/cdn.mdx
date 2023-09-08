@@ -15,7 +15,7 @@ Our basic CDN caches objects based on the cache time set when uploading objects.
 
 ### Example
 
-Let’s walk through an example of how a CDN helps with performance.
+Let's walk through an example of how a CDN helps with performance.
 
 A new bucket is created for a Supabase project launched in Singapore. All requests to the Supabase Storage API are routed to the CDN first.
 
@@ -56,13 +56,11 @@ Additionally, the smart CDN has a higher cache hit ratio as the origin server is
 
 When Smart CDN is enabled, the asset is cached on the CDN for as long as possible. You can still control how long assets are stored in the browser using the [cacheControl](/docs/reference/javascript/storage-from-upload) option when uploading a file. Smart CDN caching works with all types of storage operations including signed URLs.
 
-When a file is updated or deleted, the CDN cache is automatically invalidated to reflect the change (including transformed images).
-It can take **up to 60 seconds** for the CDN cache to be invalidated as the asset metadata has to propagate across all the data-centers around the globe.
+When a file is updated or deleted, the CDN cache is automatically invalidated to reflect the change (including transformed images). It can take **up to 60 seconds** for the CDN cache to be invalidated as the asset metadata has to propagate across all the data-centers around the globe.
 
 When an asset is invalidated at the CDN level, browsers may not update its cache.
 
-If your asset is updated frequently, we recommend that you re-upload the new asset in a different key, this way you'll always have the latest changes available without waiting the propagation delay.
-If you expect your asset to be deleted, we recommend setting a low browser TTL value using the `cacheControl` option when using smart CDN caching, the default is 1 hour which generally is a good default.
+If your asset is updated frequently, we recommend that you re-upload the new asset in a different key, this way you'll always have the latest changes available without waiting the propagation delay. If you expect your asset to be deleted, we recommend setting a low browser TTL value using the `cacheControl` option when using smart CDN caching, the default is 1 hour which generally is a good default.
 
 ## Public vs Private Buckets
 
