@@ -242,14 +242,14 @@ const AuditLogs = () => {
                         <Table.td>
                           <p
                             className="text-scale-1100 max-w-[230px] truncate"
-                            title={project?.name ?? organization?.name ?? 'Unknown'}
+                            title={project?.name ?? organization?.name ?? '-'}
                           >
                             {project?.name
                               ? 'Project: '
                               : organization?.name
                               ? 'Organization: '
                               : null}
-                            {project?.name ?? organization?.name ?? 'Unknown'}
+                            {project?.name ?? organization?.name ?? '-'}
                           </p>
                           <p
                             className="text-scale-1000 text-xs mt-0.5 truncate"
