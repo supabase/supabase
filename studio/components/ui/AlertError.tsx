@@ -31,8 +31,13 @@ const AlertError = ({ ref, subject, error, className }: AlertErrorProps) => {
       <IconAlertCircle className="h-4 w-4" />
       <AlertTitle_Shadcn_>{subject}</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-        {error?.message && <p>Error: {error?.message}</p>}
-        Try refreshing your browser, but if the issue persists, please reach out to us via support.
+        <div>
+          {error?.message && <p>Error: {error?.message}</p>}
+          <p>
+            Try refreshing your browser, but if the issue persists, please reach out to us via
+            support.
+          </p>
+        </div>
         <div>
           <Link key="contact-support" href={href} passHref>
             <Button type="warning" asChild>
