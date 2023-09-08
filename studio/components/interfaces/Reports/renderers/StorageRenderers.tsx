@@ -11,13 +11,6 @@ export const CacheHitRateChartRenderer = (
     miss_count: number
   }>
 ) => {
-  props.data = [
-    {
-      timestamp: new Date().toISOString(),
-      hit_count: 123,
-      miss_count: 123,
-    },
-  ]
   const stackedData = props.data.flatMap((datum) => [
     {
       timestamp: datum.timestamp,
@@ -51,13 +44,6 @@ export const TopCacheMissesRenderer = (
     count: number
   }>
 ) => {
-  props.data = [
-    {
-      path: '123',
-      search: '?123',
-      count: 123,
-    },
-  ]
   if (props.data.length === 0) return null
   const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-scale-400'
   const cellClasses = '!text-xs !py-2'

@@ -38,7 +38,7 @@ export const genStackColorScales = (colors: ValidStackColor[]) =>
     }
   })
 
-export const DEFAULT_STACK_COLORS = ['brand', 'slate', 'blue', 'yellow', 'indigo']
+export const DEFAULT_STACK_COLORS : ValidStackColor[] = ['brand', 'slate', 'blue', 'yellow', 'indigo']
 
 export enum DateTimeFormats {
   FULL = 'MMM D, YYYY, hh:mma',

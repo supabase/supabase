@@ -11,7 +11,7 @@ import {
   CacheHitRateChartRenderer,
   TopCacheMissesRenderer,
 } from 'components/interfaces/Reports/renderers/StorageRenderers'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import { DatePickerToFrom, LogsEndpointParams } from 'components/interfaces/Settings/Logs'
 import { useParams } from 'common'
@@ -94,6 +94,17 @@ const useStorageReport = () => {
       hook.setParams?.((prev: LogsEndpointParams) => ({ ...prev, ...params }))
     })
   }
+  useEffect(()=>{
+    
+    if (cacheHitRate.changeQuery) {
+      cacheHitRate.changeQuery(PRESET_CONFIG.storage.queries.cacheHitRate.sql([]))
+    }
+
+    if (topCacheMisses.changeQuery) {
+      topCacheMisses.changeQuery(PRESET_CONFIG.storage.queries.topCacheMisses.sql([]))
+    }
+
+  }, [])
   const isLoading = activeHooks.some((hook) => hook.isLoading)
   return {
     data: {

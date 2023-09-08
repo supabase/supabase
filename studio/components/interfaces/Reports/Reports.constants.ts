@@ -235,6 +235,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         queryType: 'logs',
         // storage report does not perform any filtering
         sql: (_filters) => `
+-- cache-hit-rate
 SELECT
   timestamp_trunc(timestamp, hour) as timestamp,
   countif( h.cf_cache_status in ('HIT', 'STALE', 'REVALIDATED', 'UPDATING') ) as hit_count,
@@ -253,6 +254,7 @@ order by timestamp desc
         queryType: 'logs',
         // storage report does not perform any filtering
         sql: (_filters) => `
+-- top-cache-misses
 SELECT
   r.path as path,
   r.search as search,
