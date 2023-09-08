@@ -112,11 +112,11 @@ const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
     >
       <Button asChild type="text" iconRight={<IconChevronDown />}>
         <span>
-          Results{' '}
+          Results
           {!isExecuting &&
             result &&
             result.rows.length > 0 &&
-            `(${result.rows.length.toLocaleString()})`}
+            ` (${result.rows.length.toLocaleString()})`}
         </span>
       </Button>
       <CSVLink
