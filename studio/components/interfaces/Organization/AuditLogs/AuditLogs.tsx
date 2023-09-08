@@ -2,8 +2,10 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
 import Image from 'next/image'
 import { useState } from 'react'
+import { Alert, Button, IconArrowDown, IconArrowUp, IconRefreshCw, IconUser } from 'ui'
 
 import { useParams } from 'common'
+import { FilterPopover, LogDetailsPanel } from 'components/interfaces/AuditLogs'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -17,9 +19,6 @@ import { useOrganizationDetailQuery } from 'data/organizations/organization-deta
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { Alert, Button, IconArrowDown, IconArrowUp, IconRefreshCw, IconUser } from 'ui'
-import FilterPopover from './FilterPopover'
-import LogDetailsPanel from './LogDetailsPanel'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
@@ -283,14 +282,14 @@ const AuditLogs = () => {
                               </div>
                             </div>
                           </Table.td>
-                          <Table.td>
+                          <Table.td className="max-w-[250px]">
                             <div className="flex items-center space-x-2">
                               {hasStatusCode && (
                                 <p className="bg-scale-400 rounded px-1 flex items-center justify-center text-xs font-mono border">
                                   {log.action.metadata[0].status}
                                 </p>
                               )}
-                              <p className="max-w-[170px] truncate" title={log.action.name}>
+                              <p className="truncate" title={log.action.name}>
                                 {log.action.name}
                               </p>
                             </div>
