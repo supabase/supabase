@@ -14,7 +14,6 @@ export async function getProfileAuditLogs(
   { iso_timestamp_start, iso_timestamp_end }: ProfileAuditLogsVariables,
   signal?: AbortSignal
 ) {
-  console.log(iso_timestamp_start, iso_timestamp_end)
   const { data, error } = await get('/platform/profile/audit', {
     params: {
       query: {
