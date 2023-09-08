@@ -66,6 +66,36 @@ If your asset is updated frequently, we recommend that you re-upload the new ass
 
 Objects in public buckets do not require any Authorization to access objects. This leads to a better cache hit rate compared to private buckets. For private buckets, permissions for accessing each object is checked on a per user level. For example, if two different users access the same object in a private bucket from the same region, it results in a cache miss for both the users since they might have different security policies attached to them. On the other hand, if two different users access the same object in a public bucket from the same region, it results in a cache hit for the second user.
 
+## Debugging Cache Hits
+
+The [storage report](https://supabase.com/dashboard/project/_/reports/storage) will give a breakdown of your project's current storage request caching.
+
+A high cache hit rate is desirable to reduce storage egress costs.
+
+The [Logs Explorer](https://supabase.com/dashboard/project/_/logs/explorer) can also be used to debug cache misses.
+
+The following example query will show the top cache misses from the `edge_logs`:
+
+```sql
+select
+  r.path as path,
+  r.search as search,
+  count(id) as count
+from
+  edge_logs as f
+  cross join unnest(f.metadata) as m
+  cross join unnest(m.request) as r
+  cross join unnest(m.response) as res
+  cross join unnest(res.headers) as h
+where
+  starts_with(r.path, '/storage/v1/object')
+  and r.method = 'GET'
+  and h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')
+group by path, search
+order by count desc
+limit 50;
+```
+
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page
