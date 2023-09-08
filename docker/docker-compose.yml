@@ -40,7 +40,7 @@ services:
 
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
       LOGFLARE_URL: http://analytics:4000
-      NEXT_PUBLIC_ENABLE_LOGS: true
+      NEXT_PUBLIC_ENABLE_LOGS: "true"
       # Comment to use Big Query backend for analytics
       NEXT_ANALYTICS_BACKEND_PROVIDER: postgres
       # Uncomment to use Big Query backend for analytics
@@ -117,7 +117,7 @@ services:
 
       GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP}
       GOTRUE_MAILER_AUTOCONFIRM: ${ENABLE_EMAIL_AUTOCONFIRM}
-      # GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED: true
+      # GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED: "true"
       # GOTRUE_SMTP_MAX_FREQUENCY: 1s
       GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL}
       GOTRUE_SMTP_HOST: ${SMTP_HOST}
@@ -321,8 +321,8 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_SCHEMA: _analytics
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
-      LOGFLARE_SINGLE_TENANT: true
-      LOGFLARE_SUPABASE_MODE: true
+      LOGFLARE_SINGLE_TENANT: "true"
+      LOGFLARE_SUPABASE_MODE: "true"
       LOGFLARE_MIN_CLUSTER_SIZE: 1
       RELEASE_COOKIE: cookie
 
@@ -337,11 +337,11 @@ services:
     ports:
       - 4000:4000
     entrypoint: |
-                  sh -c `cat <<'EOF' > run.sh && sh run.sh
+                  sh -c "cat <<'EOF' > run.sh && sh run.sh
                   ./logflare eval Logflare.Release.migrate
                   ./logflare start --sname logflare
                   EOF
-                  `
+                  "
 
   # Comment out everything below this point if you are using an external Postgres database
   db:
