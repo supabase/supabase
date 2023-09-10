@@ -8,13 +8,20 @@ import Table from 'components/to-be-cleaned/Table'
 import { useCheckPermissions, useStore } from 'hooks'
 
 interface TriggerListProps {
-  filterString: string
   schema: string
+  filterString: string
+  isLocked: boolean
   editTrigger: (trigger: any) => void
   deleteTrigger: (trigger: any) => void
 }
 
-const TriggerList = ({ filterString, schema, editTrigger, deleteTrigger }: TriggerListProps) => {
+const TriggerList = ({
+  schema,
+  filterString,
+  isLocked,
+  editTrigger,
+  deleteTrigger,
+}: TriggerListProps) => {
   const { meta } = useStore()
   const triggers = meta.triggers.list()
   const filteredTriggers = triggers.filter((x: any) =>
@@ -24,12 +31,28 @@ const TriggerList = ({ filterString, schema, editTrigger, deleteTrigger }: Trigg
   const _triggers = filteredTriggers.filter((x: any) => x.schema == schema)
   const canUpdateTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
 
-  function onEdit(trigger: any) {
-    editTrigger(trigger)
+  if (_triggers.length === 0 && filterString.length === 0) {
+    return (
+      <Table.tr key={schema}>
+        <Table.td colSpan={5}>
+          <p className="text-sm text-scale-1200">No triggers created yet</p>
+          <p className="text-sm text-light">There are no triggers found in the schema "{schema}"</p>
+        </Table.td>
+      </Table.tr>
+    )
   }
 
-  function onDelete(trigger: any) {
-    deleteTrigger(trigger)
+  if (_triggers.length === 0 && filterString.length > 0) {
+    return (
+      <Table.tr key={schema}>
+        <Table.td colSpan={5}>
+          <p className="text-sm text-scale-1200">No results found</p>
+          <p className="text-sm text-light">
+            Your search for "{filterString}" did not return any results
+          </p>
+        </Table.td>
+      </Table.tr>
+    )
   }
 
   return (
@@ -55,52 +78,57 @@ const TriggerList = ({ filterString, schema, editTrigger, deleteTrigger }: Trigg
             </div>
           </Table.td>
           <Table.td className="text-right">
-            <div className="flex items-center justify-end">
-              {canUpdateTriggers ? (
-                <Dropdown
-                  side="bottom"
-                  align="end"
-                  overlay={
-                    <>
-                      <Dropdown.Item icon={<IconEdit3 size="tiny" />} onClick={() => onEdit(x)}>
-                        Edit trigger
-                      </Dropdown.Item>
-                      <Dropdown.Item
-                        icon={<IconTrash stroke="red" size="tiny" />}
-                        onClick={() => onDelete(x)}
-                      >
-                        Delete trigger
-                      </Dropdown.Item>
-                    </>
-                  }
-                >
-                  <Button asChild type="default" icon={<IconMoreVertical />}>
-                    <span></span>
-                  </Button>
-                </Dropdown>
-              ) : (
-                <Tooltip.Root delayDuration={0}>
-                  <Tooltip.Trigger asChild>
-                    <Button disabled type="default" icon={<IconMoreVertical />} />
-                  </Tooltip.Trigger>
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="left">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                          'border border-scale-200',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-scale-1200">
-                          You need additional permissions to update triggers
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                </Tooltip.Root>
-              )}
-            </div>
+            {!isLocked && (
+              <div className="flex items-center justify-end">
+                {canUpdateTriggers ? (
+                  <Dropdown
+                    side="bottom"
+                    align="end"
+                    overlay={
+                      <>
+                        <Dropdown.Item
+                          icon={<IconEdit3 size="tiny" />}
+                          onClick={() => editTrigger(x)}
+                        >
+                          Edit trigger
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          icon={<IconTrash stroke="red" size="tiny" />}
+                          onClick={() => deleteTrigger(x)}
+                        >
+                          Delete trigger
+                        </Dropdown.Item>
+                      </>
+                    }
+                  >
+                    <Button asChild type="default" icon={<IconMoreVertical />}>
+                      <span></span>
+                    </Button>
+                  </Dropdown>
+                ) : (
+                  <Tooltip.Root delayDuration={0}>
+                    <Tooltip.Trigger asChild>
+                      <Button disabled type="default" icon={<IconMoreVertical />} />
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="left">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                            'border border-scale-200',
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-scale-1200">
+                            You need additional permissions to update triggers
+                          </span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                )}
+              </div>
+            )}
           </Table.td>
         </Table.tr>
       ))}
