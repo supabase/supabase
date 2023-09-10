@@ -1,22 +1,13 @@
 import { CommandGroup } from 'cmdk-supabase'
 import { useCommandMenu } from './CommandMenuProvider'
 import { Badge } from '../Badge'
-import { CommandItem } from './Command.utils'
+import { CommandItem, copyToClipboard } from './Command.utils'
 import { IconAlertCircle } from './../Icon/icons/IconAlertCircle'
 import ChildItem from './ChildItem'
 
 const APIKeys = ({ isSubItem = false }) => {
   const { setIsOpen, project } = useCommandMenu()
   const { apiKeys } = project ?? {}
-
-  const copyToClipboard = (str: string, callback = () => {}) => {
-    const focused = window.document.hasFocus()
-    if (focused) {
-      window.navigator?.clipboard?.writeText(str).then(callback)
-    } else {
-      console.warn('Unable to copy to clipboard')
-    }
-  }
 
   return (
     <CommandGroup>
