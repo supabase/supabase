@@ -121,29 +121,21 @@ const PolicyEditorModal = ({
     if (!command) {
       return ui.setNotification({
         category: 'error',
-        message: 'You will need to allow at one operation in your policy',
+        message: 'You will need to allow at least one operation in your policy',
         duration: 4000,
       })
     }
-    if (['SELECT', 'DELETE'].includes(command) && !definition) {
+    if (['SELECT', 'DELETE', 'UPDATE'].includes(command) && !definition) {
       return ui.setNotification({
         category: 'error',
-        message: 'Did you forget to provide a USING expression for your policy?',
+        message: 'You will need to provide a USING expression for your policy',
         duration: 4000,
       })
     }
     if (command === 'INSERT' && !check) {
       return ui.setNotification({
         category: 'error',
-        message: 'Did you forget to provide a WITH CHECK expression for your policy?',
-        duration: 4000,
-      })
-    }
-    if (command === 'UPDATE' && !definition && !check) {
-      return ui.setNotification({
-        category: 'error',
-        message:
-          'You will need to provide either a USING, or WITH CHECK expression, or both for your policy',
+        message: 'You will need to provide a WITH CHECK expression for your policy',
         duration: 4000,
       })
     }
