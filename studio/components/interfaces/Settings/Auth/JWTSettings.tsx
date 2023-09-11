@@ -85,7 +85,7 @@ const JWTSettings = () => {
 
   return (
     <>
-      <Panel title={<h5 className="mb-0">JWT Settings</h5>}>
+      <Panel title={<h5 className="mb-0">Supabase JWT Settings</h5>}>
         <Panel.Content className="space-y-6 border-t border-panel-border-interior-light dark:border-panel-border-interior-dark">
           {isError ? (
             <div className="flex items-center justify-center py-8 space-x-2">
