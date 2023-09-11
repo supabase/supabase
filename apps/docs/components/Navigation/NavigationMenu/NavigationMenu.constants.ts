@@ -887,6 +887,10 @@ export const realtime: NavMenuConstant = {
       url: undefined,
       items: [
         {
+          name: 'Throttling messages',
+          url: '/guides/realtime/guides/client-side-throttling',
+        },
+        {
           name: 'Subscribing to Database Changes',
           url: '/guides/realtime/subscribing-to-database-changes',
         },

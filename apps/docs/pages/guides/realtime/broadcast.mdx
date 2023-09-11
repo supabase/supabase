@@ -245,26 +245,6 @@ channelD.subscribe(async (status) => {
 
 Use this to guarantee that the server has received the message before resolving `channelD.send`'s promise. If the `ack` config is not set to `true` when creating the channel, the promise returned by `channelD.send` will resolve immediately.
 
-## Client-side rate limit
-
-By default the client will rate limit itself at 10 messages per second (1 message every 100 milliseconds). You can customize this when creating the client:
-
-```js
-import { createClient } from '@supabase/supabase-js'
-
-const clientE = createClient('https://<project>.supabase.co', '<your-anon-key>', {
-  realtime: {
-    params: {
-      eventsPerSecond: 20,
-    },
-  },
-})
-```
-
-By setting `eventsPerSecond` to 20, you can send one message every 50 milliseconds on a per client basis.
-
-Learn more by visiting the [Quotas](/docs/guides/realtime/quotas) section.
-
 ## More Realtime Quickstarts
 
 - [Presence Quickstart](/docs/guides/realtime/presence)
