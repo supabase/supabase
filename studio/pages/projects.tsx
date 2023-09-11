@@ -58,7 +58,7 @@ const ProjectsPage: NextPageWithLayout = () => {
 
       {!navLayoutV2 && isSuccess && (
         <div className="py-4 px-5">
-          {IS_PLATFORM && (
+          {IS_PLATFORM && organizations.length !== 0 && (
             <div className="my-2">
               <div className="flex">
                 <div className="">

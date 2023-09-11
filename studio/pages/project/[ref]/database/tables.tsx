@@ -6,6 +6,7 @@ import { ColumnList, TableList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import { DatabaseLayout } from 'components/layouts'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { Table } from 'data/tables/table-query'
 import { useStore } from 'hooks'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
@@ -28,30 +29,35 @@ const DatabaseTables: NextPageWithLayout = () => {
 
   return (
     <>
-      <div className="p-4">
-        {selectedTable !== undefined ? (
-          <ColumnList
-            selectedTable={selectedTable}
-            onAddColumn={snap.onAddColumn}
-            onEditColumn={snap.onEditColumn}
-            onDeleteColumn={snap.onDeleteColumn}
-            onSelectBack={() => setSelectedTable(undefined)}
-          />
-        ) : (
-          <TableList
-            onAddTable={snap.onAddTable}
-            onEditTable={(table) => {
-              setSelectedTableToEdit(table)
-              snap.onEditTable()
-            }}
-            onDeleteTable={(table) => {
-              setSelectedTableToEdit(table)
-              snap.onDeleteTable()
-            }}
-            onOpenTable={setSelectedTable}
-          />
-        )}
-      </div>
+      <ScaffoldContainer>
+        <ScaffoldSection>
+          <div className="col-span-12">
+            {selectedTable === undefined ? (
+              <TableList
+                onAddTable={snap.onAddTable}
+                onEditTable={(table) => {
+                  setSelectedTableToEdit(table)
+                  snap.onEditTable()
+                }}
+                onDeleteTable={(table) => {
+                  setSelectedTableToEdit(table)
+                  snap.onDeleteTable()
+                }}
+                onOpenTable={setSelectedTable}
+              />
+            ) : (
+              <ColumnList
+                selectedTable={selectedTable}
+                onAddColumn={snap.onAddColumn}
+                onEditColumn={snap.onEditColumn}
+                onDeleteColumn={snap.onDeleteColumn}
+                onSelectBack={() => setSelectedTable(undefined)}
+              />
+            )}
+          </div>
+        </ScaffoldSection>
+      </ScaffoldContainer>
+
       <DeleteConfirmationDialogs projectRef={projectRef} selectedTable={selectedTableToEdit} />
       <SidePanelEditor selectedTable={selectedTableToEdit} />
     </>
