@@ -1182,10 +1182,16 @@ class StorageExplorerStore {
     await this.fetchFoldersByPath(paths)
   }
 
-  fetchFoldersByPath = async (paths, searchString = '') => {
+  fetchFoldersByPath = async (paths, searchString = '', showLoading = false) => {
     if (this.selectedBucket.id === undefined) return
 
     const pathsWithEmptyPrefix = [''].concat(paths)
+
+    if (showLoading) {
+      this.columns = [this.selectedBucket.name].concat(paths).map((path) => {
+        return { id: path, name: path, status: STORAGE_ROW_STATUS.LOADING, items: [] }
+      })
+    }
 
     const foldersItems = await Promise.all(
       pathsWithEmptyPrefix.map(async (path, idx) => {

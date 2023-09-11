@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { Bucket } from 'data/storage/buckets-query'
-import { useLatest, useStore } from 'hooks'
+import { useStore } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID, IS_PLATFORM } from 'lib/constants'
 import { copyToClipboard } from 'lib/helpers'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
@@ -105,7 +105,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
         }
       } else if (view === STORAGE_VIEWS.COLUMNS) {
         const paths = openedFolders.map((folder: any) => folder.name)
-        fetchFoldersByPath(paths, itemSearchString)
+        fetchFoldersByPath(paths, itemSearchString, true)
       }
     }
 
