@@ -1,6 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727234-cda046d6-28c6-491a-b284-b86c5cede25d.png#gh-light-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
 </p>
 
 ---
@@ -50,7 +50,7 @@ Supabase สร้างขึ้นมาจากการรวมกัน�
 
 Supabase เป็น [hosted platform](https://supabase.com/dashboard). คุณสามารถลงทะเบียนและเริ่มใช้งาน Supabase ได้เลยโดยไม่ต้องติดตั้งอะไรเพิ่มเติม นอกเหนือไปจากนั้นเรากำลังพัฒนาระบบเพื่อการพัฒนาเว็บบน local (local development experience) ที่เป็นจุดมุ่งหมายของเราในตอนนี้ รวมถึงความมั่นคงของระบบ
 
-![สถาปัตยกรรม](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
+![สถาปัตยกรรม](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) เป็นระบบฐานข้อมูลแบบ object-relational ที่ถูกพัฒนาอย่างต่อเนื่องมากว่า 30 ปี และเป็นที่ยอมรับในเรื่องของเสถียรภาพ ความมั่นคง และประสิทธิภาพ
 - [Realtime](https://github.com/supabase/realtime) เป็นเซิร์ฟเวอร์ที่พัฒนาขึ้นด้วย Elixir ที่ทำหน้าที่ตรวจจับเมื่อมีการเปลี่ยนแปลงของข้อมูล (ทั้งการ insert, update และ delete) ใน Postgres ด้วย websockets. Supabase คอยตรวจจับเมื่อ Postgres มีการทำซ้ำ (replication) ทำการแปลงข้อมูลเป็น JSON และกระจายข้อมูลผ่าน websockets

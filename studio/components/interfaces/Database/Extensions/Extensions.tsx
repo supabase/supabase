@@ -39,7 +39,7 @@ const Extensions = () => {
   }, [filter])
 
   return (
-    <div className="p-4">
+    <>
       <div className="mb-4">
         <div className="flex items-center justify-between">
           <Input
@@ -76,7 +76,7 @@ const Extensions = () => {
         {enabledExtensions.length > 0 && (
           <div className="space-y-4">
             <h4 className="text-lg">Enabled extensions</h4>
-            <div className="mb-4 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
               {enabledExtensions.map((extension) => (
                 <ExtensionCard key={extension.name} extension={extension} />
               ))}
@@ -87,7 +87,7 @@ const Extensions = () => {
         {disabledExtensions.length > 0 && (
           <div className="space-y-4">
             <h4 className="text-lg">Available extensions</h4>
-            <div className="mb-4 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
               {disabledExtensions.map((extension) => (
                 <ExtensionCard key={extension.name} extension={extension} />
               ))}
@@ -95,7 +95,7 @@ const Extensions = () => {
           </div>
         )}
       </div>
-    </div>
+    </>
   )
 }
 

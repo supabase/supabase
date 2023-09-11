@@ -21,6 +21,7 @@ export * from './src/components/Icon/IconBackground'
 // DISPLAYS
 
 export * from './src/components/Card'
+export * from './src/components/TweetCard'
 export * from './src/components/Badge'
 export * from './src/components/Tabs'
 export * from './src/components/Alert'
@@ -469,3 +470,6 @@ export * from './src/components/Icon/icons/IconZapOff'
 export * from './src/components/Icon/icons/IconZap'
 export * from './src/components/Icon/icons/IconZoomIn'
 export * from './src/components/Icon/icons/IconZoomOut'
+
+// Export hooks
+export * from './src/lib/Hooks'
