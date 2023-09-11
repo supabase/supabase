@@ -134,6 +134,7 @@ const FileExplorerHeader = ({
     popColumn,
     popColumnAtIndex,
     popOpenedFolders,
+    popOpenedFoldersAtIndex,
     fetchFoldersByPath,
     refetchAllOpenedFolders,
     addNewFolderPlaceholder,
@@ -232,6 +233,7 @@ const FileExplorerHeader = ({
 
   const selectBreadcrumb = (columnIndex: number) => {
     popColumnAtIndex(columnIndex)
+    popOpenedFoldersAtIndex(columnIndex - 1)
   }
 
   const refreshData = async () => {

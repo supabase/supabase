@@ -252,14 +252,17 @@ const FileExplorerColumn = ({
           </div>
         )}
 
-      {snap.isSearching && itemSearchString.length > 0 && isEmpty && (
-        <div className="h-full w-full flex flex-col items-center justify-center">
-          <p className="text-sm my-3 text-scale-1200">No results found in this folder</p>
-          <p className="w-40 text-center text-sm text-light">
-            Your search for "{itemSearchString}" did not return any results
-          </p>
-        </div>
-      )}
+      {snap.isSearching &&
+        itemSearchString.length > 0 &&
+        isEmpty &&
+        column.status !== STORAGE_ROW_STATUS.LOADING && (
+          <div className="h-full w-full flex flex-col items-center justify-center">
+            <p className="text-sm my-3 text-scale-1200">No results found in this folder</p>
+            <p className="w-40 text-center text-sm text-light">
+              Your search for "{itemSearchString}" did not return any results
+            </p>
+          </div>
+        )}
 
       {/* Drag drop upload CTA for when column has files */}
       <DragOverOverlay
