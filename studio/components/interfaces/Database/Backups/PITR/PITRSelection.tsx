@@ -10,9 +10,9 @@ import { Alert, Button, IconChevronLeft, IconChevronRight, IconHelpCircle, Modal
 
 import { FormHeader, FormPanel } from 'components/ui/Forms'
 import InformationBox from 'components/ui/InformationBox'
+import { useBackupsQuery } from 'data/database/backups-query'
 import { usePitrRestoreMutation } from 'data/database/pitr-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useStore } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import BackupsEmpty from '../BackupsEmpty'
 import { Timezone } from './PITR.types'
@@ -29,9 +29,9 @@ import TimezoneSelection from './TimezoneSelection'
 const PITRSelection = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const { backups } = useStore()
   const queryClient = useQueryClient()
 
+  const { data: backups } = useBackupsQuery({ projectRef: ref })
   const [showConfiguration, setShowConfiguration] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [selectedTimezone, setSelectedTimezone] = useState<Timezone>(getClientTimezone())
@@ -47,12 +47,14 @@ const PITRSelection = () => {
   })
 
   const { earliestPhysicalBackupDateUnix, latestPhysicalBackupDateUnix } =
-    backups?.configuration?.physicalBackupData ?? {}
+    backups?.physicalBackupData ?? {}
   const hasNoBackupsAvailable = !earliestPhysicalBackupDateUnix || !latestPhysicalBackupDateUnix
   const earliestAvailableBackup = dayjs
-    .unix(earliestPhysicalBackupDateUnix)
+    .unix(earliestPhysicalBackupDateUnix ?? 0)
     .tz(selectedTimezone.utc[0])
-  const latestAvailableBackup = dayjs.unix(latestPhysicalBackupDateUnix).tz(selectedTimezone.utc[0])
+  const latestAvailableBackup = dayjs
+    .unix(latestPhysicalBackupDateUnix ?? 0)
+    .tz(selectedTimezone.utc[0])
 
   const [selectedDateRaw, setSelectedDateRaw] = useState<Date>(latestAvailableBackup.toDate())
   const selectedDate = dayjs(selectedDateRaw).tz(selectedTimezone.utc[0], true) // true to keep local time and just change +whatever
