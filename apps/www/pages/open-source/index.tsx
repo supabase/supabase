@@ -7,6 +7,9 @@ import maintainers from '~/data/maintainers.json'
 import Sponsors from '~/components/Sponsors'
 import Image from 'next/image'
 import { NextSeo } from 'next-seo'
+import ProductHeaderCentered from '../../components/Sections/ProductHeaderCentered'
+import pageData from '~/data/open-source'
+import Repos from '../../components/OpenSource/Repos'
 
 const OpenSource = () => {
   const octokit = new Octokit()
@@ -25,7 +28,7 @@ const OpenSource = () => {
       const res = await octokit.request('GET /orgs/{org}/repos', {
         org: 'supabase',
         type: 'public',
-        per_page: 6,
+        per_page: 200,
         page: 1,
       })
       setRepos(res.data)
@@ -33,10 +36,12 @@ const OpenSource = () => {
     fetchOctoData()
   }, [])
 
+  console.log(repos)
   const router = useRouter()
 
-  const meta_title = 'Open Source | Supabase'
+  const meta_title = pageData.metaTitle || 'Open Source | Supabase'
   const meta_description =
+    pageData.metaDescription ||
     'Supabase is an open source company, supporting existing open source tools and communities wherever possible.'
 
   return (
@@ -56,7 +61,13 @@ const OpenSource = () => {
         }}
       />
       <DefaultLayout>
-        <div className="text-scale-1200 container mx-auto">
+        <SectionContainer className="overflow-hidden pt-8 pb-12 md:pt-12">
+          <ProductHeaderCentered {...pageData.heroSection} />
+        </SectionContainer>
+        <SectionContainer className="!pt-0">
+          <Repos repos={repos} tabs={pageData.repo_tabs} title="Yooo" paragraph="asfd" />
+        </SectionContainer>
+        {/* <div className="text-scale-1200 container mx-auto">
           <SectionContainer>
             <div className="container">
               <div className="flex items-center mb-16">
@@ -71,9 +82,9 @@ const OpenSource = () => {
               <h2 className="mb-6 text-2xl font-medium">Sponsors</h2>
               <Sponsors />
             </div>
-          </SectionContainer>
+          </SectionContainer> */}
 
-          <SectionContainer>
+        {/* <SectionContainer>
             <div className="">
               <h2 className="mb-6 text-2xl font-medium">Community Maintainers</h2>
 
@@ -127,7 +138,6 @@ const OpenSource = () => {
             </div>
           </SectionContainer>
 
-          {/* OSS */}
           <SectionContainer>
             <div>
               <h2 className="mb-6 text-2xl font-medium">Repositories</h2>
@@ -153,6 +163,7 @@ const OpenSource = () => {
             </div>
           </SectionContainer>
         </div>
+      */}
       </DefaultLayout>
     </>
   )
