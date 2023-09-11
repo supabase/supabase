@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react'
 import dayjs from 'dayjs'
 import Chart from './Sparkline'
 import { StackedChartProps } from './Charts.types'
-import { STACK_COLORS } from './Charts.constants'
+import { DEFAULT_STACK_COLORs } from './Charts.constants'
 
 export default {
   title: 'Charts/Sparkline',
