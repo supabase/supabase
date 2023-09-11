@@ -299,6 +299,34 @@ const changes = client
 
 The channel name can be any string except 'realtime'.
 
+### Listening to multiple changes
+
+To listen to different events and schema/tables/filters combinations with the same channel:
+
+```js
+const channel = supabase
+  .channel('db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'messages',
+    },
+    (payload) => console.log(payload)
+  )
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'users',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
 ### Filtering for specific changes
 
 Use the `filter` paramater for granular changes:
@@ -318,8 +346,6 @@ const changes = client
   )
   .subscribe()
 ```
-
-The channel name can be any string except 'realtime'.
 
 ## Available filters
 
@@ -479,36 +505,7 @@ const channel = supabase
 
 This filter uses Postgres's `= ANY`. Realtime allows a maximum of 100 values for this filter.
 
-## Combination changes
-
-To listen to different events and schema/tables/filters combinations with the same channel:
-
-```js
-const channel = supabase
-  .channel('db-changes')
-  .on(
-    'postgres_changes',
-    {
-      event: '*',
-      schema: 'public',
-      table: 'messages',
-      filter: 'body=eq.bye',
-    },
-    (payload) => console.log(payload)
-  )
-  .on(
-    'postgres_changes',
-    {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'users',
-    },
-    (payload) => console.log(payload)
-  )
-  .subscribe()
-```
-
-## Full `old` record
+## Receiveing `old` records
 
 By default, only `new` record changes are sent but if you want to receive the `old` record (previous values) whenever you `UPDATE` or `DELETE` a record, you can set the `replica identity` of your table to `full`:
 
@@ -519,7 +516,7 @@ alter table
 
 <Admonition type="caution">
 
-RLS policies are not applied to `DELETE` statements. When RLS is enabled and `replica identity` is set to `full` on a table, the `old` record contains only the primary key(s).
+RLS policies are not applied to `DELETE` statements, because there is no way for Postgres to verify that a user has access to a deleted record. When RLS is enabled and `replica identity` is set to `full` on a table, the `old` record contains only the primary key(s).
 
 </Admonition>
 
@@ -587,11 +584,11 @@ supabase.realtime.setAuth('fresh-token')
 
 ## Limitations
 
-Realtime systems usually require forethought, because of their scaling dynamics. For the `Postgres Changes` feature, every change event must be checked to see if the subscribed user has access. This means that if you have 100 users subscribed to a table where you make a single insert, it will then trigger 100 "reads": one for each user.
+Realtime systems usually require forethought because of their scaling dynamics. For the `Postgres Changes` feature, every change event must be checked to see if the subscribed user has access. For instance, if you have 100 users subscribed to a table where you make a single insert, it will then trigger 100 "reads": one for each user.
 
-There can be a bottleneck on the database that limits the number of messages streamed to subscribed clients. If you are frequently changing your database, the database query may not be verify the authorization rapidly enough and the delivery of the changes will be delayed until you will get timeout.
+There can be a database bottleneck which limits message throughput. If your database cannot authorize the changes rapidly enough, the changes will be delayed until you receive a timeout.
 
-If you are listening to Postgres Changes at scale, you should consider using separate table without RLS and filters. Alternatively, you can use Realtime server-side only and then re-stream the changes to your clients using a Realtime Broadcast.
+If you are using Postgres Changes at scale, you should consider using separate "public" table without RLS and filters. Alternatively, you can use Realtime server-side only and then re-stream the changes to your clients using a Realtime Broadcast.
 
 From our observations, we recommend the following limits depending on your database size:
 
