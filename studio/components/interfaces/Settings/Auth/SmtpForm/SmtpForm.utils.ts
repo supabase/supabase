@@ -1,6 +1,4 @@
-import { components } from 'data/api'
-
-type AuthConfig = components['schemas']['GoTrueConfig']
+import { AuthConfig } from 'components/interfaces/Auth/Auth.types'
 
 interface AuthConfigForm extends AuthConfig {
   ENABLE_SMTP: boolean

@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { components } from 'data/api'
+import { get } from 'data/fetchers'
 import { useCallback } from 'react'
 import { configKeys } from './keys'
 
@@ -8,13 +8,10 @@ export type ProjectPostgrestConfigVariables = {
   projectRef?: string
 }
 
-export type ProjectPostgrestConfigResponse = {
-  max_rows: number
-  role_claim_key: string
-  db_schema: string
-  db_anon_role: string
-  db_extra_search_path: string
-  jwt_secret: string
+export type Response = components['schemas']['PostgrestConfigWithJWTSecretResponse'] & {
+  jwt_jwks_uris: string[]
+  jwt_oidc_issuers: string[]
+  jwt_custom_jwks: string
 }
 
 export async function getProjectPostgrestConfig(
@@ -25,14 +22,13 @@ export async function getProjectPostgrestConfig(
     throw new Error('projectRef is required')
   }
 
-  const response = await get(`${API_URL}/projects/${projectRef}/config/postgrest`, {
+  const { error, data } = await get('/platform/projects/{ref}/config/postgrest', {
+    params: { path: { ref: projectRef } },
     signal,
   })
-  if (response.error) {
-    throw response.error
-  }
+  if (error) throw error
 
-  return response as ProjectPostgrestConfigResponse
+  return data as Response
 }
 
 export type ProjectPostgrestConfigData = Awaited<ReturnType<typeof getProjectPostgrestConfig>>
