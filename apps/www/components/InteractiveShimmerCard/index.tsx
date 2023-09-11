@@ -80,12 +80,12 @@ const InteractiveShimmerCard = ({
     >
       <div
         className={[
-          'relative h-full rounded-xl bg-scale-200 dark:bg-scale-300 overflow-hidden transition-all text-scale-1100',
+          'relative h-full z-10 rounded-xl bg-scale-200 dark:bg-scale-300 overflow-hidden transition-all text-scale-1100',
           innerClassName,
         ].join(' ')}
       >
-        <div className="relative z-10 w-full h-full">{children}</div>
-        <div ref={innerRef} className="absolute z-0 inset-0 w-full h-full" />
+        {children}
+        <div ref={innerRef} className="absolute z-0 inset-0 w-full h-full pointer-events-none" />
       </div>
     </div>
   )
