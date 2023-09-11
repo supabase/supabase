@@ -450,6 +450,10 @@ export const auth = {
       url: '/guides/auth',
     },
     {
+      name: 'Redirect URLs',
+      url: '/guides/auth/concepts/redirect-urls',
+    },
+    {
       name: 'Quickstarts',
       items: [
         { name: 'Next.js', url: '/guides/auth/quickstarts/nextjs', items: [] },

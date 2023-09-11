@@ -396,7 +396,7 @@ services:
           "--no-verbose",
           "--tries=1",
           "--spider",
-          "http://vector:${VECTOR_API_PORT}/health"
+          "http://vector:9001/health"
         ]
       timeout: 5s
       interval: 5s

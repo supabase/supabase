@@ -9,12 +9,12 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 
 const TriggersPage: NextPageWithLayout = () => {
   const { meta } = useStore()
   const { project } = useProjectContext()
 
-  const [filterString, setFilterString] = useState<string>('')
   const [selectedTrigger, setSelectedTrigger] = useState<any>()
   const [showCreateTriggerForm, setShowCreateTriggerForm] = useState<boolean>(false)
   const [showDeleteTriggerForm, setShowDeleteTriggerForm] = useState<boolean>(false)
@@ -52,13 +52,20 @@ const TriggersPage: NextPageWithLayout = () => {
 
   return (
     <>
-      <TriggersList
-        filterString={filterString}
-        setFilterString={setFilterString}
-        createTrigger={createTrigger}
-        editTrigger={editTrigger}
-        deleteTrigger={deleteTrigger}
-      />
+      <ScaffoldContainer>
+        <ScaffoldSection>
+          <div className="col-span-12">
+            <div className="mb-4">
+              <h3 className="mb-1 text-xl text-scale-1200">Database Triggers</h3>
+            </div>
+            <TriggersList
+              createTrigger={createTrigger}
+              editTrigger={editTrigger}
+              deleteTrigger={deleteTrigger}
+            />
+          </div>
+        </ScaffoldSection>
+      </ScaffoldContainer>
       <CreateTrigger
         trigger={selectedTrigger}
         visible={showCreateTriggerForm}
