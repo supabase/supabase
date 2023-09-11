@@ -95,13 +95,14 @@ const Repos = ({ tabs, repos }: Props) => {
         </Link>
       </div>
       <div className="w-full gap-2 flex flex-col items-center">
-        <div className="flex border justify-center max-w-full w-full md:w-auto overflow-hidden items-center rounded-full bg-surface-100 relative [&_.swiper-wrapper]:w-full [&_.swiper-slide]:w-fit">
+        <div className="relative flex border justify-center h-fit max-w-full w-full md:w-auto overflow-hidden items-center rounded-full bg-surface-100 [&_.swiper-wrapper]:w-full [&_.swiper-slide]:w-fit">
           <Swiper
             // @ts-ignore
             onSwiper={setApiSwiper}
             style={{ padding: 10 }}
             initialSlide={0}
             spaceBetween={10}
+            grabCursor
             slidesPerView="auto"
             onSlideChange={(slider) =>
               setSwiperState(slider.isEnd ? 'END' : slider.isBeginning ? 'START' : 'MIDDLE')
