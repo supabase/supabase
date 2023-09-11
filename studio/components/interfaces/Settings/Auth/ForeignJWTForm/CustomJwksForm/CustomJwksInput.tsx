@@ -43,19 +43,29 @@ export const CustomJwksInput = observer(() => {
   const INITIAL_VALUES: { JWKS: string } = { JWKS: '' }
 
   const { mutateAsync: updateJwt, isLoading: isSubmittingJwtSecretUpdateRequest } =
-    useJwtSecretUpdateMutation()
+    useJwtSecretUpdateMutation({
+      onSuccess: () => {
+        ui.setNotification({
+          category: 'success',
+          message: 'Successfully added custom JWKS JSON.',
+        })
+      },
+      onError: (error) => {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to add custom JWKS JSON: ${error?.message}`,
+        })
+      },
+    })
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
-    setSubmitting(true)
+  const onSubmit = async (values: any) => {
     const trackingId = uuidv4()
     const res = await updateJwt({
       projectRef: projectRef!,
       jwtCustomJwks: values.JWKS,
       changeTrackingId: trackingId,
     })
-    console.log(res)
-
-    setSubmitting(false)
   }
 
   if (isLoading) {
@@ -70,14 +80,12 @@ export const CustomJwksInput = observer(() => {
       onSubmit={onSubmit}
       validationSchema={formSchema}
     >
-      {({ isSubmitting, resetForm, values, setFieldValue, errors }: any) => {
+      {({ resetForm, values, setFieldValue, errors }: any) => {
         const hasChanges = values.JWKS !== postgrestConfig?.jwt_custom_jwks
 
         useEffect(() => {
           resetForm({ values: { JWKS: postgrestConfig?.jwt_custom_jwks } })
-        }, [resetForm])
-
-        console.log(errors)
+        }, [])
 
         return (
           <FormSection>
@@ -106,7 +114,7 @@ export const CustomJwksInput = observer(() => {
                     resetForm({ values: { JWKS: postgrestConfig?.jwt_custom_jwks } })
                   }
                   form={formId}
-                  isSubmitting={isSubmitting}
+                  isSubmitting={isSubmittingJwtSecretUpdateRequest}
                   hasChanges={hasChanges}
                   disabled={errors.JWKS !== undefined}
                 />
