@@ -94,7 +94,7 @@ export const RESOURCE_WARNING_MESSAGES = {
       critical: {
         title: "Your project's CPU usage is at 100% and its performance is affected",
         description:
-          'You will need to either optimize your performance or upgrade your compute to a larger plan',
+          'You will need to optimize your performance or upgrade your compute. Check the usage page for more recent and detailed statistics.',
       },
     },
     cardContent: {
