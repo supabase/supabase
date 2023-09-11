@@ -3,11 +3,8 @@ import { useRouter } from 'next/router'
 import { Octokit } from '@octokit/core'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import maintainers from '~/data/maintainers.json'
-import Image from 'next/image'
 import { NextSeo } from 'next-seo'
 import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
-import Sponsors from '~/components/Sponsors'
 import Repos from '~/components/OpenSource/Repos'
 import Sponsorships from '~/components/OpenSource/Sponsorships'
 
@@ -15,16 +12,11 @@ import pageData from '~/data/open-source'
 
 // Import Swiper styles if swiper used on page
 import 'swiper/swiper.min.css'
+import OSSHero from '../../components/OpenSource/OSSHero'
 
 const OpenSource = () => {
   const octokit = new Octokit()
   const [repos, setRepos] = useState([{}])
-
-  const maintainerTags = maintainers
-    .reduce((acc: any, x: any) => acc.concat(x.tags), []) // get all tags
-    .filter((v: any, i: any, a: any) => a.indexOf(v) === i) // remove duplicates
-    .sort((a: any, b: any) => a.localeCompare(b)) // alphabetical
-  const maintainerPills = ['All'].concat(maintainerTags)
 
   useEffect(() => {
     async function fetchOctoData() {
@@ -39,7 +31,6 @@ const OpenSource = () => {
     fetchOctoData()
   }, [])
 
-  console.log(repos)
   const router = useRouter()
 
   const meta_title = pageData.metaTitle || 'Open Source | Supabase'
@@ -63,10 +54,11 @@ const OpenSource = () => {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout className="relative">
         <SectionContainer className="overflow-hidden pt-8 pb-12 md:pt-12">
           <ProductHeaderCentered className="-mb-14" {...pageData.heroSection} />
         </SectionContainer>
+        <OSSHero />
         <SectionContainer className="!pt-0">
           <Repos repos={repos} tabs={pageData.repo_tabs} title="Yooo" paragraph="asfd" />
         </SectionContainer>
