@@ -23,6 +23,7 @@ import { invalidateOrganizationsQuery } from 'data/organizations/organizations-q
 import { useStore } from 'hooks'
 import { BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
+import { useParams } from 'common'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -57,6 +58,8 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const stripe = useStripe()
   const elements = useElements()
 
+  const { plan } = useParams()
+
   const [orgName, setOrgName] = useState('')
   const [orgKind, setOrgKind] = useState(ORG_KIND_DEFAULT)
   const [orgSize, setOrgSize] = useState(ORG_SIZE_DEFAULT)
@@ -64,7 +67,10 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const [newOrgLoading, setNewOrgLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>()
 
-  const [dbPricingTierKey, setDbPricingTierKey] = useState('FREE')
+  // URL param support for passing plan
+  const [dbPricingTierKey, setDbPricingTierKey] = useState(
+    plan && ['free', 'team', 'pro'].includes(plan) ? plan.toUpperCase() : 'FREE'
+  )
 
   const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
   const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(true)
@@ -133,7 +139,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         elements,
         redirect: 'if_required',
         confirmParams: {
-          return_url: `${getURL()}/new-with-subscription`,
+          return_url: `${getURL()}/new`,
           expand: ['payment_method'],
         },
       })
@@ -366,12 +372,12 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
               description={
                 <div className="space-y-3">
                   <p className="text-sm leading-normal">
-                    This organization will use the new organization level billing, which gives you a
+                    This organization will use the new organization-based billing, which gives you a
                     single subscription for your entire organization, instead of having individual
                     subscriptions per project.{' '}
                   </p>
                   <div>
-                    <Link href="https://www.notion.so/supabase/Org-Level-Billing-Public-Docs-f059a154beb743a19199d05bab4acb08">
+                    <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
                       <a target="_blank" rel="noreferrer">
                         <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                           Documentation

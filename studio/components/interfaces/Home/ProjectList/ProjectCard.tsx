@@ -5,7 +5,6 @@ import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { Project } from 'types'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { ResourceWarning } from 'data/usage/resource-warnings-query'
-import { useFlag } from 'hooks'
 import { ProjectCardStatus } from './ProjectCardStatus'
 
 export interface ProjectCardProps {

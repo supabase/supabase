@@ -22,6 +22,8 @@ const APIDocumentationPanel = ({ visible, onClose }: APIDocumentationPanelProps)
   const {
     data: jsonSchema,
     error: jsonSchemaError,
+    isError: isErrorJSONSchema,
+    isSuccess: isSuccessJSONSchema,
     refetch,
   } = useProjectJsonSchemaQuery({ projectRef: ref })
   const { data: settings } = useProjectApiQuery({ projectRef: ref })
@@ -84,14 +86,15 @@ const APIDocumentationPanel = ({ visible, onClose }: APIDocumentationPanelProps)
     >
       <div className="Docs Docs--table-editor">
         <SidePanel.Content>
-          {jsonSchemaError ? (
+          {isErrorJSONSchema && (
             <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
               <div className="text-scale-1000">
                 <p>Error connecting to API</p>
                 <p>{`${jsonSchemaError}`}</p>
               </div>
             </div>
-          ) : (
+          )}
+          {isSuccessJSONSchema && (
             <>
               {jsonSchema ? (
                 <>

@@ -38,7 +38,11 @@ const General = () => {
   const isOrgBilling = !!organization?.subscription_id
   const formId = 'project-general-settings'
   const initialValues = { name: project?.name ?? '', ref: project?.ref ?? '' }
-  const canUpdateProject = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const canUpdateProject = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
   const { mutateAsync: updateProject, isLoading: isUpdating } = useProjectUpdateMutation()
 
   const onSubmit = async (values: any, { resetForm }: any) => {

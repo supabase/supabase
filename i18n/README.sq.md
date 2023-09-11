@@ -1,6 +1,6 @@
 <p align="center">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--light.svg#gh-light-mode-only">
-<img width="300" src="https://raw.githubusercontent.com/supabase/supabase/master/packages/common/assets/images/supabase-logo-wordmark--dark.svg#gh-dark-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727234-cda046d6-28c6-491a-b284-b86c5cede25d.png#gh-light-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
 </p>
 
 ---
@@ -50,7 +50,7 @@ Supabase është një kombinim i mjeteve që janë projekte të hapura (open sou
 
 Supabase është një [platform hostimi](https://supabase.com/dashboard). Ti mundesh të regjistrohesh dhe të fillosh ta përdorish Supabase duke mos instaluar asgjë. Poashtu ne jemi duke punuar për ta ndërtuar eksperiencën për zhvillim lokal, por kjo nuk është fokusi ynë kryesorë dhe thelbësor, së bashku me stabilitetin e platformës.
 
-![Arkitektura](https://user-images.githubusercontent.com/70828596/187547862-ffa9d058-0c3a-4851-a3e7-92ccfca4b596.png)
+![Arkitektura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) është një objekt-relacional i databasës si sistem me më shumë se 30 vite zhvillim aktiv e cila ka fituar një reputacion të fortë për besueshmërinë, karakteristikë të qëndrueshmërisë ,dhe performancë.
 - [Realtime](https://github.com/supabase/realtime) është një Elixir server që lejon të dëgjosh për insertime, fshirje dhe përdisime në databasën PostgreSQL duke përdorur websockets. Supabase dëgjon në Postgres' funksionaliteti i replikimit i integruar, ajo kthen rrjedhjen e bajteve të replikimit, pastaj transmeton JSON mbi/në websockets.
