@@ -89,7 +89,7 @@ export const RESOURCE_WARNING_MESSAGES = {
       warning: {
         title: 'Your project is currently facing high CPU usage, and its performance is affected',
         description:
-          'You will need to either optimize your performance or upgrade your compute to a larger Project',
+          'You will need to optimize your performance or upgrade your compute. Check the usage page for more recent and detailed statistics.',
       },
       critical: {
         title: "Your project's CPU usage is at 100% and its performance is affected",
