@@ -140,7 +140,12 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
 
   const canUpdateConnectionPoolingConfiguration = useCheckPermissions(
     PermissionAction.UPDATE,
-    'projects'
+    'projects',
+    {
+      resource: {
+        project_id: projectRef,
+      },
+    }
   )
 
   const updateConfig = async (updatedConfig: any) => {
