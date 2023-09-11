@@ -122,6 +122,7 @@ interface ConfigProps {
 
 export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: ConfigProps) => {
   const { ui } = useStore()
+  const { project } = useProjectContext()
   const [updates, setUpdates] = useState({
     pool_mode: bouncerInfo.pool_mode || 'transaction',
     default_pool_size: bouncerInfo.default_pool_size || undefined,
@@ -143,7 +144,7 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
     'projects',
     {
       resource: {
-        project_id: projectRef,
+        project_id: project?.id,
       },
     }
   )
