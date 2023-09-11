@@ -39,7 +39,7 @@ export const RESOURCE_WARNING_MESSAGES = {
       critical: {
         title: 'Your project has depleted its Disk IO Budget, and may become unresponsive',
         description:
-          'You will need to either optimize your performance, or upgrade your compute to a larger plan.',
+          'You will need to optimize your performance or upgrade your compute. Check the usage page for more recent and detailed statistics.',
       },
     },
     cardContent: {
