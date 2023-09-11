@@ -19,6 +19,7 @@ import {
 import { number, object, string } from 'yup'
 
 import { useParams } from 'common'
+import EmailRateLimitsAlert from 'components/interfaces/Auth/EmailRateLimitsAlert'
 import {
   FormActions,
   FormHeader,
@@ -33,7 +34,6 @@ import { useCheckPermissions, useStore } from 'hooks'
 import { urlRegex } from '../../../Auth/Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
-import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 
 const SmtpForm = () => {
   const { ui } = useStore()
