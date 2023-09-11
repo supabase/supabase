@@ -16,11 +16,9 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
-      - name: Download dependencies
-        run: npm ci
       - name: Run prettier
         run: |-
-          npx prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
+          npx --yes prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
         # [Joshen] Temp disable the following due to an issue
         # https://github.com/EPMatt/reviewdog-action-prettier/issues/34
         # uses: EPMatt/reviewdog-action-prettier@v1
@@ -54,11 +52,9 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
-      - name: Download dependencies
-        run: npm ci
       - name: Run prettier
         run: |-
-          npx prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
+          npx --yes prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
         # uses: EPMatt/reviewdog-action-prettier@v1
         # with:
         #   github_token: ${{ secrets.github_token }}
@@ -71,9 +67,7 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v3
-      - name: Install plugin
-        run: npm ci
       - name: Run prettier
         run: |-
           # Check mdx files which contain sql code blocks
-          grep -lr '```sql' apps/docs/pages/**/*.mdx | xargs npx prettier -c
+          grep -lr '```sql' apps/docs/pages/**/*.mdx | xargs npx --yes prettier -c
