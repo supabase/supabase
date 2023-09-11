@@ -80,7 +80,7 @@ const Repos = ({ tabs, repos }: Props) => {
 
   return (
     <div className="flex flex-col gap-8 xl:gap-10">
-      <div className="flex mx-auto items-center gap-6 text-sm sm:gap-8 mb-4">
+      <div className="flex mx-auto items-center gap-6 text-sm sm:gap-8">
         <Link href="https://github.com/supabase/supabase/blob/master/DEVELOPERS.md">
           <a className="text-lighter hover:underline flex gap-1 items-center" target="_blank">
             <GitHubIcon />
@@ -131,10 +131,7 @@ const Repos = ({ tabs, repos }: Props) => {
               </SwiperSlide>
             ))}
           </Swiper>
-          <div
-            className="hidden md:flex flex-nowrap overflow-x-scroll items-center p-2 md:p-1 gap-2 no-scrollbar"
-            role="tablist"
-          >
+          <div className="hidden md:flex flex-nowrap overflow-x-scroll items-center p-2 md:p-1 gap-2 no-scrollbar">
             {tabs.map((tab, index) => (
               <Tab
                 key={tab.label}

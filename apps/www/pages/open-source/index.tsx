@@ -4,12 +4,14 @@ import { Octokit } from '@octokit/core'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import maintainers from '~/data/maintainers.json'
-import Sponsors from '~/components/Sponsors'
 import Image from 'next/image'
 import { NextSeo } from 'next-seo'
-import ProductHeaderCentered from '../../components/Sections/ProductHeaderCentered'
+import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
+import Sponsors from '~/components/Sponsors'
+import Repos from '~/components/OpenSource/Repos'
+import Sponsorships from '~/components/OpenSource/Sponsorships'
+
 import pageData from '~/data/open-source'
-import Repos from '../../components/OpenSource/Repos'
 
 // Import Swiper styles if swiper used on page
 import 'swiper/swiper.min.css'
@@ -67,6 +69,9 @@ const OpenSource = () => {
         </SectionContainer>
         <SectionContainer className="!pt-0">
           <Repos repos={repos} tabs={pageData.repo_tabs} title="Yooo" paragraph="asfd" />
+        </SectionContainer>
+        <SectionContainer className="">
+          <Sponsorships sponsorships={pageData.sponsorships} />
         </SectionContainer>
       </DefaultLayout>
     </>
