@@ -4,7 +4,6 @@ import { PropsWithChildren, useEffect } from 'react'
 
 import ProductMenu from 'components/ui/ProductMenu'
 import { useSelectedProject, useStore, withAuth } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
 import ProjectLayout from '../'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
 
@@ -13,7 +12,7 @@ export interface DatabaseLayoutProps {
 }
 
 const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
-  const { ui, meta, vault, backups } = useStore()
+  const { ui, meta, vault } = useStore()
   const project = useSelectedProject()
 
   const router = useRouter()
@@ -29,10 +28,6 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
       meta.triggers.load()
       meta.extensions.load()
       meta.publications.load()
-
-      if (IS_PLATFORM) {
-        backups.load()
-      }
     }
   }, [ui.selectedProjectRef])
 

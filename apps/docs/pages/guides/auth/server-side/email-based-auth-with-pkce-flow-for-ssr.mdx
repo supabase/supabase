@@ -168,7 +168,7 @@ export const GET = async (event) => {
 		url,
 		locals: { supabase }
 	} = event;
-	const token_hash = url.searchParams.get('token') as string;
+	const token_hash = url.searchParams.get('token_hash') as string;
 	const type = url.searchParams.get('type') as string;
 	const next = url.searchParams.get('next') ?? '/';
 

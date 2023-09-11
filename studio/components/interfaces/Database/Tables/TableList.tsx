@@ -1,5 +1,4 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
@@ -8,8 +7,9 @@ import { useState } from 'react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
@@ -25,7 +25,6 @@ import {
   Input,
   Listbox,
 } from 'ui'
-import { useTablesQuery } from 'data/tables/tables-query'
 
 interface TableListProps {
   onAddTable: () => void
@@ -84,6 +83,10 @@ const TableList = ({
 
   return (
     <>
+      <div className="mb-4">
+        <h3 className="mb-1 text-xl text-scale-1200">Database Tables</h3>
+      </div>
+
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <div className="w-[260px]">
@@ -136,6 +139,7 @@ const TableList = ({
             />
           </div>
         </div>
+
         {!isLocked && (
           <div>
             <Tooltip.Root delayDuration={0}>
@@ -172,9 +176,7 @@ const TableList = ({
 
       {isLoading && (
         <div className="py-4 space-y-2">
-          <ShimmeringLoader />
-          <ShimmeringLoader className="w-3/4" />
-          <ShimmeringLoader className="w-1/2" />
+          <GenericSkeletonLoader />
         </div>
       )}
 
@@ -200,121 +202,148 @@ const TableList = ({
                 </Table.th>,
                 <Table.th key="buttons"></Table.th>,
               ]}
-              body={tables.map((x: any, i: any) => (
-                <Table.tr key={x.id}>
-                  <Table.td>
-                    <p title={x.name}>{x.name}</p>
-                  </Table.td>
-                  <Table.td className="hidden max-w-sm truncate lg:table-cell break-all whitespace-normal">
-                    {x.comment !== null ? (
-                      <p title={x.comment}>{x.comment}</p>
-                    ) : (
-                      <p className="text-scale-800">No description</p>
-                    )}
-                  </Table.td>
-                  <Table.td className="hidden xl:table-cell">
-                    <code className="text-sm">{x.live_rows_estimate ?? x.live_row_count}</code>
-                  </Table.td>
-                  <Table.td className="hidden xl:table-cell">
-                    <code className="text-sm">{x.size}</code>
-                  </Table.td>
-                  <Table.td className="hidden xl:table-cell text-center">
-                    {(realtimePublication?.tables ?? []).find(
-                      (table: any) => table.id === x.id
-                    ) && (
-                      <div className="flex justify-center">
-                        <IconCheck strokeWidth={2} />
-                      </div>
-                    )}
-                  </Table.td>
-                  <Table.td>
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        type="default"
-                        iconRight={<IconColumns />}
-                        className="whitespace-nowrap hover:border-gray-500"
-                        style={{ paddingTop: 3, paddingBottom: 3 }}
-                        onClick={() => onOpenTable(x)}
-                      >
-                        {x.columns?.length} columns
-                      </Button>
+              body={
+                <>
+                  {tables.length === 0 && filterString.length === 0 && (
+                    <Table.tr key={snap.selectedSchemaName}>
+                      <Table.td colSpan={6}>
+                        <p className="text-sm text-scale-1200">No tables created yet</p>
+                        <p className="text-sm text-light">
+                          There are no tables found in the schema "{snap.selectedSchemaName}"
+                        </p>
+                      </Table.td>
+                    </Table.tr>
+                  )}
+                  {tables.length === 0 && filterString.length > 0 && (
+                    <Table.tr key={snap.selectedSchemaName}>
+                      <Table.td colSpan={6}>
+                        <p className="text-sm text-scale-1200">No results found</p>
+                        <p className="text-sm text-light">
+                          Your search for "{filterString}" did not return any results
+                        </p>
+                      </Table.td>
+                    </Table.tr>
+                  )}
+                  {tables.length > 0 &&
+                    tables.map((x: any, i: any) => (
+                      <Table.tr key={x.id}>
+                        <Table.td>
+                          <p title={x.name}>{x.name}</p>
+                        </Table.td>
+                        <Table.td className="hidden max-w-sm truncate lg:table-cell break-all whitespace-normal">
+                          {x.comment !== null ? (
+                            <p title={x.comment}>{x.comment}</p>
+                          ) : (
+                            <p className="text-scale-800">No description</p>
+                          )}
+                        </Table.td>
+                        <Table.td className="hidden xl:table-cell">
+                          <code className="text-sm">
+                            {x.live_rows_estimate ?? x.live_row_count}
+                          </code>
+                        </Table.td>
+                        <Table.td className="hidden xl:table-cell">
+                          <code className="text-sm">{x.size}</code>
+                        </Table.td>
+                        <Table.td className="hidden xl:table-cell text-center">
+                          {(realtimePublication?.tables ?? []).find(
+                            (table: any) => table.id === x.id
+                          ) && (
+                            <div className="flex justify-center">
+                              <IconCheck strokeWidth={2} />
+                            </div>
+                          )}
+                        </Table.td>
+                        <Table.td>
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              type="default"
+                              iconRight={<IconColumns />}
+                              className="whitespace-nowrap hover:border-gray-500"
+                              style={{ paddingTop: 3, paddingBottom: 3 }}
+                              onClick={() => onOpenTable(x)}
+                            >
+                              {x.columns?.length} columns
+                            </Button>
 
-                      <Tooltip.Root delayDuration={0}>
-                        <Tooltip.Trigger>
-                          <Button
-                            type="text"
-                            icon={<IconEdit3 />}
-                            style={{ padding: 5 }}
-                            disabled={!canUpdateTables || isLocked}
-                            onClick={() => onEditTable(x)}
-                          />
-                        </Tooltip.Trigger>
-                        {!canUpdateTables && (
-                          <Tooltip.Portal>
-                            <Tooltip.Content side="bottom">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                  'border border-scale-200',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-scale-1200">
-                                  You need additional permissions to edit tables
-                                </span>
-                              </div>
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        )}
-                      </Tooltip.Root>
+                            <Tooltip.Root delayDuration={0}>
+                              <Tooltip.Trigger>
+                                <Button
+                                  type="text"
+                                  icon={<IconEdit3 />}
+                                  style={{ padding: 5 }}
+                                  disabled={!canUpdateTables || isLocked}
+                                  onClick={() => onEditTable(x)}
+                                />
+                              </Tooltip.Trigger>
+                              {!canUpdateTables && (
+                                <Tooltip.Portal>
+                                  <Tooltip.Content side="bottom">
+                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                    <div
+                                      className={[
+                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                        'border border-scale-200',
+                                      ].join(' ')}
+                                    >
+                                      <span className="text-xs text-scale-1200">
+                                        You need additional permissions to edit tables
+                                      </span>
+                                    </div>
+                                  </Tooltip.Content>
+                                </Tooltip.Portal>
+                              )}
+                            </Tooltip.Root>
 
-                      <Tooltip.Root delayDuration={0}>
-                        <Tooltip.Trigger>
-                          <Button
-                            type="text"
-                            icon={<IconTrash />}
-                            style={{ padding: 5 }}
-                            disabled={!canUpdateTables || isLocked}
-                            onClick={() => onDeleteTable(x)}
-                          />
-                        </Tooltip.Trigger>
-                        {!canUpdateTables && (
-                          <Tooltip.Portal>
-                            <Tooltip.Content side="bottom">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                  'border border-scale-200',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-scale-1200">
-                                  You need additional permissions to delete tables
-                                </span>
-                              </div>
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        )}
-                      </Tooltip.Root>
+                            <Tooltip.Root delayDuration={0}>
+                              <Tooltip.Trigger>
+                                <Button
+                                  type="text"
+                                  icon={<IconTrash />}
+                                  style={{ padding: 5 }}
+                                  disabled={!canUpdateTables || isLocked}
+                                  onClick={() => onDeleteTable(x)}
+                                />
+                              </Tooltip.Trigger>
+                              {!canUpdateTables && (
+                                <Tooltip.Portal>
+                                  <Tooltip.Content side="bottom">
+                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                    <div
+                                      className={[
+                                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                        'border border-scale-200',
+                                      ].join(' ')}
+                                    >
+                                      <span className="text-xs text-scale-1200">
+                                        You need additional permissions to delete tables
+                                      </span>
+                                    </div>
+                                  </Tooltip.Content>
+                                </Tooltip.Portal>
+                              )}
+                            </Tooltip.Root>
 
-                      {/* <Button
-                      type="text"
-                      icon={<IconEdit3 />}
-                      style={{ padding: 5 }}
-                      disabled={isLocked}
-                      onClick={() => onEditTable(x)}
-                    />
-                    <Button
-                      type="text"
-                      icon={<IconTrash />}
-                      style={{ padding: 5 }}
-                      disabled={isLocked}
-                      onClick={() => onDeleteTable(x)}
-                    /> */}
-                    </div>
-                  </Table.td>
-                </Table.tr>
-              ))}
+                            {/* <Button
+                              type="text"
+                              icon={<IconEdit3 />}
+                              style={{ padding: 5 }}
+                              disabled={isLocked}
+                              onClick={() => onEditTable(x)}
+                            />
+                            <Button
+                              type="text"
+                              icon={<IconTrash />}
+                              style={{ padding: 5 }}
+                              disabled={isLocked}
+                              onClick={() => onDeleteTable(x)}
+                            /> */}
+                          </div>
+                        </Table.td>
+                      </Table.tr>
+                    ))}
+                </>
+              }
             />
           </div>
         ))}

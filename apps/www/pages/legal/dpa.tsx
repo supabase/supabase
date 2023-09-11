@@ -41,7 +41,7 @@ const DPA = () => {
         <SectionContainer>
           <div className="mx-auto grid max-w-2xl grid-cols-12 rounded-lg">
             <div className="col-span-12 flex items-center lg:col-span-12">
-              <div className="prose flex flex-col space-y-8 p-16">
+              <div className="prose flex flex-col space-y-8 pb-16">
                 <h1 className="text-center text-5xl">DPA</h1>
                 <p>
                   We have a long-standing commitment to customer privacy and data protection, and as
@@ -82,7 +82,7 @@ const DPA = () => {
                               className="mr-1"
                               loading={isSubmitting}
                             >
-                              Download DPA document
+                              Download DPA
                             </Button>
                           }
                         />
