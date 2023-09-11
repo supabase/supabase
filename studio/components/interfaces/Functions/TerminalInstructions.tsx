@@ -93,7 +93,7 @@ const TerminalInstructions = ({
             <div className="flex items-center justify-center w-8 h-8 p-2 border rounded bg-scale-100">
               <IconTerminal strokeWidth={2} />
             </div>
-            <h4>Terminal instructions</h4>
+            <h4>Create your first Edge Function via the CLI</h4>
           </div>
           {closable && (
             <div className="cursor-pointer" onClick={() => setShowInstructions(!showInstructions)}>
