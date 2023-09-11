@@ -12,6 +12,15 @@ import { LoadingLine } from '../LoadingLine/LoadingLine'
 type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>
 type CommandPrimitiveProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>
 
+export const copyToClipboard = (str: string, callback = () => {}) => {
+  const focused = window.document.hasFocus()
+  if (focused) {
+    window.navigator?.clipboard?.writeText(str).then(callback)
+  } else {
+    console.warn('Unable to copy to clipboard')
+  }
+}
+
 export const Command = React.forwardRef<CommandPrimitiveElement, CommandPrimitiveProps>(
   ({ className, ...props }, ref) => (
     <CommandPrimitive
@@ -358,14 +367,20 @@ export function useHistoryKeys({ enable, messages, setPrompt }: UseHistoryKeysOp
         case 'ArrowUp':
           setMessageSelectionIndex((index) => {
             const newIndex = Math.max(index - 1, 0)
-            setPrompt(messages[newIndex] ?? '')
+            const newMessage = messages[newIndex]
+            if (newMessage) {
+              setPrompt(newMessage)
+            }
             return newIndex
           })
           return
         case 'ArrowDown':
           setMessageSelectionIndex((index) => {
             const newIndex = Math.min(index + 1, messages.length)
-            setPrompt(messages[newIndex] ?? '')
+            const newMessage = messages[newIndex]
+            if (newMessage) {
+              setPrompt(newMessage)
+            }
             return newIndex
           })
           return

@@ -24,7 +24,7 @@ export interface ProjectListProps {
 }
 
 const ProjectList = ({ rewriteHref }: ProjectListProps) => {
-  const { data: organizations } = useOrganizationsQuery()
+  const { data: organizations, isSuccess } = useOrganizationsQuery()
   const {
     data: allProjects,
     isLoading: isLoadingProjects,
@@ -40,7 +40,7 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
   const projectsByOrg = groupBy(allProjects, 'organization_id')
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
-  return (
+  return isSuccess && organizations && organizations?.length > 0 ? (
     <>
       {organizations?.map((organization) => {
         return (
@@ -62,6 +62,8 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
         )
       })}
     </>
+  ) : (
+    <NoProjectsState slug={''} />
   )
 }
 
@@ -93,7 +95,6 @@ const OrganizationProjects = ({
   rewriteHref,
 }: OrganizationProjectsProps) => {
   const isEmpty = !projects || projects.length === 0
-  const canReadProjects = useCheckPermissions(PermissionAction.READ, 'projects', undefined, id)
 
   return (
     <div className="space-y-3" key={makeRandomString(5)}>
@@ -132,29 +133,8 @@ const OrganizationProjects = ({
                 error={projectsError}
               />
             </div>
-          ) : !canReadProjects ? (
-            <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 py-8 px-6 text-center">
-              <div className="space-y-1">
-                <p>You need additional permissions to view projects from this organization</p>
-                <p className="text-sm text-scale-1100">
-                  Contact your organization owner or administrator for assistance.
-                </p>
-              </div>
-            </div>
           ) : isEmpty ? (
-            <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
-              <div className="space-y-1">
-                <p>No projects</p>
-                <p className="text-sm text-scale-1100">Get started by creating a new project.</p>
-              </div>
-              <div>
-                <Link href={`/new/${slug}`}>
-                  <a>
-                    <Button icon={<IconPlus />}>New Project</Button>
-                  </a>
-                </Link>
-              </div>
-            </div>
+            <NoProjectsState slug={slug} />
           ) : (
             projects?.map((project) => (
               <ProjectCard
@@ -166,6 +146,24 @@ const OrganizationProjects = ({
           )}
         </ul>
       )}
+    </div>
+  )
+}
+
+const NoProjectsState = ({ slug }: { slug: string }) => {
+  return (
+    <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+      <div className="space-y-1">
+        <p>No projects</p>
+        <p className="text-sm text-scale-1100">Get started by creating a new project.</p>
+      </div>
+      <div>
+        <Link href={`/new/${slug}`}>
+          <a>
+            <Button icon={<IconPlus />}>New Project</Button>
+          </a>
+        </Link>
+      </div>
     </div>
   )
 }

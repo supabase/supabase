@@ -8,6 +8,15 @@
 @import './../../../packages/ui/build/css/themes/dark.css';
 @import './../../../packages/ui/build/css/themes/light.css';
 
+@layer utilities {
+  .run {
+    animation-play-state: running;
+  }
+  .pause {
+    animation-play-state: paused;
+  }
+}
+
 @font-face {
   font-family: 'custom-font';
   src: url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),
