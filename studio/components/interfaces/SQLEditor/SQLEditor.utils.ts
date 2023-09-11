@@ -3,6 +3,7 @@ import MarkdownTable from 'markdown-table'
 import { NEW_SQL_SNIPPET_SKELETON } from './SQLEditor.constants'
 import { SqlSnippets, UserContent } from 'types'
 import { DiffType } from './SQLEditor.types'
+import { stripIndent } from 'common-tags'
 
 export const getResultsMarkdown = (results: any[]) => {
   const columns = Object.keys(results[0])
@@ -67,3 +68,17 @@ export function getDiffTypeDropdownLabel(diffType: DiffType) {
       throw new Error(`Unknown diff type '${diffType}'`)
   }
 }
+
+export const generateMigrationImportCommand = (
+  id: string,
+  name: string,
+  isNpx = false
+) => stripIndent`
+  ${isNpx ? 'npx ' : ''}supabase snippets download ${id} |
+    ${isNpx ? 'npx ' : ''}supabase migration new ${name}
+`
+
+export const generateSeedImportCommand = (id: string, isNpx = false) => stripIndent`
+  ${isNpx ? 'npx ' : ''}supabase snippets download ${id} >> \\
+    supabase/seed.sql
+`

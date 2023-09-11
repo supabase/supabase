@@ -79,7 +79,7 @@ export const CodeBlock = ({
 
   const large = false
   // don't show line numbers if bash == lang
-  if (lang !== 'bash') hideLineNumbers = true
+  if (lang === 'bash' || lang === 'sh') hideLineNumbers = true
   const showLineNumbers = !hideLineNumbers
 
   return (

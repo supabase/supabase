@@ -1,9 +1,11 @@
-import { Button, IconCommand, IconCornerDownLeft } from 'ui'
 import { IS_PLATFORM } from 'lib/constants'
+import { detectOS } from 'lib/helpers'
+import { useState } from 'react'
+import { Button, IconCommand, IconCornerDownLeft, IconDownload } from 'ui'
+import ImportSnippetModal from '../ImportSnippetModal'
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
 import SizeToggleButton from './SizeToggleButton'
-import { detectOS } from 'lib/helpers'
 
 export type UtilityActionsProps = {
   id: string
@@ -19,10 +21,26 @@ const UtilityActions = ({
   executeQuery,
 }: UtilityActionsProps) => {
   const os = detectOS()
+  const [isImportSnippetModalOpen, setIsImportSnippetModalOpen] = useState(false)
 
   return (
     <>
+      <ImportSnippetModal
+        id={id}
+        visible={isImportSnippetModalOpen}
+        onCancel={() => setIsImportSnippetModalOpen(false)}
+      />
       <SavingIndicator id={id} />
+      {IS_PLATFORM && (
+        <Button
+          type="text"
+          size="tiny"
+          icon={<IconDownload size="tiny" />}
+          onClick={() => setIsImportSnippetModalOpen(true)}
+        >
+          Import locally
+        </Button>
+      )}
       {IS_PLATFORM && <FavoriteButton id={id} />}
       <SizeToggleButton id={id} />
       <Button
