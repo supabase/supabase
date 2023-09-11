@@ -18,6 +18,7 @@ jobs:
           cache: 'npm'
       - name: Run prettier
         run: |-
+          npm i -g prettier-plugin-sql-cst
           npx --yes prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
         # [Joshen] Temp disable the following due to an issue
         # https://github.com/EPMatt/reviewdog-action-prettier/issues/34
