@@ -10,7 +10,7 @@ import { useStore } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID, IS_PLATFORM } from 'lib/constants'
 import { copyToClipboard } from 'lib/helpers'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { STORAGE_ROW_TYPES } from '../Storage.constants'
+import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import ConfirmDeleteModal from './ConfirmDeleteModal'
 import CustomExpiryModal from './CustomExpiryModal'
 import FileExplorer from './FileExplorer'
@@ -46,6 +46,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
     loadExplorerPreferences,
     fetchFolderContents,
     fetchMoreFolderContents,
+    fetchFoldersByPath,
     deleteFolder,
     uploadFiles,
     deleteFiles,
@@ -56,10 +57,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
 
   const { ui } = useStore()
   const { ref } = useParams()
-  const { data: customDomainData } = useCustomDomainsQuery(
-    { projectRef: ref },
-    { enabled: IS_PLATFORM }
-  )
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
   const apiService = (projectSettings?.services ?? []).find(
     (x) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
@@ -78,28 +76,33 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const fetchContents = async () => {
-      const currentFolderIdx = openedFolders.length - 1
-      const currentFolder = openedFolders[currentFolderIdx]
+      if (view === STORAGE_VIEWS.LIST) {
+        const currentFolderIdx = openedFolders.length - 1
+        const currentFolder = openedFolders[currentFolderIdx]
 
-      if (itemSearchString) {
-        if (!currentFolder) {
-          // At root of bucket
-          await fetchFolderContents(bucket.id, bucket.name, -1, itemSearchString)
+        if (itemSearchString) {
+          if (!currentFolder) {
+            // At root of bucket
+            await fetchFolderContents(bucket.id, bucket.name, -1, itemSearchString)
+          } else {
+            await fetchFolderContents(
+              currentFolder.id,
+              currentFolder.name,
+              currentFolderIdx,
+              itemSearchString
+            )
+          }
         } else {
-          await fetchFolderContents(
-            currentFolder.id,
-            currentFolder.name,
-            currentFolderIdx,
-            itemSearchString
-          )
+          if (!currentFolder) {
+            // At root of bucket
+            await fetchFolderContents(bucket.id, bucket.name, -1)
+          } else {
+            await fetchFolderContents(currentFolder.id, currentFolder.name, currentFolderIdx)
+          }
         }
-      } else {
-        if (!currentFolder) {
-          // At root of bucket
-          await fetchFolderContents(bucket.id, bucket.name, -1)
-        } else {
-          await fetchFolderContents(currentFolder.id, currentFolder.name, currentFolderIdx)
-        }
+      } else if (view === STORAGE_VIEWS.COLUMNS) {
+        const paths = openedFolders.map((folder: any) => folder.name)
+        fetchFoldersByPath(paths, itemSearchString, true)
       }
     }
 
@@ -220,6 +223,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
           openedFolders={openedFolders}
           selectedItems={selectedItems}
           selectedFilePreview={selectedFilePreview}
+          itemSearchString={itemSearchString}
           onFilesUpload={onFilesUpload}
           onSelectAllItemsInColumn={onSelectAllItemsInColumn}
           onSelectColumnEmptySpace={onSelectColumnEmptySpace}
