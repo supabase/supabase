@@ -1,8 +1,7 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { groupBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
-import { Badge, Button, IconPlus } from 'ui'
+import { Button, IconExternalLink, IconPlus, Modal } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
 import {
@@ -12,12 +11,12 @@ import {
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useCheckPermissions } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
 import { Organization, Project, ResponseError } from 'types'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
+import { useState } from 'react'
 
 export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string
@@ -96,6 +95,8 @@ const OrganizationProjects = ({
 }: OrganizationProjectsProps) => {
   const isEmpty = !projects || projects.length === 0
 
+  const [orgBillingMigrationModalVisible, setOrgBillingMigrationModalVisible] = useState(false)
+
   return (
     <div className="space-y-3" key={makeRandomString(5)}>
       <div className="flex space-x-4 items-center">
@@ -108,6 +109,14 @@ const OrganizationProjects = ({
                 <Button type="danger">Outstanding Invoices</Button>
               </a>
             </Link>
+          </div>
+        )}
+
+        {!subscription_id && (
+          <div>
+            <Button onClick={() => setOrgBillingMigrationModalVisible(true)} type="warning">
+              Action Required
+            </Button>
           </div>
         )}
       </div>
@@ -146,6 +155,48 @@ const OrganizationProjects = ({
           )}
         </ul>
       )}
+
+      <Modal
+        closable
+        hideFooter
+        size="small"
+        visible={orgBillingMigrationModalVisible}
+        onCancel={() => setOrgBillingMigrationModalVisible(false)}
+        header="We're upgrading our billing system"
+      >
+        <Modal.Content className="py-4 space-y-4">
+          <div className="space-y-3">
+            <p className="text-sm leading-normal">
+              The organization "{name}" still uses the legacy project-based billing. We've recently
+              made some big improvements to our billing system and require your action. To migrate
+              to the new organization-based billing, head over to your{' '}
+              <Link href={`/org/${slug}/billing`} passHref>
+                <a className="text-sm text-green-900 transition hover:text-green-1000">
+                  organization billing settings
+                </a>
+              </Link>
+              .
+            </p>
+
+            <div className="space-x-3">
+              <Link href="https://supabase.com/blog/organization-based-billing" passHref>
+                <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                  <a target="_blank" rel="noreferrer">
+                    Announcement
+                  </a>
+                </Button>
+              </Link>
+              <Link href="https://supabase.com/docs/guides/platform/org-based-billing" passHref>
+                <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                  <a target="_blank" rel="noreferrer">
+                    Documentation
+                  </a>
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </Modal.Content>
+      </Modal>
     </div>
   )
 }

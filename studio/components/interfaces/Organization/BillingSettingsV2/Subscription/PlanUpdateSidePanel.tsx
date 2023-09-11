@@ -25,6 +25,7 @@ import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/or
 import InformationBox from 'components/ui/InformationBox'
 import AlertError from 'components/ui/AlertError'
 import { SubscriptionTier } from 'data/subscriptions/types'
+import Table from 'components/to-be-cleaned/Table'
 
 // [Joshen TODO] Need to remove all contexts of "projects"
 
@@ -322,70 +323,71 @@ const PlanUpdateSidePanel = () => {
             <span className="text-sm">Estimating monthly costs...</span>
           )}
           {subscriptionPreviewInitialized && (
-            <InformationBox
-              defaultVisibility={false}
-              title={
-                <span>
-                  Estimated monthly price is $
-                  {Math.round(
-                    subscriptionPreview.breakdown.reduce((prev, cur) => prev + cur.total_price, 0)
-                  )}{' '}
-                  + usage
-                </span>
-              }
-              hideCollapse={false}
-              description={
-                <div>
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="py-2 font-normal text-left text-sm text-scale-1000 w-1/2">
-                          Item
-                        </th>
-                        <th className="py-2 font-normal text-left text-sm text-scale-1000">
-                          Count
-                        </th>
-                        <th className="py-2 font-normal text-left text-sm text-scale-1000">
-                          Unit Price
-                        </th>
-                        <th className="py-2 font-normal text-right text-sm text-scale-1000">
-                          Price
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {subscriptionPreview.breakdown.map((item) => (
-                        <tr key={item.description} className="border-b">
-                          <td className="py-2 text-sm">{item.description ?? 'Unknown'}</td>
-                          <td className="py-2 text-sm">{item.quantity}</td>
-                          <td className="py-2 text-sm">
-                            {item.unit_price === 0 ? 'FREE' : `$${item.unit_price}`}
-                          </td>
-                          <td className="py-2 text-sm text-right">${item.total_price}</td>
-                        </tr>
-                      ))}
-                    </tbody>
+            <div>
+              <InformationBox
+                defaultVisibility={false}
+                title={
+                  <span>
+                    Estimated monthly price is $
+                    {Math.round(
+                      subscriptionPreview.breakdown.reduce((prev, cur) => prev + cur.total_price, 0)
+                    )}{' '}
+                    + usage
+                  </span>
+                }
+                hideCollapse={false}
+                description={
+                  <Table
+                    borderless={true}
+                    head={[
+                      <Table.th key="header-item">Item</Table.th>,
+                      <Table.th key="header-count">Count</Table.th>,
+                      <Table.th key="header-unit-price">Unit Price</Table.th>,
+                      <Table.th key="header-price" className="text-right">
+                        Price
+                      </Table.th>,
+                    ]}
+                    body={
+                      <>
+                        {subscriptionPreview.breakdown.map((item) => (
+                          <Table.tr key={item.description}>
+                            <Table.td>{item.description ?? 'Unknown'}</Table.td>
+                            <Table.td>{item.quantity}</Table.td>
+                            <Table.td>
+                              {item.unit_price === 0 ? 'FREE' : `$${item.unit_price}`}
+                            </Table.td>
+                            <Table.td className="text-right">${item.total_price}</Table.td>
+                          </Table.tr>
+                        ))}
 
-                    <tbody>
-                      <tr>
-                        <td className="py-2 text-sm">Total</td>
-                        <td className="py-2 text-sm" />
-                        <td className="py-2 text-sm" />
-                        <td className="py-2 text-sm text-right">
-                          $
-                          {Math.round(
-                            subscriptionPreview.breakdown.reduce(
-                              (prev, cur) => prev + cur.total_price,
-                              0
-                            )
-                          ) ?? 0}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              }
-            />
+                        <Table.tr>
+                          <Table.td>Total</Table.td>
+                          <Table.td />
+                          <Table.td />
+                          <Table.td className=" text-right">
+                            $
+                            {Math.round(
+                              subscriptionPreview.breakdown.reduce(
+                                (prev, cur) => prev + cur.total_price,
+                                0
+                              )
+                            ) ?? 0}
+                          </Table.td>
+                        </Table.tr>
+                      </>
+                    }
+                  ></Table>
+                }
+              />
+
+              {subscriptionPreview.number_of_projects &&
+                subscriptionPreview.number_of_projects > 1 && (
+                  <p className="text-sm mt-2">
+                    All {subscriptionPreview.number_of_projects} projects from your organization "
+                    {selectedOrganization?.name}" will use the new {planMeta?.name} plan.
+                  </p>
+                )}
+            </div>
           )}
         </Modal.Content>
 
