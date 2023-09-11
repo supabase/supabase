@@ -187,6 +187,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>((props
             {...gridProps}
             rows={data?.rows ?? []}
             updateRow={updateTableRow}
+            onAddRow={onAddRow}
             onImportData={onImportData}
             onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
           />

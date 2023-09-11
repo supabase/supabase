@@ -28,6 +28,7 @@ const updateColumnResizeDebounced = AwesomeDebouncePromise(updateColumnResize, 5
 interface IGrid extends GridProps {
   rows: any[]
   updateRow: (previousRow: any, updatedData: any) => void
+  onAddRow?: () => void
   onImportData?: () => void
   onEditForeignKeyColumnValue: (args: {
     foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
@@ -48,6 +49,7 @@ export const Grid = memo(
         rowClass,
         rows,
         updateRow,
+        onAddRow,
         onImportData,
         onEditForeignKeyColumnValue,
       },
@@ -145,16 +147,20 @@ export const Grid = memo(
                 className="flex flex-col items-center justify-center"
               >
                 <p className="text-base">This table is empty</p>
-                <p className="text-sm text-light mt-1">Add or generate rows to get started.</p>
-                <div className="flex items-center space-x-2 mt-4">
-                  {/* [Joshen] Leaving this as a placeholder */}
-                  {/* <Button type="outline">Generate random data</Button> */}
-                  {onImportData !== undefined && (
-                    <Button type="default" onClick={onImportData}>
-                      Import data via CSV
-                    </Button>
-                  )}
-                </div>
+                {onAddRow !== undefined && onImportData !== undefined && (
+                  <>
+                    <p className="text-sm text-light mt-1">Add or generate rows to get started.</p>
+                    <div className="flex items-center space-x-2 mt-4">
+                      {/* [Joshen] Leaving this as a placeholder */}
+                      {/* <Button type="outline">Generate random data</Button> */}
+                      {onAddRow !== undefined && onImportData !== undefined && (
+                        <Button type="default" onClick={onImportData}>
+                          Import data via CSV
+                        </Button>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
             }
           />
