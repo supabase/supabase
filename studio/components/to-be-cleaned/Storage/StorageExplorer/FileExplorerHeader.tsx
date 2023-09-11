@@ -24,6 +24,7 @@ import {
 import { useCheckPermissions } from 'hooks'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 
 const HeaderPathEdit = ({ loading, isSearching, breadcrumbs, togglePathEdit }: any) => {
   return (
@@ -109,13 +110,14 @@ const FileExplorerHeader = ({
   onFilesUpload = noop,
 }: FileExplorerHeader) => {
   const debounceDuration = 300
+  const snap = useStorageExplorerStateSnapshot()
+
   const [pathString, setPathString] = useState('')
   const [searchString, setSearchString] = useState('')
   const [loading, setLoading] = useState({ isLoading: false, message: '' })
 
   const [isEditingPath, setIsEditingPath] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
-  const [isSearching, setIsSearching] = useState(false)
 
   const uploadButtonRef: any = useRef(null)
   const previousBreadcrumbs: any = useRef(null)
@@ -179,7 +181,7 @@ const FileExplorerHeader = ({
   const togglePathEdit = () => {
     setIsEditingPath(true)
     setPathString(breadcrumbs.slice(1).join('/'))
-    if (isSearching) onCancelSearch()
+    if (snap.isSearching) onCancelSearch()
   }
 
   const onUpdatePathString = (event: any) => {
@@ -217,12 +219,12 @@ const FileExplorerHeader = ({
   // Searching for column view requires much more thinking
   const toggleSearch = () => {
     setIsEditingPath(false)
-    setIsSearching(true)
+    snap.setIsSearching(true)
   }
 
   const onCancelSearch = () => {
     setSearchString('')
-    setIsSearching(false)
+    snap.setIsSearching(false)
     setItemSearchString('')
   }
 
@@ -260,7 +262,7 @@ const FileExplorerHeader = ({
             }}
           />
         )}
-        {!isSearching && <></>}
+        {!snap.isSearching && <></>}
         {isEditingPath ? (
           <form className="ml-2 flex-grow">
             <Input
@@ -294,14 +296,14 @@ const FileExplorerHeader = ({
         ) : view === STORAGE_VIEWS.COLUMNS ? (
           <HeaderPathEdit
             loading={loading}
-            isSearching={isSearching}
+            isSearching={snap.isSearching}
             breadcrumbs={breadcrumbs}
             togglePathEdit={togglePathEdit}
           />
         ) : (
           <HeaderBreadcrumbs
             loading={loading}
-            isSearching={isSearching}
+            isSearching={snap.isSearching}
             breadcrumbs={breadcrumbs}
             selectBreadcrumb={selectBreadcrumb}
           />
@@ -462,7 +464,7 @@ const FileExplorerHeader = ({
 
         <div className="h-6 border-r border-scale-600" />
         <div className="flex items-center pr-1.5">
-          {isSearching ? (
+          {snap.isSearching ? (
             <Input
               size="tiny"
               autoFocus
