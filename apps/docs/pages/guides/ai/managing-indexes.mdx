@@ -80,8 +80,6 @@ create index on items using ivfflat (column_name vector_cosine_ops) with (lists 
 
 Currently vectors with up to 2,000 dimensions can be indexed.
 
-If you are using the `vecs` Python library, follow the instructions in [Managing collections](/docs/guides/ai/managing-collections#create-an-index) to create indexes.
-
 ## When should you add indexes?
 
 `pgvector` recommends adding indexes only after the table has sufficient data, so that the internal IVFFlat cell clusters are based on your data's distribution. Anytime the distribution changes significantly, consider recreating indexes.
