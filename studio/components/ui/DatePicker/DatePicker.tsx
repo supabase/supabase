@@ -1,19 +1,22 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import {
   Button,
-  Popover,
-  IconChevronLeft,
-  IconChevronRight,
   IconArrowRight,
   IconCalendar,
+  IconChevronLeft,
+  IconChevronRight,
+  Popover,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
 } from 'ui'
 
+import { DatePickerToFrom } from 'components/interfaces/Settings/Logs'
 import { format } from 'date-fns'
-import TimeSplitInput from './TimeSplitInput'
 import dayjs from 'dayjs'
 import { ButtonProps } from 'ui/src/components/Button/Button'
-import { DatePickerToFrom } from 'components/interfaces/Settings/Logs'
+import TimeSplitInput from './TimeSplitInput'
 
 export interface DatePickerProps {
   onChange?: (args: DatePickerToFrom) => void
@@ -139,64 +142,87 @@ function _DatePicker({
 
     if (onChange) onChange({ from: null, to: null })
   }
+
   return (
-    <Popover
-      open={open}
-      onOpenChange={(e) => setOpen(e)}
-      size="small"
-      align="center"
-      side="bottom"
-      header={
-        hideTime ? null : (
-          <>
-            <div className="flex items-stretch justify-between py-2">
-              {!selectsRange ? null : (
+    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
+      <PopoverTrigger_Shadcn_ asChild>
+        <Button
+          title={triggerButtonTitle}
+          type={triggerButtonType}
+          icon={<IconCalendar />}
+          className={triggerButtonClassName}
+        >
+          {children !== undefined ? (
+            children
+          ) : (
+            <>
+              {/* Custom */}
+              {selectsRange &&
+              appliedStartDate &&
+              appliedEndDate &&
+              appliedStartDate !== appliedEndDate ? (
                 <>
-                  <div className="flex grow flex-col gap-1">
-                    <TimeSplitInput
-                      type="start"
-                      startTime={startTime}
-                      endTime={endTime}
-                      time={startTime}
-                      setTime={setStartTime}
-                      setStartTime={setStartTime}
-                      setEndTime={setEndTime}
-                      startDate={startDate}
-                      endDate={endDate}
-                    />
-                  </div>
-                  <div
-                    className={`
+                  {format(new Date(appliedStartDate), 'dd MMM')} -{' '}
+                  {format(new Date(appliedEndDate), 'dd MMM')}
+                </>
+              ) : appliedStartDate || appliedEndDate ? (
+                format(new Date((appliedStartDate || appliedEndDate)!), 'dd MMM')
+              ) : (
+                'Custom'
+              )}
+            </>
+          )}
+        </Button>
+      </PopoverTrigger_Shadcn_>
+      <PopoverContent_Shadcn_ align="center" side="bottom" className="p-0">
+        <>
+          {hideTime ? null : (
+            <>
+              <div className="flex items-stretch justify-between py-2">
+                {!selectsRange ? null : (
+                  <>
+                    <div className="flex grow flex-col gap-1">
+                      <TimeSplitInput
+                        type="start"
+                        startTime={startTime}
+                        endTime={endTime}
+                        time={startTime}
+                        setTime={setStartTime}
+                        setStartTime={setStartTime}
+                        setEndTime={setEndTime}
+                        startDate={startDate}
+                        endDate={endDate}
+                      />
+                    </div>
+                    <div
+                      className={`
                       flex 
                       w-12 
                       items-center 
                       justify-center
                       text-scale-900
                     `}
-                  >
-                    <IconArrowRight strokeWidth={1.5} size={14} />
-                  </div>
-                </>
-              )}
-              <div className="flex grow flex-col gap-1">
-                <TimeSplitInput
-                  type="end"
-                  startTime={startTime}
-                  endTime={endTime}
-                  time={endTime}
-                  setTime={setEndTime}
-                  setStartTime={setStartTime}
-                  setEndTime={setEndTime}
-                  startDate={startDate}
-                  endDate={endDate}
-                />
+                    >
+                      <IconArrowRight strokeWidth={1.5} size={14} />
+                    </div>
+                  </>
+                )}
+                <div className="flex grow flex-col gap-1">
+                  <TimeSplitInput
+                    type="end"
+                    startTime={startTime}
+                    endTime={endTime}
+                    time={endTime}
+                    setTime={setEndTime}
+                    setStartTime={setStartTime}
+                    setEndTime={setEndTime}
+                    startDate={startDate}
+                    endDate={endDate}
+                  />
+                </div>
               </div>
-            </div>
-          </>
-        )
-      }
-      overlay={
-        <>
+            </>
+          )}
           <div className="px-3 py-4">
             <DatePicker
               inline
@@ -262,37 +288,8 @@ function _DatePicker({
             <Button onClick={() => handleSubmit()}>Apply</Button>
           </div>
         </>
-      }
-    >
-      <Button
-        asChild
-        title={triggerButtonTitle}
-        type={triggerButtonType}
-        icon={<IconCalendar />}
-        className={triggerButtonClassName}
-      >
-        {children !== undefined ? (
-          children
-        ) : (
-          <span>
-            {/* Custom */}
-            {selectsRange &&
-            appliedStartDate &&
-            appliedEndDate &&
-            appliedStartDate !== appliedEndDate ? (
-              <>
-                {format(new Date(appliedStartDate), 'dd MMM')} -{' '}
-                {format(new Date(appliedEndDate), 'dd MMM')}
-              </>
-            ) : appliedStartDate || appliedEndDate ? (
-              format(new Date((appliedStartDate || appliedEndDate)!), 'dd MMM')
-            ) : (
-              'Custom'
-            )}
-          </span>
-        )}
-      </Button>
-    </Popover>
+      </PopoverContent_Shadcn_>
+    </Popover_Shadcn_>
   )
 }
 
