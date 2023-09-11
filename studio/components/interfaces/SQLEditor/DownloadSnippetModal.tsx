@@ -2,23 +2,23 @@ import { ModalProps } from '@ui/components/Modal/Modal'
 import { snakeCase } from 'lodash'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { CodeBlock, Modal, Separator, Tabs, TabsProvider } from 'ui'
-import { generateMigrationImportCommand, generateSeedImportCommand } from './SQLEditor.utils'
+import { generateMigrationCliCommand, generateSeedCliCommand } from './SQLEditor.utils'
 
-export interface ImportSnippetModalProps extends ModalProps {
+export interface DownloadSnippetModalProps extends ModalProps {
   id: string
 }
 
-const ImportSnippetModal = ({ id, ...props }: ImportSnippetModalProps) => {
+const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
   const snap = useSqlEditorStateSnapshot()
   const snippet = snap.snippets[id].snippet
   const migrationName = snakeCase(snippet.name)
 
   return (
-    <Modal size="xlarge" header="Import snippet locally" hideFooter closable {...props}>
+    <Modal size="xlarge" header="Create migration or seed" hideFooter closable {...props}>
       <TabsProvider>
         <div className="flex flex-col items-start justify-between gap-4 px-6 py-3">
           <p className="text-sm mt-2">
-            You can import this snippet as a local{' '}
+            You can download this snippet as a local{' '}
             <a
               className="text-brand"
               href="https://supabase.com/docs/guides/cli/local-development#database-migrations"
@@ -49,9 +49,9 @@ const ImportSnippetModal = ({ id, ...props }: ImportSnippetModalProps) => {
           </p>
           <Separator />
           <div className="flex flex-col gap-2 my-2 w-full">
-            <h2 className="text-lg">Import as migration</h2>
+            <h2 className="text-lg">Download as migration</h2>
             <p className="text-sm text-scale-1000">
-              Import the snippet as a new migration named{' '}
+              Use the snippet in a new migration named{' '}
               <CodeBlock language="bash">{migrationName}</CodeBlock>:
             </p>
             <Tabs type="underlined">
@@ -60,7 +60,7 @@ const ImportSnippetModal = ({ id, ...props }: ImportSnippetModalProps) => {
                   language="bash"
                   className="language-bash prose dark:prose-dark max-w-none"
                 >
-                  {generateMigrationImportCommand(id, migrationName)}
+                  {generateMigrationCliCommand(id, migrationName)}
                 </CodeBlock>
               </Tabs.Panel>
               <Tabs.Panel id="npx" label="npx">
@@ -69,7 +69,7 @@ const ImportSnippetModal = ({ id, ...props }: ImportSnippetModalProps) => {
                     language="bash"
                     className="language-bash prose dark:prose-dark max-w-none"
                   >
-                    {generateMigrationImportCommand(id, migrationName, true)}
+                    {generateMigrationCliCommand(id, migrationName, true)}
                   </CodeBlock>
                 </pre>
               </Tabs.Panel>
@@ -77,7 +77,7 @@ const ImportSnippetModal = ({ id, ...props }: ImportSnippetModalProps) => {
           </div>
           <Separator />
           <div className="flex flex-col gap-2 my-2 w-full">
-            <h2 className="text-lg">Import as seed</h2>
+            <h2 className="text-lg">Download as seed</h2>
             <p className="text-sm text-scale-1000">
               Append the snippet to the end of{' '}
               <CodeBlock language="bash">supabase/seed.sql</CodeBlock>:
@@ -88,7 +88,7 @@ const ImportSnippetModal = ({ id, ...props }: ImportSnippetModalProps) => {
                   language="bash"
                   className="language-bash prose dark:prose-dark max-w-none"
                 >
-                  {generateSeedImportCommand(id)}
+                  {generateSeedCliCommand(id)}
                 </CodeBlock>
               </Tabs.Panel>
               <Tabs.Panel id="npx" label="npx">
@@ -96,7 +96,7 @@ const ImportSnippetModal = ({ id, ...props }: ImportSnippetModalProps) => {
                   language="bash"
                   className="language-bash prose dark:prose-dark max-w-none"
                 >
-                  {generateSeedImportCommand(id, true)}
+                  {generateSeedCliCommand(id, true)}
                 </CodeBlock>
               </Tabs.Panel>
             </Tabs>
@@ -107,4 +107,4 @@ const ImportSnippetModal = ({ id, ...props }: ImportSnippetModalProps) => {
   )
 }
 
-export default ImportSnippetModal
+export default DownloadSnippetModal

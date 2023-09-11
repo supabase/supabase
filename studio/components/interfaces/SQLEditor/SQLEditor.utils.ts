@@ -69,16 +69,12 @@ export function getDiffTypeDropdownLabel(diffType: DiffType) {
   }
 }
 
-export const generateMigrationImportCommand = (
-  id: string,
-  name: string,
-  isNpx = false
-) => stripIndent`
+export const generateMigrationCliCommand = (id: string, name: string, isNpx = false) => stripIndent`
   ${isNpx ? 'npx ' : ''}supabase snippets download ${id} |
     ${isNpx ? 'npx ' : ''}supabase migration new ${name}
 `
 
-export const generateSeedImportCommand = (id: string, isNpx = false) => stripIndent`
+export const generateSeedCliCommand = (id: string, isNpx = false) => stripIndent`
   ${isNpx ? 'npx ' : ''}supabase snippets download ${id} >> \\
     supabase/seed.sql
 `

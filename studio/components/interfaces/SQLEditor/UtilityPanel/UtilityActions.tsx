@@ -1,8 +1,9 @@
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { useState } from 'react'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { Button, IconCommand, IconCornerDownLeft, IconDownload } from 'ui'
-import ImportSnippetModal from '../ImportSnippetModal'
+import DownloadSnippetModal from '../DownloadSnippetModal'
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
 import SizeToggleButton from './SizeToggleButton'
@@ -21,24 +22,29 @@ const UtilityActions = ({
   executeQuery,
 }: UtilityActionsProps) => {
   const os = detectOS()
-  const [isImportSnippetModalOpen, setIsImportSnippetModalOpen] = useState(false)
+  const snap = useSqlEditorStateSnapshot()
+  const [isDownloadSnippetModalOpen, setIsDownloadSnippetModalOpen] = useState(false)
+
+  const snippet = snap.snippets[id]?.snippet
 
   return (
     <>
-      <ImportSnippetModal
-        id={id}
-        visible={isImportSnippetModalOpen}
-        onCancel={() => setIsImportSnippetModalOpen(false)}
-      />
+      {snippet && (
+        <DownloadSnippetModal
+          id={id}
+          visible={isDownloadSnippetModalOpen}
+          onCancel={() => setIsDownloadSnippetModalOpen(false)}
+        />
+      )}
       <SavingIndicator id={id} />
-      {IS_PLATFORM && (
+      {IS_PLATFORM && snippet && (
         <Button
           type="text"
           size="tiny"
           icon={<IconDownload size="tiny" />}
-          onClick={() => setIsImportSnippetModalOpen(true)}
+          onClick={() => setIsDownloadSnippetModalOpen(true)}
         >
-          Import locally
+          Create migration or seed
         </Button>
       )}
       {IS_PLATFORM && <FavoriteButton id={id} />}
