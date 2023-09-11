@@ -98,7 +98,7 @@ const Indexes = () => {
       <div className="pb-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="mb-2 text-xl text-scale-1200">Indexes</h3>
+            <h3 className="mb-1 text-xl text-scale-1200">Database Indexes</h3>
             <div className="text-sm text-scale-900">
               Improve query performance against your database
             </div>

@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import clsx from 'clsx'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
 
@@ -9,6 +8,7 @@ import EditHookPanel from 'components/interfaces/Database/Hooks/EditHookPanel'
 import HooksList from 'components/interfaces/Database/Hooks/HooksList/HooksList'
 import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import NoPermission from 'components/ui/NoPermission'
 import { useHooksEnableMutation } from 'data/database/hooks-enable-mutation'
@@ -112,13 +112,14 @@ const HooksPage: NextPageWithLayout = () => {
   }
 
   return (
-    <div
-      className={clsx(
-        'mx-auto flex flex-col px-5 pt-6 pb-14',
-        'lg:pt-8 lg:px-14 1xl:px-28 2xl:px-32 h-full'
-      )}
-    >
-      <HooksList createHook={createHook} editHook={editHook} deleteHook={deleteHook} />
+    <>
+      <ScaffoldContainer>
+        <ScaffoldSection>
+          <div className="col-span-12">
+            <HooksList createHook={createHook} editHook={editHook} deleteHook={deleteHook} />
+          </div>
+        </ScaffoldSection>
+      </ScaffoldContainer>
       <EditHookPanel
         visible={showCreateHookForm}
         selectedHook={selectedHook}
@@ -129,7 +130,7 @@ const HooksPage: NextPageWithLayout = () => {
         selectedHook={selectedHook}
         onClose={() => setShowDeleteHookForm(false)}
       />
-    </div>
+    </>
   )
 }
 
