@@ -871,7 +871,7 @@ export const realtime: NavMenuConstant = {
       url: '/guides/realtime/concepts',
     },
     {
-      name: 'Features',
+      name: 'Usage',
       url: undefined,
       items: [
         { name: 'Broadcast', url: '/guides/realtime/broadcast' },
