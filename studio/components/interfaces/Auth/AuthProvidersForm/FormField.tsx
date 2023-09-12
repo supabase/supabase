@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
+import dayjs from 'dayjs'
 import { Button, IconEye, IconEyeOff, Input, InputNumber, Listbox, Toggle } from 'ui'
+import { DatePicker } from 'components/ui/DatePicker'
 
 import { BASE_PATH } from 'lib/constants'
 import { Enum } from './AuthProvidersForm.types'
@@ -12,13 +14,81 @@ interface FormFieldProps {
   disabled?: boolean
 }
 
+function formatDate(date: Date): string {
+  return dayjs(date).format('dddd, MMMM D, YYYY HH:mm:ss Z')
+}
+
 const FormField = ({ name, properties, formValues, disabled = false }: FormFieldProps) => {
   const [hidden, setHidden] = useState(!!properties.isSecret)
+  const [dateAsText, setDateAsText] = useState(
+    formValues[name] ? formatDate(new Date(formValues[name])) : ''
+  )
 
-  if (properties.show && !properties.show.matches.includes(formValues[properties.show.key]))
-    return null
+  useEffect(() => {
+    if (properties.show && properties.show.key && !formValues[properties.show.key]) {
+      formValues[name] = ''
+      setDateAsText('')
+    }
+  }, [properties.show && properties.show.key && !formValues[properties.show.key]])
+
+  if (properties.show) {
+    if (properties.show.matches) {
+      if (!properties.show.matches.includes(formValues[properties.show.key])) {
+        return null
+      }
+    } else if (!formValues[properties.show.key]) {
+      return null
+    }
+  }
 
   switch (properties.type) {
+    case 'datetime':
+      return (
+        <Input
+          size="small"
+          layout="vertical"
+          id={name}
+          name={name}
+          type="text"
+          value={dateAsText}
+          readOnly
+          label={properties.title}
+          labelOptional={
+            properties.descriptionOptional ? (
+              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                {properties.descriptionOptional}
+              </ReactMarkdown>
+            ) : null
+          }
+          descriptionText={
+            properties.description ? (
+              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                {properties.description}
+              </ReactMarkdown>
+            ) : null
+          }
+          actions={
+            <DatePicker
+              selectsRange={false}
+              minDate={new Date()}
+              from={formValues[name]}
+              to={formValues[name]}
+              onChange={(date) => {
+                if (date && date.to) {
+                  formValues[name] = date.to
+                  setDateAsText(formatDate(new Date(date.to)))
+                } else {
+                  setDateAsText('')
+                  formValues[name] = ''
+                }
+              }}
+            >
+              <span>Pick</span>
+            </DatePicker>
+          }
+        />
+      )
+
     case 'string':
       return (
         <Input

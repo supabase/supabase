@@ -159,7 +159,11 @@ export function Checkbox({
         if (values && checked === undefined) active = values[id || name]
 
         function handleBlurEvent(e: React.FocusEvent<HTMLInputElement>) {
-          if (handleBlur) handleBlur(e)
+          if (handleBlur) {
+            setTimeout(() => {
+              handleBlur(e)
+            }, 100)
+          }
           if (onBlur) onBlur(e)
         }
 
