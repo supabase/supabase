@@ -1,12 +1,13 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import { useCallback } from 'react'
+
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
-import { organizationKeys } from './keys'
 import { ResponseError } from 'types'
-import dayjs from 'dayjs'
+import { organizationKeys } from './keys'
 
-export type OrganizationAuditLog = {
+export type AuditLog = {
   action: {
     metadata: {
       method?: string
@@ -32,7 +33,7 @@ export type OrganizationAuditLog = {
 }
 
 export type OrganizationAuditLogsResponse = {
-  result: OrganizationAuditLog[]
+  result: AuditLog[]
   retention_period: number
 }
 

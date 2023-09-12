@@ -341,12 +341,14 @@ export const SocialLoginItems = [
     name: 'Twitter',
     icon: '/docs/img/icons/twitter-icon',
     url: '/guides/auth/social-login/auth-twitter',
+    hasLightIcon: true,
   },
   {
     name: 'GitHub',
     icon: '/docs/img/icons/github-icon',
     url: '/guides/auth/social-login/auth-github',
     isDarkMode: true,
+    hasLightIcon: true,
   },
   {
     name: 'Gitlab',
@@ -435,6 +437,7 @@ export const PhoneLoginsItems = [
     linkDescription:
       'Vonage is a communication platform as a service (CPaaS) provider for consumers and businesses.',
     isDarkMode: true,
+    hasLightIcon: true,
   },
 ]
 
@@ -445,6 +448,10 @@ export const auth = {
     {
       name: 'Overview',
       url: '/guides/auth',
+    },
+    {
+      name: 'Redirect URLs',
+      url: '/guides/auth/concepts/redirect-urls',
     },
     {
       name: 'Quickstarts',
@@ -492,22 +499,36 @@ export const auth = {
         { name: 'Managing User Data', url: '/guides/auth/managing-user-data' },
         { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
         { name: 'Row Level Security', url: '/guides/auth/row-level-security' },
-        { name: 'Server-side Rendering', url: '/guides/auth/server-side-rendering' },
       ],
     },
     {
-      name: 'Auth Helpers',
+      name: 'Server-side Auth',
       url: undefined,
       items: [
         { name: 'Overview', url: '/guides/auth/auth-helpers' },
-        { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui' },
-        { name: 'Flutter Auth UI', url: '/guides/auth/auth-helpers/flutter-auth-ui' },
         {
           name: 'Next.js',
           url: '/guides/auth/auth-helpers/nextjs',
         },
         { name: 'Remix', url: '/guides/auth/auth-helpers/remix' },
         { name: 'SvelteKit', url: '/guides/auth/auth-helpers/sveltekit' },
+        { name: 'Server-side Rendering', url: '/guides/auth/server-side-rendering' },
+        {
+          name: 'Email Auth with PKCE flow for SSR',
+          url: '/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr',
+        },
+        {
+          name: 'OAuth with PKCE flow for SSR',
+          url: '/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
+        },
+      ],
+    },
+    {
+      name: 'Auth UI',
+      url: undefined,
+      items: [
+        { name: 'Auth UI', url: '/guides/auth/auth-helpers/auth-ui' },
+        { name: 'Flutter Auth UI', url: '/guides/auth/auth-helpers/flutter-auth-ui' },
       ],
     },
     {
@@ -545,34 +566,35 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Connecting to your database', url: '/guides/database/connecting-to-postgres' },
         { name: 'Managing tables, views, and data', url: '/guides/database/tables' },
+        { name: 'JSON and unstructured data', url: '/guides/database/json' },
         { name: 'Managing database functions', url: '/guides/database/functions' },
         { name: 'Managing indexes', url: '/guides/database/postgres/indexes' },
+        { name: 'Managing database triggers', url: '/guides/database/postgres/triggers' },
         { name: 'Managing database webhooks', url: '/guides/database/webhooks' },
-        { name: 'Managing database replication', url: '/guides/database/replication' },
+        { name: 'Using Full Text Search', url: '/guides/database/full-text-search' },
+      ],
+    },
+    {
+      name: 'Access and security',
+      url: undefined,
+      items: [
+        { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
+        { name: 'Managing Postgres Roles', url: '/guides/database/postgres/roles' },
         { name: 'Managing secrets with Vault', url: '/guides/database/vault' },
+        { name: 'Column encryption', url: '/guides/database/column-encryption' },
       ],
     },
     {
       name: 'Postgres Guides',
       url: undefined,
       items: [
-        {
-          name: 'Analyzing efficiency and performance',
-          url: '/guides/database/inspect',
-        },
-        {
-          name: 'JSON and unstructured data',
-          url: '/guides/database/json',
-        },
-        { name: 'Implementing Full Text Search', url: '/guides/database/full-text-search' },
-        { name: 'Implementing Cascade Deletes', url: '/guides/database/postgres/cascade-deletes' },
-        { name: 'Implementing column encryption', url: '/guides/database/column-encryption' },
-        { name: 'Partitioning your tables', url: '/guides/database/partitions' },
         { name: 'Query Optimization', url: '/guides/database/query-optimization' },
+        { name: 'Debugging and monitoring', url: '/guides/database/inspect' },
+        { name: 'Partitioning your tables', url: '/guides/database/partitions' },
+        { name: 'Implementing Cascade Deletes', url: '/guides/database/postgres/cascade-deletes' },
+        { name: 'Managing database replication', url: '/guides/database/replication' },
         { name: 'Testing your database', url: '/guides/database/testing' },
-        { name: 'Managing Timeouts', url: '/guides/database/timeouts' },
-        { name: 'Managing Passwords', url: '/guides/database/managing-passwords' },
-        { name: 'Configuring Timezones', url: '/guides/database/managing-timezones' },
+        { name: 'Database Configuration', url: '/guides/database/postgres/configuration' },
       ],
     },
     {
@@ -737,6 +759,7 @@ export const api: NavMenuConstant = {
           url: '/guides/api/joins-and-nesting',
           items: [],
         },
+        { name: 'Using custom schemas', url: '/guides/api/using-custom-schemas', items: [] },
       ],
     },
     {
@@ -901,14 +924,35 @@ export const storage: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/storage' },
     { name: 'Quickstart', url: '/guides/storage/quickstart' },
-    { name: 'Uploads', url: '/guides/storage/uploads' },
-    { name: 'Access Control', url: '/guides/storage/access-control' },
-    { name: 'CDN', url: '/guides/storage/cdn' },
-    { name: 'Image Transformations', url: '/guides/storage/image-transformations' },
+    {
+      name: 'Fundamentals',
+      url: undefined,
+      items: [
+        { name: 'Uploading files to Storage', url: '/guides/storage/uploads' },
+        { name: 'Image Transformations', url: '/guides/storage/image-transformations' },
+        { name: 'How caching works', url: '/guides/storage/cdn' },
+      ],
+    },
+    {
+      name: 'Access and security',
+      url: undefined,
+      items: [{ name: 'Access Control', url: '/guides/storage/access-control' }],
+    },
   ],
 }
 
-export const ai: NavMenuConstant = {
+export const vectorIndexItems = [
+  {
+    name: 'HNSW indexes',
+    url: '/guides/ai/vector-indexes/hnsw-indexes',
+  },
+  {
+    name: 'IVFFlat indexes',
+    url: '/guides/ai/vector-indexes/ivf-indexes',
+  },
+]
+
+export const ai = {
   icon: 'ai',
   title: 'AI & Vectors',
   url: '/guides/ai',
@@ -948,8 +992,8 @@ export const ai: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Managing collections', url: '/guides/ai/managing-collections' },
-        { name: 'Managing indexes', url: '/guides/ai/managing-indexes' },
         { name: 'Vector columns', url: '/guides/ai/vector-columns' },
+        { name: 'Vector indexes', url: '/guides/ai/vector-indexes', items: vectorIndexItems },
         { name: 'Engineering for scale', url: '/guides/ai/engineering-for-scale' },
         { name: 'Choosing Compute Add-on', url: '/guides/ai/choosing-compute-addon' },
         { name: 'Going to Production', url: '/guides/ai/going-to-prod' },
@@ -1097,6 +1141,10 @@ export const platform: NavMenuConstant = {
           name: 'Migrating and Upgrading',
           url: '/guides/platform/migrating-and-upgrading-projects',
         },
+        {
+          name: 'Transfer Project',
+          url: '/guides/platform/project-transfer',
+        },
         { name: 'Network Restrictions', url: '/guides/platform/network-restrictions' },
         { name: 'Performance Tuning', url: '/guides/platform/performance' },
         { name: 'Permissions', url: '/guides/platform/permissions' },
@@ -1106,7 +1154,11 @@ export const platform: NavMenuConstant = {
     {
       name: 'Billing',
       url: undefined,
-      items: [{ name: 'Spend cap', url: '/guides/platform/spend-cap' }],
+      items: [
+        { name: 'How billing works', url: '/guides/platform/org-based-billing' },
+        { name: 'Spend caps and cost-controls', url: '/guides/platform/spend-cap' },
+        { name: 'Enterprise Billing', url: '/guides/platform/enterprise-billing' },
+      ],
     },
     {
       name: 'Single sign-on',
