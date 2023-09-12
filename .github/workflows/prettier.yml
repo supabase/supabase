@@ -48,15 +48,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+          with:
+            sparse-checkout: |
+              i18n
       - name: Setup node
         uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: 'npm'
-      - name: Download dependencies
-        run: npm ci
       - name: Run prettier
+        uses: creyD/prettier_action@v4.3
+        with:
+          # This part is also where you can pass other options, for example:
+          prettier_options: -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
+          prettier_plugins: "@prettier/prettier-plugin-sql-cst"
+          prettier_version: "2.8.8"
         run: |-
           npx prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
         # uses: EPMatt/reviewdog-action-prettier@v1
