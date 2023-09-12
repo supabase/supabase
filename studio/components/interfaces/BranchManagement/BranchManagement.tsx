@@ -118,7 +118,6 @@ const BranchManagement = () => {
   }
 
   if (!hasBranchEnabled) {
-    // [Joshen] Some empty state here
     return (
       <ProductEmptyState title="Database Branching">
         <p className="text-sm text-light">
@@ -137,16 +136,16 @@ const BranchManagement = () => {
           </div>
         ) : (
           <div className="flex items-center space-x-2 !mt-4">
-            <Link passHref href={'/'}>
+            <Link passHref href="https://forms.supabase.com/branching-request">
               <a rel="noreferrer" target="_blank">
                 <Button>Join waitlist</Button>
               </a>
             </Link>
-            <Link passHref href={'/'}>
+            {/* <Link passHref href={'/'}>
               <a rel="noreferrer" target="_blank">
                 <Button type="default">View the docs</Button>
               </a>
-            </Link>
+            </Link> */}
           </div>
         )}
       </ProductEmptyState>
