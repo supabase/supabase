@@ -60,7 +60,7 @@ const FunctionLink = React.memo(function FunctionLink({
           e.preventDefault()
           history.pushState({}, '', url)
           document.getElementById(slug)?.scrollIntoView()
-          menuState.setMenuMobileOpen(false)
+          !isParent && menuState.setMenuMobileOpen(false)
         }}
         className={cn(
           'cursor-pointer transition text-sm hover:text-scale-1200 gap-3 relative',
