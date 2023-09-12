@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
 import InformationBox from 'components/ui/InformationBox'
 import Connecting from 'components/ui/Loading/Loading'
 import { useTablesQuery } from 'data/tables/tables-query'
@@ -31,6 +32,8 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
     data: tables,
     isLoading,
     isSuccess,
+    isError,
+    error,
   } = useTablesQuery(
     {
       projectRef: project?.ref,
@@ -110,6 +113,9 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
           <Connecting />
         </div>
       )}
+
+      {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
+
       {isSuccess &&
         (tables.length === 0 ? (
           <NoSearchResults />
