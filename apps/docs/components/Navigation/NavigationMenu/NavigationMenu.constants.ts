@@ -982,7 +982,7 @@ export const ai = {
           name: 'OpenAI completions using Edge Functions',
           url: '/guides/ai/examples/openai',
         },
-        
+
         {
           name: 'Generate image captions using Hugging Face',
           url: '/guides/ai/examples/huggingface-image-captioning',
@@ -991,7 +991,7 @@ export const ai = {
           name: 'Generate Embeddings',
           url: '/guides/ai/quickstarts/generate-text-embeddings',
         },
-        
+
         {
           name: 'Adding generative Q&A to your documentation',
           url: '/guides/ai/examples/headless-vector-search',
@@ -1019,10 +1019,10 @@ export const ai = {
       items: [
         { name: 'Developing locally with Vecs', url: '/guides/ai/vecs-python-client' },
         { name: 'Creating and managing collections', url: '/guides/ai/quickstarts/hello-world' },
-        
+
         { name: 'Text Deduplication', url: '/guides/ai/quickstarts/text-deduplication' },
         { name: 'Face similarity search', url: '/guides/ai/quickstarts/face-similarity' },
-		{
+        {
           name: 'Image search with OpenAI CLIP',
           url: '/guides/ai/examples/image-search-openai-clip',
         },
