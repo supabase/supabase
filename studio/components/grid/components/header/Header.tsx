@@ -150,7 +150,9 @@ const DefaultHeader = ({
                         >
                           <div className="">
                             <p>Insert row</p>
-                            <p className="text-scale-1000">Insert a new row into {table.name}</p>
+                            <p className="text-scale-1000 text-xs">
+                              Insert a new row into {table.name}
+                            </p>
                           </div>
                         </Dropdown.Item>,
                       ]
@@ -176,7 +178,9 @@ const DefaultHeader = ({
                         >
                           <div className="">
                             <p>Insert column</p>
-                            <p className="text-scale-1000">Insert a new column into {table.name}</p>
+                            <p className="text-scale-1000 text-xs">
+                              Insert a new column into {table.name}
+                            </p>
                           </div>
                         </Dropdown.Item>,
                       ]
@@ -203,7 +207,7 @@ const DefaultHeader = ({
                         >
                           <div className="">
                             <p>Import data from CSV</p>
-                            <p className="text-scale-1000">Insert new rows from a CSV</p>
+                            <p className="text-scale-1000 text-xs">Insert new rows from a CSV</p>
                           </div>
                         </Dropdown.Item>,
                       ]

@@ -1,13 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useTheme } from 'common'
-import { useFlag, useStore } from 'hooks'
+import { useFlag } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { auth, getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
+import { BASE_PATH } from 'lib/constants'
+import { auth, buildPathWithParams, getAccessToken } from 'lib/gotrue'
 import { observer } from 'mobx-react-lite'
-import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { tweets } from 'shared-data'
 import { Button, IconFileText } from 'ui'
@@ -26,40 +26,53 @@ const SignInLayout = ({
   logoLinkToMarketingSite = false,
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
+  const router = useRouter()
   const pushNext = usePushNext()
   const queryClient = useQueryClient()
   const { isDarkMode } = useTheme()
   const ongoingIncident = useFlag('ongoingIncident')
 
+  // This useEffect redirects the user to MFA if they're already halfway signed in
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search)
-    const hasReturnTo = searchParams.has('returnTo')
-    const hasNext = searchParams.has('next')
-    const shouldRedirect = !hasReturnTo && !hasNext
+    auth
+      .initialize()
+      .then(async ({ error }) => {
+        if (error) {
+          // if there was a problem signing in via the url, don't redirect
+          return
+        }
 
-    if (!shouldRedirect) {
-      // If there's a returnTo or next, then this redirect will be handled by useAutoAuthRedirect() in _app.tsx
-      return
-    }
+        const token = await getAccessToken()
 
-    ;(async () => {
-      const { error } = await auth.initialize()
+        if (token) {
+          const { data, error } = await auth.mfa.getAuthenticatorAssuranceLevel()
+          if (error) {
+            // if there was a problem signing in via the url, don't redirect
+            return
+          }
 
-      if (error) {
-        // if there was a problem signing in via the url, don't redirect
-        return
-      }
+          if (data) {
+            // we're already where we need to be
+            if (router.pathname === '/sign-in-mfa') {
+              return
+            }
+            if (data.currentLevel !== data.nextLevel) {
+              const redirectTo = buildPathWithParams('/sign-in-mfa')
+              router.replace(redirectTo)
+              return
+            }
+          }
 
-      const {
-        data: { session },
-      } = await auth.getSession()
-
-      if (session) {
-        await queryClient.resetQueries()
-
-        await pushNext()
-      }
-    })()
+          await queryClient.resetQueries()
+          await pushNext()
+        } else {
+          // if the user doesn't have a token, he needs to go back to the sign-in page
+          const redirectTo = buildPathWithParams('/sign-in')
+          router.replace(redirectTo)
+          return
+        }
+      })
+      .catch(() => {}) // catch all errors thrown by auth methods
   }, [])
 
   const [quote, setQuote] = useState<{
@@ -77,20 +90,12 @@ const SignInLayout = ({
 
   return (
     <>
-      {IS_PLATFORM && (
-        <Head>
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `window._getReturnToPath = ${getReturnToPath.toString()};if (localStorage.getItem('${STORAGE_KEY}') && !(new URLSearchParams(location.search).has('next'))) {location.replace('${
-                BASE_PATH ?? ''
-              }' + window._getReturnToPath())}`,
-            }}
-          />
-        </Head>
-      )}
-
       <div className="flex flex-col flex-1 bg-scale-100">
-        <div className={`absolute top-0 w-full px-8 mx-auto sm:px-6 lg:px-8 ${ongoingIncident ? 'pt-16' : 'pt-6'}`}>
+        <div
+          className={`absolute top-0 w-full px-8 mx-auto sm:px-6 lg:px-8 ${
+            ongoingIncident ? 'pt-16' : 'pt-6'
+          }`}
+        >
           <nav className="relative flex items-center justify-between sm:h-10">
             <div className="flex items-center flex-grow flex-shrink-0 lg:flex-grow-0">
               <div className="flex items-center justify-between w-full md:w-auto">

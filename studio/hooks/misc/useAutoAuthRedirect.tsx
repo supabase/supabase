@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import { auth, getReturnToPath } from 'lib/gotrue'
+import { auth, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect } from 'react'
 
@@ -59,24 +59,33 @@ function useAutoAuthRedirect(queryClient: QueryClient) {
       return
     }
 
-    ;(async () => {
-      const { error } = await auth.initialize()
+    auth
+      .initialize()
+      .then(async ({ error }) => {
+        if (error) {
+          // if there was a problem signing in via the url, don't redirect
+          return
+        }
 
-      if (error) {
-        // if there was a problem signing in via the url, don't redirect
-        return
-      }
+        const token = await getAccessToken()
 
-      const {
-        data: { session },
-      } = await auth.getSession()
+        if (token) {
+          const { data, error } = await auth.mfa.getAuthenticatorAssuranceLevel()
+          if (error) {
+            // if there was a problem fetching the user AAL levels, don't redirect
+            return
+          }
 
-      if (session) {
-        await queryClient.resetQueries()
+          // if the user doesn't have the appropriate AAL level, don't redirect
+          if (data.currentLevel !== data.nextLevel) {
+            return
+          }
 
-        await pushNext()
-      }
-    })()
+          await queryClient.resetQueries()
+          await pushNext()
+        }
+      })
+      .catch(() => {}) // catch all errors thrown by auth methods
   }, [])
 }
 
