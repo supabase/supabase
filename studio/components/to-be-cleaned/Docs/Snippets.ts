@@ -1,5 +1,5 @@
 const snippets = {
-  endpoint: (endpoint) => ({
+  endpoint: (endpoint: string) => ({
     title: 'API URL',
     bash: {
       language: 'bash',
@@ -18,7 +18,7 @@ const snippets = {
       code: `npm install --save @supabase/supabase-js`,
     },
   }),
-  init: (endpoint) => ({
+  init: (endpoint: string) => ({
     title: 'Initializing',
     bash: {
       language: 'bash',
@@ -56,7 +56,7 @@ Future<void> main() async {
 }`,
     },
   }),
-  authKey: (title, varName, apikey) => ({
+  authKey: (title: string, varName: string, apikey: string) => ({
     title: `${title}`,
     bash: {
       language: 'bash',
@@ -67,7 +67,11 @@ Future<void> main() async {
       code: `const ${varName} = '${apikey}'`,
     },
   }),
-  authKeyExample: (defaultApiKey, endpoint, { keyName, showBearer = true }) => ({
+  authKeyExample: (
+    defaultApiKey: string,
+    endpoint: string,
+    { keyName, showBearer = true }: { keyName: string; showBearer: boolean }
+  ) => ({
     title: 'Example usage',
     bash: {
       language: 'bash',
@@ -90,7 +94,19 @@ const supabase = createClient(SUPABASE_URL, process.env.${keyName || 'SUPABASE_K
 `,
     },
   }),
-  rpcSingle: ({ rpcName, rpcParams, endpoint, apiKey, showBearer = true }) => {
+  rpcSingle: ({
+    rpcName,
+    rpcParams,
+    endpoint,
+    apiKey,
+    showBearer = true,
+  }: {
+    rpcName: string
+    rpcParams: any[]
+    endpoint: string
+    apiKey: string
+    showBearer: boolean
+  }) => {
     let rpcList = rpcParams.map((x) => `"${x.name}": "value"`).join(', ')
     let noParams = !rpcParams.length
     let bashParams = noParams ? '' : `\n-d '{ ${rpcList} }' \\`
@@ -131,7 +147,7 @@ else console.log(data)
       },
     }
   },
-  subscribeAll: (listenerName, resourceId) => ({
+  subscribeAll: (listenerName: string, resourceId: string) => ({
     title: 'Subscribe to all events',
     bash: {
       language: 'bash',
@@ -151,7 +167,7 @@ const ${listenerName} = supabase.channel('custom-all-channel')
   .subscribe()`,
     },
   }),
-  subscribeInserts: (listenerName, resourceId) => ({
+  subscribeInserts: (listenerName: string, resourceId: string) => ({
     title: 'Subscribe to inserts',
     bash: {
       language: 'bash',
@@ -171,7 +187,7 @@ const ${listenerName} = supabase.channel('custom-insert-channel')
   .subscribe()`,
     },
   }),
-  subscribeUpdates: (listenerName, resourceId) => ({
+  subscribeUpdates: (listenerName: string, resourceId: string) => ({
     title: 'Subscribe to updates',
     bash: {
       language: 'bash',
@@ -191,7 +207,7 @@ const ${listenerName} = supabase.channel('custom-update-channel')
   .subscribe()`,
     },
   }),
-  subscribeDeletes: (listenerName, resourceId) => ({
+  subscribeDeletes: (listenerName: string, resourceId: string) => ({
     title: 'Subscribe to deletes',
     bash: {
       language: 'bash',
@@ -211,7 +227,7 @@ const ${listenerName} = supabase.channel('custom-delete-channel')
   .subscribe()`,
     },
   }),
-  subscribeEq: (listenerName, resourceId, columnName, value) => ({
+  subscribeEq: (listenerName: string, resourceId: string, columnName: string, value: string) => ({
     title: 'Subscribe to specific rows',
     bash: {
       language: 'bash',
@@ -231,7 +247,7 @@ const ${listenerName} = supabase.channel('custom-filter-channel')
   .subscribe()`,
     },
   }),
-  readAll: (resourceId, endpoint, apiKey) => ({
+  readAll: (resourceId: string, endpoint: string, apiKey: string) => ({
     title: 'Read all rows',
     bash: {
       language: 'bash',
@@ -256,6 +272,12 @@ let { data: ${resourceId}, error } = await supabase
     endpoint,
     apiKey,
     columnName = 'some_column,other_column',
+  }: {
+    title?: string
+    resourceId: string
+    endpoint: string
+    apiKey: string
+    columnName?: string
   }) => ({
     title,
     bash: {
@@ -275,7 +297,7 @@ let { data: ${resourceId}, error } = await supabase
 `,
     },
   }),
-  readForeignTables: (resourceId, endpoint, apiKey) => ({
+  readForeignTables: (resourceId: string, endpoint: string, apiKey: string) => ({
     title: 'Read foreign tables',
     bash: {
       language: 'bash',
@@ -299,7 +321,7 @@ let { data: ${resourceId}, error } = await supabase
 `,
     },
   }),
-  readRange: (resourceId, endpoint, apiKey) => ({
+  readRange: (resourceId: string, endpoint: string, apiKey: string) => ({
     title: 'With pagination',
     bash: {
       language: 'bash',
@@ -320,7 +342,7 @@ let { data: ${resourceId}, error } = await supabase
 `,
     },
   }),
-  readFilters: (resourceId, endpoint, apiKey) => ({
+  readFilters: (resourceId: string, endpoint: string, apiKey: string) => ({
     title: 'With filtering',
     bash: {
       language: 'bash',
@@ -357,7 +379,7 @@ let { data: ${resourceId}, error } = await supabase
 `,
     },
   }),
-  insertSingle: (resourceId, endpoint, apiKey) => ({
+  insertSingle: (resourceId: string, endpoint: string, apiKey: string) => ({
     title: 'Insert a row',
     bash: {
       language: 'bash',
@@ -382,7 +404,7 @@ const { data, error } = await supabase
 `,
     },
   }),
-  insertMany: (resourceId, endpoint, apiKey) => ({
+  insertMany: (resourceId: string, endpoint: string, apiKey: string) => ({
     title: 'Insert many rows',
     bash: {
       language: 'bash',
@@ -407,7 +429,7 @@ const { data, error } = await supabase
 `,
     },
   }),
-  upsert: (resourceId, endpoint, apiKey) => ({
+  upsert: (resourceId: string, endpoint: string, apiKey: string) => ({
     title: 'Upsert matching rows',
     bash: {
       language: 'bash',
@@ -430,7 +452,7 @@ const { data, error } = await supabase
 `,
     },
   }),
-  update: (resourceId, endpoint, apiKey) => ({
+  update: (resourceId: string, endpoint: string, apiKey: string) => ({
     title: 'Update matching rows',
     bash: {
       language: 'bash',
@@ -454,7 +476,7 @@ const { data, error } = await supabase
 `,
     },
   }),
-  delete: (resourceId, endpoint, apiKey) => ({
+  delete: (resourceId: string, endpoint: string, apiKey: string) => ({
     title: 'Delete matching rows',
     bash: {
       language: 'bash',
@@ -474,7 +496,7 @@ const { error } = await supabase
 `,
     },
   }),
-  authSignup: (endpoint, apiKey, randomPassword) => ({
+  authSignup: (endpoint: string, apiKey: string, randomPassword: string) => ({
     title: 'User signup',
     bash: {
       language: 'bash',
@@ -498,7 +520,7 @@ let { data, error } = await supabase.auth.signUp({
 `,
     },
   }),
-  authLogin: (endpoint, apiKey, randomPassword) => ({
+  authLogin: (endpoint: string, apiKey: string, randomPassword: string) => ({
     title: 'User login',
     bash: {
       language: 'bash',
@@ -522,7 +544,7 @@ let { data, error } = await supabase.auth.signInWithPassword({
 `,
     },
   }),
-  authMagicLink: (endpoint, apiKey) => ({
+  authMagicLink: (endpoint: string, apiKey: string) => ({
     title: 'User login',
     bash: {
       language: 'bash',
@@ -544,7 +566,7 @@ let { data, error } = await supabase.auth.signInWithOtp({
 `,
     },
   }),
-  authPhoneSignUp: (endpoint, apiKey) => ({
+  authPhoneSignUp: (endpoint: string, apiKey: string) => ({
     title: 'Phone Signup',
     bash: {
       language: 'bash',
@@ -568,7 +590,7 @@ let { data, error } = await supabase.auth.signUp({
 `,
     },
   }),
-  authMobileOTPLogin: (endpoint, apiKey) => ({
+  authMobileOTPLogin: (endpoint: string, apiKey: string) => ({
     title: 'Phone Login',
     bash: {
       language: 'bash',
@@ -590,7 +612,7 @@ let { data, error } = await supabase.auth.signInWithOtp({
 `,
     },
   }),
-  authMobileOTPVerify: (endpoint, apiKey) => ({
+  authMobileOTPVerify: (endpoint: string, apiKey: string) => ({
     title: 'Verify Pin',
     bash: {
       language: 'bash',
@@ -616,7 +638,7 @@ let { data, error } = await supabase.auth.verifyOtp({
 `,
     },
   }),
-  authInvite: (endpoint, apiKey) => ({
+  authInvite: (endpoint: string, apiKey: string) => ({
     title: 'Invite User',
     bash: {
       language: 'bash',
@@ -637,7 +659,7 @@ let { data, error } = await supabase.auth.api.inviteUserByEmail('someone@email.c
 `,
     },
   }),
-  authThirdPartyLogin: (endpoint, apiKey) => ({
+  authThirdPartyLogin: () => ({
     title: 'Third Party Login',
     bash: {
       language: 'bash',
@@ -652,7 +674,7 @@ let { data, error } = await supabase.auth.signInWithOAuth({
 `,
     },
   }),
-  authUser: (endpoint, apiKey) => ({
+  authUser: (endpoint: string, apiKey: string) => ({
     title: 'Get User',
     bash: {
       language: 'bash',
@@ -669,7 +691,7 @@ const { data: { user } } = await supabase.auth.getUser()
 `,
     },
   }),
-  authRecover: (endpoint, apiKey) => ({
+  authRecover: (endpoint: string, apiKey: string) => ({
     title: 'Password Recovery',
     bash: {
       language: 'bash',
@@ -689,7 +711,7 @@ let { data, error } = await supabase.auth.resetPasswordForEmail(email)
 `,
     },
   }),
-  authUpdate: (endpoint, apiKey) => ({
+  authUpdate: (endpoint: string, apiKey: string) => ({
     title: 'Update User',
     bash: {
       language: 'bash',
@@ -718,7 +740,7 @@ const { data, error } = await supabase.auth.updateUser({
 `,
     },
   }),
-  authLogout: (endpoint, apiKey, randomPassword) => ({
+  authLogout: (endpoint: string, apiKey: string) => ({
     title: 'User logout',
     bash: {
       language: 'bash',

@@ -57,6 +57,12 @@ const BillingAddress = () => {
 
   const onValidate = (values: any) => {
     const errors = {} as any
+    if (
+      (values.line1 || values.line2 || values.postal_code || values.state || values.city) &&
+      !values.country
+    ) {
+      errors['country'] = 'Please select a country'
+    }
     if (isEqual(values, initialValues)) {
       setIsDirty(false)
     } else {
@@ -110,7 +116,7 @@ const BillingAddress = () => {
                         placeholder="Address line 2"
                         disabled={!canUpdateBillingAddress}
                       />
-                      <div className="flex items-center space-x-2">
+                      <div className="flex space-x-2">
                         <Listbox
                           className="w-full"
                           id="country"
@@ -139,7 +145,7 @@ const BillingAddress = () => {
                           disabled={!canUpdateBillingAddress}
                         />
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex space-x-2">
                         <Input
                           className="w-full"
                           id="city"

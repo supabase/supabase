@@ -5,7 +5,6 @@ import { PropsWithChildren, useEffect, useState } from 'react'
 import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
 import { useSelectedProject, useStore, withAuth } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
 import ProjectLayout from '../'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
 
@@ -14,7 +13,7 @@ export interface DatabaseLayoutProps {
 }
 
 const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
-  const { ui, meta, vault, backups } = useStore()
+  const { ui, meta, vault } = useStore()
   const { isLoading: isSchemasLoading } = meta.schemas
   const { isLoading: isVaultLoading } = vault
 
@@ -41,10 +40,6 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
       meta.triggers.load()
       meta.extensions.load()
       meta.publications.load()
-
-      if (IS_PLATFORM) {
-        backups.load()
-      }
     }
   }, [ui.selectedProjectRef])
 
