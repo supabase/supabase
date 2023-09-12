@@ -2,8 +2,11 @@ import { useParams } from 'common'
 import Link from 'next/link'
 import { Badge } from 'ui'
 
+import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
+import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
 import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useProjectReadOnlyQuery } from 'data/config/project-read-only-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
@@ -13,15 +16,13 @@ import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
 import OrgDropdown from './OrgDropdown'
 import ProjectDropdown from './ProjectDropdown'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
-import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
+  const { ref } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
-  const hasAccessToBranching =
-    selectedOrganization?.opt_in_tags?.includes('PREVIEW_BRANCHES_OPT_IN') ?? false
+  const enableBranchManagement = useFlag('branchManagement')
+
   const isBranchingEnabled =
     selectedProject?.is_branch_enabled === true || selectedProject?.parent_project_ref !== undefined
 
@@ -65,7 +66,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
           <>
             <OrgDropdown />
 
-            {selectedProject && (
+            {ref && (
               <>
                 <span className="text-scale-800 dark:text-scale-700">
                   <svg
@@ -108,7 +109,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
               </>
             )}
 
-            {hasAccessToBranching && (
+            {selectedProject && enableBranchManagement && (
               <>
                 <span className="text-scale-800 dark:text-scale-700">
                   <svg
@@ -138,6 +139,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
             </a>
           </Link>
         )}
+
         {/* Additional breadcrumbs are supplied */}
         <BreadcrumbsView defaultValue={breadcrumbs} />
       </div>

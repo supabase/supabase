@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ParsedUrlQuery } from 'querystring'
@@ -73,10 +74,12 @@ const ProjectLink = ({
 }
 
 const ProjectDropdown = () => {
-  const selectedProject = useSelectedProject()
+  const { ref } = useParams()
   const selectedOrganization = useSelectedOrganization()
-  const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
   const { data: allOrganizations } = useOrganizationsQuery()
+  const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
+
+  const selectedProjectName = allProjects?.find((project) => project.ref === ref)?.name
   const selectedOrganizationSlug = selectedOrganization?.slug
 
   if (isLoadingProjects) {
@@ -106,12 +109,12 @@ const ProjectDropdown = () => {
       }
     >
       <Button type="text">
-        <span className="text-xs">{selectedProject?.name}</span>
+        <span className="text-xs">{selectedProjectName}</span>
       </Button>
     </Dropdown>
   ) : (
     <Button type="text">
-      <span className="text-xs">{selectedProject?.name}</span>
+      <span className="text-xs">{selectedProjectName}</span>
     </Button>
   )
 }
