@@ -16,6 +16,7 @@ export type OrganizationBillingSubscriptionPreviewResponse = {
     quantity: number
     total_price: number
   }[]
+  number_of_projects?: number
 }
 
 export async function previewOrganizationBillingSubscription({

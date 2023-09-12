@@ -60,11 +60,11 @@ const Developers = () => {
 
   return (
     <div className="grid grid-cols-12">
-      <nav className="col-span-6 py-8" aria-labelledby="developersResources">
-        <div className="m-3 grid grid-cols-12 gap-4 py-4 pr-3">{iconSections}</div>
+      <nav className="col-span-6 py-6" aria-labelledby="developersResources">
+        <div className="m-3 grid grid-cols-12 gap-2 pr-3">{iconSections}</div>
       </nav>
-      <div className="col-span-6">
-        <div className="m-3 mx-6">
+      <div className="col-span-6 py-8">
+        <div className="py-3 mx-6">
           <p className="p">Latest announcements</p>
           <ul className="mt-6 space-y-3">
             {AnnouncementsData.map((announcement: any, idx: number) => (
