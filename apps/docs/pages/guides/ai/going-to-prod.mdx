@@ -24,11 +24,11 @@ There are a couple of cases where you might not need indexes:
 
 You don't have to create indexes in these cases and can use sequential scans instead. This type of workload will not be RAM bound and will not require any additional resources but will result in higher latencies and lower throughput. Extra CPU cores may help to improve queries per second, but it will not help to improve latency.
 
-On the other hand, if you need to scale your application, you will need to [create indexes](https://supabase.com/docs/guides/ai/vector-indexes). This will result in lower latencies and higher throughput, but will require additional RAM to make use of Postgres Caching. Also, using indexes will result in lower accuracy, since you are replacing exact (KNN) search with approximate (ANN) search.
+On the other hand, if you need to scale your application, you will need to [create indexes](/docs/guides/ai/vector-indexes). This will result in lower latencies and higher throughput, but will require additional RAM to make use of Postgres Caching. Also, using indexes will result in lower accuracy, since you are replacing exact (KNN) search with approximate (ANN) search.
 
 ## HNSW vs IVFFlat indexes
 
-`pgvector` supports two types of indexes: HNSW and IVFFlat. We recommend using [HNSW](https://supabase.com/docs/guides/ai/vector-indexes/hnsw-indexes) because of its [performance](https://supabase.com/blog/increase-performance-pgvector-hnsw#hnsw-performance-1536-dimensions) and [robustness against changing data](https://supabase.com/docs/guides/ai/vector-indexes).
+`pgvector` supports two types of indexes: HNSW and IVFFlat. We recommend using [HNSW](/docs/guides/ai/vector-indexes/hnsw-indexes) because of its [performance](https://supabase.com/blog/increase-performance-pgvector-hnsw#hnsw-performance-1536-dimensions) and [robustness against changing data](/docs/guides/ai/vector-indexes/hnsw-indexes#when-should-you-create-hnsw-indexes).
 
 <div>
   <img
@@ -49,7 +49,7 @@ Index build parameters:
 
 - `m` is the number of bi-directional links created for every new element during construction. Higher `m` is suitable for datasets with high dimensionality and/or high accuracy requirements. Reasonable values for `m` are between 2 and 100. Range 12-48 is a good starting point for most use cases (16 is the default value).
 
-- `ef_construction` is the size of the dynamic list for the nearest neighbors (used during the construction algorithm). Higher `ef_construction` will result in better index quality and higher accuracy, but it will also increase the time required to build the index. `ef_construction` has to be at least 2 \* `m` (64 is the default value). At some point, increasing `ef_construction` does not improve the quality of the index. You can measure accuracy when `ef_search`=`ef_construction`: if an accuracy is lower than 0.9, than there is room for improvement.
+- `ef_construction` is the size of the dynamic list for the nearest neighbors (used during the construction algorithm). Higher `ef_construction` will result in better index quality and higher accuracy, but it will also increase the time required to build the index. `ef_construction` has to be at least 2 \* `m` (64 is the default value). At some point, increasing `ef_construction` does not improve the quality of the index. You can measure accuracy when `ef_search`=`ef_construction`: if accuracy is lower than 0.9, then there is room for improvement.
 
 Search parameters:
 
