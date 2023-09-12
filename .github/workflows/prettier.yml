@@ -52,17 +52,12 @@ jobs:
         with:
           sparse-checkout: |
             i18n
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: 'npm'
       - name: Run prettier
         uses: creyD/prettier_action@v4.3
         with:
           # This part is also where you can pass other options, for example:
           prettier_options: -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
-          prettier_plugins: "@prettier/prettier-plugin-sql-cst"
+          prettier_plugins: "prettier-plugin-sql-cst"
           prettier_version: "2.8.8"
         # uses: EPMatt/reviewdog-action-prettier@v1
         # with:
