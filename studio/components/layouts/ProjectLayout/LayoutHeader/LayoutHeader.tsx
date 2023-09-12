@@ -38,7 +38,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     { enabled: selectedOrganization && !selectedOrganization.subscription_id }
   )
 
-  const projectHasNoLimits = subscription?.usage_billing_enabled === false
+  const projectHasNoLimits = subscription?.usage_billing_enabled === true
 
   const showOverUsageBadge =
     useFlag('overusageBadge') &&

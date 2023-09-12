@@ -57,6 +57,7 @@ function GithubExamples() {
         <div className={'lg:-mr-32 lg:-ml-32'}>
           <Swiper
             style={{ overflow: 'visible' }}
+            loop={true}
             initialSlide={3}
             spaceBetween={0}
             slidesPerView={4}
