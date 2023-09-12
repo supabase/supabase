@@ -1,16 +1,16 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
 import isbot from 'isbot'
+import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 
 export function middleware(request: NextRequest) {
   const specs = ['javascript', 'dart', 'csharp']
 
   let version = ''
-  if (request.url.includes('/v1/')) {
-    version = 'v1'
-  }
   if (request.url.includes('/v0/')) {
     version = 'v0'
+  }
+  if (request.url.includes('/v1/')) {
+    version = 'v1'
   }
 
   if (isbot(request.headers.get('user-agent'))) {
