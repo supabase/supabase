@@ -3,6 +3,7 @@ import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
+import { ResponseError } from 'types'
 import { tableKeys } from './keys'
 import { Table } from './table-query'
 
@@ -45,7 +46,7 @@ export async function getTables(
 }
 
 export type TablesData = Awaited<ReturnType<typeof getTables>>
-export type TablesError = unknown
+export type TablesError = ResponseError
 
 export const useTablesQuery = <TData = TablesData>(
   { projectRef, connectionString, schema }: TablesVariables,

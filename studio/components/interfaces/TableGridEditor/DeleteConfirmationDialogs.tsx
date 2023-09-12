@@ -6,21 +6,24 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { sqlKeys } from 'data/sql/keys'
+import { tableKeys } from 'data/tables/keys'
 import { useGetTables } from 'data/tables/tables-query'
 import { useStore, useUrlState } from 'hooks'
 import { TableLike } from 'hooks/misc/useTable'
+import { noop } from 'lib/void'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
-import { tableKeys } from 'data/tables/keys'
 
 export type DeleteConfirmationDialogsProps = {
   projectRef?: string
   selectedTable?: TableLike
+  onAfterDeleteTable?: (tables: TableLike[]) => void
 }
 
 const DeleteConfirmationDialogs = ({
   projectRef,
   selectedTable,
+  onAfterDeleteTable = noop,
 }: DeleteConfirmationDialogsProps) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
@@ -117,12 +120,8 @@ const DeleteConfirmationDialogs = ({
 
       await queryClient.invalidateQueries(entityTypeKeys.list(projectRef))
 
-      // For simplicity for now, we just open the first table within the same schema
-      if (tables.length > 0) {
-        router.push(`/project/${projectRef}/editor/${tables[0].id}`)
-      } else {
-        router.push(`/project/${projectRef}/editor/`)
-      }
+      onAfterDeleteTable(tables)
+
       ui.setNotification({
         category: 'success',
         message: `Successfully deleted table "${selectedTableToDelete.name}"`,

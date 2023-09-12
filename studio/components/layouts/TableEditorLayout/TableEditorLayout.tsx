@@ -7,9 +7,7 @@ import { useCheckPermissions, useStore } from 'hooks'
 import { ProjectLayoutWithAuth } from '../'
 import TableEditorMenu from './TableEditorMenu'
 
-export interface TableEditorLayoutProps {}
-
-const TableEditorLayout = ({ children }: PropsWithChildren<TableEditorLayoutProps>) => {
+const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   const { vault, meta, ui } = useStore()
 
   const canReadTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')

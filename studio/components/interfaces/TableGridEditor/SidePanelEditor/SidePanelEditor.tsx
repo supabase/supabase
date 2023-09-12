@@ -331,7 +331,10 @@ const SidePanelEditor = ({
           duplicateTable,
         })
 
-        await queryClient.invalidateQueries(entityTypeKeys.list(project?.ref))
+        await Promise.all([
+          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema)),
+          queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
+        ])
 
         ui.setNotification({
           id: toastId,
@@ -355,7 +358,10 @@ const SidePanelEditor = ({
           importContent
         )
 
-        await queryClient.invalidateQueries(entityTypeKeys.list(project?.ref))
+        await Promise.all([
+          queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema)),
+          queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
+        ])
 
         ui.setNotification({
           id: toastId,
@@ -398,6 +404,7 @@ const SidePanelEditor = ({
               ])
             ),
             queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
+            queryClient.invalidateQueries(tableKeys.table(project?.ref, table.schema)),
           ])
 
           ui.setNotification({

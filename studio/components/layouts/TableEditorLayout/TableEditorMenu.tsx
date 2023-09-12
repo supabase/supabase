@@ -28,9 +28,7 @@ import {
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
 
-export interface TableEditorMenuProps {}
-
-const TableEditorMenu = ({}: TableEditorMenuProps) => {
+const TableEditorMenu = () => {
   const { id } = useParams()
   const snap = useTableEditorStateSnapshot()
 

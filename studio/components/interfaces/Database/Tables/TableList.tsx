@@ -25,6 +25,7 @@ import {
   Input,
   Listbox,
 } from 'ui'
+import AlertError from 'components/ui/AlertError'
 
 interface TableListProps {
   onAddTable: () => void
@@ -58,6 +59,8 @@ const TableList = ({
     data: tables,
     isLoading,
     isSuccess,
+    isError,
+    error,
   } = useTablesQuery(
     {
       projectRef: project?.ref,
@@ -179,6 +182,8 @@ const TableList = ({
           <GenericSkeletonLoader />
         </div>
       )}
+
+      {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
 
       {isSuccess &&
         (tables.length === 0 ? (
@@ -323,21 +328,6 @@ const TableList = ({
                                 </Tooltip.Portal>
                               )}
                             </Tooltip.Root>
-
-                            {/* <Button
-                              type="text"
-                              icon={<IconEdit3 />}
-                              style={{ padding: 5 }}
-                              disabled={isLocked}
-                              onClick={() => onEditTable(x)}
-                            />
-                            <Button
-                              type="text"
-                              icon={<IconTrash />}
-                              style={{ padding: 5 }}
-                              disabled={isLocked}
-                              onClick={() => onDeleteTable(x)}
-                            /> */}
                           </div>
                         </Table.td>
                       </Table.tr>

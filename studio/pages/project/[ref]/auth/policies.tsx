@@ -8,8 +8,9 @@ import { useParams } from 'common/hooks'
 import { Policies } from 'components/interfaces/Auth/Policies'
 import { AuthLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Connecting from 'components/ui/Loading/Loading'
+import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions, useStore } from 'hooks'
@@ -80,6 +81,8 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     data: tables,
     isLoading,
     isSuccess,
+    isError,
+    error,
   } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -168,7 +171,8 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           </a>
         </div>
       </div>
-      {isLoading && <Connecting />}
+      {isLoading && <GenericSkeletonLoader />}
+      {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
       {isSuccess && (
         <Policies tables={filteredTables} hasTables={tables.length > 0} isLocked={isLocked} />
       )}

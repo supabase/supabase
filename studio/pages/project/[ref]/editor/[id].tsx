@@ -5,9 +5,11 @@ import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/Del
 import { TableEditorLayout } from 'components/layouts'
 import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import useTable from 'hooks/misc/useTable'
+import { useRouter } from 'next/router'
 import { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
+  const router = useRouter()
   const { isDarkMode } = useTheme()
   const { id: _id, ref: projectRef } = useParams()
   const id = _id ? Number(_id) : undefined
@@ -21,7 +23,18 @@ const TableEditorPage: NextPageWithLayout = () => {
         selectedTable={selectedTable}
         theme={isDarkMode ? 'dark' : 'light'}
       />
-      <DeleteConfirmationDialogs projectRef={projectRef} selectedTable={selectedTable} />
+      <DeleteConfirmationDialogs
+        projectRef={projectRef}
+        selectedTable={selectedTable}
+        onAfterDeleteTable={(tables) => {
+          // For simplicity for now, we just open the first table within the same schema
+          if (tables.length > 0) {
+            router.push(`/project/${projectRef}/editor/${tables[0].id}`)
+          } else {
+            router.push(`/project/${projectRef}/editor/`)
+          }
+        }}
+      />
     </>
   )
 }
