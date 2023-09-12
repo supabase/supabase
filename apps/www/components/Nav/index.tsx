@@ -412,11 +412,6 @@ const Nav = () => {
                       Developers
                     </a>
                   </Link>
-                  <Link href="/company">
-                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      Company
-                    </a>
-                  </Link>
                   <Link href="/pricing">
                     <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
                       Pricing
@@ -430,20 +425,17 @@ const Nav = () => {
                       Docs
                     </a>
                   </Link>
-                  <Link href="https://github.com/supabase/supabase">
-                    <a
-                      target="_blank"
-                      className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
-                    >
-                      GitHub
-                    </a>
-                  </Link>
                   <Link href="/blog">
                     <a
                       target="_blank"
                       className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
                     >
                       Blog
+                    </a>
+                  </Link>
+                  <Link href="/support">
+                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
+                      Support
                     </a>
                   </Link>
                 </div>
