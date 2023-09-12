@@ -7,6 +7,7 @@ import { Button, IconBookOpen, IconCode, IconMaximize2, IconMinimize2, IconTermi
 import CommandRender from 'components/interfaces/Functions/CommandRender'
 import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { Commands } from './Functions.types'
 
 interface TerminalInstructionsProps {
@@ -21,8 +22,10 @@ const TerminalInstructions = ({
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const [showInstructions, setShowInstructions] = useState(!closable)
+
   const { data: tokens } = useAccessTokensQuery()
   const { data: settings } = useProjectApiQuery({ projectRef })
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 
   const apiService = settings?.autoApiService
   const anonKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
@@ -30,7 +33,10 @@ const TerminalInstructions = ({
     : '[YOUR ANON KEY]'
   const endpoint = settings?.autoApiService.app_config.endpoint ?? ''
 
-  const functionsEndpoint = `${endpoint}/functions/v1`
+  const functionsEndpoint =
+    customDomainData?.customDomain?.status === 'active'
+      ? `https://${customDomainData.customDomain.hostname}/functions/v1`
+      : `https://${endpoint}/functions/v1`
 
   // get the .co or .net TLD from the restUrl
   const restUrl = settings?.autoApiService.restUrl
@@ -70,7 +76,7 @@ const TerminalInstructions = ({
       jsx: () => {
         return (
           <>
-            <span className="text-brand-600">curl</span> -L -X POST 'https://{functionsEndpoint}
+            <span className="text-brand-600">curl</span> -L -X POST '{functionsEndpoint}
             /hello-world' -H 'Authorization: Bearer [YOUR ANON KEY]'{' '}
             {`--data '{"name":"Functions"}'`}
           </>
