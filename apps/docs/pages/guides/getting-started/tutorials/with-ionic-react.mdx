@@ -314,7 +314,7 @@ setupIonicReact()
 const App: React.FC = () => {
   const [session, setSession] = useState < Session > null
   useEffect(() => {
-    setSession(supabase.auth.session())
+    setSession(supabase.auth.getSession())
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
     })
