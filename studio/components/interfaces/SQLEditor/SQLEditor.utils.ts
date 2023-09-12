@@ -71,10 +71,15 @@ export function getDiffTypeDropdownLabel(diffType: DiffType) {
 
 export const generateMigrationCliCommand = (id: string, name: string, isNpx = false) => stripIndent`
   ${isNpx ? 'npx ' : ''}supabase snippets download ${id} |
-    ${isNpx ? 'npx ' : ''}supabase migration new ${name}
+      ${isNpx ? 'npx ' : ''}supabase migration new ${name}
 `
 
 export const generateSeedCliCommand = (id: string, isNpx = false) => stripIndent`
   ${isNpx ? 'npx ' : ''}supabase snippets download ${id} >> \\
-    supabase/seed.sql
+      supabase/seed.sql
+`
+
+export const generateFileCliCommand = (id: string, name: string, isNpx = false) => stripIndent`
+  ${isNpx ? 'npx ' : ''}supabase snippets download ${id} > \\
+      ${name}.sql
 `

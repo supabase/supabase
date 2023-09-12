@@ -2,7 +2,11 @@ import { ModalProps } from '@ui/components/Modal/Modal'
 import { snakeCase } from 'lodash'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { CodeBlock, Modal, Separator, Tabs, TabsProvider } from 'ui'
-import { generateMigrationCliCommand, generateSeedCliCommand } from './SQLEditor.utils'
+import {
+  generateFileCliCommand,
+  generateMigrationCliCommand,
+  generateSeedCliCommand,
+} from './SQLEditor.utils'
 
 export interface DownloadSnippetModalProps extends ModalProps {
   id: string
@@ -14,7 +18,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
   const migrationName = snakeCase(snippet.name)
 
   return (
-    <Modal size="xlarge" header="Create migration or seed" hideFooter closable {...props}>
+    <Modal size="xlarge" header="Download snippet" hideFooter closable {...props}>
       <TabsProvider>
         <div className="flex flex-col items-start justify-between gap-4 px-6 py-3">
           <p className="text-sm mt-2">
@@ -27,16 +31,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
             >
               migration
             </a>{' '}
-            or{' '}
-            <a
-              className="text-brand"
-              href="https://supabase.com/docs/guides/cli/local-development#add-sample-data"
-              target="_blank"
-              rel="noopener"
-            >
-              seed
-            </a>
-            . Make sure you have the{' '}
+            file. Make sure you have the{' '}
             <a
               className="text-brand"
               href="https://supabase.com/docs/guides/cli/getting-started"
@@ -79,7 +74,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
           <div className="flex flex-col gap-2 my-2 w-full">
             <h2 className="text-lg">Download as seed</h2>
             <p className="text-sm text-scale-1000">
-              Append the snippet to the end of{' '}
+              Alternatively if your query consists of sample data, append the snippet to the end of{' '}
               <CodeBlock language="bash">supabase/seed.sql</CodeBlock>:
             </p>
             <Tabs type="underlined">
@@ -97,6 +92,32 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
                   className="language-bash prose dark:prose-dark max-w-none"
                 >
                   {generateSeedCliCommand(id, true)}
+                </CodeBlock>
+              </Tabs.Panel>
+            </Tabs>
+          </div>
+          <Separator />
+          <div className="flex flex-col gap-2 my-2 w-full">
+            <h2 className="text-lg">Download as SQL file</h2>
+            <p className="text-sm text-scale-1000">
+              You can also download the snippet directly into a new SQL file named{' '}
+              <CodeBlock language="bash">{`${migrationName}.sql`}</CodeBlock>:
+            </p>
+            <Tabs type="underlined">
+              <Tabs.Panel id="default" label="Default">
+                <CodeBlock
+                  language="bash"
+                  className="language-bash prose dark:prose-dark max-w-none"
+                >
+                  {generateFileCliCommand(id, migrationName)}
+                </CodeBlock>
+              </Tabs.Panel>
+              <Tabs.Panel id="npx" label="npx">
+                <CodeBlock
+                  language="bash"
+                  className="language-bash prose dark:prose-dark max-w-none"
+                >
+                  {generateFileCliCommand(id, migrationName, true)}
                 </CodeBlock>
               </Tabs.Panel>
             </Tabs>

@@ -44,7 +44,7 @@ const UtilityActions = ({
           icon={<IconDownload size="tiny" />}
           onClick={() => setIsDownloadSnippetModalOpen(true)}
         >
-          Create migration or seed
+          Download as migration file
         </Button>
       )}
       {IS_PLATFORM && <FavoriteButton id={id} />}
