@@ -56,9 +56,6 @@ const UserSettingsDropdown = () => {
           <Link passHref href="/account/me">
             <DropdownMenuItem_Shadcn_
               className="cursor-pointer"
-              onSelect={() => {
-                router.push('/account/me')
-              }}
               onClick={() => setOpen(false)}
               asChild
             >
@@ -68,13 +65,19 @@ const UserSettingsDropdown = () => {
           <Link passHref href="/account/tokens">
             <DropdownMenuItem_Shadcn_
               className="cursor-pointer"
-              onSelect={() => {
-                router.push('/account/tokens')
-              }}
               onClick={() => setOpen(false)}
               asChild
             >
               <a>Access tokens</a>
+            </DropdownMenuItem_Shadcn_>
+          </Link>
+          <Link passHref href="/account/audit">
+            <DropdownMenuItem_Shadcn_
+              className="cursor-pointer"
+              onClick={() => setOpen(false)}
+              asChild
+            >
+              <a>Audit logs</a>
             </DropdownMenuItem_Shadcn_>
           </Link>
           <DropdownMenuSeparator_Shadcn_ />

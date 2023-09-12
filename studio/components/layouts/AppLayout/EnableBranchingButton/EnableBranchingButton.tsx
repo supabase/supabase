@@ -4,6 +4,8 @@ import { useSelectedOrganization } from 'hooks'
 import { useAppUiStateSnapshot } from 'state/app'
 import BranchingWaitlistPopover from './BranchingWaitlistPopover'
 
+import { OPT_IN_TAGS } from 'lib/constants'
+
 interface EnableBranchingButtonProps {
   alt?: boolean
 }
@@ -13,7 +15,7 @@ const EnableBranchingButton = ({ alt = false }: EnableBranchingButtonProps) => {
   const selectedOrg = useSelectedOrganization()
 
   const hasAccessToBranching =
-    selectedOrg?.opt_in_tags?.includes('PREVIEW_BRANCHES_OPT_IN') ?? false
+    selectedOrg?.opt_in_tags?.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) ?? false
 
   if (!hasAccessToBranching) {
     return <BranchingWaitlistPopover alt={alt} />

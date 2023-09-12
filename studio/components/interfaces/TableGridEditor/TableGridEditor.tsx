@@ -1,41 +1,41 @@
-import { useRef, useEffect, useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
-import { find, isUndefined, noop } from 'lodash'
 import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
+import { find, isUndefined, noop } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import { useEffect, useRef, useState } from 'react'
 
-import { SchemaView } from 'types'
-import { useCheckPermissions, useFlag, useStore, useUrlState } from 'hooks'
-import useEntityType from 'hooks/misc/useEntityType'
-import { useParams } from 'common/hooks'
-import GridHeaderActions from './GridHeaderActions'
-import NotFoundState from './NotFoundState'
-import SidePanelEditor from './SidePanelEditor'
 import {
   Dictionary,
-  parseSupaTable,
+  SupaTable,
   SupabaseGrid,
   SupabaseGridRef,
-  SupaTable,
+  parseSupaTable,
 } from 'components/grid'
-import { sqlKeys } from 'data/sql/keys'
-import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
-import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
-import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
+import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import TwoOptionToggle from 'components/ui/TwoOptionToggle'
+import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
 import {
   ForeignKeyConstraint,
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
-import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
-import { ForeignRowSelectorProps } from './SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
-import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import TableDefinition from './TableDefinition'
+import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { sqlKeys } from 'data/sql/keys'
+import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
+import { useCheckPermissions, useStore, useUrlState } from 'hooks'
+import useEntityType from 'hooks/misc/useEntityType'
+import { SchemaView } from 'types'
 import APIDocumentationPanel from './APIDocumentationPanel'
-import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
+import GridHeaderActions from './GridHeaderActions'
+import NotFoundState from './NotFoundState'
+import SidePanelEditor from './SidePanelEditor'
+import { ForeignRowSelectorProps } from './SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
+import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
+import TableDefinition from './TableDefinition'
 
 export interface TableGridEditorProps {
   /** Theme for the editor */
@@ -103,7 +103,6 @@ const TableGridEditor = ({
   const gridRef = useRef<SupabaseGridRef>(null)
 
   const { project } = useProjectContext()
-  const isVaultEnabled = useFlag('vaultExtension')
   const [encryptedColumns, setEncryptedColumns] = useState([])
   const [apiPreviewPanelOpen, setApiPreviewPanelOpen] = useState(false)
 
@@ -196,7 +195,7 @@ const TableGridEditor = ({
   const foreignKeyMeta = data || []
 
   useEffect(() => {
-    if (selectedTable !== undefined && selectedTable.id !== undefined && isVaultEnabled) {
+    if (selectedTable !== undefined && selectedTable.id !== undefined) {
       getEncryptedColumns(selectedTable)
     }
   }, [selectedTable?.id])

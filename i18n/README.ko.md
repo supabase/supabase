@@ -58,7 +58,7 @@ Supabase는 오픈 소스 도구의 조합입니다. 저희는 엔터프라이�
 Supabase는 [호스팅 플랫폼](https://supabase.com/dashboard)입니다. 가입만 하면 아무것도 설치하지 않고 Supabase를 사용할 수 있습니다.
 자체 호스팅](https://supabase.com/docs/guides/hosting/overview) 및 [로컬 개발](https://supabase.com/docs/guides/local-development)도 가능합니다.
 
-아키텍처](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![아키텍처](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/)은 30년 이상 활발하게 개발되어 안정성, 기능 견고성 및 성능에 대한 높은 평판을 얻고 있는 객체 관계형 데이터베이스 시스템입니다.
 - [Realtime](https://github.com/supabase/realtime)은 웹소켓을 사용하여 PostgreSQL 삽입, 업데이트, 삭제를 수신할 수 있는 Elixir 서버입니다. Realtime은 데이터베이스 변경 사항에 대해 Postgres의 기본 제공 복제 기능을 폴링하고, 변경 사항을 JSON으로 변환한 다음, 웹 소켓을 통해 승인된 클라이언트에 JSON을 브로드캐스트합니다.
