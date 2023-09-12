@@ -1,14 +1,17 @@
-import { Form, Modal, Input, Button, Listbox } from 'ui'
+import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
+import { Button, Form, Input, Listbox, Modal } from 'ui'
+
+import { DATETIME_FORMAT } from 'lib/constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
 export interface CustomExpiryModalProps {
   onCopyUrl: (name: string, url: string) => void
 }
 
-const unitMap: { seconds: number; days: number; months: number; years: number } = {
-  seconds: 1,
+const unitMap = {
   days: 3600 * 24,
+  weeks: 3600 * 24 * 7,
   months: 3600 * 24 * 30,
   years: 3600 * 24 * 365,
 }
@@ -32,14 +35,14 @@ const CustomExpiryModal = ({ onCopyUrl }: CustomExpiryModalProps) => {
     >
       <Form
         validateOnBlur
-        initialValues={{ expiresIn: '', units: 'seconds' }}
+        initialValues={{ expiresIn: '', units: 'days' }}
         onSubmit={async (values: any, { setSubmitting }: any) => {
           setSubmitting(true)
           onCopyUrl(
             selectedFileCustomExpiry.name,
             await getFileUrl(
               selectedFileCustomExpiry,
-              values.expiresIn * unitMap[values.units as 'seconds' | 'days' | 'months' | 'years']
+              values.expiresIn * unitMap[values.units as 'days' | 'weeks' | 'months' | 'years']
             )
           )
           setSubmitting(false)
@@ -63,11 +66,11 @@ const CustomExpiryModal = ({ onCopyUrl }: CustomExpiryModalProps) => {
                 <div className="flex items-center space-x-2">
                   <Input disabled={isSubmitting} type="number" id="expiresIn" className="w-full" />
                   <Listbox id="units" className="w-[150px]">
-                    <Listbox.Option id="seconds" label="seconds" value="seconds">
-                      seconds
-                    </Listbox.Option>
                     <Listbox.Option id="days" label="days" value="days">
                       days
+                    </Listbox.Option>
+                    <Listbox.Option id="weeks" label="weeks" value="weeks">
+                      weeks
                     </Listbox.Option>
                     <Listbox.Option id="months" label="months" value="months">
                       months
@@ -77,12 +80,10 @@ const CustomExpiryModal = ({ onCopyUrl }: CustomExpiryModalProps) => {
                     </Listbox.Option>
                   </Listbox>
                 </div>
-                {values.units !== 'seconds' && (
+                {values.expiresIn !== '' && (
                   <p className="text-sm text-light mt-2">
-                    Equivalent to{' '}
-                    {values.expiresIn *
-                      unitMap[values.units as 'seconds' | 'days' | 'months' | 'years']}{' '}
-                    seconds
+                    URL will expire on{' '}
+                    {dayjs().add(values.expiresIn, values.units).format(DATETIME_FORMAT)}
                   </p>
                 )}
               </Modal.Content>
