@@ -49,9 +49,9 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v4
-          with:
-            sparse-checkout: |
-              i18n
+        with:
+          sparse-checkout: |
+            i18n
       - name: Setup node
         uses: actions/setup-node@v3
         with:
