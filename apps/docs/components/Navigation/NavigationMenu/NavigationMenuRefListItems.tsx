@@ -7,7 +7,7 @@ import * as NavItems from './NavigationMenu.constants'
 import Image from 'next/image'
 
 import RevVersionDropdown from '~/components/RefVersionDropdown'
-import { useMenuActiveRefId } from '~/hooks/useMenuState'
+import { menuState, useMenuActiveRefId } from '~/hooks/useMenuState'
 
 import React, { Fragment } from 'react'
 import { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
@@ -60,6 +60,7 @@ const FunctionLink = React.memo(function FunctionLink({
           e.preventDefault()
           history.pushState({}, '', url)
           document.getElementById(slug)?.scrollIntoView()
+          menuState.setMenuMobileOpen(false)
         }}
         className={cn(
           'cursor-pointer transition text-sm hover:text-scale-1200 gap-3 relative',
