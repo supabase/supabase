@@ -55,7 +55,7 @@ It can be challenging to authenticate your users in all these different environm
 Install the auth helpers for SvelteKit:
 
 ```bash
-npm install @supabase/auth-helpers-sveltekit @supabase/supabase-js
+npm install @supabase/auth-helpers-sveltekit
 ```
 
 Add the code below to your `src/hooks.server.ts` to initialize the client on the server:
@@ -117,7 +117,9 @@ Create a new `src/routes/+layout.server.ts` file to handle the session on the se
 
 ```ts src/routes/+layout.server.ts
 // src/routes/+layout.server.ts
-export const load = async ({ locals: { getSession } }) => {
+import type { LayoutServerLoad } from './$types'
+
+export const load: LayoutServerLoad = async ({ locals: { getSession } }) => {
   return {
     session: await getSession(),
   }
@@ -130,11 +132,11 @@ Create a new `src/routes/+layout.ts` file to handle the session and the supabase
 
 ```ts src/routes/+layout.ts
 // src/routes/+layout.ts
-import { invalidate } from '$app/navigation'
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
+import type { LayoutLoad } from './$types'
 
-export const load = async ({ fetch, data, depends }) => {
+export const load: LayoutLoad = async ({ fetch, data, depends }) => {
   depends('supabase:auth')
 
   const supabase = createSupabaseLoadClient({
@@ -163,7 +165,6 @@ Update your `src/routes/+layout.svelte`:
 
 	export let data
 
-	let { supabase, session } = data
 	$: ({ supabase, session } = data)
 
 	onMount(() => {
@@ -284,8 +285,9 @@ export const GET = async ({ url, locals: { supabase } }) => {
 ```ts title=src/routes/auth/callback/+server.ts
 // src/routes/auth/callback/+server.ts
 import { redirect } from '@sveltejs/kit'
+import type { RequestHandler } from './$types'
 
-export const GET = async ({ url, locals: { supabase } }) => {
+export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
   const code = url.searchParams.get('code')
 
   if (code) {
@@ -307,12 +309,12 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 ```svelte src/routes/account/+page.svelte
 <!-- src/routes/account/+page.svelte -->
 <script lang="ts">
-	import { enhance, type SubmitFunction } from '$app/forms'
+	import { enhance } from '$app/forms'
+	import type { SubmitFunction } from './$types'
 
 	export let data
 	export let form
 
-	let { session, supabase, profile } = data
 	$: ({ session, supabase, profile } = data)
 
 	let profileForm: HTMLFormElement
@@ -387,8 +389,9 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 Now create the associated `src/routes/account/+page.server.ts` file that will handle loading our data from the server through the `load` function
 and handle all our form actions through the `actions` object.
 
-```ts
+```ts src/routes/account/+page.server.ts
 import { fail, redirect } from '@sveltejs/kit'
+import type { Actions, PageServerLoad } from './$types'
 
 export const load = async ({ locals: { supabase, getSession } }) => {
   const session = await getSession()
