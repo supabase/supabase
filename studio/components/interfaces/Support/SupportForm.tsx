@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import {
   Button,
@@ -21,22 +22,19 @@ import Divider from 'components/ui/Divider'
 import InformationBox from 'components/ui/InformationBox'
 import MultiSelect from 'components/ui/MultiSelect'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useFlag, useStore } from 'hooks'
 import useLatest from 'hooks/misc/useLatest'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { Project } from 'types'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
-import { useRouter } from 'next/router'
-import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -314,121 +312,125 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
               </Listbox>
             </div>
 
-            <div className="px-6">
-              <div className="grid grid-cols-2 gap-4">
-                {isLoadingProjects && (
-                  <div className="space-y-2">
-                    <p className="text-sm prose">Which project is affected?</p>
-                    <ShimmeringLoader className="!py-[19px]" />
-                  </div>
-                )}
-                {isErrorProjects && (
-                  <div className="space-y-2">
-                    <p className="text-sm prose">Which project is affected?</p>
-                    <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
-                      <IconAlertCircle strokeWidth={2} className="text-scale-1000" />
-                      <p className="text-sm prose">Failed to retrieve projects</p>
-                    </div>
-                  </div>
-                )}
-                {isSuccessProjects && (
-                  <Listbox
-                    id="projectRef"
-                    layout="vertical"
-                    label="Which project is affected?"
-                    onChange={(val) => {
-                      setSelectedProjectRef(val)
-                    }}
-                  >
-                    {projects.map((option) => {
-                      const organization = organizations?.find(
-                        (x) => x.id === option.organization_id
-                      )
-                      return (
-                        <Listbox.Option
-                          key={`option-${option.ref}`}
-                          label={option.name || ''}
-                          value={option.ref}
-                        >
-                          <span>{option.name}</span>
-                          <span className="block text-xs opacity-50">{organization?.name}</span>
-                        </Listbox.Option>
-                      )
-                    })}
-                  </Listbox>
-                )}
-                <Listbox id="severity" layout="vertical" label="Severity">
-                  {SEVERITY_OPTIONS.map((option: any) => {
-                    return (
-                      <Listbox.Option
-                        key={`option-${option.value}`}
-                        label={option.label}
-                        value={option.value}
-                        disabled={option.value === 'Critical' && isFreeProject}
-                      >
-                        <span>{option.label}</span>
-                        <span className="block text-xs opacity-50">{option.description}</span>
-                      </Listbox.Option>
-                    )
-                  })}
-                </Listbox>
-              </div>
-
-              {values.projectRef !== 'no-project' && subscription && isSuccessProjects ? (
-                <p className="text-sm text-scale-1000 mt-2">
-                  This project is on the{' '}
-                  <span className="text-scale-1100">{subscription.plan.name} plan</span>
-                </p>
-              ) : isLoadingSubscription && selectedProjectRef !== 'no-project' ? (
-                <div className="flex items-center space-x-2 mt-2">
-                  <IconLoader size={14} className="animate-spin" />
-                  <p className="text-sm text-scale-1000">Checking project's plan</p>
-                </div>
-              ) : (
-                <></>
-              )}
-            </div>
-
-            {isSuccessProjects && values.projectRef === 'no-project' && (
+            {values.category !== 'Login_issues' && (
               <div className="px-6">
-                {isLoadingOrganizations && (
-                  <div className="space-y-2">
-                    <p className="text-sm prose">Which organization is affected?</p>
-                    <ShimmeringLoader className="!py-[19px]" />
-                  </div>
-                )}
-                {isErrorOrganizations && (
-                  <div className="space-y-2">
-                    <p className="text-sm prose">Which organization is affected?</p>
-                    <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
-                      <IconAlertCircle strokeWidth={2} className="text-scale-1000" />
-                      <p className="text-sm prose">Failed to retrieve organizations</p>
+                <div className="grid grid-cols-2 gap-4">
+                  {isLoadingProjects && (
+                    <div className="space-y-2">
+                      <p className="text-sm prose">Which project is affected?</p>
+                      <ShimmeringLoader className="!py-[19px]" />
                     </div>
-                  </div>
-                )}
-                {isSuccessOrganizations && (
-                  <Listbox
-                    id="organizationSlug"
-                    layout="vertical"
-                    label="Which organization is affected?"
-                  >
-                    {organizations?.map((option) => {
+                  )}
+                  {isErrorProjects && (
+                    <div className="space-y-2">
+                      <p className="text-sm prose">Which project is affected?</p>
+                      <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
+                        <IconAlertCircle strokeWidth={2} className="text-scale-1000" />
+                        <p className="text-sm prose">Failed to retrieve projects</p>
+                      </div>
+                    </div>
+                  )}
+                  {isSuccessProjects && (
+                    <Listbox
+                      id="projectRef"
+                      layout="vertical"
+                      label="Which project is affected?"
+                      onChange={(val) => {
+                        setSelectedProjectRef(val)
+                      }}
+                    >
+                      {projects.map((option) => {
+                        const organization = organizations?.find(
+                          (x) => x.id === option.organization_id
+                        )
+                        return (
+                          <Listbox.Option
+                            key={`option-${option.ref}`}
+                            label={option.name || ''}
+                            value={option.ref}
+                          >
+                            <span>{option.name}</span>
+                            <span className="block text-xs opacity-50">{organization?.name}</span>
+                          </Listbox.Option>
+                        )
+                      })}
+                    </Listbox>
+                  )}
+                  <Listbox id="severity" layout="vertical" label="Severity">
+                    {SEVERITY_OPTIONS.map((option: any) => {
                       return (
                         <Listbox.Option
-                          key={`option-${option.slug}`}
-                          label={option.name || ''}
-                          value={option.slug}
+                          key={`option-${option.value}`}
+                          label={option.label}
+                          value={option.value}
+                          disabled={option.value === 'Critical' && isFreeProject}
                         >
-                          <span>{option.name}</span>
+                          <span>{option.label}</span>
+                          <span className="block text-xs opacity-50">{option.description}</span>
                         </Listbox.Option>
                       )
                     })}
                   </Listbox>
+                </div>
+
+                {values.projectRef !== 'no-project' && subscription && isSuccessProjects ? (
+                  <p className="text-sm text-scale-1000 mt-2">
+                    This project is on the{' '}
+                    <span className="text-scale-1100">{subscription.plan.name} plan</span>
+                  </p>
+                ) : isLoadingSubscription && selectedProjectRef !== 'no-project' ? (
+                  <div className="flex items-center space-x-2 mt-2">
+                    <IconLoader size={14} className="animate-spin" />
+                    <p className="text-sm text-scale-1000">Checking project's plan</p>
+                  </div>
+                ) : (
+                  <></>
                 )}
               </div>
             )}
 
-            {subscription?.plan.id === 'free' && (
+            {isSuccessProjects &&
+              values.projectRef === 'no-project' &&
+              values.category !== 'Login_issues' && (
+                <div className="px-6">
+                  {isLoadingOrganizations && (
+                    <div className="space-y-2">
+                      <p className="text-sm prose">Which organization is affected?</p>
+                      <ShimmeringLoader className="!py-[19px]" />
+                    </div>
+                  )}
+                  {isErrorOrganizations && (
+                    <div className="space-y-2">
+                      <p className="text-sm prose">Which organization is affected?</p>
+                      <div className="border rounded-md px-4 py-2 flex items-center space-x-2">
+                        <IconAlertCircle strokeWidth={2} className="text-scale-1000" />
+                        <p className="text-sm prose">Failed to retrieve organizations</p>
+                      </div>
+                    </div>
+                  )}
+                  {isSuccessOrganizations && (
+                    <Listbox
+                      id="organizationSlug"
+                      layout="vertical"
+                      label="Which organization is affected?"
+                    >
+                      {organizations?.map((option) => {
+                        return (
+                          <Listbox.Option
+                            key={`option-${option.slug}`}
+                            label={option.name || ''}
+                            value={option.slug}
+                          >
+                            <span>{option.name}</span>
+                          </Listbox.Option>
+                        )
+                      })}
+                    </Listbox>
+                  )}
+                </div>
+              )}
+
+            {subscription?.plan.id === 'free' && values.category !== 'Login_issues' && (
               <div className="px-6">
                 <InformationBox
                   icon={<IconAlertCircle strokeWidth={2} />}
@@ -603,16 +605,18 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                       </div>
                     )}
 
-                    <div className="px-6 space-y-2">
-                      <p className="text-sm text-scale-1100">Which services are affected?</p>
-                      <MultiSelect
-                        options={SERVICE_OPTIONS}
-                        value={selectedServices}
-                        placeholder="No particular service"
-                        searchPlaceholder="Search for a service"
-                        onChange={setSelectedServices}
-                      />
-                    </div>
+                    {values.category !== 'Login_issues' && (
+                      <div className="px-6 space-y-2">
+                        <p className="text-sm text-scale-1100">Which services are affected?</p>
+                        <MultiSelect
+                          options={SERVICE_OPTIONS}
+                          value={selectedServices}
+                          placeholder="No particular service"
+                          searchPlaceholder="Search for a service"
+                          onChange={setSelectedServices}
+                        />
+                      </div>
+                    )}
                     <div className="text-area-text-sm px-6">
                       <Input.TextArea
                         id="message"

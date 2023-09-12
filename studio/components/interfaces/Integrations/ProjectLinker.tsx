@@ -1,7 +1,9 @@
 import { ReactNode, useRef, useState } from 'react'
 
-import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { IntegrationConnectionsCreateVariables } from 'data/integrations/integrations.types'
+import {
+  IntegrationConnectionsCreateVariables,
+  IntegrationProjectConnection,
+} from 'data/integrations/integrations.types'
 import { useSelectedOrganization } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { toast } from 'react-hot-toast'
@@ -19,8 +21,6 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 
 export interface Project {
   id: string

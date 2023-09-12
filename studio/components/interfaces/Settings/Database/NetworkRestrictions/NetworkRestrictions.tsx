@@ -9,6 +9,7 @@ import { FormHeader, FormPanel } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useCheckPermissions } from 'hooks'
 import AddRestrictionModal from './AddRestrictionModal'
 import AllowAllModal from './AllowAllModal'
@@ -76,14 +77,18 @@ const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
 
 const NetworkRestrictions = ({}) => {
   const { ref } = useParams()
-
+  const { project } = useProjectContext()
   const [isAddingAddress, setIsAddingAddress] = useState(false)
   const [isAllowingAll, setIsAllowingAll] = useState(false)
   const [isDisallowingAll, setIsDisallowingAll] = useState(false)
   const [selectedRestrictionToRemove, setSelectedRestrictionToRemove] = useState<string>()
   const { data, isLoading } = useNetworkRestrictionsQuery({ projectRef: ref })
 
-  const canUpdateNetworkRestrictions = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const canUpdateNetworkRestrictions = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const hasAccessToRestrictions = data?.entitlement === 'allowed'
   const restrictedIps = data?.config?.dbAllowedCidrs ?? []

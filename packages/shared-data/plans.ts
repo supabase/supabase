@@ -8,6 +8,7 @@ export interface PricingInformation {
   priceLabel?: string
   priceMonthly: number | string
   warning?: string
+  warningLegacy?: string
   description: string
   preface: string
   features: string[]
@@ -20,12 +21,13 @@ export const plans: PricingInformation[] = [
     id: 'tier_free',
     name: 'Free',
     nameBadge: '',
-    costUnit: '/ month / org',
+    costUnit: '/ month / project',
     costUnitOrg: '/ month / org',
     href: 'https://supabase.com/dashboard/new?plan=free',
     priceLabel: '',
     priceMonthly: 0,
     warning: 'Limit of 2 free organizations',
+    warningLegacy: 'Limit of 2 free projects',
     description: 'Perfect for passion projects & simple websites.',
     preface: 'Get started with:',
     features: [
@@ -49,11 +51,12 @@ export const plans: PricingInformation[] = [
     id: 'tier_pro',
     name: 'Pro',
     nameBadge: '',
-    costUnit: '/ month / org',
+    costUnit: '/ month / project',
     costUnitOrg: '/ month / org',
     href: 'https://supabase.com/dashboard/new?plan=pro',
     priceLabel: 'From',
     warning: 'Usage-based plan',
+    warningLegacy: 'Usage-based plan',
     priceMonthly: 25,
     description: 'For production applications with the option to scale.',
     features: [
@@ -78,11 +81,12 @@ export const plans: PricingInformation[] = [
     id: 'tier_team',
     name: 'Team',
     nameBadge: 'New',
-    costUnit: '/ month / org',
+    costUnit: '/ month / project',
     costUnitOrg: '/ month / org',
     href: 'https://supabase.com/dashboard/new?plan=team',
     priceLabel: 'From',
     warning: 'Usage-based plan',
+    warningLegacy: 'Usage-based plan',
     priceMonthly: 599,
     description: 'Collaborate with different permissions and access patterns.',
     features: [
