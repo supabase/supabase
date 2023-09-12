@@ -40,6 +40,17 @@ const BillingAddress = () => {
 
   const initialValues = { city, country, line1, line2, postal_code, state }
 
+  const validate = (values: any) => {
+    const errors = {} as any
+    if (
+      (values.line1 || values.line2 || values.postal_code || values.state || values.city) &&
+      !values.country
+    ) {
+      errors['country'] = 'Please select a country'
+    }
+    return errors
+  }
+
   const onSubmit = async (values: any, { resetForm }: any) => {
     if (!slug) return console.error('Slug is required')
 
@@ -84,7 +95,13 @@ const BillingAddress = () => {
             )}
 
             {isSuccess && (
-              <Form validateOnBlur id={formId} initialValues={initialValues} onSubmit={onSubmit}>
+              <Form
+                validateOnBlur
+                id={formId}
+                initialValues={initialValues}
+                validate={validate}
+                onSubmit={onSubmit}
+              >
                 {({ values, initialValues, handleReset, resetForm }: any) => {
                   const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
@@ -132,7 +149,7 @@ const BillingAddress = () => {
                             placeholder="Address line 2"
                             disabled={!canUpdateBillingAddress}
                           />
-                          <div className="flex items-center space-x-2">
+                          <div className="flex space-x-2">
                             <Listbox
                               className="w-full"
                               id="country"
@@ -161,7 +178,7 @@ const BillingAddress = () => {
                               disabled={!canUpdateBillingAddress}
                             />
                           </div>
-                          <div className="flex items-center space-x-2">
+                          <div className="flex space-x-2">
                             <Input
                               className="w-full"
                               id="city"
