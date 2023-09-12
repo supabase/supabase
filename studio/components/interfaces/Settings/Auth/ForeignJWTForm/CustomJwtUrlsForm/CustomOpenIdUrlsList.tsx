@@ -8,7 +8,7 @@ import { ValueContainer } from './ValueContainer'
 
 interface Props {
   canUpdate: boolean
-  onSelectUrlToDelete: (url: string) => void
+  onSelectUrlToDelete: (url: string, type: string) => void
 }
 
 export const CustomOpenIdUrlsList = ({ canUpdate, onSelectUrlToDelete }: Props) => {

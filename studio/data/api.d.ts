@@ -4115,11 +4115,25 @@ export interface components {
     UpdatePgsodiumConfigBody: {
       root_key: string;
     };
+    JWKeySet: {
+      e: string;
+      n: string;
+      alg: string;
+      kid: string;
+      kty: string;
+      use: string;
+    };
     PostgrestConfigWithJWTSecretResponse: {
       max_rows: number;
       db_schema: string;
       db_extra_search_path: string;
       jwt_secret?: string;
+      jwt_jwks_uris: (string)[] | null;
+      jwt_oidc_issuers: (string)[] | null;
+      jwt_jwks_resolved: {
+        keys?: (components["schemas"]["JWKeySet"])[];
+      };
+      jwt_custom_jwks: string | null;
     };
     SslEnforcements: {
       database: boolean;

@@ -1,17 +1,10 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { components } from 'data/api'
 import { get } from 'data/fetchers'
 import { useCallback } from 'react'
 import { configKeys } from './keys'
 
 export type ProjectPostgrestConfigVariables = {
   projectRef?: string
-}
-
-export type Response = components['schemas']['PostgrestConfigWithJWTSecretResponse'] & {
-  jwt_jwks_uris: string[]
-  jwt_oidc_issuers: string[]
-  jwt_custom_jwks: string
 }
 
 export async function getProjectPostgrestConfig(
@@ -28,7 +21,7 @@ export async function getProjectPostgrestConfig(
   })
   if (error) throw error
 
-  return data as Response
+  return data
 }
 
 export type ProjectPostgrestConfigData = Awaited<ReturnType<typeof getProjectPostgrestConfig>>
