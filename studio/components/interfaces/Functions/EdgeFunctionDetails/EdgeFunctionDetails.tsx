@@ -35,6 +35,7 @@ import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-function
 import { useCheckPermissions, useStore } from 'hooks'
 import CommandRender from '../CommandRender'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 
 const EdgeFunctionDetails = () => {
   const router = useRouter()
@@ -44,6 +45,7 @@ const EdgeFunctionDetails = () => {
   const [showInstructions, setShowInstructions] = useState(false)
 
   const { data: settings } = useProjectApiQuery({ projectRef })
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
   const { mutateAsync: updateEdgeFunction, isLoading: isUpdating } = useEdgeFunctionUpdateMutation()
   const { mutate: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation({
@@ -66,7 +68,10 @@ const EdgeFunctionDetails = () => {
     : '[YOUR ANON KEY]'
 
   const endpoint = apiService?.app_config.endpoint ?? ''
-  const functionUrl = `${apiService?.protocol}://${endpoint}/functions/v1/${selectedFunction?.slug}`
+  const functionUrl =
+    customDomainData?.customDomain?.status === 'active'
+      ? `${apiService?.protocol}://${customDomainData.customDomain.hostname}/functions/v1/${selectedFunction?.slug}`
+      : `${apiService?.protocol}://${endpoint}/functions/v1/${selectedFunction?.slug}`
 
   const { managementCommands, secretCommands, invokeCommands } = generateCLICommands(
     selectedFunction,
