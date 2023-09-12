@@ -73,7 +73,7 @@
     "@tailwindcss/typography": "^0.5.9",
     "@types/classnames": "^2.3.1",
     "@types/dat.gui": "^0.7.10",
-    "@types/jest": "^27.4.0",
+    "@types/jest": "^29.5.4",
     "@types/mdx-js__react": "^1.5.5",
     "@types/node": "^17.0.24",
     "@types/nodemailer": "^6.4.4",
