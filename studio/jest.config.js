@@ -2,10 +2,10 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleDirectories: ['<rootDir>', 'node_modules'],
   setupFiles: ['jest-canvas-mock', './tests/setup/radix'],
-  testEnvironment: 'jsdom',
   testTimeout: 10000,
   transform: { '^.+\\.(t|j)sx?$': 'ts-jest' },
   testRegex: '(.*\\.test.(js|jsx|ts|tsx)$)',
+  testEnvironment: 'jsdom',
   globals: {
     'ts-jest': {
       tsconfig: 'tsconfig.test.json',
