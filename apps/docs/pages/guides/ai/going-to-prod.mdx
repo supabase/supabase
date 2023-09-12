@@ -102,7 +102,7 @@ First, a few generic tips which you can pick and choose from:
 3. **Pre-warm your database.** Implement the warm-up technique before transitioning to production or running benchmarks.
    - Use [pg_prewarm](https://www.postgresql.org/docs/current/pgprewarm.html) to load the index into RAM `select pg_prewarm('vecs.docs_vec_idx');`. This will help to avoid cold cache issues.
    - Execute 10,000 to 50,000 "warm-up" queries before each benchmark/prod. This will help to utilize cache and buffers more efficiently.
-4. **Establish your workload.** Finetune `m` and `ef_construction` or `lists` constants for the pgvector index to accelerate your queries (at the expense of a slower build times). For instance, for benchmarks with 1,000,000 OpenAI embeddings, we set `m` and `ef_constuction` to 32 and 80, and it resulted in 35% higher QPS than 24 and 56 values respectively.
+4. **Establish your workload.** Finetune `m` and `ef_construction` or `lists` constants for the pgvector index to accelerate your queries (at the expense of a slower build times). For instance, for benchmarks with 1,000,000 OpenAI embeddings, we set `m` and `ef_construction` to 32 and 80, and it resulted in 35% higher QPS than 24 and 56 values respectively.
 5. **Benchmark your own specific workloads.** Doing this during cache warm-up helps gauge the best value for the index build parameters, balancing accuracy with queries per second (QPS).
 
 ## Going into production
