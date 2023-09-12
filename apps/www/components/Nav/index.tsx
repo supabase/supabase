@@ -2,8 +2,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import Announcement from '~/components/Announcement/Announcement'
-import { Button, Badge, IconStar, IconChevronDown, LW8CountdownBanner } from 'ui'
+import { Button, Badge, IconStar, IconChevronDown } from 'ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
 
@@ -198,9 +197,6 @@ const Nav = () => {
 
   return (
     <>
-      <Announcement link="/launch-week">
-        <LW8CountdownBanner />
-      </Announcement>
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
