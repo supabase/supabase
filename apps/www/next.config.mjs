@@ -1,11 +1,11 @@
 import bundleAnalyzer from '@next/bundle-analyzer'
 import nextMdx from '@next/mdx'
 
-import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
+import remarkGfm from 'remark-gfm'
 
-import rewrites from './lib/rewrites.js'
 import redirects from './lib/redirects.js'
+import rewrites from './lib/rewrites.js'
 
 import withTM from 'next-transpile-modules'
 
@@ -26,9 +26,9 @@ const withMDX = nextMdx({
       ],
       remarkGfm,
     ],
-    rehypePlugins: [rehypeSlug],
     // This is required for `MDXProvider` component
     providerImportSource: '@mdx-js/react',
+    rehypePlugins: [rehypeSlug],
   },
 })
 
