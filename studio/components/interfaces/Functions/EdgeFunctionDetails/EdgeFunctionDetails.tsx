@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -18,7 +19,6 @@ import {
   Toggle,
 } from 'ui'
 
-import { useParams } from 'common/hooks'
 import {
   FormActions,
   FormHeader,
@@ -29,13 +29,13 @@ import {
 } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
 import CommandRender from '../CommandRender'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 
 const EdgeFunctionDetails = () => {
   const router = useRouter()
