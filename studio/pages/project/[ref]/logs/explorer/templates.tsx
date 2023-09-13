@@ -50,7 +50,7 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
           </div>
         </div>
       }
-      className="h-40 px-6"
+      className="h-40"
       linkHref={`/project/${projectRef}/logs/explorer?q=${encodeURI(template.searchString)}`}
       description={template.description}
       footer={

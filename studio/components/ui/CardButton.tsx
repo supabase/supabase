@@ -48,7 +48,7 @@ const CardButton = ({
     'group relative text-left',
     'bg-panel-header-light dark:bg-panel-header-dark',
     'border border-panel-border-light dark:border-panel-border-dark',
-    'rounded-md py-4 px-4 flex flex-row h-32',
+    'rounded-md py-4 px-6 flex flex-row h-32',
     'transition ease-in-out duration-150',
   ]
 
