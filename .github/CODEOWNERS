@@ -1,3 +1,6 @@
+/packages/shared-data/pricing.ts @roryw10
+/packages/shared-data/plans.ts @roryw10
+
 /studio/ @supabase/Dashboard
 /apps/www/ @supabase/Website
 /apps/docs/ @supabase/docs

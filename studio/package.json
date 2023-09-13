@@ -82,7 +82,7 @@
     "react-beautiful-dnd": "^13.1.0",
     "react-contexify": "^5.0.0",
     "react-csv": "^2.0.3",
-    "react-datepicker": "^4.8.0",
+    "react-datepicker": "^4.16.0",
     "react-dnd": "^14.0.3",
     "react-dnd-html5-backend": "^14.0.1",
     "react-dom": "^17.0.2",

@@ -36,7 +36,11 @@ const PITRSelection = () => {
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [selectedTimezone, setSelectedTimezone] = useState<Timezone>(getClientTimezone())
 
-  const { mutate: restoreFromPitr, isLoading: isRestoring } = usePitrRestoreMutation({
+  const {
+    mutate: restoreFromPitr,
+    isLoading: isRestoring,
+    isSuccess: isSuccessPITR,
+  } = usePitrRestoreMutation({
     onSuccess: (res, variables) => {
       setTimeout(() => {
         setShowConfirmation(false)
@@ -321,15 +325,15 @@ const PITRSelection = () => {
           <div className="flex items-center justify-end space-x-2">
             <Button
               type="default"
-              disabled={isRestoring}
+              disabled={isRestoring || isSuccessPITR}
               onClick={() => setShowConfirmation(false)}
             >
               Cancel
             </Button>
             <Button
               type="warning"
-              disabled={isRestoring}
-              loading={isRestoring}
+              disabled={isRestoring || isSuccessPITR}
+              loading={isRestoring || isSuccessPITR}
               onClick={onConfirmRestore}
             >
               I understand, begin restore

@@ -57,10 +57,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
 
   const { ui } = useStore()
   const { ref } = useParams()
-  const { data: customDomainData } = useCustomDomainsQuery(
-    { projectRef: ref },
-    { enabled: IS_PLATFORM }
-  )
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
   const apiService = (projectSettings?.services ?? []).find(
     (x) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID

@@ -409,6 +409,7 @@ const FileExplorerRow = ({
             />
           ) : (
             <Dropdown
+              modal={false}
               side="bottom"
               align="end"
               overlay={[

@@ -1,18 +1,20 @@
+import dayjs from 'dayjs'
+import { IconBarChart2 } from 'ui'
+
+import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DataPoint } from 'data/analytics/constants'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
-import dayjs from 'dayjs'
-import Link from 'next/link'
-import { Alert, Button, IconBarChart2 } from 'ui'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { getAddons } from '../Subscription/Subscription.utils'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
 import { USAGE_CATEGORIES } from './Usage.constants'
 import { getUpgradeUrl } from './Usage.utils'
 import UsageBarChart from './UsageBarChart'
-import Panel from 'components/ui/Panel'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { getAddons } from '../Subscription/Subscription.utils'
+import { CPUWarnings, DiskIOBandwidthWarnings, RAMWarnings } from './UsageWarningAlerts'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 
 export interface InfrastructureProps {
   projectRef: string
@@ -28,11 +30,12 @@ const Infrastructure = ({
   currentBillingCycleSelected,
 }: InfrastructureProps) => {
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
-
+  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const projectResourceWarnings = resourceWarnings?.find((x) => x.project === projectRef)
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === 'infra')
 
   const upgradeUrl = getUpgradeUrl(projectRef, subscription)
-  const isFreeTier = subscription?.plan?.id === 'free'
+  const isFreePlan = subscription?.plan?.id === 'free'
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const selectedAddons = addons?.selected_addons ?? []
@@ -125,81 +128,14 @@ const Infrastructure = ({
             <SectionContent section={attribute}>
               {attribute.key === 'disk_io_consumption' && (
                 <>
-                  {hasLatest && latestIoBudgetConsumption >= 100 ? (
-                    <Alert withIcon variant="danger" title="Your Disk IO Budget has been used up">
-                      <p className="mb-4">
-                        Your workload has used up all your Disk IO Budget and is now running at the
-                        baseline performance. If you need consistent disk performance, consider
-                        upgrading to a larger compute add-on.
-                      </p>
-                      <Link href={upgradeUrl}>
-                        <a>
-                          <Button type="danger">
-                            {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
-                          </Button>
-                        </a>
-                      </Link>
-                    </Alert>
-                  ) : hasLatest && latestIoBudgetConsumption >= 80 ? (
-                    <Alert
-                      withIcon
-                      variant="danger"
-                      title="You are close to running out of Disk IO Budget"
-                    >
-                      <p className="mb-4">
-                        Your workload has consumed {latestIoBudgetConsumption}% of your Disk IO
-                        Budget. If you use up all your Disk IO Budget, your instance will reverted
-                        to baseline performance. If you need consistent disk performance, consider
-                        upgrading to a larger compute add-on.
-                      </p>
-                      <Link href={upgradeUrl}>
-                        <a>
-                          <Button type="danger">
-                            {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
-                          </Button>
-                        </a>
-                      </Link>
-                    </Alert>
-                  ) : currentBillingCycleSelected && highestIoBudgetConsumption >= 100 ? (
-                    <Alert
-                      withIcon
-                      variant="warning"
-                      title="You ran out of IO Budget at least once"
-                    >
-                      <p className="mb-4">
-                        Your workload has used up all your Disk IO Budget and reverted to baseline
-                        performance at least once during this billing cycle. If you need consistent
-                        disk performance, consider upgrading to a larger compute add-on.
-                      </p>
-                      <Link href={upgradeUrl}>
-                        <a>
-                          <Button type="warning">
-                            {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
-                          </Button>
-                        </a>
-                      </Link>
-                    </Alert>
-                  ) : currentBillingCycleSelected && highestIoBudgetConsumption >= 80 ? (
-                    <Alert
-                      withIcon
-                      variant="warning"
-                      title="You were close to using all your IO Budget at least once"
-                    >
-                      <p className="mb-4">
-                        Your workload has consumed {highestIoBudgetConsumption}% of your Disk IO
-                        budget during this billing cycle. If you use up all your Disk IO Budget,
-                        your instance will reverted to baseline performance. If you need consistent
-                        disk performance, consider upgrading to a larger compute add-on.
-                      </p>
-                      <Link href={upgradeUrl}>
-                        <a>
-                          <Button type="warning">
-                            {isFreeTier ? 'Upgrade project' : 'Change compute add-on'}
-                          </Button>
-                        </a>
-                      </Link>
-                    </Alert>
-                  ) : null}
+                  <DiskIOBandwidthWarnings
+                    upgradeUrl={upgradeUrl}
+                    isFreePlan={isFreePlan}
+                    hasLatest={hasLatest}
+                    currentBillingCycleSelected={currentBillingCycleSelected}
+                    latestIoBudgetConsumption={latestIoBudgetConsumption}
+                    highestIoBudgetConsumption={highestIoBudgetConsumption}
+                  />
                   <div className="space-y-1">
                     <p>Disk IO Bandwidth</p>
 
@@ -246,6 +182,21 @@ const Infrastructure = ({
                   </div>
                 </>
               )}
+              {attribute.key === 'max_cpu_usage' && (
+                <CPUWarnings
+                  isFreePlan={isFreePlan}
+                  upgradeUrl={upgradeUrl}
+                  severity={projectResourceWarnings?.cpu_exhaustion}
+                />
+              )}
+              {attribute.key === 'ram_usage' && (
+                <RAMWarnings
+                  isFreePlan={isFreePlan}
+                  upgradeUrl={upgradeUrl}
+                  severity={projectResourceWarnings?.memory_and_swap_exhaustion}
+                />
+              )}
+
               <div className="space-y-1">
                 <div className="flex flex-row justify-between">
                   {attribute.key === 'disk_io_consumption' ? (
