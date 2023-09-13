@@ -43,7 +43,7 @@ const TriggerList = ({
   if (_triggers.length === 0 && filterString.length === 0) {
     return (
       <Table.tr key={schema}>
-        <Table.td colSpan={5}>
+        <Table.td colSpan={6}>
           <p className="text-sm text-scale-1200">No triggers created yet</p>
           <p className="text-sm text-light">There are no triggers found in the schema "{schema}"</p>
         </Table.td>
