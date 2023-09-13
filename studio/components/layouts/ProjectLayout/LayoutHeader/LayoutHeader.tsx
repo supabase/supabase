@@ -1,8 +1,14 @@
 import { useParams } from 'common'
 import Link from 'next/link'
+import { useMemo } from 'react'
 import { Badge } from 'ui'
 
-import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
+import {
+  getResourcesExceededLimits,
+  getResourcesExceededLimitsOrg,
+} from 'components/ui/OveragesBanner/OveragesBanner.utils'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
@@ -12,7 +18,6 @@ import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
 import OrgDropdown from './OrgDropdown'
 import ProjectDropdown from './ProjectDropdown'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ref: projectRef } = useParams()
@@ -20,26 +25,48 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const selectedOrganization = useSelectedOrganization()
 
   // Skip with org-based-billing, as quota is for the entire org
-  const { data: usage } = useProjectUsageQuery(
+  const { data: projectUsage } = useProjectUsageQuery(
     { projectRef },
-    { enabled: selectedOrganization && !selectedOrganization.subscription_id }
+    { enabled: Boolean(selectedOrganization && !selectedOrganization.subscription_id) }
   )
-  const resourcesExceededLimits = getResourcesExceededLimits(usage)
+  const { data: orgUsage } = useOrgUsageQuery(
+    { orgSlug: selectedOrganization?.slug },
+    { enabled: Boolean(selectedOrganization && selectedOrganization.subscription_id) }
+  )
+
+  const exceedingLimits = useMemo(() => {
+    if (orgUsage) {
+      return getResourcesExceededLimitsOrg(orgUsage?.usages || []).length > 0
+    } else if (projectUsage) {
+      return getResourcesExceededLimits(projectUsage).length > 0
+    } else {
+      return false
+    }
+  }, [projectUsage, orgUsage])
 
   // Skip with org-based-billing, as quota is for the entire org
-  const { data: subscription } = useProjectSubscriptionV2Query(
+  const { data: projectSubscription } = useProjectSubscriptionV2Query(
     { projectRef },
     { enabled: selectedOrganization && !selectedOrganization.subscription_id }
   )
+
+  const { data: orgSubscription } = useProjectSubscriptionV2Query(
+    { projectRef },
+    { enabled: Boolean(selectedOrganization && selectedOrganization.subscription_id) }
+  )
+
+  const subscription = useMemo(() => {
+    return projectSubscription || orgSubscription
+  }, [projectSubscription, orgSubscription])
 
   const projectHasNoLimits = subscription?.usage_billing_enabled === true
 
   const showOverUsageBadge =
     useFlag('overusageBadge') &&
     subscription !== undefined &&
-    (subscription.plan.id === 'free' || subscription?.plan.id === 'pro') &&
+    (subscription.plan.id === 'free' || subscription.plan.id === 'pro') &&
     !projectHasNoLimits &&
-    resourcesExceededLimits.length > 0
+    exceedingLimits
 
   return (
     <div
@@ -77,7 +104,13 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
                 {showOverUsageBadge && (
                   <div className="ml-2">
-                    <Link href={`/project/${projectRef}/settings/billing/usage`}>
+                    <Link
+                      href={
+                        selectedOrganization?.subscription_id
+                          ? `/org/${selectedOrganization.slug}/usage`
+                          : `/project/${projectRef}/settings/billing/usage`
+                      }
+                    >
                       <a>
                         <Badge color="red">Exceeding usage limits</Badge>
                       </a>
