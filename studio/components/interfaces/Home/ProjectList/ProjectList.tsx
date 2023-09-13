@@ -11,6 +11,7 @@ import {
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
 import { Organization, Project, ResponseError } from 'types'
@@ -35,6 +36,7 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
     isError: isErrorPermissions,
     error: permissionsError,
   } = usePermissionsQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery()
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({ enabled: IS_PLATFORM })
   const projectsByOrg = groupBy(allProjects, 'organization_id')
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
@@ -50,6 +52,7 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
             overdueInvoices={(allOverdueInvoices ?? []).filter(
               (it) => it.organization_id === organization.id
             )}
+            resourceWarnings={resourceWarnings ?? []}
             rewriteHref={rewriteHref}
             isLoadingPermissions={isLoadingPermissions}
             isErrorPermissions={isErrorPermissions}
@@ -72,6 +75,7 @@ type OrganizationProjectsProps = {
   organization: Organization
   projects: Project[]
   overdueInvoices: OverdueInvoicesResponse[]
+  resourceWarnings: ResourceWarning[]
   isLoadingPermissions: boolean
   isErrorPermissions: boolean
   permissionsError: ResponseError | null
@@ -82,9 +86,10 @@ type OrganizationProjectsProps = {
 }
 
 const OrganizationProjects = ({
-  organization: { id, name, slug, subscription_id },
+  organization: { name, slug, subscription_id },
   projects,
   overdueInvoices,
+  resourceWarnings,
   isLoadingPermissions,
   isErrorPermissions,
   permissionsError,
@@ -150,6 +155,9 @@ const OrganizationProjects = ({
                 key={makeRandomString(5)}
                 project={project}
                 rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
+                resourceWarnings={resourceWarnings.find(
+                  (resourceWarning) => resourceWarning.project === project.ref
+                )}
               />
             ))
           )}

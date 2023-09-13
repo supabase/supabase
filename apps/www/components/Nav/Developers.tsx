@@ -32,7 +32,7 @@ const Developers = () => {
             stroke="currentColor"
             aria-hidden="true"
           >
-            <path stroke-linecap="round" strokeLinejoin="round" strokeWidth="1.5" d={icon} />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d={icon} />
           </svg>
         )}
         {Svg && <Svg />}
