@@ -1517,7 +1517,9 @@ functions:
         description: |
           If the filter on a foreign table's column is not satisfied, the foreign
           table returns `[]` or `null` but the parent table is not filtered out.
-          If you want to filter out the parent table rows, use the `!inner` hint
+          If you want to filter out the parent table rows, use the `!inner` hint.
+          For the example above, change `countries(*)` to `countries!inner(*)`. 
+          See also: The `Filter Foreign Tables` example under `Using filters`.
         hideCodeBlock: true
       - id: querying-foreign-table-with-count
         name: Querying foreign table with count
