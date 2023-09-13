@@ -8,10 +8,12 @@ import {
   IconLoader,
   IconPauseCircle,
 } from 'ui'
+import { InferredProjectStatus } from './ProjectCard.utils'
+import { getWarningContent } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
 
 export interface ProjectCardWarningsProps {
   resourceWarnings: ResourceWarning
-  projectStatus: string
+  projectStatus: InferredProjectStatus
 }
 
 export const ProjectCardStatus = ({
@@ -31,54 +33,11 @@ export const ProjectCardStatus = ({
           resourceWarnings[property as keyof typeof resourceWarnings] !== null
       )
 
-  const getContent = (metric: string) => {
-    if (metric === 'is_readonly_mode_enabled') {
-      return RESOURCE_WARNING_MESSAGES.is_readonly_mode_enabled.cardContent.warning
-    }
-
-    const severity = resourceWarnings[metric as keyof typeof resourceWarnings]
-
-    if (typeof severity !== 'string') return undefined
-
-    return RESOURCE_WARNING_MESSAGES[metric as keyof typeof RESOURCE_WARNING_MESSAGES][
-      'cardContent'
-    ][severity as 'warning' | 'critical']
-  }
-
   const hasCriticalWarning = activeWarnings.some(
     (x) => resourceWarnings[x as keyof typeof resourceWarnings] === 'critical'
   )
-
   const isCritical = activeWarnings.includes('is_readonly_mode_enabled') || hasCriticalWarning
 
-  const getWarningType = () => {
-    let type = 'default'
-
-    switch (true) {
-      case projectStatus === 'isPaused':
-        type = 'default'
-        break
-      case isCritical:
-        type = 'destructive'
-        break
-      default:
-        type = 'warning'
-        break
-    }
-
-    return type as 'warning' | 'destructive' | 'default'
-  }
-
-  const AlertIcon = () => {
-    switch (true) {
-      case projectStatus === 'isPaused' || projectStatus === 'isPausing':
-        return <IconPauseCircle strokeWidth={2} />
-      case projectStatus === 'isRestoring' || projectStatus === 'isComingUp':
-        return <IconLoader size={14} strokeWidth={2} />
-      default:
-        return <IconAlertTriangle strokeWidth={2} />
-    }
-  }
   const getTitle = () => {
     if (projectStatus === 'isPaused') return 'Project is paused'
     if (projectStatus === 'isPausing') return 'Project is pausing'
@@ -90,7 +49,7 @@ export const ProjectCardStatus = ({
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.cardContent[
           hasCriticalWarning ? 'critical' : 'warning'
         ].title
-      : getContent(activeWarnings[0])?.title
+      : getWarningContent(resourceWarnings, activeWarnings[0], 'cardContent')?.title
   }
 
   const getDescription = () => {
@@ -108,12 +67,16 @@ export const ProjectCardStatus = ({
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.cardContent[
           hasCriticalWarning ? 'critical' : 'warning'
         ].description
-      : getContent(activeWarnings[0])?.description
+      : getWarningContent(resourceWarnings, activeWarnings[0], 'cardContent')?.description
   }
 
   const alertTitle = getTitle()
   const alertDescription = getDescription()
-  const alertType = getWarningType()
+  const alertType = isCritical
+    ? 'destructive'
+    : projectStatus === 'isPaused'
+    ? 'default'
+    : 'warning'
 
   if (activeWarnings.length === 0 && projectStatus === 'isHealthy') return <div className="py-2" />
 
@@ -121,11 +84,15 @@ export const ProjectCardStatus = ({
     <div>
       <Alert_Shadcn_
         variant={alertType}
-        className="border-0 rounded-none rounded-b-md my-2 mb-2.5 [&>svg]:w-[28px]
-[&>svg]:h-[28px] [&>svg]:p-1.5 [&>svg]:left-6 pl-6"
+        className="border-0 rounded-none rounded-b-md my-2 mb-2.5 [&>svg]:w-[28px] [&>svg]:h-[28px] [&>svg]:p-1.5 [&>svg]:left-6 pl-6"
       >
-        <AlertIcon />
-
+        {projectStatus === 'isPaused' || projectStatus === 'isPausing' ? (
+          <IconPauseCircle strokeWidth={2} />
+        ) : projectStatus === 'isRestoring' || projectStatus === 'isComingUp' ? (
+          <IconLoader size={14} strokeWidth={2} className="animate-spin" />
+        ) : (
+          <IconAlertTriangle strokeWidth={2} />
+        )}
         <AlertTitle_Shadcn_ className="text-xs mb-0.5">{alertTitle}</AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_ className="text-xs">{alertDescription}</AlertDescription_Shadcn_>
       </Alert_Shadcn_>

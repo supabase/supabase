@@ -13,6 +13,7 @@ import {
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganization } from 'hooks'
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
+import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
 
 const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
@@ -46,34 +47,30 @@ const ResourceExhaustionWarningBanner = () => {
       : false
   const isCritical = activeWarnings.includes('is_readonly_mode_enabled') || hasCriticalWarning
 
-  const getContent = (metric: string) => {
-    if (projectResourceWarnings === undefined) return undefined
-    if (metric === 'is_readonly_mode_enabled') {
-      return RESOURCE_WARNING_MESSAGES.is_readonly_mode_enabled.bannerContent.warning
-    }
-    const severity = projectResourceWarnings[metric as keyof typeof projectResourceWarnings]
-    if (typeof severity !== 'string') return undefined
-    return RESOURCE_WARNING_MESSAGES[metric as keyof typeof RESOURCE_WARNING_MESSAGES]
-      .bannerContent[severity as 'warning' | 'critical']
-  }
-
   const title =
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
           hasCriticalWarning ? 'critical' : 'warning'
         ].title
-      : getContent(activeWarnings[0])?.title
+      : projectResourceWarnings !== undefined
+      ? getWarningContent(projectResourceWarnings, activeWarnings[0], 'bannerContent')?.title
+      : null
+
   const description =
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
           hasCriticalWarning ? 'critical' : 'warning'
         ].description
-      : getContent(activeWarnings[0])?.description
+      : projectResourceWarnings !== undefined
+      ? getWarningContent(projectResourceWarnings, activeWarnings[0], 'bannerContent')?.description
+      : null
+
   const learnMoreUrl =
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.docsUrl
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
           ?.docsUrl
+
   const metric =
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.metric
