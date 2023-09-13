@@ -469,8 +469,8 @@ export const pricing: Pricing = {
         plans: {
           free: false,
           pro: false,
-          team: true,
-          enterprise: true,
+          team: 'Available as paid add-on',
+          enterprise: 'Available as paid add-on',
         },
         tooltips: {
           main: 'Available as a paid add-on on Team plan and above.',
