@@ -7,6 +7,7 @@ import {
   IconAlertTriangle,
   IconLoader,
   IconPauseCircle,
+  IconRefreshCw,
 } from 'ui'
 import { InferredProjectStatus } from './ProjectCard.utils'
 import { getWarningContent } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
@@ -53,14 +54,10 @@ export const ProjectCardStatus = ({
   }
 
   const getDescription = () => {
-    if (projectStatus === 'isPaused')
-      return 'This project will not accept any requests until unpaused.'
-    if (projectStatus === 'isPausing')
-      return 'This project is entering a paused state. This may take a few minutes.'
-    if (projectStatus === 'isComingUp')
-      return 'This project is coming up. This may take a few minutes.'
-    if (projectStatus === 'isRestoring')
-      return 'This project is restoring. This may take a few minutes.'
+    if (projectStatus === 'isPaused') return 'This project will not accept requests until resumed'
+    if (projectStatus === 'isPausing') return 'The pause process will complete in a few minutes'
+    if (projectStatus === 'isComingUp') return 'Your project will be ready in a few minutes'
+    if (projectStatus === 'isRestoring') return 'Your project will be ready in a few minutes'
 
     // If none of the paused/restoring states match, proceed with the default logic
     return activeWarnings.length > 1 && showResourceExhaustionWarnings
@@ -84,16 +81,16 @@ export const ProjectCardStatus = ({
     <div>
       <Alert_Shadcn_
         variant={alertType}
-        className="border-0 rounded-none rounded-b-md my-2 mb-2.5 [&>svg]:w-[28px] [&>svg]:h-[28px] [&>svg]:p-1.5 [&>svg]:left-6 pl-6"
+        className="border-0 rounded-none rounded-b-md my-2 mb-2.5 [&>svg]:w-[28px] [&>svg]:h-[28px] [&>svg]:mt-1 [&>svg]:p-1.5 [&>svg]:left-6 pl-6"
       >
         {projectStatus === 'isPaused' || projectStatus === 'isPausing' ? (
           <IconPauseCircle strokeWidth={2} />
         ) : projectStatus === 'isRestoring' || projectStatus === 'isComingUp' ? (
-          <IconLoader size={14} strokeWidth={2} className="animate-spin" />
+          <IconRefreshCw size={14} strokeWidth={2} />
         ) : (
           <IconAlertTriangle strokeWidth={2} />
         )}
-        <AlertTitle_Shadcn_ className="text-xs mb-0.5">{alertTitle}</AlertTitle_Shadcn_>
+        <AlertTitle_Shadcn_ className="text-sm mb-0.5">{alertTitle}</AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_ className="text-xs">{alertDescription}</AlertDescription_Shadcn_>
       </Alert_Shadcn_>
     </div>
