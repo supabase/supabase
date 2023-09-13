@@ -1,13 +1,13 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams, useTheme } from 'common'
 import { isNaN, isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 
-import { useTheme } from 'common'
-import { useParams } from 'common/hooks'
 import { Dictionary } from 'components/grid'
 import { TableGridEditor } from 'components/interfaces'
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
@@ -24,7 +24,6 @@ import { sqlKeys } from 'data/sql/keys'
 import { useStore, useUrlState, withAuth } from 'hooks'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { NextPageWithLayout, SchemaView } from 'types'
-import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()

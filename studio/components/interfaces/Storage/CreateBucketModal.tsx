@@ -228,7 +228,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                       name="allowed_mime_types"
                       layout="vertical"
                       label="Allowed MIME types"
-                      placeholder="e.g image/jpg, image/png, audio/mpeg, video/mp4, etc"
+                      placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
                       descriptionText="Comma separated values"
                     />
                   </div>
