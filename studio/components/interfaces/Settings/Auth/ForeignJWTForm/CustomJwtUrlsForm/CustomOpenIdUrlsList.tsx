@@ -52,7 +52,7 @@ export const CustomOpenIdUrlsList = ({ canUpdate, onSelectUrlToDelete }: Props) 
                 <Button
                   type="default"
                   icon={<IconTrash />}
-                  onClick={() => onSelectUrlToDelete(line.url)}
+                  onClick={() => onSelectUrlToDelete(line.url, line.type)}
                 >
                   Remove
                 </Button>

@@ -35,7 +35,7 @@ export const CustomOpenIdUrls = ({ postgrestConfig }: { postgrestConfig: any }) 
 }
 
 const RemoveUrlModal = ({ selectedUrl, onClose }: { selectedUrl: string; onClose: () => void }) => {
-  const { authConfig, ui } = useStore()
+  const { ui } = useStore()
   const [isDeleting, setIsDeleting] = useState(false)
 
   const onConfirmDeleteUrl = async () => {
@@ -44,18 +44,18 @@ const RemoveUrlModal = ({ selectedUrl, onClose }: { selectedUrl: string; onClose
     // TODO: make this work
     const payload = '' //URI_ALLOW_LIST_ARRAY.filter((e: string) => e !== url)
 
-    const { error } = await authConfig.update({ URI_ALLOW_LIST: payload.toString() })
+    // const { error } = await authConfig.update({ URI_ALLOW_LIST: payload.toString() })
 
-    if (!error) {
-      onClose()
-      ui.setNotification({ category: 'success', message: 'Successfully removed URL' })
-    } else {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to remove URL: ${error?.message}`,
-      })
-    }
+    // if (!error) {
+    //   onClose()
+    //   ui.setNotification({ category: 'success', message: 'Successfully removed URL' })
+    // } else {
+    //   ui.setNotification({
+    //     error,
+    //     category: 'error',
+    //     message: `Failed to remove URL: ${error?.message}`,
+    //   })
+    // }
 
     setIsDeleting(false)
   }
