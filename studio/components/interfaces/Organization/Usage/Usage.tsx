@@ -11,12 +11,13 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
-import { Button, IconExternalLink, IconInfo, Listbox } from 'ui'
+import { Alert, Button, IconExternalLink, IconInfo, Listbox } from 'ui'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
 import SizeAndCounts from './SizeAndCounts'
 import InformationBox from 'components/ui/InformationBox'
 import Link from 'next/link'
+import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 
 const Usage = () => {
   const { slug, projectRef } = useParams()
@@ -32,6 +33,9 @@ const Usage = () => {
     isError: isErrorSubscription,
     isSuccess: isSuccessSubscription,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
+
+  const { data: usage } = useOrgUsageQuery({ orgSlug: slug })
+
   const orgProjects = projects?.filter((project) => project.organization_id === organization?.id)
 
   useEffect(() => {
@@ -87,6 +91,13 @@ const Usage = () => {
   const selectedProject = selectedProjectRef
     ? orgProjects?.find((it) => it.ref === selectedProjectRef)
     : undefined
+
+  const hasExceededAnyLimits = Boolean(
+    usage?.usages.find(
+      (metric) =>
+        !metric.unlimited && metric.capped && metric.usage > (metric?.pricing_free_units ?? 0)
+    )
+  )
 
   return (
     <>
@@ -155,6 +166,33 @@ const Usage = () => {
           )}
         </div>
       </ScaffoldContainer>
+
+      {!selectedProject && subscription && hasExceededAnyLimits && (
+        <ScaffoldContainer className="mt-5">
+          <Alert
+            withIcon
+            variant="danger"
+            title="Your organization's usage has exceeded its included quota"
+            actions={[
+              <Link
+                key="upgrade-button"
+                href={`/org/${slug}/billing?panel=${
+                  subscription.plan.id === 'free' ? 'subscriptionPlan' : 'costControl'
+                }`}
+              >
+                <Button asChild key="upgrade-button" type="default" className="ml-8">
+                  <a>{subscription.plan.id === 'free' ? 'Upgrade plan' : 'Change spend cap'}</a>
+                </Button>
+              </Link>,
+            ]}
+          >
+            Your projects can become unresponsive or enter read only mode.{' '}
+            {subscription.plan.id === 'free'
+              ? 'Please upgrade to the Pro plan to ensure that your projects remain available.'
+              : 'Please disable spend cap to ensure that your projects remain available.'}
+          </Alert>
+        </ScaffoldContainer>
+      )}
 
       {selectedProjectRef && (
         <ScaffoldContainer className="mt-5">

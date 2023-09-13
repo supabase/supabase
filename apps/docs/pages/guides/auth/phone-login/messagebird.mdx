@@ -111,7 +111,7 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/signup' \
 
 The user will now receive an SMS with a 6-digit pin that you will need to receive from them within 60-seconds before they can login to their account.
 
-You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyOTP`:
+You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyOtp`:
 
 <Tabs
   scrollable
@@ -122,7 +122,7 @@ You should present a form to the user so they can input the 6 digit pin, then se
 <TabPanel id="js" label="JavaScript">
 
 ```js
-let { session, error } = await supabase.auth.verifyOTP({
+let { session, error } = await supabase.auth.verifyOtp({
   phone: '+13334445555',
   token: '123456',
 })
@@ -237,7 +237,7 @@ The second step is the same as the previous section, you need to collect the 6-d
 <TabPanel id="js" label="JavaScript">
 
 ```js
-let { session, error } = await supabase.auth.verifyOTP({
+let { session, error } = await supabase.auth.verifyOtp({
   phone: '+13334445555',
   token: '123456',
 })

@@ -41,8 +41,6 @@ create index on items using hnsw (column_name vector_cosine_ops);
 
 Currently vectors with up to 2,000 dimensions can be indexed.
 
-If you are using the `vecs` Python library, follow the instructions in [Managing collections](/docs/guides/ai/managing-collections#create-an-index) to create indexes.
-
 ## How does HNSW work?
 
 HNSW uses proximity graphs (graphs connecting nodes based on distance between them) to approximate nearest-neighbor search. To understand HNSW, we can break it down into 2 parts:
