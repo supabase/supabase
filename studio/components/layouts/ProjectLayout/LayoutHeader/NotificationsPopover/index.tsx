@@ -21,6 +21,7 @@ import { delete_, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Project } from 'types'
 import NotificationRow from './NotificationRow'
+import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
 
 interface NotificationsPopoverProps {
   alt?: boolean
@@ -39,6 +40,17 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
   const [projectToApplyMigration, setProjectToApplyMigration] = useState<Project>()
   const [projectToRollbackMigration, setProjectToRollbackMigration] = useState<Project>()
   const [targetNotification, setTargetNotification] = useState<Notification>()
+
+  const { mutate: restartProjectServices } = useProjectRestartServicesMutation({
+    onSuccess: (res, variables) => {
+      setProjectToRestart(undefined)
+      setTargetNotification(undefined)
+
+      setProjectPostgrestStatus(queryClient, variables.ref, 'OFFLINE')
+      ui.setNotification({ category: 'success', message: `Restarting services` })
+      router.push(`/project/${variables.ref}`)
+    },
+  })
 
   const newNotifications =
     notifications?.filter(
@@ -72,41 +84,22 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
       .map((action) => action.action_type)
       .filter((actionName) => Object.keys(serviceNamesByActionName).indexOf(actionName) !== -1)
       .map((actionName) => serviceNamesByActionName[actionName])
-    const { error } = await post(`${API_URL}/projects/${ref}/restart-services`, {
-      restartRequest: {
-        region,
-        source_notification_id: id,
-        services: services,
-      },
-    })
 
-    if (error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to restart project: ${error.message}`,
-        error,
-      })
-    } else {
-      setProjectPostgrestStatus(queryClient, ref, 'OFFLINE')
-      ui.setNotification({ category: 'success', message: `Restarting services` })
-      router.push(`/project/${ref}`)
-    }
-
-    setProjectToRestart(undefined)
-    setTargetNotification(undefined)
+    restartProjectServices({ ref, region, services: services as any, source_notification_id: id })
   }
 
   const onConfirmProjectApplyMigration = async () => {
     if (!projectToApplyMigration) return
+
     const data = targetNotification?.data as PostgresqlUpgradeData
     const { resource } = data.additional as any
     if (!resource) return
+
+    // [Joshen] Leaving this as an exception for RQ due to dynamic URL
     const res = await post(`${API_URL}/database/${projectToApplyMigration.ref}/${resource}`, {})
     if (!res.error) {
       const project = await getProjectDetail({ ref: projectToApplyMigration.ref })
-      if (project) {
-        meta.setProjectDetails(project)
-      }
+      if (project) meta.setProjectDetails(project)
 
       ui.setNotification({
         category: 'success',
@@ -124,18 +117,19 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
 
   const onConfirmProjectRollbackMigration = async () => {
     if (!projectToRollbackMigration) return
+
     const data = targetNotification?.data as PostgresqlUpgradeData
     const { resource } = data.additional as any
     if (!resource) return
+
+    // [Joshen] Leaving this as an exception for RQ due to dynamic URL
     const res = await delete_(
       `${API_URL}/database/${projectToRollbackMigration.ref}/${resource}`,
       {}
     )
     if (!res.error) {
       const project = await getProjectDetail({ ref: projectToRollbackMigration.ref })
-      if (project) {
-        meta.setProjectDetails(project)
-      }
+      if (project) meta.setProjectDetails(project)
 
       ui.setNotification({
         category: 'success',
@@ -224,7 +218,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
                 className={alt ? 'px-1' : ''}
                 icon={
                   hasNewNotifications ? (
-                    <div className="-mr-3.5 z-10 h-4 w-4 flex items-center justify-center rounded-full bg-white">
+                    <div className="-mr-3.5 z-10 h-4 w-4 flex items-center justify-center rounded-full bg-black dark:bg-white">
                       <p className="text-xs text-scale-100">{newNotifications.length}</p>
                     </div>
                   ) : alt ? (

@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -18,7 +19,6 @@ import {
   Toggle,
 } from 'ui'
 
-import { useParams } from 'common/hooks'
 import {
   FormActions,
   FormHeader,
@@ -29,6 +29,7 @@ import {
 } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
@@ -44,6 +45,7 @@ const EdgeFunctionDetails = () => {
   const [showInstructions, setShowInstructions] = useState(false)
 
   const { data: settings } = useProjectApiQuery({ projectRef })
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
   const { mutateAsync: updateEdgeFunction, isLoading: isUpdating } = useEdgeFunctionUpdateMutation()
   const { mutate: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation({
@@ -66,7 +68,10 @@ const EdgeFunctionDetails = () => {
     : '[YOUR ANON KEY]'
 
   const endpoint = apiService?.app_config.endpoint ?? ''
-  const functionUrl = `${apiService?.protocol}://${endpoint}/functions/v1/${selectedFunction?.slug}`
+  const functionUrl =
+    customDomainData?.customDomain?.status === 'active'
+      ? `${apiService?.protocol}://${customDomainData.customDomain.hostname}/functions/v1/${selectedFunction?.slug}`
+      : `${apiService?.protocol}://${endpoint}/functions/v1/${selectedFunction?.slug}`
 
   const { managementCommands, secretCommands, invokeCommands } = generateCLICommands(
     selectedFunction,

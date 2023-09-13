@@ -37,7 +37,7 @@ const FeedbackWidget = ({
   setScreenshot,
 }: FeedbackWidgetProps) => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { ref, slug } = useParams()
 
   const { ui } = useStore()
   const inputRef = useRef<any>(null)
@@ -101,7 +101,7 @@ const FeedbackWidget = ({
         message: 'Please include a message in your feedback.',
         duration: 4000,
       })
-    } else if (feedback.length > 0 && ref !== undefined) {
+    } else if (feedback.length > 0) {
       setSending(true)
 
       const attachmentUrl = screenshot
@@ -113,11 +113,12 @@ const FeedbackWidget = ({
       try {
         await submitFeedback({
           projectRef: ref,
+          organizationSlug: slug,
           message: formattedFeedback,
           pathname: router.asPath,
         })
         setFeedback('')
-        ui.setNotification({ category: 'success', message: 'Feedback sent. Thank you!' })
+        ui.setNotification({ category: 'success', message: 'Feedback sent. Thank you!\n\nPlease be aware that we do not provide responses to feedback. If you require assistance or a reply, consider submitting a support ticket.' })
       } finally {
         setSending(false)
       }

@@ -24,6 +24,7 @@ const routesToIgnoreProjectDetailsRequest = [
   '/project/[ref]/settings/general',
   '/project/[ref]/settings/database',
   '/project/[ref]/settings/storage',
+  '/project/[ref]/settings/infrastructure',
   '/project/[ref]/settings/billing/subscription',
   '/project/[ref]/settings/billing/usage',
   '/project/[ref]/settings/billing/invoices',
@@ -35,6 +36,7 @@ const routesToIgnorePostgrestConnection = [
   '/project/[ref]/reports',
   '/project/[ref]/settings/general',
   '/project/[ref]/settings/database',
+  '/project/[ref]/settings/infrastructure',
   '/project/[ref]/settings/billing/subscription',
   '/project/[ref]/settings/billing/usage',
   '/project/[ref]/settings/billing/invoices',
@@ -159,8 +161,8 @@ interface ContentWrapperProps {
  * [TODO] Next iteration should scrape long polling and just listen to the project's status
  */
 const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
-  const selectedProject = useSelectedProject()
   const router = useRouter()
+  const selectedProject = useSelectedProject()
 
   const requiresDbConnection: boolean =
     (!router.pathname.includes('/project/[ref]/settings') &&
