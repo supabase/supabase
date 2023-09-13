@@ -69,6 +69,10 @@ type DeletePayload = {
 
 Logging history of webhook calls is available under the `net` schema of your database. For more info, see the [GitHub Repo](https://github.com/supabase/pg_net).
 
+## Testing Webhooks
+
+As a developer, you may not have an HTTPS URL readily available for testing or inspecting webhook payloads until you deploy a webhook consumer service. Fortunately, services like [Beeceptor](https://beeceptor.com/mock-api) or [Request Bin](https://public.requestbin.com/r) step in to fill this need. Using these you can discover all the required webhook payloads and plan for development.
+
 ## Resources
 
 - [pg_net](/docs/guides/database/extensions/pgnet): an async networking extension for PostgreSQL
