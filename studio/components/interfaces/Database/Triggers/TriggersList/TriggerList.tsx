@@ -2,7 +2,16 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes } from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { Badge, Button, Dropdown, IconEdit3, IconMoreVertical, IconTrash } from 'ui'
+import {
+  Badge,
+  Button,
+  Dropdown,
+  IconCheck,
+  IconEdit3,
+  IconMoreVertical,
+  IconTrash,
+  IconX,
+} from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
 import { useCheckPermissions, useStore } from 'hooks'
@@ -64,12 +73,19 @@ const TriggerList = ({
               {x.name}
             </p>
           </Table.td>
+
           <Table.td className="hidden lg:table-cell break-all">
-            <p title={x.table}>{x.table}</p>
+            <p title={x.table} className="truncate">
+              {x.table}
+            </p>
           </Table.td>
+
           <Table.td className="hidden space-x-2 xl:table-cell">
-            <p title={x.function_name}>{x.function_name}</p>
+            <p title={x.function_name} className="truncate">
+              {x.function_name}
+            </p>
           </Table.td>
+
           <Table.td className="hidden xl:table-cell">
             <div className="flex space-x-2">
               {x.events.map((event: string) => (
@@ -77,6 +93,17 @@ const TriggerList = ({
               ))}
             </div>
           </Table.td>
+
+          <Table.td className="hidden xl:table-cell">
+            <div className="flex items-center justify-center">
+              {x.enabled_mode !== 'DISABLED' ? (
+                <IconCheck strokeWidth={2} className="text-brand" />
+              ) : (
+                <IconX strokeWidth={2} />
+              )}
+            </div>
+          </Table.td>
+
           <Table.td className="text-right">
             {!isLocked && (
               <div className="flex items-center justify-end">
