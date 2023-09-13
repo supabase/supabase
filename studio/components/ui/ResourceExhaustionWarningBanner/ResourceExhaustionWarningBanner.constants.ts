@@ -45,11 +45,11 @@ export const RESOURCE_WARNING_MESSAGES = {
     cardContent: {
       warning: {
         title: 'Project is depleting its Disk IO Budget',
-        description: 'Project may become unresponsive if fully exhausted.',
+        description: 'It may become unresponsive if fully exhausted',
       },
       critical: {
         title: 'Project has depleted its Disk IO Budget',
-        description: 'Project may become unresponsive',
+        description: 'It may become unresponsive',
       },
     },
     docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-disk-io',
@@ -73,11 +73,11 @@ export const RESOURCE_WARNING_MESSAGES = {
     cardContent: {
       warning: {
         title: 'Project is exhausting disk space budget',
-        description: 'Project may become unresponsive if fully exhausted',
+        description: 'It may become unresponsive if fully exhausted',
       },
       critical: {
         title: 'Project has exhausted disk space budget',
-        description: 'Project may become unresponsive',
+        description: 'It may become unresponsive',
       },
     },
     docsUrl: 'https://supabase.com/docs/guides/platform/database-size#disk-management',
@@ -100,11 +100,11 @@ export const RESOURCE_WARNING_MESSAGES = {
     cardContent: {
       warning: {
         title: 'Project has high CPU usage',
-        description: `Project performance is affected`,
+        description: `Performance is affected`,
       },
       critical: {
         title: 'Project CPU usage is at 100%',
-        description: `Project performance is affected`,
+        description: `Performance is affected`,
       },
     },
     docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-cpu',
@@ -128,11 +128,11 @@ export const RESOURCE_WARNING_MESSAGES = {
     cardContent: {
       warning: {
         title: 'Project has high memory usage',
-        description: `Project performance is affected.`,
+        description: `Performance is affected`,
       },
       critical: {
         title: 'Project memory usage is at 100%',
-        description: `Project performance is affected.`,
+        description: `Performance is affected`,
       },
     },
     docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-ram',
@@ -156,11 +156,11 @@ export const RESOURCE_WARNING_MESSAGES = {
     cardContent: {
       warning: {
         title: 'Project is exhausting multiple resources',
-        description: `Project performance is affected.`,
+        description: `Performance is affected.`,
       },
       critical: {
         title: 'Project has exhausted multiple resources',
-        description: `Project performance is affected.`,
+        description: `Performance is affected.`,
       },
     },
     docsUrl: undefined,
