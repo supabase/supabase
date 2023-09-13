@@ -465,7 +465,7 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: 'HIPAA',
+        title: 'HIPAA (paid add-on)',
         plans: {
           free: false,
           pro: false,
