@@ -94,7 +94,7 @@ export const plans: PricingInformation[] = [
       'Daily backups stored for 14 days',
       'Standardised Security Questionnaire',
       'SOC2',
-      'HIPAA',
+      'HIPAA available as paid add-on',
       'SSO for Supabase Dashboard',
       'Priority email support & SLAs',
       '28-day log retention',
