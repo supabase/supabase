@@ -51,8 +51,8 @@ const Partners = () => {
                   <path
                     d="M91 1C120.005 1 145.841 14.5702 162.505 35.708"
                     stroke="url(#paint0_linear_4766_6117)"
-                    stroke-width="2"
-                    stroke-linecap="round"
+                    strokeWidth="2"
+                    strokeLinecap="round"
                   />
                   <defs>
                     <linearGradient
@@ -63,9 +63,9 @@ const Partners = () => {
                       y2="21.5"
                       gradientUnits="userSpaceOnUse"
                     >
-                      <stop stop-color="#1CF7C3" stop-opacity="0" />
-                      <stop offset="0.510417" stop-color="#1CF7C3" />
-                      <stop offset="1" stop-color="#1CF7C3" stop-opacity="0" />
+                      <stop stopColor="#1CF7C3" stopOpacity="0" />
+                      <stop offset="0.510417" stopColor="#1CF7C3" />
+                      <stop offset="1" stopColor="#1CF7C3" stopOpacity="0" />
                     </linearGradient>
                   </defs>
                 </svg>
