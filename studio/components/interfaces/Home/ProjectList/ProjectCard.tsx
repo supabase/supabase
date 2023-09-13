@@ -36,11 +36,11 @@ const ProjectCard = ({
     <li className="col-span-1 list-none">
       <CardButton
         linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
-        containerHeightClassName="h-40"
+        containerHeightClassName="h-44"
         title={
           <div className="w-full justify-between space-y-1.5 px-6">
-            <p className="flex-shrink truncate text-sm">{name}</p>
-            <span className="text-xs lowercase text-scale-1000">{desc}</span>
+            <p className="flex-shrink truncate text-base">{name}</p>
+            <span className="text-sm lowercase text-scale-1000">{desc}</span>
             <div className="flex items-center space-x-1.5">
               {isVercelIntegrated && (
                 <div className="w-fit p-1 border rounded-md flex items-center border-scale-600">

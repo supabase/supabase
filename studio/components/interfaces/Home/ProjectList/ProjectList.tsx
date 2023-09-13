@@ -86,7 +86,7 @@ type OrganizationProjectsProps = {
 }
 
 const OrganizationProjects = ({
-  organization: { id, name, slug, subscription_id },
+  organization: { name, slug, subscription_id },
   projects,
   overdueInvoices,
   resourceWarnings,
