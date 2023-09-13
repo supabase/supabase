@@ -808,7 +808,7 @@ functions:
         code: |
           ```
           with open(destination, 'wb+') as f:
-            res = supabase.storage.from_(bucket_name).download(source)
+            res = supabase.storage.from_('bucket_name').download(source)
             f.write(res)
           ```
 
