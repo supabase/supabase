@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { useWindowSize } from 'react-use'
 
-import TweetCard from '~/components/TweetCard'
+import { TweetCard } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import SwiperCore, { Autoplay } from 'swiper'
 

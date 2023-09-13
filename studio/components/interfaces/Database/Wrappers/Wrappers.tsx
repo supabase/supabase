@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { Button, IconExternalLink } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { FDW, useFDWsQuery } from 'data/fdw/fdws-query'
 import { useStore } from 'hooks'
 import DeleteWrapperModal from './DeleteWrapperModal'
@@ -43,7 +43,7 @@ const Wrappers = () => {
       <div>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="mb-2 text-xl text-scale-1200">Foreign Data Wrappers</h3>
+            <h3 className="mb-1 text-xl text-scale-1200">Foreign Data Wrappers</h3>
             <div className="text-sm text-scale-900">
               Query your data warehouse directly from your database, or third-party APIs using SQL.
             </div>
@@ -62,9 +62,7 @@ const Wrappers = () => {
 
         {isLoadingExtensions || isLoading ? (
           <div className="p-12 space-y-2 border rounded border-scale-500">
-            <ShimmeringLoader />
-            <ShimmeringLoader className="w-3/4" />
-            <ShimmeringLoader className="w-1/2" />
+            <GenericSkeletonLoader />
           </div>
         ) : isWrappersEnabled ? (
           <div>

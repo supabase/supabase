@@ -288,7 +288,7 @@ export default function IndexPage() {
                                   {plan.priceMonthly}
                                 </p>
                                 <p className="text-scale-900 mb-1.5 ml-1 text-[13px] leading-4">
-                                  {plan.costUnit}
+                                  {plan.costUnitOrg}
                                 </p>
                               </div>
 
@@ -873,7 +873,7 @@ export default function IndexPage() {
                       >
                         <a>
                           <Button size="tiny" type="primary" block>
-                            Get started
+                            Get Started
                           </Button>
                         </a>
                       </Link>
@@ -886,7 +886,7 @@ export default function IndexPage() {
                       >
                         <a>
                           <Button size="tiny" type="primary" block>
-                            Get started
+                            Get Started
                           </Button>
                         </a>
                       </Link>
@@ -906,7 +906,7 @@ export default function IndexPage() {
                       <Link href="https://forms.supabase.com/enterprise">
                         <a>
                           <Button size="tiny" type="default" block>
-                            Contact us
+                            Contact Us
                           </Button>
                         </a>
                       </Link>

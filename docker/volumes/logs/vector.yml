@@ -141,6 +141,7 @@ transforms:
     source: |-
       .metadata.host = "db-default"
       .metadata.parsed.timestamp = .timestamp
+      
       parsed, err = parse_regex(.event_message, r'.*(?P<level>INFO|NOTICE|WARNING|ERROR|LOG|FATAL|PANIC?):.*', numeric_groups: true)
 
       if err != null || parsed == null {
@@ -149,8 +150,10 @@ transforms:
       if parsed != null {
        .metadata.parsed.error_severity = parsed.level
       }
-
-
+      if .metadata.parsed.error_severity == "info" {
+          .metadata.parsed.error_severity = "log"
+      }
+      .metadata.parsed.error_severity = upcase(.metadata.parsed.error_severity)
 
 sinks:
   logflare_auth:

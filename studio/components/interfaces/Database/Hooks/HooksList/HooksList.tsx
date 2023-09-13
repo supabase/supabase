@@ -1,21 +1,20 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { includes, map as lodashMap, uniqBy } from 'lodash'
+import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
-import { includes, uniqBy, map as lodashMap } from 'lodash'
-import { observer } from 'mobx-react-lite'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, Input, IconSearch, IconExternalLink } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import { useCheckPermissions } from 'hooks'
-import SchemaTable from './SchemaTable'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { Button, IconExternalLink, IconSearch, Input } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useDatabaseHooks } from 'data/database-triggers/database-triggers-query'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import ClientLoadingError from 'components/ui/ClientLoadingError'
 import NoSearchResults from 'components/ui/NoSearchResults'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useDatabaseHooks } from 'data/database-triggers/database-triggers-query'
+import { useCheckPermissions } from 'hooks'
+import SchemaTable from './SchemaTable'
 
 export interface HooksListProps {
   createHook: () => void
@@ -30,6 +29,7 @@ const HooksList = ({
 }: HooksListProps) => {
   const { project } = useProjectContext()
   const {
+    error,
     data: hooks,
     isLoading,
     isError,
@@ -48,16 +48,11 @@ const HooksList = ({
   return (
     <>
       {isLoading ? (
-        <div className="py-4 space-y-2">
-          <ShimmeringLoader />
-          <ShimmeringLoader className="w-3/4" />
-          <ShimmeringLoader className="w-1/2" />
+        <div className="py-4">
+          <GenericSkeletonLoader />
         </div>
       ) : isError ? (
-        <ClientLoadingError
-          projectRef={project?.ref ?? ''}
-          description="Failed to retrieve database webhooks"
-        />
+        <AlertError error={error} subject="Failed to retrieve database webhooks" />
       ) : (hooks || []).length == 0 ? (
         <div className="flex h-full w-full items-center justify-center">
           <ProductEmptyState

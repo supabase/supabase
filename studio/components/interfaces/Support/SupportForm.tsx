@@ -284,7 +284,6 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
             resetForm({ values: updatedValues, initialValues: updatedValues })
           }
         }, [isReady])
-        console.log(values)
 
         return (
           <div className="space-y-8 w-[620px]">
