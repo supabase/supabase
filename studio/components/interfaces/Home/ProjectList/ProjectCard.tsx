@@ -1,11 +1,12 @@
 import { IconGitBranch, IconGitHub } from 'ui'
 
 import CardButton from 'components/ui/CardButton'
-import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
+import { BASE_PATH } from 'lib/constants'
 import { Project } from 'types'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { ProjectCardStatus } from './ProjectCardStatus'
+import { inferProjectStatus } from './ProjectCard.utils'
 
 export interface ProjectCardProps {
   project: Project
@@ -13,32 +14,6 @@ export interface ProjectCardProps {
   githubIntegration?: IntegrationProjectConnection
   vercelIntegration?: IntegrationProjectConnection
   resourceWarnings?: ResourceWarning
-}
-
-const getProjetStatus = (project: Project) => {
-  let status
-  switch (project.status) {
-    case PROJECT_STATUS.ACTIVE_HEALTHY:
-      status = 'isHealthy'
-      break
-    case PROJECT_STATUS.GOING_DOWN:
-    case PROJECT_STATUS.PAUSING:
-      status = 'isPausing'
-      break
-    case PROJECT_STATUS.INACTIVE:
-      status = 'isPaused'
-      break
-    case PROJECT_STATUS.RESTORING:
-      status = 'isRestoring'
-      break
-    case PROJECT_STATUS.UNKNOWN:
-    case PROJECT_STATUS.COMING_UP:
-      status = 'isComingUp'
-      break
-    default:
-      status = ''
-  }
-  return status
 }
 
 const ProjectCard = ({
@@ -55,7 +30,7 @@ const ProjectCard = ({
   const isGithubIntegrated = githubIntegration !== undefined
   const isVercelIntegrated = vercelIntegration !== undefined
   const githubRepository = githubIntegration?.metadata.name ?? undefined
-  const projectStatus = getProjetStatus(project)
+  const projectStatus = inferProjectStatus(project)
 
   return (
     <li className="col-span-1 list-none">
