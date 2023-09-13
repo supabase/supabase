@@ -1,8 +1,7 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { groupBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
-import { Badge, Button, IconPlus } from 'ui'
+import { Button, IconExternalLink, IconPlus, Modal } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
 import {
@@ -12,20 +11,20 @@ import {
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useCheckPermissions } from 'hooks'
+import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
 import { Organization, Project, ResponseError } from 'types'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { useState } from 'react'
 
 export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string
 }
 
 const ProjectList = ({ rewriteHref }: ProjectListProps) => {
-  const { data: organizations } = useOrganizationsQuery()
+  const { data: organizations, isSuccess } = useOrganizationsQuery()
   const {
     data: allProjects,
     isLoading: isLoadingProjects,
@@ -37,11 +36,12 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
     isError: isErrorPermissions,
     error: permissionsError,
   } = usePermissionsQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery()
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({ enabled: IS_PLATFORM })
   const projectsByOrg = groupBy(allProjects, 'organization_id')
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
-  return (
+  return isSuccess && organizations && organizations?.length > 0 ? (
     <>
       {organizations?.map((organization) => {
         return (
@@ -52,6 +52,7 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
             overdueInvoices={(allOverdueInvoices ?? []).filter(
               (it) => it.organization_id === organization.id
             )}
+            resourceWarnings={resourceWarnings ?? []}
             rewriteHref={rewriteHref}
             isLoadingPermissions={isLoadingPermissions}
             isErrorPermissions={isErrorPermissions}
@@ -63,6 +64,8 @@ const ProjectList = ({ rewriteHref }: ProjectListProps) => {
         )
       })}
     </>
+  ) : (
+    <NoProjectsState slug={''} />
   )
 }
 
@@ -72,6 +75,7 @@ type OrganizationProjectsProps = {
   organization: Organization
   projects: Project[]
   overdueInvoices: OverdueInvoicesResponse[]
+  resourceWarnings: ResourceWarning[]
   isLoadingPermissions: boolean
   isErrorPermissions: boolean
   permissionsError: ResponseError | null
@@ -82,9 +86,10 @@ type OrganizationProjectsProps = {
 }
 
 const OrganizationProjects = ({
-  organization: { id, name, slug, subscription_id },
+  organization: { name, slug, subscription_id },
   projects,
   overdueInvoices,
+  resourceWarnings,
   isLoadingPermissions,
   isErrorPermissions,
   permissionsError,
@@ -94,15 +99,13 @@ const OrganizationProjects = ({
   rewriteHref,
 }: OrganizationProjectsProps) => {
   const isEmpty = !projects || projects.length === 0
-  const canReadProjects = useCheckPermissions(PermissionAction.READ, 'projects', undefined, id)
+
+  const [orgBillingMigrationModalVisible, setOrgBillingMigrationModalVisible] = useState(false)
 
   return (
     <div className="space-y-3" key={makeRandomString(5)}>
       <div className="flex space-x-4 items-center">
-        <h4 className="text-lg flex items-center">
-          {name}
-          {subscription_id ? <Badge className="ml-3">V2</Badge> : <></>}
-        </h4>
+        <h4 className="text-lg flex items-center">{name}</h4>
 
         {!!overdueInvoices.length && (
           <div>
@@ -111,6 +114,14 @@ const OrganizationProjects = ({
                 <Button type="danger">Outstanding Invoices</Button>
               </a>
             </Link>
+          </div>
+        )}
+
+        {!subscription_id && (
+          <div>
+            <Button onClick={() => setOrgBillingMigrationModalVisible(true)} type="warning">
+              Action Required
+            </Button>
           </div>
         )}
       </div>
@@ -136,40 +147,82 @@ const OrganizationProjects = ({
                 error={projectsError}
               />
             </div>
-          ) : !canReadProjects ? (
-            <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 py-8 px-6 text-center">
-              <div className="space-y-1">
-                <p>You need additional permissions to view projects from this organization</p>
-                <p className="text-sm text-scale-1100">
-                  Contact your organization owner or administrator for assistance.
-                </p>
-              </div>
-            </div>
           ) : isEmpty ? (
-            <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
-              <div className="space-y-1">
-                <p>No projects</p>
-                <p className="text-sm text-scale-1100">Get started by creating a new project.</p>
-              </div>
-              <div>
-                <Link href={`/new/${slug}`}>
-                  <a>
-                    <Button icon={<IconPlus />}>New Project</Button>
-                  </a>
-                </Link>
-              </div>
-            </div>
+            <NoProjectsState slug={slug} />
           ) : (
             projects?.map((project) => (
               <ProjectCard
                 key={makeRandomString(5)}
                 project={project}
                 rewriteHref={rewriteHref ? rewriteHref(project.ref) : undefined}
+                resourceWarnings={resourceWarnings.find(
+                  (resourceWarning) => resourceWarning.project === project.ref
+                )}
               />
             ))
           )}
         </ul>
       )}
+
+      <Modal
+        closable
+        hideFooter
+        size="small"
+        visible={orgBillingMigrationModalVisible}
+        onCancel={() => setOrgBillingMigrationModalVisible(false)}
+        header="We're upgrading our billing system"
+      >
+        <Modal.Content className="py-4 space-y-4">
+          <div className="space-y-3">
+            <p className="text-sm leading-normal">
+              The organization "{name}" still uses the legacy project-based billing. We've recently
+              made some big improvements to our billing system and require your action. To migrate
+              to the new organization-based billing, head over to your{' '}
+              <Link href={`/org/${slug}/billing`} passHref>
+                <a className="text-sm text-green-900 transition hover:text-green-1000">
+                  organization billing settings
+                </a>
+              </Link>
+              .
+            </p>
+
+            <div className="space-x-3">
+              <Link href="https://supabase.com/blog/organization-based-billing" passHref>
+                <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                  <a target="_blank" rel="noreferrer">
+                    Announcement
+                  </a>
+                </Button>
+              </Link>
+              <Link href="https://supabase.com/docs/guides/platform/org-based-billing" passHref>
+                <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                  <a target="_blank" rel="noreferrer">
+                    Documentation
+                  </a>
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </Modal.Content>
+      </Modal>
+    </div>
+  )
+}
+
+const NoProjectsState = ({ slug }: { slug: string }) => {
+  return (
+    <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+      <div className="space-y-1">
+        <p>No projects</p>
+        <p className="text-sm text-scale-1100">Get started by creating a new project.</p>
+      </div>
+      <div>
+        <Link href={`/new/${slug}`}>
+          <a>
+            <Button icon={<IconPlus />}>New Project</Button>
+          </a>
+        </Link>
+      </div>
     </div>
   )
 }

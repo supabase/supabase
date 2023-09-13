@@ -64,12 +64,20 @@
         "url": "/brand-assets"
       },
       {
+        "text": "Security and Compliance",
+        "url": "/security"
+      },
+      {
         "text": "DPA",
         "url": "/legal/dpa"
       },
       {
         "text": "SOC2",
         "url": "https://forms.supabase.com/soc2"
+      },
+      {
+        "text": "HIPAA",
+        "url": "https://forms.supabase.com/hipaa"
       }
     ]
   },

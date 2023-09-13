@@ -42,7 +42,7 @@ Migrating projects can be achieved using the Supabase CLI. This is particularly 
 ```bash
 supabase db dump --db-url "$OLD_DB_URL" -f roles.sql --role-only
 supabase db dump --db-url "$OLD_DB_URL" -f schema.sql
-supabase db dump --db-url "$OLD_DB_URL" -f data.sql --data-only
+supabase db dump --db-url "$OLD_DB_URL" -f data.sql --use-copy --data-only
 ```
 
 ### Restore to your new project
@@ -131,6 +131,10 @@ const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
   }
 })()
 ```
+
+### Transfer to a different organization
+
+Note that project migration is for transferring your projects to different regions. If you need to move your project to a different organization without touching the infrastrusture, see [project transfers](/docs/guides/platform/project-transfer).
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

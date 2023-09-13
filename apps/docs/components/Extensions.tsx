@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import React, { useState } from 'react'
-import { GlassPanel, IconLink, IconX, Input } from 'ui'
-import extensions from '../data/extensions.json'
+import { extensions } from 'shared-data'
+import { GlassPanel, IconX, Input } from 'ui'
 
 type Extension = {
   name: string

@@ -67,8 +67,12 @@ const ProjectUsage = () => {
     // TODO (ziinc): link to edge logs with correct filter applied
     _type: 'rest' | 'realtime' | 'storage' | 'auth'
   ) => {
-    const selected = dayjs(value?.timestamp).toISOString()
-    router.push(`/project/${projectRef}/logs/edge-logs?ite=${encodeURIComponent(selected)}`)
+    const unit = selectedInterval.startUnit
+    const selectedStart = dayjs(value?.timestamp)
+    const selectedEnd = selectedStart.add(1, unit)
+    router.push(
+      `/project/${projectRef}/logs/edge-logs?ite=${encodeURIComponent(selectedEnd.toISOString())}`
+    )
   }
 
   return (

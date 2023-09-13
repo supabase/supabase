@@ -12,8 +12,12 @@ import {
   CollapsibleTrigger_Shadcn_,
   CollapsibleContent_Shadcn_,
   IconTriangle,
+  cn,
 } from 'ui'
 import ImageFadeStack from '~/components/ImageFadeStack'
+import ZoomableImg from '~/components/ZoomableImg/ZoomableImg'
+
+import 'react-medium-image-zoom/dist/styles.css'
 
 // import all components used in blog articles here
 // to do: move this into a helper/utils, it is used elsewhere
@@ -88,15 +92,19 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
       }
       return <img {...props} />
     },
-    Img: (props: any) => (
-      <figure>
-        <span className={['next-image--dynamic-fill', props.wide && 'wide'].join(' ')}>
-          <Image
-            {...props}
-            className={[type === 'blog' ? 'rounded-md border' : ''].join(' ')}
-            layout="fill"
-          />
-        </span>
+    Img: ({ zoomable = true, className, ...props }: any) => (
+      <figure className={cn('m-0', className)}>
+        <ZoomableImg zoomable={zoomable}>
+          <span
+            className={[
+              'next-image--dynamic-fill',
+              type === 'blog' ? 'rounded-md border' : '',
+              props.wide && 'wide',
+            ].join(' ')}
+          >
+            <Image layout="fill" {...props} />
+          </span>
+        </ZoomableImg>
         {props.caption && (
           <figcaption className={[getCaptionAlign(props.captionAlign)].join(' ')}>
             {props.caption}

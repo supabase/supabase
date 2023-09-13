@@ -8,7 +8,7 @@ import {
   useStore,
   useFlag,
 } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import { format } from 'sql-formatter'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIconAnimation, Button } from 'ui'
@@ -30,8 +30,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   const { setDebugSolution, setAiInput, setSqlDiff, sqlDiff } = useSqlEditor()
   const selectedOrganization = useSelectedOrganization()
   const selectedProject = useSelectedProject()
-  const isOptedInToAI =
-    selectedOrganization?.opt_in_tags?.includes('AI_SQL_GENERATOR_OPT_IN') ?? false
+  const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
   const [hasEnabledAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema-enabled', true)
 
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
@@ -68,7 +67,9 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
         <div className="flex flex-row justify-between items-center pr-8">
-          <p className="m-0 border-0 px-6 py-4 font-mono">{result.error.message ?? result.error}</p>
+          <p className="m-0 border-0 px-6 py-4 font-mono text-sm">
+            Error running SQL: {result.error.message ?? result.error}
+          </p>
           {supabaseAIEnabled && !hasHipaaAddon && (
             <Button
               icon={
