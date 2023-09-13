@@ -229,7 +229,7 @@ Add the `Auth` component to your home page
 
 Create a `src/routes/+page.server.ts` file that will return our website url to be used in our `redirectTo` above.
 
-```ts
+```ts src/routes/+page.server.ts
 // src/routes/+page.server.ts
 import { redirect } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
@@ -393,7 +393,7 @@ and handle all our form actions through the `actions` object.
 import { fail, redirect } from '@sveltejs/kit'
 import type { Actions, PageServerLoad } from './$types'
 
-export const load = async ({ locals: { supabase, getSession } }) => {
+export const load: PageServerLoad = async ({ locals: { supabase, getSession } }) => {
   const session = await getSession()
 
   if (!session) {
@@ -409,7 +409,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
   return { session, profile }
 }
 
-export const actions = {
+export const actions: Actions = {
   update: async ({ request, locals: { supabase, getSession } }) => {
     const formData = await request.formData()
     const fullName = formData.get('fullName') as string
