@@ -9,8 +9,9 @@ export default {
     h1: <span className="heading-gradient">Open Source Community</span>,
     subheader: (
       <>
-        Supabase is an open source company, actively fostering collaboration and supporting existing
-        open source tools and communities.
+        Supabase is an open source company, actively fostering collaboration
+        <br className="hidden md:inline" /> and supporting existing open source tools and
+        communities.
       </>
     ),
   },
