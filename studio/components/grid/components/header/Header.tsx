@@ -142,7 +142,7 @@ const DefaultHeader = ({
                               <div
                                 className={[
                                   'border border-scale-1100 w-[15px] h-[4px] translate-x-0.5',
-                                  'transition duration-200 group-data-[highlighted]:border-brand-900 group-data-[highlighted]:translate-x-0',
+                                  'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-x-0',
                                 ].join(' ')}
                               />
                             </div>
@@ -150,7 +150,9 @@ const DefaultHeader = ({
                         >
                           <div className="">
                             <p>Insert row</p>
-                            <p className="text-scale-1000">Insert a new row into {table.name}</p>
+                            <p className="text-scale-1000 text-xs">
+                              Insert a new row into {table.name}
+                            </p>
                           </div>
                         </Dropdown.Item>,
                       ]
@@ -168,7 +170,7 @@ const DefaultHeader = ({
                               <div
                                 className={[
                                   'border border-scale-1100 w-[4px] h-[15px] -translate-y-0.5',
-                                  'transition duration-200 group-data-[highlighted]:border-brand-900 group-data-[highlighted]:translate-y-0',
+                                  'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-y-0',
                                 ].join(' ')}
                               />
                             </div>
@@ -176,7 +178,9 @@ const DefaultHeader = ({
                         >
                           <div className="">
                             <p>Insert column</p>
-                            <p className="text-scale-1000">Insert a new column into {table.name}</p>
+                            <p className="text-scale-1000 text-xs">
+                              Insert a new column into {table.name}
+                            </p>
                           </div>
                         </Dropdown.Item>,
                       ]
@@ -192,8 +196,8 @@ const DefaultHeader = ({
                               <IconFileText className="-translate-x-[2px]" />
                               <IconArrowUp
                                 className={clsx(
-                                  'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-700 rounded-full',
-                                  'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand-900 group-data-[highlighted]:opacity-100'
+                                  'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
+                                  'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand group-data-[highlighted]:opacity-100'
                                 )}
                                 strokeWidth={3}
                                 size={12}
@@ -203,7 +207,7 @@ const DefaultHeader = ({
                         >
                           <div className="">
                             <p>Import data from CSV</p>
-                            <p className="text-scale-1000">Insert new rows from a CSV</p>
+                            <p className="text-scale-1000 text-xs">Insert new rows from a CSV</p>
                           </div>
                         </Dropdown.Item>,
                       ]

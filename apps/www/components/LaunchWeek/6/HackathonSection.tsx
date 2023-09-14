@@ -44,7 +44,7 @@ export default function LaunchHero() {
             <h3 className="text-scale-1200 text-lg">Submission</h3>
             <p className="text-scale-1100 text-sm">
               Submit your project through{' '}
-              <a className="text-brand-900" href="https://madewithsupabase.com">
+              <a className="text-brand" href="https://madewithsupabase.com">
                 madewithsupabase.com
               </a>
               .

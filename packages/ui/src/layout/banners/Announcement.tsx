@@ -28,10 +28,11 @@ const Announcement = ({
   const [hidden, setHidden] = useState(true)
 
   const router = useRouter()
+  const isHomePage = router.pathname === '/'
   const isLaunchWeekSection = router.pathname.includes('launch-week')
 
   // override to hide announcement
-  if (!show || !announcement.show) return null
+  if (!show || !announcement.show || isHomePage) return null
 
   // construct the key for the announcement, based on the title text
   const announcementKey = 'announcement_' + announcement.text.replace(/ /g, '')

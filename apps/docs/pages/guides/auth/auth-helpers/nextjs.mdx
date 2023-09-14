@@ -162,6 +162,8 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
@@ -189,6 +191,8 @@ import { NextResponse } from 'next/server'
 
 import type { NextRequest } from 'next/server'
 import type { Database } from '@/lib/database.types'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
@@ -369,13 +373,9 @@ TypeScript types can be [generated with the Supabase CLI](/docs/reference/javasc
 
 ### Server-side
 
-The combination of [Server Components](https://nextjs.org/docs/getting-started/react-essentials#server-components) and [Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions) can be used to trigger the authentication process from form submissions.
+The combination of [Server Components](https://nextjs.org/docs/getting-started/react-essentials#server-components) and [Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) can be used to trigger the authentication process from form submissions.
 
-<Admonition type="note">
-
-Next.js [Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions) are currently in Alpha and may change. For now we recommend [triggering the authentication flow client-side](/docs/guides/auth/auth-helpers/nextjs#client-side) for production applications.
-
-</Admonition>
+#### Sign Up Route
 
 <Tabs
   scrollable
@@ -385,57 +385,248 @@ Next.js [Server Actions](https://nextjs.org/docs/app/building-your-application/d
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx app/login.js
-import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
-import { revalidatePath } from 'next/cache'
+```jsx app/auth/sign-up.js
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
 
-export default async function Login() {
-  const handleSignUp = async (formData) => {
-    'use server'
-    const email = formData.get('email')
-    const password = formData.get('password')
+export const dynamic = 'force-dynamic'
 
-    const supabase = createServerActionClient({ cookies })
-    await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: 'http://localhost:3000/auth/callback',
-      },
-    })
+export async function POST(request) {
+  const requestUrl = new URL(request.url)
+  const formData = await request.formData()
+  const email = formData.get('email')
+  const password = formData.get('password')
+  const supabase = createRouteHandlerClient({ cookies })
 
-    revalidatePath('/')
-  }
+  await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: `${requestUrl.origin}/auth/callback`,
+    },
+  })
 
-  const handleSignIn = async (formData) => {
-    'use server'
-    const email = formData.get('email')
-    const password = formData.get('password')
+  return NextResponse.redirect(requestUrl.origin, {
+    status: 301,
+  })
+}
+```
 
-    const supabase = createServerActionClient({ cookies })
-    await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+</TabPanel>
 
-    revalidatePath('/')
-  }
+<TabPanel id="ts" label="TypeScript">
 
-  const handleSignOut = async () => {
-    'use server'
-    const supabase = createServerActionClient({ cookies })
-    await supabase.auth.signOut()
-    revalidatePath('/')
-  }
+```tsx app/auth/sign-up.ts
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
 
+import type { Database } from '@/lib/database.types'
+
+export const dynamic = 'force-dynamic'
+
+export async function POST(request: Request) {
+  const requestUrl = new URL(request.url)
+  const formData = await request.formData()
+  const email = String(formData.get('email'))
+  const password = String(formData.get('password'))
+  const supabase = createRouteHandlerClient<Database>({ cookies })
+
+  await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: `${requestUrl.origin}/auth/callback`,
+    },
+  })
+
+  return NextResponse.redirect(requestUrl.origin, {
+    status: 301,
+  })
+}
+```
+
+<Admonition type="note">
+
+TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createRouteHandlerClient` to add type support to the Supabase client.
+
+</Admonition>
+
+</TabPanel>
+</Tabs>
+
+<Admonition type="note">
+
+Returning a `301` status redirects from a POST to a GET route
+
+</Admonition>
+
+#### Login Route
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx app/auth/login.js
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
+
+export const dynamic = 'force-dynamic'
+
+export async function POST(request) {
+  const requestUrl = new URL(request.url)
+  const formData = await request.formData()
+  const email = formData.get('email')
+  const password = formData.get('password')
+  const supabase = createRouteHandlerClient({ cookies })
+
+  await supabase.auth.signInWithPassword({
+    email,
+    password,
+  })
+
+  return NextResponse.redirect(requestUrl.origin, {
+    status: 301,
+  })
+}
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```tsx app/auth/login.ts
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
+
+import type { Database } from '@/lib/database.types'
+
+export const dynamic = 'force-dynamic'
+
+export async function POST(request: Request) {
+  const requestUrl = new URL(request.url)
+  const formData = await request.formData()
+  const email = String(formData.get('email'))
+  const password = String(formData.get('password'))
+  const supabase = createRouteHandlerClient<Database>({ cookies })
+
+  await supabase.auth.signInWithPassword({
+    email,
+    password,
+  })
+
+  return NextResponse.redirect(requestUrl.origin, {
+    status: 301,
+  })
+}
+```
+
+<Admonition type="note">
+
+TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createRouteHandlerClient` to add type support to the Supabase client.
+
+</Admonition>
+
+</TabPanel>
+</Tabs>
+
+<Admonition type="note">
+
+Returning a `301` status redirects from a POST to a GET route
+
+</Admonition>
+
+#### Logout Route
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx app/auth/logout.js
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
+
+export const dynamic = 'force-dynamic'
+
+export async function POST(request) {
+  const requestUrl = new URL(request.url)
+  const supabase = createRouteHandlerClient({ cookies })
+
+  await supabase.auth.signOut()
+
+  return NextResponse.redirect(`${requestUrl.origin}/login`, {
+    status: 301,
+  })
+}
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```tsx app/auth/logout.ts
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
+
+import type { Database } from '@/lib/database.types'
+
+export const dynamic = 'force-dynamic'
+
+export async function POST(request: Request) {
+  const requestUrl = new URL(request.url)
+  const supabase = createRouteHandlerClient<Database>({ cookies })
+
+  await supabase.auth.signOut()
+
+  return NextResponse.redirect(`${requestUrl.origin}/login`, {
+    status: 301,
+  })
+}
+```
+
+<Admonition type="note">
+
+TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createRouteHandlerClient` to add type support to the Supabase client.
+
+</Admonition>
+
+</TabPanel>
+</Tabs>
+
+#### Login Page
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx app/login.jsx
+export default function Login() {
   return (
-    <form action={handleSignUp}>
+    <form action="/auth/login" method="post">
+      <label htmlFor="email">Email</label>
       <input name="email" />
+      <label htmlFor="password">Password</label>
       <input type="password" name="password" />
-      <button>Sign up</button>
-      <button formAction={handleSignIn}>Sign in</button>
-      <button formAction={handleSignOut}>Sign out</button>
+      <button>Sign In</button>
+      <button formAction="/auth/sign-up">Sign Up</button>
+      <button formAction="/auth/logout">Sign Out</button>
     </form>
   )
 }
@@ -445,69 +636,20 @@ export default async function Login() {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx app/login.ts
-import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
-import { revalidatePath } from 'next/cache'
-import { cookies } from 'next/headers'
-
-import type { Database } from '@/lib/database.types'
-
-export default async function Login() {
-  const handleSignUp = async (formData: FormData) => {
-    'use server'
-    const email = String(formData.get('email'))
-    const password = String(formData.get('password'))
-
-    const supabase = createServerActionClient<Database>({ cookies })
-    await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: 'http://localhost:3000/auth/callback',
-      },
-    })
-
-    revalidatePath('/')
-  }
-
-  const handleSignIn = async (formData: FormData) => {
-    'use server'
-    const email = String(formData.get('email'))
-    const password = String(formData.get('password'))
-
-    const supabase = createServerActionClient<Database>({ cookies })
-    await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    revalidatePath('/')
-  }
-
-  const handleSignOut = async () => {
-    'use server'
-    const supabase = createServerActionClient<Database>({ cookies })
-    await supabase.auth.signOut()
-    revalidatePath('/')
-  }
-
+```tsx app/login.tsx
+export default function Login() {
   return (
-    <form action={handleSignUp}>
+    <form action="/auth/login" method="post">
+      <label htmlFor="email">Email</label>
       <input name="email" />
+      <label htmlFor="password">Password</label>
       <input type="password" name="password" />
-      <button>Sign up</button>
-      <button formAction={handleSignIn}>Sign in</button>
-      <button formAction={handleSignOut}>Sign out</button>
+      <button>Sign In</button>
+      <button formAction="/auth/sign-up">Sign Up</button>
     </form>
   )
 }
 ```
-
-<Admonition type="note">
-
-TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createServerActionClient` to add type support to the Supabase client.
-
-</Admonition>
 
 </TabPanel>
 </Tabs>
@@ -551,7 +693,7 @@ This allows for the Supabase client to be easily instantiated in the correct con
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useEffect, useState } from 'react'
 
-export default function Home() {
+export default function Page() {
   const [todos, setTodos] = useState()
   const supabase = createClientComponentClient()
 
@@ -582,7 +724,7 @@ import type { Database } from '@/lib/database.types'
 
 type Todo = Database['public']['Tables']['todos']['Row']
 
-export default function Home() {
+export default function Page() {
   const [todos, setTodos] = useState<Todo[] | null>(null)
   const supabase = createClientComponentClient<Database>()
 
@@ -653,7 +795,9 @@ In order to use Supabase in Server Components, you need to have implemented the 
 import { cookies } from 'next/headers'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 
-export default async function Home() {
+export const dynamic = 'force-dynamic'
+
+export default async function Page() {
   const supabase = createServerComponentClient({ cookies })
   const { data } = await supabase.from('todos').select()
   return <pre>{JSON.stringify(data, null, 2)}</pre>
@@ -669,6 +813,8 @@ import { cookies } from 'next/headers'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 
 import type { Database } from '@/lib/database.types'
+
+export const dynamic = 'force-dynamic'
 
 export default async function ServerComponent() {
   const supabase = createServerComponentClient<Database>({ cookies })
@@ -724,6 +870,8 @@ import { cookies } from 'next/headers'
 import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
 import { revalidatePath } from 'next/cache'
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewTodo() {
   const addTodo = async (formData) => {
     'use server'
@@ -752,6 +900,8 @@ import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
 import { revalidatePath } from 'next/cache'
 
 import type { Database } from '@/lib/database.types'
+
+export const dynamic = 'force-dynamic'
 
 export default async function NewTodo() {
   const addTodo = async (formData: FormData) => {
@@ -801,10 +951,12 @@ TypeScript types can be [generated with the Supabase CLI](/docs/reference/javasc
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx app/api/todos/route.jsx
+```jsx app/api/todos/route.js
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(request) {
   const { title } = await request.json()
@@ -818,12 +970,14 @@ export async function POST(request) {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx app/api/todos/route.tsx
+```tsx app/api/todos/route.ts
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
 import type { Database } from '@/lib/database.types'
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request) {
   const { title } = await request.json()
@@ -846,8 +1000,261 @@ TypeScript types can be [generated with the Supabase CLI](/docs/reference/javasc
 
 See [refreshing session example](/docs/guides/auth/auth-helpers/nextjs#managing-session-with-middleware) above.
 
+### Edge Runtime
+
+The Next.js Edge Runtime allows you to host Server Components and Route Handlers from Edge nodes, serving the routes as close as possible to your user's location.
+
+A route can be configured to use the Edge Runtime by exporting a `runtime` variable set to `edge`. Additionally, the `cookies()` function must be called from the Edge route, before creating a Supabase Client.
+
+#### Server Components
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx app/page.jsx
+import { cookies } from 'next/headers'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+
+export const runtime = 'edge'
+export const dynamic = 'force-dynamic'
+
+export default async function Page() {
+  const cookieStore = cookies()
+
+  const supabase = createServerComponentClient({
+    cookies: () => cookieStore,
+  })
+
+  const { data } = await supabase.from('todos').select()
+  return <pre>{JSON.stringify(data, null, 2)}</pre>
+}
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```tsx app/page.tsx
+import { cookies } from 'next/headers'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+
+import type { Database } from '@/lib/database.types'
+
+export const runtime = 'edge'
+export const dynamic = 'force-dynamic'
+
+export default async function Page() {
+  const cookieStore = cookies()
+
+  const supabase = createServerComponentClient<Database>({
+    cookies: () => cookieStore,
+  })
+
+  const { data } = await supabase.from('todos').select()
+  return <pre>{JSON.stringify(data, null, 2)}</pre>
+}
+```
+
+<Admonition type="note">
+
+TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createServerComponentClient` to add type support to the Supabase client.
+
+</Admonition>
+
+</TabPanel>
+</Tabs>
+
+#### Route Handlers
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx app/api/todos/route.js
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
+
+export const runtime = 'edge'
+export const dynamic = 'force-dynamic'
+
+export async function POST(request) {
+  const { title } = await request.json()
+  const cookieStore = cookies()
+
+  const supabase = createRouteHandlerClient({
+    cookies: () => cookieStore,
+  })
+
+  const { data } = await supabase.from('todos').insert({ title }).select()
+  return NextResponse.json(data)
+}
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```tsx app/api/todos/route.ts
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
+
+import type { Database } from '@/lib/database.types'
+
+export const runtime = 'edge'
+export const dynamic = 'force-dynamic'
+
+export async function POST(request: Request) {
+  const { title } = await request.json()
+  const cookieStore = cookies()
+
+  const supabase = createRouteHandlerClient<Database>({
+    cookies: () => cookieStore,
+  })
+
+  const { data } = await supabase.from('todos').insert({ title }).select()
+  return NextResponse.json(data)
+}
+```
+
+<Admonition type="note">
+
+TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createRouteHandlerClient` to add type support to the Supabase client.
+
+</Admonition>
+
+</TabPanel>
+</Tabs>
+
+### Static Routes
+
+Server Components and Route Handlers are static by default - data is fetched once at build time and the value is cached. Since the request to Supabase now happens at build time, there is no user, session or cookie to pass along with the request to Supabase. Therefore, the `createClient` function from `supabase-js` can be used to fetch data for static routes.
+
+#### Server Components
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx app/page.jsx
+import { createClient } from '@supabase/supabase-js'
+
+export default async function Page() {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  )
+
+  const { data } = await supabase.from('todos').select()
+  return <pre>{JSON.stringify(data, null, 2)}</pre>
+}
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```tsx app/page.tsx
+import { createClient } from '@supabase/supabase-js'
+
+import type { Database } from '@/lib/database.types'
+
+export default async function Page() {
+  const supabase = createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
+  const { data } = await supabase.from('todos').select()
+  return <pre>{JSON.stringify(data, null, 2)}</pre>
+}
+```
+
+<Admonition type="note">
+
+TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createClient` to add type support to the Supabase client.
+
+</Admonition>
+
+</TabPanel>
+</Tabs>
+
+#### Route Handlers
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+>
+<TabPanel id="js" label="JavaScript">
+
+```jsx app/api/todos/route.js
+import { createClient } from '@supabase/supabase-js'
+import { NextResponse } from 'next/server'
+
+export async function POST(request) {
+  const { title } = await request.json()
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  )
+
+  const { data } = await supabase.from('todos').insert({ title }).select()
+  return NextResponse.json(data)
+}
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```tsx app/api/todos/route.ts
+import { createClient } from '@supabase/supabase-js'
+import { NextResponse } from 'next/server'
+
+import type { Database } from '@/lib/database.types'
+
+export async function POST(request: Request) {
+  const { title } = await request.json()
+
+  const supabase = createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
+  const { data } = await supabase.from('todos').insert({ title }).select()
+  return NextResponse.json(data)
+}
+```
+
+<Admonition type="note">
+
+TypeScript types can be [generated with the Supabase CLI](/docs/reference/javascript/typescript-support) and passed to `createClient` to add type support to the Supabase client.
+
+</Admonition>
+
+</TabPanel>
+</Tabs>
+
 ## More examples
 
+- [Build a Twitter Clone with the Next.js App Router and Supabase - free egghead course](https://egghead.io/courses/build-a-twitter-clone-with-the-next-js-app-router-and-supabase-19bebadb)
 - [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
 - [Full App Router example](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
 - [Realtime Subscriptions](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs/app/realtime-posts.tsx)

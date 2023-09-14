@@ -34,10 +34,10 @@ interface Props {
 }
 
 function IntegrationPartnersPage(props: Props) {
-  const { partners: initialPartners } = props
+  const initialPartners = props.partners ?? []
   const [partners, setPartners] = useState(initialPartners)
 
-  const allCategories = Array.from(new Set(initialPartners.map((p) => p.category)))
+  const allCategories = Array.from(new Set(initialPartners?.map((p) => p.category)))
 
   const router = useRouter()
 
@@ -94,7 +94,7 @@ function IntegrationPartnersPage(props: Props) {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/partners`,
+          url: `https://supabase.com/partners/integrations`,
           images: [
             {
               url: `https://supabase.com${router.basePath}/images/og/integrations.png`, // TODO
@@ -102,7 +102,7 @@ function IntegrationPartnersPage(props: Props) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout className="bg-scale-400 dark:bg-scale-100">
         <SectionContainer className="space-y-16">
           <div>
             <h1 className="h1">{meta_title}</h1>
@@ -200,10 +200,10 @@ function IntegrationPartnersPage(props: Props) {
                     <a className="text-scale-1200">INTEGRATIONS</a>
                   </Link>
                   <Link href={`/partners/experts`}>
-                    <a className="transition-colors text-brand-900 hover:text-brand-800">EXPERTS</a>
+                    <a className="transition-colors text-brand hover:text-brand-300">EXPERTS</a>
                   </Link>
                   <Link href={`/partners/integrations#become-a-partner`}>
-                    <a className="flex items-center space-x-1 transition-colors text-brand-900 hover:text-brand-800">
+                    <a className="flex items-center space-x-1 transition-colors text-brand hover:text-brand-300">
                       BECOME A PARTNER <IconArrowRight />
                     </a>
                   </Link>
@@ -213,7 +213,7 @@ function IntegrationPartnersPage(props: Props) {
             <div className="lg:col-span-8 xl:col-span-9">
               {/* Partner Tiles */}
               <div className="grid space-y-10">
-                {partners.length ? (
+                {partners?.length ? (
                   <TileGrid partners={partners} />
                 ) : (
                   <h2 className="h2">No Partners Found</h2>

@@ -103,10 +103,11 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
 
           const isApproachingLimit = hasLimit && usageRatio >= USAGE_APPROACHING_THRESHOLD
           const isExceededLimit = hasLimit && usageRatio >= 1
+          const isCapped = usageMeta?.capped
 
           return (
             <div>
-              {(isApproachingLimit || isExceededLimit) && (
+              {(isApproachingLimit || isExceededLimit) && isCapped && (
                 <Alert
                   withIcon
                   variant={isExceededLimit ? 'danger' : 'warning'}
@@ -133,7 +134,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         key: PricingMetric.STORAGE_SIZE,
         attributes: [{ key: PricingMetric.STORAGE_SIZE.toLowerCase(), color: 'white' }],
         name: 'Storage Size',
-        chartPrefix: 'Max',
+        chartPrefix: 'Average',
         unit: 'bytes',
         description:
           'Sum of all objects in your storage buckets.\nBilling is based on the average daily size in GB throughout your billing period.',

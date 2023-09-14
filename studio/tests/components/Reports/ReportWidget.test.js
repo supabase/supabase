@@ -11,8 +11,8 @@ beforeEach(() => {
 
 test('static elements', async () => {
   render(<ReportWidget data={[]} title="Some chart" sql="select" renderer={() => 'something'} />)
-  await screen.findByText(/Some chart/)
   await screen.findByText(/something/)
+  await screen.findByText(/Some chart/)
 })
 
 test("append", async ()=>{

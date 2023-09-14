@@ -69,7 +69,7 @@ const TableOfContents: FC<Props> = ({ toc, video }) => {
               <li key={i} id={item.lvl} style={{ marginLeft: `${(item.lvl - 2) * 1}rem` }}>
                 <a
                   href={`#${formatSlug(item.slug)}`}
-                  className="text-scale-1000 hover:text-brand-900 transition-colors"
+                  className="text-scale-1000 hover:text-brand transition-colors"
                   dangerouslySetInnerHTML={{ __html: formatTOCHeader(removeAnchor(item.content)) }}
                 />
               </li>

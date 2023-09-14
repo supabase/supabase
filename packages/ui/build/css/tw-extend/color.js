@@ -529,15 +529,23 @@ module.exports = {
 },
 "brand-200": {
   cssVariable: "var(--brand-200)",
-  value: "hsl(148.5, 43.5%, 82%)"
+  value: "hsl(152.5, 75%, 6.3%)"
 },
 "brand-300": {
   cssVariable: "var(--brand-300)",
-  value: "hsl(152.70000000000005, 48.5%, 26.7%)"
+  value: "hsl(153.79999999999995, 69.6%, 9%)"
 },
 "brand-400": {
   cssVariable: "var(--brand-400)",
-  value: "hsl(153.60000000000002, 41%, 12%)"
+  value: "hsl(153.29999999999995, 65.2%, 13.5%)"
+},
+"brand-500": {
+  cssVariable: "var(--brand-500)",
+  value: "hsl(153.5, 61.8%, 21.6%)"
+},
+"brand-600": {
+  cssVariable: "var(--brand-600)",
+  value: "hsl(153, 59.5%, 70%)"
 },
 "brand-DEFAULT": {
   cssVariable: "var(--brand-default)",

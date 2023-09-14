@@ -23,7 +23,7 @@ const ProjectInfrastructure: NextPageWithLayout = () => {
         >
           You might be looking for the{' '}
           <Link href={`/project/${ref}/settings/billing/usage`}>
-            <a className="text-brand-900">project's usage</a>
+            <a className="text-brand">project's usage</a>
           </Link>{' '}
           page instead.
         </Alert>

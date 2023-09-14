@@ -1,14 +1,13 @@
-import { FC } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconHelpCircle, Modal } from 'ui'
 import Link from 'next/link'
+import { Button, IconHelpCircle, Modal } from 'ui'
 
-interface Props {
+interface SpendCapModalProps {
   visible: boolean
   onHide: () => void
 }
 
-const SpendCapModal: FC<Props> = ({ visible, onHide }) => {
+const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
   return (
     <Modal hideFooter visible={visible} size="xlarge" header="Spend cap" onCancel={() => onHide()}>
       <div className="py-4 space-y-4">
@@ -35,12 +34,12 @@ const SpendCapModal: FC<Props> = ({ visible, onHide }) => {
                 <div className="flex items-center px-4 py-1">
                   <p className="w-[50%] text-sm">Database size</p>
                   <p className="w-[25%] text-sm">8GB</p>
-                  <p className="w-[25%] text-sm">$0.125/GB</p>
+                  <p className="w-[25%] text-sm">$0.125 per GB</p>
                 </div>
                 <div className="flex items-center px-4 py-1">
-                  <p className="w-[50%] text-sm">Database egress</p>
-                  <p className="w-[25%] text-sm">50GB</p>
-                  <p className="w-[25%] text-sm">$0.09/GB</p>
+                  <p className="w-[50%] text-sm">Egress</p>
+                  <p className="w-[25%] text-sm">250GB</p>
+                  <p className="w-[25%] text-sm">$0.09 per GB</p>
                 </div>
               </div>
               <div className="py-2">
@@ -76,10 +75,8 @@ const SpendCapModal: FC<Props> = ({ visible, onHide }) => {
                     </Tooltip.Root>
                   </div>
                   <p className="w-[25%] text-sm">100,000</p>
-                  <p className="w-[25%] text-sm">$0.00325/user</p>
+                  <p className="w-[25%] text-sm">$0.00325 per user</p>
                 </div>
-              </div>
-              <div className="py-2">
                 <div className="flex items-center px-4 py-1">
                   <div className="flex w-[50%] items-center space-x-2">
                     <p className="text-sm">Single Sign-On (SAML 2.0) MAUs</p>
@@ -112,19 +109,15 @@ const SpendCapModal: FC<Props> = ({ visible, onHide }) => {
                     </Tooltip.Root>
                   </div>
                   <p className="w-[25%] text-sm">50</p>
-                  <p className="w-[25%] text-sm">$0.015/user</p>
+                  <p className="w-[25%] text-sm">$0.015 per user</p>
                 </div>
               </div>
+
               <div className="py-2">
                 <div className="flex items-center px-4 py-1">
                   <p className="w-[50%] text-sm">Storage size</p>
                   <p className="w-[25%] text-sm">100GB</p>
-                  <p className="w-[25%] text-sm">$0.021/GB</p>
-                </div>
-                <div className="flex items-center px-4 py-1">
-                  <p className="w-[50%] text-sm">Storage egress</p>
-                  <p className="w-[25%] text-sm">200GB</p>
-                  <p className="w-[25%] text-sm">$0.09/GB</p>
+                  <p className="w-[25%] text-sm">$0.021 per GB</p>
                 </div>
                 <div className="flex items-center px-4 py-1">
                   <p className="w-[50%] text-sm">Storage Image Transformations</p>
@@ -137,13 +130,13 @@ const SpendCapModal: FC<Props> = ({ visible, onHide }) => {
                 <div className="flex items-center px-4 py-1">
                   <p className="w-[50%] text-sm">Realtime concurrent peak connections</p>
                   <p className="w-[25%] text-sm">500</p>
-                  <p className="w-[25%] text-sm">$10/1000</p>
+                  <p className="w-[25%] text-sm">$10 per 1000</p>
                 </div>
 
                 <div className="flex items-center px-4 py-1">
                   <p className="w-[50%] text-sm">Realtime messages</p>
                   <p className="w-[25%] text-sm">5 Million</p>
-                  <p className="w-[25%] text-sm">$2.50/Million</p>
+                  <p className="w-[25%] text-sm">$2.50 per Million</p>
                 </div>
               </div>
 
@@ -162,10 +155,10 @@ const SpendCapModal: FC<Props> = ({ visible, onHide }) => {
               </div>
             </div>
 
-            <p>
+            <p className="text-sm">
               See{' '}
               <Link href="https://supabase.com/pricing" passHref>
-                <a className="text-brand-900" target="_blank" rel="noreferrer">
+                <a className="text-brand" target="_blank" rel="noreferrer">
                   <span>pricing page</span>
                 </a>
               </Link>{' '}

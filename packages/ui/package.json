@@ -54,7 +54,7 @@
     "autoprefixer": "^10.4.14",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
-    "cmdk-supabase": "^0.2.2",
+    "cmdk-supabase": "^1.0.7",
     "color": "^4.2.3",
     "colorjs.io": "^0.4.3",
     "common-tags": "^1.8.2",
@@ -101,6 +101,7 @@
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-dom": "^17.0.11",
     "@types/react-syntax-highlighter": "^15.5.6",
+    "@testing-library/react": "^12.1.5",
     "config": "*",
     "copyfiles": "^2.4.1",
     "glob": "^8.1.0",
@@ -109,6 +110,9 @@
     "storybook-dark-mode": "^3.0.0",
     "style-dictionary": "^3.7.1",
     "tsconfig-paths-webpack-plugin": "^4.0.1",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "ts-jest": "^29.1.1",
+    "jest-environment-jsdom": "^29.7.0",
+    "next": "^12.3.2"
   }
 }

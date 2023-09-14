@@ -2,31 +2,15 @@ import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
   id: 'index',
-  title: 'Auth Helpers Overview',
-  description: 'A collection of framework-specific Auth utilities for working with Supabase.',
+  title: 'Server-Side Auth Overview',
+  description: 'Server-Side Auth guides and utilities for working with Supabase.',
   sidebar_label: 'Overview',
 }
 
-A collection of framework-specific Auth utilities for working with Supabase.
+Working with server-side frameworks is slightly different to client-side frameworks. In this section we cover the various ways of handling server-side authentication and demonstrate how to use the Supabase helper-libraries to make the process more seamless.
 
 <div className="container" style={{ padding: 0 }}>
   <div className="grid md:grid-cols-12 gap-4">
-    {/* Auth UI */}
-    <div className="col-span-6">
-      <ButtonCard
-        to={'/guides/auth/auth-helpers/auth-ui'}
-        title={'Auth UI'}
-        description={'A pre-built React component for authenticating users.'}
-      />
-    </div>
-    {/* Flutter Auth UI */}
-    <div className="col-span-6">
-      <ButtonCard
-        to={'/guides/auth/auth-helpers/flutter-auth-ui'}
-        title={'Flutter Auth UI'}
-        description={'Pre-built Flutter widgets for authenticating users.'}
-      />
-    </div>
     {/* Next.js */}
     <div className="col-span-6">
       <ButtonCard

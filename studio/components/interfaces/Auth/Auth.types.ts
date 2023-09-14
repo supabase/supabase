@@ -30,6 +30,10 @@ export interface AuthConfig {
   EXTERNAL_FACEBOOK_CLIENT_ID: string | null
   EXTERNAL_FACEBOOK_SECRET: string | null
 
+  EXTERNAL_FIGMA_ENABLED: boolean
+  EXTERNAL_FIGMA_CLIENT_ID: string | null
+  EXTERNAL_FIGMA_SECRET: string | null
+
   EXTERNAL_GITHUB_ENABLED: false
   EXTERNAL_GITHUB_CLIENT_ID: string | null
   EXTERNAL_GITHUB_SECRET: string | null

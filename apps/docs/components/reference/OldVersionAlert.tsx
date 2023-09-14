@@ -27,7 +27,7 @@ const OldVersionAlert = ({ sections }: OldVersionAlertProps) => {
         You&apos;re viewing an older version of this library.
         <br />
         <Link href={latestVersionUrl}>
-          <a className="underline decoration-brand-700 underline-offset-4 decoration-1">
+          <a className="underline decoration-brand-400 underline-offset-4 decoration-1">
             Switch to the latest
           </a>
         </Link>

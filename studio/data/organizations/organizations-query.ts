@@ -9,8 +9,11 @@ export async function getOrganizations(signal?: AbortSignal): Promise<Organizati
   const data = await get(`${API_URL}/organizations`, { signal })
   if (data.error) throw data.error
 
-  const sorted = (data as Organization[]).sort((a, b) => a.name.localeCompare(b.name))
+  if (!Array.isArray(data)) {
+    return []
+  }
 
+  const sorted = (data as Organization[]).sort((a, b) => a.name.localeCompare(b.name))
   return sorted
 }
 
@@ -24,7 +27,7 @@ export const useOrganizationsQuery = <TData = OrganizationsData>({
   useQuery<OrganizationsData, OrganizationsError, TData>(
     organizationKeys.list(),
     ({ signal }) => getOrganizations(signal),
-    { enabled: enabled, ...options }
+    { enabled: enabled, ...options, staleTime: 30 * 60 * 1000 }
   )
 
 export function prefetchOrganizations(client: QueryClient) {

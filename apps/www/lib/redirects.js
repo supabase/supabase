@@ -592,11 +592,6 @@ module.exports = [
   },
   {
     permanent: false,
-    source: '/partners',
-    destination: '/partners/integrations',
-  },
-  {
-    permanent: false,
     source: '/learn-more',
     destination: '/?utm_source=event&utm_medium=billboard&utm_campaign=aws-atlanta',
   },
@@ -1175,37 +1170,47 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-list',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-branches-list',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-create',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-branches-create',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-delete',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-branches-delete',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-switch',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-branches-create',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-changes',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-db-diff',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-commit',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-db-pull',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-remote-set',
-    destination: '/docs/reference/supabase-db',
+    destination: '/docs/reference/supabase-link',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/cli/supabase-db-remote-changes',
+    destination: '/docs/reference/supabase-db-diff',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/cli/supabase-db-remote-commit',
+    destination: '/docs/reference/supabase-db-pull',
   },
 
   {
@@ -1854,6 +1859,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/supasquad',
+    destination: '/open-source/contributing/supasquad',
+  },
+  {
+    permanent: true,
     source: '/contact/enterprise',
     destination: 'https://forms.supabase.com/enterprise',
   },
@@ -2250,5 +2260,42 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/integrations/zuplo',
     destination: '/partners/integrations/zuplo',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/oauth-apps/publish-an-oauth-app',
+    destination:
+      '/docs/guides/platform/oauth-apps/build-a-supabase-integration#create-an-oauth-app',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/oauth-apps/authorize-an-oauth-app',
+    destination: '/docs/guides/platform/oauth-apps/build-a-supabase-integration',
+  },
+  { permanent: true, source: '/docs/reference/cli/config', destination: '/docs/guides/cli/config' },
+  {
+    permanent: true,
+    source: '/docs/guides/database/timeouts',
+    destination: '/docs/guides/database/postgres/configuration',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/managing-timezones',
+    destination: '/docs/guides/database/postgres/configuration',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/managing-passwords',
+    destination: '/docs/guides/database/postgres/roles#passwords',
+  },
+  {
+    permanent: true,
+    source: '/blog/pgvector-v0-5-0-hnsw',
+    destination: '/blog/increase-performance-pgvector-hnsw',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/ai/managing-indexes',
+    destination: '/docs/guides/ai/vector-indexes',
   },
 ]
