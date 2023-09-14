@@ -39,6 +39,7 @@ jobs:
         with:
           sparse-checkout: |
             apps/docs
+            supabase
 
       - name: Setup node
         uses: actions/setup-node@v3
