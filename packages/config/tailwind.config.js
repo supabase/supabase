@@ -216,12 +216,12 @@ const uiConfig = ui({
               fontWeight: '400',
               color: 'var(--colors-scale12)',
               textDecorationLine: 'underline',
-              textDecorationColor: 'var(--colors-brand7)',
+              textDecorationColor: 'hsl(var(--brand-400))',
               textDecorationThickness: '1px',
               textUnderlineOffset: '4px',
             },
             'a:hover': {
-              textDecorationColor: 'var(--colors-brand9)',
+              textDecorationColor: 'hsl(var(--brand-default))',
             },
             figcaption: {
               color: 'var(--colors-scale9)',

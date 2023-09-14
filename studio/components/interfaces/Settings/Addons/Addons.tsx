@@ -20,11 +20,20 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useFlag } from 'hooks'
+import { useFlag, useProjectByRef } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
+import { BASE_PATH } from 'lib/constants'
 import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { Alert, Button, IconChevronRight, IconExternalLink } from 'ui'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertCircle,
+  IconChevronRight,
+  IconExternalLink,
+} from 'ui'
 import { ComputeInstanceSidePanel, CustomDomainSidePanel, PITRSidePanel } from './'
 
 const Addons = () => {
@@ -34,6 +43,8 @@ const Addons = () => {
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { project: selectedProject } = useProjectContext()
 
+  const parentProject = useProjectByRef(selectedProject?.parent_project_ref)
+  const isBranch = parentProject !== undefined
   const isProjectActive = useIsProjectActive()
   const allowedPanelValues = ['computeInstance', 'pitr', 'customDomain']
   if (panel && typeof panel === 'string' && allowedPanelValues.includes(panel)) {
@@ -78,6 +89,25 @@ const Addons = () => {
 
       <ScaffoldDivider />
 
+      {isBranch && (
+        <ScaffoldContainer>
+          <Alert_Shadcn_ variant="default" className="mt-6">
+            <IconAlertCircle strokeWidth={2} />
+            <AlertTitle_Shadcn_>
+              You are currently on a preview branch of your project
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Updating addons are not available while you're on a preview branch. To manage your
+              addons, you may return to your{' '}
+              <Link passHref href={`/project/${parentProject.ref}/settings/general`}>
+                <a className="text-brand-900">main branch</a>
+              </Link>
+              .
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        </ScaffoldContainer>
+      )}
+
       {isLoading && (
         <ScaffoldContainer>
           <ScaffoldSection>
@@ -104,14 +134,14 @@ const Addons = () => {
             <ScaffoldSection>
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
-                  <p>Optimized compute</p>
+                  <p className="m-0">Optimized compute</p>
                   <div className="space-y-2">
-                    <p className="text-sm text-scale-1100">More information</p>
+                    <p className="text-sm text-scale-1100 m-0">More information</p>
                     <div>
                       <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
                         <a target="_blank" rel="noreferrer">
                           <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                            <p className="text-sm">About compute add-ons</p>
+                            <p className="text-sm m-0">About compute add-ons</p>
                             <IconExternalLink size={16} strokeWidth={1.5} />
                           </div>
                         </a>
@@ -121,7 +151,7 @@ const Addons = () => {
                       <Link href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler">
                         <a target="_blank" rel="noreferrer">
                           <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                            <p className="text-sm">Connection Pooler</p>
+                            <p className="text-sm m-0">Connection Pooler</p>
                             <IconExternalLink size={16} strokeWidth={1.5} />
                           </div>
                         </a>
@@ -161,7 +191,7 @@ const Addons = () => {
                         type="default"
                         className="mt-2 pointer-events-auto"
                         onClick={() => snap.setPanelKey('computeInstance')}
-                        disabled={!isProjectActive || projectUpdateDisabled}
+                        disabled={isBranch || !isProjectActive || projectUpdateDisabled}
                       >
                         Change optimized compute
                       </Button>
@@ -309,14 +339,14 @@ const Addons = () => {
             <ScaffoldSection>
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
-                  <p>Point in time recovery</p>
+                  <p className="m-0">Point in time recovery</p>
                   <div className="space-y-2">
-                    <p className="text-sm text-scale-1100">More information</p>
+                    <p className="text-sm text-scale-1100 m-0">More information</p>
                     <div>
                       <Link href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery">
                         <a target="_blank" rel="noreferrer">
                           <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                            <p className="text-sm">About PITR backups</p>
+                            <p className="text-sm m-0">About PITR backups</p>
                             <IconExternalLink size={16} strokeWidth={1.5} />
                           </div>
                         </a>
@@ -356,7 +386,7 @@ const Addons = () => {
                         type="default"
                         className="mt-2 pointer-events-auto"
                         onClick={() => snap.setPanelKey('pitr')}
-                        disabled={!isProjectActive || projectUpdateDisabled}
+                        disabled={isBranch || !isProjectActive || projectUpdateDisabled}
                       >
                         Change point in time recovery
                       </Button>
@@ -373,14 +403,14 @@ const Addons = () => {
             <ScaffoldSection>
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
-                  <p>Custom domain</p>
+                  <p className="m-0">Custom domain</p>
                   <div className="space-y-2">
-                    <p className="text-sm text-scale-1100">More information</p>
+                    <p className="text-sm text-scale-1100 m-0">More information</p>
                     <div>
                       <Link href="https://supabase.com/docs/guides/platform/custom-domains">
                         <a target="_blank" rel="noreferrer">
                           <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                            <p className="text-sm">About custom domains</p>
+                            <p className="text-sm m-0">About custom domains</p>
                             <IconExternalLink size={16} strokeWidth={1.5} />
                           </div>
                         </a>
@@ -420,7 +450,7 @@ const Addons = () => {
                         type="default"
                         className="mt-2 pointer-events-auto"
                         onClick={() => snap.setPanelKey('customDomain')}
-                        disabled={!isProjectActive || projectUpdateDisabled}
+                        disabled={isBranch || !isProjectActive || projectUpdateDisabled}
                       >
                         Change custom domain
                       </Button>

@@ -1,19 +1,29 @@
-import React, { FC, useEffect, useState } from 'react'
-import { get, find, isEmpty, sortBy } from 'lodash'
+import type { PostgresColumn, PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 import { Dictionary } from 'components/grid'
-import { SidePanel, Input, Listbox, IconHelpCircle, IconDatabase, Toggle } from 'ui'
-import type { PostgresTable, PostgresColumn, PostgresSchema } from '@supabase/postgres-meta'
+import { find, get, isEmpty, sortBy } from 'lodash'
+import { useEffect, useState } from 'react'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  IconAlertTriangle,
+  IconDatabase,
+  IconHelpCircle,
+  Input,
+  Listbox,
+  SidePanel,
+} from 'ui'
 
-import { useStore } from 'hooks'
-import ActionBar from '../ActionBar'
-import { ForeignKey } from './ForeignKeySelector.types'
-import { ColumnField } from '../SidePanelEditor.types'
 import InformationBox from 'components/ui/InformationBox'
 import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { useStore } from 'hooks'
+import ActionBar from '../ActionBar'
+import { ColumnField } from '../SidePanelEditor.types'
 import { FOREIGN_KEY_DELETION_OPTIONS } from './ForeignKeySelector.constants'
+import { ForeignKey } from './ForeignKeySelector.types'
 import { generateDeletionActionDescription } from './ForeignKeySelector.utils'
 
-interface Props {
+interface ForeignKeySelectorProps {
   column: ColumnField
   metadata?: any
   visible: boolean
@@ -23,7 +33,12 @@ interface Props {
   ) => void
 }
 
-const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, saveChanges }) => {
+const ForeignKeySelector = ({
+  column,
+  visible = false,
+  closePanel,
+  saveChanges,
+}: ForeignKeySelectorProps) => {
   const { meta } = useStore()
   const [errors, setErrors] = useState<any>({})
   const [selectedForeignKey, setSelectedForeignKey] = useState<ForeignKey>({
@@ -98,10 +113,13 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
     }
     const table = find(tables, { id: tableId })
     if (table) {
+      const primaryColumn = table.primary_keys[0].name
+      const firstColumn = table.columns?.length ? table.columns[0].name : undefined
+
       setSelectedForeignKey({
         schema: table.schema,
         table: table.name,
-        column: table.columns?.length ? table.columns[0].name : undefined,
+        column: primaryColumn ?? firstColumn,
         deletionAction: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
       })
     }
@@ -145,6 +163,8 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
     resolve()
   }
 
+  const matchingColumnTypes = selectedColumn?.format === column?.format
+
   return (
     <SidePanel
       key="ForeignKeySelector"
@@ -165,6 +185,8 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
       customFooter={
         <ActionBar
           backButtonLabel="Cancel"
+          // if the type of the two columns don't match, disable the save button
+          disableApply={!matchingColumnTypes}
           applyButtonLabel="Save"
           closePanel={closePanel}
           applyFunction={onSaveChanges}
@@ -277,6 +299,31 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
                   ))}
                 </Listbox>
               )}
+              {!matchingColumnTypes && (
+                <Alert_Shadcn_ variant="warning">
+                  <IconAlertTriangle strokeWidth={2} />
+                  <AlertTitle_Shadcn_>The column types don't match</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_ className="leading-6">
+                    <span>The referenced column</span>
+                    {column?.name && <span className="text-code">{column.name}</span>}
+                    {column?.format ? (
+                      <>
+                        <span> is of type </span>
+                        <span className="text-code">{column.format}</span>
+                      </>
+                    ) : (
+                      <span> has no type</span>
+                    )}
+                    <span> while the selected foreign column </span>
+                    <span className="text-code">
+                      {selectedTable?.name}.{selectedColumn?.name}
+                    </span>
+                    <span> has </span>
+                    <span className="text-code">{selectedColumn?.data_type}</span>type. These two
+                    columns can't be referenced until they are of the same type.
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              )}
               <SidePanel.Separator />
               <InformationBox
                 icon={<IconHelpCircle size="large" strokeWidth={1.5} />}
@@ -330,7 +377,7 @@ const ForeignKeySelector: FC<Props> = ({ column, visible = false, closePanel, sa
                         href="https://supabase.com/docs/guides/database/postgres/cascade-deletes"
                         target="_blank"
                         rel="noreferrer"
-                        className="text-brand-900 opacity-75"
+                        className="text-brand opacity-75"
                       >
                         Learn more about cascade deletes
                       </a>

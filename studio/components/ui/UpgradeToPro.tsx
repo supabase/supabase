@@ -1,20 +1,27 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
-import { FC, ReactNode } from 'react'
-
-import { useCheckPermissions, useFlag } from 'hooks'
+import { ReactNode } from 'react'
 import { Button } from 'ui'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
-interface Props {
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useCheckPermissions, useFlag } from 'hooks'
+
+interface UpgradeToProProps {
   icon?: ReactNode
   primaryText: string
   projectRef: string
   secondaryText: string
+  addon?: 'pitr' | 'customDomain' | 'computeInstance'
 }
 
-const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText }) => {
+const UpgradeToPro = ({
+  icon,
+  primaryText,
+  projectRef,
+  secondaryText,
+  addon,
+}: UpgradeToProProps) => {
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef })
   const plan = subscription?.plan?.id
 
@@ -45,8 +52,8 @@ const UpgradeToPro: FC<Props> = ({ icon, primaryText, projectRef, secondaryText 
             <Tooltip.Trigger>
               <Button type="primary" disabled={!canUpdateSubscription || projectUpdateDisabled}>
                 <Link
-                  href={`/project/${projectRef}/settings/billing/subscription${
-                    plan === 'free' ? '?panel=subscriptionPlan' : ''
+                  href={`/project/${projectRef}/settings/billing/subscription?panel=${
+                    plan === 'free' ? 'subscriptionPlan' : addon || 'subscriptionPlan'
                   }`}
                 >
                   <a>{plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon'}</a>

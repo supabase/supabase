@@ -28,9 +28,7 @@ interface Props {
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'http://localhost:54321',
   // ANON KEY
-  process.env.SUPABASE_SERVICE_ROLE_SECRET ??
-    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_SECRET ??
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njk3MjcwMTIsImV4cCI6MTk4NTMwMzAxMn0.SZLqryz_-stF8dgzeVXmzZWPOqdOrBwqJROlFES8v3I'
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
 export default function UsernamePage({ user, users, ogImageUrl }: Props) {
@@ -114,7 +112,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
                     )}
                   </div>
                 </SectionContainer>
-                <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0">
+                <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0 pointer-events-none">
                   <Image
                     src="/images/launchweek/8/LW8-gradient.png"
                     layout="fill"

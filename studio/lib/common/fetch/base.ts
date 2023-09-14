@@ -1,4 +1,4 @@
-import { auth } from 'lib/gotrue'
+import { getAccessToken } from 'lib/gotrue'
 import { isUndefined } from 'lodash'
 import { SupaResponse } from 'types/base'
 
@@ -84,17 +84,6 @@ export async function handleResponseError<T = unknown>(
     const error = { code: response.status, message, requestId }
     return { error } as unknown as SupaResponse<T>
   }
-}
-
-export async function getAccessToken() {
-  // ignore if server-side
-  if (typeof window === 'undefined') return ''
-
-  const {
-    data: { session },
-  } = await auth.getSession()
-
-  return session?.access_token
 }
 
 export async function constructHeaders(requestId: string, optionHeaders?: { [prop: string]: any }) {

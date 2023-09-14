@@ -145,7 +145,7 @@ const CustomDomainSidePanel = () => {
             Custom domains allow you to present a branded experience to your users. You may set up
             your custom domain in the{' '}
             <Link href={`/project/${projectRef}/settings/general`}>
-              <a className="text-brand-900">General Settings</a>
+              <a className="text-brand">General Settings</a>
             </Link>{' '}
             page after enabling the add-on.
           </p>

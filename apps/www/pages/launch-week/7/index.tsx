@@ -28,11 +28,9 @@ interface Props {
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'http://localhost:54321',
-  process.env.SUPABASE_SERVICE_ROLE_SECRET ??
-    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_SECRET ??
-    ''
+  // ANON KEY
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
-
 export default function TicketHome({ users }: Props) {
   const { isDarkMode, toggleTheme } = useTheme()
 

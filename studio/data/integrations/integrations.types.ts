@@ -114,12 +114,29 @@ export type VercelGitLink =
       productionBranch?: string
     }
 
+export type SupabaseConfigVercel = {
+  environmentVariables: {
+    production: boolean
+    preview: boolean
+  }
+  authRedirectUris: {
+    production: boolean
+    preview: boolean
+  }
+}
+
 export type Imetadata = {
   id: string
-  supabaseConfig: {
-    projectEnvVars: {
-      write: boolean
+  supabaseConfig?: {
+    environmentVariables?: {
+      production: boolean
+      preview: boolean
     }
+    authRedirectUris?: {
+      production: boolean
+      preview: boolean
+    }
+    supabaseDirectory?: string
   }
   link?: VercelGitLink
   name: string
@@ -156,7 +173,7 @@ export type userDetails = {
 type addedBy = userDetails
 type updatedBy = userDetails
 
-export type IntegrationName = 'Vercel' | 'Netlify' | 'GitHub'
+export type IntegrationName = 'Vercel' | 'GitHub' // | 'Netlify'
 export type VercelAccountType = 'Team' | 'Personal'
 export type VercelSource = 'marketplace' | 'deploy button'
 
@@ -177,11 +194,27 @@ export type VercelTeamAccount = BaseVercelAccount & {
   team_slug: string
 }
 
-export type Integration = {
+export type VercelMetadata = {
+  vercelTeam?: string
+  gitHubConnectionOwner?: string
+  account: VercelAccount | VercelTeamAccount
+  configuration_id: string
+}
+
+export type GitHubAccount = {
+  name: string
+  type: 'User' | 'Organization'
+  avatar: string
+  installed_by_user_id: number
+}
+
+export type GitHubMetadata = {
+  installation_id: number
+  account: GitHubAccount
+}
+
+export type IntegrationBase = {
   id: string
-  integration: {
-    name: IntegrationName
-  }
   added_by: addedBy
   inserted_at: string
   updated_at: string
@@ -189,10 +222,36 @@ export type Integration = {
   organization: {
     slug: string
   }
-  metadata?: {
-    vercelTeam?: string
-    gitHubConnectionOwner?: string
-    account: VercelAccount | VercelTeamAccount
-    configuration_id: string
+}
+
+export type Integration =
+  | (IntegrationBase & {
+      id: string
+      integration: {
+        name: 'Vercel'
+      }
+      metadata?: VercelMetadata
+    })
+  | (IntegrationBase & {
+      id: string
+      integration: {
+        name: 'GitHub'
+      }
+      metadata?: GitHubMetadata
+    })
+
+export type IntegrationConnectionsCreateVariables = {
+  organizationIntegrationId: string
+  connection: {
+    foreign_project_id: string
+    supabase_project_ref: string
+    metadata: any
   }
+  orgSlug: string | undefined
+}
+
+export type UpdateConnectionPayload = {
+  id: string
+  organizationIntegrationId: string
+  metadata: Imetadata
 }

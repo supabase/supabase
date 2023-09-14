@@ -93,8 +93,8 @@
           "url": "https://supabase.com/dashboard/project/_/logs/postgrest-logs"
         },
         {
-          "label": "Postgres logs",
-          "url": "https://supabase.com/dashboard/project/_/logs/pgbouncer-logs"
+          "label": "Pooler logs",
+          "url": "https://supabase.com/dashboard/project/_/logs/pooler-logs"
         },
         {
           "label": "Auth logs logs",

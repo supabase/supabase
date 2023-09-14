@@ -17,11 +17,12 @@ import Telemetry from 'lib/telemetry'
 import { useRouter } from 'next/router'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { Alert, Button, IconCheck, IconExternalLink, Modal, SidePanel } from 'ui'
+import { Alert, Button, IconCheck, IconExternalLink, IconInfo, Modal, SidePanel } from 'ui'
 import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
+import InformationBox from 'components/ui/InformationBox'
 
 const TierUpdateSidePanel = () => {
   const { ui } = useStore()
@@ -132,6 +133,46 @@ const TierUpdateSidePanel = () => {
         }
       >
         <SidePanel.Content>
+          <InformationBox
+            icon={<IconInfo size="large" strokeWidth={1.5} />}
+            defaultVisibility={true}
+            hideCollapse
+            title="We're upgrading our billing system"
+            className="mt-4"
+            description={
+              <div className="space-y-3">
+                <p className="text-sm leading-normal">
+                  This organization uses the legacy project-based billing. We’ve recently made some
+                  big improvements to our billing system. To migrate to the new organization-based
+                  billing, head over to your{' '}
+                  <Link href={`/org/${slug}/billing`}>
+                    <a className="text-sm text-green-900 transition hover:text-green-1000">
+                      organization billing settings
+                    </a>
+                  </Link>
+                  .
+                </p>
+
+                <div className="space-x-3">
+                  <Link href="https://supabase.com/blog/organization-based-billing">
+                    <a target="_blank" rel="noreferrer">
+                      <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                        Announcement
+                      </Button>
+                    </a>
+                  </Link>
+                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
+                    <a target="_blank" rel="noreferrer">
+                      <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                        Documentation
+                      </Button>
+                    </a>
+                  </Link>
+                </div>
+              </div>
+            }
+          />
+
           <div className="py-6 grid grid-cols-12 gap-3">
             {subscriptionsPlans.map((plan) => {
               const planMeta = availablePlans.find((p) => p.id === plan.id.split('tier_')[1])
@@ -155,13 +196,13 @@ const TierUpdateSidePanel = () => {
                 >
                   <div className="w-full">
                     <div className="flex items-center space-x-2">
-                      <p className={clsx('text-brand-900 text-sm uppercase')}>{plan.name}</p>
+                      <p className={clsx('text-brand text-sm uppercase')}>{plan.name}</p>
                       {isCurrentPlan ? (
                         <div className="text-xs bg-scale-500 text-scale-1000 rounded px-2 py-0.5">
                           Current plan
                         </div>
                       ) : plan.nameBadge ? (
-                        <div className="text-xs bg-brand-400 text-brand-900 rounded px-2 py-0.5">
+                        <div className="text-xs bg-brand-400 text-brand rounded px-2 py-0.5">
                           {plan.nameBadge}
                         </div>
                       ) : (
@@ -179,9 +220,11 @@ const TierUpdateSidePanel = () => {
                       )}
                       <p className="text-scale-1000 text-sm">{tierMeta?.costUnit}</p>
                     </div>
-                    <div className={clsx('flex mt-1 mb-4', !tierMeta?.warning && 'opacity-0')}>
-                      <div className="bg-scale-200 text-brand-1100 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
-                        {tierMeta?.warning}
+                    <div
+                      className={clsx('flex mt-1 mb-4', !tierMeta?.warningLegacy && 'opacity-0')}
+                    >
+                      <div className="bg-scale-200 text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
+                        {tierMeta?.warningLegacy}
                       </div>
                     </div>
                     {isCurrentPlan ? (
@@ -258,7 +301,7 @@ const TierUpdateSidePanel = () => {
                         <li key={feature} className="flex py-2">
                           <div className="w-[12px]">
                             <IconCheck
-                              className="h-3 w-3 text-brand-900 translate-y-[2.5px]"
+                              className="h-3 w-3 text-brand translate-y-[2.5px]"
                               aria-hidden="true"
                               strokeWidth={3}
                             />

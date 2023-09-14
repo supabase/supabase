@@ -12,6 +12,15 @@ import { LoadingLine } from '../LoadingLine/LoadingLine'
 type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>
 type CommandPrimitiveProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>
 
+export const copyToClipboard = (str: string, callback = () => {}) => {
+  const focused = window.document.hasFocus()
+  if (focused) {
+    window.navigator?.clipboard?.writeText(str).then(callback)
+  } else {
+    console.warn('Unable to copy to clipboard')
+  }
+}
+
 export const Command = React.forwardRef<CommandPrimitiveElement, CommandPrimitiveProps>(
   ({ className, ...props }, ref) => (
     <CommandPrimitive
@@ -52,8 +61,6 @@ export const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDi
       <Command
         className={[
           '[&_[cmdk-group]]:px-2 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-scale-800 [&_[cmdk-input]]:h-12',
-
-          '[&_[cmdk-item]_svg]:mr-3',
           '[&_[cmdk-item]_svg]:h-5',
           '[&_[cmdk-item]_svg]:w-5',
           '[&_[cmdk-input-wrapper]_svg]:h-5',
@@ -241,7 +248,7 @@ export const CommandItem = React.forwardRef<CommandPrimitiveItemElement, Command
       {...props}
     >
       <div className="w-full flex flex-row justify-between items-center">
-        <div className="flex flex-row flex-grow items-center">{children}</div>
+        <div className="flex flex-row gap-2 flex-grow items-center">{children}</div>
         {badge}
       </div>
     </CommandPrimitive.Item>
@@ -360,14 +367,20 @@ export function useHistoryKeys({ enable, messages, setPrompt }: UseHistoryKeysOp
         case 'ArrowUp':
           setMessageSelectionIndex((index) => {
             const newIndex = Math.max(index - 1, 0)
-            setPrompt(messages[newIndex] ?? '')
+            const newMessage = messages[newIndex]
+            if (newMessage) {
+              setPrompt(newMessage)
+            }
             return newIndex
           })
           return
         case 'ArrowDown':
           setMessageSelectionIndex((index) => {
             const newIndex = Math.min(index + 1, messages.length)
-            setPrompt(messages[newIndex] ?? '')
+            const newMessage = messages[newIndex]
+            if (newMessage) {
+              setPrompt(newMessage)
+            }
             return newIndex
           })
           return

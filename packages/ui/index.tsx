@@ -21,6 +21,7 @@ export * from './src/components/Icon/IconBackground'
 // DISPLAYS
 
 export * from './src/components/Card'
+export * from './src/components/TweetCard'
 export * from './src/components/Badge'
 export * from './src/components/Tabs'
 export * from './src/components/Alert'
@@ -73,8 +74,13 @@ export * from './src/components/LoadingLine'
 // banners
 export * from './src/layout/banners'
 
+// ai icon
+export * from './src/layout/ai-icon-animation'
+
 // utilities
 export * from './src/lib/utils'
+
+// animated ui
 
 // shadcn
 
@@ -140,6 +146,26 @@ export {
   PopoverTrigger as PopoverTrigger_Shadcn_,
   PopoverContent as PopoverContent_Shadcn_,
 } from './src/components/shadcn/ui/popover'
+
+export {
+  Accordion as Accordion_Shadcn_,
+  AccordionItem as AccordionItem_Shadcn_,
+  AccordionTrigger as AccordionTrigger_Shadcn_,
+  AccordionContent as AccordionContent_Shadcn_,
+} from './src/components/shadcn/ui/accordion'
+
+export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
+export { Label as Label_Shadcn_ } from './src/components/shadcn/ui/label'
+export * from './src/components/shadcn/ui/switch'
+export { Checkbox as Checkbox_Shadcn_ } from './src/components/shadcn/ui/checkbox'
+export * from './src/components/shadcn/ui/scroll-area'
+export {
+  Collapsible as Collapsible_Shadcn_,
+  CollapsibleTrigger as CollapsibleTrigger_Shadcn_,
+  CollapsibleContent as CollapsibleContent_Shadcn_,
+} from './src/components/shadcn/ui/collapsible'
+
+export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
 // links
 
@@ -446,3 +472,6 @@ export * from './src/components/Icon/icons/IconZapOff'
 export * from './src/components/Icon/icons/IconZap'
 export * from './src/components/Icon/icons/IconZoomIn'
 export * from './src/components/Icon/icons/IconZoomOut'
+
+// Export hooks
+export * from './src/lib/Hooks'

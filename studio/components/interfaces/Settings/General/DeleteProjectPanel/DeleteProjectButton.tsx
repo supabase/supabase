@@ -42,7 +42,11 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
     }
   }, [isOpen])
 
-  const canDeleteProject = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const canDeleteProject = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const toggle = () => {
     if (isSubmitting) return
@@ -77,6 +81,7 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
           projectRef,
           message,
           reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+          exitAction: 'delete',
         })
       }
 

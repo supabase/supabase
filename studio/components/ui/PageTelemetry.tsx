@@ -1,8 +1,8 @@
+import { useIsLoggedIn, useParams, useTelemetryProps } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
-import { useParams, useTelemetryProps } from 'common'
 import { useSelectedOrganization } from 'hooks'
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
@@ -22,6 +22,8 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
         : null
     snap.setIsOptedInTelemetry(consent === 'true')
   }, [])
+
+  const isLoggedIn = useIsLoggedIn()
 
   useEffect(() => {
     function handleRouteChange(url: string) {
@@ -56,8 +58,6 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
        */
       let referrer: string | undefined = document.referrer
 
-      console.log('handle page telemetry')
-
       /**
        * Send page telemetry
        */
@@ -71,14 +71,16 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
         },
       })
 
-      post(`${API_URL}/telemetry/pageview`, {
-        ...(ref && { projectRef: ref }),
-        ...(selectedOrganization && { orgSlug: selectedOrganization.slug }),
-        referrer: referrer,
-        title: document.title,
-        path: router.route,
-        location: router.asPath,
-      })
+      if (isLoggedIn) {
+        post(`${API_URL}/telemetry/pageview`, {
+          ...(ref && { projectRef: ref }),
+          ...(selectedOrganization && { orgSlug: selectedOrganization.slug }),
+          referrer: referrer,
+          title: document.title,
+          path: router.route,
+          location: router.asPath,
+        })
+      }
     }
   }
 

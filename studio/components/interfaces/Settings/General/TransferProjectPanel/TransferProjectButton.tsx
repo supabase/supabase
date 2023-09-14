@@ -18,7 +18,7 @@ import {
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
-import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useSelectedProject, useStore } from 'hooks'
 
 const TransferProjectButton = () => {
   const { ui } = useStore()
@@ -27,10 +27,11 @@ const TransferProjectButton = () => {
   const projectRef = project?.ref
   const projectOrgId = project?.organization_id
   const { data: allOrganizations } = useOrganizationsQuery()
+  const disableProjectTransfer = useFlag('disableProjectTransfer')
 
   const organizations = (allOrganizations || [])
     .filter((it) => it.id !== projectOrgId)
-    // Only orgs with org-level subscription
+    // Only orgs with org-based subscription
     .filter((it) => it.subscription_id)
 
   const [isOpen, setIsOpen] = useState(false)
@@ -87,11 +88,15 @@ const TransferProjectButton = () => {
     <>
       <Tooltip.Root delayDuration={0}>
         <Tooltip.Trigger>
-          <Button onClick={toggle} type="default" disabled={!canTransferProject}>
+          <Button
+            onClick={toggle}
+            type="default"
+            disabled={!canTransferProject || disableProjectTransfer}
+          >
             Transfer project
           </Button>
         </Tooltip.Trigger>
-        {!canTransferProject && (
+        {(!canTransferProject || disableProjectTransfer) && (
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -102,7 +107,9 @@ const TransferProjectButton = () => {
                 ].join(' ')}
               >
                 <span className="text-xs text-scale-1200">
-                  You need additional permissions to transfer this project
+                  {!canTransferProject
+                    ? 'You need additional permissions to transfer this project'
+                    : 'Project transfers are temporarily disabled, please try again later.'}
                 </span>
               </div>
             </Tooltip.Content>
@@ -137,7 +144,13 @@ const TransferProjectButton = () => {
           <Modal.Content>
             <p className="text-sm">
               To transfer projects, the owner must be a member of both the source and target
-              organizations.
+              organizations. For further information see our{' '}
+              <Link href="https://supabase.com/docs/guides/platform/project-transfer">
+                <a className="text-brand hover:underline" target="_blank" rel="noreferrer">
+                  Documentation
+                </a>
+              </Link>
+              .
             </p>
 
             <p className="font-bold mt-6 text-sm">Transferring considerations:</p>
@@ -185,7 +198,7 @@ const TransferProjectButton = () => {
               <div className="mt-8 mx-4 border-t pt-4 space-y-2">
                 {organizations.length === 0 ? (
                   <div className="flex items-center gap-2 bg-scale-400 p-3 text-sm">
-                    <IconAlertCircle /> You do not have any organizations with an organization-level
+                    <IconAlertCircle /> You do not have any organizations with an organization-based
                     subscription.
                   </div>
                 ) : (
@@ -214,9 +227,9 @@ const TransferProjectButton = () => {
 
                 <p className="text-scale-1000 text-sm">
                   The target organization needs to use{' '}
-                  <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
+                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
                     <a target="_blank" rel="noreferrer" className="underline">
-                      organization-level-billing
+                      organization-based billing
                     </a>
                   </Link>
                   . To migrate an organization to the new billing, head to your{' '}
@@ -262,7 +275,7 @@ const TransferProjectButton = () => {
                         <span>
                           {' '}
                           Your current organization will be granted{' '}
-                          <span className="text-brand-900">
+                          <span className="text-brand">
                             ${transferPreviewData.credits_on_source_organization}
                           </span>{' '}
                           in credits as proration.
@@ -277,7 +290,7 @@ const TransferProjectButton = () => {
                         <span>
                           {' '}
                           The target organization will be billed{' '}
-                          <span className="text-brand-900">
+                          <span className="text-brand">
                             ${transferPreviewData.costs_on_target_organization}
                           </span>{' '}
                           immediately to prorate for the remainder of the billing period.

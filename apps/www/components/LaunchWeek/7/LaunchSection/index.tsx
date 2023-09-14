@@ -25,7 +25,7 @@ export const LaunchSection = (props: WeekDayProps) => {
       <div
         className={[
           'absolute mt-[4px] -ml-[21px] h-3 w-3 rounded-full border md:-ml-[37px] lg:-ml-[37.5px]',
-          props.shipped ? 'border-brand-900 bg-brand-400' : 'border-purple-900 bg-purple-300',
+          props.shipped ? 'border-brand bg-brand-400' : 'border-purple-900 bg-purple-300',
         ].join(' ')}
       ></div>
       {/* END timeline dot */}
@@ -63,7 +63,7 @@ export const LaunchSection = (props: WeekDayProps) => {
               nextDayNotShipped
                 ? 'launch-week-timeline-border--approaching'
                 : props.shipped
-                ? 'border-brand-900'
+                ? 'border-brand'
                 : 'border-purple-700',
               className,
             ].join(' ')}
@@ -152,7 +152,7 @@ export const LaunchSection = (props: WeekDayProps) => {
               md:pl-8
               lg:pl-8
         `,
-          props.shipped ? 'border-brand-900' : 'border-purple-700',
+          props.shipped ? 'border-brand' : 'border-purple-700',
           props.shippingHasStarted && 'lg:col-span-6',
           !lastIndex && 'pb-8 lg:pb-16',
         ].join(' ')}

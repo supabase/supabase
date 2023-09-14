@@ -1,33 +1,40 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
-import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Button, IconAlertCircle } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { useCheckPermissions, useStore } from 'hooks'
-import { Timezone } from './PITR.types'
-import { FormPanel } from 'components/ui/Forms'
-import TimezoneSelection from './TimezoneSelection'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { FormPanel } from 'components/ui/Forms'
+import { useBackupsQuery } from 'data/database/backups-query'
+import { useCheckPermissions } from 'hooks'
+import { Timezone } from './PITR.types'
+import TimezoneSelection from './TimezoneSelection'
 
-interface Props {
+interface PITRStatusProps {
   selectedTimezone: Timezone
   onUpdateTimezone: (timezone: Timezone) => void
   onSetConfiguration: () => void
 }
 
-const PITRStatus: FC<Props> = ({ selectedTimezone, onUpdateTimezone, onSetConfiguration }) => {
-  const { backups } = useStore()
+const PITRStatus = ({
+  selectedTimezone,
+  onUpdateTimezone,
+  onSetConfiguration,
+}: PITRStatusProps) => {
+  const { ref } = useParams()
+  const { data: backups } = useBackupsQuery({ projectRef: ref })
+
   const { earliestPhysicalBackupDateUnix, latestPhysicalBackupDateUnix } =
-    backups?.configuration?.physicalBackupData ?? {}
+    backups?.physicalBackupData ?? {}
 
   const earliestAvailableBackup = dayjs
-    .unix(earliestPhysicalBackupDateUnix)
+    .unix(earliestPhysicalBackupDateUnix ?? 0)
     .tz(selectedTimezone?.utc[0])
     .format('DD MMM YYYY, HH:mm:ss')
 
   const latestAvailableBackup = dayjs
-    .unix(latestPhysicalBackupDateUnix)
+    .unix(latestPhysicalBackupDateUnix ?? 0)
     .tz(selectedTimezone?.utc[0])
     .format('DD MMM YYYY, HH:mm:ss')
 

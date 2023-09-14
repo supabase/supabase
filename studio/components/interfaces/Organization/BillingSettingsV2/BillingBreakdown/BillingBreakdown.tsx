@@ -14,8 +14,10 @@ import { Alert, Button } from 'ui'
 import { BILLING_BREAKDOWN_METRICS } from './BillingBreakdown.constants'
 import BillingMetric from './BillingMetric'
 import UpcomingInvoice from './UpcomingInvoice'
+import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 
 const BillingBreakdown = () => {
+  const snap = useOrgSettingsPageStateSnapshot()
   const { slug: orgSlug } = useParams()
   const {
     data: usage,
@@ -49,9 +51,9 @@ const BillingBreakdown = () => {
   return (
     <ScaffoldSection>
       <ScaffoldSectionDetail>
-        <div className="sticky space-y-6 top-16">
-          <p className="text-base">Billing breakdown</p>
-          <p className="text-sm text-scale-1000">
+        <div className="sticky space-y-2 top-12">
+          <p className="text-base m-0">Billing breakdown</p>
+          <p className="text-sm text-scale-1000 m-0">
             Current billing cycle: {billingCycleStart.format('MMM DD')} -{' '}
             {billingCycleEnd.format('MMM DD')}
           </p>
@@ -93,7 +95,16 @@ const BillingBreakdown = () => {
                 variant="danger"
                 title="Your organization's usage has exceeded its included quota"
                 actions={[
-                  <Button key="upgrade-button" type="default" className="ml-8" onClick={() => {}}>
+                  <Button
+                    key="upgrade-button"
+                    type="default"
+                    className="ml-8"
+                    onClick={() =>
+                      snap.setPanelKey(
+                        currentPlan?.id === 'free' ? 'subscriptionPlan' : 'costControl'
+                      )
+                    }
+                  >
                     {currentPlan?.id === 'free' ? 'Upgrade plan' : 'Change spend cap'}
                   </Button>,
                 ]}

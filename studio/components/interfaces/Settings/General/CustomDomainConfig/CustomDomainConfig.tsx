@@ -69,6 +69,7 @@ const CustomDomainConfig = () => {
               ? 'To configure a custom domain for your project, please upgrade to the Pro plan with the custom domains add-on selected'
               : 'To configure a custom domain for your project, please enable the add-on'
           }
+          addon="customDomain"
         />
       ) : (
         <Panel>

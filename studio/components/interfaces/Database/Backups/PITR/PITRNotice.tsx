@@ -1,12 +1,13 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { Button, IconCalendar } from 'ui'
+
 import { FormPanel } from 'components/ui/Forms'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { useCheckPermissions } from 'hooks'
-import { useParams } from 'common/hooks'
-import { getPITRRetentionDuration } from './PITR.utils'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useCheckPermissions } from 'hooks'
+import { getPITRRetentionDuration } from './PITR.utils'
 
 const PITRNotice = ({}) => {
   const { ref: projectRef } = useParams()
@@ -67,7 +68,7 @@ const PITRNotice = ({}) => {
           <p className="text-sm text-scale-1100">
             Database changes are logged every <span className="text-scale-1200">2 minutes</span>,
             with a total recovery period of up to{' '}
-            <span className="text-brand-900">{retentionPeriod} days</span>.
+            <span className="text-brand">{retentionPeriod} days</span>.
           </p>
         </div>
       </div>

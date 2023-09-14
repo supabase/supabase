@@ -49,6 +49,11 @@ function Partner({
   const [focusedImage, setFocusedImage] = useState<string | null>(null)
 
   if (!partner) return <Error404 />
+
+  const videoThumbnail = partner.video
+    ? `http://img.youtube.com/vi/${partner.video}/0.jpg`
+    : undefined
+
   return (
     <>
       <NextSeo
@@ -85,7 +90,7 @@ function Partner({
       ) : null}
       <DefaultLayout>
         <SectionContainer>
-          <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-12 lg:col-span-2">
+          <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-10 lg:col-span-2">
             {/* Back button */}
             <Link href="/partners/integrations">
               <a className="text-scale-1200 hover:text-scale-1000 flex cursor-pointer items-center transition-colors">
@@ -109,56 +114,66 @@ function Partner({
             </div>
 
             <div
-              className="bg-scale-300 py-6"
+              className="bg-gradient-to-t from-scale-100 to-scale-200 border-b p-6 [&_.swiper-container]:overflow-visible"
               style={{ marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}
             >
-              <Swiper
-                initialSlide={0}
-                spaceBetween={0}
-                slidesPerView={4}
-                speed={300}
-                // slidesOffsetBefore={300}
-                centerInsufficientSlides={true}
-                breakpoints={{
-                  320: {
-                    slidesPerView: 1,
-                  },
-                  720: {
-                    slidesPerView: 2,
-                  },
-                  920: {
-                    slidesPerView: 3,
-                  },
-                  1024: {
-                    slidesPerView: 4,
-                  },
-                  1280: {
-                    slidesPerView: 5,
-                  },
-                }}
-              >
-                {partner.images?.map((image: any, i: number) => {
-                  return (
-                    <SwiperSlide key={i}>
-                      <div className="relative ml-3 mr-3 block cursor-move overflow-hidden rounded-md">
-                        <Image
-                          layout="responsive"
-                          objectFit="contain"
-                          width={1460}
-                          height={960}
-                          src={image}
-                          alt={partner.title}
-                          onClick={() => setFocusedImage(image)}
-                        />
-                      </div>
-                    </SwiperSlide>
-                  )
-                })}
-              </Swiper>
+              <SectionContainer className="!py-0 !px-3 lg:!px-12 xl:!p-0 mx-auto max-w-5xl">
+                <Swiper
+                  initialSlide={0}
+                  spaceBetween={20}
+                  slidesPerView={4}
+                  speed={300}
+                  grabCursor
+                  centeredSlides={false}
+                  centerInsufficientSlides={false}
+                  breakpoints={{
+                    320: {
+                      slidesPerView: 1.25,
+                      centeredSlides: false,
+                      spaceBetween: 10,
+                    },
+                    720: {
+                      slidesPerView: 2,
+                      centeredSlides: false,
+                      spaceBetween: 10,
+                    },
+                    920: {
+                      slidesPerView: 3,
+                      centeredSlides: false,
+                    },
+                    1024: {
+                      slidesPerView: 4,
+                    },
+                    1280: {
+                      slidesPerView: 5,
+                    },
+                  }}
+                >
+                  {partner.images?.map((image: any, i: number) => {
+                    return (
+                      <SwiperSlide key={i}>
+                        <div className="relative block overflow-hidden rounded-md">
+                          <Image
+                            layout="responsive"
+                            objectFit="contain"
+                            placeholder="blur"
+                            blurDataURL="/images/blur.png"
+                            width={1460}
+                            height={960}
+                            src={image}
+                            alt={partner.title}
+                            onClick={() => setFocusedImage(image)}
+                          />
+                        </div>
+                      </SwiperSlide>
+                    )
+                  })}
+                </Swiper>
+              </SectionContainer>
             </div>
 
             <div className="grid lg:grid-cols-8 lg:space-x-12">
-              <div className="lg:col-span-5">
+              <div className="lg:col-span-5 overflow-hidden">
                 <h2
                   className="text-scale-1200"
                   style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
@@ -171,7 +186,7 @@ function Partner({
                 </div>
               </div>
 
-              <div className="lg:col-span-3 order-first lg:order-last pt-16 lg:pt-0">
+              <div className="lg:col-span-3 order-first lg:order-last">
                 <div className="sticky top-20">
                   <h2
                     className="text-scale-1200"
@@ -183,9 +198,10 @@ function Partner({
                   {partner.video && (
                     <div className="mb-6">
                       <ExpandableVideo
-                        imgUrl=""
                         videoId={partner.video}
+                        imgUrl={videoThumbnail}
                         imgOverlayText="Watch an introductory video"
+                        triggerContainerClassName="w-full"
                       />
                     </div>
                   )}
@@ -201,7 +217,7 @@ function Partner({
                     <div className="flex items-center justify-between py-2">
                       <span className="text-scale-900">Category</span>
                       <Link href={`/partners/integrations#${partner.category.toLowerCase()}`}>
-                        <a className="text-brand-900 hover:text-brand-800 transition-colors">
+                        <a className="text-brand hover:text-brand-300 transition-colors">
                           {partner.category}
                         </a>
                       </Link>
@@ -213,7 +229,7 @@ function Partner({
                         href={partner.website}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-brand-900 hover:text-brand-800 transition-colors"
+                        className="text-brand hover:text-brand-300 transition-colors"
                       >
                         {new URL(partner.website).host}
                       </a>
@@ -226,7 +242,7 @@ function Partner({
                           href={partner.docs}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-brand-900 hover:text-brand-800 transition-colors"
+                          className="text-brand hover:text-brand-300 transition-colors"
                         >
                           <span className="flex items-center space-x-1">
                             <span>Learn</span>

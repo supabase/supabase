@@ -37,7 +37,8 @@ functions:
       **On JS**, it uses the website origin as the callback url. Session importing gets handled automatically.
       **Windows, tvOS, watchOS & Linux** currently have no default implementation. Feel free to create a PR.
 
-      You always make your own implementation and use `gotrue.parseFragmentAndImportSession(fragment)` to let [supabase-kt](https://github.com/supabase-community/supabase-kt) handle the parsing & importing of the session after receiving a callback.
+      You always make your own implementation and use `gotrue.parseSessionFromFragment(fragment)` or `gotrue.parseSessionFromUrl(url)` to let [supabase-kt](https://github.com/supabase-community/supabase-kt) handle the parsing after receiving a callback.
+      Then you can simply use `gotrue.importSession(session)`.
 
       ### Configure deeplink callbacks for Authentication
 
@@ -53,6 +54,9 @@ functions:
           install(GoTrue) {
              host = "deeplink host" // this can be anything, eg. your package name or app/company url (not your supabase url)
              scheme = "deeplink scheme"
+             
+             //Android only, you can also change that OAuth/SSO logins open in a custom tab, rather than an external browser:
+             defaultExternalAuthAction = ExternalAuthAction.CUSTOM_TABS //defaults to EXTERNAL_BROWSER
           }
           ```
       4. **Call platform specific function on startup** \
@@ -66,7 +70,7 @@ functions:
       Or open OTP links directly in your app.
 
       ### PKCE Authentication flow
-      suapbase-kt supports the [PKCE authentication flow](https://supabase.com/blog/supabase-auth-sso-pkce).
+      supabase-kt supports the [PKCE authentication flow](https://supabase.com/blog/supabase-auth-sso-pkce).
       To use it, you just have to change the `flowType` in the GoTrue configuration:
       ```kotlin
       install(GoTrue) {
@@ -2563,7 +2567,7 @@ functions:
           - `NotAuthenticated`, 
           - `LoadingFromStorage`, 
           - `NetworkError`, 
-          - `Authenticated(sesssion)`
+          - `Authenticated(session)`
   - id: reset-password-for-email
     title: 'Send a password reset request'
     notes: |
@@ -2571,12 +2575,10 @@ functions:
       - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password.
       - The `sendRecoveryEmail()` only sends a password reset link to the user's email.
       To update the user's password, see [`modifyUser()`](/docs/reference/kotlin/auth-updateuser).
-      - When the user clicks the reset link in the email they are redirected back to your application.
-      You can configure the URL that the user is redirected to with the `redirectUrl` parameter.
-      See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - The user gets redirected back to your app, assuming you setup [OTP handling](/docs/reference/kotlin/initializing)
       - After the user has been redirected successfully, prompt them for a new password and call `modifyUser()`:
         ```kotlin
-        client.gotrue.modifyUser(Email) {
+        client.gotrue.modifyUser {
             password = "1234567"
         }
         ```
@@ -3098,9 +3100,10 @@ functions:
           function()
           //invoke it with a body:
           function(body)
-          //invoke it with custom headers:
+          //invoke it with custom request options:
           function(body) {
-              set("Header", "Value")
+              header("Header", "Value")
+              parameter("Key", "Value") //url parameter
           }
           ```
   - id: subscribe

@@ -2,8 +2,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import Announcement from '~/components/Announcement/Announcement'
-import { Button, Badge, IconStar, IconChevronDown, LW8CountdownBanner } from 'ui'
+import { Button, Badge, IconStar, IconChevronDown } from 'ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
 
@@ -85,7 +84,7 @@ const Nav = () => {
             <p className="mt-1 text-sm text-scale-1100 dark:text-dark-100">{description}</p>
           </div>
           {url && (
-            <p className="mt-2 text-sm font-medium text-brand-900 lg:mt-4">
+            <p className="mt-2 text-sm font-medium text-brand lg:mt-4">
               <TextLink label={label ? 'Get notified' : 'Learn more'} url={url} />
             </p>
           )}
@@ -120,7 +119,7 @@ const Nav = () => {
     >
       <button
         className={[
-          'text-scale-900 focus:ring-brand-900 dark:bg-scale-200 dark:hover:bg-scale-300 inline-flex items-center justify-center rounded-md bg-gray-50 p-2 hover:bg-white focus:outline-none focus:ring-2 focus:ring-inset',
+          'text-scale-900 focus:ring-brand dark:bg-scale-200 dark:hover:bg-scale-300 inline-flex items-center justify-center rounded-md bg-gray-50 p-2 hover:bg-white focus:outline-none focus:ring-2 focus:ring-inset',
           showLaunchWeekNavMode && '!bg-transparent border border-[#be9eea]',
         ].join(' ')}
         aria-expanded="false"
@@ -166,7 +165,6 @@ const Nav = () => {
     <div
       className={[
         `
-        text-scale-1200 hover:text-brand-900
         inline-flex cursor-pointer items-center
         border-b-2
         border-transparent
@@ -174,6 +172,7 @@ const Nav = () => {
         text-sm font-medium
         transition-colors`,
         showLaunchWeekNavMode && '!text-white',
+        props.active ? 'text-brand' : 'hover:text-brand',
         props.active,
       ].join(' ')}
       onClick={props.onClick}
@@ -198,9 +197,6 @@ const Nav = () => {
 
   return (
     <>
-      <Announcement link="/launch-week">
-        <LW8CountdownBanner />
-      </Announcement>
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
@@ -211,9 +207,9 @@ const Nav = () => {
         />
         <nav
           className={[
-            `border-scale-300 border-b backdrop-blur-sm transition-opacity`,
-            showLaunchWeekNavMode && '!opacity-100 !border-[#e0d2f430]',
-            isLaunchWeekPage && showLaunchWeekNavMode && '!border-b-0',
+            `relative z-40 border-scale-300 border-b backdrop-blur-sm transition-opacity`,
+            showLaunchWeekNavMode ? '!opacity-100 !border-[#e0d2f430]' : '',
+            isLaunchWeekPage && showLaunchWeekNavMode ? '!border-b-0' : '',
           ].join(' ')}
         >
           {/* <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-10 xl:px-0"> */}
@@ -258,7 +254,7 @@ const Nav = () => {
                   <Link href="/pricing">
                     <a
                       className={[
-                        `text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                        `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
                         text-sm font-medium`,
                         showLaunchWeekNavMode && '!text-white',
@@ -270,7 +266,7 @@ const Nav = () => {
                   <Link href="/docs">
                     <a
                       className={[
-                        `text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                        `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
                         text-sm font-medium`,
                         showLaunchWeekNavMode && '!text-white',
@@ -282,7 +278,7 @@ const Nav = () => {
                   <Link href="/blog">
                     <a
                       className={[
-                        `text-scale-1200 hover:text-brand-900 hover:border-brand-900 dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
+                        `text-scale-1200 hover:text-brand hover:border-brand dark:text-dark-100 dark:hover:border-dark-100 inline-flex items-center
                         border-b-2 border-transparent p-5 px-1
                         text-sm font-medium`,
                         showLaunchWeekNavMode && '!text-white',
@@ -299,7 +295,7 @@ const Nav = () => {
                     className="hidden group lg:flex"
                     type="text"
                     icon={
-                      <div className="flex items-center justify-center w-4 h-4 text-brand-800">
+                      <div className="flex items-center justify-center w-4 h-4 text-brand-300">
                         <div
                           className={[
                             `text-scale-900 flex h-3 w-3 items-center justify-center
@@ -376,7 +372,7 @@ const Nav = () => {
                   <button
                     onClick={() => setOpen(false)}
                     type="button"
-                    className="inline-flex items-center justify-center p-2 bg-white rounded-md text-scale-900 focus:ring-brand-900 dark:bg-scale-300 dark:hover:bg-scale-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset"
+                    className="inline-flex items-center justify-center p-2 bg-white rounded-md text-scale-900 focus:ring-brand dark:bg-scale-300 dark:hover:bg-scale-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset"
                   >
                     <span className="sr-only">Close menu</span>
                     <svg
@@ -412,11 +408,6 @@ const Nav = () => {
                       Developers
                     </a>
                   </Link>
-                  <Link href="/company">
-                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      Company
-                    </a>
-                  </Link>
                   <Link href="/pricing">
                     <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
                       Pricing
@@ -430,20 +421,17 @@ const Nav = () => {
                       Docs
                     </a>
                   </Link>
-                  <Link href="https://github.com/supabase/supabase">
-                    <a
-                      target="_blank"
-                      className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
-                    >
-                      GitHub
-                    </a>
-                  </Link>
                   <Link href="/blog">
                     <a
                       target="_blank"
                       className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
                     >
                       Blog
+                    </a>
+                  </Link>
+                  <Link href="/support">
+                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
+                      Support
                     </a>
                   </Link>
                 </div>

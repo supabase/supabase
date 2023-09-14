@@ -25,7 +25,7 @@ const AccessTokenList = observer(() => {
 
   return (
     <>
-      <div className="max-w-7xl">
+      <div>
         <Table
           head={[
             <Table.th key="header-token">Token</Table.th>,

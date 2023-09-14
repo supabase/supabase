@@ -9,7 +9,7 @@ import { cn } from '@ui/lib/utils'
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
   `relative 
-  flex iems-center justify-center
+  flex items-center justify-center
   cursor-pointer 
   inline-flex 
   items-center 
@@ -30,9 +30,9 @@ const buttonVariants = cva(
     variants: {
       type: {
         primary: `
-            bg-brand-fixed-1100 hover:bg-brand-fixed-1000
+            bg-brand-600 dark:bg-brand/70 hover:bg-brand-600/80 dark:hover:bg-brand
             text-white
-            border-brand-fixed-1000 hover:border-brand-fixed-900 dark:border-brand-fixed-1000 dark:hover:border-brand-fixed-1000
+            border-brand dark:border-brand
             focus-visible:outline-brand-600
             shadow-sm`,
         secondary: `
@@ -51,11 +51,11 @@ const buttonVariants = cva(
             focus-visible:outline-brand-600
             shadow-sm`,
         alternative: `
-            text-brand-1100
+            text-brand-600
             bg-brand-200 hover:bg-brand-400
-            border-brand-600 hover:border-brand-800
-            dark:border-brand-700 hover:dark:border-brand-800
-            focus-visible:border-brand-800
+            border-brand-600 hover:border-brand-300
+            dark:border-brand-400 hover:dark:border-brand-300
+            focus-visible:border-brand-300
             focus-visible:outline-brand-600
             shadow-sm`,
         outline: `
@@ -73,7 +73,7 @@ const buttonVariants = cva(
             focus-visible:outline-scale-700
             shadow-sm`,
         link: `
-            text-brand-1100
+            text-brand-600
             border
             border-transparent
             hover:bg-brand-400

@@ -21,7 +21,7 @@ const ProjectAddons: NextPageWithLayout = () => {
         >
           You might be looking for the{' '}
           <Link href={`/project/${ref}/settings/billing/subscription`}>
-            <a className="text-brand-900">project's subscription</a>
+            <a className="text-brand">project's subscription</a>
           </Link>{' '}
           page instead.
         </Alert>
