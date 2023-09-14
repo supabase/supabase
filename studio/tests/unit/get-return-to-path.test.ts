@@ -15,6 +15,8 @@ describe(`getReturnToPath`, () => {
     // @ts-ignore
     window.location = { search: `?returnTo=/custom` }
 
+    // trigger change
+
     expect(getReturnToPath()).toBe('/custom')
   })
 
