@@ -25,7 +25,7 @@ CREATE INDEX ON chat_messages (created_at);
 -- below are the "new" partitioned tables, in their own schema to
 -- avoid name conflicts with the "old" tables above.  Let's start a
 -- new transaction to setup the new tables and migration procedures.
--- In order to avoid namespace polution and name conflicts with the
+-- In order to avoid namespace pollution and name conflicts with the
 -- old tables, lets put all the new partitioned tables in a new
 -- schema.
 --
