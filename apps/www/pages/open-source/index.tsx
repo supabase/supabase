@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { Octokit } from '@octokit/core'
+import { NextSeo } from 'next-seo'
+
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { NextSeo } from 'next-seo'
+import OSSHero from '~/components/OpenSource/OSSHero'
 import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
 import Repos from '~/components/OpenSource/Repos'
 import Sponsorships from '~/components/OpenSource/Sponsorships'
@@ -12,7 +14,7 @@ import pageData from '~/data/open-source'
 
 // Import Swiper styles if swiper used on page
 import 'swiper/swiper.min.css'
-import OSSHero from '../../components/OpenSource/OSSHero'
+import CTABanner from '../../components/CTABanner'
 
 const OpenSource = () => {
   const octokit = new Octokit()
@@ -26,6 +28,7 @@ const OpenSource = () => {
         per_page: 200,
         page: 1,
       })
+
       setRepos(res.data)
     }
     fetchOctoData()
@@ -37,6 +40,7 @@ const OpenSource = () => {
   const meta_description =
     pageData.metaDescription ||
     'Supabase is an open source company, supporting existing open source tools and communities wherever possible.'
+  const totalStars = repos.reduce((acc: number, val: any) => acc + val.stargazers_count, 0)
 
   return (
     <>
@@ -60,11 +64,15 @@ const OpenSource = () => {
         </SectionContainer>
         <OSSHero />
         <SectionContainer className="!pt-0">
-          <Repos repos={repos} tabs={pageData.repo_tabs} title="Yooo" paragraph="asfd" />
+          <Repos repos={repos} tabs={pageData.repo_tabs} />
         </SectionContainer>
-        <SectionContainer className="">
+        <SectionContainer className="!py-0">
+          <div className="w-full  bg-scale-400 border-b" />
+        </SectionContainer>
+        <SectionContainer>
           <Sponsorships sponsorships={pageData.sponsorships} />
         </SectionContainer>
+        <CTABanner />
       </DefaultLayout>
     </>
   )

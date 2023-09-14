@@ -20,18 +20,6 @@
   will-change: transform;
 }
 
-.gradient {
-  position: absolute;
-  user-select: none;
-  pointer-events: none;
-  inset: 0px;
-  z-index: -3;
-  filter: blur(140px);
-  transform: translateZ(0px);
-  background: radial-gradient(ellipse 50% 60% at 50% 70%, #3ecf8e, transparent),
-    radial-gradient(ellipse 70% 80% at 50% 50%, #1d7a50, transparent);
-}
-
 @media (min-width: 1024px) {
   .hero-grid-lines {
     animation-duration: 30s;

@@ -15,19 +15,6 @@ export default {
     ),
   },
   repo_tabs: [
-    // {
-    //   label: 'Generic',
-    //   icon: '',
-    //   repos: [
-    //     'supabase',
-    //     'supavisor',
-    //     'supabase-cli',
-    //     'supabase-js',
-    //     'supabase-dart',
-    //     'supabase-flutter',
-    //     'supabase-audit',
-    //   ],
-    // },
     {
       label: 'Database',
       icon: products.database.icon[16],
@@ -58,6 +45,7 @@ export default {
         'auth-helpers',
         'auth-elements',
         'auth-ui',
+        'gotrue',
         'mailme',
       ],
     },
