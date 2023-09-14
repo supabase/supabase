@@ -21,7 +21,10 @@ const OSSHero = () => (
         styles['hero-container'],
       ].join(' ')}
     >
-      <div className={['w-full h-full opacity-20 dark:opacity-60', styles['gradient']].join(' ')} />
+      <div
+        className="absolute select-none pointer-events-none inset-0 z-[3] blur-[100px] w-full h-full opacity-20 dark:opacity-60 "
+        style={{ transform: 'translateZ(0px)' }}
+      />
       <div className="absolute bottom-0 z-[-2] w-full h-full bg-gradient-to-t from-background to-transparent" />
       <HeroGrid />
     </div>

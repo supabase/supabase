@@ -22,7 +22,7 @@ const Tab = ({ isActive, label, icon, onClick }: TabProps) => (
     role="tab"
   >
     <div className="flex flex-nowrap text-sm lg:text-base gap-1 lg:gap-2 items-center">
-      {icon ? (
+      {icon && (
         <svg
           width="16"
           height="16"
@@ -39,8 +39,7 @@ const Tab = ({ isActive, label, icon, onClick }: TabProps) => (
             strokeLinejoin="round"
           />
         </svg>
-      ) : // <IconPenTool className={cn(isActive && 'transition-colors text-brand')} />
-      null}
+      )}
       <span className="whitespace-nowrap tracking-tight lg:tracking-normal">{label}</span>
     </div>
   </button>
@@ -53,16 +52,20 @@ export interface RepoTab {
 }
 
 interface Props {
-  title: string | ReactNode
-  paragraph: string
   tabs: RepoTab[]
   repos: any[]
+}
+
+enum SWIPER_STATE {
+  START = 'START',
+  MIDDLE = 'MIDDLE',
+  END = 'END',
 }
 
 const Repos = ({ tabs, repos }: Props) => {
   const [activeTab, setActiveTab] = useState(0)
   const [apiSwiper, setApiSwiper] = useState(undefined)
-  const [swiperState, setSwiperState] = useState<'START' | 'END' | 'MIDDLE'>('START')
+  const [swiperState, setSwiperState] = useState<SWIPER_STATE>(SWIPER_STATE.START)
 
   useEffect(() => {
     if (!apiSwiper) return
@@ -105,20 +108,26 @@ const Repos = ({ tabs, repos }: Props) => {
             grabCursor
             slidesPerView="auto"
             onSlideChange={(slider) =>
-              setSwiperState(slider.isEnd ? 'END' : slider.isBeginning ? 'START' : 'MIDDLE')
+              setSwiperState(
+                slider.isEnd
+                  ? SWIPER_STATE.END
+                  : slider.isBeginning
+                  ? SWIPER_STATE.START
+                  : SWIPER_STATE.MIDDLE
+              )
             }
             className="relative flex md:hidden justify-center max-w-full w-full overflow-hidden items-center rounded-full bg-surface-100 p-2"
           >
             <div
               className={cn(
                 'not-sr-only absolute inset-0 left-auto bg-gradient-to-r from-transparent to-background-surface-100 w-10 z-20 pointer-events-none opacity-0 transition-opacity',
-                swiperState !== 'END' && 'opacity-100'
+                swiperState !== SWIPER_STATE.END && 'opacity-100'
               )}
             />
             <div
               className={cn(
                 'not-sr-only absolute inset-0 right-auto bg-gradient-to-l from-transparent to-background-surface-100 w-10 z-20 pointer-events-none opacity-0 transition-opacity',
-                swiperState !== 'START' && 'opacity-100'
+                swiperState !== SWIPER_STATE.START && 'opacity-100'
               )}
             />
             {tabs.map((tab, index) => (
