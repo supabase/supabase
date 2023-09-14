@@ -297,3 +297,15 @@ BEGIN
     CALL app.create_chat_messages_partition(today);
 END;
 $$;
+--
+-- This procedure will reset the sequence for partition tables after
+-- old rows have been copied into them.
+--
+CREATE OR REPLACE PROCEDURE app.update_chat_sequences()
+    LANGUAGE plpgsql AS
+$$
+BEGIN
+    PERFORM setval('app.chats_id_seq', coalesce((SELECT max(id) FROM app.chats), 1));
+    PERFORM setval('app.chat_messages_id_seq', coalesce((SELECT max(id) FROM app.chat_messages), 1));
+END;
+$$;

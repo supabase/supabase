@@ -22,6 +22,7 @@ INSERT INTO chat_messages (created_at, chat_id, chat_created_at, message)
 
 CALL app.load_chats_partitions();
 CALL app.load_chat_messages_partitions();
+CALL app.update_chat_sequences();
 --
 -- Now schedule a job to create new partitions for "tomorrow" every night
 --
