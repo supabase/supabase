@@ -1,19 +1,12 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
-import ConditionalWrap from 'components/ui/ConditionalWrap'
 import { useColumnPrivilegesGrantMutation } from 'data/privileges/column-privileges-grant-mutation'
 import { useColumnPrivilegesRevokeMutation } from 'data/privileges/column-privileges-revoke-mutation'
 import { useTablePrivilegesGrantMutation } from 'data/privileges/table-privileges-grant-mutation'
 import { useTablePrivilegesRevokeMutation } from 'data/privileges/table-privileges-revoke-mutation'
 import { useState } from 'react'
 import { IconLoader, Toggle } from 'ui'
-import {
-  COLUMN_PRIVILEGE_TYPES,
-  ColumnPrivilegeType,
-  TABLE_PRIVILEGE_TYPES,
-  TablePrivilegeType,
-} from './Privileges.constants'
+import { COLUMN_PRIVILEGE_TYPES, ColumnPrivilegeType } from './Privileges.constants'
 import { PrivilegeColumnUI, TablePrivilegesUI } from './Privileges.types'
 import { getPrivilegesLoadingKey, isPrivilegesLoading } from './Privileges.utils'
 
@@ -179,7 +172,7 @@ const PrivilegesTable = ({ tableId, tablePrivileges, columns, role }: Privileges
       className="table-fixed mb-4"
       head={[
         <Table.th key="header-column"></Table.th>,
-        ...TABLE_PRIVILEGE_TYPES.map((privilege) => {
+        ...COLUMN_PRIVILEGE_TYPES.map((privilege) => {
           // const checked = tablePrivileges.find((p) => p.privilege_type === privilege) !== undefined
           const isLoading = isPrivilegesLoading(loadingStates, 'table', {
             relation_id: tableId,
@@ -206,7 +199,7 @@ const PrivilegesTable = ({ tableId, tablePrivileges, columns, role }: Privileges
           <Table.td>
             <button onClick={() => handleClickColumnName(column)}>{column.name}</button>
           </Table.td>
-          {TABLE_PRIVILEGE_TYPES.map((privilege) => {
+          {COLUMN_PRIVILEGE_TYPES.map((privilege) => {
             const checked = column.privileges.includes(privilege)
             const isLoading = isPrivilegesLoading(loadingStates, 'column', {
               column_id: column.id,
