@@ -3,19 +3,16 @@ import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
   title: 'Postgres Changes',
-  subtitle: "Get up and running with Realtime's Postgres Changes feature",
-  breadcrumb: 'Realtime Postgres Changes Quickstart',
+  subtitle: 'Listen to Postgres changes using Supabase Realtime.',
+  description: 'Listen to Postgres changes using Supabase Realtime.',
+  // breadcrumb: 'Realtime Postgres Changes Quickstart',
 }
 
-Realtime's Postgres Changes feature listens for database changes and sends them to clients. Clients are required to subscribe with a JWT dictating which changes they are allowed to receive based on the database's [Row Level Security](/docs/guides/auth/row-level-security).
-
-Anyone with access to a valid JWT signed with the project's JWT secret is able to listen to your database's changes, unless tables have [Row Level Security](/docs/guides/auth/row-level-security) enabled and policies in place.
-
-Clients can choose to receive `INSERT`, `UPDATE`, `DELETE`, or `*` (all) changes for all changes in a schema, a table in a schema, or a column's value in a table. Your clients should only listen to tables in the `public` schema and you must first enable the tables you want your clients to listen to.
+Let's explore how to use Realtime's Postgres Changes feature to listen to database events.
 
 ## Quick start
 
-Let's explore how to implement Realtime Postgres Changes so you can integrate it into your use case.
+In this example we'll set up a database table, secure it with Row Level Security, and subscribe to all changes using the Supabase client libraries.
 
 <StepHikeCompact>
 
@@ -81,10 +78,10 @@ Let's explore how to implement Realtime Postgres Changes so you can integrate it
 
       -- Allow anonymous access
       create policy "Allow anonymous access"
-        on todos
-        for select
-        to anon
-        using (true);
+      on todos
+      for select
+      to anon
+      using (true);
       ```
 
     </StepHikeCompact.Code>
@@ -130,9 +127,7 @@ Let's explore how to implement Realtime Postgres Changes so you can integrate it
     <StepHikeCompact.Code>
 
       ```js
-        import {
-          createClient
-        } from '@supabase/supabase-js'
+        import { createClient } from '@supabase/supabase-js'
 
         const client = createClient(
           'https://<project>.supabase.co',
@@ -175,69 +170,12 @@ Let's explore how to implement Realtime Postgres Changes so you can integrate it
 
     </StepHikeCompact.Code>
 
-    <StepHikeCompact.Details title="Listen to changes by table">
-
-    Listen to just inserts in the `todos` table by setting the `table` property to 'todos' and event name to `INSERT`.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```js
-      const channelB = client
-        .channel('table-db-changes')
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'todos',
-          },
-          (payload) => console.log(payload)
-        )
-        .subscribe()
-      ```
-
-    </StepHikeCompact.Code>
-
-    <StepHikeCompact.Details title="Listen to changes by filter">
-
-    Listen to changes in the `todos` table when a column's value equals a specified value. In this example, we only listen to inserts on `todos` where the row `id` is 1.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```js
-      const channelC = client
-        .channel('table-filter-changes')
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'todos',
-            filter: 'id=eq.1',
-          },
-          (payload) => console.log(payload)
-        )
-        .subscribe()
-      ```
-
-    </StepHikeCompact.Code>
-
-    <StepHikeCompact.Details title="More filters">
-
-    Check out the [full list of available filters](/docs/guides/realtime/postgres-changes#available-filters).
-
-    </StepHikeCompact.Details>
-
   </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={7}>
     <StepHikeCompact.Details title="Insert dummy data">
 
-    Now we can add some data to our table which will trigger `channelA`, `channelB`, and `channelC` event handlers.
+    Now we can add some data to our table which will trigger the `channelA` event handler.
 
     </StepHikeCompact.Details>
 
@@ -255,11 +193,165 @@ Let's explore how to implement Realtime Postgres Changes so you can integrate it
 
 </StepHikeCompact>
 
+## Usage
+
+You can use the Supabase client libraries to subscribe to database changes.
+
+### Listeniing to specific schemas
+
+Subscribe to specific schema events using the `schema` parameter:
+
+{/* prettier-ignore */}
+```js
+const changes = client
+  .channel('schema-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      schema: 'public', // Subscribes to the "public" schema in Postgres
+      event: '*',       // Listen to all changes
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+The channel name can be any string except 'realtime'.
+
+### Listening to INSERT events
+
+Use the `event` parameter to listen only to database `INSERT`s:
+
+```js
+const changes = client
+  .channel('schema-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT', // Listen only to INSERTs
+      schema: 'public',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+The channel name can be any string except 'realtime'.
+
+### Listening to UPDATE events
+
+Use the `event` parameter to listen only to database `UPDATE`s:
+
+```js
+const changes = client
+  .channel('schema-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'UPDATE', // Listen only to UPDATEs
+      schema: 'public',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+The channel name can be any string except 'realtime'.
+
+### Listening to DELETE events
+
+Use the `event` parameter to listen only to database `UPDATE`s:
+
+```js
+const changes = client
+  .channel('schema-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'DELETE', // Listen only to DELETEs
+      schema: 'public',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+The channel name can be any string except 'realtime'.
+
+### Listening to specific tables
+
+Subscribe to specific table events using the `table` parameter:
+
+```js
+const changes = client
+  .channel('table-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'todos',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+The channel name can be any string except 'realtime'.
+
+### Listening to multiple changes
+
+To listen to different events and schema/tables/filters combinations with the same channel:
+
+```js
+const channel = supabase
+  .channel('db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'messages',
+    },
+    (payload) => console.log(payload)
+  )
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'users',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+### Filtering for specific changes
+
+Use the `filter` parameter for granular changes:
+
+```js
+const changes = client
+  .channel('table-filter-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'todos',
+      filter: 'id=eq.1',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
 ## Available filters
 
 Realtime offers filters so you can specify the data your client receives at a more granular level.
 
-### eq
+### Equal to (eq)
 
 To listen to changes when a column's value in a table equals a client-specified value:
 
@@ -279,9 +371,9 @@ const channel = supabase
   .subscribe()
 ```
 
-<Admonition type="note">This filter uses Postgres' `=`.</Admonition>
+This filter uses Postgres's `=` filter.
 
-### neq
+### Not equal to (neq)
 
 To listen to changes when a column's value in a table does not equal a client-specified value:
 
@@ -301,9 +393,9 @@ const channel = supabase
   .subscribe()
 ```
 
-<Admonition type="note">This filter uses Postgres' `!=`.</Admonition>
+This filter uses Postgres's `!=` filter.
 
-### lt
+### Less than (lt)
 
 To listen to changes when a column's value in a table is less than a client-specified value:
 
@@ -323,11 +415,9 @@ const channel = supabase
   .subscribe()
 ```
 
-<Admonition type="note">
-  This filter uses Postgres' `<` so it works for non-numeric types but make sure to check the expected behavior of the compared data's type.
-</Admonition>
+This filter uses Postgres's `<` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
 
-### lte
+### Less than or equal to (lte)
 
 To listen to changes when a column's value in a table is less than or equal to a client-specified value:
 
@@ -347,11 +437,9 @@ const channel = supabase
   .subscribe()
 ```
 
-<Admonition type="note">
-  This filter uses Postgres' `<=` so it works for non-numeric types but make sure to check the expected behavior of the compared data's type.
-</Admonition>
+This filter uses Postgres' `<=` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
 
-### gt
+### Greater thank (gt)
 
 To listen to changes when a column's value in a table is greater than a client-specified value:
 
@@ -371,12 +459,9 @@ const channel = supabase
   .subscribe()
 ```
 
-<Admonition type="note">
-  This filter uses Postgres' `>` so it works for non-numeric types but make sure to check the
-  expected behavior of the compared data's type.
-</Admonition>
+This filter uses Postgres's `>` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
 
-### gte
+### Greater than or equal to (gte)
 
 To listen to changes when a column's value in a table is greater than or equal to a client-specified value:
 
@@ -396,12 +481,9 @@ const channel = supabase
   .subscribe()
 ```
 
-<Admonition type="note">
-  This filter uses Postgres' `>=` so it works for non-numeric types but make sure to check the
-  expected behavior of the compared data's type.
-</Admonition>
+This filter uses Postgres's `>=` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
 
-### in
+### Contained in list (in)
 
 To listen to changes when a column's value in a table equals any client-specified values:
 
@@ -421,40 +503,9 @@ const channel = supabase
   .subscribe()
 ```
 
-<Admonition type="note">
-  This filter uses Postgres' `= ANY`. Realtime allows a maximum of 100 values for this filter.
-</Admonition>
+This filter uses Postgres's `= ANY`. Realtime allows a maximum of 100 values for this filter.
 
-## Combination changes
-
-To listen to different events and schema/tables/filters combinations with the same channel:
-
-```js
-const channel = supabase
-  .channel('db-changes')
-  .on(
-    'postgres_changes',
-    {
-      event: '*',
-      schema: 'public',
-      table: 'messages',
-      filter: 'body=eq.bye',
-    },
-    (payload) => console.log(payload)
-  )
-  .on(
-    'postgres_changes',
-    {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'users',
-    },
-    (payload) => console.log(payload)
-  )
-  .subscribe()
-```
-
-## Full `old` record
+## Receiveing `old` records
 
 By default, only `new` record changes are sent but if you want to receive the `old` record (previous values) whenever you `UPDATE` or `DELETE` a record, you can set the `replica identity` of your table to `full`:
 
@@ -465,7 +516,7 @@ alter table
 
 <Admonition type="caution">
 
-RLS policies are not applied to `DELETE` statements. When RLS is enabled and `replica identity` is set to `full` on a table, the `old` record contains only the primary key(s).
+RLS policies are not applied to `DELETE` statements, because there is no way for Postgres to verify that a user has access to a deleted record. When RLS is enabled and `replica identity` is set to `full` on a table, the `old` record contains only the primary key(s).
 
 </Admonition>
 
@@ -489,9 +540,9 @@ You may choose to sign your own tokens to customize claims that can be checked i
 
 Your project JWT secret is found with your [Project API keys](https://app.supabase.com/project/_/settings/api) in your dashboard.
 
+{/* prettier-ignore */}
 <Admonition type="caution">
-  Do not expose the `service_role` token on the client because the role is authorized to bypass
-  row-level security.
+  Do not expose the `service_role` token on the client because the role is authorized to bypass row-level security.
 </Admonition>
 
 To use your own JWT with Realtime make sure to set the token after instantiating the Supabase client and before connecting to a Channel.
@@ -533,35 +584,37 @@ supabase.realtime.setAuth('fresh-token')
 
 ## Limitations
 
-The current version of Realtime's Postgres Changes feature has some performance limitations to keep in mind. There can be a bottleneck on the database that limits the number of messages streamed to subscribed clients.
+Realtime systems usually require forethought because of their scaling dynamics. For the `Postgres Changes` feature, every change event must be checked to see if the subscribed user has access. For instance, if you have 100 users subscribed to a table where you make a single insert, it will then trigger 100 "reads": one for each user.
 
-The polling query that fetches the changes is currently single-threaded. If you are frequently changing your database, the polling query may not be able to fetch the changes rapidly enough. The delivery of the changes will be delayed until you will get timeout. Additionally, there is a polling query per subscribed client, which means that each unique pair of `filters` and `JWT token` (logged-in user) affects the performance of the polling query. In other words, RLS and filters can further limit the number of messages that can be streamed to subscribed clients.
+There can be a database bottleneck which limits message throughput. If your database cannot authorize the changes rapidly enough, the changes will be delayed until you receive a timeout.
 
-From our testing and observation of the performance of the polling query, we have found that the following limits are safe to use:
+If you are using Postgres Changes at scale, you should consider using separate "public" table without RLS and filters. Alternatively, you can use Realtime server-side only and then re-stream the changes to your clients using a Realtime Broadcast.
 
-| Database Add-on  | Filters | RLS Usage | Concurrent Clients | Records per second per client | Messages per second (total) | Latency p95 (ms) |
-| ---------------- | ------- | --------- | ------------------ | ----------------------------- | --------------------------- | ---------------- |
-| micro < > medium | 🚫      | 🚫        | 500                | 10                            | 5,000                       | 257              |
-| micro < > medium | 🚫      | 🚫        | 1,000              | 10                            | 10,000                      | 800              |
-| micro < > medium | 🚫      | 🚫        | 5,000              | 2                             | 10,000                      | 1,120            |
-| large and above  | 🚫      | 🚫        | 1,000              | 10                            | 10,000                      | 261              |
-| large and above  | 🚫      | 🚫        | 5,000              | 2                             | 10,000                      | 952              |
-| large and above  | 🚫      | 🚫        | 10,000             | 1                             | 10,000                      | 949              |
-| large and above  | 🚫      | 🚫        | 200,000            | 0.04 (1 in 25 seconds)        | 8,000                       | 15,709           |
-| large and above  | ✅      | ✅        | 500                | 2                             | 1,000                       | 262              |
-| large and above  | ✅      | ✅        | 1,000              | 1                             | 1,000                       | 431              |
-| large and above  | ✅      | ✅        | 5,000              | 0.2 (1 in 5 seconds)          | 1,000                       | 702              |
+From our observations, we recommend the following limits depending on your database size:
 
-If you want to use Realtime's Postgres Changes feature you should be aware of these limitations. And if you are using this feature at scale, you should consider using separate table without RLS and filters for the purpose of streaming changes to subscribed clients. Alternatively, you can use Realtime server-side only and then re-stream the changes to your clients using a Realtime Broadcast. Don't forget to run your own benchmarks to make sure that the performance is acceptable for your use case.
+### Micro to medium
 
-We are making many improvements to Realtime's Postgres Changes.
+| Filters | RLS Usage | Concurrent Clients | Records per second per client | Messages per second (total) | Latency p95 (ms) |
+| ------- | --------- | ------------------ | ----------------------------- | --------------------------- | ---------------- |
+| 🚫      | 🚫        | 500                | 10                            | 5,000                       | 257              |
+| 🚫      | 🚫        | 1,000              | 10                            | 10,000                      | 800              |
+| 🚫      | 🚫        | 5,000              | 2                             | 10,000                      | 1,120            |
 
-If you are uncertain about the performance of your use case, please reach out using [Support Form](https://supabase.com/dashboard/support/new) and we will be happy to help you. We have a team of engineers that can advise you on the best solution for your use-case.
+### Large and above
 
-## More Realtime Quickstarts
+| Filters | RLS Usage | Concurrent Clients | Records per second per client | Messages per second (total) | Latency p95 (ms) |
+| ------- | --------- | ------------------ | ----------------------------- | --------------------------- | ---------------- |
+| 🚫      | 🚫        | 1,000              | 10                            | 10,000                      | 261              |
+| 🚫      | 🚫        | 5,000              | 2                             | 10,000                      | 952              |
+| 🚫      | 🚫        | 10,000             | 1                             | 10,000                      | 949              |
+| 🚫      | 🚫        | 200,000            | 0.04 (1 in 25 seconds)        | 8,000                       | 15,709           |
+| ✅      | ✅        | 500                | 2                             | 1,000                       | 262              |
+| ✅      | ✅        | 1,000              | 1                             | 1,000                       | 431              |
+| ✅      | ✅        | 5,000              | 0.2 (1 in 5 seconds)          | 1,000                       | 702              |
 
-- [Broadcast Quickstart](/docs/guides/realtime/broadcast)
-- [Presence Quickstart](/docs/guides/realtime/presence)
+Don't forget to run your own benchmarks to make sure that the performance is acceptable for your use case.
+
+We are making many improvements to Realtime's Postgres Changes. If you are uncertain about the performance of your use case, please reach out using [Support Form](https://supabase.com/dashboard/support/new) and we will be happy to help you. We have a team of engineers that can advise you on the best solution for your use-case.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
