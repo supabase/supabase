@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   check:
-    runs-on: test-bigger-runner
+    runs-on: [test-bigger-runner]
 
     strategy:
       matrix:
