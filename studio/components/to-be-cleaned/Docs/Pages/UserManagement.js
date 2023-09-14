@@ -1,8 +1,9 @@
 import Link from 'next/link'
-import Snippets from '../Snippets'
-import CodeSnippet from '../CodeSnippet'
 import { useRouter } from 'next/router'
+
 import { makeRandomString } from 'lib/helpers'
+import CodeSnippet from '../CodeSnippet'
+import Snippets from '../Snippets'
 
 const randomPassword = makeRandomString(20)
 
@@ -212,10 +213,7 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
           </p>
         </article>
         <article className="code">
-          <CodeSnippet
-            selectedLang={selectedLang}
-            snippet={Snippets.authThirdPartyLogin(autoApiService.endpoint, keyToShow)}
-          />
+          <CodeSnippet selectedLang={selectedLang} snippet={Snippets.authThirdPartyLogin()} />
         </article>
       </div>
 
@@ -275,7 +273,7 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
         <article className="code">
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authLogout(autoApiService.endpoint, keyToShow, randomPassword)}
+            snippet={Snippets.authLogout(autoApiService.endpoint, keyToShow)}
           />
         </article>
       </div>

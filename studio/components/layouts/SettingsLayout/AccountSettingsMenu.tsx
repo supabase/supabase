@@ -7,6 +7,7 @@ const AccountSettingsMenu = () => {
     { label: 'Preferences', pathname: `/account/me` },
     { label: 'Access Tokens', pathname: `/account/tokens` },
     { label: 'Security', pathname: `/account/security` },
+    { label: 'Audit logs', pathname: `/account/audit` },
   ]
 
   return (

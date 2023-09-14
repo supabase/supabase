@@ -137,19 +137,17 @@ const TierUpdateSidePanel = () => {
             icon={<IconInfo size="large" strokeWidth={1.5} />}
             defaultVisibility={true}
             hideCollapse
-            title="Legacy Billing"
+            title="We're upgrading our billing system"
             className="mt-4"
             description={
               <div className="space-y-3">
                 <p className="text-sm leading-normal">
                   This organization uses the legacy project-based billing. We’ve recently made some
-                  big improvements to our billing system. To opt-in to the new organization-based
+                  big improvements to our billing system. To migrate to the new organization-based
                   billing, head over to your{' '}
                   <Link href={`/org/${slug}/billing`}>
-                    <a>
-                      <span className="text-sm text-green-900 transition hover:text-green-1000">
-                        organization billing settings
-                      </span>
+                    <a className="text-sm text-green-900 transition hover:text-green-1000">
+                      organization billing settings
                     </a>
                   </Link>
                   .
