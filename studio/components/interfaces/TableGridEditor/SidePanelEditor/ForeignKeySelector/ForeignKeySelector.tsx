@@ -15,7 +15,7 @@ import {
 } from 'ui'
 
 import InformationBox from 'components/ui/InformationBox'
-import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
 import { ColumnField } from '../SidePanelEditor.types'
@@ -45,7 +45,7 @@ const ForeignKeySelector = ({
     schema: 'public',
     table: '',
     column: '',
-    deletionAction: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+    deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
   })
 
   const schemas = meta.schemas.list()
@@ -84,7 +84,7 @@ const ForeignKeySelector = ({
           schema: 'public',
           table: '',
           column: '',
-          deletionAction: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+          deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
         })
       }
     }
@@ -96,7 +96,7 @@ const ForeignKeySelector = ({
       schema,
       table: '',
       column: '',
-      deletionAction: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+      deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
     }
     setSelectedForeignKey(updatedForeignKey)
   }
@@ -108,7 +108,7 @@ const ForeignKeySelector = ({
         schema: '',
         table: '',
         column: '',
-        deletionAction: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+        deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
       })
     }
     const table = find(tables, { id: tableId })
@@ -120,7 +120,7 @@ const ForeignKeySelector = ({
         schema: table.schema,
         table: table.name,
         column: primaryColumn ?? firstColumn,
-        deletionAction: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+        deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
       })
     }
   }

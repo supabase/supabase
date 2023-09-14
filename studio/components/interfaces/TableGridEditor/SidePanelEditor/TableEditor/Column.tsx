@@ -12,7 +12,7 @@ import {
   Popover,
 } from 'ui'
 
-import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { noop } from 'lodash'
 import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
 import { Suggestion } from '../ColumnEditor/ColumnEditor.types'
@@ -127,8 +127,7 @@ const Column = ({
                         {column.foreignKey.target_table_name}.{column.foreignKey.target_column_name}
                       </p>
                     </div>
-                    {column.foreignKey.deletion_action !==
-                      FOREIGN_KEY_DELETION_ACTION.NO_ACTION && (
+                    {column.foreignKey.deletion_action !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
                       <p className="text-xs text-scale-1200 mt-1">
                         On delete: {getForeignKeyDeletionAction(column.foreignKey.deletion_action)}
                       </p>

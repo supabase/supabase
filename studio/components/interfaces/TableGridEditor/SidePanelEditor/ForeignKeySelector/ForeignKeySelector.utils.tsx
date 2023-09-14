@@ -1,5 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { IconHelpCircle } from 'ui'
 import { getForeignKeyDeletionAction } from '../ColumnEditor/ColumnEditor.utils'
 
@@ -7,7 +7,7 @@ export const generateDeletionActionDescription = (deletionAction: string, refere
   const actionName = getForeignKeyDeletionAction(deletionAction) ?? 'No action'
 
   switch (deletionAction) {
-    case FOREIGN_KEY_DELETION_ACTION.NO_ACTION:
+    case FOREIGN_KEY_CASCADE_ACTION.NO_ACTION:
       return (
         <>
           <span className="text-scale-1100">{actionName}</span>: Deleting a record from{' '}
@@ -16,7 +16,7 @@ export const generateDeletionActionDescription = (deletionAction: string, refere
           existing in this table that reference it
         </>
       )
-    case FOREIGN_KEY_DELETION_ACTION.CASCADE:
+    case FOREIGN_KEY_CASCADE_ACTION.CASCADE:
       return (
         <>
           <span className="text-scale-1100">{actionName}</span>: Deleting a record from{' '}
@@ -25,7 +25,7 @@ export const generateDeletionActionDescription = (deletionAction: string, refere
           it in this table
         </>
       )
-    case FOREIGN_KEY_DELETION_ACTION.RESTRICT:
+    case FOREIGN_KEY_CASCADE_ACTION.RESTRICT:
       return (
         <>
           <span className="text-scale-1100">{actionName}</span>
@@ -55,7 +55,7 @@ export const generateDeletionActionDescription = (deletionAction: string, refere
           referencing rows from this table.
         </>
       )
-    case FOREIGN_KEY_DELETION_ACTION.SET_DEFAULT:
+    case FOREIGN_KEY_CASCADE_ACTION.SET_DEFAULT:
       return (
         <>
           <span className="text-scale-1100">{actionName}</span>: Deleting a record from{' '}
@@ -64,7 +64,7 @@ export const generateDeletionActionDescription = (deletionAction: string, refere
           <span className="text-amber-900 opacity-75">default value</span>
         </>
       )
-    case FOREIGN_KEY_DELETION_ACTION.SET_NULL:
+    case FOREIGN_KEY_CASCADE_ACTION.SET_NULL:
       return (
         <>
           <span className="text-scale-1100">{actionName}</span>: Deleting a record from{' '}

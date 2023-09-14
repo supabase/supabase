@@ -7,7 +7,7 @@ import { useDispatch } from '../../store'
 import { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
 import { ColumnMenu } from '../menu'
 import { useTrackedState } from '../../store'
-import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { getForeignKeyDeletionAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 
 export function ColumnHeader<R>({
@@ -207,7 +207,7 @@ function renderColumnIcon(
                       {foreignKey?.targetColumnName}
                     </p>
                   </div>
-                  {foreignKey?.deletionAction !== FOREIGN_KEY_DELETION_ACTION.NO_ACTION && (
+                  {foreignKey?.deletionAction !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
                     <p className="text-xs text-scale-1200 mt-1">
                       On delete: {getForeignKeyDeletionAction(foreignKey?.deletionAction)}
                     </p>

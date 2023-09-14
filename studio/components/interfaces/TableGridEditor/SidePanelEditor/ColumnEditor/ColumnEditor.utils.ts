@@ -14,7 +14,7 @@ import {
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from '../SidePanelEditor.types'
-import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 
 const isSQLExpression = (input: string) => {
@@ -231,7 +231,7 @@ export const getColumnForeignKey = (
     const foreignKeyMeta = foreignKeys.find((fk) => fk.id === foreignKey.id)
     return {
       ...foreignKey,
-      deletion_action: foreignKeyMeta?.deletion_action ?? FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+      deletion_action: foreignKeyMeta?.deletion_action ?? FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
     }
   }
 }
@@ -244,13 +244,13 @@ const formatArrayToPostgresArray = (arrayString: string) => {
 
 export const getForeignKeyDeletionAction = (deletionAction?: string) => {
   switch (deletionAction) {
-    case FOREIGN_KEY_DELETION_ACTION.CASCADE:
+    case FOREIGN_KEY_CASCADE_ACTION.CASCADE:
       return 'Cascade'
-    case FOREIGN_KEY_DELETION_ACTION.RESTRICT:
+    case FOREIGN_KEY_CASCADE_ACTION.RESTRICT:
       return 'Restrict'
-    case FOREIGN_KEY_DELETION_ACTION.SET_DEFAULT:
+    case FOREIGN_KEY_CASCADE_ACTION.SET_DEFAULT:
       return 'Set default'
-    case FOREIGN_KEY_DELETION_ACTION.SET_NULL:
+    case FOREIGN_KEY_CASCADE_ACTION.SET_NULL:
       return 'Set NULL'
     default:
       return undefined
