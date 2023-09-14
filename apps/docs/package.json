@@ -127,6 +127,7 @@
     "ts-node": "^10.9.1",
     "tsconfig": "*",
     "tsx": "^3.12.2",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "jest-environment-jsdom": "^29.7.0"
   }
 }
