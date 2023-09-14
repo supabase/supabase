@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { AnimatePresence } from 'framer-motion'
 import { Swiper, SwiperSlide } from 'swiper/react'
+import { Octokit } from 'octokit'
 import { cn } from 'ui'
+import LogoLoader from 'ui/src/components/LogoLoader'
 
 import RepoCard from './RepoCard'
 
@@ -54,7 +56,6 @@ export interface RepoTab {
 
 interface Props {
   tabs: RepoTab[]
-  repos: any[]
 }
 
 enum SWIPER_STATE {
@@ -63,10 +64,26 @@ enum SWIPER_STATE {
   END = 'END',
 }
 
-const Repos = ({ tabs, repos }: Props) => {
+const Repos = ({ tabs }: Props) => {
+  const octokit = new Octokit()
+  const [repos, setRepos] = useState<any[] | null>(null)
   const [activeTab, setActiveTab] = useState(0)
   const [apiSwiper, setApiSwiper] = useState(undefined)
   const [swiperState, setSwiperState] = useState<SWIPER_STATE>(SWIPER_STATE.START)
+
+  useEffect(() => {
+    async function fetchOctoData() {
+      const res = await octokit.request('GET /orgs/{org}/repos', {
+        org: 'supabase',
+        type: 'public',
+        per_page: 200,
+        page: 1,
+      })
+
+      setRepos(res.data)
+    }
+    fetchOctoData()
+  }, [])
 
   useEffect(() => {
     if (!apiSwiper) return
@@ -79,8 +96,10 @@ const Repos = ({ tabs, repos }: Props) => {
   }
 
   const activeTabRepos = repos
-    .filter((repo) => tabs[activeTab].repos?.includes(repo.name))
-    ?.sort((a, b) => (a.stargazers_count < b.stargazers_count ? 1 : -1))
+    ? repos
+        ?.filter((repo) => tabs[activeTab].repos?.includes(repo.name))
+        ?.sort((a, b) => (a.stargazers_count < b.stargazers_count ? 1 : -1))
+    : []
 
   return (
     <div className="flex flex-col gap-8 xl:gap-10">
@@ -157,14 +176,20 @@ const Repos = ({ tabs, repos }: Props) => {
       </div>
       <div className="relative w-full h-fit grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         <AnimatePresence exitBeforeEnter>
-          {activeTabRepos?.map((repo: any, i: number) => (
-            <RepoCard
-              key={`${activeTab}-${repo.name}`}
-              repo={repo}
-              activeTab={activeTab}
-              index={i}
-            />
-          ))}
+          {repos === null ? (
+            <div className="col-span-full flex justify-center items-center min-h-[300px]">
+              <LogoLoader />
+            </div>
+          ) : (
+            activeTabRepos?.map((repo: any, i: number) => (
+              <RepoCard
+                key={`${activeTab}-${repo.name}`}
+                repo={repo}
+                activeTab={activeTab}
+                index={i}
+              />
+            ))
+          )}
         </AnimatePresence>
       </div>
     </div>
