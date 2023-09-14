@@ -26,8 +26,7 @@ CALL app.update_chat_sequences();
 --
 -- Now schedule a job to create new partitions for "tomorrow" every night
 --
--- CREATE EXTENSION IF NOT EXISTS pg_cron;
--- SELECT cron.schedule('new-chat-partition', '0 0 * * *', 'CALL app.load_app_partitions(now()::date)');
+SELECT cron.schedule('new-chat-partition', '0 0 * * *', 'CALL app.load_app_partitions(now()::date)');
 --
 --
 -- After bulk loading data, tables should be vacuumed and analyzed.

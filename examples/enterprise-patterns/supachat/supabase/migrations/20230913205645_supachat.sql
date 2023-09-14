@@ -30,6 +30,7 @@ CREATE INDEX ON chat_messages (created_at);
 -- schema.
 --
 CREATE SCHEMA app;
+CREATE EXTENSION pg_cron;
 
 CREATE TABLE app.chats(
     id bigserial,
