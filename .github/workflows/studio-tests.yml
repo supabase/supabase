@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   check:
-    runs-on: [self-hosted]
+    runs-on: test-bigger-runner
 
     strategy:
       matrix:
