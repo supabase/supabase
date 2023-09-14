@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { Octokit } from '@octokit/core'
 import { NextSeo } from 'next-seo'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import CTABanner from '~/components/CTABanner'
 import OSSHero from '~/components/OpenSource/OSSHero'
 import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
 import Repos from '~/components/OpenSource/Repos'
@@ -14,26 +13,8 @@ import pageData from '~/data/open-source'
 
 // Import Swiper styles if swiper used on page
 import 'swiper/swiper.min.css'
-import CTABanner from '../../components/CTABanner'
 
 const OpenSource = () => {
-  const octokit = new Octokit()
-  const [repos, setRepos] = useState([{}])
-
-  useEffect(() => {
-    async function fetchOctoData() {
-      const res = await octokit.request('GET /orgs/{org}/repos', {
-        org: 'supabase',
-        type: 'public',
-        per_page: 200,
-        page: 1,
-      })
-
-      setRepos(res.data)
-    }
-    fetchOctoData()
-  }, [])
-
   const router = useRouter()
 
   const meta_title = pageData.metaTitle || 'Open Source | Supabase'
@@ -63,7 +44,7 @@ const OpenSource = () => {
         </SectionContainer>
         <OSSHero />
         <SectionContainer className="!pt-0">
-          <Repos repos={repos} tabs={pageData.repo_tabs} />
+          <Repos tabs={pageData.repo_tabs} />
         </SectionContainer>
         <SectionContainer className="!py-0">
           <div className="w-full bg-scale-400 border-b" />
