@@ -45,7 +45,7 @@ import TypesStore from './TypesStore'
 import ForeignTableStore, { IForeignTableStore } from './ForeignTableStore'
 import ViewStore, { IViewStore } from './ViewStore'
 import MaterializedViewStore, { IMaterializedViewStore } from './MaterializedViewStore'
-import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -304,13 +304,13 @@ export default class MetaStore implements IMetaStore {
   async addForeignKey(relationship: ExtendedPostgresRelationship) {
     const { deletion_action } = relationship
     const deletionAction =
-      deletion_action === FOREIGN_KEY_DELETION_ACTION.CASCADE
+      deletion_action === FOREIGN_KEY_CASCADE_ACTION.CASCADE
         ? 'ON DELETE CASCADE'
-        : deletion_action === FOREIGN_KEY_DELETION_ACTION.RESTRICT
+        : deletion_action === FOREIGN_KEY_CASCADE_ACTION.RESTRICT
         ? 'ON DELETE RESTRICT'
-        : deletion_action === FOREIGN_KEY_DELETION_ACTION.SET_DEFAULT
+        : deletion_action === FOREIGN_KEY_CASCADE_ACTION.SET_DEFAULT
         ? 'ON DELETE SET DEFAULT'
-        : deletion_action === FOREIGN_KEY_DELETION_ACTION.SET_NULL
+        : deletion_action === FOREIGN_KEY_CASCADE_ACTION.SET_NULL
         ? 'ON DELETE SET NULL'
         : ''
 
@@ -562,7 +562,7 @@ export default class MetaStore implements IMetaStore {
         const relation = await this.rootStore.meta.addForeignKey({
           ...relationship,
           source_table_name: duplicatedTableName,
-          deletion_action: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+          deletion_action: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
         })
         if (relation.error) throw relation.error
       })
