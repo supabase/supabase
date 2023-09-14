@@ -1,6 +1,6 @@
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 
-export const FOREIGN_KEY_DELETION_OPTIONS = [
+export const FOREIGN_KEY_CASCADE_OPTIONS = [
   { key: 'no-action', label: 'No action', value: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION },
   { key: 'cascade', label: 'Cascade', value: FOREIGN_KEY_CASCADE_ACTION.CASCADE },
   { key: 'restrict', label: 'Restrict', value: FOREIGN_KEY_CASCADE_ACTION.RESTRICT },
