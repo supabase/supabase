@@ -19,7 +19,7 @@ import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constan
 import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
 import { ColumnField } from '../SidePanelEditor.types'
-import { FOREIGN_KEY_DELETION_OPTIONS } from './ForeignKeySelector.constants'
+import { FOREIGN_KEY_CASCADE_OPTIONS } from './ForeignKeySelector.constants'
 import { ForeignKey } from './ForeignKeySelector.types'
 import { generateDeletionActionDescription } from './ForeignKeySelector.utils'
 
@@ -360,6 +360,29 @@ const ForeignKeySelector = ({
                 url="https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-FK"
                 urlLabel="More information"
               />
+
+              <Listbox
+                id="updateAction"
+                value={selectedForeignKey.deletionAction}
+                label="Action if referenced row is updated"
+                descriptionText={
+                  <p>
+                    {generateDeletionActionDescription(
+                      selectedForeignKey.deletionAction,
+                      `${selectedForeignKey.schema}.${selectedForeignKey.table}`
+                    )}
+                  </p>
+                }
+                error={errors.column}
+                onChange={(value: string) => updateDeletionAction(value)}
+              >
+                {FOREIGN_KEY_CASCADE_OPTIONS.map((option) => (
+                  <Listbox.Option key={option.key} value={option.value} label={option.label}>
+                    <p className="text-scale-1200">{option.label}</p>
+                  </Listbox.Option>
+                ))}
+              </Listbox>
+
               <Listbox
                 id="deletionAction"
                 value={selectedForeignKey.deletionAction}
@@ -387,7 +410,7 @@ const ForeignKeySelector = ({
                 error={errors.column}
                 onChange={(value: string) => updateDeletionAction(value)}
               >
-                {FOREIGN_KEY_DELETION_OPTIONS.map((option) => (
+                {FOREIGN_KEY_CASCADE_OPTIONS.map((option) => (
                   <Listbox.Option key={option.key} value={option.value} label={option.label}>
                     <p className="text-scale-1200">{option.label}</p>
                   </Listbox.Option>
