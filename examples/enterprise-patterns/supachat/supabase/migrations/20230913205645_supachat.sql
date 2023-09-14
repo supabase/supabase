@@ -236,7 +236,6 @@ CREATE OR REPLACE PROCEDURE app.load_chats_partition(i date)
 $$
 BEGIN
     CALL app.create_chats_partition(i);
-    COMMIT;
     CALL app.copy_chats_partition(i);
     CALL app.index_and_attach_chats_partition(i);
     COMMIT;
@@ -266,7 +265,6 @@ CREATE OR REPLACE PROCEDURE app.load_chat_messages_partition(i date)
 $$
 BEGIN
     CALL app.create_chat_messages_partition(i);
-    COMMIT;
     CALL app.copy_chat_messages_partition(i);
     CALL app.index_and_attach_chat_messages_partition(i);
     COMMIT;
