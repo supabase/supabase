@@ -992,7 +992,7 @@ functions:
           ```dart
           await supabase
             .from('users')
-            .upsert({ 'username': 'supabot' }, { 'onConflict': 'username' });
+            .upsert({ 'username': 'supabot' }, onConflict: 'username');
           ```
       - id: return-the-exact-number-of-rows
         name: Return the exact number of rows

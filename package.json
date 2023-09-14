@@ -39,16 +39,12 @@
     }
   },
   "devDependencies": {
-    "@types/json-stringify-safe": "^5.0.0",
-    "aws-sdk": "^2.1354.0",
     "eslint": "^8.41.0",
     "eslint-config-custom": "*",
-    "json-stringify-safe": "^5.0.1",
     "prettier": "^2.8.8",
     "prettier-plugin-sql-cst": "^0.5.0",
     "supabase": "^1.45.2",
-    "ts-jest": "^27.1.3",
-    "turbo": "^1.10.3"
+    "turbo": "^1.10.13"
   },
   "repository": {
     "type": "git",

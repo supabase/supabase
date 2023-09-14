@@ -109,6 +109,7 @@
     "yargs": "^17.7.2"
   },
   "devDependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.410.0",
     "@types/hast": "^2.3.4",
     "@types/node": "^17.0.24",
     "@types/react": "17.0.39",
@@ -127,6 +128,7 @@
     "ts-node": "^10.9.1",
     "tsconfig": "*",
     "tsx": "^3.12.2",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "jest-environment-jsdom": "^29.7.0"
   }
 }

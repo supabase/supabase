@@ -77,12 +77,17 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
           ].join(' ')}
         >
           <div className="flex items-center gap-1 max-w-[85%]">
-            <h3
-              title={extension.name}
-              className="h-5 m-0 text-sm uppercase truncate cursor-pointer text-scale-1200"
-            >
-              {extension.name}
-            </h3>
+            <div className="flex items-center space-x-2 truncate">
+              <h3
+                title={extension.name}
+                className="h-5 m-0 text-sm truncate cursor-pointer text-scale-1200"
+              >
+                {extension.name}
+              </h3>
+              <p className="text-sm text-light">
+                {extension?.installed_version ?? extension.default_version}
+              </p>
+            </div>
             {extensions.find((item: any) => item.name === extension.name) ? (
               <Link
                 href={
@@ -129,7 +134,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
             <div className="py-3 px-4">
               <div className="flex items-center flex-grow space-x-2 text-sm text-scale-1100">
                 <span>Schema:</span>
-                <Badge>{`${extension.schema}`}</Badge>
+                <Badge color="scale">{`${extension.schema}`}</Badge>
               </div>
             </div>
           )}

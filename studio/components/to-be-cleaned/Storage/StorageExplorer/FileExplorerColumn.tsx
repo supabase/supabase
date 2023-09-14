@@ -16,6 +16,7 @@ import {
 import { formatBytes } from 'lib/helpers'
 import { BASE_PATH } from 'lib/constants'
 import { StorageColumn } from '../Storage.types'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 
 const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) => {
   return (
@@ -59,6 +60,7 @@ export interface FileExplorerColumnProps {
   openedFolders?: any[]
   selectedItems: any[]
   selectedFilePreview: any
+  itemSearchString: string
   onFilesUpload: (event: any, index: number) => void
   onSelectAllItemsInColumn: (index: number) => void
   onSelectColumnEmptySpace: (index: number) => void
@@ -74,6 +76,7 @@ const FileExplorerColumn = ({
   openedFolders = [],
   selectedItems = [],
   selectedFilePreview = {},
+  itemSearchString,
   onFilesUpload = noop,
   onSelectAllItemsInColumn = noop,
   onSelectColumnEmptySpace = noop,
@@ -82,6 +85,8 @@ const FileExplorerColumn = ({
 }: FileExplorerColumnProps) => {
   const [isDraggedOver, setIsDraggedOver] = useState(false)
   const fileExplorerColumnRef = useRef<any>(null)
+
+  const snap = useStorageExplorerStateSnapshot()
 
   useEffect(() => {
     if (fileExplorerColumnRef) {
@@ -102,6 +107,9 @@ const FileExplorerColumn = ({
 
   const columnItems = column.items
   const columnItemsSize = sum(columnItems.map((item) => get(item, ['metadata', 'size'], 0)))
+
+  const isEmpty =
+    column.items.filter((item) => item.status !== STORAGE_ROW_STATUS.LOADING).length === 0
 
   const { show } = useContextMenu()
   const displayMenu = (event: any) => {
@@ -229,27 +237,39 @@ const FileExplorerColumn = ({
       />
 
       {/* Drag drop upload CTA for when column is empty */}
-      {column.items.length === 0 && column.status !== STORAGE_ROW_STATUS.LOADING && (
-        <div className="h-full w-full flex flex-col items-center justify-center">
-          <img
-            src={`${BASE_PATH}/img/storage-placeholder.svg`}
-            className="opacity-75 pointer-events-none"
-          />
-          <p className="my-3 opacity-75">Drop your files here</p>
-          <p className="w-40 text-center text-sm text-scale-1100">
-            Or upload them via the "Upload file" button above
-          </p>
-        </div>
-      )}
+      {!(snap.isSearching && itemSearchString.length > 0) &&
+        column.items.length === 0 &&
+        column.status !== STORAGE_ROW_STATUS.LOADING && (
+          <div className="h-full w-full flex flex-col items-center justify-center">
+            <img
+              src={`${BASE_PATH}/img/storage-placeholder.svg`}
+              className="opacity-75 pointer-events-none"
+            />
+            <p className="my-3 opacity-75">Drop your files here</p>
+            <p className="w-40 text-center text-sm text-scale-1100">
+              Or upload them via the "Upload file" button above
+            </p>
+          </div>
+        )}
+
+      {snap.isSearching &&
+        itemSearchString.length > 0 &&
+        isEmpty &&
+        column.status !== STORAGE_ROW_STATUS.LOADING && (
+          <div className="h-full w-full flex flex-col items-center justify-center">
+            <p className="text-sm my-3 text-scale-1200">No results found in this folder</p>
+            <p className="w-40 text-center text-sm text-light">
+              Your search for "{itemSearchString}" did not return any results
+            </p>
+          </div>
+        )}
 
       {/* Drag drop upload CTA for when column has files */}
       <DragOverOverlay
         isOpen={isDraggedOver}
+        folderIsEmpty={isEmpty}
         onDragLeave={() => setIsDraggedOver(false)}
         onDrop={() => setIsDraggedOver(false)}
-        folderIsEmpty={
-          column.items.filter((item) => item.status !== STORAGE_ROW_STATUS.LOADING).length === 0
-        }
       />
 
       {/* List interface footer */}

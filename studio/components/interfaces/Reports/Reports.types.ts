@@ -3,6 +3,7 @@ import { DEFAULT_QUERY_PARAMS } from './Reports.constants'
 
 export enum Presets {
   API = 'api',
+  STORAGE = 'storage',
   AUTH = 'auth',
   QUERY_PERFORMANCE = 'query_performance',
 }
