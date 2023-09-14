@@ -79,7 +79,7 @@ using ( true ); -- the actual Policy
 Alternatively, if you only wanted users to be able to see their own profiles:
 
 ```sql
-create policy "Profiles are viewable by everyone."
+create policy "User can see their own profile only."
 on profiles
 for select using ( auth.uid() = user_id );
 ```
