@@ -69,12 +69,7 @@ const ProjectCard = ({
         }
         footer={
           <div className="mb-[-26px]">
-            {resourceWarnings && (
-              <ProjectCardStatus
-                projectStatus={projectStatus}
-                resourceWarnings={resourceWarnings}
-              />
-            )}
+            <ProjectCardStatus projectStatus={projectStatus} resourceWarnings={resourceWarnings} />
           </div>
         }
       ></CardButton>
