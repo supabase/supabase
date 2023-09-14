@@ -118,16 +118,6 @@ export function TriggerItem({ children, icon, disabled }: ItemProps) {
   )
 }
 
-export function Misc({ children, icon }: ItemProps) {
-  let __styles = styleHandler('dropdown')
-  return (
-    <div className={__styles.misc}>
-      {icon && icon}
-      {children}
-    </div>
-  )
-}
-
 export function Separator() {
   let __styles = styleHandler('dropdown')
 
@@ -218,7 +208,6 @@ export function Label({ className, ...props }: LabelProps) {
 }
 
 Dropdown.Item = Item
-Dropdown.Misc = Misc
 Dropdown.Checkbox = Checkbox
 Dropdown.Radio = Radio
 Dropdown.RadioGroup = RadioGroup
