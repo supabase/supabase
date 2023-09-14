@@ -53,6 +53,7 @@ const PrivilegesTable = ({ tableId, tablePrivileges, columns, role }: Privileges
       })
     },
   })
+
   const { mutate: revokeTable } = useTablePrivilegesRevokeMutation({
     onMutate(variables) {
       setLoadingStates((prev) => {
@@ -77,32 +78,6 @@ const PrivilegesTable = ({ tableId, tablePrivileges, columns, role }: Privileges
       })
     },
   })
-
-  const onToggleTable = (privileges: readonly TablePrivilegeType[], shouldGrant = true) => {
-    if (!project) return console.error('No project found')
-
-    if (shouldGrant) {
-      grantTable({
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        grants: privileges.map((privilege) => ({
-          relation_id: tableId,
-          grantee: role,
-          privilege_type: privilege,
-        })),
-      })
-    } else {
-      revokeTable({
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        revokes: privileges.map((privilege) => ({
-          relation_id: tableId,
-          grantee: role,
-          privilege_type: privilege,
-        })),
-      })
-    }
-  }
 
   const { mutate: grantColumn } = useColumnPrivilegesGrantMutation({
     onMutate(variables) {
@@ -183,18 +158,6 @@ const PrivilegesTable = ({ tableId, tablePrivileges, columns, role }: Privileges
     }
   }
 
-  const handleClickPrivilege = (privilege: ColumnPrivilegeType) => {
-    const allColumnsHavePrivilege = columns.every((column) => column.privileges.includes(privilege))
-
-    columns.forEach((column) => {
-      if (allColumnsHavePrivilege) {
-        onToggleColumn(column, [privilege], false)
-      } else if (!column.privileges.includes(privilege)) {
-        onToggleColumn(column, [privilege], true)
-      }
-    })
-  }
-
   const handleClickColumnName = (column: PrivilegeColumnUI) => {
     const hasAllPrivileges = COLUMN_PRIVILEGE_TYPES.every((privilege) =>
       column.privileges.includes(privilege)
@@ -217,7 +180,7 @@ const PrivilegesTable = ({ tableId, tablePrivileges, columns, role }: Privileges
       head={[
         <Table.th key="header-column"></Table.th>,
         ...TABLE_PRIVILEGE_TYPES.map((privilege) => {
-          const checked = tablePrivileges.find((p) => p.privilege_type === privilege) !== undefined
+          // const checked = tablePrivileges.find((p) => p.privilege_type === privilege) !== undefined
           const isLoading = isPrivilegesLoading(loadingStates, 'table', {
             relation_id: tableId,
             grantee: role,
@@ -232,23 +195,7 @@ const PrivilegesTable = ({ tableId, tablePrivileges, columns, role }: Privileges
                     <IconLoader className="animate-spin" size={16} />
                   </div>
                 )}
-
-                <PrivilegeButton
-                  privilege={privilege}
-                  onClick={() => {
-                    if (COLUMN_PRIVILEGE_TYPES.includes(privilege as any)) {
-                      handleClickPrivilege(privilege as ColumnPrivilegeType)
-                    }
-                  }}
-                  disabled={isLoading}
-                />
-
-                <Toggle
-                  checked={checked}
-                  onChange={() => onToggleTable([privilege], !checked)}
-                  size="tiny"
-                  disabled={isLoading}
-                />
+                {privilege.charAt(0) + privilege.slice(1).toLowerCase()}
               </div>
             </Table.th>
           )
@@ -268,7 +215,8 @@ const PrivilegesTable = ({ tableId, tablePrivileges, columns, role }: Privileges
             })
             const disabledDueToParent =
               tablePrivileges.find((p) => p.privilege_type === privilege) !== undefined
-            const disabled = isLoading || disabledDueToParent
+            //const disabled = isLoading || disabledDueToParent
+            const disabled = isLoading
 
             return (
               <Table.td key={privilege}>
@@ -279,39 +227,14 @@ const PrivilegesTable = ({ tableId, tablePrivileges, columns, role }: Privileges
                         <IconLoader className="animate-spin" size={14} />
                       </div>
                     )}
-
-                    <ConditionalWrap
-                      condition={disabledDueToParent}
-                      wrap={(children) => (
-                        <Tooltip.Root delayDuration={0}>
-                          <Tooltip.Trigger>{children}</Tooltip.Trigger>
-                          <Tooltip.Portal>
-                            <Tooltip.Content side="bottom">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                  'border border-scale-200',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-scale-1200">
-                                  Table privileges must be revoked first
-                                </span>
-                              </div>
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        </Tooltip.Root>
-                      )}
-                    >
-                      <Toggle
-                        checked={checked}
-                        onChange={() =>
-                          onToggleColumn(column, [privilege as ColumnPrivilegeType], !checked)
-                        }
-                        disabled={disabled}
-                        size="tiny"
-                      />
-                    </ConditionalWrap>
+                    <Toggle
+                      checked={checked}
+                      onChange={() =>
+                        onToggleColumn(column, [privilege as ColumnPrivilegeType], !checked)
+                      }
+                      disabled={disabled}
+                      size="tiny"
+                    />
                   </div>
                 )}
               </Table.td>
@@ -320,24 +243,6 @@ const PrivilegesTable = ({ tableId, tablePrivileges, columns, role }: Privileges
         </Table.tr>
       ))}
     />
-  )
-}
-
-const PrivilegeButton = ({
-  privilege,
-  onClick,
-  disabled,
-}: {
-  privilege: string
-  onClick: () => void
-  disabled?: boolean
-}) => {
-  const formatted = privilege.charAt(0) + privilege.slice(1).toLowerCase()
-
-  return (
-    <button onClick={onClick} disabled={disabled}>
-      {formatted}
-    </button>
   )
 }
 

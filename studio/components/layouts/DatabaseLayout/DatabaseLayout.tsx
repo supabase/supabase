@@ -7,6 +7,7 @@ import ProductMenu from 'components/ui/ProductMenu'
 import { useSelectedProject, useStore, withAuth } from 'hooks'
 import ProjectLayout from '../'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
+import { useFlag } from 'hooks'
 
 export interface DatabaseLayoutProps {
   title?: string
@@ -29,6 +30,7 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
 
   const isLoading = isSchemasLoading || (isVaultEnabled && isVaultLoading)
   const [loaded, setLoaded] = useState<boolean>(isInitialized)
+  const columnLevelPrivileges = useFlag('columnLevelPrivileges')
 
   useEffect(() => {
     if (ui.selectedProjectRef) {
@@ -70,7 +72,10 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
       isLoading={!loaded}
       product="Database"
       productMenu={
-        <ProductMenu page={page} menu={generateDatabaseMenu(project, { pgNetExtensionExists })} />
+        <ProductMenu
+          page={page}
+          menu={generateDatabaseMenu(project, { pgNetExtensionExists, columnLevelPrivileges })}
+        />
       }
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">

@@ -45,14 +45,15 @@ const PrivilegesHead = ({
             />
           </div>
           <div className="w-[230px]">
-            <RolesListbox selectedRole={selectedRole} roles={roles} onChangeRole={onChangeRole} />
-          </div>
-          <div className="w-[230px]">
             <TablesListbox
               selectedTable={selectedTable}
               tables={tables}
               onChangeTable={onChangeTable}
             />
+          </div>
+          <div className="h-[20px] w-px border-r border-scale-600"></div>
+          <div className="w-[230px]">
+            <RolesListbox selectedRole={selectedRole} roles={roles} onChangeRole={onChangeRole} />
           </div>
         </div>
       </div>

@@ -4,9 +4,9 @@ import { observer } from 'mobx-react-lite'
 import { useMemo, useState } from 'react'
 
 import { useParams } from 'common/hooks'
-import Privileges from 'components/interfaces/Auth/Privileges/Privileges'
-import { mapDataToPrivilegeColumnUI } from 'components/interfaces/Auth/Privileges/Privileges.utils'
-import { AuthLayout } from 'components/layouts'
+import Privileges from 'components/interfaces/Database/Privileges/Privileges'
+import { mapDataToPrivilegeColumnUI } from 'components/interfaces/Database/Privileges/Privileges.utils'
+import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import EmptyPageState from 'components/ui/Error'
 import Connecting from 'components/ui/Loading/Loading'
@@ -14,18 +14,22 @@ import { useColumnPrivilegesQuery } from 'data/privileges/column-privileges-quer
 import { useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
+import { useFlag } from 'hooks'
+import { useRouter } from 'next/router'
 
 const PrivilegesPage: NextPageWithLayout = () => {
   const { meta } = useStore()
   const pathParams = useParams()
   const { ref } = useParams()
   const { project } = useProjectContext()
+  const router = useRouter()
 
   const tableList = meta.tables.list()
   const schemaList = meta.schemas.list()
   const rolesList = meta.roles.list(
     (role: PostgresRole) => !meta.roles.systemRoles.includes(role.name)
   )
+  const columnLevelPrivileges = useFlag('columnLevelPrivileges')
 
   const [selectedSchema, setSelectedSchema] = useState<string>('public')
   const [selectedRole, setSelectedRole] = useState<string>('anon')
@@ -96,34 +100,42 @@ const PrivilegesPage: NextPageWithLayout = () => {
     return <Connecting />
   }
 
+  if (!columnLevelPrivileges) {
+    router.push(`/project/${ref}/database/tables`)
+  }
+
   const table = tableList.find((table) => table.name === selectedTable)
 
   return (
     <>
-      <Privileges
-        tablePrivileges={tablePrivileges}
-        columns={columnsState}
-        tables={tables}
-        selectedSchema={selectedSchema}
-        selectedRole={selectedRole}
-        selectedTable={table}
-        availableSchemas={schemaList.map((s) => s.name)}
-        openSchemas={openSchemas}
-        protectedSchemas={protectedSchemas}
-        roles={roles}
-        isSchemaLocked={isSchemaLocked}
-        onChangeSchema={handleChangeSchema}
-        onChangeRole={handleChangeRole}
-        onChangeTable={setSelectedTable}
-      />
+      {columnLevelPrivileges ? (
+        <Privileges
+          tablePrivileges={tablePrivileges}
+          columns={columnsState}
+          tables={tables}
+          selectedSchema={selectedSchema}
+          selectedRole={selectedRole}
+          selectedTable={table}
+          availableSchemas={schemaList.map((s) => s.name)}
+          openSchemas={openSchemas}
+          protectedSchemas={protectedSchemas}
+          roles={roles}
+          isSchemaLocked={isSchemaLocked}
+          onChangeSchema={handleChangeSchema}
+          onChangeRole={handleChangeRole}
+          onChangeTable={setSelectedTable}
+        />
+      ) : (
+        <Connecting />
+      )}
     </>
   )
 }
 
 PrivilegesPage.getLayout = (page) => (
-  <AuthLayout title="Auth">
+  <DatabaseLayout title="Database">
     <div className="h-full p-4">{page}</div>
-  </AuthLayout>
+  </DatabaseLayout>
 )
 
 export default observer(PrivilegesPage)
