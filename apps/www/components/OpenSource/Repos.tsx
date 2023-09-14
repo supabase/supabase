@@ -1,9 +1,10 @@
-import React, { useState, ReactNode, useEffect } from 'react'
-import { AnimatePresence } from 'framer-motion'
-import { IconPenTool, IconPlusCircle, cn } from 'ui'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import RepoCard from './RepoCard'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { AnimatePresence } from 'framer-motion'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { cn } from 'ui'
+
+import RepoCard from './RepoCard'
 
 interface TabProps {
   label: string

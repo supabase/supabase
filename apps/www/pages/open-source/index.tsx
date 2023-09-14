@@ -40,7 +40,6 @@ const OpenSource = () => {
   const meta_description =
     pageData.metaDescription ||
     'Supabase is an open source company, supporting existing open source tools and communities wherever possible.'
-  const totalStars = repos.reduce((acc: number, val: any) => acc + val.stargazers_count, 0)
 
   return (
     <>
@@ -59,15 +58,15 @@ const OpenSource = () => {
         }}
       />
       <DefaultLayout className="relative">
-        <SectionContainer className="overflow-hidden pt-8 pb-12 md:pt-12">
-          <ProductHeaderCentered className="-mb-14" {...pageData.heroSection} />
+        <SectionContainer className="overflow-hidden relative mx-auto !py-0 sm:!py-0 md:!py-4 lg:!pt-16 lg:!pb-12">
+          <ProductHeaderCentered {...pageData.heroSection} />
         </SectionContainer>
         <OSSHero />
         <SectionContainer className="!pt-0">
           <Repos repos={repos} tabs={pageData.repo_tabs} />
         </SectionContainer>
         <SectionContainer className="!py-0">
-          <div className="w-full  bg-scale-400 border-b" />
+          <div className="w-full bg-scale-400 border-b" />
         </SectionContainer>
         <SectionContainer>
           <Sponsorships sponsorships={pageData.sponsorships} />

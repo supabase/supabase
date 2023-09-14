@@ -24,14 +24,24 @@
   .hero-grid-lines {
     animation-duration: 30s;
   }
+
+  @keyframes animate-grid {
+    0% {
+      transform: translateY(500px);
+    }
+
+    to {
+      transform: translateY(100px);
+    }
+  }
 }
 
 @keyframes animate-grid {
   0% {
-    transform: translateY(500px);
+    transform: translateY(100px);
   }
 
   to {
-    transform: translateY(100px);
+    transform: translateY(-300px);
   }
 }
