@@ -53,7 +53,7 @@ const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItem
           <div>...</div>
         </div>
       </Table.td>
-      <Table.td className="text-right">
+      <Table.td className="flex items-center">
         <UserDropdown
           user={user}
           canRemoveUser={canRemoveUser}
