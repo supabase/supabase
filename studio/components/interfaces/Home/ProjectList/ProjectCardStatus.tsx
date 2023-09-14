@@ -5,7 +5,6 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   IconAlertTriangle,
-  IconLoader,
   IconPauseCircle,
   IconRefreshCw,
 } from 'ui'
@@ -13,7 +12,7 @@ import { InferredProjectStatus } from './ProjectCard.utils'
 import { getWarningContent } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
 
 export interface ProjectCardWarningsProps {
-  resourceWarnings: ResourceWarning
+  resourceWarnings?: ResourceWarning
   projectStatus: InferredProjectStatus
 }
 
@@ -25,17 +24,17 @@ export const ProjectCardStatus = ({
   const showResourceExhaustionWarnings = false
 
   // [Joshen] Read only takes higher precedence over multiple resource warnings
-  const activeWarnings = resourceWarnings.is_readonly_mode_enabled
+  const activeWarnings = resourceWarnings?.is_readonly_mode_enabled
     ? ['is_readonly_mode_enabled']
-    : Object.keys(resourceWarnings).filter(
+    : Object.keys(resourceWarnings || {}).filter(
         (property) =>
           property !== 'project' &&
           property !== 'is_readonly_mode_enabled' &&
-          resourceWarnings[property as keyof typeof resourceWarnings] !== null
+          resourceWarnings?.[property as keyof typeof resourceWarnings] !== null
       )
 
   const hasCriticalWarning = activeWarnings.some(
-    (x) => resourceWarnings[x as keyof typeof resourceWarnings] === 'critical'
+    (x) => resourceWarnings?.[x as keyof typeof resourceWarnings] === 'critical'
   )
   const isCritical = activeWarnings.includes('is_readonly_mode_enabled') || hasCriticalWarning
 
@@ -44,6 +43,8 @@ export const ProjectCardStatus = ({
     if (projectStatus === 'isPausing') return 'Project is pausing'
     if (projectStatus === 'isComingUp') return 'Project is coming up'
     if (projectStatus === 'isRestoring') return 'Project is restoring'
+
+    if (!resourceWarnings) return undefined
 
     // If none of the paused/restoring states match, proceed with the default logic
     return activeWarnings.length > 1
@@ -58,6 +59,8 @@ export const ProjectCardStatus = ({
     if (projectStatus === 'isPausing') return 'The pause process will complete in a few minutes'
     if (projectStatus === 'isComingUp') return 'Your project will be ready in a few minutes'
     if (projectStatus === 'isRestoring') return 'Your project will be ready in a few minutes'
+
+    if (!resourceWarnings) return undefined
 
     // If none of the paused/restoring states match, proceed with the default logic
     return activeWarnings.length > 1 && showResourceExhaustionWarnings
