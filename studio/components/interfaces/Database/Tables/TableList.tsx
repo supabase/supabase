@@ -1,14 +1,15 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
@@ -24,6 +25,7 @@ import {
   Input,
   Listbox,
 } from 'ui'
+import AlertError from 'components/ui/AlertError'
 
 interface TableListProps {
   onAddTable: () => void
@@ -41,7 +43,7 @@ const TableList = ({
   const { meta } = useStore()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
-  const { isLoading } = meta.tables
+
   const [filterString, setFilterString] = useState<string>('')
   const canUpdateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
@@ -53,14 +55,26 @@ const TableList = ({
     EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
 
-  const allTables: PostgresTable[] = meta.tables.list(
-    (table: PostgresTable) => table.schema === snap.selectedSchemaName
+  const {
+    data: tables,
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+  } = useTablesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: snap.selectedSchemaName,
+    },
+    {
+      select(tables) {
+        return filterString.length === 0
+          ? tables
+          : tables.filter((table) => table.name.includes(filterString))
+      },
+    }
   )
-  const tables =
-    filterString.length === 0
-      ? allTables
-      : // @ts-ignore
-        allTables.filter((table: PostgresTable) => table.name.includes(filterString))
 
   const publications = meta.publications.list()
   const realtimePublication = publications.find(
@@ -128,6 +142,7 @@ const TableList = ({
             />
           </div>
         </div>
+
         {!isLocked && (
           <div>
             <Tooltip.Root delayDuration={0}>
@@ -162,11 +177,19 @@ const TableList = ({
         )}
       </div>
 
-      <div className="my-4">
-        {isLoading ? (
+      {isLoading && (
+        <div className="py-4 space-y-2">
           <GenericSkeletonLoader />
+        </div>
+      )}
+
+      {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
+
+      {isSuccess &&
+        (tables.length === 0 ? (
+          <NoSearchResults />
         ) : (
-          <div className="w-full">
+          <div className="my-4 w-full">
             <Table
               head={[
                 <Table.th key="name">Name</Table.th>,
@@ -305,21 +328,6 @@ const TableList = ({
                                 </Tooltip.Portal>
                               )}
                             </Tooltip.Root>
-
-                            {/* <Button
-                              type="text"
-                              icon={<IconEdit3 />}
-                              style={{ padding: 5 }}
-                              disabled={isLocked}
-                              onClick={() => onEditTable(x)}
-                            />
-                            <Button
-                              type="text"
-                              icon={<IconTrash />}
-                              style={{ padding: 5 }}
-                              disabled={isLocked}
-                              onClick={() => onDeleteTable(x)}
-                            /> */}
                           </div>
                         </Table.td>
                       </Table.tr>
@@ -328,8 +336,7 @@ const TableList = ({
               }
             />
           </div>
-        )}
-      </div>
+        ))}
     </>
   )
 }

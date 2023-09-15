@@ -1,10 +1,8 @@
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { PropsWithChildren, useEffect } from 'react'
 
-import Error from 'components/ui/Error'
 import ProductMenu from 'components/ui/ProductMenu'
-import { useSchemasQuery } from 'data/database/schemas-query'
 import { useSelectedProject, useStore, withAuth } from 'hooks'
 import ProjectLayout from '../'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
@@ -16,13 +14,6 @@ export interface DatabaseLayoutProps {
 const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
   const { ui, meta, vault } = useStore()
   const project = useSelectedProject()
-  const { isLoading: isSchemasLoading } = useSchemasQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const { isLoading: isVaultLoading } = vault
-
-  const { isInitialized, error } = meta.tables
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
@@ -31,14 +22,8 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
   const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
   const pgNetExtensionExists = meta.extensions.byId('pg_net') !== undefined
 
-  const isLoading = isSchemasLoading || (isVaultEnabled && isVaultLoading)
-  const [loaded, setLoaded] = useState<boolean>(isInitialized)
-
   useEffect(() => {
     if (ui.selectedProjectRef) {
-      // Eventually should only load the required stores based on the pages
-      meta.tables.load()
-
       meta.roles.load()
       meta.triggers.load()
       meta.extensions.load()
@@ -51,14 +36,6 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
       vault.load()
     }
   }, [ui.selectedProjectRef, isVaultEnabled])
-
-  if (error) {
-    return (
-      <ProjectLayout>
-        <Error error={error} />
-      </ProjectLayout>
-    )
-  }
 
   return (
     <ProjectLayout

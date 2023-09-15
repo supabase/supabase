@@ -44,6 +44,11 @@ import ForeignTableStore, { IForeignTableStore } from './ForeignTableStore'
 import ViewStore, { IViewStore } from './ViewStore'
 import MaterializedViewStore, { IMaterializedViewStore } from './MaterializedViewStore'
 import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { getQueryClient } from 'data/query-client'
+import { tableKeys } from 'data/tables/keys'
+import { getTables } from 'data/tables/tables-query'
+import { getTable } from 'data/tables/table-query'
+import { getCachedProjectDetail } from 'data/projects/project-detail-query'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -313,7 +318,16 @@ export default class MetaStore implements IMetaStore {
   async updateTableRealtime(table: PostgresTable, enable: boolean) {
     let publicationUpdateError
     const publications = this.publications.list()
-    const publicTables = this.tables.list((table: PostgresTable) => table.schema === 'public')
+
+    const queryClient = getQueryClient()
+    const project = await getCachedProjectDetail(queryClient, this.rootStore.ui.selectedProjectRef)
+    const projectRef = project?.ref
+    const connectionString = project?.connectionString
+    const publicTables = await queryClient.fetchQuery({
+      queryKey: tableKeys.list(projectRef, 'public'),
+      queryFn: ({ signal }) =>
+        getTables({ projectRef, connectionString, schema: 'public' }, signal),
+    })
 
     let realtimePublication = publications.find((pub) => pub.name === 'supabase_realtime')
     if (realtimePublication === undefined) {
@@ -559,8 +573,15 @@ export default class MetaStore implements IMetaStore {
       })
     }
 
-    await this.tables.load()
-    const tables = this.tables.list()
+    const queryClient = getQueryClient()
+    const project = await getCachedProjectDetail(queryClient, this.rootStore.ui.selectedProjectRef)
+    const projectRef = project?.ref
+    const connectionString = project?.connectionString
+    const tables = await queryClient.fetchQuery({
+      queryKey: tableKeys.list(projectRef, 'public'),
+      queryFn: ({ signal }) => getTables({ projectRef, connectionString }, signal),
+    })
+
     const duplicatedTable = find(tables, { schema: sourceTableSchema, name: duplicatedTableName })
 
     if (isRLSEnabled) {
@@ -584,8 +605,8 @@ export default class MetaStore implements IMetaStore {
     importContent?: ImportContent
   ) {
     // Create the table first
-    const table: any = await this.tables.create(payload)
-    if (table.error) throw table.error
+    const table = await this.tables.create(payload)
+    if ('error' in table) throw table.error
 
     // If we face any errors during this process after the actual table creation
     // We'll delete the table as a way to clean up and not leave behind bits that
@@ -708,7 +729,7 @@ export default class MetaStore implements IMetaStore {
       }
 
       // Finally, return the created table
-      return await this.tables.loadById(table.id)
+      return table
     } catch (error: any) {
       this.tables.del(table.id)
       throw error
@@ -828,7 +849,21 @@ export default class MetaStore implements IMetaStore {
     // Update table's realtime configuration
     await this.updateTableRealtime(table, isRealtimeEnabled)
 
-    return { table: await this.tables.loadById(table.id), hasError }
+    const queryClient = getQueryClient()
+    const project = await getCachedProjectDetail(queryClient, this.rootStore.ui.selectedProjectRef)
+    const projectRef = project?.ref
+    const connectionString = project?.connectionString
+
+    queryClient.invalidateQueries(tableKeys.table(projectRef, table.id))
+
+    return {
+      table: await getTable({
+        projectRef,
+        connectionString,
+        id: table.id,
+      }),
+      hasError,
+    }
   }
 
   async insertRowsViaSpreadsheet(
