@@ -1,12 +1,12 @@
-import Layout from '~/layouts/DefaultGuideLayout'
+import Layout from "~/layouts/DefaultGuideLayout";
 
 export const meta = {
-  id: 'functions-quickstart',
-  title: 'Edge Functions Quickstart',
-  description: 'Globally distributed TypeScript Functions.',
-  sidebar_label: 'Quickstart',
-  video: 'https://www.youtube.com/v/rzglqRdZUQE',
-}
+  id: "functions-quickstart",
+  title: "Edge Functions Quickstart",
+  description: "Globally distributed TypeScript Functions.",
+  sidebar_label: "Quickstart",
+  video: "https://www.youtube.com/v/rzglqRdZUQE",
+};
 
 Learn how to build an Edge Function locally and deploy it to the Supabase Platform in less than 7 minutes.
 
@@ -94,14 +94,17 @@ or using one of the [client libraries](/docs#reference-documentation), e.g. usin
 
 ```js
 // https://supabase.com/docs/reference/javascript/installing
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from "@supabase/supabase-js";
 
 // Create a single supabase client for interacting with your database
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+const supabase = createClient(
+  "https://xyzcompany.supabase.co",
+  "public-anon-key",
+);
 
-const { data, error } = await supabase.functions.invoke('hello-world', {
-  body: { name: 'Functions' },
-})
+const { data, error } = await supabase.functions.invoke("hello-world", {
+  body: { name: "Functions" },
+});
 ```
 
 After invoking your Edge Function you should see the response `{ "message":"Hello Functions!" }`.
@@ -111,24 +114,29 @@ After invoking your Edge Function you should see the response `{ "message":"Hell
 When interacting with Edge Functions, it's important to be prepared for potential errors that might occur during the invocation. To handle errors effectively, the following error handling code can be used:
 
 ```js
-import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from "@supabase/supabase-js";
+import {
+  FunctionsHttpError,
+  FunctionsRelayError,
+  FunctionsFetchError,
+} from "@supabase/supabase-js";
 
-const { data, error } = await supabase.functions.invoke('hello', {
+const { data, error } = await supabase.functions.invoke("hello", {
   headers: {
-    "my-custom-header": 'my-custom-header-value'
+    "my-custom-header": "my-custom-header-value",
   },
-  body: { foo: 'bar' }      
-})
+  body: { foo: "bar" },
+});
 
 if (error instanceof FunctionsHttpError) {
-  const errorMessage = await error.context.json()
-  console.log('Function returned an error', errorMessage)
+  const errorMessage = await error.context.json();
+  console.log("Function returned an error", errorMessage);
 } else if (error instanceof FunctionsRelayError) {
-  console.log('Relay error:', error.message)
+  console.log("Relay error:", error.message);
 } else if (error instanceof FunctionsFetchError) {
-  console.log('Fetch error:', error.message)
+  console.log("Fetch error:", error.message);
 }
 ```
+
 In the provided error handling code, we're checking the type of error that occurred using the "instanceof" operator. This helps us differentiate between different types of errors and handle them appropriately. Depending on the type of error, we either log the error message or information specific to that type of error.
 
 This error handling mechanism ensures that your application can gracefully handle errors that might arise during the execution of Edge Functions, providing a more robust user experience.
@@ -140,7 +148,7 @@ We recommend using [esm.sh](https://esm.sh/) for importing Node.js modules that 
 For example, when you want to use supabase-js within Supabase Edge Functions, you would import `createClient` as follows:
 
 ```ts
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 ```
 
 As long as your environment is set up properly and the module you're importing is exporting types, the import will have types and autocompletion support.
@@ -265,6 +273,8 @@ Edge Functions supports `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`. 
 - Edge Functions
   - Serving of HTML content is not supported (`GET` requests that return `text/html` will be rewritten to `text/plain`).
 
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
+export const Page = ({ children }) => (
+  <Layout meta={meta} children={children} />
+);
 
-export default Page
+export default Page;
