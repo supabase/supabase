@@ -7,11 +7,9 @@ import { useCheckPermissions, useLocalStorage } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 
-interface EmptyStateProps {
-  onAddTable: () => void
-}
+export interface EmptyStateProps {}
 
-const EmptyState = ({ onAddTable }: EmptyStateProps) => {
+const EmptyState = ({}: EmptyStateProps) => {
   const snap = useTableEditorStateSnapshot()
   const isProtectedSchema = EXCLUDED_SCHEMAS.includes(snap.selectedSchemaName)
   const canCreateTables =
@@ -43,7 +41,7 @@ const EmptyState = ({ onAddTable }: EmptyStateProps) => {
         <ProductEmptyState
           title="Table Editor"
           ctaButtonLabel={canCreateTables ? 'Create a new table' : undefined}
-          onClickCta={canCreateTables ? onAddTable : undefined}
+          onClickCta={canCreateTables ? snap.onAddTable : undefined}
         >
           <p className="text-sm text-scale-1100">There are no tables available in this schema.</p>
         </ProductEmptyState>
@@ -52,7 +50,7 @@ const EmptyState = ({ onAddTable }: EmptyStateProps) => {
           <ProductEmptyState
             title="Table Editor"
             ctaButtonLabel={canCreateTables ? 'Create a new table' : undefined}
-            onClickCta={canCreateTables ? onAddTable : undefined}
+            onClickCta={canCreateTables ? snap.onAddTable : undefined}
           >
             <p className="text-sm text-scale-1100">
               Select a table from the navigation panel on the left to view its data
