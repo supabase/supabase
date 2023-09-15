@@ -190,7 +190,7 @@ functions:
         isSpotlight: true
         code: |
           ```dart
-          final AuthResponse = await supabase.auth.signInWithApple();
+          final AuthResponse res = await supabase.auth.signInWithApple();
           ```
   - id: sign-in-with-oauth
     title: 'signInWithOAuth()'
