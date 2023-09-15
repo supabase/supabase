@@ -1,6 +1,6 @@
 import { PostgresTable, PostgresTrigger } from '@supabase/postgres-meta'
 import Image from 'next/image'
-import { MutableRefObject, useEffect, useRef, useState } from 'react'
+import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -86,7 +86,10 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
     })
   const isSubmitting = isCreatingDatabaseTrigger || isUpdatingDatabaseTrigger
 
-  const tables = data?.sort((a, b) => (a.schema > b.schema ? 0 : -1)) ?? []
+  const tables = useMemo(
+    () => [...(data ?? [])].sort((a, b) => (a.schema > b.schema ? 0 : -1)),
+    [data]
+  )
   const restUrl = project?.restUrl
   const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
 
