@@ -27,6 +27,7 @@ import {
 import { ImportContent } from './TableEditor/TableEditor.types'
 
 export interface SidePanelEditorProps {
+  editable?: boolean
   selectedSchema: string
   selectedTable?: PostgresTable
   selectedRowToEdit?: Dictionary<any>
@@ -51,6 +52,7 @@ export interface SidePanelEditorProps {
 }
 
 const SidePanelEditor = ({
+  editable = true,
   selectedSchema,
   selectedTable,
   selectedRowToEdit,
@@ -66,6 +68,8 @@ const SidePanelEditor = ({
   onTableCreated = noop,
   onColumnSaved = noop,
 }: SidePanelEditorProps) => {
+  const readOnly = false
+
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
   const { meta, ui } = useStore()
   const queryClient = useQueryClient()
@@ -555,6 +559,7 @@ const SidePanelEditor = ({
         jsonString={selectedValueForJsonEdit?.jsonString ?? ''}
         backButtonLabel="Cancel"
         applyButtonLabel="Save changes"
+        readOnly={!editable}
         closePanel={onClosePanel}
         onSaveJSON={onSaveJSON}
       />

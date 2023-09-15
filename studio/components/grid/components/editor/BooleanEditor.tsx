@@ -6,13 +6,13 @@ interface Props<TRow, TSummaryRow = unknown> extends EditorProps<TRow, TSummaryR
   isNullable?: boolean
 }
 
-export function BooleanEditor<TRow, TSummaryRow = unknown>({
+export const BooleanEditor = <TRow, TSummaryRow = unknown>({
   row,
   column,
   isNullable,
   onRowChange,
   onClose,
-}: Props<TRow, TSummaryRow>) {
+}: Props<TRow, TSummaryRow>) => {
   const state = useTrackedState()
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
   const value = row[column.key as keyof TRow] as unknown as string

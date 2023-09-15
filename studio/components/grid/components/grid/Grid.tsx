@@ -149,7 +149,7 @@ export const Grid = memo(
                 <p className="text-base">This table is empty</p>
                 {onAddRow !== undefined && onImportData !== undefined && (
                   <>
-                    <p className="text-sm text-light mt-1">Add or generate rows to get started.</p>
+                    <p className="text-sm text-light mt-1">Add some rows to get started.</p>
                     <div className="flex items-center space-x-2 mt-4">
                       {/* [Joshen] Leaving this as a placeholder */}
                       {/* <Button type="outline">Generate random data</Button> */}
