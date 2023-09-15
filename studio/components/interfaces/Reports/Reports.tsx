@@ -276,7 +276,7 @@ const Reports = () => {
             <DropdownMenuSub_Shadcn_ key={cat.key}>
               <DropdownMenuSubTrigger_Shadcn_>
                 {cat.icon ? cat.icon : <IconHome size="tiny" />}
-                {cat.label}
+                <p>{cat.label}</p>
               </DropdownMenuSubTrigger_Shadcn_>
               <DropdownMenuPortal_Shadcn_>
                 <DropdownMenuSubContent_Shadcn_>
@@ -285,7 +285,7 @@ const Reports = () => {
                       <DropdownMenuCheckboxItem_Shadcn_
                         key={metric.key}
                         checked={config.layout?.some((x: any) => x.attribute === metric.key)}
-                        onChange={(e) => handleChartSelection({ metric, value: e })}
+                        onCheckedChange={(e) => handleChartSelection({ metric, value: e })}
                       >
                         <div className="flex flex-col space-y-0">
                           <span>{metric.label}</span>

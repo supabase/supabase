@@ -78,13 +78,11 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
               <IconEdit />
               <p className="text-scale-1200 text-sm">Edit app</p>
             </DropdownMenuItem_Shadcn_>
-            ,
-            <DropdownMenuSeparator_Shadcn_ key="separator" />,
+            <DropdownMenuSeparator_Shadcn_ key="separator" />
             <DropdownMenuItem_Shadcn_ key="delete" onClick={() => onSelectDelete()}>
               <IconTrash />
               <p className="text-scale-1200 text-sm">Delete app</p>
             </DropdownMenuItem_Shadcn_>
-            ,
           </DropdownMenuContent_Shadcn_>
         </DropdownMenu_Shadcn_>
       </Table.td>
