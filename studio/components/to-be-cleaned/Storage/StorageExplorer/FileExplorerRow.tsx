@@ -432,7 +432,7 @@ const FileExplorerRow = ({
                 {rowOptions.map((option) => {
                   if ((option?.children ?? []).length > 0) {
                     return (
-                      <DropdownMenuSub_Shadcn_>
+                      <DropdownMenuSub_Shadcn_ key={option.name}>
                         <DropdownMenuSubTrigger_Shadcn_>
                           <div
                             className={[

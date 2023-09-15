@@ -1,6 +1,16 @@
 import Panel from 'components/ui/Panel'
 import { isEmpty } from 'lodash'
-import { Badge, Button, IconArchive, IconEdit, IconMoreVertical, IconTrash } from 'ui'
+import {
+  Badge,
+  Button,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconArchive,
+  IconEdit,
+  IconMoreVertical,
+  IconTrash,
+} from 'ui'
 
 const PolicyRow = ({
   policy,

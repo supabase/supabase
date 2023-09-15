@@ -79,7 +79,6 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
                     <p className="block text-scale-1200">Generate token for experimental API</p>
                   </div>
                 </DropdownMenuItem_Shadcn_>
-                ,
               </DropdownMenuContent_Shadcn_>
             </DropdownMenu_Shadcn_>
           </div>
