@@ -19,14 +19,8 @@ const MenuItem = React.forwardRef<
       >
         {children ?? (
           <>
-            {/* {icon && <ProductIcon icon={icon} color="alt" />} */}
             {icon && (
-              <div
-                className={[
-                  // 'inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md bg-alternative text-bg',
-                  // color && color === 'alt' ? 'bg-surface-300 text-brand' : '',
-                ].join(' ')}
-              >
+              <div>
                 <svg
                   className="h-5 w-5 text-brand"
                   xmlns="http://www.w3.org/2000/svg"
