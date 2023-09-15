@@ -14,7 +14,7 @@ interface JsonEditProps {
   visible: boolean
   backButtonLabel?: string
   applyButtonLabel?: string
-  readOnly: boolean
+  readOnly?: boolean
   closePanel: () => void
   onSaveJSON: (value: string | number) => void
 }
@@ -25,7 +25,7 @@ const JsonEdit = ({
   visible,
   backButtonLabel,
   applyButtonLabel,
-  readOnly,
+  readOnly = false,
   closePanel,
   onSaveJSON,
 }: JsonEditProps) => {
