@@ -1,6 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
@@ -28,7 +27,6 @@ const DeleteConfirmationDialogs = ({
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
-  const router = useRouter()
   const [, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
   const queryClient = useQueryClient()
@@ -78,8 +76,8 @@ const DeleteConfirmationDialogs = ({
         message: `Successfully deleted column "${selectedColumnToDelete.name}"`,
       })
 
-      queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
       await Promise.all([
+        queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints'])),
         queryClient.invalidateQueries(
           tableKeys.table(project?.ref, selectedColumnToDelete!.table_id)
         ),
