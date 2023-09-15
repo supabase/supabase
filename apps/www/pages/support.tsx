@@ -1,27 +1,20 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
-import { Button, IconMessageCircle, IconGitHub, Divider, IconMail, IconArrowUpRight } from 'ui'
+import {
+  Button,
+  IconMessageCircle,
+  IconGitHub,
+  IconArrowUpRight,
+  SearchButton,
+  IconSearch,
+  IconCommand,
+} from 'ui'
 
-import Container from '~/components/Container'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import InteractiveShimmerCard from '../components/InteractiveShimmerCard'
-
-const data = [
-  {
-    title: 'Ask the Community',
-    paragraph: 'Ask the Community',
-    useThisFor: '',
-    links: [
-      {
-        label: '',
-        url: '',
-        icon: '',
-      },
-    ],
-  },
-]
+import { questions } from 'shared-data'
 
 const Index = () => {
   const router = useRouter()
@@ -50,7 +43,38 @@ const Index = () => {
         <div className="bg-alternative">
           <SectionContainer className="space-y-2 text-center">
             <h1 className="text-brand font-mono text-base uppercase tracking-widest">Support</h1>
-            <p className="h1 tracking-[-1.5px]">Hello, how can we help?</p>
+            <p className="h1 tracking-[-1px]">Hello, how can we help?</p>
+            <SearchButton className="mx-auto w-full max-w-md">
+              <div
+                className="
+                  flex
+                  px-3
+                  py-3
+                  group
+                  items-center
+                  justify-between
+                  bg-scale-200
+                  border
+                  border-scale-500
+                  hover:bg-scale-300
+                  hover:border-scale-600
+                  transition 
+                  rounded"
+              >
+                <div className="flex items-center flex-1 space-x-2">
+                  <IconSearch className="text-scale-1100" size={18} strokeWidth={2} />
+                  <p className="text-lighter text-sm group-hover:text-light transition">
+                    {questions[0]}
+                  </p>
+                </div>
+                <div className="flex items-center h-full space-x-1">
+                  <div className="hidden text-lighter md:flex items-center justify-center h-5 w-10 border rounded bg-scale-500 border-scale-700 gap-1">
+                    <IconCommand size={12} strokeWidth={1.5} />
+                    <span className="text-[12px]">K</span>
+                  </div>
+                </div>
+              </div>
+            </SearchButton>
           </SectionContainer>
         </div>
         <SectionContainer className="text grid gap-5 md:grid-cols-3">
