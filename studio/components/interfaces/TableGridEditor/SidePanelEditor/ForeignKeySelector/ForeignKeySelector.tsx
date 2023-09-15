@@ -104,7 +104,7 @@ const ForeignKeySelector = ({
     }
     const table = find(tables, { id: tableId })
     if (table) {
-      const primaryColumn = table.primary_keys[0].name
+      const primaryColumn = table.primary_keys[0]?.name
       const firstColumn = table.columns?.length ? table.columns[0].name : undefined
 
       setSelectedForeignKey({

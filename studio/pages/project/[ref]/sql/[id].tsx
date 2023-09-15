@@ -14,12 +14,16 @@ import { SQLEditorLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
 import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useParams } from 'common'
 
 const SqlEditor: NextPageWithLayout = () => {
   const monaco = useMonaco()
+  const { id } = useParams()
   const { project } = useProjectContext()
-
+  const snap = useSqlEditorStateSnapshot()
   const { mutateAsync: formatQuery } = useFormatQueryMutation()
+
   async function formatPgsql(value: string) {
     try {
       if (!project) throw new Error('No project')
@@ -75,6 +79,7 @@ const SqlEditor: NextPageWithLayout = () => {
         async provideDocumentFormattingEdits(model: any) {
           const value = model.getValue()
           const formatted = await formatPgsqlRef.current(value)
+          if (id) snap.setSql(id, formatted)
           return [{ range: model.getFullModelRange(), text: formatted }]
         },
       })

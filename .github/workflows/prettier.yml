@@ -5,74 +5,72 @@ on:
     branches:
       - 'master'
 
+# Cancel old builds on new commit for same workflow + branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   format:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            apps
       - name: Setup node
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
+      # Installing all dependencies takes up to three minutes, hacking around to only installing prettier+deps
       - name: Download dependencies
-        run: npm ci
+        run: |
+          rm package.json
+          rm package-lock.json
+          npm i prettier@2 prettier-plugin-sql-cst
       - name: Run prettier
         run: |-
           npx prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
-        # [Joshen] Temp disable the following due to an issue
-        # https://github.com/EPMatt/reviewdog-action-prettier/issues/34
-        # uses: EPMatt/reviewdog-action-prettier@v1
-        # with:
-        #   github_token: ${{ secrets.github_token }}
-        #   reporter: github-pr-review
-        #   level: warning
-        #   command: npx prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,json}'
 
-        # run: |-
-        #   function run_check() {
-        #     if $(grep -q '"prettier"' "$1") ; then
-        #       pushd "$(dirname $1)"
-        #       echo "Running prettier on $(pwd)"
-        #       npx prettier -c '**/*.{js,jsx,ts,tsx,css,md,json}'
-        #       popd
-        #     fi
-        #   }
-        #   find . -type f -name 'package.json' ! -path '*node_modules*' -print0 | while IFS= read -r -d '' file; do
-        #     run_check "$file"
-        #   done
 
   # i18n is not a node package, so we handle that one separately
   format-i18n:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            i18n
       - name: Setup node
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
+      # Installing all dependencies takes up to three minutes, hacking around to only installing prettier+deps
       - name: Download dependencies
-        run: npm ci
+        run: |
+          rm package.json
+          rm package-lock.json
+          npm i prettier@2 prettier-plugin-sql-cst
       - name: Run prettier
         run: |-
           npx prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
-        # uses: EPMatt/reviewdog-action-prettier@v1
-        # with:
-        #   github_token: ${{ secrets.github_token }}
-        #   reporter: github-pr-review
-        #   level: warning
-        #   command: npx prettier -c 'i18n/**/*.{js,jsx,ts,tsx,css,md,json}'
 
   format-sql:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
-        uses: actions/checkout@v3
-      - name: Install plugin
-        run: npm ci
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            apps/docs/pages
+      # Installing all dependencies takes up to three minutes, hacking around to only installing prettier+deps
+      - name: Download dependencies
+        run: |
+          rm package.json
+          rm package-lock.json
+          npm i prettier@2 prettier-plugin-sql-cst
       - name: Run prettier
         run: |-
           # Check mdx files which contain sql code blocks
