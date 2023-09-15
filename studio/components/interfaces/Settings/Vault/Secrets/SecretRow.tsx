@@ -116,65 +116,63 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
               <span></span>
             </Button>
           </DropdownMenuTrigger_Shadcn_>
-          <DropdownMenuContent_Shadcn_ side="bottom" className="w-[120px]">
-            <>
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <DropdownMenuItem_Shadcn_
-                    disabled={!canManageSecrets}
-                    onClick={() => onSelectEdit(secret)}
-                  >
-                    <IconEdit3 size="tiny" />
-                    <p className="text-scale-1200 text-sm"> Edit</p>
-                  </DropdownMenuItem_Shadcn_>
-                </Tooltip.Trigger>
-                {!canManageSecrets && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                          'border border-scale-200',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-scale-1200">
-                          You need additional permissions to edit secrets
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <DropdownMenuItem_Shadcn_
-                    disabled={!canManageSecrets}
-                    onClick={() => onSelectRemove(secret)}
-                  >
-                    <IconTrash stroke="red" size="tiny" />
-                    <p className="text-scale-1200 text-sm">Delete</p>
-                  </DropdownMenuItem_Shadcn_>
-                </Tooltip.Trigger>
-                {!canManageSecrets && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                          'border border-scale-200',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-scale-1200">
-                          You need additional permissions to delete secrets
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
-            </>
+          <DropdownMenuContent_Shadcn_ side="bottom">
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger>
+                <DropdownMenuItem_Shadcn_
+                  disabled={!canManageSecrets}
+                  onClick={() => onSelectEdit(secret)}
+                >
+                  <IconEdit3 size="tiny" />
+                  <p className="text-scale-1200 text-sm">Edit</p>
+                </DropdownMenuItem_Shadcn_>
+              </Tooltip.Trigger>
+              {!canManageSecrets && (
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        You need additional permissions to edit secrets
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              )}
+            </Tooltip.Root>
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger>
+                <DropdownMenuItem_Shadcn_
+                  disabled={!canManageSecrets}
+                  onClick={() => onSelectRemove(secret)}
+                >
+                  <IconTrash stroke="red" size="tiny" />
+                  <p className="text-scale-1200 text-sm">Delete</p>
+                </DropdownMenuItem_Shadcn_>
+              </Tooltip.Trigger>
+              {!canManageSecrets && (
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-scale-1200">
+                        You need additional permissions to delete secrets
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              )}
+            </Tooltip.Root>
           </DropdownMenuContent_Shadcn_>
         </DropdownMenu_Shadcn_>
       </div>

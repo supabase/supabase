@@ -162,7 +162,7 @@ const NavigationBar = () => {
               <DropdownMenuRadioGroup_Shadcn_
                 key="theme"
                 value={isDarkMode ? 'dark' : 'light'}
-                onChange={(e: any) => toggleTheme(e === 'dark')}
+                onValueChange={(e) => toggleTheme(e === 'dark')}
               >
                 {/* [Joshen] Removing system default for now, needs to be supported in useTheme from common packages */}
                 {/* <DropdownMenuRadioItem_Shadcn_ value="system">System default</DropdownMenuRadioItem_Shadcn_> */}

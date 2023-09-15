@@ -14,10 +14,10 @@ import {
   Alert,
   Button,
   DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
+  DropdownMenuRadioGroup_Shadcn_,
+  DropdownMenuRadioItem_Shadcn_,
   DropdownMenuTrigger_Shadcn_,
   DropdownMenu_Shadcn_,
-  IconCheck,
   IconChevronsDown,
   IconEdit,
   IconLoader,
@@ -301,33 +301,20 @@ const TableEditorMenu = () => {
                         align="start"
                         style={{ zIndex: 1 }}
                       >
-                        <DropdownMenuItem_Shadcn_
-                          key="alphabetical"
-                          onClick={() => {
-                            setSort('alphabetical')
-                          }}
+                        <DropdownMenuRadioGroup_Shadcn_
+                          value={sort}
+                          onValueChange={(v: any) => setSort(v)}
                         >
-                          {sort === 'alphabetical' ? (
-                            <IconCheck size="tiny" />
-                          ) : (
-                            <div className="w-[14px] h-[14px]" />
-                          )}
-                          <p className="text-scale-1200 text-sm">Alphabetical</p>
-                        </DropdownMenuItem_Shadcn_>
-                        ,
-                        <DropdownMenuItem_Shadcn_
-                          key="grouped-alphabetical"
-                          onClick={() => {
-                            setSort('grouped-alphabetical')
-                          }}
-                        >
-                          {sort === 'grouped-alphabetical' ? (
-                            <IconCheck size="tiny" />
-                          ) : (
-                            <div className="w-[14px] h-[14px]" />
-                          )}
-                          <p className="text-scale-1200 text-sm">Entity Type</p>
-                        </DropdownMenuItem_Shadcn_>
+                          <DropdownMenuRadioItem_Shadcn_ key="alphabetical" value="alphabetical">
+                            <p className="text-scale-1200 text-sm">Alphabetical</p>
+                          </DropdownMenuRadioItem_Shadcn_>
+                          <DropdownMenuRadioItem_Shadcn_
+                            key="grouped-alphabetical"
+                            value="grouped-alphabetical"
+                          >
+                            <p className="text-scale-1200 text-sm">Entity Type</p>
+                          </DropdownMenuRadioItem_Shadcn_>
+                        </DropdownMenuRadioGroup_Shadcn_>
                       </DropdownMenuContent_Shadcn_>
                     </DropdownMenu_Shadcn_>
 
