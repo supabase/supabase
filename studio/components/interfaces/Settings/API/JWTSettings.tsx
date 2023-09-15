@@ -9,7 +9,11 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import {
   Alert,
   Button,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconAlertCircle,
   IconChevronDown,
   IconEye,
@@ -162,31 +166,26 @@ const JWTSettings = () => {
                               </Tooltip.Portal>
                             </Tooltip.Root>
                           ) : (
-                            <Dropdown
-                              align="end"
-                              side="bottom"
-                              overlay={
-                                <>
-                                  <Dropdown.Item
-                                    onClick={() => setIsGeneratingKey(true)}
-                                    icon={<IconRefreshCw size={16} />}
-                                  >
+                            <DropdownMenu_Shadcn_>
+                              <DropdownMenuTrigger_Shadcn_>
+                                <Button asChild type="default" iconRight={<IconChevronDown />}>
+                                  <span>Generate a new secret</span>
+                                </Button>
+                              </DropdownMenuTrigger_Shadcn_>
+                              <DropdownMenuContent_Shadcn_ align="end" side="bottom">
+                                <DropdownMenuItem_Shadcn_ onClick={() => setIsGeneratingKey(true)}>
+                                  <IconRefreshCw size={16} />
+                                  <p className="text-scale-1200 text-sm">
                                     Generate a random secret
-                                  </Dropdown.Item>
-                                  <Dropdown.Separator />
-                                  <Dropdown.Item
-                                    onClick={() => setIsCreatingKey(true)}
-                                    icon={<IconPenTool size={16} />}
-                                  >
-                                    Create my own secret
-                                  </Dropdown.Item>
-                                </>
-                              }
-                            >
-                              <Button asChild type="default" iconRight={<IconChevronDown />}>
-                                <span>Generate a new secret</span>
-                              </Button>
-                            </Dropdown>
+                                  </p>
+                                </DropdownMenuItem_Shadcn_>
+                                <DropdownMenuSeparator_Shadcn_ />
+                                <DropdownMenuItem_Shadcn_ onClick={() => setIsCreatingKey(true)}>
+                                  <IconPenTool size={16} />
+                                  <p className="text-scale-1200 text-sm">Create my own secret</p>
+                                </DropdownMenuItem_Shadcn_>
+                              </DropdownMenuContent_Shadcn_>
+                            </DropdownMenu_Shadcn_>
                           )}
                         </div>
                       </div>

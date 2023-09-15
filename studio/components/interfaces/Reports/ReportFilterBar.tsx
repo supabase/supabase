@@ -1,7 +1,11 @@
 import { ComponentProps, useState } from 'react'
 import {
   Button,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconBox,
   IconChevronDown,
   IconCode,
@@ -147,54 +151,49 @@ const ReportFilterBar = ({
           from={datepickerFrom}
           helpers={datepickerHelpers}
         />
-        <Dropdown
-          size="small"
-          side="bottom"
-          align="start"
-          overlay={
-            <>
-              <Dropdown.Item onClick={() => handleProductFilterChange(null)}>
-                All Requests
-              </Dropdown.Item>
-              <Dropdown.Separator />
-
-              {PRODUCT_FILTERS.map((productFilter) => {
-                const Icon = productFilter.icon
-                return (
-                  <Dropdown.Item
-                    key={productFilter.key}
-                    disabled={productFilter.key === currentProductFilter?.key}
-                    onClick={() => handleProductFilterChange(productFilter)}
-                    icon={<Icon size={20} className="mr-2" />}
+        <DropdownMenu_Shadcn_>
+          <DropdownMenuTrigger_Shadcn_>
+            <Button
+              asChild
+              type="default"
+              className="inline-flex flex-row gap-2"
+              iconRight={<IconChevronDown size={14} />}
+            >
+              <span>
+                {currentProductFilter === null ? 'All Requests' : currentProductFilter.label}
+              </span>
+            </Button>
+          </DropdownMenuTrigger_Shadcn_>
+          <DropdownMenuContent_Shadcn_ size="small" side="bottom" align="start">
+            <DropdownMenuItem_Shadcn_ onClick={() => handleProductFilterChange(null)}>
+              <p className="text-scale-1200 text-sm">All Requests</p>
+            </DropdownMenuItem_Shadcn_>
+            <DropdownMenuSeparator_Shadcn_ />
+            {PRODUCT_FILTERS.map((productFilter) => {
+              const Icon = productFilter.icon
+              return (
+                <DropdownMenuItem_Shadcn_
+                  key={productFilter.key}
+                  disabled={productFilter.key === currentProductFilter?.key}
+                  onClick={() => handleProductFilterChange(productFilter)}
+                >
+                  <Icon size={20} className="mr-2" />
+                  <p
+                    className={[
+                      productFilter.key === currentProductFilter?.key ? 'font-bold' : '',
+                      'inline-block',
+                    ].join(' ')}
                   >
-                    <p
-                      className={[
-                        productFilter.key === currentProductFilter?.key ? 'font-bold' : '',
-                        'inline-block',
-                      ].join(' ')}
-                    >
-                      {productFilter.label}
-                    </p>
-                    <p className=" text-left text-scale-1000 inline-block w-[180px]">
-                      {productFilter.description}
-                    </p>
-                  </Dropdown.Item>
-                )
-              })}
-            </>
-          }
-        >
-          <Button
-            asChild
-            type="default"
-            className="inline-flex flex-row gap-2"
-            iconRight={<IconChevronDown size={14} />}
-          >
-            <span>
-              {currentProductFilter === null ? 'All Requests' : currentProductFilter.label}
-            </span>
-          </Button>
-        </Dropdown>
+                    {productFilter.label}
+                  </p>
+                  <p className=" text-left text-scale-1000 inline-block w-[180px]">
+                    {productFilter.description}
+                  </p>
+                </DropdownMenuItem_Shadcn_>
+              )
+            })}
+          </DropdownMenuContent_Shadcn_>
+        </DropdownMenu_Shadcn_>
         {filters
           .filter(
             (filter) =>

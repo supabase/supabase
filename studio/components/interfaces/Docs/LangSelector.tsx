@@ -1,6 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useCheckPermissions } from 'hooks'
-import { Button, Dropdown, IconKey } from 'ui'
+import {
+  Button,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconKey,
+} from 'ui'
 
 import { showApiKey } from 'components/interfaces/Docs/Docs.types'
 
@@ -59,17 +66,21 @@ const LangSelector = ({
               <IconKey size={12} strokeWidth={1.5} />
               <span>Project API key :</span>
             </div>
-            <Dropdown
-              align="end"
-              side="bottom"
-              className="cursor-pointer border-none bg-transparent p-0 pl-2 pr-8 text-sm text-scale-900"
-              overlay={
+            <DropdownMenu_Shadcn_>
+              <DropdownMenuTrigger_Shadcn_>
+                <Button type="default">{showApiKey.name}</Button>
+              </DropdownMenuTrigger_Shadcn_>
+              <DropdownMenuContent_Shadcn_
+                align="end"
+                side="bottom"
+                className="cursor-pointer border-none bg-transparent p-0 pl-2 pr-8 text-sm text-scale-900"
+              >
                 <>
-                  <Dropdown.Item key="hide" onClick={() => setShowApiKey(DEFAULT_KEY)}>
+                  <DropdownMenuItem_Shadcn_ key="hide" onClick={() => setShowApiKey(DEFAULT_KEY)}>
                     hide
-                  </Dropdown.Item>
+                  </DropdownMenuItem_Shadcn_>
                   {apiKey && (
-                    <Dropdown.Item
+                    <DropdownMenuItem_Shadcn_
                       key="anon"
                       onClick={() =>
                         setShowApiKey({
@@ -78,11 +89,11 @@ const LangSelector = ({
                         })
                       }
                     >
-                      anon (public)
-                    </Dropdown.Item>
+                      <p className="text-scale-1200 text-sm">anon (public)</p>
+                    </DropdownMenuItem_Shadcn_>
                   )}
                   {canReadServiceKey && (
-                    <Dropdown.Item
+                    <DropdownMenuItem_Shadcn_
                       key="service"
                       onClick={() =>
                         setShowApiKey({
@@ -91,14 +102,12 @@ const LangSelector = ({
                         })
                       }
                     >
-                      service_role (secret)
-                    </Dropdown.Item>
+                      <p className="text-scale-1200 text-sm">service_role (secret)</p>
+                    </DropdownMenuItem_Shadcn_>
                   )}
                 </>
-              }
-            >
-              <Button type="default">{showApiKey.name}</Button>
-            </Dropdown>
+              </DropdownMenuContent_Shadcn_>
+            </DropdownMenu_Shadcn_>
           </div>
         )}
       </div>

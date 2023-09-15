@@ -2,7 +2,19 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { noop } from 'lodash'
 import Link from 'next/link'
-import { Badge, Button, Dropdown, IconChevronDown, IconEdit2, IconLoader, IconTrash } from 'ui'
+import {
+  Badge,
+  Button,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconChevronDown,
+  IconEdit2,
+  IconLoader,
+  IconTrash,
+} from 'ui'
 
 import { Bucket } from 'data/storage/buckets-query'
 import { useCheckPermissions } from 'hooks'
@@ -50,36 +62,36 @@ const BucketRow = ({
         {false ? (
           <IconLoader className="animate-spin" size={16} strokeWidth={2} />
         ) : canUpdateBuckets && isSelected ? (
-          <Dropdown
-            side="bottom"
-            align="start"
-            overlay={[
-              <Dropdown.Item
+          <DropdownMenu_Shadcn_>
+            <DropdownMenuTrigger_Shadcn_>
+              <Button
+                asChild
+                type="text"
+                icon={<IconChevronDown size="tiny" strokeWidth={2} className="text-scale-1100" />}
+                style={{ padding: '3px' }}
+              >
+                <span></span>
+              </Button>
+            </DropdownMenuTrigger_Shadcn_>
+            <DropdownMenuContent_Shadcn_ side="bottom" align="start">
+              <DropdownMenuItem_Shadcn_
                 key="toggle-private"
-                icon={<IconEdit2 size="tiny" />}
                 onClick={() => onSelectEditBucket(bucket)}
               >
-                Edit bucket
-              </Dropdown.Item>,
-              <Dropdown.Separator key="bucket-separator" />,
-              <Dropdown.Item
+                <IconEdit2 size="tiny" />
+                <p className="text-scale-1200 text-sm">Edit bucket</p>
+              </DropdownMenuItem_Shadcn_>
+              ,
+              <DropdownMenuSeparator_Shadcn_ key="bucket-separator" />,
+              <DropdownMenuItem_Shadcn_
                 key="delete-bucket"
-                icon={<IconTrash size="tiny" />}
                 onClick={() => onSelectDeleteBucket(bucket)}
               >
-                Delete bucket
-              </Dropdown.Item>,
-            ]}
-          >
-            <Button
-              asChild
-              type="text"
-              icon={<IconChevronDown size="tiny" strokeWidth={2} className="text-scale-1100" />}
-              style={{ padding: '3px' }}
-            >
-              <span></span>
-            </Button>
-          </Dropdown>
+                <IconTrash size="tiny" />
+                <p className="text-scale-1200 text-sm">Delete bucket</p>
+              </DropdownMenuItem_Shadcn_>
+            </DropdownMenuContent_Shadcn_>
+          </DropdownMenu_Shadcn_>
         ) : (
           <div className="w-5" />
         )}

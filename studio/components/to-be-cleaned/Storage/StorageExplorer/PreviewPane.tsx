@@ -1,25 +1,28 @@
-import { isEmpty } from 'lodash'
-import {
-  Button,
-  Dropdown,
-  IconX,
-  IconLoader,
-  IconClipboard,
-  IconDownload,
-  IconTrash2,
-  IconAlertCircle,
-  IconChevronDown,
-} from 'ui'
-import SVG from 'react-inlinesvg'
-import { formatBytes } from 'lib/helpers'
-import { BASE_PATH } from 'lib/constants'
 import { Transition } from '@headlessui/react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { BASE_PATH } from 'lib/constants'
+import { formatBytes } from 'lib/helpers'
+import { isEmpty } from 'lodash'
+import SVG from 'react-inlinesvg'
+import {
+  Button,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconAlertCircle,
+  IconChevronDown,
+  IconClipboard,
+  IconDownload,
+  IconLoader,
+  IconTrash2,
+  IconX,
+} from 'ui'
 
 import { useCheckPermissions } from 'hooks'
-import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { URL_EXPIRY_DURATION } from '../Storage.constants'
 
 const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: string }) => {
   if (!mimeType || !previewUrl) {
@@ -204,11 +207,19 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                   Get URL
                 </Button>
               ) : (
-                <Dropdown
-                  side="bottom"
-                  align="center"
-                  overlay={[
-                    <Dropdown.Item
+                <DropdownMenu_Shadcn_>
+                  <DropdownMenuTrigger_Shadcn_>
+                    <Button
+                      type="outline"
+                      icon={<IconClipboard size={16} strokeWidth={2} />}
+                      iconRight={<IconChevronDown />}
+                      disabled={file.isCorrupted}
+                    >
+                      Get URL
+                    </Button>
+                  </DropdownMenuTrigger_Shadcn_>
+                  <DropdownMenuContent_Shadcn_ side="bottom" align="center">
+                    <DropdownMenuItem_Shadcn_
                       key="expires-one-week"
                       className="text-xs"
                       onClick={async () =>
@@ -216,8 +227,8 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                       }
                     >
                       Expire in 1 week
-                    </Dropdown.Item>,
-                    <Dropdown.Item
+                    </DropdownMenuItem_Shadcn_>
+                    <DropdownMenuItem_Shadcn_
                       key="expires-one-month"
                       className="text-xs"
                       onClick={async () =>
@@ -225,8 +236,8 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                       }
                     >
                       Expire in 1 month
-                    </Dropdown.Item>,
-                    <Dropdown.Item
+                    </DropdownMenuItem_Shadcn_>
+                    <DropdownMenuItem_Shadcn_
                       key="expires-one-year"
                       className="text-xs"
                       onClick={async () =>
@@ -234,25 +245,16 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                       }
                     >
                       Expire in 1 year
-                    </Dropdown.Item>,
-                    <Dropdown.Item
+                    </DropdownMenuItem_Shadcn_>
+                    <DropdownMenuItem_Shadcn_
                       key="custom-expiry"
                       className="text-xs"
                       onClick={() => setSelectedFileCustomExpiry(file)}
                     >
                       Custom expiry
-                    </Dropdown.Item>,
-                  ]}
-                >
-                  <Button
-                    type="outline"
-                    icon={<IconClipboard size={16} strokeWidth={2} />}
-                    iconRight={<IconChevronDown />}
-                    disabled={file.isCorrupted}
-                  >
-                    Get URL
-                  </Button>
-                </Dropdown>
+                    </DropdownMenuItem_Shadcn_>
+                  </DropdownMenuContent_Shadcn_>
+                </DropdownMenu_Shadcn_>
               )}
             </div>
             <Tooltip.Root delayDuration={0}>

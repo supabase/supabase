@@ -1,7 +1,15 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ParsedUrlQuery } from 'querystring'
-import { Button, Dropdown, IconPlus, Popover } from 'ui'
+import {
+  Button,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconPlus,
+  Popover,
+} from 'ui'
 
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -60,13 +68,13 @@ const ProjectLink = ({
   return (
     <Link passHref href={href}>
       <a className="block">
-        <Dropdown.Item
+        <DropdownMenuItem_Shadcn_
           className={
             selectedProject?.name === project.name ? 'font-bold bg-slate-400 dark:bg-slate-500' : ''
           }
         >
           {project.name}
-        </Dropdown.Item>
+        </DropdownMenuItem_Shadcn_>
       </a>
     </Link>
   )
@@ -84,31 +92,31 @@ const ProjectDropdown = () => {
   }
 
   return IS_PLATFORM ? (
-    <Dropdown
-      side="bottom"
-      align="start"
-      overlay={
-        <>
-          {allProjects
-            ?.filter((x) => x.status !== PROJECT_STATUS.INACTIVE)
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((x) => {
-              const org = allOrganizations?.find((org) => org.id === x.organization_id)
-              return <ProjectLink key={x.ref} project={x} organization={org} />
-            })}
-          <Popover.Separator />
-          <Link href={`/new/${selectedOrganizationSlug}`}>
-            <a className="block">
-              <Dropdown.Item icon={<IconPlus size="tiny" />}>New project</Dropdown.Item>
-            </a>
-          </Link>
-        </>
-      }
-    >
-      <Button type="text">
-        <span className="text-sm">{selectedProject?.name}</span>
-      </Button>
-    </Dropdown>
+    <DropdownMenu_Shadcn_>
+      <DropdownMenuTrigger_Shadcn_>
+        <Button type="text">
+          <span className="text-sm">{selectedProject?.name}</span>
+        </Button>
+      </DropdownMenuTrigger_Shadcn_>
+      <DropdownMenuContent_Shadcn_ side="bottom" align="start">
+        {allProjects
+          ?.filter((x) => x.status !== PROJECT_STATUS.INACTIVE)
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((x) => {
+            const org = allOrganizations?.find((org) => org.id === x.organization_id)
+            return <ProjectLink key={x.ref} project={x} organization={org} />
+          })}
+        <Popover.Separator />
+        <Link href={`/new/${selectedOrganizationSlug}`}>
+          <a className="block">
+            <DropdownMenuItem_Shadcn_>
+              <IconPlus size="tiny" />
+              <p className="text-scale-1200 text-sm">New project</p>
+            </DropdownMenuItem_Shadcn_>
+          </a>
+        </Link>
+      </DropdownMenuContent_Shadcn_>
+    </DropdownMenu_Shadcn_>
   ) : (
     <Button type="text">
       <span className="text-xs">{selectedProject?.name}</span>

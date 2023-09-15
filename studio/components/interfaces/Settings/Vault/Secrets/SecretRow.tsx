@@ -6,7 +6,10 @@ import Link from 'next/link'
 import { useState } from 'react'
 import {
   Button,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconEdit3,
   IconEye,
   IconEyeOff,
@@ -107,20 +110,23 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           {secret.updated_at === secret.created_at ? 'Added' : 'Updated'} on{' '}
           {dayjs(secret.updated_at).format('MMM D, YYYY')}
         </p>
-        <Dropdown
-          side="bottom"
-          className="w-[120px]"
-          overlay={
+        <DropdownMenu_Shadcn_>
+          <DropdownMenuTrigger_Shadcn_>
+            <Button asChild type="text" className="px-1" icon={<IconMoreVertical />}>
+              <span></span>
+            </Button>
+          </DropdownMenuTrigger_Shadcn_>
+          <DropdownMenuContent_Shadcn_ side="bottom" className="w-[120px]">
             <>
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <Dropdown.Item
-                    icon={<IconEdit3 size="tiny" />}
+                  <DropdownMenuItem_Shadcn_
                     disabled={!canManageSecrets}
                     onClick={() => onSelectEdit(secret)}
                   >
-                    Edit
-                  </Dropdown.Item>
+                    <IconEdit3 size="tiny" />
+                    <p className="text-scale-1200 text-sm"> Edit</p>
+                  </DropdownMenuItem_Shadcn_>
                 </Tooltip.Trigger>
                 {!canManageSecrets && (
                   <Tooltip.Portal>
@@ -142,13 +148,13 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
               </Tooltip.Root>
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <Dropdown.Item
+                  <DropdownMenuItem_Shadcn_
                     disabled={!canManageSecrets}
-                    icon={<IconTrash stroke="red" size="tiny" />}
                     onClick={() => onSelectRemove(secret)}
                   >
-                    Delete
-                  </Dropdown.Item>
+                    <IconTrash stroke="red" size="tiny" />
+                    <p className="text-scale-1200 text-sm">Delete</p>
+                  </DropdownMenuItem_Shadcn_>
                 </Tooltip.Trigger>
                 {!canManageSecrets && (
                   <Tooltip.Portal>
@@ -169,12 +175,8 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                 )}
               </Tooltip.Root>
             </>
-          }
-        >
-          <Button asChild type="text" className="px-1" icon={<IconMoreVertical />}>
-            <span></span>
-          </Button>
-        </Dropdown>
+          </DropdownMenuContent_Shadcn_>
+        </DropdownMenu_Shadcn_>
       </div>
     </div>
   )

@@ -13,7 +13,10 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Alert,
   Button,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconCheck,
   IconChevronsDown,
   IconEdit,
@@ -270,65 +273,64 @@ const TableEditorMenu = () => {
                   </div>
 
                   <div className="flex gap-3 items-center">
-                    <Dropdown
-                      size="small"
-                      side="bottom"
-                      align="start"
-                      style={{ zIndex: 1 }}
-                      overlay={[
-                        <Dropdown.Item
+                    <DropdownMenu_Shadcn_>
+                      <DropdownMenuTrigger_Shadcn_>
+                        <Tooltip.Root delayDuration={0}>
+                          <Tooltip.Trigger asChild>
+                            <div className="text-scale-900 transition-colors hover:text-scale-1200">
+                              <IconChevronsDown size={18} strokeWidth={1} />
+                            </div>
+                          </Tooltip.Trigger>
+                          <Tooltip.Portal>
+                            <Tooltip.Content side="bottom">
+                              <Tooltip.Arrow className="radix-tooltip-arrow" />
+                              <div
+                                className={[
+                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                  'border border-scale-200',
+                                ].join(' ')}
+                              >
+                                <span className="text-xs">Sort By</span>
+                              </div>
+                            </Tooltip.Content>
+                          </Tooltip.Portal>
+                        </Tooltip.Root>
+                      </DropdownMenuTrigger_Shadcn_>
+                      <DropdownMenuContent_Shadcn_
+                        size="small"
+                        side="bottom"
+                        align="start"
+                        style={{ zIndex: 1 }}
+                      >
+                        <DropdownMenuItem_Shadcn_
                           key="alphabetical"
-                          icon={
-                            sort === 'alphabetical' ? (
-                              <IconCheck size="tiny" />
-                            ) : (
-                              <div className="w-[14px] h-[14px]" />
-                            )
-                          }
                           onClick={() => {
                             setSort('alphabetical')
                           }}
                         >
-                          Alphabetical
-                        </Dropdown.Item>,
-                        <Dropdown.Item
+                          {sort === 'alphabetical' ? (
+                            <IconCheck size="tiny" />
+                          ) : (
+                            <div className="w-[14px] h-[14px]" />
+                          )}
+                          <p className="text-scale-1200 text-sm">Alphabetical</p>
+                        </DropdownMenuItem_Shadcn_>
+                        ,
+                        <DropdownMenuItem_Shadcn_
                           key="grouped-alphabetical"
-                          icon={
-                            sort === 'grouped-alphabetical' ? (
-                              <IconCheck size="tiny" />
-                            ) : (
-                              <div className="w-[14px] h-[14px]" />
-                            )
-                          }
                           onClick={() => {
                             setSort('grouped-alphabetical')
                           }}
                         >
-                          Entity Type
-                        </Dropdown.Item>,
-                      ]}
-                    >
-                      <Tooltip.Root delayDuration={0}>
-                        <Tooltip.Trigger asChild>
-                          <div className="text-scale-900 transition-colors hover:text-scale-1200">
-                            <IconChevronsDown size={18} strokeWidth={1} />
-                          </div>
-                        </Tooltip.Trigger>
-                        <Tooltip.Portal>
-                          <Tooltip.Content side="bottom">
-                            <Tooltip.Arrow className="radix-tooltip-arrow" />
-                            <div
-                              className={[
-                                'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                'border border-scale-200',
-                              ].join(' ')}
-                            >
-                              <span className="text-xs">Sort By</span>
-                            </div>
-                          </Tooltip.Content>
-                        </Tooltip.Portal>
-                      </Tooltip.Root>
-                    </Dropdown>
+                          {sort === 'grouped-alphabetical' ? (
+                            <IconCheck size="tiny" />
+                          ) : (
+                            <div className="w-[14px] h-[14px]" />
+                          )}
+                          <p className="text-scale-1200 text-sm">Entity Type</p>
+                        </DropdownMenuItem_Shadcn_>
+                      </DropdownMenuContent_Shadcn_>
+                    </DropdownMenu_Shadcn_>
 
                     <button
                       className="cursor-pointer text-scale-900 transition-colors hover:text-scale-1200"

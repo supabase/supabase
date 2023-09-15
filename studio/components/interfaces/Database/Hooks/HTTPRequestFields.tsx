@@ -9,7 +9,11 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { uuidv4 } from 'lib/helpers'
 import {
   Button,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconChevronDown,
   IconPlus,
   IconTrash,
@@ -165,11 +169,16 @@ const HTTPRequestFields = ({
                 Add a new header
               </Button>
               {type === 'supabase_function' && (
-                <Dropdown
-                  align="end"
-                  side="bottom"
-                  overlay={[
-                    <Dropdown.Item
+                <DropdownMenu_Shadcn_>
+                  <DropdownMenuTrigger_Shadcn_>
+                    <Button
+                      type="default"
+                      className="rounded-l-none px-[4px] py-[5px]"
+                      icon={<IconChevronDown />}
+                    />
+                  </DropdownMenuTrigger_Shadcn_>
+                  <DropdownMenuContent_Shadcn_ align="end" side="bottom">
+                    <DropdownMenuItem_Shadcn_
                       key="add-auth-header"
                       onClick={() =>
                         onAddHeader({
@@ -185,9 +194,10 @@ const HTTPRequestFields = ({
                           Required if your edge function enforces JWT verification
                         </p>
                       </div>
-                    </Dropdown.Item>,
-                    <Dropdown.Separator key="separator" />,
-                    <Dropdown.Item
+                    </DropdownMenuItem_Shadcn_>
+                    ,
+                    <DropdownMenuSeparator_Shadcn_ key="separator" />,
+                    <DropdownMenuItem_Shadcn_
                       key="add-source-header"
                       onClick={() =>
                         onAddHeader({
@@ -203,15 +213,9 @@ const HTTPRequestFields = ({
                           Useful to verify that the edge function was triggered from this webhook
                         </p>
                       </div>
-                    </Dropdown.Item>,
-                  ]}
-                >
-                  <Button
-                    type="default"
-                    className="rounded-l-none px-[4px] py-[5px]"
-                    icon={<IconChevronDown />}
-                  />
-                </Dropdown>
+                    </DropdownMenuItem_Shadcn_>
+                  </DropdownMenuContent_Shadcn_>
+                </DropdownMenu_Shadcn_>
               )}
             </div>
           </div>

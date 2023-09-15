@@ -9,7 +9,14 @@ import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import {
   Button,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuLabel_Shadcn_,
+  DropdownMenuRadioGroup_Shadcn_,
+  DropdownMenuRadioItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconCommand,
   IconHome,
   IconSearch,
@@ -131,44 +138,39 @@ const NavigationBar = () => {
               </Tooltip.Portal>
             </Tooltip.Root>
           )}
-          <Dropdown
-            side="right"
-            align="start"
-            overlay={
-              <>
-                {IS_PLATFORM && (
-                  <>
-                    <Link href="/account/me">
-                      <Dropdown.Item
-                        key="header"
-                        icon={<IconSettings size={14} strokeWidth={1.5} />}
-                      >
-                        Account Preferences
-                      </Dropdown.Item>
-                    </Link>
-                    <Dropdown.Separator />
-                  </>
-                )}
-                <Dropdown.Label>Theme</Dropdown.Label>
-                <Dropdown.RadioGroup
-                  key="theme"
-                  value={isDarkMode ? 'dark' : 'light'}
-                  onChange={(e: any) => toggleTheme(e === 'dark')}
-                >
-                  {/* [Joshen] Removing system default for now, needs to be supported in useTheme from common packages */}
-                  {/* <Dropdown.Radio value="system">System default</Dropdown.Radio> */}
-                  <Dropdown.Radio value="dark">Dark</Dropdown.Radio>
-                  <Dropdown.Radio value="light">Light</Dropdown.Radio>
-                </Dropdown.RadioGroup>
-              </>
-            }
-          >
-            <Button asChild type="text" size="tiny">
-              <span className="py-1 h-10 border-none">
-                <IconUser size={18} strokeWidth={2} className="text-scale-900" />
-              </span>
-            </Button>
-          </Dropdown>
+          <DropdownMenu_Shadcn_>
+            <DropdownMenuTrigger_Shadcn_>
+              <Button asChild type="text" size="tiny">
+                <span className="py-1 h-10 border-none">
+                  <IconUser size={18} strokeWidth={2} className="text-scale-900" />
+                </span>
+              </Button>
+            </DropdownMenuTrigger_Shadcn_>
+            <DropdownMenuContent_Shadcn_ side="right" align="start">
+              {IS_PLATFORM && (
+                <>
+                  <Link href="/account/me">
+                    <DropdownMenuItem_Shadcn_ key="header">
+                      <IconSettings size={14} strokeWidth={1.5} />
+                      <p className="text-scale-1200 text-sm">Account Preferences</p>
+                    </DropdownMenuItem_Shadcn_>
+                  </Link>
+                  <DropdownMenuSeparator_Shadcn_ />
+                </>
+              )}
+              <DropdownMenuLabel_Shadcn_>Theme</DropdownMenuLabel_Shadcn_>
+              <DropdownMenuRadioGroup_Shadcn_
+                key="theme"
+                value={isDarkMode ? 'dark' : 'light'}
+                onChange={(e: any) => toggleTheme(e === 'dark')}
+              >
+                {/* [Joshen] Removing system default for now, needs to be supported in useTheme from common packages */}
+                {/* <DropdownMenuRadioItem_Shadcn_ value="system">System default</DropdownMenuRadioItem_Shadcn_> */}
+                <DropdownMenuRadioItem_Shadcn_ value="dark">Dark</DropdownMenuRadioItem_Shadcn_>
+                <DropdownMenuRadioItem_Shadcn_ value="light">Light</DropdownMenuRadioItem_Shadcn_>
+              </DropdownMenuRadioGroup_Shadcn_>
+            </DropdownMenuContent_Shadcn_>
+          </DropdownMenu_Shadcn_>
         </ul>
       )}
     </div>

@@ -3,13 +3,19 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { noop } from 'lodash'
 import Link from 'next/link'
-import { PropsWithChildren, forwardRef, useState } from 'react'
+import { forwardRef, PropsWithChildren, useState } from 'react'
+
+import { Markdown } from 'components/interfaces/Markdown'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { Branch } from 'data/branches/branches-query'
+import { GitHubPullRequest } from 'data/integrations/integrations-github-pull-requests-query'
 import {
   Badge,
   Button,
-  Dropdown,
+  cn,
   DropdownMenuContent_Shadcn_,
   DropdownMenuItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
   DropdownMenuTrigger_Shadcn_,
   DropdownMenu_Shadcn_,
   IconExternalLink,
@@ -18,13 +24,7 @@ import {
   IconMoreVertical,
   IconShield,
   IconTrash,
-  cn,
 } from 'ui'
-
-import { Markdown } from 'components/interfaces/Markdown'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { Branch } from 'data/branches/branches-query'
-import { GitHubPullRequest } from 'data/integrations/integrations-github-pull-requests-query'
 
 interface BranchPanelProps {
   repo?: string
@@ -102,7 +102,7 @@ const MainBranchPanel = ({
                       <a>Change production branch</a>
                     </DropdownMenuItem_Shadcn_>
                   </Link>
-                  <Dropdown.Separator />
+                  <DropdownMenuSeparator_Shadcn_ />
                   <DropdownMenuItem_Shadcn_
                     className="flex gap-2"
                     onSelect={() => onSelectDisableBranching()}

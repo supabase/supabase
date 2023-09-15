@@ -1,6 +1,6 @@
-import { Badge, Button, IconArchive, Dropdown, IconEdit, IconTrash, IconMoreVertical } from 'ui'
-import { isEmpty } from 'lodash'
 import Panel from 'components/ui/Panel'
+import { isEmpty } from 'lodash'
+import { Badge, Button, IconArchive, IconEdit, IconMoreVertical, IconTrash } from 'ui'
 
 const PolicyRow = ({
   policy,
@@ -19,28 +19,28 @@ const PolicyRow = ({
             <span className="truncate text-sm text-scale-1200">{name}</span>
           </div>
         </div>
-        <Dropdown
+        <DropdownMenu_Shadcn_
           side="bottom"
           align="end"
           size="small"
           overlay={
             <>
-              <Dropdown.Item
+              <DropdownMenuItem_Shadcn_
                 icon={<IconEdit size={14} />}
                 type="outline"
                 className="mx-2"
                 onClick={() => onSelectPolicyEdit(policy, bucketName, table)}
               >
                 Edit
-              </Dropdown.Item>
-              <Dropdown.Separator />
-              <Dropdown.Item
+              </DropdownMenuItem_Shadcn_>
+              <DropdownMenuSeparator_Shadcn_ />
+              <DropdownMenuItem_Shadcn_
                 icon={<IconTrash size={14} />}
                 type="outline"
                 onClick={() => onSelectPolicyDelete(policy)}
               >
                 Delete
-              </Dropdown.Item>
+              </DropdownMenuItem_Shadcn_>
             </>
           }
         >
@@ -49,7 +49,7 @@ const PolicyRow = ({
             style={{ paddingLeft: 4, paddingRight: 4 }}
             icon={<IconMoreVertical />}
           />
-        </Dropdown>
+        </DropdownMenu_Shadcn_>
       </Panel.Content>
     </div>
   )

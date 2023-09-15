@@ -4,7 +4,15 @@ import { observer } from 'mobx-react-lite'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Fragment } from 'react'
-import { Button, Dropdown, IconPlus } from 'ui'
+import {
+  Button,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconPlus,
+} from 'ui'
 
 import { useParams } from 'common/hooks'
 import { useCheckPermissions } from 'hooks'
@@ -47,43 +55,33 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
   }
 
   return (
-    <Dropdown
-      side="bottom"
-      align={align}
-      size="small"
-      overlay={
-        <>
-          {WRAPPERS.map((wrapper, idx) => (
-            <Fragment key={idx}>
-              <Link
-                href={`/project/${ref}/database/wrappers/new?type=${wrapper.name.toLowerCase()}`}
-              >
-                <a>
-                  <Dropdown.Item
-                    key={wrapper.name}
-                    icon={
-                      <Image
-                        src={wrapper.icon}
-                        width={20}
-                        height={20}
-                        alt={`${wrapper.name} wrapper icon`}
-                      />
-                    }
-                  >
-                    {wrapper.label}
-                  </Dropdown.Item>
-                </a>
-              </Link>
-              {idx !== WRAPPERS.length - 1 && <Dropdown.Separator />}
-            </Fragment>
-          ))}
-        </>
-      }
-    >
-      <Button type="primary" icon={<IconPlus strokeWidth={1.5} />}>
-        {buttonText}
-      </Button>
-    </Dropdown>
+    <DropdownMenu_Shadcn_>
+      <DropdownMenuTrigger_Shadcn_>
+        <Button type="primary" icon={<IconPlus strokeWidth={1.5} />}>
+          {buttonText}
+        </Button>
+      </DropdownMenuTrigger_Shadcn_>
+      <DropdownMenuContent_Shadcn_ side="bottom" align={align} size="small">
+        {WRAPPERS.map((wrapper, idx) => (
+          <Fragment key={idx}>
+            <Link href={`/project/${ref}/database/wrappers/new?type=${wrapper.name.toLowerCase()}`}>
+              <a>
+                <DropdownMenuItem_Shadcn_ key={wrapper.name}>
+                  <Image
+                    src={wrapper.icon}
+                    width={20}
+                    height={20}
+                    alt={`${wrapper.name} wrapper icon`}
+                  />
+                  <p className="text-scale-1200 text-sm">{wrapper.label}</p>
+                </DropdownMenuItem_Shadcn_>
+              </a>
+            </Link>
+            {idx !== WRAPPERS.length - 1 && <DropdownMenuSeparator_Shadcn_ />}
+          </Fragment>
+        ))}
+      </DropdownMenuContent_Shadcn_>
+    </DropdownMenu_Shadcn_>
   )
 }
 

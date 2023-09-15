@@ -1,12 +1,24 @@
-import clsx from 'clsx'
-import SVG from 'react-inlinesvg'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import clsx from 'clsx'
+import Link from 'next/link'
+import SVG from 'react-inlinesvg'
+
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-type-query'
-import Link from 'next/link'
-import { Dropdown, IconEdit, IconCopy, IconLock, IconTrash, IconChevronDown } from 'ui'
 import { BASE_PATH } from 'lib/constants'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import {
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconChevronDown,
+  IconCopy,
+  IconEdit,
+  IconLock,
+  IconTrash,
+} from 'ui'
 
 export interface EntityListItemProps {
   id: number
@@ -116,58 +128,57 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
       </Link>
       <div className="pr-3">
         {entity.type === ENTITY_TYPE.TABLE && isActive && !isLocked && (
-          <Dropdown
-            size="small"
-            side="bottom"
-            align="start"
-            overlay={[
-              <Dropdown.Item
+          <DropdownMenu_Shadcn_>
+            <DropdownMenuTrigger_Shadcn_>
+              <div className="text-scale-900 transition-colors hover:text-scale-1200">
+                <IconChevronDown size={14} strokeWidth={2} />
+              </div>
+            </DropdownMenuTrigger_Shadcn_>
+            <DropdownMenuContent_Shadcn_ size="small" side="bottom" align="start">
+              <DropdownMenuItem_Shadcn_
                 key="edit-table"
-                icon={<IconEdit size="tiny" />}
                 onClick={(e) => {
                   e.stopPropagation()
                   snap.onEditTable()
                 }}
               >
-                Edit Table
-              </Dropdown.Item>,
-              <Dropdown.Item
+                <IconEdit size="tiny" />
+                <p className="text-scale-1200 text-sm">Edit Table</p>
+              </DropdownMenuItem_Shadcn_>
+              <DropdownMenuItem_Shadcn_
                 key="duplicate-table"
-                icon={<IconCopy size="tiny" />}
                 onClick={(e) => {
                   e.stopPropagation()
                   snap.onDuplicateTable()
                 }}
               >
-                Duplicate Table
-              </Dropdown.Item>,
+                <IconCopy size="tiny" />
+                <p className="text-scale-1200 text-sm">Duplicate Table</p>
+              </DropdownMenuItem_Shadcn_>
               <Link
                 key="view-policies"
                 href={`/project/${projectRef}/auth/policies?search=${entity.id}`}
               >
                 <a>
-                  <Dropdown.Item key="delete-table" icon={<IconLock size="tiny" />}>
-                    View Policies
-                  </Dropdown.Item>
+                  <DropdownMenuItem_Shadcn_ key="delete-table">
+                    <IconLock size="tiny" />
+                    <p className="text-scale-1200 text-sm">View Policies</p>
+                  </DropdownMenuItem_Shadcn_>
                 </a>
-              </Link>,
-              <Dropdown.Separator key="separator" />,
-              <Dropdown.Item
+              </Link>
+              <DropdownMenuSeparator_Shadcn_ key="separator" />,
+              <DropdownMenuItem_Shadcn_
                 key="delete-table"
-                icon={<IconTrash size="tiny" />}
                 onClick={(e) => {
                   e.stopPropagation()
                   snap.onDeleteTable()
                 }}
               >
-                Delete Table
-              </Dropdown.Item>,
-            ]}
-          >
-            <div className="text-scale-900 transition-colors hover:text-scale-1200">
-              <IconChevronDown size={14} strokeWidth={2} />
-            </div>
-          </Dropdown>
+                <IconTrash size="tiny" />
+                <p className="text-scale-1200 text-sm">Delete Table</p>
+              </DropdownMenuItem_Shadcn_>
+            </DropdownMenuContent_Shadcn_>
+          </DropdownMenu_Shadcn_>
         )}
       </div>
     </div>

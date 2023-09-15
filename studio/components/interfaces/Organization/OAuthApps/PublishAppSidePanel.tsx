@@ -10,8 +10,21 @@ import { useOAuthAppUpdateMutation } from 'data/oauth/oauth-app-update-mutation'
 import { OAuthApp } from 'data/oauth/oauth-apps-query'
 import { useStore } from 'hooks'
 import { isValidHttpUrl, uuidv4 } from 'lib/helpers'
-import { Badge, Button, Dropdown, Form, IconEdit, IconUpload, Input, Modal, SidePanel } from 'ui'
 import { uploadAttachment } from 'lib/upload'
+import {
+  Badge,
+  Button,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  Form,
+  IconEdit,
+  IconUpload,
+  Input,
+  Modal,
+  SidePanel,
+} from 'ui'
 import AuthorizeRequesterDetails from './AuthorizeRequesterDetails'
 
 export interface PublishAppSidePanelProps {
@@ -227,33 +240,35 @@ const PublishAppSidePanel = ({
                               }}
                             >
                               <div className="absolute bottom-1 right-1">
-                                <Dropdown
-                                  size="tiny"
-                                  align="end"
-                                  side="bottom"
-                                  overlay={[
-                                    <Dropdown.Item
+                                <DropdownMenu_Shadcn_>
+                                  <DropdownMenuTrigger_Shadcn_>
+                                    <Button type="default" icon={<IconEdit />} className="px-1" />
+                                  </DropdownMenuTrigger_Shadcn_>
+                                  <DropdownMenuContent_Shadcn_
+                                    size="tiny"
+                                    align="end"
+                                    side="bottom"
+                                  >
+                                    <DropdownMenuItem_Shadcn_
                                       key="upload"
                                       onClick={() => {
                                         if (uploadButtonRef.current)
                                           (uploadButtonRef.current as any).click()
                                       }}
                                     >
-                                      Upload image
-                                    </Dropdown.Item>,
-                                    <Dropdown.Item
+                                      <p className="text-scale-1200 text-sm">Upload image</p>
+                                    </DropdownMenuItem_Shadcn_>
+                                    <DropdownMenuItem_Shadcn_
                                       key="remove"
                                       onClick={() => {
                                         setIconFile(undefined)
                                         setIconUrl(undefined)
                                       }}
                                     >
-                                      Remove image
-                                    </Dropdown.Item>,
-                                  ]}
-                                >
-                                  <Button type="default" icon={<IconEdit />} className="px-1" />
-                                </Dropdown>
+                                      <p className="text-scale-1200 text-sm">Remove image</p>
+                                    </DropdownMenuItem_Shadcn_>
+                                  </DropdownMenuContent_Shadcn_>
+                                </DropdownMenu_Shadcn_>
                               </div>
                             </div>
                           ) : (

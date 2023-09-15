@@ -10,11 +10,14 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconAlertCircle,
   IconAlertTriangle,
   IconChevronDown,
-  IconCopy,
   IconEdit2,
   IconEye,
   IconShare,
@@ -200,44 +203,44 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
   return (
     <div className="group [div&>button[data-state='open']>span]:text-scale-900">
       {IS_PLATFORM ? (
-        <Dropdown
-          side="bottom"
-          align="end"
-          overlay={
-            <>
-              <Dropdown.Item onClick={onClickRename} icon={<IconEdit2 size="tiny" />}>
-                Rename query
-              </Dropdown.Item>
-              {sharedSnippetsFeature && visibility === 'user' && canCreateSQLSnippet && (
-                <Dropdown.Item onClick={onClickShare} icon={<IconShare size="tiny" />}>
-                  Share query
-                </Dropdown.Item>
+        <DropdownMenu_Shadcn_>
+          <DropdownMenuTrigger_Shadcn_>
+            <span
+              className={clsx(
+                'p-0.5 rounded-md',
+                isActive
+                  ? 'text-scale-1100 hover:bg-scale-800'
+                  : 'text-scale-300 dark:text-scale-200 hover:bg-scale-500 group-hover:text-scale-1100'
               )}
-              {sharedSnippetsFeature && visibility === 'project' && canCreateSQLSnippet && (
-                <Dropdown.Item onClick={createPersonalCopy} icon={<IconCopy size="tiny" />}>
-                  Create a personal copy
-                </Dropdown.Item>
-              )}
-              <>
-                <Dropdown.Separator />
-                <Dropdown.Item onClick={onClickDelete} icon={<IconTrash size="tiny" />}>
-                  Delete query
-                </Dropdown.Item>
-              </>
-            </>
-          }
-        >
-          <span
-            className={clsx(
-              'p-0.5 rounded-md',
-              isActive
-                ? 'text-scale-1100 hover:bg-scale-800'
-                : 'text-scale-300 dark:text-scale-200 hover:bg-scale-500 group-hover:text-scale-1100'
+            >
+              <IconChevronDown size="tiny" strokeWidth={2} />
+            </span>
+          </DropdownMenuTrigger_Shadcn_>
+          <DropdownMenuContent_Shadcn_ side="bottom" align="end">
+            <DropdownMenuItem_Shadcn_ onClick={onClickRename}>
+              <IconEdit2 size="tiny" />
+              <p className="text-scale-1200 text-sm">Rename query</p>
+            </DropdownMenuItem_Shadcn_>
+            {sharedSnippetsFeature && visibility === 'user' && canCreateSQLSnippet && (
+              <DropdownMenuItem_Shadcn_ onClick={onClickShare}>
+                <IconShare size="tiny" />
+                <p className="text-scale-1200 text-sm">Share query</p>
+              </DropdownMenuItem_Shadcn_>
             )}
-          >
-            <IconChevronDown size="tiny" strokeWidth={2} />
-          </span>
-        </Dropdown>
+            {sharedSnippetsFeature && visibility === 'project' && canCreateSQLSnippet && (
+              <DropdownMenuItem_Shadcn_ onClick={createPersonalCopy}>
+                <p className="text-scale-1200 text-sm">Create a personal copy</p>
+              </DropdownMenuItem_Shadcn_>
+            )}
+            <>
+              <DropdownMenuSeparator_Shadcn_ />
+              <DropdownMenuItem_Shadcn_ onClick={onClickDelete}>
+                <IconTrash size="tiny" />
+                <p className="text-scale-1200 text-sm">Delete query</p>
+              </DropdownMenuItem_Shadcn_>
+            </>
+          </DropdownMenuContent_Shadcn_>
+        </DropdownMenu_Shadcn_>
       ) : (
         <Button asChild disabled type="text" style={{ padding: '3px' }}>
           <span></span>

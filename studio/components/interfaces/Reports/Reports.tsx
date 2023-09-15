@@ -7,9 +7,15 @@ import { useEffect, useState } from 'react'
 import {
   Badge,
   Button,
-  Dropdown,
+  DropdownMenuCheckboxItem_Shadcn_,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuPortal_Shadcn_,
+  DropdownMenuSubContent_Shadcn_,
+  DropdownMenuSubTrigger_Shadcn_,
+  DropdownMenuSub_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconArrowRight,
-  IconChevronRight,
   IconHome,
   IconPlus,
   IconSave,
@@ -21,7 +27,7 @@ import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import Loading from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions } from 'hooks'
-import { METRIC_CATEGORIES, METRICS, TIME_PERIODS_REPORTS } from 'lib/constants'
+import { METRICS, METRIC_CATEGORIES, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useProjectContentStore } from 'stores/projectContentStore'
@@ -267,35 +273,29 @@ const Reports = () => {
       <>
         {Object.values(METRIC_CATEGORIES).map((cat) => {
           return (
-            <>
-              <Dropdown
-                isNested
-                overlay={
-                  <>
-                    {METRICS.filter((metric) => metric?.category?.key === cat.key).map((metric) => {
-                      return (
-                        <Dropdown.Checkbox
-                          key={metric.key}
-                          checked={config.layout?.some((x: any) => x.attribute === metric.key)}
-                          onChange={(e) => handleChartSelection({ metric, value: e })}
-                        >
-                          <div className="flex flex-col space-y-0">
-                            <span>{metric.label}</span>
-                          </div>
-                        </Dropdown.Checkbox>
-                      )
-                    })}
-                  </>
-                }
-              >
-                <Dropdown.TriggerItem icon={cat.icon ? cat.icon : <IconHome size="tiny" />}>
-                  {cat.label}
-                  <Dropdown.RightSlot>
-                    <IconChevronRight size={14} />
-                  </Dropdown.RightSlot>
-                </Dropdown.TriggerItem>
-              </Dropdown>
-            </>
+            <DropdownMenuSub_Shadcn_ key={cat.key}>
+              <DropdownMenuSubTrigger_Shadcn_>
+                {cat.icon ? cat.icon : <IconHome size="tiny" />}
+                {cat.label}
+              </DropdownMenuSubTrigger_Shadcn_>
+              <DropdownMenuPortal_Shadcn_>
+                <DropdownMenuSubContent_Shadcn_>
+                  {METRICS.filter((metric) => metric?.category?.key === cat.key).map((metric) => {
+                    return (
+                      <DropdownMenuCheckboxItem_Shadcn_
+                        key={metric.key}
+                        checked={config.layout?.some((x: any) => x.attribute === metric.key)}
+                        onChange={(e) => handleChartSelection({ metric, value: e })}
+                      >
+                        <div className="flex flex-col space-y-0">
+                          <span>{metric.label}</span>
+                        </div>
+                      </DropdownMenuCheckboxItem_Shadcn_>
+                    )
+                  })}
+                </DropdownMenuSubContent_Shadcn_>
+              </DropdownMenuPortal_Shadcn_>
+            </DropdownMenuSub_Shadcn_>
           )
         })}
       </>
@@ -349,11 +349,16 @@ const Reports = () => {
           )}
 
           {canUpdateReport ? (
-            <Dropdown side="bottom" align="end" overlay={<MetricOptions />}>
-              <Button asChild type="default" iconRight={<IconSettings />}>
-                <span>Add / Remove charts</span>
-              </Button>
-            </Dropdown>
+            <DropdownMenu_Shadcn_>
+              <DropdownMenuTrigger_Shadcn_>
+                <Button asChild type="default" iconRight={<IconSettings />}>
+                  <span>Add / Remove charts</span>
+                </Button>
+              </DropdownMenuTrigger_Shadcn_>
+              <DropdownMenuContent_Shadcn_ side="bottom" align="end">
+                <MetricOptions />
+              </DropdownMenuContent_Shadcn_>
+            </DropdownMenu_Shadcn_>
           ) : (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger asChild>
@@ -384,13 +389,18 @@ const Reports = () => {
       {config.layout.length <= 0 ? (
         <div className="flex min-h-full items-center justify-center rounded border-2 border-dashed p-16 dark:border-dark">
           {canUpdateReport ? (
-            <Dropdown side="bottom" align="center" overlay={<MetricOptions />}>
-              <Button asChild type="default" iconRight={<IconPlus />}>
-                <span>
-                  {config.layout.length <= 0 ? 'Add your first chart' : 'Add another chart'}
-                </span>
-              </Button>
-            </Dropdown>
+            <DropdownMenu_Shadcn_>
+              <DropdownMenuTrigger_Shadcn_>
+                <Button asChild type="default" iconRight={<IconPlus />}>
+                  <span>
+                    {config.layout.length <= 0 ? 'Add your first chart' : 'Add another chart'}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger_Shadcn_>
+              <DropdownMenuContent_Shadcn_ side="bottom" align="center">
+                <MetricOptions />
+              </DropdownMenuContent_Shadcn_>
+            </DropdownMenu_Shadcn_>
           ) : (
             <p className="text-sm text-scale-1000">No charts set up yet in report</p>
           )}
