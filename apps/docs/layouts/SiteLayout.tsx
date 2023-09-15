@@ -245,7 +245,7 @@ const Container = memo(function Container(props) {
         'w-full h-screen transition-all ease-out',
         // 'absolute lg:relative',
         mobileMenuOpen
-          ? '!w-auto ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden'
+          ? '!w-auto ml-[100%] sm:ml-[50%] md:ml-[33%] overflow-hidden'
           : 'overflow-auto',
         // desktop override any margin styles
         'lg:ml-0',
@@ -264,7 +264,7 @@ const NavContainer = memo(function NavContainer() {
       className={[
         // 'hidden',
         'absolute lg:relative',
-        mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0' : 'w-0 -left-[280px]',
+        mobileMenuOpen ? 'w-[100%] sm:w-[50%] md:w-[33%] left-0' : 'w-0 -left-[280px]',
         'lg:w-[420px] !lg:left-0',
         // desktop override any left styles
         'lg:left-0',
