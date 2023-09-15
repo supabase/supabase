@@ -8,7 +8,7 @@ import { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../t
 import { ColumnMenu } from '../menu'
 import { useTrackedState } from '../../store'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { getForeignKeyDeletionAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
+import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 
 export function ColumnHeader<R>({
   column,
@@ -209,7 +209,7 @@ function renderColumnIcon(
                   </div>
                   {foreignKey?.deletionAction !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
                     <p className="text-xs text-scale-1200 mt-1">
-                      On delete: {getForeignKeyDeletionAction(foreignKey?.deletionAction)}
+                      On delete: {getForeignKeyCascadeAction(foreignKey?.deletionAction)}
                     </p>
                   )}
                 </div>
