@@ -4,8 +4,10 @@ import { observer } from 'mobx-react-lite'
 import { Button, IconAlertCircle } from 'ui'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { FormPanel } from 'components/ui/Forms'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useBackupsQuery } from 'data/database/backups-query'
+import { useCheckPermissions } from 'hooks'
 import { Timezone } from './PITR.types'
 import TimezoneSelection from './TimezoneSelection'
 
@@ -20,17 +22,19 @@ const PITRStatus = ({
   onUpdateTimezone,
   onSetConfiguration,
 }: PITRStatusProps) => {
-  const { backups } = useStore()
+  const { ref } = useParams()
+  const { data: backups } = useBackupsQuery({ projectRef: ref })
+
   const { earliestPhysicalBackupDateUnix, latestPhysicalBackupDateUnix } =
-    backups?.configuration?.physicalBackupData ?? {}
+    backups?.physicalBackupData ?? {}
 
   const earliestAvailableBackup = dayjs
-    .unix(earliestPhysicalBackupDateUnix)
+    .unix(earliestPhysicalBackupDateUnix ?? 0)
     .tz(selectedTimezone?.utc[0])
     .format('DD MMM YYYY, HH:mm:ss')
 
   const latestAvailableBackup = dayjs
-    .unix(latestPhysicalBackupDateUnix)
+    .unix(latestPhysicalBackupDateUnix ?? 0)
     .tz(selectedTimezone?.utc[0])
     .format('DD MMM YYYY, HH:mm:ss')
 

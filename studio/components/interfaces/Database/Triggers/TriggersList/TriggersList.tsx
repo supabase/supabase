@@ -156,17 +156,20 @@ const TriggersList = ({
             className="table-fixed"
             head={
               <>
-                <Table.th key="name" className="w-[25%] space-x-4">
+                <Table.th key="name" className="space-x-4">
                   Name
                 </Table.th>
-                <Table.th key="table" className="hidden w-[13%] lg:table-cell">
+                <Table.th key="table" className="hidden lg:table-cell">
                   Table
                 </Table.th>
                 <Table.th key="function" className="hidden xl:table-cell">
                   Function
                 </Table.th>
-                <Table.th key="rows" className="hidden xl:table-cell xl:w-1/3">
+                <Table.th key="events" className="hidden xl:table-cell">
                   Events
+                </Table.th>
+                <Table.th key="enabled" className="hidden w-20 xl:table-cell">
+                  Enabled
                 </Table.th>
                 <Table.th key="buttons" className="w-1/12"></Table.th>
               </>
