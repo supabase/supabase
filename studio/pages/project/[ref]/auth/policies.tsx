@@ -65,7 +65,13 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     if (search) setSearchString(search)
   }, [search])
 
-  const { data: schemas } = useSchemasQuery({
+  const {
+    data: schemas,
+    isLoading: isLoadingSchemas,
+    isSuccess: isSuccessSchemas,
+    isError: isErrorSchemas,
+    error: errorSchemas,
+  } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -103,53 +109,62 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="w-[230px]">
-              <Listbox
-                size="small"
-                value={snap.selectedSchemaName}
-                onChange={(schema: string) => {
-                  snap.setSelectedSchemaName(schema)
-                  setSearchString('')
-                }}
-                icon={isLocked && <IconLock size={14} strokeWidth={2} />}
-              >
-                <Listbox.Option
-                  disabled
-                  key="normal-schemas"
-                  value="normal-schemas"
-                  label="Schemas"
+              {isLoadingSchemas && (
+                <div className="h-[34px] w-full bg-scale-1000 rounded shimmering-loader" />
+              )}
+
+              {isErrorSchemas && (
+                <AlertError error={errorSchemas} subject="Failed to retrieve schemas" />
+              )}
+
+              {isSuccessSchemas && (
+                <Listbox
+                  size="small"
+                  value={snap.selectedSchemaName}
+                  onChange={(schema: string) => {
+                    snap.setSelectedSchemaName(schema)
+                    setSearchString('')
+                  }}
+                  icon={isLocked && <IconLock size={14} strokeWidth={2} />}
                 >
-                  <p className="text-sm">Schemas</p>
-                </Listbox.Option>
-                {/* @ts-ignore */}
-                {openSchemas.map((schema) => (
                   <Listbox.Option
-                    key={schema.id}
-                    value={schema.name}
-                    label={schema.name}
-                    addOnBefore={() => <span className="text-scale-900">schema</span>}
+                    disabled
+                    key="normal-schemas"
+                    value="normal-schemas"
+                    label="Schemas"
                   >
-                    <span className="text-scale-1200 text-sm">{schema.name}</span>
+                    <p className="text-sm">Schemas</p>
                   </Listbox.Option>
-                ))}
-                <Listbox.Option
-                  disabled
-                  key="protected-schemas"
-                  value="protected-schemas"
-                  label="Protected schemas"
-                >
-                  <p className="text-sm">Protected schemas</p>
-                </Listbox.Option>
-                {protectedSchemas.map((schema) => (
+                  {openSchemas.map((schema) => (
+                    <Listbox.Option
+                      key={schema.id}
+                      value={schema.name}
+                      label={schema.name}
+                      addOnBefore={() => <span className="text-scale-900">schema</span>}
+                    >
+                      <span className="text-scale-1200 text-sm">{schema.name}</span>
+                    </Listbox.Option>
+                  ))}
                   <Listbox.Option
-                    key={schema.id}
-                    value={schema.name}
-                    label={schema.name}
-                    addOnBefore={() => <span className="text-scale-900">schema</span>}
+                    disabled
+                    key="protected-schemas"
+                    value="protected-schemas"
+                    label="Protected schemas"
                   >
-                    <span className="text-scale-1200 text-sm">{schema.name}</span>
+                    <p className="text-sm">Protected schemas</p>
                   </Listbox.Option>
-                ))}
-              </Listbox>
+                  {protectedSchemas.map((schema) => (
+                    <Listbox.Option
+                      key={schema.id}
+                      value={schema.name}
+                      label={schema.name}
+                      addOnBefore={() => <span className="text-scale-900">schema</span>}
+                    >
+                      <span className="text-scale-1200 text-sm">{schema.name}</span>
+                    </Listbox.Option>
+                  ))}
+                </Listbox>
+              )}
             </div>
             <Input
               size="small"
