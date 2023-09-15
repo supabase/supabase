@@ -193,19 +193,20 @@ export const getForeignKeyUIState = (
   originalConfig: ExtendedPostgresRelationship | undefined,
   updatedConfig: ExtendedPostgresRelationship | undefined
 ): 'Info' | 'Add' | 'Remove' | 'Update' => {
-  if (isUndefined(originalConfig) && !isUndefined(updatedConfig)) {
+  if (originalConfig === undefined && updatedConfig !== undefined) {
     return 'Add'
   }
 
-  if (!isUndefined(originalConfig) && isUndefined(updatedConfig)) {
+  if (originalConfig !== undefined && updatedConfig === undefined) {
     return 'Remove'
   }
 
   if (
-    !isEqual(originalConfig?.target_table_schema, updatedConfig?.target_table_schema) ||
-    !isEqual(originalConfig?.target_table_name, updatedConfig?.target_table_name) ||
-    !isEqual(originalConfig?.target_column_name, updatedConfig?.target_column_name) ||
-    originalConfig?.deletion_action !== updatedConfig?.deletion_action
+    originalConfig?.target_table_schema !== updatedConfig?.target_table_schema ||
+    originalConfig?.target_table_name !== updatedConfig?.target_table_name ||
+    originalConfig?.target_column_name !== updatedConfig?.target_column_name ||
+    originalConfig?.deletion_action !== updatedConfig?.deletion_action ||
+    originalConfig?.update_action !== updatedConfig?.update_action
   ) {
     return 'Update'
   }
@@ -232,6 +233,7 @@ export const getColumnForeignKey = (
     return {
       ...foreignKey,
       deletion_action: foreignKeyMeta?.deletion_action ?? FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+      update_action: foreignKeyMeta?.update_action ?? FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
     }
   }
 }
@@ -242,8 +244,8 @@ const formatArrayToPostgresArray = (arrayString: string) => {
   return arrayString.replaceAll('[', '{').replaceAll(']', '}')
 }
 
-export const getForeignKeyDeletionAction = (deletionAction?: string) => {
-  switch (deletionAction) {
+export const getForeignKeyCascadeAction = (action?: string) => {
+  switch (action) {
     case FOREIGN_KEY_CASCADE_ACTION.CASCADE:
       return 'Cascade'
     case FOREIGN_KEY_CASCADE_ACTION.RESTRICT:

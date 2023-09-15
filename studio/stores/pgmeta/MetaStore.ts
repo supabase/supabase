@@ -302,7 +302,7 @@ export default class MetaStore implements IMetaStore {
 
   // [Joshen TODO] Eventually need to extend this to composite foreign keys
   async addForeignKey(relationship: ExtendedPostgresRelationship) {
-    const { deletion_action } = relationship
+    const { deletion_action, update_action } = relationship
     const deletionAction =
       deletion_action === FOREIGN_KEY_CASCADE_ACTION.CASCADE
         ? 'ON DELETE CASCADE'
@@ -313,12 +313,20 @@ export default class MetaStore implements IMetaStore {
         : deletion_action === FOREIGN_KEY_CASCADE_ACTION.SET_NULL
         ? 'ON DELETE SET NULL'
         : ''
+    const updateAction =
+      update_action === FOREIGN_KEY_CASCADE_ACTION.CASCADE
+        ? 'ON UPDATE CASCADE'
+        : update_action === FOREIGN_KEY_CASCADE_ACTION.RESTRICT
+        ? 'ON UPDATE RESTRICT'
+        : ''
 
     const query = `
       ALTER TABLE "${relationship.source_schema}"."${relationship.source_table_name}"
       ADD CONSTRAINT "${relationship.source_table_name}_${relationship.source_column_name}_fkey"
       FOREIGN KEY ("${relationship.source_column_name}")
-      REFERENCES "${relationship.target_table_schema}"."${relationship.target_table_name}" ("${relationship.target_column_name}") ${deletionAction};
+      REFERENCES "${relationship.target_table_schema}"."${relationship.target_table_name}" ("${relationship.target_column_name}")
+      ${updateAction}
+      ${deletionAction};
     `
       .replace(/\s+/g, ' ')
       .trim()
@@ -563,6 +571,7 @@ export default class MetaStore implements IMetaStore {
           ...relationship,
           source_table_name: duplicatedTableName,
           deletion_action: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+          update_action: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
         })
         if (relation.error) throw relation.error
       })

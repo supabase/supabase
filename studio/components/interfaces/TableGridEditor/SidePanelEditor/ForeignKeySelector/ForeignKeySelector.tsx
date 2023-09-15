@@ -21,7 +21,7 @@ import ActionBar from '../ActionBar'
 import { ColumnField } from '../SidePanelEditor.types'
 import { FOREIGN_KEY_CASCADE_OPTIONS } from './ForeignKeySelector.constants'
 import { ForeignKey } from './ForeignKeySelector.types'
-import { generateDeletionActionDescription } from './ForeignKeySelector.utils'
+import { generateCascadeActionDescription } from './ForeignKeySelector.utils'
 
 interface ForeignKeySelectorProps {
   column: ColumnField
@@ -29,7 +29,14 @@ interface ForeignKeySelectorProps {
   visible: boolean
   closePanel: () => void
   saveChanges: (
-    value: { table: PostgresTable; column: PostgresColumn; deletionAction: string } | undefined
+    value:
+      | {
+          table: PostgresTable
+          column: PostgresColumn
+          deletionAction: string
+          updateAction: string
+        }
+      | undefined
   ) => void
 }
 
@@ -46,6 +53,7 @@ const ForeignKeySelector = ({
     table: '',
     column: '',
     deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+    updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
   })
 
   const schemas = meta.schemas.list()
@@ -78,6 +86,7 @@ const ForeignKeySelector = ({
           table: foreignKey.target_table_name,
           column: foreignKey.target_column_name,
           deletionAction: foreignKey.deletion_action,
+          updateAction: foreignKey.update_action,
         })
       } else {
         setSelectedForeignKey({
@@ -85,6 +94,7 @@ const ForeignKeySelector = ({
           table: '',
           column: '',
           deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+          updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
         })
       }
     }
@@ -97,6 +107,7 @@ const ForeignKeySelector = ({
       table: '',
       column: '',
       deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+      updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
     }
     setSelectedForeignKey(updatedForeignKey)
   }
@@ -104,13 +115,15 @@ const ForeignKeySelector = ({
   const updateSelectedTable = (tableId: number) => {
     setErrors({})
     if (!tableId) {
-      setSelectedForeignKey({
+      return setSelectedForeignKey({
         schema: '',
         table: '',
         column: '',
         deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+        updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
       })
     }
+
     const table = find(tables, { id: tableId })
     if (table) {
       const primaryColumn = table.primary_keys[0].name
@@ -121,6 +134,7 @@ const ForeignKeySelector = ({
         table: table.name,
         column: primaryColumn ?? firstColumn,
         deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+        updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
       })
     }
   }
@@ -134,9 +148,9 @@ const ForeignKeySelector = ({
     }
   }
 
-  const updateDeletionAction = (value: string) => {
+  const updateCascadeAction = (action: 'updateAction' | 'deletionAction', value: string) => {
     setErrors({})
-    setSelectedForeignKey({ ...selectedForeignKey, deletionAction: value })
+    setSelectedForeignKey({ ...selectedForeignKey, [action]: value })
   }
 
   const onSaveChanges = (resolve: () => void) => {
@@ -157,6 +171,7 @@ const ForeignKeySelector = ({
           table: selectedTable,
           column: selectedColumn,
           deletionAction: selectedForeignKey.deletionAction,
+          updateAction: selectedForeignKey.updateAction,
         })
       }
     }
@@ -324,7 +339,9 @@ const ForeignKeySelector = ({
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>
               )}
+
               <SidePanel.Separator />
+
               <InformationBox
                 icon={<IconHelpCircle size="large" strokeWidth={1.5} />}
                 title="Which action is most appropriate?"
@@ -363,20 +380,23 @@ const ForeignKeySelector = ({
 
               <Listbox
                 id="updateAction"
-                value={selectedForeignKey.deletionAction}
+                value={selectedForeignKey.updateAction}
                 label="Action if referenced row is updated"
                 descriptionText={
                   <p>
-                    {generateDeletionActionDescription(
-                      selectedForeignKey.deletionAction,
+                    {generateCascadeActionDescription(
+                      'update',
+                      selectedForeignKey.updateAction,
                       `${selectedForeignKey.schema}.${selectedForeignKey.table}`
                     )}
                   </p>
                 }
                 error={errors.column}
-                onChange={(value: string) => updateDeletionAction(value)}
+                onChange={(value: string) => updateCascadeAction('updateAction', value)}
               >
-                {FOREIGN_KEY_CASCADE_OPTIONS.map((option) => (
+                {FOREIGN_KEY_CASCADE_OPTIONS.filter((option) =>
+                  ['no-action', 'cascade', 'restrict'].includes(option.key)
+                ).map((option) => (
                   <Listbox.Option key={option.key} value={option.value} label={option.label}>
                     <p className="text-scale-1200">{option.label}</p>
                   </Listbox.Option>
@@ -390,7 +410,8 @@ const ForeignKeySelector = ({
                 descriptionText={
                   <>
                     <p>
-                      {generateDeletionActionDescription(
+                      {generateCascadeActionDescription(
+                        'delete',
                         selectedForeignKey.deletionAction,
                         `${selectedForeignKey.schema}.${selectedForeignKey.table}`
                       )}
@@ -408,7 +429,7 @@ const ForeignKeySelector = ({
                   </>
                 }
                 error={errors.column}
-                onChange={(value: string) => updateDeletionAction(value)}
+                onChange={(value: string) => updateCascadeAction('deletionAction', value)}
               >
                 {FOREIGN_KEY_CASCADE_OPTIONS.map((option) => (
                   <Listbox.Option key={option.key} value={option.value} label={option.label}>
