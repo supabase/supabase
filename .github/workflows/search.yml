@@ -35,7 +35,11 @@ jobs:
 
     steps:
       - name: Check out repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            apps/docs
+            supabase
 
       - name: Setup node
         uses: actions/setup-node@v3

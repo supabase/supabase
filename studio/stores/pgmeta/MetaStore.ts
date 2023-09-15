@@ -871,7 +871,8 @@ export default class MetaStore implements IMetaStore {
     return new Promise((resolve) => {
       Papa.parse(file, {
         header: true,
-        dynamicTyping: true,
+        // dynamicTyping has to be disabled so that "00001" doesn't get parsed as 1.
+        dynamicTyping: false,
         skipEmptyLines: true,
         chunkSize: CHUNK_SIZE,
         quoteChar: file.type === 'text/tab-separated-values' ? '' : '"',
