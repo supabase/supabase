@@ -172,7 +172,7 @@ const Nav = ({ blogPosts }: { blogPosts?: PostTypes[] }) => {
                   <NavigationMenuList>
                     {menu.primaryNav.map((menuItem) =>
                       menuItem.hasDropdown ? (
-                        <NavigationMenuItem className="text-sm font-medium">
+                        <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
                           <NavigationMenuTrigger className="bg-transparent data-[state=open]:text-brand data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground-strong">
                             {menuItem.title}
                           </NavigationMenuTrigger>
@@ -181,7 +181,7 @@ const Nav = ({ blogPosts }: { blogPosts?: PostTypes[] }) => {
                           </NavigationMenuContent>
                         </NavigationMenuItem>
                       ) : (
-                        <NavigationMenuItem className="text-sm font-medium">
+                        <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
                           <NavigationMenuLink asChild>
                             <MenuItem
                               href={menuItem.url}
