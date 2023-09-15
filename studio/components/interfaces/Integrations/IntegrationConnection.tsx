@@ -79,7 +79,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                   <span>Manage</span>
                 </Button>
               </DropdownMenuTrigger_Shadcn_>
-              <DropdownMenuContent_Shadcn_ side="bottom" align="end" size="medium">
+              <DropdownMenuContent_Shadcn_ side="bottom" align="end">
                 {props.type === 'Vercel' && (
                   <>
                     {router.pathname !== projectIntegrationUrl && (

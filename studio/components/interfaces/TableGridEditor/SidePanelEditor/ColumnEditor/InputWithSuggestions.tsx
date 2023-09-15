@@ -120,7 +120,7 @@ const InputWithSuggestions = ({
                   </Tooltip.Portal>
                 </Tooltip.Root>
               </DropdownMenuTrigger_Shadcn_>
-              <DropdownMenuContent_Shadcn_ size="medium" align="end" side="bottom">
+              <DropdownMenuContent_Shadcn_ align="end" side="bottom">
                 <DropdownMenuLabel_Shadcn_>
                   {suggestionsHeader || 'Suggestions'}
                 </DropdownMenuLabel_Shadcn_>

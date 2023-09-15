@@ -244,11 +244,7 @@ const PublishAppSidePanel = ({
                                   <DropdownMenuTrigger_Shadcn_>
                                     <Button type="default" icon={<IconEdit />} className="px-1" />
                                   </DropdownMenuTrigger_Shadcn_>
-                                  <DropdownMenuContent_Shadcn_
-                                    size="tiny"
-                                    align="end"
-                                    side="bottom"
-                                  >
+                                  <DropdownMenuContent_Shadcn_ align="end" side="bottom">
                                     <DropdownMenuItem_Shadcn_
                                       key="upload"
                                       onClick={() => {

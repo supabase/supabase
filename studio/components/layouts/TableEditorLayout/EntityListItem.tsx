@@ -134,7 +134,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                 <IconChevronDown size={14} strokeWidth={2} />
               </div>
             </DropdownMenuTrigger_Shadcn_>
-            <DropdownMenuContent_Shadcn_ size="small" side="bottom" align="start">
+            <DropdownMenuContent_Shadcn_ side="bottom" align="start">
               <DropdownMenuItem_Shadcn_
                 key="edit-table"
                 onClick={(e) => {

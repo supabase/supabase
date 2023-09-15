@@ -61,7 +61,7 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
           </Button>
         </DropdownMenuTrigger_Shadcn_>
 
-        <DropdownMenuContent_Shadcn_ size="small" side="bottom" align="start">
+        <DropdownMenuContent_Shadcn_ side="bottom" align="start">
           <DropdownMenuRadioGroup_Shadcn_
             onValueChange={handleHelperChange}
             value={selectedHelper?.text || ''}

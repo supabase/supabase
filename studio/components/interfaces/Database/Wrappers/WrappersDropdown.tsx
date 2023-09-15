@@ -61,7 +61,7 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
           {buttonText}
         </Button>
       </DropdownMenuTrigger_Shadcn_>
-      <DropdownMenuContent_Shadcn_ side="bottom" align={align} size="small">
+      <DropdownMenuContent_Shadcn_ side="bottom" align={align}>
         {WRAPPERS.map((wrapper, idx) => (
           <Fragment key={idx}>
             <Link href={`/project/${ref}/database/wrappers/new?type=${wrapper.name.toLowerCase()}`}>

@@ -162,7 +162,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
             <span></span>
           </Button>
         </DropdownMenuTrigger_Shadcn_>
-        <DropdownMenuContent_Shadcn_ side="bottom" align="end" size="small">
+        <DropdownMenuContent_Shadcn_ side="bottom" align="end">
           <>
             {isPendingInviteAcceptance ? (
               <>

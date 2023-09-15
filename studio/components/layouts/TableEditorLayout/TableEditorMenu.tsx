@@ -297,7 +297,6 @@ const TableEditorMenu = () => {
                         </Tooltip.Root>
                       </DropdownMenuTrigger_Shadcn_>
                       <DropdownMenuContent_Shadcn_
-                        size="small"
                         side="bottom"
                         align="start"
                         style={{ zIndex: 1 }}

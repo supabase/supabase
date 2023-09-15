@@ -223,7 +223,7 @@ const PaymentMethods = () => {
                                     className="hover:border-gray-500"
                                   />
                                 </DropdownMenuTrigger_Shadcn_>
-                                <DropdownMenuContent_Shadcn_ size="tiny">
+                                <DropdownMenuContent_Shadcn_>
                                   <DropdownMenuItem_Shadcn_
                                     key="make-default"
                                     onClick={() => setSelectedMethodForDefault(paymentMethod)}

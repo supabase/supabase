@@ -85,7 +85,7 @@ const PolicyRow = ({
                 icon={<IconMoreVertical />}
               />
             </DropdownMenuTrigger_Shadcn_>
-            <DropdownMenuContent_Shadcn_ side="bottom" align="end" size="small">
+            <DropdownMenuContent_Shadcn_ side="bottom" align="end">
               <DropdownMenuItem_Shadcn_ onClick={() => onSelectEditPolicy(policy)}>
                 <IconEdit size={14} />
                 <p className="text-scale-1200 text-sm">Edit</p>

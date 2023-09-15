@@ -44,7 +44,7 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
             Add user
           </Button>
         </DropdownMenuTrigger_Shadcn_>
-        <DropdownMenuContent_Shadcn_ side="bottom" align="end" size="small">
+        <DropdownMenuContent_Shadcn_ side="bottom" align="end">
           {inviteEnabled && (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger className="w-full">

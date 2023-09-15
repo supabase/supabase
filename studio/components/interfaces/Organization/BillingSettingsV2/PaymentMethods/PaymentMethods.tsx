@@ -179,7 +179,7 @@ const PaymentMethods = () => {
                                           <span />
                                         </Button>
                                       </DropdownMenuTrigger_Shadcn_>
-                                      <DropdownMenuContent_Shadcn_ size="tiny" align="end">
+                                      <DropdownMenuContent_Shadcn_ align="end">
                                         {[
                                           ...(subscription?.plan.id !== 'free' &&
                                           subscription?.payment_method_type === 'card'

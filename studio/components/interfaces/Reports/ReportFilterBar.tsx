@@ -164,7 +164,7 @@ const ReportFilterBar = ({
               </span>
             </Button>
           </DropdownMenuTrigger_Shadcn_>
-          <DropdownMenuContent_Shadcn_ size="small" side="bottom" align="start">
+          <DropdownMenuContent_Shadcn_ side="bottom" align="start">
             <DropdownMenuItem_Shadcn_ onClick={() => handleProductFilterChange(null)}>
               <p className="text-scale-1200 text-sm">All Requests</p>
             </DropdownMenuItem_Shadcn_>
