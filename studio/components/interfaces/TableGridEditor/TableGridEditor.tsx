@@ -18,7 +18,7 @@ import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Connecting from 'components/ui/Loading/Loading'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import {
   ForeignKeyConstraint,
   useForeignKeyConstraintsQuery,
@@ -185,7 +185,7 @@ const TableGridEditor = ({
     )
     return {
       ...relationship,
-      deletion_action: relationshipMeta?.deletion_action ?? FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+      deletion_action: relationshipMeta?.deletion_action ?? FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
     }
   })
 
