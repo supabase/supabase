@@ -27,10 +27,11 @@ import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { sqlKeys } from 'data/sql/keys'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
-import { useCheckPermissions, useStore, useUrlState } from 'hooks'
+import { useCheckPermissions, useLatest, useStore, useUrlState } from 'hooks'
 import useEntityType from 'hooks/misc/useEntityType'
 import { TableLike } from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { EMPTY_ARR } from 'lib/void'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SchemaView } from 'types'
 import APIDocumentationPanel from './APIDocumentationPanel'
@@ -157,12 +158,13 @@ const TableGridEditor = ({
   }, [selectedTable?.id])
 
   const entityType = useEntityType(selectedTable?.id)
+  const columnsRef = useLatest(selectedTable?.columns ?? EMPTY_ARR)
 
+  // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isLoadingSelectedTable) {
     return <Connecting />
   }
 
-  // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isUndefined(selectedTable)) {
     return <NotFoundState id={Number(id)} />
   }
@@ -234,8 +236,11 @@ const TableGridEditor = ({
     }
   }
 
-  const onSelectEditColumn = async (name: string) => {
-    const column = find(selectedTable?.columns ?? [], { name }) as PostgresColumn
+  // columns must be accessed via columnsRef.current as these two functions immediately become
+  // stale as they are accessed via some react-tracked madness
+  // [TODO]: refactor out all of react-tracked
+  const onSelectEditColumn = (name: string) => {
+    const column = find(columnsRef.current, { name }) as PostgresColumn
     if (column) {
       snap.onEditColumn(column)
     } else {
@@ -246,8 +251,8 @@ const TableGridEditor = ({
     }
   }
 
-  const onSelectDeleteColumn = async (name: string) => {
-    const column = find(selectedTable?.columns ?? [], { name }) as PostgresColumn
+  const onSelectDeleteColumn = (name: string) => {
+    const column = find(columnsRef.current ?? [], { name }) as PostgresColumn
     if (column) {
       snap.onDeleteColumn(column)
     } else {

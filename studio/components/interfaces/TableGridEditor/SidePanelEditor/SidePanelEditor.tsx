@@ -244,8 +244,9 @@ const SidePanelEditor = ({
       ) {
         reAddRenamedColumnSortAndFilter(selectedColumnToEdit.name, payload.name)
       }
-      queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
+
       await Promise.all([
+        queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints'])),
         queryClient.invalidateQueries(tableKeys.table(project?.ref, selectedTable!.id)),
         queryClient.invalidateQueries(
           sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
