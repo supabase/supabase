@@ -21,32 +21,32 @@ info:
       title: General
       description: General settings.
     - id: auth
-      title: Auth Settings
-      description: Auth Settings.
+      title: Auth
+      description: Auth settings.
     - id: api
-      title: API Settings
-      description: Auth Settings.
+      title: API
+      description: Auth settings.
     - id: database
-      title: Database Settings
-      description: Database Settings.
-    - id: realtime
-      title: Realtime Settings
-      description: Dashboard Settings.
-    - id: storage
-      title: Storage Settings
-      description: Storage Settings.
+      title: Database
+      description: Database settings.
     - id: dashboard
-      title: Dashboard Settings
-      description: Dashboard Settings.
+      title: Dashboard
+      description: Dashboard settings.
+    - id: realtime
+      title: Realtime
+      description: Dashboard settings.
+    - id: storage
+      title: Storage
+      description: Storage settings.
     - id: edge-functions
-      title: Edge Functions Settings
-      description: Edge Functions Settings.
+      title: Edge-Functions
+      description: Edge-Functions settings.
     - id: analytics
-      title: Analytics Settings
-      description: Analytics Settings.
+      title: Analytics
+      description: Analytics settings.
     - id: local
       title: Local Development
-      description: Local Development.
+      description: Local Development settings.
 
 # This section is an array of public functions which a user might need to execute.
 parameters:
