@@ -12,7 +12,9 @@ import { useEffect, useState } from 'react'
 import { Button, Checkbox, IconExternalLink, Input, SidePanel, Toggle } from 'ui'
 
 import { EncryptionKeySelector } from 'components/interfaces/Settings/Vault'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useStore } from 'hooks'
 import { ForeignKeySelector } from '..'
 import ActionBar from '../ActionBar'
@@ -35,9 +37,6 @@ import {
 import ColumnForeignKey from './ColumnForeignKey'
 import ColumnType from './ColumnType'
 import HeaderTitle from './HeaderTitle'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 
 export interface ColumnEditorProps {
   column?: PostgresColumn
@@ -130,6 +129,7 @@ const ColumnEditor = ({
     table: PostgresTable
     column: PostgresColumn
     deletionAction: string
+    updateAction: string
   }) => {
     onUpdateField({
       foreignKey:
@@ -144,6 +144,7 @@ const ColumnEditor = ({
               target_table_name: foreignKeyConfiguration.table.name,
               target_column_name: foreignKeyConfiguration.column.name,
               deletion_action: foreignKeyConfiguration.deletionAction,
+              update_action: foreignKeyConfiguration.updateAction,
             }
           : undefined,
       ...(foreignKeyConfiguration !== undefined && {
