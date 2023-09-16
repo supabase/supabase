@@ -198,9 +198,7 @@ const GridHeaderActions = ({
       >
         <Modal.Content className="py-4 space-y-2">
           <p className="text-sm">
-            Any changes on this table will {isRealtimeEnabled && 'no longer '}be broadcasted to
-            authorized subscribers once realtime has been{' '}
-            {isRealtimeEnabled ? 'disabled' : 'enabled'}.
+            Once realtime has been {isRealtimeEnabled ? 'disabled' : 'enabled'}, the table will {isRealtimeEnabled ? 'no longer ' : ''}broadcast any changes to authorized subscribers.
           </p>
           {!isRealtimeEnabled && (
             <p className="text-sm">
