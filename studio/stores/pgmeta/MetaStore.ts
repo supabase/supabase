@@ -1,54 +1,54 @@
-import Papa from 'papaparse'
-import { makeObservable } from 'mobx'
-import { find, isUndefined, isEqual, isEmpty, chunk } from 'lodash'
 import { Query } from 'components/grid/query/Query'
+import { chunk, find, isEmpty, isEqual, isUndefined } from 'lodash'
+import { makeObservable } from 'mobx'
+import Papa from 'papaparse'
 
 import type {
   PostgresColumn,
-  PostgresTable,
-  PostgresRelationship,
   PostgresPrimaryKey,
+  PostgresRelationship,
+  PostgresTable,
 } from '@supabase/postgres-meta'
 
-import { IS_PLATFORM, API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
+import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { timeout, tryParseJson } from 'lib/helpers'
 import { ResponseError } from 'types'
 
 import { IRootStore } from '../RootStore'
-import ColumnStore from './ColumnStore'
-import TableStore, { ITableStore } from './TableStore'
-import OpenApiStore, { IOpenApiStore } from './OpenApiStore'
 import { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
+import ColumnStore from './ColumnStore'
+import OpenApiStore, { IOpenApiStore } from './OpenApiStore'
+import TableStore, { ITableStore } from './TableStore'
 
+import {
+  generateCreateColumnPayload,
+  generateUpdateColumnPayload,
+} from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import {
   ColumnField,
   CreateColumnPayload,
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.types'
-import {
-  generateCreateColumnPayload,
-  generateUpdateColumnPayload,
-} from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import { ImportContent } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
-import RolesStore, { IRolesStore } from './RolesStore'
-import PoliciesStore from './PoliciesStore'
-import TriggersStore from './TriggersStore'
-import PublicationStore from './PublicationStore'
-import FunctionsStore from './FunctionsStore'
-import HooksStore from './HooksStore'
-import ExtensionsStore from './ExtensionsStore'
-import TypesStore from './TypesStore'
-import ForeignTableStore, { IForeignTableStore } from './ForeignTableStore'
-import ViewStore, { IViewStore } from './ViewStore'
-import MaterializedViewStore, { IMaterializedViewStore } from './MaterializedViewStore'
-import { FOREIGN_KEY_DELETION_ACTION } from 'data/database/database-query-constants'
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import { getCachedProjectDetail } from 'data/projects/project-detail-query'
 import { getQueryClient } from 'data/query-client'
 import { tableKeys } from 'data/tables/keys'
-import { getTables } from 'data/tables/tables-query'
 import { getTable } from 'data/tables/table-query'
-import { getCachedProjectDetail } from 'data/projects/project-detail-query'
+import { getTables } from 'data/tables/tables-query'
+import ExtensionsStore from './ExtensionsStore'
+import ForeignTableStore, { IForeignTableStore } from './ForeignTableStore'
+import FunctionsStore from './FunctionsStore'
+import HooksStore from './HooksStore'
+import MaterializedViewStore, { IMaterializedViewStore } from './MaterializedViewStore'
+import PoliciesStore from './PoliciesStore'
+import PublicationStore from './PublicationStore'
+import RolesStore, { IRolesStore } from './RolesStore'
+import TriggersStore from './TriggersStore'
+import TypesStore from './TypesStore'
+import ViewStore, { IViewStore } from './ViewStore'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -279,23 +279,31 @@ export default class MetaStore implements IMetaStore {
 
   // [Joshen TODO] Eventually need to extend this to composite foreign keys
   async addForeignKey(relationship: ExtendedPostgresRelationship) {
-    const { deletion_action } = relationship
+    const { deletion_action, update_action } = relationship
     const deletionAction =
-      deletion_action === FOREIGN_KEY_DELETION_ACTION.CASCADE
+      deletion_action === FOREIGN_KEY_CASCADE_ACTION.CASCADE
         ? 'ON DELETE CASCADE'
-        : deletion_action === FOREIGN_KEY_DELETION_ACTION.RESTRICT
+        : deletion_action === FOREIGN_KEY_CASCADE_ACTION.RESTRICT
         ? 'ON DELETE RESTRICT'
-        : deletion_action === FOREIGN_KEY_DELETION_ACTION.SET_DEFAULT
+        : deletion_action === FOREIGN_KEY_CASCADE_ACTION.SET_DEFAULT
         ? 'ON DELETE SET DEFAULT'
-        : deletion_action === FOREIGN_KEY_DELETION_ACTION.SET_NULL
+        : deletion_action === FOREIGN_KEY_CASCADE_ACTION.SET_NULL
         ? 'ON DELETE SET NULL'
+        : ''
+    const updateAction =
+      update_action === FOREIGN_KEY_CASCADE_ACTION.CASCADE
+        ? 'ON UPDATE CASCADE'
+        : update_action === FOREIGN_KEY_CASCADE_ACTION.RESTRICT
+        ? 'ON UPDATE RESTRICT'
         : ''
 
     const query = `
       ALTER TABLE "${relationship.source_schema}"."${relationship.source_table_name}"
       ADD CONSTRAINT "${relationship.source_table_name}_${relationship.source_column_name}_fkey"
       FOREIGN KEY ("${relationship.source_column_name}")
-      REFERENCES "${relationship.target_table_schema}"."${relationship.target_table_name}" ("${relationship.target_column_name}") ${deletionAction};
+      REFERENCES "${relationship.target_table_schema}"."${relationship.target_table_name}" ("${relationship.target_column_name}")
+      ${updateAction}
+      ${deletionAction};
     `
       .replace(/\s+/g, ' ')
       .trim()
@@ -548,7 +556,8 @@ export default class MetaStore implements IMetaStore {
         const relation = await this.rootStore.meta.addForeignKey({
           ...relationship,
           source_table_name: duplicatedTableName,
-          deletion_action: FOREIGN_KEY_DELETION_ACTION.NO_ACTION,
+          deletion_action: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+          update_action: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
         })
         if (relation.error) throw relation.error
       })

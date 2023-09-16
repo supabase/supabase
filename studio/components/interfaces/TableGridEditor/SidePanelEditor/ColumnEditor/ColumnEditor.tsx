@@ -128,6 +128,7 @@ const ColumnEditor = ({
     table: PostgresTable
     column: PostgresColumn
     deletionAction: string
+    updateAction: string
   }) => {
     onUpdateField({
       foreignKey:
@@ -142,6 +143,7 @@ const ColumnEditor = ({
               target_table_name: foreignKeyConfiguration.table.name,
               target_column_name: foreignKeyConfiguration.column.name,
               deletion_action: foreignKeyConfiguration.deletionAction,
+              update_action: foreignKeyConfiguration.updateAction,
             }
           : undefined,
       ...(foreignKeyConfiguration !== undefined && {
