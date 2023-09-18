@@ -12,6 +12,7 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
+  IconAlertCircle,
   IconAlertTriangle,
   IconDatabase,
   IconHelpCircle,
@@ -201,6 +202,7 @@ const ForeignKeySelector = ({
       customFooter={
         <ActionBar
           backButtonLabel="Cancel"
+          disableApply={!!column?.format && !matchingColumnTypes}
           applyButtonLabel="Save"
           closePanel={closePanel}
           applyFunction={onSaveChanges}
@@ -313,21 +315,34 @@ const ForeignKeySelector = ({
                   ))}
                 </Listbox>
               )}
-              {!matchingColumnTypes && (
+              {!matchingColumnTypes && !column?.format && (
+                <Alert_Shadcn_ variant="default">
+                  <IconAlertCircle className="h-4 w-4" />
+                  <AlertTitle_Shadcn_>The referenced column has no type</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_ className="leading-6">
+                    <span>The referenced column</span>
+                    {column?.name && <span className="text-code">{column.name}</span>}
+                    <span> has no type</span>
+                    <span> while the selected foreign column </span>
+                    <span className="text-code">
+                      {selectedTable?.name}.{selectedColumn?.name}
+                    </span>
+                    <span> has </span>
+                    <span className="text-code">{selectedColumn?.data_type}</span>type. They must be
+                    of the same type, therefore the referenced column type will be set to{' '}
+                    <span className="text-code">{selectedColumn?.data_type}</span>type.
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              )}
+              {!matchingColumnTypes && column?.format && (
                 <Alert_Shadcn_ variant="warning">
                   <IconAlertTriangle strokeWidth={2} />
                   <AlertTitle_Shadcn_>The column types don't match</AlertTitle_Shadcn_>
                   <AlertDescription_Shadcn_ className="leading-6">
                     <span>The referenced column</span>
                     {column?.name && <span className="text-code">{column.name}</span>}
-                    {column?.format ? (
-                      <>
-                        <span> is of type </span>
-                        <span className="text-code">{column.format}</span>
-                      </>
-                    ) : (
-                      <span> has no type</span>
-                    )}
+                    <span> is of type </span>
+                    <span className="text-code">{column.format}</span>
                     <span> while the selected foreign column </span>
                     <span className="text-code">
                       {selectedTable?.name}.{selectedColumn?.name}
