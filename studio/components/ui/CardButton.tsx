@@ -12,8 +12,8 @@ interface CardButtonProps {
   imgAlt?: string
   onClick?: () => void
   icon?: React.ReactNode
-  containerHeightClassName?: string
   loading?: boolean
+  className?: string
 }
 
 const CardButton = ({
@@ -27,7 +27,7 @@ const CardButton = ({
   imgAlt,
   onClick,
   icon,
-  containerHeightClassName = 'h-32',
+  className,
   loading = false,
 }: PropsWithChildren<CardButtonProps>) => {
   const LinkContainer = ({ children }: { children: React.ReactNode }) => (
@@ -44,12 +44,12 @@ const CardButton = ({
   const isLink = url || linkHref || onClick
 
   let containerClasses = [
+    className,
     'group relative text-left',
     'bg-panel-header-light dark:bg-panel-header-dark',
     'border border-panel-border-light dark:border-panel-border-dark',
-    'rounded-md py-4 px-6 flex flex-row',
+    'rounded-md py-4 px-6 flex flex-row h-32',
     'transition ease-in-out duration-150',
-    containerHeightClassName,
   ]
 
   if (isLink) {

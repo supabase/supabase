@@ -104,7 +104,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   <p className="text-sm text-scale-1100 text-center">
                     Unpaused projects count towards compute usage. For every hour your instance is
                     active, we'll bill you based on the instance size of your project. See{' '}
-                    <Link href="https://www.notion.so/supabase/Organization-Level-Billing-707638e35c92489995dc3ac991a324d1">
+                    <Link href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute">
                       <a target="_blank" rel="noreferrer" className="underline">
                         Compute Instance Usage Billing
                       </a>
