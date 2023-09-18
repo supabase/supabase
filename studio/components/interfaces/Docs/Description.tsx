@@ -22,7 +22,7 @@ const temp_removePostgrestText = (content: string) => {
 
 interface DescrptionProps {
   content: string
-  metadata: { table: string; column: string; rpc: string }
+  metadata: { table?: string; column?: string; rpc?: string }
   onChange: (value: string) => void
 }
 

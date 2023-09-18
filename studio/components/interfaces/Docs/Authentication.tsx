@@ -1,8 +1,8 @@
 import Link from 'next/link'
 
 import { AutoApiService } from 'data/config/project-api-query'
-import CodeSnippet from '../CodeSnippet'
-import Snippets from '../Snippets'
+import CodeSnippet from './CodeSnippet'
+import Snippets from './Snippets'
 
 interface AuthenticationProps {
   autoApiService: AutoApiService
