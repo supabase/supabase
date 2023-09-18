@@ -10,12 +10,12 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 
-const Product = () => {
+const ProductDropdown = () => {
   const { basePath } = useRouter()
 
   return (
     <>
-      <ul className="grid gap-2 p-6 grid-cols-2 w-[700px]">
+      <ul className="grid gap-2 p-6 grid-cols-1 w-[330px]">
         {Object.values(SolutionsData).map((component) => (
           <NavigationMenuLink key={component.name} asChild>
             <MenuItem
@@ -28,8 +28,8 @@ const Product = () => {
           </NavigationMenuLink>
         ))}
       </ul>
-      {/* <div className="border-l flex flex-col w-[500px]">
-        <div className="p-8">
+      <div className="border-l flex flex-col w-[500px] bg-alternative">
+        <div className="p-6">
           <Link href="/customers">
             <a className="inline-flex items-center gap-1 text-muted hover:text-brand text-xs uppercase tracking-widest font-mono mb-6">
               Customer Stories
@@ -37,7 +37,7 @@ const Product = () => {
             </a>
           </Link>
           <ul className="flex flex-col gap-3">
-            {CustomersData.slice(0, 2).map((customer) => (
+            {CustomersData.slice(0, 3).map((customer) => (
               <li key={customer.organization}>
                 <Link href={customer.url}>
                   <a className="group flex items-center gap-3">
@@ -61,7 +61,7 @@ const Product = () => {
             ))}
           </ul>
         </div>
-        <div className="border-t p-8">
+        <div className="border-t p-6">
           <p className="text-muted text-xs uppercase tracking-widest font-mono mb-6">
             {ComparisonsData.label}
           </p>
@@ -78,9 +78,9 @@ const Product = () => {
             ))}
           </ul>
         </div>
-      </div> */}
+      </div>
     </>
   )
 }
 
-export default Product
+export default ProductDropdown
