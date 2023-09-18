@@ -118,11 +118,11 @@ Now when you run a local development docs server you will see the new docs site.
 
 ## Running Docker
 
-To effectively test your changes, it's essential to run Supabase using Docker. Docker enables you to access and utilize various features of your locally modified Supabase version.
+To test your changes, you need to run Supabase using Docker. Docker lets you use features of your locally modified Supabase version.
 
 #### Prerequsites
 
-Before you begin, ensure that you have the Docker application installed on your device. If you haven't installed Docker yet, you can download and install it from [here](https://docs.docker.com/get-docker/).
+First, make sure you have the Docker application installed on your device. You can download and install it from [here](https://docs.docker.com/get-docker/).
 
 #### Getting Started
 
@@ -131,7 +131,7 @@ Before you begin, ensure that you have the Docker application installed on your 
    ```sh
    cd docker
    ```
-   
+
 2. Copy the example `env` file
 
    ```sh
@@ -144,19 +144,17 @@ Before you begin, ensure that you have the Docker application installed on your 
    docker-compose up
    ```
 
-This command initializes the containers specified in the docker-compose.yml file. It might take a few moments to complete, depending on your system's speed and internet connection.
+This command initializes the containers specified in the docker-compose.yml file. It might take a few moments to complete, depending on your computer and internet connection.
 
-Once the docker-compose up process completes, you should have your local version of Supabase up and running within Docker containers. You can access and test the features you've modified or added.
+Once the `docker-compose up` process completes, you should have your local version of Supabase up and running within Docker containers. You can access and test the features you've modified or added.
 
-Remember to keep the Docker application open as long as you're working with your local Supabase instance. This will ensure that the containers remain active and accessible for testing.
-
----
+Remember to keep the Docker application open as long as you're working with your local Supabase instance.
 
 ## Create a pull request
 
-After making your changes, open a pull request (PR). Once you submit your pull request, others from the Supabase team/community will review it with you.
+After making your changes, open a pull request. Once you submit your pull request, the Supabase team will review it with you.
 
-If you have an issue, like a merge conflict, or don't know how to open a pull request then check out [GitHub's pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests) tutorial on how to resolve merge conflicts and other issues. Once your PR has been merged, you will be proudly listed as a contributor in the [contributor chart](https://github.com/supabase/supabase/graphs/contributors).
+Once your PR has been merged, you will be proudly listed as a contributor in the [contributor chart](https://github.com/supabase/supabase/graphs/contributors).
 
 ---
 
