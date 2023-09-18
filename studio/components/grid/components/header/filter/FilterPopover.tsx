@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, KeyboardEvent } from 'react'
 import { isEqual } from 'lodash'
 import { Button, IconPlus, IconFilter, Popover } from 'ui'
 import update from 'immutability-helper'
@@ -102,6 +102,12 @@ const FilterOverlay = ({ table, filters: filtersFromUrl, setParams }: FilterOver
     })
   }
 
+  function handleEnterKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Enter') {
+      onApplyFilter()
+    }
+  }
+
   return (
     <div className="space-y-2 py-2">
       <div className="space-y-2">
@@ -113,6 +119,7 @@ const FilterOverlay = ({ table, filters: filtersFromUrl, setParams }: FilterOver
             filterIdx={index}
             onChange={onChangeFilter}
             onDelete={onDeleteFilter}
+            onKeyDown={handleEnterKeyDown}
           />
         ))}
         {filters.length == 0 && (
