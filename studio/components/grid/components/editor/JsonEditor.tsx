@@ -16,7 +16,7 @@ interface JsonEditorProps<TRow, TSummaryRow = unknown> extends EditorProps<TRow,
 export const JsonEditor = <TRow, TSummaryRow = unknown>({
   row,
   column,
-  isEditable,
+  isEditable = true,
   onRowChange,
   onExpandEditor,
 }: JsonEditorProps<TRow, TSummaryRow>) => {
