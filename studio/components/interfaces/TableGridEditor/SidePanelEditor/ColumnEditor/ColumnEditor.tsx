@@ -4,18 +4,19 @@ import type {
   PostgresTable,
   PostgresType,
 } from '@supabase/postgres-meta'
-import { useParams } from 'common'
-import { Dictionary } from 'components/grid'
 import { isEmpty, noop } from 'lodash'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Button, Checkbox, IconExternalLink, Input, SidePanel, Toggle } from 'ui'
 
+import { useParams } from 'common'
+import { Dictionary } from 'components/grid'
 import { EncryptionKeySelector } from 'components/interfaces/Settings/Vault'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useStore } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { Button, Checkbox, IconExternalLink, Input, SidePanel, Toggle } from 'ui'
 import { ForeignKeySelector } from '..'
 import ActionBar from '../ActionBar'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
@@ -82,9 +83,7 @@ const ColumnEditor = ({
   const foreignKeyMeta = data || []
 
   const keys = vault.listKeys()
-  const enumTypes = meta.types.list(
-    (type: PostgresType) => !meta.excludedSchemas.includes(type.schema)
-  )
+  const enumTypes = meta.types.list((type: PostgresType) => !EXCLUDED_SCHEMAS.includes(type.schema))
 
   const [pgsodiumExtension] = meta.extensions.list(
     (ext: PostgresExtension) => ext.name.toLowerCase() === 'pgsodium'
