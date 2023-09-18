@@ -1,62 +1,62 @@
-import Papa from 'papaparse'
-import { makeObservable, observable } from 'mobx'
-import { find, isUndefined, isEqual, isEmpty, chunk } from 'lodash'
 import { Query } from 'components/grid/query/Query'
+import { chunk, find, isEmpty, isEqual, isUndefined } from 'lodash'
+import { makeObservable } from 'mobx'
+import Papa from 'papaparse'
 
 import type {
   PostgresColumn,
-  PostgresTable,
-  PostgresRelationship,
   PostgresPrimaryKey,
-  PostgresSchema,
+  PostgresRelationship,
+  PostgresTable,
 } from '@supabase/postgres-meta'
 
-import { IS_PLATFORM, API_URL } from 'lib/constants'
 import { post } from 'lib/common/fetch'
+import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { timeout, tryParseJson } from 'lib/helpers'
 import { ResponseError } from 'types'
 
 import { IRootStore } from '../RootStore'
-import ColumnStore from './ColumnStore'
-import SchemaStore from './SchemaStore'
-import TableStore, { ITableStore } from './TableStore'
-import OpenApiStore, { IOpenApiStore } from './OpenApiStore'
 import { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
+import ColumnStore from './ColumnStore'
+import OpenApiStore, { IOpenApiStore } from './OpenApiStore'
+import TableStore, { ITableStore } from './TableStore'
 
+import {
+  generateCreateColumnPayload,
+  generateUpdateColumnPayload,
+} from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import {
   ColumnField,
   CreateColumnPayload,
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.types'
-import {
-  generateCreateColumnPayload,
-  generateUpdateColumnPayload,
-} from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import { ImportContent } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
-import RolesStore, { IRolesStore } from './RolesStore'
-import PoliciesStore from './PoliciesStore'
-import TriggersStore from './TriggersStore'
-import PublicationStore from './PublicationStore'
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import { getCachedProjectDetail } from 'data/projects/project-detail-query'
+import { getQueryClient } from 'data/query-client'
+import { tableKeys } from 'data/tables/keys'
+import { getTable } from 'data/tables/table-query'
+import { getTables } from 'data/tables/tables-query'
+import ExtensionsStore from './ExtensionsStore'
+import ForeignTableStore, { IForeignTableStore } from './ForeignTableStore'
 import FunctionsStore from './FunctionsStore'
 import HooksStore from './HooksStore'
-import ExtensionsStore from './ExtensionsStore'
-import TypesStore from './TypesStore'
-import ForeignTableStore, { IForeignTableStore } from './ForeignTableStore'
-import ViewStore, { IViewStore } from './ViewStore'
 import MaterializedViewStore, { IMaterializedViewStore } from './MaterializedViewStore'
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import PoliciesStore from './PoliciesStore'
+import PublicationStore from './PublicationStore'
+import RolesStore, { IRolesStore } from './RolesStore'
+import TriggersStore from './TriggersStore'
+import TypesStore from './TypesStore'
+import ViewStore, { IViewStore } from './ViewStore'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
 
 export interface IMetaStore {
-  excludedSchemas: string[]
-
   openApi: IOpenApiStore
   tables: ITableStore
   columns: IPostgresMetaInterface<PostgresColumn>
-  schemas: IPostgresMetaInterface<PostgresSchema>
   views: IViewStore
   materializedViews: IMaterializedViewStore
   foreignTables: IForeignTableStore
@@ -150,7 +150,6 @@ export default class MetaStore implements IMetaStore {
   openApi: OpenApiStore
   tables: TableStore
   columns: ColumnStore
-  schemas: SchemaStore
   views: ViewStore
   materializedViews: MaterializedViewStore
   foreignTables: ForeignTableStore
@@ -168,25 +167,6 @@ export default class MetaStore implements IMetaStore {
   connectionString?: string
   baseUrl: string
   headers: { [prop: string]: any }
-
-  // [Joshen] I'm going to treat this as a list of system schemas
-  excludedSchemas = [
-    'auth',
-    'extensions',
-    'information_schema',
-    'net',
-    'pgsodium',
-    'pgsodium_masks',
-    'pgbouncer',
-    'pgtle',
-    'realtime',
-    'storage',
-    'supabase_functions',
-    'supabase_migrations',
-    'vault',
-    'graphql',
-    'graphql_public',
-  ]
 
   constructor(rootStore: IRootStore, options: { projectRef: string; connectionString?: string }) {
     const { projectRef, connectionString } = options
@@ -206,7 +186,6 @@ export default class MetaStore implements IMetaStore {
     )
     this.tables = new TableStore(this.rootStore, `${this.baseUrl}/tables`, this.headers)
     this.columns = new ColumnStore(this.rootStore, `${this.baseUrl}/columns`, this.headers)
-    this.schemas = new SchemaStore(this.rootStore, `${this.baseUrl}/schemas`, this.headers)
     this.views = new ViewStore(this.rootStore, `${this.baseUrl}/views`, this.headers)
     this.materializedViews = new MaterializedViewStore(
       this.rootStore,
@@ -239,9 +218,7 @@ export default class MetaStore implements IMetaStore {
     )
     this.types = new TypesStore(this.rootStore, `${this.baseUrl}/types`, this.headers)
 
-    makeObservable(this, {
-      excludedSchemas: observable,
-    })
+    makeObservable(this, {})
   }
 
   /**
@@ -349,7 +326,16 @@ export default class MetaStore implements IMetaStore {
   async updateTableRealtime(table: PostgresTable, enable: boolean) {
     let publicationUpdateError
     const publications = this.publications.list()
-    const publicTables = this.tables.list((table: PostgresTable) => table.schema === 'public')
+
+    const queryClient = getQueryClient()
+    const project = await getCachedProjectDetail(queryClient, this.rootStore.ui.selectedProjectRef)
+    const projectRef = project?.ref
+    const connectionString = project?.connectionString
+    const publicTables = await queryClient.fetchQuery({
+      queryKey: tableKeys.list(projectRef, 'public'),
+      queryFn: ({ signal }) =>
+        getTables({ projectRef, connectionString, schema: 'public' }, signal),
+    })
 
     let realtimePublication = publications.find((pub) => pub.name === 'supabase_realtime')
     if (realtimePublication === undefined) {
@@ -596,8 +582,15 @@ export default class MetaStore implements IMetaStore {
       })
     }
 
-    await this.tables.load()
-    const tables = this.tables.list()
+    const queryClient = getQueryClient()
+    const project = await getCachedProjectDetail(queryClient, this.rootStore.ui.selectedProjectRef)
+    const projectRef = project?.ref
+    const connectionString = project?.connectionString
+    const tables = await queryClient.fetchQuery({
+      queryKey: tableKeys.list(projectRef, 'public'),
+      queryFn: ({ signal }) => getTables({ projectRef, connectionString }, signal),
+    })
+
     const duplicatedTable = find(tables, { schema: sourceTableSchema, name: duplicatedTableName })
 
     if (isRLSEnabled) {
@@ -621,8 +614,8 @@ export default class MetaStore implements IMetaStore {
     importContent?: ImportContent
   ) {
     // Create the table first
-    const table: any = await this.tables.create(payload)
-    if (table.error) throw table.error
+    const table = await this.tables.create(payload)
+    if ('error' in table) throw table.error
 
     // If we face any errors during this process after the actual table creation
     // We'll delete the table as a way to clean up and not leave behind bits that
@@ -745,7 +738,7 @@ export default class MetaStore implements IMetaStore {
       }
 
       // Finally, return the created table
-      return await this.tables.loadById(table.id)
+      return table
     } catch (error: any) {
       this.tables.del(table.id)
       throw error
@@ -865,7 +858,21 @@ export default class MetaStore implements IMetaStore {
     // Update table's realtime configuration
     await this.updateTableRealtime(table, isRealtimeEnabled)
 
-    return { table: await this.tables.loadById(table.id), hasError }
+    const queryClient = getQueryClient()
+    const project = await getCachedProjectDetail(queryClient, this.rootStore.ui.selectedProjectRef)
+    const projectRef = project?.ref
+    const connectionString = project?.connectionString
+
+    queryClient.invalidateQueries(tableKeys.table(projectRef, table.id))
+
+    return {
+      table: await getTable({
+        projectRef,
+        connectionString,
+        id: table.id,
+      }),
+      hasError,
+    }
   }
 
   async insertRowsViaSpreadsheet(
@@ -999,9 +1006,6 @@ export default class MetaStore implements IMetaStore {
 
     this.columns.setUrl(`${this.baseUrl}/columns`)
     this.columns.setHeaders(this.headers)
-
-    this.schemas.setUrl(`${this.baseUrl}/schemas`)
-    this.schemas.setHeaders(this.headers)
 
     this.views.setUrl(`${this.baseUrl}/views`)
     this.views.setHeaders(this.headers)
