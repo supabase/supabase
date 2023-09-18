@@ -21,6 +21,7 @@ export * from './src/components/Icon/IconBackground'
 // DISPLAYS
 
 export * from './src/components/Card'
+export * from './src/components/TweetCard'
 export * from './src/components/Badge'
 export * from './src/components/Tabs'
 export * from './src/components/Alert'
@@ -45,6 +46,7 @@ export * from './src/components/ExpandableVideo'
 
 export * from './src/components/Space'
 export * from './src/components/Loading'
+export * from './src/components/LogoLoader'
 export * from './src/components/Divider'
 
 // DATA ENTRY

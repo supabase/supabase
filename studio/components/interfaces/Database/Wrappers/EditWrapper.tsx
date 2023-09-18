@@ -1,48 +1,50 @@
-import Link from 'next/link'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty } from 'lodash'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+
+import { useParams } from 'common/hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  FormActions,
+  FormPanel,
+  FormSection,
+  FormSectionContent,
+  FormSectionLabel,
+  FormsContainer,
+} from 'components/ui/Forms'
+import Loading from 'components/ui/Loading'
+import { invalidateSchemasQuery } from 'data/database/schemas-query'
+import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
+import { useFDWsQuery } from 'data/fdw/fdws-query'
+import { useCheckPermissions, useImmutableValue, useStore } from 'hooks'
+import { VaultSecret } from 'types'
 import {
   Button,
   Form,
-  Input,
   IconArrowLeft,
-  IconExternalLink,
   IconEdit,
-  IconTrash,
+  IconExternalLink,
   IconLoader,
+  IconTrash,
+  Input,
 } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import { VaultSecret } from 'types'
-import { useCheckPermissions, useImmutableValue, useStore } from 'hooks'
-import { useParams } from 'common/hooks'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
-
 import InputField from './InputField'
-import { WRAPPERS } from './Wrappers.constants'
 import WrapperTableEditor from './WrapperTableEditor'
+import { WRAPPERS } from './Wrappers.constants'
 import {
+  convertKVStringArrayToJson,
   formatWrapperTables,
   makeValidateRequired,
-  convertKVStringArrayToJson,
 } from './Wrappers.utils'
-import Loading from 'components/ui/Loading'
-import {
-  FormPanel,
-  FormActions,
-  FormSection,
-  FormSectionLabel,
-  FormSectionContent,
-  FormsContainer,
-} from 'components/ui/Forms'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const EditWrapper = () => {
   const formId = 'edit-wrapper-form'
   const router = useRouter()
+  const queryClient = useQueryClient()
   const { ui, meta, vault } = useStore()
   const { ref, id } = useParams()
   const { project } = useProjectContext()
@@ -67,7 +69,7 @@ const EditWrapper = () => {
       setWrapperTables([])
 
       const hasNewSchema = wrapperTables.some((table) => table.is_new_schema)
-      if (hasNewSchema) meta.schemas.load()
+      if (hasNewSchema) invalidateSchemasQuery(queryClient, ref)
 
       router.push(`/project/${ref}/database/wrappers`)
     },

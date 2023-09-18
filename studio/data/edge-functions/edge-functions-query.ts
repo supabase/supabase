@@ -3,6 +3,7 @@ import { get } from 'lib/common/fetch'
 import { API_ADMIN_URL, IS_PLATFORM } from 'lib/constants'
 import { useCallback } from 'react'
 import { edgeFunctionsKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type EdgeFunctionsVariables = { projectRef?: string }
 
@@ -32,7 +33,7 @@ export async function getEdgeFunctions(
 }
 
 export type EdgeFunctionsData = Awaited<ReturnType<typeof getEdgeFunctions>>
-export type EdgeFunctionsError = unknown
+export type EdgeFunctionsError = ResponseError
 
 export const useEdgeFunctionsQuery = <TData = EdgeFunctionsData>(
   { projectRef }: EdgeFunctionsVariables,

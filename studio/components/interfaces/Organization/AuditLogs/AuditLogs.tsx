@@ -1,25 +1,24 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Alert, Button, IconArrowDown, IconArrowUp, IconRefreshCw, IconUser } from 'ui'
 
 import { useParams } from 'common'
+import { FilterPopover, LogDetailsPanel } from 'components/interfaces/AuditLogs'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { DatePicker } from 'components/ui/DatePicker'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import {
-  OrganizationAuditLog,
+  AuditLog,
   useOrganizationAuditLogsQuery,
 } from 'data/organizations/organization-audit-logs-query'
 import { useOrganizationDetailQuery } from 'data/organizations/organization-detail-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { Alert, Button, IconArrowDown, IconArrowUp, IconRefreshCw, IconUser } from 'ui'
-import FilterPopover from './FilterPopover'
-import LogDetailsPanel from './LogDetailsPanel'
-import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
@@ -35,7 +34,7 @@ const AuditLogs = () => {
     from: currentTime.subtract(1, 'day').toISOString(),
     to: currentTime.toISOString(),
   })
-  const [selectedLog, setSelectedLog] = useState<OrganizationAuditLog>()
+  const [selectedLog, setSelectedLog] = useState<AuditLog>()
   const [filters, setFilters] = useState<{ users: string[]; projects: string[] }>({
     users: [], // gotrue_id[]
     projects: [], // project_ref[]
@@ -51,6 +50,23 @@ const AuditLogs = () => {
       iso_timestamp_start: dateRange.from,
       iso_timestamp_end: dateRange.to,
     })
+
+  // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
+  // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
+  // viewed for more than 5 minutes, the call parameters needs to be updated. This also works with
+  // higher tiers (7 days of logs).The user will see a loading shimmer.
+  useEffect(() => {
+    const duration = dayjs(dateRange.from).diff(dayjs(dateRange.to))
+    const interval = setInterval(() => {
+      const currentTime = dayjs().utc().set('millisecond', 0)
+      setDateRange({
+        from: currentTime.add(duration).toISOString(),
+        to: currentTime.toISOString(),
+      })
+    }, 5 * 60000)
+
+    return () => clearInterval(interval)
+  }, [dateRange.from, dateRange.to])
 
   const members = detailData?.members ?? []
   const roles = rolesData?.roles ?? []
@@ -276,21 +292,21 @@ const AuditLogs = () => {
                             <div className="flex items-center space-x-4">
                               <div>{userIcon}</div>
                               <div>
-                                <p className="text-scale-1100">{user?.username ?? 'Unknown'}</p>
+                                <p className="text-scale-1100">{user?.username ?? '-'}</p>
                                 {role && (
                                   <p className="mt-0.5 text-xs text-scale-1000">{role?.name}</p>
                                 )}
                               </div>
                             </div>
                           </Table.td>
-                          <Table.td>
+                          <Table.td className="max-w-[250px]">
                             <div className="flex items-center space-x-2">
                               {hasStatusCode && (
                                 <p className="bg-scale-400 rounded px-1 flex items-center justify-center text-xs font-mono border">
                                   {log.action.metadata[0].status}
                                 </p>
                               )}
-                              <p className="max-w-[170px] truncate" title={log.action.name}>
+                              <p className="truncate" title={log.action.name}>
                                 {log.action.name}
                               </p>
                             </div>
@@ -298,7 +314,7 @@ const AuditLogs = () => {
                           <Table.td>
                             <p
                               className="text-scale-1100 max-w-[230px] truncate"
-                              title={project?.name ?? organization?.name ?? 'Unknown'}
+                              title={project?.name ?? organization?.name ?? '-'}
                             >
                               {project?.name
                                 ? 'Project: '
