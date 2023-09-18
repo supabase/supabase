@@ -452,7 +452,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         </CreateFunctionContext.Provider>
         <ConfirmationModal
           visible={isClosingPanel}
-          header="Confirm to close"
+          header="Discard changes"
           buttonLabel="Discard"
           onSelectCancel={() => setIsClosingPanel(false)}
           onSelectConfirm={() => {

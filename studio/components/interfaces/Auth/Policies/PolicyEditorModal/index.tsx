@@ -194,7 +194,7 @@ const PolicyEditorModal = ({
       <div className="">
         <ConfirmationModal
           visible={isClosingPolicyEditorModal}
-          header="Confirm to close"
+          header="Discard changes"
           buttonLabel="Discard"
           onSelectCancel={() => setIsClosingPolicyEditorModal(false)}
           onSelectConfirm={() => {
