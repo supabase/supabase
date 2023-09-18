@@ -67,7 +67,9 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
         <div className="flex flex-row justify-between items-center pr-8">
-          <p className="m-0 border-0 px-6 py-4 font-mono">{result.error.message ?? result.error}</p>
+          <p className="m-0 border-0 px-6 py-4 font-mono text-sm">
+            Error running SQL: {result.error.message ?? result.error}
+          </p>
           {supabaseAIEnabled && !hasHipaaAddon && (
             <Button
               icon={
