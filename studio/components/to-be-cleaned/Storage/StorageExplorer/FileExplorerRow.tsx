@@ -15,7 +15,6 @@ import {
   DropdownMenuTrigger_Shadcn_,
   DropdownMenu_Shadcn_,
   IconAlertCircle,
-  IconChevronRight,
   IconClipboard,
   IconDownload,
   IconEdit,
@@ -434,18 +433,8 @@ const FileExplorerRow = ({
                     return (
                       <DropdownMenuSub_Shadcn_ key={option.name}>
                         <DropdownMenuSubTrigger_Shadcn_>
-                          <div
-                            className={[
-                              'flex items-center justify-between px-4 py-1.5 text-xs text-scale-1100',
-                              'w-full focus:bg-scale-300 dark:focus:bg-scale-500 focus:text-scale-1200',
-                            ].join(' ')}
-                          >
-                            <div className="flex items-center space-x-2">
-                              {option.icon}
-                              <p className="text">{option.name}</p>
-                            </div>
-                            <IconChevronRight size="tiny" />
-                          </div>
+                          {option.icon || <></>}
+                          <p className="text-xs">{option.name}</p>
                         </DropdownMenuSubTrigger_Shadcn_>
                         <DropdownMenuPortal_Shadcn_>
                           <DropdownMenuSubContent_Shadcn_>

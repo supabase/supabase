@@ -166,7 +166,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                   </DropdownMenuItem_Shadcn_>
                 </a>
               </Link>
-              <DropdownMenuSeparator_Shadcn_ key="separator" />,
+              <DropdownMenuSeparator_Shadcn_ key="separator" />
               <DropdownMenuItem_Shadcn_
                 key="delete-table"
                 onClick={(e) => {

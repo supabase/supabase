@@ -3,8 +3,10 @@ import { isEmpty } from 'lodash'
 import {
   Badge,
   Button,
+  DropdownMenuContent_Shadcn_,
   DropdownMenuItem_Shadcn_,
   DropdownMenuSeparator_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
   DropdownMenu_Shadcn_,
   IconArchive,
   IconEdit,
@@ -29,36 +31,31 @@ const PolicyRow = ({
             <span className="truncate text-sm text-scale-1200">{name}</span>
           </div>
         </div>
-        <DropdownMenu_Shadcn_
-          side="bottom"
-          align="end"
-          size="small"
-          overlay={
-            <>
-              <DropdownMenuItem_Shadcn_
-                icon={<IconEdit size={14} />}
-                type="outline"
-                className="mx-2"
-                onClick={() => onSelectPolicyEdit(policy, bucketName, table)}
-              >
-                Edit
-              </DropdownMenuItem_Shadcn_>
-              <DropdownMenuSeparator_Shadcn_ />
-              <DropdownMenuItem_Shadcn_
-                icon={<IconTrash size={14} />}
-                type="outline"
-                onClick={() => onSelectPolicyDelete(policy)}
-              >
-                Delete
-              </DropdownMenuItem_Shadcn_>
-            </>
-          }
-        >
-          <Button
-            type="default"
-            style={{ paddingLeft: 4, paddingRight: 4 }}
-            icon={<IconMoreVertical />}
-          />
+        <DropdownMenu_Shadcn_>
+          <DropdownMenuTrigger_Shadcn_>
+            <Button
+              type="default"
+              style={{ paddingLeft: 4, paddingRight: 4 }}
+              icon={<IconMoreVertical />}
+            />
+          </DropdownMenuTrigger_Shadcn_>
+          <DropdownMenuContent_Shadcn_ side="bottom" align="end" size="small">
+            <DropdownMenuItem_Shadcn_
+              icon={<IconEdit size={14} />}
+              type="outline"
+              onClick={() => onSelectPolicyEdit(policy, bucketName, table)}
+            >
+              Edit
+            </DropdownMenuItem_Shadcn_>
+            <DropdownMenuSeparator_Shadcn_ />
+            <DropdownMenuItem_Shadcn_
+              icon={<IconTrash size={14} />}
+              type="outline"
+              onClick={() => onSelectPolicyDelete(policy)}
+            >
+              Delete
+            </DropdownMenuItem_Shadcn_>
+          </DropdownMenuContent_Shadcn_>
         </DropdownMenu_Shadcn_>
       </Panel.Content>
     </div>

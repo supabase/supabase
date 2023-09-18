@@ -349,7 +349,11 @@ const FileExplorerHeader = ({
             </DropdownMenuTrigger_Shadcn_>
 
             <DropdownMenuContent_Shadcn_>
-              <DropdownMenuRadioGroup_Shadcn_ key="viewOptions" value={view} onChange={setView}>
+              <DropdownMenuRadioGroup_Shadcn_
+                key="viewOptions"
+                value={view}
+                onValueChange={setView}
+              >
                 <DropdownMenuRadioItem_Shadcn_ value={STORAGE_VIEWS.COLUMNS}>
                   Columns
                 </DropdownMenuRadioItem_Shadcn_>
@@ -357,7 +361,6 @@ const FileExplorerHeader = ({
                   List
                 </DropdownMenuRadioItem_Shadcn_>
               </DropdownMenuRadioGroup_Shadcn_>
-              ,
             </DropdownMenuContent_Shadcn_>
           </DropdownMenu_Shadcn_>
           <DropdownMenu_Shadcn_>
@@ -372,7 +375,11 @@ const FileExplorerHeader = ({
               </Button>
             </DropdownMenuTrigger_Shadcn_>
             <DropdownMenuContent_Shadcn_>
-              <DropdownMenuRadioGroup_Shadcn_ key="sortOptions" value={sortBy} onChange={setSortBy}>
+              <DropdownMenuRadioGroup_Shadcn_
+                key="sortOptions"
+                value={sortBy}
+                onValueChange={setSortBy}
+              >
                 <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY.NAME}>
                   Name
                 </DropdownMenuRadioItem_Shadcn_>
@@ -409,7 +416,7 @@ const FileExplorerHeader = ({
               <DropdownMenuRadioGroup_Shadcn_
                 key="sortOrderOptions"
                 value={sortByOrder}
-                onChange={setSortByOrder}
+                onValueChange={setSortByOrder}
               >
                 <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY_ORDER.ASC}>
                   Ascending

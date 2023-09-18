@@ -81,8 +81,7 @@ const BucketRow = ({
                 <IconEdit2 size="tiny" />
                 <p className="text-scale-1200 text-sm">Edit bucket</p>
               </DropdownMenuItem_Shadcn_>
-              ,
-              <DropdownMenuSeparator_Shadcn_ key="bucket-separator" />,
+              <DropdownMenuSeparator_Shadcn_ key="bucket-separator" />
               <DropdownMenuItem_Shadcn_
                 key="delete-bucket"
                 onClick={() => onSelectDeleteBucket(bucket)}

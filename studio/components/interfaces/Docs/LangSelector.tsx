@@ -70,7 +70,7 @@ const LangSelector = ({
               <DropdownMenuTrigger_Shadcn_>
                 <Button type="default">{showApiKey.name}</Button>
               </DropdownMenuTrigger_Shadcn_>
-              <DropdownMenuContent_Shadcn_ align="end" side="bottom" className="">
+              <DropdownMenuContent_Shadcn_ align="end" side="bottom">
                 <>
                   <DropdownMenuItem_Shadcn_ key="hide" onClick={() => setShowApiKey(DEFAULT_KEY)}>
                     hide
