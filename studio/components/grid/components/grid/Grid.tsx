@@ -181,7 +181,7 @@ export const Grid = memo(
                         style={{ height: `calc(100% - 35px)` }}
                         className="flex flex-col items-center justify-center"
                       >
-                        <p className="text-sm text">This table is empty</p>
+                        <p className="text-sm text-light">This table is empty</p>
                         {onAddRow !== undefined && onImportData !== undefined && (
                           <>
                             <p className="text-sm text-light mt-1">
