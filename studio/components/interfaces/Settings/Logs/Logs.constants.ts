@@ -206,20 +206,42 @@ limit 100
     description: 'Number of requests done on Storage Objects',
     mode: 'custom',
     searchString: `select
-    r.method as http_verb,
-    r.path as filepath,
-    count(*) as num_requests
-  from edge_logs
-    cross join unnest(metadata) as m
-    cross join unnest(m.request) AS r
-    cross join unnest(r.headers) AS h
-  where
-    path like '%rest/v1/object%'
-  group by 
-    r.path, r.method
-  order by
-    num_requests desc
-  limit 100
+  r.method as http_verb,
+  r.path as filepath,
+  count(*) as num_requests
+from edge_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.request) AS r
+  cross join unnest(r.headers) AS h
+where
+  path like '%rest/v1/object%'
+group by 
+  r.path, r.method
+order by
+  num_requests desc
+limit 100
+`,
+    for: ['api'],
+  },
+  {
+    label: 'Storage Top Cache Misses',
+    description: 'The top Storage requests that miss caching',
+    mode: 'custom',
+    searchString: `select
+  r.path as path,
+  r.search as search,
+  count(id) as count
+from edge_logs f
+  cross join unnest(f.metadata) as m
+  cross join unnest(m.request) as r
+  cross join unnest(m.response) as res
+  cross join unnest(res.headers) as h
+where starts_with(r.path, '/storage/v1/object') 
+  and r.method = 'GET'
+  and h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')
+group by path, search
+order by count desc
+limit 100
 `,
     for: ['api'],
   },
