@@ -61,7 +61,7 @@ const ProductDropdown = () => {
             ))}
           </ul>
         </div>
-        <div className="border-t p-6">
+        <div className="p-6">
           <p className="text-muted text-xs uppercase tracking-widest font-mono mb-6">
             {ComparisonsData.label}
           </p>

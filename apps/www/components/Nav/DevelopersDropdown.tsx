@@ -116,6 +116,10 @@ const DevelopersDropdown = () => {
                 fill="#707070"
               />
             </svg>
+<<<<<<< HEAD
+=======
+
+>>>>>>> eba24d9e8 (update developers nav links)
             <span>{DevelopersData['footer']['support'].text}</span>
           </a>
         </Link>
