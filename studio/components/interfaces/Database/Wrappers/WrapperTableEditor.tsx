@@ -1,6 +1,8 @@
-import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
-import { useStore } from 'hooks'
 import { useEffect, useState } from 'react'
+
+import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useSchemasQuery } from 'data/database/schemas-query'
 import { Form, IconDatabase, IconPlus, Input, Listbox, Modal, SidePanel } from 'ui'
 import WrapperDynamicColumns from './WrapperDynamicColumns'
 import { Table, TableOption } from './Wrappers.types'
@@ -160,8 +162,11 @@ const TableForm = ({
   onSubmit: OnSubmitFn
   initialData: any
 }) => {
-  const { meta } = useStore()
-  const schemas = meta.schemas.list()
+  const { project } = useProjectContext()
+  const { data: schemas } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const requiredOptions =
     table.options.filter((option) => option.editable && option.required && !option.defaultValue) ??
@@ -208,8 +213,8 @@ const TableForm = ({
                 Create a new schema
               </Listbox.Option>
               <Modal.Separator />
-              {/* @ts-ignore */}
-              {schemas.map((schema: PostgresSchema) => {
+
+              {schemas?.map((schema) => {
                 return (
                   <Listbox.Option
                     key={schema.id}

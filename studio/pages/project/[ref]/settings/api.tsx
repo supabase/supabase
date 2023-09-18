@@ -1,5 +1,5 @@
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { createContext, useEffect } from 'react'
+import { createContext } from 'react'
 
 import { useParams } from 'common/hooks'
 import ServiceList from 'components/interfaces/Settings/API/ServiceList'
@@ -30,12 +30,6 @@ const ApiSettings: NextPageWithLayout = () => {
   PageContext.meta = meta
   PageContext.project = project
   if (meta) PageState.meta = meta
-
-  useEffect(() => {
-    if (ui.selectedProjectRef) {
-      meta.schemas.load()
-    }
-  }, [ui.selectedProjectRef])
 
   return (
     <PageContext.Provider value={PageState}>

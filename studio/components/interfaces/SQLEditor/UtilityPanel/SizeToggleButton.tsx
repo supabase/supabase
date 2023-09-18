@@ -1,6 +1,6 @@
-import { Button, IconChevronDown, IconChevronUp } from 'ui'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { Button, IconMaximize2, IconMinimize2 } from 'ui'
 
 export interface SizeToggleButton {
   id: string
@@ -22,7 +22,7 @@ const SizeToggleButton = ({ id }: SizeToggleButton) => {
           type="text"
           size="tiny"
           onClick={restorePanelSize}
-          icon={<IconChevronUp className="text-gray-1100" size="tiny" strokeWidth={2} />}
+          icon={<IconMaximize2 className="text-gray-1100" size="tiny" strokeWidth={2} />}
         />
       </Tooltip.Trigger>
       <Tooltip.Portal>
@@ -46,7 +46,7 @@ const SizeToggleButton = ({ id }: SizeToggleButton) => {
           type="text"
           size="tiny"
           onClick={maximizeEditor}
-          icon={<IconChevronDown className="text-gray-1100" size="tiny" strokeWidth={2} />}
+          icon={<IconMinimize2 className="text-gray-1100" size="tiny" strokeWidth={2} />}
         />
       </Tooltip.Trigger>
       <Tooltip.Portal>
