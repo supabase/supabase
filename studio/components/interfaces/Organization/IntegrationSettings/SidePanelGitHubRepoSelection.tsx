@@ -31,7 +31,7 @@ Check the details below before proceeding
           />
         </SidePanel.Content>
         <SidePanel.Content className="flex flex-col gap-2">
-          <label className="text-sm text-scale-900">GitHub scope / organisation</label>
+          <label className="text-sm text-scale-900">GitHub scope / organization</label>
           <div className="flex gap-3 w-full">
             <Select icon={<IconGitHub />} className="w-full">
               <Select.Option value="mildtomato">MildTomato</Select.Option>
