@@ -27,8 +27,7 @@ const Nav = () => {
   const [openDevelopers, setOpenDevelopers] = useState(false)
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
-  
-  
+
   const isHomePage = router.pathname === '/'
   const isLaunchWeekPage = router.pathname.includes('launch-week')
   const showLaunchWeekNavMode =
@@ -292,17 +291,17 @@ const Nav = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {
-                  (!isUserLoading) && <>
-                  <a href="https://github.com/supabase/supabase" target="_blank">
-                    <Button
-                      className="hidden group lg:flex"
-                      type="text"
-                      icon={
-                        <div className="flex items-center justify-center w-4 h-4 text-brand-300">
-                          <div
-                            className={[
-                              `text-scale-900 flex h-3 w-3 items-center justify-center
+                {!isUserLoading && (
+                  <>
+                    <a href="https://github.com/supabase/supabase" target="_blank">
+                      <Button
+                        className="hidden group lg:flex"
+                        type="text"
+                        icon={
+                          <div className="flex items-center justify-center w-4 h-4 text-brand-300">
+                            <div
+                              className={[
+                                `text-scale-900 flex h-3 w-3 items-center justify-center
 
                               transition-all
                               group-hover:h-4
@@ -312,46 +311,48 @@ const Nav = () => {
                               group-focus:w-4
 
                               group-focus:text-yellow-900`,
-                              showLaunchWeekNavMode && '!text-white',
-                            ].join(' ')}
-                          >
-                            <IconStar strokeWidth={2} />
+                                showLaunchWeekNavMode && '!text-white',
+                              ].join(' ')}
+                            >
+                              <IconStar strokeWidth={2} />
+                            </div>
                           </div>
-                        </div>
-                      }
-                    >
-                      <span
-                      // className={isLaunchWeekPage ? '!text-white' : ''}
+                        }
                       >
-                        Star us on GitHub
-                      </span>
-                    </Button>
-                  </a>
+                        <span
+                        // className={isLaunchWeekPage ? '!text-white' : ''}
+                        >
+                          Star us on GitHub
+                        </span>
+                      </Button>
+                    </a>
 
-                  {isLoggedIn ? (
-                    <Link href="/dashboard/projects">
-                      <a>
-                        <Button className="hidden text-white lg:block">Dashboard</Button>
-                      </a>
-                    </Link>
-                  ) : (
-                    <>
-                      <Link href="https://supabase.com/dashboard">
+                    {isLoggedIn ? (
+                      <Link href="/dashboard/projects">
                         <a>
-                          <Button type="default" className="hidden lg:block">
-                            Sign in
-                          </Button>
+                          <Button className="hidden text-white lg:block">Dashboard</Button>
                         </a>
                       </Link>
-                      <Link href="https://supabase.com/dashboard">
-                        <a>
-                          <Button className="hidden text-white lg:block">Start your project</Button>
-                        </a>
-                      </Link>
-                    </>
-                  )}
+                    ) : (
+                      <>
+                        <Link href="https://supabase.com/dashboard">
+                          <a>
+                            <Button type="default" className="hidden lg:block">
+                              Sign in
+                            </Button>
+                          </a>
+                        </Link>
+                        <Link href="https://supabase.com/dashboard">
+                          <a>
+                            <Button className="hidden text-white lg:block">
+                              Start your project
+                            </Button>
+                          </a>
+                        </Link>
+                      </>
+                    )}
                   </>
-                }
+                )}
               </div>
             </div>
           </div>
