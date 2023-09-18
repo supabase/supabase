@@ -1,10 +1,12 @@
 import Link from 'next/link'
-import Snippets from '../Snippets'
+
+import { AutoApiService } from 'data/config/project-api-query'
 import CodeSnippet from '../CodeSnippet'
+import Snippets from '../Snippets'
 
 interface AuthenticationProps {
-  autoApiService: any
-  selectedLang: string
+  autoApiService: AutoApiService
+  selectedLang: 'bash' | 'js'
   showApiKey: string
 }
 

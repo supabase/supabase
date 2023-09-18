@@ -1,6 +1,15 @@
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 
-const CodeSnippet = ({ selectedLang, snippet }) => {
+interface CodeSnippetProps {
+  selectedLang: 'bash' | 'js'
+  snippet: {
+    title?: string
+    bash: { language: string; code: string }
+    js: { language: string; code: string }
+  }
+}
+
+const CodeSnippet = ({ selectedLang, snippet }: CodeSnippetProps) => {
   if (!snippet[selectedLang]) return null
   return (
     <div className="codeblock-container">
