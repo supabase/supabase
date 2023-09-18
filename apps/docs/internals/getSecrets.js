@@ -1,20 +1,18 @@
 // for internal supabase use only
 const fs = require('fs/promises')
-const AWS = require('aws-sdk')
+const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager')
 
 const secretName = 'local/docs'
 const region = 'ap-southeast-2'
 
 const getSecrets = async (name, region) => {
   try {
-    AWS.config.update({ region })
-    const secretsmanager = new AWS.SecretsManager()
+    const secretsmanager = new SecretsManagerClient({ region })
 
-    const data = await secretsmanager
-      .getSecretValue({
-        SecretId: name,
-      })
-      .promise()
+    const command = new GetSecretValueCommand({
+      SecretId: name,
+    })
+    const data = await secretsmanager.send(command)
 
     if (!data.SecretString) {
       throw new Error('Secrets not found')
