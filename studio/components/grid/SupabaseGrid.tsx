@@ -65,7 +65,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>(
     const filters = formatFilterURLParams(filter as string[])
 
     const { project } = useProjectContext()
-    const { data, isLoading, isRefetching } = useTableRowsQuery(
+    const { data, error, isSuccess, isError, isLoading, isRefetching } = useTableRowsQuery(
       {
         queryKey: [props.table.schema, props.table.name],
         projectRef: project?.ref,
@@ -187,7 +187,14 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>(
               ref={gridRef}
               {...gridProps}
               rows={data?.rows ?? []}
+              error={error}
+              isLoading={isLoading}
+              isSuccess={isSuccess}
+              isError={isError}
+              filters={filters}
               updateRow={updateTableRow}
+              onAddRow={onAddRow}
+              onImportData={onImportData}
               onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
             />
             <Footer isLoading={isLoading || isRefetching} />
