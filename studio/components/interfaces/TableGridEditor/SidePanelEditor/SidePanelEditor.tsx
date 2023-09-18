@@ -585,7 +585,7 @@ const SidePanelEditor = ({
       />
       <ConfirmationModal
         visible={isClosingPanel}
-        header="Confirm to close"
+        header="Discard changes"
         buttonLabel="Discard"
         onSelectCancel={() => setIsClosingPanel(false)}
         onSelectConfirm={() => {

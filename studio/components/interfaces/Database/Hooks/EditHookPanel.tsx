@@ -316,7 +316,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       </SidePanel>
       <ConfirmationModal
         visible={isClosingPanel}
-        header="Confirm to close"
+        header="Discard changes"
         buttonLabel="Discard"
         onSelectCancel={() => setIsClosingPanel(false)}
         onSelectConfirm={() => {
