@@ -6,11 +6,13 @@ import { ResponseError } from 'types'
 import { secretsKeys } from './keys'
 
 export type SecretsCreateVariables = {
-  projectRef: string
+  projectRef?: string
   secrets: { name: string; value: string }[]
 }
 
 export async function createSecrets({ projectRef, secrets }: SecretsCreateVariables) {
+  if (!projectRef) throw new Error('Project ref is required')
+
   const { data, error } = await post('/v1/projects/{ref}/secrets', {
     params: { path: { ref: projectRef } },
     body: secrets,
