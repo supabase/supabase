@@ -1,17 +1,19 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { PostgresSchema } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { Button, IconLock, IconSearch, Input, Listbox } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions, useStore } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import TriggerList from './TriggerList'
 
 interface TriggersListProps {
@@ -25,15 +27,19 @@ const TriggersList = ({
   editTrigger = noop,
   deleteTrigger = noop,
 }: TriggersListProps) => {
+  const { project } = useProjectContext()
   const { meta } = useStore()
   const [selectedSchema, setSelectedSchema] = useState<string>('public')
   const [filterString, setFilterString] = useState<string>('')
 
-  const schemas: PostgresSchema[] = meta.schemas.list()
-  const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
-    meta.excludedSchemas.includes(schema?.name ?? '')
+  const { data: schemas } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const [protectedSchemas, openSchemas] = partition(schemas ?? [], (schema) =>
+    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
-  const schema = schemas.find((schema) => schema.name === selectedSchema)
+  const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
   const triggers = meta.triggers.list()
