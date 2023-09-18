@@ -41,7 +41,7 @@
   "devDependencies": {
     "eslint": "^8.41.0",
     "eslint-config-custom": "*",
-    "prettier": "2.8.8",
+    "prettier": "^2.8.8",
     "prettier-plugin-sql-cst": "^0.5.0",
     "supabase": "^1.45.2",
     "turbo": "^1.10.13"
