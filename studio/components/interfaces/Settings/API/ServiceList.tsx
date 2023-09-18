@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useEffect, useRef } from 'react'
-import { IconAlertCircle, Input } from 'ui'
+import { Badge, IconAlertCircle, Input } from 'ui'
 
 import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
@@ -14,6 +14,7 @@ import { DisplayApiSettings } from 'components/ui/ProjectSettings'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
 import JWTSettings from './JWTSettings'
 import PostgrestConfig from './PostgrestConfig'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 
 const ServiceList = () => {
   const { ui } = useStore()
@@ -23,6 +24,7 @@ const ServiceList = () => {
   const { data: settings, isError } = useProjectApiQuery({
     projectRef,
   })
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 
   const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
@@ -56,8 +58,12 @@ const ServiceList = () => {
   }, [jwtSecretUpdateStatus])
 
   // Get the API service
+  const isCustomDomainActive = customDomainData?.customDomain?.status === 'active'
   const apiService = settings?.autoApiService
   const apiUrl = `${apiService?.protocol ?? 'https'}://${apiService?.endpoint ?? '-'}`
+  const endpoint = isCustomDomainActive
+    ? `https://${customDomainData.customDomain.hostname}`
+    : apiUrl
 
   return (
     <div>
@@ -73,11 +79,20 @@ const ServiceList = () => {
             ) : (
               <Input
                 copy
-                label="URL"
+                label={
+                  isCustomDomainActive ? (
+                    <div className="flex items-center space-x-2">
+                      <p>URL</p>
+                      <Badge>Custom domain active</Badge>
+                    </div>
+                  ) : (
+                    'URL'
+                  )
+                }
                 readOnly
                 disabled
                 className="input-mono"
-                value={apiUrl}
+                value={endpoint}
                 descriptionText="A RESTful endpoint for querying and managing your database."
                 layout="horizontal"
               />
