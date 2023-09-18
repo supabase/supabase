@@ -84,7 +84,7 @@ export const ProjectCardStatus = ({
     <div>
       <Alert_Shadcn_
         variant={alertType}
-        className="border-0 rounded-none rounded-b-md my-2 mb-2.5 [&>svg]:w-[28px] [&>svg]:h-[28px] [&>svg]:mt-1 [&>svg]:p-1.5 [&>svg]:left-6 pl-6"
+        className="border-0 rounded-none rounded-b-md my-2 mb-2.5 [&>svg]:w-[28px] [&>svg]:h-[28px] [&>svg]:mt-1 [&>svg]:p-1.5 [&>svg]:left-6 pl-6 group-hover:bg-destructive-300 transition-colors"
       >
         {projectStatus === 'isPaused' || projectStatus === 'isPausing' ? (
           <IconPauseCircle strokeWidth={2} />
