@@ -7,13 +7,14 @@ import { memo } from 'react-tracked'
 
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import { useUrlState } from 'hooks'
+import { Button } from 'ui'
 import { useDispatch, useTrackedState } from '../../store'
 import { Filter, GridProps, SupaRow } from '../../types'
 import RowRenderer from './RowRenderer'
-import { Button } from 'ui'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import AlertError from 'components/ui/AlertError'
 
 const rowKeyGetter = (row: SupaRow) => {
   return row?.idx ?? -1
@@ -34,6 +35,7 @@ interface IGrid extends GridProps {
   isSuccess: boolean
   isError: boolean
   filters: Filter[]
+  setParams: ReturnType<typeof useUrlState>[1]
   updateRow: (previousRow: any, updatedData: any) => void
   onAddRow?: () => void
   onImportData?: () => void
@@ -60,6 +62,7 @@ export const Grid = memo(
         isSuccess,
         isError,
         filters,
+        setParams,
         updateRow,
         onAddRow,
         onImportData,
@@ -133,6 +136,12 @@ export const Grid = memo(
         }
       }
 
+      const removeAllFilters = () => {
+        setParams((prevParams) => {
+          return { ...prevParams, filter: [] }
+        })
+      }
+
       return (
         <div
           className={containerClass}
@@ -198,6 +207,11 @@ export const Grid = memo(
                         <p className="text-sm text-light">
                           The filters applied has returned no results from this table
                         </p>
+                        <div className="flex items-center space-x-2 mt-4">
+                          <Button type="default" onClick={() => removeAllFilters()}>
+                            Remove all filters
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </>
