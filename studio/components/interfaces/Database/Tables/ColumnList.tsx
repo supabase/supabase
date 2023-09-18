@@ -4,6 +4,11 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
+
+import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
+import Table from 'components/to-be-cleaned/Table'
+import { useCheckPermissions, useStore } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import {
   Button,
   IconChevronLeft,
@@ -14,11 +19,6 @@ import {
   IconTrash,
   Input,
 } from 'ui'
-
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
-import Table from 'components/to-be-cleaned/Table'
-import { useCheckPermissions, useStore } from 'hooks'
-import { ScaffoldHeader } from 'components/layouts/Scaffold'
 
 interface ColumnListProps {
   selectedTable: PostgresTable
@@ -42,7 +42,7 @@ const ColumnList = ({
       ? selectedTable.columns
       : selectedTable.columns?.filter((column: any) => column.name.includes(filterString))) ?? []
 
-  const isLocked = meta.excludedSchemas.includes(selectedTable.schema ?? '')
+  const isLocked = EXCLUDED_SCHEMAS.includes(selectedTable.schema ?? '')
   const canUpdateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
   return (

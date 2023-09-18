@@ -1,6 +1,6 @@
 import { PostgresTable, PostgresTrigger } from '@supabase/postgres-meta'
 import Image from 'next/image'
-import { MutableRefObject, useEffect, useRef, useState } from 'react'
+import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -12,12 +12,13 @@ import {
   EdgeFunctionsResponse,
   useEdgeFunctionsQuery,
 } from 'data/edge-functions/edge-functions-query'
+import { getTable } from 'data/tables/table-query'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useStore } from 'hooks'
-import { tryParseJson, uuidv4 } from 'lib/helpers'
+import { isValidHttpUrl, tryParseJson, uuidv4 } from 'lib/helpers'
 import { Button, Checkbox, Form, Input, Listbox, Modal, Radio, SidePanel } from 'ui'
 import HTTPRequestFields from './HTTPRequestFields'
 import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
-import { isValidHttpUrl } from 'lib/helpers'
 
 export interface EditHookPanelProps {
   visible: boolean
@@ -29,7 +30,7 @@ export type HTTPArgument = { id: string; name: string; value: string }
 
 const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) => {
   const { ref } = useParams()
-  const { meta, ui } = useStore()
+  const { ui } = useStore()
   const submitRef = useRef<any>(null)
   const [isEdited, setIsEdited] = useState(false)
   const [isClosingPanel, setIsClosingPanel] = useState(false)
@@ -44,6 +45,10 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
   const [httpParameters, setHttpParameters] = useState<HTTPArgument[]>([])
 
   const { project } = useProjectContext()
+  const { data } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
   const { mutate: createDatabaseTrigger, isLoading: isCreatingDatabaseTrigger } =
     useDatabaseTriggerCreateMutation({
@@ -81,7 +86,10 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
     })
   const isSubmitting = isCreatingDatabaseTrigger || isUpdatingDatabaseTrigger
 
-  const tables = meta.tables.list().sort((a, b) => (a.schema > b.schema ? 0 : -1))
+  const tables = useMemo(
+    () => [...(data ?? [])].sort((a, b) => (a.schema > b.schema ? 0 : -1)),
+    [data]
+  )
   const restUrl = project?.restUrl
   const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
 
@@ -185,7 +193,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       return setEventsError('Please select at least one event')
     }
 
-    const selectedTable = meta.tables.byId(values.table_id)
+    const selectedTable = await getTable(values.table_id)
     if (!selectedTable) {
       return ui.setNotification({ category: 'error', message: 'Unable to find selected table' })
     }

@@ -1,16 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { indexOf } from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { useContext, useEffect } from 'react'
-import { Form, IconAlertCircle, Input, InputNumber } from 'ui'
+import { useEffect } from 'react'
 
 import { useParams } from 'common/hooks'
-import MultiSelect from 'components/ui/MultiSelect'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
-import { PageContext } from 'pages/project/[ref]/settings/api'
-
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   FormActions,
   FormPanel,
@@ -18,12 +12,22 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
+import MultiSelect from 'components/ui/MultiSelect'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useCheckPermissions, useStore } from 'hooks'
+import { Form, IconAlertCircle, Input, InputNumber } from 'ui'
 
 const PostgrestConfig = () => {
-  const PageState: any = useContext(PageContext)
   const { ref: projectRef } = useParams()
   const { ui } = useStore()
-  const { meta } = PageState
+
+  const { project } = useProjectContext()
+  const { data: schemas } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
   const { mutate: updatePostgrestConfig, isLoading: isUpdating } =
@@ -53,15 +57,12 @@ const PostgrestConfig = () => {
   const permanentSchema = ['public', 'storage']
   const hiddenSchema = ['auth', 'pgbouncer', 'hooks', 'extensions']
   const schema =
-    meta.schemas
-      .list(
-        (x: any) => {
-          const find = indexOf(hiddenSchema, x.name)
-          if (find < 0) return x
-        },
-        { allSchemas: true }
-      )
-      .map((x: any) => {
+    schemas
+      ?.filter((x) => {
+        const find = indexOf(hiddenSchema, x.name)
+        if (find < 0) return x
+      })
+      .map((x) => {
         return {
           id: x.id,
           value: x.name,
