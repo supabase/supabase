@@ -11,12 +11,13 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
-import { Button, IconExternalLink, IconInfo, Listbox } from 'ui'
+import { Alert, Button, IconExternalLink, IconInfo, Listbox } from 'ui'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
 import SizeAndCounts from './SizeAndCounts'
 import InformationBox from 'components/ui/InformationBox'
 import Link from 'next/link'
+import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 
 const Usage = () => {
   const { slug, projectRef } = useParams()
@@ -32,6 +33,9 @@ const Usage = () => {
     isError: isErrorSubscription,
     isSuccess: isSuccessSubscription,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
+
+  const { data: usage } = useOrgUsageQuery({ orgSlug: slug })
+
   const orgProjects = projects?.filter((project) => project.organization_id === organization?.id)
 
   useEffect(() => {
@@ -87,6 +91,13 @@ const Usage = () => {
   const selectedProject = selectedProjectRef
     ? orgProjects?.find((it) => it.ref === selectedProjectRef)
     : undefined
+
+  const hasExceededAnyLimits = Boolean(
+    usage?.usages.find(
+      (metric) =>
+        !metric.unlimited && metric.capped && metric.usage > (metric?.pricing_free_units ?? 0)
+    )
+  )
 
   return (
     <>
@@ -156,6 +167,33 @@ const Usage = () => {
         </div>
       </ScaffoldContainer>
 
+      {!selectedProject && subscription && hasExceededAnyLimits && (
+        <ScaffoldContainer className="mt-5">
+          <Alert
+            withIcon
+            variant="danger"
+            title="Your organization's usage has exceeded its included quota"
+            actions={[
+              <Link
+                key="upgrade-button"
+                href={`/org/${slug}/billing?panel=${
+                  subscription.plan.id === 'free' ? 'subscriptionPlan' : 'costControl'
+                }`}
+              >
+                <Button asChild key="upgrade-button" type="default" className="ml-8">
+                  <a>{subscription.plan.id === 'free' ? 'Upgrade plan' : 'Change spend cap'}</a>
+                </Button>
+              </Link>,
+            ]}
+          >
+            Your projects can become unresponsive or enter read only mode.{' '}
+            {subscription.plan.id === 'free'
+              ? 'Please upgrade to the Pro plan to ensure that your projects remain available.'
+              : 'Please disable spend cap to ensure that your projects remain available.'}
+          </Alert>
+        </ScaffoldContainer>
+      )}
+
       {selectedProjectRef && (
         <ScaffoldContainer className="mt-5">
           <InformationBox
@@ -165,13 +203,13 @@ const Usage = () => {
                 <p>
                   You are currently viewing usage for the "
                   {selectedProject?.name || selectedProjectRef}" project. Since your organization is
-                  using the new organization-level billing, the included quota is for your whole
+                  using the new organization-based billing, the included quota is for your whole
                   organization and not just this project. For billing purposes, we sum up usage from
                   all your projects. To view your usage quota, set the project filter above back to
                   "All Projects".
                 </p>
                 <div>
-                  <Link href="https://www.notion.so/supabase/Organization-Level-Billing-9c159d69375b4af095f0b67881276582?pvs=4">
+                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
                     <a target="_blank" rel="noreferrer">
                       <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                         Documentation

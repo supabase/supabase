@@ -1,14 +1,24 @@
+import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { Button, IconExternalLink } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertCircle,
+  IconExternalLink,
+  Modal,
+} from 'ui'
 
-import { useStore } from 'hooks'
-import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
-import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-domains-activate-mutation'
-import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import Panel from 'components/ui/Panel'
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
+import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-domains-activate-mutation'
+import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
+import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
+import { useStore } from 'hooks'
 
 export type CustomDomainActivateProps = {
   projectRef?: string
@@ -19,17 +29,26 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
   const { ui } = useStore()
   const [isActivateConfirmModalVisible, setIsActivateConfirmModalVisible] = useState(false)
 
-  const { mutate: activateCustomDomain } = useCustomDomainActivateMutation({
-    onSuccess: () => {
-      ui.setNotification({ category: 'success', message: `Successfully activated custom domain` })
-      setIsActivateConfirmModalVisible(false)
-    },
-  })
+  const { data: settings } = useProjectApiQuery({ projectRef })
+  const { mutate: checkCNAMERecord, isLoading: isCheckingRecord } = useCheckCNAMERecordMutation()
+  const { mutate: activateCustomDomain, isLoading: isActivating } = useCustomDomainActivateMutation(
+    {
+      onSuccess: () => {
+        ui.setNotification({ category: 'success', message: `Successfully activated custom domain` })
+        setIsActivateConfirmModalVisible(false)
+      },
+    }
+  )
   const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
+
+  const endpoint = settings?.autoApiService.endpoint
 
   const onActivateCustomDomain = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    activateCustomDomain({ projectRef })
+    checkCNAMERecord(
+      { domain: customDomain.hostname },
+      { onSuccess: () => activateCustomDomain({ projectRef }) }
+    )
   }
 
   const onCancelCustomDomain = async () => {
@@ -51,6 +70,28 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
               application, as you will need to update any services that need to know about your
               custom domain (e.g client side code or OAuth providers)
             </span>
+          </div>
+          <div className="mt-4">
+            <Alert_Shadcn_>
+              <IconAlertCircle className="text-scale-1100" strokeWidth={1.5} />
+              <AlertTitle_Shadcn_>
+                Do remember to restore the original CNAME record from the first step before
+                activating
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                <p className="col-span-12 text-sm lg:col-span-7 leading-6">
+                  Set up a CNAME record for <code className="text-xs">{customDomain.hostname}</code>
+                  , resolving to{' '}
+                  {endpoint ? (
+                    <code className="text-xs">{endpoint}</code>
+                  ) : (
+                    "your project's API URL"
+                  )}
+                  , with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
+                  do disable the proxy option.
+                </p>
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
           </div>
         </Panel.Content>
 
@@ -103,22 +144,25 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
         </Panel.Content>
       </div>
 
-      <ConfirmModal
+      <ConfirmationModal
         size="small"
+        loading={isCheckingRecord || isActivating}
         visible={isActivateConfirmModalVisible}
-        // @ts-ignore
-        title={
+        header={
           <div>
             Are you sure you want to activate the custom domain{' '}
             <code className="text-sm">{customDomain.hostname}</code> for the project?
           </div>
         }
-        description="The existing Supabase subdomain will be deactivated."
         buttonLabel="Activate"
         buttonLoadingLabel="Activating"
         onSelectCancel={() => setIsActivateConfirmModalVisible(false)}
         onSelectConfirm={onActivateCustomDomain}
-      />
+      >
+        <Modal.Content className="py-3">
+          <p className="text-sm">The existing Supabase subdomain will be deactivated.</p>
+        </Modal.Content>
+      </ConfirmationModal>
     </>
   )
 }

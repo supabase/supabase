@@ -1,13 +1,17 @@
-import { useRef, useEffect, useState, FormEvent, KeyboardEvent, ReactNode } from 'react'
-import { orderBy, filter, without } from 'lodash'
+import clsx from 'clsx'
+import { filter, orderBy, without } from 'lodash'
+import { KeyboardEvent, ReactNode, useEffect, useRef, useState } from 'react'
 import {
-  Popover,
-  IconCheck,
   IconAlertCircle,
-  IconSearch,
-  IconPlus,
+  IconCheck,
   IconChevronDown,
+  IconPlus,
+  IconSearch,
   Input,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  ScrollArea,
 } from 'ui'
 
 import { BadgeDisabled, BadgeSelected } from './Badges'
@@ -54,6 +58,7 @@ export default function MultiSelect({
 }: Props) {
   const ref = useRef(null)
 
+  const [open, setOpen] = useState(false)
   const [selected, setSelected] = useState<string[]>(value || [])
   const [searchString, setSearchString] = useState<string>('')
   const [inputWidth, setInputWidth] = useState<number>(128)
@@ -65,6 +70,10 @@ export default function MultiSelect({
   useEffect(() => {
     setInputWidth(ref.current ? (ref.current as any).offsetWidth : inputWidth)
   }, [ref.current])
+
+  useEffect(() => {
+    if (!open) setSearchString('')
+  }, [open])
 
   const width = `${inputWidth}px`
 
@@ -131,28 +140,59 @@ export default function MultiSelect({
         ].join(' ')}
         ref={ref}
       >
-        <Popover
-          sideOffset={4}
-          side="bottom"
-          align="start"
-          style={{ width }}
-          header={
-            <div className="flex items-center space-x-2 py-1">
-              <IconSearch size={14} />
-              <input
-                autoFocus
-                className="w-72 bg-transparent text-sm placeholder-scale-1000 outline-none"
-                value={searchString}
-                placeholder={searchPlaceholder}
-                onKeyPress={onKeyPress}
-                onChange={(e: FormEvent<HTMLInputElement>) =>
-                  setSearchString(e.currentTarget.value)
+        <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+          <PopoverTrigger_Shadcn_ asChild>
+            <div
+              className={[
+                'flex w-full flex-wrap items-start gap-1.5 p-1.5 cursor-pointer',
+                `${selectedOptions.length === 0 ? 'h-9' : ''}`,
+              ].join(' ')}
+              onClick={() => setOpen(true)}
+            >
+              {selectedOptions.length === 0 && placeholder && (
+                <div className="px-2 text-sm text-scale-1000 h-full flex items-center">
+                  {placeholder}
+                </div>
+              )}
+              {selectedOptions.map((value, idx) => {
+                const id = `${value}-${idx}`
+                const option = formattedOptions.find((x) => x.value === value)
+                const isDisabled = option?.disabled ?? false
+                if (!option) {
+                  return <></>
+                } else if (isDisabled) {
+                  return <BadgeDisabled key={id} name={value} />
+                } else {
+                  return (
+                    <BadgeSelected
+                      key={id}
+                      name={value}
+                      handleRemove={() =>
+                        allowDuplicateSelection ? handleRemove(idx) : handleChange(option)
+                      }
+                    />
+                  )
                 }
-              />
+              })}
+              <div className="absolute inset-y-0 right-0 pl-3 pr-2 flex space-x-1 items-center cursor-pointer ">
+                <IconChevronDown size={16} strokeWidth={2} className="text-scale-900" />
+              </div>
             </div>
-          }
-          overlay={
-            <div className="max-h-[225px] space-y-1 overflow-y-auto p-1">
+          </PopoverTrigger_Shadcn_>
+          <PopoverContent_Shadcn_
+            className="p-0"
+            side="bottom"
+            align="start"
+            style={{ width, marginLeft: '-5px' }}
+          >
+            <Input
+              className="[&>div>div>div>input]:!rounded-b-none [&>div>div>div>input]:!pl-9"
+              icon={<IconSearch size={16} />}
+              placeholder={searchPlaceholder}
+              value={searchString}
+              onChange={(e) => setSearchString(e.target.value)}
+            />
+            <ScrollArea className={clsx('p-1', filteredOptions.length > 5 ? 'h-[225px]' : '')}>
               {filteredOptions.length >= 1 ? (
                 filteredOptions.map((option) => {
                   const active =
@@ -185,9 +225,7 @@ export default function MultiSelect({
                         <IconCheck
                           size={16}
                           strokeWidth={3}
-                          className={`cursor-pointer transition ${
-                            active ? ' dark:text-green-500' : ''
-                          }`}
+                          className={`cursor-pointer transition ${active ? 'text-brand' : ''}`}
                         />
                       )}
                       {allowDuplicateSelection && (
@@ -231,46 +269,9 @@ export default function MultiSelect({
                   )}
                 </div>
               )}
-            </div>
-          }
-          onOpenChange={() => setSearchString('')}
-        >
-          <div
-            className={[
-              'flex w-full flex-wrap items-start gap-1.5 p-1.5 cursor-default',
-              `${selectedOptions.length === 0 ? 'h-9' : ''}`,
-            ].join(' ')}
-          >
-            {selectedOptions.length === 0 && placeholder && (
-              <div className="px-2 text-sm text-scale-1000 h-full flex items-center">
-                {placeholder}
-              </div>
-            )}
-            {selectedOptions.map((value, idx) => {
-              const id = `${value}-${idx}`
-              const option = formattedOptions.find((x) => x.value === value)
-              const isDisabled = option?.disabled ?? false
-              if (!option) {
-                return <></>
-              } else if (isDisabled) {
-                return <BadgeDisabled key={id} name={value} />
-              } else {
-                return (
-                  <BadgeSelected
-                    key={id}
-                    name={value}
-                    handleRemove={() =>
-                      allowDuplicateSelection ? handleRemove(idx) : handleChange(option)
-                    }
-                  />
-                )
-              }
-            })}
-            <div className="absolute inset-y-0 right-0 pl-3 pr-2 flex space-x-1 items-center cursor-pointer ">
-              <IconChevronDown size={16} strokeWidth={2} className="text-scale-900" />
-            </div>
-          </div>
-        </Popover>
+            </ScrollArea>
+          </PopoverContent_Shadcn_>
+        </Popover_Shadcn_>
       </div>
 
       {descriptionText && (

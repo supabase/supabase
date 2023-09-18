@@ -37,7 +37,8 @@ functions:
       **On JS**, it uses the website origin as the callback url. Session importing gets handled automatically.
       **Windows, tvOS, watchOS & Linux** currently have no default implementation. Feel free to create a PR.
 
-      You always make your own implementation and use `gotrue.parseFragmentAndImportSession(fragment)` to let [supabase-kt](https://github.com/supabase-community/supabase-kt) handle the parsing & importing of the session after receiving a callback.
+      You always make your own implementation and use `gotrue.parseSessionFromFragment(fragment)` or `gotrue.parseSessionFromUrl(url)` to let [supabase-kt](https://github.com/supabase-community/supabase-kt) handle the parsing after receiving a callback.
+      Then you can simply use `gotrue.importSession(session)`.
 
       ### Configure deeplink callbacks for Authentication
 
@@ -53,6 +54,9 @@ functions:
           install(GoTrue) {
              host = "deeplink host" // this can be anything, eg. your package name or app/company url (not your supabase url)
              scheme = "deeplink scheme"
+             
+             //Android only, you can also change that OAuth/SSO logins open in a custom tab, rather than an external browser:
+             defaultExternalAuthAction = ExternalAuthAction.CUSTOM_TABS //defaults to EXTERNAL_BROWSER
           }
           ```
       4. **Call platform specific function on startup** \

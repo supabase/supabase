@@ -109,7 +109,12 @@ const nextConfig = {
       },
       {
         source: '/project/:ref/database/pgbouncer-logs',
-        destination: '/project/:ref/logs/pgbouncer-logs',
+        destination: '/project/:ref/logs/pooler-logs',
+        permanent: true,
+      },
+      {
+        source: '/project/:ref/logs/pgbouncer-logs',
+        destination: '/project/:ref/logs/pooler-logs',
         permanent: true,
       },
       {

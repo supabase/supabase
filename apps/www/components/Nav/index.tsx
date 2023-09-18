@@ -2,8 +2,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import Announcement from '~/components/Announcement/Announcement'
-import { Button, Badge, IconStar, IconChevronDown, LW8CountdownBanner } from 'ui'
+import { Button, Badge, IconStar, IconChevronDown } from 'ui'
 import FlyOut from '~/components/UI/FlyOut'
 import Transition from 'lib/Transition'
 
@@ -166,7 +165,6 @@ const Nav = () => {
     <div
       className={[
         `
-        text-scale-1200 hover:text-brand
         inline-flex cursor-pointer items-center
         border-b-2
         border-transparent
@@ -174,6 +172,7 @@ const Nav = () => {
         text-sm font-medium
         transition-colors`,
         showLaunchWeekNavMode && '!text-white',
+        props.active ? 'text-brand' : 'hover:text-brand',
         props.active,
       ].join(' ')}
       onClick={props.onClick}
@@ -198,9 +197,6 @@ const Nav = () => {
 
   return (
     <>
-      <Announcement link="/launch-week#today">
-        <LW8CountdownBanner />
-      </Announcement>
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
@@ -412,11 +408,6 @@ const Nav = () => {
                       Developers
                     </a>
                   </Link>
-                  <Link href="/company">
-                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
-                      Company
-                    </a>
-                  </Link>
                   <Link href="/pricing">
                     <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
                       Pricing
@@ -430,20 +421,17 @@ const Nav = () => {
                       Docs
                     </a>
                   </Link>
-                  <Link href="https://github.com/supabase/supabase">
-                    <a
-                      target="_blank"
-                      className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
-                    >
-                      GitHub
-                    </a>
-                  </Link>
                   <Link href="/blog">
                     <a
                       target="_blank"
                       className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white"
                     >
                       Blog
+                    </a>
+                  </Link>
+                  <Link href="/support">
+                    <a className="block py-2 pl-3 pr-4 text-base font-medium rounded-md text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
+                      Support
                     </a>
                   </Link>
                 </div>

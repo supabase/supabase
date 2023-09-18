@@ -1,31 +1,46 @@
-import { useState } from 'react'
-import { Button, IconAlertCircle, Modal } from 'ui'
 import Link from 'next/link'
-import { useStore } from 'hooks'
+import { useCallback, useState } from 'react'
+
 import { useParams } from 'common/hooks'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import type { PostgresTable } from '@supabase/postgres-meta'
-import { RLS_ACKNOWLEDGED_KEY } from 'components/grid/constants'
+import { rlsAcknowledgedKey } from 'components/grid/constants'
 import RLSDisableModalContent from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/RLSDisableModal'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { useTableQuery } from 'data/tables/table-query'
+import useEntityType from 'hooks/misc/useEntityType'
+import { Button, IconAlertCircle, Modal } from 'ui'
 
 export default function RLSBannerWarning() {
-  const { meta } = useStore()
-  const { ref: projectRef, id: tableID } = useParams()
+  const { project } = useProjectContext()
+  const { ref: projectRef, id: _id } = useParams()
+  const tableID = _id ? Number(_id) : undefined
 
-  const isAcknowledged =
-    localStorage?.getItem(`${RLS_ACKNOWLEDGED_KEY}-${tableID}`) === 'true' ?? false
+  const rlsKey = rlsAcknowledgedKey(tableID)
+  const isAcknowledged = localStorage?.getItem(rlsKey) === 'true' ?? false
 
   const [isOpen, setIsOpen] = useState(false)
 
-  const tables: PostgresTable[] = meta.tables.list()
-  const currentTable = tables.find((table) => table.id.toString() === tableID)
+  const entityType = useEntityType(tableID)
+  const { data: currentTable } = useTableQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      id: tableID,
+    },
+    {
+      enabled: entityType?.type === ENTITY_TYPE.TABLE,
+    }
+  )
+
   const rlsEnabled = currentTable?.rls_enabled
   const isPublicTable = currentTable?.schema === 'public'
 
-  function handleDismissWarning() {
-    localStorage.setItem(`${RLS_ACKNOWLEDGED_KEY}-${tableID}`, 'true')
+  const handleDismissWarning = useCallback(() => {
+    new BroadcastChannel(rlsKey).postMessage({ type: 'dismiss' })
+    localStorage.setItem(rlsKey, 'true')
     setIsOpen(false)
-  }
+  }, [rlsKey])
 
   return (
     <>

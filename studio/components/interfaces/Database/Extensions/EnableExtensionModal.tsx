@@ -1,8 +1,10 @@
-import type { PostgresExtension, PostgresSchema } from '@supabase/postgres-meta'
+import type { PostgresExtension } from '@supabase/postgres-meta'
 import { useEffect, useState } from 'react'
 import { Button, Form, IconDatabase, IconPlus, Input, Listbox, Modal } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useSchemasQuery } from 'data/database/schemas-query'
 import { useStore } from 'hooks'
 
 interface EnableExtensionModalProps {
@@ -12,11 +14,15 @@ interface EnableExtensionModalProps {
 }
 
 const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionModalProps) => {
+  const { project } = useProjectContext()
   const { ui, meta } = useStore()
   const [defaultSchema, setDefaultSchema] = useState()
   const [fetchingSchemaInfo, setFetchingSchemaInfo] = useState(false)
 
-  const schemas = meta.schemas.list()
+  const { data: schemas, isLoading: isSchemasLoading } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   // [Joshen] Worth checking in with users - whether having this schema selection
   // might be confusing, and if we should have a tooltip to explain that schemas
@@ -44,7 +50,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
     return () => {
       cancel = true
     }
-  }, [visible])
+  }, [visible, extension.name])
 
   const validate = (values: any) => {
     const errors: any = {}
@@ -124,7 +130,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
           return (
             <div className="space-y-4 py-4">
               <Modal.Content>
-                {fetchingSchemaInfo ? (
+                {fetchingSchemaInfo || isSchemasLoading ? (
                   <div className="space-y-2">
                     <ShimmeringLoader />
                     <div className="w-3/4">
@@ -156,8 +162,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                       Create a new schema "{extension.name}"
                     </Listbox.Option>
                     <Modal.Separator />
-                    {/* @ts-ignore */}
-                    {schemas.map((schema: PostgresSchema) => {
+                    {schemas?.map((schema) => {
                       return (
                         <Listbox.Option
                           key={schema.id}

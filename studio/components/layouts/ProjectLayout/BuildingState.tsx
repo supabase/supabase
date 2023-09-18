@@ -6,17 +6,17 @@ import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { Badge, Button, IconArrowRight, IconLoader } from 'ui'
 
+import { useParams } from 'common'
 import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
+import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
+import { useSelectedProject } from 'hooks'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { Project } from 'types'
 
-export interface BuildingStateProps {
-  project: Project
-}
-
-const BuildingState = ({ project }: BuildingStateProps) => {
+const BuildingState = () => {
+  const { ref } = useParams()
+  const project = useSelectedProject()
   const queryClient = useQueryClient()
   const checkServerInterval = useRef<number>()
 
@@ -31,7 +31,7 @@ const BuildingState = ({ project }: BuildingStateProps) => {
       const { status } = projectStatus
       if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
         clearInterval(checkServerInterval.current)
-
+        if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
         await invalidateProjectsQuery(queryClient)
       }
     }
@@ -44,6 +44,8 @@ const BuildingState = ({ project }: BuildingStateProps) => {
       clearInterval(checkServerInterval.current)
     }
   }, [])
+
+  if (project === undefined) return null
 
   return (
     <div className="mx-auto my-16 w-full max-w-6xl items-center justify-center">
