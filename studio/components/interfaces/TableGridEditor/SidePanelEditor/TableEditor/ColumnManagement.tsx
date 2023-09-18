@@ -53,6 +53,7 @@ const ColumnManagement = ({
     table: PostgresTable
     column: PostgresColumn
     deletionAction: string
+    updateAction: string
   }) => {
     if (selectedColumnToEditRelation !== undefined) {
       onUpdateColumn(selectedColumnToEditRelation, {
@@ -68,6 +69,7 @@ const ColumnManagement = ({
                 target_table_name: foreignKeyConfiguration.table.name,
                 target_column_name: foreignKeyConfiguration.column.name,
                 deletion_action: foreignKeyConfiguration.deletionAction,
+                update_action: foreignKeyConfiguration.updateAction,
               }
             : undefined,
         ...(foreignKeyConfiguration !== undefined && {

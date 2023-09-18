@@ -3,13 +3,18 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, edited]
 
+# Cancel old builds on new commit for same workflow + branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   misspell:
     name: runner / misspell
     runs-on: ubuntu-latest
     steps:
       - name: Check out code.
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: misspell
         uses: reviewdog/action-misspell@v1
         with:

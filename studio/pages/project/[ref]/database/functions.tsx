@@ -5,14 +5,13 @@ import { useEffect, useState } from 'react'
 import { CreateFunction, DeleteFunction } from 'components/interfaces/Database'
 import FunctionsList from 'components/interfaces/Database/Functions/FunctionsList/FunctionsList'
 import { DatabaseLayout } from 'components/layouts'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, useStore } from 'hooks'
 import { NextPageWithLayout } from 'types'
 
 const FunctionsPage: NextPageWithLayout = () => {
-  const { meta } = useStore()
-  const { project } = useProjectContext()
+  const { ui, meta } = useStore()
   const [selectedFunction, setSelectedFunction] = useState<any>()
   const [showCreateFunctionForm, setShowCreateFunctionForm] = useState<boolean>(false)
   const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState<boolean>(false)
@@ -20,10 +19,10 @@ const FunctionsPage: NextPageWithLayout = () => {
   const canReadFunctions = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'functions')
 
   useEffect(() => {
-    if (project?.ref) {
+    if (ui.selectedProjectRef) {
       fetchFunctions()
     }
-  }, [project?.ref])
+  }, [ui.selectedProjectRef])
 
   const fetchFunctions = async () => {
     meta.functions.load()
@@ -50,11 +49,20 @@ const FunctionsPage: NextPageWithLayout = () => {
 
   return (
     <>
-      <FunctionsList
-        createFunction={createFunction}
-        editFunction={editFunction}
-        deleteFunction={deleteFunction}
-      />
+      <ScaffoldContainer>
+        <ScaffoldSection>
+          <div className="col-span-12">
+            <div className="mb-4">
+              <h3 className="mb-1 text-xl text-scale-1200">Database Functions</h3>
+            </div>
+            <FunctionsList
+              createFunction={createFunction}
+              editFunction={editFunction}
+              deleteFunction={deleteFunction}
+            />
+          </div>
+        </ScaffoldSection>
+      </ScaffoldContainer>
       <CreateFunction
         func={selectedFunction}
         visible={showCreateFunctionForm}

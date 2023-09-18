@@ -1,10 +1,11 @@
-import { upsertContent, UpsertContentPayload } from 'data/content/content-upsert-mutation'
-import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { debounce, memoize } from 'lodash'
 import { useMemo } from 'react'
-import { SqlSnippets } from 'types'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxySet } from 'valtio/utils'
+
+import { upsertContent, UpsertContentPayload } from 'data/content/content-upsert-mutation'
+import { SqlSnippet } from 'data/content/sql-snippets-query'
+import { SqlSnippets } from 'types'
 
 export type StateSnippet = {
   snippet: SqlSnippet
