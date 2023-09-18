@@ -21,12 +21,12 @@ import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wo
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
 import { data as DevelopersData } from 'data/Developers'
-import Developers from './Developers'
+import DevelopersDropdown from './DevelopersDropdown'
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
 import MobileMenu from './MobileMenu'
 import MenuItem from './MenuItem'
-import Product from './Product'
+import ProductDropdown from './ProductDropdown'
 
 import SolutionsData from 'data/Solutions'
 import { useWindowSize } from 'react-use'
@@ -37,14 +37,14 @@ const menu = {
     {
       title: 'Product',
       hasDropdown: true,
-      dropdown: <Product />,
+      dropdown: <ProductDropdown />,
       dropdownContainerClassName: 'rounded-lg flex flex-row',
       subMenu: SolutionsData,
     },
     {
       title: 'Developers',
       hasDropdown: true,
-      dropdown: <Developers />,
+      dropdown: <DevelopersDropdown />,
       dropdownContainerClassName: 'rounded-lg',
       subMenu: DevelopersData,
     },
@@ -94,14 +94,14 @@ const Nav = ({ blogPosts }: { blogPosts?: PostTypes[] }) => {
       {
         title: 'Product',
         hasDropdown: true,
-        dropdown: <Product />,
+        dropdown: <ProductDropdown />,
         dropdownContainerClassName: 'rounded-lg flex flex-row',
         subMenu: SolutionsData,
       },
       {
         title: 'Developers',
         hasDropdown: true,
-        dropdown: <Developers />,
+        dropdown: <DevelopersDropdown />,
         dropdownContainerClassName: 'rounded-lg',
         subMenu: DevelopersData,
       },
@@ -142,7 +142,7 @@ const Nav = ({ blogPosts }: { blogPosts?: PostTypes[] }) => {
           ].join(' ')}
         >
           <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-16 xl:px-20">
-            <div className="flex items-center px-6 flex-1 sm:items-stretch justify-between">
+            <div className="flex items-center px-6 lg:px-0 flex-1 sm:items-stretch justify-between">
               <div className="flex items-center">
                 <div className="flex items-center flex-shrink-0">
                   <Link href="/" as="/">
@@ -168,7 +168,7 @@ const Nav = ({ blogPosts }: { blogPosts?: PostTypes[] }) => {
                     </Link>
                   )}
                 </div>
-                <NavigationMenu className="hidden pl-4 sm:ml-4 sm:space-x-4 lg:flex h-16">
+                <NavigationMenu className="hidden pl-4 sm:space-x-4 lg:flex h-16">
                   <NavigationMenuList>
                     {menu.primaryNav.map((menuItem) =>
                       menuItem.hasDropdown ? (

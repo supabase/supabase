@@ -1,5 +1,5 @@
 export const data = {
-  label: 'Compare',
+  label: 'Compare Supabase',
   comparisons: [
     {
       text: 'Supabase vs Firebase',
