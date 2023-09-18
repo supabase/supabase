@@ -1,16 +1,23 @@
-import { useState, useEffect } from 'react'
-import { partition } from 'lodash'
-import { Button, Listbox, IconSearch, Input, IconExternalLink, IconLock } from 'ui'
-import { observer } from 'mobx-react-lite'
-import { PostgresTable, PostgresPolicy } from '@supabase/postgres-meta'
+import { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { partition } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useState } from 'react'
 
-import { NextPageWithLayout } from 'types'
-import { useCheckPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { AuthLayout } from 'components/layouts'
 import { Policies } from 'components/interfaces/Auth/Policies'
+import { AuthLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { useCheckPermissions, useStore } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { NextPageWithLayout } from 'types'
+import { Button, IconExternalLink, IconLock, IconSearch, Input, Listbox } from 'ui'
 
 /**
  * Filter tables by table name and policy name
@@ -48,27 +55,47 @@ const onFilterTables = (
 }
 
 const AuthPoliciesPage: NextPageWithLayout = () => {
+  const { project } = useProjectContext()
+  const snap = useTableEditorStateSnapshot()
   const { meta } = useStore()
   const { search } = useParams()
-  const [selectedSchema, setSelectedSchema] = useState<string>('public')
   const [searchString, setSearchString] = useState<string>('')
 
   useEffect(() => {
     if (search) setSearchString(search)
   }, [search])
 
-  const schemas = meta.schemas.list()
+  const {
+    data: schemas,
+    isLoading: isLoadingSchemas,
+    isSuccess: isSuccessSchemas,
+    isError: isErrorSchemas,
+    error: errorSchemas,
+  } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
   const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
-    meta.excludedSchemas.includes(schema?.name ?? '')
+    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
-  // @ts-ignore
-  const schema = schemas.find((schema) => schema.name === selectedSchema)
+  const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
   const policies = meta.policies.list()
 
-  const tables = meta.tables.list((table: { schema: string }) => table.schema === selectedSchema)
-  const filteredTables = onFilterTables(tables, policies, searchString)
+  const {
+    data: tables,
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+  } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: snap.selectedSchemaName,
+  })
+
+  const filteredTables = onFilterTables(tables ?? [], policies, searchString)
 
   const canReadPolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
 
@@ -82,53 +109,62 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="w-[230px]">
-              <Listbox
-                size="small"
-                value={selectedSchema}
-                onChange={(schema: string) => {
-                  setSelectedSchema(schema)
-                  setSearchString('')
-                }}
-                icon={isLocked && <IconLock size={14} strokeWidth={2} />}
-              >
-                <Listbox.Option
-                  disabled
-                  key="normal-schemas"
-                  value="normal-schemas"
-                  label="Schemas"
+              {isLoadingSchemas && (
+                <div className="h-[34px] w-full bg-scale-1000 rounded shimmering-loader" />
+              )}
+
+              {isErrorSchemas && (
+                <AlertError error={errorSchemas} subject="Failed to retrieve schemas" />
+              )}
+
+              {isSuccessSchemas && (
+                <Listbox
+                  size="small"
+                  value={snap.selectedSchemaName}
+                  onChange={(schema: string) => {
+                    snap.setSelectedSchemaName(schema)
+                    setSearchString('')
+                  }}
+                  icon={isLocked && <IconLock size={14} strokeWidth={2} />}
                 >
-                  <p className="text-sm">Schemas</p>
-                </Listbox.Option>
-                {/* @ts-ignore */}
-                {openSchemas.map((schema) => (
                   <Listbox.Option
-                    key={schema.id}
-                    value={schema.name}
-                    label={schema.name}
-                    addOnBefore={() => <span className="text-scale-900">schema</span>}
+                    disabled
+                    key="normal-schemas"
+                    value="normal-schemas"
+                    label="Schemas"
                   >
-                    <span className="text-scale-1200 text-sm">{schema.name}</span>
+                    <p className="text-sm">Schemas</p>
                   </Listbox.Option>
-                ))}
-                <Listbox.Option
-                  disabled
-                  key="protected-schemas"
-                  value="protected-schemas"
-                  label="Protected schemas"
-                >
-                  <p className="text-sm">Protected schemas</p>
-                </Listbox.Option>
-                {protectedSchemas.map((schema) => (
+                  {openSchemas.map((schema) => (
+                    <Listbox.Option
+                      key={schema.id}
+                      value={schema.name}
+                      label={schema.name}
+                      addOnBefore={() => <span className="text-scale-900">schema</span>}
+                    >
+                      <span className="text-scale-1200 text-sm">{schema.name}</span>
+                    </Listbox.Option>
+                  ))}
                   <Listbox.Option
-                    key={schema.id}
-                    value={schema.name}
-                    label={schema.name}
-                    addOnBefore={() => <span className="text-scale-900">schema</span>}
+                    disabled
+                    key="protected-schemas"
+                    value="protected-schemas"
+                    label="Protected schemas"
                   >
-                    <span className="text-scale-1200 text-sm">{schema.name}</span>
+                    <p className="text-sm">Protected schemas</p>
                   </Listbox.Option>
-                ))}
-              </Listbox>
+                  {protectedSchemas.map((schema) => (
+                    <Listbox.Option
+                      key={schema.id}
+                      value={schema.name}
+                      label={schema.name}
+                      addOnBefore={() => <span className="text-scale-900">schema</span>}
+                    >
+                      <span className="text-scale-1200 text-sm">{schema.name}</span>
+                    </Listbox.Option>
+                  ))}
+                </Listbox>
+              )}
             </div>
             <Input
               size="small"
@@ -150,7 +186,11 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           </a>
         </div>
       </div>
-      <Policies tables={filteredTables} hasTables={tables.length > 0} isLocked={isLocked} />
+      {isLoading && <GenericSkeletonLoader />}
+      {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
+      {isSuccess && (
+        <Policies tables={filteredTables} hasTables={tables.length > 0} isLocked={isLocked} />
+      )}
     </div>
   )
 }

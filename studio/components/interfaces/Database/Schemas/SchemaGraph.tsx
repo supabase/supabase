@@ -1,7 +1,8 @@
 import dagre from '@dagrejs/dagre'
 import clsx from 'clsx'
-import { observer } from 'mobx-react-lite'
 import { uniqBy } from 'lodash'
+import { Diamond, Fingerprint } from 'lucide-react'
+import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo } from 'react'
 import ReactFlow, {
   Background,
@@ -17,11 +18,10 @@ import ReactFlow, {
 
 import { PostgresTable } from '@supabase/postgres-meta'
 import { useTheme } from 'common/Providers'
-import { useStore } from 'hooks'
-import { IconHash, IconKey, IconLoader, IconLock } from 'ui'
-import { Diamond, Fingerprint } from 'lucide-react'
-
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useTablesQuery } from 'data/tables/tables-query'
 import 'reactflow/dist/style.css'
+import { IconHash, IconKey, IconLoader, IconLock } from 'ui'
 
 type TableNodeData = {
   name: string
@@ -347,23 +347,32 @@ const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
 }
 
 const SchemaGraph = ({ schema }: { schema: string }) => {
-  const { meta } = useStore()
-  const tables = meta.tables.list((table: { schema: string }) => table.schema === schema)
+  const { project } = useProjectContext()
+  const {
+    data: tables,
+    isLoading,
+    isError,
+    error,
+  } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema,
+  })
 
-  if (meta.tables.isLoading) {
+  if (isLoading) {
     return (
       <div className="flex h-full w-full items-center justify-center space-x-2">
         <IconLoader className="animate-spin" size={14} />
-        <p className="text-sm text-scale-1000">Loading schemas...</p>
+        <p className="text-sm text-scale-1000">Loading table...</p>
       </div>
     )
   }
 
-  if (meta.tables.hasError) {
+  if (isError) {
     return (
       <div className="px-6 py-4 text-scale-1000">
         <p>Error connecting to API</p>
-        <p>{`${meta.tables.error?.message ?? 'Unknown error'}`}</p>
+        <p>{`${error?.message ?? 'Unknown error'}`}</p>
       </div>
     )
   }

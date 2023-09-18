@@ -3,7 +3,8 @@ import Layout from '~/layouts/DefaultGuideLayout'
 export const meta = {
   id: 'realtime',
   title: 'Realtime',
-  description: 'Supabase Realtime with Broadcast, Presence, and Postgres Changes.',
+  description: 'Send and receive messages to connected clients.',
+  subtitle: 'Send and receive messages to connected clients.',
   sidebar_label: 'Overview',
 }
 
@@ -13,14 +14,57 @@ Supabase provides a globally distributed cluster of [Realtime](https://github.co
 - [Presence](/docs/guides/realtime/presence): Track and synchronize shared state between clients.
 - [Postgres Changes](/docs/guides/realtime/postgres-changes): Listen to Postgres database changes and send them to authorized clients.
 
-A [channel](https://hexdocs.pm/phoenix/channels.html) is the basic building block of Realtime and narrows the scope of data flow to subscribed clients. You can think of a channel as a chatroom where participants are able to see who's online and send and receive messages; similar to a Discord or Slack channel.
+## Examples
 
-All clients can connect to a channel and take advantage of the built-in features, Broadcast and Presence, while extensions, like Postgres Changes, must be enabled prior to use.
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {examples.map((x) => (
+    <div className="col-span-12" key={x.href}>
+      <Link href={x.href} passHref>
+        <a>
+          <GlassPanel title={x.name}>{x.description}</GlassPanel>
+        </a>
+      </Link>
+    </div>
+  ))}
+</div>
 
-## See Also
+export const examples = [
+  {
+    name: 'Multiplayer.dev',
+    description: 'Mouse movements and chat messages.',
+    href: 'https://multiplayer.dev',
+  },
+]
 
-- [Realtime: Multiplayer Edition](https://supabase.com/blog/supabase-realtime-multiplayer-general-availability) blog post
+## Resources
 
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
+Find the source code and documentation in the Supabase GitHub repository.
+
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {resources.map((x) => (
+    <div className="col-span-6" key={x.href}>
+      <Link href={x.href} passHref>
+        <a>
+          <GlassPanel title={x.name}>{x.description}</GlassPanel>
+        </a>
+      </Link>
+    </div>
+  ))}
+</div>
+
+export const resources = [
+  {
+    name: 'Supabase Realtime',
+    description: 'View the source code.',
+    href: 'https://github.com/supabase/realtime',
+  },
+  {
+    name: 'Realtime: Multiplayer Edition',
+    description: 'Read more about Supabase Realtime.',
+    href: 'https://supabase.com/blog/supabase-realtime-multiplayer-general-availability',
+  },
+]
+
+export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
 
 export default Page

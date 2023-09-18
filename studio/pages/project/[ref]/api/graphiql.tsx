@@ -34,7 +34,6 @@ const GraphiQLPage: NextPageWithLayout = () => {
   useEffect(() => {
     if (ui.selectedProjectRef) {
       // Schemas may be needed when enabling the GraphQL extension
-      meta.schemas.load()
       meta.extensions.load()
     }
   }, [ui.selectedProjectRef])

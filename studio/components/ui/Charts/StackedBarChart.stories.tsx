@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react'
 import dayjs from 'dayjs'
 import Chart from './StackedBarChart'
 import { StackedChartProps } from './Charts.types'
-import { STACK_COLORS } from './Charts.constants'
+import { DEFAULT_STACK_COLORS, genStackColorScales } from './Charts.constants'
 
 export default {
   title: 'Charts/StackedBarChart',
@@ -38,7 +38,7 @@ export const StackedBarChart = () => (
   <div className="flex flex-col gap-4 ">
     <ExampleName>Default Stacked Chart Colors</ExampleName>
     <div className="flex flex-row ">
-      {STACK_COLORS.map((c) => (
+      {genStackColorScales(DEFAULT_STACK_COLORS).map((c) => (
         <div className="w-10 h-10" key={c.base} style={{ background: c.base }}></div>
       ))}
     </div>

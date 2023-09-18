@@ -1,6 +1,15 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { partition } from 'lodash'
 import { useMemo, useState } from 'react'
-import { noop, partition } from 'lodash'
-import { observer } from 'mobx-react-lite'
+
+import { useParams } from 'common/hooks'
+import InfiniteList from 'components/ui/InfiniteList'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useCheckPermissions, useLocalStorage } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Alert,
   Button,
@@ -16,37 +25,12 @@ import {
   Listbox,
   Menu,
 } from 'ui'
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import type { PostgresSchema } from '@supabase/postgres-meta'
-
-import { useParams } from 'common/hooks'
-import { useCheckPermissions, useStore, useLocalStorage } from 'hooks'
-import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { Entity } from 'data/entity-types/entity-type-query'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import InfiniteList from 'components/ui/InfiniteList'
 import EntityListItem from './EntityListItem'
 
-export interface TableEditorMenuProps {
-  selectedSchema?: string
-  onSelectSchema: (schema: string) => void
-  onAddTable: () => void
-  onEditTable: (table: Entity) => void
-  onDeleteTable: (table: Entity) => void
-  onDuplicateTable: (table: Entity) => void
-}
-
-const TableEditorMenu = ({
-  selectedSchema,
-  onSelectSchema = noop,
-  onAddTable = noop,
-  onEditTable = noop,
-  onDeleteTable = noop,
-  onDuplicateTable = noop,
-}: TableEditorMenuProps) => {
-  const { meta } = useStore()
+const TableEditorMenu = () => {
   const { id } = useParams()
+  const snap = useTableEditorStateSnapshot()
 
   const [searchText, setSearchText] = useState<string>('')
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
@@ -68,7 +52,7 @@ const TableEditorMenu = ({
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: selectedSchema,
+      schema: snap.selectedSchemaName,
       search: searchText || undefined,
       sort,
     },
@@ -83,18 +67,27 @@ const TableEditorMenu = ({
     [data?.pages]
   )
 
-  const schemas: PostgresSchema[] = meta.schemas.list()
-  const schema = schemas.find((schema) => schema.name === selectedSchema)
-  const canCreateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const {
+    data: schemas,
+    isLoading: isSchemasLoading,
+    isSuccess: isSchemasSuccess,
+    isError: isSchemasError,
+    error: schemasError,
+    refetch: refetchSchemas,
+  } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
-  const isLoadingTableMetadata = id ? !meta.tables.byId(id) : true
+  const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
+  const canCreateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const refreshTables = async () => {
     await refetch()
   }
 
   const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
-    meta.excludedSchemas.includes(schema?.name ?? '')
+    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
@@ -105,25 +98,29 @@ const TableEditorMenu = ({
     >
       {/* Schema selection dropdown */}
       <div className="px-3 mx-4">
-        {!meta.schemas.isInitialized ? (
+        {isSchemasLoading && (
           <div className="flex h-[26px] items-center space-x-3 rounded border border-gray-500 px-3">
             <IconLoader className="animate-spin" size={12} />
             <span className="text-xs text-scale-900">Loading schemas...</span>
           </div>
-        ) : meta.schemas.hasError ? (
+        )}
+
+        {isSchemasError && (
           <Alert variant="warning" title="Failed to load schemas" className="!px-3 !py-3">
-            <p className="mb-2">Error: {meta.schemas?.error?.message}</p>
-            <Button type="default" size="tiny" onClick={() => meta.schemas.load()}>
+            <p className="mb-2">Error: {schemasError.message}</p>
+            <Button type="default" size="tiny" onClick={() => refetchSchemas()}>
               Reload schemas
             </Button>
           </Alert>
-        ) : (
+        )}
+
+        {isSchemasSuccess && (
           <Listbox
             size="tiny"
-            value={selectedSchema}
+            value={snap.selectedSchemaName}
             onChange={(name: string) => {
               setSearchText('')
-              onSelectSchema(name)
+              snap.setSelectedSchemaName(name)
             }}
           >
             <Listbox.Option
@@ -188,7 +185,7 @@ const TableEditorMenu = ({
                   }
                   type="default"
                   style={{ justifyContent: 'start' }}
-                  onClick={onAddTable}
+                  onClick={snap.onAddTable}
                 >
                   <span>New table</span>
                 </Button>
@@ -352,10 +349,6 @@ const TableEditorMenu = ({
               itemProps={{
                 projectRef: project?.ref,
                 id: Number(id),
-                onEditTable,
-                onDeleteTable,
-                onDuplicateTable,
-                isLoadingTableMetadata,
               }}
               getItemSize={() => 28}
               hasNextPage={hasNextPage}
@@ -369,4 +362,4 @@ const TableEditorMenu = ({
   )
 }
 
-export default observer(TableEditorMenu)
+export default TableEditorMenu
