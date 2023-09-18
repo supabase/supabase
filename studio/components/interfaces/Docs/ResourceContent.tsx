@@ -1,8 +1,11 @@
-import Snippets from 'components/to-be-cleaned/Docs/Snippets'
-import CodeSnippet from 'components/to-be-cleaned/Docs/CodeSnippet'
-import Param from 'components/to-be-cleaned/Docs/Param'
-import Description from 'components/to-be-cleaned/Docs/Description'
+import { useParams } from 'common'
 import { IconTable } from 'ui'
+
+import CodeSnippet from 'components/to-be-cleaned/Docs/CodeSnippet'
+import Description from 'components/to-be-cleaned/Docs/Description'
+import Param from 'components/to-be-cleaned/Docs/Param'
+import Snippets from 'components/to-be-cleaned/Docs/Snippets'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 
 const ResourceContent = ({
   autoApiService,
@@ -14,7 +17,12 @@ const ResourceContent = ({
   showApiKey,
   refreshDocs,
 }: any) => {
-  if (!paths || !definitions) return null
+  const { ref } = useParams()
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
+  const endpoint =
+    customDomainData?.customDomain?.status === 'active'
+      ? `https://${customDomainData.customDomain.hostname}`
+      : autoApiService.endpoint
 
   const keyToShow = !!showApiKey ? showApiKey : 'SUPABASE_KEY'
   const resourcePaths = paths[`/${resourceId}`]
@@ -27,6 +35,8 @@ const ResourceContent = ({
     id,
     required: resourceDefinition?.required?.includes(id),
   }))
+
+  if (!paths || !definitions) return null
 
   return (
     <>
@@ -75,7 +85,7 @@ const ResourceContent = ({
                   snippet={Snippets.readColumns({
                     title: `Select ${x.id}`,
                     resourceId,
-                    endpoint: autoApiService.endpoint,
+                    endpoint: endpoint,
                     apiKey: keyToShow,
                     columnName: x.id,
                   })}
@@ -106,23 +116,23 @@ const ResourceContent = ({
             <article className="code">
               <CodeSnippet
                 selectedLang={selectedLang}
-                snippet={Snippets.readAll(resourceId, autoApiService.endpoint, keyToShow)}
+                snippet={Snippets.readAll(resourceId, endpoint, keyToShow)}
               />
               <CodeSnippet
                 selectedLang={selectedLang}
                 snippet={Snippets.readColumns({
                   resourceId,
-                  endpoint: autoApiService.endpoint,
+                  endpoint: endpoint,
                   apiKey: keyToShow,
                 })}
               />
               <CodeSnippet
                 selectedLang={selectedLang}
-                snippet={Snippets.readForeignTables(resourceId, autoApiService.endpoint, keyToShow)}
+                snippet={Snippets.readForeignTables(resourceId, endpoint, keyToShow)}
               />
               <CodeSnippet
                 selectedLang={selectedLang}
-                snippet={Snippets.readRange(resourceId, autoApiService.endpoint, keyToShow)}
+                snippet={Snippets.readRange(resourceId, endpoint, keyToShow)}
               />
             </article>
           </div>
@@ -143,7 +153,7 @@ const ResourceContent = ({
             <article className="code">
               <CodeSnippet
                 selectedLang={selectedLang}
-                snippet={Snippets.readFilters(resourceId, autoApiService.endpoint, keyToShow)}
+                snippet={Snippets.readFilters(resourceId, endpoint, keyToShow)}
               />
             </article>
           </div>
@@ -174,15 +184,15 @@ const ResourceContent = ({
             <article className="code">
               <CodeSnippet
                 selectedLang={selectedLang}
-                snippet={Snippets.insertSingle(resourceId, autoApiService.endpoint, keyToShow)}
+                snippet={Snippets.insertSingle(resourceId, endpoint, keyToShow)}
               />
               <CodeSnippet
                 selectedLang={selectedLang}
-                snippet={Snippets.insertMany(resourceId, autoApiService.endpoint, keyToShow)}
+                snippet={Snippets.insertMany(resourceId, endpoint, keyToShow)}
               />
               <CodeSnippet
                 selectedLang={selectedLang}
-                snippet={Snippets.upsert(resourceId, autoApiService.endpoint, keyToShow)}
+                snippet={Snippets.upsert(resourceId, endpoint, keyToShow)}
               />
             </article>
           </div>
@@ -214,7 +224,7 @@ const ResourceContent = ({
             <article className="code">
               <CodeSnippet
                 selectedLang={selectedLang}
-                snippet={Snippets.update(resourceId, autoApiService.endpoint, keyToShow)}
+                snippet={Snippets.update(resourceId, endpoint, keyToShow)}
               />
             </article>
           </div>
@@ -242,7 +252,7 @@ const ResourceContent = ({
             <article className="code">
               <CodeSnippet
                 selectedLang={selectedLang}
-                snippet={Snippets.delete(resourceId, autoApiService.endpoint, keyToShow)}
+                snippet={Snippets.delete(resourceId, endpoint, keyToShow)}
               />
             </article>
           </div>

@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -9,7 +10,6 @@ import CodeEditor from 'components/ui/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
 import MigrationsEmptyState from './MigrationsEmptyState'
-import dayjs from 'dayjs'
 
 const Migrations = () => {
   const [search, setSearch] = useState('')
@@ -32,7 +32,7 @@ const Migrations = () => {
       <div>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="mb-2 text-xl text-scale-1200">Migrations</h3>
+            <h3 className="mb-1 text-xl text-scale-1200">Database Migrations</h3>
             <div className="text-sm text-scale-900">
               History of migrations that have been run on your database
             </div>

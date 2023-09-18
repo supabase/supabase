@@ -202,7 +202,7 @@ const InputField = ({
       ...(field.isNullable ? [{ value: 'null', label: 'NULL' }] : []),
     ]
 
-    const defaultValue = field.value === null ? 'null' : field.value
+const defaultValue = field.defaultValue !== null ? field.defaultValue : 'null'
 
     return (
       <Listbox

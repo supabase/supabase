@@ -210,6 +210,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                   overlay={[
                     <Dropdown.Item
                       key="expires-one-week"
+                      className="text-xs"
                       onClick={async () =>
                         onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.WEEK))
                       }
@@ -218,6 +219,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                     </Dropdown.Item>,
                     <Dropdown.Item
                       key="expires-one-month"
+                      className="text-xs"
                       onClick={async () =>
                         onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.MONTH))
                       }
@@ -226,6 +228,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                     </Dropdown.Item>,
                     <Dropdown.Item
                       key="expires-one-year"
+                      className="text-xs"
                       onClick={async () =>
                         onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.YEAR))
                       }
@@ -234,6 +237,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                     </Dropdown.Item>,
                     <Dropdown.Item
                       key="custom-expiry"
+                      className="text-xs"
                       onClick={() => setSelectedFileCustomExpiry(file)}
                     >
                       Custom expiry

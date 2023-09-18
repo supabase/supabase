@@ -15,6 +15,7 @@ export interface FileExplorerProps {
   openedFolders: any[]
   selectedItems: any[]
   selectedFilePreview: any
+  itemSearchString: string
   onFilesUpload: (event: any, index: number) => void
   onSelectAllItemsInColumn: (index: number) => void
   onSelectColumnEmptySpace: (index: number) => void
@@ -28,6 +29,7 @@ const FileExplorer = ({
   openedFolders = [],
   selectedItems = [],
   selectedFilePreview = {},
+  itemSearchString,
   onFilesUpload = noop,
   onSelectAllItemsInColumn = noop,
   onSelectColumnEmptySpace = noop,
@@ -64,6 +66,7 @@ const FileExplorer = ({
               openedFolders={openedFolders}
               selectedItems={selectedItems}
               selectedFilePreview={selectedFilePreview}
+              itemSearchString={itemSearchString}
               onFilesUpload={onFilesUpload}
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}
               onSelectColumnEmptySpace={onSelectColumnEmptySpace}
@@ -82,6 +85,7 @@ const FileExplorer = ({
               column={columns[columns.length - 1]}
               selectedItems={selectedItems}
               selectedFilePreview={selectedFilePreview}
+              itemSearchString={itemSearchString}
               onFilesUpload={onFilesUpload}
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}
               onSelectColumnEmptySpace={onSelectColumnEmptySpace}

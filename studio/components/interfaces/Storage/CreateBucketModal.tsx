@@ -70,6 +70,9 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
     if (values.has_file_size_limit && values.formatted_size_limit < 0) {
       errors.formatted_size_limit = 'File size upload limit has to be at least 0'
     }
+    if (values.name === 'public') {
+      errors.name = '"public" is a reserved name. Please choose another name'
+    }
     return errors
   }
 
@@ -225,7 +228,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                       name="allowed_mime_types"
                       layout="vertical"
                       label="Allowed MIME types"
-                      placeholder="e.g image/jpg, image/png, audio/mpeg, video/mp4, etc"
+                      placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
                       descriptionText="Comma separated values"
                     />
                   </div>

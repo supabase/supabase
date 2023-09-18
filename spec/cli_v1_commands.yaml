@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.88.0
+  version: 1.93.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1481,7 +1481,7 @@ commands:
     summary: Show total table sizes, including table index sizes
     description: |2-
 
-      This command displays the total size of each table in the database. It is the sum of the values that `pg_table_size()` and `pg_indexes_size()` gives for each table.
+      This command displays the total size of each table in the database. It is the sum of the values that `pg_table_size()` and `pg_indexes_size()` gives for each table. System tables inside `pg_catalog` and `information_schema` are not included.
 
       ```
                       NAME               │    SIZE
@@ -2249,7 +2249,7 @@ commands:
         default_value: ''
   - id: supabase-db
     title: supabase db
-    summary: Manage local Postgres databases
+    summary: Manage Postgres databases
     tags:
       - local-dev
     links: []
