@@ -46,6 +46,7 @@ export * from './src/components/ExpandableVideo'
 
 export * from './src/components/Space'
 export * from './src/components/Loading'
+export * from './src/components/LogoLoader'
 export * from './src/components/Divider'
 
 // DATA ENTRY
