@@ -2,7 +2,13 @@ import Link from 'next/link'
 import Snippets from '../Snippets'
 import CodeSnippet from '../CodeSnippet'
 
-export default function Authentication({ autoApiService, selectedLang, showApiKey }) {
+interface AuthenticationProps {
+  autoApiService: any
+  selectedLang: string
+  showApiKey: string
+}
+
+const Authentication = ({ autoApiService, selectedLang, showApiKey }: AuthenticationProps) => {
   // [Joshen] ShowApiKey should really be a boolean, its confusing
   const defaultApiKey =
     showApiKey !== 'SUPABASE_KEY'
@@ -101,3 +107,5 @@ export default function Authentication({ autoApiService, selectedLang, showApiKe
     </>
   )
 }
+
+export default Authentication
