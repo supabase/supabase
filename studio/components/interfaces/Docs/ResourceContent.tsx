@@ -1,11 +1,11 @@
 import { useParams } from 'common'
 import { IconTable } from 'ui'
 
-import CodeSnippet from 'components/to-be-cleaned/Docs/CodeSnippet'
 import Description from 'components/to-be-cleaned/Docs/Description'
 import Param from 'components/to-be-cleaned/Docs/Param'
 import Snippets from 'components/to-be-cleaned/Docs/Snippets'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import CodeSnippet from 'components/ui/Docs/CodeSnippet'
 
 const ResourceContent = ({
   autoApiService,
@@ -40,6 +40,14 @@ const ResourceContent = ({
 
   return (
     <>
+      <div className="justify-between px-6 py-4 bg-scale-200 dark:bg-scale-300 [&div>h4]:font-bold">
+        aaaaaa
+        <CodeSnippet
+          selectedLang={selectedLang}
+          snippet={Snippets.init(endpoint)}
+          titleClasses="font-bold capitalize"
+        />
+      </div>
       <h2 className="doc-section__table-name text-scale-1200 mt-0 flex items-center px-6 gap-2">
         <span className="bg-slate-300 dark:bg-slate-400 p-2 rounded-lg">
           <IconTable size="small" />

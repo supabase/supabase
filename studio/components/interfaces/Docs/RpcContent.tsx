@@ -1,5 +1,5 @@
 import Snippets from 'components/to-be-cleaned/Docs/Snippets'
-import CodeSnippet from 'components/to-be-cleaned/Docs/CodeSnippet'
+import CodeSnippet from 'components/ui/Docs/CodeSnippet'
 import Param from 'components/to-be-cleaned/Docs/Param'
 import Description from 'components/to-be-cleaned/Docs/Description'
 

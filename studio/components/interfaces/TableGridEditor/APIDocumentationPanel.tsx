@@ -10,6 +10,7 @@ import ActionBar from './SidePanelEditor/ActionBar'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { snakeToCamel } from 'lib/helpers'
+import InitializeClient from '../Docs/InitializeClient'
 
 interface APIDocumentationPanelProps {
   visible: boolean
@@ -108,7 +109,7 @@ const APIDocumentationPanel = ({ visible, onClose }: APIDocumentationPanelProps)
                       autoApiService={autoApiService}
                     />
                   </div>
-
+                  <InitializeClient selectedLang={selectedLang} />
                   {jsonSchema?.definitions && (
                     <ResourceContent
                       autoApiService={autoApiService}

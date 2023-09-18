@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import Link from 'next/link'
 
 import GeneratingTypes from 'components/interfaces/Docs/GeneratingTypes'
-import CodeSnippet from '../../CodeSnippet'
+import CodeSnippet from 'components/ui/Docs/CodeSnippet'
 
 interface IntroductionProps {
   selectedLang: string

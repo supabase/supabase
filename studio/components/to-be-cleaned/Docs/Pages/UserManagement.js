@@ -2,8 +2,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { makeRandomString } from 'lib/helpers'
-import CodeSnippet from '../CodeSnippet'
+
 import Snippets from '../Snippets'
+import CodeSnippet from 'components/ui/Docs/CodeSnippet'
 
 const randomPassword = makeRandomString(20)
 

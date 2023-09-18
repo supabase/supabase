@@ -115,7 +115,7 @@ const DisplayApiSettings = () => {
               onChange={() => {}}
               descriptionText={
                 x.tags === 'service_role'
-                  ? 'This key has the ability to bypass Row Level Security. Never share it publicly.'
+                  ? 'This key has the ability to bypass Row Level Security. It should only be used on a server and never on a client or browser. Never share it publicly.'
                   : 'This key is safe to use in a browser if you have enabled Row Level Security for your tables and configured policies.'
               }
             />

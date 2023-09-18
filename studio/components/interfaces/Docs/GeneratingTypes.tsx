@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Button, IconDownload, IconExternalLink } from 'ui'
 
 import { useParams } from 'common/hooks'
-import CodeSnippet from 'components/to-be-cleaned/Docs/CodeSnippet'
+import CodeSnippet from 'components/ui/Docs/CodeSnippet'
 import { generateTypes } from 'data/projects/project-type-generation-query'
 import { useStore } from 'hooks'
 

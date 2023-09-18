@@ -1,6 +1,6 @@
 import { AutoApiService } from 'data/config/project-api-query'
 import Snippets from '../Snippets'
-import CodeSnippet from '../CodeSnippet'
+import CodeSnippet from 'components/ui/Docs/CodeSnippet'
 
 interface Props {
   autoApiService: AutoApiService
