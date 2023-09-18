@@ -30,7 +30,6 @@ import ProductDropdown from './ProductDropdown'
 
 import SolutionsData from 'data/Solutions'
 import { useWindowSize } from 'react-use'
-import PostTypes from '../../types/post'
 
 const menu = {
   primaryNav: [
@@ -63,7 +62,7 @@ const menu = {
   ],
 }
 
-const Nav = ({ blogPosts }: { blogPosts?: PostTypes[] }) => {
+const Nav = () => {
   const { theme, resolvedTheme } = useTheme()
   const router = useRouter()
   const { width } = useWindowSize()
