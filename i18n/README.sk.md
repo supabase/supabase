@@ -12,9 +12,9 @@
 - [x] hostovaná databáza Postgres. [Dokumenty](https://supabase.com/docs/guides/database)
 - [x] Autentifikácia a autorizácia. [Dokumenty](https://supabase.com/docs/guides/auth)
 - [x] Automaticky generované rozhrania API.
-  - [x] REST. [Dokumenty](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Dokumenty](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Odbery v reálnom čase. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Dokumenty](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Dokumenty](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Odbery v reálnom čase. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funkcie.
   - [x] Databázové funkcie. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Okrajové funkcie [Docs](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Úplnú dokumentáciu nájdete na stránke [supabase.com/docs](https://supabase.com/docs)
 
-Ak chcete zistiť, ako prispievať, navštívte stránku [Začíname](./DEVELOPERS.md)
+Ak chcete zistiť, ako prispievať, navštívte stránku [Začíname](../DEVELOPERS.md)
 
 ## Komunita a podpora
 
@@ -39,7 +39,7 @@ Ak chcete zistiť, ako prispievať, navštívte stránku [Začíname](./DEVELOPE
 ## Stav
 
 - [x] Alfa: Testujeme Supabase s uzavretým súborom zákazníkov
-- [x] Verejná alfa: [app.supabase.com](https://app.supabase.com). Ale buďte na nás mierni, je tu niekoľko zádrheľov
+- [x] Verejná alfa: [supabase.com/dashboard](https://supabase.com/dashboard). Ale buďte na nás mierni, je tu niekoľko zádrheľov
 - [x] Verejná beta verzia: Dostatočne stabilná pre väčšinu prípadov použitia, ktoré nie sú určené pre podniky
 - [ ] Verejná: Všeobecná dostupnosť [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabase je kombináciou nástrojov s otvoreným zdrojovým kódom. Funkcie Fire
 
 **Architektúra**
 
-Supabase je [hostovaná platforma](https://app.supabase.com). Môžete sa zaregistrovať a začať používať Supabase bez toho, aby ste čokoľvek inštalovali.
+Supabase je [hostovaná platforma](https://supabase.com/dashboard). Môžete sa zaregistrovať a začať používať Supabase bez toho, aby ste čokoľvek inštalovali.
 Môžete tiež [samostatne hosťovať](https://supabase.com/docs/guides/hosting/overview) a [vyvíjať lokálne](https://supabase.com/docs/guides/local-development).
 
 ![Architektúra](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)

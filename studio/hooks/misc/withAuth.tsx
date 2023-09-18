@@ -2,9 +2,10 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { ComponentType, useEffect } from 'react'
 
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useAuthenticatorAssuranceLevelQuery } from 'data/profile/mfa-authenticator-assurance-level-query'
+import { useSelectedProject, useStore } from 'hooks'
 import { useAuth } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import { getReturnToPath, STORAGE_KEY } from 'lib/gotrue'
@@ -21,35 +22,32 @@ const PLATFORM_ONLY_PAGES = [
 
 export function withAuth<T>(
   WrappedComponent: ComponentType<T> | NextPageWithLayout<T, T>,
-  options?: {
-    redirectTo: string
-    /* run the redirect if the user is logged in */
-    redirectIfFound?: boolean
-  }
+  options: {
+    /**
+     * The auth level used to check the user credentials. In most cases, if the user has MFA enabled
+     * we want the highest level (which is 2) for all pages. For certain pages, the user should be
+     * able to access them even if he didn't finished his login (typed in his MFA code), for example
+     * the support page: We want the user to be able to submit a ticket even if he's not fully
+     * signed in.
+     * @default true
+     */
+    useHighestAAL: boolean
+  } = { useHighestAAL: true }
 ) {
-  const WithAuthHOC: ComponentType<T> = (props: any) => {
+  const WithAuthHOC: ComponentType<T> = (props) => {
     const router = useRouter()
     const { basePath } = router
-    const { ref, slug } = useParams()
+    const { ref } = useParams()
     const rootStore = useStore()
     const { isLoading, session } = useAuth()
+    const { isLoading: isAALLoading, data: aalData } = useAuthenticatorAssuranceLevelQuery()
 
-    const { app, ui } = rootStore
+    const { ui } = rootStore
     const page = router.pathname.split('/').slice(3).join('/')
 
-    const redirectTo = options?.redirectTo ?? defaultRedirectTo(ref)
-    const redirectIfFound = options?.redirectIfFound
-
-    useEffect(() => {
-      if (!app.organizations.isInitialized) app.organizations.load()
-      if (!app.projects.isInitialized) app.projects.load()
-    }, [app.organizations.isInitialized, app.projects.isInitialized])
+    const redirectTo = defaultRedirectTo(ref)
 
     usePermissionsQuery({
-      enabled: IS_PLATFORM,
-      onSuccess(permissions) {
-        ui.setPermissions(permissions)
-      },
       onError(error: any) {
         ui.setNotification({
           error,
@@ -60,29 +58,39 @@ export function withAuth<T>(
     })
 
     const isLoggedIn = Boolean(session)
+    const isCorrectLevel = options.useHighestAAL
+      ? aalData?.currentLevel === aalData?.nextLevel
+      : true
 
     const isAccessingBlockedPage =
       !IS_PLATFORM &&
       PLATFORM_ONLY_PAGES.some((platformOnlyPage) => page.startsWith(platformOnlyPage))
     const isRedirecting =
       isAccessingBlockedPage ||
-      checkRedirectTo(isLoading, router.pathname, isLoggedIn, redirectTo, redirectIfFound)
+      checkRedirectTo(
+        isLoading || isAALLoading,
+        router.pathname,
+        isLoggedIn,
+        isCorrectLevel,
+        redirectTo
+      )
 
     useEffect(() => {
       // This should run after setting store data
       if (isRedirecting) {
-        router.push(redirectTo)
+        const searchParams = new URLSearchParams(location.search)
+        searchParams.set('returnTo', location.pathname)
+        const url = `${redirectTo}?${searchParams.toString()}`
+        router.push(url)
       }
     }, [isRedirecting, redirectTo])
 
+    const selectedProject = useSelectedProject()
     useEffect(() => {
-      if (router.isReady) {
-        if (ref) {
-          rootStore.setProjectRef(ref)
-        }
-        rootStore.setOrganizationSlug(slug)
+      if (selectedProject) {
+        rootStore.setProject(selectedProject)
       }
-    }, [isLoading, router.isReady, ref, slug])
+    }, [selectedProject])
 
     if (!isLoading && !isRedirecting && !isLoggedIn) {
       return <Error500 />
@@ -125,17 +133,14 @@ function checkRedirectTo(
   loading: boolean,
   pathname: string,
   isLoggedIn: boolean,
-  redirectTo: string,
-  redirectIfFound?: boolean
+  isCorrectLevel: boolean,
+  redirectTo: string
 ) {
   if (loading) return false
   if (pathname === redirectTo) return false
 
-  // If redirectTo is set, redirect if the user is not logged in.
-  if (redirectTo && !redirectIfFound && !isLoggedIn) return true
-
-  // If redirectIfFound is also set, redirect if the user was found
-  if (redirectIfFound && isLoggedIn) return true
+  // If redirectTo is set, redirect if the user is not logged in or logged in with MFA.
+  if (redirectTo && (!isLoggedIn || !isCorrectLevel)) return true
 
   return false
 }

@@ -1,32 +1,31 @@
-import dayjs from 'dayjs'
-import Link from 'next/link'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { FC, Fragment, useEffect, useState } from 'react'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import dayjs from 'dayjs'
+import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
+import { Fragment, useEffect, useState } from 'react'
 import {
   Alert,
-  Input,
-  IconSearch,
-  Listbox,
   Button,
-  Modal,
   Form,
-  IconTrash,
+  IconExternalLink,
   IconKey,
   IconLoader,
+  IconSearch,
+  IconTrash,
   IconX,
-  IconExternalLink,
+  Input,
+  Listbox,
+  Modal,
 } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useStore, checkPermissions } from 'hooks'
-import { useParams } from 'common/hooks'
+
 import Divider from 'components/ui/Divider'
+import { useCheckPermissions, useStore } from 'hooks'
 
 const DEFAULT_KEY_NAME = 'No description provided'
 
-interface Props {}
-
-const EncryptionKeysManagement: FC<Props> = ({}) => {
+const EncryptionKeysManagement = () => {
   const { vault, ui } = useStore()
   const { id } = useParams()
 
@@ -36,7 +35,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
   const [selectedKeyToRemove, setSelectedKeyToRemove] = useState<any>()
   const [isDeletingKey, setIsDeletingKey] = useState(false)
 
-  const canManageKeys = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canManageKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   useEffect(() => {
     if (id !== undefined) setSearchValue(id)
@@ -141,7 +140,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Link href="https://github.com/supabase/vault">
+            <Link href="https://supabase.com/docs/guides/database/vault">
               <a target="_blank" rel="noreferrer">
                 <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                   Vault Documentation
@@ -330,11 +329,7 @@ const EncryptionKeysManagement: FC<Props> = ({}) => {
                     Provide a name for your key for easier identification.
                   </p>
                   <div className="space-y-4 pb-4">
-                    <Input
-                      id="name"
-                      label="Key Name"
-                      descriptionText="Keys are of standard UUID types."
-                    />
+                    <Input id="name" label="Key Name" />
                   </div>
                 </Modal.Content>
                 <Modal.Separator />

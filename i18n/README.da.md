@@ -7,14 +7,14 @@
 
 # Supabase
 
-[Supabase] (https://supabase.com) er et Open Source Firebase-alternativ. Vi opbygger Firebase-funktionerne ved hjælp af open source-værktøjer i virksomhedskvalitet.
+[Supabase](https://supabase.com) er et Open Source Firebase-alternativ. Vi opbygger Firebase-funktionerne ved hjælp af open source-værktøjer i virksomhedskvalitet.
 
 - [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
 - [x] Autentifikation og autorisering. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Automatisk genererede API'er.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Realtidsabonnementer. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Realtidsabonnementer. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funktioner.
   - [x] Databasefunktioner. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Edge-funktioner [Docs](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Du kan finde den fulde dokumentation på [supabase.com/docs](https://supabase.com/docs)
 
-For at se, hvordan man bidrager, besøg [Getting Started](./DEVELOPERS.md)
+For at se, hvordan man bidrager, besøg [Getting Started](../DEVELOPERS.md)
 
 ## Fællesskab og support
 
@@ -39,7 +39,7 @@ For at se, hvordan man bidrager, besøg [Getting Started](./DEVELOPERS.md)
 ## Status
 
 - [x] Alpha: Vi tester Supabase med et lukket sæt af kunder
-- [x] Offentlig Alpha: Alle kan tilmelde sig på [app.supabase.com] (https://app.supabase.com). Men vær forsigtig med os, der er et par knuder
+- [x] Offentlig Alpha: Alle kan tilmelde sig på [supabase.com/dashboard](https://supabase.com/dashboard). Men vær forsigtig med os, der er et par knuder
 - [x] Public Beta: Stabil nok til de fleste ikke-virksomhedsrelaterede brugssager
 - [ ] Public: Public: Generel tilgængelighed [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,14 +55,14 @@ Supabase er en kombination af open source-værktøjer. Vi opbygger funktionerne 
 
 **Arkitektur**
 
-Supabase er en [hosted platform] (https://app.supabase.com). Du kan tilmelde dig og begynde at bruge Supabase uden at installere noget.
+Supabase er en [hosted platform](https://supabase.com/dashboard). Du kan tilmelde dig og begynde at bruge Supabase uden at installere noget.
 Du kan også [selv hoste](https://supabase.com/docs/guides/hosting/overview) og [udvikle lokalt](https://supabase.com/docs/guides/local-development).
 
 ![Arkitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
 
 - [PostgreSQL](https://www.postgresql.org/) er et objektrelationelt databasesystem med over 30 års aktiv udvikling, der har givet det et godt ry for pålidelighed, robusthed og ydeevne.
 - [Realtime](https://github.com/supabase/realtime) er en Elixir-server, der giver dig mulighed for at lytte til PostgreSQL-indsættelser, -opdateringer og -slettelser ved hjælp af websockets. Realtime spørger Postgres' indbyggede replikationsfunktionalitet efter databaseændringer, konverterer ændringer til JSON og sender derefter JSON'en over websockets til autoriserede klienter.
-- [PostgREST] (http://postgrest.org/) er en webserver, der forvandler din PostgreSQL-database direkte til et RESTful API
+- [PostgREST](http://postgrest.org/) er en webserver, der forvandler din PostgreSQL-database direkte til et RESTful API
 - [pg_graphql](http://github.com/supabase/pg_graphql/) er en PostgreSQL-udvidelse, der eksponerer et GraphQL API
 - [Storage](https://github.com/supabase/storage-api) giver en RESTful grænseflade til administration af filer gemt i S3, der bruger Postgres til at administrere tilladelser.
 - [postgres-meta](https://github.com/supabase/postgres-meta) er et RESTful API til administration af din Postgres, så du kan hente tabeller, tilføje roller og køre forespørgsler osv.

@@ -21,7 +21,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { useContextMenu } from 'react-contexify'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import {
   STORAGE_VIEWS,
   STORAGE_ROW_TYPES,
@@ -71,7 +71,7 @@ export const RowIcon = ({ view, status, fileType, mimeType }: any) => {
   return <IconFile size={16} strokeWidth={2} />
 }
 
-interface FileExplorerRowProps {
+export interface FileExplorerRowProps {
   index: number
   item: any
   view: string
@@ -79,6 +79,7 @@ interface FileExplorerRowProps {
   selectedItems: any[]
   openedFolders: any[]
   selectedFilePreview: any
+  onCopyUrl: (name: string, url: string) => void
 }
 
 const FileExplorerRow = ({
@@ -89,9 +90,11 @@ const FileExplorerRow = ({
   selectedItems = [],
   openedFolders = [],
   selectedFilePreview = {},
+  onCopyUrl,
 }: FileExplorerRowProps) => {
   const storageExplorerStore = useStorageStore()
   const {
+    getFileUrl,
     popColumnAtIndex,
     pushOpenedFolderAtIndex,
     popOpenedFoldersAtIndex,
@@ -107,7 +110,6 @@ const FileExplorerRow = ({
     fetchFolderContents,
     downloadFile,
     downloadFolder,
-    copyFileURLToClipboard,
     selectRangeItems,
   } = storageExplorerStore
 
@@ -117,7 +119,7 @@ const FileExplorerRow = ({
   const isOpened =
     openedFolders.length > columnIndex ? isEqual(openedFolders[columnIndex], item) : false
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview.id, item.id)
-  const canUpdateFiles = checkPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const { show } = useContextMenu()
 
@@ -188,7 +190,11 @@ const FileExplorerRow = ({
                       {
                         name: 'Get URL',
                         icon: <IconClipboard size="tiny" />,
-                        onClick: async () => await copyFileURLToClipboard(itemWithColumnIndex),
+                        onClick: async () =>
+                          onCopyUrl(
+                            itemWithColumnIndex.name,
+                            await getFileUrl(itemWithColumnIndex)
+                          ),
                       },
                     ]
                   : [
@@ -199,25 +205,25 @@ const FileExplorerRow = ({
                           {
                             name: 'Expire in 1 week',
                             onClick: async () =>
-                              await copyFileURLToClipboard(
-                                itemWithColumnIndex,
-                                URL_EXPIRY_DURATION.WEEK
+                              onCopyUrl(
+                                itemWithColumnIndex.name,
+                                await getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.WEEK)
                               ),
                           },
                           {
                             name: 'Expire in 1 month',
                             onClick: async () =>
-                              await copyFileURLToClipboard(
-                                itemWithColumnIndex,
-                                URL_EXPIRY_DURATION.MONTH
+                              onCopyUrl(
+                                itemWithColumnIndex.name,
+                                await getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.MONTH)
                               ),
                           },
                           {
                             name: 'Expire in 1 year',
                             onClick: async () =>
-                              await copyFileURLToClipboard(
-                                itemWithColumnIndex,
-                                URL_EXPIRY_DURATION.YEAR
+                              onCopyUrl(
+                                itemWithColumnIndex.name,
+                                await getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.YEAR)
                               ),
                           },
                           {
@@ -403,6 +409,7 @@ const FileExplorerRow = ({
             />
           ) : (
             <Dropdown
+              modal={false}
               side="bottom"
               align="end"
               overlay={[
@@ -417,7 +424,7 @@ const FileExplorerRow = ({
                         overlay={(option?.children ?? [])?.map((child) => {
                           return (
                             <Dropdown.Item key={child.name} onClick={child.onClick}>
-                              {child.name}
+                              <p className="text-xs">{child.name}</p>
                             </Dropdown.Item>
                           )
                         })}
@@ -430,7 +437,7 @@ const FileExplorerRow = ({
                         >
                           <div className="flex items-center space-x-2">
                             {option.icon}
-                            <p>{option.name}</p>
+                            <p className="text">{option.name}</p>
                           </div>
                           <IconChevronRight size="tiny" />
                         </div>
@@ -445,7 +452,7 @@ const FileExplorerRow = ({
                         icon={option.icon || <></>}
                         onClick={option.onClick}
                       >
-                        {option.name}
+                        <p className="text-xs">{option.name}</p>
                       </Dropdown.Item>
                     )
                   }

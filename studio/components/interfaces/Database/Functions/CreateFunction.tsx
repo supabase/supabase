@@ -1,15 +1,20 @@
-import { FC, useEffect, useContext, createContext, FormEvent, useState } from 'react'
-import { isEmpty, mapValues, has, filter, keyBy, isUndefined, partition, isNull } from 'lodash'
-import { observer, useLocalObservable } from 'mobx-react-lite'
-import { Button, Input, SidePanel, IconTrash, Radio, IconPlus, Toggle, Modal, Listbox } from 'ui'
-import { Dictionary } from 'components/grid'
+import { filter, has, isEmpty, isNull, isUndefined, keyBy, mapValues, partition } from 'lodash'
 import { makeAutoObservable } from 'mobx'
+import { observer, useLocalObservable } from 'mobx-react-lite'
+import { FormEvent, createContext, useContext, useEffect, useState } from 'react'
+import { Button, IconPlus, IconTrash, Input, Listbox, Modal, Radio, SidePanel, Toggle } from 'ui'
 
-import { useStore } from 'hooks'
+import { Dictionary } from 'components/grid'
+import { Function } from 'components/interfaces/Functions/Functions.types'
+import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import Panel from 'components/ui/Panel'
 import SqlEditor from 'components/ui/SqlEditor'
-import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useStore } from 'hooks'
+import { isResponseOk } from 'lib/common/fetch'
+import { SupaResponse } from 'types'
 
 // [Refactor] Remove local state, just use the Form component
 
@@ -284,28 +289,31 @@ function hasWhitespace(value: string) {
 
 const CreateFunctionContext = createContext<ICreateFunctionStore | null>(null)
 
-type CreateFunctionProps = {
+interface CreateFunctionProps {
   func: any
   visible: boolean
   setVisible: (value: boolean) => void
-} & any
+}
 
-const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) => {
+const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
+  const { project } = useProjectContext()
   const { ui, meta } = useStore()
   const _localState = useLocalObservable(() => new CreateFunctionStore())
   _localState.meta = meta as any
 
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
 
-  useEffect(() => {
-    const fetchSchemas = async () => {
-      await (_localState!.meta as any).schemas.load()
-      const schemas = (_localState!.meta as any).schemas.list()
-      _localState.setSchemas(schemas)
+  useSchemasQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      onSuccess(schemas) {
+        _localState.setSchemas(schemas)
+      },
     }
-
-    fetchSchemas()
-  }, [])
+  )
 
   useEffect(() => {
     _localState.formState.reset(func)
@@ -318,15 +326,15 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
         _localState.setLoading(true)
 
         const body = _localState.formState.requestBody
-        const response: any = body.id
+        const response: SupaResponse<Function> = body.id
           ? await (_localState!.meta as any).functions.update(body.id, body)
           : await (_localState!.meta as any).functions.create(body)
 
-        if (response.error) {
+        if (!isResponseOk(response)) {
           ui.setNotification({
             category: 'error',
             message: `Failed to create function: ${
-              response.error?.message ?? 'Submit request failed'
+              response.error.message ?? 'Submit request failed'
             }`,
           })
           _localState.setLoading(false)
@@ -466,7 +474,7 @@ const CreateFunction: FC<CreateFunctionProps> = ({ func, visible, setVisible }) 
 
 export default observer(CreateFunction)
 
-const InputName: FC = observer(({}) => {
+const InputName = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
   return (
     <Input
@@ -488,11 +496,11 @@ const InputName: FC = observer(({}) => {
   )
 })
 
-type InputMultiArgumentsProps = {
+interface InputMultiArgumentsProps {
   readonly?: boolean
 }
 
-const InputMultiArguments: FC<InputMultiArgumentsProps> = observer(({ readonly }) => {
+const InputMultiArguments = observer(({ readonly }: InputMultiArgumentsProps) => {
   const _localState = useContext(CreateFunctionContext)
 
   function onAddArgument() {
@@ -539,14 +547,14 @@ const InputMultiArguments: FC<InputMultiArgumentsProps> = observer(({ readonly }
   )
 })
 
-type InputArgumentProps = {
+interface InputArgumentProps {
   idx: number
   name: string
   type: string
   error?: string
   readonly?: boolean
 }
-const InputArgument: FC<InputArgumentProps> = observer(({ idx, name, type, error, readonly }) => {
+const InputArgument = observer(({ idx, name, type, error, readonly }: InputArgumentProps) => {
   const _localState = useContext(CreateFunctionContext)
 
   function onNameChange(e: FormEvent<HTMLInputElement>) {
@@ -606,21 +614,13 @@ const InputArgument: FC<InputArgumentProps> = observer(({ idx, name, type, error
         ))}
       </Listbox>
       {!readonly && (
-        <div>
-          <Button
-            danger
-            type="default"
-            icon={<IconTrash size="tiny" />}
-            onClick={onDelete}
-            size="small"
-          />
-        </div>
+        <Button type="danger" icon={<IconTrash size="tiny" />} onClick={onDelete} size="small" />
       )}
     </div>
   )
 })
 
-const InputMultiConfigParams: FC = observer(({}) => {
+const InputMultiConfigParams = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
   function onAddArgument() {
@@ -661,13 +661,13 @@ const InputMultiConfigParams: FC = observer(({}) => {
   )
 })
 
-type InputConfigParamProps = {
+interface InputConfigParamProps {
   idx: number
   name: string
   value: string
   error?: { name?: string; value?: string }
 }
-const InputConfigParam: FC<InputConfigParamProps> = observer(({ idx, name, value, error }) => {
+const InputConfigParam = observer(({ idx, name, value, error }: InputConfigParamProps) => {
   const _localState = useContext(CreateFunctionContext)
 
   function onNameChange(e: FormEvent<HTMLInputElement>) {
@@ -718,20 +718,12 @@ const InputConfigParam: FC<InputConfigParamProps> = observer(({ idx, name, value
         size="small"
         error={error?.value}
       />
-      <div>
-        <Button
-          danger
-          type="default"
-          icon={<IconTrash size="tiny" />}
-          onClick={onDelete}
-          size="small"
-        />
-      </div>
+      <Button type="danger" icon={<IconTrash size="tiny" />} onClick={onDelete} size="small" />
     </div>
   )
 })
 
-const InputDefinition: FC = observer(({}) => {
+const InputDefinition = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
   return (
     <div className="space-y-4">
@@ -746,7 +738,7 @@ const InputDefinition: FC = observer(({}) => {
           </p>
         )}
       </div>
-      <div className="h-40 border dark:border-dark">
+      <div className="h-60 resize-y border dark:border-dark">
         <SqlEditor
           defaultValue={_localState!.formState.definition.value}
           onInputChange={(value: string | undefined) => {
@@ -762,7 +754,7 @@ const InputDefinition: FC = observer(({}) => {
   )
 })
 
-const SelectSchema: FC = observer(({}) => {
+const SelectSchema = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
   return (
@@ -785,7 +777,7 @@ const SelectSchema: FC = observer(({}) => {
   )
 })
 
-const SelectLanguage: FC = observer(({}) => {
+const SelectLanguage = observer(({}) => {
   const { meta } = useStore()
   const _localState = useContext(CreateFunctionContext)
 
@@ -823,7 +815,7 @@ const SelectLanguage: FC = observer(({}) => {
   )
 })
 
-const SelectReturnType: FC = observer(({}) => {
+const SelectReturnType = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
   return (
@@ -856,7 +848,7 @@ const SelectReturnType: FC = observer(({}) => {
   )
 })
 
-const SelectBehavior: FC = observer(({}) => {
+const SelectBehavior = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
   return (
@@ -881,7 +873,7 @@ const SelectBehavior: FC = observer(({}) => {
   )
 })
 
-const RadioSecurity: FC = observer(({}) => {
+const RadioSecurity = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
   return (

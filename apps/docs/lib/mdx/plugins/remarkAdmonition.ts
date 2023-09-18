@@ -1,8 +1,8 @@
 import { Content, Paragraph, Parent } from 'mdast'
 import { MdxJsxFlowElement } from 'mdast-util-mdx'
+import { AdmonitionProps } from 'ui'
 import { Node } from 'unist'
 import { visit } from 'unist-util-visit'
-import { AdmonitionProps } from '~/components/Admonition'
 
 /**
  * Transforms an `mkdocs-material` Admonition to a Supabase Admonition.

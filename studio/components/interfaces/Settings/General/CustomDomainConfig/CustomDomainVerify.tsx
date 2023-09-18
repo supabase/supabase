@@ -1,16 +1,24 @@
+import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { Alert, Button, IconAlertCircle, IconExternalLink, IconHelpCircle, IconRefreshCw } from 'ui'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertCircle,
+  IconExternalLink,
+  IconHelpCircle,
+  IconRefreshCw,
+} from 'ui'
 
-import { useStore } from 'hooks'
+import Panel from 'components/ui/Panel'
 import { ProjectApiResponse } from 'data/config/project-api-query'
-import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
+import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
 import DNSRecord from './DNSRecord'
-import Panel from 'components/ui/Panel'
-import InformationBox from 'components/ui/InformationBox'
 
 export type CustomDomainVerifyProps = {
   projectRef?: string
@@ -19,7 +27,6 @@ export type CustomDomainVerifyProps = {
 }
 
 const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomainVerifyProps) => {
-  const { ui } = useStore()
   const [isNotVerifiedYet, setIsNotVerifiedYet] = useState(false)
 
   const { mutate: reverifyCustomDomain, isLoading: isReverifyLoading } =
@@ -28,7 +35,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
         if (res.status === '2_initiated') setIsNotVerifiedYet(true)
       },
     })
-  const { mutateAsync: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
+  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
 
   const hasCAAErrors = customDomain.ssl.validation_errors?.reduce(
     (acc, error) => acc || error.message.includes('caa_error'),
@@ -36,22 +43,13 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
   )
 
   const onReverifyCustomDomain = () => {
-    if (!projectRef) {
-      throw new Error('Project ref is required')
-    }
-
+    if (!projectRef) return console.error('Project ref is required')
     reverifyCustomDomain({ projectRef })
   }
 
   const onCancelCustomDomain = async () => {
-    if (!projectRef) {
-      throw new Error('Project ref is required')
-    }
-    try {
-      await deleteCustomDomain({ projectRef })
-    } catch (error: any) {
-      ui.setNotification({ category: 'error', message: error.message })
-    }
+    if (!projectRef) return console.error('Project ref is required')
+    deleteCustomDomain({ projectRef })
   }
 
   return (
@@ -70,24 +68,20 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
             Records which have been successfully verified will be removed from this list below.
           </p>
           <div className="mt-4 mb-2">
-            <InformationBox
-              hideCollapse
-              defaultVisibility
-              icon={
-                isNotVerifiedYet ? (
-                  <IconAlertCircle className="text-scale-1100" strokeWidth={1.5} />
-                ) : (
-                  <IconHelpCircle className="text-scale-1100" strokeWidth={1.5} />
-                )
-              }
-              title={
-                isNotVerifiedYet
+            <Alert_Shadcn_ variant="default">
+              {isNotVerifiedYet ? (
+                <IconAlertCircle className="text-scale-1100" strokeWidth={1.5} />
+              ) : (
+                <IconHelpCircle className="text-scale-1100" strokeWidth={1.5} />
+              )}
+              <AlertTitle_Shadcn_>
+                {isNotVerifiedYet
                   ? 'Unable to verify records from DNS provider yet.'
-                  : 'Please note that it may take up to 24 hours for the DNS records to propagate.'
-              }
-              description={
-                isNotVerifiedYet ? (
-                  <div className="space-y-1">
+                  : 'Please note that it may take up to 24 hours for the DNS records to propagate.'}
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                {isNotVerifiedYet ? (
+                  <div className="mt-2">
                     <p>
                       Do check again in a bit as it may take up to 24 hours for changes in DNS
                       records to propagate.
@@ -95,7 +89,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
                     <p>
                       You may also visit{' '}
                       <Link href={`https://whatsmydns.net/#TXT/${customDomain.hostname}`}>
-                        <a className="text-brand-900">here</a>
+                        <a className="text-brand">here</a>
                       </Link>{' '}
                       to check if your DNS has been propagated successfully before clicking verify.
                     </p>
@@ -104,13 +98,13 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
                   <p>
                     You may also visit{' '}
                     <Link href={`https://whatsmydns.net/#TXT/${customDomain.hostname}`}>
-                      <a className="text-brand-900">here</a>
+                      <a className="text-brand">here</a>
                     </Link>{' '}
                     to check if your DNS has been propagated successfully before clicking verify.
                   </p>
-                )
-              }
-            />
+                )}
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
           </div>
         </div>
 
@@ -187,8 +181,8 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
 
         <div className="!mt-4">
           <p className="text-sm text-scale-1000">
-            One of the records requires you to replace the CNAME record set up in the first step
-            with a TXT record.
+            One of the records requires you to <span className="text-scale-1100">replace</span> the
+            CNAME record set up in the first step with a TXT record.
           </p>
           <p className="text-sm text-scale-1000">
             You'll be able to restore it back to the CNAME after the verification process has been

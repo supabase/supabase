@@ -5,18 +5,14 @@ import { Configuration, OpenAIApi } from 'openai'
 import { inspect } from 'util'
 import { v4 as uuidv4 } from 'uuid'
 import { fetchSources } from './sources'
-import yargs from 'yargs'
+import * as minimist from 'minimist'
 
 dotenv.config()
 
 async function generateEmbeddings() {
-  const argv = await yargs.option('refresh', {
-    alias: 'r',
-    description: 'Refresh data',
-    type: 'boolean',
-  }).argv
+  const argv = minimist(process.argv.slice(2))
 
-  const shouldRefresh = argv.refresh
+  const shouldRefresh = Boolean(argv.refresh)
 
   const requiredEnvVars = [
     'NEXT_PUBLIC_SUPABASE_URL',
@@ -80,13 +76,11 @@ async function generateEmbeddings() {
         throw fetchPageError
       }
 
-      type Singular<T> = T extends any[] ? undefined : T
-
       // We use checksum to determine if this page & its sections need to be regenerated
       if (!shouldRefresh && existingPage?.checksum === checksum) {
-        const existingParentPage = existingPage?.parentPage as Singular<
-          typeof existingPage.parentPage
-        >
+        const existingParentPage = Array.isArray(existingPage?.parentPage)
+          ? existingPage?.parentPage[0]
+          : existingPage?.parentPage
 
         // If parent page changed, update it
         if (existingParentPage?.path !== parentPath) {

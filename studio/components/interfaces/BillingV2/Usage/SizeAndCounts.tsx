@@ -8,9 +8,16 @@ export interface SizeAndCountsProps {
   startDate: string | undefined
   endDate: string | undefined
   subscription: ProjectSubscriptionResponse | undefined
+  currentBillingCycleSelected: boolean
 }
 
-const SizeAndCounts = ({ projectRef, startDate, endDate, subscription }: SizeAndCountsProps) => {
+const SizeAndCounts = ({
+  projectRef,
+  startDate,
+  endDate,
+  subscription,
+  currentBillingCycleSelected,
+}: SizeAndCountsProps) => {
   const { data: dbSizeData, isLoading: isLoadingDbSizeData } = useDailyStatsQuery({
     projectRef,
     attribute: 'total_db_size_bytes',
@@ -61,9 +68,10 @@ const SizeAndCounts = ({ projectRef, startDate, endDate, subscription }: SizeAnd
   return (
     <UsageSection
       projectRef={projectRef}
-      categoryKey='sizeCount'
+      categoryKey="sizeCount"
       chartMeta={chartMeta}
       subscription={subscription}
+      currentBillingCycleSelected={currentBillingCycleSelected}
     />
   )
 }

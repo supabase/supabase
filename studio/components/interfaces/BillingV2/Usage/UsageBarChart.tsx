@@ -9,7 +9,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { Y_DOMAIN_CEILING_MULTIPLIER } from './Usage.constants'
 import dayjs from 'dayjs'
 
 // [Joshen] This BarChart is specifically for usage, hence not a reusable component, and not
@@ -23,6 +22,7 @@ export interface UsageBarChartProps {
   yLimit?: number
   yLeftMargin?: number
   yFormatter?: (value: number | string) => string
+  tooltipFormatter?: (value: number | string) => string
 }
 
 const UsageBarChart = ({
@@ -33,6 +33,7 @@ const UsageBarChart = ({
   yLimit,
   yLeftMargin = 10,
   yFormatter,
+  tooltipFormatter
 }: UsageBarChartProps) => {
   const yMin = 0 // We can consider passing this as a prop if there's a use case in the future
 
@@ -71,7 +72,7 @@ const UsageBarChart = ({
                       <p className="text-scale-1000 text-lg">No data yet</p>
                     ) : (
                       <p className="text-xl">
-                        {yFormatter !== undefined ? yFormatter(value) : value}
+                        {tooltipFormatter !== undefined ? tooltipFormatter(value) : value}
                       </p>
                     )}
                     <p className="text-xs text-scale-1100 mt-1">

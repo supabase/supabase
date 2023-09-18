@@ -3,26 +3,10 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { invoicesKeys } from './keys'
+import { UpcomingInvoiceResponse } from './org-invoice-upcoming-query'
 
 export type UpcomingInvoiceVariables = {
   projectRef?: string
-}
-
-export type UpcomingInvoiceResponse = {
-  amount_total: number
-  currency: string
-  customer_balance: number
-  subscription_id: string
-  billing_cycle_end: string
-  billing_cycle_start: string
-  lines: {
-    amount: number
-    description: string
-    period: { start: string; end: string }
-    quantity: number
-    unit_price: number
-    usage_based: boolean
-  }[]
 }
 
 export async function getUpcomingInvoice(

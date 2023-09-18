@@ -1,19 +1,13 @@
-import { FC } from 'react'
-import { Alert } from 'ui'
-
-import { useStore } from 'hooks'
-import Panel from 'components/ui/Panel'
-
-import DeleteProjectButton from './DeleteProjectButton'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms'
+import Panel from 'components/ui/Panel'
+import { Alert } from 'ui'
+import DeleteProjectButton from './DeleteProjectButton'
 
-interface Props {}
+const DeleteProjectPanel = () => {
+  const { project } = useProjectContext()
 
-const DeleteProjectPanel: FC<Props> = ({}) => {
-  const { ui } = useStore()
-  const project = ui.selectedProject
-
-  if (project === undefined) return <></>
+  if (project === undefined) return null
 
   return (
     <section>

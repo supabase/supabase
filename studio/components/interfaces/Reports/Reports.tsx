@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import dayjs from 'dayjs'
 import { groupBy, isNull } from 'lodash'
 import { toJS } from 'mobx'
-import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
 import {
   Badge,
   Button,
@@ -14,17 +15,16 @@ import {
   IconSave,
   IconSettings,
 } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { checkPermissions } from 'hooks'
-import useProfile from 'hooks/misc/useProfile'
 import { useParams } from 'common/hooks'
-import { uuidv4 } from 'lib/helpers'
-import { METRIC_CATEGORIES, METRICS, TIME_PERIODS_REPORTS } from 'lib/constants'
-import { useProjectContentStore } from 'stores/projectContentStore'
-import Loading from 'components/ui/Loading'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import Loading from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
+import { useCheckPermissions } from 'hooks'
+import { METRIC_CATEGORIES, METRICS, TIME_PERIODS_REPORTS } from 'lib/constants'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { useProjectContentStore } from 'stores/projectContentStore'
 import GridResize from './GridResize'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
 
@@ -33,7 +33,7 @@ const DEFAULT_CHART_ROW_COUNT = 4
 
 const Reports = () => {
   const { id, ref } = useParams()
-  const { data: profile } = useProfile()
+  const { profile } = useProfile()
 
   const [report, setReport] = useState<any>()
 
@@ -46,7 +46,7 @@ const Reports = () => {
   const [endDate, setEndDate] = useState<any>(null)
 
   const contentStore = useProjectContentStore(ref)
-  const canReadReport = checkPermissions(PermissionAction.READ, 'user_content', {
+  const canReadReport = useCheckPermissions(PermissionAction.READ, 'user_content', {
     resource: {
       type: 'report',
       visibility: report?.visibility,
@@ -54,7 +54,7 @@ const Reports = () => {
     },
     subject: { id: profile?.id },
   })
-  const canUpdateReport = checkPermissions(PermissionAction.UPDATE, 'user_content', {
+  const canUpdateReport = useCheckPermissions(PermissionAction.UPDATE, 'user_content', {
     resource: {
       type: 'report',
       visibility: report?.visibility,
@@ -350,14 +350,14 @@ const Reports = () => {
 
           {canUpdateReport ? (
             <Dropdown side="bottom" align="end" overlay={<MetricOptions />}>
-              <Button as="span" type="default" iconRight={<IconSettings />}>
-                Add / Remove charts
+              <Button asChild type="default" iconRight={<IconSettings />}>
+                <span>Add / Remove charts</span>
               </Button>
             </Dropdown>
           ) : (
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
-                <Button disabled as="span" type="default" iconRight={<IconSettings />}>
+              <Tooltip.Trigger asChild>
+                <Button disabled type="default" iconRight={<IconSettings />}>
                   Add / Remove charts
                 </Button>
               </Tooltip.Trigger>
@@ -385,8 +385,10 @@ const Reports = () => {
         <div className="flex min-h-full items-center justify-center rounded border-2 border-dashed p-16 dark:border-dark">
           {canUpdateReport ? (
             <Dropdown side="bottom" align="center" overlay={<MetricOptions />}>
-              <Button as="span" type="default" iconRight={<IconPlus />}>
-                {config.layout.length <= 0 ? 'Add your first chart' : 'Add another chart'}
+              <Button asChild type="default" iconRight={<IconPlus />}>
+                <span>
+                  {config.layout.length <= 0 ? 'Add your first chart' : 'Add another chart'}
+                </span>
               </Button>
             </Dropdown>
           ) : (

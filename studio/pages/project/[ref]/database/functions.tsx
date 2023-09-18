@@ -1,27 +1,28 @@
-import { useState, useEffect } from 'react'
-import { observer } from 'mobx-react-lite'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
+import { useEffect, useState } from 'react'
 
-import { useStore, checkPermissions } from 'hooks'
-import { DatabaseLayout } from 'components/layouts'
 import { CreateFunction, DeleteFunction } from 'components/interfaces/Database'
-import { NextPageWithLayout } from 'types'
-import NoPermission from 'components/ui/NoPermission'
 import FunctionsList from 'components/interfaces/Database/Functions/FunctionsList/FunctionsList'
+import { DatabaseLayout } from 'components/layouts'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import NoPermission from 'components/ui/NoPermission'
+import { useCheckPermissions, useStore } from 'hooks'
+import { NextPageWithLayout } from 'types'
 
 const FunctionsPage: NextPageWithLayout = () => {
-  const { meta, ui } = useStore()
+  const { ui, meta } = useStore()
   const [selectedFunction, setSelectedFunction] = useState<any>()
   const [showCreateFunctionForm, setShowCreateFunctionForm] = useState<boolean>(false)
   const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState<boolean>(false)
 
-  const canReadFunctions = checkPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'functions')
+  const canReadFunctions = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'functions')
 
   useEffect(() => {
-    if (ui.selectedProject?.ref) {
+    if (ui.selectedProjectRef) {
       fetchFunctions()
     }
-  }, [ui.selectedProject?.ref])
+  }, [ui.selectedProjectRef])
 
   const fetchFunctions = async () => {
     meta.functions.load()
@@ -48,11 +49,20 @@ const FunctionsPage: NextPageWithLayout = () => {
 
   return (
     <>
-      <FunctionsList
-        createFunction={createFunction}
-        editFunction={editFunction}
-        deleteFunction={deleteFunction}
-      />
+      <ScaffoldContainer>
+        <ScaffoldSection>
+          <div className="col-span-12">
+            <div className="mb-4">
+              <h3 className="mb-1 text-xl text-scale-1200">Database Functions</h3>
+            </div>
+            <FunctionsList
+              createFunction={createFunction}
+              editFunction={editFunction}
+              deleteFunction={deleteFunction}
+            />
+          </div>
+        </ScaffoldSection>
+      </ScaffoldContainer>
       <CreateFunction
         func={selectedFunction}
         visible={showCreateFunctionForm}

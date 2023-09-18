@@ -14,10 +14,11 @@ import Link from 'next/link'
 import SparkBar from 'components/ui/SparkBar'
 import clsx from 'clsx'
 import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
-import { ChartYFormatterCompactNumber, getUpgradeUrlFromV2Subscription } from './Usage.utils'
+import { ChartTooltipValueFormatter, ChartYFormatterCompactNumber, getUpgradeUrl } from './Usage.utils'
 import { formatBytes } from 'lib/helpers'
 import UsageBarChart from './UsageBarChart'
 import Panel from 'components/ui/Panel'
+import * as Tooltip from '@radix-ui/react-tooltip'
 
 interface UsageSectionProps {
   projectRef: string
@@ -26,9 +27,16 @@ interface UsageSectionProps {
   chartMeta: {
     [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean; hasNoData: boolean }
   }
+  currentBillingCycleSelected: boolean
 }
 
-const UsageSection = ({ projectRef, categoryKey, chartMeta, subscription }: UsageSectionProps) => {
+const UsageSection = ({
+  projectRef,
+  categoryKey,
+  chartMeta,
+  subscription,
+  currentBillingCycleSelected,
+}: UsageSectionProps) => {
   const { data: usage } = useProjectUsageQuery({ projectRef })
   const categoryMeta = USAGE_CATEGORIES.find((category) => category.key === categoryKey)
 
@@ -37,7 +45,7 @@ const UsageSection = ({ projectRef, categoryKey, chartMeta, subscription }: Usag
   const usageBasedBilling = subscription?.usage_billing_enabled
   const exceededLimitStyle = !usageBasedBilling ? 'text-red-900' : 'text-amber-900'
 
-  const upgradeUrl = getUpgradeUrlFromV2Subscription(projectRef, subscription)
+  const upgradeUrl = getUpgradeUrl(projectRef, subscription)
 
   return (
     <>
@@ -58,129 +66,200 @@ const UsageSection = ({ projectRef, categoryKey, chartMeta, subscription }: Usag
         return (
           <div id={attribute.anchor} key={attribute.key}>
             <SectionContent section={attribute}>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <p className="text-sm">{attribute.name} usage</p>
-                    {!usageBasedBilling && usageRatio >= 1 ? (
-                      <div className="flex items-center space-x-2 min-w-[115px]">
-                        <IconAlertTriangle
-                          size={14}
-                          strokeWidth={2}
-                          className={exceededLimitStyle}
-                        />
-                        <p className={`text-sm ${exceededLimitStyle}`}>Exceeded limit</p>
+              {usageMeta?.available_in_plan ? (
+                <>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <p className="text-sm">{attribute.name} usage</p>
+                        {currentBillingCycleSelected &&
+                          usageBasedBilling === false &&
+                          usageRatio >= USAGE_APPROACHING_THRESHOLD && (
+                            <Tooltip.Root delayDuration={0}>
+                              <Tooltip.Trigger asChild>
+                                {!usageBasedBilling && usageRatio >= 1 ? (
+                                  <div className="flex items-center space-x-2 min-w-[115px] cursor-help">
+                                    <IconAlertTriangle
+                                      size={14}
+                                      strokeWidth={2}
+                                      className={exceededLimitStyle}
+                                    />
+                                    <p className={`text-sm ${exceededLimitStyle}`}>
+                                      Exceeded limit
+                                    </p>
+                                  </div>
+                                ) : (
+                                  !usageBasedBilling &&
+                                  usageRatio >= USAGE_APPROACHING_THRESHOLD && (
+                                    <div className="flex items-center space-x-2 min-w-[115px] cursor-help">
+                                      <IconAlertTriangle
+                                        size={14}
+                                        strokeWidth={2}
+                                        className="text-amber-900"
+                                      />
+                                      <p className="text-sm text-amber-900">Approaching limit</p>
+                                    </div>
+                                  )
+                                )}
+                              </Tooltip.Trigger>
+                              <Tooltip.Portal>
+                                <Tooltip.Content side="bottom">
+                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                  <div
+                                    className={[
+                                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                      'border border-scale-200',
+                                    ].join(' ')}
+                                  >
+                                    <p className="text-xs text-scale-1200">
+                                      Exceeding your plans included usage will lead to restrictions
+                                      to your project.
+                                    </p>
+                                    <p className="text-xs text-scale-1200">
+                                      Upgrade to a usage-based plan or disable the spend cap to
+                                      avoid restrictions.
+                                    </p>
+                                  </div>
+                                </Tooltip.Content>
+                              </Tooltip.Portal>
+                            </Tooltip.Root>
+                          )}
                       </div>
-                    ) : !usageBasedBilling && usageRatio >= USAGE_APPROACHING_THRESHOLD ? (
-                      <div className="flex items-center space-x-2 min-w-[115px]">
-                        <IconAlertTriangle size={14} strokeWidth={2} className="text-amber-900" />
-                        <p className="text-sm text-amber-900">Approaching limit</p>
-                      </div>
-                    ) : null}
-                  </div>
 
-                  {!usageBasedBilling && usageRatio >= USAGE_APPROACHING_THRESHOLD && (
-                    <Link href={upgradeUrl}>
-                      <a>
-                        <Button type="default" size="tiny">
-                          Upgrade project
-                        </Button>
-                      </a>
-                    </Link>
-                  )}
-                </div>
-                {usageMeta?.limit > 0 && (
-                  <SparkBar
-                    type="horizontal"
-                    barClass={clsx(
-                      usageRatio >= 1
-                        ? usageBasedBilling
-                          ? 'bg-amber-900'
-                          : 'bg-red-900'
-                        : usageRatio >= USAGE_APPROACHING_THRESHOLD
-                        ? 'bg-amber-900'
-                        : 'bg-scale-1100'
-                    )}
-                    bgClass="bg-gray-300 dark:bg-gray-600"
-                    value={usageMeta?.usage ?? 0}
-                    max={usageMeta?.limit || 1}
-                  />
-                )}
-                <div>
-                  <div className="flex items-center justify-between border-b py-1">
-                    <p className="text-xs text-scale-1000">
-                      Included in {subscription?.plan?.name.toLowerCase()} plan
-                    </p>
-                    <p className="text-xs">
-                      {attribute.unit === 'bytes'
-                        ? formatBytes(usageMeta?.limit ?? 0)
-                        : (usageMeta?.limit ?? 0).toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-between py-1">
-                    <p className="text-xs text-scale-1000">
-                      {attribute.chartPrefix || 'Used '}in period
-                    </p>
-                    <p className="text-xs">
-                      {attribute.unit === 'bytes'
-                        ? formatBytes(usageMeta?.usage ?? 0)
-                        : (usageMeta?.usage ?? 0).toLocaleString()}
-                    </p>
-                  </div>
-                  {usageMeta?.limit > 0 && (
-                    <div className="flex items-center justify-between border-t py-1">
-                      <p className="text-xs text-scale-1000">Overage in period</p>
-                      <p className="text-xs">
-                        {usageExcess < 0
-                          ? attribute.unit === 'bytes'
-                            ? formatBytes(0)
-                            : 0
-                          : attribute.unit === 'bytes'
-                          ? formatBytes(usageExcess)
-                          : usageExcess.toLocaleString()}
-                      </p>
+                      {currentBillingCycleSelected &&
+                        !usageBasedBilling &&
+                        usageRatio >= USAGE_APPROACHING_THRESHOLD && (
+                          <Link href={upgradeUrl}>
+                            <a className="pb-1">
+                              <Button type="default" size="tiny">
+                                {subscription?.plan?.id === 'free'
+                                  ? 'Upgrade plan'
+                                  : 'Change spend cap'}
+                              </Button>
+                            </a>
+                          </Link>
+                        )}
                     </div>
+                    {currentBillingCycleSelected && usageMeta?.limit > 0 && (
+                      <SparkBar
+                        type="horizontal"
+                        barClass={clsx(
+                          usageRatio >= 1
+                            ? usageBasedBilling
+                              ? 'bg-scale-1100'
+                              : 'bg-red-900'
+                            : usageBasedBilling === false &&
+                              usageRatio >= USAGE_APPROACHING_THRESHOLD
+                            ? 'bg-amber-900'
+                            : 'bg-scale-1100'
+                        )}
+                        bgClass="bg-gray-300 dark:bg-gray-600"
+                        value={usageMeta?.usage ?? 0}
+                        max={usageMeta?.limit || 1}
+                      />
+                    )}
+                    <div>
+                      <div className="flex items-center justify-between border-b py-1">
+                        <p className="text-xs text-scale-1000">
+                          Included in {subscription?.plan?.name.toLowerCase()} plan
+                        </p>
+                        {usageMeta?.limit === -1 ? (
+                          <p className="text-xs">None</p>
+                        ) : usageMeta?.limit === 0 ? (
+                          <p className="text-xs">Unlimited</p>
+                        ) : (
+                          <p className="text-xs">
+                            {attribute.unit === 'bytes'
+                              ? formatBytes(usageMeta?.limit ?? 0)
+                              : (usageMeta?.limit ?? 0).toLocaleString()}
+                          </p>
+                        )}
+                      </div>
+                      {currentBillingCycleSelected && (
+                        <div className="flex items-center justify-between py-1">
+                          <p className="text-xs text-scale-1000">
+                            {attribute.chartPrefix || 'Used '}in period
+                          </p>
+                          <p className="text-xs">
+                            {attribute.unit === 'bytes'
+                              ? formatBytes(usageMeta?.usage ?? 0)
+                              : (usageMeta?.usage ?? 0).toLocaleString()}
+                          </p>
+                        </div>
+                      )}
+                      {currentBillingCycleSelected && usageMeta?.limit > 0 && (
+                        <div className="flex items-center justify-between border-t py-1">
+                          <p className="text-xs text-scale-1000">Overage in period</p>
+                          <p className="text-xs">
+                            {(usageMeta?.limit ?? 0) === -1 || usageExcess < 0
+                              ? 0
+                              : attribute.unit === 'bytes'
+                              ? formatBytes(usageExcess)
+                              : usageExcess.toLocaleString()}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {attribute.additionalInfo?.(projectRef, subscription, usage)}
+
+                  <div className="space-y-1">
+                    <p>
+                      {attribute.chartPrefix || ''}
+                      {attribute.name} per day
+                    </p>
+                    {attribute.chartDescription.split('\n').map((paragraph, idx) => (
+                      <p key={`para-${idx}`} className="text-sm text-scale-1000">
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+                  {chartMeta[attribute.key].isLoading ? (
+                    <div className="space-y-2">
+                      <ShimmeringLoader />
+                      <ShimmeringLoader className="w-3/4" />
+                      <ShimmeringLoader className="w-1/2" />
+                    </div>
+                  ) : chartData.length > 0 && notAllValuesZero ? (
+                    <UsageBarChart
+                      name={`${attribute.chartPrefix || ''}${attribute.name}`}
+                      unit={attribute.unit}
+                      attribute={attribute.attribute}
+                      data={chartData}
+                      yLeftMargin={chartMeta[attribute.key].margin}
+                      yFormatter={(value) => ChartYFormatterCompactNumber(value, attribute.unit)}
+                      tooltipFormatter={(value) => ChartTooltipValueFormatter(value, attribute.unit)}
+                    />
+                  ) : (
+                    <Panel>
+                      <Panel.Content>
+                        <div className="flex flex-col items-center justify-center">
+                          <IconBarChart2 className="text-scale-1100 mb-2" />
+                          <p className="text-sm">No data in period</p>
+                          <p className="text-sm text-scale-1000">May take up to 24 hours to show</p>
+                        </div>
+                      </Panel.Content>
+                    </Panel>
                   )}
-                </div>
-              </div>
-
-              {attribute.additionalInfo?.(subscription, usage)}
-
-              <div className="space-y-1">
-                <p>
-                  {attribute.chartPrefix || ''}
-                  {attribute.name} per day
-                </p>
-                {attribute.chartDescription.split('\n').map((paragraph, idx) => (
-                  <p key={`para-${idx}`} className="text-sm text-scale-1000">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-              {chartMeta[attribute.key].isLoading ? (
-                <div className="space-y-2">
-                  <ShimmeringLoader />
-                  <ShimmeringLoader className="w-3/4" />
-                  <ShimmeringLoader className="w-1/2" />
-                </div>
-              ) : chartData.length > 1 && notAllValuesZero ? (
-                <UsageBarChart
-                  name={`${attribute.chartPrefix || ''}${attribute.name}`}
-                  unit={attribute.unit}
-                  attribute={attribute.attribute}
-                  data={chartData}
-                  yLeftMargin={chartMeta[attribute.key].margin}
-                  yFormatter={(value) => ChartYFormatterCompactNumber(value, attribute.unit)}
-                />
+                </>
               ) : (
                 <Panel>
                   <Panel.Content>
-                    <div className="flex flex-col items-center justify-center">
-                      <IconBarChart2 className="text-scale-1100 mb-2" />
-                      <p className='text-sm'>No data in period</p>
-                      <p className="text-sm text-scale-1000">
-                        May take up to 24 hours to show
-                      </p>
+                    <div className="flex w-full items-center flex-col justify-center space-y-2 md:flex-row md:justify-between">
+                      <div className="space-y-1">
+                        <p className="text-sm">Not included in plan</p>
+                        <div>
+                          <p className="text-sm text-scale-1100">
+                            You need to be on a higher plan in order to use this feature.
+                          </p>
+                        </div>
+                      </div>
+                      <Link href={`/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`}>
+                        <a>
+                          <Button type="primary">Upgrade plan</Button>
+                        </a>
+                      </Link>
                     </div>
                   </Panel.Content>
                 </Panel>

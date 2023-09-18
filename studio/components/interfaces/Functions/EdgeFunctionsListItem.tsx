@@ -1,29 +1,37 @@
-import dayjs from 'dayjs'
-import { FC, useState } from 'react'
-import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
-import { IconCheck, IconClipboard } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import dayjs from 'dayjs'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { IconCheck, IconClipboard } from 'ui'
 
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 
-interface Props {
+interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
 }
 
-const EdgeFunctionsListItem: FC<Props> = ({ function: item }) => {
+const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) => {
   const router = useRouter()
-  const { ui } = useStore()
   const { ref } = useParams()
+  const { project } = useProjectContext()
   const [isCopied, setIsCopied] = useState(false)
 
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
+
   // get the .co or .net TLD from the restUrl
-  const restUrl = ui.selectedProject?.restUrl
-  const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
+  const restUrl = project?.restUrl
+  const restUrlTld =
+    restUrl !== undefined ? new URL(restUrl as string).hostname.split('.').pop() : 'co'
   const functionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${item.slug}`
+
+  const endpoint =
+    customDomainData?.customDomain?.status === 'active'
+      ? `https://${customDomainData.customDomain.hostname}/functions/v1/${item.slug}`
+      : functionUrl
 
   return (
     <Table.tr
@@ -39,7 +47,7 @@ const EdgeFunctionsListItem: FC<Props> = ({ function: item }) => {
       </Table.td>
       <Table.td className="">
         <div className="text-xs text-scale-1100 flex gap-2 items-center truncate">
-          <p className="font-mono truncate hidden md:inline">{functionUrl}</p>
+          <p className="font-mono truncate hidden md:inline">{endpoint}</p>
           <button
             type="button"
             className="text-scale-900 hover:text-scale-1200 transition"
@@ -52,11 +60,11 @@ const EdgeFunctionsListItem: FC<Props> = ({ function: item }) => {
                 }, 3000)
               }
               event.stopPropagation()
-              onCopy(functionUrl)
+              onCopy(endpoint)
             }}
           >
             {isCopied ? (
-              <div className="text-brand-900">
+              <div className="text-brand">
                 <IconCheck size={14} strokeWidth={3} />
               </div>
             ) : (
@@ -103,4 +111,4 @@ const EdgeFunctionsListItem: FC<Props> = ({ function: item }) => {
   )
 }
 
-export default observer(EdgeFunctionsListItem)
+export default EdgeFunctionsListItem

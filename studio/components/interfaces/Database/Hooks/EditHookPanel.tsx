@@ -1,24 +1,24 @@
-import Image from 'next/image'
-import { useState, useRef, useEffect, MutableRefObject } from 'react'
 import { PostgresTable, PostgresTrigger } from '@supabase/postgres-meta'
-import { Button, SidePanel, Form, Input, Listbox, Checkbox, Radio, Badge, Modal } from 'ui'
+import Image from 'next/image'
+import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
 
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { tryParseJson, uuidv4 } from 'lib/helpers'
-import HTTPRequestFields from './HTTPRequestFields'
-import { isValidHttpUrl } from './Hooks.utils'
-import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { FormSection, FormSectionLabel, FormSectionContent } from 'components/ui/Forms'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
+import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
+import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-transaction-mutation'
 import {
   EdgeFunctionsResponse,
   useEdgeFunctionsQuery,
 } from 'data/edge-functions/edge-functions-query'
-import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
-import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-transaction-mutation'
+import { getTable } from 'data/tables/table-query'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { useStore } from 'hooks'
+import { isValidHttpUrl, tryParseJson, uuidv4 } from 'lib/helpers'
+import { Button, Checkbox, Form, Input, Listbox, Modal, Radio, SidePanel } from 'ui'
+import HTTPRequestFields from './HTTPRequestFields'
+import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
 
 export interface EditHookPanelProps {
   visible: boolean
@@ -29,12 +29,10 @@ export interface EditHookPanelProps {
 export type HTTPArgument = { id: string; name: string; value: string }
 
 const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) => {
-  // [Joshen] Need to change to use RQ once Alaister's PR goes in
   const { ref } = useParams()
-  const { meta, ui } = useStore()
+  const { ui } = useStore()
   const submitRef = useRef<any>(null)
   const [isEdited, setIsEdited] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isClosingPanel, setIsClosingPanel] = useState(false)
 
   // [Joshen] There seems to be some bug between Checkbox.Group within the Form component
@@ -47,12 +45,52 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
   const [httpParameters, setHttpParameters] = useState<HTTPArgument[]>([])
 
   const { project } = useProjectContext()
+  const { data } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
-  const { mutateAsync: createDatabaseTrigger } = useDatabaseTriggerCreateMutation()
-  const { mutateAsync: updateDatabaseTrigger } = useDatabaseTriggerUpdateMutation()
+  const { mutate: createDatabaseTrigger, isLoading: isCreatingDatabaseTrigger } =
+    useDatabaseTriggerCreateMutation({
+      onSuccess: (res) => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully created new webhook "${res.name}"`,
+        })
+        onClose()
+      },
+      onError: (error) => {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to create webhook: ${error.message}`,
+        })
+      },
+    })
+  const { mutate: updateDatabaseTrigger, isLoading: isUpdatingDatabaseTrigger } =
+    useDatabaseTriggerUpdateMutation({
+      onSuccess: (res) => {
+        ui.setNotification({
+          category: 'success',
+          message: `Successfully updated webhook "${res.name}"`,
+        })
+        onClose()
+      },
+      onError: (error) => {
+        ui.setNotification({
+          error,
+          category: 'error',
+          message: `Failed to update webhook: ${error.message}`,
+        })
+      },
+    })
+  const isSubmitting = isCreatingDatabaseTrigger || isUpdatingDatabaseTrigger
 
-  const tables = meta.tables.list().sort((a, b) => (a.schema > b.schema ? 0 : -1))
-  const restUrl = ui.selectedProject?.restUrl
+  const tables = useMemo(
+    () => [...(data ?? [])].sort((a, b) => (a.schema > b.schema ? 0 : -1)),
+    [data]
+  )
+  const restUrl = project?.restUrl
   const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
 
   const isEdgeFunction = (url: string) =>
@@ -66,12 +104,12 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
     function_type: isEdgeFunction(selectedHook?.function_args?.[0] ?? '')
       ? 'supabase_function'
       : 'http_request',
+    timeout_ms: Number(selectedHook?.function_args?.[4] ?? 1000),
   }
 
   useEffect(() => {
     if (visible) {
       setIsEdited(false)
-      setIsSubmitting(false)
       setIsClosingPanel(false)
 
       // Reset form fields outside of the Form context
@@ -139,6 +177,10 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       }
     }
 
+    if (values.timeout_ms < 1000 || values.timeout_ms > 5000) {
+      errors['timeout_ms'] = 'Timeout should be between 1000ms and 5000ms'
+    }
+
     if (JSON.stringify(values) !== JSON.stringify(initialValues)) setIsEdited(true)
     return errors
   }
@@ -151,12 +193,11 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       return setEventsError('Please select at least one event')
     }
 
-    const selectedTable = meta.tables.byId(values.table_id)
+    const selectedTable = await getTable(values.table_id)
     if (!selectedTable) {
       return ui.setNotification({ category: 'error', message: 'Unable to find selected table' })
     }
 
-    const serviceTimeoutMs = '1000'
     const headers = httpHeaders
       .filter((header) => header.name && header.value)
       .reduce((a: any, b: any) => {
@@ -186,55 +227,23 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
         values.http_method,
         JSON.stringify(headers),
         JSON.stringify(parameters),
-        serviceTimeoutMs,
+        values.timeout_ms.toString(),
       ],
     }
 
     if (selectedHook === undefined) {
-      try {
-        setIsSubmitting(true)
-        await createDatabaseTrigger({
-          projectRef: project?.ref,
-          connectionString: project?.connectionString,
-          payload,
-        })
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully created new webhook "${values.name}"`,
-        })
-        onClose()
-      } catch (error: any) {
-        ui.setNotification({
-          error,
-          category: 'error',
-          message: `Failed to create webhook: ${error.message}`,
-        })
-      } finally {
-        setIsSubmitting(false)
-      }
+      createDatabaseTrigger({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        payload,
+      })
     } else {
-      try {
-        setIsSubmitting(true)
-        await updateDatabaseTrigger({
-          projectRef: project?.ref,
-          connectionString: project?.connectionString,
-          originalTrigger: selectedHook,
-          updatedTrigger: payload,
-        })
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully updated webhook "${values.name}"`,
-        })
-        onClose()
-      } catch (error: any) {
-        ui.setNotification({
-          error,
-          category: 'error',
-          message: `Failed to update webhook: ${error.message}`,
-        })
-      } finally {
-        setIsSubmitting(false)
-      }
+      updateDatabaseTrigger({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        originalTrigger: selectedHook,
+        updatedTrigger: payload,
+      })
     }
   }
 

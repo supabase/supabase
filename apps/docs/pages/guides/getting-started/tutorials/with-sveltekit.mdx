@@ -44,7 +44,7 @@ PUBLIC_SUPABASE_URL="YOUR_SUPABASE_URL"
 PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_KEY"
 ```
 
-Optionally, add `src/styles.css` with the [CSS from the example](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/svelte-user-management/src/app.css).
+Optionally, add `src/styles.css` with the [CSS from the example](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/sveltekit-user-management/src/styles.css).
 
 ### Supabase Auth Helpers
 
@@ -55,7 +55,7 @@ It can be challenging to authenticate your users in all these different environm
 Install the auth helpers for SvelteKit:
 
 ```bash
-npm install @supabase/auth-helpers-sveltekit
+npm install @supabase/auth-helpers-sveltekit @supabase/supabase-js
 ```
 
 Add the code below to your `src/hooks.server.ts` to initialize the client on the server:

@@ -5,7 +5,7 @@ In this example we're implementing image search using the [OpenAI CLIP Model](ht
 We're implementing two methods in the [`/image_search/main.py` file](/image_search/main.py):
 
 1. The `seed` method generates embeddings for the images in the `images` folder and upserts them into a collection in Supabase Vector.
-2. Thw `search` method generates an embedding from the search query and performs a vector similarity search query.
+2. The `search` method generates an embedding from the search query and performs a vector similarity search query.
 
 ## Setup
 
@@ -28,7 +28,7 @@ We're implementing two methods in the [`/image_search/main.py` file](/image_sear
 
 ## Run on hosted Supabase project
 
-- Set `DB_CONNECTION` with the connection string from your hosted Supabase Dashboard: https://app.supabase.com/project/_/settings/database > Connection string > URI
+- Set `DB_CONNECTION` with the connection string from your hosted Supabase Dashboard: https://supabase.com/dashboard/project/_/settings/database > Connection string > URI
 
 ## Attributions
 

@@ -1,20 +1,23 @@
-import { createContext, useEffect } from 'react'
 import { observer, useLocalObservable } from 'mobx-react-lite'
+import { createContext } from 'react'
 
-import { useStore } from 'hooks'
 import { useParams } from 'common/hooks'
-import { NextPageWithLayout } from 'types'
-import { SettingsLayout } from 'components/layouts'
 import ServiceList from 'components/interfaces/Settings/API/ServiceList'
+import { SettingsLayout } from 'components/layouts'
+import {
+  useIsProjectActive,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
+import { useStore } from 'hooks'
+import { NextPageWithLayout } from 'types'
 import { IconAlertCircle } from 'ui'
-import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
 
 export const PageContext: any = createContext(null)
 
 const ApiSettings: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const { meta, ui } = useStore()
-  const project = ui.selectedProject
+  const { ui, meta } = useStore()
+  const { project } = useProjectContext()
   const isActive = useIsProjectActive()
 
   // [Joshen] Will need to deprecate this
@@ -27,10 +30,6 @@ const ApiSettings: NextPageWithLayout = () => {
   PageContext.meta = meta
   PageContext.project = project
   if (meta) PageState.meta = meta
-
-  useEffect(() => {
-    if (project?.ref) meta.schemas.load()
-  }, [project?.ref])
 
   return (
     <PageContext.Provider value={PageState}>

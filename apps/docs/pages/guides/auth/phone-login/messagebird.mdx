@@ -24,7 +24,7 @@ We'll cover:
 What you'll need:
 
 - A MessageBird account (sign up here: https://dashboard.messagebird.com/en/sign-up)
-- A Supabase project (create one here: https://app.supabase.com)
+- A Supabase project (create one here: https://supabase.com/dashboard)
 - A mobile phone capable of receiving SMS
 
 ## Steps
@@ -49,7 +49,7 @@ You will need the following values to get started:
 - Live API Key / Test API Key
 - MessageBird originator
 
-Now go to the Auth > Settings page in the Supabase dashboard (https://app.supabase.com/project/YOUR-PROJECT-REF/auth/settings).
+Now go to the Auth > Settings page in the Supabase dashboard (https://supabase.com/dashboard/project/YOUR-PROJECT-REF/auth/settings).
 
 You should see an option to enable Phone Signup.
 
@@ -68,7 +68,7 @@ Now the backend should be setup, we can proceed to add our client-side code!
 
 The SMS message sent to a phone containing an OTP code can be customized. This is useful if you need to mention a brand name or display a website address.
 
-Go to Auth > Templates page in the Supabase dashboard (https://app.supabase.com/project/YOUR-PROJECT-REF/auth/templates).
+Go to Auth > Templates page in the Supabase dashboard (https://supabase.com/dashboard/project/YOUR-PROJECT-REF/auth/templates).
 
 Use the variable `.Code` in the template to display the code.
 
@@ -111,7 +111,7 @@ curl -X POST 'https://cvwawazfelidkloqmbma.supabase.co/auth/v1/signup' \
 
 The user will now receive an SMS with a 6-digit pin that you will need to receive from them within 60-seconds before they can login to their account.
 
-You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyOTP`:
+You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyOtp`:
 
 <Tabs
   scrollable
@@ -122,7 +122,7 @@ You should present a form to the user so they can input the 6 digit pin, then se
 <TabPanel id="js" label="JavaScript">
 
 ```js
-let { session, error } = await supabase.auth.verifyOTP({
+let { session, error } = await supabase.auth.verifyOtp({
   phone: '+13334445555',
   token: '123456',
 })
@@ -237,7 +237,7 @@ The second step is the same as the previous section, you need to collect the 6-d
 <TabPanel id="js" label="JavaScript">
 
 ```js
-let { session, error } = await supabase.auth.verifyOTP({
+let { session, error } = await supabase.auth.verifyOtp({
   phone: '+13334445555',
   token: '123456',
 })
@@ -276,7 +276,7 @@ The user does not have a password therefore will need to sign in via this method
 ## Resources
 
 - [MessageBird Signup](https://dashboard.messagebird.com/en/sign-up)
-- [Supabase Dashboard](https://app.supabase.com)
+- [Supabase Dashboard](https://supabase.com/dashboard)
 - [Supabase Row Level Security](/docs/guides/auth#row-level-security)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

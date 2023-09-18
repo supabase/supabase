@@ -1,34 +1,28 @@
+import { useParams } from 'common'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import { Button, IconCheckSquare, Loading } from 'ui'
 
+import { useOrganizationJoinDeclineMutation } from 'data/organizations/organization-join-decline-mutation'
+import { useOrganizationJoinMutation } from 'data/organizations/organization-join-mutation'
+import {
+  TokenInfo,
+  validateTokenInformation,
+} from 'data/organizations/organization-join-token-validation-query'
 import { useStore } from 'hooks'
-import useProfile from 'hooks/misc/useProfile'
 import { useSignOut } from 'lib/auth'
-import { API_URL } from 'lib/constants'
-import { get, post, delete_ } from 'lib/common/fetch'
-
-interface ITokenInfo {
-  organization_name?: string | undefined
-  token_does_not_exist?: boolean
-  email_match?: boolean
-  authorized_user?: boolean
-  expired_token?: boolean
-  invite_id?: number
-}
-
-type TokenInfo = ITokenInfo | undefined
+import { useProfile } from 'lib/profile'
 
 const JoinOrganizationPage = () => {
   const router = useRouter()
-  const { slug, token, name } = router.query
-  const { ui, app } = useStore()
-  const { data: profile } = useProfile()
+  const { slug, token, name } = useParams()
+  const { ui } = useStore()
+  const { profile } = useProfile()
   const signOut = useSignOut()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState(false)
+  const [error, setError] = useState<any>()
   const [tokenValidationInfo, setTokenValidationInfo] = useState<TokenInfo>(undefined)
   const [tokenInfoLoaded, setTokenInfoLoaded] = useState(false)
   const { token_does_not_exist, email_match, expired_token, organization_name, invite_id } =
@@ -36,18 +30,48 @@ const JoinOrganizationPage = () => {
 
   const loginRedirectLink = `/?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
 
+  const { mutate: joinOrganization } = useOrganizationJoinMutation({
+    onSuccess: () => {
+      setIsSubmitting(false)
+      router.push('/')
+    },
+    onError: (error) => {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to join organization: ${error.message}`,
+      })
+      setIsSubmitting(false)
+    },
+  })
+
+  const { mutate: declineOrganization } = useOrganizationJoinDeclineMutation({
+    onSuccess: () => {
+      setIsSubmitting(false)
+      router.push('/')
+    },
+    onError: (error) => {
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to decline invitation: ${error.message}`,
+      })
+      setIsSubmitting(false)
+    },
+  })
+
   useEffect(() => {
     const fetchTokenInfo = async () => {
-      await ui.load()
+      if (!slug) return console.error('Slug is required')
+      if (!token) return console.error('Token is required')
 
-      const response = await get(`${API_URL}/organizations/${slug}/members/join?token=${token}`)
-
-      if (response.error) {
-        setError(response.error)
-        setTokenInfoLoaded(true)
-      } else {
+      try {
+        const response = await validateTokenInformation({ slug, token })
         setTokenInfoLoaded(true)
         setTokenValidationInfo(response)
+      } catch (error) {
+        setError(error)
+        setTokenInfoLoaded(true)
       }
     }
 
@@ -63,38 +87,17 @@ const JoinOrganizationPage = () => {
   }, [token, router.asPath])
 
   async function handleJoinOrganization() {
+    if (!slug) return console.error('Slug is required')
+    if (!token) return console.error('Token is required')
     setIsSubmitting(true)
-    const response = await post(`${API_URL}/organizations/${slug}/members/join?token=${token}`, {})
-
-    if (response.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to join organization: ${response.error.message}`,
-      })
-      setIsSubmitting(false)
-    } else {
-      setIsSubmitting(false)
-      app.onOrgAdded(response)
-      router.push('/')
-    }
+    joinOrganization({ slug, token })
   }
 
   async function handleDeclineJoinOrganization() {
+    if (!slug) return console.error('Slug is required')
+    if (!invite_id) return console.error('Invite ID is required')
     setIsSubmitting(true)
-    const response = await delete_(
-      `${API_URL}/organizations/${slug}/members/invite?invited_id=${invite_id}`,
-      {}
-    )
-    if (response.error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to decline invitation: ${response.error.message}`,
-      })
-      setIsSubmitting(false)
-    } else {
-      setIsSubmitting(false)
-      router.push('/')
-    }
+    declineOrganization({ slug, invited_id: invite_id })
   }
 
   const isError =
@@ -116,7 +119,7 @@ const JoinOrganizationPage = () => {
     )
 
     const message = error ? (
-      <p>There was an error requesting details for this invitation.</p>
+      <p>There was an error requesting details for this invitation. ({error.message})</p>
     ) : token_does_not_exist ? (
       <>
         <p>The invite token is invalid.</p>
@@ -134,7 +137,7 @@ const JoinOrganizationPage = () => {
         <p className="text-scale-900">
           To accept this invitation, you will need to{' '}
           <a
-            className="cursor-pointer text-brand-900"
+            className="cursor-pointer text-brand"
             onClick={async () => {
               await signOut()
               router.reload()

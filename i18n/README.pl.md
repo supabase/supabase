@@ -12,9 +12,9 @@
 - [x] hostowana baza danych Postgres [x]. [Dokumenty](https://supabase.com/docs/guides/database)
 - [x] uwierzytelnianie i autoryzacja [x]. [Dokumenty](https://supabase.com/docs/guides/auth)
 - [x] Automatycznie generowane interfejsy API.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/database/api#rest-api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/database/api#graphql-api)
-  - [x] Subskrypcje w czasie rzeczywistym. [Docs](https://supabase.com/docs/guides/database/api#realtime-api)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Subskrypcje w czasie rzeczywistym. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funkcje.
   - [x] Funkcje bazy danych. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Funkcje brzegowe [Docs](https://supabase.com/docs/guides/functions)
@@ -27,7 +27,7 @@
 
 Pełna dokumentacja znajduje się na stronie [supabase.com/docs](https://supabase.com/docs)
 
-Aby zobaczyć, jak wnieść swój wkład, odwiedź [Getting Started](./DEVELOPERS.md)
+Aby zobaczyć, jak wnieść swój wkład, odwiedź [Getting Started](../DEVELOPERS.md)
 
 ## Społeczność i wsparcie
 
@@ -39,7 +39,7 @@ Aby zobaczyć, jak wnieść swój wkład, odwiedź [Getting Started](./DEVELOPER
 ## Status
 
 - [x] Alpha: Testujemy Supabase z zamkniętą grupą klientów
-- [x] Publiczna wersja alfa: Każdy może zarejestrować się na stronie [app.supabase.com](https://app.supabase.com). Ale spokojnie, jest kilka niedociągnięć
+- [x] Publiczna wersja alfa: Każdy może zarejestrować się na stronie [supabase.com/dashboard](https://supabase.com/dashboard). Ale spokojnie, jest kilka niedociągnięć
 - [x] Publiczna beta: Wystarczająco stabilna dla większości przypadków użycia innych niż korporacyjne
 - [] Public: Ogólna dostępność [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
@@ -55,7 +55,7 @@ Supabase to połączenie narzędzi open source. Tworzymy funkcje Firebase przy u
 
 **Architektura**
 
-Supabase jest [platformą hostowaną] (https://app.supabase.com). Możesz zarejestrować się i zacząć korzystać z Supabase bez instalowania czegokolwiek.
+Supabase jest [platformą hostowaną](https://supabase.com/dashboard). Możesz zarejestrować się i zacząć korzystać z Supabase bez instalowania czegokolwiek.
 Możesz także [self-host](https://supabase.com/docs/guides/hosting/overview) i [rozwijać lokalnie](https://supabase.com/docs/guides/local-development).
 
 ![Architektura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)

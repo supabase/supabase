@@ -9,7 +9,59 @@ import { Button, Collapsible, IconChevronRight } from 'ui'
 import { queryParamsToObject } from '../Reports.utils'
 import { Fragment } from 'react'
 import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
+import sumBy from 'lodash/sumBy'
 
+export const NetworkTrafficRenderer = (
+  props: ReportWidgetProps<{
+    timestamp: string
+    ingress: number
+    egress: number
+  }>
+) => {
+  const data = useFillTimeseriesSorted(
+    props.data,
+    'timestamp',
+    ['ingress_mb', 'egress_mb'],
+    0,
+    props.params?.iso_timestamp_start,
+    props.params?.iso_timestamp_end
+  )
+  const totalIngress = sumBy(props.data, 'ingress_mb')
+  const totalEgress = sumBy(props.data, 'egress_mb')
+
+  function determinePrecision(valueInMb: number) {
+    return valueInMb < 0.001 ? 7 : totalIngress > 1 ? 2 : 4
+  }
+  return (
+    <div className="flex flex-col gap-2 w-full">
+      <BarChart
+        size="small"
+        title="Ingress"
+        highlightedValue={sumBy(props.data, 'ingress_mb')}
+        format="MB"
+        className="w-full"
+        valuePrecision={determinePrecision(totalIngress)}
+        data={data}
+        yAxisKey="ingress_mb"
+        xAxisKey="timestamp"
+        displayDateInUtc
+      />
+
+      <BarChart
+        size="small"
+        title="Egress"
+        highlightedValue={totalEgress}
+        format="MB"
+        valuePrecision={determinePrecision(totalEgress)}
+        className="w-full"
+        data={data}
+        yAxisKey="egress_mb"
+        xAxisKey="timestamp"
+        displayDateInUtc
+      />
+    </div>
+  )
+}
 export const TotalRequestsChartRenderer = (
   props: ReportWidgetProps<{
     timestamp: string
@@ -171,11 +223,13 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
   <Collapsible>
     <Collapsible.Trigger asChild>
       <div className="flex gap-2">
-        <Button as="span" type="text" className=" !py-0 !p-1" title="Show more route details">
-          <IconChevronRight
-            size={14}
-            className="transition data-open-parent:rotate-90 data-closed-parent:rotate-0"
-          />
+        <Button asChild type="text" className=" !py-0 !p-1" title="Show more route details">
+          <span>
+            <IconChevronRight
+              size={14}
+              className="transition data-open-parent:rotate-90 data-closed-parent:rotate-0"
+            />
+          </span>
         </Button>
         <TextFormatter className="w-10 h-4 text-center rounded bg-scale-500" value={datum.method} />
         {datum.status_code && (

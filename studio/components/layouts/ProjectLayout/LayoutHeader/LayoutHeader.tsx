@@ -1,45 +1,72 @@
-import Link from 'next/link'
-import { observer } from 'mobx-react-lite'
 import { useParams } from 'common'
+import Link from 'next/link'
+import { useMemo } from 'react'
 import { Badge } from 'ui'
 
-import { IS_PLATFORM, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { useFlag, useStore } from 'hooks'
+import {
+  getResourcesExceededLimits,
+  getResourcesExceededLimitsOrg,
+} from 'components/ui/OveragesBanner/OveragesBanner.utils'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useOrgUsageQuery } from 'data/usage/org-usage-query'
+import { useProjectUsageQuery } from 'data/usage/project-usage-query'
+import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
 import BreadcrumbsView from './BreadcrumbsView'
-import OrgDropdown from './OrgDropdown'
-import ProjectDropdown from './ProjectDropdown'
 import FeedbackDropdown from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
-import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
-import { useProjectUsageQuery } from 'data/usage/project-usage-query'
-import { useProjectReadOnlyQuery } from 'data/config/project-read-only-query'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import OrgDropdown from './OrgDropdown'
+import ProjectDropdown from './ProjectDropdown'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
-  const { ui } = useStore()
-  const { selectedOrganization, selectedProject } = ui
-
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
-  const { data: isReadOnlyMode } = useProjectReadOnlyQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const selectedProject = useSelectedProject()
+  const selectedOrganization = useSelectedOrganization()
 
-  const { data: usage } = useProjectUsageQuery({ projectRef })
-  const resourcesExceededLimits = getResourcesExceededLimits(usage)
+  // Skip with org-based-billing, as quota is for the entire org
+  const { data: projectUsage } = useProjectUsageQuery(
+    { projectRef },
+    { enabled: Boolean(selectedOrganization && !selectedOrganization.subscription_id) }
+  )
+  const { data: orgUsage } = useOrgUsageQuery(
+    { orgSlug: selectedOrganization?.slug },
+    { enabled: Boolean(selectedOrganization && selectedOrganization.subscription_id) }
+  )
 
-  const projectHasNoLimits =
-    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.PAYG ||
-    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.ENTERPRISE ||
-    ui.selectedProject?.subscription_tier === PRICING_TIER_PRODUCT_IDS.TEAM
+  const exceedingLimits = useMemo(() => {
+    if (orgUsage) {
+      return getResourcesExceededLimitsOrg(orgUsage?.usages || []).length > 0
+    } else if (projectUsage) {
+      return getResourcesExceededLimits(projectUsage).length > 0
+    } else {
+      return false
+    }
+  }, [projectUsage, orgUsage])
+
+  // Skip with org-based-billing, as quota is for the entire org
+  const { data: projectSubscription } = useProjectSubscriptionV2Query(
+    { projectRef },
+    { enabled: selectedOrganization && !selectedOrganization.subscription_id }
+  )
+
+  const { data: orgSubscription } = useProjectSubscriptionV2Query(
+    { projectRef },
+    { enabled: Boolean(selectedOrganization && selectedOrganization.subscription_id) }
+  )
+
+  const subscription = useMemo(() => {
+    return projectSubscription || orgSubscription
+  }, [projectSubscription, orgSubscription])
+
+  const projectHasNoLimits = subscription?.usage_billing_enabled === true
 
   const showOverUsageBadge =
     useFlag('overusageBadge') &&
-    selectedProject?.subscription_tier !== undefined &&
+    subscription !== undefined &&
+    (subscription.plan.id === 'free' || subscription.plan.id === 'pro') &&
     !projectHasNoLimits &&
-    resourcesExceededLimits.length > 0
+    exceedingLimits
 
   return (
     <div
@@ -75,21 +102,15 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                 {/* Project Dropdown */}
                 <ProjectDropdown />
 
-                {/* [Terry] Temporary until we figure out how we want to display this permanently */}
-                {/* context: https://www.notion.so/supabase/DB-Disk-Size-Free-tier-Read-only-Critical-f2b8937c13a149e3ac769fe5888f6db0*/}
-                {isReadOnlyMode && (
-                  <div className="ml-2">
-                    <Link href={`/project/${projectRef}/settings/billing/usage`}>
-                      <a>
-                        <Badge color="red">Project is in read-only mode</Badge>
-                      </a>
-                    </Link>
-                  </div>
-                )}
-
                 {showOverUsageBadge && (
                   <div className="ml-2">
-                    <Link href={`/project/${projectRef}/settings/billing/usage`}>
+                    <Link
+                      href={
+                        selectedOrganization?.subscription_id
+                          ? `/org/${selectedOrganization.slug}/usage`
+                          : `/project/${projectRef}/settings/billing/usage`
+                      }
+                    >
                       <a>
                         <Badge color="red">Exceeding usage limits</Badge>
                       </a>
@@ -120,4 +141,4 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     </div>
   )
 }
-export default observer(LayoutHeader)
+export default LayoutHeader
