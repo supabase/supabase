@@ -90,7 +90,7 @@ const Param = ({
         <div className="grid gap-2 mt-2">
           <label className="font-mono text-xs uppercase text-scale-900">Description</label>
           <Description
-            content={description.toString()}
+            content={description?.toString()}
             metadata={metadata}
             onChange={onDesciptionUpdated}
           />

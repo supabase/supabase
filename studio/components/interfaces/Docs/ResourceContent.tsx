@@ -28,7 +28,7 @@ const ResourceContent = ({
   const resourcePaths = paths[`/${resourceId}`]
   const resourceDefinition = definitions[resourceId]
   const resourceMeta = resources[resourceId]
-  const description = resourceDefinition.description || null
+  const description = resourceDefinition?.description || null
   const methods = Object.keys(resourcePaths).map((x) => x.toUpperCase())
   const properties = Object.entries(resourceDefinition.properties || []).map(([id, val]: any) => ({
     ...val,
