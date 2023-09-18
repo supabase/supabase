@@ -152,11 +152,11 @@ Future<AuthResponse> signInWithGoogle() {
     nonce: rawNonce,
   );
 }
-```
+````
 
 In the Supabase JavaScript library, which you can use with web-based native frameworks like React Native or Expo, you can invoke this functionality like so:
 
-```ts
+````ts
 await supabase.auth.signInWithIdToken({
   provider: 'google',
   token: '<identity token received from the OS>',
