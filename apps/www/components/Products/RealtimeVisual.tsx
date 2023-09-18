@@ -3,10 +3,8 @@ import React, { useEffect, useState } from 'react'
 import classNames from 'classnames'
 
 function getRandomAxis(prevIteration: number) {
-  // Generate a random number between 0 (inclusive) and 13 (exclusive)
   const possibleXValues = [0, 1, 4]
   const possibleYValues = [0, 1]
-
   return {
     x: possibleXValues[Math.floor(Math.random() * possibleXValues.length)],
     y: possibleYValues[Math.floor(Math.random() * possibleYValues.length)],
