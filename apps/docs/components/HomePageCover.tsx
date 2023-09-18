@@ -82,7 +82,7 @@ const HomePageCover = (props) => {
             Discover how to set up a database to an app making queries in just a few minutes.
           </p>
         </div>
-        <div className="flex flex-wrap md:grid md:grid-cols-4 2xl:grid-cols-8 gap-2 sm:gap-3">
+        <div className="flex flex-wrap md:grid md:grid-cols-4 md:gap-6 2xl:grid-cols-8 gap-2 sm:gap-3">
           {frameworks.map((framework, i) => (
             <Link key={i} href={framework.href} passHref>
               <a className="no-underline">
