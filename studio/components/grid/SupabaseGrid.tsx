@@ -192,6 +192,7 @@ const SupabaseGridLayout = forwardRef<SupabaseGridRef, SupabaseGridProps>(
               isSuccess={isSuccess}
               isError={isError}
               filters={filters}
+              setParams={setParams}
               updateRow={updateTableRow}
               onAddRow={onAddRow}
               onImportData={onImportData}
