@@ -1,13 +1,24 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
+import { AutoApiService } from 'data/config/project-api-query'
 import { makeRandomString } from 'lib/helpers'
 import CodeSnippet from '../CodeSnippet'
 import Snippets from '../Snippets'
 
 const randomPassword = makeRandomString(20)
 
-export default function UserManagement({ autoApiService, selectedLang, showApiKey }) {
+interface UserManagementProps {
+  autoApiService: AutoApiService
+  selectedLang: 'bash' | 'js'
+  showApiKey: string
+}
+
+export default function UserManagement({
+  autoApiService,
+  selectedLang,
+  showApiKey,
+}: UserManagementProps) {
   const router = useRouter()
 
   const keyToShow = showApiKey ? showApiKey : 'SUPABASE_KEY'
@@ -100,7 +111,7 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
         <article className="code">
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authPhoneSignUp(autoApiService.endpoint, keyToShow, randomPassword)}
+            snippet={Snippets.authPhoneSignUp(autoApiService.endpoint, keyToShow)}
           />
         </article>
       </div>
@@ -120,11 +131,7 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
         <article className="code">
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authMobileOTPLogin(
-              autoApiService.endpoint,
-              keyToShow,
-              randomPassword
-            )}
+            snippet={Snippets.authMobileOTPLogin(autoApiService.endpoint, keyToShow)}
           />
         </article>
       </div>
@@ -144,11 +151,7 @@ export default function UserManagement({ autoApiService, selectedLang, showApiKe
         <article className="code">
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authMobileOTPVerify(
-              autoApiService.endpoint,
-              keyToShow,
-              randomPassword
-            )}
+            snippet={Snippets.authMobileOTPVerify(autoApiService.endpoint, keyToShow)}
           />
         </article>
       </div>

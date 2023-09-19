@@ -1,7 +1,7 @@
 import { noop } from 'lodash'
 import { Badge, IconCode, IconDatabase } from 'ui'
 
-import Description from './Description'
+import Description from 'components/interfaces/Docs/Description'
 
 function getColumnType(type: string, format: string) {
   // json and jsonb both have type=undefined, so check format instead
@@ -89,7 +89,11 @@ const Param = ({
       {description !== false && (
         <div className="grid gap-2 mt-2">
           <label className="font-mono text-xs uppercase text-scale-900">Description</label>
-          <Description content={description} metadata={metadata} onChange={onDesciptionUpdated} />
+          <Description
+            content={description?.toString()}
+            metadata={metadata}
+            onChange={onDesciptionUpdated}
+          />
         </div>
       )}
     </>
