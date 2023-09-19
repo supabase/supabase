@@ -30,7 +30,6 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
     const errors: any = {}
     if (values.name.length === 0) errors.name = 'Please provide a name for your secret'
     if (values.value.length === 0) errors.value = 'Please provide a value for your secret'
-    console.log('validate', errors)
     return errors
   }
 
