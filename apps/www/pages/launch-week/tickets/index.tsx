@@ -28,7 +28,7 @@ const supabaseAdmin = createClient(
 
 const generateOgs = async (users: UserData[]) => {
   users?.map(async (user) => {
-    const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/lw8-ticket-og?username=${encodeURIComponent(
+    const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw8-ticket-og?username=${encodeURIComponent(
       user.username ?? ''
     )}${!!user.golden ? '&golden=true' : ''}`
     return await fetch(ogImageUrl)
