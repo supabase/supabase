@@ -25,7 +25,7 @@ const EdgeFunctionSecrets = () => {
     isSuccess,
     isError,
   } = useSecretsQuery({
-    projectRef: projectRef ?? '',
+    projectRef: projectRef,
   })
 
   const { mutate: deleteSecret, isLoading: isDeleting } = useSecretsDeleteMutation({
