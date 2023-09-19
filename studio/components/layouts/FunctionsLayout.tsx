@@ -130,7 +130,7 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
                 </div>
               </div>
             </div>
-            {selectedFunction !== undefined && <FunctionsNav item={selectedFunction} />}
+            {functionSlug !== undefined && <FunctionsNav item={selectedFunction} />}
           </div>
           <div
             className={[
