@@ -74,7 +74,6 @@ const TableGridEditor = ({
 
   const canEditTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
   const canEditColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
-
   const isReadOnly = !canEditTables && !canEditColumns
 
   const getEncryptedColumns = async (table: any) => {
@@ -318,7 +317,7 @@ const TableGridEditor = ({
         theme={theme}
         gridProps={{ height: '100%' }}
         storageRef={projectRef}
-        editable={!isReadOnly && canEditTables && canEditViaTableEditor}
+        editable={!isReadOnly && canEditViaTableEditor}
         schema={selectedTable.schema}
         table={gridTable}
         refreshDocs={refreshDocs}
@@ -382,6 +381,7 @@ const TableGridEditor = ({
 
       {snap.selectedSchemaName !== undefined && (
         <SidePanelEditor
+          editable={!isReadOnly && canEditViaTableEditor}
           selectedTable={selectedTable as PostgresTable}
           onRowCreated={onRowCreated}
           onRowUpdated={onRowUpdated}
