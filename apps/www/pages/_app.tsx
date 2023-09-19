@@ -1,23 +1,24 @@
 import '../../../packages/ui/build/css/themes/light.css'
 import '../../../packages/ui/build/css/themes/dark.css'
-
 import '../styles/index.css'
-
-import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from 'lib/constants'
-import { DefaultSeo } from 'next-seo'
-import { AppProps } from 'next/app'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-import Meta from '~/components/Favicons'
-import '../styles/index.css'
-import { post } from '~/lib/fetchWrapper'
-import { AuthProvider, ThemeProvider, useTelemetryProps } from 'common'
-import Head from 'next/head'
 import 'config/code-hike.scss'
 
-export default function MyApp({ Component, pageProps }: AppProps) {
+import { useEffect } from 'react'
+import { AppProps } from 'next/app'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { DefaultSeo } from 'next-seo'
+
+import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from 'lib/constants'
+import Meta from '~/components/Favicons'
+import { post } from '~/lib/fetchWrapper'
+import PortalToast from 'ui/src/layout/PortalToast'
+import { AuthProvider, ThemeProvider, useConsent, useTelemetryProps } from 'common'
+
+export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
+  const { consentValue, hasAcceptedConsent } = useConsent()
 
   function handlePageTelemetry(route: string) {
     return post(`${API_URL}/telemetry/page`, {
@@ -32,6 +33,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   }
 
   useEffect(() => {
+    if (!hasAcceptedConsent) return
+
     function handleRouteChange(url: string) {
       handlePageTelemetry(url)
     }
@@ -41,16 +44,17 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router.events])
+  }, [router.events, consentValue])
 
   useEffect(() => {
+    if (!hasAcceptedConsent) return
     /**
      * Send page telemetry on first page load
      */
     if (router.isReady) {
       handlePageTelemetry(router.asPath)
     }
-  }, [router.isReady])
+  }, [router.isReady, consentValue])
 
   const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
   const { basePath } = useRouter()
@@ -85,6 +89,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       />
       <AuthProvider>
         <ThemeProvider detectSystemColorPreference={false}>
+          <PortalToast />
           <Component {...pageProps} />
         </ThemeProvider>
       </AuthProvider>

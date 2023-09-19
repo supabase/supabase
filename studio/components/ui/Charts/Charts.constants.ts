@@ -10,28 +10,35 @@ export const CHART_COLORS = {
 }
 
 // refer to packages/ui/radix-colors.js for full list of colors
-export const STACK_COLORS = [
-  ['brand', 9],
-  ['mint', 9],
-  ['blue', 9],
-  ['sky', 9],
-  ['lime', 9],
-  ['yellow', 9],
-  ['orange', 9],
-].map(([color, n]) => ({
-  lighter: `var(--colors-${color}${(n as number) - 1})`,
-  base: `var(--colors-${color}${n})`,
-  darker: `var(--colors-${color}${(n as number) + 1})`,
-}))
+export type ValidStackColor =
+  | 'brand'
+  | 'blue'
+  | 'red'
+  | 'yellow'
+  | 'green'
+  | 'slate'
+  | 'indigo'
+  | 'tomato'
+  | 'orange'
+  | 'amber'
 
-export const USAGE_COLORS = {
-  200: 'hsl(var(--brand-default))',
-  201: 'hsl(var(--brand-500))',
-  400: 'var(--colors-amber9)',
-  401: 'var(--colors-amber8)',
-  404: 'var(--colors-amber7)',
-  500: 'var(--colors-red9)',
-}
+export const genStackColorScales = (colors: ValidStackColor[]) =>
+  colors.map((color) => {
+    // override default base scale for certain colors that do not have good contrast
+    const scale =
+      (
+        {
+          slate: 11,
+        } as any
+      )[color] ?? 9
+    return {
+      lighter: `var(--colors-${color}${(scale as number) - 1})`,
+      base: `var(--colors-${color}${scale})`,
+      darker: `var(--colors-${color}${(scale as number) + 1})`,
+    }
+  })
+
+export const DEFAULT_STACK_COLORS : ValidStackColor[] = ['brand', 'slate', 'blue', 'yellow', 'indigo']
 
 export enum DateTimeFormats {
   FULL = 'MMM D, YYYY, hh:mma',

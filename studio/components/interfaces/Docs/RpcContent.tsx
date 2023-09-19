@@ -1,7 +1,7 @@
-import Snippets from 'components/to-be-cleaned/Docs/Snippets'
-import CodeSnippet from 'components/to-be-cleaned/Docs/CodeSnippet'
-import Param from 'components/to-be-cleaned/Docs/Param'
-import Description from 'components/to-be-cleaned/Docs/Description'
+import Snippets from 'components/interfaces/Docs/Snippets'
+import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
+import Param from 'components/interfaces/Docs/Param'
+import Description from 'components/interfaces/Docs/Description'
 
 /**
  * TODO: need to support rpc with the same name and different params type
