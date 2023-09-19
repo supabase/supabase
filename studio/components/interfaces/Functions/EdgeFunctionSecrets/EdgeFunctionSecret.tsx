@@ -14,27 +14,13 @@ const EdgeFunctionSecret = ({ secret, onSelectDelete }: EdgeFunctionSecretProps)
   return (
     <Table.tr>
       <Table.td>
-        <p className="truncate py-2 w-[250px]">{secret.name}</p>
+        <p className="truncate py-2">{secret.name}</p>
       </Table.td>
       <Table.td>
-        <div className="flex items-center space-x-2">
-          <Button
-            type="text"
-            icon={
-              show ? (
-                <IconEyeOff size={16} strokeWidth={1.5} />
-              ) : (
-                <IconEye size={16} strokeWidth={1.5} />
-              )
-            }
-            className="px-1"
-            onClick={() => setShow(!show)}
-          />
-          {show ? (
-            <Input copy value={secret.value} size="small" className="font-mono w-full" />
-          ) : (
-            <p className="text-sm font-mono">••••••••••••••••••</p>
-          )}
+        <div className="flex items-center space-x-2 max-w-[500px]">
+          <p className="font-mono text-sm truncate" title={secret.value}>
+            {secret.value}
+          </p>
         </div>
       </Table.td>
       <Table.td>

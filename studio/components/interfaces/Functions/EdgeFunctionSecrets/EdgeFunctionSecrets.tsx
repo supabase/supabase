@@ -54,11 +54,9 @@ const EdgeFunctionSecrets = () => {
       {isSuccess && (
         <Table
           head={[
-            <Table.th key="secret-name" className="w-[250px]">
-              Name
-            </Table.th>,
-            <Table.th key="secret-value">Value</Table.th>,
-            <Table.th key="add-secret" className="w-[100px]">
+            <Table.th key="secret-name">Name</Table.th>,
+            <Table.th key="secret-value">Digest</Table.th>,
+            <Table.th key="add-secret">
               <div className="flex items-center justify-end">
                 <Button onClick={() => setShowCreateSecret(true)}>Add new secret</Button>
               </div>
