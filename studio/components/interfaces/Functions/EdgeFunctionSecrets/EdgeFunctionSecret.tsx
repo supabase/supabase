@@ -1,7 +1,6 @@
 import Table from 'components/to-be-cleaned/Table'
 import { ProjectSecret } from 'data/secrets/secrets-query'
-import { useState } from 'react'
-import { Button, IconEye, IconEyeOff, IconTrash, Input } from 'ui'
+import { Button, IconTrash } from 'ui'
 
 interface EdgeFunctionSecretProps {
   secret: ProjectSecret
@@ -9,15 +8,13 @@ interface EdgeFunctionSecretProps {
 }
 
 const EdgeFunctionSecret = ({ secret, onSelectDelete }: EdgeFunctionSecretProps) => {
-  const [show, setShow] = useState(false)
-
   return (
     <Table.tr>
       <Table.td>
         <p className="truncate py-2">{secret.name}</p>
       </Table.td>
       <Table.td>
-        <div className="flex items-center space-x-2 max-w-[500px]">
+        <div className="flex items-center space-x-2">
           <p className="font-mono text-sm truncate" title={secret.value}>
             {secret.value}
           </p>
