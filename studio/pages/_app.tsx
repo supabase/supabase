@@ -32,6 +32,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 // @ts-ignore
 import Prism from 'prism-react-renderer/prism'
+import ConsentToast from 'ui/src/components/ConsentToast'
 
 import Favicons from 'components/head/Favicons'
 import {
@@ -40,7 +41,6 @@ import {
   PortalToast,
   RouteValidationWrapper,
 } from 'components/interfaces/App'
-import ConsentToast from 'components/ui/ConsentToast'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import { useRootQueryClient } from 'data/query-client'
