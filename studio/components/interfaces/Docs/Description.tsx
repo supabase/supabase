@@ -1,9 +1,10 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { noop } from 'lodash'
 import { useState } from 'react'
 import { Button, IconLoader } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useStore, useCheckPermissions } from 'hooks'
 import AutoTextArea from 'components/to-be-cleaned/forms/AutoTextArea'
+import { useCheckPermissions, useStore } from 'hooks'
 import { timeout } from 'lib/helpers'
 
 // Removes some auto-generated Postgrest text
@@ -26,7 +27,7 @@ interface DescrptionProps {
   onChange: (value: string) => void
 }
 
-const Description = ({ content, metadata, onChange = () => {} }: DescrptionProps) => {
+const Description = ({ content, metadata, onChange = noop }: DescrptionProps) => {
   const { meta, ui } = useStore()
 
   const contentText = temp_removePostgrestText(content || '').trim()
