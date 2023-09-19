@@ -20,7 +20,7 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
       typeof window !== 'undefined'
         ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
         : null
-    snap.setIsOptedInTelemetry(consent === 'true')
+    if (consent !== null) snap.setIsOptedInTelemetry(consent === 'true')
   }, [])
 
   const isLoggedIn = useIsLoggedIn()
