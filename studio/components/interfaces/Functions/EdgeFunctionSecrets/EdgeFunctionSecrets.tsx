@@ -1,6 +1,7 @@
 import { useParams } from 'common'
+import Link from 'next/link'
 import { useState } from 'react'
-import { Button, IconSearch, Input, Modal } from 'ui'
+import { Button, IconExternalLink, IconSearch, Input, Modal } from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -63,7 +64,16 @@ const EdgeFunctionSecrets = () => {
               onChange={(e: any) => setSearchString(e.target.value)}
               icon={<IconSearch size="tiny" />}
             />
-            <Button onClick={() => setShowCreateSecret(true)}>Add new secret</Button>
+            <div className="flex items-center space-x-2">
+              <Link passHref href="https://supabase.com/docs/guides/functions/secrets">
+                <a target="_blank" rel="noreferrer">
+                  <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+                    Documentation
+                  </Button>
+                </a>
+              </Link>
+              <Button onClick={() => setShowCreateSecret(true)}>Add new secret</Button>
+            </div>
           </div>
           <Table
             head={[
