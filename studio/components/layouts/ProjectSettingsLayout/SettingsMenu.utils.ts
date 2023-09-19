@@ -93,7 +93,7 @@ export const generateSettingsMenu = (
             ? [
                 {
                   name: 'Edge Functions',
-                  key: 'edge-functions',
+                  key: 'functions',
                   url: `/project/${ref}/settings/functions`,
                   items: [],
                 },
