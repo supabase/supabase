@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { useState } from 'react'
-import { Button, Modal } from 'ui'
+import { Button, IconSearch, Input, Modal } from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -15,16 +15,11 @@ import EdgeFunctionSecret from './EdgeFunctionSecret'
 const EdgeFunctionSecrets = () => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
+  const [searchString, setSearchString] = useState('')
   const [showCreateSecret, setShowCreateSecret] = useState(false)
   const [selectedSecret, setSelectedSecret] = useState<ProjectSecret>()
 
-  const {
-    data: secrets,
-    error,
-    isLoading,
-    isSuccess,
-    isError,
-  } = useSecretsQuery({
+  const { data, error, isLoading, isSuccess, isError } = useSecretsQuery({
     projectRef: projectRef,
   })
 
@@ -37,6 +32,12 @@ const EdgeFunctionSecrets = () => {
       setSelectedSecret(undefined)
     },
   })
+
+  const secrets =
+    searchString.length > 0
+      ? data?.filter((secret) => secret.name.toLowerCase().includes(searchString.toLowerCase())) ??
+        []
+      : data ?? []
 
   return (
     <>
@@ -52,24 +53,55 @@ const EdgeFunctionSecrets = () => {
       {isError && <AlertError error={error} subject="Failed to retrieve project secrets" />}
 
       {isSuccess && (
-        <Table
-          head={[
-            <Table.th key="secret-name">Name</Table.th>,
-            <Table.th key="secret-value">Digest</Table.th>,
-            <Table.th key="add-secret">
-              <div className="flex items-center justify-end">
-                <Button onClick={() => setShowCreateSecret(true)}>Add new secret</Button>
-              </div>
-            </Table.th>,
-          ]}
-          body={secrets?.map((secret) => (
-            <EdgeFunctionSecret
-              key={secret.name}
-              secret={secret}
-              onSelectDelete={() => setSelectedSecret(secret)}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Input
+              size="small"
+              className="w-80"
+              placeholder="Search for a secret"
+              value={searchString}
+              onChange={(e: any) => setSearchString(e.target.value)}
+              icon={<IconSearch size="tiny" />}
             />
-          ))}
-        />
+            <Button onClick={() => setShowCreateSecret(true)}>Add new secret</Button>
+          </div>
+          <Table
+            head={[
+              <Table.th key="secret-name">Name</Table.th>,
+              <Table.th key="secret-value">Digest</Table.th>,
+              <Table.th key="actions" />,
+            ]}
+            body={
+              secrets.length > 0 ? (
+                secrets.map((secret) => (
+                  <EdgeFunctionSecret
+                    key={secret.name}
+                    secret={secret}
+                    onSelectDelete={() => setSelectedSecret(secret)}
+                  />
+                ))
+              ) : secrets.length === 0 && searchString.length > 0 ? (
+                <Table.tr>
+                  <Table.td colSpan={3}>
+                    <p className="text-sm text-scale-1200">No results found</p>
+                    <p className="text-sm text-light">
+                      Your search for "{searchString}" did not return any results
+                    </p>
+                  </Table.td>
+                </Table.tr>
+              ) : (
+                <Table.tr>
+                  <Table.td colSpan={3}>
+                    <p className="text-sm text-scale-1200">No secrets created</p>
+                    <p className="text-sm text-light">
+                      There are no secrets associated with your project yet
+                    </p>
+                  </Table.td>
+                </Table.tr>
+              )
+            }
+          />
+        </div>
       )}
 
       <AddNewSecretModal visible={showCreateSecret} onClose={() => setShowCreateSecret(false)} />
