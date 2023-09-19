@@ -50,41 +50,43 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
     connectionString: project?.connectionString,
   })
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
-  const { mutate: createDatabaseTrigger, isLoading: isCreatingDatabaseTrigger } =
-    useDatabaseTriggerCreateMutation({
-      onSuccess: (res) => {
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully created new webhook "${res.name}"`,
-        })
-        onClose()
-      },
-      onError: (error) => {
-        ui.setNotification({
-          error,
-          category: 'error',
-          message: `Failed to create webhook: ${error.message}`,
-        })
-      },
-    })
-  const { mutate: updateDatabaseTrigger, isLoading: isUpdatingDatabaseTrigger } =
-    useDatabaseTriggerUpdateMutation({
-      onSuccess: (res) => {
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully updated webhook "${res.name}"`,
-        })
-        onClose()
-      },
-      onError: (error) => {
-        ui.setNotification({
-          error,
-          category: 'error',
-          message: `Failed to update webhook: ${error.message}`,
-        })
-      },
-    })
-  const isSubmitting = isCreatingDatabaseTrigger || isUpdatingDatabaseTrigger
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { mutate: createDatabaseTrigger } = useDatabaseTriggerCreateMutation({
+    onSuccess: (res) => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully created new webhook "${res.name}"`,
+      })
+      setIsSubmitting(false)
+      onClose()
+    },
+    onError: (error) => {
+      setIsSubmitting(false)
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to create webhook: ${error.message}`,
+      })
+    },
+  })
+  const { mutate: updateDatabaseTrigger } = useDatabaseTriggerUpdateMutation({
+    onSuccess: (res) => {
+      setIsSubmitting(false)
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully updated webhook "${res.name}"`,
+      })
+      onClose()
+    },
+    onError: (error) => {
+      setIsSubmitting(false)
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to update webhook: ${error.message}`,
+      })
+    },
+  })
 
   const tables = useMemo(
     () => [...(data ?? [])].sort((a, b) => (a.schema > b.schema ? 0 : -1)),
@@ -186,6 +188,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
   }
 
   const onSubmit = async (values: any) => {
+    setIsSubmitting(true)
     if (!project?.ref) {
       return console.error('Project ref is required')
     }
@@ -193,8 +196,13 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       return setEventsError('Please select at least one event')
     }
 
-    const selectedTable = await getTable(values.table_id)
+    const selectedTable = await getTable({
+      id: values.table_id,
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    })
     if (!selectedTable) {
+      setIsSubmitting(false)
       return ui.setNotification({ category: 'error', message: 'Unable to find selected table' })
     }
 
