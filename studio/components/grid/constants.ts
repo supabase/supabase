@@ -18,4 +18,5 @@ export const ERROR_PRIMARY_KEY_NOTFOUND =
 
 export const RLS_ACKNOWLEDGED_KEY = 'supabase-acknowledge-rls-warning'
 
-export const rlsAcknowledgedKey = (tableID?: string) => `${RLS_ACKNOWLEDGED_KEY}-${tableID}`
+export const rlsAcknowledgedKey = (tableID?: string | number) =>
+  `${RLS_ACKNOWLEDGED_KEY}-${String(tableID)}`
