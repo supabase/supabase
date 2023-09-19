@@ -149,7 +149,7 @@
     "@types/uuid": "^8.3.4",
     "@types/zxcvbn": "^4.4.1",
     "autoprefixer": "^10.4.14",
-    "aws-sdk": "^2.1354.0",
+    "@aws-sdk/client-secrets-manager": "^3.410.0",
     "babel-loader": "^8.2.3",
     "common": "*",
     "config": "*",

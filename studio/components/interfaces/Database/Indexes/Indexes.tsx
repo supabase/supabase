@@ -137,7 +137,7 @@ const Indexes = () => {
                 onChange={setSelectedSchema}
                 className="w-[260px]"
               >
-                {(schemas?.result ?? []).map((schema) => (
+                {(schemas ?? []).map((schema) => (
                   <Listbox.Option
                     key={schema.name}
                     value={schema.name}

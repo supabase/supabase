@@ -36,7 +36,7 @@ const ProjectCard = ({
     <li className="col-span-1 list-none">
       <CardButton
         linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
-        className="h-44 !px-0"
+        className="h-44 !px-0 group"
         title={
           <div className="w-full justify-between space-y-1.5 px-6">
             <p className="flex-shrink truncate text-base">{name}</p>
@@ -69,12 +69,7 @@ const ProjectCard = ({
         }
         footer={
           <div className="mb-[-26px]">
-            {resourceWarnings && (
-              <ProjectCardStatus
-                projectStatus={projectStatus}
-                resourceWarnings={resourceWarnings}
-              />
-            )}
+            <ProjectCardStatus projectStatus={projectStatus} resourceWarnings={resourceWarnings} />
           </div>
         }
       ></CardButton>

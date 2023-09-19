@@ -33,6 +33,7 @@ import { formatBytes } from 'lib/helpers'
 import { BASE_PATH } from 'lib/constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import FileExplorerRowEditing from './FileExplorerRowEditing'
+import { copyPathToFolder } from './StorageExplorer.utils'
 
 export const RowIcon = ({ view, status, fileType, mimeType }: any) => {
   if (view === STORAGE_VIEWS.LIST && status === STORAGE_ROW_STATUS.LOADING) {
@@ -170,6 +171,11 @@ const FileExplorerRow = ({
             name: 'Download',
             icon: <IconDownload size="tiny" />,
             onClick: () => downloadFolder(itemWithColumnIndex),
+          },
+          {
+            name: 'Copy path to folder',
+            icon: <IconClipboard size="tiny" />,
+            onClick: () => copyPathToFolder(openedFolders, itemWithColumnIndex),
           },
           ...(canUpdateFiles
             ? [
