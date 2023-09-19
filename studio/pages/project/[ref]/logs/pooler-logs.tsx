@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, IconAlertCircle } from 'ui'
 
 import { LogsTableName } from 'components/interfaces/Settings/Logs'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
@@ -18,10 +17,7 @@ export const LogPage: NextPageWithLayout = () => {
   if (isLoading) {
     return <Connecting />
   }
-  const isSupavisorEnabled =
-    poolingConfiguration?.supavisor_enabled ??
-    poolingConfiguration?.connectionString.includes('pooler.supabase.com') ??
-    false
+  const isSupavisorEnabled = poolingConfiguration?.supavisor_enabled ?? false
 
   return (
     <LogsPreviewer

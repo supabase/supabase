@@ -136,7 +136,9 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.json(generateTitleResult)
   } catch (error) {
     console.error(
-      `AI SQL editing failed: ${isError(error) ? error.message : 'An unknown error occurred'}`
+      `AI SQL editing failed: ${
+        isError(error) ? error.message : 'An unknown error occurred'
+      }, titleResponseString: ${titleResponseString}`
     )
 
     return res.status(500).json({

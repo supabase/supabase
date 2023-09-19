@@ -10,7 +10,13 @@ export const PG_META_URL = IS_PLATFORM
   : process.env.STUDIO_PG_META_URL
 export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
+/**
+ * @deprecated use DATETIME_FORMAT
+ */
 export const DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ssZ'
+
+// should be used for all dayjs formattings shown to the user. Includes timezone info.
+export const DATETIME_FORMAT = 'DD MMM YYYY, HH:mm:ss (ZZ)'
 
 // Keyboard Shortcuts Related
 export const SHORTCUT_KEYS = {

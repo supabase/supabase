@@ -8,7 +8,7 @@ import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
-import Snippets from 'components/to-be-cleaned/Docs/Snippets'
+import Snippets from 'components/interfaces/Docs/Snippets'
 import Panel from 'components/ui/Panel'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 

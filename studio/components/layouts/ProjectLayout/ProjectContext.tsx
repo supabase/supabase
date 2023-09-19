@@ -1,10 +1,12 @@
+import { createContext, PropsWithChildren, useContext, useMemo } from 'react'
+
 import { useParams } from 'common/hooks'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { PROJECT_STATUS } from 'lib/constants'
-import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
+import { TableEditorStateContextProvider } from 'state/table-editor'
 import { Project } from 'types'
 
-type ProjectContextType = {
+export interface ProjectContextType {
   project: Project | undefined
   isLoading: boolean
 }
@@ -35,7 +37,13 @@ export const ProjectContextProvider = ({
     }
   }, [selectedProject, isLoading])
 
-  return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>
+  return (
+    <ProjectContext.Provider value={value}>
+      <TableEditorStateContextProvider key={`table-editor-state-${projectRef}`}>
+        {children}
+      </TableEditorStateContextProvider>
+    </ProjectContext.Provider>
+  )
 }
 
 export const ProjectContextFromParamsProvider = ({ children }: PropsWithChildren<{}>) => {

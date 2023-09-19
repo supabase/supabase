@@ -42,13 +42,11 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
             <div className="text-sm text-scale-1000">
               To manage your billing address, emails or Tax ID, head to your{' '}
               <Link href={`/org/${orgSlug}/billing`}>
-                <a>
-                  <span className="text-sm text-green-900 transition hover:text-green-1000">
-                    organization settings
-                  </span>
-                  .
+                <a className="text-sm text-green-900 transition hover:text-green-1000">
+                  organization settings
                 </a>
               </Link>
+              .
             </div>
             <div className="space-y-2">
               <p className="text-sm text-scale-1100">More information</p>
@@ -164,7 +162,7 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
               )} - ${billingCycleEnd.format('MMM DD')})`}
               bgClass="bg-gray-300 dark:bg-gray-600"
               labelBottomClass="!text-scale-1000 pb-1"
-              labelTop={`${daysToCycleEnd} Days left`}
+              labelTop={`${daysToCycleEnd} days remaining`}
             />
 
             {subscription && (
