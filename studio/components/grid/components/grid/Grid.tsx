@@ -185,7 +185,7 @@ export const Grid = memo(
                         {onAddRow !== undefined && onImportData !== undefined && (
                           <>
                             <p className="text-sm text-light mt-1">
-                              Add or generate rows to get started.
+                              Add rows to your table to get started.
                             </p>
                             <div className="flex items-center space-x-2 mt-4">
                               {/* [Joshen] Leaving this as a placeholder */}

@@ -5,7 +5,7 @@ import { useMemo, useRef } from 'react'
 import { format } from 'sql-formatter'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTableDefinitionQuery } from 'data/database/table-definition-query'
 import { useViewDefinitionQuery } from 'data/database/view-definition-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
@@ -91,10 +91,8 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
 
   if (isLoading) {
     return (
-      <div className="py-4 space-y-2">
-        <ShimmeringLoader />
-        <ShimmeringLoader className="w-3/4" />
-        <ShimmeringLoader className="w-1/2" />
+      <div className="p-4">
+        <GenericSkeletonLoader />
       </div>
     )
   }
