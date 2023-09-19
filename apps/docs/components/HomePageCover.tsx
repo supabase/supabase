@@ -63,7 +63,7 @@ const HomePageCover = (props) => {
   const GettingStarted = () => (
     <div
       className="
-        border border-scale-400 bg-scale-200
+        border bg-scale-200
         relative overflow-hidden
         grid grid-cols-12
         rounded-lg
@@ -71,7 +71,7 @@ const HomePageCover = (props) => {
         "
     >
       <div className="col-span-full flex flex-col md:flex-row xl:flex-col justify-between gap-1 md:gap-3">
-        <div className="md:max-w-xs xl:max-w-none">
+        <div className="md:max-w-xs shrink w-fit xl:max-w-none">
           <div className="flex items-center gap-3 mb-3">
             <IconBackground>
               <IconPlay className="text-brand-600 dark:text-brand w-4" strokeWidth={2} />
@@ -82,7 +82,7 @@ const HomePageCover = (props) => {
             Discover how to set up a database to an app making queries in just a few minutes.
           </p>
         </div>
-        <div className="flex flex-wrap md:grid md:grid-cols-4 2xl:grid-cols-8 gap-2 sm:gap-3">
+        <div className="flex shrink-0 flex-wrap md:grid md:grid-cols-5 gap-2 sm:gap-3">
           {frameworks.map((framework, i) => (
             <Link key={i} href={framework.href} passHref>
               <a className="no-underline">
@@ -113,7 +113,7 @@ const HomePageCover = (props) => {
             </p>
           </div>
         </div>
-        <div className="w-full xl:max-w-[375px] 2xl:max-w-[620px] -mb-40">
+        <div className="w-full xl:max-w-[440px] -mb-40">
           <GettingStarted />
         </div>
       </div>

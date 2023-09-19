@@ -39,7 +39,6 @@
     }
   },
   "devDependencies": {
-    "aws-sdk": "^2.1354.0",
     "eslint": "^8.41.0",
     "eslint-config-custom": "*",
     "prettier": "^2.8.8",
