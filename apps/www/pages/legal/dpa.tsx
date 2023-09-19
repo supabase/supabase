@@ -30,7 +30,7 @@ const DPA = () => {
 
       resetForm()
       setFormSubmitted(true)
-      window.open('https://supabase.com/downloads/docs/Supabase+DPA+220503.pdf', '_blank')
+      window.open('https://supabase.com/downloads/docs/Supabase+DPA+230907.pdf', '_blank')
     } catch (error: any) {
       setError(error.message)
     }
@@ -49,7 +49,18 @@ const DPA = () => {
                   ("DPA").
                 </p>
 
-                <p>You can download our latest DPA document by submitting your email here.</p>
+                <p>
+                  You can download our latest DPA document by submitting your email here. For the
+                  document to be considered executed, you must return the signed DPA document to{' '}
+                  <a
+                    href="mailto:privacy@supabase.com"
+                    target="_blank"
+                    className="text-brand hover:text-brand"
+                  >
+                    privacy@supabase.com
+                  </a>
+                  .
+                </p>
 
                 {formSubmitted ? (
                   <p className="text-brand">
