@@ -10,6 +10,7 @@ const main = (command: string[], options: any) => {
 }
 
 // Run everything
+/* @ts-ignore - required for Next.js build */
 const argv = minimist(process.argv.slice(2))
 main(argv['_'], argv)
 
