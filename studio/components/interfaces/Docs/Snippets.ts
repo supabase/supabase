@@ -70,7 +70,7 @@ Future<void> main() async {
   authKeyExample: (
     defaultApiKey: string,
     endpoint: string,
-    { keyName, showBearer = true }: { keyName: string; showBearer: boolean }
+    { keyName, showBearer = true }: { keyName?: string; showBearer?: boolean }
   ) => ({
     title: 'Example usage',
     bash: {
