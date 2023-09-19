@@ -130,6 +130,8 @@ These variables will be exposed on the app, and that's completely fine since we 
 [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
 ```dart lib/main.dart
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 Future<void> main() async {
   await Supabase.initialize(
     url: 'YOUR_SUPABASE_URL',
