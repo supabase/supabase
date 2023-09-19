@@ -55,6 +55,8 @@ const GithubRepositorySelection = ({
   const githubIntegrationAppUrl =
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
       ? ' https://github.com/apps/supabase'
+      : process.env.NEXT_PUBLIC_ENVIRONMENT === 'preview'
+      ? 'https://github.com/apps/supabase-staging'
       : 'https://github.com/apps/supabase-local-testing'
 
   const {
