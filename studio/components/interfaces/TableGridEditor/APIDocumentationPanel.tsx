@@ -120,7 +120,7 @@ const APIDocumentationPanel = ({ visible, onClose }: APIDocumentationPanelProps)
                   <ResourceContent
                     autoApiService={autoApiService}
                     selectedLang={selectedLang}
-                    resourceId={tables.find((table) => table.id === Number(id))?.name}
+                    resourceId={table?.name}
                     resources={resources}
                     definitions={jsonSchema.definitions}
                     paths={jsonSchema.paths}
