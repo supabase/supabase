@@ -16,7 +16,9 @@ const PortalToast = () => (
       toastOptions={{
         className: '!bg-overlay !text border !max-w-[600px]',
         style: {
-          padding: '10px',
+          padding: '8px',
+          paddingLeft: '16px',
+          paddingRight: '16px',
           fontSize: '0.875rem',
         },
         error: {

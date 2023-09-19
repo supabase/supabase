@@ -33,12 +33,12 @@ import toast from 'react-hot-toast'
 // @ts-ignore
 import Prism from 'prism-react-renderer/prism'
 import ConsentToast from 'ui/src/components/ConsentToast'
+import PortalToast from 'ui/src/layout/PortalToast'
 
 import Favicons from 'components/head/Favicons'
 import {
   AppBannerWrapper,
   CommandMenuWrapper,
-  PortalToast,
   RouteValidationWrapper,
 } from 'components/interfaces/App'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
