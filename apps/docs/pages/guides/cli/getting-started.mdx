@@ -126,6 +126,10 @@ supabase start
 
 ## Running Supabase locally
 
+The Supabase CLI uses Docker containers to manage the local development stack. To get started,
+
+- Install [Docker Desktop](https://docs.docker.com/desktop)
+
 Inside the folder where you want to create your project, run:
 
 ```bash
@@ -140,7 +144,7 @@ Now, to start the Supabase stack, run:
 supabase start
 ```
 
-This takes time on your first run because the CLI needs to download the local Docker images. The CLI includes the entire Supabase toolset, and a few additional images that are useful for local development (like a local SMTP server and a database diff tool).
+This takes time on your first run because the CLI needs to download the Docker images to your local machine. The CLI includes the entire Supabase toolset, and a few additional images that are useful for local development (like a local SMTP server and a database diff tool).
 
 The local development environment includes Supabase Studio, a graphical interface for working with your database, running by default on [localhost:54323](http://localhost:54323).
 
