@@ -134,7 +134,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
             value={selectedSchema}
             onChange={setSelectedSchema}
           >
-            {(schemas?.result ?? []).map((schema) => (
+            {(schemas ?? []).map((schema) => (
               <Listbox.Option key={schema.name} value={schema.name} label={schema.name}>
                 {schema.name}
               </Listbox.Option>

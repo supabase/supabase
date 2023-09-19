@@ -1,10 +1,10 @@
 import { useParams } from 'common'
 import { IconTable } from 'ui'
 
-import CodeSnippet from 'components/to-be-cleaned/Docs/CodeSnippet'
-import Description from 'components/to-be-cleaned/Docs/Description'
-import Param from 'components/to-be-cleaned/Docs/Param'
-import Snippets from 'components/to-be-cleaned/Docs/Snippets'
+import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
+import Description from 'components/interfaces/Docs/Description'
+import Param from 'components/interfaces/Docs/Param'
+import Snippets from 'components/interfaces/Docs/Snippets'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 
 const ResourceContent = ({
@@ -28,7 +28,7 @@ const ResourceContent = ({
   const resourcePaths = paths[`/${resourceId}`]
   const resourceDefinition = definitions[resourceId]
   const resourceMeta = resources[resourceId]
-  const description = resourceDefinition.description || null
+  const description = resourceDefinition?.description || null
   const methods = Object.keys(resourcePaths).map((x) => x.toUpperCase())
   const properties = Object.entries(resourceDefinition.properties || []).map(([id, val]: any) => ({
     ...val,
