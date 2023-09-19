@@ -26,6 +26,8 @@ import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useFormatQueryMutation } from 'data/sql/format-sql-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { isError } from 'data/utils/error-check'
 import {
   useFlag,
@@ -40,6 +42,7 @@ import { removeCommentsFromSql, uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import Telemetry from 'lib/telemetry'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { subscriptionHasHipaaAddon } from '../BillingV2/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import AISettingsModal from './AISettingsModal'
 import {
@@ -60,8 +63,6 @@ import {
   getDiffTypeDropdownLabel,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
-import { subscriptionHasHipaaAddon } from '../BillingV2/Subscription/Subscription.utils'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -98,6 +99,7 @@ const SQLEditor = () => {
   const project = useSelectedProject()
   const snap = useSqlEditorStateSnapshot()
 
+  const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSql, isLoading: isGenerateSqlLoading } = useSqlGenerateMutation()
   const { mutateAsync: editSql, isLoading: isEditSqlLoading } = useSqlEditMutation()
   const { mutateAsync: titleSql } = useSqlTitleGenerateMutation()
@@ -202,6 +204,44 @@ const SQLEditor = () => {
     },
     [generateSqlTitle, snap]
   )
+
+  const prettifyQuery = useCallback(async () => {
+    if (isDiffOpen) return
+
+    // use the latest state
+    const state = getSqlEditorStateSnapshot()
+    const snippet = state.snippets[id]
+
+    if (editorRef.current && project) {
+      const editor = editorRef.current
+      const selection = editor.getSelection()
+      const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
+      const sql = snippet
+        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
+        : selectedValue || editorRef.current?.getValue()
+      formatQuery(
+        {
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          sql,
+        },
+        {
+          onSuccess: (res) => {
+            const editorModel = editorRef?.current?.getModel()
+            if (editorRef.current && editorModel) {
+              editorRef.current.executeEdits('apply-prettify-edit', [
+                {
+                  text: res.result,
+                  range: editorModel.getFullModelRange(),
+                },
+              ])
+              snap.setSql(id, res.result)
+            }
+          },
+        }
+      )
+    }
+  }, [formatQuery, id, isDiffOpen, project, snap])
 
   const executeQuery = useCallback(
     async (force: boolean = false) => {
@@ -886,6 +926,7 @@ const SQLEditor = () => {
                 id={id}
                 isExecuting={isExecuting}
                 isDisabled={isDiffOpen}
+                prettifyQuery={prettifyQuery}
                 executeQuery={executeQuery}
               />
             )}

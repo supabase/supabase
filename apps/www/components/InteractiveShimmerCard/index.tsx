@@ -1,4 +1,5 @@
 import React, { PropsWithChildren, useEffect, useRef } from 'react'
+import { cn } from 'ui'
 
 interface Props {
   outerClassName?: string
@@ -68,24 +69,24 @@ const InteractiveShimmerCard = ({
   return (
     <div
       ref={outerRef}
-      className={[
+      className={cn(
         'relative rounded-xl bg-scale-400 from-scale-800 to-scale-800 p-px transition-all shadow-md',
         !trackCursor && hasActiveOnHover
           ? activeColor === 'brand'
             ? 'hover:bg-none hover:!bg-brand'
             : 'hover:bg-none hover:!bg-scale-900'
           : '',
-        outerClassName,
-      ].join(' ')}
+        outerClassName
+      )}
     >
       <div
-        className={[
-          'relative h-full rounded-xl bg-scale-200 dark:bg-scale-300 overflow-hidden transition-all text-scale-1100',
-          innerClassName,
-        ].join(' ')}
+        className={cn(
+          'relative h-full z-10 rounded-xl bg-scale-200 dark:bg-scale-300 overflow-hidden transition-all text-scale-1100',
+          innerClassName
+        )}
       >
-        <div className="relative z-10 w-full h-full">{children}</div>
-        <div ref={innerRef} className="absolute z-0 inset-0 w-full h-full" />
+        {children}
+        <div ref={innerRef} className="absolute z-0 inset-0 w-full h-full pointer-events-none" />
       </div>
     </div>
   )

@@ -7,9 +7,11 @@ import { Button, IconPlus, IconTrash, Input, Listbox, Modal, Radio, SidePanel, T
 import { Dictionary } from 'components/grid'
 import { Function } from 'components/interfaces/Functions/Functions.types'
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import Panel from 'components/ui/Panel'
 import SqlEditor from 'components/ui/SqlEditor'
+import { useSchemasQuery } from 'data/database/schemas-query'
 import { useStore } from 'hooks'
 import { isResponseOk } from 'lib/common/fetch'
 import { SupaResponse } from 'types'
@@ -294,21 +296,24 @@ interface CreateFunctionProps {
 }
 
 const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
+  const { project } = useProjectContext()
   const { ui, meta } = useStore()
   const _localState = useLocalObservable(() => new CreateFunctionStore())
   _localState.meta = meta as any
 
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
 
-  useEffect(() => {
-    const fetchSchemas = async () => {
-      await (_localState!.meta as any).schemas.load()
-      const schemas = (_localState!.meta as any).schemas.list()
-      _localState.setSchemas(schemas)
+  useSchemasQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      onSuccess(schemas) {
+        _localState.setSchemas(schemas)
+      },
     }
-
-    fetchSchemas()
-  }, [])
+  )
 
   useEffect(() => {
     _localState.formState.reset(func)
@@ -447,8 +452,8 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         </CreateFunctionContext.Provider>
         <ConfirmationModal
           visible={isClosingPanel}
-          header="Confirm to close"
-          buttonLabel="Confirm"
+          header="Discard changes"
+          buttonLabel="Discard"
           onSelectCancel={() => setIsClosingPanel(false)}
           onSelectConfirm={() => {
             setIsClosingPanel(false)

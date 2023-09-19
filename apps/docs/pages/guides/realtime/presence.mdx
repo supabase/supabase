@@ -3,233 +3,92 @@ import StepHikeCompact from '~/components/StepHikeCompact'
 
 export const meta = {
   title: 'Presence',
-  subtitle: "Get up and running with Realtime's Presence feature",
-  breadcrumb: 'Realtime Presence Quickstart',
+  description: 'Share state between users with Realtime Presence.',
+  subtitle: 'Share state between users with Realtime Presence.',
+  // breadcrumb: 'Realtime Presence Quickstart',
 }
 
-Presence can be used to share state between clients. Each client maintains their own piece of state within the shared state.
+Let's explore how to implement Realtime Presence to track state between multiple users.
 
-Presence utilizes an in-memory conflict-free replicated data type (CRDT) to track and synchronize shared state in an eventually consistent manner. It computes the difference between existing state and new state changes and sends the necessary updates to clients via Broadcast.
+## Usage
 
-When a new client subscribes to a channel, it will immediately receive the channel's latest state in a single message instead of waiting for all other clients to send their individual states.
+You can use the Supabase client libraries to track Presence state between users.
 
-Clients are free to come-and-go as they please, and as long as they are all subscribed to the same channel then they will all have the same Presence state as each other.
+### Initialize the client
 
-The neat thing about Presence is that if a client is suddenly disconnected (for example, they go offline), their state will be automatically removed from the shared state. If you've ever tried to build an “I'm online” feature which handles unexpected disconnects, you'll appreciate how useful this is.
+Go to your Supabase project's [API Settings](https://supabase.com/dashboard/project/_/settings/api) and grab the `URL` and `anon` public API key.
 
-## Quick start
+```js
+import { createClient } from '@supabase/supabase-js'
 
-Let's explore how to implement Realtime Presence so you can integrate it into your use case.
+const SUPABASE_URL = 'https://<project>.supabase.co'
+const SUPABASE_KEY = '<your-anon-key>'
 
-<StepHikeCompact>
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+```
 
-  <StepHikeCompact.Step step={1}>
-  
-    <StepHikeCompact.Details title="Install the client">
+### Sync and track state
 
-      Install the Supabase JavaScript client.
+Listen to the `sync`, `join`, and `leave` events triggered whenever any client joins or leaves the channel or changes their slice of state:
 
-    </StepHikeCompact.Details>
+```js
+const roomOne = supabase.channel('room_01')
 
-    <StepHikeCompact.Code>
+roomOne
+  .on('presence', { event: 'sync' }, () => {
+    const newState = roomOne.presenceState()
+    console.log('sync', newState)
+  })
+  .on('presence', { event: 'join' }, ({ key, newPresences }) => {
+    console.log('join', key, newPresences)
+  })
+  .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+    console.log('leave', key, leftPresences)
+  })
+  .subscribe()
+```
 
-      ```bash
-        npm install @supabase/supabase-js
-      ```
+### Sending state
 
-    </StepHikeCompact.Code>
+You can send state to all subscribers using `track()`:
 
-  </StepHikeCompact.Step>
+{/* prettier-ignore */}
+```js
+const roomOne = supabase.channel('room_01')
 
-  <StepHikeCompact.Step step={2}>
-  
-    <StepHikeCompact.Details title="Create the first client">
+const userStatus = {
+  user: 'user-1',
+  online_at: new Date().toISOString(),
+}
 
-      This client will be used to track Presence state as new clients join and leave the channel.
+roomOne.subscribe(async (status) => {
+  if (status !== 'SUBSCRIBED') { return }
 
-      Go to your Supabase project's [API Settings](https://supabase.com/dashboard/project/_/settings/api) and grab the `URL` and `anon` public API key.
+  const presenceTrackStatus = await roomOne.track(userStatus)
+  console.log(presenceTrackStatus)
+})
+```
 
-    </StepHikeCompact.Details>
+A client will receive state from any other client that is subscribed to the same topic (in this case `room_01`). It will also automatically trigger its own `sync` and `join` event handlers.
 
-    <StepHikeCompact.Code>
+### Stop tracking
 
-      ```js
-        import {
-          createClient
-        } from '@supabase/supabase-js'
+You can stop tracking precense using the `untrack()` method. This will trigger the `sync` and `leave` event handlers.
 
-        const clientA = createClient(
-          'https://<project>.supabase.co',
-          '<your-anon-key>'
-        )
-      ```
+```js
+const untrackPresence = async () => {
+  const presenceUntrackStatus = await roomOne.untrack()
+  console.log(presenceUntrackStatus)
+}
 
-    </StepHikeCompact.Code>
+untrackPresence()
+```
 
-  </StepHikeCompact.Step>
+## Presence options
 
-  <StepHikeCompact.Step step={3}>
-  
-    <StepHikeCompact.Details title="Create a channel">
+You can pass configuration options while initializing the Supabase Client.
 
-      A channel's topic can be anything except for `'realtime'`.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```js
-        const channelA = clientA.channel('room-1')
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={4}>
-
-    <StepHikeCompact.Details title="Sync and track state">
-
-      Listen to the `sync`, `join`, and `leave` events triggered whenever any client joins or leaves the channel or changes their slice of state.
-
-      To begin tracking state, `clientA` calls `channelA.track()`, passing in the desired state to share. Once `clientA` successfully tracks its state, it will automatically trigger its own `sync` and `join` event handlers.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```js
-        channelA
-          .on(
-            'presence',
-            { event: 'sync' },
-            () => {
-              const newState = channelA.presenceState()
-              console.log('sync', newState)
-            }
-          )
-          .on(
-            'presence',
-            { event: 'join' },
-            ({ key, newPresences }) => {
-              console.log('join', key, newPresences)
-            }
-          )
-          .on(
-            'presence',
-            { event: 'leave' },
-            ({ key, leftPresences }) => {
-              console.log('leave', key, leftPresences)
-            }
-          )
-          .subscribe(async (status) => {
-            if (status === 'SUBSCRIBED') {
-              const presenceTrackStatus = await channelA.track({
-                user: 'user-1',
-                online_at: new Date().toISOString(),
-              })
-              console.log(presenceTrackStatus)
-            }
-          })
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={5}>
-  
-    <StepHikeCompact.Details title="Create the second client">
-
-      This client will add to and remove from shared state so other clients can be notified of changes to Presence state.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```js
-        const clientB = createClient(
-          'https://<project>.supabase.co',
-          '<your-anon-key>'
-        )
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={6}>
-  
-    <StepHikeCompact.Details title="Create another channel">
-
-      This channel's topic must match `channelA`'s.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```js
-        const channelB = clientB.channel('room-1')
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={7}>
-  
-    <StepHikeCompact.Details title="Add to state">
-
-      Subscribe to channel and add to state.
-
-      This will trigger `clientA`'s `sync` and `join` event handlers.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```js
-        channelB.subscribe(async (status) => {
-          if (status === 'SUBSCRIBED') {
-            const presenceTrackStatus = await channelA.track({
-              user: 'user-2',
-              online_at: new Date().toISOString(),
-            })
-            console.log(presenceTrackStatus)
-          }
-        })
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={8}>
-  
-    <StepHikeCompact.Details title="Remove from state">
-
-      This will trigger `clientA`'s `sync` and `leave` event handlers.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```js
-        const untrackPresence = async () => {
-          const presenceUntrackStatus = await channelB.untrack()
-          console.log(presenceUntrackStatus)
-        }
-
-        untrackPresence()
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-</StepHikeCompact>
-
-## Presence Key
+### Presence Key
 
 By default, Presence will generate a unique `UUIDv1` key on the server to track a client channel's state. If you prefer, you can provide a custom key when creating the channel. This key should be unique among clients.
 
@@ -244,31 +103,6 @@ const channelC = supabase.channel('test', {
   },
 })
 ```
-
-## Client-Side Rate Limit
-
-By default the client will rate limit itself at 10 messages per second (1 message every 100 milliseconds). You can customize this when creating the client:
-
-```js
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>', {
-  realtime: {
-    params: {
-      eventsPerSecond: 5,
-    },
-  },
-})
-```
-
-By setting `eventsPerSecond` to 5, you can send one message every 200 milliseconds on a per client basis.
-
-Learn more by visiting the [Quotas](/docs/guides/realtime/quotas) section.
-
-## More Realtime Quickstarts
-
-- [Broadcast Quickstart](/docs/guides/realtime/broadcast)
-- [Postgres Changes Quickstart](/docs/guides/realtime/postgres-changes)
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 

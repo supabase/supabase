@@ -7,11 +7,14 @@ import { memo } from 'react-tracked'
 
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useDispatch, useTrackedState } from '../../store'
-import { GridProps, SupaRow } from '../../types'
-import RowRenderer from './RowRenderer'
+import { useUrlState } from 'hooks'
 import { Button } from 'ui'
+import { useDispatch, useTrackedState } from '../../store'
+import { Filter, GridProps, SupaRow } from '../../types'
+import RowRenderer from './RowRenderer'
 
 const rowKeyGetter = (row: SupaRow) => {
   return row?.idx ?? -1
@@ -27,6 +30,12 @@ const updateColumnResizeDebounced = AwesomeDebouncePromise(updateColumnResize, 5
 
 interface IGrid extends GridProps {
   rows: any[]
+  error: any
+  isLoading: boolean
+  isSuccess: boolean
+  isError: boolean
+  filters: Filter[]
+  setParams: ReturnType<typeof useUrlState>[1]
   updateRow: (previousRow: any, updatedData: any) => void
   onAddRow?: () => void
   onImportData?: () => void
@@ -48,6 +57,12 @@ export const Grid = memo(
         gridClass,
         rowClass,
         rows,
+        error,
+        isLoading,
+        isSuccess,
+        isError,
+        filters,
+        setParams,
         updateRow,
         onAddRow,
         onImportData,
@@ -121,6 +136,12 @@ export const Grid = memo(
         }
       }
 
+      const removeAllFilters = () => {
+        setParams((prevParams) => {
+          return { ...prevParams, filter: [] }
+        })
+      }
+
       return (
         <div
           className={containerClass}
@@ -142,26 +163,60 @@ export const Grid = memo(
             rowClass={rowClass}
             style={{ height: '100%' }}
             noRowsFallback={
-              <div
-                style={{ height: `calc(100% - 35px)` }}
-                className="flex flex-col items-center justify-center"
-              >
-                <p className="text-base">This table is empty</p>
-                {onAddRow !== undefined && onImportData !== undefined && (
+              <>
+                {isLoading && (
+                  <div className="p-2">
+                    <GenericSkeletonLoader />
+                  </div>
+                )}
+                {isError && (
+                  <div className="p-2">
+                    <AlertError error={error} subject="Failed to retrieve rows from table" />
+                  </div>
+                )}
+                {isSuccess && (
                   <>
-                    <p className="text-sm text-light mt-1">Add or generate rows to get started.</p>
-                    <div className="flex items-center space-x-2 mt-4">
-                      {/* [Joshen] Leaving this as a placeholder */}
-                      {/* <Button type="outline">Generate random data</Button> */}
-                      {onAddRow !== undefined && onImportData !== undefined && (
-                        <Button type="default" onClick={onImportData}>
-                          Import data via CSV
-                        </Button>
-                      )}
-                    </div>
+                    {(filters ?? []).length === 0 ? (
+                      <div
+                        style={{ height: `calc(100% - 35px)` }}
+                        className="flex flex-col items-center justify-center"
+                      >
+                        <p className="text-sm text">This table is empty</p>
+                        {onAddRow !== undefined && onImportData !== undefined && (
+                          <>
+                            <p className="text-sm text-light mt-1">
+                              Add rows to your table to get started.
+                            </p>
+                            <div className="flex items-center space-x-2 mt-4">
+                              {/* [Joshen] Leaving this as a placeholder */}
+                              {/* <Button type="outline">Generate random data</Button> */}
+                              {onAddRow !== undefined && onImportData !== undefined && (
+                                <Button type="default" onClick={onImportData}>
+                                  Import data via CSV
+                                </Button>
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      <div
+                        style={{ height: `calc(100% - 35px)` }}
+                        className="flex flex-col items-center justify-center"
+                      >
+                        <p className="text-sm text-light">
+                          The filters applied has returned no results from this table
+                        </p>
+                        <div className="flex items-center space-x-2 mt-4">
+                          <Button type="default" onClick={() => removeAllFilters()}>
+                            Remove all filters
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
-              </div>
+              </>
             }
           />
         </div>
