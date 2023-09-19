@@ -1,15 +1,14 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
 import { useState } from 'react'
 import { Button, IconLoader } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { useStore, useCheckPermissions } from 'hooks'
 import AutoTextArea from 'components/to-be-cleaned/forms/AutoTextArea'
-import { useCheckPermissions, useStore } from 'hooks'
 import { timeout } from 'lib/helpers'
 
 // Removes some auto-generated Postgrest text
 // Ideally PostgREST wouldn't add this if there is already a comment
-const temp_removePostgrestText = (content: string) => {
+const temp_removePostgrestText = (content) => {
   const postgrestTextPk = `Note:\nThis is a Primary Key.<pk/>`
   const postgrestTextFk = `Note:\nThis is a Foreign Key to`
   const pkTextPos = content.lastIndexOf(postgrestTextPk)
@@ -21,13 +20,7 @@ const temp_removePostgrestText = (content: string) => {
   return cleansed
 }
 
-interface DescrptionProps {
-  content: string
-  metadata: { table?: string; column?: string; rpc?: string }
-  onChange: (value: string) => void
-}
-
-const Description = ({ content, metadata, onChange = noop }: DescrptionProps) => {
+export default function Description({ content, metadata, onChange = () => {} }) {
   const { meta, ui } = useStore()
 
   const contentText = temp_removePostgrestText(content || '').trim()
@@ -88,7 +81,7 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
         className="w-full"
         placeholder="Click to edit."
         value={value}
-        onChange={(e: any) => setValue(e.target.value)}
+        onChange={(e) => setValue(e.target.value)}
       />
       <div
         className={`flex items-center gap-2 ${
@@ -116,5 +109,3 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
     </div>
   )
 }
-
-export default Description

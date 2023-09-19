@@ -1,10 +1,10 @@
 import { AutoApiService } from 'data/config/project-api-query'
-import Snippets from 'components/interfaces/Docs/Snippets'
-import CodeSnippet from './CodeSnippet'
+import Snippets from '../Snippets'
+import CodeSnippet from '../CodeSnippet'
 
 interface Props {
   autoApiService: AutoApiService
-  selectedLang: 'bash' | 'js'
+  selectedLang: string
 }
 
 export default function Introduction({ autoApiService, selectedLang }: Props) {

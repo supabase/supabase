@@ -2,10 +2,10 @@ import { useParams } from 'common'
 import Link from 'next/link'
 
 import GeneratingTypes from 'components/interfaces/Docs/GeneratingTypes'
-import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
+import CodeSnippet from '../../CodeSnippet'
 
 interface IntroductionProps {
-  selectedLang: 'bash' | 'js'
+  selectedLang: string
 }
 
 const Introduction = ({ selectedLang }: IntroductionProps) => {
