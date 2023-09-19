@@ -64,37 +64,13 @@ Unlike the OAuth flow which requires the use of a web browser, the native Sign i
 
 When the user provides consent, Apple issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
 
-If you are building an iOS or macOS app using Flutter, you can use [apple_sign_in](https://pub.dev/packages/sign_in_with_apple) package to quickly get the user's consent and sign them in to your Supabase project:
+If you are building an iOS or macOS app using Flutter, you can use the [signInWithApple()](/docs/reference/dart/sign-in-with-apple) method to perform Apple sign in:
 
 ```dart
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:crypto/crypto.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-Future<AuthResponse> signInWithApple() {
-
-  // Generate a random string
-  final rawNonce = _generateRandomString();
-  final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
-
-  final credential = await SignInWithApple.getAppleIDCredential(
-    scopes: [
-      AppleIDAuthorizationScopes.email,
-      AppleIDAuthorizationScopes.fullName,
-    ],
-    nonce: hashedNonce,
-  );
-
-  final idToken = credential.identityToken;
-  if (idToken == null) {
-    throw 'Could not find ID Token from generated credential.';
-  }
-
-  return signInWithIdToken(
-    provider: Provider.apple,
-    idToken: idToken,
-    nonce: rawNonce,
-  );
-}
+final AuthResponse res = await supabase.auth.signInWithApple();
+final User? user = res.user;
 ```
 
 In the Supabase JavaScript library, which you can use with web-based native frameworks like React Native or Expo, you can invoke this functionality like so:
