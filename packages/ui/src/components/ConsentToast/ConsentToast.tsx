@@ -1,7 +1,6 @@
 import { noop } from 'lodash'
 import Link from 'next/link'
 import { Button } from 'ui'
-import { useRouter } from 'next/router'
 
 interface ConsentToastProps {
   onAccept: () => void
@@ -9,15 +8,11 @@ interface ConsentToastProps {
 }
 
 const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastProps) => {
-  const { basePath } = useRouter()
-
   return (
-    <div className="space-y-3">
-      <div className="text-sm">
-        <p>
-          <span className="underline font-medium">No cookies.</span> 🍪
-        </p>
-        <p>
+    <div className="space-y-3 py-1">
+      <div>
+        <p className="text-sm font-medium">No cookies. 🍪</p>
+        <p className="text-light">
           We only collect analytics essential to ensuring smooth operation of our services.
         </p>
       </div>
@@ -28,10 +23,10 @@ const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastProps) =
         <Button type="text" onClick={onOptOut}>
           Opt out
         </Button>
-        <Link href="https://supabase.com/privacy">
-          <a target="_blank" rel="noreferrer">
-            <Button type="text">Learn more</Button>
-          </a>
+        <Link passHref target="_blank" rel="noreferrer" href="https://supabase.com/privacy">
+          <Button asChild type="text">
+            <a>Learn more</a>
+          </Button>
         </Link>
       </div>
     </div>
