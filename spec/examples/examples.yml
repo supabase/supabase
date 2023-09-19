@@ -4414,7 +4414,7 @@ functions:
                   name
                 )
               `)
-              .order('name', { foreignTable: 'cities', ascending: false })
+              .order('cities(name)')
             ```
 
           </TabPanel>
