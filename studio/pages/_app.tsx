@@ -62,7 +62,8 @@ dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 dart(Prism)
 
-if (!IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging') {
+if (IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging') {
+  // [Joshen] For staff only to debug internal issues
   LogRocket.init('bffopb/supabase-dashboard-staff')
 }
 
