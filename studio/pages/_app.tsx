@@ -102,7 +102,9 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     if (!IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging') {
       LogRocket.init('bffopb/supabase-dashboard-staff')
     }
+  }, [])
 
+  useEffect(() => {
     // Check for telemetry consent
     if (typeof window !== 'undefined') {
       const onAcceptConsent = () => {
