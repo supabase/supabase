@@ -23,8 +23,8 @@ interface Props {
 }
 
 const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'http://localhost:54321',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_MISC_USE_URL ?? 'http://localhost:54321',
+  process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
 )
 
 export default function UsernamePage({ user, users, ogImageUrl }: Props) {
@@ -35,7 +35,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
   const OG_URL = `${SITE_URL}/tickets/${username}`
 
   const [supabase] = useState(() =>
-    createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+    createClient(process.env.NEXT_PUBLIC_MISC_USE_URL!, process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!)
   )
 
   if (!ticketNumber) {

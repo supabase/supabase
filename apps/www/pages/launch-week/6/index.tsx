@@ -50,8 +50,8 @@ export default function launchweek() {
     if (!supabase) {
       setSupabase(
         createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+          process.env.NEXT_PUBLIC_MISC_USE_URL!,
+          process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
         )
       )
     }
