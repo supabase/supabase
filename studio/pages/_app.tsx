@@ -62,6 +62,10 @@ dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 dart(Prism)
 
+if (!IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging') {
+  LogRocket.init('bffopb/supabase-dashboard-staff')
+}
+
 loader.config({
   // [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
   // locally. We're however, only storing the assets which we need (based on what the network tab loads
@@ -97,12 +101,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   )
 
   const getSavingState = () => rootStore.content.savingState
-
-  useEffect(() => {
-    if (!IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging') {
-      LogRocket.init('bffopb/supabase-dashboard-staff')
-    }
-  }, [])
 
   useEffect(() => {
     // Check for telemetry consent
