@@ -10,7 +10,7 @@ import {
 } from 'ui'
 
 interface BranchingWaitlistPopoverProps {
-  alt?: boolean
+  alt?: boolean // To distinguish slight style change between nav v1 and v2, true for former
 }
 
 const BranchingWaitlistPopover = ({ alt = false }: BranchingWaitlistPopoverProps) => {

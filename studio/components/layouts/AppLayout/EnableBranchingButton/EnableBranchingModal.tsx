@@ -14,8 +14,6 @@ import BranchingWaitlistPopover from './BranchingWaitlistPopover'
 import GithubRepositorySelection from './GithubRepositorySelection'
 import VercelProjectSelection from './VercelProjectSelection'
 
-// [Joshen] Temp
-
 const EnableBranchingModal = () => {
   const { ui } = useStore()
   const { ref } = useParams()
@@ -118,7 +116,6 @@ const EnableBranchingModal = () => {
           </>
         )}
 
-        {/* [Joshen TODO] Feels like this copy writing needs some relooking before we ship, make sure they are factual too */}
         <Modal.Content className="px-7 py-6 flex flex-col gap-3">
           <p className="text-sm text-light">Please keep in mind the following:</p>
           <div className="flex flex-row gap-4">

@@ -137,9 +137,11 @@ const BranchManagement = () => {
         ) : (
           <div className="flex items-center space-x-2 !mt-4">
             <Link passHref href="https://forms.supabase.com/branching-request">
-              <a rel="noreferrer" target="_blank">
-                <Button>Join waitlist</Button>
-              </a>
+              <Button>
+                <a rel="noreferrer" target="_blank">
+                  Join waitlist
+                </a>
+              </Button>
             </Link>
             {/* <Link passHref href={'/'}>
               <a rel="noreferrer" target="_blank">
