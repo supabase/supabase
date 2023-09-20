@@ -32,15 +32,12 @@ const BillingSettings = () => {
       : customerBalance
 
   const orgBillingMigrationEnabled = useFlag('orgBillingMigration')
-  const canMigrateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const selectedOrganization = useSelectedOrganization()
   const { subscription_id } = selectedOrganization ?? {}
 
   return (
     <ScaffoldContainerLegacy>
-      {orgBillingMigrationEnabled && canMigrateOrganization && !subscription_id && (
-        <OrganizationBillingMigrationPanel />
-      )}
+      {orgBillingMigrationEnabled && !subscription_id && <OrganizationBillingMigrationPanel />}
 
       <ProjectsSummary projects={projects} />
 
