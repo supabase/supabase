@@ -18,6 +18,7 @@ import { ProjectContextProvider } from './ProjectContext'
 import ProjectPausedState from './ProjectPausedState'
 import RestoringState from './RestoringState'
 import UpgradingState from './UpgradingState'
+import Connecting from 'components/ui/Loading/Loading'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -189,7 +190,11 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
   return (
     <>
       {isLoading || (requiresProjectDetails && selectedProject === undefined) ? (
-        <LoadingState />
+        router.pathname.endsWith('[ref]') ? (
+          <LoadingState />
+        ) : (
+          <Connecting />
+        )
       ) : isProjectUpgrading ? (
         <UpgradingState />
       ) : isProjectPausing ? (
