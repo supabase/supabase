@@ -83,7 +83,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     >
       <div className="-ml-2 flex items-center text-sm">
         {/* Organization is selected */}
-        {projectRef && selectedOrganization ? (
+        {projectRef && (
           <>
             <OrganizationDropdown alt />
 
@@ -146,14 +146,6 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
               </>
             )}
           </>
-        ) : (
-          <Link href="/projects">
-            <a
-              className={`cursor-pointer px-2 py-1 text-xs text-scale-1200 focus:bg-transparent focus:outline-none`}
-            >
-              Supabase
-            </a>
-          </Link>
         )}
 
         {/* Additional breadcrumbs are supplied */}
