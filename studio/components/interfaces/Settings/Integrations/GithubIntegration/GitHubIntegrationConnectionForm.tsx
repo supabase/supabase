@@ -207,7 +207,7 @@ const GitHubIntegrationConnectionForm = ({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <FormLabel_Shadcn_ className="!text">Supabase directory</FormLabel_Shadcn_>
           <FormDescription_Shadcn_ className="text-xs text-lighter mb-3">
-            Migrations and seed.sql file will be run from this directory.
+            Migration and seed SQL files will be run from this directory.
           </FormDescription_Shadcn_>
           <FormField_Shadcn_
             control={form.control}
