@@ -129,7 +129,7 @@ const DefaultHeader = ({
           <div className="flex items-center gap-2">
             {canCreateColumns && (
               <DropdownMenu_Shadcn_>
-                <DropdownMenuTrigger_Shadcn_>
+                <DropdownMenuTrigger_Shadcn_ className="flex">
                   <Button size="tiny" icon={<IconChevronDown size={14} strokeWidth={1.5} />}>
                     Insert
                   </Button>
