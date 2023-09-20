@@ -10,7 +10,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20230803-15c6762
+    image: supabase/studio:20230912-748fd33
     restart: unless-stopped
     healthcheck:
       test:
@@ -76,7 +76,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.82.4
+    image: supabase/gotrue:v2.92.1
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -136,7 +136,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v11.1.0
+    image: postgrest/postgrest:v11.2.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -273,7 +273,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.13.1
+    image: supabase/edge-runtime:v1.18.1
     restart: unless-stopped
     depends_on:
       analytics:

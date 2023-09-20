@@ -877,7 +877,7 @@ export const realtime: NavMenuConstant = {
       url: '/guides/realtime/concepts',
     },
     {
-      name: 'Features',
+      name: 'Usage',
       url: undefined,
       items: [
         { name: 'Broadcast', url: '/guides/realtime/broadcast' },
@@ -893,13 +893,12 @@ export const realtime: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Subscribing to Database Changes',
-          url: '/guides/realtime/subscribing-to-database-changes',
+          name: 'Throttling messages',
+          url: '/guides/realtime/guides/client-side-throttling',
         },
         {
-          name: 'Bring Your Own Database',
-          url: '/guides/realtime/bring-your-own-database',
-          items: [],
+          name: 'Subscribing to Database Changes',
+          url: '/guides/realtime/subscribing-to-database-changes',
         },
         {
           name: 'Using Realtime with Next.js',
@@ -913,7 +912,12 @@ export const realtime: NavMenuConstant = {
       items: [
         { name: 'Quotas', url: '/guides/realtime/quotas' },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
-        { name: 'Protocol', url: '/guides/realtime/protocol' },
+        { name: 'Message Protocol', url: '/guides/realtime/protocol' },
+        {
+          name: 'Bring Your Own Database',
+          url: '/guides/realtime/bring-your-own-database',
+          items: [],
+        },
       ],
     },
   ],

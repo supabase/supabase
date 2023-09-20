@@ -1,12 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Button, Form, IconArrowLeft, IconEdit, IconExternalLink, IconTrash, Input } from 'ui'
 
 import { useParams } from 'common/hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   FormActions,
   FormPanel,
@@ -15,10 +16,10 @@ import {
   FormSectionLabel,
   FormsContainer,
 } from 'components/ui/Forms'
+import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { Button, Form, IconArrowLeft, IconEdit, IconExternalLink, IconTrash, Input } from 'ui'
 import InputField from './InputField'
 import WrapperTableEditor from './WrapperTableEditor'
 import { WRAPPERS } from './Wrappers.constants'
@@ -27,7 +28,8 @@ import { makeValidateRequired } from './Wrappers.utils'
 const CreateWrapper = () => {
   const formId = 'create-wrapper-form'
   const router = useRouter()
-  const { ui, meta } = useStore()
+  const queryClient = useQueryClient()
+  const { ui } = useStore()
   const { ref, type } = useParams()
   const { project } = useProjectContext()
   const canCreateWrapper = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
@@ -46,7 +48,7 @@ const CreateWrapper = () => {
       setNewTables([])
 
       const hasNewSchema = newTables.some((table) => table.is_new_schema)
-      if (hasNewSchema) meta.schemas.load()
+      if (hasNewSchema) invalidateSchemasQuery(queryClient, ref)
 
       router.push(`/project/${ref}/database/wrappers`)
     },
