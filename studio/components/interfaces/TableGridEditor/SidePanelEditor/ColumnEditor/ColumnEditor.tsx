@@ -16,7 +16,18 @@ import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { Button, Checkbox, IconExternalLink, Input, SidePanel, Toggle } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Checkbox,
+  IconAlertTriangle,
+  IconExternalLink,
+  Input,
+  SidePanel,
+  Toggle,
+} from 'ui'
 import { ForeignKeySelector } from '..'
 import ActionBar from '../ActionBar'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
@@ -393,6 +404,35 @@ const ColumnEditor = ({
                   onUpdateDescription={(name) => onUpdateField({ keyName: name })}
                 />
               )}
+            </FormSectionContent>
+          </FormSection>
+          <SidePanel.Separator />
+
+          {/* TODO: need to pull column privilages in here
+          if any columns are using column-level privilages, show this warning */}
+          <FormSection
+            header={
+              <FormSectionLabel className="lg:!col-span-4">Column privilages</FormSectionLabel>
+            }
+          >
+            <FormSectionContent loading={false} className="lg:!col-span-8">
+              <Alert_Shadcn_ variant="warning">
+                <IconAlertTriangle strokeWidth={2} />
+                <AlertTitle_Shadcn_>This table uses column-privilages</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  <p>
+                    Several columns in this table have column-level privilages. This new column will
+                    have privilages set to on by default.
+                  </p>
+                  <p className="mt-3">
+                    <Link href={`/project/${ref}/database/privileges`} passHref>
+                      <Button asChild type="default" size="tiny">
+                        <a>Column-level Privilages</a>
+                      </Button>
+                    </Link>
+                  </p>
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
             </FormSectionContent>
           </FormSection>
         </>
