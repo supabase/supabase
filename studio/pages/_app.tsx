@@ -27,6 +27,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
+import LogRocket from 'logrocket'
 import Head from 'next/head'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -98,6 +99,10 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const getSavingState = () => rootStore.content.savingState
 
   useEffect(() => {
+    if (!IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging') {
+      LogRocket.init('bffopb/supabase-dashboard-staff')
+    }
+
     // Check for telemetry consent
     if (typeof window !== 'undefined') {
       const onAcceptConsent = () => {
