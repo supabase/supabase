@@ -85,7 +85,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
         {/* Organization is selected */}
         {projectRef && (
           <>
-            <OrganizationDropdown alt />
+            <OrganizationDropdown />
 
             {projectRef && (
               <>
@@ -105,7 +105,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                   </svg>
                 </span>
 
-                <ProjectDropdown alt />
+                <ProjectDropdown />
 
                 {showOverUsageBadge && (
                   <div className="ml-2">
@@ -142,7 +142,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                     <path d="M16 3.549L7.12 20.600"></path>
                   </svg>
                 </span>
-                {isBranchingEnabled ? <BranchDropdown alt /> : <EnableBranchingButton alt />}
+                {isBranchingEnabled ? <BranchDropdown /> : <EnableBranchingButton />}
               </>
             )}
           </>
