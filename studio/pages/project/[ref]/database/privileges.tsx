@@ -16,16 +16,31 @@ import { NextPageWithLayout } from 'types'
 import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
 import { useFlag } from 'hooks'
 import { useRouter } from 'next/router'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 
 const PrivilegesPage: NextPageWithLayout = () => {
   const { meta } = useStore()
+
   const pathParams = useParams()
   const { ref } = useParams()
   const { project } = useProjectContext()
   const router = useRouter()
+  console.log(project)
 
-  const tableList = meta.tables.list()
-  const schemaList = meta.schemas.list()
+  const { data: tableList, isLoading: isLoadingTables } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  //const schemaList = meta.schemas.list()
+  const { data: schemas } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
   const rolesList = meta.roles.list(
     (role: PostgresRole) => !meta.roles.systemRoles.includes(role.name)
   )
@@ -35,20 +50,26 @@ const PrivilegesPage: NextPageWithLayout = () => {
   const [selectedRole, setSelectedRole] = useState<string>('anon')
 
   const tables = tableList
-    .filter((table) => table.schema === selectedSchema)
+    ?.filter((table) => table.schema === selectedSchema)
     .map((table) => table.name)
 
-  const [selectedTable, setSelectedTable] = useState<string>(pathParams.table ?? tables[0] ?? '')
+  const [selectedTable, setSelectedTable] = useState<string>(pathParams.table ?? tables?.[0] ?? '')
 
   const {
     data: allTablePrivileges,
     isLoading: isLoadingTablePrivileges,
     isError: isErrorTablePrivileges,
     error: errorTablePrivileges,
-  } = useTablePrivilegesQuery({
-    projectRef: ref,
-    connectionString: project?.connectionString,
-  })
+  } = useTablePrivilegesQuery(
+    {
+      projectRef: ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      enabled: !!project,
+    }
+  )
+
   const tablePrivileges = useMemo(
     () =>
       allTablePrivileges
@@ -65,20 +86,26 @@ const PrivilegesPage: NextPageWithLayout = () => {
     isLoading: isLoadingColumnPrivileges,
     isError: isErrorColumnPrivileges,
     error: errorColumnPrivileges,
-  } = useColumnPrivilegesQuery({
-    projectRef: ref,
-    connectionString: project?.connectionString,
-  })
-  const [protectedSchemas, openSchemas] = partition(schemaList, (schema) =>
-    meta.excludedSchemas.includes(schema?.name ?? '')
+  } = useColumnPrivilegesQuery(
+    {
+      projectRef: ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      enabled: !!project,
+    }
   )
-  const schema = schemaList.find((schema) => schema.name === selectedSchema)
+
+  const [protectedSchemas, openSchemas] = partition(schemas ?? [], (schema) =>
+    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+  )
+  const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const isSchemaLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
   const roles = rolesList.map((role: PostgresRole) => role.name)
 
   const handleChangeSchema = (schema: string) => {
-    const newTable = tableList.find((table) => table.schema === schema)?.name ?? ''
+    const newTable = tableList?.find((table) => table.schema === schema)?.name ?? ''
     setSelectedSchema(schema)
     setSelectedTable(newTable)
   }
@@ -96,7 +123,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
     return <EmptyPageState error={errorTablePrivileges || errorColumnPrivileges} />
   }
 
-  if (isLoadingTablePrivileges || isLoadingColumnPrivileges) {
+  if (isLoadingTablePrivileges || isLoadingColumnPrivileges || isLoadingTables) {
     return <Connecting />
   }
 
@@ -104,27 +131,30 @@ const PrivilegesPage: NextPageWithLayout = () => {
     router.push(`/project/${ref}/database/tables`)
   }
 
-  const table = tableList.find((table) => table.name === selectedTable)
-
+  const table = tableList?.find((table) => table.name === selectedTable)
   return (
     <>
       {columnLevelPrivileges ? (
-        <Privileges
-          tablePrivileges={tablePrivileges}
-          columns={columnsState}
-          tables={tables}
-          selectedSchema={selectedSchema}
-          selectedRole={selectedRole}
-          selectedTable={table}
-          availableSchemas={schemaList.map((s) => s.name)}
-          openSchemas={openSchemas}
-          protectedSchemas={protectedSchemas}
-          roles={roles}
-          isSchemaLocked={isSchemaLocked}
-          onChangeSchema={handleChangeSchema}
-          onChangeRole={handleChangeRole}
-          onChangeTable={setSelectedTable}
-        />
+        <ScaffoldContainer>
+          <ScaffoldSection>
+            <Privileges
+              tablePrivileges={tablePrivileges}
+              columns={columnsState}
+              tables={tables || []}
+              selectedSchema={selectedSchema}
+              selectedRole={selectedRole}
+              selectedTable={table}
+              availableSchemas={schemas?.map((s) => s.name) || []}
+              openSchemas={openSchemas}
+              protectedSchemas={protectedSchemas}
+              roles={roles}
+              isSchemaLocked={isSchemaLocked}
+              onChangeSchema={handleChangeSchema}
+              onChangeRole={handleChangeRole}
+              onChangeTable={setSelectedTable}
+            />
+          </ScaffoldSection>
+        </ScaffoldContainer>
       ) : (
         <Connecting />
       )}
@@ -134,7 +164,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
 
 PrivilegesPage.getLayout = (page) => (
   <DatabaseLayout title="Database">
-    <div className="h-full p-4">{page}</div>
+    <div>{page}</div>
   </DatabaseLayout>
 )
 

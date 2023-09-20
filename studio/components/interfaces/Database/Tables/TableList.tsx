@@ -43,7 +43,6 @@ const TableList = ({
   const { meta } = useStore()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
-
   const [filterString, setFilterString] = useState<string>('')
   const canUpdateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 

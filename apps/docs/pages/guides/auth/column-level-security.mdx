@@ -6,7 +6,13 @@ export const meta = {
   description: 'Secure your data using Postgres Column Level Security.',
 }
 
-PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) gives you granular control over who can access rows of data. However, it doesn't give you control over which columns they can access within rows. Sometimes you want to restrict access to specific columns in your database. Column Level Security (CLS) allows you to do just that.
+PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) gives you granular control over who can access rows of data. However, it doesn't give you control over which columns they can access within rows. Sometimes you want to restrict access to specific columns in your database. Column Level Privilages allows you to do just that.
+
+<Admonition type="caution">
+  This is an advanced feature. We do not recommend using column-level privilages for most users.
+  Instead, we recommend using RLS policies in combination with a dedicated table for handling user
+  roles.
+</Admonition>
 
 ## Policies at the Row Level
 
@@ -142,11 +148,11 @@ authenticated;
   </StepHikeCompact.Step>
 </StepHikeCompact>
 
+## Considerations when using column-level privilages
+- If you turn off a column privilege you won't be able to use that column at all.
+- All operations (insert, update, delete) as well as using `select *` will fail.
 
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
 export default Page
-
-
-```

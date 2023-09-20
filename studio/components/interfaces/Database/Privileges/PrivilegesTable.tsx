@@ -22,55 +22,55 @@ const PrivilegesTable = ({ tableId, tablePrivileges, columns, role }: Privileges
 
   const [loadingStates, setLoadingStates] = useState<Set<string>>(() => new Set())
 
-  const { mutate: grantTable } = useTablePrivilegesGrantMutation({
-    onMutate(variables) {
-      setLoadingStates((prev) => {
-        const newSet = new Set(prev)
+  // const { mutate: grantTable } = useTablePrivilegesGrantMutation({
+  //   onMutate(variables) {
+  //     setLoadingStates((prev) => {
+  //       const newSet = new Set(prev)
 
-        variables.grants.forEach((grant) => {
-          newSet.add(getPrivilegesLoadingKey('table', grant))
-        })
+  //       variables.grants.forEach((grant) => {
+  //         newSet.add(getPrivilegesLoadingKey('table', grant))
+  //       })
 
-        return newSet
-      })
-    },
-    onSettled(_data, _error, variables) {
-      setLoadingStates((prev) => {
-        const newSet = new Set(prev)
+  //       return newSet
+  //     })
+  //   },
+  //   onSettled(_data, _error, variables) {
+  //     setLoadingStates((prev) => {
+  //       const newSet = new Set(prev)
 
-        variables.grants.forEach((grant) => {
-          newSet.delete(getPrivilegesLoadingKey('table', grant))
-        })
+  //       variables.grants.forEach((grant) => {
+  //         newSet.delete(getPrivilegesLoadingKey('table', grant))
+  //       })
 
-        return newSet
-      })
-    },
-  })
+  //       return newSet
+  //     })
+  //   },
+  // })
 
-  const { mutate: revokeTable } = useTablePrivilegesRevokeMutation({
-    onMutate(variables) {
-      setLoadingStates((prev) => {
-        const newSet = new Set(prev)
+  // const { mutate: revokeTable } = useTablePrivilegesRevokeMutation({
+  //   onMutate(variables) {
+  //     setLoadingStates((prev) => {
+  //       const newSet = new Set(prev)
 
-        variables.revokes.forEach((revoke) => {
-          newSet.add(getPrivilegesLoadingKey('table', revoke))
-        })
+  //       variables.revokes.forEach((revoke) => {
+  //         newSet.add(getPrivilegesLoadingKey('table', revoke))
+  //       })
 
-        return newSet
-      })
-    },
-    onSettled(_data, _error, variables) {
-      setLoadingStates((prev) => {
-        const newSet = new Set(prev)
+  //       return newSet
+  //     })
+  //   },
+  //   onSettled(_data, _error, variables) {
+  //     setLoadingStates((prev) => {
+  //       const newSet = new Set(prev)
 
-        variables.revokes.forEach((revoke) => {
-          newSet.delete(getPrivilegesLoadingKey('table', revoke))
-        })
+  //       variables.revokes.forEach((revoke) => {
+  //         newSet.delete(getPrivilegesLoadingKey('table', revoke))
+  //       })
 
-        return newSet
-      })
-    },
-  })
+  //       return newSet
+  //     })
+  //   },
+  // })
 
   const { mutate: grantColumn } = useColumnPrivilegesGrantMutation({
     onMutate(variables) {
@@ -104,7 +104,6 @@ const PrivilegesTable = ({ tableId, tablePrivileges, columns, role }: Privileges
         variables.revokes.forEach((revoke) => {
           newSet.add(getPrivilegesLoadingKey('column', revoke))
         })
-
         return newSet
       })
     },
@@ -127,7 +126,6 @@ const PrivilegesTable = ({ tableId, tablePrivileges, columns, role }: Privileges
     shouldGrant = true
   ) => {
     if (!project) return console.error('No project found')
-
     if (shouldGrant) {
       grantColumn({
         projectRef: project.ref,

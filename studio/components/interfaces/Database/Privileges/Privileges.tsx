@@ -2,6 +2,8 @@ import { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 import { PrivilegeColumnUI, TablePrivilegesUI } from './Privileges.types'
 import PrivilegesBody from './PrivilegesBody'
 import PrivilegesHead from './PrivilegesHead'
+import Link from 'next/link'
+import { Button, IconExternalLink } from 'ui'
 
 export interface PrivilegesProps {
   tables: string[]
@@ -37,30 +39,53 @@ const Privileges = ({
   onChangeTable,
 }: PrivilegesProps) => {
   return (
-    <>
-      <div className="flex flex-col h-full">
-        <PrivilegesHead
-          selectedSchema={selectedSchema}
-          selectedRole={selectedRole}
-          selectedTable={selectedTable}
-          tables={tables}
-          availableSchemas={availableSchemas}
-          openSchemas={openSchemas}
-          protectedSchemas={protectedSchemas}
-          roles={roles}
-          isSchemaLocked={isSchemaLocked}
-          onChangeSchema={onChangeSchema}
-          onChangeRole={onChangeRole}
-          onChangeTable={onChangeTable}
-        />
-        <PrivilegesBody
-          tablePrivileges={tablePrivileges}
-          columns={columns}
-          table={selectedTable}
-          role={selectedRole}
-        />
+    <div className="col-span-12">
+      <div className="flex items-center justify-between mb-6 gap-12">
+        <div>
+          <h3 className="mb-1 text-xl">Column-level Privilages</h3>
+
+          <div className="text-sm text-lighter">
+            <p>Grant or revoke privileges on a column based on user role.</p>
+            <p>This is an advanced feature and should be used with caution.</p>
+          </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Link href="https://supabase.com/docs/guides/guides/auth/column-level-security">
+            <a target="_blank" rel="noreferrer">
+              <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                Documentation
+              </Button>
+            </a>
+          </Link>
+        </div>
       </div>
-    </>
+      <PrivilegesHead
+        selectedSchema={selectedSchema}
+        selectedRole={selectedRole}
+        selectedTable={selectedTable}
+        tables={tables}
+        availableSchemas={availableSchemas}
+        openSchemas={openSchemas}
+        protectedSchemas={protectedSchemas}
+        roles={roles}
+        isSchemaLocked={isSchemaLocked}
+        onChangeSchema={onChangeSchema}
+        onChangeRole={onChangeRole}
+        onChangeTable={onChangeTable}
+      />
+      <PrivilegesBody
+        tablePrivileges={tablePrivileges}
+        columns={columns}
+        table={selectedTable}
+        role={selectedRole}
+      />
+      {selectedTable && (
+        <p className="text-xs text-right text-light">
+          <strong>Warning: </strong>
+          Changing column privilages can break existing queries
+        </p>
+      )}
+    </div>
   )
 }
 
