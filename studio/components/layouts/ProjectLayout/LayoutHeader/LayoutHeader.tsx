@@ -5,12 +5,14 @@ import { Badge } from 'ui'
 
 import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
 import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
-import { getResourcesExceededLimits } from 'components/ui/OveragesBanner/OveragesBanner.utils'
+import OrganizationDropdown from 'components/layouts/AppLayout/OrganizationDropdown'
+import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
+import {
+  getResourcesExceededLimits,
+  getResourcesExceededLimitsOrg,
+} from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
-
-import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
-
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
@@ -18,8 +20,6 @@ import BreadcrumbsView from './BreadcrumbsView'
 import FeedbackDropdown from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
-import OrgDropdown from './OrgDropdown'
-import ProjectDropdown from './ProjectDropdown'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ref: projectRef } = useParams()
@@ -85,7 +85,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
         {/* Organization is selected */}
         {projectRef && selectedOrganization ? (
           <>
-            <OrgDropdown />
+            <OrganizationDropdown alt />
 
             {projectRef && (
               <>
@@ -104,7 +104,8 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                     <path d="M16 3.549L7.12 20.600"></path>
                   </svg>
                 </span>
-                <ProjectDropdown />
+
+                <ProjectDropdown alt />
 
                 {showOverUsageBadge && (
                   <div className="ml-2">

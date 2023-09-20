@@ -6,7 +6,9 @@ import { useMemo } from 'react'
 export function useSelectedProject() {
   const { ref } = useParams()
   const { data } = useProjectDetailQuery({ ref })
-  return data
+
+  const updatedData = { ...data, parentRef: data?.parent_project_ref ?? data?.ref ?? undefined }
+  return updatedData
 }
 
 export function useProjectByRef(ref?: string) {
