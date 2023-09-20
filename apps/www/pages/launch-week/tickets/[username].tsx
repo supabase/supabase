@@ -144,7 +144,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const { data: users } = await supabaseAdmin!.from('lw8_tickets_golden').select().limit(17)
 
   fetch(
-    `https://obuldanrptloktxcffvn.functions.supabase.co/lw8-ticket?username=${encodeURIComponent(
+    `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw8-ticket?username=${encodeURIComponent(
       username ?? ''
     )}`
   ).catch((_) => {})
