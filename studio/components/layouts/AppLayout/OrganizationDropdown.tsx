@@ -24,7 +24,11 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks'
 
-const OrganizationDropdown = () => {
+interface OrganizationDropdownProps {
+  alt?: boolean // To distinguish slight behaviour change between nav v1 and v2, true for former
+}
+
+const OrganizationDropdown = ({ alt = false }: OrganizationDropdownProps) => {
   const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
@@ -56,7 +60,7 @@ const OrganizationDropdown = () => {
               }
             >
               <div className="flex items-center space-x-2">
-                <p className="text-sm">{orgName}</p>
+                <p className={alt ? 'text-xs' : 'text-sm'}>{orgName}</p>
                 {isSuccess && <Badge color="scale">{subscription?.plan.name}</Badge>}
               </div>
             </Button>
@@ -72,6 +76,8 @@ const OrganizationDropdown = () => {
                   {organizations?.map((org) => {
                     const href = router.pathname.includes('[slug]')
                       ? router.pathname.replace('[slug]', org.slug)
+                      : alt
+                      ? `/org/${org.slug}/general`
                       : `/org/${org.slug}`
                     return (
                       <Link passHref href={href} key={org.slug}>

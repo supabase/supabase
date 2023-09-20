@@ -99,7 +99,11 @@ const ProjectLink = ({
   )
 }
 
-const ProjectDropdown = () => {
+interface ProjectDropdownProps {
+  alt?: boolean // To distinguish slight behaviour change between nav v1 and v2, true for former
+}
+
+const ProjectDropdown = ({ alt = false }: ProjectDropdownProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
@@ -116,9 +120,11 @@ const ProjectDropdown = () => {
     { projectRef: ref },
     { enabled: !isOrgBilling }
   )
-  const projects = allProjects
-    ?.filter((x) => x.organization_id === selectedOrganization?.id)
-    .sort((a, b) => a.name.localeCompare(b.name))
+  const projects = alt
+    ? allProjects?.sort((a, b) => a.name.localeCompare(b.name))
+    : allProjects
+        ?.filter((x) => x.organization_id === selectedOrganization?.id)
+        .sort((a, b) => a.name.localeCompare(b.name))
   const selectedProject = isBranch
     ? parentProject
     : projectDetails || projects?.find((project) => project.ref === ref)
@@ -139,7 +145,7 @@ const ProjectDropdown = () => {
             iconRight={<IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />}
           >
             <div className="flex items-center space-x-2">
-              <p className="text-sm">{selectedProject?.name}</p>
+              <p className={alt ? 'text-xs' : 'text-sm'}>{selectedProject?.name}</p>
               {isSuccess && !isOrgBilling && <Badge color="slate">{subscription?.plan.name}</Badge>}
             </div>
           </Button>
@@ -192,7 +198,7 @@ const ProjectDropdown = () => {
     </div>
   ) : (
     <Button type="text">
-      <span className="text-sm">{selectedProject?.name}</span>
+      <span className={alt ? 'text-xs' : 'text-sm'}>{selectedProject?.name}</span>
     </Button>
   )
 }
