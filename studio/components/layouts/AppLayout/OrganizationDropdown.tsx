@@ -25,10 +25,10 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useSelectedOrganization } from 'hooks'
 
 interface OrganizationDropdownProps {
-  alt?: boolean // To distinguish slight behavior change between nav v1 and v2, true for former
+  isNewNav?: boolean
 }
 
-const OrganizationDropdown = ({ alt = false }: OrganizationDropdownProps) => {
+const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) => {
   const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
@@ -60,7 +60,7 @@ const OrganizationDropdown = ({ alt = false }: OrganizationDropdownProps) => {
               }
             >
               <div className="flex items-center space-x-2">
-                <p className={alt ? 'text-xs' : 'text-sm'}>{orgName}</p>
+                <p className={isNewNav ? 'text-sm' : 'text-xs'}>{orgName}</p>
                 {isSuccess && <Badge color="scale">{subscription?.plan.name}</Badge>}
               </div>
             </Button>
@@ -76,9 +76,9 @@ const OrganizationDropdown = ({ alt = false }: OrganizationDropdownProps) => {
                   {organizations?.map((org) => {
                     const href = router.pathname.includes('[slug]')
                       ? router.pathname.replace('[slug]', org.slug)
-                      : alt
-                      ? `/org/${org.slug}/general`
-                      : `/org/${org.slug}`
+                      : isNewNav
+                      ? `/org/${org.slug}`
+                      : `/org/${org.slug}/general`
                     return (
                       <Link passHref href={href} key={org.slug}>
                         <CommandItem_Shadcn_

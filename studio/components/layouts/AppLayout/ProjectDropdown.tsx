@@ -100,10 +100,10 @@ const ProjectLink = ({
 }
 
 interface ProjectDropdownProps {
-  alt?: boolean // To distinguish slight behavior change between nav v1 and v2, true for former
+  isNewNav?: boolean
 }
 
-const ProjectDropdown = ({ alt = false }: ProjectDropdownProps) => {
+const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
@@ -116,11 +116,11 @@ const ProjectDropdown = ({ alt = false }: ProjectDropdownProps) => {
     { projectRef: ref },
     { enabled: !isOrgBilling }
   )
-  const projects = alt
-    ? allProjects?.sort((a, b) => a.name.localeCompare(b.name))
-    : allProjects
+  const projects = isNewNav
+    ? allProjects
         ?.filter((x) => x.organization_id === selectedOrganization?.id)
         .sort((a, b) => a.name.localeCompare(b.name))
+    : allProjects?.sort((a, b) => a.name.localeCompare(b.name))
   const selectedProject = isBranch
     ? projects?.find((project) => project.ref === projectDetails?.parentRef)
     : projects?.find((project) => project.ref === ref)
@@ -141,7 +141,7 @@ const ProjectDropdown = ({ alt = false }: ProjectDropdownProps) => {
             iconRight={<IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />}
           >
             <div className="flex items-center space-x-2">
-              <p className={alt ? 'text-xs' : 'text-sm'}>{selectedProject?.name}</p>
+              <p className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedProject?.name}</p>
               {isSuccess && !isOrgBilling && <Badge color="slate">{subscription?.plan.name}</Badge>}
             </div>
           </Button>
@@ -194,7 +194,7 @@ const ProjectDropdown = ({ alt = false }: ProjectDropdownProps) => {
     </div>
   ) : (
     <Button type="text">
-      <span className={alt ? 'text-xs' : 'text-sm'}>{selectedProject?.name}</span>
+      <span className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedProject?.name}</span>
     </Button>
   )
 }

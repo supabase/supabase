@@ -35,10 +35,12 @@ const AppHeader = () => {
             />
           </a>
         </Link>
-        <OrganizationDropdown />
-        {ref !== undefined && <ProjectDropdown />}
+        <OrganizationDropdown isNewNav />
+        {ref !== undefined && <ProjectDropdown isNewNav />}
         {ref !== undefined && enableBranchManagement && (
-          <>{isBranchingEnabled ? <BranchDropdown /> : <EnableBranchingButton />}</>
+          <>
+            {isBranchingEnabled ? <BranchDropdown isNewNav /> : <EnableBranchingButton isNewNav />}
+          </>
         )}
       </div>
 

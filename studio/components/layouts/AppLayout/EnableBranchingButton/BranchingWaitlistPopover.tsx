@@ -10,16 +10,16 @@ import {
 } from 'ui'
 
 interface BranchingWaitlistPopoverProps {
-  alt?: boolean // To distinguish slight style change between nav v1 and v2, true for former
+  isNewNav?: boolean
 }
 
-const BranchingWaitlistPopover = ({ alt = false }: BranchingWaitlistPopoverProps) => {
+const BranchingWaitlistPopover = ({ isNewNav = false }: BranchingWaitlistPopoverProps) => {
   const [open, setOpen] = useState(false)
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button type={alt ? 'text' : 'default'} icon={<IconGitBranch strokeWidth={1.5} />}>
+        <Button type={isNewNav ? 'default' : 'text'} icon={<IconGitBranch strokeWidth={1.5} />}>
           Enable branching
         </Button>
       </PopoverTrigger_Shadcn_>

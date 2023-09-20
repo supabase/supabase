@@ -64,10 +64,10 @@ const BranchLink = ({
 }
 
 interface BranchDropdownProps {
-  alt?: boolean // To distinguish slight style change between nav v1 and v2, true for former
+  isNewNav?: boolean
 }
 
-const BranchDropdown = ({ alt = false }: BranchDropdownProps) => {
+const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
@@ -101,13 +101,11 @@ const BranchDropdown = ({ alt = false }: BranchDropdownProps) => {
                 type="text"
                 className="pr-2"
                 iconRight={
-                  !alt ? (
-                    <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />
-                  ) : null
+                  <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />
                 }
               >
                 <div className="flex items-center space-x-2">
-                  <p className={alt ? 'text-xs' : 'text-sm'}>{selectedBranch?.name}</p>
+                  <p className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedBranch?.name}</p>
                   {selectedBranch?.is_default ? (
                     <Badge color="amber">Production</Badge>
                   ) : (
