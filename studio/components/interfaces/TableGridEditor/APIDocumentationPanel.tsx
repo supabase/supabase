@@ -92,7 +92,7 @@ const APIDocumentationPanel = ({ visible, onClose }: APIDocumentationPanelProps)
         />
       }
     >
-      <div className="Docs Docs--table-editor">
+      <div className="Docs Docs--table-editor Docs--inner-wrapper">
         {isErrorJSONSchema && (
           <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
             <div className="text-scale-1000">
@@ -105,7 +105,7 @@ const APIDocumentationPanel = ({ visible, onClose }: APIDocumentationPanelProps)
           <>
             {jsonSchema ? (
               <>
-                <div className="sticky top-0 z-10 bg-scale-100 dark:bg-scale-300">
+                <div className="sticky top-0 z-10">
                   <LangSelector
                     selectedLang={selectedLang}
                     setSelectedLang={setSelectedLang}
