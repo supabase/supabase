@@ -1,11 +1,11 @@
 import { createClient } from '@supabase/supabase-js'
 import dotenv from 'dotenv'
+import minimist from 'minimist'
 import 'openai'
 import { Configuration, OpenAIApi } from 'openai'
 import { inspect } from 'util'
 import { v4 as uuidv4 } from 'uuid'
 import { fetchSources } from './sources'
-import * as minimist from 'minimist'
 
 dotenv.config()
 
