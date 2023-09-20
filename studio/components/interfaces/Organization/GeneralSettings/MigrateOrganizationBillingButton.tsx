@@ -32,7 +32,7 @@ const MigrateOrganizationBillingButton = observer(() => {
   const organization = useSelectedOrganization()
 
   const disableOrgBillingMigration = useFlag('disableOrgBillingMigration')
-  const canMigrateOrg = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const canMigrateOrg = useCheckPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
 
   const [isOpen, setIsOpen] = useState(false)
   const [tier, setTier] = useState('')
@@ -93,8 +93,6 @@ const MigrateOrganizationBillingButton = observer(() => {
     }
   }, [isOpen])
 
-  const canMigrateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-
   const selectedLimitedUsage = useMemo(
     () => tier === 'PRO' && isSpendCapEnabled,
     [tier, isSpendCapEnabled]
@@ -118,7 +116,7 @@ const MigrateOrganizationBillingButton = observer(() => {
 
   const onConfirmMigrate = async () => {
     if (!tier) return
-    if (!canMigrateOrganization) {
+    if (!canMigrateOrg) {
       return ui.setNotification({
         category: 'error',
         message: 'You do not have the required permissions to migrate this organization',
@@ -136,7 +134,7 @@ const MigrateOrganizationBillingButton = observer(() => {
               loading={!organization?.slug}
               onClick={toggle}
               type="primary"
-              disabled={!canMigrateOrg || disableOrgBillingMigration}
+              disabled={disableOrgBillingMigration}
             >
               Migrate organization
             </Button>
