@@ -85,7 +85,7 @@ const InfrastructureInfo = () => {
                   readOnly
                   disabled
                   label="PostgREST version"
-                  value={project?.serviceVersions.postgrest ?? ''}
+                  value={project?.serviceVersions?.postgrest ?? ''}
                 />
                 <Input
                   readOnly
