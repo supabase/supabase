@@ -154,8 +154,8 @@ const DefaultHeader = ({
                               />
                             </div>
                             <div>
-                              <p className="text-scale-1200 text-sm">Insert row</p>
-                              <p className="text-scale-1000 text-xs">
+                              <p className="text">Insert row</p>
+                              <p className="text-lighter text-xs">
                                 Insert a new row into {table.name}
                               </p>
                             </div>
@@ -180,8 +180,8 @@ const DefaultHeader = ({
                               />
                             </div>
                             <div>
-                              <p className="text-scale-1200 text-sm">Insert column</p>
-                              <p className="text-scale-1000 text-xs">
+                              <p className="text">Insert column</p>
+                              <p className="text-lighter text-xs">
                                 Insert a new column into {table.name}
                               </p>
                             </div>
@@ -207,8 +207,8 @@ const DefaultHeader = ({
                               />
                             </div>
                             <div>
-                              <p className="text-scale-1200 text-sm">Import data from CSV</p>
-                              <p className="text-scale-1000 text-xs">Insert new rows from a CSV</p>
+                              <p className="text">Import data from CSV</p>
+                              <p className="text-lighter text-xs">Insert new rows from a CSV</p>
                             </div>
                           </DropdownMenuItem_Shadcn_>,
                         ]
@@ -404,7 +404,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           icon={<IconX size="tiny" strokeWidth={2} />}
           onClick={deselectRows}
         />
-        <span className="text-xs text-scale-1200">
+        <span className="text-xs text-lighter">
           {allRowsSelected
             ? `${totalRows} rows selected`
             : selectedRows.size > 1

@@ -18,6 +18,7 @@ import {
   IconAlertCircle,
   IconAlertTriangle,
   IconChevronDown,
+  IconCopy,
   IconEdit2,
   IconEye,
   IconShare,
@@ -229,6 +230,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
             )}
             {sharedSnippetsFeature && visibility === 'project' && canCreateSQLSnippet && (
               <DropdownMenuItem_Shadcn_ onClick={createPersonalCopy}>
+                <IconCopy size="tiny" />
                 <p className="text-scale-1200 text-sm">Create a personal copy</p>
               </DropdownMenuItem_Shadcn_>
             )}

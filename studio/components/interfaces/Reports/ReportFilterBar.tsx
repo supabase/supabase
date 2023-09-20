@@ -1,6 +1,7 @@
 import { ComponentProps, useState } from 'react'
 import {
   Button,
+  cn,
   DropdownMenuContent_Shadcn_,
   DropdownMenuItem_Shadcn_,
   DropdownMenuSeparator_Shadcn_,
@@ -179,10 +180,10 @@ const ReportFilterBar = ({
                 >
                   <Icon size={20} className="mr-2" />
                   <p
-                    className={[
+                    className={cn(
                       productFilter.key === currentProductFilter?.key ? 'font-bold' : '',
-                      'inline-block',
-                    ].join(' ')}
+                      'inline-block'
+                    )}
                   >
                     {productFilter.label}
                   </p>

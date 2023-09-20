@@ -30,7 +30,7 @@ export const DropdownControl = ({
       <DropdownMenuTrigger_Shadcn_>{children}</DropdownMenuTrigger_Shadcn_>
       <DropdownMenuContent_Shadcn_ side={side} align={align}>
         <div className="dropdown-control" style={{ maxHeight: '30vh' }}>
-          {options.length == 0 && <p className="dropdown-control__empty-text">No more items</p>}
+          {options.length === 0 && <p className="dropdown-control__empty-text">No more items</p>}
           {options.map((x) => {
             return (
               <DropdownMenuItem_Shadcn_ key={x.value} onClick={() => onSelect(x.value)}>

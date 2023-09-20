@@ -52,7 +52,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
             <Tooltip.Trigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
               <DropdownMenuItem_Shadcn_ onClick={onEditColumn} disabled={isEncrypted}>
                 <IconEdit size="tiny" />
-                <p className="text-scale-1200 text-sm">Edit column</p>
+                <p className="text text-sm">Edit column</p>
               </DropdownMenuItem_Shadcn_>
             </Tooltip.Trigger>
             {isEncrypted && (
@@ -65,9 +65,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
-                      Encrypted columns cannot be edited
-                    </span>
+                    <span className="text-xs text">Encrypted columns cannot be edited</span>
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>
@@ -78,12 +76,12 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
           {column.frozen ? (
             <>
               <IconUnlock size="tiny" />
-              <p className="text-scale-1200 text-sm">Unfreeze column</p>
+              <p className="text">Unfreeze column</p>
             </>
           ) : (
             <>
               <IconLock size="tiny" />
-              <p className="text-scale-1200 text-sm">Freeze column</p>
+              <p className="text">Freeze column</p>
             </>
           )}
         </DropdownMenuItem_Shadcn_>
@@ -92,7 +90,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
             <Divider light />
             <DropdownMenuItem_Shadcn_ onClick={onDeleteColumn}>
               <IconTrash size="tiny" stroke="red" />
-              <p className="text-scale-1200 text-sm">Delete column</p>
+              <p className="text">Delete column</p>
             </DropdownMenuItem_Shadcn_>
           </>
         )}

@@ -198,7 +198,7 @@ const DateRangePicker = ({
       <DropdownMenu_Shadcn_>
         <DropdownMenuTrigger_Shadcn_>
           <Button asChild type="default" iconRight={<IconChevronDown />}>
-            <span>{timePeriod && options.find((x: any) => x.key == timePeriod)?.label}</span>
+            <span>{timePeriod && options.find((x) => x.key === timePeriod)?.label}</span>
           </Button>
         </DropdownMenuTrigger_Shadcn_>
 
