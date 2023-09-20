@@ -7,7 +7,7 @@ import BranchingWaitlistPopover from './BranchingWaitlistPopover'
 import { OPT_IN_TAGS } from 'lib/constants'
 
 interface EnableBranchingButtonProps {
-  alt?: boolean
+  alt?: boolean // To distinguish slight style change between nav v1 and v2, true for former
 }
 
 const EnableBranchingButton = ({ alt = false }: EnableBranchingButtonProps) => {
