@@ -100,7 +100,7 @@ const ProjectLink = ({
 }
 
 interface ProjectDropdownProps {
-  alt?: boolean // To distinguish slight behaviour change between nav v1 and v2, true for former
+  alt?: boolean // To distinguish slight behavior change between nav v1 and v2, true for former
 }
 
 const ProjectDropdown = ({ alt = false }: ProjectDropdownProps) => {
