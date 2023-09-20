@@ -33,7 +33,7 @@ export const generateToolRoutes = (
       icon: (
         <SVG
           src={`${BASE_PATH}/img/sql-editor.svg`}
-          style={{ width: `${18}px`, height: `${18}px` }}
+          style={{ width: `${18}px`, height: `${18}px`, strokeWidth: `4` }}
           preProcessor={(code) => code.replace(/svg/, 'svg class="m-auto text-color-inherit"')}
         />
       ),
@@ -162,7 +162,7 @@ export const generateOtherRoutes = (ref?: string, project?: ProjectBase): Route[
           {
             key: 'reports',
             label: 'Reports',
-            icon: <IconBarChart size={18} strokeWidth={2} />,
+            icon: <IconBarChart size={18} strokeWidth={2.5} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/reports`),
           },
         ]
@@ -170,7 +170,7 @@ export const generateOtherRoutes = (ref?: string, project?: ProjectBase): Route[
     {
       key: 'logs',
       label: 'Logs',
-      icon: <IconList size={18} strokeWidth={2} />,
+      icon: <IconList size={18} strokeWidth={2.5} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs/explorer`),
     },
     {
@@ -184,7 +184,7 @@ export const generateOtherRoutes = (ref?: string, project?: ProjectBase): Route[
           {
             key: 'settings',
             label: 'Project Settings',
-            icon: <IconSettings size={18} strokeWidth={2} />,
+            icon: <IconSettings size={18} strokeWidth={2.5} />,
             link: ref && `/project/${ref}/settings/general`,
           },
         ]

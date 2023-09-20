@@ -1,35 +1,65 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { IconAlertCircle, IconClock, Modal } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import InformationBox from 'components/ui/InformationBox'
-import Loading from 'components/ui/Loading'
 import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { useBackupRestoreMutation } from 'data/database/backup-restore-mutation'
+import { DatabaseBackup, useBackupsQuery } from 'data/database/backups-query'
+import { setProjectStatus } from 'data/projects/projects-query'
 import { useCheckPermissions, useStore } from 'hooks'
-import { IconAlertCircle, IconClock } from 'ui'
+import { PROJECT_STATUS } from 'lib/constants'
 import BackupItem from './BackupItem'
 import BackupsEmpty from './BackupsEmpty'
-import BackupsError from './BackupsError'
 
 const BackupsList = () => {
+  const { ui } = useStore()
+  const router = useRouter()
+  const queryClient = useQueryClient()
   const { project: selectedProject } = useProjectContext()
-  const { backups } = useStore()
   const projectRef = selectedProject?.ref || 'default'
+
+  const [selectedBackup, setSelectedBackup] = useState<DatabaseBackup>()
+
   const canTriggerScheduledBackups = useCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
   )
 
-  const isPitrEnabled = backups?.configuration?.pitr_enabled
+  const { data: backups } = useBackupsQuery({ projectRef })
+  const {
+    mutate: restoreFromBackup,
+    isLoading: isRestoring,
+    isSuccess: isSuccessBackup,
+  } = useBackupRestoreMutation({
+    onSuccess: () => {
+      setTimeout(() => {
+        setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
+        ui.setNotification({
+          category: 'success',
+          message: `Restoring database back to ${dayjs(selectedBackup?.inserted_at).format(
+            'DD MMM YYYY HH:mm:ss'
+          )}`,
+        })
+        router.push(`/project/${projectRef}`)
+      }, 3000)
+    },
+  })
 
-  if (backups.isLoading) return <Loading />
-  if (backups.error) return <BackupsError />
+  const planKey = backups?.tierKey ?? ''
+  const sortedBackups = (backups?.backups ?? []).sort(
+    (a, b) => new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
+  )
+  const isPitrEnabled = backups?.pitr_enabled
 
-  const { tierKey } = backups.configuration
-  const sortedBackups = backups.list()
-
-  if (tierKey === 'FREE') {
+  if (planKey === 'FREE') {
     return (
       <UpgradeToPro
         icon={<IconClock size="large" />}
@@ -41,30 +71,60 @@ const BackupsList = () => {
     )
   }
 
-  if (isPitrEnabled) {
-    return null
-  }
+  if (isPitrEnabled) return null
 
   return (
-    <div className="space-y-6">
-      {!sortedBackups?.length && tierKey !== 'FREE' ? (
-        <BackupsEmpty />
-      ) : (
-        <>
-          {!canTriggerScheduledBackups && (
-            <InformationBox
-              icon={<IconAlertCircle className="text-scale-1100" strokeWidth={2} />}
-              title="You need additional permissions to trigger a scheduled backup"
-            />
-          )}
-          <Panel>
-            {sortedBackups?.map((x: any, i: number) => {
-              return <BackupItem key={x.id} projectRef={projectRef} backup={x} index={i} />
-            })}
-          </Panel>
-        </>
-      )}
-    </div>
+    <>
+      <div className="space-y-6">
+        {sortedBackups.length === 0 && planKey !== 'FREE' ? (
+          <BackupsEmpty />
+        ) : (
+          <>
+            {!canTriggerScheduledBackups && (
+              <InformationBox
+                icon={<IconAlertCircle className="text-scale-1100" strokeWidth={2} />}
+                title="You need additional permissions to trigger a scheduled backup"
+              />
+            )}
+            <Panel>
+              {sortedBackups?.map((x, i: number) => {
+                return (
+                  <BackupItem
+                    key={x.id}
+                    backup={x}
+                    index={i}
+                    onSelectBackup={() => setSelectedBackup(x)}
+                  />
+                )
+              })}
+            </Panel>
+          </>
+        )}
+      </div>
+      <ConfirmationModal
+        size="medium"
+        buttonLabel="Confirm restore"
+        buttonLoadingLabel="Restoring"
+        visible={selectedBackup !== undefined}
+        header="Confirm to restore from backup"
+        loading={isRestoring || isSuccessBackup}
+        onSelectCancel={() => setSelectedBackup(undefined)}
+        onSelectConfirm={() => {
+          if (selectedBackup === undefined) return console.error('Backup required')
+          restoreFromBackup({ ref: projectRef, backup: selectedBackup })
+        }}
+      >
+        <Modal.Content>
+          <div className="pt-6 pb-5">
+            <p>
+              Are you sure you want to restore from $
+              {dayjs(selectedBackup?.inserted_at).format('DD MMM YYYY')}? This will destroy any new
+              data written since this backup was made.
+            </p>
+          </div>
+        </Modal.Content>
+      </ConfirmationModal>
+    </>
   )
 }
 

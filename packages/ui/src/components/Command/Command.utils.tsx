@@ -12,6 +12,15 @@ import { LoadingLine } from '../LoadingLine/LoadingLine'
 type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>
 type CommandPrimitiveProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>
 
+export const copyToClipboard = (str: string, callback = () => {}) => {
+  const focused = window.document.hasFocus()
+  if (focused) {
+    window.navigator?.clipboard?.writeText(str).then(callback)
+  } else {
+    console.warn('Unable to copy to clipboard')
+  }
+}
+
 export const Command = React.forwardRef<CommandPrimitiveElement, CommandPrimitiveProps>(
   ({ className, ...props }, ref) => (
     <CommandPrimitive
