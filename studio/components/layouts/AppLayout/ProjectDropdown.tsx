@@ -110,11 +110,7 @@ const ProjectDropdown = ({ alt = false }: ProjectDropdownProps) => {
   const selectedOrganization = useSelectedOrganization()
   const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
 
-  const isBranch = projectDetails?.parent_project_ref !== undefined
-  const parentProject = isBranch
-    ? allProjects?.find((project) => project.ref === projectDetails.parent_project_ref)
-    : undefined
-
+  const isBranch = projectDetails?.parentRef !== projectDetails?.ref
   const isOrgBilling = !!selectedOrganization?.subscription_id
   const { data: subscription, isSuccess } = useProjectSubscriptionV2Query(
     { projectRef: ref },
@@ -126,12 +122,12 @@ const ProjectDropdown = ({ alt = false }: ProjectDropdownProps) => {
         ?.filter((x) => x.organization_id === selectedOrganization?.id)
         .sort((a, b) => a.name.localeCompare(b.name))
   const selectedProject = isBranch
-    ? parentProject
-    : projectDetails || projects?.find((project) => project.ref === ref)
+    ? projects?.find((project) => project.ref === projectDetails?.parentRef)
+    : projects?.find((project) => project.ref === ref)
 
   const [open, setOpen] = useState(false)
 
-  if (isLoadingProjects) {
+  if (isLoadingProjects || !selectedProject) {
     return <ShimmeringLoader className="w-[90px]" />
   }
 

@@ -7,8 +7,8 @@ export function useSelectedProject() {
   const { ref } = useParams()
   const { data } = useProjectDetailQuery({ ref })
 
-  const updatedData = { ...data, parentRef: data?.parent_project_ref ?? data?.ref ?? undefined }
-  return updatedData
+  if (data) return { ...data, parentRef: data?.parent_project_ref ?? data?.ref ?? undefined }
+  return data
 }
 
 export function useProjectByRef(ref?: string) {
