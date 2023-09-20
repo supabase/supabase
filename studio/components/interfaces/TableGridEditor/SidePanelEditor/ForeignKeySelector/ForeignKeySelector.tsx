@@ -319,7 +319,7 @@ const ForeignKeySelector = ({
                 <Alert_Shadcn_ variant="default">
                   <IconAlertCircle className="h-4 w-4" />
                   <AlertTitle_Shadcn_>
-                    The reference column's type will be updated to {selectedColumn?.data_type}
+                    The referenced column's type will be updated to {selectedColumn?.data_type}
                   </AlertTitle_Shadcn_>
                   <AlertDescription_Shadcn_ className="leading-6">
                     <span>The referenced column</span>
