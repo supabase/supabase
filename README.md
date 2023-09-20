@@ -52,7 +52,7 @@ We are currently in Public Beta. Watch "releases" of this repo to get notified o
 
 ## How it works
 
-Supabase is a combination of open source tools. We’re building the features of Firebase using enterprise-grade, open source products. If the tools and communities exist, with an MIT, Apache 2, or equivalent open license, we will use and support that tool. If the tool doesn't exist, we build and open source it ourselves. Supabase is not a 1-to-1 mapping of Firebase. Our aim is to give developers a Firebase-like developer experience using open source tools.
+Supabase is a combination of open-source tools. We’re building the features of Firebase using enterprise-grade, open-source products. If the tools and communities exist, with an MIT, Apache 2, or equivalent open license, we will use and support that tool. If the tool doesn't exist, we build and open-source it ourselves. Supabase is not a 1-to-1 mapping of Firebase. We aim to give developers a Firebase-like developer experience using open-source tools.
 
 **Architecture**
 
