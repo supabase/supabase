@@ -132,7 +132,7 @@ const GitHubIntegrationConnectionForm = ({
       <div>
         <Label_Shadcn_ className="text">Production branch</Label_Shadcn_>
         <p className="text-xs text-light mb-3">
-          Deploy Edge Functions when merged into Production branch
+          All other branches will be treated as Preview branches
         </p>
         {/* <pre>! This should only work if branching is turned on !</pre> */}
         <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
