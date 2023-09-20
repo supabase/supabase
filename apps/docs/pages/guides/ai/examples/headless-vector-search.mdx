@@ -87,7 +87,7 @@ const onSubmit = (e: Event) => {
   isLoading.value = true
 
   const query = new URLSearchParams({ query: inputRef.current!.value })
-  const projectUrl = `https://your-project-ref.functions.supabase.co`
+  const projectUrl = `https://your-project-ref.supabase.co/functions/v1`
   const queryURL = `${projectURL}/${query}`
   const eventSource = new EventSource(queryURL)
 
