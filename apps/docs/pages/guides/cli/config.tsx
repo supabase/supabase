@@ -7,17 +7,15 @@ import Head from 'next/head'
 import { CodeBlock } from 'ui'
 
 // Parameters are grouped on the page by tag
-const TAGS = ['General', 'Auth', 'API', 'Database', 'Dashboard', 'Local', 'Edge-Functions']
-
 const tocList = []
-const content = TAGS.map((tag) => {
-  tocList.push({ text: tag, link: `${tag.toLowerCase()}-config`, level: 2 })
+const content = specFile.info.tags.map((tag) => {
+  tocList.push({ text: tag.title, link: `${tag.id}-config`, level: 2 })
   return (
     <div>
-      <Heading tag="h2">{tag} Config</Heading>
+      <Heading tag="h2">{tag.title} Config</Heading>
       {specFile.parameters
-        .filter((param: Parameter) => param.tags[0] === tag.toLowerCase())
-        .map((parameter: Parameter, index) => {
+        .filter((param: Parameter) => param.tags[0] === tag.id)
+        .map((parameter: Parameter) => {
           tocList.push({ text: parameter.id, link: `#${parameter.id}`, level: 3 })
           return <Info parameter={parameter} />
         })}
