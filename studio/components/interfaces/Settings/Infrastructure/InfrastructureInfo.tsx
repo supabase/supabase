@@ -79,7 +79,7 @@ const InfrastructureInfo = () => {
                   readOnly
                   disabled
                   label="GoTrue version"
-                  value={project?.serviceVersions.gotrue ?? ''}
+                  value={project?.serviceVersions?.gotrue ?? ''}
                 />
                 <Input
                   readOnly
