@@ -1,6 +1,6 @@
 import * as TabsPrimitive from '@radix-ui/react-tabs'
 import { useRouter } from 'next/router'
-import * as React from 'react'
+import { Children, useEffect, useState } from 'react'
 import styleHandler from '../../lib/theme/styleHandler'
 import { useTabGroup } from './TabsProvider'
 
@@ -41,16 +41,31 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
 }) => {
   // toArray is used here to filter out invalid children
   // another method would be to use React.Children.map
-  const children = React.Children.toArray(_children) as PanelPropsProps[]
+  const children = Children.toArray(_children) as PanelPropsProps[]
 
-  const [activeTab, setActiveTab] = React.useState(
+  const [activeTab, setActiveTab] = useState(
     defaultActiveId ??
       // if no defaultActiveId is set use the first panel
       children?.[0]?.props?.id
   )
 
   const router = useRouter()
-  const hash = router?.asPath?.split('#')[1]?.toUpperCase()
+  const hash = router?.asPath?.split('#')[1]
+  const hashTab = extractHashTab(hash)
+
+  /**
+   * If URL hash present in the format `tab--<tab-id>`,
+   * switch to that tab.
+   *
+   * Note: useEffect necessary here to ensure this only
+   * happens client side
+   */
+  useEffect(() => {
+    if (hashTab) {
+      setActiveTab(hashTab)
+      setGroupActiveId?.(hashTab)
+    }
+  }, [hashTab])
 
   let __styles = styleHandler('tabs')
 
@@ -58,7 +73,7 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
 
   const { groupActiveId, setGroupActiveId } = useTabGroup(tabIds)
 
-  const active = activeId ?? groupActiveId ?? activeTab ?? hash
+  const active = activeId ?? groupActiveId ?? activeTab
 
   function onTabClick(id: string) {
     setActiveTab(id)
@@ -140,3 +155,15 @@ export const Panel: React.FC<PanelProps> = ({ children, id, className }) => {
 
 Tabs.Panel = Panel
 export default Tabs
+
+function extractHashTab(hash?: string) {
+  if (!hash) {
+    return undefined
+  }
+
+  const match = hash.match(/tab--(.*)/i)
+
+  if (match) {
+    return match[1]?.toLowerCase()
+  }
+}
