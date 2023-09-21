@@ -65,6 +65,7 @@
     "lodash": "^4.17.21",
     "logrocket": "^5.0.1",
     "lottie-react": "^2.4.0",
+    "lucide-react": "^0.167.0",
     "markdown-table": "=2.0.0",
     "mobx": "^6.3.2",
     "mobx-react-lite": "^3.2.0",

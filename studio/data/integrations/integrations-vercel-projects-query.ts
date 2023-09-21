@@ -57,32 +57,3 @@ export const useVercelProjectsQuery = <TData = VercelProjectsData>(
       ...options,
     }
   )
-
-/**
- * useVercelProjectsPrefetch is used for prefetching data. For example, starting a query loading before a page is navigated to.
- *
- * @example
- * const prefetch = useVercelProjectsPrefetch({ orgSlug })
- *
- * return (
- *   <Link onMouseEnter={() => prefetch()}>
- *     Start loading on hover
- *   </Link>
- * )
- */
-export const useVercelProjectsPrefetch = ({
-  // orgSlug,
-  // orgId,
-  organization_integration_id,
-}: VercelProjectsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (organization_integration_id) {
-      client.prefetchQuery(
-        integrationKeys.vercelProjectList(organization_integration_id),
-        ({ signal }) => getVercelProjects({ organization_integration_id }, signal)
-      )
-    }
-  }, [organization_integration_id])
-}
