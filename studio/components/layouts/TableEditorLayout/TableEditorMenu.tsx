@@ -13,23 +13,35 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Alert,
   Button,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  Command_Shadcn_,
   Dropdown,
   IconCheck,
   IconChevronsDown,
+  IconCode,
   IconEdit,
   IconLoader,
+  IconPlus,
   IconRefreshCw,
   IconSearch,
   IconX,
   Input,
-  Listbox,
   Menu,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  ScrollArea,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
 
 const TableEditorMenu = () => {
   const { id } = useParams()
+  const [open, setOpen] = useState(false)
   const snap = useTableEditorStateSnapshot()
 
   const [searchText, setSearchText] = useState<string>('')
@@ -86,8 +98,9 @@ const TableEditorMenu = () => {
     await refetch()
   }
 
-  const [protectedSchemas, openSchemas] = partition(schemas, (schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+  const [protectedSchemas, openSchemas] = partition(
+    (schemas ?? []).sort((a, b) => a.name.localeCompare(b.name)),
+    (schema) => EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
@@ -115,55 +128,88 @@ const TableEditorMenu = () => {
         )}
 
         {isSchemasSuccess && (
-          <Listbox
-            size="tiny"
-            value={snap.selectedSchemaName}
-            onChange={(name: string) => {
-              setSearchText('')
-              snap.setSelectedSchemaName(name)
-            }}
-          >
-            <Listbox.Option
-              disabled
-              key="normal-schemas"
-              value="normal-schemas"
-              label="Schemas"
-              className="!w-[200px]"
-            >
-              <p className="text-xs text-scale-1100">Schemas</p>
-            </Listbox.Option>
-            {openSchemas.map((schema) => (
-              <Listbox.Option
-                key={schema.id}
-                value={schema.name}
-                label={schema.name}
-                className="!w-[200px]"
-                addOnBefore={() => <span className="text-scale-900 text-xs">schema</span>}
+          <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+            <PopoverTrigger_Shadcn_ asChild>
+              <Button
+                asChild
+                type="outline"
+                className="w-full [&>span]:w-full"
+                iconRight={
+                  <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />
+                }
               >
-                <span className="text-scale-1200 text-xs">{schema.name}</span>
-              </Listbox.Option>
-            ))}
-            <Listbox.Option
-              disabled
-              key="protected-schemas"
-              value="protected-schemas"
-              label="Protected schemas"
-              className="!w-[200px]"
-            >
-              <p className="text-xs text-scale-1100">Protected schemas</p>
-            </Listbox.Option>
-            {protectedSchemas.map((schema) => (
-              <Listbox.Option
-                key={schema.id}
-                value={schema.name}
-                label={schema.name}
-                className="!w-[200px]"
-                addOnBefore={() => <span className="text-scale-900 text-xs">schema</span>}
-              >
-                <span className="text-scale-1200 text-xs">{schema.name}</span>
-              </Listbox.Option>
-            ))}
-          </Listbox>
+                <div>
+                  <div className="w-full flex space-x-3 py-0.5">
+                    <p className="text-xs text-light">schema</p>
+                    <p className="text-xs">{snap.selectedSchemaName}</p>
+                  </div>
+                </div>
+              </Button>
+            </PopoverTrigger_Shadcn_>
+            <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+              <Command_Shadcn_>
+                <CommandInput_Shadcn_ placeholder="Find schema..." />
+                <CommandList_Shadcn_>
+                  <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
+                  <CommandGroup_Shadcn_>
+                    <ScrollArea className={(schemas || []).length > 7 ? 'h-[210px]' : ''}>
+                      {openSchemas?.map((schema) => (
+                        <CommandItem_Shadcn_
+                          asChild
+                          key={schema.id}
+                          className="cursor-pointer flex items-center space-x-2 w-full"
+                          onSelect={() => {
+                            setSearchText('')
+                            snap.setSelectedSchemaName(schema.name)
+                            setOpen(false)
+                          }}
+                          onClick={() => {
+                            setSearchText('')
+                            snap.setSelectedSchemaName(schema.name)
+                            setOpen(false)
+                          }}
+                        >
+                          <p>{schema.name}</p>
+                        </CommandItem_Shadcn_>
+                      ))}
+                      {protectedSchemas?.map((schema) => (
+                        <CommandItem_Shadcn_
+                          asChild
+                          key={schema.id}
+                          className="cursor-pointer flex items-center space-x-2 w-full"
+                          onSelect={() => {
+                            setSearchText('')
+                            snap.setSelectedSchemaName(schema.name)
+                            setOpen(false)
+                          }}
+                          onClick={() => {
+                            setSearchText('')
+                            snap.setSelectedSchemaName(schema.name)
+                            setOpen(false)
+                          }}
+                        >
+                          <p>{schema.name}</p>
+                        </CommandItem_Shadcn_>
+                      ))}
+                    </ScrollArea>
+                  </CommandGroup_Shadcn_>
+                  <CommandGroup_Shadcn_ className="border-t">
+                    <CommandItem_Shadcn_
+                      asChild
+                      className="cursor-pointer flex items-center space-x-2 w-full"
+                      onSelect={() => {}}
+                      onClick={() => setOpen(false)}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <IconPlus />
+                        <p>Create a new schema</p>
+                      </div>
+                    </CommandItem_Shadcn_>
+                  </CommandGroup_Shadcn_>
+                </CommandList_Shadcn_>
+              </Command_Shadcn_>
+            </PopoverContent_Shadcn_>
+          </Popover_Shadcn_>
         )}
       </div>
 
