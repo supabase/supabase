@@ -349,7 +349,7 @@ const changes = client
 
 ## Available filters
 
-Realtime offers filters so you can specify the data your client receives at a more granular level.
+Realtime offers filters so you can specify the data your client ves at a more granular level.
 
 ### Equal to (eq)
 
@@ -505,7 +505,7 @@ const channel = supabase
 
 This filter uses Postgres's `= ANY`. Realtime allows a maximum of 100 values for this filter.
 
-## Receiveing `old` records
+## Receiving `old` records
 
 By default, only `new` record changes are sent but if you want to receive the `old` record (previous values) whenever you `UPDATE` or `DELETE` a record, you can set the `replica identity` of your table to `full`:
 
