@@ -1,16 +1,16 @@
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { Fragment, PropsWithChildren, ReactNode } from 'react'
-
 import { useParams } from 'common/hooks'
-import Connecting from 'components/ui/Loading'
 import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { useFlag, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { Fragment, PropsWithChildren, ReactNode } from 'react'
 import AppLayout from '../AppLayout/AppLayout'
+import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import LayoutHeader from './LayoutHeader'
+import LoadingState from './LoadingState'
 import NavigationBar from './NavigationBar/NavigationBar'
 import PausingState from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
@@ -18,6 +18,7 @@ import { ProjectContextProvider } from './ProjectContext'
 import ProjectPausedState from './ProjectPausedState'
 import RestoringState from './RestoringState'
 import UpgradingState from './UpgradingState'
+import Connecting from 'components/ui/Loading/Loading'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -120,6 +121,8 @@ const ProjectLayout = ({
             )}
           </main>
         </div>
+
+        <EnableBranchingModal />
       </ProjectContextProvider>
     </AppLayout>
   )
@@ -187,7 +190,11 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
   return (
     <>
       {isLoading || (requiresProjectDetails && selectedProject === undefined) ? (
-        <Connecting />
+        router.pathname.endsWith('[ref]') ? (
+          <LoadingState />
+        ) : (
+          <Connecting />
+        )
       ) : isProjectUpgrading ? (
         <UpgradingState />
       ) : isProjectPausing ? (
@@ -262,6 +269,8 @@ export const ProjectLayoutNonBlocking = ({
             )}
           </main>
         </div>
+
+        <EnableBranchingModal />
       </ProjectContextProvider>
     </AppLayout>
   )
