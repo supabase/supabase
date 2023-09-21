@@ -199,7 +199,7 @@
             "in": "query",
             "schema": { "type": "string" }
           },
-          { "name": "scope", "required": true, "in": "query", "schema": { "type": "string" } },
+          { "name": "scope", "required": false, "in": "query", "schema": { "type": "string" } },
           { "name": "state", "required": false, "in": "query", "schema": { "type": "string" } },
           {
             "name": "response_mode",
@@ -248,6 +248,51 @@
           }
         },
         "tags": ["oauth (beta)"]
+      }
+    },
+    "/v1/snippets": {
+      "get": {
+        "operationId": "listSnippets",
+        "summary": "Lists SQL snippets for the logged in user",
+        "parameters": [
+          {
+            "name": "project_ref",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/SnippetList" } }
+            }
+          },
+          "500": { "description": "Failed to list user's SQL snippets" }
+        },
+        "tags": ["snippets"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/snippets/{id}": {
+      "get": {
+        "operationId": "getSnippet",
+        "summary": "Gets a specific SQL snippet",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/SnippetResponse" } }
+            }
+          },
+          "500": { "description": "Failed to retrieve SQL snippet" }
+        },
+        "tags": ["snippets"],
+        "security": [{ "bearer": [] }]
       }
     },
     "/v1/projects/{ref}/api-keys": {
@@ -1273,8 +1318,8 @@
     },
     "/v1/projects/{ref}/config/database/pgbouncer": {
       "get": {
-        "operationId": "getPgbouncerConfig",
-        "summary": "Gets project's pgbouncer config",
+        "operationId": "v1GetPgbouncerConfig",
+        "summary": "Get project's pgbouncer config",
         "parameters": [
           {
             "name": "ref",
@@ -1289,49 +1334,13 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ProjectPgBouncerConfig" }
+                "schema": { "$ref": "#/components/schemas/V1PgbouncerConfigResponse" }
               }
             }
           },
           "500": { "description": "Failed to retrieve project's pgbouncer config" }
         },
-        "tags": ["projects config"],
-        "security": [{ "bearer": [] }]
-      },
-      "patch": {
-        "operationId": "updatePgbouncerConfig",
-        "summary": "Updates project's pgbouncer config",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/UpdatePgbouncerConfigBody" }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/UpdatePoolingConfigResponse" }
-              }
-            }
-          },
-          "403": { "description": "" },
-          "500": { "description": "Failed to update project's pgbouncer config" }
-        },
-        "tags": ["projects config"],
-        "security": [{ "bearer": [] }]
+        "tags": ["projects config"]
       }
     },
     "/v1/projects/{ref}/config/auth": {
@@ -1877,6 +1886,54 @@
         "tags": ["sso"],
         "security": [{ "bearer": [] }]
       }
+    },
+    "/v1/projects/{ref}/database/backups/restore-pitr": {
+      "post": {
+        "operationId": "v1RestorePitr",
+        "summary": "List members of an organization",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/V1RestorePitrBody" } }
+          }
+        },
+        "responses": { "201": { "description": "" } },
+        "tags": ["backups (beta)"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/organizations/{slug}/members": {
+      "get": {
+        "operationId": "v1ListOrganizationMembers",
+        "summary": "List members of an organization",
+        "parameters": [
+          { "name": "slug", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/V1OrganizationMemberResponse" }
+                }
+              }
+            }
+          }
+        },
+        "tags": ["organizations"],
+        "security": [{ "bearer": [] }]
+      }
     }
   },
   "info": { "title": "Supabase API (v1)", "description": "", "version": "1.0.0", "contact": {} },
@@ -2007,7 +2064,7 @@
             "description": "Region you want your server to reside in",
             "example": "us-east-1"
           },
-          "kps_enabled": { "type": "boolean" }
+          "kps_enabled": { "type": "boolean", "deprecated": true }
         },
         "required": ["db_pass", "name", "organization_id", "plan", "region"]
       },
@@ -2043,6 +2100,88 @@
           "expires_in": { "type": "number" }
         },
         "required": ["token_type", "access_token", "refresh_token", "expires_in"]
+      },
+      "SnippetProject": {
+        "type": "object",
+        "properties": { "id": { "type": "number" }, "name": { "type": "string" } },
+        "required": ["id", "name"]
+      },
+      "SnippetUser": {
+        "type": "object",
+        "properties": { "id": { "type": "number" }, "username": { "type": "string" } },
+        "required": ["id", "username"]
+      },
+      "SnippetMeta": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "inserted_at": { "type": "string" },
+          "updated_at": { "type": "string" },
+          "type": { "type": "string", "enum": ["sql"] },
+          "visibility": { "type": "string", "enum": ["user", "project", "org", "public"] },
+          "name": { "type": "string" },
+          "description": { "type": "string", "nullable": true },
+          "project": { "$ref": "#/components/schemas/SnippetProject" },
+          "owner": { "$ref": "#/components/schemas/SnippetUser" },
+          "updated_by": { "$ref": "#/components/schemas/SnippetUser" }
+        },
+        "required": [
+          "id",
+          "inserted_at",
+          "updated_at",
+          "type",
+          "visibility",
+          "name",
+          "description",
+          "project",
+          "owner",
+          "updated_by"
+        ]
+      },
+      "SnippetList": {
+        "type": "object",
+        "properties": {
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/SnippetMeta" } }
+        },
+        "required": ["data"]
+      },
+      "SnippetContent": {
+        "type": "object",
+        "properties": {
+          "favorite": { "type": "boolean" },
+          "schema_version": { "type": "string" },
+          "sql": { "type": "string" }
+        },
+        "required": ["favorite", "schema_version", "sql"]
+      },
+      "SnippetResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "inserted_at": { "type": "string" },
+          "updated_at": { "type": "string" },
+          "type": { "type": "string", "enum": ["sql"] },
+          "visibility": { "enum": ["user", "project", "org", "public"], "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string", "nullable": true },
+          "project": { "$ref": "#/components/schemas/SnippetProject" },
+          "owner": { "$ref": "#/components/schemas/SnippetUser" },
+          "updated_by": { "$ref": "#/components/schemas/SnippetUser" },
+          "content": { "$ref": "#/components/schemas/SnippetContent" }
+        },
+        "required": [
+          "id",
+          "inserted_at",
+          "updated_at",
+          "type",
+          "visibility",
+          "name",
+          "description",
+          "project",
+          "owner",
+          "updated_by",
+          "content"
+        ]
       },
       "ApiKeyResponse": {
         "type": "object",
@@ -2153,8 +2292,14 @@
       "CreateSecretBody": {
         "type": "object",
         "properties": {
-          "name": { "type": "string" },
-          "value": { "type": "string", "pattern": "/^(?!SUPABASE_).*/" }
+          "name": {
+            "type": "string",
+            "maxLength": 256,
+            "pattern": "/^(?!SUPABASE_).*/",
+            "description": "Secret name must not start with the SUPABASE_ prefix.",
+            "example": "string"
+          },
+          "value": { "type": "string", "maxLength": 24576 }
         },
         "required": ["name", "value"]
       },
@@ -2326,84 +2471,14 @@
           "session_replication_role": { "enum": ["origin", "replica", "local"], "type": "string" }
         }
       },
-      "ProjectPgBouncerConfig": {
+      "V1PgbouncerConfigResponse": {
         "type": "object",
         "properties": {
-          "db_dns_name": { "type": "string" },
-          "db_host": { "type": "string" },
-          "db_name": { "type": "string" },
-          "db_port": { "type": "number" },
-          "db_ssl": { "type": "boolean" },
-          "db_user": { "type": "string" },
+          "pool_mode": { "type": "string", "enum": ["transaction", "session", "statement"] },
           "default_pool_size": { "type": "number" },
           "ignore_startup_parameters": { "type": "string" },
-          "inserted_at": { "type": "string" },
-          "pgbouncer_enabled": { "type": "boolean" },
-          "supavisor_enabled": { "type": "boolean" },
-          "pgbouncer_status": {
-            "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
-            "type": "string"
-          },
-          "pool_mode": { "enum": ["transaction", "session", "statement"], "type": "string" },
-          "max_client_conn": { "type": "number", "nullable": true },
-          "connectionString": { "type": "string" }
-        },
-        "required": [
-          "db_dns_name",
-          "db_host",
-          "db_name",
-          "db_port",
-          "db_ssl",
-          "db_user",
-          "ignore_startup_parameters",
-          "inserted_at",
-          "pgbouncer_enabled",
-          "supavisor_enabled",
-          "pgbouncer_status",
-          "pool_mode",
-          "connectionString"
-        ]
-      },
-      "UpdatePgbouncerConfigBody": {
-        "type": "object",
-        "properties": {
-          "default_pool_size": { "type": "integer", "minimum": 0, "maximum": 1000 },
-          "max_client_conn": {
-            "type": "integer",
-            "nullable": true,
-            "minimum": 0,
-            "maximum": 18000
-          },
-          "ignore_startup_parameters": { "type": "string" },
-          "pgbouncer_enabled": { "type": "boolean" },
-          "pool_mode": { "enum": ["transaction", "session", "statement"], "type": "string" }
-        },
-        "required": ["ignore_startup_parameters", "pgbouncer_enabled", "pool_mode"]
-      },
-      "UpdatePoolingConfigResponse": {
-        "type": "object",
-        "properties": {
-          "default_pool_size": { "type": "integer", "minimum": 0, "maximum": 1000 },
-          "max_client_conn": {
-            "type": "integer",
-            "nullable": true,
-            "minimum": 0,
-            "maximum": 18000
-          },
-          "ignore_startup_parameters": { "type": "string" },
-          "pgbouncer_enabled": { "type": "boolean" },
-          "pool_mode": { "enum": ["transaction", "session", "statement"], "type": "string" },
-          "pgbouncer_status": {
-            "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
-            "type": "string"
-          }
-        },
-        "required": [
-          "ignore_startup_parameters",
-          "pgbouncer_enabled",
-          "pool_mode",
-          "pgbouncer_status"
-        ]
+          "max_client_conn": { "type": "number" }
+        }
       },
       "AuthConfigResponse": {
         "type": "object",
@@ -2619,6 +2694,21 @@
           "updated_at": { "type": "string" }
         },
         "required": ["id"]
+      },
+      "V1RestorePitrBody": {
+        "type": "object",
+        "properties": { "recovery_time_target_unix": { "type": "number" } },
+        "required": ["recovery_time_target_unix"]
+      },
+      "V1OrganizationMemberResponse": {
+        "type": "object",
+        "properties": {
+          "user_id": { "type": "string" },
+          "user_name": { "type": "string" },
+          "email": { "type": "string" },
+          "role_name": { "type": "string" }
+        },
+        "required": ["user_id", "user_name", "role_name"]
       }
     }
   }
