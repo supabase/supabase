@@ -384,7 +384,7 @@ const Addons = () => {
                     {!sufficientPgVersion ? (
                       <Alert_Shadcn_ className="mt-2">
                         <AlertTitle_Shadcn_>
-                          Your project is too old to be able to enable PITR for
+                          Your project is too old to enable PITR
                         </AlertTitle_Shadcn_>
                         <AlertDescription_Shadcn_>
                           <p className="text-sm leading-normal mb-2">
