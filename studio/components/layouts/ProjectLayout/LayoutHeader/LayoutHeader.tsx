@@ -3,6 +3,10 @@ import Link from 'next/link'
 import { useMemo } from 'react'
 import { Badge } from 'ui'
 
+import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
+import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
+import OrganizationDropdown from 'components/layouts/AppLayout/OrganizationDropdown'
+import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
 import {
   getResourcesExceededLimits,
   getResourcesExceededLimitsOrg,
@@ -16,13 +20,16 @@ import BreadcrumbsView from './BreadcrumbsView'
 import FeedbackDropdown from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopover from './NotificationsPopover'
-import OrgDropdown from './OrgDropdown'
-import ProjectDropdown from './ProjectDropdown'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
+
+  const enableBranchManagement = useFlag('branchManagement')
+
+  const isBranchingEnabled =
+    selectedProject?.is_branch_enabled === true || selectedProject?.parent_project_ref !== undefined
 
   // Skip with org-based-billing, as quota is for the entire org
   const { data: projectUsage } = useProjectUsageQuery(
@@ -76,13 +83,11 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     >
       <div className="-ml-2 flex items-center text-sm">
         {/* Organization is selected */}
-        {projectRef && selectedOrganization ? (
+        {projectRef && (
           <>
-            {/* Org Dropdown */}
-            <OrgDropdown />
+            <OrganizationDropdown />
 
-            {/* Project is selected */}
-            {selectedProject && (
+            {projectRef && (
               <>
                 <span className="text-scale-800 dark:text-scale-700">
                   <svg
@@ -99,7 +104,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                     <path d="M16 3.549L7.12 20.600"></path>
                   </svg>
                 </span>
-                {/* Project Dropdown */}
+
                 <ProjectDropdown />
 
                 {showOverUsageBadge && (
@@ -119,16 +124,30 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                 )}
               </>
             )}
+
+            {selectedProject && enableBranchManagement && (
+              <>
+                <span className="text-scale-800 dark:text-scale-700">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    fill="none"
+                    shapeRendering="geometricPrecision"
+                  >
+                    <path d="M16 3.549L7.12 20.600"></path>
+                  </svg>
+                </span>
+                {isBranchingEnabled ? <BranchDropdown /> : <EnableBranchingButton />}
+              </>
+            )}
           </>
-        ) : (
-          <Link href="/projects">
-            <a
-              className={`cursor-pointer px-2 py-1 text-xs text-scale-1200 focus:bg-transparent focus:outline-none`}
-            >
-              Supabase
-            </a>
-          </Link>
         )}
+
         {/* Additional breadcrumbs are supplied */}
         <BreadcrumbsView defaultValue={breadcrumbs} />
       </div>

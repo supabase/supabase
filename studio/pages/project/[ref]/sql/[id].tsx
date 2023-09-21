@@ -67,7 +67,7 @@ const SqlEditor: NextPageWithLayout = () => {
       pgInfoRef.current = {}
     }
     pgInfoRef.current.tableColumns = tableColumns?.result
-    pgInfoRef.current.schemas = schemas?.result
+    pgInfoRef.current.schemas = schemas
     pgInfoRef.current.keywords = keywords?.result
     pgInfoRef.current.functions = functions?.result
   }

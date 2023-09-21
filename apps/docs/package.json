@@ -84,8 +84,8 @@
     "react-markdown": "^8.0.3",
     "rehype-slug": "^5.1.0",
     "remark": "^14.0.2",
-    "remark-gfm": "^3.0.1",
     "remark-emoji": "^3.1.2",
+    "remark-gfm": "^3.0.1",
     "ui": "*",
     "unist-builder": "^3.0.1",
     "unist-util-filter": "^4.0.1",
@@ -96,6 +96,7 @@
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.410.0",
     "@types/hast": "^2.3.4",
+    "@types/minimist": "^1.2.2",
     "@types/node": "^17.0.24",
     "@types/react": "17.0.39",
     "@types/unist": "^2.0.6",
@@ -103,6 +104,7 @@
     "dotenv": "^16.0.3",
     "ejs": "^3.1.8",
     "globby": "^13.2.2",
+    "jest-environment-jsdom": "^29.7.0",
     "minimist": "^1.2.8",
     "next-transpile-modules": "^9.0.0",
     "npm-run-all": "^4.1.5",
@@ -111,7 +113,6 @@
     "ts-node": "^10.9.1",
     "tsconfig": "*",
     "tsx": "^3.12.2",
-    "typescript": "^5.0.4",
-    "jest-environment-jsdom": "^29.7.0"
+    "typescript": "^5.0.4"
   }
 }

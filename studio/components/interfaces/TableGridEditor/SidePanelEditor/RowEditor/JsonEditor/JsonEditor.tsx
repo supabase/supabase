@@ -14,6 +14,7 @@ interface JsonEditProps {
   visible: boolean
   backButtonLabel?: string
   applyButtonLabel?: string
+  readOnly?: boolean
   closePanel: () => void
   onSaveJSON: (value: string | number) => void
 }
@@ -24,6 +25,7 @@ const JsonEdit = ({
   visible,
   backButtonLabel,
   applyButtonLabel,
+  readOnly = false,
   closePanel,
   onSaveJSON,
 }: JsonEditProps) => {
@@ -67,7 +69,7 @@ const JsonEdit = ({
         <div className="flex items-center justify-between">
           {view === 'edit' ? (
             <p>
-              Editing JSON Field: <code>{column}</code>
+              {readOnly ? 'Viewing' : 'Editing'} JSON Field: <code>{column}</code>
             </p>
           ) : (
             <p>
@@ -86,10 +88,11 @@ const JsonEdit = ({
       onCancel={closePanel}
       customFooter={
         <ActionBar
+          hideApply={readOnly}
           closePanel={closePanel}
           backButtonLabel={backButtonLabel}
           applyButtonLabel={applyButtonLabel}
-          applyFunction={validateJSON}
+          applyFunction={readOnly ? undefined : validateJSON}
         />
       }
     >
@@ -98,7 +101,11 @@ const JsonEdit = ({
           <div className="mt-4 flex flex-auto flex-col space-y-4">
             {view === 'edit' ? (
               <div className="h-[500px] w-full flex-grow border dark:border-dark">
-                <JsonEditor onInputChange={onInputChange} defaultValue={jsonStr.toString()} />
+                <JsonEditor
+                  readOnly={readOnly}
+                  onInputChange={onInputChange}
+                  defaultValue={jsonStr.toString()}
+                />
               </div>
             ) : (
               <DrilldownViewer jsonData={tryParseJson(jsonStr)} />

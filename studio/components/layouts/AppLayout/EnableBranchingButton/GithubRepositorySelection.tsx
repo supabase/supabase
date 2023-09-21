@@ -52,6 +52,12 @@ const GithubRepositorySelection = ({
   const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') ?? []
 
   const sidePanels = useSidePanelsStateSnapshot()
+  const githubIntegrationAppUrl =
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
+      ? ' https://github.com/apps/supabase'
+      : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+      ? 'https://github.com/apps/supabase-staging'
+      : 'https://github.com/apps/supabase-local-testing'
 
   const {
     data: githubBranches,
@@ -91,7 +97,7 @@ const GithubRepositorySelection = ({
               : 'Your database preview branches will be based on the branches in the Git repository that your project is connected with.'}
           </p>
           {!hasGithubIntegrationInstalled && (
-            <Link passHref href="/">
+            <Link passHref href={githubIntegrationAppUrl}>
               <a target="_blank" rel="noreferrer">
                 <Button type="default" className="!mt-3">
                   Install Github Integration
