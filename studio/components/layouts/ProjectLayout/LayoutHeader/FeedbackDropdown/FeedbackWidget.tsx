@@ -132,7 +132,7 @@ const FeedbackWidget = ({
       <Input.TextArea
         className="w-80 p-3"
         size="small"
-        placeholder="Ideas on how to improve this page.&#10;Use the Support Form for technical issues."
+        placeholder="Ideas on how to improve Supabase.&#10;Use the Support Form for technical issues."
         rows={5}
         value={feedback}
         onChange={onFeedbackChange}
