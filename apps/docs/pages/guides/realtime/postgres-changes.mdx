@@ -197,7 +197,7 @@ In this example we'll set up a database table, secure it with Row Level Security
 
 You can use the Supabase client libraries to subscribe to database changes.
 
-### Listeniing to specific schemas
+### Listening to specific schemas
 
 Subscribe to specific schema events using the `schema` parameter:
 
@@ -505,7 +505,7 @@ const channel = supabase
 
 This filter uses Postgres's `= ANY`. Realtime allows a maximum of 100 values for this filter.
 
-## Receiveing `old` records
+## Receiving `old` records
 
 By default, only `new` record changes are sent but if you want to receive the `old` record (previous values) whenever you `UPDATE` or `DELETE` a record, you can set the `replica identity` of your table to `full`:
 
