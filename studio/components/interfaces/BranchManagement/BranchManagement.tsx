@@ -159,15 +159,8 @@ const BranchManagement = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <div className="col-span-12">
-            <h3 className="text-xl mb-8">Branch Manager</h3>
-            <div className="mb-6 flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Input placeholder="Search branch" size="small" icon={<IconSearch />} />
-              </div>
-              <Button type="default" onClick={() => setShowCreateBranch(true)}>
-                Create preview branch
-              </Button>
-            </div>
+            <h3 className="text-xl mb-8">Branches</h3>
+
             <div className="">
               {isLoadingIntegrations && <GenericSkeletonLoader />}
               {isErrorIntegrations && (
@@ -181,6 +174,7 @@ const BranchManagement = () => {
                   <MainBranchPanel
                     repo={githubConnection?.metadata.name}
                     branch={mainBranch}
+                    onSelectCreateBranch={() => setShowCreateBranch(true)}
                     onSelectDisableBranching={() => setShowDisableBranching(true)}
                   />
                   <PullRequests
