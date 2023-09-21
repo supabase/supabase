@@ -74,7 +74,6 @@ export const generateDatabaseMenu = (
           key: 'wrappers',
           url: `/project/${ref}/database/wrappers`,
           items: [],
-          label: 'ALPHA',
         },
         ...(IS_PLATFORM
           ? [
