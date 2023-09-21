@@ -10,6 +10,7 @@ import { rlsAcknowledgedKey } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useCheckPermissions, useStore } from 'hooks'
+import { MousePointer2 } from 'lucide-react'
 
 export interface GridHeaderActionsProps {
   table: PostgresTable
@@ -165,15 +166,13 @@ const GridHeaderActions = ({
             </a>
           </Link>
         )}
-
         <Button
           type="default"
           icon={
-            isRealtimeEnabled ? (
-              <IconZap className="text-brand" strokeWidth={1.5} />
-            ) : (
-              <IconZapOff />
-            )
+            <MousePointer2
+              size={14}
+              className={isRealtimeEnabled ? 'text-brand' : 'text-lighter'}
+            />
           }
           onClick={() => setShowEnableRealtime(true)}
         >
@@ -198,7 +197,8 @@ const GridHeaderActions = ({
       >
         <Modal.Content className="py-4 space-y-2">
           <p className="text-sm">
-            Once realtime has been {isRealtimeEnabled ? 'disabled' : 'enabled'}, the table will {isRealtimeEnabled ? 'no longer ' : ''}broadcast any changes to authorized subscribers.
+            Once realtime has been {isRealtimeEnabled ? 'disabled' : 'enabled'}, the table will{' '}
+            {isRealtimeEnabled ? 'no longer ' : ''}broadcast any changes to authorized subscribers.
           </p>
           {!isRealtimeEnabled && (
             <p className="text-sm">
