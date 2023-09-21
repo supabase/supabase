@@ -17,7 +17,7 @@ function DarkModeToggle({ disabled = false }: { disabled?: boolean }) {
                   isDarkMode ? 'bg-scale-500' : 'bg-scale-900'
                 } ${disabled && '!cursor-not-allowed'} mx-5
               `}
-        onClick={() => toggleTheme()}
+        onClick={() => toggleTheme(!isDarkMode)} // Pass the current isDarkMode value as an argument
       >
         <span className="sr-only">Toggle Themes</span>
         <span
