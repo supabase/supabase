@@ -42,7 +42,7 @@ const Privileges = ({
     <div className="col-span-12">
       <div className="flex items-center justify-between mb-6 gap-12">
         <div>
-          <h3 className="mb-1 text-xl">Column-level Privilages</h3>
+          <h3 className="mb-1 text-xl">Column-level privileges</h3>
 
           <div className="text-sm text-lighter">
             <p>Grant or revoke privileges on a column based on user role.</p>
@@ -82,7 +82,7 @@ const Privileges = ({
       {selectedTable && (
         <p className="text-xs text-right text-light">
           <strong>Warning: </strong>
-          Changing column privilages can break existing queries
+          Changing column privileges can break existing queries
         </p>
       )}
     </div>

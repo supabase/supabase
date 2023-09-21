@@ -408,26 +408,26 @@ const ColumnEditor = ({
           </FormSection>
           <SidePanel.Separator />
 
-          {/* TODO: need to pull column privilages in here
-          if any columns are using column-level privilages, show this warning */}
+          {/* TODO: need to pull column privileges in here
+          if any columns are using column-level privileges, show this warning */}
           <FormSection
             header={
-              <FormSectionLabel className="lg:!col-span-4">Column privilages</FormSectionLabel>
+              <FormSectionLabel className="lg:!col-span-4">Column privileges</FormSectionLabel>
             }
           >
             <FormSectionContent loading={false} className="lg:!col-span-8">
               <Alert_Shadcn_ variant="warning">
                 <IconAlertTriangle strokeWidth={2} />
-                <AlertTitle_Shadcn_>This table uses column-privilages</AlertTitle_Shadcn_>
+                <AlertTitle_Shadcn_>This table uses column-privileges</AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
                   <p>
-                    Several columns in this table have column-level privilages. This new column will
-                    have privilages set to on by default.
+                    Several columns in this table have column-level privileges. This new column will
+                    have privileges set to on by default.
                   </p>
                   <p className="mt-3">
                     <Link href={`/project/${ref}/database/privileges`} passHref>
                       <Button asChild type="default" size="tiny">
-                        <a>Column-level Privilages</a>
+                        <a>Column-level privileges</a>
                       </Button>
                     </Link>
                   </p>
