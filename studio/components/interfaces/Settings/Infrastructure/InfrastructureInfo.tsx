@@ -65,8 +65,8 @@ const InfrastructureInfo = () => {
         </ScaffoldSection>
         <ScaffoldSection className="!pt-0">
           <ScaffoldSectionDetail>
-            <p>Postgres</p>
-            <p className="text-scale-1000 text-sm">Information on your Postgres instance</p>
+            <p>Service Versions</p>
+            <p className="text-scale-1000 text-sm">Information on your provisioned instance</p>
           </ScaffoldSectionDetail>
           <ScaffoldSectionContent>
             {isLoadingUpgradeEligibility && <GenericSkeletonLoader />}
@@ -78,8 +78,20 @@ const InfrastructureInfo = () => {
                 <Input
                   readOnly
                   disabled
+                  label="GoTrue version"
+                  value={project?.serviceVersions?.gotrue ?? ''}
+                />
+                <Input
+                  readOnly
+                  disabled
+                  label="PostgREST version"
+                  value={project?.serviceVersions?.postgrest ?? ''}
+                />
+                <Input
+                  readOnly
+                  disabled
                   value={currentPgVersion}
-                  label="Current version"
+                  label="Postgres version"
                   actions={[
                     isOnLatestVersion && (
                       <Tooltip.Root key="tooltip-latest" delayDuration={0}>

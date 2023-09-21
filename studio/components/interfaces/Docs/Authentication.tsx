@@ -1,8 +1,16 @@
 import Link from 'next/link'
-import Snippets from '../Snippets'
-import CodeSnippet from '../CodeSnippet'
 
-export default function Authentication({ autoApiService, selectedLang, showApiKey }) {
+import { AutoApiService } from 'data/config/project-api-query'
+import CodeSnippet from './CodeSnippet'
+import Snippets from './Snippets'
+
+interface AuthenticationProps {
+  autoApiService: AutoApiService
+  selectedLang: 'bash' | 'js'
+  showApiKey: string
+}
+
+const Authentication = ({ autoApiService, selectedLang, showApiKey }: AuthenticationProps) => {
   // [Joshen] ShowApiKey should really be a boolean, its confusing
   const defaultApiKey =
     showApiKey !== 'SUPABASE_KEY'
@@ -101,3 +109,5 @@ export default function Authentication({ autoApiService, selectedLang, showApiKe
     </>
   )
 }
+
+export default Authentication

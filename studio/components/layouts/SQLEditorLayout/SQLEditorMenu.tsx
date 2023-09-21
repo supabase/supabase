@@ -56,7 +56,9 @@ const SideBarContent = observer(() => {
   }, [projectSnippets, projectSnippetsFilterString])
 
   const personalSnippets = useMemo(() => {
-    const ss = snippets.filter((snippet) => snippet.visibility === 'user')
+    const ss = snippets.filter(
+      (snippet) => snippet.visibility === 'user' && !snippet.content.favorite
+    )
 
     if (personalSnippetsFilterString.length > 0) {
       return ss.filter((tab) =>
@@ -350,7 +352,9 @@ const SideBarContent = observer(() => {
                   </div>
                 ) : (
                   <div className="text text-sm h-32 border border-dashed flex flex-col gap-3 items-center justify-center px-3 mx-3 rounded">
-                    <span className="text-lighter">No queries found</span>
+                    {filteredFavoriteSnippets.length === 0 && (
+                      <span className="text-lighter">No queries found</span>
+                    )}
                     <Button type="default" onClick={() => handleNewQuery()}>
                       New Query
                     </Button>

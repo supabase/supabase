@@ -2,6 +2,7 @@ import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
+import { Modal } from 'ui'
 
 import { Dictionary } from 'components/grid'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -13,7 +14,6 @@ import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-muta
 import { tableKeys } from 'data/tables/keys'
 import { useStore, useUrlState } from 'hooks'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { Modal } from 'ui'
 import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
 import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
@@ -26,6 +26,7 @@ import {
 import { ImportContent } from './TableEditor/TableEditor.types'
 
 export interface SidePanelEditorProps {
+  editable?: boolean
   selectedTable?: PostgresTable
   onRowCreated?: (row: Dictionary<any>) => void
   onRowUpdated?: (row: Dictionary<any>, idx: number) => void
@@ -37,6 +38,7 @@ export interface SidePanelEditorProps {
 }
 
 const SidePanelEditor = ({
+  editable = true,
   selectedTable,
   onRowCreated = noop,
   onRowUpdated = noop,
@@ -558,6 +560,7 @@ const SidePanelEditor = ({
         jsonString={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.jsonString) || ''}
         backButtonLabel="Cancel"
         applyButtonLabel="Save changes"
+        readOnly={!editable}
         closePanel={onClosePanel}
         onSaveJSON={onSaveJSON}
       />
@@ -585,8 +588,8 @@ const SidePanelEditor = ({
       />
       <ConfirmationModal
         visible={isClosingPanel}
-        header="Confirm to close"
-        buttonLabel="Confirm"
+        header="Discard changes"
+        buttonLabel="Discard"
         onSelectCancel={() => setIsClosingPanel(false)}
         onSelectConfirm={() => {
           setIsClosingPanel(false)

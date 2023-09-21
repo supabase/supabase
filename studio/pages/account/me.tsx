@@ -11,9 +11,12 @@ import { useStore } from 'hooks'
 import { useSession } from 'lib/auth'
 import { useProfile } from 'lib/profile'
 import { NextPageWithLayout } from 'types'
-import { Button, IconMoon, IconSun, Input, Listbox } from 'ui'
+import { Button, IconMoon, IconSun, Input, Listbox, Toggle } from 'ui'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import AlertError from 'components/ui/AlertError'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useEffect, useState } from 'react'
+import { useAppStateSnapshot } from 'state/app-state'
 
 const User: NextPageWithLayout = () => {
   return (
@@ -112,6 +115,10 @@ const ProfileCard = observer(() => {
       <section>
         <ThemeSettings />
       </section>
+
+      <section>
+        <AnalyticsSettings />
+      </section>
     </article>
   )
 })
@@ -191,6 +198,28 @@ const ThemeSettings = observer(() => {
             Light
           </Listbox.Option>
         </Listbox>
+      </Panel.Content>
+    </Panel>
+  )
+})
+
+const AnalyticsSettings = observer(() => {
+  const snap = useAppStateSnapshot()
+
+  const onToggleOptIn = () => {
+    const value = !snap.isOptedInTelemetry ? 'true' : 'false'
+    snap.setIsOptedInTelemetry(value === 'true')
+  }
+
+  return (
+    <Panel title={<h5 key="panel-title">Analytics</h5>}>
+      <Panel.Content>
+        <Toggle
+          checked={snap.isOptedInTelemetry}
+          onChange={onToggleOptIn}
+          label="Opt-in to send telemetry data from the dashboard"
+          descriptionText="By opting into sending telemetry data, Supabase can improve the overall dashboard user experience"
+        />
       </Panel.Content>
     </Panel>
   )

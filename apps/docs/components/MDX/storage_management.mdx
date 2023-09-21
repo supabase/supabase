@@ -66,7 +66,7 @@ begin
   if coalesce(old.avatar_url, '') <> ''
       and (tg_op = 'DELETE' or (old.avatar_url <> new.avatar_url)) then
     -- extract avatar name
-    avatar_name := substring(old.avatar_url from '/([^\/]+)\?.*$');
+    avatar_name := old.avatar_url;
     select
       into status, content
       result.status, result.content
