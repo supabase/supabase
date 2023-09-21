@@ -23,6 +23,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useFlag, useProjectByRef } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH } from 'lib/constants'
+import { getSemanticVersion } from 'lib/helpers'
 import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {
   Alert,
@@ -53,8 +54,7 @@ const Addons = () => {
 
   const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
   // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
-  // const sufficientPgVersion = getSemanticVersion(selectedProject?.dbVersion ?? '') >= 141044
-  const sufficientPgVersion = false
+  const sufficientPgVersion = getSemanticVersion(selectedProject?.dbVersion ?? '') >= 141044
 
   // [Joshen] We could possibly look into reducing the interval to be more "realtime"
   // I tried setting the interval to 1m but no data was returned, may need to experiment

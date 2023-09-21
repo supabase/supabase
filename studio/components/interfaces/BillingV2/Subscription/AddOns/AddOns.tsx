@@ -2,7 +2,15 @@ import { useParams, useTheme } from 'common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { Alert, Button, IconChevronRight, IconExternalLink } from 'ui'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconChevronRight,
+  IconExternalLink,
+} from 'ui'
 
 import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import {
@@ -20,8 +28,9 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useFlag } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH } from 'lib/constants'
+import { getSemanticVersion } from 'lib/helpers'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { getAddons, getSemanticVersion } from '../Subscription.utils'
+import { getAddons } from '../Subscription.utils'
 
 const AddOns = () => {
   const { isDarkMode } = useTheme()
@@ -35,7 +44,6 @@ const AddOns = () => {
 
   // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
   const sufficientPgVersion = getSemanticVersion(selectedProject?.dbVersion ?? '') >= 141044
-  console.log({ sufficientPgVersion })
 
   // [Joshen] We could possibly look into reducing the interval to be more "realtime"
   // I tried setting the interval to 1m but no data was returned, may need to experiment
@@ -313,19 +321,39 @@ const AddOns = () => {
                       ? `Point in time recovery of ${pitr.variant.meta?.backup_duration_days} days is enabled`
                       : 'Point in time recovery is not enabled'}
                   </p>
-                  <ProjectUpdateDisabledTooltip
-                    projectUpdateDisabled={projectUpdateDisabled}
-                    projectNotActive={!isProjectActive}
-                  >
-                    <Button
-                      type="default"
-                      className="mt-2 pointer-events-auto"
-                      onClick={() => snap.setPanelKey('pitr')}
-                      disabled={!isProjectActive || projectUpdateDisabled}
+                  {!sufficientPgVersion ? (
+                    <Alert_Shadcn_ className="mt-2">
+                      <AlertTitle_Shadcn_>
+                        Your project is too old to be able to enable PITR for
+                      </AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        <p className="text-sm leading-normal mb-2">
+                          Reach out to us via support if you're interested
+                        </p>
+                        <Link
+                          href={`/support/new?ref=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
+                        >
+                          <a>
+                            <Button type="default">Contact support</Button>
+                          </a>
+                        </Link>
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  ) : (
+                    <ProjectUpdateDisabledTooltip
+                      projectUpdateDisabled={projectUpdateDisabled}
+                      projectNotActive={!isProjectActive}
                     >
-                      Change point in time recovery
-                    </Button>
-                  </ProjectUpdateDisabledTooltip>
+                      <Button
+                        type="default"
+                        className="mt-2 pointer-events-auto"
+                        onClick={() => snap.setPanelKey('pitr')}
+                        disabled={!isProjectActive || projectUpdateDisabled || !sufficientPgVersion}
+                      >
+                        Change point in time recovery
+                      </Button>
+                    </ProjectUpdateDisabledTooltip>
+                  )}
                 </div>
               </div>
 
