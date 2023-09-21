@@ -13,13 +13,13 @@ import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from 'lib/constants'
 import Meta from '~/components/Favicons'
 import { post } from '~/lib/fetchWrapper'
 import PortalToast from 'ui/src/layout/PortalToast'
-import { AuthProvider, ThemeProvider, useConsent, useTelemetryProps } from 'common'
+import { AuthProvider, ThemeProvider, useTelemetryConsent, useTelemetryProps } from 'common'
 import { handleYTConsent } from '../lib/consent'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
-  const { consentValue, hasAcceptedConsent } = useConsent()
+  const { consentValue, hasAcceptedConsent } = useTelemetryConsent()
 
   handleYTConsent()
 

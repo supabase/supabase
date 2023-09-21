@@ -1,19 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import ConsentToast from 'ui/src/components/ConsentToast'
+import { isBrowser } from '../helpers'
 
 // Use with PortalToast from 'ui/src/layout/PortalToast'
-export const useConsent = () => {
+export const useTelemetryConsent = () => {
   const consentToastId = useRef<string>()
-  const isClient = typeof window !== 'undefined'
-  if (!isClient) return {}
+  if (!isBrowser) return {}
   const TELEMETRY_CONSENT = 'supabase-consent'
   const [consentValue, setConsentValue] = useState<string | null>(
     localStorage?.getItem(TELEMETRY_CONSENT)
   )
 
   const handleConsent = (value: 'true' | 'false') => {
-    if (!isClient) return
+    if (!isBrowser) return
     setConsentValue(value)
     localStorage.setItem(TELEMETRY_CONSENT, value)
 
@@ -21,7 +21,7 @@ export const useConsent = () => {
   }
 
   useEffect(() => {
-    if (isClient && consentValue === null) {
+    if (isBrowser && consentValue === null) {
       consentToastId.current = toast(
         <ConsentToast
           onAccept={() => handleConsent('true')}

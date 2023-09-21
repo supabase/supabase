@@ -68,6 +68,7 @@ export * from './src/components/Command'
 
 // Widgets
 export * from './src/components/CountdownWidget'
+export * from './src/components/IFrameWithConsent'
 
 // layout
 export * from './src/components/LoadingLine'
