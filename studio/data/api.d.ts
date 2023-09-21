@@ -89,10 +89,6 @@ export interface paths {
     /** Gets project backups */
     get: operations["BackupsController_getBackups"];
   };
-  "/platform/database/{ref}/backups/download": {
-    /** Download project backup */
-    post: operations["BackupsController_downloadBackup"];
-  };
   "/platform/database/{ref}/backups/restore": {
     /** Restore project backup */
     post: operations["BackupsController_restoreBackup"];
@@ -829,6 +825,10 @@ export interface paths {
     /** Updates a project's health status. */
     put: operations["HealthReportingController_updateStatus"];
   };
+  "/system/projects/{ref}/ha-events": {
+    /** Records an HA event */
+    put: operations["HaEventsController_updateStatus"];
+  };
   "/system/projects/{ref}/credentials/aws": {
     /** Allows a project to obtain temporary credentials. */
     post: operations["AwsCredentialsController_getTemporaryCredentials"];
@@ -856,6 +856,14 @@ export interface paths {
   "/system/projects/{ref}/config/update-jwt/complete": {
     /** Handle update project jwt on completion */
     post: operations["ProjectUpdateJwtController_completeUpdateJwt"];
+  };
+  "/system/projects": {
+    /** Create a project */
+    post: operations["ProjectsController_createProject"];
+  };
+  "/system/organizations/{slug}/usage": {
+    /** Gets usage stats */
+    get: operations["OrgUsageSystemController_getDailyStats"];
   };
   "/system/integrations/vercel/webhooks": {
     /** Processes Vercel event */
@@ -924,10 +932,6 @@ export interface paths {
   "/v0/database/{ref}/backups": {
     /** Gets project backups */
     get: operations["BackupsController_getBackups"];
-  };
-  "/v0/database/{ref}/backups/download": {
-    /** Download project backup */
-    post: operations["BackupsController_downloadBackup"];
   };
   "/v0/database/{ref}/backups/restore": {
     /** Restore project backup */
@@ -1536,6 +1540,10 @@ export interface paths {
     /** Enables Database Webhooks on the project */
     post: operations["V1DatabaseWebhooksController_v1EnableDatabaseWebhooks"];
   };
+  "/v1/projects/{ref}/database/backups/restore-pitr": {
+    /** List members of an organization */
+    post: operations["V1RestorePitrController_v1RestorePitr"];
+  };
   "/v1/projects/{ref}/functions": {
     /**
      * List all functions 
@@ -1581,13 +1589,10 @@ export interface paths {
     /** Create an organization */
     post: operations["OrganizationsController_createOrganization"];
   };
-<<<<<<< HEAD
-=======
   "/v1/organizations/{slug}/members": {
     /** List members of an organization */
     get: operations["V1OrganizationMembersController_v1ListOrganizationMembers"];
   };
->>>>>>> @{-1}
   "/v1/oauth/authorize": {
     /** Authorize user through oauth */
     get: operations["OAuthController_authorize"];
@@ -1596,8 +1601,6 @@ export interface paths {
     /** Exchange auth code for user's access and refresh token */
     post: operations["OAuthController_token"];
   };
-<<<<<<< HEAD
-=======
   "/v1/snippets": {
     /** Lists SQL snippets for the logged in user */
     get: operations["SnippetsController_listSnippets"];
@@ -1606,7 +1609,6 @@ export interface paths {
     /** Gets a specific SQL snippet */
     get: operations["SnippetsController_getSnippet"];
   };
->>>>>>> @{-1}
 }
 
 export type webhooks = Record<string, never>;
@@ -1742,6 +1744,8 @@ export interface components {
       SMS_VONAGE_API_SECRET: string;
       SMS_VONAGE_FROM: string;
       SMS_TEMPLATE: string;
+      SMS_TEST_OTP: string;
+      SMS_TEST_OTP_VALID_UNTIL: string;
       EXTERNAL_APPLE_ENABLED: boolean;
       EXTERNAL_APPLE_CLIENT_ID: string;
       EXTERNAL_APPLE_SECRET: string;
@@ -1852,11 +1856,8 @@ export interface components {
       SMS_PROVIDER?: string;
       SMS_MESSAGEBIRD_ACCESS_KEY?: string;
       SMS_MESSAGEBIRD_ORIGINATOR?: string;
-<<<<<<< HEAD
-=======
       SMS_TEST_OTP?: string;
       SMS_TEST_OTP_VALID_UNTIL?: string;
->>>>>>> @{-1}
       SMS_TEXTLOCAL_API_KEY?: string;
       SMS_TEXTLOCAL_SENDER?: string;
       SMS_TWILIO_ACCOUNT_SID?: string;
@@ -1991,6 +1992,8 @@ export interface components {
       SMS_VONAGE_API_SECRET: string;
       SMS_VONAGE_FROM: string;
       SMS_TEMPLATE: string;
+      SMS_TEST_OTP: string;
+      SMS_TEST_OTP_VALID_UNTIL: string;
       EXTERNAL_APPLE_ENABLED: boolean;
       EXTERNAL_APPLE_CLIENT_ID: string;
       EXTERNAL_APPLE_SECRET: string;
@@ -2113,18 +2116,6 @@ export interface components {
         earliestPhysicalBackupDateUnix?: number;
         latestPhysicalBackupDateUnix?: number;
       };
-    };
-    DownloadBackupBody: {
-      id: number;
-      data: Record<string, never>;
-      inserted_at: string;
-      project_id: number;
-      s3_bucket: string;
-      s3_path: string;
-      status: string;
-    };
-    DownloadBackupResponse: {
-      fileUrl: string;
     };
     RestoreLogicalBackupBody: {
       id: number;
@@ -3123,6 +3114,7 @@ export interface components {
        * @enum {string}
        */
       region: "us-east-1" | "us-west-1" | "us-west-2" | "ap-southeast-1" | "ap-northeast-1" | "ap-northeast-2" | "ap-southeast-2" | "eu-west-1" | "eu-west-2" | "eu-west-3" | "eu-central-1" | "ca-central-1" | "ap-south-1" | "sa-east-1";
+      /** @deprecated */
       kps_enabled?: boolean;
     };
     CreateProjectResponse: {
@@ -3253,9 +3245,6 @@ export interface components {
     };
     UpdateProjectBody: {
       name: string;
-    };
-    RestoreProjectBody: {
-      kps_enabled?: boolean;
     };
     BackupId: {
       id: number;
@@ -4006,6 +3995,10 @@ export interface components {
       value: string;
     };
     CreateSecretBody: {
+      /**
+       * @description Secret name must not start with the SUPABASE_ prefix. 
+       * @example string
+       */
       name: string;
       value: string;
     };
@@ -4013,6 +4006,11 @@ export interface components {
       /** @enum {string} */
       status: "ACTIVE_HEALTHY" | "ACTIVE_UNHEALTHY" | "COMING_UP" | "GOING_DOWN" | "INACTIVE" | "INIT_FAILED" | "REMOVED" | "RESTORING" | "UNKNOWN" | "UPGRADING" | "PAUSING";
       reportingToken: string;
+    };
+    EventBody: {
+      reportingToken: string;
+      eventType: string;
+      message: string;
     };
     CredentialsRequestBody: {
       projectToken: string;
@@ -4045,6 +4043,14 @@ export interface components {
       payment_method_id?: string;
       existing_org_subscription_id?: string;
       dryRun?: boolean;
+      force?: boolean;
+      billing_cycle_anchor?: string;
+    };
+    DatabaseResponse: {
+      /** @description Database host */
+      host: string;
+      /** @description Database version */
+      version: string;
     };
     GetMetricsBody: {
       /** @enum {string} */
@@ -4086,12 +4092,6 @@ export interface components {
       git_branch?: string;
       created_at: string;
       updated_at: string;
-    };
-    DatabaseResponse: {
-      /** @description Database host */
-      host: string;
-      /** @description Database version */
-      version: string;
     };
     ApiKeyResponse: {
       name: string;
@@ -4305,6 +4305,9 @@ export interface components {
       created_at?: string;
       updated_at?: string;
     };
+    V1RestorePitrBody: {
+      recovery_time_target_unix: number;
+    };
     FunctionSlugResponse: {
       id: string;
       slug: string;
@@ -4319,15 +4322,12 @@ export interface components {
       entrypoint_path?: string;
       import_map_path?: string;
     };
-<<<<<<< HEAD
-=======
     V1OrganizationMemberResponse: {
       user_id: string;
       user_name: string;
       email?: string;
       role_name: string;
     };
->>>>>>> @{-1}
     OAuthTokenBody: {
       /** @enum {string} */
       grant_type: "authorization_code" | "refresh_token";
@@ -4345,8 +4345,6 @@ export interface components {
       refresh_token: string;
       expires_in: number;
     };
-<<<<<<< HEAD
-=======
     SnippetProject: {
       id: number;
       name: string;
@@ -4392,7 +4390,6 @@ export interface components {
       updated_by: components["schemas"]["SnippetUser"];
       content: components["schemas"]["SnippetContent"];
     };
->>>>>>> @{-1}
   };
   responses: never;
   parameters: never;
@@ -4789,29 +4786,6 @@ export interface operations {
       500: never;
     };
   };
-  /** Download project backup */
-  BackupsController_downloadBackup: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["DownloadBackupBody"];
-      };
-    };
-    responses: {
-      201: {
-        content: {
-          "application/json": components["schemas"]["DownloadBackupResponse"];
-        };
-      };
-      /** @description Failed to download project backup */
-      500: never;
-    };
-  };
   /** Restore project backup */
   BackupsController_restoreBackup: {
     parameters: {
@@ -4826,11 +4800,7 @@ export interface operations {
       };
     };
     responses: {
-      201: {
-        content: {
-          "application/json": Record<string, never>;
-        };
-      };
+      201: never;
       /** @description Failed to restore project backup */
       500: never;
     };
@@ -4849,11 +4819,7 @@ export interface operations {
       };
     };
     responses: {
-      201: {
-        content: {
-          "application/json": Record<string, never>;
-        };
-      };
+      201: never;
       /** @description Failed to restore project with physical backup */
       500: never;
     };
@@ -4872,11 +4838,7 @@ export interface operations {
       };
     };
     responses: {
-      201: {
-        content: {
-          "application/json": Record<string, never>;
-        };
-      };
+      201: never;
       /** @description Failed to restore project to a previous point in time */
       500: never;
     };
@@ -7491,11 +7453,7 @@ export interface operations {
       };
     };
     responses: {
-      201: {
-        content: {
-          "application/json": Record<string, never>;
-        };
-      };
+      201: never;
       /** @description Failed to pause the project */
       500: never;
     };
@@ -7597,11 +7555,6 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string;
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RestoreProjectBody"];
       };
     };
     responses: {
@@ -9194,6 +9147,25 @@ export interface operations {
       500: never;
     };
   };
+  /** Records an HA event */
+  HaEventsController_updateStatus: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EventBody"];
+      };
+    };
+    responses: {
+      200: never;
+      /** @description Failed to record HA event. */
+      500: never;
+    };
+  };
   /** Allows a project to obtain temporary credentials. */
   AwsCredentialsController_getTemporaryCredentials: {
     parameters: {
@@ -9287,6 +9259,24 @@ export interface operations {
     };
     responses: {
       201: never;
+    };
+  };
+  /** Gets usage stats */
+  OrgUsageSystemController_getDailyStats: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string;
+      };
+    };
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["OrgUsageResponse"];
+        };
+      };
+      /** @description Failed to get usage stats */
+      500: never;
     };
   };
   /** Processes Vercel event */
@@ -10289,6 +10279,23 @@ export interface operations {
       500: never;
     };
   };
+  /** List members of an organization */
+  V1RestorePitrController_v1RestorePitr: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["V1RestorePitrBody"];
+      };
+    };
+    responses: {
+      201: never;
+    };
+  };
   /**
    * Retrieve a function 
    * @description Retrieves a function with the specified slug and project.
@@ -10408,8 +10415,6 @@ export interface operations {
       500: never;
     };
   };
-<<<<<<< HEAD
-=======
   /** List members of an organization */
   V1OrganizationMembersController_v1ListOrganizationMembers: {
     parameters: {
@@ -10425,7 +10430,6 @@ export interface operations {
       };
     };
   };
->>>>>>> @{-1}
   /** Authorize user through oauth */
   OAuthController_authorize: {
     parameters: {
@@ -10459,8 +10463,6 @@ export interface operations {
       };
     };
   };
-<<<<<<< HEAD
-=======
   /** Lists SQL snippets for the logged in user */
   SnippetsController_listSnippets: {
     parameters: {
@@ -10495,5 +10497,4 @@ export interface operations {
       500: never;
     };
   };
->>>>>>> @{-1}
 }
