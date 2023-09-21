@@ -1,12 +1,12 @@
 import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
-import { find, isUndefined, noop } from 'lodash'
+import { find, isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
+import { useParams } from 'common'
 import {
   Dictionary,
   SupaTable,
@@ -16,6 +16,7 @@ import {
 } from 'components/grid'
 import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import Connecting from 'components/ui/Loading/Loading'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import {
@@ -26,83 +27,39 @@ import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { sqlKeys } from 'data/sql/keys'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
-import { useCheckPermissions, useStore, useUrlState } from 'hooks'
+import { useCheckPermissions, useLatest, useStore, useUrlState } from 'hooks'
 import useEntityType from 'hooks/misc/useEntityType'
+import { TableLike } from 'hooks/misc/useTable'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { EMPTY_ARR } from 'lib/void'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SchemaView } from 'types'
 import APIDocumentationPanel from './APIDocumentationPanel'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor'
-import { ForeignRowSelectorProps } from './SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
-import { JsonEditValue } from './SidePanelEditor/RowEditor/RowEditor.types'
 import TableDefinition from './TableDefinition'
 
 export interface TableGridEditorProps {
   /** Theme for the editor */
   theme?: 'dark' | 'light'
 
-  selectedSchema?: string
-  selectedTable: any // PostgresTable | SchemaView
-
-  /** Determines what side panel editor to show */
-  sidePanelKey?: 'row' | 'column' | 'table' | 'json' | 'foreign-row-selector' | 'csv-import'
-  /** Toggles if we're duplicating a table */
-  isDuplicating: boolean
-  /** Selected entities if we're editing a row, column or table */
-  selectedRowToEdit?: Dictionary<any>
-  selectedColumnToEdit?: PostgresColumn
-  selectedTableToEdit?: PostgresTable
-  selectedValueForJsonEdit?: JsonEditValue
-  selectedForeignKeyToEdit?: {
-    foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
-    row: any
-    column: any
-  }
-
-  onAddRow: () => void
-  onEditRow: (row: Dictionary<any>) => void
-  onAddColumn: () => void
-  onEditColumn: (column: PostgresColumn) => void
-  onDeleteColumn: (column: PostgresColumn) => void
-  onExpandJSONEditor: (column: string, row: any) => void
-  onEditForeignKeyColumnValue: (args: {
-    foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
-    row: any
-    column: any
-  }) => void
-  onClosePanel: () => void
-  onImportData: () => void
+  isLoadingSelectedTable?: boolean
+  selectedTable?: TableLike
 }
 
 const TableGridEditor = ({
   theme = 'dark',
-
-  selectedSchema,
+  isLoadingSelectedTable = false,
   selectedTable,
-  sidePanelKey,
-  isDuplicating,
-  selectedRowToEdit,
-  selectedColumnToEdit,
-  selectedTableToEdit,
-  selectedValueForJsonEdit,
-  selectedForeignKeyToEdit,
-
-  onAddRow = noop,
-  onEditRow = noop,
-  onAddColumn = noop,
-  onEditColumn = noop,
-  onDeleteColumn = noop,
-  onExpandJSONEditor = noop,
-  onEditForeignKeyColumnValue = noop,
-  onClosePanel = noop,
-  onImportData = noop,
 }: TableGridEditorProps) => {
+  const { project } = useProjectContext()
+  const snap = useTableEditorStateSnapshot()
   const { meta, ui, vault } = useStore()
   const router = useRouter()
   const { ref: projectRef, id } = useParams()
   const gridRef = useRef<SupabaseGridRef>(null)
 
-  const { project } = useProjectContext()
   const [encryptedColumns, setEncryptedColumns] = useState([])
   const [apiPreviewPanelOpen, setApiPreviewPanelOpen] = useState(false)
 
@@ -117,7 +74,6 @@ const TableGridEditor = ({
 
   const canEditTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
   const canEditColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
-
   const isReadOnly = !canEditTables && !canEditColumns
 
   const getEncryptedColumns = async (table: any) => {
@@ -201,34 +157,38 @@ const TableGridEditor = ({
   }, [selectedTable?.id])
 
   const entityType = useEntityType(selectedTable?.id)
+  const columnsRef = useLatest(selectedTable?.columns ?? EMPTY_ARR)
 
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
+  if (isLoadingSelectedTable) {
+    return <Connecting />
+  }
+
   if (isUndefined(selectedTable)) {
     return <NotFoundState id={Number(id)} />
   }
-
-  const tableId = selectedTable?.id
 
   const isViewSelected =
     entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
   const isTableSelected = entityType?.type === ENTITY_TYPE.TABLE
   const isForeignTableSelected = entityType?.type === ENTITY_TYPE.FOREIGN_TABLE
-  const isLocked = meta.excludedSchemas.includes(entityType?.schema ?? '')
+  const isLocked = EXCLUDED_SCHEMAS.includes(entityType?.schema ?? '')
   const canEditViaTableEditor = isTableSelected && !isLocked
 
   // [Joshen] We can tweak below to eventually support composite keys as the data
   // returned from foreignKeyMeta should be easy to deal with, rather than pg-meta
-  const formattedRelationships = (selectedTable?.relationships ?? []).map(
-    (relationship: PostgresRelationship) => {
-      const relationshipMeta = foreignKeyMeta.find(
-        (fk: ForeignKeyConstraint) => fk.id === relationship.id
-      )
-      return {
-        ...relationship,
-        deletion_action: relationshipMeta?.deletion_action ?? FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-      }
+  const formattedRelationships = (
+    ('relationships' in selectedTable && selectedTable.relationships) ||
+    []
+  ).map((relationship: PostgresRelationship) => {
+    const relationshipMeta = foreignKeyMeta.find(
+      (fk: ForeignKeyConstraint) => fk.id === relationship.id
+    )
+    return {
+      ...relationship,
+      deletion_action: relationshipMeta?.deletion_action ?? FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
     }
-  )
+  })
 
   const gridTable =
     !isViewSelected && !isForeignTableSelected
@@ -275,27 +235,31 @@ const TableGridEditor = ({
     }
   }
 
-  const onSelectEditColumn = async (name: string) => {
-    // For some reason, selectedTable here is stale after adding a table
-    // temporary workaround is to list grab the selected table again
-    const tables: PostgresTable[] = meta.tables.list()
-    // @ts-ignore
-    const table = tables.find((table) => table.id === Number(tableId))
-    const column = find(table!.columns, { name }) as PostgresColumn
+  // columns must be accessed via columnsRef.current as these two functions immediately become
+  // stale as they are accessed via some react-tracked madness
+  // [TODO]: refactor out all of react-tracked
+  const onSelectEditColumn = (name: string) => {
+    const column = find(columnsRef.current, { name }) as PostgresColumn
     if (column) {
-      onEditColumn(column)
+      snap.onEditColumn(column)
     } else {
-      console.error(`Unable to find column ${name} in ${table?.name}`)
+      ui.setNotification({
+        category: 'error',
+        message: `Unable to find column ${name} in ${selectedTable?.name}`,
+      })
     }
   }
 
-  const onSelectDeleteColumn = async (name: string) => {
-    // For some reason, selectedTable here is stale after adding a table
-    // temporary workaround is to list grab the selected table again
-    const tables: PostgresTable[] = meta.tables.list()
-    const table = tables.find((table) => table.id === Number(tableId))
-    const column = find(table!.columns, { name }) as PostgresColumn
-    onDeleteColumn(column)
+  const onSelectDeleteColumn = (name: string) => {
+    const column = find(columnsRef.current ?? [], { name }) as PostgresColumn
+    if (column) {
+      snap.onDeleteColumn(column)
+    } else {
+      ui.setNotification({
+        category: 'error',
+        message: `Unable to find column ${name} in ${selectedTable?.name}`,
+      })
+    }
   }
 
   const onError = (error: any) => {
@@ -308,11 +272,14 @@ const TableGridEditor = ({
   const updateTableRow = (previousRow: any, updatedData: any) => {
     if (!project) return
 
-    const enumArrayColumns = selectedTable.columns
-      .filter((column: any) => {
-        return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
-      })
-      .map((column: any) => column.name)
+    const enumArrayColumns =
+      ('columns' in selectedTable &&
+        selectedTable.columns
+          ?.filter((column) => {
+            return (column?.enums ?? []).length > 0 && column.data_type.toLowerCase() === 'array'
+          })
+          .map((column) => column.name)) ||
+      []
 
     const identifiers = {} as Dictionary<any>
     ;(selectedTable as PostgresTable).primary_keys.forEach(
@@ -350,7 +317,7 @@ const TableGridEditor = ({
         theme={theme}
         gridProps={{ height: '100%' }}
         storageRef={projectRef}
-        editable={!isReadOnly && canEditTables && canEditViaTableEditor}
+        editable={!isReadOnly && canEditViaTableEditor}
         schema={selectedTable.schema}
         table={gridTable}
         refreshDocs={refreshDocs}
@@ -384,17 +351,19 @@ const TableGridEditor = ({
             </>
           ) : null
         }
-        onAddColumn={onAddColumn}
+        onAddColumn={snap.onAddColumn}
         onEditColumn={onSelectEditColumn}
         onDeleteColumn={onSelectDeleteColumn}
-        onAddRow={onAddRow}
+        onAddRow={snap.onAddRow}
         updateTableRow={updateTableRow}
-        onEditRow={onEditRow}
-        onImportData={onImportData}
+        onEditRow={snap.onEditRow}
+        onImportData={snap.onImportData}
         onError={onError}
         onSqlQuery={onSqlQuery}
-        onExpandJSONEditor={onExpandJSONEditor}
-        onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
+        onExpandJSONEditor={(column, row) =>
+          snap.onExpandJSONEditor({ column, row, jsonString: JSON.stringify(row[column]) || '' })
+        }
+        onEditForeignKeyColumnValue={snap.onEditForeignKeyColumnValue}
         showCustomChildren={(isViewSelected || isTableSelected) && selectedView === 'definition'}
         customHeader={
           (isViewSelected || isTableSelected) && selectedView === 'definition' ? (
@@ -410,22 +379,14 @@ const TableGridEditor = ({
         {(isViewSelected || isTableSelected) && <TableDefinition id={selectedTable?.id} />}
       </SupabaseGrid>
 
-      {!isUndefined(selectedSchema) && (
+      {snap.selectedSchemaName !== undefined && (
         <SidePanelEditor
-          selectedSchema={selectedSchema}
-          isDuplicating={isDuplicating}
+          editable={!isReadOnly && canEditViaTableEditor}
           selectedTable={selectedTable as PostgresTable}
-          selectedRowToEdit={selectedRowToEdit}
-          selectedColumnToEdit={selectedColumnToEdit}
-          selectedTableToEdit={selectedTableToEdit}
-          selectedValueForJsonEdit={selectedValueForJsonEdit}
-          selectedForeignKeyToEdit={selectedForeignKeyToEdit}
-          sidePanelKey={sidePanelKey}
           onRowCreated={onRowCreated}
           onRowUpdated={onRowUpdated}
           onColumnSaved={onColumnSaved}
           onTableCreated={onTableCreated}
-          closePanel={onClosePanel}
         />
       )}
 

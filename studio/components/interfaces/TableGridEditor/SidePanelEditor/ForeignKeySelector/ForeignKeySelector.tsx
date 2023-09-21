@@ -1,11 +1,18 @@
 import type { PostgresColumn, PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
-import { Dictionary } from 'components/grid'
 import { find, get, isEmpty, sortBy } from 'lodash'
 import { useEffect, useState } from 'react'
+
+import { Dictionary } from 'components/grid'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import InformationBox from 'components/ui/InformationBox'
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useTablesQuery } from 'data/tables/tables-query'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
+  IconAlertCircle,
   IconAlertTriangle,
   IconDatabase,
   IconHelpCircle,
@@ -13,10 +20,6 @@ import {
   Listbox,
   SidePanel,
 } from 'ui'
-
-import InformationBox from 'components/ui/InformationBox'
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
 import { ColumnField } from '../SidePanelEditor.types'
 import { FOREIGN_KEY_CASCADE_OPTIONS } from './ForeignKeySelector.constants'
@@ -46,7 +49,7 @@ const ForeignKeySelector = ({
   closePanel,
   saveChanges,
 }: ForeignKeySelectorProps) => {
-  const { meta } = useStore()
+  const { project } = useProjectContext()
   const [errors, setErrors] = useState<any>({})
   const [selectedForeignKey, setSelectedForeignKey] = useState<ForeignKey>({
     schema: 'public',
@@ -56,10 +59,15 @@ const ForeignKeySelector = ({
     updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
   })
 
-  const schemas = meta.schemas.list()
-  const tables = meta.tables.list(
-    (table: PostgresTable) => table.schema === selectedForeignKey.schema
-  )
+  const { data: schemas } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const { data: tables } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: selectedForeignKey.schema,
+  })
 
   const foreignKey = column?.foreignKey
   const selectedTable: PostgresTable | undefined = find(tables, {
@@ -69,11 +77,6 @@ const ForeignKeySelector = ({
   const selectedColumn: PostgresColumn | undefined = find(selectedTable?.columns ?? [], {
     name: selectedForeignKey?.column,
   })
-
-  useEffect(() => {
-    // make sure the public schemas are loaded initially
-    meta.tables.loadBySchema('public')
-  }, [])
 
   useEffect(() => {
     // Reset the state of the side panel
@@ -101,7 +104,6 @@ const ForeignKeySelector = ({
   }, [visible])
 
   const updateSelectedSchema = (schema: string) => {
-    meta.tables.loadBySchema(schema)
     const updatedForeignKey = {
       schema,
       table: '',
@@ -200,8 +202,7 @@ const ForeignKeySelector = ({
       customFooter={
         <ActionBar
           backButtonLabel="Cancel"
-          // if the type of the two columns don't match, disable the save button
-          disableApply={!matchingColumnTypes}
+          disableApply={!!column?.format && !matchingColumnTypes}
           applyButtonLabel="Save"
           closePanel={closePanel}
           applyFunction={onSaveChanges}
@@ -227,7 +228,7 @@ const ForeignKeySelector = ({
             error={errors.schema}
             onChange={(value: string) => updateSelectedSchema(value)}
           >
-            {schemas.map((schema: PostgresSchema) => {
+            {schemas?.map((schema: PostgresSchema) => {
               return (
                 <Listbox.Option
                   key={schema.id}
@@ -314,21 +315,32 @@ const ForeignKeySelector = ({
                   ))}
                 </Listbox>
               )}
-              {!matchingColumnTypes && (
-                <Alert_Shadcn_ variant="warning">
-                  <IconAlertTriangle strokeWidth={2} />
-                  <AlertTitle_Shadcn_>The column types don't match</AlertTitle_Shadcn_>
+              {!matchingColumnTypes && !column?.format && (
+                <Alert_Shadcn_ variant="default">
+                  <IconAlertCircle className="h-4 w-4" />
+                  <AlertTitle_Shadcn_>
+                    The referenced column's type will be updated to {selectedColumn?.data_type}
+                  </AlertTitle_Shadcn_>
                   <AlertDescription_Shadcn_ className="leading-6">
                     <span>The referenced column</span>
                     {column?.name && <span className="text-code">{column.name}</span>}
-                    {column?.format ? (
-                      <>
-                        <span> is of type </span>
-                        <span className="text-code">{column.format}</span>
-                      </>
-                    ) : (
-                      <span> has no type</span>
-                    )}
+                    <span>
+                      {' '}
+                      must match the type of the selected foreign column when creating a foreign key
+                      relationship.
+                    </span>
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              )}
+              {!matchingColumnTypes && column?.format && (
+                <Alert_Shadcn_ variant="warning">
+                  <IconAlertTriangle strokeWidth={2} />
+                  <AlertTitle_Shadcn_>Column types do not match</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_ className="leading-6">
+                    <span>The referenced column</span>
+                    {column?.name && <span className="text-code">{column.name}</span>}
+                    <span> is of type </span>
+                    <span className="text-code">{column.format}</span>
                     <span> while the selected foreign column </span>
                     <span className="text-code">
                       {selectedTable?.name}.{selectedColumn?.name}
