@@ -10,8 +10,6 @@ import InformationBox from 'components/ui/InformationBox'
 import { Button, IconExternalLink, IconInfo } from 'ui'
 import Link from 'next/link'
 
-// [Joshen] This can be deprecated I think - no longer used
-
 export interface SubscriptionProps {}
 
 const Subscription = ({}: SubscriptionProps) => {
