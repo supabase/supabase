@@ -1,36 +1,41 @@
 import { useParams, useTheme } from 'common'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import dayjs from 'dayjs'
-import { useFlag } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconChevronRight, IconExternalLink } from 'ui'
-import { getAddons } from '../Subscription.utils'
+
+import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import {
   ComputeInstanceSidePanel,
   CustomDomainSidePanel,
   PITRSidePanel,
 } from 'components/interfaces/Settings/Addons'
-import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import {
   useIsProjectActive,
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useFlag } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
+import { BASE_PATH } from 'lib/constants'
+import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import { getAddons, getSemanticVersion } from '../Subscription.utils'
 
 const AddOns = () => {
+  const { isDarkMode } = useTheme()
   const { ref: projectRef } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { isDarkMode } = useTheme()
 
   const { project: selectedProject } = useProjectContext()
   const isProjectActive = useIsProjectActive()
   const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
+
+  // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
+  const sufficientPgVersion = getSemanticVersion(selectedProject?.dbVersion ?? '') >= 141044
+  console.log({ sufficientPgVersion })
 
   // [Joshen] We could possibly look into reducing the interval to be more "realtime"
   // I tried setting the interval to 1m but no data was returned, may need to experiment
