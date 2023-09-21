@@ -78,7 +78,7 @@ verify_jwt = false
 You can invoke Edge Functions using curl:
 
 ```bash
-curl --request POST 'https://<project_ref>.functions.supabase.co/hello-world' \
+curl --request POST 'https://<project_ref>.supabase.co/functions/v1/hello-world' \
   --header 'Authorization: Bearer ANON_KEY' \
   --header 'Content-Type: application/json' \
   --data '{ "name":"Functions" }'

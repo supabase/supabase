@@ -20,7 +20,6 @@ const AppHeader = () => {
   const organization = useSelectedOrganization()
   const enableBranchManagement = useFlag('branchManagement')
 
-  const isBranchingSupported = project?.cloud_provider === 'FLY'
   const isBranchingEnabled =
     project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
 
@@ -36,10 +35,12 @@ const AppHeader = () => {
             />
           </a>
         </Link>
-        <OrganizationDropdown />
-        {ref !== undefined && <ProjectDropdown />}
-        {ref !== undefined && isBranchingSupported && enableBranchManagement && (
-          <>{isBranchingEnabled ? <BranchDropdown /> : <EnableBranchingButton />}</>
+        <OrganizationDropdown isNewNav />
+        {ref !== undefined && <ProjectDropdown isNewNav />}
+        {ref !== undefined && enableBranchManagement && (
+          <>
+            {isBranchingEnabled ? <BranchDropdown isNewNav /> : <EnableBranchingButton isNewNav />}
+          </>
         )}
       </div>
 
