@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
+import { ListTree } from 'lucide-react'
 
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -148,7 +149,7 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
                         onClick={() => setOpen(false)}
                       >
                         <a>
-                          <IconGitBranch size={14} strokeWidth={1.5} />
+                          <ListTree size={14} strokeWidth={1.5} />
                           <p>Manage branches</p>
                         </a>
                       </CommandItem_Shadcn_>
