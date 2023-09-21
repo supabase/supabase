@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import matter from 'gray-matter'
 import authors from 'lib/authors.json'
 import { MDXRemote } from 'next-mdx-remote'
-import { Badge, Divider, IconChevronLeft } from 'ui'
+import { Badge, Divider, IFrameWithConsent, IconChevronLeft } from 'ui'
 
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -304,16 +304,18 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                   <article>
                     <div className={['prose prose-docs'].join(' ')}>
                       {props.blog.youtubeHero ? (
-                        <iframe
-                          className="w-full"
-                          width="700"
-                          height="350"
-                          src={props.blog.youtubeHero}
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                          // @ts-expect-error
-                          allowfullscreen={true}
-                        ></iframe>
+                        <div className="relative w-full h-[350px] overflow-hidden rounded-lg video-with-border">
+                          <IFrameWithConsent
+                            className="w-full"
+                            width="700"
+                            height="350"
+                            src={props.blog.youtubeHero}
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                            // @ts-expect-error
+                            allowfullscreen={true}
+                          ></IFrameWithConsent>
+                        </div>
                       ) : (
                         props.blog.thumb && (
                           <div className="relative mb-8 h-96 w-full overflow-auto rounded-lg border">

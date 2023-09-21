@@ -64,13 +64,13 @@ Decrypted data can be accessed by a special view that is automatically created w
 ## Deep Dive on How The Vault works
 
 <div className="video-container">
-  <iframe
+  <IFrame
     src="https://www.youtube-nocookie.com/embed/QHLPNDrdN2w"
     title="YouTube video player"
     frameborder="0"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowfullscreen
-  ></iframe>
+  ></IFrame>
 </div>
 
 As we mentioned, the Vault uses pgsodium's Transparent Column Encryption (TCE) to store secrets in an authenticated encrypted form. There are some details around that you may be curious about, what does authenticated mean, and where are encryption keys store? This section explains those details.

@@ -90,14 +90,14 @@ For now, Branching in Supabase is limited to development partners. We'll be roll
 The new App Router in Next.js adds a lot of exciting features, like React Suspense and Streaming. Supabase now fully-supports the App Router in Next.js:
 
 <div className="video-container">
-  <iframe
+  <IFrame
     className="w-full"
     src="https://www.youtube-nocookie.com/embed/w3LD0Z73vgU"
     title="YouTube video player"
     frameBorder="0"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
     allowfullscreen
-  ></iframe>
+  ></IFrame>
 </div>
 
 The Next.js App Router shifts a significant amount of your app development from the client to the server, using Server Components, Route Handlers and Server Actions. This means Supabase Auth needs to be configured to store session data in cookies - available in the browser and on the server - rather than Local Storage. We've simplified this process for you with our new [Next.js Auth Helpers package](https://supabase.com/docs/guides/auth/auth-helpers/nextjs).

@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { IFrameWithConsent } from 'ui'
 import LinkCard from '~/components/LinkCard'
 import LinkCardsWrapper from '~/components/LinkCardsWrapper'
 
@@ -8,6 +9,9 @@ function getComponents(type: any) {
   const components = {
     LinkCardsWrapper: (props: any) => <LinkCardsWrapper {...props} />,
     LinkCard: (props: any) => <LinkCard {...props} />,
+    IFrame: (props: any) => {
+      return <IFrameWithConsent {...props} />
+    },
     img: (props: any) => {
       if (props.className !== ignoreClass) {
         return (

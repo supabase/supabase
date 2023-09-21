@@ -13,6 +13,7 @@ import {
   CollapsibleContent_Shadcn_,
   IconTriangle,
   cn,
+  IFrameWithConsent,
 } from 'ui'
 import ImageFadeStack from '~/components/ImageFadeStack'
 import ZoomableImg from '~/components/ZoomableImg/ZoomableImg'
@@ -75,6 +76,9 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
       } else {
         return <code {...props} />
       }
+    },
+    IFrame: (props: any) => {
+      return <IFrameWithConsent {...props} />
     },
     ImageGrid,
     ImageFadeStack,

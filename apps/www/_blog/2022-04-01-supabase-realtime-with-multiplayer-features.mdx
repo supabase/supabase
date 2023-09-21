@@ -19,13 +19,13 @@ Today is the 1st of April, or April Fool's Day, but I like to think of today as 
 Here's the next version of Realtime, with multiplayer features.
 
 <div className="video-container">
-  <iframe
+  <IFrame
     className="w-full video-with-border"
     src="https://www.youtube-nocookie.com/embed/BelYEMJ2N00"
     frameBorder="1"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowFullScreen
-  ></iframe>
+  ></IFrame>
 </div>
 
 We've made quite a few iterations on Realtime in the past. The first major version of Realtime listened to a single database by streaming changes from PostgreSQL's Write-Ahead Log and sending them to clients via WebSockets. The second major version introduced better security via WALRUS (Write Ahead Log Realtime Unified Security) which adheres to a database's RLS policies to determine authorized clients. However, this version continues to be single tenant as it can only poll one database at a time.
