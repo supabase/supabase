@@ -391,11 +391,12 @@ const Addons = () => {
                             Reach out to us via support if you're interested
                           </p>
                           <Link
+                            passHref
                             href={`/support/new?ref=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
                           >
-                            <a>
-                              <Button type="default">Contact support</Button>
-                            </a>
+                            <Button asChild type="default">
+                              <a>Contact support</a>
+                            </Button>
                           </Link>
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
