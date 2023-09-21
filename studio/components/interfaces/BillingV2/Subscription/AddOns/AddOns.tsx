@@ -1,36 +1,49 @@
 import { useParams, useTheme } from 'common'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import dayjs from 'dayjs'
-import { useFlag } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { Alert, Button, IconChevronRight, IconExternalLink } from 'ui'
-import { getAddons } from '../Subscription.utils'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconChevronRight,
+  IconExternalLink,
+} from 'ui'
+
+import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import {
   ComputeInstanceSidePanel,
   CustomDomainSidePanel,
   PITRSidePanel,
 } from 'components/interfaces/Settings/Addons'
-import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import {
   useIsProjectActive,
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useFlag } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
+import { BASE_PATH } from 'lib/constants'
+import { getSemanticVersion } from 'lib/helpers'
+import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import { getAddons } from '../Subscription.utils'
 
 const AddOns = () => {
+  const { isDarkMode } = useTheme()
   const { ref: projectRef } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { isDarkMode } = useTheme()
 
   const { project: selectedProject } = useProjectContext()
   const isProjectActive = useIsProjectActive()
   const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
+
+  // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
+  const sufficientPgVersion = getSemanticVersion(selectedProject?.dbVersion ?? '') >= 141044
 
   // [Joshen] We could possibly look into reducing the interval to be more "realtime"
   // I tried setting the interval to 1m but no data was returned, may need to experiment
@@ -308,19 +321,40 @@ const AddOns = () => {
                       ? `Point in time recovery of ${pitr.variant.meta?.backup_duration_days} days is enabled`
                       : 'Point in time recovery is not enabled'}
                   </p>
-                  <ProjectUpdateDisabledTooltip
-                    projectUpdateDisabled={projectUpdateDisabled}
-                    projectNotActive={!isProjectActive}
-                  >
-                    <Button
-                      type="default"
-                      className="mt-2 pointer-events-auto"
-                      onClick={() => snap.setPanelKey('pitr')}
-                      disabled={!isProjectActive || projectUpdateDisabled}
+                  {!sufficientPgVersion ? (
+                    <Alert_Shadcn_ className="mt-2">
+                      <AlertTitle_Shadcn_>
+                        Your project is too old enable PITR
+                      </AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        <p className="text-sm leading-normal mb-2">
+                          Reach out to us via support if you're interested
+                        </p>
+                        <Link
+                          passHref
+                          href={`/support/new?ref=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
+                        >
+                          <Button asChild type="default">
+                            <a>Contact support</a>
+                          </Button>
+                        </Link>
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  ) : (
+                    <ProjectUpdateDisabledTooltip
+                      projectUpdateDisabled={projectUpdateDisabled}
+                      projectNotActive={!isProjectActive}
                     >
-                      Change point in time recovery
-                    </Button>
-                  </ProjectUpdateDisabledTooltip>
+                      <Button
+                        type="default"
+                        className="mt-2 pointer-events-auto"
+                        onClick={() => snap.setPanelKey('pitr')}
+                        disabled={!isProjectActive || projectUpdateDisabled || !sufficientPgVersion}
+                      >
+                        Change point in time recovery
+                      </Button>
+                    </ProjectUpdateDisabledTooltip>
+                  )}
                 </div>
               </div>
 

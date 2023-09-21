@@ -23,6 +23,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useFlag, useProjectByRef } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH } from 'lib/constants'
+import { getSemanticVersion } from 'lib/helpers'
 import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {
   Alert,
@@ -52,6 +53,8 @@ const Addons = () => {
   }
 
   const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
+  // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
+  const sufficientPgVersion = getSemanticVersion(selectedProject?.dbVersion ?? '') >= 141044
 
   // [Joshen] We could possibly look into reducing the interval to be more "realtime"
   // I tried setting the interval to 1m but no data was returned, may need to experiment
@@ -378,19 +381,45 @@ const Addons = () => {
                         ? `Point in time recovery of ${pitr.variant.meta?.backup_duration_days} days is enabled`
                         : 'Point in time recovery is not enabled'}
                     </p>
-                    <ProjectUpdateDisabledTooltip
-                      projectUpdateDisabled={projectUpdateDisabled}
-                      projectNotActive={!isProjectActive}
-                    >
-                      <Button
-                        type="default"
-                        className="mt-2 pointer-events-auto"
-                        onClick={() => snap.setPanelKey('pitr')}
-                        disabled={isBranch || !isProjectActive || projectUpdateDisabled}
+                    {!sufficientPgVersion ? (
+                      <Alert_Shadcn_ className="mt-2">
+                        <AlertTitle_Shadcn_>
+                          Your project is too old to enable PITR
+                        </AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_>
+                          <p className="text-sm leading-normal mb-2">
+                            Reach out to us via support if you're interested
+                          </p>
+                          <Link
+                            passHref
+                            href={`/support/new?ref=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
+                          >
+                            <Button asChild type="default">
+                              <a>Contact support</a>
+                            </Button>
+                          </Link>
+                        </AlertDescription_Shadcn_>
+                      </Alert_Shadcn_>
+                    ) : (
+                      <ProjectUpdateDisabledTooltip
+                        projectUpdateDisabled={projectUpdateDisabled}
+                        projectNotActive={!isProjectActive}
                       >
-                        Change point in time recovery
-                      </Button>
-                    </ProjectUpdateDisabledTooltip>
+                        <Button
+                          type="default"
+                          className="mt-2 pointer-events-auto"
+                          onClick={() => snap.setPanelKey('pitr')}
+                          disabled={
+                            isBranch ||
+                            !isProjectActive ||
+                            projectUpdateDisabled ||
+                            !sufficientPgVersion
+                          }
+                        >
+                          Change point in time recovery
+                        </Button>
+                      </ProjectUpdateDisabledTooltip>
+                    )}
                   </div>
                 </div>
               </ScaffoldSectionContent>
