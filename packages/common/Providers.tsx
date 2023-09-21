@@ -3,14 +3,9 @@ import { createContext, useContext, useEffect, useState } from 'react'
 export interface UseThemeProps {
   isDarkMode: boolean
   /**
-   * Toggle between dark mode and light mode.
-   *
-   * If `darkMode` left `undefined`, toggles between modes.
-   *
-   * If `darkMode` set, forces
-   * dark mode if `true` and light mode if `false`.
+   * Toggle between dark mode, light mode, or system default.
    */
-  toggleTheme: (darkMode?: boolean) => void
+  toggleTheme: (isDarkMode: boolean) => void
 }
 
 interface ThemeProviderProps {
@@ -29,48 +24,43 @@ export const ThemeProvider = ({
   detectSystemColorPreference = true,
   children,
 }: ThemeProviderProps) => {
-  const [isDarkMode, setIsDarkMode] = useState(true)
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(true)
 
   useEffect(() => {
     const key = localStorage.getItem('supabaseDarkMode')
-    // If no localStorage is set
-    // and detectSystemColorPreference is false
-    // default to dark mode
     const hasNoKey = key === null
-    const shouldBeDarkMode = hasNoKey || key === 'true'
-
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
 
-    hasNoKey && detectSystemColorPreference
-      ? toggleTheme(prefersDark)
-      : toggleTheme(shouldBeDarkMode)
-  }, [])
+    if (hasNoKey && detectSystemColorPreference) {
+      setIsDarkMode(prefersDark)
+      localStorage.setItem('supabaseDarkMode', prefersDark.toString()) // Set the value in localStorage
+    } else {
+      setIsDarkMode(key === 'true')
+    }
+  }, [detectSystemColorPreference])
 
-  const toggleTheme: UseThemeProps['toggleTheme'] = (darkMode) => {
-    const newMode = typeof darkMode === 'boolean' ? darkMode : !isDarkMode
-    localStorage.setItem('supabaseDarkMode', newMode.toString())
-
-    const newTheme = newMode ? 'dark' : 'light'
-
-    document.body.classList.remove('light', 'dark')
-    document.body.classList.add(newTheme)
-
-    // Color scheme must be applied to document element (`<html>`)
-    document.documentElement.style.colorScheme = newTheme
-
+  const toggleTheme: UseThemeProps['toggleTheme'] = () => {
+    const newMode = !isDarkMode
     setIsDarkMode(newMode)
+    localStorage.setItem('supabaseDarkMode', newMode.toString())
   }
 
+  // Apply the theme to the body and document element as before
+  useEffect(() => {
+    const newThemeClass = isDarkMode ? 'dark' : 'light'
+    document.body.classList.remove('light', 'dark')
+    document.body.classList.add(newThemeClass)
+    document.documentElement.style.colorScheme = newThemeClass
+  }, [isDarkMode])
+
   return (
-    <>
-      <ThemeContext.Provider
-        value={{
-          isDarkMode,
-          toggleTheme,
-        }}
-      >
-        {children}
-      </ThemeContext.Provider>
-    </>
+    <ThemeContext.Provider
+      value={{
+        isDarkMode,
+        toggleTheme,
+      }}
+    >
+      {children}
+    </ThemeContext.Provider>
   )
 }

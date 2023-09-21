@@ -153,10 +153,8 @@ const NavigationBar = () => {
                 <Dropdown.RadioGroup
                   key="theme"
                   value={isDarkMode ? 'dark' : 'light'}
-                  onChange={(e: any) => toggleTheme(e === 'dark')}
+                  onChange={() => toggleTheme(!isDarkMode)}
                 >
-                  {/* [Joshen] Removing system default for now, needs to be supported in useTheme from common packages */}
-                  {/* <Dropdown.Radio value="system">System default</Dropdown.Radio> */}
                   <Dropdown.Radio value="dark">Dark</Dropdown.Radio>
                   <Dropdown.Radio value="light">Light</Dropdown.Radio>
                 </Dropdown.RadioGroup>
