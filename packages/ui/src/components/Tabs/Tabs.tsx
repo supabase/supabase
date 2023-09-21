@@ -9,6 +9,7 @@ interface TabsProps {
   defaultActiveId?: string
   activeId?: string
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
+  queryGroup?: string
   block?: boolean
   tabBarGutter?: number
   tabBarStyle?: React.CSSProperties
@@ -30,6 +31,7 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
   activeId,
   type = 'pills',
   size = 'tiny',
+  queryGroup,
   block,
   onChange,
   onClick,
@@ -42,34 +44,29 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
   // toArray is used here to filter out invalid children
   // another method would be to use React.Children.map
   const children = Children.toArray(_children) as PanelPropsProps[]
+  const tabIds = children.map((tab) => tab.props.id)
+
+  const router = useRouter()
+  const queryTabs = queryGroup ? router.query[queryGroup] : undefined
+  const [queryTabRaw] = Array.isArray(queryTabs) ? queryTabs : [queryTabs]
+  const queryTab = queryTabRaw && tabIds.includes(queryTabRaw) ? queryTabRaw : undefined
 
   const [activeTab, setActiveTab] = useState(
-    defaultActiveId ??
+    queryTab ??
+      defaultActiveId ??
       // if no defaultActiveId is set use the first panel
       children?.[0]?.props?.id
   )
 
-  const router = useRouter()
-  const hash = router?.asPath?.split('#')[1]
-  const hashTab = extractHashTab(hash)
-
-  /**
-   * If URL hash present in the format `tab--<tab-id>`,
-   * switch to that tab.
-   *
-   * Note: useEffect necessary here to ensure this only
-   * happens client side
-   */
+  // If query param present for the query group, switch to that tab.
   useEffect(() => {
-    if (hashTab) {
-      setActiveTab(hashTab)
-      setGroupActiveId?.(hashTab)
+    if (queryTab) {
+      setActiveTab(queryTab)
+      setGroupActiveId?.(queryTab)
     }
-  }, [hashTab])
+  }, [queryTab])
 
   let __styles = styleHandler('tabs')
-
-  const tabIds = children.map((tab) => tab.props.id)
 
   const { groupActiveId, setGroupActiveId } = useTabGroup(tabIds)
 
@@ -78,6 +75,12 @@ const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
   function onTabClick(id: string) {
     setActiveTab(id)
     setGroupActiveId?.(id)
+
+    if (queryGroup) {
+      const url = new URL(document.location.href)
+      url.searchParams.set(queryGroup, id)
+      window.history.replaceState(undefined, '', url)
+    }
 
     onClick?.(id)
     if (id !== active) {
@@ -155,15 +158,3 @@ export const Panel: React.FC<PanelProps> = ({ children, id, className }) => {
 
 Tabs.Panel = Panel
 export default Tabs
-
-function extractHashTab(hash?: string) {
-  if (!hash) {
-    return undefined
-  }
-
-  const match = hash.match(/tab--(.*)/i)
-
-  if (match) {
-    return match[1]?.toLowerCase()
-  }
-}
