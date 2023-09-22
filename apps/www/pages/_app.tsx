@@ -93,6 +93,7 @@ export default function App({ Component, pageProps }: AppProps) {
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
+          forcedTheme={router.pathname === '/' ? 'dark' : undefined}
         >
           <PortalToast />
           <Component {...pageProps} />

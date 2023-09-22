@@ -22,18 +22,6 @@ const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSec
 type Props = { customerStories: PostTypes[] }
 
 const Index = ({ customerStories }: Props) => {
-  const { theme, setTheme } = useTheme()
-  const [initialDarkMode] = useState(theme)
-
-  // useEffect(() => {
-  //   toggleTheme(true)
-  //   document.body.className = 'dark'
-  //   return () => {
-  //     document.body.className = ''
-  //     toggleTheme(initialDarkMode)
-  //   }
-  // }, [])
-
   return (
     <Layout>
       <Hero />
