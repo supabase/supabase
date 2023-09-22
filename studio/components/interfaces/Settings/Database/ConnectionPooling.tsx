@@ -1,10 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Fragment, useState } from 'react'
-import { Input } from 'ui'
-import { AutoField } from 'uniforms-bootstrap4'
+import { Fragment } from 'react'
+import { Input, Form, InputNumber, Listbox } from 'ui'
+import {
+  FormActions,
+  FormHeader,
+  FormPanel,
+  FormSection,
+  FormSectionContent,
+  FormSectionLabel,
+} from 'components/ui/Forms'
+import { number, object, string } from 'yup'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import AlertError from 'components/ui/AlertError'
 import Divider from 'components/ui/Divider'
 import Panel from 'components/ui/Panel'
@@ -123,154 +130,216 @@ interface ConfigProps {
 export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: ConfigProps) => {
   const { ui } = useStore()
   const { project } = useProjectContext()
-  const [updates, setUpdates] = useState({
+
+  const { isLoading } = usePoolingConfigurationQuery({ projectRef })
+
+  const formId = 'connection-pooler-form'
+
+  const INITIAL_VALUES = {
     pool_mode: bouncerInfo.pool_mode || 'transaction',
-    default_pool_size: bouncerInfo.default_pool_size || undefined,
+    default_pool_size: bouncerInfo.default_pool_size || 10,
     ignore_startup_parameters: bouncerInfo.ignore_startup_parameters || '',
     pgbouncer_enabled: bouncerInfo.pgbouncer_enabled,
-    max_client_conn: bouncerInfo.max_client_conn || undefined,
+    max_client_connections: bouncerInfo.max_client_conn || undefined,
+  }
+
+  const schema = object({
+    pool_mode: string(),
+    ignore_startup_parameters: string(),
+    default_pool_size: number().min(10),
+    max_client_connections: number(),
   })
 
   const { mutateAsync: updateConfiguration, isLoading: isUpdating } =
     usePoolingConfigurationUpdateMutation({
-      onSuccess: (res) => {
-        setUpdates({ ...(res as any) })
+      onSuccess: () => {
         ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
       },
     })
 
-  const canUpdateConnectionPoolingConfiguration = useCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    {
-      resource: {
-        project_id: project?.id,
-      },
-    }
-  )
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
-  const updateConfig = async (updatedConfig: any) => {
+  const onSubmit = async (values: any) => {
     try {
       await updateConfiguration({
         ref: projectRef,
-        pgbouncer_enabled: updatedConfig.pgbouncer_enabled,
-        default_pool_size: updatedConfig.default_pool_size,
-        ignore_startup_parameters: updatedConfig.ignore_startup_parameters,
-        pool_mode: updatedConfig.pool_mode,
-        max_client_conn: updatedConfig.max_client_conn,
+        pgbouncer_enabled: values.pgbouncer_enabled,
+        default_pool_size: values.default_pool_size,
+        ignore_startup_parameters: values.ignore_startup_parameters,
+        pool_mode: values.pool_mode,
+        max_client_conn: values.max_client_connections,
       })
     } finally {
     }
   }
 
-  const formSchema = {
-    properties: {
-      pool_mode: {
-        title: 'Pool Mode',
-        type: 'string',
-        options: [
-          {
-            label: 'Transaction',
-            value: 'transaction',
-          },
-          {
-            label: 'Session',
-            value: 'session',
-          },
-        ],
-      },
-      ignore_startup_parameters: {
-        title: 'Ignore Startup Parameters',
-        type: 'string',
-        help: 'Defaults are either blank or "extra_float_digits"',
-      },
-      max_client_conn: {
-        title: 'Max Client Connections',
-        oneOf: [{ type: 'integer' }, { type: 'null' }],
-        help: 'The maximum number of concurrent client connections allowed. Overrides default optimizations; refer to https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config',
-      },
-      default_pool_size: {
-        title: 'Default Pool Size',
-        oneOf: [{ type: 'integer' }, { type: 'null' }],
-        help: 'The maximum number of connections made to the underlying Postgres cluster, per user+db combination. Overrides default optimizations; refer to https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config',
-      },
-    },
-    required: ['pool_mode'],
-    type: 'object',
-  }
-
   return (
     <div>
-      <SchemaFormPanel
-        title="Connection Pooling Custom Configuration"
-        schema={formSchema}
-        model={updates}
-        submitLabel="Save"
-        cancelLabel="Cancel"
-        loading={isUpdating}
-        onChangeModel={(model: any) => setUpdates(model)}
-        onSubmit={(model: any) => updateConfig(model)}
-        onReset={() => setUpdates(bouncerInfo)}
-        disabled={!canUpdateConnectionPoolingConfiguration}
-        disabledMessage="You need additional permissions to update connection pooling settings"
+      <Form
+        id={formId}
+        initialValues={INITIAL_VALUES}
+        onSubmit={onSubmit}
+        validationSchema={schema}
       >
-        <div className="space-y-6 py-4">
-          {bouncerInfo.pgbouncer_enabled && (
+        {({ handleReset, values, initialValues }: any) => {
+          const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
+
+          return (
             <>
-              <AutoField
-                name="pool_mode"
-                showInlineError
-                errorMessage="You must select one of the two options"
+              <FormHeader
+                title="Connection Pooling Custom Configuration"
+                description="Configure your connection pool settings"
               />
-              <div className="!mt-1 flex" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
-                <p className="text-sm text-scale-900">
-                  Specify when a connection can be returned to the pool. To find out the most
-                  suitable mode for your use case,{' '}
-                  <a
-                    className="text-green-900"
-                    target="_blank"
-                    rel="noreferrer"
-                    href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool"
-                  >
-                    click here
-                  </a>
-                  .
-                </p>
-              </div>
-              {!bouncerInfo.supavisor_enabled && (
-                <>
-                  <Divider light />
-                  <AutoField name="ignore_startup_parameters" />
-                  <Divider light />
-                  <AutoField name="max_client_conn" />
-                  <Divider light />
-                  <AutoField name="default_pool_size" />
-                </>
-              )}
+              <FormPanel
+                disabled={true}
+                footer={
+                  <div className="flex py-4 px-8">
+                    <FormActions
+                      form={formId}
+                      isSubmitting={isUpdating}
+                      hasChanges={hasChanges}
+                      handleReset={handleReset}
+                      disabled={!canUpdateConfig}
+                      helper={
+                        !canUpdateConfig
+                          ? 'You need additional permissions to update authentication settings'
+                          : undefined
+                      }
+                    />
+                  </div>
+                }
+              >
+                {bouncerInfo.pgbouncer_enabled && (
+                  <FormSection header={<FormSectionLabel>Pool Mode</FormSectionLabel>}>
+                    <FormSectionContent loading={isUpdating}>
+                      <Listbox size="medium" id="pool_mode" name="pool_mode">
+                        <Listbox.Option
+                          key="transaction"
+                          id="transaction"
+                          value="transaction"
+                          label="Transaction"
+                        >
+                          Transaction
+                        </Listbox.Option>
+                        <Listbox.Option key="session" id="session" value="session" label="Session">
+                          Session
+                        </Listbox.Option>
+                      </Listbox>
+                      <p className="text-sm text-lighter -mt-2">
+                        Specify when a connection can be returned to the pool. To find out the most
+                        suitable mode for your use case, refer to the{' '}
+                        <a
+                          className="text-green-900"
+                          target="_blank"
+                          rel="noreferrer"
+                          href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool"
+                        >
+                          documentation
+                        </a>
+                        .
+                      </p>
+                    </FormSectionContent>
+                  </FormSection>
+                )}
+
+                <FormSection
+                  header={<FormSectionLabel>Ignore Startup Parameters</FormSectionLabel>}
+                >
+                  <FormSectionContent loading={isLoading}>
+                    <Input
+                      id="ignore_startup_parameters"
+                      size="small"
+                      disabled={!canUpdateConfig}
+                    />
+                    <p className="text-sm text-lighter -mt-2">
+                      Defaults are either blank or "extra_float_digits"
+                    </p>
+                  </FormSectionContent>
+                </FormSection>
+                {bouncerInfo.pgbouncer_enabled && (
+                  <>
+                    <FormSection
+                      header={<FormSectionLabel>Max client connections</FormSectionLabel>}
+                    >
+                      <FormSectionContent loading={isLoading}>
+                        <InputNumber
+                          id="max_client_connections"
+                          size="small"
+                          disabled={!canUpdateConfig}
+                        />
+                        <p className="text-sm text-lighter -mt-2">
+                          The maximum number of concurrent client connections allowed. Overrides
+                          default optimizations; refer to the{' '}
+                          <a
+                            className="text-green-900"
+                            target="_blank"
+                            rel="noreferrer"
+                            href="https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config"
+                          >
+                            documentation
+                          </a>
+                          .
+                        </p>
+                      </FormSectionContent>
+                    </FormSection>
+                    <FormSection header={<FormSectionLabel>Default pool size</FormSectionLabel>}>
+                      <FormSectionContent loading={isLoading}>
+                        <InputNumber
+                          id="default_pool_size"
+                          size="small"
+                          min={10}
+                          disabled={!canUpdateConfig}
+                        />
+                        <p className="text-sm text-lighter -mt-2">
+                          The maximum number of connections made to the underlying Postgres cluster,
+                          per user+db combination. Overrides default optimizations; refer to the{' '}
+                          <a
+                            className="text-green-900"
+                            target="_blank"
+                            rel="noreferrer"
+                            href="https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config"
+                          >
+                            documentation
+                          </a>
+                          .
+                        </p>
+                      </FormSectionContent>
+                    </FormSection>
+                  </>
+                )}
+                <FormSection header={<FormSectionLabel>Port</FormSectionLabel>}>
+                  <FormSectionContent loading={isLoading}>
+                    <Input
+                      className="input-mono"
+                      readOnly
+                      copy
+                      disabled
+                      value={connectionInfo.db_port}
+                    />
+                  </FormSectionContent>
+                </FormSection>
+                <FormSection header={<FormSectionLabel>Connection string</FormSectionLabel>}>
+                  <FormSectionContent loading={isLoading}>
+                    <Input
+                      className="input-mono"
+                      layout="vertical"
+                      readOnly
+                      copy
+                      disabled
+                      value={bouncerInfo.connectionString}
+                    />
+                  </FormSectionContent>
+                </FormSection>
+                <div className="border-t border-scale-400"></div>
+              </FormPanel>
             </>
-          )}
-          <Divider light />
-          <Input
-            className="input-mono"
-            layout="horizontal"
-            readOnly
-            copy
-            disabled
-            value={connectionInfo.db_port}
-            label="Port"
-          />
-          <Divider light />
-          <Input
-            className="input-mono"
-            layout="vertical"
-            readOnly
-            copy
-            disabled
-            label="Connection string"
-            value={bouncerInfo.connectionString}
-          />
-        </div>
-      </SchemaFormPanel>
+          )
+        }}
+      </Form>
     </div>
   )
 }

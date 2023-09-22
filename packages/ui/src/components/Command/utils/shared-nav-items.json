@@ -43,6 +43,10 @@
         {
           "label": "Backups",
           "url": "https://supabase.com/dashboard/project/_/database/backups/scheduled"
+        },
+        {
+          "label": "Connection Pooling",
+          "url": "https://supabase.com/dashboard/project/_/settings/database"
         }
       ]
     },
