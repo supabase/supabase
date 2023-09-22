@@ -1,18 +1,20 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useCheckPermissions } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
 import { useState } from 'react'
 import semver from 'semver'
-import { Button, Dropdown, IconChevronDown, IconMail, IconPlus, IconUserPlus } from 'ui'
+
+import { useCheckPermissions } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
+import { Button, Dropdown, IconChevronDown, IconMail, IconUserPlus } from 'ui'
 import CreateUserModal from './CreateUserModal'
 import InviteUserModal from './InviteUserModal'
 
 export type AddUserDropdownProps = {
+  refetch: () => void
   projectKpsVersion?: string
 }
 
-const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
+const AddUserDropdown = ({ refetch, projectKpsVersion }: AddUserDropdownProps) => {
   const inviteEnabled = IS_PLATFORM
     ? semver.gte(
         // @ts-ignore
@@ -103,8 +105,10 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
         </Button>
       </Dropdown>
 
-      {inviteEnabled && <InviteUserModal visible={inviteVisible} setVisible={setInviteVisible} />}
-      <CreateUserModal visible={createVisible} setVisible={setCreateVisible} />
+      {inviteEnabled && (
+        <InviteUserModal visible={inviteVisible} refetch={refetch} setVisible={setInviteVisible} />
+      )}
+      <CreateUserModal visible={createVisible} refetch={refetch} setVisible={setCreateVisible} />
     </>
   )
 }

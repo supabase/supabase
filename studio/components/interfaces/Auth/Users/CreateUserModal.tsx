@@ -1,22 +1,23 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
-import { useContext } from 'react'
 import { Button, Checkbox, Form, IconLock, IconMail, Input, Loading, Modal } from 'ui'
 
 import { useUserCreateMutation } from 'data/auth/user-create-mutation'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCheckPermissions, useStore } from 'hooks'
-import { PageContext } from 'pages/project/[ref]/auth/users'
 
 export type CreateUserModalProps = {
   visible: boolean
   setVisible: (visible: boolean) => void
+  refetch: () => void
 }
 
-const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
+const CreateUserModal = ({ visible, setVisible, refetch }: CreateUserModalProps) => {
   const { ui } = useStore()
-  const PageState: any = useContext(PageContext)
-  const projectRef = PageState.projectRef
+  const { ref: projectRef } = useParams()
+  // const PageState: any = useContext(PageContext)
+  // const projectRef = PageState.projectRef
 
   const { data, isLoading, isSuccess } = useProjectApiQuery({ projectRef }, { enabled: visible })
 
@@ -48,7 +49,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
         message: `Successfully created user: ${res.email}`,
       })
       setVisible(false)
-      await PageState.fetchData(1)
+      await refetch()
     },
   })
 

@@ -1,30 +1,28 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
-import { useContext } from 'react'
 import { Button, Dropdown, IconMail, IconMoreHorizontal, IconShieldOff, IconTrash } from 'ui'
 
-import { useParams } from 'common'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useUserDeleteMFAFactorsMutation } from 'data/auth/user-delete-mfa-factors-mutation'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
 import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mutation'
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
+import { User } from 'data/auth/users-query'
 import { useStore } from 'hooks'
 import { timeout } from 'lib/helpers'
-import { PageContext } from 'pages/project/[ref]/auth/users'
-import { User } from './Users.types'
 
 interface UserDropdownProps {
   user: User
+  refetch: () => void
   canRemoveUser: boolean
   canRemoveMFAFactors: boolean
 }
 
-const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdownProps) => {
+const UserDropdown = ({ user, refetch, canRemoveUser, canRemoveMFAFactors }: UserDropdownProps) => {
   const { ui } = useStore()
   const { ref } = useParams()
-  const PageState: any = useContext(PageContext)
 
   const { mutate: resetPassword, isLoading: isResetting } = useUserResetPasswordMutation({
     onSuccess: () => {
@@ -80,8 +78,7 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
         try {
           await deleteUser({ projectRef: ref, user })
           ui.setNotification({ category: 'success', message: `Successfully deleted ${user.email}` })
-          PageState.users = PageState.users.filter((x: any) => x.id != user.id)
-          PageState.totalUsers -= 1
+          await refetch()
         } catch (error) {}
       },
     })
@@ -94,6 +91,8 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
       message: `This is permanent! Are you sure you want to delete the user's MFA factors?`,
       onAsyncConfirm: async () => {
         if (!ref) return console.error('Project ref is required')
+        if (!user.id) return console.error('User id is required')
+
         try {
           await deleteUserMFAFactors({ projectRef: ref, userId: user.id })
           ui.setNotification({

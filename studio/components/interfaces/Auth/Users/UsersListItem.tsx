@@ -1,19 +1,19 @@
-import { observer } from 'mobx-react-lite'
 import { Badge } from 'ui'
 
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import Table from 'components/to-be-cleaned/Table'
 import UserDropdown from './UserDropdown'
-import { User } from './Users.types'
 import { getDateFromIsoString } from './Users.utils'
+import { User } from 'data/auth/users-query'
 
 interface UserListItemProps {
   user: User
+  refetch: () => void
   canRemoveUser: boolean
   canRemoveMFAFactors: boolean
 }
 
-const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItemProps) => {
+const UserListItem = ({ user, refetch, canRemoveUser, canRemoveMFAFactors }: UserListItemProps) => {
   const isUserConfirmed = user.email_confirmed_at || user.phone_confirmed_at
   const createdAt = getDateFromIsoString(user.created_at)
   const lastSignedIn = getDateFromIsoString(user.last_sign_in_at)
@@ -29,9 +29,7 @@ const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItem
         <span className="text-scale-1200">{!user.phone ? '-' : user.phone}</span>
       </Table.td>
       <Table.td className="table-cell">
-        <span className="capitalize text-scale-1200">
-          {user?.raw_app_meta_data?.provider || user?.app_metadata?.provider}
-        </span>
+        <span className="capitalize text-scale-1200">{user?.raw_app_meta_data?.provider}</span>
       </Table.td>
       <Table.td className="table-cell">
         <span className="text-scale-1200">{createdAt?.format('DD MMM, YYYY HH:mm')}</span>
@@ -56,6 +54,7 @@ const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItem
       <Table.td className="text-right">
         <UserDropdown
           user={user}
+          refetch={refetch}
           canRemoveUser={canRemoveUser}
           canRemoveMFAFactors={canRemoveMFAFactors}
         />
@@ -64,4 +63,4 @@ const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItem
   )
 }
 
-export default observer(UserListItem)
+export default UserListItem
