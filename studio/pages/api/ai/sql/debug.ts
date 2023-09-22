@@ -1,6 +1,7 @@
 import { SchemaBuilder } from '@serafin/schema-builder'
 import { codeBlock, stripIndent } from 'common-tags'
 import { isError } from 'data/utils/error-check'
+import { jsonrepair } from 'jsonrepair'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import type {
@@ -165,7 +166,10 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const debugSqlResult: DebugSqlResult = JSON.parse(sqlResponseString)
+    // Attempt to repair broken JSON from OpenAI (eg. multiline strings)
+    const repairedJsonString = jsonrepair(sqlResponseString)
+
+    const debugSqlResult: DebugSqlResult = JSON.parse(repairedJsonString)
 
     if (!debugSqlResult.sql) {
       console.error(`AI SQL debugging failed: Unable to debug SQL for the given error message`)
