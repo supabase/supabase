@@ -450,7 +450,7 @@ const FileExplorerRow = ({
                       </DropdownMenuSub_Shadcn_>
                     )
                   } else if (option.name === 'Separator') {
-                    return <DropdownMenuSeparator_Shadcn_ key="row-separator" />
+                    return <DropdownMenuSeparator_Shadcn_ />
                   } else {
                     return (
                       <DropdownMenuItem_Shadcn_ key={option.name} onClick={option.onClick}>

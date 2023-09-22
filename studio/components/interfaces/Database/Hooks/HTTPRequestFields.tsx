@@ -195,7 +195,7 @@ const HTTPRequestFields = ({
                         </p>
                       </div>
                     </DropdownMenuItem_Shadcn_>
-                    <DropdownMenuSeparator_Shadcn_ key="separator" />
+                    <DropdownMenuSeparator_Shadcn_ />
                     <DropdownMenuItem_Shadcn_
                       key="add-source-header"
                       onClick={() =>

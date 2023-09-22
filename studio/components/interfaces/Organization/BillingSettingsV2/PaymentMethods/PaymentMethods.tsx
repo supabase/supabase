@@ -180,30 +180,28 @@ const PaymentMethods = () => {
                                         </Button>
                                       </DropdownMenuTrigger_Shadcn_>
                                       <DropdownMenuContent_Shadcn_ align="end">
-                                        {[
-                                          ...(subscription?.plan.id !== 'free' &&
-                                          subscription?.payment_method_type === 'card'
-                                            ? [
-                                                <DropdownMenuItem_Shadcn_
-                                                  key="make-default"
-                                                  onClick={() =>
-                                                    setSelectedMethodForUse(paymentMethod)
-                                                  }
-                                                >
-                                                  <p className="text-scale-1200 text-sm">
-                                                    Use this card
-                                                  </p>
-                                                </DropdownMenuItem_Shadcn_>,
-                                                <DropdownMenuSeparator_Shadcn_ key="card-separator" />,
-                                              ]
-                                            : []),
-                                          <DropdownMenuItem_Shadcn_
-                                            key="delete-method"
-                                            onClick={() => setSelectedMethodToDelete(paymentMethod)}
-                                          >
-                                            <p className="text-scale-1200 text-sm">Delete card</p>
-                                          </DropdownMenuItem_Shadcn_>,
-                                        ]}
+                                        {subscription?.plan.id !== 'free' &&
+                                          subscription?.payment_method_type === 'card' && (
+                                            <>
+                                              <DropdownMenuItem_Shadcn_
+                                                key="make-default"
+                                                onClick={() =>
+                                                  setSelectedMethodForUse(paymentMethod)
+                                                }
+                                              >
+                                                <p className="text-scale-1200 text-sm">
+                                                  Use this card
+                                                </p>
+                                              </DropdownMenuItem_Shadcn_>
+                                              <DropdownMenuSeparator_Shadcn_ />
+                                            </>
+                                          )}
+                                        <DropdownMenuItem_Shadcn_
+                                          key="delete-method"
+                                          onClick={() => setSelectedMethodToDelete(paymentMethod)}
+                                        >
+                                          <p className="text-scale-1200 text-sm">Delete card</p>
+                                        </DropdownMenuItem_Shadcn_>
                                       </DropdownMenuContent_Shadcn_>
                                     </DropdownMenu_Shadcn_>
                                   ) : null}
