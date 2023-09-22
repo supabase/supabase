@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { IconChevronRight, useTheme } from 'ui'
-
+import { IconChevronRight } from 'ui'
+import { useTheme } from 'next-themes'
 import { BASE_PATH } from 'lib/constants'
 
 interface ExampleProjectProps {

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
-import { useParams, useTheme } from 'common'
+import { useParams } from 'common'
+import { useTheme } from 'next-themes'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,

@@ -1,4 +1,5 @@
-import { useParams, useTheme } from 'common'
+import { useParams } from 'common'
+import { useTheme } from 'next-themes'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useMemo } from 'react'

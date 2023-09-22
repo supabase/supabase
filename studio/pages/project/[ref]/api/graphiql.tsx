@@ -18,7 +18,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const { ui, meta } = useStore()
   const { theme } = useTheme()
-  const theme = theme === 'dark' ? 'dark' : 'light'
+  const currentTheme = theme === 'dark' ? 'dark' : 'light'
 
   const isExtensionsLoading = meta.extensions.isLoading
   const pgGraphqlExtension = meta.extensions.byId('pg_graphql')
@@ -79,7 +79,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
     )
   }
 
-  return <GraphiQL fetcher={fetcher} theme={theme} accessToken={anonKey} />
+  return <GraphiQL fetcher={fetcher} theme={currentTheme} accessToken={anonKey} />
 }
 
 GraphiQLPage.getLayout = (page) => <DocsLayout title="GraphiQL">{page}</DocsLayout>
