@@ -126,11 +126,11 @@ const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
       </DropdownMenuTrigger_Shadcn_>
       <DropdownMenuContent_Shadcn_ side="bottom" align="start">
         <>
-          <DropdownMenuItem_Shadcn_ onClick={onDownloadCSV}>
+          <DropdownMenuItem_Shadcn_ onClick={onDownloadCSV} className="space-x-2">
             <IconDownload size="tiny" />
             <p className="text-scale-1200 text-sm">Download CSV</p>
           </DropdownMenuItem_Shadcn_>
-          <DropdownMenuItem_Shadcn_ onClick={onCopyAsMarkdown}>
+          <DropdownMenuItem_Shadcn_ onClick={onCopyAsMarkdown} className="space-x-2">
             <IconClipboard size="tiny" />
             <p className="text-scale-1200 text-sm">Copy as markdown</p>
           </DropdownMenuItem_Shadcn_>

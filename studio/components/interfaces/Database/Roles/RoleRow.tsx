@@ -139,7 +139,8 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                       </DropdownMenuTrigger_Shadcn_>
                       <DropdownMenuContent_Shadcn_ side="bottom" className="w-[120px]">
                         <DropdownMenuItem_Shadcn_
-                          onClick={(event: any) => {
+                          className="space-x-2"
+                          onClick={(event) => {
                             event.stopPropagation()
                             onSelectDelete(role)
                           }}

@@ -127,6 +127,7 @@ const InputWithSuggestions = ({
                 <DropdownMenuSeparator_Shadcn_ />
                 {filteredSuggestions.map((suggestion: Suggestion) => (
                   <DropdownMenuItem_Shadcn_
+                    className="space-x-2"
                     key={suggestion.name}
                     onClick={() => onSelectSuggestion(suggestion)}
                   >

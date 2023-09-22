@@ -74,12 +74,20 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
             <Button type="default" icon={<IconMoreVertical />} className="px-1" />
           </DropdownMenuTrigger_Shadcn_>
           <DropdownMenuContent_Shadcn_ align="end" side="bottom">
-            <DropdownMenuItem_Shadcn_ key="edit" onClick={() => onSelectEdit()}>
+            <DropdownMenuItem_Shadcn_
+              className="space-x-2"
+              key="edit"
+              onClick={() => onSelectEdit()}
+            >
               <IconEdit />
               <p className="text-scale-1200 text-sm">Edit app</p>
             </DropdownMenuItem_Shadcn_>
             <DropdownMenuSeparator_Shadcn_ />
-            <DropdownMenuItem_Shadcn_ key="delete" onClick={() => onSelectDelete()}>
+            <DropdownMenuItem_Shadcn_
+              className="space-x-2"
+              key="delete"
+              onClick={() => onSelectDelete()}
+            >
               <IconTrash />
               <p className="text-scale-1200 text-sm">Delete app</p>
             </DropdownMenuItem_Shadcn_>

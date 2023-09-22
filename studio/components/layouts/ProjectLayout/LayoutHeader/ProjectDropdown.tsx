@@ -109,7 +109,7 @@ const ProjectDropdown = () => {
         <Popover.Separator />
         <Link href={`/new/${selectedOrganizationSlug}`}>
           <a className="block">
-            <DropdownMenuItem_Shadcn_>
+            <DropdownMenuItem_Shadcn_ className="space-x-2">
               <IconPlus size="tiny" />
               <p className="text-scale-1200 text-sm">New project</p>
             </DropdownMenuItem_Shadcn_>

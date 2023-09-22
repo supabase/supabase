@@ -66,7 +66,7 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
           <Fragment key={idx}>
             <Link href={`/project/${ref}/database/wrappers/new?type=${wrapper.name.toLowerCase()}`}>
               <a>
-                <DropdownMenuItem_Shadcn_ key={wrapper.name}>
+                <DropdownMenuItem_Shadcn_ key={wrapper.name} className="space-x-2">
                   <Image
                     src={wrapper.icon}
                     width={20}

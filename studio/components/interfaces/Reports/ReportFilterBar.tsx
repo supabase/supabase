@@ -175,6 +175,7 @@ const ReportFilterBar = ({
               return (
                 <DropdownMenuItem_Shadcn_
                   key={productFilter.key}
+                  className="space-x-2"
                   disabled={productFilter.key === currentProductFilter?.key}
                   onClick={() => handleProductFilterChange(productFilter)}
                 >

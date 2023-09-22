@@ -120,6 +120,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger asChild>
                 <DropdownMenuItem_Shadcn_
+                  className="space-x-2"
                   disabled={!canManageSecrets}
                   onClick={() => onSelectEdit(secret)}
                 >
@@ -148,6 +149,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger asChild>
                 <DropdownMenuItem_Shadcn_
+                  className="space-x-2"
                   disabled={!canManageSecrets}
                   onClick={() => onSelectRemove(secret)}
                 >

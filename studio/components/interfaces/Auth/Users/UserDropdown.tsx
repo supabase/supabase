@@ -135,18 +135,18 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
         <>
           {user.email !== null ? (
             <>
-              <DropdownMenuItem_Shadcn_ onClick={handleResetPassword}>
+              <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={handleResetPassword}>
                 <IconMail size="tiny" />
                 <p className="text-scale-1200 text-sm">Send password recovery</p>
               </DropdownMenuItem_Shadcn_>
-              <DropdownMenuItem_Shadcn_ onClick={handleSendMagicLink}>
+              <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={handleSendMagicLink}>
                 <IconMail size="tiny" />
                 <p className="text-scale-1200 text-sm">Send magic link</p>
               </DropdownMenuItem_Shadcn_>
             </>
           ) : null}
           {user.phone !== null ? (
-            <DropdownMenuItem_Shadcn_ onClick={handleSendOtp}>
+            <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={handleSendOtp}>
               <IconMail size="tiny" />
               <p className="text-scale-1200 text-sm">Send OTP</p>
             </DropdownMenuItem_Shadcn_>
@@ -157,6 +157,7 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
               <DropdownMenuItem_Shadcn_
                 onClick={handleDeleteFactors}
                 disabled={!canRemoveMFAFactors}
+                className="space-x-2"
               >
                 <IconShieldOff size="tiny" />
                 <p className="text-scale-1200 text-sm">Remove MFA factors</p>

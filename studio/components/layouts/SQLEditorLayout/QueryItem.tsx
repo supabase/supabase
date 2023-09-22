@@ -218,25 +218,25 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
             </span>
           </DropdownMenuTrigger_Shadcn_>
           <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-            <DropdownMenuItem_Shadcn_ onClick={onClickRename}>
+            <DropdownMenuItem_Shadcn_ onClick={onClickRename} className="space-x-2">
               <IconEdit2 size="tiny" />
               <p className="text-scale-1200 text-sm">Rename query</p>
             </DropdownMenuItem_Shadcn_>
             {sharedSnippetsFeature && visibility === 'user' && canCreateSQLSnippet && (
-              <DropdownMenuItem_Shadcn_ onClick={onClickShare}>
+              <DropdownMenuItem_Shadcn_ onClick={onClickShare} className="space-x-2">
                 <IconShare size="tiny" />
                 <p className="text-scale-1200 text-sm">Share query</p>
               </DropdownMenuItem_Shadcn_>
             )}
             {sharedSnippetsFeature && visibility === 'project' && canCreateSQLSnippet && (
-              <DropdownMenuItem_Shadcn_ onClick={createPersonalCopy}>
+              <DropdownMenuItem_Shadcn_ onClick={createPersonalCopy} className="space-x-2">
                 <IconCopy size="tiny" />
                 <p className="text-scale-1200 text-sm">Duplicate personal copy</p>
               </DropdownMenuItem_Shadcn_>
             )}
             <>
               <DropdownMenuSeparator_Shadcn_ />
-              <DropdownMenuItem_Shadcn_ onClick={onClickDelete}>
+              <DropdownMenuItem_Shadcn_ onClick={onClickDelete} className="space-x-2">
                 <IconTrash size="tiny" />
                 <p className="text-scale-1200 text-sm">Delete query</p>
               </DropdownMenuItem_Shadcn_>

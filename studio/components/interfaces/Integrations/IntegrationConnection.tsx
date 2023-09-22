@@ -98,6 +98,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                       </Link>
                     )}
                     <DropdownMenuItem_Shadcn_
+                      className="space-x-2"
                       onSelect={(event) => {
                         event.preventDefault()
                         onReSyncEnvVars()
@@ -114,7 +115,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                     <DropdownMenuSeparator_Shadcn_ />
                   </>
                 )}
-                <DropdownMenuItem_Shadcn_ onSelect={() => setIsOpen(true)}>
+                <DropdownMenuItem_Shadcn_ className="space-x-2" onSelect={() => setIsOpen(true)}>
                   <IconTrash size={14} />
                   <p className="text-scale-1200 text-sm">Delete connection</p>
                 </DropdownMenuItem_Shadcn_>

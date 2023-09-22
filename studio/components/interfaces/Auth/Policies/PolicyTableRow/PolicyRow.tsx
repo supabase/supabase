@@ -86,12 +86,18 @@ const PolicyRow = ({
               />
             </DropdownMenuTrigger_Shadcn_>
             <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-              <DropdownMenuItem_Shadcn_ onClick={() => onSelectEditPolicy(policy)}>
+              <DropdownMenuItem_Shadcn_
+                className="space-x-2"
+                onClick={() => onSelectEditPolicy(policy)}
+              >
                 <IconEdit size={14} />
                 <p className="text-scale-1200 text-sm">Edit</p>
               </DropdownMenuItem_Shadcn_>
               <DropdownMenuSeparator_Shadcn_ />
-              <DropdownMenuItem_Shadcn_ onClick={() => onSelectDeletePolicy(policy)}>
+              <DropdownMenuItem_Shadcn_
+                className="space-x-2"
+                onClick={() => onSelectDeletePolicy(policy)}
+              >
                 <IconTrash size={14} />
                 <p className="text-scale-1200 text-sm">Delete</p>
               </DropdownMenuItem_Shadcn_>

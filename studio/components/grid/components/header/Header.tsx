@@ -140,7 +140,7 @@ const DefaultHeader = ({
                       ? [
                           <DropdownMenuItem_Shadcn_
                             key="add-row"
-                            className="group"
+                            className="group space-x-2"
                             onClick={onAddRow}
                           >
                             <div className="-mt-2 pr-1.5">
@@ -166,7 +166,7 @@ const DefaultHeader = ({
                       ? [
                           <DropdownMenuItem_Shadcn_
                             key="add-column"
-                            className="group"
+                            className="group space-x-2"
                             onClick={onAddColumn}
                           >
                             <div className="flex -mt-2 pr-1.5">
@@ -192,7 +192,7 @@ const DefaultHeader = ({
                       ? [
                           <DropdownMenuItem_Shadcn_
                             key="import-data"
-                            className="group"
+                            className="group space-x-2"
                             onClick={onImportData}
                           >
                             <div className="relative -mt-2">

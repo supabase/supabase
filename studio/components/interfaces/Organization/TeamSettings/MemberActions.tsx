@@ -187,7 +187,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
                 )}
               </>
             ) : (
-              <DropdownMenuItem_Shadcn_ onClick={handleMemberDelete}>
+              <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={handleMemberDelete}>
                 <IconTrash size={16} />
                 <p className="text-scale-1200 text-sm">Remove member</p>
               </DropdownMenuItem_Shadcn_>

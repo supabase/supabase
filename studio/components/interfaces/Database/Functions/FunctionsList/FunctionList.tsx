@@ -103,17 +103,24 @@ const FunctionList = ({
                     <DropdownMenuContent_Shadcn_ side="left">
                       {isApiDocumentAvailable && (
                         <DropdownMenuItem_Shadcn_
+                          className="space-x-2"
                           onClick={() => router.push(`/project/${projectRef}/api?rpc=${x.name}`)}
                         >
                           <IconFileText size="tiny" />
                           <p className="text-scale-1200 text-sm">Client API docs</p>
                         </DropdownMenuItem_Shadcn_>
                       )}
-                      <DropdownMenuItem_Shadcn_ onClick={() => editFunction(x)}>
+                      <DropdownMenuItem_Shadcn_
+                        className="space-x-2"
+                        onClick={() => editFunction(x)}
+                      >
                         <IconEdit3 size="tiny" />
                         <p className="text-scale-1200 text-sm">Edit function</p>
                       </DropdownMenuItem_Shadcn_>
-                      <DropdownMenuItem_Shadcn_ onClick={() => deleteFunction(x)}>
+                      <DropdownMenuItem_Shadcn_
+                        className="space-x-2"
+                        onClick={() => deleteFunction(x)}
+                      >
                         <IconTrash stroke="red" size="tiny" />
                         <p className="text-scale-1200 text-sm">Delete function</p>
                       </DropdownMenuItem_Shadcn_>

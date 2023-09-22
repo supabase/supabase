@@ -119,11 +119,17 @@ const TriggerList = ({
                     </DropdownMenuTrigger_Shadcn_>
                     <DropdownMenuContent_Shadcn_ side="bottom" align="end">
                       <>
-                        <DropdownMenuItem_Shadcn_ onClick={() => editTrigger(x)}>
+                        <DropdownMenuItem_Shadcn_
+                          className="space-x-2"
+                          onClick={() => editTrigger(x)}
+                        >
                           <IconEdit3 size="tiny" />
                           <p className="text-scale-1200 text-sm">Edit trigger</p>
                         </DropdownMenuItem_Shadcn_>
-                        <DropdownMenuItem_Shadcn_ onClick={() => deleteTrigger(x)}>
+                        <DropdownMenuItem_Shadcn_
+                          className="space-x-2"
+                          onClick={() => deleteTrigger(x)}
+                        >
                           <IconTrash stroke="red" size="tiny" />
                           <p className="text-scale-1200 text-sm">Delete trigger</p>
                         </DropdownMenuItem_Shadcn_>

@@ -97,11 +97,14 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
 
                     <DropdownMenuContent_Shadcn_ side="left">
                       <>
-                        <DropdownMenuItem_Shadcn_ onClick={() => editHook(x)}>
+                        <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={() => editHook(x)}>
                           <IconEdit3 size="tiny" />
                           <p className="text-scale-1200 text-sm">Edit hook</p>
                         </DropdownMenuItem_Shadcn_>
-                        <DropdownMenuItem_Shadcn_ onClick={() => deleteHook(x)}>
+                        <DropdownMenuItem_Shadcn_
+                          className="space-x-2"
+                          onClick={() => deleteHook(x)}
+                        >
                           <IconTrash stroke="red" size="tiny" />
                           <p className="text-scale-1200 text-sm">Delete hook</p>
                         </DropdownMenuItem_Shadcn_>

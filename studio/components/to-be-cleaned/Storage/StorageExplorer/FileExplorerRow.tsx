@@ -432,7 +432,7 @@ const FileExplorerRow = ({
                   if ((option?.children ?? []).length > 0) {
                     return (
                       <DropdownMenuSub_Shadcn_ key={option.name}>
-                        <DropdownMenuSubTrigger_Shadcn_>
+                        <DropdownMenuSubTrigger_Shadcn_ className="space-x-2">
                           {option.icon || <></>}
                           <p className="text-xs">{option.name}</p>
                         </DropdownMenuSubTrigger_Shadcn_>
@@ -453,7 +453,11 @@ const FileExplorerRow = ({
                     return <DropdownMenuSeparator_Shadcn_ />
                   } else {
                     return (
-                      <DropdownMenuItem_Shadcn_ key={option.name} onClick={option.onClick}>
+                      <DropdownMenuItem_Shadcn_
+                        className="space-x-2"
+                        key={option.name}
+                        onClick={option.onClick}
+                      >
                         {option.icon || <></>}
                         <p className="text-xs">{option.name}</p>
                       </DropdownMenuItem_Shadcn_>

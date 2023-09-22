@@ -50,7 +50,11 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
         {state.editable && onEditColumn !== undefined && (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
-              <DropdownMenuItem_Shadcn_ onClick={onEditColumn} disabled={isEncrypted}>
+              <DropdownMenuItem_Shadcn_
+                className="space-x-2"
+                onClick={onEditColumn}
+                disabled={isEncrypted}
+              >
                 <IconEdit size="tiny" />
                 <p className="text text-sm">Edit column</p>
               </DropdownMenuItem_Shadcn_>
@@ -72,7 +76,10 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
             )}
           </Tooltip.Root>
         )}
-        <DropdownMenuItem_Shadcn_ onClick={column.frozen ? onUnfreezeColumn : onFreezeColumn}>
+        <DropdownMenuItem_Shadcn_
+          className="space-x-2"
+          onClick={column.frozen ? onUnfreezeColumn : onFreezeColumn}
+        >
           {column.frozen ? (
             <>
               <IconUnlock size="tiny" />
@@ -88,7 +95,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
         {state.editable && onDeleteColumn !== undefined && (
           <>
             <Divider light />
-            <DropdownMenuItem_Shadcn_ onClick={onDeleteColumn}>
+            <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={onDeleteColumn}>
               <IconTrash size="tiny" stroke="red" />
               <p className="text">Delete column</p>
             </DropdownMenuItem_Shadcn_>

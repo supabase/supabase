@@ -49,6 +49,7 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger className="w-full">
                 <DropdownMenuItem_Shadcn_
+                  className="space-x-2"
                   disabled={!canInviteUsers}
                   onClick={() => setInviteVisible(true)}
                 >
@@ -79,6 +80,7 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger className="w-full">
               <DropdownMenuItem_Shadcn_
+                className="space-x-2"
                 disabled={!canCreateUsers}
                 onClick={() => setCreateVisible(true)}
               >

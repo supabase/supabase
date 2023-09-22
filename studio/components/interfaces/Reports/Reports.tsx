@@ -274,7 +274,7 @@ const Reports = () => {
         {Object.values(METRIC_CATEGORIES).map((cat) => {
           return (
             <DropdownMenuSub_Shadcn_ key={cat.key}>
-              <DropdownMenuSubTrigger_Shadcn_>
+              <DropdownMenuSubTrigger_Shadcn_ className="space-x-2">
                 {cat.icon ? cat.icon : <IconHome size="tiny" />}
                 <p>{cat.label}</p>
               </DropdownMenuSubTrigger_Shadcn_>

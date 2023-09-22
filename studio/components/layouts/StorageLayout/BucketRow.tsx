@@ -76,6 +76,7 @@ const BucketRow = ({
             <DropdownMenuContent_Shadcn_ side="bottom" align="start">
               <DropdownMenuItem_Shadcn_
                 key="toggle-private"
+                className="space-x-2"
                 onClick={() => onSelectEditBucket(bucket)}
               >
                 <IconEdit2 size="tiny" />
@@ -84,6 +85,7 @@ const BucketRow = ({
               <DropdownMenuSeparator_Shadcn_ />
               <DropdownMenuItem_Shadcn_
                 key="delete-bucket"
+                className="space-x-2"
                 onClick={() => onSelectDeleteBucket(bucket)}
               >
                 <IconTrash size="tiny" />

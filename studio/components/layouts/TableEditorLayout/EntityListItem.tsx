@@ -137,6 +137,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
             <DropdownMenuContent_Shadcn_ side="bottom" align="start">
               <DropdownMenuItem_Shadcn_
                 key="edit-table"
+                className="space-x-2"
                 onClick={(e) => {
                   e.stopPropagation()
                   snap.onEditTable()
@@ -147,6 +148,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
               </DropdownMenuItem_Shadcn_>
               <DropdownMenuItem_Shadcn_
                 key="duplicate-table"
+                className="space-x-2"
                 onClick={(e) => {
                   e.stopPropagation()
                   snap.onDuplicateTable()
@@ -160,7 +162,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                 href={`/project/${projectRef}/auth/policies?search=${entity.id}`}
               >
                 <a>
-                  <DropdownMenuItem_Shadcn_ key="delete-table">
+                  <DropdownMenuItem_Shadcn_ key="delete-table" className="space-x-2">
                     <IconLock size="tiny" />
                     <p className="text-scale-1200 text-sm">View Policies</p>
                   </DropdownMenuItem_Shadcn_>
@@ -169,6 +171,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
               <DropdownMenuSeparator_Shadcn_ />
               <DropdownMenuItem_Shadcn_
                 key="delete-table"
+                className="space-x-2"
                 onClick={(e) => {
                   e.stopPropagation()
                   snap.onDeleteTable()

@@ -41,19 +41,21 @@ const PolicyRow = ({
           </DropdownMenuTrigger_Shadcn_>
           <DropdownMenuContent_Shadcn_ side="bottom" align="end" size="small">
             <DropdownMenuItem_Shadcn_
-              icon={<IconEdit size={14} />}
+              className="space-x-2"
               type="outline"
               onClick={() => onSelectPolicyEdit(policy, bucketName, table)}
             >
-              Edit
+              <IconEdit size={14} />
+              <p className="text-scale-1200 text-sm">Edit</p>
             </DropdownMenuItem_Shadcn_>
             <DropdownMenuSeparator_Shadcn_ />
             <DropdownMenuItem_Shadcn_
-              icon={<IconTrash size={14} />}
               type="outline"
+              className="space-x-2"
               onClick={() => onSelectPolicyDelete(policy)}
             >
-              Delete
+              <IconTrash size={14} />
+              <p className="text-scale-1200 text-sm">Delete</p>
             </DropdownMenuItem_Shadcn_>
           </DropdownMenuContent_Shadcn_>
         </DropdownMenu_Shadcn_>
