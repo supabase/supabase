@@ -56,7 +56,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
                 disabled={isEncrypted}
               >
                 <IconEdit size="tiny" />
-                <p className="text text-sm">Edit column</p>
+                <p className="text">Edit column</p>
               </DropdownMenuItem_Shadcn_>
             </Tooltip.Trigger>
             {isEncrypted && (

@@ -107,7 +107,7 @@ const FunctionList = ({
                           onClick={() => router.push(`/project/${projectRef}/api?rpc=${x.name}`)}
                         >
                           <IconFileText size="tiny" />
-                          <p className="text-scale-1200 text-sm">Client API docs</p>
+                          <p className="text">Client API docs</p>
                         </DropdownMenuItem_Shadcn_>
                       )}
                       <DropdownMenuItem_Shadcn_
@@ -115,14 +115,14 @@ const FunctionList = ({
                         onClick={() => editFunction(x)}
                       >
                         <IconEdit3 size="tiny" />
-                        <p className="text-scale-1200 text-sm">Edit function</p>
+                        <p className="text">Edit function</p>
                       </DropdownMenuItem_Shadcn_>
                       <DropdownMenuItem_Shadcn_
                         className="space-x-2"
                         onClick={() => deleteFunction(x)}
                       >
                         <IconTrash stroke="red" size="tiny" />
-                        <p className="text-scale-1200 text-sm">Delete function</p>
+                        <p className="text">Delete function</p>
                       </DropdownMenuItem_Shadcn_>
                     </DropdownMenuContent_Shadcn_>
                   </DropdownMenu_Shadcn_>

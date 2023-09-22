@@ -137,18 +137,18 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
             <>
               <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={handleResetPassword}>
                 <IconMail size="tiny" />
-                <p className="text-scale-1200 text-sm">Send password recovery</p>
+                <p className="text">Send password recovery</p>
               </DropdownMenuItem_Shadcn_>
               <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={handleSendMagicLink}>
                 <IconMail size="tiny" />
-                <p className="text-scale-1200 text-sm">Send magic link</p>
+                <p className="text">Send magic link</p>
               </DropdownMenuItem_Shadcn_>
             </>
           ) : null}
           {user.phone !== null ? (
             <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={handleSendOtp}>
               <IconMail size="tiny" />
-              <p className="text-scale-1200 text-sm">Send OTP</p>
+              <p className="text">Send OTP</p>
             </DropdownMenuItem_Shadcn_>
           ) : null}
           <DropdownMenuSeparator_Shadcn_ />
@@ -160,7 +160,7 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
                 className="space-x-2"
               >
                 <IconShieldOff size="tiny" />
-                <p className="text-scale-1200 text-sm">Remove MFA factors</p>
+                <p className="text">Remove MFA factors</p>
               </DropdownMenuItem_Shadcn_>
             </Tooltip.Trigger>
             {/* 
@@ -193,7 +193,7 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
                 className="space-x-2"
               >
                 <IconTrash size="tiny" />
-                <p className="text-scale-1200 text-sm">Delete user</p>
+                <p className="text">Delete user</p>
               </DropdownMenuItem_Shadcn_>
             </Tooltip.Trigger>
             {!canRemoveUser && (
