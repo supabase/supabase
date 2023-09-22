@@ -23,18 +23,6 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       level: 'database',
     },
     {
-      label: 'REST API',
-      icon: 'rest',
-      href: '/guides/api',
-      level: 'api',
-    },
-    {
-      label: 'GraphQL',
-      icon: 'graphql',
-      href: '/guides/pg_graphql/graphql',
-      level: 'graphql',
-    },
-    {
       label: 'Auth',
       icon: 'auth',
       href: '/guides/auth',
@@ -47,12 +35,6 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       level: 'functions',
     },
     {
-      label: 'Realtime',
-      icon: 'realtime',
-      href: '/guides/realtime',
-      level: 'realtime',
-    },
-    {
       label: 'Storage',
       icon: 'storage',
       href: '/guides/storage',
@@ -63,9 +45,35 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       icon: 'ai',
       href: '/guides/ai',
       level: 'ai',
+    }
+  ],
+  [
+    {
+      label: 'APIs',
+    },
+    {
+      label: 'REST',
+      icon: 'rest',
+      href: '/guides/api',
+      level: 'api',
+    },
+    {
+      label: 'GraphQL',
+      icon: 'graphql',
+      href: '/guides/pg_graphql/graphql',
+      level: 'graphql',
+    },
+    {
+      label: 'Realtime',
+      icon: 'realtime',
+      href: '/guides/realtime',
+      level: 'realtime',
     },
   ],
   [
+    {
+      label: 'Development Cycle',
+    },
     {
       label: 'Local Dev / CLI',
       icon: 'reference-cli',
