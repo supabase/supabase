@@ -32,16 +32,22 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       level: 'auth',
     },
     {
+      label: 'Storage',
+      icon: 'storage',
+      href: '/guides/storage',
+      level: 'storage',
+    },
+    {
       label: 'Edge Functions',
       icon: 'edge-functions',
       href: '/guides/functions',
       level: 'functions',
     },
     {
-      label: 'Storage',
-      icon: 'storage',
-      href: '/guides/storage',
-      level: 'storage',
+      label: 'Realtime',
+      icon: 'realtime',
+      href: '/guides/realtime',
+      level: 'realtime',
     },
     {
       label: 'AI & Vectors',
@@ -52,7 +58,7 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
   ],
   [
     {
-      label: 'APIs',
+      label: 'API',
     },
     {
       label: 'REST',
@@ -65,12 +71,6 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       icon: 'graphql',
       href: '/guides/pg_graphql/graphql',
       level: 'graphql',
-    },
-    {
-      label: 'Realtime',
-      icon: 'realtime',
-      href: '/guides/realtime',
-      level: 'realtime',
     },
   ],
   [
