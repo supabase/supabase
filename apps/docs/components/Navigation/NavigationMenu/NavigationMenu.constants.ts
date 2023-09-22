@@ -23,8 +23,8 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       level: 'database',
     },
     {
-      label: 'Serverless APIs',
-      icon: 'serverless-apis',
+      label: 'REST API',
+      icon: 'rest',
       href: '/guides/api',
       level: 'api',
     },
@@ -747,12 +747,15 @@ export const database: NavMenuConstant = {
 }
 
 export const api: NavMenuConstant = {
-  icon: 'serverless-apis',
-  title: 'Serverless APIs',
+  icon: 'rest',
+  title: 'REST API',
   url: '/guides/api',
   items: [
     { name: 'Overview', url: '/guides/api', items: [] },
     { name: 'Quickstart', url: '/guides/api/quickstart', items: [] },
+    { name: 'Client Libraries', url: '/guides/api/rest/client-libs', items: [] },
+    { name: 'Auto-generated Docs', url: '/guides/api/rest/auto-generated-docs', items: [] },
+    { name: 'Generating Types', url: '/guides/api/rest/generating-types', items: [] },
     {
       name: 'Guides',
       url: '/guides/api',
@@ -765,22 +768,8 @@ export const api: NavMenuConstant = {
           url: '/guides/api/joins-and-nesting',
           items: [],
         },
-        { name: 'Using custom schemas', url: '/guides/api/using-custom-schemas', items: [] },
+        { name: 'Using custom schemas', url: '/guides/api/using-custom-schemas', items: [] }
       ],
-    },
-    {
-      name: 'REST & REALTIME',
-      url: undefined,
-      items: [
-        { name: 'Auto-generated Docs', url: '/guides/api/rest/auto-generated-docs', items: [] },
-        { name: 'Client Libraries', url: '/guides/api/rest/client-libs', items: [] },
-        { name: 'Generating Types', url: '/guides/api/rest/generating-types', items: [] },
-      ],
-    },
-    {
-      name: 'GRAPHQL',
-      url: undefined,
-      items: [{ name: 'GraphiQL Documentation', url: '/guides/api/graphql/graphiql', items: [] }],
     },
   ],
 }

@@ -17,7 +17,7 @@ import {
   IconMenuRealtime,
   IconMenuResources,
   IconMenuSelfHosting,
-  IconMenuServerlessApis,
+  IconMenuRestApis,
   IconMenuStorage,
   IconMenuSwift,
   IconMenuStatus,
@@ -33,8 +33,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16) {
       return <IconMenuGettingStarted width={width} height={height} />
     case 'database':
       return <IconMenuDatabase width={width} height={height} />
-    case 'serverless-apis':
-      return <IconMenuServerlessApis width={width} height={height} />
+    case 'rest':
+      return <IconMenuRestApis width={width} height={height} />
     case 'graphql':
       return <IconMenuGraphQL width={width} height={height} />
     case 'auth':

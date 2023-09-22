@@ -139,7 +139,7 @@ export function IconMenuDatabase({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuServerlessApis({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuRestApis({ width = 16, height = 16 }: HomeMenuIcon) {
   return (
     <svg
       viewBox="0 0 16 16"
