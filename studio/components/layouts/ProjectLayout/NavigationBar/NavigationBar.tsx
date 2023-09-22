@@ -152,7 +152,7 @@ const NavigationBar = () => {
                   <Link href="/account/me">
                     <DropdownMenuItem_Shadcn_ key="header" className="space-x-2">
                       <IconSettings size={14} strokeWidth={1.5} />
-                      <p className="text-scale-1200 text-sm">Account Preferences</p>
+                      <p className="text">Account Preferences</p>
                     </DropdownMenuItem_Shadcn_>
                   </Link>
                   <DropdownMenuSeparator_Shadcn_ />

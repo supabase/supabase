@@ -735,9 +735,7 @@ const SQLEditor = () => {
                                     }
                                   }}
                                 >
-                                  <p className="text-scale-1200 text-sm">
-                                    {getDiffTypeDropdownLabel(diffType)}
-                                  </p>
+                                  <p className="text">{getDiffTypeDropdownLabel(diffType)}</p>
                                 </DropdownMenuItem_Shadcn_>
                               ))}
                           </DropdownMenuContent_Shadcn_>

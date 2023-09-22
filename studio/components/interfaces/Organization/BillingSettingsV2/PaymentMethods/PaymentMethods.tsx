@@ -189,9 +189,7 @@ const PaymentMethods = () => {
                                                   setSelectedMethodForUse(paymentMethod)
                                                 }
                                               >
-                                                <p className="text-scale-1200 text-sm">
-                                                  Use this card
-                                                </p>
+                                                <p className="text">Use this card</p>
                                               </DropdownMenuItem_Shadcn_>
                                               <DropdownMenuSeparator_Shadcn_ />
                                             </>
@@ -200,7 +198,7 @@ const PaymentMethods = () => {
                                           key="delete-method"
                                           onClick={() => setSelectedMethodToDelete(paymentMethod)}
                                         >
-                                          <p className="text-scale-1200 text-sm">Delete card</p>
+                                          <p className="text">Delete card</p>
                                         </DropdownMenuItem_Shadcn_>
                                       </DropdownMenuContent_Shadcn_>
                                     </DropdownMenu_Shadcn_>

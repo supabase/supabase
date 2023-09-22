@@ -46,7 +46,7 @@ const PolicyRow = ({
               onClick={() => onSelectPolicyEdit(policy, bucketName, table)}
             >
               <IconEdit size={14} />
-              <p className="text-scale-1200 text-sm">Edit</p>
+              <p className="text">Edit</p>
             </DropdownMenuItem_Shadcn_>
             <DropdownMenuSeparator_Shadcn_ />
             <DropdownMenuItem_Shadcn_
@@ -55,7 +55,7 @@ const PolicyRow = ({
               onClick={() => onSelectPolicyDelete(policy)}
             >
               <IconTrash size={14} />
-              <p className="text-scale-1200 text-sm">Delete</p>
+              <p className="text">Delete</p>
             </DropdownMenuItem_Shadcn_>
           </DropdownMenuContent_Shadcn_>
         </DropdownMenu_Shadcn_>

@@ -110,14 +110,14 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                       ) : (
                         <IconRefreshCw size={14} />
                       )}
-                      <p className="text-scale-1200 text-sm">Resync environment variables</p>
+                      <p className="text">Resync environment variables</p>
                     </DropdownMenuItem_Shadcn_>
                     <DropdownMenuSeparator_Shadcn_ />
                   </>
                 )}
                 <DropdownMenuItem_Shadcn_ className="space-x-2" onSelect={() => setIsOpen(true)}>
                   <IconTrash size={14} />
-                  <p className="text-scale-1200 text-sm">Delete connection</p>
+                  <p className="text">Delete connection</p>
                 </DropdownMenuItem_Shadcn_>
               </DropdownMenuContent_Shadcn_>
             </DropdownMenu_Shadcn_>

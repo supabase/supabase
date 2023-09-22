@@ -128,11 +128,11 @@ const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
         <>
           <DropdownMenuItem_Shadcn_ onClick={onDownloadCSV} className="space-x-2">
             <IconDownload size="tiny" />
-            <p className="text-scale-1200 text-sm">Download CSV</p>
+            <p className="text">Download CSV</p>
           </DropdownMenuItem_Shadcn_>
           <DropdownMenuItem_Shadcn_ onClick={onCopyAsMarkdown} className="space-x-2">
             <IconClipboard size="tiny" />
-            <p className="text-scale-1200 text-sm">Copy as markdown</p>
+            <p className="text">Copy as markdown</p>
           </DropdownMenuItem_Shadcn_>
         </>
       </DropdownMenuContent_Shadcn_>

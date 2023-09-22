@@ -101,7 +101,7 @@ const LogsQueryPanel = ({
                       key={template.label}
                       onClick={() => onSelectTemplate(template)}
                     >
-                      <p className="text-scale-1200 text-sm">{template.label}</p>
+                      <p className="text">{template.label}</p>
                     </DropdownMenuItem_Shadcn_>
                   ))}
               </DropdownMenuContent_Shadcn_>

@@ -167,7 +167,7 @@ const ReportFilterBar = ({
           </DropdownMenuTrigger_Shadcn_>
           <DropdownMenuContent_Shadcn_ side="bottom" align="start">
             <DropdownMenuItem_Shadcn_ onClick={() => handleProductFilterChange(null)}>
-              <p className="text-scale-1200 text-sm">All Requests</p>
+              <p className="text">All Requests</p>
             </DropdownMenuItem_Shadcn_>
             <DropdownMenuSeparator_Shadcn_ />
             {PRODUCT_FILTERS.map((productFilter) => {
@@ -188,7 +188,7 @@ const ReportFilterBar = ({
                   >
                     {productFilter.label}
                   </p>
-                  <p className=" text-left text-scale-1000 inline-block w-[180px]">
+                  <p className="text-left text-scale-1000 inline-block w-[180px]">
                     {productFilter.description}
                   </p>
                 </DropdownMenuItem_Shadcn_>

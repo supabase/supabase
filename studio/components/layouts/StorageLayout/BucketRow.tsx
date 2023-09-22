@@ -80,7 +80,7 @@ const BucketRow = ({
                 onClick={() => onSelectEditBucket(bucket)}
               >
                 <IconEdit2 size="tiny" />
-                <p className="text-scale-1200 text-sm">Edit bucket</p>
+                <p className="text">Edit bucket</p>
               </DropdownMenuItem_Shadcn_>
               <DropdownMenuSeparator_Shadcn_ />
               <DropdownMenuItem_Shadcn_
@@ -89,7 +89,7 @@ const BucketRow = ({
                 onClick={() => onSelectDeleteBucket(bucket)}
               >
                 <IconTrash size="tiny" />
-                <p className="text-scale-1200 text-sm">Delete bucket</p>
+                <p className="text">Delete bucket</p>
               </DropdownMenuItem_Shadcn_>
             </DropdownMenuContent_Shadcn_>
           </DropdownMenu_Shadcn_>

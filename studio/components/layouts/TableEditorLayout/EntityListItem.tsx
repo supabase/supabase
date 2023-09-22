@@ -144,7 +144,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                 }}
               >
                 <IconEdit size="tiny" />
-                <p className="text-scale-1200 text-sm">Edit Table</p>
+                <p className="text">Edit Table</p>
               </DropdownMenuItem_Shadcn_>
               <DropdownMenuItem_Shadcn_
                 key="duplicate-table"
@@ -155,7 +155,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                 }}
               >
                 <IconCopy size="tiny" />
-                <p className="text-scale-1200 text-sm">Duplicate Table</p>
+                <p className="text">Duplicate Table</p>
               </DropdownMenuItem_Shadcn_>
               <Link
                 key="view-policies"
@@ -164,7 +164,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                 <a>
                   <DropdownMenuItem_Shadcn_ key="delete-table" className="space-x-2">
                     <IconLock size="tiny" />
-                    <p className="text-scale-1200 text-sm">View Policies</p>
+                    <p className="text">View Policies</p>
                   </DropdownMenuItem_Shadcn_>
                 </a>
               </Link>
@@ -178,7 +178,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                 }}
               >
                 <IconTrash size="tiny" />
-                <p className="text-scale-1200 text-sm">Delete Table</p>
+                <p className="text">Delete Table</p>
               </DropdownMenuItem_Shadcn_>
             </DropdownMenuContent_Shadcn_>
           </DropdownMenu_Shadcn_>

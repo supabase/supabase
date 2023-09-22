@@ -252,7 +252,7 @@ const PublishAppSidePanel = ({
                                           (uploadButtonRef.current as any).click()
                                       }}
                                     >
-                                      <p className="text-scale-1200 text-sm">Upload image</p>
+                                      <p className="text">Upload image</p>
                                     </DropdownMenuItem_Shadcn_>
                                     <DropdownMenuItem_Shadcn_
                                       key="remove"
@@ -261,7 +261,7 @@ const PublishAppSidePanel = ({
                                         setIconUrl(undefined)
                                       }}
                                     >
-                                      <p className="text-scale-1200 text-sm">Remove image</p>
+                                      <p className="text">Remove image</p>
                                     </DropdownMenuItem_Shadcn_>
                                   </DropdownMenuContent_Shadcn_>
                                 </DropdownMenu_Shadcn_>

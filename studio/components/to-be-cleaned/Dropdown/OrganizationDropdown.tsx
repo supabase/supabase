@@ -39,7 +39,7 @@ const OrganizationDropdown = ({
           <DropdownMenuSeparator_Shadcn_ />
           <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={() => router.push(`/new`)}>
             <IconPlus size="tiny" />
-            <p className="text-scale-1200 text-sm">New organization</p>
+            <p className="text">New organization</p>
           </DropdownMenuItem_Shadcn_>
         </>
       </DropdownMenuContent_Shadcn_>
