@@ -8,12 +8,12 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useCheckPermissions, useStore } from 'hooks'
 import { useParams } from 'common/hooks'
 import { BASE_PATH } from 'lib/constants'
-import { useTheme } from 'common'
+import { useTheme } from 'next-themes'
 
 const WrappersDisabledState = () => {
   const { ui, meta } = useStore()
   const { ref } = useParams()
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
   const wrappersExtension = meta.extensions.byId('wrappers')
   const vaultExtension = meta.extensions.byId('supabase_vault')
   const isNotAvailable = wrappersExtension === undefined || vaultExtension === undefined
@@ -71,9 +71,10 @@ const WrappersDisabledState = () => {
         style={{
           backgroundSize: '45%',
           backgroundPosition: '105% 40%',
-          backgroundImage: isDarkMode
-            ? `url("${BASE_PATH}/img/wrappers-dark.png")`
-            : `url("${BASE_PATH}/img/wrappers-light.png")`,
+          backgroundImage:
+            theme === 'dark'
+              ? `url("${BASE_PATH}/img/wrappers-dark.png")`
+              : `url("${BASE_PATH}/img/wrappers-light.png")`,
         }}
       >
         <div className="w-3/5 space-y-8">

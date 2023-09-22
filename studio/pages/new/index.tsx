@@ -18,7 +18,7 @@ const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
  * No org selected yet, create a new one
  */
 const Wizard: NextPageWithLayout = () => {
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
 
   const [intent, setIntent] = useState<any>()
   const captchaLoaded = useIsHCaptchaLoaded()
@@ -42,7 +42,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const options = {
     clientSecret: intent ? intent.client_secret : '',
-    appearance: { theme: isDarkMode ? 'night' : 'flat', labels: 'floating' },
+    appearance: { theme: theme === 'dark' ? 'night' : 'flat', labels: 'floating' },
   } as any
 
   const loadPaymentForm = async () => {

@@ -38,7 +38,7 @@ const SpendCapSidePanel = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
 
   const [showUsageCosts, setShowUsageCosts] = useState(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
@@ -185,9 +185,7 @@ const SpendCapSidePanel = () => {
                               <p className="text-xs pl-4">{item.title}</p>
                             </Table.td>
                             <Table.td>
-                              <p className="text-xs pl-4">
-                                {item.plans['pro']}
-                              </p>
+                              <p className="text-xs pl-4">{item.plans['pro']}</p>
                             </Table.td>
                           </Table.tr>
                         )
@@ -252,7 +250,7 @@ const SpendCapSidePanel = () => {
                       )}
                       width={160}
                       height={96}
-                      src={isDarkMode ? option.imageUrl : option.imageUrlLight}
+                      src={theme === 'dark' ? option.imageUrl : option.imageUrlLight}
                     />
 
                     <p

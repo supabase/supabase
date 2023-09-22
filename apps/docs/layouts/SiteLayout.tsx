@@ -1,4 +1,4 @@
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
@@ -216,13 +216,13 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
 })
 
 const HeaderLogo = memo(function HeaderLogo() {
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
   return (
     <Link href="/">
       <a className="px-10 flex items-center gap-2">
         <Image
           className="cursor-pointer"
-          src={isDarkMode ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
+          src={theme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
           width={96}
           height={24}
           alt="Supabase Logo"

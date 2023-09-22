@@ -5,10 +5,10 @@ import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 
 import { BASE_PATH } from 'lib/constants'
-import { useTheme } from 'common'
+import { useTheme } from 'next-themes'
 
 const Error404: NextPage = ({}) => {
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
   const [show404, setShow404] = useState<boolean>(false)
 
   useEffect(() => {
@@ -27,7 +27,7 @@ const Error404: NextPage = ({}) => {
                 <a>
                   <Image
                     src={
-                      isDarkMode
+                      theme === 'dark'
                         ? `${BASE_PATH}/img/supabase-dark.svg`
                         : `${BASE_PATH}/img/supabase-light.svg`
                     }

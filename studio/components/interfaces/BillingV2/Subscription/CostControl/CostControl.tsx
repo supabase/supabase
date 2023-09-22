@@ -15,7 +15,7 @@ const CostControl = ({}: CostControlProps) => {
   const { ref: projectRef } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
 
   const { data: subscription, isLoading } = useProjectSubscriptionV2Query({ projectRef })
 
@@ -100,8 +100,12 @@ const CostControl = ({}: CostControlProps) => {
                     height={96}
                     src={
                       isUsageBillingEnabled
-                        ? `${BASE_PATH}/img/spend-cap-off${isDarkMode ? '' : '--light'}.png?v=3`
-                        : `${BASE_PATH}/img/spend-cap-on${isDarkMode ? '' : '--light'}.png?v=3`
+                        ? `${BASE_PATH}/img/spend-cap-off${
+                            theme === 'dark' ? '' : '--light'
+                          }.png?v=3`
+                        : `${BASE_PATH}/img/spend-cap-on${
+                            theme === 'dark' ? '' : '--light'
+                          }.png?v=3`
                     }
                   />
                 </div>

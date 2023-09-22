@@ -17,7 +17,7 @@ import ReactFlow, {
 } from 'reactflow'
 
 import { PostgresTable } from '@supabase/postgres-meta'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTablesQuery } from 'data/tables/tables-query'
 import 'reactflow/dist/style.css'
@@ -300,9 +300,9 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
 }
 
 const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
-  const { isDarkMode } = useTheme()
-  const backgroundPatternColor = isDarkMode ? '#2e2e2e' : '#e6e8eb'
-  const edgeStrokeColor = isDarkMode ? '#ededed' : '#111318'
+  const { theme } = useTheme()
+  const backgroundPatternColor = theme === 'dark' ? '#2e2e2e' : '#e6e8eb'
+  const edgeStrokeColor = theme === 'dark' ? '#ededed' : '#111318'
 
   const reactFlowInstance = useReactFlow()
   const nodeTypes = useMemo(
@@ -318,7 +318,7 @@ const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
       reactFlowInstance.setEdges(edges)
       setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
     })
-  }, [tables, isDarkMode])
+  }, [tables, theme])
 
   return (
     <>

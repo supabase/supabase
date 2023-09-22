@@ -1,16 +1,33 @@
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
-import { Button, IconCommand, IconGitHub, IconMoon, IconSearch, IconSun, SearchButton } from 'ui'
+import {
+  Button,
+  DropdownMenuGroup_Shadcn_,
+  DropdownMenuRadioGroup_Shadcn_,
+  DropdownMenuRadioItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenu_Shadcn_,
+  DropdownMenuContent_Shadcn_,
+  IconCommand,
+  IconGitHub,
+  IconMoon,
+  IconSearch,
+  IconSun,
+  SearchButton,
+  DropdownMenuTrigger_Shadcn_,
+  IconUser,
+} from 'ui'
 
 import { getPageType } from '~/lib/helpers'
 import { REFERENCES } from './NavigationMenu.constants'
 
 const TopNavBarRef: FC = () => {
-  const { isDarkMode, toggleTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const [open, setOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const { asPath, push } = useRouter()
@@ -28,7 +45,7 @@ const TopNavBarRef: FC = () => {
 
   useEffect(() => {
     setMounted(true)
-  }, [isDarkMode])
+  }, [theme])
 
   const pageLinks = [
     { text: 'Guides', key: 'docs', link: '/' },
@@ -63,7 +80,7 @@ const TopNavBarRef: FC = () => {
             <a className=" flex items-center gap-2">
               <Image
                 className="cursor-pointer"
-                src={isDarkMode ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
+                src={theme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
                 width={96}
                 height={24}
                 alt="Supabase Logo"
@@ -125,7 +142,47 @@ const TopNavBarRef: FC = () => {
               <IconGitHub size={16} className="text-scale-1100 hover:text-scale-1200 transition" />
             </a>
           </Link>
-          <div className="cursor-pointer px-2.5 py-1" onClick={() => toggleTheme()}>
+          <DropdownMenu_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
+            <DropdownMenuTrigger_Shadcn_ asChild>
+              <button
+                id="user-settings-dropdown"
+                className="flex items-center justify-center h-7 w-7 text"
+              >
+                <IconSun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <IconMoon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                <span className="sr-only">Toggle theme</span>
+              </button>
+            </DropdownMenuTrigger_Shadcn_>
+            <DropdownMenuContent_Shadcn_ align="end" className="w-60">
+              <DropdownMenuGroup_Shadcn_>
+                <DropdownMenuRadioGroup_Shadcn_
+                  value={theme}
+                  onValueChange={(value) => {
+                    setTheme(value)
+                  }}
+                >
+                  <DropdownMenuRadioItem_Shadcn_ value={'system'}>
+                    System
+                  </DropdownMenuRadioItem_Shadcn_>
+                  <DropdownMenuRadioItem_Shadcn_ value={'dark'}>Dark</DropdownMenuRadioItem_Shadcn_>
+                  <DropdownMenuRadioItem_Shadcn_ value={'light'}>
+                    Light
+                  </DropdownMenuRadioItem_Shadcn_>
+                </DropdownMenuRadioGroup_Shadcn_>
+              </DropdownMenuGroup_Shadcn_>
+            </DropdownMenuContent_Shadcn_>
+          </DropdownMenu_Shadcn_>
+          {/* <DropdownMenuRadioGroup_Shadcn_
+            value={theme}
+            onValueChange={(x) => {
+              setTheme(x)
+            }}
+          >
+            <DropdownMenuRadioItem_Shadcn_ value={'system'}>System</DropdownMenuRadioItem_Shadcn_>
+            <DropdownMenuRadioItem_Shadcn_ value={'dark'}>Dark</DropdownMenuRadioItem_Shadcn_>
+            <DropdownMenuRadioItem_Shadcn_ value={'light'}>Light</DropdownMenuRadioItem_Shadcn_>
+          </DropdownMenuRadioGroup_Shadcn_> */}
+          {/* <div className="cursor-pointer px-2.5 py-1" onClick={() => toggleTheme()}>
             {isDarkMode ? (
               <IconMoon
                 size={16}
@@ -139,7 +196,7 @@ const TopNavBarRef: FC = () => {
                 className="text-scale-1100 hover:text-scale-1200 transition"
               />
             )}
-          </div>
+          </div> */}
         </div>
       </div>
     </nav>

@@ -1,9 +1,9 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useParams, useTheme } from 'common'
+import { useParams } from 'common'
 import { isUndefined } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-
+import { useTheme } from 'next-themes'
 import { useFlag } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
@@ -27,7 +27,7 @@ import NavigationIconButton from './NavigationIconButton'
 
 const NavigationBar = () => {
   const router = useRouter()
-  const { isDarkMode, toggleTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
 
   const os = detectOS()
@@ -152,11 +152,10 @@ const NavigationBar = () => {
                 <Dropdown.Label>Theme</Dropdown.Label>
                 <Dropdown.RadioGroup
                   key="theme"
-                  value={isDarkMode ? 'dark' : 'light'}
-                  onChange={(e: any) => toggleTheme(e === 'dark')}
+                  value={theme}
+                  onChange={(value: string) => setTheme(value)}
                 >
-                  {/* [Joshen] Removing system default for now, needs to be supported in useTheme from common packages */}
-                  {/* <Dropdown.Radio value="system">System default</Dropdown.Radio> */}
+                  <Dropdown.Radio value="system">System</Dropdown.Radio>
                   <Dropdown.Radio value="dark">Dark</Dropdown.Radio>
                   <Dropdown.Radio value="light">Light</Dropdown.Radio>
                 </Dropdown.RadioGroup>

@@ -1,10 +1,16 @@
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
 import {
   Button,
+  DropdownMenuGroup_Shadcn_,
+  DropdownMenuRadioGroup_Shadcn_,
+  DropdownMenuRadioItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenu_Shadcn_,
+  DropdownMenuContent_Shadcn_,
   IconCommand,
   IconMenu,
   IconMoon,
@@ -16,7 +22,7 @@ import {
 import { REFERENCES } from './NavigationMenu.constants'
 
 const TopNavBar: FC = () => {
-  const { isDarkMode, toggleTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -33,7 +39,7 @@ const TopNavBar: FC = () => {
 
   useEffect(() => {
     setMounted(true)
-  }, [isDarkMode])
+  }, [theme])
 
   const onSelectVersion = (version: string) => {
     // [Joshen] Ideally we use <Link> but this works for now
@@ -67,7 +73,7 @@ const TopNavBar: FC = () => {
               <a className="flex items-center">
                 <Image
                   className="cursor-pointer"
-                  src={isDarkMode ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
+                  src={theme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
                   width={124}
                   height={24}
                   alt="Supabase Logo"
@@ -137,8 +143,50 @@ const TopNavBar: FC = () => {
           </Button>
           <ul className="flex items-center">
             <li className="px-4">
-              <div className="cursor-pointer" onClick={() => toggleTheme()}>
-                {isDarkMode ? (
+              <DropdownMenu_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
+                <DropdownMenuContent_Shadcn_ align="end" className="w-60">
+                  <DropdownMenuGroup_Shadcn_>
+                    <div key="profile" className="px-2 py-1.5">
+                      <p className="text-sm text-scale-1200">hay</p>
+                    </div>
+
+                    <DropdownMenuSeparator_Shadcn_ />
+
+                    <DropdownMenuRadioGroup_Shadcn_
+                      value={theme}
+                      onValueChange={(x) => {
+                        setTheme(x)
+                      }}
+                    >
+                      <DropdownMenuRadioItem_Shadcn_ value={'system'}>
+                        System
+                      </DropdownMenuRadioItem_Shadcn_>
+                      <DropdownMenuRadioItem_Shadcn_ value={'dark'}>
+                        Dark
+                      </DropdownMenuRadioItem_Shadcn_>
+                      <DropdownMenuRadioItem_Shadcn_ value={'light'}>
+                        Light
+                      </DropdownMenuRadioItem_Shadcn_>
+                    </DropdownMenuRadioGroup_Shadcn_>
+
+                    <DropdownMenuSeparator_Shadcn_ />
+                  </DropdownMenuGroup_Shadcn_>
+                </DropdownMenuContent_Shadcn_>
+              </DropdownMenu_Shadcn_>
+              {/* <DropdownMenuRadioGroup_Shadcn_
+                value={theme}
+                onValueChange={(x) => {
+                  setTheme(x)
+                }}
+              >
+                <DropdownMenuRadioItem_Shadcn_ value={'system'}>
+                  System
+                </DropdownMenuRadioItem_Shadcn_>
+                <DropdownMenuRadioItem_Shadcn_ value={'dark'}>Dark</DropdownMenuRadioItem_Shadcn_>
+                <DropdownMenuRadioItem_Shadcn_ value={'light'}>Light</DropdownMenuRadioItem_Shadcn_>
+              </DropdownMenuRadioGroup_Shadcn_> */}
+              {/* <div className="cursor-pointer" onClick={() => setTheme('dark')}>
+                {theme === 'dark' ? (
                   <IconMoon
                     size={16}
                     strokeWidth={1}
@@ -151,7 +199,7 @@ const TopNavBar: FC = () => {
                     className="text-scale-1100 hover:text-scale-1200 transition"
                   />
                 )}
-              </div>
+              </div> */}
             </li>
           </ul>
         </div>

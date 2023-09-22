@@ -46,7 +46,7 @@ const ComputeInstanceSidePanel = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
   const { project: selectedProject } = useProjectContext()
   const organization = useSelectedOrganization()
   const isOrgBilling = !!organization?.subscription_id
@@ -235,7 +235,7 @@ const ComputeInstanceSidePanel = () => {
                         )}
                         width={160}
                         height={96}
-                        src={isDarkMode ? option.imageUrl : option.imageUrlLight}
+                        src={theme === 'dark' ? option.imageUrl : option.imageUrlLight}
                       />
 
                       <p

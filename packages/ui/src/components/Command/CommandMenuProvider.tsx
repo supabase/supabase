@@ -1,4 +1,4 @@
-import { useTheme, UseThemeProps } from 'common'
+// import { useTheme, UseThemeProps } from 'common'
 import dynamic from 'next/dynamic'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 
@@ -48,7 +48,7 @@ export const useCommandMenu = () => {
 }
 
 export interface CommandMenuActions {
-  toggleTheme: UseThemeProps['toggleTheme']
+  //toggleTheme: UseThemeProps['toggleTheme']
 }
 
 export interface CommandMenuProviderProps {
@@ -87,10 +87,10 @@ const CommandMenuProvider = ({
   const [isLoading, setIsLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [pages, setPages] = useState<string[]>([])
-  const { toggleTheme } = useTheme()
+  //const { toggleTheme } = useTheme()
   const currentPage = pages[pages.length - 1]
 
-  const actions: CommandMenuActions = { toggleTheme }
+  const actions: CommandMenuActions = { null: null }
   const project = projectRef !== undefined ? { ref: projectRef, apiKeys, apiUrl } : undefined
 
   useKeyboardEvents({ setIsOpen, currentPage, setSearch, setPages })

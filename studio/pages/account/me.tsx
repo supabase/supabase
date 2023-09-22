@@ -1,7 +1,8 @@
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 
-import { useTheme } from 'common'
+import { useTheme } from 'next-themes'
+
 import { AccountLayout } from 'components/layouts'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
 import Panel from 'components/ui/Panel'
@@ -173,24 +174,23 @@ const Profile = ({ profile }: { profile?: ProfileType }) => {
 }
 
 const ThemeSettings = observer(() => {
-  const { isDarkMode, toggleTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
 
   return (
     <Panel title={<h5 key="panel-title">Theme</h5>}>
       <Panel.Content>
         <Listbox
-          value={isDarkMode ? 'dark' : 'light'}
+          value={theme}
           label="Interface theme"
           descriptionText="Choose a theme preference"
           layout="horizontal"
           style={{ width: '50%' }}
-          icon={isDarkMode ? <IconMoon /> : <IconSun />}
-          onChange={(themeOption: any) => toggleTheme(themeOption === 'dark')}
+          icon={theme ? <IconMoon /> : <IconSun />}
+          onChange={(value: string) => setTheme(value)}
         >
-          {/* [Joshen] Removing system default for now, needs to be supported in useTheme from common packages */}
-          {/* <Listbox.Option label="System default" value="system">
+          <Listbox.Option label="System default" value="system">
             System default
-          </Listbox.Option> */}
+          </Listbox.Option>
           <Listbox.Option label="Dark" value="dark">
             Dark
           </Listbox.Option>
