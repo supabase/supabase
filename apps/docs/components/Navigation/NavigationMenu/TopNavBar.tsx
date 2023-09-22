@@ -23,6 +23,7 @@ import { REFERENCES } from './NavigationMenu.constants'
 
 const TopNavBar: FC = () => {
   const { theme, setTheme } = useTheme()
+  const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
