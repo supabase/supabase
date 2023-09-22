@@ -24,6 +24,7 @@ import {
   UpdateColumnPayload,
 } from './SidePanelEditor.types'
 import { ImportContent } from './TableEditor/TableEditor.types'
+import SchemaEditor from './SchemaEditor'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -553,6 +554,11 @@ const SidePanelEditor = ({
         closePanel={onClosePanel}
         saveChanges={saveTable}
         updateEditorDirty={() => setIsEdited(true)}
+      />
+      <SchemaEditor
+        visible={snap.sidePanel?.type === 'schema'}
+        closePanel={onClosePanel}
+        saveChanges={() => {}}
       />
       <JsonEdit
         visible={snap.sidePanel?.type === 'json'}

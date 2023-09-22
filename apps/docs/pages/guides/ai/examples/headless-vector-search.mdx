@@ -10,7 +10,7 @@ export const meta = {
 
 Supabase provides a [Headless Search Toolkit](https://github.com/supabase/headless-vector-search) for adding "Generative Q&A" to your documentation. The toolkit is "headless", so that you can integrate it into your existing website and style it to match your website theme.
 
-You can see how this works with the Supabase docs. Just him `cmd+k` and "ask" for something like "what are the features of supabase?". You will see that the response is streamed back, using the information provided in the docs:
+You can see how this works with the Supabase docs. Just hit `cmd+k` and "ask" for something like "what are the features of supabase?". You will see that the response is streamed back, using the information provided in the docs:
 
 ![headless search](/docs/img/ai/headless-search/headless.png)
 
@@ -87,7 +87,7 @@ const onSubmit = (e: Event) => {
   isLoading.value = true
 
   const query = new URLSearchParams({ query: inputRef.current!.value })
-  const projectUrl = `https://your-project-ref.functions.supabase.co`
+  const projectUrl = `https://your-project-ref.supabase.co/functions/v1`
   const queryURL = `${projectURL}/${query}`
   const eventSource = new EventSource(queryURL)
 

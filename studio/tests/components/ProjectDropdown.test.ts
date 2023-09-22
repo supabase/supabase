@@ -1,4 +1,4 @@
-import { sanitizeRoute } from 'components/layouts/ProjectLayout/LayoutHeader/ProjectDropdown'
+import { sanitizeRoute } from 'components/layouts/AppLayout/ProjectDropdown'
 
 test('Should sanitize project routes correctly when switching projects by removing project specific parameters', () => {
   expect(sanitizeRoute('/project/[ref]', { ref: 'abc' })).toBe('/project/[ref]')
