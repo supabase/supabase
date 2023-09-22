@@ -99,33 +99,35 @@ const ProjectLink = ({
   )
 }
 
-const ProjectDropdown = () => {
+interface ProjectDropdownProps {
+  isNewNav?: boolean
+}
+
+const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
   const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
 
-  const isBranch = projectDetails?.parent_project_ref !== undefined
-  const parentProject = isBranch
-    ? allProjects?.find((project) => project.ref === projectDetails.parent_project_ref)
-    : undefined
-
+  const isBranch = projectDetails?.parentRef !== projectDetails?.ref
   const isOrgBilling = !!selectedOrganization?.subscription_id
   const { data: subscription, isSuccess } = useProjectSubscriptionV2Query(
     { projectRef: ref },
     { enabled: !isOrgBilling }
   )
-  const projects = allProjects
-    ?.filter((x) => x.organization_id === selectedOrganization?.id)
-    .sort((a, b) => a.name.localeCompare(b.name))
+  const projects = isNewNav
+    ? allProjects
+        ?.filter((x) => x.organization_id === selectedOrganization?.id)
+        .sort((a, b) => a.name.localeCompare(b.name))
+    : allProjects?.sort((a, b) => a.name.localeCompare(b.name))
   const selectedProject = isBranch
-    ? parentProject
-    : projectDetails || projects?.find((project) => project.ref === ref)
+    ? projects?.find((project) => project.ref === projectDetails?.parentRef)
+    : projects?.find((project) => project.ref === ref)
 
   const [open, setOpen] = useState(false)
 
-  if (isLoadingProjects) {
+  if (isLoadingProjects || !selectedProject) {
     return <ShimmeringLoader className="w-[90px]" />
   }
 
@@ -139,7 +141,7 @@ const ProjectDropdown = () => {
             iconRight={<IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />}
           >
             <div className="flex items-center space-x-2">
-              <p className="text-sm">{selectedProject?.name}</p>
+              <p className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedProject?.name}</p>
               {isSuccess && !isOrgBilling && <Badge color="slate">{subscription?.plan.name}</Badge>}
             </div>
           </Button>
@@ -192,7 +194,7 @@ const ProjectDropdown = () => {
     </div>
   ) : (
     <Button type="text">
-      <span className="text-sm">{selectedProject?.name}</span>
+      <span className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedProject?.name}</span>
     </Button>
   )
 }

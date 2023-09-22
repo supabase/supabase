@@ -3,14 +3,15 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useMemo } from 'react'
 
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useSelectedProject } from './useSelectedProject'
+import { useProjectByRef } from './useSelectedProject'
 
 export function useSelectedOrganization({ enabled = true } = {}) {
   const isLoggedIn = useIsLoggedIn()
 
-  const { slug } = useParams()
+  const { ref, slug } = useParams()
   const { data } = useOrganizationsQuery({ enabled: isLoggedIn && enabled })
-  const selectedProject = useSelectedProject()
+
+  const selectedProject = useProjectByRef(ref)
 
   const localStorageSlug = useMemo(() => {
     return typeof window !== 'undefined'

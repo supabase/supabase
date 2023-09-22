@@ -31,6 +31,7 @@ interface BranchPanelProps {
   branch?: Branch
   onSelectUpdate?: () => void
   onSelectDelete?: () => void
+  onSelectCreateBranch?: () => void
   onSelectDisableBranching?: () => void
   generateCreatePullRequestURL?: (branch?: string) => string
 }
@@ -39,6 +40,7 @@ const MainBranchPanel = ({
   repo,
   branch,
   onSelectUpdate = noop,
+  onSelectCreateBranch = noop,
   onSelectDisableBranching = noop,
 }: BranchPanelProps) => {
   const { ref } = useParams()
@@ -48,23 +50,28 @@ const MainBranchPanel = ({
   return (
     <div className="border rounded-lg">
       <div className="bg-surface-200 shadow-sm flex justify-between items-center pl-8 pr-6 py-3 rounded-t-lg text-sm">
-        <div className="flex items-center space-x-4">
-          <div className="w-8 h-8 bg-scale-200 rounded-md flex items-center justify-center">
-            <IconGitHub size={18} strokeWidth={2} />
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center space-x-4">
+            <div className="w-8 h-8 bg-scale-200 rounded-md flex items-center justify-center">
+              <IconGitHub size={18} strokeWidth={2} />
+            </div>
+            <p>Github branch workflow</p>
+            <Link passHref href={`https://github.com/${repo}`}>
+              <a target="_blank" rel="noreferrer">
+                <Button
+                  type="text"
+                  size="small"
+                  className="text-light hover:text py-1 px-1.5"
+                  iconRight={<IconExternalLink size={14} strokeWidth={1.5} />}
+                >
+                  {repo}
+                </Button>
+              </a>
+            </Link>
           </div>
-          <p>Github branch workflow</p>
-          <Link passHref href={`https://github.com/${repo}`}>
-            <a target="_blank" rel="noreferrer">
-              <Button
-                type="text"
-                size="small"
-                className="text-light hover:text py-1 px-1.5"
-                iconRight={<IconExternalLink size={14} strokeWidth={1.5} />}
-              >
-                {repo}
-              </Button>
-            </a>
-          </Link>
+          <Button type="default" onClick={() => onSelectCreateBranch()}>
+            Create preview branch
+          </Button>
         </div>
       </div>
       <div className="bg-surface-100 border-t shadow-sm flex justify-between items-center pl-8 pr-6 py-3 rounded-b-lg text-sm">
