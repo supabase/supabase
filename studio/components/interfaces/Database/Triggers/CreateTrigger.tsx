@@ -393,8 +393,8 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
             </CreateTriggerContext.Provider>
             <ConfirmationModal
               visible={isClosingPanel}
-              header="Confirm to close"
-              buttonLabel="Confirm"
+              header="Discard changes"
+              buttonLabel="Discard"
               onSelectCancel={() => setIsClosingPanel(false)}
               onSelectConfirm={() => {
                 setIsClosingPanel(false)

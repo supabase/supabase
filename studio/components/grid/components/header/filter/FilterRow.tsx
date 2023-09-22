@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, KeyboardEvent } from 'react'
 import { Button, Input, IconChevronDown, IconX } from 'ui'
 
 import { Filter, FilterOperator, SupaTable } from 'components/grid/types'
@@ -11,9 +11,10 @@ export interface FilterRowProps {
   filter: Filter
   onChange: (index: number, filter: Filter) => void
   onDelete: (index: number) => void
+  onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void
 }
 
-const FilterRow = ({ table, filter, filterIdx, onChange, onDelete }: FilterRowProps) => {
+const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: FilterRowProps) => {
   const column = table.columns.find((x) => x.name === filter.column)
   const columnOptions =
     table.columns?.map((x) => {
@@ -80,6 +81,7 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete }: FilterRowPr
             value: event.target.value,
           })
         }
+        onKeyDown={onKeyDown}
       />
       <Button
         icon={<IconX strokeWidth={1.5} size={14} />}

@@ -27,16 +27,19 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
+import LogRocket from 'logrocket'
 import Head from 'next/head'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 // @ts-ignore
 import Prism from 'prism-react-renderer/prism'
+import ConsentToast from 'ui/src/components/ConsentToast'
+import PortalToast from 'ui/src/layout/PortalToast'
 
 import Favicons from 'components/head/Favicons'
 import {
   AppBannerWrapper,
   CommandMenuWrapper,
-  PortalToast,
   RouteValidationWrapper,
 } from 'components/interfaces/App'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
@@ -45,9 +48,10 @@ import { useRootQueryClient } from 'data/query-client'
 import { StoreProvider } from 'hooks'
 import useAutoAuthRedirect from 'hooks/misc/useAutoAuthRedirect'
 import { AuthProvider } from 'lib/auth'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { dart } from 'lib/constants/prism'
 import { ProfileProvider } from 'lib/profile'
+import { useAppStateSnapshot } from 'state/app-state'
 import { RootStore } from 'stores'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
@@ -57,6 +61,11 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 dart(Prism)
+
+if (IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging') {
+  // [Joshen] For staff only to debug internal issues
+  LogRocket.init('bffopb/supabase-dashboard-staff')
+}
 
 loader.config({
   // [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
@@ -77,7 +86,9 @@ loader.config({
 // the dashboard, all other layout components should not be doing that
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
+  const consentToastId = useRef<string>()
   const queryClient = useRootQueryClient()
+  const snap = useAppStateSnapshot()
   const [rootStore] = useState(() => new RootStore())
 
   // [Joshen] Some issues with using createBrowserSupabaseClient
@@ -92,32 +103,50 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   const getSavingState = () => rootStore.content.savingState
 
-  // prompt the user if they try and leave with unsaved content store changes
   useEffect(() => {
+    // Check for telemetry consent
+    if (typeof window !== 'undefined') {
+      const onAcceptConsent = () => {
+        snap.setIsOptedInTelemetry(true)
+        if (consentToastId.current) toast.dismiss(consentToastId.current)
+      }
+
+      const onOptOut = () => {
+        snap.setIsOptedInTelemetry(false)
+        if (consentToastId.current) toast.dismiss(consentToastId.current)
+      }
+
+      const hasAcknowledgedConsent = localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      if (hasAcknowledgedConsent === null) {
+        consentToastId.current = toast(
+          <ConsentToast onAccept={onAcceptConsent} onOptOut={onOptOut} />,
+          {
+            id: 'consent-toast',
+            position: 'bottom-right',
+            duration: Infinity,
+          }
+        )
+      }
+    }
+
+    // prompt the user if they try and leave with unsaved content store changes
     const warningText = 'You have unsaved changes - are you sure you wish to leave this page?'
 
     const handleWindowClose = (e: BeforeUnloadEvent) => {
       const savingState = getSavingState()
-
       const unsavedChanges =
         savingState === 'UPDATING_REQUIRED' ||
         savingState === 'UPDATING' ||
         savingState === 'UPDATING_FAILED'
 
-      if (!unsavedChanges) {
-        return
-      }
-
+      if (!unsavedChanges) return
       e.preventDefault()
-
       return (e.returnValue = warningText)
     }
 
     window.addEventListener('beforeunload', handleWindowClose)
 
-    return () => {
-      window.removeEventListener('beforeunload', handleWindowClose)
-    }
+    return () => window.removeEventListener('beforeunload', handleWindowClose)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -126,6 +155,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page)
 
   const AuthContainer = useMemo(
+    // eslint-disable-next-line react/display-name
     () => (props: any) => {
       return IS_PLATFORM ? (
         <SessionContextProvider supabaseClient={supabase as any}>

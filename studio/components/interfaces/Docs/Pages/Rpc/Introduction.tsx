@@ -1,4 +1,4 @@
-export default function Introduction() {
+const Introduction = () => {
   return (
     <>
       <h2 className="doc-heading">Introduction</h2>
@@ -14,3 +14,5 @@ export default function Introduction() {
     </>
   )
 }
+
+export default Introduction

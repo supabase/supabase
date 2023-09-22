@@ -1,4 +1,4 @@
-export default function NoDescription() {
+const NoDescription = () => {
   return (
     <p className="text-gray-300 text-sm">
       No description provided.
@@ -7,3 +7,5 @@ export default function NoDescription() {
     </p>
   )
 }
+
+export default NoDescription
