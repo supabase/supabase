@@ -179,8 +179,7 @@ const SidePanelEditor = ({
     }
   }
 
-
-  const onSaveJSON = async (value: string | number) => {
+  const onSaveJSON = async (value: string | number | null) => {
     if (selectedTable === undefined || !(snap.sidePanel?.type === 'json')) return
     const selectedValueForJsonEdit = snap.sidePanel.jsonValue
 
