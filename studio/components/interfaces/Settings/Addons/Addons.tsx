@@ -23,6 +23,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useFlag, useProjectByRef } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH } from 'lib/constants'
+import { getSemanticVersion } from 'lib/helpers'
 import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {
   Alert,
@@ -52,6 +53,8 @@ const Addons = () => {
   }
 
   const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
+  // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
+  const sufficientPgVersion = getSemanticVersion(selectedProject?.dbVersion ?? '') >= 141044
 
   // [Joshen] We could possibly look into reducing the interval to be more "realtime"
   // I tried setting the interval to 1m but no data was returned, may need to experiment
@@ -134,14 +137,14 @@ const Addons = () => {
             <ScaffoldSection>
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
-                  <p>Optimized compute</p>
+                  <p className="m-0">Optimized compute</p>
                   <div className="space-y-2">
-                    <p className="text-sm text-scale-1100">More information</p>
+                    <p className="text-sm text-scale-1100 m-0">More information</p>
                     <div>
                       <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
                         <a target="_blank" rel="noreferrer">
                           <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                            <p className="text-sm">About compute add-ons</p>
+                            <p className="text-sm m-0">About compute add-ons</p>
                             <IconExternalLink size={16} strokeWidth={1.5} />
                           </div>
                         </a>
@@ -151,7 +154,7 @@ const Addons = () => {
                       <Link href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler">
                         <a target="_blank" rel="noreferrer">
                           <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                            <p className="text-sm">Connection Pooler</p>
+                            <p className="text-sm m-0">Connection Pooler</p>
                             <IconExternalLink size={16} strokeWidth={1.5} />
                           </div>
                         </a>
@@ -339,14 +342,14 @@ const Addons = () => {
             <ScaffoldSection>
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
-                  <p>Point in time recovery</p>
+                  <p className="m-0">Point in time recovery</p>
                   <div className="space-y-2">
-                    <p className="text-sm text-scale-1100">More information</p>
+                    <p className="text-sm text-scale-1100 m-0">More information</p>
                     <div>
                       <Link href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery">
                         <a target="_blank" rel="noreferrer">
                           <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                            <p className="text-sm">About PITR backups</p>
+                            <p className="text-sm m-0">About PITR backups</p>
                             <IconExternalLink size={16} strokeWidth={1.5} />
                           </div>
                         </a>
@@ -378,19 +381,45 @@ const Addons = () => {
                         ? `Point in time recovery of ${pitr.variant.meta?.backup_duration_days} days is enabled`
                         : 'Point in time recovery is not enabled'}
                     </p>
-                    <ProjectUpdateDisabledTooltip
-                      projectUpdateDisabled={projectUpdateDisabled}
-                      projectNotActive={!isProjectActive}
-                    >
-                      <Button
-                        type="default"
-                        className="mt-2 pointer-events-auto"
-                        onClick={() => snap.setPanelKey('pitr')}
-                        disabled={isBranch || !isProjectActive || projectUpdateDisabled}
+                    {!sufficientPgVersion ? (
+                      <Alert_Shadcn_ className="mt-2">
+                        <AlertTitle_Shadcn_>
+                          Your project is too old to enable PITR
+                        </AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_>
+                          <p className="text-sm leading-normal mb-2">
+                            Reach out to us via support if you're interested
+                          </p>
+                          <Link
+                            passHref
+                            href={`/support/new?ref=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
+                          >
+                            <Button asChild type="default">
+                              <a>Contact support</a>
+                            </Button>
+                          </Link>
+                        </AlertDescription_Shadcn_>
+                      </Alert_Shadcn_>
+                    ) : (
+                      <ProjectUpdateDisabledTooltip
+                        projectUpdateDisabled={projectUpdateDisabled}
+                        projectNotActive={!isProjectActive}
                       >
-                        Change point in time recovery
-                      </Button>
-                    </ProjectUpdateDisabledTooltip>
+                        <Button
+                          type="default"
+                          className="mt-2 pointer-events-auto"
+                          onClick={() => snap.setPanelKey('pitr')}
+                          disabled={
+                            isBranch ||
+                            !isProjectActive ||
+                            projectUpdateDisabled ||
+                            !sufficientPgVersion
+                          }
+                        >
+                          Change point in time recovery
+                        </Button>
+                      </ProjectUpdateDisabledTooltip>
+                    )}
                   </div>
                 </div>
               </ScaffoldSectionContent>
@@ -403,14 +432,14 @@ const Addons = () => {
             <ScaffoldSection>
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
-                  <p>Custom domain</p>
+                  <p className="m-0">Custom domain</p>
                   <div className="space-y-2">
-                    <p className="text-sm text-scale-1100">More information</p>
+                    <p className="text-sm text-scale-1100 m-0">More information</p>
                     <div>
                       <Link href="https://supabase.com/docs/guides/platform/custom-domains">
                         <a target="_blank" rel="noreferrer">
                           <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                            <p className="text-sm">About custom domains</p>
+                            <p className="text-sm m-0">About custom domains</p>
                             <IconExternalLink size={16} strokeWidth={1.5} />
                           </div>
                         </a>

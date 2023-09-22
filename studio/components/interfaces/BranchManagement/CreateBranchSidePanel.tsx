@@ -61,11 +61,13 @@ const CreateBranchSidePanel = ({ visible, onClose }: CreateBranchSidePanelProps)
   const githubIntegration = integrations?.find(
     (integration) =>
       integration.integration.name === 'GitHub' &&
-      integration.connections.some((connection) => connection.supabase_project_ref === ref)
+      integration.connections.some(
+        (connection) => connection.supabase_project_ref === projectDetails?.parentRef
+      )
   )
 
   const githubConnection = githubIntegration?.connections?.find(
-    (connection) => connection.supabase_project_ref === ref
+    (connection) => connection.supabase_project_ref === projectDetails?.parentRef
   )
   const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') || []
   const {

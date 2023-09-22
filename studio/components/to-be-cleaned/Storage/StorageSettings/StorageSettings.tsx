@@ -99,7 +99,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
   // [Joshen] To be refactored using FormContainer, FormPanel, FormContent etc once
   // Jonny's auth config refactor PR goes in
   return (
-    <div className="mx-auto w-[56rem] max-w-4xl px-5 pt-12 pb-20">
+    <div>
       <Form validateOnBlur initialValues={initialValues} validate={onValidate} onSubmit={onSubmit}>
         {({ values, handleReset }: { values: any; handleReset: () => void }) => {
           const hasChanges =
@@ -108,7 +108,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
           return (
             <>
               <div className="mb-6">
-                <h3 className="mb-2 text-xl text-scale-1200">Storage settings</h3>
+                <h3 className="mb-2 text-xl text-scale-1200">Storage Settings</h3>
                 <div className="text-sm text-scale-900">
                   Configure your project's storage settings
                 </div>

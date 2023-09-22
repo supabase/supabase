@@ -1,14 +1,17 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import * as Sentry from '@sentry/nextjs'
+import { AuthError } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
+import { getMfaAuthenticatorAssuranceLevel } from 'data/profile/mfa-authenticator-assurance-level-query'
 import { useStore } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
-import { auth } from 'lib/gotrue'
+import { auth, buildPathWithParams } from 'lib/gotrue'
 import { incrementSignInClicks } from 'lib/local-storage'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
-import * as Sentry from '@sentry/nextjs'
 
 const signInSchema = object({
   email: string().email('Must be a valid email').required('Email is required'),
@@ -17,6 +20,7 @@ const signInSchema = object({
 
 const SignInForm = () => {
   const { ui } = useStore()
+  const router = useRouter()
   const pushNext = usePushNext()
   const queryClient = useQueryClient()
 
@@ -47,15 +51,37 @@ const SignInForm = () => {
         Sentry.captureMessage('Sign in without previous sign out detected')
       }
 
-      ui.setNotification({
-        id: toastId,
-        category: 'success',
-        message: `Signed in successfully!`,
-      })
+      try {
+        const data = await getMfaAuthenticatorAssuranceLevel()
+        if (data) {
+          if (data.currentLevel !== data.nextLevel) {
+            ui.setNotification({
+              id: toastId,
+              category: 'success',
+              message: `You need to provide your second factor authentication.`,
+            })
+            const url = buildPathWithParams('/sign-in-mfa')
+            router.replace(url)
+            return
+          }
+        }
 
-      await queryClient.resetQueries()
+        ui.setNotification({
+          id: toastId,
+          category: 'success',
+          message: `Signed in successfully!`,
+        })
 
-      await pushNext()
+        await queryClient.resetQueries()
+
+        await pushNext()
+      } catch (error) {
+        ui.setNotification({
+          id: toastId,
+          category: 'error',
+          message: (error as AuthError).message,
+        })
+      }
     } else {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()

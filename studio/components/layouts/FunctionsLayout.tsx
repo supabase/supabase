@@ -2,10 +2,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
-import { PropsWithChildren, useState } from 'react'
-import { Button, IconCode, IconExternalLink, IconTerminal, Modal } from 'ui'
+import { PropsWithChildren } from 'react'
+import { Button, IconCode, IconExternalLink } from 'ui'
 
-import { TerminalInstructions } from 'components/interfaces/Functions'
 import NoPermission from 'components/ui/NoPermission'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
@@ -19,7 +18,6 @@ interface FunctionsLayoutProps {
 
 const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutProps>) => {
   const { functionSlug, ref } = useParams()
-  const [showTerminalInstructions, setShowTerminalInstructions] = useState(false)
   const { data: functions, isLoading } = useEdgeFunctionsQuery({ projectRef: ref })
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
 
@@ -109,17 +107,16 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
                     )}
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Button
-                      type="default"
-                      icon={<IconTerminal size={14} strokeWidth={1.5} />}
-                      onClick={() => setShowTerminalInstructions(true)}
-                    >
-                      Terminal Instructions
-                    </Button>
+                    <Link href={`/project/${ref}/settings/functions`}>
+                      <a>
+                        <Button type="default">Manage secrets</Button>
+                      </a>
+                    </Link>
                     <Link href="https://supabase.com/docs/guides/functions">
                       <a target="_link">
                         <Button
                           type="default"
+                          className="translate-y-[1px]"
                           icon={<IconExternalLink size={14} strokeWidth={1.5} />}
                         >
                           Documentation
@@ -130,7 +127,7 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
                 </div>
               </div>
             </div>
-            {selectedFunction !== undefined && <FunctionsNav item={selectedFunction} />}
+            {functionSlug !== undefined && <FunctionsNav item={selectedFunction} />}
           </div>
           <div
             className={[
@@ -142,24 +139,6 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
           </div>
         </div>
       )}
-
-      <Modal
-        size="xlarge"
-        visible={showTerminalInstructions}
-        onCancel={() => setShowTerminalInstructions(false)}
-        header={<h3>Deploying an edge function to your project</h3>}
-        customFooter={
-          <div className="w-full flex items-center justify-end">
-            <Button type="primary" size="tiny" onClick={() => setShowTerminalInstructions(false)}>
-              Confirm
-            </Button>
-          </div>
-        }
-      >
-        <div className="py-4">
-          <TerminalInstructions removeBorder />
-        </div>
-      </Modal>
     </ProjectLayout>
   )
 }

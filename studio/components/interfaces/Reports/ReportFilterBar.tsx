@@ -275,6 +275,11 @@ const ReportFilterBar = ({
               <Input
                 size="tiny"
                 label="Value"
+                placeholder={
+                  addFilterValues.compare === 'matches'
+                    ? 'Provide a regex expression'
+                    : 'Provide a string'
+                }
                 onChange={(e) => {
                   setAddFilterValues((prev) => ({ ...prev, value: e.target.value }))
                 }}
