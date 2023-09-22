@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic'
 
 import PostTypes from '~/types/post'
 import { getSortedPosts } from '~/lib/posts'
-import { useTheme } from 'common'
+import { useTheme } from 'next-themes'
 import content from '~/data/home/content'
 import Layout from '~/components/Layouts/Default'
 import Hero from '~/components/Hero/Hero'
@@ -22,17 +22,17 @@ const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSec
 type Props = { customerStories: PostTypes[] }
 
 const Index = ({ customerStories }: Props) => {
-  const { isDarkMode, toggleTheme } = useTheme()
-  const [initialDarkMode] = useState(isDarkMode)
+  const { theme, setTheme } = useTheme()
+  const [initialDarkMode] = useState(theme)
 
-  useEffect(() => {
-    toggleTheme(true)
-    document.body.className = 'dark'
-    return () => {
-      document.body.className = ''
-      toggleTheme(initialDarkMode)
-    }
-  }, [])
+  // useEffect(() => {
+  //   toggleTheme(true)
+  //   document.body.className = 'dark'
+  //   return () => {
+  //     document.body.className = ''
+  //     toggleTheme(initialDarkMode)
+  //   }
+  // }, [])
 
   return (
     <Layout>

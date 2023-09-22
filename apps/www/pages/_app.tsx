@@ -88,7 +88,12 @@ export default function App({ Component, pageProps }: AppProps) {
         }}
       />
       <AuthProvider>
-        <ThemeProvider detectSystemColorPreference={false}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           <PortalToast />
           <Component {...pageProps} />
         </ThemeProvider>

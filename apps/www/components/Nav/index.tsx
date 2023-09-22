@@ -13,14 +13,15 @@ import Developers from '~/components/Nav/Developers'
 
 import ScrollProgress from '~/components/ScrollProgress'
 
-import { useIsLoggedIn, useIsUserLoading, useTheme } from 'common'
+import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { useTheme } from 'next-themes'
 import TextLink from '../TextLink'
 import Image from 'next/image'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
 const Nav = () => {
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [openProduct, setOpenProduct] = useState(false)
@@ -225,7 +226,9 @@ const Nav = () => {
                   <Link href="/" as="/">
                     <a className="block w-auto h-6">
                       <Image
-                        src={isDarkMode ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight}
+                        src={
+                          theme === 'dark' ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight
+                        }
                         width={124}
                         height={24}
                         alt="Supabase Logo"

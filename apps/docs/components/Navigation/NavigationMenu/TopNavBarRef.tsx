@@ -172,31 +172,6 @@ const TopNavBarRef: FC = () => {
               </DropdownMenuGroup_Shadcn_>
             </DropdownMenuContent_Shadcn_>
           </DropdownMenu_Shadcn_>
-          {/* <DropdownMenuRadioGroup_Shadcn_
-            value={theme}
-            onValueChange={(x) => {
-              setTheme(x)
-            }}
-          >
-            <DropdownMenuRadioItem_Shadcn_ value={'system'}>System</DropdownMenuRadioItem_Shadcn_>
-            <DropdownMenuRadioItem_Shadcn_ value={'dark'}>Dark</DropdownMenuRadioItem_Shadcn_>
-            <DropdownMenuRadioItem_Shadcn_ value={'light'}>Light</DropdownMenuRadioItem_Shadcn_>
-          </DropdownMenuRadioGroup_Shadcn_> */}
-          {/* <div className="cursor-pointer px-2.5 py-1" onClick={() => toggleTheme()}>
-            {isDarkMode ? (
-              <IconMoon
-                size={16}
-                strokeWidth={1}
-                className="text-scale-1100 hover:text-scale-1200 transition"
-              />
-            ) : (
-              <IconSun
-                size={16}
-                strokeWidth={1}
-                className="text-scale-1100 hover:text-scale-1200 transition"
-              />
-            )}
-          </div> */}
         </div>
       </div>
     </nav>

@@ -8,7 +8,7 @@ import { Badge, Button, IconCheck } from 'ui'
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import career from '~/data/career.json'
 import Styles from './career.module.css'
 
@@ -76,7 +76,7 @@ export async function getStaticProps() {
 }
 
 const CareerPage: NextPage = ({ jobs, contributors }: any) => {
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
   const { basePath } = useRouter()
 
   const meta_title = 'Careers | Supabase'
@@ -282,7 +282,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                             <div className="relative w-full h-full mx-auto">
                               <Image
                                 src={`/images/career/icons/${human.icon}${
-                                  isDarkMode ? '-dark' : '-light'
+                                  theme === 'dark' ? '-dark' : '-light'
                                 }.svg`}
                                 className="w-12 h-12 sm:w-10 sm:h-10 lg:w-12 lg:h-12"
                                 alt={`${human.icon} icon`}
@@ -306,7 +306,9 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                 <div className="w-14 h-14 rounded-lg flex items-center mx-auto mb-6">
                   <div className="relative w-full h-full mx-auto">
                     <Image
-                      src={`/images/career/icons/open_source${isDarkMode ? '-dark' : '-light'}.svg`}
+                      src={`/images/career/icons/open_source${
+                        theme === 'dark' ? '-dark' : '-light'
+                      }.svg`}
                       alt="open source icon"
                       layout="fill"
                       objectFit="cover"
@@ -395,7 +397,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                           <div className="relative w-full h-full mx-auto">
                             <Image
                               src={`/images/career/icons/${benefits.icon}${
-                                isDarkMode ? '-dark' : '-light'
+                                theme === 'dark' ? '-dark' : '-light'
                               }.svg`}
                               alt={`${benefits.icon} icon`}
                               layout="fill"
@@ -421,7 +423,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
             <div className="w-14 h-14 rounded-lg flex items-center mx-auto mb-6">
               <div className="relative w-full h-full mx-auto">
                 <Image
-                  src={`/images/career/icons/jobs${isDarkMode ? '-dark' : '-light'}.svg`}
+                  src={`/images/career/icons/jobs${theme === 'dark' ? '-dark' : '-light'}.svg`}
                   alt="jobs icon"
                   layout="fill"
                   objectFit="cover"
