@@ -180,17 +180,19 @@ const ReportFilterBar = ({
                   onClick={() => handleProductFilterChange(productFilter)}
                 >
                   <Icon size={20} className="mr-2" />
-                  <p
-                    className={cn(
-                      productFilter.key === currentProductFilter?.key ? 'font-bold' : '',
-                      'inline-block'
-                    )}
-                  >
-                    {productFilter.label}
-                  </p>
-                  <p className="text-left text-scale-1000 inline-block w-[180px]">
-                    {productFilter.description}
-                  </p>
+                  <div className="flex flex-col">
+                    <p
+                      className={cn(
+                        productFilter.key === currentProductFilter?.key ? 'font-bold' : '',
+                        'inline-block'
+                      )}
+                    >
+                      {productFilter.label}
+                    </p>
+                    <p className="text-left text-scale-1000 inline-block w-[180px]">
+                      {productFilter.description}
+                    </p>
+                  </div>
                 </DropdownMenuItem_Shadcn_>
               )
             })}
@@ -224,7 +226,6 @@ const ReportFilterBar = ({
           header={
             <div className="flex justify-between items-center py-1">
               <h5 className="text-sm text-scale-1200">Add Filter</h5>
-
               <Button
                 type="primary"
                 size="tiny"

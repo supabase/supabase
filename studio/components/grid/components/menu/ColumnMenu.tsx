@@ -111,7 +111,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
         <DropdownMenuTrigger_Shadcn_>
           <Button
             asChild
-            className="opacity-50"
+            className="opacity-50 flex"
             type="text"
             icon={<IconChevronDown />}
             style={{ padding: '3px' }}

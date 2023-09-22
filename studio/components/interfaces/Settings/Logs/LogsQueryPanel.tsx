@@ -79,8 +79,8 @@ const LogsQueryPanel = ({
                   .map((source) => (
                     <DropdownMenuItem_Shadcn_ key={source} onClick={() => onSelectSource(source)}>
                       <div className="flex flex-col gap-1">
-                        <span className="font-mono font-bold text-scale-1100">{source}</span>
-                        <span className="text-scale-1100">{LOGS_SOURCE_DESCRIPTION[source]}</span>
+                        <span className="font-mono font-bold">{source}</span>
+                        <span className="text-light">{LOGS_SOURCE_DESCRIPTION[source]}</span>
                       </div>
                     </DropdownMenuItem_Shadcn_>
                   ))}

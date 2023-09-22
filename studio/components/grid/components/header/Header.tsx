@@ -404,7 +404,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           icon={<IconX size="tiny" strokeWidth={2} />}
           onClick={deselectRows}
         />
-        <span className="text-xs text-lighter">
+        <span className="text-xs text-scale-1200">
           {allRowsSelected
             ? `${totalRows} rows selected`
             : selectedRows.size > 1

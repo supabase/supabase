@@ -57,7 +57,7 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
               Generate new token
             </Button>
             <DropdownMenu_Shadcn_>
-              <DropdownMenuTrigger_Shadcn_>
+              <DropdownMenuTrigger_Shadcn_ asChild>
                 <Button
                   asChild
                   type="primary"
