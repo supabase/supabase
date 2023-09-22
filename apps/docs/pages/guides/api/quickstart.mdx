@@ -29,6 +29,7 @@ We'll create a database table called `todos` for storing tasks. This creates a c
         size="small"
         type="underlined"
         defaultActiveId="sql"
+        queryGroup="database-method"
       >
       <TabPanel id="sql" label="SQL">
 
@@ -148,6 +149,7 @@ We provide a number of [Client Libraries](https://github.com/supabase/supabase#c
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
@@ -171,6 +173,7 @@ response = supabase.table('todos').select("*").execute()
 
 </TabPanel>
 </Tabs>
+
 export const Page = ({ children }) => <Layout meta={meta} children={children} hideToc={true} />
 
 export default Page
