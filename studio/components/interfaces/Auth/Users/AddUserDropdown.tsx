@@ -10,11 +10,10 @@ import CreateUserModal from './CreateUserModal'
 import InviteUserModal from './InviteUserModal'
 
 export type AddUserDropdownProps = {
-  refetch: () => void
   projectKpsVersion?: string
 }
 
-const AddUserDropdown = ({ refetch, projectKpsVersion }: AddUserDropdownProps) => {
+const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
   const inviteEnabled = IS_PLATFORM
     ? semver.gte(
         // @ts-ignore
@@ -39,7 +38,7 @@ const AddUserDropdown = ({ refetch, projectKpsVersion }: AddUserDropdownProps) =
           <>
             {inviteEnabled && (
               <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger className="w-full">
+                <Tooltip.Trigger className="w-full text-left">
                   <Dropdown.Item
                     icon={<IconMail size="small" />}
                     disabled={!canInviteUsers}
@@ -69,7 +68,7 @@ const AddUserDropdown = ({ refetch, projectKpsVersion }: AddUserDropdownProps) =
             )}
 
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger className="w-full">
+              <Tooltip.Trigger className="w-full text-left">
                 <Dropdown.Item
                   icon={<IconUserPlus size="small" />}
                   disabled={!canCreateUsers}
@@ -105,10 +104,8 @@ const AddUserDropdown = ({ refetch, projectKpsVersion }: AddUserDropdownProps) =
         </Button>
       </Dropdown>
 
-      {inviteEnabled && (
-        <InviteUserModal visible={inviteVisible} refetch={refetch} setVisible={setInviteVisible} />
-      )}
-      <CreateUserModal visible={createVisible} refetch={refetch} setVisible={setCreateVisible} />
+      {inviteEnabled && <InviteUserModal visible={inviteVisible} setVisible={setInviteVisible} />}
+      <CreateUserModal visible={createVisible} setVisible={setCreateVisible} />
     </>
   )
 }

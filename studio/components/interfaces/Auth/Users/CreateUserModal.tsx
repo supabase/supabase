@@ -10,14 +10,11 @@ import { useCheckPermissions, useStore } from 'hooks'
 export type CreateUserModalProps = {
   visible: boolean
   setVisible: (visible: boolean) => void
-  refetch: () => void
 }
 
-const CreateUserModal = ({ visible, setVisible, refetch }: CreateUserModalProps) => {
+const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
-  // const PageState: any = useContext(PageContext)
-  // const projectRef = PageState.projectRef
 
   const { data, isLoading, isSuccess } = useProjectApiQuery({ projectRef }, { enabled: visible })
 
@@ -49,7 +46,6 @@ const CreateUserModal = ({ visible, setVisible, refetch }: CreateUserModalProps)
         message: `Successfully created user: ${res.email}`,
       })
       setVisible(false)
-      await refetch()
     },
   })
 
@@ -62,7 +58,7 @@ const CreateUserModal = ({ visible, setVisible, refetch }: CreateUserModalProps)
     }
 
     const { protocol, endpoint, serviceApiKey } = data.autoApiService
-    createUser({ endpoint, protocol, serviceApiKey, user: values })
+    createUser({ projectRef, endpoint, protocol, serviceApiKey, user: values })
   }
 
   return (

@@ -90,7 +90,7 @@ const Users = () => {
             Reload
           </Button>
 
-          <AddUserDropdown refetch={refetch} projectKpsVersion={project?.kpsVersion} />
+          <AddUserDropdown projectKpsVersion={project?.kpsVersion} />
         </div>
       </div>
       <section className="thin-scrollbars mt-4 overflow-visible px-6">
@@ -99,7 +99,6 @@ const Users = () => {
             <UsersList
               page={page}
               setPage={setPage}
-              refetch={refetch}
               keywords={filterKeywords}
               verified={filterVerified}
               total={data?.total ?? 0}

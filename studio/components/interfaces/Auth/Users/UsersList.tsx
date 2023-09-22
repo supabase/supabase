@@ -10,7 +10,6 @@ import { User } from 'data/auth/users-query'
 interface UsersListProps {
   page: number
   setPage: (page: number) => void
-  refetch: () => void
   keywords: string
   verified?: 'verified' | 'unverified'
 
@@ -23,7 +22,6 @@ interface UsersListProps {
 const UsersList = ({
   page,
   setPage,
-  refetch,
   keywords,
   total,
   users,
@@ -77,7 +75,6 @@ const UsersList = ({
                 <UserListItem
                   key={x.id}
                   user={x}
-                  refetch={refetch}
                   canRemoveUser={canRemoveUser}
                   canRemoveMFAFactors={canRemoveMFAFactors}
                 />

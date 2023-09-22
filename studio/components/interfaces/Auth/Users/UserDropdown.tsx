@@ -1,6 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import { Button, Dropdown, IconMail, IconMoreHorizontal, IconShieldOff, IconTrash } from 'ui'
 
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
@@ -15,12 +14,11 @@ import { timeout } from 'lib/helpers'
 
 interface UserDropdownProps {
   user: User
-  refetch: () => void
   canRemoveUser: boolean
   canRemoveMFAFactors: boolean
 }
 
-const UserDropdown = ({ user, refetch, canRemoveUser, canRemoveMFAFactors }: UserDropdownProps) => {
+const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdownProps) => {
   const { ui } = useStore()
   const { ref } = useParams()
 
@@ -78,7 +76,6 @@ const UserDropdown = ({ user, refetch, canRemoveUser, canRemoveMFAFactors }: Use
         try {
           await deleteUser({ projectRef: ref, user })
           ui.setNotification({ category: 'success', message: `Successfully deleted ${user.email}` })
-          await refetch()
         } catch (error) {}
       },
     })
@@ -202,4 +199,4 @@ const UserDropdown = ({ user, refetch, canRemoveUser, canRemoveMFAFactors }: Use
   )
 }
 
-export default observer(UserDropdown)
+export default UserDropdown

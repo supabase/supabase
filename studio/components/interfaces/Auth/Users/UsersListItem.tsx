@@ -8,12 +8,11 @@ import { User } from 'data/auth/users-query'
 
 interface UserListItemProps {
   user: User
-  refetch: () => void
   canRemoveUser: boolean
   canRemoveMFAFactors: boolean
 }
 
-const UserListItem = ({ user, refetch, canRemoveUser, canRemoveMFAFactors }: UserListItemProps) => {
+const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItemProps) => {
   const isUserConfirmed = user.email_confirmed_at || user.phone_confirmed_at
   const createdAt = getDateFromIsoString(user.created_at)
   const lastSignedIn = getDateFromIsoString(user.last_sign_in_at)
@@ -54,7 +53,6 @@ const UserListItem = ({ user, refetch, canRemoveUser, canRemoveMFAFactors }: Use
       <Table.td className="text-right">
         <UserDropdown
           user={user}
-          refetch={refetch}
           canRemoveUser={canRemoveUser}
           canRemoveMFAFactors={canRemoveMFAFactors}
         />

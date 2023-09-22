@@ -9,12 +9,11 @@ import { useCheckPermissions, useStore } from 'hooks'
 export type InviteUserModalProps = {
   visible: boolean
   setVisible: (visible: boolean) => void
-  refetch: () => void
 }
 
-const InviteUserModal = ({ visible, setVisible, refetch }: InviteUserModalProps) => {
+const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
   const { ui } = useStore()
-  const { ref } = useParams()
+  const { ref: projectRef } = useParams()
 
   const handleToggle = () => setVisible(!visible)
   const { mutateAsync: inviteUser, isLoading: isInviting } = useUserInviteMutation()
@@ -35,10 +34,9 @@ const InviteUserModal = ({ visible, setVisible, refetch }: InviteUserModalProps)
   }
 
   const onInviteUser = async (values: any) => {
-    if (!ref) return console.error('Project ref is required')
+    if (!projectRef) return console.error('Project ref is required')
 
-    await inviteUser({ projectRef: ref, email: values.email })
-    await refetch()
+    await inviteUser({ projectRef, email: values.email })
     ui.setNotification({ category: 'success', message: `Sent invite email to ${values.email}` })
     setVisible(false)
   }
