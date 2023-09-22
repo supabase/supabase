@@ -204,7 +204,7 @@ const DateRangePicker = ({
 
         <DropdownMenuContent_Shadcn_ side="bottom" align="start">
           <DropdownMenuRadioGroup_Shadcn_ value={timePeriod} onValueChange={(x) => handleChange(x)}>
-            {options.map((option: any) => {
+            {options.map((option) => {
               return (
                 <DropdownMenuRadioItem_Shadcn_ value={option.key} key={option.key}>
                   {option.label}
