@@ -286,8 +286,8 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
       _localState.setTriggerFunctions(triggerFuncs)
     }
 
-    fetchFunctions()
-  }, [])
+    if (ui.selectedProjectRef) fetchFunctions()
+  }, [ui.selectedProjectRef])
 
   useEffect(() => {
     _localState.setisDirty(false)
