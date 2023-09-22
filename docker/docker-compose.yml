@@ -10,7 +10,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20230912-748fd33
+    image: supabase/studio:20230922-4866427
     restart: unless-stopped
     healthcheck:
       test:
@@ -76,7 +76,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.92.1
+    image: supabase/gotrue:v2.96.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -156,7 +156,7 @@ services:
 
   realtime:
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.10.1
+    image: supabase/realtime:v2.22.21
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -196,7 +196,7 @@ services:
 
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v0.40.4
+    image: supabase/storage-api:v0.41.7
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -255,7 +255,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.68.0
+    image: supabase/postgres-meta:v0.70.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -273,7 +273,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.18.1
+    image: supabase/edge-runtime:v1.19.0
     restart: unless-stopped
     depends_on:
       analytics:
@@ -295,7 +295,7 @@ services:
 
   analytics:
     container_name: supabase-analytics
-    image: supabase/logflare:1.4.0
+    image: supabase/logflare:1.4.5
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:4000/health" ]
       timeout: 5s
@@ -346,7 +346,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.1.0.103
+    image: supabase/postgres:15.1.0.119
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s
