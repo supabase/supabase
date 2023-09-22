@@ -39,7 +39,7 @@ const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   }
 
   return (
-    <ProjectLayoutWithAuth product="Table editor" productMenu={<TableEditorMenu />}>
+    <ProjectLayoutWithAuth product="Table Editor" productMenu={<TableEditorMenu />}>
       {children}
     </ProjectLayoutWithAuth>
   )
