@@ -1,8 +1,8 @@
-import Introduction from 'components/to-be-cleaned/Docs/Pages/Introduction'
-import Authentication from 'components/to-be-cleaned/Docs/Pages/Authentication'
-import TablesIntroduction from 'components/to-be-cleaned/Docs/Pages/Tables/Introduction'
-import UserManagement from 'components/to-be-cleaned/Docs/Pages/UserManagement'
-import RpcIntroduction from 'components/to-be-cleaned/Docs/Pages/Rpc/Introduction'
+import Introduction from 'components/interfaces/Docs/Introduction'
+import Authentication from 'components/interfaces/Docs/Authentication'
+import TablesIntroduction from 'components/interfaces/Docs/Pages/Tables/Introduction'
+import UserManagement from 'components/interfaces/Docs/Pages/UserManagement'
+import RpcIntroduction from 'components/interfaces/Docs/Pages/Rpc/Introduction'
 
 const GeneralContent = ({ autoApiService, selectedLang, page, showApiKey }: any) => {
   let selected = page?.toLowerCase()

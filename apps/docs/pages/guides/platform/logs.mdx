@@ -78,6 +78,10 @@ The Logs tab displays logs emitted during function execution.
 
 ![Function Logs](/docs/img/guides/platform/logs/logs-functions.png)
 
+**Log Message Length**
+
+Edge Function log messages have a max length of 10,000 characters. If you try to log a message longer than that it will be truncated.
+
 </TabPanel>
 </Tabs>
 
@@ -85,9 +89,15 @@ The Logs tab displays logs emitted during function execution.
 
 ## Logging Postgres Queries
 
-By default, query logs are disabled for new Supabase projects, as they can reveal metadata about the contents of your database (such as table and column names).
+By default, only DDL statements are logged for new Supabase projects.
 
-To enable query logs:
+<Admonition type="note">
+
+For projects created before 18th July 2023, statement execution logging is disabled completely by default.
+
+</Admonition>
+
+To enable query logs for other categories of statements:
 
 1. [Enable the pgAudit extension](https://supabase.com/dashboard/project/_/database/extensions).
 2. [Restart your project](https://supabase.com/dashboard/project/_/settings/general) using the **Fast database reboot** option.

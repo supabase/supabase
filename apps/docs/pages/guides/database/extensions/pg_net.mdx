@@ -157,7 +157,7 @@ Make a POST request to a Supabase Edge Function with auth header and JSON body p
 ```sql
 select
     net.http_post(
-        url:='https://project-ref.functions.supabase.co/function-name',
+        url:='https://project-ref.supabase.co/functions/v1/function-name',
         headers:='{"Content-Type": "application/json", "Authorization": "Bearer YOUR_ANON_KEY"}'::jsonb,
         body:='{"name": "pg_net"}'::jsonb
     ) as request_id;
