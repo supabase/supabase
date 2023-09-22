@@ -5,6 +5,7 @@ import {
   IconMenuCli,
   IconMenuCsharp,
   IconMenuDatabase,
+  IconMenuGraphQL,
   IconMenuEdgeFunctions,
   IconMenuFlutter,
   IconMenuGettingStarted,
@@ -34,6 +35,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16) {
       return <IconMenuDatabase width={width} height={height} />
     case 'serverless-apis':
       return <IconMenuServerlessApis width={width} height={height} />
+    case 'graphql':
+      return <IconMenuGraphQL width={width} height={height} />
     case 'auth':
       return <IconMenuAuth width={width} height={height} />
     case 'edge-functions':

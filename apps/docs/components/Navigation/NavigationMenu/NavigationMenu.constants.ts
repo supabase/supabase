@@ -30,7 +30,7 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
     },
     {
       label: 'GraphQL',
-      icon: 'serverless-apis',
+      icon: 'graphql',
       href: '/guides/pg_graphql/graphql',
       level: 'graphql',
     },
