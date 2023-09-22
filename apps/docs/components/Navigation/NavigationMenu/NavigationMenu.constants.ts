@@ -45,7 +45,7 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       icon: 'ai',
       href: '/guides/ai',
       level: 'ai',
-    }
+    },
   ],
   [
     {
