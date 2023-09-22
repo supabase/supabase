@@ -205,10 +205,10 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
     <div className="group [div&>button[data-state='open']>span]:text-scale-900">
       {IS_PLATFORM ? (
         <DropdownMenu_Shadcn_>
-          <DropdownMenuTrigger_Shadcn_>
+          <DropdownMenuTrigger_Shadcn_ className="flex items-center">
             <span
               className={clsx(
-                'p-0.5 rounded-md',
+                'rounded-md',
                 isActive
                   ? 'text-scale-1100 hover:bg-scale-800'
                   : 'text-scale-300 dark:text-scale-200 hover:bg-scale-500 group-hover:text-scale-1100'
@@ -231,7 +231,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
             {sharedSnippetsFeature && visibility === 'project' && canCreateSQLSnippet && (
               <DropdownMenuItem_Shadcn_ onClick={createPersonalCopy}>
                 <IconCopy size="tiny" />
-                <p className="text-scale-1200 text-sm">Create a personal copy</p>
+                <p className="text-scale-1200 text-sm">Duplicate personal copy</p>
               </DropdownMenuItem_Shadcn_>
             )}
             <>
