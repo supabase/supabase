@@ -17,6 +17,9 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
   ],
   [
     {
+      label: 'Product',
+    },
+    {
       label: 'Database',
       icon: 'database',
       href: '/guides/database',
