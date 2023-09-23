@@ -144,7 +144,7 @@ First, make sure you have the Docker application installed on your device. You c
    docker-compose up
    ```
 
-This command initializes the containers specified in the docker-compose.yml file. It might take a few moments to complete, depending on your computer and internet connection. You may get any error that looks like this:
+This command initializes the containers specified in the docker-compose.yml file. It might take a few moments to complete, depending on your computer and internet connection. You may get an error that looks similar to the below message:
 
    ```sh
    ERROR: The Compose file './docker-compose.yml' is invalid because:
