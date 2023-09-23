@@ -234,7 +234,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 ![Made with Supabase (dark)](./apps/www/public/badge-made-with-supabase-dark.svg)
 
 ```md
-[![Made with Fresh](https://supabase.com/badge-made-with-supabase-dark.svg)](https://fresh.deno.dev)
+[![Made with Supabase](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)
 ```
 
 ```html
