@@ -35,8 +35,12 @@ export function isArrayColumn(type: string) {
 }
 
 const TEXT_TYPES = ['uuid', 'text', 'character varying']
-export function isTextColumn(type: string) {
-  return TEXT_TYPES.indexOf(type.toLowerCase()) > -1
+const USER_DEFINED_TEXT_TYPES = ['citext']
+export function isTextColumn(type: string, format: string) {
+  return (
+    TEXT_TYPES.indexOf(type.toLowerCase()) > -1 ||
+    USER_DEFINED_TEXT_TYPES.indexOf(format.toLowerCase()) > -1
+  )
 }
 
 const TIMESTAMP_TYPES = ['timestamp', 'timestamptz']

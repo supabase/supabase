@@ -188,7 +188,7 @@ function getColumnType(columnDef: SupaColumn): ColumnType {
     return 'array'
   } else if (isJsonColumn(columnDef.dataType)) {
     return 'json'
-  } else if (isTextColumn(columnDef.dataType)) {
+  } else if (isTextColumn(columnDef.dataType, columnDef.format)) {
     return 'text'
   } else if (isDateColumn(columnDef.format)) {
     return 'date'
