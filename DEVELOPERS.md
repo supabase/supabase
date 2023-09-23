@@ -147,16 +147,17 @@ First, make sure you have the Docker application installed on your device. You c
 This command initializes the containers specified in the docker-compose.yml file. It might take a few moments to complete, depending on your computer and internet connection. You may get any error that looks like this:
 
    ```sh
-   ERROR: The Compose file \'./docker-compose.yml\' is invalid because:
+   ERROR: The Compose file './docker-compose.yml' is invalid because:
    Services.Analytics.environment.LOGFLARE_SUPABASE_MODE contains true, which is an invalid type, it should be a string, number or null
    ```
 Look for the specified field in the docker-compose.yml file and change it to a 1 if it was set to true. 
 
 
-Once the `docker-compose up` process completes, the process will continue to run in the terminal and you will now have access to your local version of Supabase up and running within Docker containers. 
+Once the `docker-compose up` process completes, it will continue to run in the terminal and you will now have access to your local version of Supabase up and running within Docker containers. 
 
-You can access and test the features you've modified or added by going to http://localhost:8000 and you will be required to login with credentials. 
-See https://supabase.com/docs/guides/self-hosting/docker#accessing-supabase-studio for more information on this.
+You can access and test the features you've modified or added by going to http://localhost:8000 and you will be required to login. 
+
+See https://supabase.com/docs/guides/self-hosting/docker#accessing-supabase-studio for more information.
 
 Remember to keep the Docker application open as long as you're working with your local Supabase instance.
 
