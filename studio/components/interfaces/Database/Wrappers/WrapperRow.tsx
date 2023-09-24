@@ -114,7 +114,7 @@ const WrapperRow = ({
                     ))}
                     <div className="!mt-3 space-y-1">
                       <p className="text-sm text-scale-1100">
-                        Foreign tables: {wrapper.tables ? `(${wrapper.tables.length})` : ''}
+                        Foreign tables{wrapper.tables && `: (${wrapper.tables.length})`}
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {wrapper.tables ? (
