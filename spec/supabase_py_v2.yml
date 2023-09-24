@@ -658,7 +658,7 @@ functions:
           data, count = supabase.table('countries') \
             .update({'name': 'Austrailia'}) \
             .eq('id', 1) \
-            .execute() \
+            .execute()
           ```
         data:
           sql: |
@@ -688,7 +688,7 @@ functions:
           ```python
           data, count = supabase.table('countries') \
             .upsert({'id': 1, 'name': 'Austrailia'}) \
-            .execute() \
+            .execute()
           ```
         data:
           sql: |
@@ -713,7 +713,7 @@ functions:
             ```python
             data, count = supabase.table('countries') \
               .upsert([{'id': 1, 'name': 'Albania'}, {'id': 2, 'name': 'Algeria'}]) \
-              .execute() \
+              .execute()
             ```
         data:
           sql: |
@@ -749,7 +749,7 @@ functions:
           data, count = supabase.table('countries') \
             .delete() \
             .eq('id', 1) \
-            .execute() \
+            .execute()
           ```
         data:
           sql: |
@@ -1459,8 +1459,6 @@ functions:
         isSpotlight: true
   - id: not
     title: not_()
-    notes: |
-      not_() expects you to use the raw PostgREST syntax for the filter values.
     examples:
         - id: with-select
           name: With `select()`
