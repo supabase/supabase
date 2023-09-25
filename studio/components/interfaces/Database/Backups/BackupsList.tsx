@@ -117,7 +117,7 @@ const BackupsList = () => {
         <Modal.Content>
           <div className="pt-6 pb-5">
             <p>
-              Are you sure you want to restore from $
+              Are you sure you want to restore from
               {dayjs(selectedBackup?.inserted_at).format('DD MMM YYYY')}? This will destroy any new
               data written since this backup was made.
             </p>

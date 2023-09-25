@@ -3,12 +3,12 @@ import { useState } from 'react'
 import { Button, IconDownload, IconExternalLink } from 'ui'
 
 import { useParams } from 'common/hooks'
-import CodeSnippet from 'components/to-be-cleaned/Docs/CodeSnippet'
+import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
 import { generateTypes } from 'data/projects/project-type-generation-query'
 import { useStore } from 'hooks'
 
 interface Props {
-  selectedLang: string
+  selectedLang: 'bash' | 'js'
 }
 
 export default function GeneratingTypes({ selectedLang }: Props) {
@@ -86,7 +86,7 @@ export default function GeneratingTypes({ selectedLang }: Props) {
                 </Button>
               )}
             </p>
-            <p className="text-xs text-scale-1100 bg-scale-200 p-4">
+            <p className="text-xs text-center text-scale-1100 bg-scale-200 p-4">
               Remember to re-generate and download this file as you make changes to your tables.
             </p>
           </div>

@@ -1,10 +1,9 @@
-import { FC } from 'react'
-import { isUndefined, includes, noop } from 'lodash'
-import { Button, Select, Input, IconLink, IconArrowRight, IconEdit2, Listbox } from 'ui'
+import { includes, noop } from 'lodash'
+import { Button, IconEdit2, IconLink, Input, Listbox, Select } from 'ui'
 
-import { RowField } from './RowEditor.types'
+import { DATETIME_TYPES, JSON_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import DateTimeInput from './DateTimeInput'
-import { TEXT_TYPES, JSON_TYPES, DATETIME_TYPES } from '../SidePanelEditor.constants'
+import { RowField } from './RowEditor.types'
 
 export interface InputFieldProps {
   field: RowField
@@ -202,7 +201,15 @@ const InputField = ({
       ...(field.isNullable ? [{ value: 'null', label: 'NULL' }] : []),
     ]
 
-const defaultValue = field.defaultValue !== null ? field.defaultValue : 'null'
+    // Ivan: The value coming in from backend is processed (NULL converted to 'null' string) so that
+    // it's properly selected in the listbox. The issue is with the internal implementation of the
+    // Listbox where the default column value is only considered when field.value is null
+    // (the JS kind). Since we're converting that null into 'null', defaultValue isn't used as it
+    // should. To fix this, we're only setting the defaultValue of the listbox and not setting the
+    // value in the next renders. This makes the ListBox an uncontrolled component but it works.
+    // PS: This is the third time we're fixing this in a month. If you have to fix this again, just
+    // use Input for booleans.
+    const defaultValue = field.value === 'null' ? field.defaultValue : field.value
 
     return (
       <Listbox
@@ -212,7 +219,7 @@ const defaultValue = field.defaultValue !== null ? field.defaultValue : 'null'
         label={field.name}
         labelOptional={field.format}
         descriptionText={field.comment}
-        defaultValue={defaultValue}
+        defaultValue={defaultValue === null ? 'null' : defaultValue}
         onChange={(value: string) => {
           if (value === 'null') onUpdateField({ [field.name]: null })
           else onUpdateField({ [field.name]: value })
