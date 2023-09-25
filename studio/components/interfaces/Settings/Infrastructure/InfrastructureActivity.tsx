@@ -1,8 +1,16 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { Fragment, useMemo, useState } from 'react'
+import { IconBarChart2, IconExternalLink } from 'ui'
 
-import { useParams } from 'common'
+import { getAddons } from 'components/interfaces/BillingV2/Subscription/Subscription.utils'
+import {
+  CPUWarnings,
+  DiskIOBandwidthWarnings,
+  RAMWarnings,
+} from 'components/interfaces/BillingV2/Usage/UsageWarningAlerts'
+import UsageBarChart from 'components/interfaces/Organization/Usage/UsageBarChart'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -19,10 +27,8 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
-import { Alert, Button, IconBarChart2, IconExternalLink } from 'ui'
-import { getAddons } from '../../BillingV2/Subscription/Subscription.utils'
-import UsageBarChart from '../../Organization/Usage/UsageBarChart'
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 
 const InfrastructureActivity = () => {
   const { ref: projectRef } = useParams()
@@ -30,17 +36,17 @@ const InfrastructureActivity = () => {
   const isOrgBilling = !!organization?.subscription_id
   const [dateRange, setDateRange] = useState<any>()
 
-  const currentBillingCycleSelected = true
-  const upgradeUrl = '/'
-  const categoryMeta = INFRA_ACTIVITY_METRICS.find((category) => category.key === 'infra')
-
   const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: organization?.slug,
   })
   const isFreePlan = subscription?.plan?.id === 'free'
 
+  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const projectResourceWarnings = resourceWarnings?.find((x) => x.project === projectRef)
+
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const selectedAddons = addons?.selected_addons ?? []
+
   const { computeInstance } = getAddons(selectedAddons)
   const currentComputeInstanceSpecs = computeInstance?.variant?.meta ?? {
     baseline_disk_io_mbs: 87,
@@ -49,6 +55,27 @@ const InfrastructureActivity = () => {
     cpu_dedicated: true,
     memory_gb: 1,
   }
+
+  const currentBillingCycleSelected = useMemo(() => {
+    // Selected by default
+    if (!dateRange?.period_start || !dateRange?.period_end || !subscription) return true
+
+    const { current_period_start, current_period_end } = subscription
+
+    return (
+      dayjs(dateRange.period_start.date).isSame(new Date(current_period_start * 1000)) &&
+      dayjs(dateRange.period_end.date).isSame(new Date(current_period_end * 1000))
+    )
+  }, [dateRange, subscription])
+
+  const upgradeUrl =
+    subscription === undefined
+      ? `/`
+      : subscription.plan.id === 'free'
+      ? `/org/${organization?.slug ?? '[slug]'}/billing#subscription`
+      : `/project/${projectRef}/settings/addons`
+
+  const categoryMeta = INFRA_ACTIVITY_METRICS.find((category) => category.key === 'infra')
 
   const startDate = useMemo(() => {
     if (dateRange?.period_start?.date === 'Invalid Date') return undefined
@@ -116,6 +143,13 @@ const InfrastructureActivity = () => {
     dateFormat,
   })
 
+  const hasLatest = dayjs(endDate!).isAfter(dayjs().startOf('day'))
+
+  const latestIoBudgetConsumption =
+    hasLatest && ioBudgetData?.data?.slice(-1)?.[0]
+      ? Number(ioBudgetData.data.slice(-1)[0].disk_io_consumption)
+      : 0
+
   const highestIoBudgetConsumption = Math.max(
     ...(ioBudgetData?.data || []).map((x) => Number(x.disk_io_consumption) ?? 0),
     0
@@ -180,11 +214,11 @@ const InfrastructureActivity = () => {
                   <div className="sticky top-32 space-y-6">
                     <div className="space-y-1">
                       <div className="flex items-center space-x-2">
-                        <p className="text-base capitalize">{attribute.name}</p>
+                        <h4 className="text-base capitalize m-0">{attribute.name}</h4>
                       </div>
                       <div className="grid gap-4">
                         {attribute.description.split('\n').map((value, idx) => (
-                          <p key={`desc-${idx}`} className="text-sm text-scale-1000 pr-8">
+                          <p key={`desc-${idx}`} className="text-sm text-scale-1000 pr-8 m-0">
                             {value}
                           </p>
                         ))}
@@ -199,7 +233,7 @@ const InfrastructureActivity = () => {
                           <Link href={link.url}>
                             <a target="_blank" rel="noreferrer">
                               <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                                <p className="text-sm">{link.name}</p>
+                                <p className="text-sm m-0">{link.name}</p>
                                 <IconExternalLink size={16} strokeWidth={1.5} />
                               </div>
                             </a>
@@ -212,46 +246,14 @@ const InfrastructureActivity = () => {
                 <ScaffoldSectionContent>
                   {attribute.key === 'disk_io_consumption' && (
                     <>
-                      {currentBillingCycleSelected && highestIoBudgetConsumption >= 100 ? (
-                        <Alert
-                          withIcon
-                          variant="danger"
-                          title="IO Budget for today has been used up"
-                        >
-                          <p className="mb-4">
-                            Your workload has used up all the burst IO throughput minutes and ran at
-                            the baseline performance. If you need consistent disk performance,
-                            consider upgrading to a larger compute add-on.
-                          </p>
-                          <Link href={upgradeUrl}>
-                            <a>
-                              <Button type="danger">
-                                {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
-                              </Button>
-                            </a>
-                          </Link>
-                        </Alert>
-                      ) : currentBillingCycleSelected && highestIoBudgetConsumption >= 80 ? (
-                        <Alert
-                          withIcon
-                          variant="warning"
-                          title="IO Budget for today is running out"
-                        >
-                          <p className="mb-4">
-                            Your workload is about to use up all the burst IO throughput minutes
-                            during the day. Once this is completely used up, your workload will run
-                            at the baseline performance. If you need consistent disk performance,
-                            consider upgrading to a larger compute add-on.
-                          </p>
-                          <Link href={upgradeUrl}>
-                            <a>
-                              <Button type="warning">
-                                {isFreePlan ? 'Upgrade project' : 'Change compute add-on'}
-                              </Button>
-                            </a>
-                          </Link>
-                        </Alert>
-                      ) : null}
+                      <DiskIOBandwidthWarnings
+                        upgradeUrl={upgradeUrl}
+                        isFreePlan={isFreePlan}
+                        hasLatest={hasLatest}
+                        currentBillingCycleSelected={currentBillingCycleSelected}
+                        latestIoBudgetConsumption={latestIoBudgetConsumption}
+                        highestIoBudgetConsumption={highestIoBudgetConsumption}
+                      />
                       <div className="space-y-1">
                         <p>Disk IO Bandwidth</p>
 
@@ -302,6 +304,21 @@ const InfrastructureActivity = () => {
                       </div>
                     </>
                   )}
+                  {attribute.key === 'max_cpu_usage' && (
+                    <CPUWarnings
+                      isFreePlan={isFreePlan}
+                      upgradeUrl={upgradeUrl}
+                      severity={projectResourceWarnings?.cpu_exhaustion}
+                    />
+                  )}
+                  {attribute.key === 'ram_usage' && (
+                    <RAMWarnings
+                      isFreePlan={isFreePlan}
+                      upgradeUrl={upgradeUrl}
+                      severity={projectResourceWarnings?.memory_and_swap_exhaustion}
+                    />
+                  )}
+
                   <div className="space-y-1">
                     <div className="flex flex-row justify-between">
                       {attribute.key === 'disk_io_consumption' ? (

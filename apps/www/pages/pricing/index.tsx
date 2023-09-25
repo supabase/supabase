@@ -14,6 +14,7 @@ import { useTheme } from 'common/Providers'
 import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
 import { plans } from 'shared-data/plans'
 import { ArrowNarrowRightIcon } from '@heroicons/react/outline'
+import AnnouncementBadge from '../../components/Announcement/Badge'
 
 export default function IndexPage() {
   const router = useRouter()
@@ -151,7 +152,7 @@ export default function IndexPage() {
       />
 
       <div>
-        <div className="relative z-10 py-16 lg:py-28">
+        <div className="relative z-10 py-16 lg:py-20">
           <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl space-y-2 lg:max-w-none">
               <h1 className="text-brand text-base">Pricing</h1>
@@ -159,45 +160,13 @@ export default function IndexPage() {
               <p className="p text-lg">
                 Start building for free, collaborate with a team, then scale to millions of users.
               </p>
-              <div className="w-full flex justify-center items-center opacity-0 !animate-[fadeIn_0.5s_cubic-bezier(0.25,0.25,0,1)_0.5s_both]">
-                <Link href="/blog/organization-based-billing" passHref>
-                  <a
-                    target="_blank"
-                    className="
-          group
-          relative
-          flex flex-row
-          items-center
-          pr-3 p-1
-          text-sm
-          w-auto
-          gap-2
-          text-left
-          rounded-full
-          bg-opacity-20
-          border
-          border-background-surface-100
-          hover:border-background-surface-300
-          overflow-hidden
-          focus:outline-none focus:ring-brand-600 focus:ring-2 focus:rounded-full
-          "
-                  >
-                    <Badge color="brand" size="large" className="py-1">
-                      Update
-                    </Badge>
-                    <span className="text-foreground">Changes to how we bill</span>
-                    <ArrowNarrowRightIcon className="h-4 ml-2 -translate-x-1 transition-transform group-hover:translate-x-0" />
-                    <div
-                      className="absolute inset-0 -z-10 bg-gradient-to-br
-            opacity-70
-            overflow-hidden rounded-full
-            from-background-surface-100
-            to-background-surface-300
-            backdrop-blur-md
-            "
-                    />
-                  </a>
-                </Link>
+              <div className="w-full inline-flex justify-center items-center pt-3 pb-6">
+                <AnnouncementBadge
+                  url="/blog/organization-based-billing"
+                  badge="Update"
+                  announcement="Changes to how we bill"
+                  target="_blank"
+                />
               </div>
             </div>
           </div>
