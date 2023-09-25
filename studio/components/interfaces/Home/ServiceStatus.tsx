@@ -77,11 +77,14 @@ const ServiceStatus = () => {
     isLoading: isLoadingAuth,
     isError: isErrorAuth,
     isSuccess: isSuccessAuth,
-  } = useAuthServiceStatusQuery({
-    projectRef: ref,
-    endpoint: endpoint,
-    anonKey: defaultApiKey,
-  })
+  } = useAuthServiceStatusQuery(
+    {
+      projectRef: ref,
+      endpoint: endpoint,
+      anonKey: defaultApiKey,
+    },
+    { enabled: defaultApiKey !== undefined }
+  )
 
   const services = [
     {
@@ -143,28 +146,33 @@ const ServiceStatus = () => {
         align="end"
         style={{ marginLeft: '-247px' }}
       >
-        {services.map((service) => (
-          <div
-            key={service.name}
-            className="px-4 py-2 text-xs flex items-center justify-between border-b"
-          >
-            <div>
-              <p>{service.name}</p>
-              <p className="text-light">
-                {service.isLoading && 'Checking status'}
-                {service.isSuccess && 'No issues'}
-                {service.isError && 'Unable to connect'}
-              </p>
+        {services.map((service) => {
+          if (['Auth', 'Realtime'].includes(service.name) && defaultApiKey === undefined) {
+            return null
+          }
+          return (
+            <div
+              key={service.name}
+              className="px-4 py-2 text-xs flex items-center justify-between border-b"
+            >
+              <div>
+                <p>{service.name}</p>
+                <p className="text-light">
+                  {service.isLoading && 'Checking status'}
+                  {service.isSuccess && 'No issues'}
+                  {service.isError && 'Unable to connect'}
+                </p>
+              </div>
+              {service.isLoading && <IconLoader className="animate-spin" size="tiny" />}
+              {service.isSuccess && (
+                <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
+              )}
+              {service.isError && (
+                <AlertTriangle className="text-amber-900" size={18} strokeWidth={1.5} />
+              )}
             </div>
-            {service.isLoading && <IconLoader className="animate-spin" size="tiny" />}
-            {service.isSuccess && (
-              <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
-            )}
-            {service.isError && (
-              <AlertTriangle className="text-amber-900" size={18} strokeWidth={1.5} />
-            )}
-          </div>
-        ))}
+          )
+        })}
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )
