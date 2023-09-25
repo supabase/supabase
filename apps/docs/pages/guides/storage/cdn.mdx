@@ -74,7 +74,7 @@ The [Logs Explorer](https://supabase.com/dashboard/project/_/logs/explorer) can 
 
 <Admonition type="note">The reporting date range depends on your plan's log retention.</Admonition>
 
-Cache hits can be determined via the `metadata.response.headers.cf_cache_status` key. Any value corresponding to either `HIT`, `STALE`, `REVALIDATED`, or `UPDATING` would be considered a cache hit.
+Cache hits can be determined via the `metadata.response.headers.cf_cache_status` key. Any value corresponding to either `HIT`, `STALE`, `REVALIDATED`, or `UPDATING` is considered a cache hit.
 The following example query will show the top cache misses from the `edge_logs`:
 
 ```sql
