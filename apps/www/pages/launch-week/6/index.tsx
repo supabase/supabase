@@ -63,7 +63,6 @@ export default function launchweek() {
     }
   }, [supabase])
 
-
   async function getCreators() {
     try {
       // setLoading(true)

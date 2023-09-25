@@ -61,7 +61,6 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
     }
   }, [])
 
-
   return (
     <>
       <NextSeo
