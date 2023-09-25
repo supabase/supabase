@@ -227,7 +227,9 @@ const Nav = () => {
                     <a className="block w-auto h-6">
                       <Image
                         src={
-                          theme === 'dark' ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight
+                          theme === 'dark' || isHomePage
+                            ? supabaseLogoWordmarkDark
+                            : supabaseLogoWordmarkLight
                         }
                         width={124}
                         height={24}

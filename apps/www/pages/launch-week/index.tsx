@@ -53,8 +53,8 @@ export default function TicketHome({ users, meetups }: Props) {
   const bgImageId = query.bgImageId?.toString()
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [session, setSession] = useState<Session | null>(null)
-  const { theme, setTheme } = useTheme()
-  const [initialDarkMode] = useState(theme === 'dark')
+
+  const [initialDarkMode] = useState('dark')
 
   const defaultUserData = {
     id: query.id?.toString(),
@@ -91,7 +91,6 @@ export default function TicketHome({ users, meetups }: Props) {
       return () => subscription.unsubscribe()
     }
   }, [supabase])
-
 
   return (
     <>
