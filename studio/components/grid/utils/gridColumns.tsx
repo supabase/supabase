@@ -4,6 +4,7 @@ import { ColumnType, SupaColumn, SupaRow, SupaTable } from '../types'
 import {
   isArrayColumn,
   isBoolColumn,
+  isCiTextColumn,
   isDateColumn,
   isDateTimeColumn,
   isEnumColumn,
@@ -188,7 +189,9 @@ function getColumnType(columnDef: SupaColumn): ColumnType {
     return 'array'
   } else if (isJsonColumn(columnDef.dataType)) {
     return 'json'
-  } else if (isTextColumn(columnDef.dataType, columnDef.format)) {
+  } else if (isTextColumn(columnDef.dataType)) {
+    return 'text'
+  } else if (isCiTextColumn(columnDef.format)) {
     return 'text'
   } else if (isDateColumn(columnDef.format)) {
     return 'date'
