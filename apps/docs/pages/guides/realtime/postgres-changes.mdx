@@ -672,8 +672,8 @@ const channel = supabase
     {
       event: 'INSERT',
       schema: 'public',
-      table: 'messages',
-      filter: 'body=neq.hey',
+      table: 'profiles',
+      filter: 'age=lt.65',
     },
     (payload) => console.log(payload)
   )
@@ -687,8 +687,8 @@ const channel = supabase
 val myChannel = supabase.realtime.createChannel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
-    table = "messages"
-    filter = "body=neq.hey"
+    table = "profiles"
+    filter = "age=lt.65"
 }
 
 changes
