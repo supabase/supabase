@@ -227,7 +227,7 @@ const Nav = () => {
                     <a className="block w-auto h-6">
                       <Image
                         src={
-                          theme === 'dark' || isHomePage
+                          theme === 'dark' || showLaunchWeekNavMode
                             ? supabaseLogoWordmarkDark
                             : supabaseLogoWordmarkLight
                         }
