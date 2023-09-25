@@ -10,6 +10,8 @@ export type AuthServiceStatusVariables = {
   anonKey?: string
 }
 
+// [Joshen] Need to proxy through API
+
 export async function getAuthServiceStatus(
   { projectRef, endpoint, anonKey }: AuthServiceStatusVariables,
   signal?: AbortSignal
@@ -23,6 +25,7 @@ export async function getAuthServiceStatus(
     headers: { apikey: anonKey },
   })
 
+  if (response.error) throw response.error
   return response.error === undefined
 }
 

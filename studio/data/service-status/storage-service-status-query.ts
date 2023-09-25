@@ -1,36 +1,33 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'lib/common/fetch'
+import { get } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { serviceStatusKeys } from './keys'
 
 export type StorageServiceStatusVariables = {
   projectRef?: string
-  endpoint?: string
-  anonKey?: string
 }
 
 export async function getStorageServiceStatus(
-  { projectRef, endpoint, anonKey }: StorageServiceStatusVariables,
+  { projectRef }: StorageServiceStatusVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!endpoint) throw new Error('endpoint is required')
-  if (!anonKey) throw new Error('anonKey is required')
 
-  const response = await get(`https://${endpoint}/storage/v1/bucket`, {
+  const { error } = await get(`/platform/storage/{ref}/buckets`, {
+    params: { path: { ref: projectRef } },
     signal,
-    headers: { Authorization: `Bearer ${anonKey}` },
   })
 
-  return response.error === undefined
+  if (error) throw error
+  return error === undefined
 }
 
 export type StorageServiceStatusData = Awaited<ReturnType<typeof getStorageServiceStatus>>
 export type StorageServiceStatusError = ResponseError
 
 export const useStorageServiceStatusQuery = <TData = StorageServiceStatusData>(
-  { projectRef, endpoint, anonKey }: StorageServiceStatusVariables,
+  { projectRef }: StorageServiceStatusVariables,
   {
     enabled = true,
     ...options
@@ -38,13 +35,9 @@ export const useStorageServiceStatusQuery = <TData = StorageServiceStatusData>(
 ) =>
   useQuery<StorageServiceStatusData, StorageServiceStatusError, TData>(
     serviceStatusKeys.storage(projectRef),
-    ({ signal }) => getStorageServiceStatus({ projectRef, endpoint, anonKey }, signal),
+    ({ signal }) => getStorageServiceStatus({ projectRef }, signal),
     {
-      enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        typeof endpoint !== 'undefined' &&
-        typeof anonKey !== 'undefined',
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )

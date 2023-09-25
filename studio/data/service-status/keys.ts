@@ -9,6 +9,6 @@ export const serviceStatusKeys = {
     ['projects', projectRef, 'service-status', 'realtime'] as const,
   auth: (projectRef: string | undefined) =>
     ['projects', projectRef, 'service-status', 'auth'] as const,
-  supavisor: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'service-status', 'supavisor'] as const,
+  pooler: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'service-status', 'pooler'] as const,
 }

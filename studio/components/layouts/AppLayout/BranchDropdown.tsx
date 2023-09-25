@@ -19,7 +19,6 @@ import {
   IconAlertCircle,
   IconCheck,
   IconCode,
-  IconGitBranch,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,

@@ -1,13 +1,10 @@
 import { ClientLibrary, ExampleProject } from 'components/interfaces/Home'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
+import ServiceStatus from 'components/interfaces/Home/ServiceStatus'
 import { ProjectLayoutWithAuth } from 'components/layouts'
 import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
 import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner'
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useAuthServiceStatusQuery } from 'data/service-status/auth-service-status-query'
-import { usePostgrestServiceStatusQuery } from 'data/service-status/postgrest-service-status-query'
-import { useStorageServiceStatusQuery } from 'data/service-status/storage-service-status-query'
 import { useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
@@ -20,30 +17,11 @@ const Home: NextPageWithLayout = () => {
       ? project?.name
       : 'Welcome to your project'
 
-  const { data } = useProjectApiQuery({ projectRef: project?.ref })
-
-  const { data: postgrestStatus } = usePostgrestServiceStatusQuery({
-    projectRef: project?.ref,
-    endpoint: data?.autoApiService.endpoint,
-    anonKey: data?.autoApiService.defaultApiKey,
-  })
-  const { data: authStatus } = useAuthServiceStatusQuery({
-    projectRef: project?.ref,
-    endpoint: data?.autoApiService.endpoint,
-    anonKey: data?.autoApiService.defaultApiKey,
-  })
-  const { data: storageStatus } = useStorageServiceStatusQuery({
-    projectRef: project?.ref,
-    endpoint: data?.autoApiService.endpoint,
-    anonKey: data?.autoApiService.defaultApiKey,
-  })
-
-  console.log({ postgrestStatus, authStatus, storageStatus })
-
   return (
     <div className="w-full mx-auto my-16 space-y-16 max-w-7xl">
-      <div className="flex items-center mx-6 space-x-6">
+      <div className="flex items-center justify-between mx-6 space-x-6">
         <h1 className="text-3xl">{projectName}</h1>
+        <ServiceStatus />
       </div>
 
       <div className="mx-6">
