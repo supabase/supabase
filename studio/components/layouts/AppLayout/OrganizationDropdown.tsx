@@ -102,7 +102,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
                 </ScrollArea>
               </CommandGroup_Shadcn_>
               <CommandGroup_Shadcn_ className="border-t">
-                <Link passHref href="new">
+                <Link passHref href="/new">
                   <CommandItem_Shadcn_
                     asChild
                     className="cursor-pointer flex items-center space-x-2 w-full"
