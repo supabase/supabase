@@ -4,6 +4,10 @@ import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import { ProjectLayoutWithAuth } from 'components/layouts'
 import ProjectPausedState from 'components/layouts/ProjectLayout/ProjectPausedState'
 import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useAuthServiceStatusQuery } from 'data/service-status/auth-service-status-query'
+import { usePostgrestServiceStatusQuery } from 'data/service-status/postgrest-service-status-query'
+import { useStorageServiceStatusQuery } from 'data/service-status/storage-service-status-query'
 import { useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { NextPageWithLayout } from 'types'
@@ -15,6 +19,26 @@ const Home: NextPageWithLayout = () => {
     project?.ref !== 'default' && project?.name !== undefined
       ? project?.name
       : 'Welcome to your project'
+
+  const { data } = useProjectApiQuery({ projectRef: project?.ref })
+
+  const { data: postgrestStatus } = usePostgrestServiceStatusQuery({
+    projectRef: project?.ref,
+    endpoint: data?.autoApiService.endpoint,
+    anonKey: data?.autoApiService.defaultApiKey,
+  })
+  const { data: authStatus } = useAuthServiceStatusQuery({
+    projectRef: project?.ref,
+    endpoint: data?.autoApiService.endpoint,
+    anonKey: data?.autoApiService.defaultApiKey,
+  })
+  const { data: storageStatus } = useStorageServiceStatusQuery({
+    projectRef: project?.ref,
+    endpoint: data?.autoApiService.endpoint,
+    anonKey: data?.autoApiService.defaultApiKey,
+  })
+
+  console.log({ postgrestStatus, authStatus, storageStatus })
 
   return (
     <div className="w-full mx-auto my-16 space-y-16 max-w-7xl">

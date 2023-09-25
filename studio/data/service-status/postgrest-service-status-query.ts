@@ -1,32 +1,36 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
+import { get } from 'lib/common/fetch'
 import { ResponseError } from 'types'
 import { serviceStatusKeys } from './keys'
 
 export type PostgrestServiceStatusVariables = {
   projectRef?: string
+  endpoint?: string
+  anonKey?: string
 }
 
 export async function getPostgrestServiceStatus(
-  { projectRef }: PostgrestServiceStatusVariables,
+  { projectRef, endpoint, anonKey }: PostgrestServiceStatusVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
+  if (!endpoint) throw new Error('endpoint is required')
+  if (!anonKey) throw new Error('anonKey is required')
 
-  const { data, error } = await get(`/platform/projects/{ref}/live`, {
-    params: { path: { ref: projectRef } },
+  const response = await get(`https://${endpoint}/rest-admin/v1/live`, {
     signal,
+    headers: { apikey: anonKey },
   })
-  if (error) throw error
-  return data
+
+  return response.error === undefined
 }
 
 export type PostgrestServiceStatusData = Awaited<ReturnType<typeof getPostgrestServiceStatus>>
 export type PostgrestServiceStatusError = ResponseError
 
 export const usePostgrestServiceStatusQuery = <TData = PostgrestServiceStatusData>(
-  { projectRef }: PostgrestServiceStatusVariables,
+  { projectRef, endpoint, anonKey }: PostgrestServiceStatusVariables,
   {
     enabled = true,
     ...options
@@ -34,9 +38,13 @@ export const usePostgrestServiceStatusQuery = <TData = PostgrestServiceStatusDat
 ) =>
   useQuery<PostgrestServiceStatusData, PostgrestServiceStatusError, TData>(
     serviceStatusKeys.postgrest(projectRef),
-    ({ signal }) => getPostgrestServiceStatus({ projectRef }, signal),
+    ({ signal }) => getPostgrestServiceStatus({ projectRef, endpoint, anonKey }, signal),
     {
-      enabled: enabled && typeof projectRef !== 'undefined',
+      enabled:
+        enabled &&
+        typeof projectRef !== 'undefined' &&
+        typeof endpoint !== 'undefined' &&
+        typeof anonKey !== 'undefined',
       ...options,
     }
   )
