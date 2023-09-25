@@ -15,6 +15,7 @@ export type SidePanel =
   | { type: 'row'; row?: Dictionary<any> }
   | { type: 'column'; column?: PostgresColumn }
   | { type: 'table'; mode: 'new' | 'edit' | 'duplicate' }
+  | { type: 'schema'; mode: 'new' | 'edit' }
   | { type: 'json'; jsonValue: JsonEditValue }
   | {
       type: 'foreign-row-selector'
@@ -59,6 +60,13 @@ export const createTableEditorState = () => {
     },
     closeConfirmationDialog: () => {
       state.ui = { open: 'none' }
+    },
+
+    onAddSchema: () => {
+      state.ui = {
+        open: 'side-panel',
+        sidePanel: { type: 'schema', mode: 'new' },
+      }
     },
 
     /* Tables */

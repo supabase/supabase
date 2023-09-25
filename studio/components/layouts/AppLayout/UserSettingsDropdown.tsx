@@ -16,6 +16,7 @@ import {
 } from 'ui'
 
 import { useTheme } from 'common'
+import { useFlag } from 'hooks'
 import { useSignOut } from 'lib/auth'
 import { useProfile } from 'lib/profile'
 import { useState } from 'react'
@@ -25,6 +26,7 @@ const UserSettingsDropdown = () => {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const { profile } = useProfile()
+  const showAuditLogs = useFlag('auditLogs')
   const { setIsOpen: setCommandMenuOpen } = useCommandMenu()
   const { isDarkMode, toggleTheme } = useTheme()
 
@@ -71,15 +73,17 @@ const UserSettingsDropdown = () => {
               <a>Access tokens</a>
             </DropdownMenuItem_Shadcn_>
           </Link>
-          <Link passHref href="/account/audit">
-            <DropdownMenuItem_Shadcn_
-              className="cursor-pointer"
-              onClick={() => setOpen(false)}
-              asChild
-            >
-              <a>Audit logs</a>
-            </DropdownMenuItem_Shadcn_>
-          </Link>
+          {showAuditLogs ? (
+            <Link passHref href="/account/audit">
+              <DropdownMenuItem_Shadcn_
+                className="cursor-pointer"
+                onClick={() => setOpen(false)}
+                asChild
+              >
+                <a>Audit logs</a>
+              </DropdownMenuItem_Shadcn_>
+            </Link>
+          ) : null}
           <DropdownMenuSeparator_Shadcn_ />
           <DropdownMenuItem_Shadcn_
             className="cursor-pointer"

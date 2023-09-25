@@ -34,8 +34,8 @@ const NewProjectPanel = () => {
                   Get started by building out your database
                 </h3>
                 <p className="text-base text-scale-1100">
-                  Start building your app by creating tables and inserting data. Our table editor
-                  makes Postgres as easy to use as a spreadsheet, but there's also our SQL editor if
+                  Start building your app by creating tables and inserting data. Our Table Editor
+                  makes Postgres as easy to use as a spreadsheet, but there's also our SQL Editor if
                   you need something more.
                 </p>
               </div>
@@ -54,7 +54,7 @@ const NewProjectPanel = () => {
                         />
                       }
                     >
-                      Table editor
+                      Table Editor
                     </Button>
                   </a>
                 </Link>
