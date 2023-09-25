@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import Link from 'next/link'
-import { Button, IconExternalLink, IconGitBranch } from 'ui'
+import { Button, IconExternalLink, IconGitPullRequest } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -103,7 +103,7 @@ const PullRequests = ({
                   <div className="w-96 border rounded-md mt-4">
                     <div className="px-5 py-3 bg-surface-100 flex items-center justify-between">
                       <div className="flex items-center space-x-4">
-                        <IconGitBranch strokeWidth={2} className="text-scale-1100" />
+                        <IconGitPullRequest strokeWidth={2} className="text-scale-1100" />
                         <p>Create a pull request</p>
                       </div>
                       <Link passHref href={pullRequestUrl}>

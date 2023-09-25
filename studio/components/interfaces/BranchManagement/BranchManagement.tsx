@@ -26,6 +26,7 @@ import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutat
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
+import { OPT_IN_TAGS } from 'lib/constants'
 import { useAppUiStateSnapshot } from 'state/app'
 import { MainBranchPanel } from './BranchPanels'
 import CreateBranchSidePanel from './CreateBranchSidePanel'
@@ -40,7 +41,7 @@ const BranchManagement = () => {
   const selectedOrg = useSelectedOrganization()
 
   const hasAccessToBranching =
-    selectedOrg?.opt_in_tags?.includes('PREVIEW_BRANCHES_OPT_IN') ?? false
+    selectedOrg?.opt_in_tags?.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) ?? false
   const hasBranchEnabled = project?.is_branch_enabled
 
   const isBranch = project?.parent_project_ref !== undefined
@@ -117,7 +118,6 @@ const BranchManagement = () => {
   }
 
   if (!hasBranchEnabled) {
-    // [Joshen] Some empty state here
     return (
       <ProductEmptyState title="Database Branching">
         <p className="text-sm text-light">
@@ -136,16 +136,18 @@ const BranchManagement = () => {
           </div>
         ) : (
           <div className="flex items-center space-x-2 !mt-4">
-            <Link passHref href={'/'}>
-              <a rel="noreferrer" target="_blank">
-                <Button>Join waitlist</Button>
-              </a>
+            <Link passHref href="https://forms.supabase.com/branching-request">
+              <Button asChild>
+                <a rel="noreferrer" target="_blank">
+                  Join waitlist
+                </a>
+              </Button>
             </Link>
-            <Link passHref href={'/'}>
+            {/* <Link passHref href={'/'}>
               <a rel="noreferrer" target="_blank">
                 <Button type="default">View the docs</Button>
               </a>
-            </Link>
+            </Link> */}
           </div>
         )}
       </ProductEmptyState>
@@ -157,15 +159,8 @@ const BranchManagement = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <div className="col-span-12">
-            <h3 className="text-xl mb-8">Branch Manager</h3>
-            <div className="mb-6 flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Input placeholder="Search branch" size="small" icon={<IconSearch />} />
-              </div>
-              <Button type="default" onClick={() => setShowCreateBranch(true)}>
-                Create preview branch
-              </Button>
-            </div>
+            <h3 className="text-xl mb-8">Branches</h3>
+
             <div className="">
               {isLoadingIntegrations && <GenericSkeletonLoader />}
               {isErrorIntegrations && (
@@ -179,6 +174,7 @@ const BranchManagement = () => {
                   <MainBranchPanel
                     repo={githubConnection?.metadata.name}
                     branch={mainBranch}
+                    onSelectCreateBranch={() => setShowCreateBranch(true)}
                     onSelectDisableBranching={() => setShowDisableBranching(true)}
                   />
                   <PullRequests

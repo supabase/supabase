@@ -4,11 +4,21 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import { Button, IconChevronLeft, IconEdit3, IconPlus, IconSearch, IconTrash, Input } from 'ui'
 
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import { useCheckPermissions, useStore } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import {
+  Button,
+  IconChevronLeft,
+  IconChevronRight,
+  IconEdit3,
+  IconPlus,
+  IconSearch,
+  IconTrash,
+  Input,
+} from 'ui'
 
 interface ColumnListProps {
   selectedTable: PostgresTable
@@ -32,11 +42,19 @@ const ColumnList = ({
       ? selectedTable.columns
       : selectedTable.columns?.filter((column: any) => column.name.includes(filterString))) ?? []
 
-  const isLocked = meta.excludedSchemas.includes(selectedTable.schema ?? '')
+  const isLocked = EXCLUDED_SCHEMAS.includes(selectedTable.schema ?? '')
   const canUpdateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
   return (
     <>
+      <div className="mb-4 flex items-center space-x-2">
+        <div className="flex items-center space-x-2">
+          <h3 className="mb-1 text-xl text-scale-1200">Database Tables</h3>
+          <IconChevronRight strokeWidth={1.5} className="text-light" />
+          <h3 className="mb-1 text-xl text-scale-1200">{selectedTable.name}</h3>
+        </div>
+      </div>
+
       <div className="mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
@@ -48,7 +66,6 @@ const ColumnList = ({
                 icon={<IconChevronLeft size="small" />}
                 style={{ padding: '5px' }}
               />
-              <code>{selectedTable.name}</code>
             </div>
             <div>
               <Input

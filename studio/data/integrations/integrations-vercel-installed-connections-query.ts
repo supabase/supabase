@@ -54,37 +54,7 @@ export const useVercelProjectConnectionsQuery = <TData = VercelProjectsData>(
     integrationKeys.vercelConnectionsList(organization_integration_id),
     ({ signal }) => getVercelInstalledConnections({ organization_integration_id }, signal),
     {
-      enabled:
-        enabled &&
-        typeof organization_integration_id !== 'undefined' &&
-        typeof organization_integration_id !== 'undefined',
+      enabled: enabled && typeof organization_integration_id !== 'undefined',
       ...options,
     }
   )
-
-/**
- * useVercelProjectsPrefetch is used for prefetching data. For example, starting a query loading before a page is navigated to.
- *
- * @example
- * const prefetch = useVercelProjectsPrefetch({ orgSlug })
- *
- * return (
- *   <Link onMouseEnter={() => prefetch()}>
- *     Start loading on hover
- *   </Link>
- * )
- */
-export const useVercelProjectsPrefetch = ({
-  organization_integration_id,
-}: VercelProjectsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (organization_integration_id) {
-      client.prefetchQuery(
-        integrationKeys.vercelConnectionsList(organization_integration_id),
-        ({ signal }) => getVercelInstalledConnections({ organization_integration_id }, signal)
-      )
-    }
-  }, [organization_integration_id])
-}

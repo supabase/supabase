@@ -95,6 +95,7 @@ You can now visit your local Dashboard at [http://localhost:54323](http://localh
   size="small"
   type="underlined"
   defaultActiveId="postgres"
+  queryGroup="access-method"
 >
 <TabPanel id="postgres" label="Postgres">
 
@@ -422,6 +423,16 @@ If you have additional triggers or RLS policies defined on your `auth` schema, y
 ```bash
 supabase db pull --schema auth
 ```
+
+### Sync Storage buckets
+
+Your RLS policies on storge buckets can be pulled locally by specifying `storage` schema. For example,
+
+```bash
+supabase db pull --schema storage
+```
+
+The buckets and objects themselves are rows in the storage schema so they won't be pulled automatically.
 
 ### Local Logging
 

@@ -5,8 +5,7 @@ import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 export const generateSettingsMenu = (
   ref?: string,
   project?: ProjectBase,
-  organization?: Organization,
-  isVaultEnabled: boolean = false
+  organization?: Organization
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
@@ -46,17 +45,13 @@ export const generateSettingsMenu = (
             url: `/project/${ref}/settings/addons`,
             items: [],
           },
-          ...(isVaultEnabled
-            ? [
-                {
-                  name: 'Vault',
-                  key: 'vault',
-                  url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/vault/secrets`,
-                  items: [],
-                  label: 'BETA',
-                },
-              ]
-            : []),
+          {
+            name: 'Vault',
+            key: 'vault',
+            url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/vault/secrets`,
+            items: [],
+            label: 'BETA',
+          },
         ],
       },
       {
@@ -77,7 +72,7 @@ export const generateSettingsMenu = (
           ...(IS_PLATFORM
             ? [
                 {
-                  name: 'Auth',
+                  name: 'Authentication',
                   key: 'auth',
                   url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/auth`,
                   items: [],
@@ -90,6 +85,16 @@ export const generateSettingsMenu = (
                   name: 'Storage',
                   key: 'storage',
                   url: `/project/${ref}/settings/storage`,
+                  items: [],
+                },
+              ]
+            : []),
+          ...(IS_PLATFORM
+            ? [
+                {
+                  name: 'Edge Functions',
+                  key: 'functions',
+                  url: `/project/${ref}/settings/functions`,
                   items: [],
                 },
               ]
@@ -168,17 +173,13 @@ export const generateSettingsMenu = (
                 },
               ]
             : []),
-          ...(isVaultEnabled
-            ? [
-                {
-                  name: 'Vault',
-                  key: 'vault',
-                  url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/vault/secrets`,
-                  items: [],
-                  label: 'BETA',
-                },
-              ]
-            : []),
+          {
+            name: 'Vault',
+            key: 'vault',
+            url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/vault/secrets`,
+            items: [],
+            label: 'BETA',
+          },
         ],
       },
       ...(IS_PLATFORM
