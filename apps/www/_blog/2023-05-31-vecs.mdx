@@ -45,10 +45,10 @@ DB_CONNECTION = "postgresql://<user>:<password>@<host>:<port>/<db_name>"
 vx = vecs.create_client(DB_CONNECTION)
 
 # create a collection of vectors with 3 dimensions
-docs = vx.create_collection(name="docs", dimension=3)
+docs = vx.get_or_create_collection(name="docs", dimension=3)
 ```
 
-The `create_collection` call sets up a table in the Postgres database specified by `DB_CONNECTION` in a schema named `vecs` with the user defined name `docs`.
+The `get_or_create_collection` call sets up a table in the Postgres database specified by `DB_CONNECTION` in a schema named `vecs` with the user defined name `docs`.
 
 Or, more specifically:
 
@@ -166,7 +166,7 @@ One option we're exploring is to optionally assign transformation pipelines to c
 ```python
 # This is mock code only, not currently functional
 
-docs: Collection =vx.create_collection(
+docs: Collection =vx.get_or_create_collection(
     docs='docs',
     dimension=512,
     transform = TextPreprocessor(  # this is new
