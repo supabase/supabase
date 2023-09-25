@@ -2,6 +2,7 @@ import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
+import { toast } from 'react-hot-toast'
 import { Modal } from 'ui'
 
 import { Dictionary } from 'components/grid'
@@ -24,6 +25,7 @@ import {
   UpdateColumnPayload,
 } from './SidePanelEditor.types'
 import { ImportContent } from './TableEditor/TableEditor.types'
+import SchemaEditor from './SchemaEditor'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -122,13 +124,13 @@ const SidePanelEditor = ({
     payload: any,
     isNewRecord: boolean,
     configuration: { identifiers: any; rowIdx: number },
-    onComplete: Function
+    onComplete: (err?: any) => void
   ) => {
     if (!project || selectedTable === undefined) {
       return console.error('no project or table selected')
     }
 
-    let saveRowError = false
+    let saveRowError: Error | undefined
     if (isNewRecord) {
       try {
         const result = await createTableRows({
@@ -140,7 +142,7 @@ const SidePanelEditor = ({
         })
         onRowCreated(result[0])
       } catch (error: any) {
-        saveRowError = true
+        saveRowError = error
       }
     } else {
       const hasChanges = !isEmpty(payload)
@@ -156,11 +158,11 @@ const SidePanelEditor = ({
               enumArrayColumns,
             })
             onRowUpdated(result[0], configuration.rowIdx)
-          } catch (error) {
-            saveRowError = true
+          } catch (error: any) {
+            saveRowError = error
           }
         } else {
-          saveRowError = true
+          saveRowError = new Error('No primary key')
           ui.setNotification({
             category: 'error',
             message:
@@ -170,27 +172,31 @@ const SidePanelEditor = ({
       }
     }
 
-    onComplete()
+    onComplete(saveRowError)
     if (!saveRowError) {
       setIsEdited(false)
       snap.closeSidePanel()
     }
   }
 
-  const onSaveJSON = async (value: string | number) => {
+  const onSaveJSON = async (value: string | number | null) => {
     if (selectedTable === undefined || !(snap.sidePanel?.type === 'json')) return
     const selectedValueForJsonEdit = snap.sidePanel.jsonValue
 
     try {
       const { row, column } = selectedValueForJsonEdit
-      const payload = { [column]: JSON.parse(value as any) }
+      const payload = { [column]: value === null ? null : JSON.parse(value as any) }
       const identifiers = {} as Dictionary<any>
       selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
 
       const isNewRecord = false
       const configuration = { identifiers, rowIdx: row.idx }
 
-      saveRow(payload, isNewRecord, configuration, () => {})
+      saveRow(payload, isNewRecord, configuration, (error) => {
+        if (error) {
+          toast.error(error?.message ?? 'Something went wrong while trying to save the JSON value')
+        }
+      })
     } catch (error: any) {}
   }
 
@@ -553,6 +559,11 @@ const SidePanelEditor = ({
         closePanel={onClosePanel}
         saveChanges={saveTable}
         updateEditorDirty={() => setIsEdited(true)}
+      />
+      <SchemaEditor
+        visible={snap.sidePanel?.type === 'schema'}
+        closePanel={onClosePanel}
+        saveChanges={() => {}}
       />
       <JsonEdit
         visible={snap.sidePanel?.type === 'json'}

@@ -256,7 +256,7 @@ export async function handler(req: Request) {
       )
     if (storageError) throw new Error(`storageError: ${storageError.message}`)
     // Generate image for gallery
-    fetch('https://obuldanrptloktxcffvn.functions.supabase.co/lw7-ticket-gallery', {
+    fetch('https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw7-ticket-gallery', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

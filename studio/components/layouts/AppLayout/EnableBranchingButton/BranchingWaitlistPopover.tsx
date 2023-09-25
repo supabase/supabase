@@ -9,13 +9,17 @@ import {
   Popover_Shadcn_,
 } from 'ui'
 
-const BranchingWaitlistPopover = () => {
+interface BranchingWaitlistPopoverProps {
+  isNewNav?: boolean
+}
+
+const BranchingWaitlistPopover = ({ isNewNav = false }: BranchingWaitlistPopoverProps) => {
   const [open, setOpen] = useState(false)
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button type="default" icon={<IconGitBranch strokeWidth={1.5} />}>
+        <Button type={isNewNav ? 'default' : 'text'} icon={<IconGitBranch strokeWidth={1.5} />}>
           Enable branching
         </Button>
       </PopoverTrigger_Shadcn_>
@@ -35,16 +39,16 @@ const BranchingWaitlistPopover = () => {
           enrolled in database branching.
         </p>
         <div className="flex items-center space-x-2">
-          <Link passHref href={'/'}>
+          <Link passHref href="https://forms.supabase.com/branching-request">
             <a rel="noreferrer" target="_blank">
               <Button>Join waitlist</Button>
             </a>
           </Link>
-          <Link passHref href={'/'}>
+          {/* <Link passHref href={'/'}>
             <a rel="noreferrer" target="_blank">
               <Button type="default">View the docs</Button>
             </a>
-          </Link>
+          </Link> */}
         </div>
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
