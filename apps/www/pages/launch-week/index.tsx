@@ -92,6 +92,10 @@ export default function TicketHome({ users, meetups }: Props) {
     }
   }, [supabase])
 
+  useEffect(() => {
+    document.body.className = 'dark bg-[#020405]'
+  }, [])
+
   return (
     <>
       <NextSeo

@@ -21,7 +21,7 @@ import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wo
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
 const Nav = () => {
-  const { theme } = useTheme()
+  const { theme, resolvedTheme } = useTheme()
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [openProduct, setOpenProduct] = useState(false)
@@ -227,7 +227,10 @@ const Nav = () => {
                     <a className="block w-auto h-6">
                       <Image
                         src={
-                          theme === 'dark' || showLaunchWeekNavMode
+                          isLaunchWeekPage ||
+                          theme === 'dark' ||
+                          resolvedTheme === 'dark' ||
+                          isHomePage
                             ? supabaseLogoWordmarkDark
                             : supabaseLogoWordmarkLight
                         }
