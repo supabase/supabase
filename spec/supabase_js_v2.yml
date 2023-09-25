@@ -129,12 +129,12 @@ functions:
             private async _encrypt(key: string, value: string) {
               const encryptionKey = crypto.getRandomValues(new Uint8Array(256 / 8));
 
-              const cipher = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(1));
-              const encryptedBytes = aesCtr.encrypt(aesjs.utils.utf8.toBytes(value));
+              const cipher = new aesjs.ModeOfOperation.ctr(encryptionKey, new aesjs.Counter(1));
+              const encryptedBytes = cipher.encrypt(aesjs.utils.utf8.toBytes(value));
 
               await SecureStore.setItemAsync(key, aesjs.utils.hex.fromBytes(encryptionKey));
 
-              return aesjs.utils.hex.toBytes(encryptedBytes);
+              return aesjs.utils.hex.fromBytes(encryptedBytes);
             }
 
             private async _decrypt(key: string, value: string) {
