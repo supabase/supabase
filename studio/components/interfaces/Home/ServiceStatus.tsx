@@ -1,9 +1,8 @@
 import { useParams } from 'common'
-import { CheckCircle2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   Button,
-  IconAlertTriangle,
   IconLoader,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -162,7 +161,7 @@ const ServiceStatus = () => {
               <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
             )}
             {service.isError && (
-              <IconAlertTriangle className="text-amber-900" size="tiny" strokeWidth={1.5} />
+              <AlertTriangle className="text-amber-900" size={18} strokeWidth={1.5} />
             )}
           </div>
         ))}
