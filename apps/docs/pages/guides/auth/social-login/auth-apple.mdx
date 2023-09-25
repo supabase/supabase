@@ -30,13 +30,37 @@ Sign in with Apple's OAuth flow is designed for web or browser based sign in met
 
 Behind the scenes, Supabase Auth uses the [REST APIs](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api) provided by Apple.
 
+
+
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
 To initiate sign in, you can use the `signInWithOAuth()` method from the Supabase JavaScript library:
 
-```ts
+```js
 supabase.auth.signInWithOAuth({
   provider: 'apple',
 })
 ```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+To initiate sign in, you can use the `loginWith()` method from the Supabase Kotlin library:
+
+```kotlin
+supabase.gotrue.loginWith(Apple)
+```
+
+</TabPanel>
+</Tabs>
 
 This call takes the user to Apple's consent screen. Once the flow ends, the user's profile information is exchanged and validated with Supabase Auth before it redirects back to your web application with an access and refresh token representing the user's session.
 
@@ -64,6 +88,15 @@ Unlike the OAuth flow which requires the use of a web browser, the native Sign i
 
 When the user provides consent, Apple issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dart"
+  queryGroup="language"
+>
+<TabPanel id="dart" label="Flutter">
+
 If you are building an iOS or macOS app using Flutter, you can use the [signInWithApple()](/docs/reference/dart/sign-in-with-apple) method to perform Apple sign in:
 
 ```dart
@@ -73,6 +106,9 @@ final AuthResponse res = await supabase.auth.signInWithApple();
 final User? user = res.user;
 ```
 
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
+
 In the Supabase JavaScript library, which you can use with web-based native frameworks like React Native or Expo, you can invoke this functionality like so:
 
 ```ts
@@ -81,6 +117,46 @@ await supabase.auth.signInWithIdToken({
   token: '<identity token received from the OS>',
 })
 ```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+On [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/) supported targets, you can use the [compose-auth](https://supabase.com/docs/reference/kotlin/installing) plugin. On iOS it uses Native Apple Login automatically and on other platforms it uses `gotrue.loginWith(Apple)`.
+
+**Initialize the Supabase Client**
+
+```kotlin
+val supabaseClient = createSupabaseClient(
+    supabaseUrl = "SUPABASE_URL",
+    supabaseKey = "SUPABASE_KEY"
+) {
+    install(GoTrue)
+    install(ComposeAuth) {
+        nativeAppleLogin()
+    }
+}
+```
+
+**Use the Compose Auth plugin in your Auth Screen**
+
+```kotlin
+val authState = supabaseClient.composeAuth.rememberLoginWithApple(
+    onResult = {
+        when(it) { //handle errors
+            NativeSignInResult.ClosedByUser -> TODO()
+            is NativeSignInResult.Error -> TODO()
+            is NativeSignInResult.NetworkError -> TODO()
+            NativeSignInResult.Success -> TODO()
+        }
+    }
+)
+
+Button(onClick = { authState.startFlow() }) {
+    Text("Sign in with Apple")
+}
+```
+</TabPanel>
+</Tabs>
 
 Please take a look at these open-source projects which may help you obtain an ID token directly from the OS:
 
