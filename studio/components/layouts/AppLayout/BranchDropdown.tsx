@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
+import { ListTree } from 'lucide-react'
 
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -63,7 +64,11 @@ const BranchLink = ({
   )
 }
 
-const BranchDropdown = () => {
+interface BranchDropdownProps {
+  isNewNav?: boolean
+}
+
+const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
@@ -101,7 +106,7 @@ const BranchDropdown = () => {
                 }
               >
                 <div className="flex items-center space-x-2">
-                  <p className="text-sm">{selectedBranch?.name}</p>
+                  <p className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedBranch?.name}</p>
                   {selectedBranch?.is_default ? (
                     <Badge color="amber">Production</Badge>
                   ) : (
@@ -144,7 +149,7 @@ const BranchDropdown = () => {
                         onClick={() => setOpen(false)}
                       >
                         <a>
-                          <IconGitBranch size={14} strokeWidth={1.5} />
+                          <ListTree size={14} strokeWidth={1.5} />
                           <p>Manage branches</p>
                         </a>
                       </CommandItem_Shadcn_>
