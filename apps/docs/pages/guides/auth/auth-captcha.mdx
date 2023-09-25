@@ -107,15 +107,6 @@ We will pass it the sitekey we copied from the hCaptcha website as a property al
 
 Now lets use the captcha token we receive in our Supabase signUp function.
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="jsx"
-  queryGroup="language"
->
-<TabPanel id="jsx" label="JavaScript">
-
 ```jsx
 await supabase.auth.signUp({
   email,
@@ -123,20 +114,6 @@ await supabase.auth.signUp({
   options: { captchaToken },
 })
 ```
-
-</TabPanel>
-<TabPanel id="kotlin" label="Kotlin">
-
-```kotlin
-supabase.gotrue.signUpWith(Email) {
-    this.password = password
-    this.email = email
-    this.captchaToken = captchaToken
-}
-```
-
-</TabPanel>
-</Tabs>
 
 We will also need to reset the captcha challenge after we have made a call to the function above.
 
@@ -207,15 +184,6 @@ We will pass it the sitekey we copied from the Cloudflare website as a property 
 
 We can now use the captchaToken we receive in our Supabase `signUp` function.
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="jsx"
-  queryGroup="language"
->
-<TabPanel id="jsx" label="JavaScript">
-
 ```jsx
 await supabase.auth.signUp({
   email,
@@ -223,20 +191,6 @@ await supabase.auth.signUp({
   options: { captchaToken },
 })
 ```
-
-</TabPanel>
-<TabPanel id="kotlin" label="Kotlin">
-
-```kotlin
-supabase.gotrue.signUpWith(Email) {
-    this.password = password
-    this.email = email
-    this.captchaToken = captchaToken
-}
-```
-
-</TabPanel>
-</Tabs>
 
 To test locally, you will need to add localhost to the domain whitelist as per the [Cloudflare docs](https://developers.cloudflare.com/turnstile/reference/testing/)
 
