@@ -92,14 +92,6 @@ export default function TicketHome({ users, meetups }: Props) {
     }
   }, [supabase])
 
-  // useEffect(() => {
-  //   toggleTheme(true)
-  //   document.body.className = 'dark bg-[#020405]'
-  //   return () => {
-  //     document.body.className = ''
-  //     toggleTheme(initialDarkMode)
-  //   }
-  // }, [])
 
   return (
     <>
