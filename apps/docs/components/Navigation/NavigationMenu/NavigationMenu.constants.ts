@@ -69,7 +69,7 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
     {
       label: 'GraphQL',
       icon: 'graphql',
-      href: '/guides/pg_graphql/graphql',
+      href: '/guides/graphql',
       level: 'graphql',
     },
   ],
@@ -782,6 +782,16 @@ export const api: NavMenuConstant = {
         { name: 'Using custom schemas', url: '/guides/api/using-custom-schemas', items: [] },
       ],
     },
+  ],
+}
+
+export const graphql: NavMenuConstant = {
+  icon: 'graphql',
+  title: 'GraphQL',
+  url: '/guides/graphql',
+  items: [
+    { name: 'Overview', url: '/guides/graphql', items: [] },
+    { name: 'API', url: '/guides/graphql/api', items: [] },
   ],
 }
 

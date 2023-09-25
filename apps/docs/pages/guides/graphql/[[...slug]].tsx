@@ -23,8 +23,8 @@ const externalSite = 'https://supabase.github.io/pg_graphql'
 // Each external docs page is mapped to a local page
 const pageMap = [
   {
-    slug: 'graphql',
     meta: {
+      id: 'graphql-overview',
       title: 'GraphQL',
     },
     remoteFile: 'supabase.md',
@@ -32,6 +32,7 @@ const pageMap = [
   {
     slug: 'api',
     meta: {
+      id: 'graphql-api',
       title: 'GraphQL API',
     },
     remoteFile: 'api.md',
@@ -47,6 +48,7 @@ interface PGGraphQLDocsProps {
 }
 
 export default function PGGraphQLDocs({ source, meta }: PGGraphQLDocsProps) {
+  console.log('render graphql')
   return (
     <Layout meta={meta}>
       <MDXRemote {...source} components={components} />
@@ -58,10 +60,11 @@ export default function PGGraphQLDocs({ source, meta }: PGGraphQLDocsProps) {
  * Fetch markdown from external repo and transform links
  */
 export const getStaticProps: GetStaticProps<PGGraphQLDocsProps> = async ({ params }) => {
-  const page = pageMap.find(({ slug }) => slug === params.slug)
+  const [slug] = params.slug ?? []
+  const page = pageMap.find((page) => page.slug === slug)
 
   if (!page) {
-    throw new Error(`No page mapping found for slug '${params.slug}'`)
+    throw new Error(`No page mapping found for slug '${slug}'`)
   }
 
   const { remoteFile, meta } = page
@@ -142,7 +145,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   return {
     paths: pageMap.map(({ slug }) => ({
       params: {
-        slug,
+        slug: slug ? [slug] : [],
       },
     })),
     fallback: false,
