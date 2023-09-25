@@ -92,6 +92,7 @@ const ApiOperationSection = (props) => {
             size="small"
             type="underlined"
             defaultActiveId={operation.responseList[0].responseCode}
+            queryGroup="response-status"
           >
             {operation.responseList.map((response: any) => (
               <Tabs.Panel id={response.responseCode} label={response.responseCode}>
