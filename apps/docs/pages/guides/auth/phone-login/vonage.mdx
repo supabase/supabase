@@ -88,6 +88,16 @@ let { user, error } = await supabase.auth.signUp({
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+supabase.gotrue.signUpWith(Phone) {
+    phoneNumber = "+13334445555"
+    password = "some-password"
+}
+```
+
+</TabPanel>
 <TabPanel id="http" label="HTTP">
 
 ```bash
@@ -121,6 +131,17 @@ let { session, error } = await supabase.auth.verifyOtp({
   phone: '491512223334444',
   token: '123456',
 })
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+supabase.gotrue.verifyPhoneOtp(
+    type = OtpType.Phone.SMS,
+    phoneNumber = "+13334445555",
+    token = "123456"
+)
 ```
 
 </TabPanel>
@@ -172,6 +193,16 @@ let { user, error } = await supabase.auth.signInWithPassword({
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+supabase.gotrue.loginWith(Phone) {
+    phoneNumber = "+13334445555"
+    password = "some-password"
+}
+```
+
+</TabPanel>
 <TabPanel id="http" label="HTTP">
 
 ```bash
@@ -209,6 +240,15 @@ let { user, error } = await supabase.auth.signInWithOtp({
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+supabase.gotrue.sendOtpTo(Phone) {
+    phoneNumber = "+13334445555"
+}
+```
+
+</TabPanel>
 <TabPanel id="http" label="HTTP">
 
 ```bash
@@ -239,6 +279,17 @@ let { session, error } = await supabase.auth.verifyOtp({
   phone: '491512223334444',
   token: '123456',
 })
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+supabase.gotrue.verifyPhoneOtp(
+    type = OtpType.Phone.SMS,
+    phoneNumber = "+13334445555",
+    token = "123456"
+)
 ```
 
 </TabPanel>
