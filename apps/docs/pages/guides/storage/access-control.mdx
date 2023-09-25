@@ -1,4 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import { IFrameWithConsent } from 'ui'
 
 export const meta = {
   id: 'storage-access-control',
@@ -164,12 +165,12 @@ using ( auth.uid() = owner );
 {/* Finish with a video. This also appears in the Sidebar via the "tocVideo" metadata */}
 
 <div className="video-container">
-  <iframe
+  <IFrameWithConsent
     src="https://www.youtube-nocookie.com/embed/4ERX__Y908k"
     frameBorder="1"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowFullScreen
-  ></iframe>
+  ></IFrameWithConsent>
 </div>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

@@ -1,4 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import { IFrameWithConsent } from 'ui'
 
 export const meta = {
   id: 'tables',
@@ -298,12 +299,12 @@ For example if you had the following situations:
 <TabPanel id="dashboard" label="Dashboard">
 
 <div className="video-container">
-  <iframe
+  <IFrameWithConsent
     src="https://www.youtube-nocookie.com/embed/TKwF3IGij5c"
     frameBorder="1"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowFullScreen
-  ></iframe>
+  ></IFrameWithConsent>
 </div>
 
 </TabPanel>

@@ -1,4 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import { IFrameWithConsent } from 'ui'
 
 export const meta = {
   id: 'examples-telegram-bot',
@@ -8,12 +9,12 @@ export const meta = {
 }
 
 <div class="video-container">
-  <iframe
+  <IFrameWithConsent
     src="https://www.youtube-nocookie.com/embed/AWfE3a9J_uo"
     frameBorder="1"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowFullScreen
-  ></iframe>
+  ></IFrameWithConsent>
 </div>
 
 Handle Telegram Bot Webhooks with the [grammY framework](https://grammy.dev/). grammY is an open source Telegram Bot Framework which makes it easy to handle and respond to incoming messages. [View on GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/telegram-bot).

@@ -1,4 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import { IFrameWithConsent } from 'ui'
 
 export const meta = {
   id: 'functions-import-maps',
@@ -8,12 +9,12 @@ export const meta = {
 }
 
 <div class="video-container">
-  <iframe
+  <IFrameWithConsent
     src="https://www.youtube-nocookie.com/embed/ILr3cneZuFk"
     frameBorder="1"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowFullScreen
-  ></iframe>
+  ></IFrameWithConsent>
 </div>
 
 Since [Supabase CLI](https://supabase.com/docs/guides/resources/supabase-cli) version `1.33.0` [import maps](https://deno.land/manual@v1.29.2/node/import_maps) can be used with Supabase Edge Functions.

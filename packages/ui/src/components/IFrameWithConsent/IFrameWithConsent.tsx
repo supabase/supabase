@@ -1,6 +1,6 @@
 import { useConsentValue } from 'common'
 import { IframeHTMLAttributes } from 'react'
-import { Button } from '../Button'
+import { Button } from 'ui'
 import { cn } from '../../lib/utils'
 
 /**
@@ -19,7 +19,7 @@ const IFrameWithConsent = (props: Props) => {
       ) : (
         <div
           className={cn(
-            'absolute z-10 w-full inset-0 aspect-video flex items-center justify-center flex-col text-center gap-2 p-6 bg-alternative text-sm',
+            'absolute w-full inset-0 aspect-video flex items-center justify-center flex-col text-center gap-2 p-6 bg-alternative text-sm',
             props.className
           )}
         >

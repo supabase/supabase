@@ -1,4 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import { IFrameWithConsent } from 'ui'
 
 export const meta = {
   title: 'Rate Limiting Edge Functions',
@@ -6,12 +7,12 @@ export const meta = {
 }
 
 <div class="video-container">
-  <iframe
+  <IFrameWithConsent
     src="https://www.youtube-nocookie.com/embed/o4ooiE-SdUg"
     frameBorder="1"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowFullScreen
-  ></iframe>
+  ></IFrameWithConsent>
 </div>
 
 [Redis](https://redis.io/docs/about/) is an open source (BSD licensed), in-memory data structure store used as a database, cache, message broker, and streaming engine. It is optimized for atomic operations like incrementing a value, for example for a view counter or rate limiting. We can even rate limit based on the user ID from Supabase Auth!

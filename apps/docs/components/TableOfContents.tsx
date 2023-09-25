@@ -4,6 +4,7 @@
 
 import { FC } from 'react'
 import { getAnchor, removeAnchor } from './CustomHTMLElements/CustomHTMLElements.utils'
+import { IFrameWithConsent } from 'ui'
 
 interface TOCHeader {
   id: number
@@ -53,12 +54,12 @@ const TableOfContents: FC<Props> = ({ toc, video }) => {
     <>
       {video && (
         <div className="video-container">
-          <iframe
+          <IFrameWithConsent
             src="https://www.youtube-nocookie.com/embed/0Fs96oZ4se0"
             frameBorder="1"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
-          ></iframe>
+          ></IFrameWithConsent>
         </div>
       )}
       <ul className="toc-menu list-none pl-4 text-[0.8rem] grid gap-2 mt-12">

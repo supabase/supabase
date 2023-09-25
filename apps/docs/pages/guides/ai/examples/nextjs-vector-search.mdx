@@ -1,5 +1,6 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 import StepHikeCompact from '~/components/StepHikeCompact'
+import { IFrameWithConsent } from 'ui'
 
 export const meta = {
   title: 'Vector search with Next.js and OpenAI',
@@ -536,12 +537,12 @@ Want to learn more about the awesome tech that is powering this?
 - Watch Greg's video for a full breakdown:
 
 <div class="video-container">
-  <iframe
+  <IFrameWithConsent
     src="https://www.youtube-nocookie.com/embed/Yhtjd7yGGGA"
     frameBorder="1"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowFullScreen
-  ></iframe>
+  ></IFrameWithConsent>
 </div>
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />

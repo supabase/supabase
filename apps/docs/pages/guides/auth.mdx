@@ -1,6 +1,6 @@
 import Layout from '~/layouts/DefaultGuideLayout'
-
 import { useRouter } from 'next/router'
+import { IFrameWithConsent } from 'ui'
 
 export const meta = {
   id: 'auth',
@@ -21,12 +21,12 @@ Postgres is at the heart of everything we do, and the Auth system follows this p
 Here's a quick, 2 minute tour of the Auth features built-in to Supabase:
 
 <div className="video-container">
-  <iframe
+  <IFrameWithConsent
     src="https://www.youtube-nocookie.com/embed/6ow_jW4epf8"
     frameBorder="1"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowFullScreen
-  ></iframe>
+  ></IFrameWithConsent>
 </div>
 
 ## Authentication

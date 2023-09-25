@@ -1,4 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import { IFrameWithConsent } from 'ui'
 
 export const meta = {
   id: 'webhooks',
@@ -20,12 +21,12 @@ using the [pg_net](/docs/guides/database/extensions/pgnet) extension. This exten
 This video demonstrates how you can create a new customer in Stripe each time a row is inserted into a `profiles` table:
 
 <div className="video-container">
-  <iframe
+  <IFrameWithConsent
     src="https://www.youtube-nocookie.com/embed/codAs9-NeHM"
     frameBorder="1"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowFullScreen
-  ></iframe>
+  ></IFrameWithConsent>
 </div>
 
 ## Creating a webhook

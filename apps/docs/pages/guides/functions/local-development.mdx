@@ -1,4 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import { IFrameWithConsent } from 'ui'
 
 export const meta = {
   id: 'functions-local-development',
@@ -13,12 +14,12 @@ You can follow the [Deno guide](https://deno.com/manual@v1.32.5/getting_started/
 When developing with VS Code inside of an existing application, you can utilize [multi-root workspaces](https://code.visualstudio.com/docs/editor/workspaces#_multiroot-workspaces).
 
 <div className="video-container">
-  <iframe
+  <IFrameWithConsent
     src="https://www.youtube-nocookie.com/embed/lFhU3L8VoSQ"
     frameBorder="1"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowFullScreen
-  ></iframe>
+  ></IFrameWithConsent>
 </div>
 
 For example, see this `edge-functions.code-workspace` configuration for a CRA (create react app) client with Supabase Edge Functions. You can find the complete example on [GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions).

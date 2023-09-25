@@ -1,7 +1,7 @@
 import { useBreakpoint } from 'common'
 import Image from 'next/image'
 import React, { ReactNode } from 'react'
-import { IconPlay, Modal } from 'ui'
+import { IFrameWithConsent, IconPlay, Modal } from 'ui'
 
 interface ExpandableVideoProps {
   videoId: string
@@ -94,7 +94,7 @@ export function ExpandableVideo({
               <p className="text-xs">Close</p>
             </button>
             <div className="video-container !rounded overflow-hidden">
-              <iframe
+              <IFrameWithConsent
                 src={`https://www.youtube-nocookie.com/embed/${videoId}`}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen

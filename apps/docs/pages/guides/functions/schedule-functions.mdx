@@ -1,4 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import { IFrameWithConsent } from 'ui'
 
 export const meta = {
   id: 'schedule-functions',
@@ -7,12 +8,12 @@ export const meta = {
 }
 
 <div class="video-container">
-  <iframe
+  <IFrameWithConsent
     src="https://www.youtube-nocookie.com/embed/-U6DJcjVvGo"
     frameBorder="1"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowFullScreen
-  ></iframe>
+  ></IFrameWithConsent>
 </div>
 
 The hosted Supabase Platform supports the [`pg_cron` extension](/docs/guides/database/extensions/pgcron), a simple cron-based job scheduler for PostgreSQL that runs inside the database.

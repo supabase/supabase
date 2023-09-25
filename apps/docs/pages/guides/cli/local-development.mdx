@@ -1,4 +1,5 @@
 import Layout from '~/layouts/DefaultGuideLayout'
+import { IFrameWithConsent } from 'ui'
 
 export const meta = {
   id: 'local-development',
@@ -155,12 +156,12 @@ http://localhost:54321/auth/v1/           # Auth (GoTrue)
 Database changes are managed through "migrations." Database migrations are a common way of tracking changes to your database over time.
 
 <div className="video-container">
-  <iframe
+  <IFrameWithConsent
     src="https://www.youtube-nocookie.com/embed/Kx5nHBmIxyQ"
     frameBorder="1"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowFullScreen
-  ></iframe>
+  ></IFrameWithConsent>
 </div>
 
 For this guide, we'll create a table called `employees` and see how we can make changes to it.
