@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions, useStore } from 'hooks'
@@ -93,44 +93,53 @@ const TableList = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <div className="w-[260px]">
-            <Listbox
-              size="small"
-              value={snap.selectedSchemaName}
-              onChange={snap.setSelectedSchemaName}
-              icon={isLocked && <IconLock size={14} strokeWidth={2} />}
-            >
-              <Listbox.Option disabled key="normal-schemas" value="normal-schemas" label="Schemas">
-                <p className="text-sm">Schemas</p>
-              </Listbox.Option>
-              {openSchemas.map((schema) => (
-                <Listbox.Option
-                  key={schema.id}
-                  value={schema.name}
-                  label={schema.name}
-                  addOnBefore={() => <span className="text-scale-900">schema</span>}
-                >
-                  <span className="text-scale-1200 text-sm">{schema.name}</span>
-                </Listbox.Option>
-              ))}
-              <Listbox.Option
-                disabled
-                key="protected-schemas"
-                value="protected-schemas"
-                label="Protected schemas"
+            {schema ? (
+              <Listbox
+                size="small"
+                value={snap.selectedSchemaName}
+                onChange={snap.setSelectedSchemaName}
+                icon={isLocked && <IconLock size={14} strokeWidth={2} />}
               >
-                <p className="text-sm">Protected schemas</p>
-              </Listbox.Option>
-              {protectedSchemas.map((schema) => (
                 <Listbox.Option
-                  key={schema.id}
-                  value={schema.name}
-                  label={schema.name}
-                  addOnBefore={() => <span className="text-scale-900">schema</span>}
+                  disabled
+                  key="normal-schemas"
+                  value="normal-schemas"
+                  label="Schemas"
                 >
-                  <span className="text-scale-1200 text-sm">{schema.name}</span>
+                  <p className="text-sm">Schemas</p>
                 </Listbox.Option>
-              ))}
-            </Listbox>
+                {openSchemas.map((schema) => (
+                  <Listbox.Option
+                    key={schema.id}
+                    value={schema.name}
+                    label={schema.name}
+                    addOnBefore={() => <span className="text-scale-900">schema</span>}
+                  >
+                    <span className="text-scale-1200 text-sm">{schema.name}</span>
+                  </Listbox.Option>
+                ))}
+                <Listbox.Option
+                  disabled
+                  key="protected-schemas"
+                  value="protected-schemas"
+                  label="Protected schemas"
+                >
+                  <p className="text-sm">Protected schemas</p>
+                </Listbox.Option>
+                {protectedSchemas.map((schema) => (
+                  <Listbox.Option
+                    key={schema.id}
+                    value={schema.name}
+                    label={schema.name}
+                    addOnBefore={() => <span className="text-scale-900">schema</span>}
+                  >
+                    <span className="text-scale-1200 text-sm">{schema.name}</span>
+                  </Listbox.Option>
+                ))}
+              </Listbox>
+            ) : (
+              <ShimmeringLoader />
+            )}
           </div>
           <div>
             <Input
