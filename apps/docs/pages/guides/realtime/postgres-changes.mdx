@@ -875,6 +875,15 @@ This filter uses Postgres's `>=` filter, so it works for non-numeric types. Make
 
 To listen to changes when a column's value in a table equals any client-specified values:
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
 ```js
 const channel = supabase
   .channel('changes')
@@ -890,6 +899,30 @@ const channel = supabase
   )
   .subscribe()
 ```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val myChannel = supabase.realtime.createChannel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
+    table = "products"
+    filter = "name=in.(red, blue, yellow)"
+}
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+	
+supabase.realtime.connect()
+myChannel.join()
+```
+
+</TabPanel>
+</Tabs>
 
 This filter uses Postgres's `= ANY`. Realtime allows a maximum of 100 values for this filter.
 
@@ -935,6 +968,15 @@ Your project JWT secret is found with your [Project API keys](https://app.supaba
 
 To use your own JWT with Realtime make sure to set the token after instantiating the Supabase client and before connecting to a Channel.
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
 ```js
 const { createClient } = require('@supabase/supabase-js')
 
@@ -958,9 +1000,47 @@ const channel = supabase
   .subscribe()
 ```
 
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
+	install(Realtime) {
+		jwtToken = "your-custom-jwt"
+	}
+}
+val myChannel = supabase.realtime.createChannel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
+    table = "products"
+    filter = "name=in.(red, blue, yellow)"
+}
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+	
+supabase.realtime.connect()
+myChannel.join()
+```
+
+</TabPanel>
+</Tabs>
+
 ### Refreshed tokens
 
 You will need to refresh tokens on your own, but once generated, you can pass them to Realtime.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
 
 For example, if you're using the `supabase-js` `v2` client then you can pass your token like this:
 
@@ -969,6 +1049,18 @@ For example, if you're using the `supabase-js` `v2` client then you can pass you
 
 supabase.realtime.setAuth('fresh-token')
 ```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+In Kotlin, you have to update the token manually per channel:
+
+```kotlin
+myChannel.updateAuth("fresh-token")
+```
+
+</TabPanel>
+</Tabs>
 
 ## Limitations
 
