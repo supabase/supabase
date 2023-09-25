@@ -6,7 +6,7 @@ import { ChangeEvent, useRef, useState } from 'react'
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { VercelIntegrationLayout } from 'components/layouts'
-import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import { ScaffoldColumn, ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
@@ -21,47 +21,37 @@ import { passwordStrength } from 'lib/helpers'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
 import { NextPageWithLayout } from 'types'
 import { Alert, Button, Checkbox, IconBook, IconLifeBuoy, Input, Listbox, LoadingLine } from 'ui'
+import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
 
 const VercelIntegration: NextPageWithLayout = () => {
   const [loading, setLoading] = useState<boolean>(false)
 
   return (
     <>
-      <main className="overflow-auto flex flex-col h-full">
-        <LoadingLine loading={loading} />
-
-        <>
-          <ScaffoldContainer className="max-w-md flex flex-col gap-6 grow py-8">
-            <h1 className="text-xl text-scale-1200">New project</h1>
-            <>
-              <Markdown content={`Choose the Supabase organization you wish to install in`} />
-              <CreateProject loading={loading} setLoading={setLoading} />
-            </>
-          </ScaffoldContainer>
-          <ScaffoldContainer className="flex flex-col gap-6 py-3">
-            <Alert withIcon variant="info" title="You can uninstall this Integration at any time.">
-              <Markdown
-                content={`You can remove this integration at any time via Vercel or the Supabase dashboard.`}
-              />
-            </Alert>
-          </ScaffoldContainer>
-        </>
-
-        <ScaffoldDivider />
-      </main>
-      <ScaffoldContainer className="bg-body flex flex-row gap-6 py-6 border-t">
-        <div className="flex items-center gap-2 text-xs text-scale-900">
-          <IconBook size={16} /> Docs
-        </div>
-        <div className="flex items-center gap-2 text-xs text-scale-900">
-          <IconLifeBuoy size={16} /> Support
-        </div>
+      <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
+        <ScaffoldColumn className="!max-w-[900px] mx-auto w-full">
+          <header>
+            <h1 className="text-xl text">New project</h1>
+            <Markdown
+              className="text-light"
+              content={`Choose the Supabase organization you wish to install in`}
+            />
+          </header>
+          <CreateProject loading={loading} setLoading={setLoading} />
+          <Alert withIcon variant="info" title="You can uninstall this Integration at any time.">
+            <Markdown
+              content={`You can remove this integration at any time via Vercel or the Supabase dashboard.`}
+            />
+          </Alert>
+        </ScaffoldColumn>
       </ScaffoldContainer>
     </>
   )
 }
 
-VercelIntegration.getLayout = (page) => <VercelIntegrationLayout>{page}</VercelIntegrationLayout>
+VercelIntegration.getLayout = (page) => (
+  <VercelIntegrationWindowLayout>{page}</VercelIntegrationWindowLayout>
+)
 
 const CreateProject = ({
   loading,
