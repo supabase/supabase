@@ -48,7 +48,6 @@ interface PGGraphQLDocsProps {
 }
 
 export default function PGGraphQLDocs({ source, meta }: PGGraphQLDocsProps) {
-  console.log('render graphql')
   return (
     <Layout meta={meta}>
       <MDXRemote {...source} components={components} />
