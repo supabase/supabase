@@ -15,14 +15,17 @@ const remarkMkDocsAdmonition = function () {
       const [firstChild] = paragraph.children
 
       if (firstChild?.type === 'text') {
-        const match = firstChild.value.match(/^!!! ?(.*?)\n(.*)/s)
+        // Look for 3 '!', followed by an admonition type, followed by
+        // an optionally quoted title, followed by optional newlines of text
+        const match = firstChild.value.match(/^!!! ?("?)(.+)\1 ?\n?((?:.|\n)*)/)
 
         if (!match) {
           return
         }
 
-        // Extract the admonition type along with the remaining text
-        const [, type, value] = match
+        // Extract the admonition type, title, and remaining text
+        const [, , typeTitle, value] = match
+        const [, type, title] = typeTitle.match(/^(.+?) ?(?:"(.*)")?$/)
 
         // Rewrite the node's value to remove the admonition syntax
         firstChild.value = value
@@ -44,6 +47,14 @@ const remarkMkDocsAdmonition = function () {
             },
           ],
           children,
+        }
+
+        if (title) {
+          admonitionElement.attributes.push({
+            type: 'mdxJsxAttribute',
+            name: 'label',
+            value: title,
+          })
         }
 
         // Overwrite original node with new element
