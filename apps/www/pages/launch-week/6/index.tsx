@@ -63,14 +63,6 @@ export default function launchweek() {
     }
   }, [supabase])
 
-  // useEffect(() => {
-  //   toggleTheme(true)
-  //   document.body.className = 'bg-[#121212]'
-  //   return () => {
-  //     document.body.className = ''
-  //     isDarkMode ? toggleTheme(true) : toggleTheme(false)
-  //   }
-  // }, [])
 
   async function getCreators() {
     try {

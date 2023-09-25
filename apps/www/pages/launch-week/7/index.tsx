@@ -38,14 +38,6 @@ export default function TicketHome({ users }: Props) {
   const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/seven/launch-week-7-teaser.jpg`
 
-  // useEffect(() => {
-  //   toggleTheme(true)
-  //   document.body.className = 'bg-[#1C1C1C]'
-  //   return () => {
-  //     document.body.className = ''
-  //     isDarkMode ? toggleTheme(true) : toggleTheme(false)
-  //   }
-  // }, [])
 
   return (
     <>
