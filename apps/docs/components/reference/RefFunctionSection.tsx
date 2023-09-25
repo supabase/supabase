@@ -111,6 +111,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                   size="tiny"
                   type="rounded-pills"
                   scrollable
+                  queryGroup="example"
                 >
                   {item.examples &&
                     item.examples.map((example, exampleIndex) => {
@@ -174,7 +175,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                                       <div className="bg-scale-300 border rounded prose max-w-none">
                                         <div className="bg-scale-200 px-5 py-2">
                                           <div className="flex gap-2 items-center">
-                                            <div className="text-brand-900">
+                                            <div className="text-brand">
                                               <IconDatabase size={16} />
                                             </div>
                                             <h5 className="text-xs text-scale-1200">

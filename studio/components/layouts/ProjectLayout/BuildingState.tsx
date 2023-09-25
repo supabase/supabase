@@ -3,20 +3,20 @@ import ClientLibrary from 'components/interfaces/Home/ClientLibrary'
 import ExampleProject from 'components/interfaces/Home/ExampleProject'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import Link from 'next/link'
-import { FC, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Badge, Button, IconArrowRight, IconLoader } from 'ui'
 
+import { useParams } from 'common'
 import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
+import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
+import { useSelectedProject } from 'hooks'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { Project } from 'types'
 
-export interface BuildingStateProps {
-  project: Project
-}
-
-const BuildingState = ({ project }: BuildingStateProps) => {
+const BuildingState = () => {
+  const { ref } = useParams()
+  const project = useSelectedProject()
   const queryClient = useQueryClient()
   const checkServerInterval = useRef<number>()
 
@@ -31,7 +31,7 @@ const BuildingState = ({ project }: BuildingStateProps) => {
       const { status } = projectStatus
       if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
         clearInterval(checkServerInterval.current)
-
+        if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
         await invalidateProjectsQuery(queryClient)
       }
     }
@@ -45,8 +45,10 @@ const BuildingState = ({ project }: BuildingStateProps) => {
     }
   }, [])
 
+  if (project === undefined) return null
+
   return (
-    <div className="mx-auto my-16 w-full max-w-6xl items-center justify-center">
+    <div className="mx-auto my-16 w-full max-w-7xl items-center justify-center">
       <div className="mx-6 flex flex-col space-y-16">
         <div className=" flex flex-col gap-4">
           <div className="flex items-center space-x-3">
@@ -55,8 +57,8 @@ const BuildingState = ({ project }: BuildingStateProps) => {
               <div className="flex items-center gap-2">
                 <IconLoader className="animate-spin" size={12} />
                 <span>
-                  {project.status === PROJECT_STATUS.RESTORING
-                    ? 'Restoring project'
+                  {project.status === PROJECT_STATUS.UNKNOWN
+                    ? 'Initiating project set up'
                     : 'Setting up project'}
                 </span>
               </div>
@@ -82,7 +84,7 @@ const BuildingState = ({ project }: BuildingStateProps) => {
                       Browse the Supabase{' '}
                       <Link href="https://supabase.com/docs">
                         <a
-                          className="mb-0 text-brand-900 transition-colors hover:text-brand-1200"
+                          className="mb-0 text-brand transition-colors hover:text-brand-600"
                           target="_blank"
                           rel="noreferrer"
                         >

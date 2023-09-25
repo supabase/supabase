@@ -1,29 +1,30 @@
-import { FC, useEffect, createContext, useContext, useState } from 'react'
+import { has, isEmpty, mapValues, union, without } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { isEmpty, mapValues, has, without, union } from 'lodash'
-import {
-  Input,
-  SidePanel,
-  Checkbox,
-  Listbox,
-  IconPlayCircle,
-  IconPauseCircle,
-  IconTerminal,
-  Badge,
-  Button,
-  Modal,
-} from 'ui'
-import { Dictionary } from 'components/grid'
-import { useRouter } from 'next/router'
+import { createContext, useContext, useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
 
-import ChooseFunctionForm from './ChooseFunctionForm'
+import { Dictionary } from 'components/grid'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import FormEmptyBox from 'components/ui/FormBoxEmpty'
 import NoTableState from 'components/ui/States/NoTableState'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import {
+  Badge,
+  Button,
+  Checkbox,
+  IconPauseCircle,
+  IconPlayCircle,
+  IconTerminal,
+  Input,
+  Listbox,
+  Modal,
+  SidePanel,
+} from 'ui'
+import ChooseFunctionForm from './ChooseFunctionForm'
 
 class CreateTriggerFormState {
   id: number | undefined
@@ -249,35 +250,40 @@ function hasWhitespace(value: string) {
 
 const CreateTriggerContext = createContext<ICreateTriggerStore | null>(null)
 
-type CreateTriggerProps = {
+interface CreateTriggerProps {
   trigger?: any
   visible: boolean
   setVisible: (value: boolean) => void
-} & any
+}
 
-const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible }) => {
+const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => {
+  const { project } = useProjectContext()
   const { ui, meta } = useStore()
   const [isClosingPanel, setIsClosingPanel] = useState(false)
   const _localState = useLocalObservable(() => new CreateTriggerStore())
   _localState.meta = meta as any
 
-  // for the empty 'no tables' state link
-  const router = useRouter()
-  const { ref } = router.query
+  useTablesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      onSuccess(tables) {
+        if (_localState.tables.length <= 0) {
+          _localState.setTables(tables)
+        }
+      },
+    }
+  )
 
   useEffect(() => {
-    const fetchTables = async () => {
-      await (_localState!.meta as any)!.tables!.load()
-      const tables = (_localState!.meta as any)!.tables.list()
-      _localState.setTables(tables)
-    }
     const fetchFunctions = async () => {
       await (_localState.meta as any).functions.load()
       const triggerFuncs = (_localState!.meta as any)!.functions.listTriggerFunctions()
       _localState.setTriggerFunctions(triggerFuncs)
     }
 
-    fetchTables()
     fetchFunctions()
   }, [])
 
@@ -387,8 +393,8 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
             </CreateTriggerContext.Provider>
             <ConfirmationModal
               visible={isClosingPanel}
-              header="Confirm to close"
-              buttonLabel="Confirm"
+              header="Discard changes"
+              buttonLabel="Discard"
               onSelectCancel={() => setIsClosingPanel(false)}
               onSelectConfirm={() => {
                 setIsClosingPanel(false)
@@ -413,7 +419,7 @@ const CreateTrigger: FC<CreateTriggerProps> = ({ trigger, visible, setVisible })
 
 export default observer(CreateTrigger)
 
-const InputName: FC = observer(({}) => {
+const InputName = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <Input
@@ -435,7 +441,7 @@ const InputName: FC = observer(({}) => {
   )
 })
 
-const SelectEnabledMode: FC = observer(({}) => {
+const SelectEnabledMode = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <Listbox
@@ -508,7 +514,7 @@ const SelectEnabledMode: FC = observer(({}) => {
   )
 })
 
-const SelectOrientation: FC = observer(({}) => {
+const SelectOrientation = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <Listbox
@@ -537,7 +543,7 @@ const SelectOrientation: FC = observer(({}) => {
   )
 })
 
-const ListboxTable: FC = observer(({}) => {
+const ListboxTable = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
 
   return (
@@ -597,7 +603,7 @@ const ListboxTable: FC = observer(({}) => {
   )
 })
 
-const CheckboxEvents: FC = observer(({}) => {
+const CheckboxEvents = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     // @ts-ignore
@@ -643,7 +649,7 @@ const CheckboxEvents: FC = observer(({}) => {
   )
 })
 
-const ListboxActivation: FC = observer(({}) => {
+const ListboxActivation = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <Listbox
@@ -699,7 +705,7 @@ const ListboxActivation: FC = observer(({}) => {
   )
 })
 
-const FunctionForm: FC = observer(({}) => {
+const FunctionForm = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
 
   return (
@@ -718,7 +724,7 @@ const FunctionForm: FC = observer(({}) => {
   )
 })
 
-const FunctionEmpty: FC = observer(({}) => {
+const FunctionEmpty = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
   return (
     <button
@@ -742,7 +748,7 @@ const FunctionEmpty: FC = observer(({}) => {
   )
 })
 
-const FunctionWithArguments: FC = observer(({}) => {
+const FunctionWithArguments = observer(({}) => {
   const _localState = useContext(CreateTriggerContext)
 
   return (

@@ -1,57 +1,61 @@
-import { FC, useState } from 'react'
-import { uniqBy, map as lodashMap, includes } from 'lodash'
-import { Button, IconSearch, IconLoader, Input } from 'ui'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PostgresFunction } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { noop, partition } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
+import { Button, IconLock, IconSearch, Input, Listbox } from 'ui'
 
-import { useCheckPermissions, useStore } from 'hooks'
-import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import SchemaTable from './SchemaTable'
+import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import { useCheckPermissions, useStore } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import FunctionList from './FunctionList'
 
-interface Props {
+interface FunctionsListProps {
   createFunction: () => void
   editFunction: (fn: PostgresFunction) => void
   deleteFunction: (fn: PostgresFunction) => void
 }
 
-const FunctionsList: FC<Props> = ({
-  createFunction = () => {},
-  editFunction = () => {},
-  deleteFunction = () => {},
-}) => {
+const FunctionsList = ({
+  createFunction = noop,
+  editFunction = noop,
+  deleteFunction = noop,
+}: FunctionsListProps) => {
+  const { project } = useProjectContext()
   const { meta } = useStore()
+  const [selectedSchema, setSelectedSchema] = useState<string>('public')
   const [filterString, setFilterString] = useState<string>('')
 
-  const functions = meta.functions.list(
-    (fn: PostgresFunction) => !meta.excludedSchemas.includes(fn.schema)
-  )
-  const filteredFunctions = functions.filter((x: PostgresFunction) =>
-    includes(x.name?.toLowerCase(), filterString.toLowerCase())
-  )
-  const filteredFunctionSchemas = lodashMap(uniqBy(filteredFunctions, 'schema'), 'schema')
   const canCreateFunctions = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'functions'
   )
 
+  const { data: schemas } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const [protectedSchemas, openSchemas] = partition(schemas ?? [], (schema) =>
+    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+  )
+  const schema = schemas?.find((schema) => schema.name === selectedSchema)
+  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+
+  const functions = meta.functions.list()
+
   if (meta.functions.isLoading) {
-    return (
-      <div className="flex h-full w-full items-center justify-center space-x-2">
-        <IconLoader className="animate-spin" size={14} />
-        <p>Loading functions...</p>
-      </div>
-    )
+    return <GenericSkeletonLoader />
   }
 
   if (meta.functions.hasError) {
     return (
-      <p className="px-6 py-4">
-        <p>Error connecting to API</p>
-        <p>{`${meta.functions.error?.message ?? 'Unknown error'}`}</p>
-      </p>
+      <AlertError error={meta.functions.error} subject="Failed to retrieve database functions" />
     )
   }
 
@@ -76,15 +80,64 @@ const FunctionsList: FC<Props> = ({
           </ProductEmptyState>
         </div>
       ) : (
-        <div className="w-full space-y-4 py-4">
-          <div className="flex items-center justify-between px-6">
-            <Input
-              placeholder="Filter by name"
-              size="small"
-              icon={<IconSearch size="tiny" />}
-              value={filterString}
-              onChange={(e) => setFilterString(e.target.value)}
-            />
+        <div className="w-full space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-[260px]">
+                <Listbox
+                  size="small"
+                  value={selectedSchema}
+                  onChange={setSelectedSchema}
+                  icon={isLocked && <IconLock size={14} strokeWidth={2} />}
+                >
+                  <Listbox.Option
+                    disabled
+                    key="normal-schemas"
+                    value="normal-schemas"
+                    label="Schemas"
+                  >
+                    <p className="text-sm">Schemas</p>
+                  </Listbox.Option>
+                  {/* @ts-ignore */}
+                  {openSchemas.map((schema) => (
+                    <Listbox.Option
+                      key={schema.id}
+                      value={schema.name}
+                      label={schema.name}
+                      addOnBefore={() => <span className="text-scale-900">schema</span>}
+                    >
+                      <span className="text-scale-1200 text-sm">{schema.name}</span>
+                    </Listbox.Option>
+                  ))}
+                  <Listbox.Option
+                    disabled
+                    key="protected-schemas"
+                    value="protected-schemas"
+                    label="Protected schemas"
+                  >
+                    <p className="text-sm">Protected schemas</p>
+                  </Listbox.Option>
+                  {protectedSchemas.map((schema) => (
+                    <Listbox.Option
+                      key={schema.id}
+                      value={schema.name}
+                      label={schema.name}
+                      addOnBefore={() => <span className="text-scale-900">schema</span>}
+                    >
+                      <span className="text-scale-1200 text-sm">{schema.name}</span>
+                    </Listbox.Option>
+                  ))}
+                </Listbox>
+              </div>
+              <Input
+                placeholder="Filter by name"
+                size="small"
+                icon={<IconSearch size="tiny" />}
+                value={filterString}
+                onChange={(e) => setFilterString(e.target.value)}
+              />
+            </div>
+
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger>
                 <Button disabled={!canCreateFunctions} onClick={() => createFunction()}>
@@ -112,23 +165,33 @@ const FunctionsList: FC<Props> = ({
               )}
             </Tooltip.Root>
           </div>
-          {filteredFunctions.length <= 0 && (
-            <div className="mx-auto flex max-w-lg items-center justify-center space-x-3 rounded border p-6 shadow-md dark:border-dark">
-              <p>No results match your filter query</p>
-              <Button type="outline" onClick={() => setFilterString('')}>
-                Reset filter
-              </Button>
-            </div>
-          )}
-          {filteredFunctionSchemas.map((schema: any) => (
-            <SchemaTable
-              key={schema}
-              filterString={filterString}
-              schema={schema}
-              editFunction={editFunction}
-              deleteFunction={deleteFunction}
-            />
-          ))}
+
+          <Table
+            className="table-fixed"
+            head={
+              <>
+                <Table.th key="name" className="w-1/3 space-x-4">
+                  Name
+                </Table.th>
+                <Table.th key="arguments" className="hidden md:table-cell">
+                  Arguments
+                </Table.th>
+                <Table.th key="return_type" className="hidden lg:table-cell">
+                  Return type
+                </Table.th>
+                <Table.th key="buttons" className="w-1/6"></Table.th>
+              </>
+            }
+            body={
+              <FunctionList
+                schema={selectedSchema}
+                filterString={filterString}
+                isLocked={isLocked}
+                editFunction={editFunction}
+                deleteFunction={deleteFunction}
+              />
+            }
+          />
         </div>
       )}
     </>

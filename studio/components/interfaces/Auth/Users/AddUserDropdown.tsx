@@ -43,7 +43,7 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
                     disabled={!canInviteUsers}
                     onClick={() => setInviteVisible(true)}
                   >
-                    Send Invitation
+                    Send invitation
                   </Dropdown.Item>
                 </Tooltip.Trigger>
                 {!canInviteUsers && (
@@ -73,7 +73,7 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
                   disabled={!canCreateUsers}
                   onClick={() => setCreateVisible(true)}
                 >
-                  Create New User
+                  Create new user
                 </Dropdown.Item>
               </Tooltip.Trigger>
 

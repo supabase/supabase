@@ -1,8 +1,8 @@
 import Link from 'next/link'
-import { FC, ReactNode, useState } from 'react'
+import { ReactNode, useState } from 'react'
 import { Button, IconExternalLink, IconMaximize2, IconMinimize2 } from 'ui'
 
-interface Props {
+interface InformationBoxProps {
   icon?: ReactNode
   title: ReactNode | string
   description?: ReactNode | string
@@ -15,7 +15,7 @@ interface Props {
   block?: boolean
 }
 
-const InformationBox: FC<Props> = ({
+const InformationBox = ({
   icon,
   title,
   description,
@@ -26,7 +26,7 @@ const InformationBox: FC<Props> = ({
   button,
   className = '',
   block = false,
-}) => {
+}: InformationBoxProps) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(defaultVisibility)
 
   return (

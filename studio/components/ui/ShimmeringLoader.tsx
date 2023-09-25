@@ -12,4 +12,13 @@ const ShimmeringLoader = ({ className = '', delayIndex = 0, animationDelay = 150
   )
 }
 
+const GenericSkeletonLoader = () => (
+  <div className="space-y-2">
+    <ShimmeringLoader />
+    <ShimmeringLoader className="w-3/4" />
+    <ShimmeringLoader className="w-1/2" />
+  </div>
+)
+
+export { GenericSkeletonLoader }
 export default ShimmeringLoader

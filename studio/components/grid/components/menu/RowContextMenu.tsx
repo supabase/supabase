@@ -1,11 +1,12 @@
-import { Menu, Item, ItemParams, PredicateParams, Separator } from 'react-contexify'
-import { IconTrash, IconClipboard, IconEdit } from 'ui'
-import { useDispatch, useTrackedState } from '../../store'
-import { formatClipboardValue, copyToClipboard } from '../../utils'
-import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { Item, ItemParams, Menu, PredicateParams, Separator } from 'react-contexify'
+import { IconClipboard, IconEdit, IconTrash } from 'ui'
+
 import { SupaRow, SupaTable } from 'components/grid/types'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
+import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
+import { useDispatch, useTrackedState } from '../../store'
+import { copyToClipboard, formatClipboardValue } from '../../utils'
 
 export const ROW_CONTEXT_MENU_ID = 'row-context-menu-id'
 
@@ -19,7 +20,18 @@ const RowContextMenu = ({ table, rows }: RowContextMenuProps) => {
   const dispatch = useDispatch()
 
   const { project } = useProjectContext()
-  const { mutateAsync: deleteRows } = useTableRowDeleteMutation()
+  const { mutate: deleteRows } = useTableRowDeleteMutation({
+    onSuccess: (res, variables) => {
+      dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs: [variables.rows[0].idx] } })
+      dispatch({
+        type: 'SELECTED_ROWS_CHANGE',
+        payload: { selectedRows: new Set() },
+      })
+    },
+    onError: (error) => {
+      if (state.onError) state.onError(error)
+    },
+  })
 
   function onDeleteRow(p: ItemParams) {
     confirmAlert({
@@ -31,22 +43,12 @@ const RowContextMenu = ({ table, rows }: RowContextMenuProps) => {
         const row = rows[rowIdx]
         if (!row || !project) return
 
-        try {
-          await deleteRows({
-            projectRef: project.ref,
-            connectionString: project.connectionString,
-            table,
-            rows: [row],
-          })
-
-          dispatch({ type: 'REMOVE_ROWS', payload: { rowIdxs: [row.idx] } })
-          dispatch({
-            type: 'SELECTED_ROWS_CHANGE',
-            payload: { selectedRows: new Set() },
-          })
-        } catch (error) {
-          if (state.onError) state.onError(error)
-        }
+        deleteRows({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          table,
+          rows: [row],
+        })
       },
     })
   }
@@ -93,7 +95,7 @@ const RowContextMenu = ({ table, rows }: RowContextMenuProps) => {
           <IconEdit size="tiny" />
           <span className="ml-2 text-xs">Edit row</span>
         </Item>
-        <Separator />
+        {state.editable && <Separator />}
         <Item onClick={onDeleteRow} hidden={isItemHidden} data="delete">
           <IconTrash size="tiny" stroke="red" />
           <span className="ml-2 text-xs">Delete row</span>

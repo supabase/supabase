@@ -1,26 +1,25 @@
-import { FC } from 'react'
-import Link from 'next/link'
+import { useMonaco } from '@monaco-editor/react'
+import { useTheme } from 'common'
+import IncidentBanner from 'components/layouts/AppLayout/IncidentBanner'
+import { getTheme } from 'components/ui/CodeEditor'
 import { useFlag } from 'hooks'
-import { IconExternalLink } from 'ui'
+import { PropsWithChildren, useEffect } from 'react'
 
-const AppBannerWrapper: FC = ({ children }) => {
+const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
+  const monaco = useMonaco()
+  const { isDarkMode } = useTheme()
   const ongoingIncident = useFlag('ongoingIncident')
+
+  useEffect(() => {
+    if (monaco) {
+      const theme: any = getTheme(isDarkMode)
+      monaco.editor.defineTheme('supabase', theme)
+    }
+  }, [isDarkMode, monaco])
 
   return (
     <div className="min-h-full flex flex-col">
-      {ongoingIncident && (
-        <Link href="https://status.supabase.com">
-          <a target="_blank" rel="noreferrer">
-            <div className="flex cursor-pointer items-center justify-center space-x-2 bg-green-900 py-3 text-scale-400 transition hover:bg-green-1000 dark:text-scale-1200">
-              <p className="text-sm font-medium">
-                We are currently investigating a technical issue, follow status.supabase.com for
-                updates
-              </p>
-              <IconExternalLink size={16} strokeWidth={2} />
-            </div>
-          </a>
-        </Link>
-      )}
+      {ongoingIncident && <IncidentBanner />}
 
       {children}
     </div>

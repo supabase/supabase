@@ -116,11 +116,45 @@ Now when you run a local development docs server you will see the new docs site.
 
 ---
 
+## Running Docker
+
+To test your changes, you need to run Supabase using Docker. Docker lets you use features of your locally modified Supabase version.
+
+#### Prerequsites
+
+First, make sure you have the Docker application installed on your device. You can download and install it from [here](https://docs.docker.com/get-docker/).
+
+#### Getting Started
+
+1. Navigate to the `docker` directory in your forked repo
+
+   ```sh
+   cd docker
+   ```
+
+2. Copy the example `env` file
+
+   ```sh
+   cp .env.example .env
+   ```
+
+3. Run docker
+
+   ```sh
+   docker-compose up
+   ```
+
+This command initializes the containers specified in the docker-compose.yml file. It might take a few moments to complete, depending on your computer and internet connection.
+
+Once the `docker-compose up` process completes, you should have your local version of Supabase up and running within Docker containers. You can access and test the features you've modified or added.
+
+Remember to keep the Docker application open as long as you're working with your local Supabase instance.
+
 ## Create a pull request
 
-After making your changes, open a pull request (PR). Once you submit your pull request, others from the Supabase team/community will review it with you.
+After making your changes, open a pull request. Once you submit your pull request, the Supabase team will review it with you.
 
-If you have an issue, like a merge conflict, or don't know how to open a pull request then check out [GitHub's pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests) tutorial on how to resolve merge conflicts and other issues. Once your PR has been merged, you will be proudly listed as a contributor in the [contributor chart](https://github.com/supabase/supabase/graphs/contributors).
+Once your PR has been merged, you will be proudly listed as a contributor in the [contributor chart](https://github.com/supabase/supabase/graphs/contributors).
 
 ---
 
@@ -129,6 +163,26 @@ If you have an issue, like a merge conflict, or don't know how to open a pull re
 ### Add a redirect
 
 Create a new entry in the [`redirects.js`](https://github.com/supabase/supabase/blob/master/apps/www/lib/redirects.js) file in our main site.
+
+---
+
+### Federated docs
+
+We support "federating" docs, meaning doc content can come directly from external repos other than [`supabase/supabase`](https://github.com/supabase/supabase).
+
+- It's great for things like client libs who have their own set of docs that we don't want to duplicate on the official Supabase docs (eg. [`supabase/vecs`](https://github.com/supabase/vecs)).
+- No duplication or manual steps required - fetches and generates automatically as part of the docs build pipeline
+- It's flexible - you can "embed" external docs nearly anywhere at any level in Supabase docs, but they will feel native
+- If you are maintaining a repo containing docs that you think could also live in Supabase docs, feel free to create an issue and we can work together to integrate
+
+Federated docs work using Next.js's build pipeline. We use `getStaticProps()` to fetch remote documentation (ie. markdown) at build time which is processed and passed to the respective page within the docs.
+
+See the [Vecs Python source code](https://github.com/supabase/supabase/blob/master/apps/docs/pages/guides/ai/python/%5Bslug%5D.tsx) to see how we do this for [`supabase/vecs`](https://github.com/supabase/vecs). Use this as a starting point for federating other docs.
+
+Some things to consider:
+
+- Links will often need to be transformed. For example if you are bringing in external markdown content, they may contain relative links that may not translate 1-to-1 after rendering in the Supabase docs. Use the [Link Transform](https://github.com/supabase/supabase/blob/master/apps/docs/lib/mdx/plugins/rehypeLinkTransform.ts) rehype plugin to transform links.
+- External markdown may contain syntax extensions that Supabase docs don't understand by default (eg. [mkdocs-material extensions](https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown)). We've built a few remark plugins to support these extensions (eg. [MkDocs Admonition](https://github.com/supabase/supabase/blob/master/apps/docs/lib/mdx/plugins/remarkAdmonition.ts)). If there is a markdown extension that you need that isn't built yet, feel free to open an issue and we can work together to create it.
 
 ---
 

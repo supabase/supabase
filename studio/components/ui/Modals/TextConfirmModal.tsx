@@ -1,7 +1,7 @@
-import { FC, ReactNode } from 'react'
-import { Modal, Button, Input, Alert, Form } from 'ui'
+import { PropsWithChildren, ReactNode } from 'react'
+import { Alert, Button, Form, Input, Modal } from 'ui'
 
-interface Props {
+interface TextConfirmModalProps {
   loading: boolean
   visible: boolean
   title: string
@@ -11,12 +11,11 @@ interface Props {
   confirmString: string
   alert?: string
   text?: string | ReactNode
-  children?: ReactNode
   onConfirm: () => void
   onCancel: () => void
 }
 
-const TextConfirmModal: FC<Props> = ({
+const TextConfirmModal = ({
   title,
   size = 'small',
   onConfirm,
@@ -29,7 +28,7 @@ const TextConfirmModal: FC<Props> = ({
   alert,
   text,
   children,
-}) => {
+}: PropsWithChildren<TextConfirmModalProps>) => {
   // [Joshen] Have to keep the loading prop here as this component itself doesn't
   // directly trigger any potential async job that follows onConfirm. It only triggers
   // the onConfirm callback function, and hence if anything fails in the callback,
@@ -69,7 +68,7 @@ const TextConfirmModal: FC<Props> = ({
               )}
               {text !== undefined && (
                 <Modal.Content>
-                  <p className="mb-2 block text-sm">{text}</p>
+                  <p className="mb-2 block text-sm break-all">{text}</p>
                 </Modal.Content>
               )}
               <Modal.Separator />
@@ -78,7 +77,7 @@ const TextConfirmModal: FC<Props> = ({
                   id="confirmValue"
                   label={
                     <span>
-                      Type <span className="text-scale-1200">{confirmString}</span> to confirm.
+                      Type <span className="text-scale-1200 break-all">{confirmString}</span> to confirm.
                     </span>
                   }
                   placeholder={confirmPlaceholder}

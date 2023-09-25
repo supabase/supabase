@@ -1,3 +1,4 @@
+import { stripIndent } from 'common-tags'
 import { SqlSnippets, UserContent } from 'types'
 import { SQLTemplate } from './SQLEditor.types'
 
@@ -1169,7 +1170,7 @@ $$;
 `.trim(),
   },
   {
-    id: 21,
+    id: 22,
     type: 'template',
     title: 'Replication status report',
     description: 'See the status of your replication slots and replication lag.',
@@ -1184,6 +1185,94 @@ SELECT
 FROM pg_control_checkpoint(), pg_replication_slots s
 LEFT JOIN pg_stat_replication r ON (r.pid = s.active_pid);
 `,
+  },
+  {
+    id: 23,
+    type: 'quickstart',
+    title: 'LangChain',
+    description: 'LangChain is a popular framework for working with AI, Vectors, and embeddings.',
+    sql: `
+-- Enable the pgvector extension to work with embedding vectors
+create extension vector;
+
+-- Create a table to store your documents
+create table documents (
+  id bigserial primary key,
+  content text, -- corresponds to Document.pageContent
+  metadata jsonb, -- corresponds to Document.metadata
+  embedding vector(1536) -- 1536 works for OpenAI embeddings, change if needed
+);
+
+-- Create a function to search for documents
+create function match_documents (
+  query_embedding vector(1536),
+  match_count int default null,
+  filter jsonb DEFAULT '{}'
+) returns table (
+  id bigint,
+  content text,
+  metadata jsonb,
+  similarity float
+)
+language plpgsql
+as $$
+#variable_conflict use_column
+begin
+  return query
+  select
+    id,
+    content,
+    metadata,
+    1 - (documents.embedding <=> query_embedding) as similarity
+  from documents
+  where metadata @> filter
+  order by documents.embedding <=> query_embedding
+  limit match_count;
+end;
+$$;
+`.trim(),
+  },
+  {
+    id: 24,
+    type: 'template',
+    title: 'Install dbdev',
+    description: 'dbdev is a client for installing 3rd party packages into your database.',
+    sql: `
+create extension if not exists http with schema extensions;
+create extension if not exists pg_tle;
+select pgtle.uninstall_extension_if_exists('supabase-dbdev');
+drop extension if exists "supabase-dbdev";
+select
+    pgtle.install_extension(
+        'supabase-dbdev',
+        resp.contents ->> 'version',
+        'PostgreSQL package manager',
+        resp.contents ->> 'sql'
+    )
+from http(
+    (
+        'GET',
+        'https://api.database.dev/rest/v1/'
+        || 'package_versions?select=sql,version'
+        || '&package_name=eq.supabase-dbdev'
+        || '&order=version.desc'
+        || '&limit=1',
+        array[
+            ('apiKey', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhtdXB0cHBsZnZpaWZyYndtbXR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODAxMDczNzIsImV4cCI6MTk5NTY4MzM3Mn0.z2CN0mvO2No8wSi46Gw59DFGCTJrzM0AQKsu_5k134s')::http_header
+        ],
+        null,
+        null
+    )
+) x,
+lateral (
+    select
+        ((row_to_json(x) -> 'content') #>> '{}')::json -> 0
+) resp(contents);
+create extension "supabase-dbdev";
+select dbdev.install('supabase-dbdev');
+drop extension if exists "supabase-dbdev";
+create extension "supabase-dbdev";
+`.trim(),
   },
 ]
 
@@ -1201,3 +1290,12 @@ export const NEW_SQL_SNIPPET_SKELETON: UserContent<SqlSnippets.Content> = {
     favorite: false,
   },
 }
+
+export const sqlAiDisclaimerComment = stripIndent`
+  -- Supabase AI is experimental and may produce incorrect answers
+  -- Always verify the output before executing
+`
+
+export const untitledSnippetTitle = 'Untitled query'
+
+export const destructiveSqlRegex = [/(drop|delete|truncate)\s/i]

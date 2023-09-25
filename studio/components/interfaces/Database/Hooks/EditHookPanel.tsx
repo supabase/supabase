@@ -1,6 +1,6 @@
 import { PostgresTable, PostgresTrigger } from '@supabase/postgres-meta'
 import Image from 'next/image'
-import { MutableRefObject, useEffect, useRef, useState } from 'react'
+import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -12,12 +12,13 @@ import {
   EdgeFunctionsResponse,
   useEdgeFunctionsQuery,
 } from 'data/edge-functions/edge-functions-query'
+import { getTable } from 'data/tables/table-query'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useStore } from 'hooks'
-import { tryParseJson, uuidv4 } from 'lib/helpers'
+import { isValidHttpUrl, tryParseJson, uuidv4 } from 'lib/helpers'
 import { Button, Checkbox, Form, Input, Listbox, Modal, Radio, SidePanel } from 'ui'
 import HTTPRequestFields from './HTTPRequestFields'
 import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
-import { isValidHttpUrl } from 'lib/helpers'
 
 export interface EditHookPanelProps {
   visible: boolean
@@ -28,12 +29,10 @@ export interface EditHookPanelProps {
 export type HTTPArgument = { id: string; name: string; value: string }
 
 const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) => {
-  // [Joshen] Need to change to use RQ once Alaister's PR goes in
   const { ref } = useParams()
-  const { meta, ui } = useStore()
+  const { ui } = useStore()
   const submitRef = useRef<any>(null)
   const [isEdited, setIsEdited] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isClosingPanel, setIsClosingPanel] = useState(false)
 
   // [Joshen] There seems to be some bug between Checkbox.Group within the Form component
@@ -46,11 +45,53 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
   const [httpParameters, setHttpParameters] = useState<HTTPArgument[]>([])
 
   const { project } = useProjectContext()
+  const { data } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
-  const { mutateAsync: createDatabaseTrigger } = useDatabaseTriggerCreateMutation()
-  const { mutateAsync: updateDatabaseTrigger } = useDatabaseTriggerUpdateMutation()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { mutate: createDatabaseTrigger } = useDatabaseTriggerCreateMutation({
+    onSuccess: (res) => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully created new webhook "${res.name}"`,
+      })
+      setIsSubmitting(false)
+      onClose()
+    },
+    onError: (error) => {
+      setIsSubmitting(false)
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to create webhook: ${error.message}`,
+      })
+    },
+  })
+  const { mutate: updateDatabaseTrigger } = useDatabaseTriggerUpdateMutation({
+    onSuccess: (res) => {
+      setIsSubmitting(false)
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully updated webhook "${res.name}"`,
+      })
+      onClose()
+    },
+    onError: (error) => {
+      setIsSubmitting(false)
+      ui.setNotification({
+        error,
+        category: 'error',
+        message: `Failed to update webhook: ${error.message}`,
+      })
+    },
+  })
 
-  const tables = meta.tables.list().sort((a, b) => (a.schema > b.schema ? 0 : -1))
+  const tables = useMemo(
+    () => [...(data ?? [])].sort((a, b) => (a.schema > b.schema ? 0 : -1)),
+    [data]
+  )
   const restUrl = project?.restUrl
   const restUrlTld = new URL(restUrl as string).hostname.split('.').pop()
 
@@ -65,12 +106,12 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
     function_type: isEdgeFunction(selectedHook?.function_args?.[0] ?? '')
       ? 'supabase_function'
       : 'http_request',
+    timeout_ms: Number(selectedHook?.function_args?.[4] ?? 1000),
   }
 
   useEffect(() => {
     if (visible) {
       setIsEdited(false)
-      setIsSubmitting(false)
       setIsClosingPanel(false)
 
       // Reset form fields outside of the Form context
@@ -138,11 +179,16 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       }
     }
 
+    if (values.timeout_ms < 1000 || values.timeout_ms > 5000) {
+      errors['timeout_ms'] = 'Timeout should be between 1000ms and 5000ms'
+    }
+
     if (JSON.stringify(values) !== JSON.stringify(initialValues)) setIsEdited(true)
     return errors
   }
 
   const onSubmit = async (values: any) => {
+    setIsSubmitting(true)
     if (!project?.ref) {
       return console.error('Project ref is required')
     }
@@ -150,12 +196,16 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       return setEventsError('Please select at least one event')
     }
 
-    const selectedTable = meta.tables.byId(values.table_id)
+    const selectedTable = await getTable({
+      id: values.table_id,
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    })
     if (!selectedTable) {
+      setIsSubmitting(false)
       return ui.setNotification({ category: 'error', message: 'Unable to find selected table' })
     }
 
-    const serviceTimeoutMs = '1000'
     const headers = httpHeaders
       .filter((header) => header.name && header.value)
       .reduce((a: any, b: any) => {
@@ -185,55 +235,23 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
         values.http_method,
         JSON.stringify(headers),
         JSON.stringify(parameters),
-        serviceTimeoutMs,
+        values.timeout_ms.toString(),
       ],
     }
 
     if (selectedHook === undefined) {
-      try {
-        setIsSubmitting(true)
-        await createDatabaseTrigger({
-          projectRef: project?.ref,
-          connectionString: project?.connectionString,
-          payload,
-        })
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully created new webhook "${values.name}"`,
-        })
-        onClose()
-      } catch (error: any) {
-        ui.setNotification({
-          error,
-          category: 'error',
-          message: `Failed to create webhook: ${error.message}`,
-        })
-      } finally {
-        setIsSubmitting(false)
-      }
+      createDatabaseTrigger({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        payload,
+      })
     } else {
-      try {
-        setIsSubmitting(true)
-        await updateDatabaseTrigger({
-          projectRef: project?.ref,
-          connectionString: project?.connectionString,
-          originalTrigger: selectedHook,
-          updatedTrigger: payload,
-        })
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully updated webhook "${values.name}"`,
-        })
-        onClose()
-      } catch (error: any) {
-        ui.setNotification({
-          error,
-          category: 'error',
-          message: `Failed to update webhook: ${error.message}`,
-        })
-      } finally {
-        setIsSubmitting(false)
-      }
+      updateDatabaseTrigger({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        originalTrigger: selectedHook,
+        updatedTrigger: payload,
+      })
     }
   }
 
@@ -306,8 +324,8 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       </SidePanel>
       <ConfirmationModal
         visible={isClosingPanel}
-        header="Confirm to close"
-        buttonLabel="Confirm"
+        header="Discard changes"
+        buttonLabel="Discard"
         onSelectCancel={() => setIsClosingPanel(false)}
         onSelectConfirm={() => {
           setIsClosingPanel(false)

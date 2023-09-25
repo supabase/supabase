@@ -1,15 +1,26 @@
-import { FC, useState } from 'react'
-import { observer } from 'mobx-react-lite'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Input, Button, IconSearch, IconPlus, IconChevronLeft, IconEdit3, IconTrash } from 'ui'
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { noop } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
 
-import { useStore, useCheckPermissions } from 'hooks'
-import Table from 'components/to-be-cleaned/Table'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
+import Table from 'components/to-be-cleaned/Table'
+import { useCheckPermissions, useStore } from 'hooks'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import {
+  Button,
+  IconChevronLeft,
+  IconChevronRight,
+  IconEdit3,
+  IconPlus,
+  IconSearch,
+  IconTrash,
+  Input,
+} from 'ui'
 
-interface Props {
+interface ColumnListProps {
   selectedTable: PostgresTable
   onSelectBack: () => void
   onAddColumn: () => void
@@ -17,13 +28,13 @@ interface Props {
   onDeleteColumn: (column: any) => void
 }
 
-const ColumnList: FC<Props> = ({
+const ColumnList = ({
   selectedTable,
-  onSelectBack = () => {},
-  onAddColumn = () => {},
-  onEditColumn = () => {},
-  onDeleteColumn = () => {},
-}) => {
+  onSelectBack = noop,
+  onAddColumn = noop,
+  onEditColumn = noop,
+  onDeleteColumn = noop,
+}: ColumnListProps) => {
   const { meta } = useStore()
   const [filterString, setFilterString] = useState<string>('')
   const columns =
@@ -31,11 +42,19 @@ const ColumnList: FC<Props> = ({
       ? selectedTable.columns
       : selectedTable.columns?.filter((column: any) => column.name.includes(filterString))) ?? []
 
-  const isLocked = meta.excludedSchemas.includes(selectedTable.schema ?? '')
+  const isLocked = EXCLUDED_SCHEMAS.includes(selectedTable.schema ?? '')
   const canUpdateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
   return (
     <>
+      <div className="mb-4 flex items-center space-x-2">
+        <div className="flex items-center space-x-2">
+          <h3 className="mb-1 text-xl text-scale-1200">Database Tables</h3>
+          <IconChevronRight strokeWidth={1.5} className="text-light" />
+          <h3 className="mb-1 text-xl text-scale-1200">{selectedTable.name}</h3>
+        </div>
+      </div>
+
       <div className="mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
@@ -47,7 +66,6 @@ const ColumnList: FC<Props> = ({
                 icon={<IconChevronLeft size="small" />}
                 style={{ padding: '5px' }}
               />
-              <code>{selectedTable.name}</code>
             </div>
             <div>
               <Input

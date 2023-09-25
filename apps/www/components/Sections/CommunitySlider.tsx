@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { useWindowSize } from 'react-use'
 
-import TweetCard from '~/components/TweetCard'
+import { TweetCard } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import SwiperCore, { Autoplay } from 'swiper'
 
@@ -130,7 +130,7 @@ const CommunitySlider = () => {
       <p className="text-scale-900 my-3 text-base">{card.abstract}</p>
 
       {card.url && (
-        <div className="text-brand-900 block cursor-pointer text-sm">Read Customer Story</div>
+        <div className="text-brand block cursor-pointer text-sm">Read Customer Story</div>
       )}
     </div>
   )

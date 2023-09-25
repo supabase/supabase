@@ -96,7 +96,7 @@ const levelsData = {
   },
   reference_swift_v0: {
     icon: '/docs/img/icons/menu/reference-swift',
-    name: 'Swift Reference v1.0',
+    name: 'Swift Reference v0.0',
   },
   reference_kotlin_v0: {
     icon: '/docs/img/icons/menu/reference-kotlin',
@@ -227,7 +227,7 @@ const HeaderLogo = memo(function HeaderLogo() {
           height={24}
           alt="Supabase Logo"
         />
-        <span className="font-mono text-sm font-medium text-brand-900">DOCS</span>
+        <span className="font-mono text-sm font-medium text-brand">DOCS</span>
       </a>
     </Link>
   )
@@ -243,7 +243,7 @@ const Container = memo(function Container(props) {
       className={[
         // 'overflow-x-auto',
         'w-full h-screen transition-all ease-out',
-        'absolute lg:relative',
+        // 'absolute lg:relative',
         mobileMenuOpen
           ? '!w-auto ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden'
           : 'overflow-auto',

@@ -4,16 +4,24 @@ import { IS_PLATFORM } from 'lib/constants'
 
 export const generateDatabaseMenu = (
   project?: Project,
-  foreignDataWrappersEnabled: boolean = false,
-  pgNetExtensionExists: boolean = false
+  flags?: {
+    pgNetExtensionExists: boolean
+  }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
+  const { pgNetExtensionExists } = flags || {}
 
   return [
     {
       title: 'Database',
       items: [
         { name: 'Tables', key: 'tables', url: `/project/${ref}/database/tables`, items: [] },
+        {
+          name: 'Schema Visualizer',
+          key: 'schemas',
+          url: `/project/${ref}/database/schemas`,
+          items: [],
+        },
         {
           name: 'Triggers',
           key: 'triggers',
@@ -39,7 +47,7 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/replication`,
           items: [],
         },
-        ...(pgNetExtensionExists
+        ...(!!pgNetExtensionExists
           ? [
               {
                 name: 'Webhooks',
@@ -49,17 +57,12 @@ export const generateDatabaseMenu = (
               },
             ]
           : []),
-        ...(foreignDataWrappersEnabled
-          ? [
-              {
-                name: 'Wrappers',
-                key: 'wrappers',
-                url: `/project/${ref}/database/wrappers`,
-                items: [],
-                label: 'ALPHA',
-              },
-            ]
-          : []),
+        {
+          name: 'Wrappers',
+          key: 'wrappers',
+          url: `/project/${ref}/database/wrappers`,
+          items: [],
+        },
         ...(IS_PLATFORM
           ? [
               {
@@ -74,6 +77,12 @@ export const generateDatabaseMenu = (
           name: 'Migrations',
           key: 'migrations',
           url: `/project/${ref}/database/migrations`,
+          items: [],
+        },
+        {
+          name: 'Indexes',
+          key: 'indexes',
+          url: `/project/${ref}/database/indexes`,
           items: [],
         },
       ],

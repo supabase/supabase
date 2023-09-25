@@ -1,43 +1,45 @@
-import { FC, useState, Dispatch, SetStateAction } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import {
-  Alert,
-  Button,
-  Dropdown,
-  Input,
-  Modal,
-  IconEye,
-  IconEyeOff,
-  IconKey,
-  IconLoader,
-  IconChevronDown,
-  IconRefreshCw,
-  IconPenTool,
-  IconAlertCircle,
-} from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   JwtSecretUpdateError,
   JwtSecretUpdateProgress,
   JwtSecretUpdateStatus,
 } from '@supabase/shared-types/out/events'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Dispatch, SetStateAction, useState } from 'react'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Dropdown,
+  IconAlertCircle,
+  IconAlertTriangle,
+  IconChevronDown,
+  IconEye,
+  IconEyeOff,
+  IconKey,
+  IconLoader,
+  IconPenTool,
+  IconRefreshCw,
+  Input,
+  Modal,
+} from 'ui'
 
-import { uuidv4 } from 'lib/helpers'
-import { useStore, useCheckPermissions } from 'hooks'
 import { useParams } from 'common/hooks'
-import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
+import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutation'
+import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { useCheckPermissions, useStore } from 'hooks'
+import { uuidv4 } from 'lib/helpers'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
 } from './API.constants'
-import Panel from 'components/ui/Panel'
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 
-interface Props {}
-
-const JWTSettings: FC<Props> = ({}) => {
+const JWTSettings = () => {
   const { ui } = useStore()
   const { ref: projectRef } = useParams()
 
@@ -45,8 +47,6 @@ const JWTSettings: FC<Props> = ({}) => {
   const [showCustomTokenInput, setShowCustomTokenInput] = useState(false)
   const [isCreatingKey, setIsCreatingKey] = useState<boolean>(false)
   const [isRegeneratingKey, setIsGeneratingKey] = useState<boolean>(false)
-  const [isSubmittingJwtSecretUpdateRequest, setIsSubmittingJwtSecretUpdateRequest] =
-    useState<boolean>(false)
 
   const canReadJWTSecret = useCheckPermissions(PermissionAction.READ, 'field.jwt_secret')
   const canGenerateNewJWTSecret = useCheckPermissions(
@@ -56,6 +56,8 @@ const JWTSettings: FC<Props> = ({}) => {
 
   const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
+  const { mutateAsync: updateJwt, isLoading: isSubmittingJwtSecretUpdateRequest } =
+    useJwtSecretUpdateMutation()
 
   const { Failed, Updated, Updating } = JwtSecretUpdateStatus
 
@@ -68,35 +70,21 @@ const JWTSettings: FC<Props> = ({}) => {
   const jwtSecretUpdateProgressMessage =
     JWT_SECRET_UPDATE_PROGRESS_MESSAGES[data?.jwtSecretUpdateProgress as JwtSecretUpdateProgress]
 
-  const { mutateAsync: updateJwt } = useJwtSecretUpdateMutation()
-
   async function handleJwtSecretUpdate(
     jwt_secret: string,
     setModalVisibility: Dispatch<SetStateAction<boolean>>
   ) {
-    if (!projectRef) return
-
-    setIsSubmittingJwtSecretUpdateRequest(true)
+    if (!projectRef) return console.error('Project ref is required')
+    const trackingId = uuidv4()
     try {
-      const trackingId = uuidv4()
-      await updateJwt({
-        projectRef,
-        jwtSecret: jwt_secret,
-        changeTrackingId: trackingId,
-      })
-
+      await updateJwt({ projectRef, jwtSecret: jwt_secret, changeTrackingId: trackingId })
       setModalVisibility(false)
-
       ui.setNotification({
         category: 'info',
         message:
           'Successfully submitted JWT secret update request. Please wait while your project is updated.',
       })
-    } catch (error: any) {
-      ui.setNotification({ category: 'error', message: error.message })
-    } finally {
-      setIsSubmittingJwtSecretUpdateRequest(false)
-    }
+    } catch (error) {}
   }
 
   return (
@@ -216,36 +204,40 @@ const JWTSettings: FC<Props> = ({}) => {
                     Change tracking ID: {data?.changeTrackingId} <br />
                     Error message: {jwtSecretUpdateErrorMessage}
                   </Alert>
-                ) : canGenerateNewJWTSecret ? (
-                  <Alert
-                    withIcon
-                    variant="warning"
-                    title="This will invalidate all existing API keys!"
-                  >
-                    Generating a new JWT secret will invalidate <u>all</u> of your API keys,
-                    including your <code>service_role</code> and <code>anon</code> keys. Your
-                    project will also be restarted during this process, which will terminate any
-                    existing connections.
-                  </Alert>
-                ) : (
-                  <></>
-                )}
+                ) : null}
               </div>
             </>
           )}
         </Panel.Content>
       </Panel>
-      <ConfirmModal
+
+      <ConfirmationModal
         danger
+        size="medium"
         visible={isRegeneratingKey}
-        title="Are you absolutely sure?"
-        description="This action cannot be undone and the old JWT secret will be lost. All existing API keys
-        will be invalidated, and any open connections will be terminated."
+        header="Confirm to generate a new JWT secret"
         buttonLabel="Generate new secret"
         buttonLoadingLabel="Generating"
         onSelectCancel={() => setIsGeneratingKey(false)}
         onSelectConfirm={() => handleJwtSecretUpdate('ROLL', setIsGeneratingKey)}
-      />
+      >
+        <Modal.Content className="py-4 space-y-4">
+          <Alert_Shadcn_ variant="warning">
+            <IconAlertTriangle />
+            <AlertTitle_Shadcn_>This will invalidate all existing API keys</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Generating a new JWT secret will invalidate <u className="text">all</u> of your API
+              keys, including your <code className="text-xs">service_role</code> and{' '}
+              <code className="text-xs">anon</code> keys. Your project will also be restarted during
+              this process, which will terminate any existing connections.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+          <p className="text text-sm">
+            This action cannot be undone and the old JWT secret will be lost. All existing API keys
+            will be invalidated, and any open connections will be terminated.
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
 
       <Modal
         closable
@@ -278,11 +270,16 @@ const JWTSettings: FC<Props> = ({}) => {
               Create a custom JWT secret. Make sure it is a strong combination of characters that
               cannot be guessed easily.
             </p>
-            <Alert
-              withIcon
-              variant="warning"
-              title="All existing API keys will be invalidated, and any open connections will be terminated."
-            />
+            <Alert_Shadcn_ variant="warning">
+              <IconAlertTriangle />
+              <AlertTitle_Shadcn_>This will invalidate all existing API keys</AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                Generating a new JWT secret will invalidate <u className="text">all</u> of your API
+                keys, including your <code className="text-xs">service_role</code> and{' '}
+                <code className="text-xs">anon</code> keys. Your project will also be restarted
+                during this process, which will terminate any existing connections.
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
             <Input
               onChange={(e: any) => setCustomToken(e.target.value)}
               value={customToken}

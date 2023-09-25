@@ -1,17 +1,19 @@
+import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import Link from 'next/link'
-import { FC, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { Button, IconAlertCircle, IconCheckCircle, IconLoader } from 'ui'
 
-import { getProjectDetail } from 'data/projects/project-detail-query'
+import { getProjectDetail, invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useStore } from 'hooks'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { Button, IconAlertCircle, IconCheckCircle, IconLoader } from 'ui'
 import { useProjectContext } from './ProjectContext'
 
-interface Props {}
-
-const RestoringState: FC<Props> = ({}) => {
+const RestoringState = () => {
+  const { ref } = useParams()
   const { meta } = useStore()
+  const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const checkServerInterval = useRef<number>()
 
@@ -47,9 +49,8 @@ const RestoringState: FC<Props> = ({}) => {
 
     setLoading(true)
     const projectDetail = await getProjectDetail({ ref: project?.ref })
-    if (projectDetail) {
-      meta.setProjectDetails(projectDetail)
-    }
+    if (projectDetail) meta.setProjectDetails(projectDetail)
+    if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
   }
 
   return (
@@ -59,7 +60,7 @@ const RestoringState: FC<Props> = ({}) => {
           <div className="space-y-6 pt-6">
             <div className="flex px-8 space-x-8">
               <div className="mt-1">
-                <IconCheckCircle className="text-brand-900" size={18} strokeWidth={2} />
+                <IconCheckCircle className="text-brand" size={18} strokeWidth={2} />
               </div>
               <div className="space-y-1">
                 <p>Restoration complete!</p>

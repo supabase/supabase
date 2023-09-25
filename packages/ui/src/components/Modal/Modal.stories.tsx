@@ -147,7 +147,7 @@ export const Default = (args: any) => (
     {...args}
     header={
       <div className="flex items-center gap-2 text-scale-1200">
-        <div className="text-brand-700">
+        <div className="text-brand-400">
           <IconLink2 />
         </div>
         <div className="flex items-baseline gap-2">

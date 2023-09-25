@@ -1,5 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { format } from 'date-fns'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
@@ -7,13 +8,12 @@ import { useState } from 'react'
 import DatePicker from 'react-datepicker'
 import { Alert, Button, IconChevronLeft, IconChevronRight, IconHelpCircle, Modal } from 'ui'
 
-import { useParams } from 'common'
 import { FormHeader, FormPanel } from 'components/ui/Forms'
 import InformationBox from 'components/ui/InformationBox'
+import { useBackupsQuery } from 'data/database/backups-query'
+import { usePitrRestoreMutation } from 'data/database/pitr-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useStore } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { PROJECT_STATUS } from 'lib/constants'
 import BackupsEmpty from '../BackupsEmpty'
 import { Timezone } from './PITR.types'
 import {
@@ -27,28 +27,41 @@ import TimeInput from './TimeInput'
 import TimezoneSelection from './TimezoneSelection'
 
 const PITRSelection = () => {
-  const queryClient = useQueryClient()
   const router = useRouter()
   const { ref } = useParams()
+  const queryClient = useQueryClient()
 
-  const { ui, backups } = useStore()
-
+  const { data: backups } = useBackupsQuery({ projectRef: ref })
+  const [showConfiguration, setShowConfiguration] = useState(false)
+  const [showConfirmation, setShowConfirmation] = useState(false)
   const [selectedTimezone, setSelectedTimezone] = useState<Timezone>(getClientTimezone())
 
+  const {
+    mutate: restoreFromPitr,
+    isLoading: isRestoring,
+    isSuccess: isSuccessPITR,
+  } = usePitrRestoreMutation({
+    onSuccess: (res, variables) => {
+      setTimeout(() => {
+        setShowConfirmation(false)
+        setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.RESTORING)
+        router.push(`/project/${variables.ref}`)
+      }, 3000)
+    },
+  })
+
   const { earliestPhysicalBackupDateUnix, latestPhysicalBackupDateUnix } =
-    backups?.configuration?.physicalBackupData ?? {}
+    backups?.physicalBackupData ?? {}
   const hasNoBackupsAvailable = !earliestPhysicalBackupDateUnix || !latestPhysicalBackupDateUnix
   const earliestAvailableBackup = dayjs
-    .unix(earliestPhysicalBackupDateUnix)
+    .unix(earliestPhysicalBackupDateUnix ?? 0)
     .tz(selectedTimezone.utc[0])
-  const latestAvailableBackup = dayjs.unix(latestPhysicalBackupDateUnix).tz(selectedTimezone.utc[0])
+  const latestAvailableBackup = dayjs
+    .unix(latestPhysicalBackupDateUnix ?? 0)
+    .tz(selectedTimezone.utc[0])
 
   const [selectedDateRaw, setSelectedDateRaw] = useState<Date>(latestAvailableBackup.toDate())
   const selectedDate = dayjs(selectedDateRaw).tz(selectedTimezone.utc[0], true) // true to keep local time and just change +whatever
-
-  const [showConfiguration, setShowConfiguration] = useState(false)
-  const [showConfirmation, setShowConfirmation] = useState(false)
-  const [isRestoring, setIsRestoring] = useState(false)
 
   const isSelectedOnEarliestDay = selectedDate.isSame(earliestAvailableBackup, 'day')
   const isSelectedOnLatestDay = selectedDate.isSame(latestAvailableBackup, 'day')
@@ -98,28 +111,9 @@ const PITRSelection = () => {
   }
 
   const onConfirmRestore = async () => {
-    if (!recoveryTimeTargetUnix) return
-
-    setIsRestoring(true)
-    const projectRef = ref as string
-    const { error } = await post(`${API_URL}/database/${projectRef}/backups/pitr`, {
-      recovery_time_target_unix: recoveryTimeTargetUnix,
-    })
-
-    if (error) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to start restoration: ${error.message}`,
-      })
-      setIsRestoring(false)
-    } else {
-      setTimeout(() => {
-        setShowConfirmation(false)
-        setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
-        router.push(`/project/${projectRef}`)
-      }, 3000)
-    }
+    if (!ref) return console.error('Project ref is required')
+    if (!recoveryTimeTargetUnix) return console.error('Recovery time target unix is required')
+    restoreFromPitr({ ref, recovery_time_target_unix: recoveryTimeTargetUnix })
   }
 
   return (
@@ -331,15 +325,15 @@ const PITRSelection = () => {
           <div className="flex items-center justify-end space-x-2">
             <Button
               type="default"
-              disabled={isRestoring}
+              disabled={isRestoring || isSuccessPITR}
               onClick={() => setShowConfirmation(false)}
             >
               Cancel
             </Button>
             <Button
               type="warning"
-              disabled={isRestoring}
-              loading={isRestoring}
+              disabled={isRestoring || isSuccessPITR}
+              loading={isRestoring || isSuccessPITR}
               onClick={onConfirmRestore}
             >
               I understand, begin restore

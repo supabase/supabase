@@ -1,49 +1,51 @@
-import Link from 'next/link'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty } from 'lodash'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+
+import { useParams } from 'common/hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  FormActions,
+  FormPanel,
+  FormSection,
+  FormSectionContent,
+  FormSectionLabel,
+  FormsContainer,
+} from 'components/ui/Forms'
+import Loading from 'components/ui/Loading'
+import { invalidateSchemasQuery } from 'data/database/schemas-query'
+import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
+import { useFDWsQuery } from 'data/fdw/fdws-query'
+import { useCheckPermissions, useImmutableValue, useStore } from 'hooks'
+import { VaultSecret } from 'types'
 import {
   Button,
   Form,
-  Input,
   IconArrowLeft,
-  IconExternalLink,
   IconEdit,
-  IconTrash,
+  IconExternalLink,
   IconLoader,
+  IconTrash,
+  Input,
 } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import { VaultSecret } from 'types'
-import { useCheckPermissions, useImmutableValue, useStore } from 'hooks'
-import { useParams } from 'common/hooks'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
-
 import InputField from './InputField'
-import { WRAPPERS } from './Wrappers.constants'
 import WrapperTableEditor from './WrapperTableEditor'
+import { WRAPPERS } from './Wrappers.constants'
 import {
+  convertKVStringArrayToJson,
   formatWrapperTables,
   makeValidateRequired,
-  convertKVStringArrayToJson,
 } from './Wrappers.utils'
-import Loading from 'components/ui/Loading'
-import {
-  FormPanel,
-  FormActions,
-  FormSection,
-  FormSectionLabel,
-  FormSectionContent,
-  FormsContainer,
-} from 'components/ui/Forms'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const EditWrapper = () => {
   const formId = 'edit-wrapper-form'
   const router = useRouter()
-  const { ui, vault } = useStore()
+  const queryClient = useQueryClient()
+  const { ui, meta, vault } = useStore()
   const { ref, id } = useParams()
   const { project } = useProjectContext()
 
@@ -58,7 +60,20 @@ const EditWrapper = () => {
   const wrapper = useImmutableValue(foundWrapper)
   const wrapperMeta = WRAPPERS.find((w) => w.handlerName === wrapper?.handler)
 
-  const { mutateAsync: updateFDW, isLoading: isSaving } = useFDWUpdateMutation()
+  const { mutate: updateFDW, isLoading: isSaving } = useFDWUpdateMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: `Successfully updated ${wrapperMeta?.label} foreign data wrapper`,
+      })
+      setWrapperTables([])
+
+      const hasNewSchema = wrapperTables.some((table) => table.is_new_schema)
+      if (hasNewSchema) invalidateSchemasQuery(queryClient, ref)
+
+      router.push(`/project/${ref}/database/wrappers`)
+    },
+  })
 
   const [wrapperTables, setWrapperTables] = useState<any[]>([])
   const [isEditingTable, setIsEditingTable] = useState(false)
@@ -136,7 +151,7 @@ const EditWrapper = () => {
     setSelectedTableToEdit(undefined)
   }
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
+  const onSubmit = async (values: any) => {
     const validate = makeValidateRequired(wrapperMeta.server.options)
     const errors: any = validate(values)
 
@@ -145,32 +160,14 @@ const EditWrapper = () => {
     if (wrapperTables.length === 0) errors.tables = 'Please add at least one table'
     if (!isEmpty(errors)) return setFormErrors(errors)
 
-    setSubmitting(true)
-    try {
-      await updateFDW({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        wrapper,
-        wrapperMeta,
-        formState: { ...values, server_name: `${wrapper_name}_server` },
-        tables: wrapperTables,
-      })
-
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated ${wrapperMeta.label} foreign data wrapper`,
-      })
-      setWrapperTables([])
-      router.push(`/project/${ref}/database/wrappers`)
-    } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to create ${wrapperMeta.label} foreign data wrapper: ${error.message}`,
-      })
-    } finally {
-      setSubmitting(false)
-    }
+    updateFDW({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      wrapper,
+      wrapperMeta,
+      formState: { ...values, server_name: `${wrapper_name}_server` },
+      tables: wrapperTables,
+    })
   }
 
   return (
@@ -205,7 +202,7 @@ const EditWrapper = () => {
         </div>
 
         <Form id={formId} initialValues={initialValues} onSubmit={onSubmit}>
-          {({ isSubmitting, handleReset, values, initialValues, resetForm }: any) => {
+          {({ handleReset, values, initialValues, resetForm }: any) => {
             // [Alaister] although this "technically" is breaking the rules of React hooks
             // it won't error because the hooks are always rendered in the same order
             // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -259,7 +256,7 @@ const EditWrapper = () => {
                   <div className="flex px-8 py-4">
                     <FormActions
                       form={formId}
-                      isSubmitting={isSubmitting}
+                      isSubmitting={isSaving}
                       hasChanges={hasChanges}
                       handleReset={() => {
                         handleReset()

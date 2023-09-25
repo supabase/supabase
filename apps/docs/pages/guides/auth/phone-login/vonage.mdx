@@ -53,7 +53,7 @@ Now go to the Auth > Settings page in the Supabase dashboard (https://supabase.c
 
 You should see an option to enable Phone Signup.
 
-Toggle it on, and copy the api key, api secret and optionally phone number values over from the Vonage dashboard. Click save.
+Toggle it on, and copy the api key, api secret and phone number values over from the Vonage dashboard. Click save.
 
 Now the backend should be setup, we can proceed to add our client-side code!
 
@@ -76,6 +76,7 @@ Using supabase-js on the client you'll want to use the same `signUp` method that
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
@@ -104,18 +105,19 @@ curl -X POST 'https://xxx.supabase.co/auth/v1/signup' \
 
 The user will now receive an SMS with a 6-digit pin that you will need to receive from them within 60-seconds before they can login to their account.
 
-You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyOTP`:
+You should present a form to the user so they can input the 6 digit pin, then send it along with the phone number to `verifyOtp`:
 
 <Tabs
   scrollable
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
 ```js
-let { session, error } = await supabase.auth.verifyOTP({
+let { session, error } = await supabase.auth.verifyOtp({
   phone: '491512223334444',
   token: '123456',
 })
@@ -158,6 +160,7 @@ Also now that the mobile has been verified, the user can use the number and pass
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
@@ -195,6 +198,7 @@ In javascript we can use the `signIn` method with a single parameter: `phone`
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
@@ -226,11 +230,12 @@ The second step is the same as the previous section, you need to collect the 6-d
   size="small"
   type="underlined"
   defaultActiveId="js"
+  queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
 
 ```js
-let { session, error } = await supabase.auth.verifyOTP({
+let { session, error } = await supabase.auth.verifyOtp({
   phone: '491512223334444',
   token: '123456',
 })
