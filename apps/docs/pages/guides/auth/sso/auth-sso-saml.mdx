@@ -200,6 +200,8 @@ supabase.auth.signInWithSSO({
 })
 ```
 
+Calling [`signInWithSSO`](/docs/reference/javascript/auth-signinwithsso) starts the sign-in process using the identity provider registered for the `company.com` domain name. It is not required that identity providers be assigned one or multiple domain names, in which case you can use the provider's unique ID instead.
+
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
@@ -207,10 +209,10 @@ supabase.auth.signInWithSSO({
 supabase.gotrue.loginWith(SSO.withDomain("company.com"))
 ```
 
+Calling [`loginWith(SSO)`](/docs/reference/kotlin/auth-signinwithsso) starts the sign-in process using the identity provider registered for the `company.com` domain name. It is not required that identity providers be assigned one or multiple domain names, in which case you can use the provider's unique ID instead.
+
 </TabPanel>
 </Tabs>
-
-Calling [`signInWithSSO`](/docs/reference/javascript/auth-signinwithsso) starts the sign-in process using the identity provider registered for the `company.com` domain name. It is not required that identity providers be assigned one or multiple domain names, in which case you can use the provider's unique ID instead.
 
 ### Understanding attribute mappings
 
