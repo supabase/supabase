@@ -2,7 +2,7 @@ import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
-import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
+import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 
 import Head from 'next/head'
 import { PropsWithChildren, memo } from 'react'
@@ -330,7 +330,7 @@ const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
           <NavContainer />
           <Container>
             <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
-              <TopNavBarRef />
+              <TopNavBar />
             </div>
             <div
               className={[
