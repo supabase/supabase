@@ -116,10 +116,8 @@ const ServiceStatus = () => {
     },
   ]
 
-  const isLoadingChecks =
-    isLoadingPostgres || isLoadingPostgrest || isLoadingAuth || isLoadingStorage
-  const allServicesOperational =
-    isSuccessAuth && isSuccessPostgres && isSuccessPostgrest && isSuccessStorage
+  const isLoadingChecks = services.some((service) => service.isLoading)
+  const allServicesOperational = services.every((service) => service.isSuccess)
 
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
