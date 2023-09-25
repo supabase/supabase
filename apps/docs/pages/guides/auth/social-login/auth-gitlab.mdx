@@ -57,7 +57,7 @@ Setting up GitLab logins for your application consists of 3 parts:
 When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `gitlab` as the `provider`:
 
 ```js
-async function signInWithGitlab() {
+async function signInWithGitLab() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'gitlab',
   })
@@ -70,7 +70,7 @@ async function signInWithGitlab() {
 When your user signs in, call [loginWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Gitlab` as the `Provider`:
 
 ```kotlin
-suspend fun signInWithGitlab() {
+suspend fun signInWithGitLab() {
 	supabase.gotrue.loginWith(Gitlab)
 }
 ```
