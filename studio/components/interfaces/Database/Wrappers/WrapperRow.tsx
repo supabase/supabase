@@ -114,21 +114,25 @@ const WrapperRow = ({
                     ))}
                     <div className="!mt-3 space-y-1">
                       <p className="text-sm text-scale-1100">
-                        Foreign tables: ({wrapper.tables.length})
+                        Foreign tables{wrapper.tables && `: (${wrapper.tables.length})`}
                       </p>
                       <div className="flex flex-wrap gap-2">
-                        {wrapper.tables.map((table: any) => (
-                          <Link key={table.id} href={`/project/${ref}/editor/${table.id}`}>
-                            <a>
-                              <div
-                                key={table.id}
-                                className="text-sm border rounded px-2 py-1 transition bg-scale-400 hover:bg-scale-500"
-                              >
-                                {table.name}
-                              </div>
-                            </a>
-                          </Link>
-                        ))}
+                        {wrapper.tables ? (
+                          wrapper.tables.map((table: any) => (
+                            <Link key={table.id} href={`/project/${ref}/editor/${table.id}`}>
+                              <a>
+                                <div
+                                  key={table.id}
+                                  className="text-sm border rounded px-2 py-1 transition bg-scale-400 hover:bg-scale-500"
+                                >
+                                  {table.name}
+                                </div>
+                              </a>
+                            </Link>
+                          ))
+                        ) : (
+                          <p className="text-sm text-scale-1100">No tables available</p>
+                        )}
                       </div>
                     </div>
                   </div>
