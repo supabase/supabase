@@ -1,28 +1,29 @@
 import { useParams } from 'common'
+import { CheckCircle2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   Button,
   IconAlertTriangle,
-  IconCheckCircle,
   IconLoader,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
 
+import { createClient } from '@supabase/supabase-js'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useAuthServiceStatusQuery } from 'data/service-status/auth-service-status-query'
 import { usePostgresServiceStatusQuery } from 'data/service-status/postgres-service-status-query'
 import { usePostgrestServiceStatusQuery } from 'data/service-status/postgrest-service-status-query'
 import { useStorageServiceStatusQuery } from 'data/service-status/storage-service-status-query'
 import { useSelectedProject } from 'hooks'
-import { createClient } from '@supabase/supabase-js'
 
 const ServiceStatus = () => {
   const { ref } = useParams()
   const project = useSelectedProject()
   const [open, setOpen] = useState(false)
 
+  const isBranch = project?.parentRef !== project?.ref
   const { data } = useProjectApiQuery({ projectRef: ref })
   const { endpoint, defaultApiKey } = data?.autoApiService || {}
 
@@ -85,13 +86,13 @@ const ServiceStatus = () => {
 
   const services = [
     {
-      name: 'Authentication',
+      name: 'Auth',
       isLoading: isLoadingAuth,
       isError: isErrorAuth,
       isSuccess: isSuccessAuth,
     },
     {
-      name: 'Postgres',
+      name: 'Database',
       isLoading: isLoadingPostgres,
       isError: isErrorPostgres,
       isSuccess: isSuccessPostgres,
@@ -134,18 +135,14 @@ const ServiceStatus = () => {
             )
           }
         >
-          {isLoadingChecks
-            ? 'Checking project service statuses'
-            : allServicesOperational
-            ? 'Project services are operational'
-            : 'Projects services are having issues'}
+          {isBranch ? 'Preview Branch' : 'Project'} Status
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_
         className="p-0 w-56"
         side="bottom"
         align="end"
-        style={{ marginLeft: '-240px' }}
+        style={{ marginLeft: '-247px' }}
       >
         {services.map((service) => (
           <div
@@ -162,7 +159,7 @@ const ServiceStatus = () => {
             </div>
             {service.isLoading && <IconLoader className="animate-spin" size="tiny" />}
             {service.isSuccess && (
-              <IconCheckCircle className="text-brand" size="tiny" strokeWidth={1.5} />
+              <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
             )}
             {service.isError && (
               <IconAlertTriangle className="text-amber-900" size="tiny" strokeWidth={1.5} />
