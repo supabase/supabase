@@ -47,6 +47,7 @@ const AddPaymentMethodForm = ({ returnUrl, onCancel, onConfirm }: AddPaymentMeth
       ui.setNotification({
         category: 'error',
         message: error?.message ?? ' Failed to save card details',
+        duration: 4000
       })
     } else {
       setIsSaving(false)

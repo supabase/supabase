@@ -54,6 +54,7 @@ const PublicationsTableItem = ({ table, selectedPublication }: PublicationsTable
       ui.setNotification({
         category: 'error',
         message: `Failed to toggle replication for ${table.name}: ${error.message}`,
+        duration: 4000
       })
       setChecked(originalChecked)
       setLoading(false)

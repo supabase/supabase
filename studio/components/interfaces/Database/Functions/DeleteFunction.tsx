@@ -36,6 +36,7 @@ const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
       ui.setNotification({
         category: 'error',
         message: `Failed to delete ${name}: ${error.message}`,
+        duration: 4000
       })
     } finally {
       setLoading(false)

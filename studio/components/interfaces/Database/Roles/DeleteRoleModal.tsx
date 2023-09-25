@@ -24,11 +24,13 @@ const DeleteRoleModal = ({ role, visible, onClose }: DeleteRoleModalProps) => {
       return ui.setNotification({
         category: 'error',
         message: `Failed to delete role: ${res.error.message}`,
+        duration: 4000
       })
     } else {
       ui.setNotification({
         category: 'success',
         message: `Successfully deleted role: "${role.name}"`,
+        duration: 4000
       })
       onClose()
     }

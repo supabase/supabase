@@ -53,6 +53,7 @@ const SQLQuickstarts = observer(() => {
       ui.setNotification({
         category: 'error',
         message: `Failed to create new query: ${error.message}`,
+        duration: 4000
       })
     }
   }

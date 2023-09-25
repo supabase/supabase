@@ -126,6 +126,7 @@ const SecondStep = ({
       ui.setNotification({
         category: 'error',
         message: `Failed to add a second factor authentication:  ${error?.message}`,
+        duration: 4000
       })
     },
     onSuccess: () => {

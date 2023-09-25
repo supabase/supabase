@@ -75,6 +75,7 @@ const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
       ui.setNotification({
         category: 'error',
         message: `Failed to toggle RLS: ${res.error.message}`,
+        duration: 4000
       })
     }
     closeConfirmModal()
@@ -86,6 +87,7 @@ const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
       ui.setNotification({
         category: 'error',
         message: `Error adding policy: ${res.error.message}`,
+        duration: 4000
       })
       return true
     }
@@ -98,6 +100,7 @@ const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
       ui.setNotification({
         category: 'error',
         message: `Error updating policy: ${res.error.message}`,
+        duration: 4000
       })
       return true
     }
@@ -110,6 +113,7 @@ const Policies = ({ tables, hasTables, isLocked }: PoliciesProps) => {
       ui.setNotification({
         category: 'error',
         message: `Error deleting policy: ${res.error.message}`,
+        duration: 4000
       })
     } else {
       ui.setNotification({ category: 'success', message: 'Successfully deleted policy!' })

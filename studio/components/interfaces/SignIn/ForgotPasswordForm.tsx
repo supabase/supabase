@@ -34,6 +34,7 @@ const ForgotPasswordForm = () => {
       ui.setNotification({
         category: 'error',
         message: `Failed to send reset email: ${error.message}`,
+        duration: 4000
       })
     },
   })

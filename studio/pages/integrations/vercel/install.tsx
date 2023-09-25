@@ -141,6 +141,7 @@ const VercelIntegration: NextPageWithLayout = () => {
       return ui.setNotification({
         category: 'error',
         message: 'Vercel Configuration source missing',
+        duration: 4000
       })
     }
 

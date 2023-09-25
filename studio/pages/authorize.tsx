@@ -53,12 +53,14 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
       return ui.setNotification({
         category: 'error',
         message: 'Unable to approve request: auth_id is missing ',
+        duration: 4000
       })
     }
     if (!selectedOrg) {
       return ui.setNotification({
         category: 'error',
         message: 'Unable to approve request: No organization selected',
+        duration: 4000
       })
     }
 
@@ -70,6 +72,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
       return ui.setNotification({
         category: 'error',
         message: 'Unable to decline request: auth_id is missing ',
+        duration: 4000
       })
 
     declineRequest({ id: auth_id })

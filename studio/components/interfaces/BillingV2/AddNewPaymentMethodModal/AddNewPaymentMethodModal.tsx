@@ -44,6 +44,7 @@ const AddNewPaymentMethodModal = ({
         category: 'error',
         error: intent.error,
         message: `Failed to setup intent: ${error.message}`,
+        duration: 4000
       })
     },
   })

@@ -120,6 +120,7 @@ const MigrateOrganizationBillingButton = observer(() => {
       return ui.setNotification({
         category: 'error',
         message: 'You do not have the required permissions to migrate this organization',
+        duration: 4000
       })
     }
     migrateBilling({ organizationSlug: organization?.slug, tier: dbTier, paymentMethodId })

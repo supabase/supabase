@@ -35,6 +35,7 @@ const DeleteOrganizationButton = () => {
       return ui.setNotification({
         category: 'error',
         message: 'You do not have the required permissions to delete this organization',
+        duration: 4000
       })
     }
     if (!orgSlug) return console.error('Org slug is required')

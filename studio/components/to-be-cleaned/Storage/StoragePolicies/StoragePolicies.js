@@ -116,6 +116,7 @@ const StoragePolicies = () => {
       ui.setNotification({
         category: 'error',
         message: `Error adding policy: ${res.error.message}`,
+        duration: 4000
       })
       return true
     }
@@ -128,6 +129,7 @@ const StoragePolicies = () => {
       ui.setNotification({
         category: 'error',
         message: `Error updating policy: ${res.error.message}`,
+        duration: 4000
       })
       return true
     }
@@ -140,6 +142,7 @@ const StoragePolicies = () => {
       ui.setNotification({
         category: 'error',
         message: `Failed to delete policy: ${res.error.message}`,
+        duration: 4000
       })
     } else {
       ui.setNotification({ category: 'success', message: 'Successfully deleted policy!' })

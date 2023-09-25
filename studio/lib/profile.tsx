@@ -45,6 +45,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
       ui.setNotification({
         category: 'error',
         message: 'Failed to create your profile. Please refresh to try again.',
+        duration: 4000
       })
     },
   })

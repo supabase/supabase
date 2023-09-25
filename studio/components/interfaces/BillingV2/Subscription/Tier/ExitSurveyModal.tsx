@@ -69,6 +69,7 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
       return ui.setNotification({
         category: 'error',
         message: 'Please select at least one reason for canceling your subscription',
+        duration: 4000
       })
     }
 

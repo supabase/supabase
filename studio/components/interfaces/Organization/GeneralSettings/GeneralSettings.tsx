@@ -43,6 +43,7 @@ const GeneralSettings = () => {
       return ui.setNotification({
         category: 'error',
         message: 'You do not have the required permissions to update this organization',
+        duration: 4000
       })
     }
 

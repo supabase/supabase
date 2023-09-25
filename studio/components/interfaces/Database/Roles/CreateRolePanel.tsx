@@ -42,11 +42,13 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
       return ui.setNotification({
         category: 'error',
         message: `Failed to create role: ${res.error.message}`,
+        duration: 4000
       })
     } else {
       ui.setNotification({
         category: 'success',
         message: `Successfully created new role: ${res.name}`,
+        duration: 4000
       })
       onClose()
     }

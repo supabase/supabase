@@ -63,6 +63,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
         message: `Failed to update role for ${getUserDisplayName(selectedMember)}: ${
           error.message
         }`,
+        duration: 4000
       })
     },
   })

@@ -110,6 +110,7 @@ const GridHeaderActions = ({
       ui.setNotification({
         category: 'error',
         message: `Failed to toggle realtime for ${table.name}: ${error.message}`,
+        duration: 4000
       })
     } finally {
       setIsTogglingRealtime(false)

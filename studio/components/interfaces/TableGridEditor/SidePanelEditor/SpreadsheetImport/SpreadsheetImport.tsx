@@ -147,18 +147,21 @@ const SpreadsheetImport = ({
       ui.setNotification({
         category: 'error',
         message: 'Please upload a file to import your data with',
+        duration: 4000
       })
       resolve()
     } else if (selectedHeaders.length === 0) {
       ui.setNotification({
         category: 'error',
         message: 'Please select at least one header from your CSV',
+        duration: 4000
       })
       resolve()
     } else if (!isCompatible) {
       ui.setNotification({
         category: 'error',
         message: 'The data that you are trying to import is incompatible with your table structure',
+        duration: 4000
       })
       resolve()
     } else {

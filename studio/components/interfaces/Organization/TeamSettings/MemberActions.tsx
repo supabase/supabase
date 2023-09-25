@@ -63,6 +63,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
       ui.setNotification({
         category: 'error',
         message: `Failed to resend invitation: ${error.message}`,
+        duration: 4000
       })
     },
   })

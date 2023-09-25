@@ -98,6 +98,7 @@ const DeleteConfirmationDialogs = ({
       ui.setNotification({
         category: 'error',
         message: `Failed to delete ${selectedColumnToDelete!.name}: ${error.message}`,
+        duration: 4000
       })
     } finally {
       snap.closeConfirmationDialog()

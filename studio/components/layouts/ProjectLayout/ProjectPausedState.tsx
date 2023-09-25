@@ -53,6 +53,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
       ui.setNotification({
         category: 'error',
         message: 'You do not have the required permissions to restore this project',
+        duration: 4000
       })
     } else if (hasMembersExceedingFreeTierLimit) setShowFreeProjectLimitWarning(true)
     else setShowConfirmRestore(true)

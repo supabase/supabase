@@ -330,6 +330,7 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
       ui.setNotification({
         category: 'error',
         message: `Filed to create trigger: ${error.message}`,
+        duration: 4000
       })
       _localState.setLoading(false)
     }

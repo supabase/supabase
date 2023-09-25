@@ -45,11 +45,13 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
       ui.setNotification({
         category: 'error',
         message: `Failed to update role "${role.name}": ${res.error.message}`,
+        duration: 4000
       })
     } else {
       ui.setNotification({
         category: 'success',
         message: `Successfully updated role "${role.name}"`,
+        duration: 4000
       })
       resetForm({ values: { ...values }, initialValues: { ...values } })
     }

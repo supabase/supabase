@@ -57,6 +57,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
       return ui.setNotification({
         category: 'error',
         message: `Failed to create user: Error loading project config`,
+        duration: 4000
       })
     }
 

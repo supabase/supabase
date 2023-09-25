@@ -193,6 +193,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
       ui.setNotification({
         category: 'error',
         message: `Failed to create a personal copy of this query: ${error.message}`,
+        duration: 4000
       })
     }
   }

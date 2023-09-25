@@ -366,6 +366,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       ui.setNotification({
         category: 'error',
         message: `Sorry! We're unable to support exporting of CSV for row counts larger than ${MAX_EXPORT_ROW_COUNT.toLocaleString()} at the moment.`,
+        duration: 4000
       })
       return setIsExporting(false)
     }

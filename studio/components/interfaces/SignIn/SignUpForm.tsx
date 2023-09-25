@@ -36,6 +36,7 @@ const SignUpForm = () => {
       ui.setNotification({
         category: 'error',
         message: `Failed to sign up: ${error.message}`,
+        duration: 4000
       })
     },
   })

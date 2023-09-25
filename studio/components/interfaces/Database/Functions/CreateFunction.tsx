@@ -353,6 +353,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
       ui.setNotification({
         category: 'error',
         message: `Failed to create function: ${error.message}`,
+        duration: 4000
       })
       _localState.setLoading(false)
     }

@@ -27,6 +27,7 @@ const ProjectSummary = ({ project }: ProjectSummaryProps) => {
       ui.setNotification({
         category: 'error',
         message: `Failed to get project subscription: ${(error as any)?.message ?? 'unknown'}`,
+        duration: 4000
       })
     }
   }, [error])

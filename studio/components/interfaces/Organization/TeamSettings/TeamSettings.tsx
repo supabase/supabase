@@ -71,6 +71,7 @@ const TeamSettings = () => {
       ui.setNotification({
         category: 'error',
         message: `Failed to leave organization: ${error?.message}`,
+        duration: 4000
       })
     } finally {
       setIsLeaving(false)

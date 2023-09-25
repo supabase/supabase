@@ -54,6 +54,7 @@ const RestartServerButton = () => {
       return ui.setNotification({
         category: 'error',
         message: 'You do not have the required permissions to restart this project',
+        duration: 4000
       })
     }
     restartProject({ ref: projectRef })
@@ -64,6 +65,7 @@ const RestartServerButton = () => {
       return ui.setNotification({
         category: 'error',
         message: 'You do not have the required permissions to restart this project',
+        duration: 4000
       })
     }
     restartProjectServices({ ref: projectRef, region: projectRegion, services: ['postgresql'] })

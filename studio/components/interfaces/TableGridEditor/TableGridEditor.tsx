@@ -246,6 +246,7 @@ const TableGridEditor = ({
       ui.setNotification({
         category: 'error',
         message: `Unable to find column ${name} in ${selectedTable?.name}`,
+        duration: 4000
       })
     }
   }
@@ -258,6 +259,7 @@ const TableGridEditor = ({
       ui.setNotification({
         category: 'error',
         message: `Unable to find column ${name} in ${selectedTable?.name}`,
+        duration: 4000
       })
     }
   }
@@ -266,6 +268,7 @@ const TableGridEditor = ({
     ui.setNotification({
       category: 'error',
       message: error?.details ?? error?.message ?? error,
+      duration: 4000
     })
   }
 
@@ -291,6 +294,7 @@ const TableGridEditor = ({
       return ui.setNotification({
         category: 'error',
         message: ERROR_PRIMARY_KEY_NOTFOUND,
+        duration: 4000
       })
     }
 
