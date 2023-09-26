@@ -6,7 +6,7 @@ import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 import { useBreakpoint } from 'common'
 
 const IntegrationsImage = () => {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const isMobile = useBreakpoint(767)
   const ref = useRef(null)
   const isInView = useInView(ref, { margin: '-25%', once: true })
@@ -17,7 +17,7 @@ const IntegrationsImage = () => {
   console.log('ismobile', isMobile)
 
   const image =
-    theme === 'dark'
+    resolvedTheme === 'dark'
       ? `/images/product/vector/vector-tools-dark${isMobile ? '-mobile' : ''}.svg`
       : `/images/product/vector/vector-tools-light${isMobile ? '-mobile' : ''}.svg`
 

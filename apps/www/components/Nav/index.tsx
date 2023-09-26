@@ -172,7 +172,7 @@ const Nav = () => {
         border-transparent
         px-1
         text-sm font-medium
-        transition-colors`,
+        text-scale-1200 transition-colors`,
         showLaunchWeekNavMode && '!text-white',
         props.active ? 'text-brand' : 'hover:text-brand',
         props.active,
@@ -227,10 +227,7 @@ const Nav = () => {
                     <a className="block w-auto h-6">
                       <Image
                         src={
-                          isLaunchWeekPage ||
-                          theme === 'dark' ||
-                          resolvedTheme === 'dark' ||
-                          isHomePage
+                          isLaunchWeekPage || resolvedTheme === 'dark' || isHomePage
                             ? supabaseLogoWordmarkDark
                             : supabaseLogoWordmarkLight
                         }

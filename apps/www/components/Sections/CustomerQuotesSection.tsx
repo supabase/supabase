@@ -40,8 +40,8 @@ const CustomerQuotesSection = (props: Props) => {
   const isInView = useInView(ref, { margin: '-25%', once: true })
 
   const Card = ({ customer, index }: Card) => {
-    const { theme } = useTheme()
-    const logo = `/images/customers/logos/${theme !== 'dark' ? '' : 'light/'}${
+    const { resolvedTheme } = useTheme()
+    const logo = `/images/customers/logos/${resolvedTheme !== 'dark' ? '' : 'light/'}${
       customer.customer
     }.png`
 

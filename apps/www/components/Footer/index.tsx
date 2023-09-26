@@ -15,7 +15,7 @@ interface Props {
 }
 
 const Footer = (props: Props) => {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const { pathname } = useRouter()
 
   const isLaunchWeekPage = pathname.includes('launch-week') || pathname === '/'
@@ -37,7 +37,7 @@ const Footer = (props: Props) => {
                   src={
                     isLaunchWeekPage
                       ? supabaseLogoWordmarkDark
-                      : theme === 'dark'
+                      : resolvedTheme === 'dark'
                       ? supabaseLogoWordmarkDark
                       : supabaseLogoWordmarkLight
                   }

@@ -93,7 +93,13 @@ export default function TicketHome({ users, meetups }: Props) {
   }, [supabase])
 
   useEffect(() => {
-    document.body.className = 'dark bg-[#020405]'
+    document.body.classList.add('bg-[#020405]')
+
+    return () => {
+      if (document.body.classList.contains('bg-[#020405]')) {
+        document.body.classList.remove('bg-[#020405]')
+      }
+    }
   }, [])
 
   return (
