@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Alert, Button, IconDownload, IconExternalLink, IconLoader, Toggle } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   FormHeader,
   FormPanel,
@@ -16,7 +17,6 @@ import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const SSLConfiguration = () => {
   const { ui } = useStore()
@@ -100,7 +100,7 @@ const SSLConfiguration = () => {
               className="lg:col-span-7"
               description={
                 <div className="space-y-4">
-                  <p className="text-sm text-scale-1000">
+                  <p className="text-sm text-foreground-light">
                     Reject non-SSL connections to your database
                   </p>
                   {isSuccess && !sslEnforcementConfiguration?.appliedSuccessfully && (

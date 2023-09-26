@@ -26,9 +26,9 @@ const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
             {/* Maybe ideate this in Figma first but this is good enough for now */}
             <div className="border rounded border-scale-600 bg-scale-500">
               <div className="flex items-center px-4 pt-2 pb-1">
-                <p className="w-[50%] text-sm text-scale-1100">Item</p>
-                <p className="w-[25%] text-sm text-scale-1100">Limit</p>
-                <p className="w-[25%] text-sm text-scale-1100">Rate</p>
+                <p className="w-[50%] text-sm text-foreground-light">Item</p>
+                <p className="w-[25%] text-sm text-foreground-light">Limit</p>
+                <p className="w-[25%] text-sm text-foreground-light">Rate</p>
               </div>
               <div className="py-2">
                 <div className="flex items-center px-4 py-1">

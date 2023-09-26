@@ -135,7 +135,7 @@ const PaymentMethods = () => {
             footer={
               <div className="flex w-full justify-between">
                 {!canUpdatePaymentMethods ? (
-                  <p className="text-sm text-scale-1000">
+                  <p className="text-sm text-foreground-light">
                     You need additional permissions to manage this organization's payment methods
                   </p>
                 ) : (

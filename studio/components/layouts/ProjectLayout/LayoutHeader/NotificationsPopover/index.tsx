@@ -15,13 +15,13 @@ import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useNotificationsQuery } from 'data/notifications/notifications-query'
 import { useNotificationsUpdateMutation } from 'data/notifications/notifications-update-mutation'
 import { getProjectDetail } from 'data/projects/project-detail-query'
+import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
 import { setProjectPostgrestStatus } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 import { delete_, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Project } from 'types'
 import NotificationRow from './NotificationRow'
-import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
 
 interface NotificationsPopoverProps {
   alt?: boolean
@@ -160,7 +160,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
             <div className="flex items-center justify-between border-b border-gray-500 bg-gray-400 px-4 py-2">
               <p className="text-sm">Notifications</p>
               {/* Area for improvement: Paginate notifications and show in a side panel */}
-              {/* <p className="text-scale-1000 hover:text-foreground cursor-pointer text-sm transition">
+              {/* <p className="text-foreground-light hover:text-foreground cursor-pointer text-sm transition">
               See all{' '}
               {notifications.length > MAX_NOTIFICATIONS_TO_SHOW && `(${notifications.length})`}
             </p> */}
@@ -168,7 +168,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
             <div className="max-h-[380px] overflow-y-auto py-2">
               {notifications.length === 0 ? (
                 <div className="py-2 px-4">
-                  <p className="text-sm text-scale-1000">No notifications available</p>
+                  <p className="text-sm text-foreground-light">No notifications available</p>
                 </div>
               ) : (
                 <>
@@ -222,7 +222,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
                       <p className="text-xs text-scale-100">{newNotifications.length}</p>
                     </div>
                   ) : alt ? (
-                    <IconInbox size={18} strokeWidth={1.5} className="text-scale-1100" />
+                    <IconInbox size={18} strokeWidth={1.5} className="text-foreground-light" />
                   ) : (
                     <IconBell size={16} strokeWidth={1.5} className="text-foreground" />
                   )
@@ -231,7 +231,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
                   hasNewNotifications ? (
                     <>
                       {alt ? (
-                        <IconInbox size={18} strokeWidth={1.5} className="text-scale-1100" />
+                        <IconInbox size={18} strokeWidth={1.5} className="text-foreground-light" />
                       ) : (
                         <IconBell size={16} strokeWidth={1.5} className="text-foreground" />
                       )}

@@ -13,7 +13,7 @@ const PolicyAllowedOperation = ({
   return (
     <div className="flex justify-between space-x-12">
       <div className="flex w-1/3 flex-col space-y-2">
-        <label className="text-base text-scale-1100" htmlFor="allowed-operation">
+        <label className="text-base text-foreground-light" htmlFor="allowed-operation">
           Allowed operation
         </label>
         <p className="text-sm text-scale-900">Select an operation for this policy</p>

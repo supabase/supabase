@@ -1,25 +1,25 @@
-import { isEmpty } from 'lodash'
-import {
-  Button,
-  Dropdown,
-  IconX,
-  IconLoader,
-  IconClipboard,
-  IconDownload,
-  IconTrash2,
-  IconAlertCircle,
-  IconChevronDown,
-} from 'ui'
-import SVG from 'react-inlinesvg'
-import { formatBytes } from 'lib/helpers'
-import { BASE_PATH } from 'lib/constants'
 import { Transition } from '@headlessui/react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { BASE_PATH } from 'lib/constants'
+import { formatBytes } from 'lib/helpers'
+import { isEmpty } from 'lodash'
+import SVG from 'react-inlinesvg'
+import {
+  Button,
+  Dropdown,
+  IconAlertCircle,
+  IconChevronDown,
+  IconClipboard,
+  IconDownload,
+  IconLoader,
+  IconTrash2,
+  IconX,
+} from 'ui'
 
 import { useCheckPermissions } from 'hooks'
-import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { URL_EXPIRY_DURATION } from '../Storage.constants'
 
 const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: string }) => {
   if (!mimeType || !previewUrl) {
@@ -67,7 +67,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
       <div className="flex h-full w-full items-center justify-center px-10">
         <audio key={previewUrl} controls style={{ width: 'inherit' }}>
           <source src={previewUrl} type="audio/mpeg" />
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             Your browser does not support the audio element.
           </p>
         </audio>
@@ -79,7 +79,9 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
       <div className="flex h-full w-full items-center justify-center">
         <video key={previewUrl} controls style={{ maxHeight: '100%' }}>
           <source src={previewUrl} type="video/mp4" />
-          <p className="text-sm text-scale-1100">Your browser does not support the video tag.</p>
+          <p className="text-sm text-foreground-light">
+            Your browser does not support the video tag.
+          </p>
         </video>
       </div>
     )
@@ -158,14 +160,14 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
               <h5 className="break-words text-base text-foreground">{file.name}</h5>
               {file.isCorrupted && (
                 <div className="flex items-center space-x-2">
-                  <IconAlertCircle size={14} strokeWidth={2} className="text-scale-1100" />
-                  <p className="text-sm text-scale-1100">
+                  <IconAlertCircle size={14} strokeWidth={2} className="text-foreground-light" />
+                  <p className="text-sm text-foreground-light">
                     File is corrupted, please delete and reupload this file again
                   </p>
                 </div>
               )}
               {mimeType && (
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   {mimeType}
                   {size && <span> - {size}</span>}
                 </p>
@@ -176,11 +178,11 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
             <div className="space-y-2">
               <div>
                 <label className="mb-1 text-xs text-scale-900">Added on</label>
-                <p className="text-sm text-scale-1100">{createdAt}</p>
+                <p className="text-sm text-foreground-light">{createdAt}</p>
               </div>
               <div>
                 <label className="mb-1 text-xs text-scale-900">Last modified</label>
-                <p className="text-sm text-scale-1100">{updatedAt}</p>
+                <p className="text-sm text-foreground-light">{updatedAt}</p>
               </div>
             </div>
 

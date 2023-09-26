@@ -10,7 +10,7 @@ const FunctionsEmptyState = () => {
           <p className="max-w-lg text-base text-foreground">
             Scalable functions to run your code with no server management.
           </p>
-          <p className="max-w-lg text-sm text-scale-1100">
+          <p className="max-w-lg text-sm text-foreground-light">
             Edge Functions are server-side Typescript functions, distributed globally at the edge -
             close to your users. They can be used for listening to webhooks or integrating your
             Supabase project with third-parties.

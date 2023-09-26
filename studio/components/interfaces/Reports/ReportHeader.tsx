@@ -17,7 +17,7 @@ const ReportHeader: React.FC<Props> = ({ title, onRefresh, isLoading }) => (
       icon={
         <IconRefreshCw
           size="tiny"
-          className={`text-scale-1100 ${isLoading ? 'animate-spin' : ''}`}
+          className={`text-foreground-light ${isLoading ? 'animate-spin' : ''}`}
         />
       }
     >

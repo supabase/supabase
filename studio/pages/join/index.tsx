@@ -111,7 +111,7 @@ const JoinOrganizationPage = () => {
       <div
         className={[
           'flex flex-col items-center justify-center gap-3 text-sm',
-          isError ? 'text-scale-1100' : 'text-foreground',
+          isError ? 'text-foreground-light' : 'text-foreground',
         ].join(' ')}
       >
         {children}

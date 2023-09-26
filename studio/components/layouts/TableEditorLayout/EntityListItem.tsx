@@ -1,28 +1,27 @@
-import saveAs from 'file-saver'
-import Papa from 'papaparse'
-import clsx from 'clsx'
-import SVG from 'react-inlinesvg'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import clsx from 'clsx'
+import { parseSupaTable } from 'components/grid'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-type-query'
+import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
+import { getTable } from 'data/tables/table-query'
+import saveAs from 'file-saver'
+import { useStore } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 import Link from 'next/link'
+import Papa from 'papaparse'
+import SVG from 'react-inlinesvg'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Dropdown,
-  IconEdit,
+  IconChevronDown,
   IconCopy,
+  IconDownload,
+  IconEdit,
   IconLock,
   IconTrash,
-  IconChevronDown,
-  IconDownload,
 } from 'ui'
-import { BASE_PATH } from 'lib/constants'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
-import { useParams } from 'common'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { getTable } from 'data/tables/table-query'
-import { parseSupaTable } from 'components/grid'
-import { useStore } from 'hooks'
 
 export interface EntityListItemProps {
   id: number
@@ -142,7 +141,8 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                     entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
                     entity.type === ENTITY_TYPE.MATERIALIZED_VIEW &&
                       'text-purple-1000 bg-purple-500',
-                    entity.type === ENTITY_TYPE.PARTITIONED_TABLE && 'text-scale-1100 bg-scale-800'
+                    entity.type === ENTITY_TYPE.PARTITIONED_TABLE &&
+                      'text-foreground-light bg-scale-800'
                   )}
                 >
                   {Object.entries(ENTITY_TYPE)
@@ -167,7 +167,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
               </Tooltip.Content>
             </Tooltip.Portal>
           </Tooltip.Root>
-          <p className="text-sm text-scale-1100 group-hover:text-foreground transition max-w-[85%] overflow-hidden text-ellipsis whitespace-nowrap">
+          <p className="text-sm text-foreground-light group-hover:text-foreground transition max-w-[85%] overflow-hidden text-ellipsis whitespace-nowrap">
             {/* only show tooltips if required, to reduce noise */}
             {entity.name.length > 20 ? (
               <Tooltip.Root delayDuration={0} disableHoverableContent={true}>

@@ -1,22 +1,22 @@
-import { useState, useRef, useEffect } from 'react'
-import { get, noop, sum } from 'lodash'
-import { Checkbox, IconUpload } from 'ui'
 import { Transition } from '@headlessui/react'
+import { get, noop, sum } from 'lodash'
+import { useEffect, useRef, useState } from 'react'
 import { useContextMenu } from 'react-contexify'
+import { Checkbox, IconUpload } from 'ui'
 
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import FileExplorerRow from './FileExplorerRow'
-import {
-  STORAGE_VIEWS,
-  STORAGE_ROW_TYPES,
-  STORAGE_ROW_STATUS,
-  CONTEXT_MENU_KEYS,
-} from '../Storage.constants'
-import { formatBytes } from 'lib/helpers'
 import { BASE_PATH } from 'lib/constants'
-import { StorageColumn } from '../Storage.types'
+import { formatBytes } from 'lib/helpers'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import {
+  CONTEXT_MENU_KEYS,
+  STORAGE_ROW_STATUS,
+  STORAGE_ROW_TYPES,
+  STORAGE_VIEWS,
+} from '../Storage.constants'
+import { StorageColumn } from '../Storage.types'
+import FileExplorerRow from './FileExplorerRow'
 
 const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) => {
   return (
@@ -176,10 +176,10 @@ const FileExplorerColumn = ({
           {columnFiles.length > 0 ? (
             <>
               <SelectAllCheckbox />
-              <p className="text-sm text-scale-1100">Select all {columnFiles.length} files</p>
+              <p className="text-sm text-foreground-light">Select all {columnFiles.length} files</p>
             </>
           ) : (
-            <p className="text-sm text-scale-1100">No files available for selection</p>
+            <p className="text-sm text-foreground-light">No files available for selection</p>
           )}
         </div>
       )}
@@ -246,7 +246,7 @@ const FileExplorerColumn = ({
               className="opacity-75 pointer-events-none"
             />
             <p className="my-3 opacity-75">Drop your files here</p>
-            <p className="w-40 text-center text-sm text-scale-1100">
+            <p className="w-40 text-center text-sm text-foreground-light">
               Or upload them via the "Upload file" button above
             </p>
           </div>

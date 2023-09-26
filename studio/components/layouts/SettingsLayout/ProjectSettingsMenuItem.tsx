@@ -44,7 +44,7 @@ const ProjectSettingsMenuItem = ({ project }: ProjectSettingsMenuItemProps) => {
             className="h-4 w-4 transition-transform duration-200"
             strokeWidth={1.5}
           />
-          <p className="text-scale-1100 text-sm font-normal transition duration-200">
+          <p className="text-foreground-light text-sm font-normal transition duration-200">
             {project.name}
           </p>
         </div>

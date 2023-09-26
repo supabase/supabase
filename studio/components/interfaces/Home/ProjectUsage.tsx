@@ -95,7 +95,7 @@ const ProjectUsage = () => {
             <span>{selectedInterval.label}</span>
           </Button>
         </Dropdown>
-        <span className="text-xs text-scale-1000">
+        <span className="text-xs text-foreground-light">
           Statistics for past {selectedInterval.label}
         </span>
       </div>
@@ -104,7 +104,7 @@ const ProjectUsage = () => {
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
+                <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
                   <IconDatabase strokeWidth={2} size={16} />
                 </div>
               }
@@ -129,7 +129,7 @@ const ProjectUsage = () => {
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
+                <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
                   <IconKey strokeWidth={2} size={16} />
                 </div>
               }
@@ -153,7 +153,7 @@ const ProjectUsage = () => {
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
+                <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
                   <IconArchive strokeWidth={2} size={16} />
                 </div>
               }
@@ -178,7 +178,7 @@ const ProjectUsage = () => {
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
+                <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
                   <IconZap strokeWidth={2} size={16} />
                 </div>
               }

@@ -37,12 +37,12 @@ const PolicyDefinition = ({
         <div className="flex space-x-12">
           <div className="flex w-1/3 flex-col space-y-2">
             <div className="flex items-center space-x-2">
-              <label className="text-base text-scale-1100" htmlFor="policy-name">
+              <label className="text-base text-foreground-light" htmlFor="policy-name">
                 USING expression
               </label>
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <IconHelpCircle className="text-scale-1100" size={16} strokeWidth={1.5} />
+                  <IconHelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
                   <Tooltip.Content side="bottom">
@@ -84,12 +84,12 @@ const PolicyDefinition = ({
         <div className="flex space-x-12">
           <div className="flex w-1/3 flex-col space-y-2">
             <div className="flex items-center space-x-2">
-              <label className="text-base text-scale-1100" htmlFor="policy-name">
+              <label className="text-base text-foreground-light" htmlFor="policy-name">
                 WITH CHECK expression
               </label>
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <IconHelpCircle className="text-scale-1100" size={16} strokeWidth={1.5} />
+                  <IconHelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
                   <Tooltip.Content side="bottom">

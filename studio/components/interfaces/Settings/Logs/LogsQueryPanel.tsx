@@ -9,10 +9,10 @@ import Link from 'next/link'
 import React from 'react'
 import {
   EXPLORER_DATEPICKER_HELPERS,
-  LOGS_SOURCE_DESCRIPTION,
-  LogTemplate,
   LogsTableName,
   LogsWarning,
+  LOGS_SOURCE_DESCRIPTION,
+  LogTemplate,
 } from '.'
 import DatePickers from './Logs.DatePickers'
 
@@ -64,8 +64,10 @@ const LogsQueryPanel = ({
                 .map((source) => (
                   <Dropdown.Item key={source} onClick={() => onSelectSource(source)}>
                     <div className="flex flex-col gap-1">
-                      <span className="font-mono font-bold text-scale-1100">{source}</span>
-                      <span className="text-scale-1100">{LOGS_SOURCE_DESCRIPTION[source]}</span>
+                      <span className="font-mono font-bold text-foreground-light">{source}</span>
+                      <span className="text-foreground-light">
+                        {LOGS_SOURCE_DESCRIPTION[source]}
+                      </span>
                     </div>
                   </Dropdown.Item>
                 ))}

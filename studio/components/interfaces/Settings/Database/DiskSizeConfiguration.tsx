@@ -1,19 +1,19 @@
-import dayjs from 'dayjs'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Alert, Button, Form, InputNumber, Modal } from 'ui'
 import { number, object } from 'yup'
 
 import { useParams } from 'common/hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useCheckPermissions, useStore } from 'hooks'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 export interface DiskSizeConfigurationProps {
   disabled?: boolean
@@ -87,7 +87,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
               <div className="grid grid-cols-1 items-center lg:grid-cols-3">
                 <div className="col-span-2 space-y-1">
                   {projectUsage?.disk_volume_size_gb && (
-                    <span className="text-scale-1100 flex gap-2 items-baseline">
+                    <span className="text-foreground-light flex gap-2 items-baseline">
                       <span className="text-foreground">Current Disk Storage Size:</span>
                       <span className="text-foreground text-xl">
                         {currentDiskSize}

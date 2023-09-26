@@ -93,7 +93,7 @@ const WrapperRow = ({
                     {visibleMetadata.map((metadata) => (
                       <div
                         key={metadata.name}
-                        className="flex items-center space-x-2 text-sm text-scale-1000"
+                        className="flex items-center space-x-2 text-sm text-foreground-light"
                       >
                         <p>{metadata.label}:</p>
                         <p>{serverOptions[metadata.name]}</p>
@@ -101,11 +101,11 @@ const WrapperRow = ({
                     ))}
                     {encryptedMetadata.map((metadata) => (
                       <div key={metadata.name} className="flex items-center space-x-2 text-sm">
-                        <p className="text-scale-1000">{metadata.label}:</p>
+                        <p className="text-foreground-light">{metadata.label}:</p>
                         <Link
                           href={`/project/${ref}/settings/vault/secrets?search=${wrapper.name}_${metadata.name}`}
                         >
-                          <a className="transition text-scale-1000 hover:text-scale-1100 flex items-center space-x-2">
+                          <a className="transition text-foreground-light hover:text-foreground flex items-center space-x-2">
                             <span>Encrypted in Vault</span>
                             <IconExternalLink size={14} strokeWidth={1.5} />
                           </a>
@@ -113,7 +113,7 @@ const WrapperRow = ({
                       </div>
                     ))}
                     <div className="!mt-3 space-y-1">
-                      <p className="text-sm text-scale-1100">
+                      <p className="text-sm text-foreground-light">
                         Foreign tables{wrapper.tables && `: (${wrapper.tables.length})`}
                       </p>
                       <div className="flex flex-wrap gap-2">
@@ -131,7 +131,7 @@ const WrapperRow = ({
                             </Link>
                           ))
                         ) : (
-                          <p className="text-sm text-scale-1100">No tables available</p>
+                          <p className="text-sm text-foreground-light">No tables available</p>
                         )}
                       </div>
                     </div>

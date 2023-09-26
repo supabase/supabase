@@ -1,4 +1,4 @@
-import { Fetcher, createGraphiQLFetcher } from '@graphiql/toolkit'
+import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useMemo } from 'react'
 
@@ -67,7 +67,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
         <div className="w-full max-w-md">
           <div className="mb-6">
             <h1 className="mt-8 mb-2 text-2xl">Enable the GraphQL Extension</h1>
-            <h2 className="text-sm text-scale-1100">
+            <h2 className="text-sm text-foreground-light">
               Toggle the switch below to enable the GraphQL extension. You can then use the GraphQL
               API with your Supabase Database.
             </h2>

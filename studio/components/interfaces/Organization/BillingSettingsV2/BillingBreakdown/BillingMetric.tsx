@@ -1,14 +1,14 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import clsx from 'clsx'
 import Link from 'next/link'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { BILLING_BREAKDOWN_METRICS } from 'components/interfaces/BillingV2/Subscription/Subscription.constants'
-import { Button, IconAlertTriangle, IconChevronRight, IconInfo } from 'ui'
-import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
+import SparkBar from 'components/ui/SparkBar'
 import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
 import { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import SparkBar from 'components/ui/SparkBar'
+import { Button, IconAlertTriangle, IconChevronRight, IconInfo } from 'ui'
+import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
 
 export interface BillingMetricProps {
   idx: number
@@ -57,7 +57,7 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
         <Link href={`/org/${slug}/usage#${metric.anchor}`}>
           <a>
             <div className="group flex items-center space-x-2">
-              <p className="text-sm text-scale-1100 group-hover:text-foreground transition cursor-pointer">
+              <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                 {metric.name}
               </p>
               <IconChevronRight
@@ -73,7 +73,7 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
               <div className="flex items-center">
-                <IconInfo size={14} strokeWidth={2} className="hover:text-scale-1000" />
+                <IconInfo size={14} strokeWidth={2} className="hover:text-foreground-light" />
               </div>
             </Tooltip.Trigger>
             <Tooltip.Portal>
@@ -168,7 +168,7 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
           }
           bgClass="bg-gray-300 dark:bg-gray-600"
           labelBottom={usageLabel}
-          labelBottomClass="!text-scale-1000"
+          labelBottomClass="!text-foreground-light"
           labelTop={hasLimit ? percentageLabel : undefined}
           labelTopClass={
             !hasLimit
@@ -182,7 +182,7 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
         />
       ) : (
         <div className="flex items-center justify-between flex-grow">
-          <p className="text-sm text-scale-1000">Unavailable in your plan</p>
+          <p className="text-sm text-foreground-light">Unavailable in your plan</p>
           <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
             Upgrade
           </Button>

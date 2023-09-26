@@ -71,7 +71,7 @@ const VaultToggle = () => {
         <div className="w-3/5 space-y-8">
           <div className="space-y-2">
             <h4 className="text-lg">Enable Vault today</h4>
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               Supabase Vault is a Postgres extension for managing secrets and encryption inside your
               database without leaking any sensitive information.
             </p>
@@ -80,10 +80,10 @@ const VaultToggle = () => {
             <div className="space-y-4">
               <div className="rounded border border-scale-500 px-4 py-2 flex items-center justify-between">
                 <div>
-                  <p className="text-scale-1100 text-sm">
+                  <p className="text-foreground-light text-sm">
                     Vault is not available for this project yet.
                   </p>
-                  <p className="text-scale-1000 text-sm">
+                  <p className="text-foreground-light text-sm">
                     Do reach out to us if you're interested!
                   </p>
                 </div>

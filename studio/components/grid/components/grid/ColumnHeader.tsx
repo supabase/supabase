@@ -1,14 +1,13 @@
-import * as React from 'react'
-import { IconArrowRight, IconKey, IconLink, IconLock } from 'ui'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd'
+import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { XYCoord } from 'dnd-core'
-import { useDispatch } from '../../store'
+import * as React from 'react'
+import { DropTargetMonitor, useDrag, useDrop } from 'react-dnd'
+import { IconArrowRight, IconKey, IconLink, IconLock } from 'ui'
+import { useDispatch, useTrackedState } from '../../store'
 import { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
 import { ColumnMenu } from '../menu'
-import { useTrackedState } from '../../store'
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 
 export function ColumnHeader<R>({
   column,
@@ -198,7 +197,7 @@ function renderColumnIcon(
                 ].join(' ')}
               >
                 <div>
-                  <p className="text-xs text-scale-1100">Foreign key relation:</p>
+                  <p className="text-xs text-foreground-light">Foreign key relation:</p>
                   <div className="flex items-center space-x-1">
                     <p className="text-xs text-foreground">{name}</p>
                     <IconArrowRight size="tiny" strokeWidth={1.5} />

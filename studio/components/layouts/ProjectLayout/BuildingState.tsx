@@ -65,11 +65,11 @@ const BuildingState = () => {
             </Badge>
           </div>
           <div>
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               {' '}
               We are provisioning your database and API endpoints
             </p>
-            <p className="text-sm text-scale-1100"> This may take a few minutes</p>
+            <p className="text-sm text-foreground-light"> This may take a few minutes</p>
           </div>
         </div>
         <div>
@@ -80,7 +80,7 @@ const BuildingState = () => {
 
                 <ChecklistItem
                   description={
-                    <p className="text-sm text-scale-1100">
+                    <p className="text-sm text-foreground-light">
                       Browse the Supabase{' '}
                       <Link href="https://supabase.com/docs">
                         <a
@@ -100,7 +100,7 @@ const BuildingState = () => {
                 <h4 className="text-base text-foreground">Not working?</h4>
                 <ChecklistItem
                   description={
-                    <p className="text-sm text-scale-1100">
+                    <p className="text-sm text-foreground-light">
                       Try refreshing after a couple of minutes.
                     </p>
                   }
@@ -109,7 +109,7 @@ const BuildingState = () => {
                   <ChecklistItem
                     description={
                       <>
-                        <p className="mb-4 text-sm text-scale-1100">
+                        <p className="mb-4 text-sm text-foreground-light">
                           If your dashboard hasn't connected within 2 minutes, you can open a
                           support ticket.
                         </p>

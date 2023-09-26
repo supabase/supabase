@@ -103,7 +103,7 @@ const DatabaseUsage = observer(() => {
 
                 {isPaidTier && (
                   <div className="flex justify-between items-center mt-3">
-                    <div className="flex flex-row space-x-3 text-scale-1000 text-sm">
+                    <div className="flex flex-row space-x-3 text-foreground-light text-sm">
                       <Badge>Auto-Scaling</Badge>
                     </div>
 
@@ -142,7 +142,7 @@ const DatabaseUsage = observer(() => {
 
                 {isPaidTier && (
                   <div className="flex justify-between items-center mt-3">
-                    <div className="flex flex-row space-x-3 text-scale-1000 text-sm">
+                    <div className="flex flex-row space-x-3 text-foreground-light text-sm">
                       {usage?.disk_volume_size_gb && (
                         <span>Disk Size: {usage.disk_volume_size_gb} GB</span>
                       )}
@@ -215,13 +215,13 @@ const DatabaseUsage = observer(() => {
                 />
                 {dateRange && (
                   <div className="flex items-center space-x-2">
-                    <p className="text-scale-1000">
+                    <p className="text-foreground-light">
                       {dayjs(dateRange.period_start.date).format('MMMM D, hh:mma')}
                     </p>
-                    <p className="text-scale-1000">
+                    <p className="text-foreground-light">
                       <IconArrowRight size={12} />
                     </p>
-                    <p className="text-scale-1000">
+                    <p className="text-foreground-light">
                       {dayjs(dateRange.period_end.date).format('MMMM D, hh:mma')}
                     </p>
                   </div>

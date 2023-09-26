@@ -25,7 +25,7 @@ const NoDataPlaceholder: React.FC<Props> = ({
     >
       <IconBarChart2 className="text-scale-800" />
       <div>
-        <p className="text-scale-1100 text-xs">{title}</p>
+        <p className="text-foreground-light text-xs">{title}</p>
         {message && <p className="text-scale-900 text-xs">{message}</p>}
       </div>
     </div>
