@@ -1,9 +1,6 @@
-import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-
 import PostTypes from '~/types/post'
 import { getSortedPosts } from '~/lib/posts'
-import { useTheme } from 'next-themes'
 import content from '~/data/home/content'
 import Layout from '~/components/Layouts/Default'
 import Hero from '~/components/Hero/Hero'
