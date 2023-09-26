@@ -181,7 +181,7 @@ const DefaultHeader = ({
                             </div>
                             <div>
                               <p>Insert column</p>
-                              <p className="text-lighter text-xs">
+                              <p className="text-foreground-light text-xs">
                                 Insert a new column into {table.name}
                               </p>
                             </div>
@@ -208,7 +208,9 @@ const DefaultHeader = ({
                             </div>
                             <div>
                               <p>Import data from CSV</p>
-                              <p className="text-lighter text-xs">Insert new rows from a CSV</p>
+                              <p className="text-foreground-light text-xs">
+                                Insert new rows from a CSV
+                              </p>
                             </div>
                           </DropdownMenuItem_Shadcn_>,
                         ]
