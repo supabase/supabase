@@ -493,7 +493,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                                 <a
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="flex items-center space-x-2 text-foreground-light underline hover:text-foreground-light transition"
+                                  className="flex items-center space-x-2 text-foreground-light underline hover:text-foreground transition"
                                 >
                                   Github discussions
                                   <IconExternalLink size={14} strokeWidth={2} className="ml-1" />

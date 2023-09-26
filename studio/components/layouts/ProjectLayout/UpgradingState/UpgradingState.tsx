@@ -189,7 +189,7 @@ const UpgradingState = () => {
                                   ? 'text-foreground'
                                   : isCompleted
                                   ? 'text-foreground-light'
-                                  : 'text-foreground-light'
+                                  : 'text-foreground-lighter'
                               } hover:text-foreground transition`}
                             >
                               {isCurrent

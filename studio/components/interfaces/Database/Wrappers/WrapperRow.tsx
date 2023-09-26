@@ -105,7 +105,7 @@ const WrapperRow = ({
                         <Link
                           href={`/project/${ref}/settings/vault/secrets?search=${wrapper.name}_${metadata.name}`}
                         >
-                          <a className="transition text-foreground-light hover:text-foreground-light flex items-center space-x-2">
+                          <a className="transition text-foreground-light hover:text-foreground flex items-center space-x-2">
                             <span>Encrypted in Vault</span>
                             <IconExternalLink size={14} strokeWidth={1.5} />
                           </a>

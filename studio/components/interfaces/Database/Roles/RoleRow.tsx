@@ -122,9 +122,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                   <p
                     id="collapsible-trigger"
                     className={`text-sm ${
-                      role.active_connections > 0
-                        ? 'text-foreground-light'
-                        : 'text-foreground-light'
+                      role.active_connections > 0 ? 'text-foreground' : 'text-foreground-light'
                     }`}
                   >
                     {role.active_connections} connections
