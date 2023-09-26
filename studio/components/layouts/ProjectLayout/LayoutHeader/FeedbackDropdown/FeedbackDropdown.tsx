@@ -48,7 +48,7 @@ const FeedbackDropdown = ({ alt = false }: FeedbackDropdownProps) => {
             )
           }
         >
-          <span className="hidden md:flex">Feedback</span>
+          <span className="md:flex">Feedback</span>
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ side="bottom" align="end" className="w-full p-0">
