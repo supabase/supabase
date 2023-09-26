@@ -9,6 +9,7 @@ import {
   DropdownMenuItem_Shadcn_,
   DropdownMenuTrigger_Shadcn_,
   DropdownMenu_Shadcn_,
+  IconCheck,
   IconEdit3,
   IconFileText,
   IconMoreVertical,
@@ -77,6 +78,7 @@ const FunctionList = ({
     )
   }
 
+  console.log({ _functions })
   return (
     <>
       {_functions.map((x) => (
@@ -89,6 +91,9 @@ const FunctionList = ({
           </Table.td>
           <Table.td className="hidden lg:table-cell">
             <p>{x.return_type}</p>
+          </Table.td>
+          <Table.td className="hidden lg:table-cell">
+            <p className="text-center">{x.security_definer ? <IconCheck /> : null}</p>
           </Table.td>
           <Table.td className="text-right">
             {!isLocked && (
