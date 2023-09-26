@@ -304,7 +304,7 @@ const Reports = () => {
 
   return (
     <div className="mx-6 flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
-      <h1 className="text-xl text-scale-1200">Reports</h1>
+      <h1 className="text-xl text-foreground">Reports</h1>
 
       <div className="mb-4 flex items-center justify-between space-x-3">
         <div className="flex items-center space-x-3">
@@ -317,13 +317,13 @@ const Reports = () => {
 
           {startDate && endDate && (
             <div className="hidden items-center space-x-1 lg:flex ">
-              <span className="text-sm text-scale-1100">
+              <span className="text-sm text-foreground-light">
                 {dayjs(startDate).format('MMM D, YYYY')}
               </span>
               <span className="text-scale-900">
                 <IconArrowRight size={12} />
               </span>
-              <span className="text-sm text-scale-1100">
+              <span className="text-sm text-foreground-light">
                 {dayjs(endDate).format('MMM D, YYYY')}
               </span>
             </div>
@@ -375,7 +375,7 @@ const Reports = () => {
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text-foreground">
                       You need additional permissions to update this project's report
                     </span>
                   </div>
@@ -402,7 +402,7 @@ const Reports = () => {
               </DropdownMenuContent_Shadcn_>
             </DropdownMenu_Shadcn_>
           ) : (
-            <p className="text-sm text-scale-1000">No charts set up yet in report</p>
+            <p className="text-sm text-foreground-light">No charts set up yet in report</p>
           )}
         </div>
       ) : (

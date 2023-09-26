@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions, useStore } from 'hooks'
@@ -47,7 +47,11 @@ const TableList = ({
   const [filterString, setFilterString] = useState<string>('')
   const canUpdateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
-  const { data: schemas } = useSchemasQuery({
+  const {
+    data: schemas,
+    isLoading: isLoadingSchemas,
+    isSuccess: isSuccessSchemas,
+  } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -87,50 +91,58 @@ const TableList = ({
   return (
     <>
       <div className="mb-4">
-        <h3 className="mb-1 text-xl text-scale-1200">Database Tables</h3>
+        <h3 className="mb-1 text-xl text-foreground">Database Tables</h3>
       </div>
 
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <div className="w-[260px]">
-            <Listbox
-              size="small"
-              value={snap.selectedSchemaName}
-              onChange={snap.setSelectedSchemaName}
-              icon={isLocked && <IconLock size={14} strokeWidth={2} />}
-            >
-              <Listbox.Option disabled key="normal-schemas" value="normal-schemas" label="Schemas">
-                <p className="text-sm">Schemas</p>
-              </Listbox.Option>
-              {openSchemas.map((schema) => (
-                <Listbox.Option
-                  key={schema.id}
-                  value={schema.name}
-                  label={schema.name}
-                  addOnBefore={() => <span className="text-scale-900">schema</span>}
-                >
-                  <span className="text-scale-1200 text-sm">{schema.name}</span>
-                </Listbox.Option>
-              ))}
-              <Listbox.Option
-                disabled
-                key="protected-schemas"
-                value="protected-schemas"
-                label="Protected schemas"
+            {isLoadingSchemas && <ShimmeringLoader className="!py-4" />}
+            {isSuccessSchemas && (
+              <Listbox
+                size="small"
+                value={snap.selectedSchemaName}
+                onChange={snap.setSelectedSchemaName}
+                icon={isLocked && <IconLock size={14} strokeWidth={2} />}
               >
-                <p className="text-sm">Protected schemas</p>
-              </Listbox.Option>
-              {protectedSchemas.map((schema) => (
                 <Listbox.Option
-                  key={schema.id}
-                  value={schema.name}
-                  label={schema.name}
-                  addOnBefore={() => <span className="text-scale-900">schema</span>}
+                  disabled
+                  key="normal-schemas"
+                  value="normal-schemas"
+                  label="Schemas"
                 >
-                  <span className="text-scale-1200 text-sm">{schema.name}</span>
+                  <p className="text-sm">Schemas</p>
                 </Listbox.Option>
-              ))}
-            </Listbox>
+                {openSchemas.map((schema) => (
+                  <Listbox.Option
+                    key={schema.id}
+                    value={schema.name}
+                    label={schema.name}
+                    addOnBefore={() => <span className="text-scale-900">schema</span>}
+                  >
+                    <span className="text-foreground text-sm">{schema.name}</span>
+                  </Listbox.Option>
+                ))}
+                <Listbox.Option
+                  disabled
+                  key="protected-schemas"
+                  value="protected-schemas"
+                  label="Protected schemas"
+                >
+                  <p className="text-sm">Protected schemas</p>
+                </Listbox.Option>
+                {protectedSchemas.map((schema) => (
+                  <Listbox.Option
+                    key={schema.id}
+                    value={schema.name}
+                    label={schema.name}
+                    addOnBefore={() => <span className="text-scale-900">schema</span>}
+                  >
+                    <span className="text-foreground text-sm">{schema.name}</span>
+                  </Listbox.Option>
+                ))}
+              </Listbox>
+            )}
           </div>
           <div>
             <Input
@@ -165,7 +177,7 @@ const TableList = ({
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to create tables
                       </span>
                     </div>
@@ -212,7 +224,7 @@ const TableList = ({
                   {tables.length === 0 && filterString.length === 0 && (
                     <Table.tr key={snap.selectedSchemaName}>
                       <Table.td colSpan={6}>
-                        <p className="text-sm text-scale-1200">No tables created yet</p>
+                        <p className="text-sm text-foreground">No tables created yet</p>
                         <p className="text-sm text-light">
                           There are no tables found in the schema "{snap.selectedSchemaName}"
                         </p>
@@ -222,7 +234,7 @@ const TableList = ({
                   {tables.length === 0 && filterString.length > 0 && (
                     <Table.tr key={snap.selectedSchemaName}>
                       <Table.td colSpan={6}>
-                        <p className="text-sm text-scale-1200">No results found</p>
+                        <p className="text-sm text-foreground">No results found</p>
                         <p className="text-sm text-light">
                           Your search for "{filterString}" did not return any results
                         </p>
@@ -291,7 +303,7 @@ const TableList = ({
                                         'border border-scale-200',
                                       ].join(' ')}
                                     >
-                                      <span className="text-xs text-scale-1200">
+                                      <span className="text-xs text-foreground">
                                         You need additional permissions to edit tables
                                       </span>
                                     </div>
@@ -320,7 +332,7 @@ const TableList = ({
                                         'border border-scale-200',
                                       ].join(' ')}
                                     >
-                                      <span className="text-xs text-scale-1200">
+                                      <span className="text-xs text-foreground">
                                         You need additional permissions to delete tables
                                       </span>
                                     </div>

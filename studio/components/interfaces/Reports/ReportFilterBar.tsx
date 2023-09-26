@@ -189,7 +189,7 @@ const ReportFilterBar = ({
                     >
                       {productFilter.label}
                     </p>
-                    <p className="text-left text-scale-1000 inline-block w-[180px]">
+                    <p className=" text-left text-foreground-light inline-block w-[180px]">
                       {productFilter.description}
                     </p>
                   </div>
@@ -215,7 +215,7 @@ const ReportFilterBar = ({
                 size="tiny"
                 className="!p-0 !space-x-0"
                 onClick={() => onRemoveFilters([filter])}
-                icon={<IconX size="tiny" className="text-scale-1100" />}
+                icon={<IconX size="tiny" className="text-foreground-light" />}
               >
                 <span className="sr-only">Remove</span>
               </Button>
@@ -225,7 +225,8 @@ const ReportFilterBar = ({
           align="end"
           header={
             <div className="flex justify-between items-center py-1">
-              <h5 className="text-sm text-scale-1200">Add Filter</h5>
+              <h5 className="text-sm text-foreground">Add Filter</h5>
+
               <Button
                 type="primary"
                 size="tiny"
@@ -294,7 +295,7 @@ const ReportFilterBar = ({
             asChild
             type="default"
             size="tiny"
-            icon={<IconPlus size="tiny" className={`text-scale-1100 `} />}
+            icon={<IconPlus size="tiny" className={`text-foreground-light `} />}
           >
             <span>Add filter</span>
           </Button>

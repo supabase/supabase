@@ -43,9 +43,9 @@ const LangSelector = ({
           onClick={() => setSelectedLang('js')}
           className={`${
             selectedLang == 'js'
-              ? 'bg-scale-300 font-medium text-scale-1200 dark:bg-scale-200'
+              ? 'bg-scale-300 font-medium text-foreground dark:bg-scale-200'
               : 'bg-scale-100 text-scale-900 dark:bg-scale-100'
-          } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-scale-1200 focus:outline-none`}
+          } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-foreground focus:outline-none`}
         >
           JavaScript
         </button>
@@ -54,9 +54,9 @@ const LangSelector = ({
           onClick={() => setSelectedLang('bash')}
           className={`${
             selectedLang == 'bash'
-              ? 'bg-scale-300 font-medium text-scale-1200 dark:bg-scale-200'
+              ? 'bg-scale-300 font-medium text-foreground dark:bg-scale-200'
               : 'bg-scale-100 text-scale-900 dark:bg-scale-100'
-          } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-scale-1200 focus:outline-none`}
+          } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-foreground focus:outline-none`}
         >
           Bash
         </button>

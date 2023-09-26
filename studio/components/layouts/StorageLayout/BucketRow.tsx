@@ -41,14 +41,14 @@ const BucketRow = ({
       key={bucket.id}
       className={clsx(
         'group flex items-center justify-between rounded-md',
-        isSelected && 'text-scale-1200 bg-scale-300'
+        isSelected && 'text-foreground bg-scale-300'
       )}
     >
       <Link href={`/project/${projectRef}/storage/buckets/${bucket.id}`}>
         <a className="py-1 px-3 w-full">
           <div className="flex items-center justify-between space-x-2 truncate w-full">
             <p
-              className="text-sm text-scale-1100 group-hover:text-scale-1200 transition truncate"
+              className="text-sm text-foreground-light group-hover:text-foreground transition truncate"
               title={bucket.name}
             >
               {bucket.name}
@@ -67,7 +67,9 @@ const BucketRow = ({
               <Button
                 asChild
                 type="text"
-                icon={<IconChevronDown size="tiny" strokeWidth={2} className="text-scale-1100" />}
+                icon={
+                  <IconChevronDown size="tiny" strokeWidth={2} className="text-foreground-light" />
+                }
                 style={{ padding: '3px' }}
               >
                 <span></span>

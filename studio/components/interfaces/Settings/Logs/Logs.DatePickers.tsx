@@ -60,7 +60,6 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
             <span>{selectedHelper?.text || defaultHelper.text}</span>
           </Button>
         </DropdownMenuTrigger_Shadcn_>
-
         <DropdownMenuContent_Shadcn_ side="bottom" align="start">
           <DropdownMenuRadioGroup_Shadcn_
             onValueChange={handleHelperChange}
@@ -73,9 +72,9 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
                 disabled={helper.disabled}
               >
                 <span
-                  className={[helper.disabled ? 'text-scale-1000 cursor-not-allowed' : ''].join(
-                    ' '
-                  )}
+                  className={[
+                    helper.disabled ? 'text-foreground-light cursor-not-allowed' : '',
+                  ].join(' ')}
                 >
                   {helper.text}
                 </span>
@@ -84,6 +83,7 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
           </DropdownMenuRadioGroup_Shadcn_>
         </DropdownMenuContent_Shadcn_>
       </DropdownMenu_Shadcn_>
+
       <DatePicker
         triggerButtonClassName="rounded-l-none"
         triggerButtonType={selectedHelper ? 'default' : 'secondary'}

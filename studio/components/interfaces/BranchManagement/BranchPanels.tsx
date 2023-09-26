@@ -241,7 +241,7 @@ const PullRequestPanel = ({
                   : `Created ${formattedTimeFromNow}`}
               </p>
             </div>
-            <p className="text-scale-1000 ml-8 mt-0.5">{pr.title}</p>
+            <p className="text-foreground-light ml-8 mt-0.5">{pr.title}</p>
           </div>
           <div className="flex items-center space-x-4">
             <Link passHref href={pr.url}>

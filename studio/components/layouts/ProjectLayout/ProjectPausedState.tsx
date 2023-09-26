@@ -76,14 +76,14 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
           <div className="mx-6 flex h-[500px] items-center justify-center rounded border border-scale-400 bg-scale-300 p-8">
             <div className="grid w-[480px] gap-4">
               <div className="mx-auto flex max-w-[300px] items-center justify-center space-x-4 lg:space-x-8">
-                <IconPauseCircle className="text-scale-1100" size={50} strokeWidth={1.5} />
+                <IconPauseCircle className="text-foreground-light" size={50} strokeWidth={1.5} />
               </div>
 
               <div className="space-y-2">
                 <p className="text-center">
                   The project "{project?.name ?? ''}" is currently paused.
                 </p>
-                <p className="text-sm text-scale-1100 text-center">
+                <p className="text-sm text-foreground-light text-center">
                   All of your project's data is still intact, but your project is inaccessible while
                   paused.{' '}
                   {product !== undefined ? (
@@ -96,12 +96,12 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   )}
                 </p>
                 {isFreePlan && (
-                  <p className="text-sm text-scale-1100 text-center">
+                  <p className="text-sm text-foreground-light text-center">
                     You can also prevent project pausing in the future by upgrading to Pro.
                   </p>
                 )}
                 {!isFreePlan && (
-                  <p className="text-sm text-scale-1100 text-center">
+                  <p className="text-sm text-foreground-light text-center">
                     Unpaused projects count towards compute usage. For every hour your instance is
                     active, we'll bill you based on the instance size of your project. See{' '}
                     <Link href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute">
@@ -136,7 +136,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                             'border border-scale-200 ', //border
                           ].join(' ')}
                         >
-                          <span className="text-xs text-scale-1200">
+                          <span className="text-xs text-foreground">
                             You need additional permissions to resume this project
                           </span>
                         </div>
@@ -187,11 +187,11 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
         <div className="py-4 space-y-4">
           <Modal.Content>
             <div className="space-y-2">
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 The following members have reached their maximum limits for the number of active
                 free plan projects within organizations where they are an administrator or owner:
               </p>
-              <ul className="pl-5 text-sm list-disc text-scale-1100">
+              <ul className="pl-5 text-sm list-disc text-foreground-light">
                 {(membersExceededLimit || []).map((member, idx: number) => (
                   <li key={`member-${idx}`}>
                     {member.username || member.primary_email} (Limit: {member.free_project_limit}{' '}
@@ -199,7 +199,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   </li>
                 ))}
               </ul>
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 These members will need to either delete, pause, or upgrade one or more of these
                 projects before you're able to unpause this project.
               </p>

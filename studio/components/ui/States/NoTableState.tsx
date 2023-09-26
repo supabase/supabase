@@ -17,7 +17,7 @@ const NoTableState: React.FC<Props> = ({ message }) => {
         router.push(`/project/${ref}/editor`)
       }}
     >
-      <p className="text-sm text-scale-1100">{message}</p>
+      <p className="text-sm text-foreground-light">{message}</p>
     </ProductEmptyState>
   )
 }

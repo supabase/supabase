@@ -80,7 +80,9 @@ const LogsQueryPanel = ({
                     <DropdownMenuItem_Shadcn_ key={source} onClick={() => onSelectSource(source)}>
                       <div className="flex flex-col gap-1">
                         <span className="font-mono font-bold">{source}</span>
-                        <span className="text-light">{LOGS_SOURCE_DESCRIPTION[source]}</span>
+                        <span className="text-foreground-light">
+                          {LOGS_SOURCE_DESCRIPTION[source]}
+                        </span>
                       </div>
                     </DropdownMenuItem_Shadcn_>
                   ))}
@@ -168,7 +170,7 @@ const LogsQueryPanel = ({
                               'border border-scale-200',
                             ].join(' ')}
                           >
-                            <span className="text-xs text-scale-1200">
+                            <span className="text-xs text-foreground">
                               You need additional permissions to save your query
                             </span>
                           </div>

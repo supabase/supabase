@@ -1,7 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useCheckPermissions } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
 import { useState } from 'react'
 import semver from 'semver'
 import {
@@ -14,6 +12,9 @@ import {
   IconMail,
   IconUserPlus,
 } from 'ui'
+
+import { useCheckPermissions } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
 import CreateUserModal from './CreateUserModal'
 import InviteUserModal from './InviteUserModal'
 
@@ -67,7 +68,7 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to invite users
                       </span>
                     </div>
@@ -78,7 +79,7 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
           )}
 
           <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger className="w-full">
+            <Tooltip.Trigger className="w-full text-left">
               <DropdownMenuItem_Shadcn_
                 className="space-x-2"
                 disabled={!canCreateUsers}

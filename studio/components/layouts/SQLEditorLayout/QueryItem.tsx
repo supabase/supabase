@@ -63,7 +63,7 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
       key={id}
       className={clsx(
         'flex items-center justify-between rounded-md group',
-        isActive && 'text-scale-1200 bg-scale-400 dark:bg-scale-600 -active'
+        isActive && 'text-foreground bg-scale-400 dark:bg-scale-600 -active'
       )}
       ref={isActive ? (activeItemRef as React.RefObject<HTMLDivElement>) : null}
     >
@@ -71,7 +71,7 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
         <a className="py-1 px-3 w-full overflow-hidden">
           <p
             title={description || name}
-            className="text-sm text-scale-1100 group-hover:text-scale-1200 transition overflow-hidden text-ellipsis"
+            className="text-sm text-foreground-light group-hover:text-foreground transition overflow-hidden text-ellipsis"
           >
             {name}
           </p>
@@ -266,7 +266,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
       >
         <Modal.Content>
           <div className="my-6">
-            <div className="text-sm text-scale-1100 grid gap-4">
+            <div className="text-sm text-foreground-light grid gap-4">
               <div className="grid gap-1">
                 {sharedSnippetsFeature && visibility === 'project' && (
                   <Alert_Shadcn_ variant="destructive">
@@ -294,7 +294,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
       >
         <Modal.Content>
           <div className="my-6">
-            <div className="text-sm text-scale-1100 grid gap-4">
+            <div className="text-sm text-foreground-light grid gap-4">
               <div className="grid gap-1">
                 <Alert_Shadcn_ variant="warning">
                   <IconAlertTriangle strokeWidth={2} />

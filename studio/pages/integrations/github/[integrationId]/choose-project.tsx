@@ -70,7 +70,7 @@ const ChooseProjectGitHubPage: NextPageWithLayout = () => {
         <>
           <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
             <header>
-              <h1 className="text-xl text-scale-1200">
+              <h1 className="text-xl text-foreground">
                 Link a Supabase project to a GitHub repository
               </h1>
               <Markdown

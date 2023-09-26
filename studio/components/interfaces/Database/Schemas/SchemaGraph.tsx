@@ -9,6 +9,7 @@ import ReactFlow, {
   BackgroundVariant,
   Edge,
   Handle,
+  MiniMap,
   Node,
   NodeProps,
   Position,
@@ -303,6 +304,8 @@ const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
   const { isDarkMode } = useTheme()
   const backgroundPatternColor = isDarkMode ? '#2e2e2e' : '#e6e8eb'
   const edgeStrokeColor = isDarkMode ? '#ededed' : '#111318'
+  const miniMapNodeColor = '#111318'
+  const miniMapMaskColor = isDarkMode ? 'rgb(17, 19, 24, .8)' : 'rgb(237, 237, 237, .8)'
 
   const reactFlowInstance = useReactFlow()
   const nodeTypes = useMemo(
@@ -336,10 +339,18 @@ const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
           }}
           nodeTypes={nodeTypes}
           fitView
-          maxZoom={1.5}
+          minZoom={0.8}
+          maxZoom={1.8}
           proOptions={{ hideAttribution: true }}
         >
           <Background gap={16} color={backgroundPatternColor} variant={BackgroundVariant.Lines} />
+          <MiniMap
+            pannable
+            zoomable
+            nodeColor={miniMapNodeColor}
+            maskColor={miniMapMaskColor}
+            className="border border-scale-600 rounded-md shadow-sm"
+          />
         </ReactFlow>
       </div>
     </>
@@ -363,14 +374,14 @@ const SchemaGraph = ({ schema }: { schema: string }) => {
     return (
       <div className="flex h-full w-full items-center justify-center space-x-2">
         <IconLoader className="animate-spin" size={14} />
-        <p className="text-sm text-scale-1000">Loading table...</p>
+        <p className="text-sm text-foreground-light">Loading table...</p>
       </div>
     )
   }
 
   if (isError) {
     return (
-      <div className="px-6 py-4 text-scale-1000">
+      <div className="px-6 py-4 text-foreground-light">
         <p>Error connecting to API</p>
         <p>{`${error?.message ?? 'Unknown error'}`}</p>
       </div>

@@ -14,11 +14,13 @@ import {
   Button,
   DropdownMenuContent_Shadcn_,
   DropdownMenuItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
   DropdownMenuTrigger_Shadcn_,
   DropdownMenu_Shadcn_,
   IconEdit3,
   IconMoreVertical,
   IconTrash,
+  IconXCircle,
 } from 'ui'
 
 export interface HookListProps {
@@ -101,6 +103,11 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
                           <IconEdit3 size="tiny" />
                           <p className="text">Edit hook</p>
                         </DropdownMenuItem_Shadcn_>
+                        <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={() => editHook(x)}>
+                          <IconXCircle size="tiny" strokeWidth={2} />
+                          <p className="text">Disable hook</p>
+                        </DropdownMenuItem_Shadcn_>
+                        <DropdownMenuSeparator_Shadcn_ />
                         <DropdownMenuItem_Shadcn_
                           className="space-x-2"
                           onClick={() => deleteHook(x)}
@@ -125,7 +132,7 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
                             'border border-scale-200',
                           ].join(' ')}
                         >
-                          <span className="text-xs text-scale-1200">
+                          <span className="text-xs text-foreground">
                             You need additional permissions to update webhooks
                           </span>
                         </div>

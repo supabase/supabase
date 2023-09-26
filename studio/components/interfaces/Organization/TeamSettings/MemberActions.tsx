@@ -132,7 +132,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
                   'border border-scale-200 ', //border
                 ].join(' ')}
               >
-                <span className="text-xs text-scale-1200">
+                <span className="text-xs text-foreground">
                   You need additional permissions to manage this team member
                 </span>
               </div>

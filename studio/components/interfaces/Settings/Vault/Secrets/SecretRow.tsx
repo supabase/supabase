@@ -57,11 +57,11 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
     <div className="px-6 py-4 flex items-center space-x-4">
       <div className="space-y-1 min-w-[35%] max-w-[35%]">
         <div>
-          <p className="text-sm text-scale-1200" title={name}>
+          <p className="text-sm text-foreground" title={name}>
             {name}
           </p>
           {secret.description !== undefined && (
-            <p className="text-sm text-scale-1100" title={secret.description}>
+            <p className="text-sm text-foreground-light" title={secret.description}>
               {secret.description}
             </p>
           )}
@@ -70,11 +70,11 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           <IconKey
             size={14}
             strokeWidth={2}
-            className="text-scale-1000 transition group-hover:text-brand"
+            className="text-foreground-light transition group-hover:text-brand"
           />
           <Link href={`/project/${ref}/settings/vault/keys?id=${secret.key_id}`}>
             <a
-              className="text-scale-1100 font-mono text-xs cursor-pointer transition group-hover:text-brand"
+              className="text-foreground-light font-mono text-xs cursor-pointer transition group-hover:text-brand"
               title={secret.key_id}
             >
               {secret.key_id}
@@ -106,7 +106,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
         </div>
       </div>
       <div className="flex items-center justify-end w-[25%] space-x-4">
-        <p className="text-sm text-scale-1100">
+        <p className="text-sm text-foreground-light">
           {secret.updated_at === secret.created_at ? 'Added' : 'Updated'} on{' '}
           {dayjs(secret.updated_at).format('MMM D, YYYY')}
         </p>
@@ -138,7 +138,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to edit secrets
                       </span>
                     </div>
@@ -146,6 +146,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                 </Tooltip.Portal>
               )}
             </Tooltip.Root>
+
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger asChild>
                 <DropdownMenuItem_Shadcn_
@@ -167,7 +168,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to delete secrets
                       </span>
                     </div>

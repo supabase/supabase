@@ -4,8 +4,8 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 
-import { BASE_PATH } from 'lib/constants'
 import { useTheme } from 'common'
+import { BASE_PATH } from 'lib/constants'
 
 const Error404: NextPage = ({}) => {
   const { isDarkMode } = useTheme()
@@ -55,7 +55,9 @@ const Error404: NextPage = ({}) => {
       >
         <div className="flex w-[380px] flex-col items-center justify-center space-y-3 text-center">
           <h3 className="text-xl">Looking for something? 🔍</h3>
-          <p className="text-scale-1100">We couldn't find the page that you're looking for!</p>
+          <p className="text-foreground-light">
+            We couldn't find the page that you're looking for!
+          </p>
         </div>
         <div className="flex items-center space-x-4">
           <Link href="/projects">

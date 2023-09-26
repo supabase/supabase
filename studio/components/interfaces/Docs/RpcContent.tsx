@@ -36,7 +36,7 @@ const RpcContent = ({
 
   return (
     <>
-      <h2 className="text-scale-1200 mt-0">
+      <h2 className="text-foreground mt-0">
         <span className="px-6 text-2xl">{meta.id}</span>
       </h2>
 
@@ -61,7 +61,7 @@ const RpcContent = ({
       </div>
       {rpcParams.length > 0 && (
         <div>
-          <h3 className="text-scale-1200 mt-0 px-6 capitalize">Function Arguments</h3>
+          <h3 className="text-foreground mt-0 px-6 capitalize">Function Arguments</h3>
           {rpcParams.map((x, i) => {
             return (
               <div key={i} className="doc-section">

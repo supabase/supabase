@@ -155,7 +155,7 @@ const DefaultHeader = ({
                             </div>
                             <div>
                               <p className="text">Insert row</p>
-                              <p className="text-lighter text-xs">
+                              <p className="text-foreground-light text-xs">
                                 Insert a new row into {table.name}
                               </p>
                             </div>
@@ -404,7 +404,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           icon={<IconX size="tiny" strokeWidth={2} />}
           onClick={deselectRows}
         />
-        <span className="text-xs text-scale-1200">
+        <span className="text-xs text-foreground">
           {allRowsSelected
             ? `${totalRows} rows selected`
             : selectedRows.size > 1

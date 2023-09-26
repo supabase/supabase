@@ -70,7 +70,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
       <div className="flex h-full w-full items-center justify-center px-10">
         <audio key={previewUrl} controls style={{ width: 'inherit' }}>
           <source src={previewUrl} type="audio/mpeg" />
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             Your browser does not support the audio element.
           </p>
         </audio>
@@ -82,7 +82,9 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
       <div className="flex h-full w-full items-center justify-center">
         <video key={previewUrl} controls style={{ maxHeight: '100%' }}>
           <source src={previewUrl} type="video/mp4" />
-          <p className="text-sm text-scale-1100">Your browser does not support the video tag.</p>
+          <p className="text-sm text-foreground-light">
+            Your browser does not support the video tag.
+          </p>
         </video>
       </div>
     )
@@ -139,7 +141,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
           style={{ width }}
         >
           {/* Preview Header */}
-          <div className="flex w-full justify-end text-scale-900 transition-colors hover:text-scale-1200">
+          <div className="flex w-full justify-end text-scale-900 transition-colors hover:text-foreground">
             <IconX
               className="cursor-pointer"
               size={14}
@@ -158,17 +160,17 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
           <div className="w-full space-y-6">
             {/* Preview Information */}
             <div className="space-y-1">
-              <h5 className="break-words text-base text-scale-1200">{file.name}</h5>
+              <h5 className="break-words text-base text-foreground">{file.name}</h5>
               {file.isCorrupted && (
                 <div className="flex items-center space-x-2">
-                  <IconAlertCircle size={14} strokeWidth={2} className="text-scale-1100" />
-                  <p className="text-sm text-scale-1100">
+                  <IconAlertCircle size={14} strokeWidth={2} className="text-foreground-light" />
+                  <p className="text-sm text-foreground-light">
                     File is corrupted, please delete and reupload this file again
                   </p>
                 </div>
               )}
               {mimeType && (
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   {mimeType}
                   {size && <span> - {size}</span>}
                 </p>
@@ -179,11 +181,11 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
             <div className="space-y-2">
               <div>
                 <label className="mb-1 text-xs text-scale-900">Added on</label>
-                <p className="text-sm text-scale-1100">{createdAt}</p>
+                <p className="text-sm text-foreground-light">{createdAt}</p>
               </div>
               <div>
                 <label className="mb-1 text-xs text-scale-900">Last modified</label>
-                <p className="text-sm text-scale-1100">{updatedAt}</p>
+                <p className="text-sm text-foreground-light">{updatedAt}</p>
               </div>
             </div>
 
@@ -279,7 +281,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to delete this file
                       </span>
                     </div>

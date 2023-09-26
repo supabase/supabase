@@ -1,9 +1,9 @@
-import { NextRouter, useRouter } from 'next/router'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconExternalLink, IconHelpCircle, Loading } from 'ui'
-import { BaseReportParams } from './Reports.types'
-import { LogsEndpointParams } from '../Settings/Logs'
 import Panel from 'components/ui/Panel'
+import { NextRouter, useRouter } from 'next/router'
+import { Button, IconExternalLink, IconHelpCircle, Loading } from 'ui'
+import { LogsEndpointParams } from '../Settings/Logs'
+import { BaseReportParams } from './Reports.types'
 
 export interface ReportWidgetProps<T = any> {
   data: T[]
@@ -45,7 +45,11 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
               {props?.tooltip && (
                 <Tooltip.Root delayDuration={0}>
                   <Tooltip.Trigger>
-                    <IconHelpCircle className="text-scale-1100" size="tiny" strokeWidth={1.5} />
+                    <IconHelpCircle
+                      className="text-foreground-light"
+                      size="tiny"
+                      strokeWidth={1.5}
+                    />
                   </Tooltip.Trigger>
                   <Tooltip.Portal>
                     <Tooltip.Content side="bottom">
@@ -56,14 +60,14 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
                           'border border-scale-200',
                         ].join(' ')}
                       >
-                        <span className="text-xs text-scale-1200">{props.tooltip}</span>
+                        <span className="text-xs text-foreground">{props.tooltip}</span>
                       </div>
                     </Tooltip.Content>
                   </Tooltip.Portal>
                 </Tooltip.Root>
               )}
             </div>
-            <p className="text-sm text-scale-1100">{props.description}</p>
+            <p className="text-sm text-foreground-light">{props.description}</p>
           </div>
           {props.params && (
             <Tooltip.Root delayDuration={0}>
@@ -93,7 +97,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">Open in Logs Explorer</span>
+                    <span className="text-xs text-foreground">Open in Logs Explorer</span>
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>

@@ -68,7 +68,7 @@ const PaymentMethods = () => {
         <ScaffoldSectionDetail>
           <div className="sticky space-y-2 top-12">
             <p className="text-base m-0">Payment methods</p>
-            <p className="text-sm text-scale-1000 mb-2 pr-4 m-0">
+            <p className="text-sm text-foreground-light mb-2 pr-4 m-0">
               After adding a payment method, make sure to mark it as active to use it for billing.
               You can remove unused cards.
             </p>
@@ -117,7 +117,7 @@ const PaymentMethods = () => {
                     footer={
                       <div className="flex items-center justify-between py-4 px-8">
                         {!canUpdatePaymentMethods ? (
-                          <p className="text-sm text-scale-1000">
+                          <p className="text-sm text-foreground-light">
                             You need additional permissions to manage payment methods
                           </p>
                         ) : (

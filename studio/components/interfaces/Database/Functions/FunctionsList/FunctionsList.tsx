@@ -70,11 +70,11 @@ const FunctionsList = ({
             disabled={!canCreateFunctions}
             disabledMessage="You need additional permissions to create functions"
           >
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               PostgreSQL functions, also known as stored procedures, is a set of SQL and procedural
               commands such as declarations, assignments, loops, flow-of-control, etc.
             </p>
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               It's stored on the database server and can be invoked using the SQL interface.
             </p>
           </ProductEmptyState>
@@ -106,7 +106,7 @@ const FunctionsList = ({
                       label={schema.name}
                       addOnBefore={() => <span className="text-scale-900">schema</span>}
                     >
-                      <span className="text-scale-1200 text-sm">{schema.name}</span>
+                      <span className="text-foreground text-sm">{schema.name}</span>
                     </Listbox.Option>
                   ))}
                   <Listbox.Option
@@ -124,7 +124,7 @@ const FunctionsList = ({
                       label={schema.name}
                       addOnBefore={() => <span className="text-scale-900">schema</span>}
                     >
-                      <span className="text-scale-1200 text-sm">{schema.name}</span>
+                      <span className="text-foreground text-sm">{schema.name}</span>
                     </Listbox.Option>
                   ))}
                 </Listbox>
@@ -155,7 +155,7 @@ const FunctionsList = ({
                           'border border-scale-200',
                         ].join(' ')}
                       >
-                        <span className="text-xs text-scale-1200">
+                        <span className="text-xs text-foreground">
                           You need additional permissions to create functions
                         </span>
                       </div>
