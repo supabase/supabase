@@ -24,7 +24,7 @@ const PITRNotice = ({}) => {
       disabled={true}
       footer={
         <div className="flex items-center justify-between p-6">
-          <span className="text-sm text-scale-1000">
+          <span className="text-sm text-foreground-light">
             You can also increase your recovery retention period updating your PITR add-on
           </span>
           <Tooltip.Root delayDuration={0}>

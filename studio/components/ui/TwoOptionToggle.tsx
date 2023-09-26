@@ -41,7 +41,7 @@ const TwoOptionToggle = ({
           key={`toggle_${index}`}
           style={{ width: width + 1 }}
           className={`
-              ${activeOption === option ? 'text-foreground' : 'text-scale-1000'}
+              ${activeOption === option ? 'text-foreground' : 'text-foreground-light'}
               ${index === 0 ? 'right-0' : 'left-0'}
               ${buttonStyle(activeOption === option)}
               cursor-pointer
@@ -51,7 +51,7 @@ const TwoOptionToggle = ({
           <span
             className={clsx(
               'capitalize hover:text-foreground dark:hover:text-foreground',
-              activeOption === option ? 'text-foreground' : 'text-scale-1000'
+              activeOption === option ? 'text-foreground' : 'text-foreground-light'
             )}
           >
             {option}

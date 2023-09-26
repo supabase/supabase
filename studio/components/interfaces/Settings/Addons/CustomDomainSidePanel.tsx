@@ -184,10 +184,12 @@ const CustomDomainSidePanel = () => {
                     <p className="text-sm">No custom domain</p>
                   </div>
                   <div className="px-4 py-2">
-                    <p className="text-scale-1000">Use the default supabase domain for your API</p>
+                    <p className="text-foreground-light">
+                      Use the default supabase domain for your API
+                    </p>
                     <div className="flex items-center space-x-1 mt-2">
                       <p className="text-foreground text-sm">$0</p>
-                      <p className="text-scale-1000 translate-y-[1px]"> / month</p>
+                      <p className="text-foreground-light translate-y-[1px]"> / month</p>
                     </div>
                   </div>
                 </div>
@@ -207,10 +209,12 @@ const CustomDomainSidePanel = () => {
                       <p className="text-sm">{option.name}</p>
                     </div>
                     <div className="px-4 py-2">
-                      <p className="text-scale-1000">Present a branded experience to your users</p>
+                      <p className="text-foreground-light">
+                        Present a branded experience to your users
+                      </p>
                       <div className="flex items-center space-x-1 mt-2">
                         <p className="text-foreground text-sm">${option.price}</p>
-                        <p className="text-scale-1000 translate-y-[1px]"> / month</p>
+                        <p className="text-foreground-light translate-y-[1px]"> / month</p>
                       </div>
                     </div>
                   </div>

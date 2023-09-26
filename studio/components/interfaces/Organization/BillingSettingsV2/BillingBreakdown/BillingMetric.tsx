@@ -73,7 +73,7 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
               <div className="flex items-center">
-                <IconInfo size={14} strokeWidth={2} className="hover:text-scale-1000" />
+                <IconInfo size={14} strokeWidth={2} className="hover:text-foreground-light" />
               </div>
             </Tooltip.Trigger>
             <Tooltip.Portal>
@@ -168,7 +168,7 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
           }
           bgClass="bg-gray-300 dark:bg-gray-600"
           labelBottom={usageLabel}
-          labelBottomClass="!text-scale-1000"
+          labelBottomClass="!text-foreground-light"
           labelTop={hasLimit ? percentageLabel : undefined}
           labelTopClass={
             !hasLimit
@@ -182,7 +182,7 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
         />
       ) : (
         <div className="flex items-center justify-between flex-grow">
-          <p className="text-sm text-scale-1000">Unavailable in your plan</p>
+          <p className="text-sm text-foreground-light">Unavailable in your plan</p>
           <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
             Upgrade
           </Button>

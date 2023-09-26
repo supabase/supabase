@@ -67,7 +67,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           <IconKey
             size={14}
             strokeWidth={2}
-            className="text-scale-1000 transition group-hover:text-brand"
+            className="text-foreground-light transition group-hover:text-brand"
           />
           <Link href={`/project/${ref}/settings/vault/keys?id=${secret.key_id}`}>
             <a

@@ -105,7 +105,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                     <p className="text-left text-sm" id="collapsible-trigger">
                       {role.name}
                     </p>
-                    <p className="text-left text-sm text-scale-1000" id="collapsible-trigger">
+                    <p className="text-left text-sm text-foreground-light" id="collapsible-trigger">
                       (ID: {role.id})
                     </p>
                   </div>
@@ -122,7 +122,9 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                   <p
                     id="collapsible-trigger"
                     className={`text-sm ${
-                      role.active_connections > 0 ? 'text-foreground-light' : 'text-scale-1000'
+                      role.active_connections > 0
+                        ? 'text-foreground-light'
+                        : 'text-foreground-light'
                     }`}
                   >
                     {role.active_connections} connections

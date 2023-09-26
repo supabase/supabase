@@ -392,7 +392,7 @@ const Reports = () => {
               </Button>
             </Dropdown>
           ) : (
-            <p className="text-sm text-scale-1000">No charts set up yet in report</p>
+            <p className="text-sm text-foreground-light">No charts set up yet in report</p>
           )}
         </div>
       ) : (

@@ -32,7 +32,7 @@ const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
         asChild
         type={(sorts || []).length > 0 ? 'link' : 'text'}
         icon={
-          <div className="text-scale-1000">
+          <div className="text-foreground-light">
             <IconList strokeWidth={1.5} />
           </div>
         }

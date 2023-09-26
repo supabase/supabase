@@ -154,7 +154,7 @@ const SignInMfaForm = () => {
 
       <div className="my-8">
         <div className="text-sm">
-          <span className="text-scale-1000">Unable to sign in?</span>{' '}
+          <span className="text-foreground-light">Unable to sign in?</span>{' '}
         </div>
         <ul className="list-disc pl-6">
           {factors?.totp.length === 2 && (

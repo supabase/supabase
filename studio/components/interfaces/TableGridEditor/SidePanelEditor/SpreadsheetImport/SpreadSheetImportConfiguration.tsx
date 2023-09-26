@@ -42,7 +42,7 @@ const SpreadsheetImportConfiguration = ({
           <div className="py-2 space-y-3">
             <div>
               <p className="text-sm text-foreground-light">Select which columns to import</p>
-              <p className="text-sm text-scale-1000">
+              <p className="text-sm text-foreground-light">
                 By default, all columns are selected to be imported from your CSV
               </p>
             </div>

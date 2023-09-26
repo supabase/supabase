@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Button } from 'ui'
 import SchemaForm from './SchemaForm'
 
@@ -53,7 +53,7 @@ export default function SchemaFormPanel({
           <h6>{title || ''}</h6>
         </div>
         {disabled && disabledMessage ? (
-          <p className="text-sm text-scale-1000">{disabledMessage}</p>
+          <p className="text-sm text-foreground-light">{disabledMessage}</p>
         ) : (
           <div
             className={`flex transition duration-150 ${

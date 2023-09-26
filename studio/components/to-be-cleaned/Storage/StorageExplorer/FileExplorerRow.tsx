@@ -368,7 +368,7 @@ const FileExplorerRow = ({
           {item.isCorrupted && (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger>
-                <IconAlertCircle size={18} strokeWidth={2} className="text-scale-1000" />
+                <IconAlertCircle size={18} strokeWidth={2} className="text-foreground-light" />
               </Tooltip.Trigger>
               <Tooltip.Portal>
                 <Tooltip.Content side="bottom">

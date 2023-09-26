@@ -212,7 +212,7 @@ const PITRSidePanel = () => {
                     <p
                       className={clsx(
                         'text-sm transition',
-                        isSelected ? 'text-foreground' : 'text-scale-1000'
+                        isSelected ? 'text-foreground' : 'text-foreground-light'
                       )}
                     >
                       {option.name}
@@ -290,7 +290,7 @@ const PITRSidePanel = () => {
                         <p className="text-sm">{option.name}</p>
                       </div>
                       <div className="px-4 py-2">
-                        <p className="text-scale-1000">
+                        <p className="text-foreground-light">
                           Allow database restorations to any time up to{' '}
                           {option.identifier.split('_')[1]} days ago
                         </p>
@@ -298,7 +298,7 @@ const PITRSidePanel = () => {
                           <p className="text-foreground text-sm">
                             ${option.price.toLocaleString()}
                           </p>
-                          <p className="text-scale-1000 translate-y-[1px]"> / month</p>
+                          <p className="text-foreground-light translate-y-[1px]"> / month</p>
                         </div>
                       </div>
                     </div>

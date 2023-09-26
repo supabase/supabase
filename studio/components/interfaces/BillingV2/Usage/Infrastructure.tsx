@@ -141,12 +141,12 @@ const Infrastructure = ({
 
                     {currentComputeInstanceSpecs.baseline_disk_io_mbs ===
                     currentComputeInstanceSpecs.max_disk_io_mbs ? (
-                      <p className="text-sm text-scale-1000">
+                      <p className="text-sm text-foreground-light">
                         Your current compute can has a baseline and maximum disk throughput of{' '}
                         {currentComputeInstanceSpecs.max_disk_io_mbs?.toLocaleString()} Mbps.
                       </p>
                     ) : (
-                      <p className="text-sm text-scale-1000">
+                      <p className="text-sm text-foreground-light">
                         Your current compute can burst up to{' '}
                         {currentComputeInstanceSpecs.max_disk_io_mbs?.toLocaleString()} Mbps for 30
                         minutes a day and reverts to the baseline performance of{' '}
@@ -157,17 +157,19 @@ const Infrastructure = ({
                   <div>
                     <p className="text-sm mb-2">Overview</p>
                     <div className="flex items-center justify-between border-b py-1">
-                      <p className="text-xs text-scale-1000">Current compute instance</p>
+                      <p className="text-xs text-foreground-light">Current compute instance</p>
                       <p className="text-xs">{computeInstance?.variant?.name ?? 'Micro'}</p>
                     </div>
                     <div className="flex items-center justify-between border-b py-1">
-                      <p className="text-xs text-scale-1000">Maximum IO Bandwidth (burst limit)</p>
+                      <p className="text-xs text-foreground-light">
+                        Maximum IO Bandwidth (burst limit)
+                      </p>
                       <p className="text-xs">
                         {currentComputeInstanceSpecs.max_disk_io_mbs?.toLocaleString()} Mbps
                       </p>
                     </div>
                     <div className="flex items-center justify-between border-b py-1">
-                      <p className="text-xs text-scale-1000">Baseline IO Bandwidth</p>
+                      <p className="text-xs text-foreground-light">Baseline IO Bandwidth</p>
                       <p className="text-xs">
                         {currentComputeInstanceSpecs.baseline_disk_io_mbs?.toLocaleString()} Mbps
                       </p>
@@ -175,7 +177,7 @@ const Infrastructure = ({
                     {currentComputeInstanceSpecs.max_disk_io_mbs !==
                       currentComputeInstanceSpecs?.baseline_disk_io_mbs && (
                       <div className="flex items-center justify-between py-1">
-                        <p className="text-xs text-scale-1000">Daily burst time limit</p>
+                        <p className="text-xs text-foreground-light">Daily burst time limit</p>
                         <p className="text-xs">30 mins</p>
                       </div>
                     )}
@@ -213,7 +215,7 @@ const Infrastructure = ({
                 </div>
 
                 {attribute.key === 'ram_usage' && (
-                  <div className="text-sm text-scale-1000">
+                  <div className="text-sm text-foreground-light">
                     <p>
                       Your compute instance has {currentComputeInstanceSpecs.memory_gb} GB of
                       memory.
@@ -228,13 +230,13 @@ const Infrastructure = ({
                 )}
 
                 {attribute.key === 'max_cpu_usage' && (
-                  <p className="text-sm text-scale-1000">
+                  <p className="text-sm text-foreground-light">
                     Your compute instance has {currentComputeInstanceSpecs.cpu_cores} CPU cores.
                   </p>
                 )}
 
                 {attribute.chartDescription.split('\n').map((paragraph, idx) => (
-                  <p key={`para-${idx}`} className="text-sm text-scale-1000">
+                  <p key={`para-${idx}`} className="text-sm text-foreground-light">
                     {paragraph}
                   </p>
                 ))}
@@ -261,7 +263,9 @@ const Infrastructure = ({
                     <div className="flex flex-col items-center justify-center space-y-2">
                       <IconBarChart2 className="text-foreground-light mb-2" />
                       <p className="text-sm">No data in period</p>
-                      <p className="text-sm text-scale-1000">May take a few minutes to show</p>
+                      <p className="text-sm text-foreground-light">
+                        May take a few minutes to show
+                      </p>
                     </div>
                   </Panel.Content>
                 </Panel>

@@ -23,7 +23,7 @@ const SignUpPage: NextPageWithLayout = () => {
       </div>
 
       <div className="my-8 self-center text-sm">
-        <span className="text-scale-1000">Have an account?</span>{' '}
+        <span className="text-foreground-light">Have an account?</span>{' '}
         <Link href="/sign-in">
           <a className="underline text-foreground hover:text-foreground-light transition">
             Sign In Now

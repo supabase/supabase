@@ -225,7 +225,7 @@ const TransferProjectButton = () => {
                   </Listbox>
                 )}
 
-                <p className="text-scale-1000 text-sm">
+                <p className="text-foreground-light text-sm">
                   The target organization needs to use{' '}
                   <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
                     <a target="_blank" rel="noreferrer" className="underline">

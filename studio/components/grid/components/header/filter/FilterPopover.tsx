@@ -32,7 +32,7 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
         asChild
         type={(filters || []).length > 0 ? 'link' : 'text'}
         icon={
-          <div className="text-scale-1000">
+          <div className="text-foreground-light">
             <IconFilter strokeWidth={1.5} />
           </div>
         }

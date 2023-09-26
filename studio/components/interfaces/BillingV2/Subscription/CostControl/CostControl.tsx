@@ -33,7 +33,7 @@ const CostControl = ({}: CostControlProps) => {
             <div className="space-y-6">
               <div>
                 <p className="text-base">Cost Control</p>
-                <p className="text-sm text-scale-1000">
+                <p className="text-sm text-foreground-light">
                   Control whether to use beyond your plans included quota
                 </p>
               </div>
@@ -79,7 +79,7 @@ const CostControl = ({}: CostControlProps) => {
                 is exceeded will you be charged for any additional usage.
               </Alert>
             ) : (
-              <p className="text-sm text-scale-1000">
+              <p className="text-sm text-foreground-light">
                 You can control whether your project is charged for additional usage beyond the{' '}
                 <Link href="#breakdown">
                   <a className="text-sm text-green-900 transition hover:text-green-1000">
@@ -110,7 +110,7 @@ const CostControl = ({}: CostControlProps) => {
                 <p className="mb-1">
                   Spend cap is {isUsageBillingEnabled ? 'disabled' : 'enabled'}
                 </p>
-                <p className="text-sm text-scale-1000">
+                <p className="text-sm text-foreground-light">
                   {isUsageBillingEnabled ? (
                     <span>You will be charged for any usage above the included quota.</span>
                   ) : (
@@ -121,7 +121,7 @@ const CostControl = ({}: CostControlProps) => {
                   )}
                 </p>
                 {isUsageBillingEnabled && (
-                  <p className="text-sm text-scale-1000 mt-1">
+                  <p className="text-sm text-foreground-light mt-1">
                     Your project will never become unresponsive. Only when your usage reaches the
                     quota limit will you be charged for any excess usage.
                   </p>

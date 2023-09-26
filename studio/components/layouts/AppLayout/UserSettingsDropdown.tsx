@@ -51,7 +51,7 @@ const UserSettingsDropdown = () => {
             <p className="text-sm text-foreground">
               {profile?.first_name} {profile?.last_name}
             </p>
-            <p className="text-sm text-scale-1000 truncate">{profile?.primary_email}</p>
+            <p className="text-sm text-foreground-light truncate">{profile?.primary_email}</p>
           </div>
 
           <DropdownMenuSeparator_Shadcn_ />

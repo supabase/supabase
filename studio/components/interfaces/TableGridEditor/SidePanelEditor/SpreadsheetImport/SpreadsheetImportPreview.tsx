@@ -84,7 +84,7 @@ const SpreadsheetImportPreview = ({
       <Collapsible.Content>
         <SidePanel.Content>
           <div className="mb-4">
-            <p className="text-sm text-scale-1000">
+            <p className="text-sm text-foreground-light">
               {selectedTable === undefined
                 ? `Your table will have ${spreadsheetData.rowCount.toLocaleString()} rows and the
                         following ${spreadsheetData.headers.length} columns.`
@@ -92,7 +92,7 @@ const SpreadsheetImportPreview = ({
                     selectedTable.name
                   }"`}
             </p>
-            <p className="text-sm text-scale-1000">
+            <p className="text-sm text-foreground-light">
               Here is a preview of the data that will be added (up to the first 20 columns and first
               20 rows).
             </p>
@@ -102,8 +102,8 @@ const SpreadsheetImportPreview = ({
               <SpreadsheetPreviewGrid height={350} headers={previewHeaders} rows={previewRows} />
             ) : (
               <div className="flex items-center justify-center py-4 border border-scale-600 rounded-md space-x-2">
-                <IconAlertCircle size={16} strokeWidth={1.5} className="text-scale-1000" />
-                <p className="text-sm text-scale-1000">
+                <IconAlertCircle size={16} strokeWidth={1.5} className="text-foreground-light" />
+                <p className="text-sm text-foreground-light">
                   {previewHeaders.length === 0
                     ? 'No headers have been selected'
                     : previewRows.length === 0
@@ -118,7 +118,7 @@ const SpreadsheetImportPreview = ({
               <div className="flex flex-col space-y-1">
                 <p className="text-sm">Issues found in spreadsheet</p>
                 {isCompatible && (
-                  <p className="text-sm text-scale-1000">
+                  <p className="text-sm text-foreground-light">
                     {selectedTable !== undefined
                       ? 'This CSV can still be imported into your table despite issues in the following rows.'
                       : 'Your table can still be created nonetheless despite issues in the following rows.'}

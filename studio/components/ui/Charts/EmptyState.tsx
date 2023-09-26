@@ -20,7 +20,7 @@ const EmptyState = ({
     <IconBarChart2 className="text-foreground-light" />
     <div>
       <p className="text-xs text-foreground-light">{title}</p>
-      <p className="text-xs text-scale-1000">{message}</p>
+      <p className="text-xs text-foreground-light">{message}</p>
     </div>
   </div>
 )

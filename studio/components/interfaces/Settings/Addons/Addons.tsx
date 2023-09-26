@@ -85,7 +85,7 @@ const Addons = () => {
         <div className="mx-auto flex flex-col gap-10 py-6">
           <div>
             <p className="text-xl">Add ons</p>
-            <p className="text-sm text-scale-1000">Level up your project with add-ons</p>
+            <p className="text-sm text-foreground-light">Level up your project with add-ons</p>
           </div>
         </div>
       </ScaffoldContainer>
@@ -184,7 +184,7 @@ const Addons = () => {
                     </div>
                   </div>
                   <div className="flex-grow">
-                    <p className="text-sm text-scale-1000">Current option:</p>
+                    <p className="text-sm text-foreground-light">Current option:</p>
                     <p className="">{computeInstance?.variant.name ?? 'Micro'}</p>
                     <ProjectUpdateDisabledTooltip
                       projectUpdateDisabled={projectUpdateDisabled}
@@ -277,13 +277,13 @@ const Addons = () => {
                       </p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
-                      <p className="text-sm text-scale-1000">No. of direct connections</p>
+                      <p className="text-sm text-foreground-light">No. of direct connections</p>
                       <p className="text-sm">
                         {computeInstance?.variant?.meta?.connections_direct ?? 60}
                       </p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
-                      <p className="text-sm text-scale-1000">No. of pooler connections</p>
+                      <p className="text-sm text-foreground-light">No. of pooler connections</p>
                       <p className="text-sm">
                         {computeInstance?.variant?.meta?.connections_pooler ?? 200}
                       </p>
@@ -375,7 +375,7 @@ const Addons = () => {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-scale-1000">Current option:</p>
+                    <p className="text-sm text-foreground-light">Current option:</p>
                     <p className="">
                       {pitr !== undefined
                         ? `Point in time recovery of ${pitr.variant.meta?.backup_duration_days} days is enabled`
@@ -465,7 +465,7 @@ const Addons = () => {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-scale-1000">Current option:</p>
+                    <p className="text-sm text-foreground-light">Current option:</p>
                     <p className="">
                       {customDomain !== undefined
                         ? 'Custom domain is enabled'

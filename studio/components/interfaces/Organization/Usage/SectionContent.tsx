@@ -30,7 +30,7 @@ const SectionContent = ({
                   </div>
                   <div className="grid gap-4">
                     {description.split('\n').map((value, idx) => (
-                      <p key={`desc-${idx}`} className="text-sm text-scale-1000 pr-8">
+                      <p key={`desc-${idx}`} className="text-sm text-foreground-light pr-8">
                         {value}
                       </p>
                     ))}

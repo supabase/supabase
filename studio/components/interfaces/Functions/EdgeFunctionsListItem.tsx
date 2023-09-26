@@ -86,7 +86,7 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger>
             <div className="flex items-center space-x-2">
-              <p className="text-sm text-scale-1000">{dayjs(item.updated_at).fromNow()}</p>
+              <p className="text-sm text-foreground-light">{dayjs(item.updated_at).fromNow()}</p>
             </div>
           </Tooltip.Trigger>
           <Tooltip.Portal>

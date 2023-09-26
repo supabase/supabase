@@ -43,7 +43,7 @@ const SpreadSheetFileUpload = ({
           <span className="text-code">-</span>) or underscores (<span className="text-code">_</span>
           ).
         </p>
-        <p className="text-sm text-scale-1000">
+        <p className="text-sm text-foreground-light">
           Tip: Datetime columns should be formatted as YYYY-MM-DD HH:mm:ss
         </p>
       </div>

@@ -118,7 +118,11 @@ const FeedbackWidget = ({
           pathname: router.asPath,
         })
         setFeedback('')
-        ui.setNotification({ category: 'success', message: 'Feedback sent. Thank you!\n\nPlease be aware that we do not provide responses to feedback. If you require assistance or a reply, consider submitting a support ticket.' })
+        ui.setNotification({
+          category: 'success',
+          message:
+            'Feedback sent. Thank you!\n\nPlease be aware that we do not provide responses to feedback. If you require assistance or a reply, consider submitting a support ticket.',
+        })
       } finally {
         setSending(false)
       }
@@ -216,7 +220,7 @@ const FeedbackWidget = ({
             </Button>
           </div>
         </div>
-        <p className="text-xs text-scale-1000">
+        <p className="text-xs text-foreground-light">
           Have a technical issue? Contact{' '}
           <Link href="/support/new">
             <a>

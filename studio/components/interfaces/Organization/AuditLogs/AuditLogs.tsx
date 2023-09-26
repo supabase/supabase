@@ -294,7 +294,9 @@ const AuditLogs = () => {
                               <div>
                                 <p className="text-foreground-light">{user?.username ?? '-'}</p>
                                 {role && (
-                                  <p className="mt-0.5 text-xs text-scale-1000">{role?.name}</p>
+                                  <p className="mt-0.5 text-xs text-foreground-light">
+                                    {role?.name}
+                                  </p>
                                 )}
                               </div>
                             </div>
@@ -324,7 +326,7 @@ const AuditLogs = () => {
                               {project?.name ?? organization?.name ?? 'Unknown'}
                             </p>
                             <p
-                              className="text-scale-1000 text-xs mt-0.5 truncate"
+                              className="text-foreground-light text-xs mt-0.5 truncate"
                               title={
                                 log.target.metadata.project_ref ?? log.target.metadata.org_slug
                               }

@@ -16,7 +16,7 @@ const ClientLoadingError = ({
         <IconAlertCircle strokeWidth={1.5} className="text-foreground-light" />
         <div className="space-y-1">
           <p className="text-sm text-foreground">{description}</p>
-          <p className="text-sm text-scale-1000">
+          <p className="text-sm text-foreground-light">
             Try refreshing your browser. However, if this issue persists, please reach out to us via
             support.
           </p>

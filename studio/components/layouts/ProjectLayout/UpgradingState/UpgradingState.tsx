@@ -189,7 +189,7 @@ const UpgradingState = () => {
                                   ? 'text-foreground'
                                   : isCompleted
                                   ? 'text-foreground-light'
-                                  : 'text-scale-1000'
+                                  : 'text-foreground-light'
                               } hover:text-foreground transition`}
                             >
                               {isCurrent
@@ -207,7 +207,7 @@ const UpgradingState = () => {
                   {initiated_at !== undefined && (
                     <Tooltip.Root delayDuration={0}>
                       <Tooltip.Trigger className="w-full">
-                        <p className="text-sm text-center text-scale-1000">
+                        <p className="text-sm text-center text-foreground-light">
                           Started on: {initiatedAtUTC} (UTC)
                         </p>
                       </Tooltip.Trigger>

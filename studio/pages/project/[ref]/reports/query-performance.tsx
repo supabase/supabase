@@ -66,7 +66,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     indexHitRate && tableHitRate && (indexHitRate <= 0.99 || tableHitRate <= 0.99)
 
   const headerText = (
-    <p className="whitespace-pre-wrap prose text-sm max-w-2xl text-scale-1000">
+    <p className="whitespace-pre-wrap prose text-sm max-w-2xl text-foreground-light">
       Identify the queries that consume the most time and database resources.
       {'\n\n'}It relies on the <code>pg_stat_statements</code> table. Read more about{' '}
       <Link
@@ -96,7 +96,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   Look for queries with high or mean execution times. These are often good candidates for optimization.
 `
   const panelClassNames = 'text-sm max-w-none flex flex-col gap-8 py-4'
-  const helperTextClassNames = 'prose text-sm max-w-2xl text-scale-1000'
+  const helperTextClassNames = 'prose text-sm max-w-2xl text-foreground-light'
 
   return (
     <ReportPadding>

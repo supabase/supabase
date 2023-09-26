@@ -140,7 +140,7 @@ const Subscription = () => {
                     )
                   }
                 >
-                  <div className="text-sm text-scale-1000 mr-2">
+                  <div className="text-sm text-foreground-light mr-2">
                     When this organization exceeds its{' '}
                     <Link href="#breakdown">
                       <a className="text-sm text-green-900 transition hover:text-green-1000">
@@ -172,7 +172,7 @@ const Subscription = () => {
                   'MMM DD'
                 )} - ${billingCycleEnd.format('MMM DD')})`}
                 bgClass="bg-gray-300 dark:bg-gray-600"
-                labelBottomClass="!text-scale-1000 pb-1"
+                labelBottomClass="!text-foreground-light pb-1"
                 labelTop={`${daysToCycleEnd} days remaining`}
               />
             </div>

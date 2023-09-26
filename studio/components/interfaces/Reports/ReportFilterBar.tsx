@@ -175,7 +175,7 @@ const ReportFilterBar = ({
                     >
                       {productFilter.label}
                     </p>
-                    <p className=" text-left text-scale-1000 inline-block w-[180px]">
+                    <p className=" text-left text-foreground-light inline-block w-[180px]">
                       {productFilter.description}
                     </p>
                   </Dropdown.Item>

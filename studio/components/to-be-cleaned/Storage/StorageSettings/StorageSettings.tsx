@@ -187,7 +187,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
                   <div className="flex justify-between px-8 py-4">
                     <div className="flex items-center justify-between w-full gap-2">
                       {!canUpdateStorageSettings ? (
-                        <p className="text-sm text-scale-1000">
+                        <p className="text-sm text-foreground-light">
                           You need additional permissions to update storage settings
                         </p>
                       ) : (

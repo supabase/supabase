@@ -11,7 +11,7 @@ const SignInSSOPage: NextPageWithLayout = () => {
 
       <div className="my-8 self-center text-sm">
         <div>
-          <span className="text-scale-1000">Interested in SSO?</span>{' '}
+          <span className="text-foreground-light">Interested in SSO?</span>{' '}
           <a
             href="https://supabase.com/contact/enterprise"
             rel="noopener noreferrer"

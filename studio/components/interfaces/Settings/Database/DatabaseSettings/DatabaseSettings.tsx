@@ -18,7 +18,7 @@ const DatabaseSettings = () => {
   if (isError) {
     return (
       <div className="mx-auto p-6 text-center sm:w-full md:w-3/4">
-        <p className="text-scale-1000">Error loading database settings</p>
+        <p className="text-foreground-light">Error loading database settings</p>
       </div>
     )
   }

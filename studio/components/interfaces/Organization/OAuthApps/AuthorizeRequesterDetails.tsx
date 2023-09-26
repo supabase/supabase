@@ -15,7 +15,7 @@ const AuthorizeRequesterDetails = ({ icon, name, domain }: AuthorizeRequesterDet
               backgroundImage: icon !== null ? `url('${icon}')` : 'none',
             }}
           >
-            {icon === null && <p className="text-scale-1000 text-lg">{name[0]}</p>}
+            {icon === null && <p className="text-foreground-light text-lg">{name[0]}</p>}
           </div>
         </div>
       </div>

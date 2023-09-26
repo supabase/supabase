@@ -152,7 +152,7 @@ const General = () => {
                     <IconBarChart2 strokeWidth={2} />
                     <div>
                       <p className="text-sm">Project usage statistics has been moved</p>
-                      <p className="text-scale-1000 text-sm">
+                      <p className="text-foreground-light text-sm">
                         You may view your project's usage under your organization's settings
                       </p>
                     </div>

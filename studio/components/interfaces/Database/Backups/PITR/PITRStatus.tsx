@@ -51,7 +51,7 @@ const PITRStatus = ({
           <div className="flex items-center justify-between p-6">
             <div className="flex items-center space-x-4">
               <IconAlertCircle className="text-foreground-light" size={18} strokeWidth={1.5} />
-              <span className="text-scale-1000 text-sm">
+              <span className="text-foreground-light text-sm">
                 You'll be able to pick the right date and time when you begin
               </span>
             </div>

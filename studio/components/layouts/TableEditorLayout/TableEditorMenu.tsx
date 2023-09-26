@@ -306,7 +306,7 @@ const TableEditorMenu = () => {
         {isLoading ? (
           <div className="mx-4 flex items-center space-x-2">
             <IconLoader className="animate-spin" size={14} strokeWidth={1.5} />
-            <p className="text-sm text-scale-1000">Loading entities...</p>
+            <p className="text-sm text-foreground-light">Loading entities...</p>
           </div>
         ) : searchText.length === 0 && (entityTypes?.length ?? 0) === 0 ? (
           <div className="mx-4 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">

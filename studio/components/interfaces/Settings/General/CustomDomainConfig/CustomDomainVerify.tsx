@@ -180,12 +180,12 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
         )}
 
         <div className="!mt-4">
-          <p className="text-sm text-scale-1000">
+          <p className="text-sm text-foreground-light">
             One of the records requires you to{' '}
             <span className="text-foreground-light">replace</span> the CNAME record set up in the
             first step with a TXT record.
           </p>
-          <p className="text-sm text-scale-1000">
+          <p className="text-sm text-foreground-light">
             You'll be able to restore it back to the CNAME after the verification process has been
             completed.
           </p>

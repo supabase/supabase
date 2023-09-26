@@ -153,7 +153,7 @@ const PaymentMethodSelection = ({
               onClick={() => setShowAddNewPaymentMethodModal(true)}
             >
               <IconPlus size={16} />
-              <p className="transition text-scale-1000 group-hover:text-foreground">
+              <p className="transition text-foreground-light group-hover:text-foreground">
                 Add new payment method
               </p>
             </div>

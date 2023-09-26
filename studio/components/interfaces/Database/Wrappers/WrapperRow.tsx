@@ -93,7 +93,7 @@ const WrapperRow = ({
                     {visibleMetadata.map((metadata) => (
                       <div
                         key={metadata.name}
-                        className="flex items-center space-x-2 text-sm text-scale-1000"
+                        className="flex items-center space-x-2 text-sm text-foreground-light"
                       >
                         <p>{metadata.label}:</p>
                         <p>{serverOptions[metadata.name]}</p>
@@ -101,11 +101,11 @@ const WrapperRow = ({
                     ))}
                     {encryptedMetadata.map((metadata) => (
                       <div key={metadata.name} className="flex items-center space-x-2 text-sm">
-                        <p className="text-scale-1000">{metadata.label}:</p>
+                        <p className="text-foreground-light">{metadata.label}:</p>
                         <Link
                           href={`/project/${ref}/settings/vault/secrets?search=${wrapper.name}_${metadata.name}`}
                         >
-                          <a className="transition text-scale-1000 hover:text-foreground-light flex items-center space-x-2">
+                          <a className="transition text-foreground-light hover:text-foreground-light flex items-center space-x-2">
                             <span>Encrypted in Vault</span>
                             <IconExternalLink size={14} strokeWidth={1.5} />
                           </a>

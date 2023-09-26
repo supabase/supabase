@@ -198,11 +198,11 @@ const AddRestrictionModal = ({
                       </code>{' '}
                       will be restricted
                     </p>
-                    <p className="text-sm text-scale-1000">
+                    <p className="text-sm text-foreground-light">
                       Selected address space: <code className="text-xs">{addressRange.start}</code>{' '}
                       to <code className="text-xs">{addressRange.end}</code>{' '}
                     </p>
-                    <p className="text-sm text-scale-1000">
+                    <p className="text-sm text-foreground-light">
                       Number of addresses: {availableAddresses}
                     </p>
                   </div>
@@ -211,7 +211,7 @@ const AddRestrictionModal = ({
                 <Modal.Content>
                   <div className="pt-2 pb-4">
                     <div className="h-[68px] flex items-center">
-                      <p className="text-sm text-scale-1000">
+                      <p className="text-sm text-foreground-light">
                         A summary of your restriction will be shown here after entering a valid IP
                         address and CIDR block size
                       </p>

@@ -40,7 +40,7 @@ const ProjectCard = ({
         title={
           <div className="w-full justify-between space-y-1.5 px-6">
             <p className="flex-shrink truncate text-base">{name}</p>
-            <span className="text-sm lowercase text-scale-1000">{desc}</span>
+            <span className="text-sm lowercase text-foreground-light">{desc}</span>
             <div className="flex items-center space-x-1.5">
               {isVercelIntegrated && (
                 <div className="w-fit p-1 border rounded-md flex items-center border-scale-600">

@@ -127,7 +127,7 @@ const GeneralSettings = () => {
                             size={16}
                             className={clsx('transition-all', open ? 'rotate-90' : '')}
                           />
-                          <p className="text-sm text-scale-1000 underline">
+                          <p className="text-sm text-foreground-light underline">
                             Important information regarding opting in
                           </p>
                         </div>

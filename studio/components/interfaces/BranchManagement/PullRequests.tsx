@@ -96,7 +96,7 @@ const PullRequests = ({
             <BranchContainer>
               <div className="flex items-center flex-col justify-center w-full py-8">
                 <p>No pull requests made yet for this repository</p>
-                <p className="text-scale-1000">
+                <p className="text-foreground-light">
                   Only pull requests with the ./migration directory changes will show here.
                 </p>
                 {previewBranches.length > 0 && (
@@ -117,7 +117,7 @@ const PullRequests = ({
                     <div className="px-5 py-3 border-t flex items-center justify-between">
                       <div>
                         <p>Not sure what to do?</p>
-                        <p className="text-scale-1000">Browse our documentation</p>
+                        <p className="text-foreground-light">Browse our documentation</p>
                       </div>
                       <Button type="default" iconRight={<IconExternalLink />}>
                         Docs

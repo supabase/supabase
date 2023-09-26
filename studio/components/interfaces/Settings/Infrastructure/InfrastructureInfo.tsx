@@ -45,7 +45,7 @@ const InfrastructureInfo = () => {
         <div className="mx-auto flex flex-col gap-10 py-6">
           <div>
             <p className="text-xl">Infrastructure</p>
-            <p className="text-sm text-scale-1000">
+            <p className="text-sm text-foreground-light">
               General information regarding your server instance
             </p>
           </div>
@@ -56,7 +56,7 @@ const InfrastructureInfo = () => {
         <ScaffoldSection>
           <ScaffoldSectionDetail>
             <p>Configuration</p>
-            <p className="text-scale-1000 text-sm">Information on your server provider</p>
+            <p className="text-foreground-light text-sm">Information on your server provider</p>
           </ScaffoldSectionDetail>
           <ScaffoldSectionContent>
             <Input readOnly disabled value={project?.cloud_provider} label="Cloud provider" />
@@ -66,7 +66,9 @@ const InfrastructureInfo = () => {
         <ScaffoldSection className="!pt-0">
           <ScaffoldSectionDetail>
             <p>Service Versions</p>
-            <p className="text-scale-1000 text-sm">Information on your provisioned instance</p>
+            <p className="text-foreground-light text-sm">
+              Information on your provisioned instance
+            </p>
           </ScaffoldSectionDetail>
           <ScaffoldSectionContent>
             {isLoadingUpgradeEligibility && <GenericSkeletonLoader />}

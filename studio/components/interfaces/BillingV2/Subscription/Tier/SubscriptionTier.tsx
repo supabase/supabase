@@ -39,7 +39,7 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
         <div className="col-span-12 lg:col-span-5 space-y-6">
           <div className="sticky space-y-6 top-16">
             <p className="text-base">Subscription plan</p>
-            <div className="text-sm text-scale-1000">
+            <div className="text-sm text-foreground-light">
               To manage your billing address, emails or Tax ID, head to your{' '}
               <Link href={`/org/${orgSlug}/billing`}>
                 <a className="text-sm text-green-900 transition hover:text-green-1000">
@@ -130,7 +130,7 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
                   )
                 }
               >
-                <p className="text-sm text-scale-1000">
+                <p className="text-sm text-foreground-light">
                   When this project exceeds its{' '}
                   <Link href="#breakdown">
                     <a className="text-sm text-green-900 transition hover:text-green-1000">
@@ -161,7 +161,7 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
                 'MMM DD'
               )} - ${billingCycleEnd.format('MMM DD')})`}
               bgClass="bg-gray-300 dark:bg-gray-600"
-              labelBottomClass="!text-scale-1000 pb-1"
+              labelBottomClass="!text-foreground-light pb-1"
               labelTop={`${daysToCycleEnd} days remaining`}
             />
 

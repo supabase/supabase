@@ -10,8 +10,8 @@ import { getInvoice } from 'data/invoices/invoice-query'
 import { useProjectInvoicesCountQuery } from 'data/invoices/project-invoices-count-query'
 import { useProjectInvoicesQuery } from 'data/invoices/project-invoices-query'
 import { useStore } from 'hooks'
-import InvoiceStatusBadge from './InvoiceStatusBadge'
 import { InvoiceStatus } from './Invoices.types'
+import InvoiceStatusBadge from './InvoiceStatusBadge'
 
 const PAGE_LIMIT = 10
 
@@ -67,7 +67,7 @@ const Invoices = () => {
             invoices.length === 0 ? (
               <Table.tr>
                 <Table.td colSpan={6} className="p-3 py-12 text-center">
-                  <p className="text-scale-1000">No invoices for this project yet</p>
+                  <p className="text-foreground-light">No invoices for this project yet</p>
                 </Table.td>
               </Table.tr>
             ) : (

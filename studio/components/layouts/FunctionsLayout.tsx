@@ -87,7 +87,7 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
                     </Link>
                     {name && (
                       <div className="mt-1.5 flex items-center space-x-4">
-                        <span className="text-scale-1000">
+                        <span className="text-foreground-light">
                           <svg
                             viewBox="0 0 24 24"
                             width="16"

@@ -41,7 +41,7 @@ const DisplayApiSettings = () => {
       title={
         <div className="space-y-3">
           <h5 className="text-base">Project API keys</h5>
-          <p className="text-sm text-scale-1000">
+          <p className="text-sm text-foreground-light">
             Your API is secured behind an API gateway which requires an API Key for every request.
             <br />
             You can use the keys below in the Supabase client libraries.

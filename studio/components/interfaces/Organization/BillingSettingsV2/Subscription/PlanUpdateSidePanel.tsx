@@ -178,7 +178,7 @@ const PlanUpdateSidePanel = () => {
                     <div className="flex items-center space-x-2">
                       <p className={clsx('text-brand text-sm uppercase')}>{plan.name}</p>
                       {isCurrentPlan ? (
-                        <div className="text-xs bg-scale-500 text-scale-1000 rounded px-2 py-0.5">
+                        <div className="text-xs bg-scale-500 text-foreground-light rounded px-2 py-0.5">
                           Current plan
                         </div>
                       ) : plan.nameBadge ? (
@@ -190,7 +190,7 @@ const PlanUpdateSidePanel = () => {
                       )}
                     </div>
                     <div className="mt-4 flex items-center space-x-1">
-                      {(price ?? 0) > 0 && <p className="text-scale-1000 text-sm">From</p>}
+                      {(price ?? 0) > 0 && <p className="text-foreground-light text-sm">From</p>}
                       {isLoadingPlans ? (
                         <div className="h-[28px] flex items-center justify-center">
                           <ShimmeringLoader className="w-[30px] h-[24px]" />
@@ -198,7 +198,7 @@ const PlanUpdateSidePanel = () => {
                       ) : (
                         <p className="text-foreground text-lg">${price}</p>
                       )}
-                      <p className="text-scale-1000 text-sm">{tierMeta?.costUnitOrg}</p>
+                      <p className="text-foreground-light text-sm">{tierMeta?.costUnitOrg}</p>
                     </div>
                     <div className={clsx('flex mt-1 mb-4', !tierMeta?.warning && 'opacity-0')}>
                       <div className="bg-scale-200 text-brand-600 border shadow-sm rounded-md bg-opacity-30 py-0.5 px-2 text-xs">
@@ -282,7 +282,7 @@ const PlanUpdateSidePanel = () => {
 
                   {plan.footer && (
                     <div className="border-t pt-4 mt-4">
-                      <p className="text-scale-1000 text-xs">{plan.footer}</p>
+                      <p className="text-foreground-light text-xs">{plan.footer}</p>
                     </div>
                   )}
                 </div>

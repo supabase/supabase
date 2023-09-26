@@ -209,7 +209,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                           </div>
                           {IS_PLATFORM && (
                             <div className="col-span-12">
-                              <p className="text-scale-1000 text-sm">
+                              <p className="text-foreground-light text-sm">
                                 Note: The{' '}
                                 <Link href={`/project/${ref}/settings/storage`}>
                                   <a className="text-brand opacity-80 hover:opacity-100 transition">

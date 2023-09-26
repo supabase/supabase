@@ -162,10 +162,10 @@ const NetworkRestrictions = ({}) => {
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
-                    <IconAlertCircle strokeWidth={1.5} className="text-scale-1000" />
+                    <IconAlertCircle strokeWidth={1.5} className="text-foreground-light" />
                     <p className="text-sm">Your network restrictions were not applied correctly</p>
                   </div>
-                  <p className="text-sm text-scale-1000">
+                  <p className="text-sm text-foreground-light">
                     Please try to add your network restrictions again
                   </p>
                 </div>
@@ -191,7 +191,7 @@ const NetworkRestrictions = ({}) => {
                     <p className="text-foreground-light text-sm">
                       Your database can be accessed by all IP addresses
                     </p>
-                    <p className="text-scale-1000 text-sm">
+                    <p className="text-foreground-light text-sm">
                       You may start limiting access to your database by adding a network
                       restriction.
                     </p>
@@ -213,11 +213,11 @@ const NetworkRestrictions = ({}) => {
                       Your database <span className="text-amber-900 opacity-80">cannot</span> be
                       accessed externally
                     </p>
-                    <p className="text-scale-1000 text-sm">
+                    <p className="text-foreground-light text-sm">
                       All external IP addresses have been disallowed from accessing your project's
                       database.
                     </p>
-                    <p className="text-scale-1000 text-sm">
+                    <p className="text-foreground-light text-sm">
                       Note: Restrictions only apply to your database, and not to Supabase services
                     </p>
                   </div>
@@ -236,11 +236,11 @@ const NetworkRestrictions = ({}) => {
                     <p className="text-foreground-light text-sm">
                       Only the following IP addresses have access to your database
                     </p>
-                    <p className="text-scale-1000 text-sm">
+                    <p className="text-foreground-light text-sm">
                       You may remove all of them to allow all IP addresses to have access to your
                       database
                     </p>
-                    <p className="text-scale-1000 text-sm">
+                    <p className="text-foreground-light text-sm">
                       Note: Restrictions only apply to your database, and not to Supabase services
                     </p>
                   </div>
@@ -259,7 +259,7 @@ const NetworkRestrictions = ({}) => {
                   return (
                     <div key={ip} className="px-8 py-4 flex items-center justify-between">
                       <div className="flex items-center space-x-5">
-                        <IconGlobe size={16} className="text-scale-1000" />
+                        <IconGlobe size={16} className="text-foreground-light" />
                         <p className="text-sm font-mono">{ip}</p>
                       </div>
                       <Button type="default" onClick={() => setSelectedRestrictionToRemove(ip)}>

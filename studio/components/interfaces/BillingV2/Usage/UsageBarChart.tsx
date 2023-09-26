@@ -64,11 +64,11 @@ const UsageBarChart = ({
 
                 return (
                   <div className="w-[170px] border bg-scale-300 rounded-md px-2 py-2">
-                    <p className="text-xs text-scale-1000">
+                    <p className="text-xs text-foreground-light">
                       {attribute === 'disk_io_budget' ? `Remaining IO budget:` : `${name}:`}
                     </p>
                     {dataPeriod.startOf('day').isAfter(dayjs().startOf('day')) ? (
-                      <p className="text-scale-1000 text-lg">No data yet</p>
+                      <p className="text-foreground-light text-lg">No data yet</p>
                     ) : (
                       <p className="text-xl">
                         {tooltipFormatter !== undefined ? tooltipFormatter(value) : value}

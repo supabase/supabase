@@ -164,7 +164,7 @@ const UsageSection = ({
                     )}
                     <div>
                       <div className="flex items-center justify-between border-b py-1">
-                        <p className="text-xs text-scale-1000">
+                        <p className="text-xs text-foreground-light">
                           Included in {subscription?.plan?.name.toLowerCase()} plan
                         </p>
                         {usageMeta?.limit === -1 ? (
@@ -181,7 +181,7 @@ const UsageSection = ({
                       </div>
                       {currentBillingCycleSelected && (
                         <div className="flex items-center justify-between py-1">
-                          <p className="text-xs text-scale-1000">
+                          <p className="text-xs text-foreground-light">
                             {attribute.chartPrefix || 'Used '}in period
                           </p>
                           <p className="text-xs">
@@ -193,7 +193,7 @@ const UsageSection = ({
                       )}
                       {currentBillingCycleSelected && usageMeta?.limit > 0 && (
                         <div className="flex items-center justify-between border-t py-1">
-                          <p className="text-xs text-scale-1000">Overage in period</p>
+                          <p className="text-xs text-foreground-light">Overage in period</p>
                           <p className="text-xs">
                             {(usageMeta?.limit ?? 0) === -1 || usageExcess < 0
                               ? 0
@@ -214,7 +214,7 @@ const UsageSection = ({
                       {attribute.name} per day
                     </p>
                     {attribute.chartDescription.split('\n').map((paragraph, idx) => (
-                      <p key={`para-${idx}`} className="text-sm text-scale-1000">
+                      <p key={`para-${idx}`} className="text-sm text-foreground-light">
                         {paragraph}
                       </p>
                     ))}
@@ -243,7 +243,9 @@ const UsageSection = ({
                         <div className="flex flex-col items-center justify-center">
                           <IconBarChart2 className="text-foreground-light mb-2" />
                           <p className="text-sm">No data in period</p>
-                          <p className="text-sm text-scale-1000">May take up to 24 hours to show</p>
+                          <p className="text-sm text-foreground-light">
+                            May take up to 24 hours to show
+                          </p>
                         </div>
                       </Panel.Content>
                     </Panel>

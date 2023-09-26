@@ -130,7 +130,7 @@ const SchemaFunctionGroup = observer(({ schema, selectFunction }: SchemaFunction
   return (
     <div className="space-y-4">
       <div className="sticky top-0 flex items-center space-x-1 px-6 backdrop-blur backdrop-filter">
-        <h5 className="text-scale-1000">schema</h5>
+        <h5 className="text-foreground-light">schema</h5>
         <h5>{schema}</h5>
       </div>
       <div className="space-y-0 divide-y border-t border-b dark:divide-dark dark:border-dark">

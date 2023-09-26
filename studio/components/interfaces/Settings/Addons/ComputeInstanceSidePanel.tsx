@@ -241,7 +241,7 @@ const ComputeInstanceSidePanel = () => {
                       <p
                         className={clsx(
                           'text-sm transition',
-                          isSelected ? 'text-foreground' : 'text-scale-1000'
+                          isSelected ? 'text-foreground' : 'text-foreground-light'
                         )}
                       >
                         {option.name}
@@ -299,8 +299,10 @@ const ComputeInstanceSidePanel = () => {
                           <p className="text-sm">{option.name}</p>
                         </div>
                         <div className="px-4 py-2">
-                          <p className="text-scale-1000">{option.meta?.memory_gb ?? 0} GB memory</p>
-                          <p className="text-scale-1000">
+                          <p className="text-foreground-light">
+                            {option.meta?.memory_gb ?? 0} GB memory
+                          </p>
+                          <p className="text-foreground-light">
                             {option.meta?.cpu_cores ?? 0}-core {cpuArchitecture} CPU (
                             {option.meta?.cpu_dedicated ? 'Dedicated' : 'Shared'})
                           </p>
@@ -309,7 +311,7 @@ const ComputeInstanceSidePanel = () => {
                               <span className="text-foreground text-sm">
                                 ${option.price.toLocaleString()}
                               </span>
-                              <span className="text-scale-1000 translate-y-[1px]">
+                              <span className="text-foreground-light translate-y-[1px]">
                                 {' '}
                                 / {option.price_interval === 'monthly' ? 'month' : 'hour'}
                               </span>
@@ -321,7 +323,7 @@ const ComputeInstanceSidePanel = () => {
                                     <IconInfo
                                       size={14}
                                       strokeWidth={2}
-                                      className="hover:text-scale-1000"
+                                      className="hover:text-foreground-light"
                                     />
                                   </div>
                                 </Tooltip.Trigger>

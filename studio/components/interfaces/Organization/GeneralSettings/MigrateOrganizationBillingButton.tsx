@@ -268,7 +268,7 @@ const MigrateOrganizationBillingButton = observer(() => {
 
             {tier !== '' && tier !== 'FREE' && (
               <div className="my-2 space-y-1 pb-4">
-                <p className="text-sm text-scale-1000">
+                <p className="text-sm text-foreground-light">
                   Paid plans come with one compute instance included. Additional projects will at
                   least cost the compute instance hours used (min $10/month). See{' '}
                   <Link href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute">
@@ -310,7 +310,7 @@ const MigrateOrganizationBillingButton = observer(() => {
                   </div>
 
                   <div className="col-span-12">
-                    <p className="text-sm text-scale-1000">
+                    <p className="text-sm text-foreground-light">
                       When enabled, usage is limited to the plan's quota, with restrictions when
                       limits are exceeded. When disabled, you scale beyond Pro limits without
                       restrictions and pay for over-usage beyond the quota.
@@ -412,16 +412,16 @@ const MigrateOrganizationBillingButton = observer(() => {
                     <table className="w-full">
                       <thead>
                         <tr className="border-b">
-                          <th className="py-2 font-normal text-left text-sm text-scale-1000 w-1/2">
+                          <th className="py-2 font-normal text-left text-sm text-foreground-light w-1/2">
                             Item
                           </th>
-                          <th className="py-2 font-normal text-left text-sm text-scale-1000">
+                          <th className="py-2 font-normal text-left text-sm text-foreground-light">
                             Count
                           </th>
-                          <th className="py-2 font-normal text-left text-sm text-scale-1000">
+                          <th className="py-2 font-normal text-left text-sm text-foreground-light">
                             Unit price
                           </th>
-                          <th className="py-2 font-normal text-right text-sm text-scale-1000">
+                          <th className="py-2 font-normal text-right text-sm text-foreground-light">
                             Price
                           </th>
                         </tr>

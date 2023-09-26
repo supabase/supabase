@@ -261,7 +261,7 @@ const SpendCapSidePanel = () => {
                       className={clsx(
                         'text-sm transition',
                         !isFreePlan && 'group-hover:text-foreground',
-                        isSelected ? 'text-foreground' : 'text-scale-1000'
+                        isSelected ? 'text-foreground' : 'text-foreground-light'
                       )}
                     >
                       {option.name}

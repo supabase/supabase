@@ -221,7 +221,7 @@ const PITRSelection = () => {
                   />
                   <div className="flex items-center space-x-2">
                     <div className="border w-4 h-4 border-scale-800 bg-brand-600" />
-                    <p className="text-xs text-scale-1000">Point in time back up available</p>
+                    <p className="text-xs text-foreground-light">Point in time back up available</p>
                   </div>
                 </div>
 
@@ -284,7 +284,7 @@ const PITRSelection = () => {
                             />
                           </div>
 
-                          <p className="text-sm text-scale-1000 mt-8">
+                          <p className="text-sm text-foreground-light mt-8">
                             Enter a time within the available range to restore from. <br /> Backups
                             are captured every 2 minutes, allowing you to enter a time and restore
                             your database to the closest backup point. We'll match the time you
@@ -294,13 +294,13 @@ const PITRSelection = () => {
                         <div className="!mt-4 space-y-1">
                           <h3 className="text-sm text-foreground-light"></h3>
                           {isSelectedOnEarliestDay && (
-                            <p className="text-sm text-scale-1000">
+                            <p className="text-sm text-foreground-light">
                               <strong>Earliest backup available for this date</strong>:{' '}
                               {earliestAvailableBackup.format('HH:mm:ss')}
                             </p>
                           )}
                           {isSelectedOnLatestDay && (
-                            <p className="text-sm text-scale-1000">
+                            <p className="text-sm text-foreground-light">
                               <strong>Latest backup available for this date</strong>:{' '}
                               {latestAvailableBackup.format('HH:mm:ss')}
                             </p>

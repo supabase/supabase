@@ -92,7 +92,7 @@ const WrappersDisabledState = () => {
                   <p className="text-foreground-light text-sm">
                     Wrappers is not available for this project yet.
                   </p>
-                  <p className="text-scale-1000 text-sm">
+                  <p className="text-foreground-light text-sm">
                     Do reach out to us if you're interested!
                   </p>
                 </div>

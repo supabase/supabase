@@ -595,7 +595,7 @@ const ListboxTable = observer(({}) => {
             )}
           >
             <div className="flex flex-row items-center space-x-1">
-              <p className="text-sm text-scale-1000">{x.schema}</p>
+              <p className="text-sm text-foreground-light">{x.schema}</p>
               <p className="text">{x.name}</p>
             </div>
           </Listbox.Option>
@@ -769,7 +769,7 @@ const FunctionWithArguments = observer(({}) => {
             <IconTerminal size="small" strokeWidth={2} width={14} />
           </div>
           <div className="flex items-center gap-2">
-            <p className="text-scale-1000">{_localState!.formState.functionName.value}</p>
+            <p className="text-foreground-light">{_localState!.formState.functionName.value}</p>
             <div>
               <Badge>{_localState!.formState.functionSchema.value}</Badge>
             </div>
