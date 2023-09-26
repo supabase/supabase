@@ -43,7 +43,9 @@ const EmptyState = ({}: EmptyStateProps) => {
           ctaButtonLabel={canCreateTables ? 'Create a new table' : undefined}
           onClickCta={canCreateTables ? snap.onAddTable : undefined}
         >
-          <p className="text-sm text-scale-1100">There are no tables available in this schema.</p>
+          <p className="text-sm text-foreground-light">
+            There are no tables available in this schema.
+          </p>
         </ProductEmptyState>
       ) : (
         <div className="flex flex-col items-center space-y-4">
@@ -52,7 +54,7 @@ const EmptyState = ({}: EmptyStateProps) => {
             ctaButtonLabel={canCreateTables ? 'Create a new table' : undefined}
             onClickCta={canCreateTables ? snap.onAddTable : undefined}
           >
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               Select a table from the navigation panel on the left to view its data
               {canCreateTables && ', or create a new one.'}
             </p>

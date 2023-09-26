@@ -12,6 +12,7 @@ import NoTableState from 'components/ui/States/NoTableState'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import {
   Badge,
   Button,
@@ -112,7 +113,7 @@ interface ICreateTriggerStore {
   setChooseFunctionFormVisible: (value: boolean) => void
   setDefaultSelectedTable: () => void
   setLoading: (value: boolean) => void
-  setTables: (value: Dictionary<any>[]) => void
+  setTables: (value: any[]) => void
   setTriggerFunctions: (value: Dictionary<any>[]) => void
   validateForm: () => boolean
 }
@@ -168,8 +169,10 @@ class CreateTriggerStore implements ICreateTriggerStore {
     this.isDirty = value
   }
 
-  setTables = (value: Dictionary<any>[]) => {
-    this.tables = value as any
+  setTables = (value: any[]) => {
+    this.tables = value
+      .sort((a, b) => a.schema.localeCompare(b.schema))
+      .filter((a) => !EXCLUDED_SCHEMAS.includes(a.schema)) as any
     this.setDefaultSelectedTable()
   }
 
@@ -261,7 +264,6 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
   const { ui, meta } = useStore()
   const [isClosingPanel, setIsClosingPanel] = useState(false)
   const _localState = useLocalObservable(() => new CreateTriggerStore())
-  _localState.meta = meta as any
 
   useTablesQuery(
     {
@@ -279,13 +281,13 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
 
   useEffect(() => {
     const fetchFunctions = async () => {
-      await (_localState.meta as any).functions.load()
-      const triggerFuncs = (_localState!.meta as any)!.functions.listTriggerFunctions()
+      await meta.functions.load()
+      const triggerFuncs = (meta as any)!.functions.listTriggerFunctions()
       _localState.setTriggerFunctions(triggerFuncs)
     }
 
-    fetchFunctions()
-  }, [])
+    if (ui.selectedProjectRef) fetchFunctions()
+  }, [ui.selectedProjectRef])
 
   useEffect(() => {
     _localState.setisDirty(false)
@@ -304,8 +306,8 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
 
         const body = _localState.formState.requestBody
         const response: any = _localState.isEditing
-          ? await (_localState.meta as any).triggers.update(body.id, body)
-          : await (_localState.meta as any).triggers.create(body)
+          ? await (meta as any).triggers.update(body.id, body)
+          : await (meta as any).triggers.create(body)
 
         if (response.error) {
           ui.setNotification({
@@ -402,7 +404,7 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
               }}
             >
               <Modal.Content>
-                <p className="py-4 text-sm text-scale-1100">
+                <p className="py-4 text-sm text-foreground-light">
                   There are unsaved changes. Are you sure you want to close the panel? Your changes
                   will be lost.
                 </p>
@@ -593,8 +595,8 @@ const ListboxTable = observer(({}) => {
             )}
           >
             <div className="flex flex-row items-center space-x-1">
-              <p>{x.name}</p>
-              <p className="text-sm text-scale-1000">{x.schema}</p>
+              <p className="text-sm text-foreground-light">{x.schema}</p>
+              <p className="text">{x.name}</p>
             </div>
           </Listbox.Option>
         )
@@ -767,7 +769,7 @@ const FunctionWithArguments = observer(({}) => {
             <IconTerminal size="small" strokeWidth={2} width={14} />
           </div>
           <div className="flex items-center gap-2">
-            <p className="text-scale-1000">{_localState!.formState.functionName.value}</p>
+            <p className="text-foreground-light">{_localState!.formState.functionName.value}</p>
             <div>
               <Badge>{_localState!.formState.functionSchema.value}</Badge>
             </div>

@@ -50,7 +50,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
         <>
           <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">
             <IconClock className="animate-bounce" />
-            <h3 className="text-lg text-scale-1200">No Recent Queries Yet</h3>
+            <h3 className="text-lg text-foreground">No Recent Queries Yet</h3>
             <p className="text-sm text-scale-900">
               Your recent queries run from the{' '}
               <Link href={`/project/${ref}/logs/explorer`}>

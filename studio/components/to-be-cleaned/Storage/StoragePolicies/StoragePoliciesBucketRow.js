@@ -1,6 +1,18 @@
-import { Badge, Button, IconArchive, Dropdown, IconEdit, IconTrash, IconMoreVertical } from 'ui'
-import { isEmpty } from 'lodash'
 import Panel from 'components/ui/Panel'
+import { isEmpty } from 'lodash'
+import {
+  Badge,
+  Button,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconArchive,
+  IconEdit,
+  IconMoreVertical,
+  IconTrash,
+} from 'ui'
 
 const PolicyRow = ({
   policy,
@@ -16,40 +28,37 @@ const PolicyRow = ({
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="font-mono text-xs text-scale-900">{command}</div>
           <div className="flex flex-col gap-2 lg:flex-row">
-            <span className="truncate text-sm text-scale-1200">{name}</span>
+            <span className="truncate text-sm text-foreground">{name}</span>
           </div>
         </div>
-        <Dropdown
-          side="bottom"
-          align="end"
-          size="small"
-          overlay={
-            <>
-              <Dropdown.Item
-                icon={<IconEdit size={14} />}
-                type="outline"
-                className="mx-2"
-                onClick={() => onSelectPolicyEdit(policy, bucketName, table)}
-              >
-                Edit
-              </Dropdown.Item>
-              <Dropdown.Separator />
-              <Dropdown.Item
-                icon={<IconTrash size={14} />}
-                type="outline"
-                onClick={() => onSelectPolicyDelete(policy)}
-              >
-                Delete
-              </Dropdown.Item>
-            </>
-          }
-        >
-          <Button
-            type="default"
-            style={{ paddingLeft: 4, paddingRight: 4 }}
-            icon={<IconMoreVertical />}
-          />
-        </Dropdown>
+        <DropdownMenu_Shadcn_>
+          <DropdownMenuTrigger_Shadcn_>
+            <Button
+              type="default"
+              style={{ paddingLeft: 4, paddingRight: 4 }}
+              icon={<IconMoreVertical />}
+            />
+          </DropdownMenuTrigger_Shadcn_>
+          <DropdownMenuContent_Shadcn_ side="bottom" align="end" size="small">
+            <DropdownMenuItem_Shadcn_
+              className="space-x-2"
+              type="outline"
+              onClick={() => onSelectPolicyEdit(policy, bucketName, table)}
+            >
+              <IconEdit size={14} />
+              <p className="text">Edit</p>
+            </DropdownMenuItem_Shadcn_>
+            <DropdownMenuSeparator_Shadcn_ />
+            <DropdownMenuItem_Shadcn_
+              type="outline"
+              className="space-x-2"
+              onClick={() => onSelectPolicyDelete(policy)}
+            >
+              <IconTrash size={14} />
+              <p className="text">Delete</p>
+            </DropdownMenuItem_Shadcn_>
+          </DropdownMenuContent_Shadcn_>
+        </DropdownMenu_Shadcn_>
       </Panel.Content>
     </div>
   )
@@ -79,7 +88,7 @@ const StoragePoliciesBucketRow = ({
       title={[
         <div key={label} className="flex w-full items-center justify-between">
           <div className="flex items-center space-x-4">
-            <IconArchive className="text-scale-1000" size="small" />
+            <IconArchive className="text-foreground-light" size="small" />
             <h4 className="m-0 text-lg">
               <span>{label}</span>
             </h4>
@@ -109,7 +118,7 @@ const StoragePoliciesBucketRow = ({
           ))}
           {policies.length !== 0 ? (
             <div className="px-6 py-2">
-              <p className="text-sm text-scale-1100">{getFooterLabel()}</p>
+              <p className="text-sm text-foreground-light">{getFooterLabel()}</p>
             </div>
           ) : null}
         </div>

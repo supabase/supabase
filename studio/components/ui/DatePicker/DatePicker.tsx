@@ -252,19 +252,21 @@ function _DatePicker({
                       type="button"
                       className={`
                         ${prevMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                        text-scale-1100 hover:text-scale-1200 focus:outline-none
+                        text-foreground-light hover:text-foreground focus:outline-none
                     `}
                     >
                       <IconChevronLeft size={16} strokeWidth={2} />
                     </button>
-                    <span className="text-sm text-scale-1100">{format(date, 'MMMM yyyy')}</span>
+                    <span className="text-sm text-foreground-light">
+                      {format(date, 'MMMM yyyy')}
+                    </span>
                     <button
                       onClick={increaseMonth}
                       disabled={nextMonthButtonDisabled}
                       type="button"
                       className={`
                         ${nextMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                        text-scale-1100 hover:text-scale-1200 focus:outline-none
+                        text-foreground-light hover:text-foreground focus:outline-none
                     `}
                     >
                       <IconChevronRight size={16} strokeWidth={2} />

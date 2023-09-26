@@ -1,13 +1,13 @@
-import { useState, useMemo, useCallback, KeyboardEvent } from 'react'
-import { isEqual } from 'lodash'
-import { Button, IconPlus, IconFilter, Popover } from 'ui'
-import update from 'immutability-helper'
 import { useUrlState } from 'hooks'
+import update from 'immutability-helper'
+import { isEqual } from 'lodash'
+import { KeyboardEvent, useCallback, useMemo, useState } from 'react'
+import { Button, IconFilter, IconPlus, Popover } from 'ui'
 
-import FilterRow from './FilterRow'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { Filter, SupaTable } from 'components/grid/types'
 import { FilterOperatorOptions } from './Filter.constants'
+import FilterRow from './FilterRow'
 
 export interface FilterPopoverProps {
   table: SupaTable
@@ -32,7 +32,7 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
         asChild
         type={(filters || []).length > 0 ? 'link' : 'text'}
         icon={
-          <div className="text-scale-1000">
+          <div className="text-foreground-light">
             <IconFilter strokeWidth={1.5} />
           </div>
         }
@@ -124,7 +124,7 @@ const FilterOverlay = ({ table, filters: filtersFromUrl, setParams }: FilterOver
         ))}
         {filters.length == 0 && (
           <div className="space-y-1 px-3">
-            <h5 className="text-sm text-scale-1100">No filters applied to this view</h5>
+            <h5 className="text-sm text-foreground-light">No filters applied to this view</h5>
             <p className="text-xs text-scale-900">Add a column below to filter the view</p>
           </div>
         )}

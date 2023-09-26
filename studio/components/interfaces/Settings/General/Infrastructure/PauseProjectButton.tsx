@@ -72,7 +72,7 @@ const PauseProjectButton = () => {
                   'border border-scale-200 ', //border
                 ].join(' ')}
               >
-                <span className="text-xs text-scale-1200">
+                <span className="text-xs text-foreground">
                   {isPaused
                     ? 'Your project is already paused'
                     : !canPauseProject

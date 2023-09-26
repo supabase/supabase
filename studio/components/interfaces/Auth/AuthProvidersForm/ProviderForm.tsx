@@ -2,7 +2,19 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from 'ui'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Collapsible,
+  Form,
+  IconAlertTriangle,
+  IconCheck,
+  IconChevronUp,
+  Input,
+} from 'ui'
 
 import { useParams } from 'common'
 import { components } from 'data/api'
@@ -84,7 +96,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
       <Collapsible.Trigger asChild>
         <button
           type="button"
-          className="group flex w-full items-center justify-between rounded py-3 px-6 text-scale-1200"
+          className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
         >
           <div className="flex items-center gap-3">
             <IconChevronUp
@@ -128,10 +140,29 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
               <div
                 className="
                   group border-t
-                  border-scale-500 bg-scale-100 py-6 px-6 text-scale-1200 dark:bg-scale-300
+                  border-scale-500 bg-scale-100 py-6 px-6 text-foreground dark:bg-scale-300
                 "
               >
                 <div className="mx-auto my-6 max-w-lg space-y-6">
+                  {provider.title === 'LinkedIn' && (
+                    <Alert_Shadcn_ variant="warning">
+                      <IconAlertTriangle strokeWidth={2} />
+                      <AlertTitle_Shadcn_>
+                        LinkedIn provider temporarily unavailable
+                      </AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        Linkedin has updated their OAuth APIs, which has broken the current Supabase
+                        implementation. We're actively tracking{' '}
+                        <a
+                          className="underline"
+                          href="https://github.com/supabase/gotrue/issues/1216"
+                        >
+                          this issue
+                        </a>{' '}
+                        and you can subscribe to it for future updates.
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  )}
                   {Object.keys(provider.properties).map((x: string) => (
                     <FormField
                       key={x}
@@ -198,7 +229,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                                 'border border-scale-200',
                               ].join(' ')}
                             >
-                              <span className="text-xs text-scale-1200">
+                              <span className="text-xs text-foreground">
                                 You need additional permissions to update provider settings
                               </span>
                             </div>

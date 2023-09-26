@@ -1,15 +1,15 @@
-import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
-import BarChart from 'components/ui/Charts/BarChart'
-import Table from 'components/to-be-cleaned/Table'
 import {
   jsonSyntaxHighlight,
   TextFormatter,
 } from 'components/interfaces/Settings/Logs/LogsFormatters'
-import { Button, Collapsible, IconChevronRight } from 'ui'
-import { queryParamsToObject } from '../Reports.utils'
-import { Fragment } from 'react'
+import Table from 'components/to-be-cleaned/Table'
+import BarChart from 'components/ui/Charts/BarChart'
 import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
 import sumBy from 'lodash/sumBy'
+import { Fragment } from 'react'
+import { Button, Collapsible, IconChevronRight } from 'ui'
+import { queryParamsToObject } from '../Reports.utils'
+import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
@@ -245,7 +245,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
           />
         )}
         <div className=" truncate max-w-sm lg:max-w-lg">
-          <TextFormatter className="text-scale-1100" value={datum.path} />
+          <TextFormatter className="text-foreground-light" value={datum.path} />
           <TextFormatter
             className="max-w-sm text-scale-900 truncate "
             value={decodeURIComponent(datum.search || '')}

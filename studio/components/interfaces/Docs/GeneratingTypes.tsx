@@ -86,7 +86,7 @@ export default function GeneratingTypes({ selectedLang }: Props) {
                 </Button>
               )}
             </p>
-            <p className="text-xs text-center text-scale-1100 bg-scale-200 p-4">
+            <p className="text-xs text-center text-foreground-light bg-scale-200 p-4">
               Remember to re-generate and download this file as you make changes to your tables.
             </p>
           </div>
