@@ -78,7 +78,6 @@ const FunctionList = ({
     )
   }
 
-  console.log({ _functions })
   return (
     <>
       {_functions.map((x) => (
