@@ -312,12 +312,12 @@ const PITRSidePanel = () => {
             <>
               {selectedOption === 'pitr_0' ||
               (selectedPitr?.price ?? 0) < (subscriptionPitr?.variant.price ?? 0) ? (
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of that's unused during the current billing
                   cycle will be returned as credits that can be used for subsequent billing cycles
                 </p>
               ) : (
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of{' '}
                   <span className="text-foreground">${selectedPitr?.price.toLocaleString()}</span>{' '}
                   will be added to your monthly invoice. You're immediately charged for the

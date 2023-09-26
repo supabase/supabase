@@ -17,8 +17,8 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useStore } from 'hooks'
 import { isValidHttpUrl, tryParseJson, uuidv4 } from 'lib/helpers'
 import { Button, Checkbox, Form, Input, Listbox, Modal, Radio, SidePanel } from 'ui'
-import HTTPRequestFields from './HTTPRequestFields'
 import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
+import HTTPRequestFields from './HTTPRequestFields'
 
 export interface EditHookPanelProps {
   visible: boolean
@@ -334,7 +334,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
         }}
       >
         <Modal.Content>
-          <p className="py-4 text-sm text-scale-1100">
+          <p className="py-4 text-sm text-foreground-light">
             There are unsaved changes. Are you sure you want to close the panel? Your changes will
             be lost.
           </p>

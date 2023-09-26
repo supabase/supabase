@@ -25,7 +25,7 @@ const Success = ({ sentCategory = '' }: SuccessProps) => {
       </div>
       <div className="flex items-center flex-col space-y-2">
         <h3 className="text-xl">Support request successfully sent!</h3>
-        <p className="text-sm text-scale-1100">
+        <p className="text-sm text-foreground-light">
           We will reach out to you using your account's email address
         </p>
       </div>

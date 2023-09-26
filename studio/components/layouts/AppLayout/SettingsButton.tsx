@@ -12,7 +12,7 @@ const SettingsButton = () => {
       <Link href={slug ? `/org/${slug}/general` : '/'} passHref>
         <Tooltip.Trigger type="button" asChild className="px-1">
           <a id="organization-settings">
-            <IconSettings size={18} strokeWidth={1.5} className="text-scale-1100" />
+            <IconSettings size={18} strokeWidth={1.5} className="text-foreground-light" />
           </a>
         </Tooltip.Trigger>
       </Link>

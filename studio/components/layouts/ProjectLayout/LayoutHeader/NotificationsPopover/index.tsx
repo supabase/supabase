@@ -15,13 +15,13 @@ import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useNotificationsQuery } from 'data/notifications/notifications-query'
 import { useNotificationsUpdateMutation } from 'data/notifications/notifications-update-mutation'
 import { getProjectDetail } from 'data/projects/project-detail-query'
+import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
 import { setProjectPostgrestStatus } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 import { delete_, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { Project } from 'types'
 import NotificationRow from './NotificationRow'
-import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
 
 interface NotificationsPopoverProps {
   alt?: boolean
@@ -222,7 +222,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
                       <p className="text-xs text-scale-100">{newNotifications.length}</p>
                     </div>
                   ) : alt ? (
-                    <IconInbox size={18} strokeWidth={1.5} className="text-scale-1100" />
+                    <IconInbox size={18} strokeWidth={1.5} className="text-foreground-light" />
                   ) : (
                     <IconBell size={16} strokeWidth={1.5} className="text-foreground" />
                   )
@@ -231,7 +231,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
                   hasNewNotifications ? (
                     <>
                       {alt ? (
-                        <IconInbox size={18} strokeWidth={1.5} className="text-scale-1100" />
+                        <IconInbox size={18} strokeWidth={1.5} className="text-foreground-light" />
                       ) : (
                         <IconBell size={16} strokeWidth={1.5} className="text-foreground" />
                       )}

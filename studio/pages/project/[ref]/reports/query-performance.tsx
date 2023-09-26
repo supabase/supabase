@@ -155,7 +155,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
                   </div>
                 </div>
                 <div className="px-8 pt-4 m-0">
-                  <p className="text-scale-1100 text-sm max-w-2xl">
+                  <p className="text-foreground-light text-sm max-w-2xl">
                     For best performance, ensure that the cache hit rate ratios above 99%. <br />{' '}
                     Consider upgrading to an instance with more memory if the ratios dip below 95%.
                   </p>

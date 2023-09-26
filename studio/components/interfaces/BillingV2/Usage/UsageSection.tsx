@@ -1,28 +1,28 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import clsx from 'clsx'
+import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import SectionHeader from './SectionHeader'
-import { CategoryMetaKey, USAGE_CATEGORIES } from './Usage.constants'
+import SparkBar from 'components/ui/SparkBar'
+import { DataPoint } from 'data/analytics/constants'
+import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
 import {
   ProjectUsageResponse,
   UsageMetric,
   useProjectUsageQuery,
 } from 'data/usage/project-usage-query'
-import { DataPoint } from 'data/analytics/constants'
-import SectionContent from './SectionContent'
+import { formatBytes } from 'lib/helpers'
+import Link from 'next/link'
 import { Button, IconAlertTriangle, IconBarChart2 } from 'ui'
 import { USAGE_APPROACHING_THRESHOLD } from '../Billing.constants'
-import Link from 'next/link'
-import SparkBar from 'components/ui/SparkBar'
-import clsx from 'clsx'
-import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
+import SectionContent from './SectionContent'
+import SectionHeader from './SectionHeader'
+import { CategoryMetaKey, USAGE_CATEGORIES } from './Usage.constants'
 import {
   ChartTooltipValueFormatter,
   ChartYFormatterCompactNumber,
   getUpgradeUrl,
 } from './Usage.utils'
-import { formatBytes } from 'lib/helpers'
 import UsageBarChart from './UsageBarChart'
-import Panel from 'components/ui/Panel'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
 interface UsageSectionProps {
   projectRef: string
@@ -241,7 +241,7 @@ const UsageSection = ({
                     <Panel>
                       <Panel.Content>
                         <div className="flex flex-col items-center justify-center">
-                          <IconBarChart2 className="text-scale-1100 mb-2" />
+                          <IconBarChart2 className="text-foreground-light mb-2" />
                           <p className="text-sm">No data in period</p>
                           <p className="text-sm text-scale-1000">May take up to 24 hours to show</p>
                         </div>
@@ -256,7 +256,7 @@ const UsageSection = ({
                       <div className="space-y-1">
                         <p className="text-sm">Not included in plan</p>
                         <div>
-                          <p className="text-sm text-scale-1100">
+                          <p className="text-sm text-foreground-light">
                             You need to be on a higher plan in order to use this feature.
                           </p>
                         </div>

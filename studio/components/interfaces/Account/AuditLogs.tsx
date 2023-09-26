@@ -241,7 +241,7 @@ const AuditLogs = () => {
                         </Table.td>
                         <Table.td>
                           <p
-                            className="text-scale-1100 max-w-[230px] truncate"
+                            className="text-foreground-light max-w-[230px] truncate"
                             title={project?.name ?? organization?.name ?? '-'}
                           >
                             {project?.name

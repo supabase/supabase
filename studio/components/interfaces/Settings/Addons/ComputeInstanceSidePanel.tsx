@@ -355,7 +355,7 @@ const ComputeInstanceSidePanel = () => {
             )}
 
             {selectedCategory === 'micro' && (
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 Your database will use the standard Micro size instance of 2-core {cpuArchitecture}{' '}
                 CPU (Shared) with 1GB of memory.
               </p>
@@ -363,13 +363,13 @@ const ComputeInstanceSidePanel = () => {
 
             {hasChanges &&
               (selectedCategory === 'micro' && !isOrgBilling ? (
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of that's unused during the current billing
                   cycle will be returned as credits that can be used for subsequent billing cycles
                 </p>
               ) : selectedCategory !== 'micro' && selectedCompute?.price_interval === 'monthly' ? (
                 // Monthly payment with project-level subscription
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of{' '}
                   <span className="text-foreground">
                     ${selectedCompute?.price.toLocaleString()}
@@ -381,7 +381,7 @@ const ComputeInstanceSidePanel = () => {
                 </p>
               ) : selectedCategory !== 'micro' ? (
                 // Hourly usage-billing with org-based subscription
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   There are no immediate charges when changing compute. Compute Hours are a
                   usage-based item and you're billed at the end of your billing cycle based on your
                   compute usage. Read more about{' '}

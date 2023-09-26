@@ -16,11 +16,11 @@ const TemplatePreview = ({ selectedTemplate }: TemplatePreviewProps) => {
             <div className="space-y-2">
               <div className="flex flex-col space-y-2">
                 <h3 className="text-foreground text-base">{templateName}</h3>
-                <p className="text-scale-1100 text-sm">{description}</p>
+                <p className="text-foreground-light text-sm">{description}</p>
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-scale-1100 text-sm">Policy SQL template:</label>
+              <label className="text-foreground-light text-sm">Policy SQL template:</label>
               <div className="h-64">
                 <SqlEditor readOnly queryId={id} defaultValue={statement} />
               </div>

@@ -376,7 +376,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                 {values.projectRef !== 'no-project' && subscription && isSuccessProjects ? (
                   <p className="text-sm text-scale-1000 mt-2">
                     This project is on the{' '}
-                    <span className="text-scale-1100">{subscription.plan.name} plan</span>
+                    <span className="text-foreground-light">{subscription.plan.name} plan</span>
                   </p>
                 ) : isLoadingSubscription && selectedProjectRef !== 'no-project' ? (
                   <div className="flex items-center space-x-2 mt-2">
@@ -493,7 +493,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                                 <a
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="flex items-center space-x-2 text-scale-1000 underline hover:text-scale-1100 transition"
+                                  className="flex items-center space-x-2 text-scale-1000 underline hover:text-foreground-light transition"
                                 >
                                   Github discussions
                                   <IconExternalLink size={14} strokeWidth={2} className="ml-1" />
@@ -539,7 +539,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                     {selectedLibrary !== undefined && (
                       <div className="px-6 space-y-4 !mt-4">
                         <div className="space-y-2">
-                          <p className="text-sm text-scale-1100">
+                          <p className="text-sm text-foreground-light">
                             Found an issue or a bug? Try searching our Github issues or submit a new
                             one.
                           </p>
@@ -557,7 +557,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                               >
                                 <div className="space-y-1">
                                   <p className="text-sm">{library.name}</p>
-                                  <p className="text-sm text-scale-1100">
+                                  <p className="text-sm text-foreground-light">
                                     For issues regarding the {libraryLanguage} client library
                                   </p>
                                 </div>
@@ -584,7 +584,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                           >
                             <div className="space-y-1">
                               <p className="text-sm">supabase</p>
-                              <p className="text-sm text-scale-1100">
+                              <p className="text-sm text-foreground-light">
                                 For any issues about our API
                               </p>
                             </div>
@@ -607,7 +607,9 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
                     {values.category !== 'Login_issues' && (
                       <div className="px-6 space-y-2">
-                        <p className="text-sm text-scale-1100">Which services are affected?</p>
+                        <p className="text-sm text-foreground-light">
+                          Which services are affected?
+                        </p>
                         <MultiSelect
                           options={SERVICE_OPTIONS}
                           value={selectedServices}
@@ -639,7 +641,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                     )}
                     <div className="space-y-4 px-6">
                       <div className="space-y-1">
-                        <p className="block text-sm text-scale-1100">Attachments</p>
+                        <p className="block text-sm text-foreground-light">Attachments</p>
                         <p className="block text-sm text-scale-1000">
                           Upload up to {MAX_ATTACHMENTS} screenshots that might be relevant to the
                           issue that you're facing

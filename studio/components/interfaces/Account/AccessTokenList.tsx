@@ -89,7 +89,7 @@ const AccessTokenList = observer(() => {
         }}
       >
         <Modal.Content>
-          <p className="py-4 text-sm text-scale-1100">
+          <p className="py-4 text-sm text-foreground-light">
             {`This action cannot be undone. Are you sure you want to delete "${token?.name}" token?`}
           </p>
         </Modal.Content>

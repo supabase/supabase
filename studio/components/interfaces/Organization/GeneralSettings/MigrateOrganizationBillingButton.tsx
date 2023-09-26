@@ -19,12 +19,12 @@ import {
 } from 'ui'
 
 import { SpendCapModal } from 'components/interfaces/BillingV2'
+import InformationBox from 'components/ui/InformationBox'
 import { useOrganizationBillingMigrationMutation } from 'data/organizations/organization-migrate-billing-mutation'
 import { useOrganizationBillingMigrationPreview } from 'data/organizations/organization-migrate-billing-preview-query'
 import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import PaymentMethodSelection from '../BillingSettingsV2/Subscription/PaymentMethodSelection'
-import InformationBox from 'components/ui/InformationBox'
 
 const MigrateOrganizationBillingButton = observer(() => {
   const { ui } = useStore()
@@ -207,7 +207,7 @@ const MigrateOrganizationBillingButton = observer(() => {
               </>
             )}
           <Modal.Content>
-            <div className="text-scale-1100 text-sm space-y-2">
+            <div className="text-foreground-light text-sm space-y-2">
               <p>
                 Migrating to new organization-based billing combines subscriptions for all projects
                 in the organization into a single subscription.
@@ -252,7 +252,7 @@ const MigrateOrganizationBillingButton = observer(() => {
               })}
             </Listbox>
 
-            <p className="text-sm text-scale-1100 mt-4">
+            <p className="text-sm text-foreground-light mt-4">
               The pricing plan, along with included usage limits will apply to your entire
               organization. See{' '}
               <a
@@ -461,7 +461,7 @@ const MigrateOrganizationBillingButton = observer(() => {
           )}
 
           <Modal.Content>
-            <p className="mb-4 text-sm text-scale-1100">
+            <p className="mb-4 text-sm text-foreground-light">
               The migration can take up to 30 seconds, please do not cancel the request or close
               your browser.
             </p>

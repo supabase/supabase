@@ -152,7 +152,7 @@ const SpendCapSidePanel = () => {
                   size={16}
                   className={showUsageCosts ? 'rotate-90' : ''}
                 />
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   How are each resource charged after exceeding the included quota?
                 </p>
               </div>

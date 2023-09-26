@@ -62,7 +62,7 @@ const InformationBox = ({
             }`}
             style={{ maxHeight: isExpanded ? 500 : 0 }}
           >
-            <div className="text-scale-1100 text-sm">{description}</div>
+            <div className="text-foreground-light text-sm">{description}</div>
 
             {url && (
               <Link href={url}>

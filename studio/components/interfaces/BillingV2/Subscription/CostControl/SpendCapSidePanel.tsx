@@ -1,3 +1,4 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { useParams, useTheme } from 'common'
 import Table from 'components/to-be-cleaned/Table'
@@ -5,14 +6,13 @@ import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import Telemetry from 'lib/telemetry'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { pricing } from 'shared-data/pricing'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, Collapsible, IconChevronRight, IconExternalLink, SidePanel } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { pricing } from 'shared-data/pricing'
-import Telemetry from 'lib/telemetry'
-import { useRouter } from 'next/router'
 
 const SPEND_CAP_OPTIONS: {
   name: string
@@ -148,7 +148,7 @@ const SpendCapSidePanel = () => {
                   size={16}
                   className={showUsageCosts ? 'rotate-90' : ''}
                 />
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   How are each resource charged after exceeding the included quota?
                 </p>
               </div>

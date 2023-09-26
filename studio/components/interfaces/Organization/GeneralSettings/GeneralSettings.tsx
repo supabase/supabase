@@ -133,7 +133,7 @@ const GeneralSettings = () => {
                         </div>
                       </Collapsible.Trigger>
                       <Collapsible.Content>
-                        <div className="space-y-2 py-4 ml-16 text-sm text-scale-1100">
+                        <div className="space-y-2 py-4 ml-16 text-sm text-foreground-light">
                           <p>
                             Supabase AI is a chatbot support tool powered by OpenAI. Supabase will
                             share the query you submit and information about the databases you

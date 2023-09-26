@@ -40,7 +40,7 @@ const SignInPage: NextPageWithLayout = () => {
         <div>
           <span className="text-scale-1000">Don't have an account?</span>{' '}
           <Link href="/sign-up">
-            <a className="underline transition text-foreground hover:text-scale-1100">
+            <a className="underline transition text-foreground hover:text-foreground-light">
               Sign Up Now
             </a>
           </Link>

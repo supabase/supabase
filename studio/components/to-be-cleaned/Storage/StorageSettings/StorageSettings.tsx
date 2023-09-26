@@ -2,14 +2,14 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 import { Button, Form, IconClock, Input, Listbox } from 'ui'
 
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import { STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, StorageSizeUnits } from './StorageSettings.constants'
+import { StorageSizeUnits, STORAGE_FILE_SIZE_LIMIT_MAX_BYTES } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 
 export type StorageSettingsProps = {
   projectRef: string | undefined
@@ -161,7 +161,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
                             </Listbox>
                           </div>
                         </div>
-                        <p className="text-sm text-scale-1100">
+                        <p className="text-sm text-foreground-light">
                           {selectedUnit !== StorageSizeUnits.BYTES &&
                             `Equivalent to ${convertToBytes(
                               values.fileSizeLimit,

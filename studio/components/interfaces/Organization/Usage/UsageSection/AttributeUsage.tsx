@@ -9,6 +9,7 @@ import SparkBar from 'components/ui/SparkBar'
 import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
 import { OrgUsageResponse, UsageMetric } from 'data/usage/org-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
+import { useMemo } from 'react'
 import { ResponseError } from 'types'
 import { Button, IconAlertTriangle, IconBarChart2 } from 'ui'
 import SectionContent from '../SectionContent'
@@ -20,7 +21,6 @@ import {
 } from '../Usage.utils'
 import UsageBarChart from '../UsageBarChart'
 import { ChartMeta } from './UsageSection'
-import { useMemo } from 'react'
 
 export interface AttributeUsageProps {
   slug: string
@@ -259,7 +259,7 @@ const AttributeUsage = ({
                   <Panel>
                     <Panel.Content>
                       <div className="flex flex-col items-center justify-center">
-                        <IconBarChart2 className="text-scale-1100 mb-2" />
+                        <IconBarChart2 className="text-foreground-light mb-2" />
                         <p className="text-sm">No data in period</p>
                         <p className="text-sm text-scale-1000">May take up to 24 hours to show</p>
                       </div>
@@ -274,7 +274,7 @@ const AttributeUsage = ({
                     <div className="space-y-1">
                       <p className="text-sm">Not included in plan</p>
                       <div>
-                        <p className="text-sm text-scale-1100">
+                        <p className="text-sm text-foreground-light">
                           You need to be on a higher plan in order to use this feature.
                         </p>
                       </div>

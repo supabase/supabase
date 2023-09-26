@@ -5,11 +5,11 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Button, IconAlertCircle, IconExternalLink, IconGlobe, IconLock } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader, FormPanel } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useCheckPermissions } from 'hooks'
 import AddRestrictionModal from './AddRestrictionModal'
 import AllowAllModal from './AllowAllModal'
@@ -188,7 +188,7 @@ const NetworkRestrictions = ({}) => {
               <div className="px-8 py-8 flex items-center justify-between">
                 <div className="flex items-start space-x-4">
                   <div className="space-y-1">
-                    <p className="text-scale-1100 text-sm">
+                    <p className="text-foreground-light text-sm">
                       Your database can be accessed by all IP addresses
                     </p>
                     <p className="text-scale-1000 text-sm">
@@ -207,9 +207,9 @@ const NetworkRestrictions = ({}) => {
             ) : isDisallowedAll ? (
               <div className="px-8 py-8 flex items-center justify-between">
                 <div className="flex items-start space-x-4">
-                  <IconLock className="text-scale-1100" strokeWidth={1.5} />
+                  <IconLock className="text-foreground-light" strokeWidth={1.5} />
                   <div className="space-y-1">
-                    <p className="text-scale-1100 text-sm">
+                    <p className="text-foreground-light text-sm">
                       Your database <span className="text-amber-900 opacity-80">cannot</span> be
                       accessed externally
                     </p>
@@ -233,7 +233,7 @@ const NetworkRestrictions = ({}) => {
               <div className="divide-y">
                 <div className="px-8 py-3 flex items-center justify-between">
                   <div>
-                    <p className="text-scale-1100 text-sm">
+                    <p className="text-foreground-light text-sm">
                       Only the following IP addresses have access to your database
                     </p>
                     <p className="text-scale-1000 text-sm">

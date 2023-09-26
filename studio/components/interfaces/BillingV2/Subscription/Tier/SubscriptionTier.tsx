@@ -2,13 +2,13 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 
 import { useParams } from 'common'
+import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useFlag, useSelectedOrganization } from 'hooks'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink } from 'ui'
-import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import SubscriptionPaymentMethod from './SubscriptionPaymentMethod'
 import TierUpdateSidePanel from './TierUpdateSidePanel'
 
@@ -49,7 +49,7 @@ const SubscriptionTier = ({}: SubscriptionTierProps) => {
               .
             </div>
             <div className="space-y-2">
-              <p className="text-sm text-scale-1100">More information</p>
+              <p className="text-sm text-foreground-light">More information</p>
               <div>
                 <Link href="https://supabase.com/pricing">
                   <a target="_blank" rel="noreferrer">

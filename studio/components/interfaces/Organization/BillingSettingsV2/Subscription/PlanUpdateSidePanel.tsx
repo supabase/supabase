@@ -4,10 +4,16 @@ import clsx from 'clsx'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
+import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
+import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
 import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
+import { SubscriptionTier } from 'data/subscriptions/types'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
@@ -20,12 +26,6 @@ import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
-import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
-import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
-import InformationBox from 'components/ui/InformationBox'
-import AlertError from 'components/ui/AlertError'
-import { SubscriptionTier } from 'data/subscriptions/types'
-import Table from 'components/to-be-cleaned/Table'
 
 // [Joshen TODO] Need to remove all contexts of "projects"
 
@@ -274,7 +274,7 @@ const PlanUpdateSidePanel = () => {
                               strokeWidth={3}
                             />
                           </div>
-                          <p className="ml-3 text-xs text-scale-1100">{feature}</p>
+                          <p className="ml-3 text-xs text-foreground-light">{feature}</p>
                         </li>
                       ))}
                     </ul>

@@ -120,7 +120,7 @@ const AddRestrictionModal = ({
             <>
               <Modal.Content>
                 <div className="py-6 space-y-4">
-                  <p className="text-sm text-scale-1100">
+                  <p className="text-sm text-foreground-light">
                     This will add an IP address range to a list of allowed ranges that can access
                     your database. Only IPv4 addresses are supported at the moment.
                   </p>

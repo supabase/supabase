@@ -19,7 +19,7 @@ const TwoOptionToggle = ({
     isActive: boolean
   ) => `absolute top-0 z-1 text-xs inline-flex h-full items-center justify-center font-medium
     ${
-      isActive ? 'hover:text-scale-1100 dark:hover:text-white' : 'hover:text-gray-600'
+      isActive ? 'hover:text-foreground-light dark:hover:text-white' : 'hover:text-gray-600'
     } dark:hover:text-white focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue
     transition ease-in-out duration-150`
 

@@ -1,12 +1,12 @@
 import { IconGitBranch, IconGitHub } from 'ui'
 
 import CardButton from 'components/ui/CardButton'
-import { BASE_PATH } from 'lib/constants'
-import { Project } from 'types'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { ResourceWarning } from 'data/usage/resource-warnings-query'
-import { ProjectCardStatus } from './ProjectCardStatus'
+import { BASE_PATH } from 'lib/constants'
+import { Project } from 'types'
 import { inferProjectStatus } from './ProjectCard.utils'
+import { ProjectCardStatus } from './ProjectCardStatus'
 
 export interface ProjectCardProps {
   project: Project
@@ -61,7 +61,7 @@ const ProjectCard = ({
                   <div className="w-fit p-1 border rounded-md flex items-center border-scale-600">
                     <IconGitHub size={12} strokeWidth={1.5} />
                   </div>
-                  <p className="text-xs !ml-2 text-scale-1100">{githubRepository}</p>
+                  <p className="text-xs !ml-2 text-foreground-light">{githubRepository}</p>
                 </>
               )}
             </div>

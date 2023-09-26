@@ -105,7 +105,7 @@ const WrapperRow = ({
                         <Link
                           href={`/project/${ref}/settings/vault/secrets?search=${wrapper.name}_${metadata.name}`}
                         >
-                          <a className="transition text-scale-1000 hover:text-scale-1100 flex items-center space-x-2">
+                          <a className="transition text-scale-1000 hover:text-foreground-light flex items-center space-x-2">
                             <span>Encrypted in Vault</span>
                             <IconExternalLink size={14} strokeWidth={1.5} />
                           </a>
@@ -113,7 +113,7 @@ const WrapperRow = ({
                       </div>
                     ))}
                     <div className="!mt-3 space-y-1">
-                      <p className="text-sm text-scale-1100">
+                      <p className="text-sm text-foreground-light">
                         Foreign tables{wrapper.tables && `: (${wrapper.tables.length})`}
                       </p>
                       <div className="flex flex-wrap gap-2">
@@ -131,7 +131,7 @@ const WrapperRow = ({
                             </Link>
                           ))
                         ) : (
-                          <p className="text-sm text-scale-1100">No tables available</p>
+                          <p className="text-sm text-foreground-light">No tables available</p>
                         )}
                       </div>
                     </div>

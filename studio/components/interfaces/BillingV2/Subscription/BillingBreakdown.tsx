@@ -158,7 +158,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                       <Link href={`/project/${projectRef}/settings/billing/usage#${metric.anchor}`}>
                         <a>
                           <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-foreground transition cursor-pointer">
+                            <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                               {metric.name}
                             </p>
                             <IconChevronRight
@@ -335,7 +335,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
           <p className="text-sm text-scale-1000">
             The following table shows your upcoming costs. Depending on your usage, the final amount
             may vary. Next invoice on{' '}
-            <span className="text-scale-1100">{billingCycleEnd.format('MMM DD, YYYY')}</span>.
+            <span className="text-foreground-light">{billingCycleEnd.format('MMM DD, YYYY')}</span>.
           </p>
 
           {isLoadingUpcomingInvoice ? (

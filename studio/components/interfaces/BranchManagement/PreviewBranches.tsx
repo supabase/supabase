@@ -94,7 +94,7 @@ const PreviewBranches = ({
                 <div className="w-[500px] border rounded-md mt-4">
                   <div className="px-5 py-3 bg-surface-100 flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <IconGitBranch strokeWidth={2} className="text-scale-1100" />
+                      <IconGitBranch strokeWidth={2} className="text-foreground-light" />
                       <div>
                         <p>Create a preview branch</p>
                         <p className="text-scale-1000">Start developing in preview</p>

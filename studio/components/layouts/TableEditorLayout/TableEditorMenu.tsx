@@ -148,7 +148,11 @@ const TableEditorMenu = () => {
                   type="outline"
                   className="w-full [&>span]:w-full"
                   iconRight={
-                    <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />
+                    <IconCode
+                      className="text-foreground-light rotate-90"
+                      strokeWidth={2}
+                      size={12}
+                    />
                   }
                 >
                   <div>
@@ -307,12 +311,16 @@ const TableEditorMenu = () => {
         ) : searchText.length === 0 && (entityTypes?.length ?? 0) === 0 ? (
           <div className="mx-4 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
             <p className="text-xs">No entities available</p>
-            <p className="text-xs text-scale-1100">This schema has no entities available yet</p>
+            <p className="text-xs text-foreground-light">
+              This schema has no entities available yet
+            </p>
           </div>
         ) : searchText.length > 0 && (entityTypes?.length ?? 0) === 0 ? (
           <div className="mx-4 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
             <p className="text-xs">No results found</p>
-            <p className="text-xs text-scale-1100">There are no entities that match your search</p>
+            <p className="text-xs text-foreground-light">
+              There are no entities that match your search
+            </p>
           </div>
         ) : (
           <Menu

@@ -168,7 +168,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                     <IconChevronDown
                       size={18}
                       strokeWidth={2}
-                      className={clsx('text-scale-1100', showConfiguration && 'rotate-180')}
+                      className={clsx('text-foreground-light', showConfiguration && 'rotate-180')}
                     />
                   </div>
                 </Collapsible.Trigger>

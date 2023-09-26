@@ -20,7 +20,7 @@ const NewProjectPanel = () => {
           <div className="flex h-full flex-col justify-between">
             <div className="space-y-2">
               <h3 className="text-xl text-foreground">Welcome to your new project</h3>
-              <p className="text-base text-scale-1100">
+              <p className="text-base text-foreground-light">
                 Your project has been deployed on its own instance, with its own API all set up and
                 ready to use.
               </p>
@@ -33,7 +33,7 @@ const NewProjectPanel = () => {
                 <h3 className="text-xl text-foreground">
                   Get started by building out your database
                 </h3>
-                <p className="text-base text-scale-1100">
+                <p className="text-base text-foreground-light">
                   Start building your app by creating tables and inserting data. Our Table Editor
                   makes Postgres as easy to use as a spreadsheet, but there's also our SQL Editor if
                   you need something more.
@@ -97,7 +97,7 @@ const NewProjectPanel = () => {
           <div className="flex h-full flex-col justify-between space-y-6">
             <div className="max-w-2xl space-y-2">
               <h3 className="text-xl text-foreground">Explore our other products</h3>
-              <p className="text-base text-scale-1100">
+              <p className="text-base text-foreground-light">
                 Supabase provides all the backend features you need to build a product. You can use
                 it completely, or just the features you need.
               </p>
@@ -242,14 +242,14 @@ const NewProjectPanel = () => {
         <div className="space-y-6">
           <div className="space-y-2">
             <h3 className="text-xl text-foreground">Connecting to your new project</h3>
-            <p className="text-base text-scale-1100 lg:max-w-sm">
+            <p className="text-base text-foreground-light lg:max-w-sm">
               Interact with your database through the{' '}
               <Link href="https://supabase.com/docs/reference">
                 <a className="text-brand">Supabase client libraries</a>
               </Link>{' '}
               with your API keys.
             </p>
-            <p className="text-base text-scale-1100 lg:max-w-sm">
+            <p className="text-base text-foreground-light lg:max-w-sm">
               More information about your project's keys can be found in your project's API
               settings.
             </p>

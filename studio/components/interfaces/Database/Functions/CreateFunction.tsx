@@ -1,7 +1,7 @@
 import { filter, has, isEmpty, isNull, isUndefined, keyBy, mapValues, partition } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { FormEvent, createContext, useContext, useEffect, useState } from 'react'
+import { createContext, FormEvent, useContext, useEffect, useState } from 'react'
 import { Button, IconPlus, IconTrash, Input, Listbox, Modal, Radio, SidePanel, Toggle } from 'ui'
 
 import { Dictionary } from 'components/grid'
@@ -14,9 +14,9 @@ import SqlEditor from 'components/ui/SqlEditor'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useStore } from 'hooks'
 import { isResponseOk } from 'lib/common/fetch'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { SupaResponse } from 'types'
 import { convertArgumentTypes, convertConfigParams, hasWhitespace } from './Functions.utils'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 
 // [Refactor] Remove local state, just use the Form component
 
@@ -427,7 +427,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
           }}
         >
           <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
+            <p className="py-4 text-sm text-foreground-light">
               There are unsaved changes. Are you sure you want to close the panel? Your changes will
               be lost.
             </p>
@@ -481,7 +481,7 @@ const InputMultiArguments = observer(({ readonly }: InputMultiArgumentsProps) =>
     <div>
       <div className="flex flex-col">
         <h5 className="text-base text-foreground">Arguments</h5>
-        <p className="text-sm text-scale-1100">
+        <p className="text-sm text-foreground-light">
           Arguments can be referenced in the function body using either names or numbers.
         </p>
       </div>
@@ -695,11 +695,11 @@ const InputDefinition = observer(({}) => {
     <div className="space-y-4">
       <div className="flex flex-col">
         <h5 className="text-base text-foreground">Definition</h5>
-        <p className="text-sm text-scale-1100">
+        <p className="text-sm text-foreground-light">
           The language below should be written in `{_localState!.formState.language.value}`.
         </p>
         {!_localState?.isEditing && (
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             Change the language in the Advanced Settings below.
           </p>
         )}

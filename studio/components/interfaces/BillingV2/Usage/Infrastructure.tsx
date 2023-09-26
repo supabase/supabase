@@ -7,6 +7,7 @@ import { DataPoint } from 'data/analytics/constants'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { getAddons } from '../Subscription/Subscription.utils'
 import SectionContent from './SectionContent'
 import SectionHeader from './SectionHeader'
@@ -14,7 +15,6 @@ import { USAGE_CATEGORIES } from './Usage.constants'
 import { getUpgradeUrl } from './Usage.utils'
 import UsageBarChart from './UsageBarChart'
 import { CPUWarnings, DiskIOBandwidthWarnings, RAMWarnings } from './UsageWarningAlerts'
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 
 export interface InfrastructureProps {
   projectRef: string
@@ -259,7 +259,7 @@ const Infrastructure = ({
                 <Panel>
                   <Panel.Content>
                     <div className="flex flex-col items-center justify-center space-y-2">
-                      <IconBarChart2 className="text-scale-1100 mb-2" />
+                      <IconBarChart2 className="text-foreground-light mb-2" />
                       <p className="text-sm">No data in period</p>
                       <p className="text-sm text-scale-1000">May take a few minutes to show</p>
                     </div>

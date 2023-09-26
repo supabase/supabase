@@ -1,14 +1,14 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import clsx from 'clsx'
 import Link from 'next/link'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
 import { BILLING_BREAKDOWN_METRICS } from 'components/interfaces/BillingV2/Subscription/Subscription.constants'
-import { Button, IconAlertTriangle, IconChevronRight, IconInfo } from 'ui'
-import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
+import SparkBar from 'components/ui/SparkBar'
 import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
 import { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import SparkBar from 'components/ui/SparkBar'
+import { Button, IconAlertTriangle, IconChevronRight, IconInfo } from 'ui'
+import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
 
 export interface BillingMetricProps {
   idx: number
@@ -57,7 +57,7 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
         <Link href={`/org/${slug}/usage#${metric.anchor}`}>
           <a>
             <div className="group flex items-center space-x-2">
-              <p className="text-sm text-scale-1100 group-hover:text-foreground transition cursor-pointer">
+              <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                 {metric.name}
               </p>
               <IconChevronRight

@@ -13,7 +13,7 @@ const ClientLoadingError = ({
   return (
     <div className="px-6 py-4 bg-scale-400 border border-scale-600 rounded flex justify-between items-center">
       <div className="flex space-x-4">
-        <IconAlertCircle strokeWidth={1.5} className="text-scale-1100" />
+        <IconAlertCircle strokeWidth={1.5} className="text-foreground-light" />
         <div className="space-y-1">
           <p className="text-sm text-foreground">{description}</p>
           <p className="text-sm text-scale-1000">

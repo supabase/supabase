@@ -43,7 +43,7 @@ const PolicyTableRow = ({
     >
       {policies.length === 0 && (
         <div className="p-4 px-6 space-y-1">
-          <p className="text-scale-1100 text-sm">No policies created yet</p>
+          <p className="text-foreground-light text-sm">No policies created yet</p>
           {!isLocked &&
             (table.rls_enabled ? (
               <p className="text-scale-1000 text-sm">

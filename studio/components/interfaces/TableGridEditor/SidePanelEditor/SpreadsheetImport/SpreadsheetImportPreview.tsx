@@ -1,19 +1,19 @@
 import clsx from 'clsx'
 import { useEffect, useState } from 'react'
 import {
-  SidePanel,
   Badge,
   Button,
   Collapsible,
+  IconAlertCircle,
+  IconArrowRight,
   IconChevronDown,
   IconChevronRight,
-  IconArrowRight,
-  IconAlertCircle,
+  SidePanel,
 } from 'ui'
 
+import { PostgresTable } from '@supabase/postgres-meta'
 import { SpreadsheetData } from './SpreadsheetImport.types'
 import SpreadsheetPreviewGrid from './SpreadsheetPreviewGrid'
-import { PostgresTable } from '@supabase/postgres-meta'
 
 const MAX_ROWS = 20
 const MAX_HEADERS = 20
@@ -72,7 +72,7 @@ const SpreadsheetImportPreview = ({
                 <IconChevronDown
                   size={18}
                   strokeWidth={2}
-                  className={clsx('text-scale-1100', expandPreview && 'rotate-180')}
+                  className={clsx('text-foreground-light', expandPreview && 'rotate-180')}
                 />
               }
               className="px-1"

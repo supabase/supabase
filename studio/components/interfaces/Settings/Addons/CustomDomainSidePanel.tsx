@@ -223,12 +223,12 @@ const CustomDomainSidePanel = () => {
             <>
               {selectedOption === 'cd_none' ||
               (selectedCustomDomain?.price ?? 0) < (subscriptionCDOption?.variant.price ?? 0) ? (
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of that's unused during the current billing
                   cycle will be returned as credits that can be used for subsequent billing cycles
                 </p>
               ) : (
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of{' '}
                   <span className="text-foreground">
                     ${selectedCustomDomain?.price.toLocaleString()}

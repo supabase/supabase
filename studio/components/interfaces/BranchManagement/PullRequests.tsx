@@ -103,7 +103,7 @@ const PullRequests = ({
                   <div className="w-96 border rounded-md mt-4">
                     <div className="px-5 py-3 bg-surface-100 flex items-center justify-between">
                       <div className="flex items-center space-x-4">
-                        <IconGitPullRequest strokeWidth={2} className="text-scale-1100" />
+                        <IconGitPullRequest strokeWidth={2} className="text-foreground-light" />
                         <p>Create a pull request</p>
                       </div>
                       <Link passHref href={pullRequestUrl}>

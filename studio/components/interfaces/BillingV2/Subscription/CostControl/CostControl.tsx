@@ -1,13 +1,13 @@
 import { useParams, useTheme } from 'common'
+import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import { useFlag } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import Link from 'next/link'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink } from 'ui'
 import SpendCapSidePanel from './SpendCapSidePanel'
-import Link from 'next/link'
-import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
-import { useFlag } from 'hooks'
 
 export interface CostControlProps {}
 
@@ -38,7 +38,7 @@ const CostControl = ({}: CostControlProps) => {
                 </p>
               </div>
               <div className="space-y-2">
-                <p className="text-sm text-scale-1100">More information</p>
+                <p className="text-sm text-foreground-light">More information</p>
                 <div>
                   <Link href="https://supabase.com/docs/guides/platform/spend-cap">
                     <a target="_blank" rel="noreferrer">

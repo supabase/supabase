@@ -1,4 +1,5 @@
 import { DataPoint } from 'data/analytics/constants'
+import dayjs from 'dayjs'
 import {
   Bar,
   CartesianGrid,
@@ -9,7 +10,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import dayjs from 'dayjs'
 
 // [Joshen] This BarChart is specifically for usage, hence not a reusable component, and not
 // replacing the existing BarChart in ui/Charts
@@ -33,12 +33,11 @@ const UsageBarChart = ({
   yLimit,
   yLeftMargin = 10,
   yFormatter,
-  tooltipFormatter
+  tooltipFormatter,
 }: UsageBarChartProps) => {
   const yMin = 0 // We can consider passing this as a prop if there's a use case in the future
 
   const yDomain = [yMin, yLimit ?? 0]
-
 
   return (
     <div className="w-full h-[200px]">
@@ -75,7 +74,7 @@ const UsageBarChart = ({
                         {tooltipFormatter !== undefined ? tooltipFormatter(value) : value}
                       </p>
                     )}
-                    <p className="text-xs text-scale-1100 mt-1">
+                    <p className="text-xs text-foreground-light mt-1">
                       {dataPeriod.format('DD MMM YYYY')}
                     </p>
                   </div>

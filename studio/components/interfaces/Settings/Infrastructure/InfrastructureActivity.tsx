@@ -25,10 +25,10 @@ import { DataPoint } from 'data/analytics/constants'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganization } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 
 const InfrastructureActivity = () => {
   const { ref: projectRef } = useParams()
@@ -225,7 +225,7 @@ const InfrastructureActivity = () => {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <p className="text-sm text-foreground dark:text-scale-1100 mb-2">
+                      <p className="text-sm text-foreground dark:text-foreground-light mb-2">
                         More information
                       </p>
                       {attribute.links.map((link) => (
@@ -381,7 +381,7 @@ const InfrastructureActivity = () => {
                     <Panel>
                       <Panel.Content>
                         <div className="flex flex-col items-center justify-center space-y-2">
-                          <IconBarChart2 className="text-scale-1100 mb-2" />
+                          <IconBarChart2 className="text-foreground-light mb-2" />
                           <p className="text-sm">No data in period</p>
                           <p className="text-sm text-scale-1000">May take a few minutes to show</p>
                         </div>

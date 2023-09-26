@@ -139,7 +139,7 @@ const Addons = () => {
                 <div className="space-y-6">
                   <p className="m-0">Optimized compute</p>
                   <div className="space-y-2">
-                    <p className="text-sm text-scale-1100 m-0">More information</p>
+                    <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
                       <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
                         <a target="_blank" rel="noreferrer">
@@ -243,7 +243,7 @@ const Addons = () => {
                       <Link href={`/project/${projectRef}/settings/infrastructure#ram`}>
                         <a>
                           <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-foreground transition cursor-pointer">
+                            <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                               Memory
                             </p>
                             <IconChevronRight
@@ -260,7 +260,7 @@ const Addons = () => {
                       <Link href={`/project/${projectRef}/settings/infrastructure#cpu`}>
                         <a>
                           <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-foreground transition cursor-pointer">
+                            <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                               CPU
                             </p>
                             <IconChevronRight
@@ -292,7 +292,7 @@ const Addons = () => {
                       <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
                         <a>
                           <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-foreground transition cursor-pointer">
+                            <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                               Max Disk Throughput
                             </p>
                             <IconChevronRight
@@ -313,7 +313,7 @@ const Addons = () => {
                       <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
                         <a>
                           <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-foreground transition cursor-pointer">
+                            <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                               Baseline Disk Throughput
                             </p>
                             <IconChevronRight
@@ -344,7 +344,7 @@ const Addons = () => {
                 <div className="space-y-6">
                   <p className="m-0">Point in time recovery</p>
                   <div className="space-y-2">
-                    <p className="text-sm text-scale-1100 m-0">More information</p>
+                    <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
                       <Link href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery">
                         <a target="_blank" rel="noreferrer">
@@ -434,7 +434,7 @@ const Addons = () => {
                 <div className="space-y-6">
                   <p className="m-0">Custom domain</p>
                   <div className="space-y-2">
-                    <p className="text-sm text-scale-1100 m-0">More information</p>
+                    <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
                       <Link href="https://supabase.com/docs/guides/platform/custom-domains">
                         <a target="_blank" rel="noreferrer">

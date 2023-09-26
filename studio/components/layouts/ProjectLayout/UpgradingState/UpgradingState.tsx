@@ -15,6 +15,7 @@ import {
   IconSettings,
 } from 'ui'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common/hooks'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
 import { getProjectDetail, invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
@@ -22,7 +23,6 @@ import { useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProjectContext } from '../ProjectContext'
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
-import { useQueryClient } from '@tanstack/react-query'
 
 const UpgradingState = () => {
   const { ref } = useParams()
@@ -79,7 +79,7 @@ const UpgradingState = () => {
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">Upgrade completed!</p>
-                  <p className="mt-4 text-center text-sm text-scale-1100 w-[300px] mx-auto">
+                  <p className="mt-4 text-center text-sm text-foreground-light w-[300px] mx-auto">
                     Your project has been successfully upgraded to Postgres {target_version} and is
                     now back online.
                   </p>
@@ -97,7 +97,7 @@ const UpgradingState = () => {
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">We ran into an issue while upgrading your project</p>
-                  <p className="mt-4 text-center text-sm text-scale-1100 w-[450px] mx-auto">
+                  <p className="mt-4 text-center text-sm text-foreground-light w-[450px] mx-auto">
                     Your project is back online and its data is not affected. Please reach out to us
                     via our support form for assistance with the upgrade.
                   </p>
@@ -125,7 +125,7 @@ const UpgradingState = () => {
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">Upgrading in progress</p>
-                  <p className="text-sm text-center text-scale-1100">
+                  <p className="text-sm text-center text-foreground-light">
                     Upgrades can take from a few minutes up to several hours depending on the size
                     of your database. Your project will be offline while it is being upgraded.
                   </p>
@@ -172,7 +172,7 @@ const UpgradingState = () => {
                               <div className="flex items-center justify-center w-5 h-5 rounded-full">
                                 <IconLoader
                                   size={20}
-                                  className="animate-spin text-scale-1100"
+                                  className="animate-spin text-foreground-light"
                                   strokeWidth={2}
                                 />
                               </div>
@@ -188,7 +188,7 @@ const UpgradingState = () => {
                                 isCurrent
                                   ? 'text-foreground'
                                   : isCompleted
-                                  ? 'text-scale-1100'
+                                  ? 'text-foreground-light'
                                   : 'text-scale-1000'
                               } hover:text-foreground transition`}
                             >

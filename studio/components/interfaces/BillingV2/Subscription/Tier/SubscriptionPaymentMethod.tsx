@@ -124,7 +124,7 @@ const SubscriptionPaymentMethod = ({
             <>
               <div className="flex space-x-3">
                 <div>
-                  <p className="text-scale-1100">Payment via invoice</p>
+                  <p className="text-foreground-light">Payment via invoice</p>
                   <p className="text-sm text-scale-1000">
                     You get a monthly invoice and payment link via email.
                   </p>

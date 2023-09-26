@@ -40,7 +40,7 @@ const UserSettingsDropdown = () => {
       <DropdownMenuTrigger_Shadcn_ asChild>
         <button
           id="user-settings-dropdown"
-          className="flex items-center justify-center border font-bold rounded-full h-7 w-7 text-scale-1100 bg-surface-100"
+          className="flex items-center justify-center border font-bold rounded-full h-7 w-7 text-foreground-light bg-surface-100"
         >
           {profile?.first_name ? profile?.first_name?.[0] : <IconUser size={14} strokeWidth={2} />}
         </button>

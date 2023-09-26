@@ -189,7 +189,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                             <div>
                               <p className="text-foreground">{getUserDisplayName(x)}</p>
                               {x.invited_id === undefined && (
-                                <p className="text-scale-1100">{x.primary_email}</p>
+                                <p className="text-foreground-light">{x.primary_email}</p>
                               )}
                             </div>
                           </div>
@@ -269,7 +269,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                             </Tooltip.Root>
                           ) : (
                             <div className="flex items-center space-x-2">
-                              <p className="text-sm text-scale-1100">Invalid role</p>
+                              <p className="text-sm text-foreground-light">Invalid role</p>
                               <Tooltip.Root delayDuration={0}>
                                 <Tooltip.Trigger>
                                   <IconAlertCircle size={16} strokeWidth={1.5} />
@@ -310,7 +310,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                         <Table.td colSpan={12}>
                           <div className="flex items-center space-x-3 opacity-75">
                             <IconAlertCircle size={16} strokeWidth={2} />
-                            <p className="text-scale-1100">
+                            <p className="text-foreground-light">
                               No users matched the search query "{searchString}"
                             </p>
                           </div>
@@ -323,7 +323,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                   className="bg-panel-secondary-light dark:bg-panel-secondary-dark"
                 >
                   <Table.td colSpan={4}>
-                    <p className="text-scale-1100">
+                    <p className="text-foreground-light">
                       {searchString ? `${filteredMembers.length} of ` : ''}
                       {members.length || '0'} {members.length == 1 ? 'user' : 'users'}
                     </p>
@@ -344,7 +344,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
       >
         <div className="flex flex-col gap-2 py-4">
           <Modal.Content>
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               You are changing the role of{' '}
               <span className="text-foreground">{getUserDisplayName(selectedMember)}</span> from{' '}
               <span className="text-foreground">{getRoleNameById(selectedMember?.oldRoleId)}</span>{' '}

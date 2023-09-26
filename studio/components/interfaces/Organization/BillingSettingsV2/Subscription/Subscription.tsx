@@ -46,7 +46,7 @@ const Subscription = () => {
           <div className="sticky space-y-6 top-12">
             <p className="text-base m-0">Subscription Plan</p>
             <div className="space-y-2">
-              <p className="text-sm text-scale-1100 m-0">More information</p>
+              <p className="text-sm text-foreground-light m-0">More information</p>
               <div>
                 <Link href="https://supabase.com/pricing">
                   <a target="_blank" rel="noreferrer">

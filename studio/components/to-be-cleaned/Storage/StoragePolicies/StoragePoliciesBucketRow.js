@@ -1,6 +1,6 @@
-import { Badge, Button, IconArchive, Dropdown, IconEdit, IconTrash, IconMoreVertical } from 'ui'
-import { isEmpty } from 'lodash'
 import Panel from 'components/ui/Panel'
+import { isEmpty } from 'lodash'
+import { Badge, Button, Dropdown, IconArchive, IconEdit, IconMoreVertical, IconTrash } from 'ui'
 
 const PolicyRow = ({
   policy,
@@ -109,7 +109,7 @@ const StoragePoliciesBucketRow = ({
           ))}
           {policies.length !== 0 ? (
             <div className="px-6 py-2">
-              <p className="text-sm text-scale-1100">{getFooterLabel()}</p>
+              <p className="text-sm text-foreground-light">{getFooterLabel()}</p>
             </div>
           ) : null}
         </div>

@@ -115,7 +115,7 @@ const Column = ({
                   <span className="text-xs text-foreground">Edit foreign key relation</span>
                 ) : (
                   <div>
-                    <p className="text-xs text-scale-1100">Foreign key relation:</p>
+                    <p className="text-xs text-foreground-light">Foreign key relation:</p>
                     <div className="flex items-center space-x-1">
                       <p className="text-xs text-foreground">
                         {column.foreignKey.source_schema}.{column.foreignKey.source_table_name}.
@@ -261,11 +261,11 @@ const Column = ({
             >
               <div className="group flex items-center -space-x-1">
                 {settingsCount > 0 && (
-                  <div className="rounded-full bg-scale-1200 py-0.5 px-2 text-xs text-scale-100 dark:bg-scale-100 dark:text-scale-1100">
+                  <div className="rounded-full bg-scale-1200 py-0.5 px-2 text-xs text-scale-100 dark:bg-scale-100 dark:text-foreground-light">
                     {settingsCount}
                   </div>
                 )}
-                <div className="text-scale-1100 transition-colors group-hover:text-foreground">
+                <div className="text-foreground-light transition-colors group-hover:text-foreground">
                   <IconSettings size={18} strokeWidth={1} />
                 </div>
               </div>

@@ -1,6 +1,5 @@
 import SignInSSOForm from 'components/interfaces/SignIn/SignInSSOForm'
 import { SignInLayout } from 'components/layouts'
-import Link from 'next/link'
 import { NextPageWithLayout } from 'types'
 
 const SignInSSOPage: NextPageWithLayout = () => {
@@ -16,7 +15,7 @@ const SignInSSOPage: NextPageWithLayout = () => {
           <a
             href="https://supabase.com/contact/enterprise"
             rel="noopener noreferrer"
-            className="underline text-foreground hover:text-scale-1100 transition"
+            className="underline text-foreground hover:text-foreground-light transition"
           >
             Let Us Know
           </a>

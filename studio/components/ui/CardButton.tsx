@@ -86,7 +86,7 @@ const CardButton = ({
         {typeof title === 'string' ? <h5 className="text-foreground">{title}</h5> : title}
         {(children || description) && (
           <div className="flex w-full flex-1 flex-col">
-            <p className="text-sm text-scale-1100">{description}</p>
+            <p className="text-sm text-foreground-light">{description}</p>
             <div className="w-full">{children && children}</div>
           </div>
         )}

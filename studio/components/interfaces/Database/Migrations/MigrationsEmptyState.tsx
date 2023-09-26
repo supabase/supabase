@@ -50,7 +50,7 @@ const MigrationsEmptyState = () => {
       <div className="space-y-8">
         <div className="space-y-2 w-4/5">
           <h4 className="text-lg">Database migrations</h4>
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             Database changes are managed through "migrations" and they are a common way of tracking
             changes to your database over time. You can run migrations against your project's
             database via the Supabase CLI.

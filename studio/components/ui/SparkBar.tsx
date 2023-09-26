@@ -43,7 +43,7 @@ const SparkBar = ({
             >
               {labelBottom}
             </p>
-            <p className={clsx('text-scale-1100 text-sm', labelTopClass)}>{labelTop}</p>
+            <p className={clsx('text-foreground-light text-sm', labelTopClass)}>{labelTop}</p>
           </div>
         )}
         <div

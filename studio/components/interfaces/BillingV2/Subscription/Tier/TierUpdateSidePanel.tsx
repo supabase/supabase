@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
+import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
@@ -22,7 +23,6 @@ import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
-import InformationBox from 'components/ui/InformationBox'
 
 const TierUpdateSidePanel = () => {
   const { ui } = useStore()
@@ -306,7 +306,7 @@ const TierUpdateSidePanel = () => {
                               strokeWidth={3}
                             />
                           </div>
-                          <p className="ml-3 text-xs text-scale-1100">{feature}</p>
+                          <p className="ml-3 text-xs text-foreground-light">{feature}</p>
                         </li>
                       ))}
                     </ul>

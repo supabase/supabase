@@ -10,8 +10,8 @@ import { useOAuthAppUpdateMutation } from 'data/oauth/oauth-app-update-mutation'
 import { OAuthApp } from 'data/oauth/oauth-apps-query'
 import { useStore } from 'hooks'
 import { isValidHttpUrl, uuidv4 } from 'lib/helpers'
-import { Badge, Button, Dropdown, Form, IconEdit, IconUpload, Input, Modal, SidePanel } from 'ui'
 import { uploadAttachment } from 'lib/upload'
+import { Badge, Button, Dropdown, Form, IconEdit, IconUpload, Input, Modal, SidePanel } from 'ui'
 import AuthorizeRequesterDetails from './AuthorizeRequesterDetails'
 
 export interface PublishAppSidePanelProps {
@@ -268,7 +268,7 @@ const PublishAppSidePanel = ({
                               }}
                             >
                               <IconUpload size={18} strokeWidth={1.5} className="text-foreground" />
-                              <p className="text-xs text-scale-1100">Upload logo</p>
+                              <p className="text-xs text-foreground-light">Upload logo</p>
                             </div>
                           )}
                           <input

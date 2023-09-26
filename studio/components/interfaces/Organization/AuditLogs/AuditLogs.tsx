@@ -292,7 +292,7 @@ const AuditLogs = () => {
                             <div className="flex items-center space-x-4">
                               <div>{userIcon}</div>
                               <div>
-                                <p className="text-scale-1100">{user?.username ?? '-'}</p>
+                                <p className="text-foreground-light">{user?.username ?? '-'}</p>
                                 {role && (
                                   <p className="mt-0.5 text-xs text-scale-1000">{role?.name}</p>
                                 )}
@@ -313,7 +313,7 @@ const AuditLogs = () => {
                           </Table.td>
                           <Table.td>
                             <p
-                              className="text-scale-1100 max-w-[230px] truncate"
+                              className="text-foreground-light max-w-[230px] truncate"
                               title={project?.name ?? organization?.name ?? '-'}
                             >
                               {project?.name

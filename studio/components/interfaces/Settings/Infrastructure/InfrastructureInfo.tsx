@@ -122,7 +122,7 @@ const InfrastructureInfo = () => {
                 {showDbUpgrades && data?.eligible && <ProjectUpgradeAlert />}
                 {showDbUpgrades && !data?.eligible && data?.requires_manual_intervention && (
                   <Alert
-                    icon={<IconPackage className="text-scale-1100" strokeWidth={1.5} />}
+                    icon={<IconPackage className="text-foreground-light" strokeWidth={1.5} />}
                     variant="neutral"
                     title="A new version of Postgres is available for your project"
                   >

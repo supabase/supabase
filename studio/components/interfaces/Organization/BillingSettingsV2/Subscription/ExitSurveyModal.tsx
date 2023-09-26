@@ -140,7 +140,7 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
       >
         <Modal.Content>
           <div className="py-6 space-y-4">
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               We always strive to improve Supabase as much as we can. Please let us know the reasons
               you are canceling your subscription so that we can improve in the future.
             </p>
