@@ -1,10 +1,11 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useCheckPermissions } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
 import { useState } from 'react'
 import semver from 'semver'
-import { Button, Dropdown, IconChevronDown, IconMail, IconPlus, IconUserPlus } from 'ui'
+
+import { useCheckPermissions } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
+import { Button, Dropdown, IconChevronDown, IconMail, IconUserPlus } from 'ui'
 import CreateUserModal from './CreateUserModal'
 import InviteUserModal from './InviteUserModal'
 
@@ -37,7 +38,7 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
           <>
             {inviteEnabled && (
               <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger className="w-full">
+                <Tooltip.Trigger className="w-full text-left">
                   <Dropdown.Item
                     icon={<IconMail size="small" />}
                     disabled={!canInviteUsers}
@@ -67,7 +68,7 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
             )}
 
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger className="w-full">
+              <Tooltip.Trigger className="w-full text-left">
                 <Dropdown.Item
                   icon={<IconUserPlus size="small" />}
                   disabled={!canCreateUsers}

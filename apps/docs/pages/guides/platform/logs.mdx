@@ -20,6 +20,7 @@ Supabase provides a logging interface specific to each product. You can use simp
   size="small"
   type="underlined"
   defaultActiveId="api"
+  queryGroup="product"
 >
 <TabPanel id="api" label="API">
 
@@ -301,7 +302,7 @@ where h.x_real_ip is not null and r.method = "GET";
 
 Refer to the full field reference for each available source below. Do note that in order to access each nested key, you would need to perform the [necessary unnesting joins](#unnesting-arrays)
 
-<Tabs scrollable size="small" type="underlined" defaultActiveId="edge_logs">
+<Tabs scrollable size="small" type="underlined" defaultActiveId="edge_logs" queryGroup="source">
   {logConstants.schemas.map((schema) => (
     <TabPanel id={schema.reference} label={schema.name}>
       <table>
