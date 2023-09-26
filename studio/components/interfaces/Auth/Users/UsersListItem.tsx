@@ -1,11 +1,10 @@
-import { observer } from 'mobx-react-lite'
 import { Badge } from 'ui'
 
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import Table from 'components/to-be-cleaned/Table'
 import UserDropdown from './UserDropdown'
-import { User } from './Users.types'
 import { getDateFromIsoString } from './Users.utils'
+import { User } from 'data/auth/users-query'
 
 interface UserListItemProps {
   user: User
@@ -29,9 +28,7 @@ const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItem
         <span className="text-scale-1200">{!user.phone ? '-' : user.phone}</span>
       </Table.td>
       <Table.td className="table-cell">
-        <span className="capitalize text-scale-1200">
-          {user?.raw_app_meta_data?.provider || user?.app_metadata?.provider}
-        </span>
+        <span className="capitalize text-scale-1200">{user?.raw_app_meta_data?.provider}</span>
       </Table.td>
       <Table.td className="table-cell">
         <span className="text-scale-1200">{createdAt?.format('DD MMM, YYYY HH:mm')}</span>
@@ -64,4 +61,4 @@ const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItem
   )
 }
 
-export default observer(UserListItem)
+export default UserListItem

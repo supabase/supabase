@@ -23,8 +23,12 @@ const levelsData = {
     name: 'Database',
   },
   api: {
-    icon: '/docs/img/icons/menu/database',
-    name: 'Serverless APIs',
+    icon: '/docs/img/icons/menu/rest',
+    name: 'REST API',
+  },
+  graphql: {
+    icon: '/docs/img/icons/menu/graphql',
+    name: 'GraphQL',
   },
   auth: {
     icon: '/docs/img/icons/menu/auth',

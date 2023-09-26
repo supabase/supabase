@@ -113,8 +113,8 @@ const HooksPage: NextPageWithLayout = () => {
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldSection>
+      <ScaffoldContainer className="h-full">
+        <ScaffoldSection className="h-full">
           <div className="col-span-12">
             <HooksList createHook={createHook} editHook={editHook} deleteHook={deleteHook} />
           </div>
