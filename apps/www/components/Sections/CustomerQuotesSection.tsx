@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import { IconArrowUpRight } from 'ui'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 
@@ -40,8 +40,10 @@ const CustomerQuotesSection = (props: Props) => {
   const isInView = useInView(ref, { margin: '-25%', once: true })
 
   const Card = ({ customer, index }: Card) => {
-    const { isDarkMode } = useTheme()
-    const logo = `/images/customers/logos/${!isDarkMode ? '' : 'light/'}${customer.customer}.png`
+    const { resolvedTheme } = useTheme()
+    const logo = `/images/customers/logos/${resolvedTheme !== 'dark' ? '' : 'light/'}${
+      customer.customer
+    }.png`
 
     const initial = INITIAL_BOTTOM
     const animate = getAnimation({ delay: index * 0.1 })

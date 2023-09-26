@@ -2,7 +2,8 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
-import { useParams, useTheme } from 'common'
+import { useParams } from 'common'
+import { useTheme } from 'next-themes'
 import { getAddons } from 'components/interfaces/BillingV2/Subscription/Subscription.utils'
 import ProjectUpdateDisabledTooltip from 'components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import {
@@ -38,7 +39,7 @@ import {
 import { ComputeInstanceSidePanel, CustomDomainSidePanel, PITRSidePanel } from './'
 
 const Addons = () => {
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
   const { ref: projectRef, panel } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -174,10 +175,10 @@ const Addons = () => {
                         src={
                           computeInstance !== undefined
                             ? `${BASE_PATH}/img/optimized-compute-on${
-                                isDarkMode ? '' : '--light'
+                                theme === 'dark' ? '' : '--light'
                               }.png`
                             : `${BASE_PATH}/img/optimized-compute-off${
-                                isDarkMode ? '' : '--light'
+                                theme === 'dark' ? '' : '--light'
                               }.png`
                         }
                       />
@@ -368,8 +369,10 @@ const Addons = () => {
                         height={96}
                         src={
                           pitr !== undefined
-                            ? `${BASE_PATH}/img/pitr-on${isDarkMode ? '' : '--light'}.png?v=2`
-                            : `${BASE_PATH}/img/pitr-off${isDarkMode ? '' : '--light'}.png?v=2`
+                            ? `${BASE_PATH}/img/pitr-on${theme === 'dark' ? '' : '--light'}.png?v=2`
+                            : `${BASE_PATH}/img/pitr-off${
+                                theme === 'dark' ? '' : '--light'
+                              }.png?v=2`
                         }
                       />
                     </div>
@@ -458,8 +461,12 @@ const Addons = () => {
                         height={96}
                         src={
                           customDomain !== undefined
-                            ? `${BASE_PATH}/img/custom-domain-on${isDarkMode ? '' : '--light'}.png`
-                            : `${BASE_PATH}/img/custom-domain-off${isDarkMode ? '' : '--light'}.png`
+                            ? `${BASE_PATH}/img/custom-domain-on${
+                                theme === 'dark' ? '' : '--light'
+                              }.png`
+                            : `${BASE_PATH}/img/custom-domain-off${
+                                theme === 'dark' ? '' : '--light'
+                              }.png`
                         }
                       />
                     </div>
