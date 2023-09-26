@@ -1,4 +1,4 @@
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import * as React from 'react'
 import Image from 'next/image'
 
@@ -29,8 +29,8 @@ const GlassPanel = ({
   showLink = false,
   showIconBg = false,
 }: Props) => {
-  const { isDarkMode } = useTheme()
-  const showLogoInverse = logoInverse && isDarkMode
+  const { resolvedTheme } = useTheme()
+  const showLogoInverse = logoInverse && resolvedTheme === 'dark'
   const showLogo = !showLogoInverse && logo
 
   const IconBackground: React.FC = (props) => (
@@ -106,7 +106,7 @@ const GlassPanel = ({
               <img
                 className="w-5"
                 alt={title}
-                src={`${icon}${hasLightIcon && !isDarkMode ? '-light' : ''}.svg`}
+                src={`${icon}${hasLightIcon && resolvedTheme !== 'dark' ? '-light' : ''}.svg`}
               />
             </IconBackground>
           ) : (
