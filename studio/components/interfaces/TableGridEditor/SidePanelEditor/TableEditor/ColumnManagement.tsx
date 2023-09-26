@@ -164,7 +164,7 @@ const ColumnManagement = ({
         </div>
 
         {hasImportContent && (
-          <p className="text-sm text-scale-1000 my-2">
+          <p className="text-sm text-foreground-light my-2">
             Your table will be created with {importContent?.rowCount?.toLocaleString()} rows and the
             following {columns.length} columns.
           </p>
@@ -210,7 +210,7 @@ const ColumnManagement = ({
                         'border border-scale-200 ', //border
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         Recommended to use lowercase and use an underscore to separate words e.g.
                         column_name
                       </span>
@@ -240,7 +240,7 @@ const ColumnManagement = ({
                         'border border-scale-200 ', //border
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         Can either be a literal or an expression. When using an expression wrap your
                         expression in brackets, e.g. (gen_random_uuid())
                       </span>
@@ -344,7 +344,7 @@ const ColumnManagement = ({
             <a target="_blank" rel="noreferrer">
               <Button
                 type="text"
-                className="text-scale-1000 hover:text-scale-1200"
+                className="text-foreground-light hover:text-foreground"
                 icon={<IconExternalLink size={12} strokeWidth={2} />}
               >
                 Learn more about data types

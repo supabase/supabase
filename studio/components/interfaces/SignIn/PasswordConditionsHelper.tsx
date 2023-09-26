@@ -32,7 +32,7 @@ const PasswordCondition = ({ title, isMet }: PasswordConditionProps) => {
     <div
       className={
         'flex items-center gap-1 space-x-1.5 transition duration-200 ' +
-        (isMet ? 'text-scale-1100' : 'text-scale-900')
+        (isMet ? 'text-foreground-light' : 'text-scale-900')
       }
     >
       {isMet ? (

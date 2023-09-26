@@ -98,7 +98,7 @@ const Indexes = () => {
       <div className="pb-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="mb-1 text-xl text-scale-1200">Database Indexes</h3>
+            <h3 className="mb-1 text-xl text-foreground">Database Indexes</h3>
             <div className="text-sm text-scale-900">
               Improve query performance against your database
             </div>
@@ -186,7 +186,7 @@ const Indexes = () => {
                 {sortedIndexes.length === 0 && search.length === 0 && (
                   <Table.tr>
                     <Table.td colSpan={4}>
-                      <p className="text-sm text-scale-1200">No indexes created yet</p>
+                      <p className="text-sm text-foreground">No indexes created yet</p>
                       <p className="text-sm text-light">
                         There are no indexes found in the schema "{selectedSchema}"
                       </p>
@@ -196,7 +196,7 @@ const Indexes = () => {
                 {sortedIndexes.length === 0 && search.length > 0 && (
                   <Table.tr>
                     <Table.td colSpan={4}>
-                      <p className="text-sm text-scale-1200">No results found</p>
+                      <p className="text-sm text-foreground">No results found</p>
                       <p className="text-sm text-light">
                         Your search for "{search}" did not return any results
                       </p>

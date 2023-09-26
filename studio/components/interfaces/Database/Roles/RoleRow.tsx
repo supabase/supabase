@@ -89,7 +89,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
               <button
                 id="collapsible-trigger"
                 type="button"
-                className="group flex w-full items-center justify-between rounded py-3 px-6 text-scale-1200"
+                className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
                 onClick={(event: any) => {
                   if (event.target.id === 'collapsible-trigger') setIsExpanded(!isExpanded)
                 }}
@@ -105,7 +105,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                     <p className="text-left text-sm" id="collapsible-trigger">
                       {role.name}
                     </p>
-                    <p className="text-left text-sm text-scale-1000" id="collapsible-trigger">
+                    <p className="text-left text-sm text-foreground-light" id="collapsible-trigger">
                       (ID: {role.id})
                     </p>
                   </div>
@@ -122,7 +122,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                   <p
                     id="collapsible-trigger"
                     className={`text-sm ${
-                      role.active_connections > 0 ? 'text-scale-1100' : 'text-scale-1000'
+                      role.active_connections > 0 ? 'text-foreground' : 'text-foreground-light'
                     }`}
                   >
                     {role.active_connections} connections
@@ -156,7 +156,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
               </button>
             </Collapsible.Trigger>
             <Collapsible.Content>
-              <div className="group border-t border-scale-500 bg-scale-100 py-6 px-20 text-scale-1200 dark:bg-scale-300">
+              <div className="group border-t border-scale-500 bg-scale-100 py-6 px-20 text-foreground dark:bg-scale-300">
                 <div className="py-4 space-y-[9px]">
                   {Object.keys(ROLE_PERMISSIONS).map((permission) => (
                     <Toggle

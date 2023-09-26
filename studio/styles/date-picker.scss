@@ -58,7 +58,7 @@
 }
 
 .react-datepicker__day {
-  @apply w-10 h-10 flex items-center font-normal justify-center text-sm leading-loose transition text-scale-1100;
+  @apply w-10 h-10 flex items-center font-normal justify-center text-sm leading-loose transition text-foreground-light;
   /* @apply mb-1 py-1; */
   @apply -space-y-px;
   @apply border border-scale-500;
@@ -102,5 +102,5 @@
 }
 
 .react-datepicker__day--highlighted {
-  @apply bg-brand-600 text-scale-1100;
+  @apply bg-brand-600 text-foreground-light;
 }

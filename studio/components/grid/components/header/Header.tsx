@@ -1,33 +1,33 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import saveAs from 'file-saver'
 import Papa from 'papaparse'
-import { useState, ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
 import {
   Button,
-  IconDownload,
-  IconX,
-  IconTrash,
   Dropdown,
-  IconChevronDown,
-  IconFileText,
   IconArrowUp,
+  IconChevronDown,
+  IconDownload,
+  IconFileText,
+  IconTrash,
+  IconX,
 } from 'ui'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { useCheckPermissions, useStore, useUrlState } from 'hooks'
-import FilterDropdown from './filter'
-import SortPopover from './sort'
-import RefreshButton from './RefreshButton'
-import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { Sort, Filter, SupaTable } from 'components/grid/types'
+import clsx from 'clsx'
 import { useDispatch, useTrackedState } from 'components/grid/store'
+import { Filter, Sort, SupaTable } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
+import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
+import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
+import { useCheckPermissions, useStore, useUrlState } from 'hooks'
+import FilterDropdown from './filter'
+import RefreshButton from './RefreshButton'
 import RLSBannerWarning from './RLSBannerWarning'
-import clsx from 'clsx'
+import SortPopover from './sort'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
@@ -150,7 +150,7 @@ const DefaultHeader = ({
                         >
                           <div className="">
                             <p>Insert row</p>
-                            <p className="text-scale-1000 text-xs">
+                            <p className="text-foreground-light text-xs">
                               Insert a new row into {table.name}
                             </p>
                           </div>
@@ -178,7 +178,7 @@ const DefaultHeader = ({
                         >
                           <div className="">
                             <p>Insert column</p>
-                            <p className="text-scale-1000 text-xs">
+                            <p className="text-foreground-light text-xs">
                               Insert a new column into {table.name}
                             </p>
                           </div>
@@ -207,7 +207,9 @@ const DefaultHeader = ({
                         >
                           <div className="">
                             <p>Import data from CSV</p>
-                            <p className="text-scale-1000 text-xs">Insert new rows from a CSV</p>
+                            <p className="text-foreground-light text-xs">
+                              Insert new rows from a CSV
+                            </p>
                           </div>
                         </Dropdown.Item>,
                       ]
@@ -406,7 +408,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           icon={<IconX size="tiny" strokeWidth={2} />}
           onClick={deselectRows}
         />
-        <span className="text-xs text-scale-1200">
+        <span className="text-xs text-foreground">
           {allRowsSelected
             ? `${totalRows} rows selected`
             : selectedRows.size > 1

@@ -111,7 +111,7 @@ const JoinOrganizationPage = () => {
       <div
         className={[
           'flex flex-col items-center justify-center gap-3 text-sm',
-          isError ? 'text-scale-1100' : 'text-scale-1200',
+          isError ? 'text-foreground-light' : 'text-foreground',
         ].join(' ')}
       >
         {children}
@@ -165,10 +165,10 @@ const JoinOrganizationPage = () => {
     <>
       <div className="flex flex-col gap-2 px-6 py-8">
         <>
-          <p className="text-sm text-scale-1200">You have been invited to join </p>
+          <p className="text-sm text-foreground">You have been invited to join </p>
           {organization_name ? (
             <>
-              <p className="text-3xl text-scale-1200">
+              <p className="text-3xl text-foreground">
                 {name ? name : organization_name ? `${organization_name}` : 'an organization'}
               </p>
               {!token_does_not_exist && (
@@ -177,7 +177,7 @@ const JoinOrganizationPage = () => {
             </>
           ) : (
             <>
-              <p className="text-3xl text-scale-1200">{'an organization'}</p>
+              <p className="text-3xl text-foreground">{'an organization'}</p>
             </>
           )}
           {slug && <p className="text-xs text-scale-900">{`organization slug: ${slug}`}</p>}

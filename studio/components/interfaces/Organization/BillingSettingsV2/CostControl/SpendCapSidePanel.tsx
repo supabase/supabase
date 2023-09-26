@@ -152,7 +152,7 @@ const SpendCapSidePanel = () => {
                   size={16}
                   className={showUsageCosts ? 'rotate-90' : ''}
                 />
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   How are each resource charged after exceeding the included quota?
                 </p>
               </div>
@@ -178,7 +178,7 @@ const SpendCapSidePanel = () => {
                     <>
                       <Table.tr key={categoryId}>
                         <Table.td>
-                          <p className="text-xs text-scale-1200">{category.title}</p>
+                          <p className="text-xs text-foreground">{category.title}</p>
                         </Table.td>
                         <Table.td>{null}</Table.td>
                       </Table.tr>
@@ -260,8 +260,8 @@ const SpendCapSidePanel = () => {
                     <p
                       className={clsx(
                         'text-sm transition',
-                        !isFreePlan && 'group-hover:text-scale-1200',
-                        isSelected ? 'text-scale-1200' : 'text-scale-1000'
+                        !isFreePlan && 'group-hover:text-foreground',
+                        isSelected ? 'text-foreground' : 'text-foreground-light'
                       )}
                     >
                       {option.name}

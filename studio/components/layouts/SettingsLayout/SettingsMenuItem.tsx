@@ -14,7 +14,7 @@ const SettingsMenuItem = ({ href, label, isActive }: SettingsMenuItemProps) => {
         <a
           className={clsx(
             'text-sm',
-            isActive ? 'text-scale-1200' : 'text-scale-1100 hover:text-scale-1200 transition'
+            isActive ? 'text-foreground' : 'text-foreground-light hover:text-foreground transition'
           )}
         >
           {label}

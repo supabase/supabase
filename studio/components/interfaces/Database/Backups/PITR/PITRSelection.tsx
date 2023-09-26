@@ -160,7 +160,7 @@ const PITRSelection = () => {
                               'border-scale-200 border w-48 text-center',
                             ].join(' ')}
                           >
-                            <span className="text-scale-1200 text-xs">
+                            <span className="text-foreground text-xs">
                               Selected date is out of range where backups are available
                             </span>
                           </div>
@@ -196,12 +196,12 @@ const PITRSelection = () => {
                             type="button"
                             className={`
                             ${prevMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                            text-scale-1100 hover:text-scale-1200 focus:outline-none
+                            text-foreground-light hover:text-foreground focus:outline-none
                         `}
                           >
                             <IconChevronLeft size={16} strokeWidth={2} />
                           </button>
-                          <span className="text-scale-1100 text-sm">
+                          <span className="text-foreground-light text-sm">
                             {format(date, 'MMMM yyyy')}
                           </span>
                           <button
@@ -210,7 +210,7 @@ const PITRSelection = () => {
                             type="button"
                             className={`
                             ${nextMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                            text-scale-1100 hover:text-scale-1200 focus:outline-none
+                            text-foreground-light hover:text-foreground focus:outline-none
                         `}
                           >
                             <IconChevronRight size={16} strokeWidth={2} />
@@ -221,7 +221,7 @@ const PITRSelection = () => {
                   />
                   <div className="flex items-center space-x-2">
                     <div className="border w-4 h-4 border-scale-800 bg-brand-600" />
-                    <p className="text-xs text-scale-1000">Point in time back up available</p>
+                    <p className="text-xs text-foreground-light">Point in time back up available</p>
                   </div>
                 </div>
 
@@ -240,7 +240,7 @@ const PITRSelection = () => {
                   ) : (
                     <div className="space-y-8 py-2">
                       <div className="space-y-1">
-                        <p className="text-sm text-scale-1100">Restore database to</p>
+                        <p className="text-sm text-foreground-light">Restore database to</p>
                         <p className="text-3xl">
                           <span>{dayjs(selectedDate).format('DD MMM YYYY')}</span>
                           <span>
@@ -252,7 +252,7 @@ const PITRSelection = () => {
                       </div>
                       <div className="space-y-2">
                         <div className="space-y-1">
-                          <p className="text-sm text-scale-1100">Time zone</p>
+                          <p className="text-sm text-foreground-light">Time zone</p>
                           <div className="w-[350px]">
                             <TimezoneSelection
                               hideLabel
@@ -264,7 +264,7 @@ const PITRSelection = () => {
                         </div>
                         <div>
                           <div className="space-y-1">
-                            <p className="text-sm text-scale-1100">Recovery time</p>
+                            <p className="text-sm text-foreground-light">Recovery time</p>
                             <TimeInput
                               defaultTime={selectedTime}
                               minimumTime={
@@ -284,7 +284,7 @@ const PITRSelection = () => {
                             />
                           </div>
 
-                          <p className="text-sm text-scale-1000 mt-8">
+                          <p className="text-sm text-foreground-light mt-8">
                             Enter a time within the available range to restore from. <br /> Backups
                             are captured every 2 minutes, allowing you to enter a time and restore
                             your database to the closest backup point. We'll match the time you
@@ -292,15 +292,15 @@ const PITRSelection = () => {
                           </p>
                         </div>
                         <div className="!mt-4 space-y-1">
-                          <h3 className="text-sm text-scale-1100"></h3>
+                          <h3 className="text-sm text-foreground-light"></h3>
                           {isSelectedOnEarliestDay && (
-                            <p className="text-sm text-scale-1000">
+                            <p className="text-sm text-foreground-light">
                               <strong>Earliest backup available for this date</strong>:{' '}
                               {earliestAvailableBackup.format('HH:mm:ss')}
                             </p>
                           )}
                           {isSelectedOnLatestDay && (
-                            <p className="text-sm text-scale-1000">
+                            <p className="text-sm text-foreground-light">
                               <strong>Latest backup available for this date</strong>:{' '}
                               {latestAvailableBackup.format('HH:mm:ss')}
                             </p>
@@ -344,7 +344,7 @@ const PITRSelection = () => {
         <div className="space-y-4 py-3">
           <Modal.Content>
             <div className="py-2 space-y-1">
-              <p className="text-sm text-scale-1100">Your database will be restored to:</p>
+              <p className="text-sm text-foreground-light">Your database will be restored to:</p>
             </div>
             <div className="py-2 flex flex-col gap-3">
               <div>
@@ -370,7 +370,7 @@ const PITRSelection = () => {
           </Modal.Content>
           <Modal.Separator />
           <Modal.Content>
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               Restores may take from a few minutes up to several hours depending on the size of your
               database. During this period, your project will not be available, until the
               restoration is completed.

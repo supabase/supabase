@@ -41,31 +41,30 @@ const LogSelection = ({
     partialLog?.id
   )
   const Formatter = () => {
-    
     switch (queryType) {
       case 'api':
         if (!fullLog) return null
-        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />;
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
         return <DatabaseApiSelectionRender log={fullLog} />
 
       case 'database':
         if (!fullLog) return null
-        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />;
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
         return <DatabasePostgresSelectionRender log={fullLog} />
 
       case 'fn_edge':
         if (!fullLog) return null
-        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />;
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
         return <FunctionInvocationSelectionRender log={fullLog} />
 
       case 'functions':
         if (!fullLog) return null
-        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />;
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
         return <FunctionLogsSelectionRender log={fullLog} />
 
       case 'auth':
         if (!fullLog) return null
-        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />;
+        if (!fullLog.metadata) return <DefaultPreviewSelectionRenderer log={fullLog} />
         return <AuthSelectionRenderer log={fullLog} />
 
       default:
@@ -147,7 +146,7 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
             </div>
           </div>
           <div className="flex flex-col gap-1">
-            <h3 className="text-sm text-scale-1200">Select an Event</h3>
+            <h3 className="text-sm text-foreground">Select an Event</h3>
             <p className="text-xs text-scale-900">
               Select an Event to view the code snippet (pretty view) or complete JSON payload (raw
               view).
@@ -163,7 +162,7 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
             </div>
             <Button
               type="text"
-              className="cursor-pointer transition hover:text-scale-1200 h-8 w-8 px-0 py-0 flex items-center justify-center"
+              className="cursor-pointer transition hover:text-foreground h-8 w-8 px-0 py-0 flex items-center justify-center"
               onClick={onClose}
             >
               <IconX size={14} strokeWidth={2} className="text-scale-900" />

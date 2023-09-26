@@ -1,7 +1,7 @@
-import { Alert, Button, Dropdown, IconClock } from 'ui'
 import { DatePicker } from 'components/ui/DatePicker'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
+import { Alert, Button, Dropdown, IconClock } from 'ui'
 import { DatetimeHelper, getDefaultHelper, LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from '.'
 
 interface Props {
@@ -50,9 +50,9 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
               {helpers.map((helper) => (
                 <Dropdown.Radio key={helper.text} value={helper.text} disabled={helper.disabled}>
                   <span
-                    className={[helper.disabled ? 'text-scale-1000 cursor-not-allowed' : ''].join(
-                      ' '
-                    )}
+                    className={[
+                      helper.disabled ? 'text-foreground-light cursor-not-allowed' : '',
+                    ].join(' ')}
                   >
                     {helper.text}
                   </span>

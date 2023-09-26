@@ -19,7 +19,7 @@ const TwoOptionToggle = ({
     isActive: boolean
   ) => `absolute top-0 z-1 text-xs inline-flex h-full items-center justify-center font-medium
     ${
-      isActive ? 'hover:text-scale-1100 dark:hover:text-white' : 'hover:text-gray-600'
+      isActive ? 'hover:text-foreground-light dark:hover:text-white' : 'hover:text-gray-600'
     } dark:hover:text-white focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue
     transition ease-in-out duration-150`
 
@@ -41,7 +41,7 @@ const TwoOptionToggle = ({
           key={`toggle_${index}`}
           style={{ width: width + 1 }}
           className={`
-              ${activeOption === option ? 'text-scale-1200' : 'text-scale-1000'}
+              ${activeOption === option ? 'text-foreground' : 'text-foreground-light'}
               ${index === 0 ? 'right-0' : 'left-0'}
               ${buttonStyle(activeOption === option)}
               cursor-pointer
@@ -50,8 +50,8 @@ const TwoOptionToggle = ({
         >
           <span
             className={clsx(
-              'capitalize hover:text-scale-1200 dark:hover:text-scale-1200',
-              activeOption === option ? 'text-scale-1200' : 'text-scale-1000'
+              'capitalize hover:text-foreground dark:hover:text-foreground',
+              activeOption === option ? 'text-foreground' : 'text-foreground-light'
             )}
           >
             {option}

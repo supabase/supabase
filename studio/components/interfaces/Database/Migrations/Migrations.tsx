@@ -32,7 +32,7 @@ const Migrations = () => {
       <div>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="mb-1 text-xl text-scale-1200">Database Migrations</h3>
+            <h3 className="mb-1 text-xl text-foreground">Database Migrations</h3>
             <div className="text-sm text-scale-900">
               History of migrations that have been run on your database
             </div>
@@ -139,7 +139,7 @@ const Migrations = () => {
                       ) : (
                         <Table.tr>
                           <Table.td colSpan={3}>
-                            <p className="text-sm text-scale-1200">No results found</p>
+                            <p className="text-sm text-foreground">No results found</p>
                             <p className="text-sm text-light">
                               Your search for "{search}" did not return any results
                             </p>
