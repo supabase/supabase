@@ -54,7 +54,7 @@ const TopNavBar: FC = () => {
   return (
     <nav className="h-[60px] border-b backdrop-blur backdrop-filter bg bg-opacity-75">
       <div className="px-5 max-w-7xl mx-auto flex gap-3 justify-between items-center h-full">
-        <div className={['lg:hidden'].join(' ')}>
+        <div className="lg:hidden">
           <Link href="/">
             <a className=" flex items-center gap-2">
               <Image
