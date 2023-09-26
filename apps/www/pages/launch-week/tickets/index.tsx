@@ -9,7 +9,7 @@ import { createClient } from '@supabase/supabase-js'
 import { debounce } from 'lodash'
 
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -22,13 +22,13 @@ interface Props {
 }
 
 const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'http://localhost:54321',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_MISC_USE_URL ?? 'http://localhost:54321',
+  process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
 )
 
 const generateOgs = async (users: UserData[]) => {
   users?.map(async (user) => {
-    const ogImageUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/lw8-ticket-og?username=${encodeURIComponent(
+    const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw8-ticket-og?username=${encodeURIComponent(
       user.username ?? ''
     )}${!!user.golden ? '&golden=true' : ''}`
     return await fetch(ogImageUrl)
@@ -42,8 +42,8 @@ export default function TicketsPage({ users }: Props) {
   const DESCRIPTION = 'Supabase Launch Week 8 | 7–11 August 2023'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/8/lw8-og.jpg`
 
-  const { isDarkMode, toggleTheme } = useTheme()
-  const [initialDarkMode] = useState(isDarkMode)
+  const { theme, setTheme } = useTheme()
+  const [initialDarkMode] = useState(theme === 'dark')
   const [isLoading, setIsLoading] = useState(false)
   const [offset, setOffset] = useState(1)
   const [isLast, setIsLast] = useState(false)
@@ -92,11 +92,11 @@ export default function TicketsPage({ users }: Props) {
   }, [])
 
   useEffect(() => {
-    toggleTheme(true)
+    setTheme('dark')
     document.body.className = 'dark bg-[#020405]'
     return () => {
       document.body.className = ''
-      toggleTheme(initialDarkMode)
+      setTheme('dark')
     }
   }, [])
 

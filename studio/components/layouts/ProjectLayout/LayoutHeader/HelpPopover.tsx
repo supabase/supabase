@@ -40,7 +40,7 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
                   <IconHelpCircle
                     size={alt ? 18 : 16}
                     strokeWidth={1.5}
-                    className={alt ? 'text-scale-1100' : 'text-scale-900'}
+                    className={alt ? 'text-foreground-light' : 'text-scale-900'}
                   />
                 }
               >
@@ -59,7 +59,7 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
                   'space-y-2 border border-scale-200',
                 ].join(' ')}
               >
-                <p className="text-xs text-scale-1200">Help</p>
+                <p className="text-xs text-foreground">Help</p>
               </div>
             </Tooltip.Content>
           </Tooltip.Portal>
@@ -67,7 +67,7 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
       </Tooltip.Root>
       <PopoverContent_Shadcn_ className="w-[400px] space-y-4 p-0 py-5" align="end" side="bottom">
         <div className="mb-5 space-y-4 px-5">
-          <h5 className="text-scale-1200">Need help with your project?</h5>
+          <h5 className="text-foreground">Need help with your project?</h5>
           <p className="text-sm text-scale-900">
             For issues with your project hosted on supabase.com, or other inquiries about our hosted
             services.

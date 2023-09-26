@@ -45,7 +45,7 @@ const UpgradeToPro = ({
           <div className="space-y-1">
             <p className="text-sm">{primaryText}</p>
             <div>
-              <p className="text-sm text-scale-1100">{secondaryText}</p>
+              <p className="text-sm text-foreground-light">{secondaryText}</p>
             </div>
           </div>
           <Tooltip.Root delayDuration={0}>
@@ -70,7 +70,7 @@ const UpgradeToPro = ({
                       'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text-foreground">
                       {projectUpdateDisabled ? (
                         <>
                           Subscription changes are currently disabled.

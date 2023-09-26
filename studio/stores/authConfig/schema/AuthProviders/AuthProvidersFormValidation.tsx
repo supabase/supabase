@@ -1,4 +1,4 @@
-import { boolean, number, object, string, ValidationError } from 'yup'
+import { boolean, number, object, string, date, ValidationError } from 'yup'
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 
 const parseBase64URL = (b64url: string) => {
@@ -243,6 +243,21 @@ const PROVIDER_PHONE = {
         matches: ['twilio', 'messagebird', 'textlocal', 'vonage'],
       },
     },
+    SMS_TEST_OTP: {
+      type: 'string',
+      title: 'Test Phone Numbers and OTPs',
+      description:
+        'Register phone number and OTP combinations for testing as a comma separated list of <phone number>=<otp> pairs. Example: `18005550123=789012`',
+    },
+    SMS_TEST_OTP_VALID_UNTIL: {
+      type: 'datetime',
+      title: 'Test OTPs Valid Until',
+      description:
+        "Test phone number and OTP combinations won't be active past this date and time (local time zone).",
+      show: {
+        key: 'SMS_TEST_OTP',
+      },
+    },
   },
   validationSchema: object().shape({
     EXTERNAL_PHONE_ENABLED: boolean().required(),
@@ -356,6 +371,20 @@ const PROVIDER_PHONE = {
     SMS_OTP_EXP: number().min(0, 'Must be more than 0').required('This is required'),
     SMS_OTP_LENGTH: number().min(6, 'Must be 6 or more in length').required('This is required'),
     SMS_TEMPLATE: string().required('SMS template is required.'),
+    SMS_TEST_OTP: string()
+      .matches(
+        /^\s*([0-9]{1,15}=[0-9]+)(\s*,\s*[0-9]{1,15}=[0-9]+)*\s*$/g,
+        'Must be a comma-separated list of <phone number>=<OTP> pairs. Phone numbers should be in international format, without spaces, dashes or the + prefix. Example: 123456789=987654'
+      )
+      .trim()
+      .transform((value: string) => value.replace(/\s+/g, '')),
+    SMS_TEST_OTP_VALID_UNTIL: string().when(['SMS_TEST_OTP'], {
+      is: (SMS_TEST_OTP: string | null) => {
+        return !!SMS_TEST_OTP
+      },
+      then: (schema) => schema.required('You must provide a valid until date.'),
+      otherwise: (schema) => schema.transform((value: string) => ''),
+    }),
   }),
   misc: {
     iconKey: 'phone-icon4',

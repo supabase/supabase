@@ -14,13 +14,19 @@ import { getProjectDetail } from 'data/projects/project-detail-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const ResetDbPassword = ({ disabled = false }) => {
   const { ref } = useParams()
   const { ui, meta } = useStore()
 
   const isProjectActive = useIsProjectActive()
-  const canResetDbPassword = useCheckPermissions(PermissionAction.UPDATE, 'projects')
+  const { project } = useProjectContext()
+  const canResetDbPassword = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const [showResetDbPass, setShowResetDbPass] = useState<boolean>(false)
 
@@ -122,7 +128,7 @@ const ResetDbPassword = ({ disabled = false }) => {
                           'border border-scale-200 ', //border
                         ].join(' ')}
                       >
-                        <span className="text-xs text-scale-1200">
+                        <span className="text-xs text-foreground">
                           {!canResetDbPassword
                             ? 'You need additional permissions to reset the database password'
                             : !isProjectActive
@@ -140,7 +146,7 @@ const ResetDbPassword = ({ disabled = false }) => {
       </Panel>
       <Modal
         hideFooter
-        header={<h5 className="text-sm text-scale-1200">Reset database password</h5>}
+        header={<h5 className="text-sm text-foreground">Reset database password</h5>}
         confirmText="Reset password"
         size="medium"
         visible={showResetDbPass}

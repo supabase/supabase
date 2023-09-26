@@ -15,6 +15,7 @@ import {
   Toggle,
 } from 'ui'
 
+import { useParams } from 'common'
 import { SpendCapModal } from 'components/interfaces/BillingV2'
 import InformationBox from 'components/ui/InformationBox'
 import Panel from 'components/ui/Panel'
@@ -57,6 +58,8 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const stripe = useStripe()
   const elements = useElements()
 
+  const { plan } = useParams()
+
   const [orgName, setOrgName] = useState('')
   const [orgKind, setOrgKind] = useState(ORG_KIND_DEFAULT)
   const [orgSize, setOrgSize] = useState(ORG_SIZE_DEFAULT)
@@ -64,7 +67,10 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const [newOrgLoading, setNewOrgLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>()
 
-  const [dbPricingTierKey, setDbPricingTierKey] = useState('FREE')
+  // URL param support for passing plan
+  const [dbPricingTierKey, setDbPricingTierKey] = useState(
+    plan && ['free', 'team', 'pro'].includes(plan) ? plan.toUpperCase() : 'FREE'
+  )
 
   const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
   const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(true)
@@ -133,7 +139,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         elements,
         redirect: 'if_required',
         confirmParams: {
-          return_url: `${getURL()}/new-with-subscription`,
+          return_url: `${getURL()}/new`,
           expand: ['payment_method'],
         },
       })
@@ -192,7 +198,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         >
           <Panel.Content className="pt-0">
             <p className="text-sm">This is your organization within Supabase.</p>
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               For example, you can use the name of your company or department.
             </p>
           </Panel.Content>

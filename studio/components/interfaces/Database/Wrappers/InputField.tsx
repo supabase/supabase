@@ -32,7 +32,7 @@ const InputField = ({ option, loading, error }: InputFieldProps) => {
                     <IconHelpCircle
                       strokeWidth={2}
                       size={14}
-                      className="text-scale-1000 hover:text-scale-1200 cursor-pointer transition"
+                      className="text-foreground-light hover:text-foreground cursor-pointer transition"
                     />
                   </a>
                 </Link>
@@ -60,7 +60,7 @@ const InputField = ({ option, loading, error }: InputFieldProps) => {
                   <IconHelpCircle
                     strokeWidth={2}
                     size={14}
-                    className="text-scale-1000 hover:text-scale-1200 cursor-pointer transition"
+                    className="text-foreground-light hover:text-foreground cursor-pointer transition"
                   />
                 </a>
               </Link>

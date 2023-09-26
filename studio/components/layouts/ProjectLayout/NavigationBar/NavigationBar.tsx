@@ -1,15 +1,22 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useParams, useTheme } from 'common'
+import { useParams } from 'common'
 import { isUndefined } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-
+import { useTheme } from 'next-themes'
 import { useFlag } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import {
   Button,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuLabel_Shadcn_,
+  DropdownMenuRadioGroup_Shadcn_,
+  DropdownMenuRadioItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconCommand,
   IconHome,
   IconSearch,
@@ -27,7 +34,7 @@ import NavigationIconButton from './NavigationIconButton'
 
 const NavigationBar = () => {
   const router = useRouter()
-  const { isDarkMode, toggleTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
 
   const os = detectOS()
@@ -121,7 +128,7 @@ const NavigationBar = () => {
                     ].join(' ')}
                   >
                     {os === 'macos' ? (
-                      <IconCommand size={11.5} strokeWidth={1.5} className="text-scale-1200" />
+                      <IconCommand size={11.5} strokeWidth={1.5} className="text-foreground" />
                     ) : (
                       <p className="text-xs">CTRL</p>
                     )}
@@ -131,44 +138,40 @@ const NavigationBar = () => {
               </Tooltip.Portal>
             </Tooltip.Root>
           )}
-          <Dropdown
-            side="right"
-            align="start"
-            overlay={
-              <>
-                {IS_PLATFORM && (
-                  <>
-                    <Link href="/account/me">
-                      <Dropdown.Item
-                        key="header"
-                        icon={<IconSettings size={14} strokeWidth={1.5} />}
-                      >
-                        Account Preferences
-                      </Dropdown.Item>
-                    </Link>
-                    <Dropdown.Separator />
-                  </>
-                )}
-                <Dropdown.Label>Theme</Dropdown.Label>
-                <Dropdown.RadioGroup
-                  key="theme"
-                  value={isDarkMode ? 'dark' : 'light'}
-                  onChange={(e: any) => toggleTheme(e === 'dark')}
-                >
-                  {/* [Joshen] Removing system default for now, needs to be supported in useTheme from common packages */}
-                  {/* <Dropdown.Radio value="system">System default</Dropdown.Radio> */}
-                  <Dropdown.Radio value="dark">Dark</Dropdown.Radio>
-                  <Dropdown.Radio value="light">Light</Dropdown.Radio>
-                </Dropdown.RadioGroup>
-              </>
-            }
-          >
-            <Button asChild type="text" size="tiny">
-              <span className="py-1 h-10 border-none">
-                <IconUser size={18} strokeWidth={2} className="text-scale-900" />
-              </span>
-            </Button>
-          </Dropdown>
+          <DropdownMenu_Shadcn_>
+            <DropdownMenuTrigger_Shadcn_>
+              <Button asChild type="text" size="tiny">
+                <span className="py-1 h-10 border-none">
+                  <IconUser size={18} strokeWidth={2} className="text-scale-900" />
+                </span>
+              </Button>
+            </DropdownMenuTrigger_Shadcn_>
+            <DropdownMenuContent_Shadcn_ side="right" align="start">
+              {IS_PLATFORM && (
+                <>
+                  <Link href="/account/me">
+                    <DropdownMenuItem_Shadcn_ key="header" className="space-x-2">
+                      <IconSettings size={14} strokeWidth={1.5} />
+                      <p className="text">Account Preferences</p>
+                    </DropdownMenuItem_Shadcn_>
+                  </Link>
+                  <DropdownMenuSeparator_Shadcn_ />
+                </>
+              )}
+              <DropdownMenuLabel_Shadcn_>Theme</DropdownMenuLabel_Shadcn_>
+              <DropdownMenuRadioGroup_Shadcn_
+                key="theme"
+                value={theme === 'dark' ? 'dark' : 'light'}
+                onValueChange={(value: string) => setTheme(value)}
+              >
+                <DropdownMenuRadioItem_Shadcn_ value="system">
+                  System default
+                </DropdownMenuRadioItem_Shadcn_>
+                <DropdownMenuRadioItem_Shadcn_ value="dark">Dark</DropdownMenuRadioItem_Shadcn_>
+                <DropdownMenuRadioItem_Shadcn_ value="light">Light</DropdownMenuRadioItem_Shadcn_>
+              </DropdownMenuRadioGroup_Shadcn_>
+            </DropdownMenuContent_Shadcn_>
+          </DropdownMenu_Shadcn_>
         </ul>
       )}
     </div>
