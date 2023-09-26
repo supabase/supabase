@@ -4,7 +4,14 @@ import { useQueryClient } from '@tanstack/react-query'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Button, Dropdown, IconChevronDown } from 'ui'
+import {
+  Button,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconChevronDown,
+} from 'ui'
 
 import {
   useIsProjectActive,
@@ -99,11 +106,17 @@ const RestartServerButton = () => {
               Restart project
             </Button>
             {canRestartProject && isProjectActive && (
-              <Dropdown
-                align="end"
-                side="bottom"
-                overlay={[
-                  <Dropdown.Item
+              <DropdownMenu_Shadcn_>
+                <DropdownMenuTrigger_Shadcn_>
+                  <Button
+                    type="default"
+                    className="rounded-l-none px-[4px] py-[5px]"
+                    icon={<IconChevronDown />}
+                    disabled={!canRestartProject}
+                  />
+                </DropdownMenuTrigger_Shadcn_>
+                <DropdownMenuContent_Shadcn_ align="end" side="bottom">
+                  <DropdownMenuItem_Shadcn_
                     key="database"
                     disabled={isLoading}
                     onClick={() => {
@@ -117,16 +130,9 @@ const RestartServerButton = () => {
                         failure modes
                       </p>
                     </div>
-                  </Dropdown.Item>,
-                ]}
-              >
-                <Button
-                  type="default"
-                  className="rounded-l-none px-[4px] py-[5px]"
-                  icon={<IconChevronDown />}
-                  disabled={!canRestartProject}
-                />
-              </Dropdown>
+                  </DropdownMenuItem_Shadcn_>
+                </DropdownMenuContent_Shadcn_>
+              </DropdownMenu_Shadcn_>
             )}
           </div>
         </Tooltip.Trigger>

@@ -5,9 +5,16 @@ import { useContextMenu } from 'react-contexify'
 import SVG from 'react-inlinesvg'
 import {
   Checkbox,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuPortal_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenuSubContent_Shadcn_,
+  DropdownMenuSubTrigger_Shadcn_,
+  DropdownMenuSub_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconAlertCircle,
-  IconChevronRight,
   IconClipboard,
   IconDownload,
   IconEdit,
@@ -414,61 +421,51 @@ const FileExplorerRow = ({
               strokeWidth={2}
             />
           ) : (
-            <Dropdown
-              modal={false}
-              side="bottom"
-              align="end"
-              overlay={[
-                rowOptions.map((option) => {
+            <DropdownMenu_Shadcn_ modal={false}>
+              <DropdownMenuTrigger_Shadcn_>
+                <div className="storage-row-menu opacity-0">
+                  <IconMoreVertical size={16} strokeWidth={2} />
+                </div>
+              </DropdownMenuTrigger_Shadcn_>
+              <DropdownMenuContent_Shadcn_ side="bottom" align="end">
+                {rowOptions.map((option) => {
                   if ((option?.children ?? []).length > 0) {
                     return (
-                      <Dropdown
-                        isNested
-                        key={option.name}
-                        side="right"
-                        align="start"
-                        overlay={(option?.children ?? [])?.map((child) => {
-                          return (
-                            <Dropdown.Item key={child.name} onClick={child.onClick}>
-                              <p className="text-xs">{child.name}</p>
-                            </Dropdown.Item>
-                          )
-                        })}
-                      >
-                        <div
-                          className={[
-                            'flex items-center justify-between px-4 py-1.5 text-xs text-foreground-light',
-                            'w-full focus:bg-scale-300 dark:focus:bg-scale-500 focus:text-foreground',
-                          ].join(' ')}
-                        >
-                          <div className="flex items-center space-x-2">
-                            {option.icon}
-                            <p className="text">{option.name}</p>
-                          </div>
-                          <IconChevronRight size="tiny" />
-                        </div>
-                      </Dropdown>
+                      <DropdownMenuSub_Shadcn_ key={option.name}>
+                        <DropdownMenuSubTrigger_Shadcn_ className="space-x-2">
+                          {option.icon || <></>}
+                          <p className="text-xs">{option.name}</p>
+                        </DropdownMenuSubTrigger_Shadcn_>
+                        <DropdownMenuPortal_Shadcn_>
+                          <DropdownMenuSubContent_Shadcn_>
+                            {(option?.children ?? [])?.map((child) => {
+                              return (
+                                <DropdownMenuItem_Shadcn_ key={child.name} onClick={child.onClick}>
+                                  <p className="text-xs">{child.name}</p>
+                                </DropdownMenuItem_Shadcn_>
+                              )
+                            })}
+                          </DropdownMenuSubContent_Shadcn_>
+                        </DropdownMenuPortal_Shadcn_>
+                      </DropdownMenuSub_Shadcn_>
                     )
                   } else if (option.name === 'Separator') {
-                    return <Dropdown.Separator key="row-separator" />
+                    return <DropdownMenuSeparator_Shadcn_ key={option.name} />
                   } else {
                     return (
-                      <Dropdown.Item
+                      <DropdownMenuItem_Shadcn_
+                        className="space-x-2"
                         key={option.name}
-                        icon={option.icon || <></>}
                         onClick={option.onClick}
                       >
+                        {option.icon || <></>}
                         <p className="text-xs">{option.name}</p>
-                      </Dropdown.Item>
+                      </DropdownMenuItem_Shadcn_>
                     )
                   }
-                }),
-              ]}
-            >
-              <div className="storage-row-menu opacity-0">
-                <IconMoreVertical size={16} strokeWidth={2} />
-              </div>
-            </Dropdown>
+                })}
+              </DropdownMenuContent_Shadcn_>
+            </DropdownMenu_Shadcn_>
           )}
         </div>
       </div>

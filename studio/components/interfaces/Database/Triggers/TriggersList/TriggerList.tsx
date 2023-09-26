@@ -5,7 +5,10 @@ import { observer } from 'mobx-react-lite'
 import {
   Badge,
   Button,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconCheck,
   IconEdit3,
   IconMoreVertical,
@@ -108,30 +111,31 @@ const TriggerList = ({
             {!isLocked && (
               <div className="flex items-center justify-end">
                 {canUpdateTriggers ? (
-                  <Dropdown
-                    side="bottom"
-                    align="end"
-                    overlay={
+                  <DropdownMenu_Shadcn_>
+                    <DropdownMenuTrigger_Shadcn_>
+                      <Button asChild type="default" icon={<IconMoreVertical />}>
+                        <span></span>
+                      </Button>
+                    </DropdownMenuTrigger_Shadcn_>
+                    <DropdownMenuContent_Shadcn_ side="bottom" align="end">
                       <>
-                        <Dropdown.Item
-                          icon={<IconEdit3 size="tiny" />}
+                        <DropdownMenuItem_Shadcn_
+                          className="space-x-2"
                           onClick={() => editTrigger(x)}
                         >
-                          Edit trigger
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                          icon={<IconTrash stroke="red" size="tiny" />}
+                          <IconEdit3 size="tiny" />
+                          <p className="text">Edit trigger</p>
+                        </DropdownMenuItem_Shadcn_>
+                        <DropdownMenuItem_Shadcn_
+                          className="space-x-2"
                           onClick={() => deleteTrigger(x)}
                         >
-                          Delete trigger
-                        </Dropdown.Item>
+                          <IconTrash stroke="red" size="tiny" />
+                          <p className="text">Delete trigger</p>
+                        </DropdownMenuItem_Shadcn_>
                       </>
-                    }
-                  >
-                    <Button asChild type="default" icon={<IconMoreVertical />}>
-                      <span></span>
-                    </Button>
-                  </Dropdown>
+                    </DropdownMenuContent_Shadcn_>
+                  </DropdownMenu_Shadcn_>
                 ) : (
                   <Tooltip.Root delayDuration={0}>
                     <Tooltip.Trigger asChild>
