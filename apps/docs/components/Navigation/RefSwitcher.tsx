@@ -12,7 +12,7 @@ const RefSwitcher = () => {
 
   useEffect(() => {
     setOpen(false)
-  }, [router.pathname])
+  }, [router.asPath])
 
   return (
     <div className="px-10 flex items-center -space-x-px">

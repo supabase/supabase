@@ -12,7 +12,7 @@ import { NextPageWithLayout } from 'types'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 
 const TriggersPage: NextPageWithLayout = () => {
-  const { meta } = useStore()
+  const { meta, ui } = useStore()
   const { project } = useProjectContext()
 
   const [selectedTrigger, setSelectedTrigger] = useState<any>()
@@ -22,10 +22,8 @@ const TriggersPage: NextPageWithLayout = () => {
   const canReadTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
 
   useEffect(() => {
-    if (project?.ref) {
-      fetchTriggers()
-    }
-  }, [project?.ref])
+    if (ui.selectedProjectRef) fetchTriggers()
+  }, [ui.selectedProjectRef])
 
   const fetchTriggers = async () => {
     meta.triggers.load()

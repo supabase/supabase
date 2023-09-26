@@ -25,6 +25,7 @@ import {
   SidePanel,
 } from 'ui'
 import ChooseFunctionForm from './ChooseFunctionForm'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 
 class CreateTriggerFormState {
   id: number | undefined
@@ -112,7 +113,7 @@ interface ICreateTriggerStore {
   setChooseFunctionFormVisible: (value: boolean) => void
   setDefaultSelectedTable: () => void
   setLoading: (value: boolean) => void
-  setTables: (value: Dictionary<any>[]) => void
+  setTables: (value: any[]) => void
   setTriggerFunctions: (value: Dictionary<any>[]) => void
   validateForm: () => boolean
 }
@@ -168,8 +169,10 @@ class CreateTriggerStore implements ICreateTriggerStore {
     this.isDirty = value
   }
 
-  setTables = (value: Dictionary<any>[]) => {
-    this.tables = value as any
+  setTables = (value: any[]) => {
+    this.tables = value
+      .sort((a, b) => a.schema.localeCompare(b.schema))
+      .filter((a) => !EXCLUDED_SCHEMAS.includes(a.schema)) as any
     this.setDefaultSelectedTable()
   }
 
@@ -261,7 +264,6 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
   const { ui, meta } = useStore()
   const [isClosingPanel, setIsClosingPanel] = useState(false)
   const _localState = useLocalObservable(() => new CreateTriggerStore())
-  _localState.meta = meta as any
 
   useTablesQuery(
     {
@@ -279,13 +281,13 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
 
   useEffect(() => {
     const fetchFunctions = async () => {
-      await (_localState.meta as any).functions.load()
-      const triggerFuncs = (_localState!.meta as any)!.functions.listTriggerFunctions()
+      await meta.functions.load()
+      const triggerFuncs = (meta as any)!.functions.listTriggerFunctions()
       _localState.setTriggerFunctions(triggerFuncs)
     }
 
-    fetchFunctions()
-  }, [])
+    if (ui.selectedProjectRef) fetchFunctions()
+  }, [ui.selectedProjectRef])
 
   useEffect(() => {
     _localState.setisDirty(false)
@@ -304,8 +306,8 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
 
         const body = _localState.formState.requestBody
         const response: any = _localState.isEditing
-          ? await (_localState.meta as any).triggers.update(body.id, body)
-          : await (_localState.meta as any).triggers.create(body)
+          ? await (meta as any).triggers.update(body.id, body)
+          : await (meta as any).triggers.create(body)
 
         if (response.error) {
           ui.setNotification({
@@ -593,8 +595,8 @@ const ListboxTable = observer(({}) => {
             )}
           >
             <div className="flex flex-row items-center space-x-1">
-              <p>{x.name}</p>
               <p className="text-sm text-scale-1000">{x.schema}</p>
+              <p className="text">{x.name}</p>
             </div>
           </Listbox.Option>
         )
