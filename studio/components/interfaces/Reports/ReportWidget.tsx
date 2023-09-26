@@ -108,10 +108,13 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
         <Loading active={props.isLoading}>
           {props.data === undefined ? null : props.renderer({ ...props, router, projectRef })}
         </Loading>
-
-        {props.append &&
-          props.append({ ...props, ...(props.appendProps || {}), router, projectRef })}
       </Panel.Content>
+
+      {props.append && (
+        <div className="p-px">
+          {props.append({ ...props, ...(props.appendProps || {}), router, projectRef })}
+        </div>
+      )}
     </Panel>
   )
 }
