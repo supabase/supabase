@@ -26,7 +26,11 @@ const IFrameWithConsent = (props: Props) => {
           <p className="text-base m-0 text-strong">Allow YouTube content?</p>
           <p className="max-w-lg m-0 mb-2 text-light">
             We ask for your permission to load content provided by YouTube, Google. Learn more about{' '}
-            <a href="https://policies.google.com/privacy?hl=en-GB" className="underline">
+            <a
+              href="https://policies.google.com/privacy?hl=en-GB"
+              target="_blank"
+              className="underline"
+            >
               Google's privacy policy
             </a>{' '}
             before accepting.
