@@ -29,7 +29,7 @@ const VercelIntegration: NextPageWithLayout = () => {
   return (
     <>
       <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
-        <ScaffoldColumn className="!max-w-[900px] mx-auto w-full">
+        <ScaffoldColumn className="mx-auto w-full max-w-md">
           <header>
             <h1 className="text-xl text">New project</h1>
             <Markdown
