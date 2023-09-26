@@ -6,7 +6,10 @@ import Link from 'next/link'
 import { useState } from 'react'
 import {
   Button,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconEdit3,
   IconEye,
   IconEyeOff,
@@ -107,74 +110,74 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           {secret.updated_at === secret.created_at ? 'Added' : 'Updated'} on{' '}
           {dayjs(secret.updated_at).format('MMM D, YYYY')}
         </p>
-        <Dropdown
-          side="bottom"
-          className="w-[120px]"
-          overlay={
-            <>
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <Dropdown.Item
-                    icon={<IconEdit3 size="tiny" />}
-                    disabled={!canManageSecrets}
-                    onClick={() => onSelectEdit(secret)}
-                  >
-                    Edit
-                  </Dropdown.Item>
-                </Tooltip.Trigger>
-                {!canManageSecrets && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                          'border border-scale-200',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-foreground">
-                          You need additional permissions to edit secrets
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
-                  <Dropdown.Item
-                    disabled={!canManageSecrets}
-                    icon={<IconTrash stroke="red" size="tiny" />}
-                    onClick={() => onSelectRemove(secret)}
-                  >
-                    Delete
-                  </Dropdown.Item>
-                </Tooltip.Trigger>
-                {!canManageSecrets && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                          'border border-scale-200',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-foreground">
-                          You need additional permissions to delete secrets
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
-            </>
-          }
-        >
-          <Button asChild type="text" className="px-1" icon={<IconMoreVertical />}>
-            <span></span>
-          </Button>
-        </Dropdown>
+        <DropdownMenu_Shadcn_>
+          <DropdownMenuTrigger_Shadcn_>
+            <Button asChild type="text" className="px-1" icon={<IconMoreVertical />}>
+              <span></span>
+            </Button>
+          </DropdownMenuTrigger_Shadcn_>
+          <DropdownMenuContent_Shadcn_ side="bottom">
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger asChild>
+                <DropdownMenuItem_Shadcn_
+                  className="space-x-2"
+                  disabled={!canManageSecrets}
+                  onClick={() => onSelectEdit(secret)}
+                >
+                  <IconEdit3 size="tiny" />
+                  <p className="text">Edit</p>
+                </DropdownMenuItem_Shadcn_>
+              </Tooltip.Trigger>
+              {!canManageSecrets && (
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-foreground">
+                        You need additional permissions to edit secrets
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              )}
+            </Tooltip.Root>
+
+            <Tooltip.Root delayDuration={0}>
+              <Tooltip.Trigger asChild>
+                <DropdownMenuItem_Shadcn_
+                  className="space-x-2"
+                  disabled={!canManageSecrets}
+                  onClick={() => onSelectRemove(secret)}
+                >
+                  <IconTrash stroke="red" size="tiny" />
+                  <p className="text-light">Delete</p>
+                </DropdownMenuItem_Shadcn_>
+              </Tooltip.Trigger>
+              {!canManageSecrets && (
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                        'border border-scale-200',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-foreground">
+                        You need additional permissions to delete secrets
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              )}
+            </Tooltip.Root>
+          </DropdownMenuContent_Shadcn_>
+        </DropdownMenu_Shadcn_>
       </div>
     </div>
   )

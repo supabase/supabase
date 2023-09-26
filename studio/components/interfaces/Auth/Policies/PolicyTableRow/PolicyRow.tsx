@@ -2,7 +2,17 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
-import { Button, Dropdown, IconEdit, IconMoreVertical, IconTrash } from 'ui'
+import {
+  Button,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconEdit,
+  IconMoreVertical,
+  IconTrash,
+} from 'ui'
 
 import Panel from 'components/ui/Panel'
 import { useCheckPermissions } from 'hooks'
@@ -67,34 +77,32 @@ const PolicyRow = ({
       </div>
       <div>
         {canUpdatePolicies ? (
-          <Dropdown
-            side="bottom"
-            align="end"
-            size="small"
-            overlay={
-              <>
-                <Dropdown.Item
-                  icon={<IconEdit size={14} />}
-                  onClick={() => onSelectEditPolicy(policy)}
-                >
-                  Edit
-                </Dropdown.Item>
-                <Dropdown.Separator />
-                <Dropdown.Item
-                  icon={<IconTrash size={14} />}
-                  onClick={() => onSelectDeletePolicy(policy)}
-                >
-                  Delete
-                </Dropdown.Item>
-              </>
-            }
-          >
-            <Button
-              type="default"
-              style={{ paddingLeft: 4, paddingRight: 4 }}
-              icon={<IconMoreVertical />}
-            />
-          </Dropdown>
+          <DropdownMenu_Shadcn_>
+            <DropdownMenuTrigger_Shadcn_>
+              <Button
+                type="default"
+                style={{ paddingLeft: 4, paddingRight: 4 }}
+                icon={<IconMoreVertical />}
+              />
+            </DropdownMenuTrigger_Shadcn_>
+            <DropdownMenuContent_Shadcn_ side="bottom" align="end">
+              <DropdownMenuItem_Shadcn_
+                className="space-x-2"
+                onClick={() => onSelectEditPolicy(policy)}
+              >
+                <IconEdit size={14} />
+                <p className="text">Edit</p>
+              </DropdownMenuItem_Shadcn_>
+              <DropdownMenuSeparator_Shadcn_ />
+              <DropdownMenuItem_Shadcn_
+                className="space-x-2"
+                onClick={() => onSelectDeletePolicy(policy)}
+              >
+                <IconTrash size={14} />
+                <p className="text">Delete</p>
+              </DropdownMenuItem_Shadcn_>
+            </DropdownMenuContent_Shadcn_>
+          </DropdownMenu_Shadcn_>
         ) : (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>

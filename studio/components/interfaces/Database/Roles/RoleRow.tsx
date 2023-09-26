@@ -4,7 +4,10 @@ import { useState } from 'react'
 import {
   Button,
   Collapsible,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   Form,
   IconChevronUp,
   IconHelpCircle,
@@ -128,29 +131,25 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                     {role.active_connections} connections
                   </p>
                   {!disabled && (
-                    <Dropdown
-                      side="bottom"
-                      className="w-[120px]"
-                      overlay={
-                        <>
-                          <Dropdown.Item
-                            icon={
-                              <IconTrash className="text-red-800" size="tiny" strokeWidth={2} />
-                            }
-                            onClick={(event: any) => {
-                              event.stopPropagation()
-                              onSelectDelete(role)
-                            }}
-                          >
-                            Delete
-                          </Dropdown.Item>
-                        </>
-                      }
-                    >
-                      <Button asChild type="default" className="px-1" icon={<IconMoreVertical />}>
-                        <span></span>
-                      </Button>
-                    </Dropdown>
+                    <DropdownMenu_Shadcn_>
+                      <DropdownMenuTrigger_Shadcn_>
+                        <Button asChild type="default" className="px-1" icon={<IconMoreVertical />}>
+                          <span></span>
+                        </Button>
+                      </DropdownMenuTrigger_Shadcn_>
+                      <DropdownMenuContent_Shadcn_ side="bottom" className="w-[120px]">
+                        <DropdownMenuItem_Shadcn_
+                          className="space-x-2"
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            onSelectDelete(role)
+                          }}
+                        >
+                          <IconTrash className="text-red-800" size="tiny" strokeWidth={2} />
+                          <p className="text">Delete</p>
+                        </DropdownMenuItem_Shadcn_>
+                      </DropdownMenuContent_Shadcn_>
+                    </DropdownMenu_Shadcn_>
                   )}
                 </div>
               </button>
