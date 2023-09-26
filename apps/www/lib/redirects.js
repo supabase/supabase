@@ -2298,4 +2298,9 @@ module.exports = [
     source: '/docs/guides/ai/managing-indexes',
     destination: '/docs/guides/ai/vector-indexes',
   },
+  {
+    permanent: true,
+    source: '/documentation',
+    destination: '/docs',
+  },
 ]
