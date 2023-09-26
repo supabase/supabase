@@ -1,7 +1,7 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
-import { useTheme } from 'common'
+import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useState } from 'react'
 import { Modal } from 'ui'
 
@@ -27,7 +27,7 @@ const AddNewPaymentMethodModal = ({
   onConfirm,
 }: AddNewPaymentMethodModalProps) => {
   const { ui } = useStore()
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
   const [intent, setIntent] = useState<any>()
   const selectedOrganization = useSelectedOrganization()
 
@@ -90,7 +90,7 @@ const AddNewPaymentMethodModal = ({
 
   const options = {
     clientSecret: intent ? intent.client_secret : '',
-    appearance: { theme: isDarkMode ? 'night' : 'flat', labels: 'floating' },
+    appearance: { theme: theme === 'dark' ? 'night' : 'flat', labels: 'floating' },
   } as any
 
   const onLocalCancel = () => {
