@@ -43,7 +43,7 @@ const Wrappers = () => {
       <div>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="mb-1 text-xl text-scale-1200">Foreign Data Wrappers</h3>
+            <h3 className="mb-1 text-xl text-foreground">Foreign Data Wrappers</h3>
             <div className="text-sm text-scale-900">
               Query your data warehouse directly from your database, or third-party APIs using SQL.
             </div>

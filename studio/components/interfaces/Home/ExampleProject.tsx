@@ -41,8 +41,8 @@ const ExampleProject = ({ framework, title, description, url }: ExampleProjectPr
             />
           </div>
           <div className="w-4/5 space-y-2">
-            <h5 className="text-scale-1200">{title}</h5>
-            <p className="text-sm text-scale-1000">{description}</p>
+            <h5 className="text-foreground">{title}</h5>
+            <p className="text-sm text-foreground-light">{description}</p>
           </div>
           <div
             className="
@@ -53,7 +53,7 @@ const ExampleProject = ({ framework, title, description, url }: ExampleProjectPr
             transition-all
             duration-200
             group-hover:right-3
-            group-hover:text-scale-1200
+            group-hover:text-foreground
           "
           >
             <IconChevronRight />

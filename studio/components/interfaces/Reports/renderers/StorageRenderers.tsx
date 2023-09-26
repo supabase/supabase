@@ -65,7 +65,7 @@ export const TopCacheMissesRenderer = (
                 <Table.tr className="p-0">
                   <Table.td className={[cellClasses].join(' ')}>
                     <div className=" truncate max-w-sm lg:max-w-lg">
-                      <TextFormatter className="text-scale-1100" value={datum.path} />
+                      <TextFormatter className="text-foreground-light" value={datum.path} />
                       <TextFormatter
                         className="max-w-sm text-scale-900 truncate "
                         value={decodeURIComponent(datum.search || '')}

@@ -1,12 +1,12 @@
 import { IconGitBranch, IconGitHub } from 'ui'
 
 import CardButton from 'components/ui/CardButton'
-import { BASE_PATH } from 'lib/constants'
-import { Project } from 'types'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { ResourceWarning } from 'data/usage/resource-warnings-query'
-import { ProjectCardStatus } from './ProjectCardStatus'
+import { BASE_PATH } from 'lib/constants'
+import { Project } from 'types'
 import { inferProjectStatus } from './ProjectCard.utils'
+import { ProjectCardStatus } from './ProjectCardStatus'
 
 export interface ProjectCardProps {
   project: Project
@@ -40,7 +40,7 @@ const ProjectCard = ({
         title={
           <div className="w-full justify-between space-y-1.5 px-6">
             <p className="flex-shrink truncate text-base">{name}</p>
-            <span className="text-sm lowercase text-scale-1000">{desc}</span>
+            <span className="text-sm lowercase text-foreground-light">{desc}</span>
             <div className="flex items-center space-x-1.5">
               {isVercelIntegrated && (
                 <div className="w-fit p-1 border rounded-md flex items-center border-scale-600">
@@ -61,7 +61,7 @@ const ProjectCard = ({
                   <div className="w-fit p-1 border rounded-md flex items-center border-scale-600">
                     <IconGitHub size={12} strokeWidth={1.5} />
                   </div>
-                  <p className="text-xs !ml-2 text-scale-1100">{githubRepository}</p>
+                  <p className="text-xs !ml-2 text-foreground-light">{githubRepository}</p>
                 </>
               )}
             </div>

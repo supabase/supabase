@@ -18,6 +18,7 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
 import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
+import SchemaEditor from './SchemaEditor'
 import {
   ColumnField,
   CreateColumnPayload,
@@ -25,7 +26,6 @@ import {
   UpdateColumnPayload,
 } from './SidePanelEditor.types'
 import { ImportContent } from './TableEditor/TableEditor.types'
-import SchemaEditor from './SchemaEditor'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -609,7 +609,7 @@ const SidePanelEditor = ({
         }}
       >
         <Modal.Content>
-          <p className="py-4 text-sm text-scale-1100">
+          <p className="py-4 text-sm text-foreground-light">
             There are unsaved changes. Are you sure you want to close the panel? Your changes will
             be lost.
           </p>

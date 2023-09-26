@@ -1,9 +1,9 @@
+import { useTheme } from 'next-themes'
+import { BASE_PATH } from 'lib/constants'
 import { observer } from 'mobx-react-lite'
 import Image from 'next/image'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
-import { BASE_PATH } from 'lib/constants'
-import { useTheme } from 'next-themes'
 
 type ForgotPasswordLayoutProps = {
   heading: string
@@ -51,7 +51,7 @@ const ForgotPasswordLayout = ({
           {showHeadings && (
             <div className="mb-6">
               <h1 className="text-2xl lg:text-3xl mt-8 mb-2">{heading}</h1>
-              <h2 className="text-scale-1100 text-sm">{subheading}</h2>
+              <h2 className="text-foreground-light text-sm">{subheading}</h2>
             </div>
           )}
 

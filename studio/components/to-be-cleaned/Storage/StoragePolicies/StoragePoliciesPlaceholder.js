@@ -1,5 +1,5 @@
-import { IconArchive } from 'ui'
 import Panel from 'components/ui/Panel'
+import { IconArchive } from 'ui'
 
 const StoragePoliciesPlaceholder = ({ guiHeight }) => (
   <Panel
@@ -13,7 +13,9 @@ const StoragePoliciesPlaceholder = ({ guiHeight }) => (
     ]}
   >
     <div className="p-4 px-6">
-      <p className="text-sm text-scale-1100">Create a bucket first to start writing policies!</p>
+      <p className="text-sm text-foreground-light">
+        Create a bucket first to start writing policies!
+      </p>
     </div>
   </Panel>
 )

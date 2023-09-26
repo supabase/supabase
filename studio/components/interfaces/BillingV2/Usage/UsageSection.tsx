@@ -1,24 +1,28 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import clsx from 'clsx'
+import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import SectionHeader from './SectionHeader'
-import { CategoryMetaKey, USAGE_CATEGORIES } from './Usage.constants'
+import SparkBar from 'components/ui/SparkBar'
+import { DataPoint } from 'data/analytics/constants'
+import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
 import {
   ProjectUsageResponse,
   UsageMetric,
   useProjectUsageQuery,
 } from 'data/usage/project-usage-query'
-import { DataPoint } from 'data/analytics/constants'
-import SectionContent from './SectionContent'
+import { formatBytes } from 'lib/helpers'
+import Link from 'next/link'
 import { Button, IconAlertTriangle, IconBarChart2 } from 'ui'
 import { USAGE_APPROACHING_THRESHOLD } from '../Billing.constants'
-import Link from 'next/link'
-import SparkBar from 'components/ui/SparkBar'
-import clsx from 'clsx'
-import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
-import { ChartTooltipValueFormatter, ChartYFormatterCompactNumber, getUpgradeUrl } from './Usage.utils'
-import { formatBytes } from 'lib/helpers'
+import SectionContent from './SectionContent'
+import SectionHeader from './SectionHeader'
+import { CategoryMetaKey, USAGE_CATEGORIES } from './Usage.constants'
+import {
+  ChartTooltipValueFormatter,
+  ChartYFormatterCompactNumber,
+  getUpgradeUrl,
+} from './Usage.utils'
 import UsageBarChart from './UsageBarChart'
-import Panel from 'components/ui/Panel'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
 interface UsageSectionProps {
   projectRef: string
@@ -111,11 +115,11 @@ const UsageSection = ({
                                       'border border-scale-200',
                                     ].join(' ')}
                                   >
-                                    <p className="text-xs text-scale-1200">
+                                    <p className="text-xs text-foreground">
                                       Exceeding your plans included usage will lead to restrictions
                                       to your project.
                                     </p>
-                                    <p className="text-xs text-scale-1200">
+                                    <p className="text-xs text-foreground">
                                       Upgrade to a usage-based plan or disable the spend cap to
                                       avoid restrictions.
                                     </p>
@@ -160,7 +164,7 @@ const UsageSection = ({
                     )}
                     <div>
                       <div className="flex items-center justify-between border-b py-1">
-                        <p className="text-xs text-scale-1000">
+                        <p className="text-xs text-foreground-light">
                           Included in {subscription?.plan?.name.toLowerCase()} plan
                         </p>
                         {usageMeta?.limit === -1 ? (
@@ -177,7 +181,7 @@ const UsageSection = ({
                       </div>
                       {currentBillingCycleSelected && (
                         <div className="flex items-center justify-between py-1">
-                          <p className="text-xs text-scale-1000">
+                          <p className="text-xs text-foreground-light">
                             {attribute.chartPrefix || 'Used '}in period
                           </p>
                           <p className="text-xs">
@@ -189,7 +193,7 @@ const UsageSection = ({
                       )}
                       {currentBillingCycleSelected && usageMeta?.limit > 0 && (
                         <div className="flex items-center justify-between border-t py-1">
-                          <p className="text-xs text-scale-1000">Overage in period</p>
+                          <p className="text-xs text-foreground-light">Overage in period</p>
                           <p className="text-xs">
                             {(usageMeta?.limit ?? 0) === -1 || usageExcess < 0
                               ? 0
@@ -210,7 +214,7 @@ const UsageSection = ({
                       {attribute.name} per day
                     </p>
                     {attribute.chartDescription.split('\n').map((paragraph, idx) => (
-                      <p key={`para-${idx}`} className="text-sm text-scale-1000">
+                      <p key={`para-${idx}`} className="text-sm text-foreground-light">
                         {paragraph}
                       </p>
                     ))}
@@ -229,15 +233,19 @@ const UsageSection = ({
                       data={chartData}
                       yLeftMargin={chartMeta[attribute.key].margin}
                       yFormatter={(value) => ChartYFormatterCompactNumber(value, attribute.unit)}
-                      tooltipFormatter={(value) => ChartTooltipValueFormatter(value, attribute.unit)}
+                      tooltipFormatter={(value) =>
+                        ChartTooltipValueFormatter(value, attribute.unit)
+                      }
                     />
                   ) : (
                     <Panel>
                       <Panel.Content>
                         <div className="flex flex-col items-center justify-center">
-                          <IconBarChart2 className="text-scale-1100 mb-2" />
+                          <IconBarChart2 className="text-foreground-light mb-2" />
                           <p className="text-sm">No data in period</p>
-                          <p className="text-sm text-scale-1000">May take up to 24 hours to show</p>
+                          <p className="text-sm text-foreground-light">
+                            May take up to 24 hours to show
+                          </p>
                         </div>
                       </Panel.Content>
                     </Panel>
@@ -250,12 +258,14 @@ const UsageSection = ({
                       <div className="space-y-1">
                         <p className="text-sm">Not included in plan</p>
                         <div>
-                          <p className="text-sm text-scale-1100">
+                          <p className="text-sm text-foreground-light">
                             You need to be on a higher plan in order to use this feature.
                           </p>
                         </div>
                       </div>
-                      <Link href={`/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`}>
+                      <Link
+                        href={`/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`}
+                      >
                         <a>
                           <Button type="primary">Upgrade plan</Button>
                         </a>

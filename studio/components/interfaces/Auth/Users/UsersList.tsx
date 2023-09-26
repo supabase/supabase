@@ -1,17 +1,33 @@
-import { useContext } from 'react'
-import { observer } from 'mobx-react-lite'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IconAlertCircle, Loading } from 'ui'
 
-import { PageContext } from 'pages/project/[ref]/auth/users'
 import Table from 'components/to-be-cleaned/Table'
+import { User } from 'data/auth/users-query'
+import { useCheckPermissions } from 'hooks'
 import UserListItem from './UsersListItem'
 import UsersPagination from './UsersPagination'
-import { useCheckPermissions } from 'hooks'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-const UsersList = ({}) => {
-  const PageState: any = useContext(PageContext)
+interface UsersListProps {
+  page: number
+  setPage: (page: number) => void
+  keywords: string
+  verified?: 'verified' | 'unverified'
 
+  total: number
+  users: User[]
+  isLoading: boolean
+  isSuccess: boolean
+}
+
+const UsersList = ({
+  page,
+  setPage,
+  keywords,
+  total,
+  users,
+  isLoading,
+  isSuccess,
+}: UsersListProps) => {
   // Check once on the top level, rather than checking for every row
   const canRemoveUser = useCheckPermissions(PermissionAction.TENANT_SQL_DELETE, 'auth.users')
   const canRemoveMFAFactors = useCheckPermissions(
@@ -20,7 +36,7 @@ const UsersList = ({}) => {
   )
 
   return (
-    <Loading active={PageState.usersLoading}>
+    <Loading active={isLoading}>
       <Table
         head={
           <>
@@ -35,7 +51,7 @@ const UsersList = ({}) => {
         }
         body={
           <>
-            {!PageState.usersLoading && PageState.users.length == 0 && (
+            {isSuccess && users.length == 0 && (
               <Table.tr>
                 {/* @ts-ignore */}
                 <Table.td
@@ -44,17 +60,18 @@ const UsersList = ({}) => {
                 >
                   <div className="flex items-center space-x-3 opacity-75">
                     <IconAlertCircle size={16} strokeWidth={2} />
-                    <p className="text-scale-1000">
-                      {PageState.filterKeywords
-                        ? `No users matched the search query "${PageState.filterKeywords}"`
+                    <p className="text-foreground-light">
+                      {keywords
+                        ? `No users matched the search query "${keywords}"`
                         : 'No users in your project yet'}
                     </p>
                   </div>
                 </Table.td>
               </Table.tr>
             )}
-            {PageState.users.length > 0 &&
-              PageState.users.map((x: any) => (
+            {isSuccess &&
+              users.length > 0 &&
+              users.map((x: any) => (
                 <UserListItem
                   key={x.id}
                   user={x}
@@ -64,7 +81,7 @@ const UsersList = ({}) => {
               ))}
             <Table.tr>
               <Table.td colSpan={7}>
-                <UsersPagination />
+                <UsersPagination total={total} page={page} setPage={setPage} />
               </Table.td>
             </Table.tr>
           </>
@@ -74,4 +91,4 @@ const UsersList = ({}) => {
   )
 }
 
-export default observer(UsersList)
+export default UsersList

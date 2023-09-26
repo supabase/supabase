@@ -112,23 +112,23 @@ const Column = ({
                 ].join(' ')}
               >
                 {column.foreignKey === undefined ? (
-                  <span className="text-xs text-scale-1200">Edit foreign key relation</span>
+                  <span className="text-xs text-foreground">Edit foreign key relation</span>
                 ) : (
                   <div>
-                    <p className="text-xs text-scale-1100">Foreign key relation:</p>
+                    <p className="text-xs text-foreground-light">Foreign key relation:</p>
                     <div className="flex items-center space-x-1">
-                      <p className="text-xs text-scale-1200">
+                      <p className="text-xs text-foreground">
                         {column.foreignKey.source_schema}.{column.foreignKey.source_table_name}.
                         {column.foreignKey.source_column_name}
                       </p>
                       <IconArrowRight size="tiny" strokeWidth={1.5} />
-                      <p className="text-xs text-scale-1200">
+                      <p className="text-xs text-foreground">
                         {column.foreignKey.target_table_schema}.
                         {column.foreignKey.target_table_name}.{column.foreignKey.target_column_name}
                       </p>
                     </div>
                     {column.foreignKey.deletion_action !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
-                      <p className="text-xs text-scale-1200 mt-1">
+                      <p className="text-xs text-foreground mt-1">
                         On delete: {getForeignKeyCascadeAction(column.foreignKey.deletion_action)}
                       </p>
                     )}
@@ -196,7 +196,7 @@ const Column = ({
               align="end"
               header={
                 <div className="flex items-center justify-center">
-                  <h5 className="text-sm text-scale-1200">Extra options</h5>
+                  <h5 className="text-sm text-foreground">Extra options</h5>
                 </div>
               }
               overlay={[
@@ -261,11 +261,11 @@ const Column = ({
             >
               <div className="group flex items-center -space-x-1">
                 {settingsCount > 0 && (
-                  <div className="rounded-full bg-scale-1200 py-0.5 px-2 text-xs text-scale-100 dark:bg-scale-100 dark:text-scale-1100">
+                  <div className="rounded-full bg-scale-1200 py-0.5 px-2 text-xs text-scale-100 dark:bg-scale-100 dark:text-foreground-light">
                     {settingsCount}
                   </div>
                 )}
-                <div className="text-scale-1100 transition-colors group-hover:text-scale-1200">
+                <div className="text-foreground-light transition-colors group-hover:text-foreground">
                   <IconSettings size={18} strokeWidth={1} />
                 </div>
               </div>

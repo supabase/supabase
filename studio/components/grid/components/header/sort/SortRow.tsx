@@ -1,7 +1,7 @@
-import { useRef, memo } from 'react'
-import { Button, IconMenu, Toggle, IconX } from 'ui'
 import { XYCoord } from 'dnd-core'
-import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd'
+import { memo, useRef } from 'react'
+import { DropTargetMonitor, useDrag, useDrop } from 'react-dnd'
+import { Button, IconMenu, IconX, Toggle } from 'ui'
 
 import { DragItem, Sort, SupaTable } from 'components/grid/types'
 
@@ -103,11 +103,11 @@ const SortRow = ({ table, index, columnName, sort, onDelete, onToggle, onDrag }:
       style={{ opacity }}
       data-handler-id={handlerId}
     >
-      <span className="transition-color text-scale-900 hover:text-scale-1100">
+      <span className="transition-color text-scale-900 hover:text-foreground-light">
         <IconMenu strokeWidth={2} size={16} />
       </span>
       <div className="grow">
-        <span className="flex grow items-center gap-1 truncate text-sm text-scale-1200">
+        <span className="flex grow items-center gap-1 truncate text-sm text-foreground">
           <span className="text-xs text-scale-900">{index > 0 ? 'then by' : 'sort by'}</span>
           {column.name}
         </span>

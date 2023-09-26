@@ -20,7 +20,7 @@ const ChartHeader: React.FC<ChartHeaderProps> = ({
 
   const highlighted = (
     <h5
-      className={`text-scale-1200 text-xl font-normal ${minimalHeader ? 'text-base' : 'text-2xl'}`}
+      className={`text-foreground text-xl font-normal ${minimalHeader ? 'text-base' : 'text-2xl'}`}
     >
       {highlightedValue !== undefined && String(highlightedValue)}
       <span className="text-lg">

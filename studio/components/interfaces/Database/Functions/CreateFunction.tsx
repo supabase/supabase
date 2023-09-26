@@ -1,7 +1,7 @@
 import { filter, has, isEmpty, isNull, isUndefined, keyBy, mapValues, partition } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { FormEvent, createContext, useContext, useEffect, useState } from 'react'
+import { createContext, FormEvent, useContext, useEffect, useState } from 'react'
 import { Button, IconPlus, IconTrash, Input, Listbox, Modal, Radio, SidePanel, Toggle } from 'ui'
 
 import { Dictionary } from 'components/grid'
@@ -14,7 +14,9 @@ import SqlEditor from 'components/ui/SqlEditor'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useStore } from 'hooks'
 import { isResponseOk } from 'lib/common/fetch'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { SupaResponse } from 'types'
+import { convertArgumentTypes, convertConfigParams, hasWhitespace } from './Functions.utils'
 
 // [Refactor] Remove local state, just use the Form component
 
@@ -87,37 +89,6 @@ class CreateFunctionFormState {
     this.schema = state.schema
     this.securityDefiner = state.securityDefiner
   }
-}
-
-/**
- * convert argument_types = "a integer, b integer"
- * to args = {value: [{name:'a', type:'integer'}, {name:'b', type:'integer'}]}
- */
-function convertArgumentTypes(value: string) {
-  const items = value?.split(',')
-  if (isEmpty(value) || !items || items?.length == 0) return { value: [] }
-  const temp = items.map((x) => {
-    const str = x.trim()
-    const space = str.indexOf(' ')
-    const name = str.slice(0, space !== 1 ? space : 0)
-    const type = str.slice(space + 1)
-    return { name, type }
-  })
-  return { value: temp }
-}
-
-/**
- * convert config_params =  {search_path: "auth, public"}
- * to {value: [{name: 'search_path', value: 'auth, public'}]}
- */
-function convertConfigParams(value: Dictionary<any>) {
-  const temp = []
-  if (value) {
-    for (var key in value) {
-      temp.push({ name: key, value: value[key] })
-    }
-  }
-  return { value: temp }
 }
 
 interface ICreateFunctionStore {
@@ -283,10 +254,6 @@ class CreateFunctionStore implements ICreateFunctionStore {
   }
 }
 
-function hasWhitespace(value: string) {
-  return /\s/.test(value)
-}
-
 const CreateFunctionContext = createContext<ICreateFunctionStore | null>(null)
 
 interface CreateFunctionProps {
@@ -296,10 +263,9 @@ interface CreateFunctionProps {
 }
 
 const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
-  const { project } = useProjectContext()
   const { ui, meta } = useStore()
+  const { project } = useProjectContext()
   const _localState = useLocalObservable(() => new CreateFunctionStore())
-  _localState.meta = meta as any
 
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
 
@@ -327,8 +293,8 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
 
         const body = _localState.formState.requestBody
         const response: SupaResponse<Function> = body.id
-          ? await (_localState!.meta as any).functions.update(body.id, body)
-          : await (_localState!.meta as any).functions.create(body)
+          ? await (meta as any).functions.update(body.id, body)
+          : await (meta as any).functions.create(body)
 
         if (!isResponseOk(response)) {
           ui.setNotification({
@@ -461,7 +427,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
           }}
         >
           <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
+            <p className="py-4 text-sm text-foreground-light">
               There are unsaved changes. Are you sure you want to close the panel? Your changes will
               be lost.
             </p>
@@ -514,8 +480,8 @@ const InputMultiArguments = observer(({ readonly }: InputMultiArgumentsProps) =>
   return (
     <div>
       <div className="flex flex-col">
-        <h5 className="text-base text-scale-1200">Arguments</h5>
-        <p className="text-sm text-scale-1100">
+        <h5 className="text-base text-foreground">Arguments</h5>
+        <p className="text-sm text-foreground-light">
           Arguments can be referenced in the function body using either names or numbers.
         </p>
       </div>
@@ -634,7 +600,7 @@ const InputMultiConfigParams = observer(({}) => {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h5 className="text-base text-scale-1200">Config Params</h5>
+        <h5 className="text-base text-foreground">Config Params</h5>
       </div>
       <div className="space-y-2 pt-4">
         {_localState!.formState.configParams.value.map(
@@ -728,12 +694,12 @@ const InputDefinition = observer(({}) => {
   return (
     <div className="space-y-4">
       <div className="flex flex-col">
-        <h5 className="text-base text-scale-1200">Definition</h5>
-        <p className="text-sm text-scale-1100">
+        <h5 className="text-base text-foreground">Definition</h5>
+        <p className="text-sm text-foreground-light">
           The language below should be written in `{_localState!.formState.language.value}`.
         </p>
         {!_localState?.isEditing && (
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             Change the language in the Advanced Settings below.
           </p>
         )}
@@ -757,6 +723,13 @@ const InputDefinition = observer(({}) => {
 const SelectSchema = observer(({}) => {
   const _localState = useContext(CreateFunctionContext)
 
+  const { project } = useProjectContext()
+  const { data } = useSchemasQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const schemas = data?.filter((schema) => !EXCLUDED_SCHEMAS.includes(schema.name)) ?? []
+
   return (
     <Listbox
       id="schema"
@@ -768,7 +741,7 @@ const SelectSchema = observer(({}) => {
       descriptionText="Tables made in the table editor will be in 'public'"
       onChange={(value) => _localState!.onFormChange({ key: 'schema', value })}
     >
-      {_localState!.schemas.map((x) => (
+      {schemas.map((x) => (
         <Listbox.Option key={x.name} label={x.name} value={x.name}>
           {x.name}
         </Listbox.Option>

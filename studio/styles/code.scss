@@ -35,7 +35,7 @@
   .token.doc-comment.parameter.punctuation,
   .token.doc-comment.optional-parameter.punctuation {
     font-style: normal !important;
-    @apply text-scale-1100 #{!important};
+    @apply text-foreground-light #{!important};
   }
 
   .token.keyword,

@@ -17,8 +17,8 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useStore } from 'hooks'
 import { isValidHttpUrl, tryParseJson, uuidv4 } from 'lib/helpers'
 import { Button, Checkbox, Form, Input, Listbox, Modal, Radio, SidePanel } from 'ui'
-import HTTPRequestFields from './HTTPRequestFields'
 import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
+import HTTPRequestFields from './HTTPRequestFields'
 
 export interface EditHookPanelProps {
   visible: boolean
@@ -334,7 +334,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
         }}
       >
         <Modal.Content>
-          <p className="py-4 text-sm text-scale-1100">
+          <p className="py-4 text-sm text-foreground-light">
             There are unsaved changes. Are you sure you want to close the panel? Your changes will
             be lost.
           </p>
@@ -424,7 +424,7 @@ const FormContents = ({
           <FormSectionLabel
             className="lg:!col-span-4"
             description={
-              <p className="text-sm text-scale-1000">
+              <p className="text-sm text-foreground-light">
                 Select which table and events will trigger your webhook
               </p>
             }
@@ -457,8 +457,8 @@ const FormContents = ({
                 label={table.name}
               >
                 <div className="flex items-center space-x-2">
-                  <p className="text-scale-1000">{table.schema}</p>
-                  <p className="text-scale-1200">{table.name}</p>
+                  <p className="text-foreground-light">{table.schema}</p>
+                  <p className="text-foreground">{table.name}</p>
                 </div>
               </Listbox.Option>
             ))}
@@ -502,9 +502,9 @@ const FormContents = ({
                     <Image src={webhook.icon} layout="fixed" width="32" height="32" />
                     <div className="flex-col space-y-0">
                       <div className="flex space-x-2">
-                        <p className="text-scale-1200">{webhook.label}</p>
+                        <p className="text-foreground">{webhook.label}</p>
                       </div>
-                      <p className="text-scale-1000">{webhook.description}</p>
+                      <p className="text-foreground-light">{webhook.description}</p>
                     </div>
                   </div>
                 }

@@ -375,14 +375,14 @@ const SchemaGraph = ({ schema }: { schema: string }) => {
     return (
       <div className="flex h-full w-full items-center justify-center space-x-2">
         <IconLoader className="animate-spin" size={14} />
-        <p className="text-sm text-scale-1000">Loading table...</p>
+        <p className="text-sm text-foreground-light">Loading table...</p>
       </div>
     )
   }
 
   if (isError) {
     return (
-      <div className="px-6 py-4 text-scale-1000">
+      <div className="px-6 py-4 text-foreground-light">
         <p>Error connecting to API</p>
         <p>{`${error?.message ?? 'Unknown error'}`}</p>
       </div>

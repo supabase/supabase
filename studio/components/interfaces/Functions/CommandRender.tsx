@@ -19,13 +19,13 @@ const Command = ({ item }: any) => {
     <div className="space-y-1">
       <span className="font-mono text-sm text-scale-900">{`> ${item.comment}`}</span>
       <div className="flex items-center gap-2">
-        <div className="flex gap-2 font-mono text-sm font-normal text-scale-1200">
+        <div className="flex gap-2 font-mono text-sm font-normal text-foreground">
           <span className="text-scale-900">$</span>
           <span>
             <span className="">{item.jsx ? item.jsx() : null} </span>
             <button
               type="button"
-              className="text-scale-900 hover:text-scale-1200"
+              className="text-scale-900 hover:text-foreground"
               onClick={() => {
                 function onCopy(value: any) {
                   setIsCopied(true)

@@ -10,7 +10,11 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconAlertCircle,
   IconAlertTriangle,
   IconChevronDown,
@@ -59,7 +63,7 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
       key={id}
       className={clsx(
         'flex items-center justify-between rounded-md group',
-        isActive && 'text-scale-1200 bg-scale-400 dark:bg-scale-600 -active'
+        isActive && 'text-foreground bg-scale-400 dark:bg-scale-600 -active'
       )}
       ref={isActive ? (activeItemRef as React.RefObject<HTMLDivElement>) : null}
     >
@@ -67,13 +71,13 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
         <a className="py-1 px-3 w-full overflow-hidden">
           <p
             title={description || name}
-            className="text-sm text-scale-1100 group-hover:text-scale-1200 transition overflow-hidden text-ellipsis"
+            className="text-sm text-foreground-light group-hover:text-foreground transition overflow-hidden text-ellipsis"
           >
             {name}
           </p>
         </a>
       </Link>
-      <div className="pr-3">{<QueryItemActions tabInfo={tabInfo} activeId={activeId} />}</div>
+      <div className="pr-1">{<QueryItemActions tabInfo={tabInfo} activeId={activeId} />}</div>
     </div>
   )
 }
@@ -198,46 +202,47 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
   }
 
   return (
-    <div className="group [div&>button[data-state='open']>span]:text-scale-900">
+    <div className="group [div&>button[data-state='open']>span]:text-scale-900 flex items-center">
       {IS_PLATFORM ? (
-        <Dropdown
-          side="bottom"
-          align="end"
-          overlay={
-            <>
-              <Dropdown.Item onClick={onClickRename} icon={<IconEdit2 size="tiny" />}>
-                Rename query
-              </Dropdown.Item>
-              {sharedSnippetsFeature && visibility === 'user' && canCreateSQLSnippet && (
-                <Dropdown.Item onClick={onClickShare} icon={<IconShare size="tiny" />}>
-                  Share query
-                </Dropdown.Item>
+        <DropdownMenu_Shadcn_>
+          <DropdownMenuTrigger_Shadcn_ asChild>
+            <span
+              className={clsx(
+                'rounded p-1',
+                isActive
+                  ? 'text-foreground-light hover:bg-scale-800'
+                  : 'text-scale-300 dark:text-scale-200 hover:bg-scale-500 group-hover:text-foreground-light'
               )}
-              {sharedSnippetsFeature && visibility === 'project' && canCreateSQLSnippet && (
-                <Dropdown.Item onClick={createPersonalCopy} icon={<IconCopy size="tiny" />}>
-                  Create a personal copy
-                </Dropdown.Item>
-              )}
-              <>
-                <Dropdown.Separator />
-                <Dropdown.Item onClick={onClickDelete} icon={<IconTrash size="tiny" />}>
-                  Delete query
-                </Dropdown.Item>
-              </>
-            </>
-          }
-        >
-          <span
-            className={clsx(
-              'p-0.5 rounded-md',
-              isActive
-                ? 'text-scale-1100 hover:bg-scale-800'
-                : 'text-scale-300 dark:text-scale-200 hover:bg-scale-500 group-hover:text-scale-1100'
+            >
+              <IconChevronDown size="tiny" strokeWidth={2} />
+            </span>
+          </DropdownMenuTrigger_Shadcn_>
+          <DropdownMenuContent_Shadcn_ side="bottom" align="end">
+            <DropdownMenuItem_Shadcn_ onClick={onClickRename} className="space-x-2">
+              <IconEdit2 size="tiny" />
+              <p className="text">Rename query</p>
+            </DropdownMenuItem_Shadcn_>
+            {sharedSnippetsFeature && visibility === 'user' && canCreateSQLSnippet && (
+              <DropdownMenuItem_Shadcn_ onClick={onClickShare} className="space-x-2">
+                <IconShare size="tiny" />
+                <p className="text">Share query</p>
+              </DropdownMenuItem_Shadcn_>
             )}
-          >
-            <IconChevronDown size="tiny" strokeWidth={2} />
-          </span>
-        </Dropdown>
+            {sharedSnippetsFeature && visibility === 'project' && canCreateSQLSnippet && (
+              <DropdownMenuItem_Shadcn_ onClick={createPersonalCopy} className="space-x-2">
+                <IconCopy size="tiny" />
+                <p className="text">Duplicate personal copy</p>
+              </DropdownMenuItem_Shadcn_>
+            )}
+            <>
+              <DropdownMenuSeparator_Shadcn_ />
+              <DropdownMenuItem_Shadcn_ onClick={onClickDelete} className="space-x-2">
+                <IconTrash size="tiny" />
+                <p className="text">Delete query</p>
+              </DropdownMenuItem_Shadcn_>
+            </>
+          </DropdownMenuContent_Shadcn_>
+        </DropdownMenu_Shadcn_>
       ) : (
         <Button asChild disabled type="text" style={{ padding: '3px' }}>
           <span></span>
@@ -261,7 +266,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
       >
         <Modal.Content>
           <div className="my-6">
-            <div className="text-sm text-scale-1100 grid gap-4">
+            <div className="text-sm text-foreground-light grid gap-4">
               <div className="grid gap-1">
                 {sharedSnippetsFeature && visibility === 'project' && (
                   <Alert_Shadcn_ variant="destructive">
@@ -289,7 +294,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
       >
         <Modal.Content>
           <div className="my-6">
-            <div className="text-sm text-scale-1100 grid gap-4">
+            <div className="text-sm text-foreground-light grid gap-4">
               <div className="grid gap-1">
                 <Alert_Shadcn_ variant="warning">
                   <IconAlertTriangle strokeWidth={2} />

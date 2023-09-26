@@ -1,5 +1,3 @@
-import dayjs from 'dayjs'
-import { Project } from 'types'
 import {
   Action,
   ActionType,
@@ -10,9 +8,11 @@ import {
   ServiceUpgrade,
   ViolatedLimit,
 } from '@supabase/shared-types/out/notifications'
-import { IconArrowRight, IconExternalLink, Button } from 'ui'
-import Link from 'next/link'
 import { Markdown } from 'components/interfaces/Markdown'
+import dayjs from 'dayjs'
+import Link from 'next/link'
+import { Project } from 'types'
+import { Button, IconArrowRight, IconExternalLink } from 'ui'
 
 export const formatNotificationText = (project: Project, notification: Notification) => {
   const projectName = project.name
@@ -111,7 +111,7 @@ export const formatNotificationText = (project: Project, notification: Notificat
                     <Link href={upgrade.changelog_link}>
                       <a target="_blank" rel="noreferrer">
                         <IconExternalLink
-                          className="cursor-pointer text-scale-1000 hover:text-scale-1200 transition"
+                          className="cursor-pointer text-foreground-light hover:text-foreground transition"
                           size={12}
                           strokeWidth={2}
                         />

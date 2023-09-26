@@ -1,6 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
 
 import { useParams } from 'common/hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
@@ -9,8 +8,18 @@ import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/or
 import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { observer } from 'mobx-react-lite'
 import { Member, Role } from 'types'
-import { Button, Dropdown, IconMoreHorizontal, IconTrash } from 'ui'
+import {
+  Button,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconMoreHorizontal,
+  IconTrash,
+} from 'ui'
 import { isInviteExpired } from '../Organization.utils'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 
@@ -123,7 +132,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
                   'border border-scale-200 ', //border
                 ].join(' ')}
               >
-                <span className="text-xs text-scale-1200">
+                <span className="text-xs text-foreground">
                   You need additional permissions to manage this team member
                 </span>
               </div>
@@ -141,52 +150,51 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
 
   return (
     <div className="flex items-center justify-end">
-      <Dropdown
-        side="bottom"
-        align="end"
-        size="small"
-        overlay={
+      <DropdownMenu_Shadcn_>
+        <DropdownMenuTrigger_Shadcn_>
+          <Button
+            asChild
+            type="text"
+            disabled={isLoading}
+            loading={isLoading}
+            icon={<IconMoreHorizontal />}
+          >
+            <span></span>
+          </Button>
+        </DropdownMenuTrigger_Shadcn_>
+        <DropdownMenuContent_Shadcn_ side="bottom" align="end">
           <>
             {isPendingInviteAcceptance ? (
               <>
                 {canRevokeInvite && (
-                  <Dropdown.Item onClick={() => handleRevokeInvitation(member)}>
+                  <DropdownMenuItem_Shadcn_ onClick={() => handleRevokeInvitation(member)}>
                     <div className="flex flex-col">
                       <p>Cancel invitation</p>
                       <p className="block opacity-50">Revoke this invitation.</p>
                     </div>
-                  </Dropdown.Item>
+                  </DropdownMenuItem_Shadcn_>
                 )}
                 {canResendInvite && isExpired && (
                   <>
-                    <Dropdown.Separator />
-                    <Dropdown.Item onClick={() => handleResendInvite(member)}>
+                    <DropdownMenuSeparator_Shadcn_ />
+                    <DropdownMenuItem_Shadcn_ onClick={() => handleResendInvite(member)}>
                       <div className="flex flex-col">
                         <p>Resend invitation</p>
                         <p className="block opacity-50">Invites expire after 24hrs.</p>
                       </div>
-                    </Dropdown.Item>
+                    </DropdownMenuItem_Shadcn_>
                   </>
                 )}
               </>
             ) : (
-              <Dropdown.Item icon={<IconTrash size={16} />} onClick={handleMemberDelete}>
-                <p>Remove member</p>
-              </Dropdown.Item>
+              <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={handleMemberDelete}>
+                <IconTrash size={16} />
+                <p className="text">Remove member</p>
+              </DropdownMenuItem_Shadcn_>
             )}
           </>
-        }
-      >
-        <Button
-          asChild
-          type="text"
-          disabled={isLoading}
-          loading={isLoading}
-          icon={<IconMoreHorizontal />}
-        >
-          <span></span>
-        </Button>
-      </Dropdown>
+        </DropdownMenuContent_Shadcn_>
+      </DropdownMenu_Shadcn_>
     </div>
   )
 }
