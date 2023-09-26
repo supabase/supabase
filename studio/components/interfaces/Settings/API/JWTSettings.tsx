@@ -94,7 +94,7 @@ const JWTSettings = () => {
           {isError ? (
             <div className="flex items-center justify-center py-8 space-x-2">
               <IconAlertCircle size={16} strokeWidth={1.5} />
-              <p className="text-sm text-scale-1100">Failed to retrieve JWT settings</p>
+              <p className="text-sm text-foreground-light">Failed to retrieve JWT settings</p>
             </div>
           ) : (
             <>
@@ -158,7 +158,7 @@ const JWTSettings = () => {
                                       'border border-scale-200',
                                     ].join(' ')}
                                   >
-                                    <span className="text-xs text-scale-1200">
+                                    <span className="text-xs text-foreground">
                                       You need additional permissions to generate a new JWT secret
                                     </span>
                                   </div>
@@ -266,7 +266,7 @@ const JWTSettings = () => {
       >
         <Modal.Content>
           <div className="py-4 space-y-2">
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               Create a custom JWT secret. Make sure it is a strong combination of characters that
               cannot be guessed easily.
             </p>

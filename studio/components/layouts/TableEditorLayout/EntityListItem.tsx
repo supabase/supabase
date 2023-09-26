@@ -1,12 +1,27 @@
-import clsx from 'clsx'
-import SVG from 'react-inlinesvg'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import clsx from 'clsx'
+import { parseSupaTable } from 'components/grid'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-type-query'
-import Link from 'next/link'
-import { Dropdown, IconEdit, IconCopy, IconLock, IconTrash, IconChevronDown } from 'ui'
+import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
+import { getTable } from 'data/tables/table-query'
+import saveAs from 'file-saver'
+import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import Link from 'next/link'
+import Papa from 'papaparse'
+import SVG from 'react-inlinesvg'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import {
+  Dropdown,
+  IconChevronDown,
+  IconCopy,
+  IconDownload,
+  IconEdit,
+  IconLock,
+  IconTrash,
+} from 'ui'
+import { useProjectContext } from '../ProjectLayout/ProjectContext'
 
 export interface EntityListItemProps {
   id: number
@@ -16,7 +31,10 @@ export interface EntityListItemProps {
 }
 
 const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListItemProps) => {
+  const { ui } = useStore()
+  const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
+
   const isActive = Number(id) === entity.id
   const formatTooltipText = (entityType: string) => {
     return Object.entries(ENTITY_TYPE)
@@ -26,11 +44,72 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
       ?.join(' ')
   }
 
+  const exportTableAsCSV = async () => {
+    if (!project?.connectionString) return console.error('Connection string is required')
+    const toastId = ui.setNotification({
+      category: 'loading',
+      message: `Exporting ${entity.name} as CSV...`,
+    })
+
+    try {
+      const table = await getTable({
+        id: entity.id,
+        projectRef,
+        connectionString: project.connectionString,
+      })
+      const supaTable =
+        table &&
+        parseSupaTable(
+          {
+            table: table,
+            columns: table.columns ?? [],
+            primaryKeys: table.primary_keys,
+            relationships: table.relationships,
+          },
+          []
+        )
+
+      const rows = await fetchAllTableRows({
+        projectRef,
+        connectionString: project.connectionString,
+        table: supaTable,
+      })
+      const formattedRows = rows.map((row) => {
+        const formattedRow = row
+        Object.keys(row).map((column) => {
+          if (typeof row[column] === 'object' && row[column] !== null)
+            formattedRow[column] = JSON.stringify(formattedRow[column])
+        })
+        return formattedRow
+      })
+
+      if (formattedRows.length > 0) {
+        const csv = Papa.unparse(formattedRows, {
+          columns: supaTable.columns.map((column) => column.name),
+        })
+        const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+        saveAs(csvData, `${entity!.name}_rows.csv`)
+      }
+
+      ui.setNotification({
+        id: toastId,
+        category: 'success',
+        message: `Successfully exported ${entity.name} as CSV`,
+      })
+    } catch (error: any) {
+      ui.setNotification({
+        id: toastId,
+        category: 'error',
+        message: `Failed to export table: ${error.message}`,
+      })
+    }
+  }
+
   return (
     <div
       className={clsx(
         'group flex items-center justify-between rounded-md',
-        isActive && 'text-scale-1200 bg-scale-300'
+        isActive && 'text-foreground bg-scale-300'
       )}
     >
       <Link href={`/project/${projectRef}/editor/${entity.id}`}>
@@ -62,7 +141,8 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                     entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
                     entity.type === ENTITY_TYPE.MATERIALIZED_VIEW &&
                       'text-purple-1000 bg-purple-500',
-                    entity.type === ENTITY_TYPE.PARTITIONED_TABLE && 'text-scale-1100 bg-scale-800'
+                    entity.type === ENTITY_TYPE.PARTITIONED_TABLE &&
+                      'text-foreground-light bg-scale-800'
                   )}
                 >
                   {Object.entries(ENTITY_TYPE)
@@ -80,14 +160,14 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                     'border border-scale-200',
                   ].join(' ')}
                 >
-                  <span className="text-xs text-scale-1200 capitalize">
+                  <span className="text-xs text-foreground capitalize">
                     {formatTooltipText(entity.type)}
                   </span>
                 </div>
               </Tooltip.Content>
             </Tooltip.Portal>
           </Tooltip.Root>
-          <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition max-w-[85%] overflow-hidden text-ellipsis whitespace-nowrap">
+          <p className="text-sm text-foreground-light group-hover:text-foreground transition max-w-[85%] overflow-hidden text-ellipsis whitespace-nowrap">
             {/* only show tooltips if required, to reduce noise */}
             {entity.name.length > 20 ? (
               <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
@@ -103,7 +183,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">{entity.name}</span>
+                      <span className="text-xs text-foreground">{entity.name}</span>
                     </div>
                   </Tooltip.Content>
                 </Tooltip.Portal>
@@ -151,6 +231,16 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                   </Dropdown.Item>
                 </a>
               </Link>,
+              <Dropdown.Item
+                key="download-table-csv"
+                icon={<IconDownload size="tiny" />}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  exportTableAsCSV()
+                }}
+              >
+                Export as CSV
+              </Dropdown.Item>,
               <Dropdown.Separator key="separator" />,
               <Dropdown.Item
                 key="delete-table"
@@ -164,7 +254,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
               </Dropdown.Item>,
             ]}
           >
-            <div className="text-scale-900 transition-colors hover:text-scale-1200">
+            <div className="text-scale-900 transition-colors hover:text-foreground">
               <IconChevronDown size={14} strokeWidth={2} />
             </div>
           </Dropdown>

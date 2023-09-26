@@ -42,7 +42,7 @@ const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) 
       onCancel={onClose}
       onConfirm={onConfirmDeleteSecret}
       loading={isDeleting}
-      header={<h5 className="text-sm text-scale-1200">Confirm to delete secret</h5>}
+      header={<h5 className="text-sm text-foreground">Confirm to delete secret</h5>}
     >
       <div className="py-4">
         <Modal.Content>
@@ -53,7 +53,7 @@ const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) 
             </p>
             <div className="space-y-1">
               <p className="text-sm">{selectedSecret?.description}</p>
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 ID: <span className="font-mono">{selectedSecret?.key_id}</span>
               </p>
             </div>

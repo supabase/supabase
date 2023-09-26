@@ -39,7 +39,7 @@ const InformationBox = ({
           <div className="flex w-full space-x-3 lg:items-start">
             {icon && <span className="text-scale-900">{icon}</span>}
             <div className="flex-grow">
-              <h5 className="text-sm text-scale-1200">{title}</h5>
+              <h5 className="text-sm text-foreground">{title}</h5>
             </div>
           </div>
           {description && !hideCollapse ? (
@@ -62,7 +62,7 @@ const InformationBox = ({
             }`}
             style={{ maxHeight: isExpanded ? 500 : 0 }}
           >
-            <div className="text-scale-1100 text-sm">{description}</div>
+            <div className="text-foreground-light text-sm">{description}</div>
 
             {url && (
               <Link href={url}>

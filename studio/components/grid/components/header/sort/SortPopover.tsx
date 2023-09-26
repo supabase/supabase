@@ -1,13 +1,13 @@
-import React, { useState, useMemo, useCallback } from 'react'
-import { isEqual } from 'lodash'
-import update from 'immutability-helper'
-import { Button, IconList, IconChevronDown, Popover } from 'ui'
 import { useUrlState } from 'hooks'
+import update from 'immutability-helper'
+import { isEqual } from 'lodash'
+import { useCallback, useMemo, useState } from 'react'
+import { Button, IconChevronDown, IconList, Popover } from 'ui'
 
-import SortRow from './SortRow'
 import { DropdownControl } from 'components/grid/components/common'
-import { Sort, SupaTable } from 'components/grid/types'
 import { formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
+import { Sort, SupaTable } from 'components/grid/types'
+import SortRow from './SortRow'
 
 export interface SortPopoverProps {
   table: SupaTable
@@ -32,7 +32,7 @@ const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
         asChild
         type={(sorts || []).length > 0 ? 'link' : 'text'}
         icon={
-          <div className="text-scale-1000">
+          <div className="text-foreground-light">
             <IconList strokeWidth={1.5} />
           </div>
         }
@@ -120,7 +120,7 @@ const SortOverlay = ({ table, sorts: sortsFromUrl, setParams }: SortOverlayProps
       ))}
       {sorts.length === 0 && (
         <div className="space-y-1 px-3">
-          <h5 className="text-sm text-scale-1100">No sorts applied to this view</h5>
+          <h5 className="text-sm text-foreground-light">No sorts applied to this view</h5>
           <p className="text-xs text-scale-900">Add a column below to sort the view</p>
         </div>
       )}
@@ -144,7 +144,7 @@ const SortOverlay = ({ table, sorts: sortsFromUrl, setParams }: SortOverlayProps
             </Button>
           </DropdownControl>
         ) : (
-          <p className="text-sm text-scale-1100">All columns have been added</p>
+          <p className="text-sm text-foreground-light">All columns have been added</p>
         )}
         <Button disabled={isEqual(sorts, initialSorts)} type="default" onClick={onApplySort}>
           Apply sorting

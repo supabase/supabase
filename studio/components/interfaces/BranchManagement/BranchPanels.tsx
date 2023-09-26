@@ -3,10 +3,11 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { noop } from 'lodash'
 import Link from 'next/link'
-import { PropsWithChildren, forwardRef, useState } from 'react'
+import { forwardRef, PropsWithChildren, useState } from 'react'
 import {
   Badge,
   Button,
+  cn,
   Dropdown,
   DropdownMenuContent_Shadcn_,
   DropdownMenuItem_Shadcn_,
@@ -18,7 +19,6 @@ import {
   IconMoreVertical,
   IconShield,
   IconTrash,
-  cn,
 } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
@@ -241,7 +241,7 @@ const PullRequestPanel = ({
                   : `Created ${formattedTimeFromNow}`}
               </p>
             </div>
-            <p className="text-scale-1000 ml-8 mt-0.5">{pr.title}</p>
+            <p className="text-foreground-light ml-8 mt-0.5">{pr.title}</p>
           </div>
           <div className="flex items-center space-x-4">
             <Link passHref href={pr.url}>

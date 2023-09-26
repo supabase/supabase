@@ -9,7 +9,16 @@ import Table from 'components/to-be-cleaned/Table'
 import { useDatabaseHooks } from 'data/database-triggers/database-triggers-query'
 import { useCheckPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import { Badge, Button, Dropdown, IconEdit3, IconMoreVertical, IconTrash } from 'ui'
+import {
+  Badge,
+  Button,
+  Dropdown,
+  IconEdit3,
+  IconMoreVertical,
+  IconStopCircle,
+  IconTrash,
+  IconXCircle,
+} from 'ui'
 
 export interface HookListProps {
   schema: string
@@ -82,11 +91,21 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
                     side="left"
                     overlay={
                       <>
-                        <Dropdown.Item icon={<IconEdit3 size="tiny" />} onClick={() => editHook(x)}>
+                        <Dropdown.Item
+                          icon={<IconEdit3 size="tiny" strokeWidth={2} />}
+                          onClick={() => editHook(x)}
+                        >
                           Edit hook
                         </Dropdown.Item>
                         <Dropdown.Item
-                          icon={<IconTrash stroke="red" size="tiny" />}
+                          icon={<IconXCircle size="tiny" strokeWidth={2} />}
+                          onClick={() => editHook(x)}
+                        >
+                          Disable hook
+                        </Dropdown.Item>
+                        <Dropdown.Separator />
+                        <Dropdown.Item
+                          icon={<IconTrash stroke="red" size="tiny" strokeWidth={2} />}
                           onClick={() => deleteHook(x)}
                         >
                           Delete hook
@@ -112,7 +131,7 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
                             'border border-scale-200',
                           ].join(' ')}
                         >
-                          <span className="text-xs text-scale-1200">
+                          <span className="text-xs text-foreground">
                             You need additional permissions to update webhooks
                           </span>
                         </div>

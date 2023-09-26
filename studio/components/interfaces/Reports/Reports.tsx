@@ -21,7 +21,7 @@ import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import Loading from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions } from 'hooks'
-import { METRIC_CATEGORIES, METRICS, TIME_PERIODS_REPORTS } from 'lib/constants'
+import { METRICS, METRIC_CATEGORIES, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useProjectContentStore } from 'stores/projectContentStore'
@@ -304,7 +304,7 @@ const Reports = () => {
 
   return (
     <div className="mx-6 flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
-      <h1 className="text-xl text-scale-1200">Reports</h1>
+      <h1 className="text-xl text-foreground">Reports</h1>
 
       <div className="mb-4 flex items-center justify-between space-x-3">
         <div className="flex items-center space-x-3">
@@ -317,13 +317,13 @@ const Reports = () => {
 
           {startDate && endDate && (
             <div className="hidden items-center space-x-1 lg:flex ">
-              <span className="text-sm text-scale-1100">
+              <span className="text-sm text-foreground-light">
                 {dayjs(startDate).format('MMM D, YYYY')}
               </span>
               <span className="text-scale-900">
                 <IconArrowRight size={12} />
               </span>
-              <span className="text-sm text-scale-1100">
+              <span className="text-sm text-foreground-light">
                 {dayjs(endDate).format('MMM D, YYYY')}
               </span>
             </div>
@@ -370,7 +370,7 @@ const Reports = () => {
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text-foreground">
                       You need additional permissions to update this project's report
                     </span>
                   </div>
@@ -392,7 +392,7 @@ const Reports = () => {
               </Button>
             </Dropdown>
           ) : (
-            <p className="text-sm text-scale-1000">No charts set up yet in report</p>
+            <p className="text-sm text-foreground-light">No charts set up yet in report</p>
           )}
         </div>
       ) : (

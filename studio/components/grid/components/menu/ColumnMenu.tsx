@@ -65,7 +65,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text-foreground">
                       Encrypted columns cannot be edited
                     </span>
                   </div>

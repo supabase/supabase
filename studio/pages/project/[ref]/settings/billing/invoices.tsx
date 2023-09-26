@@ -2,11 +2,11 @@ import Link from 'next/link'
 
 import { Invoices } from 'components/interfaces/BillingV2'
 import { SettingsLayout } from 'components/layouts'
+import InformationBox from 'components/ui/InformationBox'
 import { useSelectedOrganization } from 'hooks'
-import { NextPageWithLayout } from 'types'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import InformationBox from 'components/ui/InformationBox'
+import { NextPageWithLayout } from 'types'
 import { Button, IconExternalLink, IconInfo } from 'ui'
 
 const ProjectBilling: NextPageWithLayout = () => {
@@ -87,7 +87,7 @@ const Settings = () => {
 
         <h4 className="text-lg">Invoices</h4>
 
-        <div className="text-sm text-scale-1000">
+        <div className="text-sm text-foreground-light">
           To manage your billing address, emails or Tax ID, head to your{' '}
           <Link href={`/org/${orgSlug}/billing`} passHref>
             <a className="text-sm text-green-900 transition hover:text-green-1000">

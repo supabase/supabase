@@ -81,7 +81,7 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
       size="medium"
       visible={visible}
       onCancel={onClose}
-      header={<h5 className="text-sm text-scale-1200">Add new secret</h5>}
+      header={<h5 className="text-sm text-foreground">Add new secret</h5>}
     >
       <Form
         id="add-new-secret-form"

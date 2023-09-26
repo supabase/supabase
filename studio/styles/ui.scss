@@ -33,7 +33,7 @@
 
 // TO DO: REMOVE
 .form-group label {
-  @apply inline-block text-scale-1100 text-sm py-2;
+  @apply inline-block text-foreground-light text-sm py-2;
   width: 33%;
   align-self: top;
 }
@@ -118,7 +118,7 @@
 }
 
 .table-container thead th {
-  @apply text-scale-1100 font-normal text-sm;
+  @apply text-foreground-light font-normal text-sm;
   @apply bg-table-header-light dark:bg-table-header-dark;
   @apply border-t border-b border-table-border-light dark:border-table-border-dark;
 }
@@ -276,7 +276,7 @@
     max-width: 50%;
 
     h4 {
-      @apply uppercase font-normal m-1 p-0 text-sm text-scale-1100;
+      @apply uppercase font-normal m-1 p-0 text-sm text-foreground-light;
     }
 
     h4:not(:first-child) {

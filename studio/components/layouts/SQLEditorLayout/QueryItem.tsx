@@ -59,7 +59,7 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
       key={id}
       className={clsx(
         'flex items-center justify-between rounded-md group',
-        isActive && 'text-scale-1200 bg-scale-400 dark:bg-scale-600 -active'
+        isActive && 'text-foreground bg-scale-400 dark:bg-scale-600 -active'
       )}
       ref={isActive ? (activeItemRef as React.RefObject<HTMLDivElement>) : null}
     >
@@ -67,7 +67,7 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
         <a className="py-1 px-3 w-full overflow-hidden">
           <p
             title={description || name}
-            className="text-sm text-scale-1100 group-hover:text-scale-1200 transition overflow-hidden text-ellipsis"
+            className="text-sm text-foreground-light group-hover:text-foreground transition overflow-hidden text-ellipsis"
           >
             {name}
           </p>
@@ -231,8 +231,8 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
             className={clsx(
               'p-0.5 rounded-md',
               isActive
-                ? 'text-scale-1100 hover:bg-scale-800'
-                : 'text-scale-300 dark:text-scale-200 hover:bg-scale-500 group-hover:text-scale-1100'
+                ? 'text-foreground-light hover:bg-scale-800'
+                : 'text-scale-300 dark:text-scale-200 hover:bg-scale-500 group-hover:text-foreground-light'
             )}
           >
             <IconChevronDown size="tiny" strokeWidth={2} />
@@ -261,7 +261,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
       >
         <Modal.Content>
           <div className="my-6">
-            <div className="text-sm text-scale-1100 grid gap-4">
+            <div className="text-sm text-foreground-light grid gap-4">
               <div className="grid gap-1">
                 {sharedSnippetsFeature && visibility === 'project' && (
                   <Alert_Shadcn_ variant="destructive">
@@ -289,7 +289,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
       >
         <Modal.Content>
           <div className="my-6">
-            <div className="text-sm text-scale-1100 grid gap-4">
+            <div className="text-sm text-foreground-light grid gap-4">
               <div className="grid gap-1">
                 <Alert_Shadcn_ variant="warning">
                   <IconAlertTriangle strokeWidth={2} />

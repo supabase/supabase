@@ -128,7 +128,7 @@ const ResetDbPassword = ({ disabled = false }) => {
                           'border border-scale-200 ', //border
                         ].join(' ')}
                       >
-                        <span className="text-xs text-scale-1200">
+                        <span className="text-xs text-foreground">
                           {!canResetDbPassword
                             ? 'You need additional permissions to reset the database password'
                             : !isProjectActive
@@ -146,7 +146,7 @@ const ResetDbPassword = ({ disabled = false }) => {
       </Panel>
       <Modal
         hideFooter
-        header={<h5 className="text-sm text-scale-1200">Reset database password</h5>}
+        header={<h5 className="text-sm text-foreground">Reset database password</h5>}
         confirmText="Reset password"
         size="medium"
         visible={showResetDbPass}
