@@ -14,7 +14,7 @@ const SpreadSheetTextInput = ({ input, onInputChange }: SpreadSheetTextInputProp
         include any special characters other than hyphens (<code>-</code>) or underscores (
         <code>_</code>).
       </p>
-      <p className="text-sm text-scale-900">
+      <p className="text-sm text-foreground-lighter">
         Tip: Datetime columns should be formatted as YYYY-MM-DD HH:mm:ss
       </p>
     </div>

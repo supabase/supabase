@@ -25,7 +25,7 @@ const PolicyRoles = ({ roles, selectedRoles, onUpdateSelectedRoles }: PolicyRole
         <label className="text-foreground-light text-base" htmlFor="policy-name">
           Target roles
         </label>
-        <p className="text-scale-900 text-sm">Apply policy to the selected roles</p>
+        <p className="text-foreground-lighter text-sm">Apply policy to the selected roles</p>
       </div>
       <div className="relative w-2/3">
         <MultiSelect

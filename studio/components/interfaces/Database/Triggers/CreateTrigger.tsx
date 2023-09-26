@@ -470,7 +470,7 @@ const SelectEnabledMode = observer(({}) => {
         label="Origin"
       >
         Origin
-        <span className="block text-scale-900">This is a default behaviour</span>
+        <span className="block text-foreground-lighter">This is a default behaviour</span>
       </Listbox.Option>
       <Listbox.Option
         addOnBefore={({ active, selected }: any) => {
@@ -482,7 +482,7 @@ const SelectEnabledMode = observer(({}) => {
         label="Replica"
       >
         Replica
-        <span className="block text-scale-900">
+        <span className="block text-foreground-lighter">
           Will only fire if the session is in “replica” mode
         </span>
       </Listbox.Option>
@@ -496,7 +496,7 @@ const SelectEnabledMode = observer(({}) => {
         label="Always"
       >
         Always
-        <span className="block text-scale-900">
+        <span className="block text-foreground-lighter">
           Will fire regardless of the current replication role
         </span>
       </Listbox.Option>
@@ -510,7 +510,7 @@ const SelectEnabledMode = observer(({}) => {
         label="Disabled"
       >
         Disabled
-        <span className="block text-scale-900">Will not fire</span>
+        <span className="block text-foreground-lighter">Will not fire</span>
       </Listbox.Option>
     </Listbox>
   )
@@ -535,11 +535,11 @@ const SelectOrientation = observer(({}) => {
     >
       <Listbox.Option value="ROW" label="Row">
         Row
-        <span className="block text-scale-900">fires once for each processed row</span>
+        <span className="block text-foreground-lighter">fires once for each processed row</span>
       </Listbox.Option>
       <Listbox.Option value="STATEMENT" label="Statement">
         Statement
-        <span className="block text-scale-900">fires once for each statement</span>
+        <span className="block text-foreground-lighter">fires once for each statement</span>
       </Listbox.Option>
     </Listbox>
   )
@@ -681,7 +681,7 @@ const ListboxActivation = observer(({}) => {
       >
         <div className="flex flex-col">
           <span>{'before'}</span>
-          <span className="block text-scale-900">
+          <span className="block text-foreground-lighter">
             Trigger fires before the operation is attempted
           </span>
         </div>
@@ -698,7 +698,7 @@ const ListboxActivation = observer(({}) => {
       >
         <div className="flex flex-col">
           <span>{'after'}</span>
-          <span className="block text-scale-900">
+          <span className="block text-foreground-lighter">
             Trigger fires after the operation has completed
           </span>
         </div>

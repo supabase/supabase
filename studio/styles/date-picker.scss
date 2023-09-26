@@ -38,7 +38,7 @@
 }
 
 .react-datepicker__day-names {
-  @apply flex -space-x-px text-scale-900 font-normal text-center text-xs;
+  @apply flex -space-x-px text-foreground-lighter font-normal text-center text-xs;
 }
 
 .react-datepicker__day-name {

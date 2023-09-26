@@ -320,7 +320,7 @@ const Reports = () => {
               <span className="text-sm text-foreground-light">
                 {dayjs(startDate).format('MMM D, YYYY')}
               </span>
-              <span className="text-scale-900">
+              <span className="text-foreground-lighter">
                 <IconArrowRight size={12} />
               </span>
               <span className="text-sm text-foreground-light">

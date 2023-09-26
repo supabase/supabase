@@ -271,7 +271,9 @@ const Wizard: NextPageWithLayout = () => {
           </Button>
           <div className="items-center space-x-3">
             {!projectCreationDisabled && (
-              <span className="text-xs text-scale-900">You can rename your project later</span>
+              <span className="text-xs text-foreground-lighter">
+                You can rename your project later
+              </span>
             )}
             <Button
               onClick={onClickNext}
@@ -286,7 +288,7 @@ const Wizard: NextPageWithLayout = () => {
     >
       <>
         <Panel.Content className="pt-0 pb-6">
-          <p className="text-sm text-scale-900">
+          <p className="text-sm text-foreground-lighter">
             Your project will have its own dedicated instance and full postgres database.
             <br />
             An API will be set up so you can easily interact with your new database.

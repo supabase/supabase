@@ -140,7 +140,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
                       key={schema.id}
                       value={schema.name}
                       label={schema.name}
-                      addOnBefore={() => <span className="text-scale-900">schema</span>}
+                      addOnBefore={() => <span className="text-foreground-lighter">schema</span>}
                     >
                       <span className="text-foreground text-sm">{schema.name}</span>
                     </Listbox.Option>
@@ -158,7 +158,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
                       key={schema.id}
                       value={schema.name}
                       label={schema.name}
-                      addOnBefore={() => <span className="text-scale-900">schema</span>}
+                      addOnBefore={() => <span className="text-foreground-lighter">schema</span>}
                     >
                       <span className="text-foreground text-sm">{schema.name}</span>
                     </Listbox.Option>

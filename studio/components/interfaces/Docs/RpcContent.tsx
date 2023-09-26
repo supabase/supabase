@@ -1,7 +1,7 @@
-import Snippets from 'components/interfaces/Docs/Snippets'
 import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
-import Param from 'components/interfaces/Docs/Param'
 import Description from 'components/interfaces/Docs/Description'
+import Param from 'components/interfaces/Docs/Param'
+import Snippets from 'components/interfaces/Docs/Snippets'
 
 /**
  * TODO: need to support rpc with the same name and different params type
@@ -42,7 +42,7 @@ const RpcContent = ({
 
       <div className="doc-section">
         <article className="text ">
-          <label className="font-mono text-xs uppercase text-scale-900">Description</label>
+          <label className="font-mono text-xs uppercase text-foreground-lighter">Description</label>
           <Description content={summary} metadata={{ rpc: rpcId }} onChange={refreshDocs} />
         </article>
         <article className="code">

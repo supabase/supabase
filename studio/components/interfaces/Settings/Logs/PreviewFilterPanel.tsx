@@ -117,7 +117,7 @@ const PreviewFilterPanel = ({
               handleInputSearch(e.target.value)
             }}
             icon={
-              <div className="text-scale-900">
+              <div className="text-foreground-lighter">
                 <IconSearch size={14} />
               </div>
             }

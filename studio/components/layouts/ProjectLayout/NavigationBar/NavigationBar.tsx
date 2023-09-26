@@ -1,12 +1,12 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
-import { isUndefined } from 'lodash'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useTheme } from 'next-themes'
 import { useFlag } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
+import { isUndefined } from 'lodash'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import {
   Button,
   DropdownMenuContent_Shadcn_,
@@ -114,7 +114,7 @@ const NavigationBar = () => {
                   className="border-none"
                 >
                   <div className="py-1">
-                    <IconSearch size={18} strokeWidth={2} className="text-scale-900" />
+                    <IconSearch size={18} strokeWidth={2} className="text-foreground-lighter" />
                   </div>
                 </Button>
               </Tooltip.Trigger>
@@ -142,7 +142,7 @@ const NavigationBar = () => {
             <DropdownMenuTrigger_Shadcn_>
               <Button asChild type="text" size="tiny">
                 <span className="py-1 h-10 border-none">
-                  <IconUser size={18} strokeWidth={2} className="text-scale-900" />
+                  <IconUser size={18} strokeWidth={2} className="text-foreground-lighter" />
                 </span>
               </Button>
             </DropdownMenuTrigger_Shadcn_>

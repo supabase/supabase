@@ -32,7 +32,7 @@ const PolicyEditorModalTitle = ({
         <div className="flex items-center space-x-3">
           <span
             onClick={onSelectBackFromTemplates}
-            className="cursor-pointer text-scale-900 transition-colors hover:text-foreground"
+            className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
           >
             <IconChevronLeft strokeWidth={2} size={14} />
           </span>
