@@ -147,7 +147,9 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                   {provider.title === 'LinkedIn' && (
                     <Alert_Shadcn_ variant="warning">
                       <IconAlertTriangle strokeWidth={2} />
-                      <AlertTitle_Shadcn_>Warning</AlertTitle_Shadcn_>
+                      <AlertTitle_Shadcn_>
+                        LinkedIn provider temporarily unavailable
+                      </AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
                         Linkedin has updated their OAuth APIs, which has broken the current Supabase
                         implementation. We're actively tracking{' '}
