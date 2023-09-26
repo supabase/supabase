@@ -1,4 +1,4 @@
-import { useTheme } from 'common'
+import { useTheme } from 'next-themes'
 import { BASE_PATH } from 'lib/constants'
 import { observer } from 'mobx-react-lite'
 import Image from 'next/image'
@@ -19,7 +19,7 @@ const ForgotPasswordLayout = ({
   showHeadings = true,
   children,
 }: PropsWithChildren<ForgotPasswordLayoutProps>) => {
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
 
   return (
     <div className="flex-1 bg-scale-200 flex flex-col gap-8 lg:gap-16 xl:gap-32">
@@ -31,7 +31,7 @@ const ForgotPasswordLayout = ({
                 <a>
                   <Image
                     src={
-                      isDarkMode
+                      theme === 'dark'
                         ? `${BASE_PATH}/img/supabase-dark.svg`
                         : `${BASE_PATH}/img/supabase-light.svg`
                     }

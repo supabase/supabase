@@ -1,9 +1,9 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useParams, useTheme } from 'common'
+import { useParams } from 'common'
 import { isUndefined } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-
+import { useTheme } from 'next-themes'
 import { useFlag } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
@@ -34,7 +34,7 @@ import NavigationIconButton from './NavigationIconButton'
 
 const NavigationBar = () => {
   const router = useRouter()
-  const { isDarkMode, toggleTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
 
   const os = detectOS()
@@ -161,11 +161,12 @@ const NavigationBar = () => {
               <DropdownMenuLabel_Shadcn_>Theme</DropdownMenuLabel_Shadcn_>
               <DropdownMenuRadioGroup_Shadcn_
                 key="theme"
-                value={isDarkMode ? 'dark' : 'light'}
-                onValueChange={(e) => toggleTheme(e === 'dark')}
+                value={theme === 'dark' ? 'dark' : 'light'}
+                onValueChange={(value: string) => setTheme(value)}
               >
-                {/* [Joshen] Removing system default for now, needs to be supported in useTheme from common packages */}
-                {/* <DropdownMenuRadioItem_Shadcn_ value="system">System default</DropdownMenuRadioItem_Shadcn_> */}
+                <DropdownMenuRadioItem_Shadcn_ value="system">
+                  System default
+                </DropdownMenuRadioItem_Shadcn_>
                 <DropdownMenuRadioItem_Shadcn_ value="dark">Dark</DropdownMenuRadioItem_Shadcn_>
                 <DropdownMenuRadioItem_Shadcn_ value="light">Light</DropdownMenuRadioItem_Shadcn_>
               </DropdownMenuRadioGroup_Shadcn_>

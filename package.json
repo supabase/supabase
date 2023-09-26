@@ -64,5 +64,8 @@
   ],
   "volta": {
     "node": "18.17.1"
+  },
+  "dependencies": {
+    "next-themes": "^0.2.1"
   }
 }

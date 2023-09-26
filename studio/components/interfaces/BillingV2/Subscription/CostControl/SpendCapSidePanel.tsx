@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
-import { useParams, useTheme } from 'common'
+import { useParams } from 'common'
+import { useTheme } from 'next-themes'
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project-subscription-update-mutation'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
@@ -38,7 +39,7 @@ const SpendCapSidePanel = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
 
   const [showUsageCosts, setShowUsageCosts] = useState(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
@@ -250,7 +251,7 @@ const SpendCapSidePanel = () => {
                       )}
                       width={160}
                       height={96}
-                      src={isDarkMode ? option.imageUrl : option.imageUrlLight}
+                      src={theme === 'dark' ? option.imageUrl : option.imageUrlLight}
                     />
 
                     <p
