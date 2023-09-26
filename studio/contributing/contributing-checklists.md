@@ -12,7 +12,7 @@ You don't need to go through all of these for every PR you contribute. These che
 
 ### Table Editor
 
-- [ ] Go to **Table editor**
+- [ ] Go to **Table Editor**
   - [ ] Create a **new table**
     - [ ] Add different fields and types: at least one nullable, one with default generated value (like `now()`), at least one date field
     - [ ] Insert a few rows into the table
