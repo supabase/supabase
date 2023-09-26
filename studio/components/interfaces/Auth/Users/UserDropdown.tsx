@@ -122,7 +122,7 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
           type="text"
           icon={<IconMoreHorizontal />}
           loading={isLoading}
-          className="hover:border-gray-500"
+          className="hover:border-gray-500 flex"
         >
           <span />
         </Button>

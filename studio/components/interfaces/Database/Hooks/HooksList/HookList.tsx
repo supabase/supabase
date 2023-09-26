@@ -20,7 +20,6 @@ import {
   IconEdit3,
   IconMoreVertical,
   IconTrash,
-  IconXCircle,
 } from 'ui'
 
 export interface HookListProps {
@@ -102,10 +101,6 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
                         <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={() => editHook(x)}>
                           <IconEdit3 size="tiny" />
                           <p className="text">Edit hook</p>
-                        </DropdownMenuItem_Shadcn_>
-                        <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={() => editHook(x)}>
-                          <IconXCircle size="tiny" strokeWidth={2} />
-                          <p className="text">Disable hook</p>
                         </DropdownMenuItem_Shadcn_>
                         <DropdownMenuSeparator_Shadcn_ />
                         <DropdownMenuItem_Shadcn_

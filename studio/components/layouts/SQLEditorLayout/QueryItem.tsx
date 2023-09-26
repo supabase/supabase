@@ -77,7 +77,7 @@ const QueryItem = ({ tabInfo }: QueryItemProps) => {
           </p>
         </a>
       </Link>
-      <div className="pr-3">{<QueryItemActions tabInfo={tabInfo} activeId={activeId} />}</div>
+      <div className="pr-1">{<QueryItemActions tabInfo={tabInfo} activeId={activeId} />}</div>
     </div>
   )
 }
@@ -202,13 +202,13 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
   }
 
   return (
-    <div className="group [div&>button[data-state='open']>span]:text-scale-900">
+    <div className="group [div&>button[data-state='open']>span]:text-scale-900 flex items-center">
       {IS_PLATFORM ? (
         <DropdownMenu_Shadcn_>
-          <DropdownMenuTrigger_Shadcn_ className="flex items-center">
+          <DropdownMenuTrigger_Shadcn_ asChild>
             <span
               className={clsx(
-                'rounded-md',
+                'rounded p-1',
                 isActive
                   ? 'text-foreground-light hover:bg-scale-800'
                   : 'text-scale-300 dark:text-scale-200 hover:bg-scale-500 group-hover:text-foreground-light'

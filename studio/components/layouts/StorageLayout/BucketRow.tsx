@@ -57,48 +57,46 @@ const BucketRow = ({
           </div>
         </a>
       </Link>
-      <div className="pr-3">
-        {/* [JOSHEN TODO] need to change this */}
-        {false ? (
-          <IconLoader className="animate-spin" size={16} strokeWidth={2} />
-        ) : canUpdateBuckets && isSelected ? (
-          <DropdownMenu_Shadcn_>
-            <DropdownMenuTrigger_Shadcn_>
-              <Button
-                asChild
-                type="text"
-                icon={
-                  <IconChevronDown size="tiny" strokeWidth={2} className="text-foreground-light" />
-                }
-                style={{ padding: '3px' }}
-              >
-                <span></span>
-              </Button>
-            </DropdownMenuTrigger_Shadcn_>
-            <DropdownMenuContent_Shadcn_ side="bottom" align="start">
-              <DropdownMenuItem_Shadcn_
-                key="toggle-private"
-                className="space-x-2"
-                onClick={() => onSelectEditBucket(bucket)}
-              >
-                <IconEdit2 size="tiny" />
-                <p className="text">Edit bucket</p>
-              </DropdownMenuItem_Shadcn_>
-              <DropdownMenuSeparator_Shadcn_ />
-              <DropdownMenuItem_Shadcn_
-                key="delete-bucket"
-                className="space-x-2"
-                onClick={() => onSelectDeleteBucket(bucket)}
-              >
-                <IconTrash size="tiny" />
-                <p className="text">Delete bucket</p>
-              </DropdownMenuItem_Shadcn_>
-            </DropdownMenuContent_Shadcn_>
-          </DropdownMenu_Shadcn_>
-        ) : (
-          <div className="w-5" />
-        )}
-      </div>
+      {/* [JOSHEN TODO] need to change this */}
+      {false ? (
+        <IconLoader className="animate-spin" size={16} strokeWidth={2} />
+      ) : canUpdateBuckets && isSelected ? (
+        <DropdownMenu_Shadcn_>
+          <DropdownMenuTrigger_Shadcn_ asChild>
+            <Button
+              asChild
+              type="text"
+              icon={
+                <IconChevronDown size="tiny" strokeWidth={2} className="text-foreground-light" />
+              }
+              className="mr-1 p-0.5"
+            >
+              <span></span>
+            </Button>
+          </DropdownMenuTrigger_Shadcn_>
+          <DropdownMenuContent_Shadcn_ side="bottom" align="start">
+            <DropdownMenuItem_Shadcn_
+              key="toggle-private"
+              className="space-x-2"
+              onClick={() => onSelectEditBucket(bucket)}
+            >
+              <IconEdit2 size="tiny" />
+              <p className="text">Edit bucket</p>
+            </DropdownMenuItem_Shadcn_>
+            <DropdownMenuSeparator_Shadcn_ />
+            <DropdownMenuItem_Shadcn_
+              key="delete-bucket"
+              className="space-x-2"
+              onClick={() => onSelectDeleteBucket(bucket)}
+            >
+              <IconTrash size="tiny" />
+              <p className="text">Delete bucket</p>
+            </DropdownMenuItem_Shadcn_>
+          </DropdownMenuContent_Shadcn_>
+        </DropdownMenu_Shadcn_>
+      ) : (
+        <div className="w-5" />
+      )}
     </div>
   )
 }

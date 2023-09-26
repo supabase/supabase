@@ -2,9 +2,9 @@ import { Badge } from 'ui'
 
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import Table from 'components/to-be-cleaned/Table'
+import { User } from 'data/auth/users-query'
 import UserDropdown from './UserDropdown'
 import { getDateFromIsoString } from './Users.utils'
-import { User } from 'data/auth/users-query'
 
 interface UserListItemProps {
   user: User
@@ -50,7 +50,7 @@ const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItem
           <div>...</div>
         </div>
       </Table.td>
-      <Table.td className="flex items-center">
+      <Table.td className="table-cell">
         <UserDropdown
           user={user}
           canRemoveUser={canRemoveUser}
