@@ -48,7 +48,7 @@ const UserSettingsDropdown = () => {
       <DropdownMenuContent_Shadcn_ align="end" className="w-60">
         <DropdownMenuGroup_Shadcn_>
           <div key="profile" className="px-2 py-1.5">
-            <p className="text-sm text-scale-1200">
+            <p className="text-sm text-foreground">
               {profile?.first_name} {profile?.last_name}
             </p>
             <p className="text-sm text-scale-1000 truncate">{profile?.primary_email}</p>

@@ -395,7 +395,7 @@ const Wizard: NextPageWithLayout = () => {
                         const value = providerObj['id']
                         return (
                           <Listbox.Option key={value} label={label} value={value}>
-                            <span className="text-scale-1200">{label}</span>
+                            <span className="text-foreground">{label}</span>
                           </Listbox.Option>
                         )
                       })}
@@ -451,7 +451,7 @@ const Wizard: NextPageWithLayout = () => {
                             />
                           )}
                         >
-                          <span className="text-scale-1200">{label}</span>
+                          <span className="text-foreground">{label}</span>
                         </Listbox.Option>
                       )
                     })}

@@ -139,7 +139,7 @@ export function ColumnHeader<R>({
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">Primary key</span>
+                    <span className="text-xs text-foreground">Primary key</span>
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>
@@ -163,7 +163,7 @@ export function ColumnHeader<R>({
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">Encrypted column</span>
+                    <span className="text-xs text-foreground">Encrypted column</span>
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>
@@ -200,15 +200,15 @@ function renderColumnIcon(
                 <div>
                   <p className="text-xs text-scale-1100">Foreign key relation:</p>
                   <div className="flex items-center space-x-1">
-                    <p className="text-xs text-scale-1200">{name}</p>
+                    <p className="text-xs text-foreground">{name}</p>
                     <IconArrowRight size="tiny" strokeWidth={1.5} />
-                    <p className="text-xs text-scale-1200">
+                    <p className="text-xs text-foreground">
                       {foreignKey?.targetTableSchema}.{foreignKey?.targetTableName}.
                       {foreignKey?.targetColumnName}
                     </p>
                   </div>
                   {foreignKey?.deletionAction !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
-                    <p className="text-xs text-scale-1200 mt-1">
+                    <p className="text-xs text-foreground mt-1">
                       On delete: {getForeignKeyCascadeAction(foreignKey?.deletionAction)}
                     </p>
                   )}

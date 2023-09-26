@@ -243,7 +243,7 @@ const Addons = () => {
                       <Link href={`/project/${projectRef}/settings/infrastructure#ram`}>
                         <a>
                           <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
+                            <p className="text-sm text-scale-1100 group-hover:text-foreground transition cursor-pointer">
                               Memory
                             </p>
                             <IconChevronRight
@@ -260,7 +260,7 @@ const Addons = () => {
                       <Link href={`/project/${projectRef}/settings/infrastructure#cpu`}>
                         <a>
                           <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
+                            <p className="text-sm text-scale-1100 group-hover:text-foreground transition cursor-pointer">
                               CPU
                             </p>
                             <IconChevronRight
@@ -292,7 +292,7 @@ const Addons = () => {
                       <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
                         <a>
                           <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
+                            <p className="text-sm text-scale-1100 group-hover:text-foreground transition cursor-pointer">
                               Max Disk Throughput
                             </p>
                             <IconChevronRight
@@ -313,7 +313,7 @@ const Addons = () => {
                       <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
                         <a>
                           <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
+                            <p className="text-sm text-scale-1100 group-hover:text-foreground transition cursor-pointer">
                               Baseline Disk Throughput
                             </p>
                             <IconChevronRight

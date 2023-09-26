@@ -203,7 +203,7 @@ const PaymentMethods = () => {
                                         'w-48 border border-scale-200 text-center', //border
                                       ].join(' ')}
                                     >
-                                      <span className="text-xs text-scale-1200">
+                                      <span className="text-xs text-foreground">
                                         Your default payment method cannot be deleted
                                       </span>
                                     </div>

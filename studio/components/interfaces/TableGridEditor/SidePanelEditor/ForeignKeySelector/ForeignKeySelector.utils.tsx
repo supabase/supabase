@@ -47,7 +47,7 @@ export const generateCascadeActionDescription = (
                     'w-[300px] space-y-2 border border-scale-200',
                   ].join(' ')}
                 >
-                  <p className="text-xs text-scale-1200">
+                  <p className="text-xs text-foreground">
                     This is similar to no action, but the restrict check cannot be deferred till
                     later in the transaction
                   </p>

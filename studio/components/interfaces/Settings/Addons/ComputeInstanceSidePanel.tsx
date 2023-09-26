@@ -241,7 +241,7 @@ const ComputeInstanceSidePanel = () => {
                       <p
                         className={clsx(
                           'text-sm transition',
-                          isSelected ? 'text-scale-1200' : 'text-scale-1000'
+                          isSelected ? 'text-foreground' : 'text-scale-1000'
                         )}
                       >
                         {option.name}
@@ -306,7 +306,7 @@ const ComputeInstanceSidePanel = () => {
                           </p>
                           <div className="flex justify-between items-center mt-2">
                             <div className="flex items-center space-x-1">
-                              <span className="text-scale-1200 text-sm">
+                              <span className="text-foreground text-sm">
                                 ${option.price.toLocaleString()}
                               </span>
                               <span className="text-scale-1000 translate-y-[1px]">
@@ -335,7 +335,7 @@ const ComputeInstanceSidePanel = () => {
                                       ].join(' ')}
                                     >
                                       <div className="flex items-center space-x-1">
-                                        <p className="text-scale-1200 text-sm">
+                                        <p className="text-foreground text-sm">
                                           ${Number(option.price * 672).toFixed(0)} - $
                                           {Number(option.price * 744).toFixed(0)} per month
                                         </p>
@@ -371,7 +371,7 @@ const ComputeInstanceSidePanel = () => {
                 // Monthly payment with project-level subscription
                 <p className="text-sm text-scale-1100">
                   Upon clicking confirm, the amount of{' '}
-                  <span className="text-scale-1200">
+                  <span className="text-foreground">
                     ${selectedCompute?.price.toLocaleString()}
                   </span>{' '}
                   will be added to your monthly invoice. Any previous compute addon is prorated and

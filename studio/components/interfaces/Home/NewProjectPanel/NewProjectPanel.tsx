@@ -19,7 +19,7 @@ const NewProjectPanel = () => {
         <div className="flex flex-col space-y-20">
           <div className="flex h-full flex-col justify-between">
             <div className="space-y-2">
-              <h3 className="text-xl text-scale-1200">Welcome to your new project</h3>
+              <h3 className="text-xl text-foreground">Welcome to your new project</h3>
               <p className="text-base text-scale-1100">
                 Your project has been deployed on its own instance, with its own API all set up and
                 ready to use.
@@ -30,7 +30,7 @@ const NewProjectPanel = () => {
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 flex flex-col justify-center space-y-8 lg:col-span-7">
               <div className="space-y-2">
-                <h3 className="text-xl text-scale-1200">
+                <h3 className="text-xl text-foreground">
                   Get started by building out your database
                 </h3>
                 <p className="text-base text-scale-1100">
@@ -96,7 +96,7 @@ const NewProjectPanel = () => {
 
           <div className="flex h-full flex-col justify-between space-y-6">
             <div className="max-w-2xl space-y-2">
-              <h3 className="text-xl text-scale-1200">Explore our other products</h3>
+              <h3 className="text-xl text-foreground">Explore our other products</h3>
               <p className="text-base text-scale-1100">
                 Supabase provides all the backend features you need to build a product. You can use
                 it completely, or just the features you need.
@@ -241,7 +241,7 @@ const NewProjectPanel = () => {
       <div className="col-span-12 lg:col-span-4">
         <div className="space-y-6">
           <div className="space-y-2">
-            <h3 className="text-xl text-scale-1200">Connecting to your new project</h3>
+            <h3 className="text-xl text-foreground">Connecting to your new project</h3>
             <p className="text-base text-scale-1100 lg:max-w-sm">
               Interact with your database through the{' '}
               <Link href="https://supabase.com/docs/reference">

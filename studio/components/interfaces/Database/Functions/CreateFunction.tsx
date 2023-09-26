@@ -480,7 +480,7 @@ const InputMultiArguments = observer(({ readonly }: InputMultiArgumentsProps) =>
   return (
     <div>
       <div className="flex flex-col">
-        <h5 className="text-base text-scale-1200">Arguments</h5>
+        <h5 className="text-base text-foreground">Arguments</h5>
         <p className="text-sm text-scale-1100">
           Arguments can be referenced in the function body using either names or numbers.
         </p>
@@ -600,7 +600,7 @@ const InputMultiConfigParams = observer(({}) => {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h5 className="text-base text-scale-1200">Config Params</h5>
+        <h5 className="text-base text-foreground">Config Params</h5>
       </div>
       <div className="space-y-2 pt-4">
         {_localState!.formState.configParams.value.map(
@@ -694,7 +694,7 @@ const InputDefinition = observer(({}) => {
   return (
     <div className="space-y-4">
       <div className="flex flex-col">
-        <h5 className="text-base text-scale-1200">Definition</h5>
+        <h5 className="text-base text-foreground">Definition</h5>
         <p className="text-sm text-scale-1100">
           The language below should be written in `{_localState!.formState.language.value}`.
         </p>

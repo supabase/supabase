@@ -174,7 +174,7 @@ const SpendCapSidePanel = () => {
                     <>
                       <Table.tr key={categoryId}>
                         <Table.td>
-                          <p className="text-xs text-scale-1200">{category.title}</p>
+                          <p className="text-xs text-foreground">{category.title}</p>
                         </Table.td>
                         <Table.td>{null}</Table.td>
                       </Table.tr>
@@ -185,9 +185,7 @@ const SpendCapSidePanel = () => {
                               <p className="text-xs pl-4">{item.title}</p>
                             </Table.td>
                             <Table.td>
-                              <p className="text-xs pl-4">
-                                {item.plans['pro']}
-                              </p>
+                              <p className="text-xs pl-4">{item.plans['pro']}</p>
                             </Table.td>
                           </Table.tr>
                         )
@@ -258,8 +256,8 @@ const SpendCapSidePanel = () => {
                     <p
                       className={clsx(
                         'text-sm transition',
-                        !isFreePlan && 'group-hover:text-scale-1200',
-                        isSelected ? 'text-scale-1200' : 'text-scale-1000'
+                        !isFreePlan && 'group-hover:text-foreground',
+                        isSelected ? 'text-foreground' : 'text-scale-1000'
                       )}
                     >
                       {option.name}

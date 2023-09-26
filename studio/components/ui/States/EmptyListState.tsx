@@ -31,7 +31,7 @@ const EmptyListState = ({ title, description }: { title: string; description: st
         </div>
       </div>
       <div className="flex flex-col gap-1 px-5">
-        <h3 className="text-scale-1200 text-sm">{title}</h3>
+        <h3 className="text-foreground text-sm">{title}</h3>
         <p className="text-scale-900 text-sm">{description}</p>
       </div>
     </div>

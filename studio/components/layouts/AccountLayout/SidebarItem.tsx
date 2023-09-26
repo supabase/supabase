@@ -60,7 +60,7 @@ const SidebarItem = ({
           )}
           <span
             title={label}
-            className="w-full truncate text-sm text-scale-1100 transition group-hover:text-scale-1200"
+            className="w-full truncate text-sm text-scale-1100 transition group-hover:text-foreground"
           >
             {isSubitem ? <p>{label}</p> : label}
           </span>

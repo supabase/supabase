@@ -114,7 +114,7 @@ const Infrastructure = ({}: InfrastructureProps) => {
                             'border border-scale-200 w-[200px]',
                           ].join(' ')}
                         >
-                          <span className="text-xs text-scale-1200">
+                          <span className="text-xs text-foreground">
                             Project is on the latest version of Postgres that Supabase supports
                           </span>
                         </div>

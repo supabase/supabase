@@ -88,7 +88,7 @@ const Header = ({
   const highlighted = (
     <h5
       className={
-        'text-xl font-normal text-scale-1200 ' + (minimalHeader ? 'text-base' : 'text-2xl')
+        'text-xl font-normal text-foreground ' + (minimalHeader ? 'text-base' : 'text-2xl')
       }
     >
       {title}

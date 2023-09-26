@@ -65,7 +65,7 @@ const SpreadSheetFileUpload = ({
         <div className="flex h-28 flex-col items-center justify-center space-y-2 rounded-md border border-dashed dark:border-gray-700">
           <div className="flex items-center space-x-2">
             <IconFileText size={14} strokeWidth={1.5} />
-            <p className="text-sm text-scale-1200">{uploadedFile.name}</p>
+            <p className="text-sm text-foreground">{uploadedFile.name}</p>
           </div>
           {parseProgress === 100 ? (
             <Button type="outline" onClick={removeUploadedFile}>

@@ -118,7 +118,7 @@ const TerminalInstructions = ({
       {tokens && tokens.length === 0 ? (
         <div className="px-8 py-6 space-y-3 border-t">
           <div>
-            <h3 className="text-base text-scale-1200">You may need to create an access token</h3>
+            <h3 className="text-base text-foreground">You may need to create an access token</h3>
             <p className="text-sm text-scale-1100">
               You can create a secure access token in your account section
             </p>
@@ -130,7 +130,7 @@ const TerminalInstructions = ({
       ) : (
         <div className="px-8 py-6 space-y-3 border-t">
           <div>
-            <h3 className="text-base text-scale-1200">Need help?</h3>
+            <h3 className="text-base text-foreground">Need help?</h3>
             <p className="text-sm text-scale-1100">
               Read the documentation, or browse some sample code.
             </p>
