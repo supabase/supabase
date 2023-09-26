@@ -1,12 +1,28 @@
+import saveAs from 'file-saver'
+import Papa from 'papaparse'
 import clsx from 'clsx'
 import SVG from 'react-inlinesvg'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-type-query'
 import Link from 'next/link'
-import { Dropdown, IconEdit, IconCopy, IconLock, IconTrash, IconChevronDown } from 'ui'
+import {
+  Dropdown,
+  IconEdit,
+  IconCopy,
+  IconLock,
+  IconTrash,
+  IconChevronDown,
+  IconDownload,
+} from 'ui'
 import { BASE_PATH } from 'lib/constants'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
+import { useParams } from 'common'
+import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { getTable } from 'data/tables/table-query'
+import { parseSupaTable } from 'components/grid'
+import { useStore } from 'hooks'
 
 export interface EntityListItemProps {
   id: number
@@ -16,7 +32,10 @@ export interface EntityListItemProps {
 }
 
 const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListItemProps) => {
+  const { ui } = useStore()
+  const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
+
   const isActive = Number(id) === entity.id
   const formatTooltipText = (entityType: string) => {
     return Object.entries(ENTITY_TYPE)
@@ -24,6 +43,67 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
       ?.toLowerCase()
       ?.split('_')
       ?.join(' ')
+  }
+
+  const exportTableAsCSV = async () => {
+    if (!project?.connectionString) return console.error('Connection string is required')
+    const toastId = ui.setNotification({
+      category: 'loading',
+      message: `Exporting ${entity.name} as CSV...`,
+    })
+
+    try {
+      const table = await getTable({
+        id: entity.id,
+        projectRef,
+        connectionString: project.connectionString,
+      })
+      const supaTable =
+        table &&
+        parseSupaTable(
+          {
+            table: table,
+            columns: table.columns ?? [],
+            primaryKeys: table.primary_keys,
+            relationships: table.relationships,
+          },
+          []
+        )
+
+      const rows = await fetchAllTableRows({
+        projectRef,
+        connectionString: project.connectionString,
+        table: supaTable,
+      })
+      const formattedRows = rows.map((row) => {
+        const formattedRow = row
+        Object.keys(row).map((column) => {
+          if (typeof row[column] === 'object' && row[column] !== null)
+            formattedRow[column] = JSON.stringify(formattedRow[column])
+        })
+        return formattedRow
+      })
+
+      if (formattedRows.length > 0) {
+        const csv = Papa.unparse(formattedRows, {
+          columns: supaTable.columns.map((column) => column.name),
+        })
+        const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+        saveAs(csvData, `${entity!.name}_rows.csv`)
+      }
+
+      ui.setNotification({
+        id: toastId,
+        category: 'success',
+        message: `Successfully exported ${entity.name} as CSV`,
+      })
+    } catch (error: any) {
+      ui.setNotification({
+        id: toastId,
+        category: 'error',
+        message: `Failed to export table: ${error.message}`,
+      })
+    }
   }
 
   return (
@@ -151,6 +231,16 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                   </Dropdown.Item>
                 </a>
               </Link>,
+              <Dropdown.Item
+                key="download-table-csv"
+                icon={<IconDownload size="tiny" />}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  exportTableAsCSV()
+                }}
+              >
+                Export as CSV
+              </Dropdown.Item>,
               <Dropdown.Separator key="separator" />,
               <Dropdown.Item
                 key="delete-table"
