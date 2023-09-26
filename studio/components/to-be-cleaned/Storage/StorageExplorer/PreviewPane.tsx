@@ -223,7 +223,6 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                   <DropdownMenuContent_Shadcn_ side="bottom" align="center">
                     <DropdownMenuItem_Shadcn_
                       key="expires-one-week"
-                      className="text-xs"
                       onClick={async () =>
                         onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.WEEK))
                       }
@@ -232,7 +231,6 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                     </DropdownMenuItem_Shadcn_>
                     <DropdownMenuItem_Shadcn_
                       key="expires-one-month"
-                      className="text-xs"
                       onClick={async () =>
                         onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.MONTH))
                       }
@@ -241,7 +239,6 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                     </DropdownMenuItem_Shadcn_>
                     <DropdownMenuItem_Shadcn_
                       key="expires-one-year"
-                      className="text-xs"
                       onClick={async () =>
                         onCopyUrl(file.name, await getFileUrl(file, URL_EXPIRY_DURATION.YEAR))
                       }
@@ -250,7 +247,6 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                     </DropdownMenuItem_Shadcn_>
                     <DropdownMenuItem_Shadcn_
                       key="custom-expiry"
-                      className="text-xs"
                       onClick={() => setSelectedFileCustomExpiry(file)}
                     >
                       Custom expiry
