@@ -75,19 +75,19 @@ const ColumnType = ({
   const inferIcon = (type: string) => {
     switch (type) {
       case 'number':
-        return <IconHash size={16} className="text-scale-1200" strokeWidth={1.5} />
+        return <IconHash size={16} className="text-foreground" strokeWidth={1.5} />
       case 'time':
-        return <IconCalendar size={16} className="text-scale-1200" strokeWidth={1.5} />
+        return <IconCalendar size={16} className="text-foreground" strokeWidth={1.5} />
       case 'text':
-        return <IconType size={16} className="text-scale-1200" strokeWidth={1.5} />
+        return <IconType size={16} className="text-foreground" strokeWidth={1.5} />
       case 'json':
         return (
-          <div className="text-scale-1200" style={{ padding: '0px 1px' }}>
+          <div className="text-foreground" style={{ padding: '0px 1px' }}>
             {'{ }'}
           </div>
         )
       case 'bool':
-        return <IconToggleRight size={16} className="text-scale-1200" strokeWidth={1.5} />
+        return <IconToggleRight size={16} className="text-foreground" strokeWidth={1.5} />
       default:
         return <div />
     }
@@ -158,7 +158,7 @@ const ColumnType = ({
             addOnBefore={() => inferIcon(option.type)}
           >
             <div className="flex items-center space-x-4">
-              <span className="text-scale-1200">{option.name}</span>
+              <span className="text-foreground">{option.name}</span>
               <span className="text-scale-900">{option.description}</span>
             </div>
           </Listbox.Option>

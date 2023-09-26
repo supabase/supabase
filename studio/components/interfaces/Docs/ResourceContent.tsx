@@ -40,7 +40,7 @@ const ResourceContent = ({
 
   return (
     <>
-      <h2 className="doc-section__table-name text-scale-1200 mt-0 flex items-center px-6 gap-2">
+      <h2 className="doc-section__table-name text-foreground mt-0 flex items-center px-6 gap-2">
         <span className="bg-slate-300 dark:bg-slate-400 p-2 rounded-lg">
           <IconTable size="small" />
         </span>
@@ -97,7 +97,7 @@ const ResourceContent = ({
       )}
       {methods.includes('GET') && (
         <>
-          <h3 className="text-scale-1200 mt-4 px-6">Read rows</h3>
+          <h3 className="text-foreground mt-4 px-6">Read rows</h3>
           <div className="doc-section">
             <article className="text ">
               <p>
@@ -161,7 +161,7 @@ const ResourceContent = ({
       )}
       {methods.includes('POST') && (
         <>
-          <h3 className="text-scale-1200 mt-4 px-6">Insert rows</h3>
+          <h3 className="text-foreground mt-4 px-6">Insert rows</h3>
           <div className="doc-section">
             <article className="text ">
               <p>
@@ -200,7 +200,7 @@ const ResourceContent = ({
       )}
       {methods.includes('PATCH') && (
         <>
-          <h3 className="text-scale-1200 mt-4 px-6">Update rows</h3>
+          <h3 className="text-foreground mt-4 px-6">Update rows</h3>
           <div className="doc-section">
             <article className="text ">
               <p>
@@ -232,7 +232,7 @@ const ResourceContent = ({
       )}
       {methods.includes('DELETE') && (
         <>
-          <h3 className="text-scale-1200 mt-4 px-6">Delete rows</h3>
+          <h3 className="text-foreground mt-4 px-6">Delete rows</h3>
           <div className="doc-section">
             <article className="text ">
               <p>
@@ -260,7 +260,7 @@ const ResourceContent = ({
       )}
       {(methods.includes('DELETE') || methods.includes('POST') || methods.includes('PATCH')) && (
         <>
-          <h3 className="text-scale-1200 mt-4 px-6">Subscribe to changes</h3>
+          <h3 className="text-foreground mt-4 px-6">Subscribe to changes</h3>
           <div className="doc-section">
             <article className="text ">
               <p>

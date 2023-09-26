@@ -173,7 +173,7 @@ const SideBarContent = observer(() => {
                           'w-4',
                           'h-4',
                           'cursor-pointer',
-                          isFavoritesFilterOpen ? 'text-scale-1200' : 'text-scale-900'
+                          isFavoritesFilterOpen ? 'text-foreground' : 'text-scale-900'
                         )}
                         onClick={() => {
                           setFavoritesFilterString('')
@@ -240,7 +240,7 @@ const SideBarContent = observer(() => {
                           'w-4',
                           'h-4',
                           'cursor-pointer',
-                          isProjectSnippetsFilterOpen ? 'text-scale-1200' : 'text-scale-900'
+                          isProjectSnippetsFilterOpen ? 'text-foreground' : 'text-scale-900'
                         )}
                         onClick={() => {
                           setProjectSnippetsFilterString('')
@@ -306,7 +306,7 @@ const SideBarContent = observer(() => {
                         'w-4',
                         'h-4',
                         'cursor-pointer',
-                        isPersonalSnippetsFilterOpen ? 'text-scale-1200' : 'text-scale-900'
+                        isPersonalSnippetsFilterOpen ? 'text-foreground' : 'text-scale-900'
                       )}
                       onClick={() => {
                         setPersonalSnippetsFilterString('')

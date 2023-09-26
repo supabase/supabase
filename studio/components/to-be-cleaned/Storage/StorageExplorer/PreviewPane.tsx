@@ -136,7 +136,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
           style={{ width }}
         >
           {/* Preview Header */}
-          <div className="flex w-full justify-end text-scale-900 transition-colors hover:text-scale-1200">
+          <div className="flex w-full justify-end text-scale-900 transition-colors hover:text-foreground">
             <IconX
               className="cursor-pointer"
               size={14}
@@ -155,7 +155,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
           <div className="w-full space-y-6">
             {/* Preview Information */}
             <div className="space-y-1">
-              <h5 className="break-words text-base text-scale-1200">{file.name}</h5>
+              <h5 className="break-words text-base text-foreground">{file.name}</h5>
               {file.isCorrupted && (
                 <div className="flex items-center space-x-2">
                   <IconAlertCircle size={14} strokeWidth={2} className="text-scale-1100" />
@@ -277,7 +277,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to delete this file
                       </span>
                     </div>

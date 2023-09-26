@@ -304,7 +304,7 @@ const Reports = () => {
 
   return (
     <div className="mx-6 flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
-      <h1 className="text-xl text-scale-1200">Reports</h1>
+      <h1 className="text-xl text-foreground">Reports</h1>
 
       <div className="mb-4 flex items-center justify-between space-x-3">
         <div className="flex items-center space-x-3">
@@ -370,7 +370,7 @@ const Reports = () => {
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text-foreground">
                       You need additional permissions to update this project's report
                     </span>
                   </div>

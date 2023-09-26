@@ -70,7 +70,7 @@ const PolicyTableRowHeader = ({
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to create RLS policies
                       </span>
                     </div>
@@ -98,7 +98,7 @@ const PolicyTableRowHeader = ({
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to toggle RLS
                       </span>
                     </div>

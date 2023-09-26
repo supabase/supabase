@@ -158,7 +158,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                       <Link href={`/project/${projectRef}/settings/billing/usage#${metric.anchor}`}>
                         <a>
                           <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
+                            <p className="text-sm text-scale-1100 group-hover:text-foreground transition cursor-pointer">
                               {metric.name}
                             </p>
                             <IconChevronRight
@@ -189,7 +189,7 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                                   'border border-scale-200',
                                 ].join(' ')}
                               >
-                                <div className="text-xs text-scale-1200">
+                                <div className="text-xs text-foreground">
                                   {usageFee.pricingStrategy === 'UNIT' ? (
                                     <div>
                                       <p>
@@ -260,11 +260,11 @@ const BillingBreakdown = ({}: BillingBreakdownProps) => {
                                     'border border-scale-200',
                                   ].join(' ')}
                                 >
-                                  <p className="text-xs text-scale-1200">
+                                  <p className="text-xs text-foreground">
                                     Exceeding your plans included usage will lead to restrictions to
                                     your project.
                                   </p>
-                                  <p className="text-xs text-scale-1200">
+                                  <p className="text-xs text-foreground">
                                     Upgrade to a usage-based plan or disable the spend cap to avoid
                                     restrictions.
                                   </p>

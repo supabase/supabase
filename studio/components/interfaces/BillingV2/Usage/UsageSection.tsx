@@ -14,7 +14,11 @@ import Link from 'next/link'
 import SparkBar from 'components/ui/SparkBar'
 import clsx from 'clsx'
 import { ProjectSubscriptionResponse } from 'data/subscriptions/project-subscription-v2-query'
-import { ChartTooltipValueFormatter, ChartYFormatterCompactNumber, getUpgradeUrl } from './Usage.utils'
+import {
+  ChartTooltipValueFormatter,
+  ChartYFormatterCompactNumber,
+  getUpgradeUrl,
+} from './Usage.utils'
 import { formatBytes } from 'lib/helpers'
 import UsageBarChart from './UsageBarChart'
 import Panel from 'components/ui/Panel'
@@ -111,11 +115,11 @@ const UsageSection = ({
                                       'border border-scale-200',
                                     ].join(' ')}
                                   >
-                                    <p className="text-xs text-scale-1200">
+                                    <p className="text-xs text-foreground">
                                       Exceeding your plans included usage will lead to restrictions
                                       to your project.
                                     </p>
-                                    <p className="text-xs text-scale-1200">
+                                    <p className="text-xs text-foreground">
                                       Upgrade to a usage-based plan or disable the spend cap to
                                       avoid restrictions.
                                     </p>
@@ -229,7 +233,9 @@ const UsageSection = ({
                       data={chartData}
                       yLeftMargin={chartMeta[attribute.key].margin}
                       yFormatter={(value) => ChartYFormatterCompactNumber(value, attribute.unit)}
-                      tooltipFormatter={(value) => ChartTooltipValueFormatter(value, attribute.unit)}
+                      tooltipFormatter={(value) =>
+                        ChartTooltipValueFormatter(value, attribute.unit)
+                      }
                     />
                   ) : (
                     <Panel>
@@ -255,7 +261,9 @@ const UsageSection = ({
                           </p>
                         </div>
                       </div>
-                      <Link href={`/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`}>
+                      <Link
+                        href={`/project/${projectRef}/settings/billing/subscription?panel=subscriptionPlan`}
+                      >
                         <a>
                           <Button type="primary">Upgrade plan</Button>
                         </a>

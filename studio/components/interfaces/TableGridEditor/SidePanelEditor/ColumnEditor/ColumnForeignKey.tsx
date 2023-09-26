@@ -102,7 +102,7 @@ const ColumnForeignKeyInformation = ({
         <div className="flex flex-col space-y-4">
           <div className="space-y-2">
             <p className="text-scale-1100">This column has the following foreign key relation:</p>
-            <div className="flex items-center space-x-2 text-scale-1200">
+            <div className="flex items-center space-x-2 text-foreground">
               <p className="text-xs text-code font-mono">{columnName}</p>
               <IconArrowRight size={14} strokeWidth={2} />
               <p className="text-xs text-code font-mono">
@@ -156,7 +156,7 @@ const ColumnForeignKeyAdded = ({
             <span>
               The following foreign key relation will be <span className="text-brand">added</span>:
             </span>
-            <div className="flex items-center space-x-2 text-scale-1200">
+            <div className="flex items-center space-x-2 text-foreground">
               <p
                 className={`${
                   columnName.length > 0 ? 'text-code font-mono text-xs' : ''

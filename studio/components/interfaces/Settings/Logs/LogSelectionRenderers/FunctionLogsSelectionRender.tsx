@@ -14,7 +14,7 @@ const FunctionLogsSelectionRender = ({ log }: any) => {
     <>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
         <span className="text-scale-900 text-sm col-span-4">Event message</span>
-        <div className="text-xs text-wrap font-mono text-scale-1200 mt-2 whitespace-pre-wrap overflow-x-auto">
+        <div className="text-xs text-wrap font-mono text-foreground mt-2 whitespace-pre-wrap overflow-x-auto">
           {log.event_message}
         </div>
       </div>
@@ -31,7 +31,7 @@ const FunctionLogsSelectionRender = ({ log }: any) => {
         <SelectionDetailedRow label="Deployment ID" value={metadata.deployment_id} />
       </div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
-        <h3 className="text-lg text-scale-1200 mb-4">Metadata</h3>
+        <h3 className="text-lg text-foreground mb-4">Metadata</h3>
         <pre className="text-sm syntax-highlight overflow-x-auto">
           <div
             className="text-wrap"

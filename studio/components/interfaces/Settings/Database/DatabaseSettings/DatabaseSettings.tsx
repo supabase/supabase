@@ -27,7 +27,7 @@ const DatabaseSettings = () => {
     return (
       <div className="space-y-10">
         <section className="space-y-6">
-          <h3 className="text-scale-1200 mb-2 text-xl">Database Settings</h3>
+          <h3 className="text-foreground mb-2 text-xl">Database Settings</h3>
           <Panel
             title={
               <h5 key="panel-title" className="mb-0">
@@ -133,7 +133,7 @@ const DatabaseSettings = () => {
   return (
     <div className="space-y-10">
       <section className="space-y-6">
-        <h3 className="text-scale-1200 mb-2 text-xl">Database Settings</h3>
+        <h3 className="text-foreground mb-2 text-xl">Database Settings</h3>
         <Panel
           title={
             <h5 key="panel-title" className="mb-0">

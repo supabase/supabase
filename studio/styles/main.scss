@@ -26,7 +26,7 @@ body,
 #__next,
 .main {
   @apply bg-scale-200;
-  @apply text-scale-1200;
+  @apply text-foreground;
   height: 100%;
   padding: 0;
   margin: 0;
@@ -68,7 +68,7 @@ input.form-control,
   @apply rounded-md;
   @apply shadow-sm;
   @apply transition-all;
-  @apply text-scale-1200;
+  @apply text-foreground;
   @apply border;
   @apply focus:shadow-md;
 

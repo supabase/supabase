@@ -70,7 +70,7 @@ const UpgradeToPro = ({
                       'rounded bg-scale-100 py-1 px-2 leading-none shadow', // background
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text-foreground">
                       {projectUpdateDisabled ? (
                         <>
                           Subscription changes are currently disabled.

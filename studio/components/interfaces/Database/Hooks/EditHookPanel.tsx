@@ -458,7 +458,7 @@ const FormContents = ({
               >
                 <div className="flex items-center space-x-2">
                   <p className="text-scale-1000">{table.schema}</p>
-                  <p className="text-scale-1200">{table.name}</p>
+                  <p className="text-foreground">{table.name}</p>
                 </div>
               </Listbox.Option>
             ))}
@@ -502,7 +502,7 @@ const FormContents = ({
                     <Image src={webhook.icon} layout="fixed" width="32" height="32" />
                     <div className="flex-col space-y-0">
                       <div className="flex space-x-2">
-                        <p className="text-scale-1200">{webhook.label}</p>
+                        <p className="text-foreground">{webhook.label}</p>
                       </div>
                       <p className="text-scale-1000">{webhook.description}</p>
                     </div>

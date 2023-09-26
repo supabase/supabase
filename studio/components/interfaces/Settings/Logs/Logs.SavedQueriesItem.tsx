@@ -26,7 +26,7 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
                 <IconChevronRight strokeWidth={2} size={14} />
               </div>
             </button>
-            <span className="text-sm text-scale-1200">{item.name}</span>
+            <span className="text-sm text-foreground">{item.name}</span>
           </div>
         </Table.td>
         <Table.td className="">

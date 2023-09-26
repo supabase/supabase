@@ -107,7 +107,7 @@ const SortRow = ({ table, index, columnName, sort, onDelete, onToggle, onDrag }:
         <IconMenu strokeWidth={2} size={16} />
       </span>
       <div className="grow">
-        <span className="flex grow items-center gap-1 truncate text-sm text-scale-1200">
+        <span className="flex grow items-center gap-1 truncate text-sm text-foreground">
           <span className="text-xs text-scale-900">{index > 0 ? 'then by' : 'sort by'}</span>
           {column.name}
         </span>

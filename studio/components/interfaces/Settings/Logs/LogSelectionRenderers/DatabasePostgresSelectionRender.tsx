@@ -20,7 +20,7 @@ const DatabasePostgresSelectionRender = ({ log }: any) => {
       <div className={LOGS_TAILWIND_CLASSES.log_selection_x_padding}>
         <span className="col-span-4 text-sm text-scale-900">Event message</span>
 
-        <div className="text-wrap mt-2 overflow-x-auto whitespace-pre-wrap font-mono  text-xs text-scale-1200">
+        <div className="text-wrap mt-2 overflow-x-auto whitespace-pre-wrap font-mono  text-xs text-foreground">
           {log.event_message}
         </div>
       </div>
@@ -42,7 +42,7 @@ const DatabasePostgresSelectionRender = ({ log }: any) => {
       )}
       <LogsDivider />
       <div className={LOGS_TAILWIND_CLASSES.log_selection_x_padding}>
-        <h3 className="mb-4 text-lg text-scale-1200">Metadata</h3>
+        <h3 className="mb-4 text-lg text-foreground">Metadata</h3>
         <pre className="syntax-highlight overflow-x-auto text-sm">
           <div
             className="text-wrap"

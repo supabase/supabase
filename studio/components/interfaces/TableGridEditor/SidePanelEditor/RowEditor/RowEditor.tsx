@@ -169,7 +169,7 @@ const RowEditor = ({
                 <SidePanel.Content>
                   <div className="space-y-10 py-6">
                     <div>
-                      <h3 className="text-base text-scale-1200">Optional Fields</h3>
+                      <h3 className="text-base text-foreground">Optional Fields</h3>
                       <p className="text-sm text-scale-900">
                         These are columns that do not need any value
                       </p>

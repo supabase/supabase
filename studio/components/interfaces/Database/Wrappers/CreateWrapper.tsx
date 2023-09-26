@@ -138,7 +138,7 @@ const CreateWrapper = () => {
               </a>
             </Link>
           </div>
-          <h3 className="mb-2 text-xl text-scale-1200">Create a {wrapperMeta.label} Wrapper</h3>
+          <h3 className="mb-2 text-xl text-foreground">Create a {wrapperMeta.label} Wrapper</h3>
           <div className="flex items-center space-x-2">
             <Link href={wrapperMeta.docsUrl}>
               <a target="_blank" rel="noreferrer">

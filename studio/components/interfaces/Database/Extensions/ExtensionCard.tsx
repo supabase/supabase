@@ -80,7 +80,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
             <div className="flex items-center space-x-2 truncate">
               <h3
                 title={extension.name}
-                className="h-5 m-0 text-sm truncate cursor-pointer text-scale-1200"
+                className="h-5 m-0 text-sm truncate cursor-pointer text-foreground"
               >
                 {extension.name}
               </h3>

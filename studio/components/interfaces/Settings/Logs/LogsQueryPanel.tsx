@@ -152,7 +152,7 @@ const LogsQueryPanel = ({
                               'border border-scale-200',
                             ].join(' ')}
                           >
-                            <span className="text-xs text-scale-1200">
+                            <span className="text-xs text-foreground">
                               You need additional permissions to save your query
                             </span>
                           </div>

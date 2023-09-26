@@ -119,7 +119,7 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
                   'border-scale-200 border',
                 ].join(' ')}
               >
-                <span className="text-scale-1200 text-xs">Hours (HH)</span>
+                <span className="text-foreground text-xs">Hours (HH)</span>
               </div>
             </Tooltip.Content>
           </Tooltip.Portal>
@@ -149,7 +149,7 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
                   'border-scale-200 border',
                 ].join(' ')}
               >
-                <span className="text-scale-1200 text-xs">Minutes (MM)</span>
+                <span className="text-foreground text-xs">Minutes (MM)</span>
               </div>
             </Tooltip.Content>
           </Tooltip.Portal>
@@ -179,7 +179,7 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
                   'border-scale-200 border',
                 ].join(' ')}
               >
-                <span className="text-scale-1200 text-xs">Seconds (SS)</span>
+                <span className="text-foreground text-xs">Seconds (SS)</span>
               </div>
             </Tooltip.Content>
           </Tooltip.Portal>

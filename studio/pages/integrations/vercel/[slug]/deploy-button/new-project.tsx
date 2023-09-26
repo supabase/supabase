@@ -32,7 +32,7 @@ const VercelIntegration: NextPageWithLayout = () => {
 
         <>
           <ScaffoldContainer className="max-w-md flex flex-col gap-6 grow py-8">
-            <h1 className="text-xl text-scale-1200">New project</h1>
+            <h1 className="text-xl text-foreground">New project</h1>
             <>
               <Markdown content={`Choose the Supabase organization you wish to install in`} />
               <CreateProject loading={loading} setLoading={setLoading} />
@@ -318,7 +318,7 @@ const CreateProject = ({
                     />
                   )}
                 >
-                  <span className="text-scale-1200">{label}</span>
+                  <span className="text-foreground">{label}</span>
                 </Listbox.Option>
               )
             })}

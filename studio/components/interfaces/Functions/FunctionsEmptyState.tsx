@@ -7,7 +7,7 @@ const FunctionsEmptyState = () => {
     <>
       <div className="grid max-w-7xl gap-y-12 py-12 lg:grid-cols-12 lg:gap-x-16">
         <div className="col-span-5 space-y-4">
-          <p className="max-w-lg text-base text-scale-1200">
+          <p className="max-w-lg text-base text-foreground">
             Scalable functions to run your code with no server management.
           </p>
           <p className="max-w-lg text-sm text-scale-1100">

@@ -134,11 +134,11 @@ const AttributeUsage = ({
                                     'border border-scale-200',
                                   ].join(' ')}
                                 >
-                                  <p className="text-xs text-scale-1200">
+                                  <p className="text-xs text-foreground">
                                     Exceeding your plans included usage will lead to restrictions to
                                     your project.
                                   </p>
-                                  <p className="text-xs text-scale-1200">
+                                  <p className="text-xs text-foreground">
                                     Upgrade to a usage-based plan or disable the spend cap to avoid
                                     restrictions.
                                   </p>

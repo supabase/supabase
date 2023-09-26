@@ -146,7 +146,7 @@ const WrappersDisabledState = () => {
                           'border border-scale-200',
                         ].join(' ')}
                       >
-                        <span className="text-xs text-scale-1200">
+                        <span className="text-xs text-foreground">
                           You need additional permissions to enable Wrappers for this project
                         </span>
                       </div>
