@@ -222,7 +222,7 @@ const ReportFilterBar = ({
           align="end"
           header={
             <div className="flex justify-between items-center py-1">
-              <h5 className="text-sm text-scale-1200">Add Filter</h5>
+              <h5 className="text-sm text-foreground">Add Filter</h5>
 
               <Button
                 type="primary"

@@ -252,7 +252,7 @@ function _DatePicker({
                       type="button"
                       className={`
                         ${prevMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                        text-scale-1100 hover:text-scale-1200 focus:outline-none
+                        text-scale-1100 hover:text-foreground focus:outline-none
                     `}
                     >
                       <IconChevronLeft size={16} strokeWidth={2} />
@@ -264,7 +264,7 @@ function _DatePicker({
                       type="button"
                       className={`
                         ${nextMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                        text-scale-1100 hover:text-scale-1200 focus:outline-none
+                        text-scale-1100 hover:text-foreground focus:outline-none
                     `}
                     >
                       <IconChevronRight size={16} strokeWidth={2} />

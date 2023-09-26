@@ -35,7 +35,7 @@ const DatabaseApiSelectionRender = ({ log }: any) => {
       </div>
       <LogsDivider />
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
-        <h3 className="text-lg text-scale-1200 mb-4">Request Metadata</h3>
+        <h3 className="text-lg text-foreground mb-4">Request Metadata</h3>
         <pre className="text-sm syntax-highlight overflow-x-auto">
           <div
             className="text-wrap"
@@ -47,7 +47,7 @@ const DatabaseApiSelectionRender = ({ log }: any) => {
       </div>
       <LogsDivider />
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
-        <h3 className="text-lg text-scale-1200 mb-4">Response Metadata</h3>
+        <h3 className="text-lg text-foreground mb-4">Response Metadata</h3>
         <pre className="text-sm syntax-highlight overflow-x-auto">
           <div
             dangerouslySetInnerHTML={{

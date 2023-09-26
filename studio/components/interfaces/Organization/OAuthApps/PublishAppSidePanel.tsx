@@ -267,7 +267,7 @@ const PublishAppSidePanel = ({
                                   (uploadButtonRef.current as any).click()
                               }}
                             >
-                              <IconUpload size={18} strokeWidth={1.5} className="text-scale-1200" />
+                              <IconUpload size={18} strokeWidth={1.5} className="text-foreground" />
                               <p className="text-xs text-scale-1100">Upload logo</p>
                             </div>
                           )}

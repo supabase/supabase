@@ -56,7 +56,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
     <>
       <Panel.Content className="space-y-6">
         <div>
-          <h4 className="text-scale-1200 mb-2">
+          <h4 className="text-foreground mb-2">
             Configure TXT verification for your custom domain{' '}
             <code className="text-sm">{customDomain.hostname}</code>
           </h4>

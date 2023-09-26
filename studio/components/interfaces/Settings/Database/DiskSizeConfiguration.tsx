@@ -88,10 +88,10 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                 <div className="col-span-2 space-y-1">
                   {projectUsage?.disk_volume_size_gb && (
                     <span className="text-scale-1100 flex gap-2 items-baseline">
-                      <span className="text-scale-1200">Current Disk Storage Size:</span>
-                      <span className="text-scale-1200 text-xl">
+                      <span className="text-foreground">Current Disk Storage Size:</span>
+                      <span className="text-foreground text-xl">
                         {currentDiskSize}
-                        <span className="text-scale-1200 text-sm">GB</span>
+                        <span className="text-foreground text-sm">GB</span>
                       </span>
                     </span>
                   )}
@@ -121,7 +121,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
                               'border border-scale-200 ', //border
                             ].join(' ')}
                           >
-                            <span className="text-xs text-scale-1200">
+                            <span className="text-xs text-foreground">
                               You need additional permissions to increase the disk size
                             </span>
                           </div>
@@ -172,7 +172,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
       )}
 
       <Modal
-        header={<h5 className="text-sm text-scale-1200">Increase Disk Storage Size</h5>}
+        header={<h5 className="text-sm text-foreground">Increase Disk Storage Size</h5>}
         size="medium"
         visible={showResetDbPass}
         loading={isUpdatingDiskSize}

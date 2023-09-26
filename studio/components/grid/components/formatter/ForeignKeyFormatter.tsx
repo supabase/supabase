@@ -75,7 +75,7 @@ export const ForeignKeyFormatter = (props: PropsWithChildren<FormatterProps<Supa
                     'border border-scale-200',
                   ].join(' ')}
                 >
-                  <span className="text-xs text-scale-1200">View referencing record</span>
+                  <span className="text-xs text-foreground">View referencing record</span>
                 </div>
               </Tooltip.Content>
             </Tooltip.Portal>

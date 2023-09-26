@@ -109,7 +109,7 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
                   'border border-scale-200 ', //border
                 ].join(' ')}
               >
-                <span className="text-xs text-scale-1200">
+                <span className="text-xs text-foreground">
                   You need additional permissions to delete this project
                 </span>
               </div>
@@ -165,7 +165,7 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
                         `${
                           active
                             ? ` bg-scale-1200 text-scale-100 opacity-100 hover:bg-opacity-75`
-                            : ` bg-scale-700 text-scale-1200 opacity-25 hover:opacity-50`
+                            : ` bg-scale-700 text-foreground opacity-25 hover:opacity-50`
                         }`,
                       ].join(' ')}
                     >

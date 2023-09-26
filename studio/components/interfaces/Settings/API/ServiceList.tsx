@@ -67,7 +67,7 @@ const ServiceList = () => {
 
   return (
     <div>
-      <h3 className="mb-6 text-xl text-scale-1200">API Settings</h3>
+      <h3 className="mb-6 text-xl text-foreground">API Settings</h3>
       <section>
         <Panel title={<h5 className="mb-0">Project URL</h5>}>
           <Panel.Content>

@@ -186,11 +186,11 @@ const UpgradingState = () => {
                             <p
                               className={`text-sm ${
                                 isCurrent
-                                  ? 'text-scale-1200'
+                                  ? 'text-foreground'
                                   : isCompleted
                                   ? 'text-scale-1100'
                                   : 'text-scale-1000'
-                              } hover:text-scale-1200 transition`}
+                              } hover:text-foreground transition`}
                             >
                               {isCurrent
                                 ? message.progress
@@ -220,7 +220,7 @@ const UpgradingState = () => {
                               'border border-scale-200 ', //border
                             ].join(' ')}
                           >
-                            <span className="text-xs text-scale-1200">{initiatedAt}</span>
+                            <span className="text-xs text-foreground">{initiatedAt}</span>
                           </div>
                         </Tooltip.Content>
                       </Tooltip.Portal>

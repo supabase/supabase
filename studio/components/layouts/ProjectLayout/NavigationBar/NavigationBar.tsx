@@ -121,7 +121,7 @@ const NavigationBar = () => {
                     ].join(' ')}
                   >
                     {os === 'macos' ? (
-                      <IconCommand size={11.5} strokeWidth={1.5} className="text-scale-1200" />
+                      <IconCommand size={11.5} strokeWidth={1.5} className="text-foreground" />
                     ) : (
                       <p className="text-xs">CTRL</p>
                     )}

@@ -16,7 +16,7 @@ const PolicyRow = ({
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="font-mono text-xs text-scale-900">{command}</div>
           <div className="flex flex-col gap-2 lg:flex-row">
-            <span className="truncate text-sm text-scale-1200">{name}</span>
+            <span className="truncate text-sm text-foreground">{name}</span>
           </div>
         </div>
         <Dropdown

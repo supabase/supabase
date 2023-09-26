@@ -239,7 +239,7 @@ const AuditLogs = () => {
                                     'border border-scale-200',
                                   ].join(' ')}
                                 >
-                                  <span className="text-xs text-scale-1200">
+                                  <span className="text-xs text-foreground">
                                     {dateSortDesc ? 'Sort latest first' : 'Sort earliest first'}
                                   </span>
                                 </div>

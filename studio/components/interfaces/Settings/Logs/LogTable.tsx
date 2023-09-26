@@ -184,11 +184,11 @@ const LogTable = ({
       <div className="flex items-center gap-2">
         {data && data.length ? (
           <>
-            <span className="text-sm text-scale-1200">Query results</span>
+            <span className="text-sm text-foreground">Query results</span>
             <span className="text-sm text-scale-1100">{data && data.length}</span>
           </>
         ) : (
-          <span className="text-xs text-scale-1200">Results will be shown below</span>
+          <span className="text-xs text-foreground">Results will be shown below</span>
         )}
       </div>
       <div className="flex items-center gap-2">
@@ -256,7 +256,7 @@ const LogTable = ({
         </div>
       </div>
       <div className="flex flex-col gap-1 px-5">
-        <h3 className="text-lg text-scale-1200">No results</h3>
+        <h3 className="text-lg text-foreground">No results</h3>
         <p className="text-sm text-scale-900">Try another search, or adjusting the filters</p>
       </div>
     </div>

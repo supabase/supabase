@@ -38,7 +38,7 @@ const SectionContent = ({
                 </div>
                 {links && links.length && (
                   <div className="space-y-2">
-                    <p className="text-sm text-scale-1200 dark:text-scale-1100 mb-2">
+                    <p className="text-sm text-foreground dark:text-scale-1100 mb-2">
                       More information
                     </p>
                     {links.map((link) => (

@@ -42,7 +42,7 @@ const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) 
       onCancel={onClose}
       onConfirm={onConfirmDeleteSecret}
       loading={isDeleting}
-      header={<h5 className="text-sm text-scale-1200">Confirm to delete secret</h5>}
+      header={<h5 className="text-sm text-foreground">Confirm to delete secret</h5>}
     >
       <div className="py-4">
         <Modal.Content>
