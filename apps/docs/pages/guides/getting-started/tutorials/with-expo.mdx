@@ -73,11 +73,11 @@ These variables will be exposed on the browser, and that's completely fine since
   </TabPanel>
   <TabPanel id="secure-store" label="SecureStore">
 
-    If you wish to encrypt the user's session information, you can use `aes-js` and store the encryption key in Expo SecureStore. The `aes-js` library, a reputable JavaScript-only implementation of the AES encryption algorithm in CTR mode. A new 256-bit encryption key is generated using the `react-native-get-random-values` library. This key is stored inside Expo's SecureStore, while the value is encrypted and placed inside AsyncStorage.
+    If you wish to encrypt the user's session information, you can use `aes-js` and store the encryption key in [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore). The [`aes-js` library](https://github.com/ricmoo/aes-js) is a reputable JavaScript-only implementation of the AES encryption algorithm in CTR mode. A new 256-bit encryption key is generated using the `react-native-get-random-values` library. This key is stored inside Expo's SecureStore, while the value is encrypted and placed inside AsyncStorage.
 
     Please make sure that:
     - You keep the `expo-secure-storage`, `aes-js` and `react-native-get-random-values` libraries up-to-date.
-    - Choose the correct `SecureStoreOptions` for storing the encryption key, as some options require the application to be visible on screen for the storage to be accessible.
+    - Choose the correct [`SecureStoreOptions`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestoreoptions) for your app's needs. E.g. [`SecureStore.WHEN_UNLOCKED`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestorewhen_unlocked) regulates when the data can be accessed.
     - Carefully consider optimizations or other modifications to the above example, as those can lead to introducing subtle security vulnerabilities.
 
     Install the necessary dependencies in the root of your Expo project:
