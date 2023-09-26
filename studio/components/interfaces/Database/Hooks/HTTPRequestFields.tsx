@@ -87,7 +87,7 @@ const HTTPRequestFields = ({
             />
           ) : type === 'supabase_function' && edgeFunctions.length === 0 ? (
             <div className="space-y-1">
-              <p className="text-sm text-scale-1100">Select which edge function to trigger</p>
+              <p className="text-sm text-foreground-light">Select which edge function to trigger</p>
               <div className="px-4 py-4 border rounded bg-scale-500 border-scale-700 flex items-center justify-between space-x-4">
                 <p className="text-sm">No edge functions created yet</p>
                 <Link href={`/project/${ref}/functions`}>
@@ -181,7 +181,7 @@ const HTTPRequestFields = ({
                     >
                       <div className="space-y-1">
                         <p className="block text-foreground">Add auth header with service key</p>
-                        <p className="text-scale-1000">
+                        <p className="text-foreground-light">
                           Required if your edge function enforces JWT verification
                         </p>
                       </div>
@@ -199,7 +199,7 @@ const HTTPRequestFields = ({
                     >
                       <div className="space-y-1">
                         <p className="block text-foreground">Add custom source header</p>
-                        <p className="text-scale-1000">
+                        <p className="text-foreground-light">
                           Useful to verify that the edge function was triggered from this webhook
                         </p>
                       </div>

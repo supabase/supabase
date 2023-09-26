@@ -24,7 +24,7 @@ const PITRNotice = ({}) => {
       disabled={true}
       footer={
         <div className="flex items-center justify-between p-6">
-          <span className="text-sm text-scale-1000">
+          <span className="text-sm text-foreground-light">
             You can also increase your recovery retention period updating your PITR add-on
           </span>
           <Tooltip.Root delayDuration={0}>
@@ -65,7 +65,7 @@ const PITRNotice = ({}) => {
         </div>
         <div className="space-y-2">
           <p className="text-sm">Recovery retention period</p>
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             Database changes are logged every <span className="text-foreground">2 minutes</span>,
             with a total recovery period of up to{' '}
             <span className="text-brand">{retentionPeriod} days</span>.

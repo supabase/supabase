@@ -45,7 +45,7 @@ const UpgradeToPro = ({
           <div className="space-y-1">
             <p className="text-sm">{primaryText}</p>
             <div>
-              <p className="text-sm text-scale-1100">{secondaryText}</p>
+              <p className="text-sm text-foreground-light">{secondaryText}</p>
             </div>
           </div>
           <Tooltip.Root delayDuration={0}>

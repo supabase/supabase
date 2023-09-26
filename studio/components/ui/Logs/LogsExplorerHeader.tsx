@@ -36,7 +36,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
         </div>
 
         <h1 className="text-2xl text-foreground">Logs Explorer</h1>
-        {subtitle && <span className="text-2xl text-scale-1000">{subtitle}</span>}
+        {subtitle && <span className="text-2xl text-foreground-light">{subtitle}</span>}
       </div>
       <div className="flex flex-row gap-2">
         <Link href={LOGS_EXPLORER_DOCS_URL}>

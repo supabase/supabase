@@ -94,7 +94,7 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
           }`,
         ].join(' ')}
       >
-        <IconClock className="text-scale-1100" size={18} strokeWidth={1.5} />
+        <IconClock className="text-foreground-light" size={18} strokeWidth={1.5} />
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger className="w-1/4" tabIndex={-1}>
             <input

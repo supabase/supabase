@@ -37,13 +37,13 @@ const SpreadSheetFileUpload = ({
   return (
     <div className="space-y-4">
       <div>
-        <p className="mb-2 text-sm text-scale-1100">
+        <p className="mb-2 text-sm text-foreground-light">
           Upload a CSV or TSV file. The first row should be the headers of the table, and your
           headers should not include any special characters other than hyphens (
           <span className="text-code">-</span>) or underscores (<span className="text-code">_</span>
           ).
         </p>
-        <p className="text-sm text-scale-1000">
+        <p className="text-sm text-foreground-light">
           Tip: Datetime columns should be formatted as YYYY-MM-DD HH:mm:ss
         </p>
       </div>

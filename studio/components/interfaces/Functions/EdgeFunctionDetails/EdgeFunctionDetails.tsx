@@ -192,7 +192,7 @@ const EdgeFunctionDetails = () => {
                             for this function
                           </p>
                         </div>
-                        <p className="text-sm text-scale-1000">
+                        <p className="text-sm text-foreground-light">
                           Import maps allow the use of bare specifiers in functions instead of
                           explicit import URLs
                         </p>

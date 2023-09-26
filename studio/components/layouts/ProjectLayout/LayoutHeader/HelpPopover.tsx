@@ -40,7 +40,7 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
                   <IconHelpCircle
                     size={alt ? 18 : 16}
                     strokeWidth={1.5}
-                    className={alt ? 'text-scale-1100' : 'text-scale-900'}
+                    className={alt ? 'text-foreground-light' : 'text-scale-900'}
                   />
                 }
               >

@@ -1,8 +1,8 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { Button, IconAlertCircle, IconCheck, IconLoader, IconRefreshCcw } from 'ui'
 import { usePrevious } from 'hooks'
 import { useEffect, useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { Button, IconAlertCircle, IconCheck, IconLoader, IconRefreshCcw } from 'ui'
 
 export type SavingIndicatorProps = { id: string }
 
@@ -96,7 +96,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
           </Tooltip.Content>
         </Tooltip.Root>
       ) : null}
-      <span className="text-scale-1000 text-sm">
+      <span className="text-foreground-light text-sm">
         {savingState === 'UPDATING_FAILED' && 'Failed to save'}
       </span>
     </div>

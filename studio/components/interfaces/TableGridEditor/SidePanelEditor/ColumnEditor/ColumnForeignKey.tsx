@@ -101,7 +101,9 @@ const ColumnForeignKeyInformation = ({
       title={
         <div className="flex flex-col space-y-4">
           <div className="space-y-2">
-            <p className="text-scale-1100">This column has the following foreign key relation:</p>
+            <p className="text-foreground-light">
+              This column has the following foreign key relation:
+            </p>
             <div className="flex items-center space-x-2 text-foreground">
               <p className="text-xs text-code font-mono">{columnName}</p>
               <IconArrowRight size={14} strokeWidth={2} />
@@ -151,7 +153,7 @@ const ColumnForeignKeyAdded = ({
     <InformationBox
       block
       title={
-        <div className="flex flex-col space-y-4 text-scale-1100">
+        <div className="flex flex-col space-y-4 text-foreground-light">
           <div className="space-y-2">
             <span>
               The following foreign key relation will be <span className="text-brand">added</span>:
@@ -210,7 +212,7 @@ const ColumnForeignKeyRemoved = ({
       title={
         <div className="flex flex-col space-y-4">
           <div className="space-y-2">
-            <p className="text-scale-1100">
+            <p className="text-foreground-light">
               The following foreign key relation will be{' '}
               <span className="text-amber-900">removed</span>:
             </p>

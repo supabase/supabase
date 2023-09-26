@@ -164,7 +164,7 @@ const ColumnManagement = ({
         </div>
 
         {hasImportContent && (
-          <p className="text-sm text-scale-1000 my-2">
+          <p className="text-sm text-foreground-light my-2">
             Your table will be created with {importContent?.rowCount?.toLocaleString()} rows and the
             following {columns.length} columns.
           </p>
@@ -344,7 +344,7 @@ const ColumnManagement = ({
             <a target="_blank" rel="noreferrer">
               <Button
                 type="text"
-                className="text-scale-1000 hover:text-foreground"
+                className="text-foreground-light hover:text-foreground"
                 icon={<IconExternalLink size={12} strokeWidth={2} />}
               >
                 Learn more about data types

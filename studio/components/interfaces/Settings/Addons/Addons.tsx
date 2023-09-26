@@ -85,7 +85,7 @@ const Addons = () => {
         <div className="mx-auto flex flex-col gap-10 py-6">
           <div>
             <p className="text-xl">Add ons</p>
-            <p className="text-sm text-scale-1000">Level up your project with add-ons</p>
+            <p className="text-sm text-foreground-light">Level up your project with add-ons</p>
           </div>
         </div>
       </ScaffoldContainer>
@@ -139,7 +139,7 @@ const Addons = () => {
                 <div className="space-y-6">
                   <p className="m-0">Optimized compute</p>
                   <div className="space-y-2">
-                    <p className="text-sm text-scale-1100 m-0">More information</p>
+                    <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
                       <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
                         <a target="_blank" rel="noreferrer">
@@ -184,7 +184,7 @@ const Addons = () => {
                     </div>
                   </div>
                   <div className="flex-grow">
-                    <p className="text-sm text-scale-1000">Current option:</p>
+                    <p className="text-sm text-foreground-light">Current option:</p>
                     <p className="">{computeInstance?.variant.name ?? 'Micro'}</p>
                     <ProjectUpdateDisabledTooltip
                       projectUpdateDisabled={projectUpdateDisabled}
@@ -243,7 +243,7 @@ const Addons = () => {
                       <Link href={`/project/${projectRef}/settings/infrastructure#ram`}>
                         <a>
                           <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-foreground transition cursor-pointer">
+                            <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                               Memory
                             </p>
                             <IconChevronRight
@@ -260,7 +260,7 @@ const Addons = () => {
                       <Link href={`/project/${projectRef}/settings/infrastructure#cpu`}>
                         <a>
                           <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-foreground transition cursor-pointer">
+                            <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                               CPU
                             </p>
                             <IconChevronRight
@@ -277,13 +277,13 @@ const Addons = () => {
                       </p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
-                      <p className="text-sm text-scale-1000">No. of direct connections</p>
+                      <p className="text-sm text-foreground-light">No. of direct connections</p>
                       <p className="text-sm">
                         {computeInstance?.variant?.meta?.connections_direct ?? 60}
                       </p>
                     </div>
                     <div className="w-full flex items-center justify-between border-b py-2">
-                      <p className="text-sm text-scale-1000">No. of pooler connections</p>
+                      <p className="text-sm text-foreground-light">No. of pooler connections</p>
                       <p className="text-sm">
                         {computeInstance?.variant?.meta?.connections_pooler ?? 200}
                       </p>
@@ -292,7 +292,7 @@ const Addons = () => {
                       <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
                         <a>
                           <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-foreground transition cursor-pointer">
+                            <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                               Max Disk Throughput
                             </p>
                             <IconChevronRight
@@ -313,7 +313,7 @@ const Addons = () => {
                       <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
                         <a>
                           <div className="group flex items-center space-x-2">
-                            <p className="text-sm text-scale-1100 group-hover:text-foreground transition cursor-pointer">
+                            <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                               Baseline Disk Throughput
                             </p>
                             <IconChevronRight
@@ -344,7 +344,7 @@ const Addons = () => {
                 <div className="space-y-6">
                   <p className="m-0">Point in time recovery</p>
                   <div className="space-y-2">
-                    <p className="text-sm text-scale-1100 m-0">More information</p>
+                    <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
                       <Link href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery">
                         <a target="_blank" rel="noreferrer">
@@ -375,7 +375,7 @@ const Addons = () => {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-scale-1000">Current option:</p>
+                    <p className="text-sm text-foreground-light">Current option:</p>
                     <p className="">
                       {pitr !== undefined
                         ? `Point in time recovery of ${pitr.variant.meta?.backup_duration_days} days is enabled`
@@ -434,7 +434,7 @@ const Addons = () => {
                 <div className="space-y-6">
                   <p className="m-0">Custom domain</p>
                   <div className="space-y-2">
-                    <p className="text-sm text-scale-1100 m-0">More information</p>
+                    <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
                       <Link href="https://supabase.com/docs/guides/platform/custom-domains">
                         <a target="_blank" rel="noreferrer">
@@ -465,7 +465,7 @@ const Addons = () => {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-scale-1000">Current option:</p>
+                    <p className="text-sm text-foreground-light">Current option:</p>
                     <p className="">
                       {customDomain !== undefined
                         ? 'Custom domain is enabled'

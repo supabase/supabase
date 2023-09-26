@@ -30,13 +30,13 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
           </div>
         </Table.td>
         <Table.td className="">
-          <span className="text-scale-1100">{item.description}</span>
+          <span className="text-foreground-light">{item.description}</span>
         </Table.td>
         <Table.td className="">
-          <span className="text-scale-1100">{timestampLocalFormatter(item.inserted_at)}</span>
+          <span className="text-foreground-light">{timestampLocalFormatter(item.inserted_at)}</span>
         </Table.td>
         <Table.td className="">
-          <span className="text-scale-1100">{timestampLocalFormatter(item.updated_at)}</span>
+          <span className="text-foreground-light">{timestampLocalFormatter(item.updated_at)}</span>
         </Table.td>
         <Table.td className=" text-right">
           <Button

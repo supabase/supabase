@@ -64,8 +64,8 @@ const SQLTemplates = observer(() => {
       <div>
         <div className="mb-4">
           <h1 className="text-foreground mb-3 text-xl">Scripts</h1>
-          <p className="text-scale-1100 text-sm">Quick scripts to run on your database.</p>
-          <p className="text-scale-1100 text-sm">
+          <p className="text-foreground-light text-sm">Quick scripts to run on your database.</p>
+          <p className="text-foreground-light text-sm">
             Click on any script to fill the query box, modify the script, then click
             <span className="text-code">Run</span>.
           </p>

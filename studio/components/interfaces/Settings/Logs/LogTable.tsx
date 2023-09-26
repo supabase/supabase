@@ -13,9 +13,9 @@ import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresC
 import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewColumnRenderer'
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
-import LogSelection, { LogSelectionProps } from './LogSelection'
 import { LogData, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat } from './Logs.utils'
+import LogSelection, { LogSelectionProps } from './LogSelection'
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 
@@ -185,7 +185,7 @@ const LogTable = ({
         {data && data.length ? (
           <>
             <span className="text-sm text-foreground">Query results</span>
-            <span className="text-sm text-scale-1100">{data && data.length}</span>
+            <span className="text-sm text-foreground-light">{data && data.length}</span>
           </>
         ) : (
           <span className="text-xs text-foreground">Results will be shown below</span>
@@ -237,7 +237,7 @@ const LogTable = ({
       <div className="flex flex-col gap-1">
         <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-scale-600 px-2 dark:border-scale-900"></div>
         <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-scale-600 px-2 dark:border-scale-900">
-          <div className="absolute right-1 -bottom-4 text-scale-1100">
+          <div className="absolute right-1 -bottom-4 text-foreground-light">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6"

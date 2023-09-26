@@ -12,6 +12,7 @@ import NoTableState from 'components/ui/States/NoTableState'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import {
   Badge,
   Button,
@@ -25,7 +26,6 @@ import {
   SidePanel,
 } from 'ui'
 import ChooseFunctionForm from './ChooseFunctionForm'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 
 class CreateTriggerFormState {
   id: number | undefined
@@ -404,7 +404,7 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
               }}
             >
               <Modal.Content>
-                <p className="py-4 text-sm text-scale-1100">
+                <p className="py-4 text-sm text-foreground-light">
                   There are unsaved changes. Are you sure you want to close the panel? Your changes
                   will be lost.
                 </p>
@@ -595,7 +595,7 @@ const ListboxTable = observer(({}) => {
             )}
           >
             <div className="flex flex-row items-center space-x-1">
-              <p className="text-sm text-scale-1000">{x.schema}</p>
+              <p className="text-sm text-foreground-light">{x.schema}</p>
               <p className="text">{x.name}</p>
             </div>
           </Listbox.Option>
@@ -769,7 +769,7 @@ const FunctionWithArguments = observer(({}) => {
             <IconTerminal size="small" strokeWidth={2} width={14} />
           </div>
           <div className="flex items-center gap-2">
-            <p className="text-scale-1000">{_localState!.formState.functionName.value}</p>
+            <p className="text-foreground-light">{_localState!.formState.functionName.value}</p>
             <div>
               <Badge>{_localState!.formState.functionSchema.value}</Badge>
             </div>
