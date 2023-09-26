@@ -7,7 +7,7 @@ import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmM
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useDispatch, useTrackedState } from '../../store'
 import { copyToClipboard, formatClipboardValue } from '../../utils'
-import { useEffect, useCallback } from 'react'
+import { useCallback } from 'react'
 
 export const ROW_CONTEXT_MENU_ID = 'row-context-menu-id'
 
