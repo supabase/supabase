@@ -4,16 +4,17 @@ import Link from 'next/link'
 import { useTheme } from 'common'
 import { AccountLayout } from 'components/layouts'
 import SchemaFormPanel from 'components/to-be-cleaned/forms/SchemaFormPanel'
+import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
 import { Profile as ProfileType } from 'data/profile/types'
 import { useStore } from 'hooks'
 import { useSession } from 'lib/auth'
 import { useProfile } from 'lib/profile'
+import { useAppStateSnapshot } from 'state/app-state'
 import { NextPageWithLayout } from 'types'
-import { Button, IconMoon, IconSun, Input, Listbox } from 'ui'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import AlertError from 'components/ui/AlertError'
+import { Button, IconMoon, IconSun, Input, Listbox, Toggle } from 'ui'
 
 const User: NextPageWithLayout = () => {
   return (
@@ -112,6 +113,10 @@ const ProfileCard = observer(() => {
       <section>
         <ThemeSettings />
       </section>
+
+      <section>
+        <AnalyticsSettings />
+      </section>
     </article>
   )
 })
@@ -146,7 +151,7 @@ const Profile = ({ profile }: { profile?: ProfileType }) => {
           {session?.user.app_metadata.provider === 'email' && (
             <div className="text-sm grid gap-2 md:grid md:grid-cols-12 md:gap-x-4">
               <div className="flex flex-col space-y-2 col-span-4 ">
-                <p className="text-scale-1100 break-all">Password</p>
+                <p className="text-foreground-light break-all">Password</p>
               </div>
               <div className="col-span-8">
                 <Link href="/reset-password">
@@ -191,6 +196,28 @@ const ThemeSettings = observer(() => {
             Light
           </Listbox.Option>
         </Listbox>
+      </Panel.Content>
+    </Panel>
+  )
+})
+
+const AnalyticsSettings = observer(() => {
+  const snap = useAppStateSnapshot()
+
+  const onToggleOptIn = () => {
+    const value = !snap.isOptedInTelemetry ? 'true' : 'false'
+    snap.setIsOptedInTelemetry(value === 'true')
+  }
+
+  return (
+    <Panel title={<h5 key="panel-title">Analytics</h5>}>
+      <Panel.Content>
+        <Toggle
+          checked={snap.isOptedInTelemetry}
+          onChange={onToggleOptIn}
+          label="Opt-in to send telemetry data from the dashboard"
+          descriptionText="By opting into sending telemetry data, Supabase can improve the overall dashboard user experience"
+        />
       </Panel.Content>
     </Panel>
   )

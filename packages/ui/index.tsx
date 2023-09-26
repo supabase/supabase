@@ -21,6 +21,7 @@ export * from './src/components/Icon/IconBackground'
 // DISPLAYS
 
 export * from './src/components/Card'
+export * from './src/components/TweetCard'
 export * from './src/components/Badge'
 export * from './src/components/Tabs'
 export * from './src/components/Alert'
@@ -37,14 +38,17 @@ export * from './src/components/Menu'
 export * from './src/components/Modal'
 export * from './src/components/SidePanel'
 export * from './src/components/Dropdown'
+export * from './src/components/ConsentToast'
 export * from './src/components/ContextMenu'
 export * from './src/components/Popover'
 export * from './src/components/ExpandableVideo'
+export * from './src/layout/PortalToast'
 
 // UTILITIES
 
 export * from './src/components/Space'
 export * from './src/components/Loading'
+export * from './src/components/LogoLoader'
 export * from './src/components/Divider'
 
 // DATA ENTRY

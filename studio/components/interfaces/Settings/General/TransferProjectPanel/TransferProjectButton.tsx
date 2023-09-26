@@ -18,7 +18,7 @@ import {
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
-import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useSelectedProject, useStore } from 'hooks'
 
 const TransferProjectButton = () => {
   const { ui } = useStore()
@@ -27,10 +27,11 @@ const TransferProjectButton = () => {
   const projectRef = project?.ref
   const projectOrgId = project?.organization_id
   const { data: allOrganizations } = useOrganizationsQuery()
+  const disableProjectTransfer = useFlag('disableProjectTransfer')
 
   const organizations = (allOrganizations || [])
     .filter((it) => it.id !== projectOrgId)
-    // Only orgs with org-level subscription
+    // Only orgs with org-based subscription
     .filter((it) => it.subscription_id)
 
   const [isOpen, setIsOpen] = useState(false)
@@ -87,11 +88,15 @@ const TransferProjectButton = () => {
     <>
       <Tooltip.Root delayDuration={0}>
         <Tooltip.Trigger>
-          <Button onClick={toggle} type="default" disabled={!canTransferProject}>
+          <Button
+            onClick={toggle}
+            type="default"
+            disabled={!canTransferProject || disableProjectTransfer}
+          >
             Transfer project
           </Button>
         </Tooltip.Trigger>
-        {!canTransferProject && (
+        {(!canTransferProject || disableProjectTransfer) && (
           <Tooltip.Portal>
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -101,8 +106,10 @@ const TransferProjectButton = () => {
                   'border border-scale-200 ', //border
                 ].join(' ')}
               >
-                <span className="text-xs text-scale-1200">
-                  You need additional permissions to transfer this project
+                <span className="text-xs text-foreground">
+                  {!canTransferProject
+                    ? 'You need additional permissions to transfer this project'
+                    : 'Project transfers are temporarily disabled, please try again later.'}
                 </span>
               </div>
             </Tooltip.Content>
@@ -133,11 +140,17 @@ const TransferProjectButton = () => {
           </div>
         }
       >
-        <div className="space-y-4 py-4 text-scale-1100">
+        <div className="space-y-4 py-4 text-foreground-light">
           <Modal.Content>
             <p className="text-sm">
               To transfer projects, the owner must be a member of both the source and target
-              organizations.
+              organizations. For further information see our{' '}
+              <Link href="https://supabase.com/docs/guides/platform/project-transfer">
+                <a className="text-brand hover:underline" target="_blank" rel="noreferrer">
+                  Documentation
+                </a>
+              </Link>
+              .
             </p>
 
             <p className="font-bold mt-6 text-sm">Transferring considerations:</p>
@@ -185,7 +198,7 @@ const TransferProjectButton = () => {
               <div className="mt-8 mx-4 border-t pt-4 space-y-2">
                 {organizations.length === 0 ? (
                   <div className="flex items-center gap-2 bg-scale-400 p-3 text-sm">
-                    <IconAlertCircle /> You do not have any organizations with an organization-level
+                    <IconAlertCircle /> You do not have any organizations with an organization-based
                     subscription.
                   </div>
                 ) : (
@@ -212,11 +225,11 @@ const TransferProjectButton = () => {
                   </Listbox>
                 )}
 
-                <p className="text-scale-1000 text-sm">
+                <p className="text-foreground-light text-sm">
                   The target organization needs to use{' '}
-                  <Link href="https://www.notion.so/supabase/Org-Level-Billing-Public-Docs-f059a154beb743a19199d05bab4acb08">
+                  <Link href="https://supabase.com/docs/guides/platform/org-based-billing">
                     <a target="_blank" rel="noreferrer" className="underline">
-                      organization-level-billing
+                      organization-based billing
                     </a>
                   </Link>
                   . To migrate an organization to the new billing, head to your{' '}
@@ -235,7 +248,7 @@ const TransferProjectButton = () => {
             <Modal.Content>
               <div className="px-4">
                 {transferPreviewData && transferPreviewData.valid && (
-                  <div className="text-sm text-scale-1100 p-4 bg-scale-400">
+                  <div className="text-sm text-foreground-light p-4 bg-scale-400">
                     {transferPreviewData.source_subscription_plan !==
                     transferPreviewData.target_subscription_plan ? (
                       <div>
@@ -309,12 +322,12 @@ const TransferProjectButton = () => {
                     </div>
                     {transferPreviewData.members_exceeding_free_project_limit.length > 0 && (
                       <div className="space-y-2">
-                        <p className="text-sm text-scale-1100">
+                        <p className="text-sm text-foreground-light">
                           These members have reached their maximum limits for the number of active
                           Free plan projects within organizations where they are an administrator or
                           owner:
                         </p>
-                        <ul className="pl-5 text-sm list-disc text-scale-1100">
+                        <ul className="pl-5 text-sm list-disc text-foreground-light">
                           {(transferPreviewData.members_exceeding_free_project_limit || []).map(
                             (member, idx: number) => (
                               <li key={`member-${idx}`}>
@@ -323,7 +336,7 @@ const TransferProjectButton = () => {
                             )
                           )}
                         </ul>
-                        <p className="text-sm text-scale-1100">
+                        <p className="text-sm text-foreground-light">
                           These members will need to either delete, pause, or upgrade one or more of
                           their projects before you can downgrade this project.
                         </p>

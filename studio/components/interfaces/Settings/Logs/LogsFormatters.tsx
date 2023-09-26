@@ -32,7 +32,7 @@ export const SelectionDetailedRow = ({
   return (
     <div className="grid grid-cols-12 group">
       <span className="text-scale-900 text-sm col-span-4 whitespace-pre-wrap">{label}</span>
-      <span className="text-scale-1200 text-sm col-span-6 whitespace-pre-wrap break-all">
+      <span className="text-foreground text-sm col-span-6 whitespace-pre-wrap break-all">
         {valueRender ?? value}
       </span>
       <CopyButton
@@ -274,7 +274,7 @@ export function jsonSyntaxHighlight(input: Object) {
       var cls = 'number text-tomato-900'
       if (/^"/.test(match)) {
         if (/:$/.test(match)) {
-          cls = 'key text-scale-1200'
+          cls = 'key text-foreground'
         } else {
           cls = 'string text-brand-600'
         }

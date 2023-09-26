@@ -41,7 +41,7 @@ const DisplayApiSettings = () => {
       title={
         <div className="space-y-3">
           <h5 className="text-base">Project API keys</h5>
-          <p className="text-sm text-scale-1000">
+          <p className="text-sm text-foreground-light">
             Your API is secured behind an API gateway which requires an API Key for every request.
             <br />
             You can use the keys below in the Supabase client libraries.
@@ -58,14 +58,14 @@ const DisplayApiSettings = () => {
       {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
         <div className="flex items-center justify-center py-8 space-x-2">
           <IconAlertCircle size={16} strokeWidth={1.5} />
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             {isProjectSettingsError ? 'Failed to retrieve API keys' : 'Failed to update JWT secret'}
           </p>
         </div>
       ) : isApiKeysEmpty || isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
         <div className="flex items-center justify-center py-8 space-x-2">
           <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             {isProjectSettingsLoading || isApiKeysEmpty
               ? 'Retrieving API keys'
               : 'JWT secret is being updated'}

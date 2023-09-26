@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import CardButton from 'components/ui/CardButton'
+import { useState } from 'react'
 
 export interface SQLCardProps {
   title: string
@@ -20,7 +20,7 @@ const SQLCard = ({ title, description, sql, onClick }: SQLCardProps) => {
       title={title}
       loading={loading}
       onClick={() => handleOnClick()}
-      footer={<span className="text-scale-1100 text-sm">{description}</span>}
+      footer={<span className="text-foreground-light text-sm">{description}</span>}
     />
   )
 }

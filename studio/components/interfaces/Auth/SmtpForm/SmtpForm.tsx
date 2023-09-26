@@ -33,6 +33,7 @@ import { useCheckPermissions, useStore } from 'hooks'
 import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
+import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 
 const SmtpForm = () => {
   const { ui } = useStore()
@@ -231,23 +232,7 @@ const SmtpForm = () => {
                 )
               ) : (
                 <div className="mx-8 mb-8 -mt-4">
-                  <Alert_Shadcn_ variant="warning">
-                    <IconAlertTriangle strokeWidth={2} />
-                    <AlertTitle_Shadcn_>Built-in email service is rate-limited!</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      You're using the built-in email service. The service has rate limits and it's
-                      not meant to be used for production apps. Check the{' '}
-                      <a
-                        href="https://supabase.com/docs/guides/platform/going-into-prod#auth-rate-limits"
-                        className="underline"
-                        target="_blank"
-                      >
-                        documentation
-                      </a>{' '}
-                      for an up-to-date information on the current rate limits. Please use a custom
-                      SMTP server if you're planning on having large number of users.
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
+                  <EmailRateLimitsAlert />
                 </div>
               )}
 

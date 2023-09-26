@@ -70,6 +70,9 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
     if (values.has_file_size_limit && values.formatted_size_limit < 0) {
       errors.formatted_size_limit = 'File size upload limit has to be at least 0'
     }
+    if (values.name === 'public') {
+      errors.name = '"public" is a reserved name. Please choose another name'
+    }
     return errors
   }
 
@@ -156,7 +159,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                     <IconChevronDown
                       size={18}
                       strokeWidth={2}
-                      className={clsx('text-scale-1100', showConfiguration && 'rotate-180')}
+                      className={clsx('text-foreground-light', showConfiguration && 'rotate-180')}
                     />
                   </div>
                 </Collapsible.Trigger>
@@ -206,7 +209,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                           </div>
                           {IS_PLATFORM && (
                             <div className="col-span-12">
-                              <p className="text-scale-1000 text-sm">
+                              <p className="text-foreground-light text-sm">
                                 Note: The{' '}
                                 <Link href={`/project/${ref}/settings/storage`}>
                                   <a className="text-brand opacity-80 hover:opacity-100 transition">
@@ -225,7 +228,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                       name="allowed_mime_types"
                       layout="vertical"
                       label="Allowed MIME types"
-                      placeholder="e.g image/jpg, image/png, audio/mpeg, video/mp4, etc"
+                      placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
                       descriptionText="Comma separated values"
                     />
                   </div>

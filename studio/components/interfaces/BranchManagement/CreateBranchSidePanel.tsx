@@ -61,11 +61,13 @@ const CreateBranchSidePanel = ({ visible, onClose }: CreateBranchSidePanelProps)
   const githubIntegration = integrations?.find(
     (integration) =>
       integration.integration.name === 'GitHub' &&
-      integration.connections.some((connection) => connection.supabase_project_ref === ref)
+      integration.connections.some(
+        (connection) => connection.supabase_project_ref === projectDetails?.parentRef
+      )
   )
 
   const githubConnection = githubIntegration?.connections?.find(
-    (connection) => connection.supabase_project_ref === ref
+    (connection) => connection.supabase_project_ref === projectDetails?.parentRef
   )
   const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') || []
   const {
@@ -111,7 +113,7 @@ const CreateBranchSidePanel = ({ visible, onClose }: CreateBranchSidePanelProps)
           {isLoadingIntegrations && <GenericSkeletonLoader />}
           {isSuccessIntegrations && (
             <div>
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 Your project is currently connected to the repository:
               </p>
               <div className="flex items-center space-x-2">

@@ -60,7 +60,7 @@ const ProductEmptyState = ({
                               'border border-scale-200',
                             ].join(' ')}
                           >
-                            <span className="text-xs text-scale-1200">{disabledMessage}</span>
+                            <span className="text-xs text-foreground">{disabledMessage}</span>
                           </div>
                         </Tooltip.Content>
                       </Tooltip.Portal>

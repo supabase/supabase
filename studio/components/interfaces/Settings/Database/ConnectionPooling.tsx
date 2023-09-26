@@ -80,7 +80,7 @@ const ConnectionPooling = () => {
               }
             >
               <Panel.Content>
-                <p className="text-scale-1000">
+                <p className="text-foreground-light">
                   Please start a new project to enable this feature.
                 </p>
               </Panel.Content>
@@ -88,13 +88,7 @@ const ConnectionPooling = () => {
           ) : (
             <PgbouncerConfig
               projectRef={projectRef}
-              // [Joshen TODO] remove this check once API PR has been deployed:
-              // https://github.com/supabase/infrastructure/pull/14173
-              bouncerInfo={{
-                ...bouncerInfo,
-                supavisor_enabled:
-                  poolingConfiguration.connectionString.includes('pooler.supabase.com'),
-              }}
+              bouncerInfo={bouncerInfo}
               connectionInfo={connectionInfo}
             />
           )}
@@ -128,6 +122,7 @@ interface ConfigProps {
 
 export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: ConfigProps) => {
   const { ui } = useStore()
+  const { project } = useProjectContext()
   const [updates, setUpdates] = useState({
     pool_mode: bouncerInfo.pool_mode || 'transaction',
     default_pool_size: bouncerInfo.default_pool_size || undefined,
@@ -146,7 +141,12 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
 
   const canUpdateConnectionPoolingConfiguration = useCheckPermissions(
     PermissionAction.UPDATE,
-    'projects'
+    'projects',
+    {
+      resource: {
+        project_id: project?.id,
+      },
+    }
   )
 
   const updateConfig = async (updatedConfig: any) => {

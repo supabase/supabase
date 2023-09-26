@@ -11,7 +11,7 @@ const FormBoxEmpty = ({ icon, text }: Props) => {
       <div className="relative bg-scale-300 text-scale-900 w-6 h-6 rounded-full flex items-center justify-center">
         {icon}
       </div>
-      <p className="text-scale-1000">{text}</p>
+      <p className="text-foreground-light">{text}</p>
     </div>
   )
 }

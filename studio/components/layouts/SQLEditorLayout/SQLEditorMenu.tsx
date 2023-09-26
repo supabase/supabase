@@ -56,7 +56,9 @@ const SideBarContent = observer(() => {
   }, [projectSnippets, projectSnippetsFilterString])
 
   const personalSnippets = useMemo(() => {
-    const ss = snippets.filter((snippet) => snippet.visibility === 'user')
+    const ss = snippets.filter(
+      (snippet) => snippet.visibility === 'user' && !snippet.content.favorite
+    )
 
     if (personalSnippetsFilterString.length > 0) {
       return ss.filter((tab) =>
@@ -171,7 +173,7 @@ const SideBarContent = observer(() => {
                           'w-4',
                           'h-4',
                           'cursor-pointer',
-                          isFavoritesFilterOpen ? 'text-scale-1200' : 'text-scale-900'
+                          isFavoritesFilterOpen ? 'text-foreground' : 'text-scale-900'
                         )}
                         onClick={() => {
                           setFavoritesFilterString('')
@@ -238,7 +240,7 @@ const SideBarContent = observer(() => {
                           'w-4',
                           'h-4',
                           'cursor-pointer',
-                          isProjectSnippetsFilterOpen ? 'text-scale-1200' : 'text-scale-900'
+                          isProjectSnippetsFilterOpen ? 'text-foreground' : 'text-scale-900'
                         )}
                         onClick={() => {
                           setProjectSnippetsFilterString('')
@@ -304,7 +306,7 @@ const SideBarContent = observer(() => {
                         'w-4',
                         'h-4',
                         'cursor-pointer',
-                        isPersonalSnippetsFilterOpen ? 'text-scale-1200' : 'text-scale-900'
+                        isPersonalSnippetsFilterOpen ? 'text-foreground' : 'text-scale-900'
                       )}
                       onClick={() => {
                         setPersonalSnippetsFilterString('')
@@ -350,7 +352,9 @@ const SideBarContent = observer(() => {
                   </div>
                 ) : (
                   <div className="text text-sm h-32 border border-dashed flex flex-col gap-3 items-center justify-center px-3 mx-3 rounded">
-                    <span className="text-lighter">No queries found</span>
+                    {filteredFavoriteSnippets.length === 0 && (
+                      <span className="text-lighter">No queries found</span>
+                    )}
                     <Button type="default" onClick={() => handleNewQuery()}>
                       New Query
                     </Button>

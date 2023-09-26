@@ -6,7 +6,10 @@ import {
   Alert,
   Badge,
   Button,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconCreditCard,
   IconMoreHorizontal,
   IconPlus,
@@ -135,7 +138,7 @@ const PaymentMethods = () => {
             footer={
               <div className="flex w-full justify-between">
                 {!canUpdatePaymentMethods ? (
-                  <p className="text-sm text-scale-1000">
+                  <p className="text-sm text-foreground-light">
                     You need additional permissions to manage this organization's payment methods
                   </p>
                 ) : (
@@ -203,7 +206,7 @@ const PaymentMethods = () => {
                                         'w-48 border border-scale-200 text-center', //border
                                       ].join(' ')}
                                     >
-                                      <span className="text-xs text-scale-1200">
+                                      <span className="text-xs text-foreground">
                                         Your default payment method cannot be deleted
                                       </span>
                                     </div>
@@ -211,30 +214,30 @@ const PaymentMethods = () => {
                                 </Tooltip.Portal>
                               </Tooltip.Root>
                             ) : (
-                              <Dropdown
-                                size="tiny"
-                                overlay={[
-                                  <Dropdown.Item
+                              <DropdownMenu_Shadcn_>
+                                <DropdownMenuTrigger_Shadcn_>
+                                  <Button
+                                    type="outline"
+                                    icon={<IconMoreHorizontal />}
+                                    loading={isLoadingPaymentMethods}
+                                    className="hover:border-gray-500"
+                                  />
+                                </DropdownMenuTrigger_Shadcn_>
+                                <DropdownMenuContent_Shadcn_>
+                                  <DropdownMenuItem_Shadcn_
                                     key="make-default"
                                     onClick={() => setSelectedMethodForDefault(paymentMethod)}
                                   >
-                                    Make default
-                                  </Dropdown.Item>,
-                                  <Dropdown.Item
+                                    <p className="text">Make default</p>
+                                  </DropdownMenuItem_Shadcn_>
+                                  <DropdownMenuItem_Shadcn_
                                     key="delete-method"
                                     onClick={() => setSelectedMethodToDelete(paymentMethod)}
                                   >
-                                    Delete
-                                  </Dropdown.Item>,
-                                ]}
-                              >
-                                <Button
-                                  type="outline"
-                                  icon={<IconMoreHorizontal />}
-                                  loading={isLoadingPaymentMethods}
-                                  className="hover:border-gray-500"
-                                />
-                              </Dropdown>
+                                    <p className="text">Delete</p>
+                                  </DropdownMenuItem_Shadcn_>
+                                </DropdownMenuContent_Shadcn_>
+                              </DropdownMenu_Shadcn_>
                             )}
                           </>
                         )}
