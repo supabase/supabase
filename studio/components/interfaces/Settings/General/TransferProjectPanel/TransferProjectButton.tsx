@@ -106,7 +106,7 @@ const TransferProjectButton = () => {
                   'border border-scale-200 ', //border
                 ].join(' ')}
               >
-                <span className="text-xs text-scale-1200">
+                <span className="text-xs text">
                   {!canTransferProject
                     ? 'You need additional permissions to transfer this project'
                     : 'Project transfers are temporarily disabled, please try again later.'}

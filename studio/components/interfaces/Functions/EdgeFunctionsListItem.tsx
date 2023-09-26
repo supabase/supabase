@@ -42,7 +42,7 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
     >
       <Table.td className="">
         <div className="flex items-center gap-2">
-          <p className="text-sm text-scale-1200">{item.name}</p>
+          <p className="text-sm text">{item.name}</p>
         </div>
       </Table.td>
       <Table.td className="">
@@ -50,7 +50,7 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
           <p className="font-mono truncate hidden md:inline">{endpoint}</p>
           <button
             type="button"
-            className="text-scale-900 hover:text-scale-1200 transition"
+            className="text-scale-900 hover:text transition"
             onClick={(event: any) => {
               function onCopy(value: any) {
                 setIsCopied(true)
@@ -96,7 +96,7 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
                   'border border-scale-200',
                 ].join(' ')}
               >
-                <span className="text-xs text-scale-1200">
+                <span className="text-xs text">
                   Last updated on {dayjs(item.updated_at).format('DD MMM, YYYY HH:mm')}
                 </span>
               </div>

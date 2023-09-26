@@ -34,7 +34,7 @@ const SizeToggleButton = ({ id }: SizeToggleButton) => {
               'border border-scale-200',
             ].join(' ')}
           >
-            <span className="text-xs text-scale-1200">Show results</span>
+            <span className="text-xs text">Show results</span>
           </div>
         </Tooltip.Content>
       </Tooltip.Portal>
@@ -58,7 +58,7 @@ const SizeToggleButton = ({ id }: SizeToggleButton) => {
               'border border-scale-200',
             ].join(' ')}
           >
-            <span className="text-xs text-scale-1200">Collapse results</span>
+            <span className="text-xs text">Collapse results</span>
           </div>
         </Tooltip.Content>
       </Tooltip.Portal>

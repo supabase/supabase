@@ -16,7 +16,7 @@ const SignInSSOPage: NextPageWithLayout = () => {
           <a
             href="https://supabase.com/contact/enterprise"
             rel="noopener noreferrer"
-            className="underline text-scale-1200 hover:text-scale-1100 transition"
+            className="underline text hover:text-scale-1100 transition"
           >
             Let Us Know
           </a>

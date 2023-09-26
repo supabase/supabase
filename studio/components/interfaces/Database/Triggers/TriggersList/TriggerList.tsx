@@ -44,7 +44,7 @@ const TriggerList = ({
     return (
       <Table.tr key={schema}>
         <Table.td colSpan={6}>
-          <p className="text-sm text-scale-1200">No triggers created yet</p>
+          <p className="text-sm text">No triggers created yet</p>
           <p className="text-sm text-light">There are no triggers found in the schema "{schema}"</p>
         </Table.td>
       </Table.tr>
@@ -55,7 +55,7 @@ const TriggerList = ({
     return (
       <Table.tr key={schema}>
         <Table.td colSpan={5}>
-          <p className="text-sm text-scale-1200">No results found</p>
+          <p className="text-sm text">No results found</p>
           <p className="text-sm text-light">
             Your search for "{filterString}" did not return any results
           </p>
@@ -146,7 +146,7 @@ const TriggerList = ({
                             'border border-scale-200',
                           ].join(' ')}
                         >
-                          <span className="text-xs text-scale-1200">
+                          <span className="text-xs text">
                             You need additional permissions to update triggers
                           </span>
                         </div>

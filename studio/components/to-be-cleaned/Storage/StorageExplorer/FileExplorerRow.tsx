@@ -379,7 +379,7 @@ const FileExplorerRow = ({
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text">
                       File is corrupted, please delete and reupload again.
                     </span>
                   </div>
@@ -438,7 +438,7 @@ const FileExplorerRow = ({
                         <div
                           className={[
                             'flex items-center justify-between px-4 py-1.5 text-xs text-scale-1100',
-                            'w-full focus:bg-scale-300 dark:focus:bg-scale-500 focus:text-scale-1200',
+                            'w-full focus:bg-scale-300 dark:focus:bg-scale-500 focus:text',
                           ].join(' ')}
                         >
                           <div className="flex items-center space-x-2">

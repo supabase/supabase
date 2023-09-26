@@ -92,7 +92,7 @@ const PaymentMethodSelection = ({
                   disabled={!canUpdatePaymentMethods}
                   icon={<IconCreditCard />}
                   onClick={() => setShowAddNewPaymentMethodModal(true)}
-                  htmlType='button'
+                  htmlType="button"
                 >
                   Add new
                 </Button>
@@ -107,7 +107,7 @@ const PaymentMethodSelection = ({
                         'w-48 border border-scale-200 text-center', //border
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text">
                         You need additional permissions to add new payment methods to this
                         organization
                       </span>
@@ -153,9 +153,7 @@ const PaymentMethodSelection = ({
               onClick={() => setShowAddNewPaymentMethodModal(true)}
             >
               <IconPlus size={16} />
-              <p className="transition text-scale-1000 group-hover:text-scale-1200">
-                Add new payment method
-              </p>
+              <p className="transition text-scale-1000 group-hover:text">Add new payment method</p>
             </div>
           </Listbox>
         )}

@@ -160,7 +160,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
             <div className="flex items-center justify-between border-b border-gray-500 bg-gray-400 px-4 py-2">
               <p className="text-sm">Notifications</p>
               {/* Area for improvement: Paginate notifications and show in a side panel */}
-              {/* <p className="text-scale-1000 hover:text-scale-1200 cursor-pointer text-sm transition">
+              {/* <p className="text-scale-1000 hover:text cursor-pointer text-sm transition">
               See all{' '}
               {notifications.length > MAX_NOTIFICATIONS_TO_SHOW && `(${notifications.length})`}
             </p> */}
@@ -224,7 +224,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
                   ) : alt ? (
                     <IconInbox size={18} strokeWidth={1.5} className="text-scale-1100" />
                   ) : (
-                    <IconBell size={16} strokeWidth={1.5} className="text-scale-1200" />
+                    <IconBell size={16} strokeWidth={1.5} className="text" />
                   )
                 }
                 iconRight={
@@ -233,7 +233,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
                       {alt ? (
                         <IconInbox size={18} strokeWidth={1.5} className="text-scale-1100" />
                       ) : (
-                        <IconBell size={16} strokeWidth={1.5} className="text-scale-1200" />
+                        <IconBell size={16} strokeWidth={1.5} className="text" />
                       )}
                     </>
                   ) : null
@@ -252,7 +252,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
                   'border border-scale-200 flex items-center space-x-1',
                 ].join(' ')}
               >
-                <span className="text-xs text-scale-1200">Notifications</span>
+                <span className="text-xs text">Notifications</span>
               </div>
             </Tooltip.Content>
           </Tooltip.Portal>
@@ -275,7 +275,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
         title={`Apply schema migration for "${projectToApplyMigration?.name}"`}
         // @ts-ignore
         description={
-          <div className="text-scale-1200 space-y-2">
+          <div className="text space-y-2">
             <div className="space-y-1">
               <p>The following schema migration will be applied to the project</p>
               <ol className="list-disc pl-6">
@@ -308,7 +308,7 @@ const NotificationsPopover = ({ alt = false }: NotificationsPopoverProps) => {
         title={`Rollback schema migration for "${projectToRollbackMigration?.name}"`}
         // @ts-ignore
         description={
-          <div className="text-scale-1200 space-y-2">
+          <div className="text space-y-2">
             <div className="space-y-1">
               <p>The following schema migration will be rolled back for the project</p>
               <ol className="list-disc pl-6">

@@ -46,7 +46,7 @@ const UtilityActions = ({
                 'border border-scale-200',
               ].join(' ')}
             >
-              <span className="text-xs text-scale-1200">Prettify SQL</span>
+              <span className="text-xs text">Prettify SQL</span>
             </div>
           </Tooltip.Content>
         </Tooltip.Portal>

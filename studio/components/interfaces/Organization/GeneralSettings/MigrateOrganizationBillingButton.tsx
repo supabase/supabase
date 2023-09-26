@@ -149,7 +149,7 @@ const MigrateOrganizationBillingButton = observer(() => {
                     'border border-scale-200 ', //border
                   ].join(' ')}
                 >
-                  <span className="text-xs text-scale-1200">
+                  <span className="text-xs text">
                     {!canMigrateOrg
                       ? 'You need additional permissions to migrate this organization'
                       : 'Migrations are temporarily disabled, please try again later.'}
@@ -168,7 +168,7 @@ const MigrateOrganizationBillingButton = observer(() => {
         onCancel={toggle}
         header={
           <div className="flex items-baseline gap-2">
-            <h5 className="text-sm text-scale-1200">Migrate organization</h5>
+            <h5 className="text-sm text">Migrate organization</h5>
           </div>
         }
       >

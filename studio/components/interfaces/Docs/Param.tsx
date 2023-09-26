@@ -51,7 +51,7 @@ const Param = ({
             </label>
 
             <div className="flex items-center gap-4">
-              <span className="text-md text-scale-1200 pb-0.5">{name}</span>
+              <span className="text-md text pb-0.5">{name}</span>
             </div>
           </div>
         </div>

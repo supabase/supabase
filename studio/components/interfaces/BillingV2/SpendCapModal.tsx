@@ -64,7 +64,7 @@ const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
                                 'border border-scale-200 ', //border
                               ].join(' ')}
                             >
-                              <span className="text-xs text-scale-1200">
+                              <span className="text-xs text">
                                 Monthly Active Users: A user that has made an API request in the
                                 last month
                               </span>
@@ -98,7 +98,7 @@ const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
                                 'border border-scale-200 ', //border
                               ].join(' ')}
                             >
-                              <span className="text-xs text-scale-1200">
+                              <span className="text-xs text">
                                 Single Sign-On Monthly Active Users: A user that has made an API
                                 request in the last month
                               </span>

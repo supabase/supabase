@@ -54,7 +54,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
     <div className="px-6 py-4 flex items-center space-x-4">
       <div className="space-y-1 min-w-[35%] max-w-[35%]">
         <div>
-          <p className="text-sm text-scale-1200" title={name}>
+          <p className="text-sm text" title={name}>
             {name}
           </p>
           {secret.description !== undefined && (
@@ -132,7 +132,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                           'border border-scale-200',
                         ].join(' ')}
                       >
-                        <span className="text-xs text-scale-1200">
+                        <span className="text-xs text">
                           You need additional permissions to edit secrets
                         </span>
                       </div>
@@ -160,7 +160,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                           'border border-scale-200',
                         ].join(' ')}
                       >
-                        <span className="text-xs text-scale-1200">
+                        <span className="text-xs text">
                           You need additional permissions to delete secrets
                         </span>
                       </div>

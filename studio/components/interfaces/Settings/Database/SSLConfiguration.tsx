@@ -153,7 +153,7 @@ const SSLConfiguration = () => {
                           'border border-scale-200 w-[250px]',
                         ].join(' ')}
                       >
-                        <span className="text-xs text-scale-1200 text-center flex items-center justify-center">
+                        <span className="text-xs text text-center flex items-center justify-center">
                           {!canUpdateSSLEnforcement
                             ? 'You need additional permissions to update SSL enforcement for your project'
                             : !hasAccessToSSLEnforcement
@@ -200,7 +200,7 @@ const SSLConfiguration = () => {
                         'border border-scale-200 w-[250px]',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text">
                         Projects before 15:08 (GMT+08), 29th April 2021 do not have SSL certificates
                         installed
                       </span>

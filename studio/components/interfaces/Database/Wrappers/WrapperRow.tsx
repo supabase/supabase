@@ -50,7 +50,7 @@ const WrapperRow = ({
         <Collapsible.Trigger asChild>
           <button
             type="button"
-            className="flex items-center justify-between w-full px-6 py-3 rounded group text-scale-1200"
+            className="flex items-center justify-between w-full px-6 py-3 rounded group text"
           >
             <div className="flex items-center gap-3">
               <IconChevronUp
@@ -67,14 +67,14 @@ const WrapperRow = ({
               <span className="text-sm capitalize">{wrapperMeta.label}</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="px-3 py-1 text-xs border rounded-md border-scale-500 bg-scale-100 text-scale-1200 dark:border-scale-700 dark:bg-scale-300">
+              <div className="px-3 py-1 text-xs border rounded-md border-scale-500 bg-scale-100 text dark:border-scale-700 dark:bg-scale-300">
                 {wrappers.length} wrapper{wrappers.length > 1 ? 's' : ''}
               </div>
             </div>
           </button>
         </Collapsible.Trigger>
         <Collapsible.Content>
-          <div className="border-t group border-scale-500 bg-scale-100 text-scale-1200 dark:bg-scale-300 divide-y">
+          <div className="border-t group border-scale-500 bg-scale-100 text dark:bg-scale-300 divide-y">
             {wrappers.map((wrapper) => {
               const serverOptions = Object.fromEntries(
                 wrapper.server_options.map((option: any) => option.split('='))
@@ -167,7 +167,7 @@ const WrapperRow = ({
                                   'border border-scale-200',
                                 ].join(' ')}
                               >
-                                <span className="text-xs text-scale-1200">
+                                <span className="text-xs text">
                                   You need additional permissions to edit wrappers
                                 </span>
                               </div>
@@ -196,7 +196,7 @@ const WrapperRow = ({
                                 'border border-scale-200',
                               ].join(' ')}
                             >
-                              <span className="text-xs text-scale-1200">
+                              <span className="text-xs text">
                                 You need additional permissions to add wrappers
                               </span>
                             </div>

@@ -36,7 +36,7 @@ const SparkBar = ({
           <div className="flex align-baseline justify-between pb-1 space-x-8">
             <p
               className={clsx(
-                'text-scale-1200 text-sm truncate capitalize-sentence',
+                'text text-sm truncate capitalize-sentence',
                 labelTop.length > 0 && 'max-w-[75%]',
                 labelBottomClass
               )}

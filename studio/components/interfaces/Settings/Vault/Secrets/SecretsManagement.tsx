@@ -129,7 +129,7 @@ const SecretsManagement = () => {
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text">
                         You need additional permissions to add secrets
                       </span>
                     </div>
@@ -145,7 +145,7 @@ const SecretsManagement = () => {
           {!vault.isLoaded ? (
             <div className="px-6 py-6 space-x-2 flex items-center justify-center">
               <IconLoader className="animate-spin text-scale-1100" size={16} strokeWidth={1.5} />
-              <p className="text-sm text-scale-1200">Loading secrets from the Vault</p>
+              <p className="text-sm text">Loading secrets from the Vault</p>
             </div>
           ) : (
             <>
@@ -165,14 +165,14 @@ const SecretsManagement = () => {
                 <>
                   {searchValue.length === 0 ? (
                     <div className="px-6 py-6 space-y-1 flex flex-col items-center justify-center">
-                      <p className="text-sm text-scale-1200">No secrets added yet</p>
+                      <p className="text-sm text">No secrets added yet</p>
                       <p className="text-sm text-scale-1100">
                         The Vault allows you to store sensitive information like API keys
                       </p>
                     </div>
                   ) : (
                     <div className="px-6 py-4 space-y-1">
-                      <p className="text-sm text-scale-1200">No results found</p>
+                      <p className="text-sm text">No results found</p>
                       <p className="text-sm text-scale-1100">
                         Your search for "{searchValue}" did not return any results
                       </p>

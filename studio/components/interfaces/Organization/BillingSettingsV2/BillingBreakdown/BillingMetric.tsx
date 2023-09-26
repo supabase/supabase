@@ -35,7 +35,9 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
   const isExceededLimit = hasLimit && usageRatio >= 1
 
   const usageCurrentLabel =
-    metric.units === 'bytes' ? `${usageMeta?.usage?.toLocaleString() ?? 0} GB` : usageMeta?.usage?.toLocaleString()
+    metric.units === 'bytes'
+      ? `${usageMeta?.usage?.toLocaleString() ?? 0} GB`
+      : usageMeta?.usage?.toLocaleString()
   const usageLimitLabel =
     metric.units === 'bytes'
       ? `${usageMeta?.pricing_free_units ?? 0} GB`
@@ -55,7 +57,7 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
         <Link href={`/org/${slug}/usage#${metric.anchor}`}>
           <a>
             <div className="group flex items-center space-x-2">
-              <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
+              <p className="text-sm text-scale-1100 group-hover:text transition cursor-pointer">
                 {metric.name}
               </p>
               <IconChevronRight
@@ -83,7 +85,7 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
                     'border border-scale-200',
                   ].join(' ')}
                 >
-                  <div className="text-xs text-scale-1200">
+                  <div className="text-xs text">
                     {usageFee.pricingStrategy === 'UNIT' ? (
                       <div>
                         <p>
@@ -138,10 +140,10 @@ const BillingMetric = ({ idx, slug, metric, usage, subscription }: BillingMetric
                     'border border-scale-200',
                   ].join(' ')}
                 >
-                  <p className="text-xs text-scale-1200">
+                  <p className="text-xs text">
                     Exceeding your plans included usage will lead to restrictions to your project.
                   </p>
-                  <p className="text-xs text-scale-1200">
+                  <p className="text-xs text">
                     Upgrade to a usage-based plan or disable the spend cap to avoid restrictions.
                   </p>
                 </div>

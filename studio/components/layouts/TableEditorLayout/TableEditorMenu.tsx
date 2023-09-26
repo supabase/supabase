@@ -249,7 +249,7 @@ const TableEditorMenu = () => {
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text">
                         You need additional permissions to create tables
                       </span>
                     </div>
@@ -373,7 +373,7 @@ const TableEditorMenu = () => {
                       >
                         <Tooltip.Root delayDuration={0}>
                           <Tooltip.Trigger asChild>
-                            <div className="text-scale-900 transition-colors hover:text-scale-1200">
+                            <div className="text-scale-900 transition-colors hover:text">
                               <IconChevronsDown size={18} strokeWidth={1} />
                             </div>
                           </Tooltip.Trigger>
@@ -394,7 +394,7 @@ const TableEditorMenu = () => {
                       </Dropdown>
 
                       <button
-                        className="cursor-pointer text-scale-900 transition-colors hover:text-scale-1200"
+                        className="cursor-pointer text-scale-900 transition-colors hover:text"
                         onClick={refreshTables}
                       >
                         <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />

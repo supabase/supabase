@@ -65,9 +65,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
-                      Encrypted columns cannot be edited
-                    </span>
+                    <span className="text-xs text">Encrypted columns cannot be edited</span>
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>

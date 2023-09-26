@@ -57,7 +57,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
                 'border-scale-200 border ',
               ].join(' ')}
             >
-              <span className="text-scale-1200 text-xs">All changes saved</span>
+              <span className="text text-xs">All changes saved</span>
             </div>
           </Tooltip.Content>
         </Tooltip.Root>
@@ -74,7 +74,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
                 'border-scale-200 border',
               ].join(' ')}
             >
-              <span className="text-scale-1200 text-xs">Saving changes...</span>
+              <span className="text text-xs">Saving changes...</span>
             </div>
           </Tooltip.Content>
         </Tooltip.Root>
@@ -91,7 +91,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
                 'border-scale-200 border ',
               ].join(' ')}
             >
-              <span className="text-scale-1200 text-xs">Failed to save changes</span>
+              <span className="text text-xs">Failed to save changes</span>
             </div>
           </Tooltip.Content>
         </Tooltip.Root>

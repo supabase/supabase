@@ -86,11 +86,7 @@ const Header = ({
     </h3>
   )
   const highlighted = (
-    <h5
-      className={
-        'text-xl font-normal text-scale-1200 ' + (minimalHeader ? 'text-base' : 'text-2xl')
-      }
-    >
+    <h5 className={'text-xl font-normal text ' + (minimalHeader ? 'text-base' : 'text-2xl')}>
       {title}
       <span className="text-lg">{format}</span>
     </h5>

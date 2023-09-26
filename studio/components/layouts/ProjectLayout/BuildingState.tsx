@@ -52,7 +52,7 @@ const BuildingState = () => {
       <div className="mx-6 flex flex-col space-y-16">
         <div className=" flex flex-col gap-4">
           <div className="flex items-center space-x-3">
-            <h1 className="text-3xl text-scale-1200">{project?.name}</h1>
+            <h1 className="text-3xl text">{project?.name}</h1>
             <Badge color="brand">
               <div className="flex items-center gap-2">
                 <IconLoader className="animate-spin" size={12} />
@@ -76,7 +76,7 @@ const BuildingState = () => {
           <div className=" grid grid-cols-12 gap-12">
             <div className="col-span-12 space-y-12 lg:col-span-4">
               <div>
-                <h4 className="text-base text-scale-1200">While you wait</h4>
+                <h4 className="text-base text">While you wait</h4>
 
                 <ChecklistItem
                   description={
@@ -97,7 +97,7 @@ const BuildingState = () => {
                 />
               </div>
               <div>
-                <h4 className="text-base text-scale-1200">Not working?</h4>
+                <h4 className="text-base text">Not working?</h4>
                 <ChecklistItem
                   description={
                     <p className="text-sm text-scale-1100">

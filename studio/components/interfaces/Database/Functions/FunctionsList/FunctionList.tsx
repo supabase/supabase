@@ -45,7 +45,7 @@ const FunctionList = ({
     return (
       <Table.tr key={schema}>
         <Table.td colSpan={4}>
-          <p className="text-sm text-scale-1200">No functions created yet</p>
+          <p className="text-sm text">No functions created yet</p>
           <p className="text-sm text-light">
             There are no functions found in the schema "{schema}"
           </p>
@@ -58,7 +58,7 @@ const FunctionList = ({
     return (
       <Table.tr key={schema}>
         <Table.td colSpan={4}>
-          <p className="text-sm text-scale-1200">No results found</p>
+          <p className="text-sm text">No results found</p>
           <p className="text-sm text-light">
             Your search for "{filterString}" did not return any results
           </p>
@@ -129,7 +129,7 @@ const FunctionList = ({
                             'border border-scale-200',
                           ].join(' ')}
                         >
-                          <span className="text-xs text-scale-1200">
+                          <span className="text-xs text">
                             You need additional permissions to update functions
                           </span>
                         </div>

@@ -692,7 +692,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                     <div className="px-6">
                       <div className="flex items-center space-x-1 justify-end block text-sm mt-0 mb-2">
                         <p className="text-scale-1000">We will contact you at</p>
-                        <p className="text-scale-1200 font-medium">{respondToEmail}</p>
+                        <p className="text font-medium">{respondToEmail}</p>
                       </div>
                       <div className="flex items-center space-x-1 justify-end block text-sm mt-0 mb-2">
                         <p className="text-scale-1000">

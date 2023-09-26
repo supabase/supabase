@@ -76,7 +76,7 @@ const NotificationRow = ({
                   <IconX
                     size={14}
                     strokeWidth={2}
-                    className="text-scale-1100 group-hover:text-scale-1200 transition"
+                    className="text-scale-1100 group-hover:text transition"
                   />
                 }
                 onClick={() => dismissNotification(notification.id)}

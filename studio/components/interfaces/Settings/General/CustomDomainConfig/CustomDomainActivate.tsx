@@ -61,7 +61,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
       <div className="flex flex-col items-start">
         <Panel.Content>
           <div className="flex flex-col gap-2">
-            <h4 className="text-scale-1200">
+            <h4 className="text">
               Setup complete! Press activate to enable the custom domain{' '}
               <code className="text-sm">{customDomain.hostname}</code> for this project.
             </h4>

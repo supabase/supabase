@@ -126,7 +126,7 @@ const PreviewFilterPanel = ({
               hasEdits && (
                 <button
                   onClick={() => handleInputSearch(search)}
-                  className="mx-2 text-scale-1100 hover:text-scale-1200"
+                  className="mx-2 text-scale-1100 hover:text"
                 >
                   {'↲'}
                 </button>

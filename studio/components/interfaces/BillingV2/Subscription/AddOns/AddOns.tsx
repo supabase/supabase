@@ -208,7 +208,7 @@ const AddOns = () => {
                     <Link href={`/project/${projectRef}/settings/billing/usage#ram`}>
                       <a>
                         <div className="group flex items-center space-x-2">
-                          <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
+                          <p className="text-sm text-scale-1100 group-hover:text transition cursor-pointer">
                             Memory
                           </p>
                           <IconChevronRight
@@ -225,7 +225,7 @@ const AddOns = () => {
                     <Link href={`/project/${projectRef}/settings/billing/usage#cpu`}>
                       <a>
                         <div className="group flex items-center space-x-2">
-                          <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
+                          <p className="text-sm text-scale-1100 group-hover:text transition cursor-pointer">
                             CPU
                           </p>
                           <IconChevronRight
@@ -257,7 +257,7 @@ const AddOns = () => {
                     <Link href={`/project/${projectRef}/settings/billing/usage#disk_io`}>
                       <a>
                         <div className="group flex items-center space-x-2">
-                          <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
+                          <p className="text-sm text-scale-1100 group-hover:text transition cursor-pointer">
                             Max Disk Throughput
                           </p>
                           <IconChevronRight
@@ -277,7 +277,7 @@ const AddOns = () => {
                     <Link href={`/project/${projectRef}/settings/billing/usage#disk_io`}>
                       <a>
                         <div className="group flex items-center space-x-2">
-                          <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition cursor-pointer">
+                          <p className="text-sm text-scale-1100 group-hover:text transition cursor-pointer">
                             Baseline Disk Throughput
                           </p>
                           <IconChevronRight
@@ -323,9 +323,7 @@ const AddOns = () => {
                   </p>
                   {!sufficientPgVersion ? (
                     <Alert_Shadcn_ className="mt-2">
-                      <AlertTitle_Shadcn_>
-                        Your project is too old enable PITR
-                      </AlertTitle_Shadcn_>
+                      <AlertTitle_Shadcn_>Your project is too old enable PITR</AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
                         <p className="text-sm leading-normal mb-2">
                           Reach out to us via support if you're interested

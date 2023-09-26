@@ -111,7 +111,7 @@ const RestartServerButton = () => {
                     }}
                   >
                     <div className="space-y-1">
-                      <p className="block text-scale-1200">Fast database reboot</p>
+                      <p className="block text">Fast database reboot</p>
                       <p className="block text-scale-1100 text-xs">
                         Restarts only the database - faster but may not be able to recover from all
                         failure modes
@@ -140,7 +140,7 @@ const RestartServerButton = () => {
                   'border border-scale-200 ', //border
                 ].join(' ')}
               >
-                <span className="text-xs text-scale-1200">
+                <span className="text-xs text">
                   {!canRestartProject
                     ? 'You need additional permissions to restart this project'
                     : !isProjectActive
@@ -159,9 +159,8 @@ const RestartServerButton = () => {
         // @ts-ignore
         description={
           <>
-            Are you sure you want to restart the{' '}
-            <span className="text-scale-1200">{serviceToRestart}</span>? There will be a few minutes
-            of downtime.
+            Are you sure you want to restart the <span className="text">{serviceToRestart}</span>?
+            There will be a few minutes of downtime.
           </>
         }
         buttonLabel="Restart"

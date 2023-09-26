@@ -196,7 +196,7 @@ const PlanUpdateSidePanel = () => {
                           <ShimmeringLoader className="w-[30px] h-[24px]" />
                         </div>
                       ) : (
-                        <p className="text-scale-1200 text-lg">${price}</p>
+                        <p className="text text-lg">${price}</p>
                       )}
                       <p className="text-scale-1000 text-sm">{tierMeta?.costUnitOrg}</p>
                     </div>
@@ -252,7 +252,7 @@ const PlanUpdateSidePanel = () => {
                                   'border border-scale-200',
                                 ].join(' ')}
                               >
-                                <span className="text-xs text-scale-1200">
+                                <span className="text-xs text">
                                   You do not have permission to change the subscription plan.
                                 </span>
                               </div>

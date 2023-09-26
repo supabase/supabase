@@ -220,7 +220,7 @@ const EdgeFunctionDetails = () => {
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded border bg-scale-1200 p-2 text-scale-100 dark:bg-scale-100 dark:text-scale-1200">
+              <div className="flex h-8 w-8 items-center justify-center rounded border bg-scale-1200 p-2 text-scale-100 dark:bg-scale-100 dark:text">
                 <IconTerminal strokeWidth={2} />
               </div>
               <h4>Command line access</h4>
@@ -275,7 +275,7 @@ const EdgeFunctionDetails = () => {
                             'border border-scale-200',
                           ].join(' ')}
                         >
-                          <span className="text-xs text-scale-1200">
+                          <span className="text-xs text">
                             You need additional permissions to delete an edge function
                           </span>
                         </div>

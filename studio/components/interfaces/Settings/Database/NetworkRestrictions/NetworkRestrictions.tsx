@@ -38,7 +38,7 @@ const AllowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
               'border border-scale-200 w-[250px]',
             ].join(' ')}
           >
-            <span className="text-xs text-scale-1200">
+            <span className="text-xs text">
               You need additional permissions to update network restrictions
             </span>
           </div>
@@ -65,7 +65,7 @@ const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
               'border border-scale-200 w-[250px]',
             ].join(' ')}
           >
-            <span className="text-xs text-scale-1200">
+            <span className="text-xs text">
               You need additional permissions to update network restrictions
             </span>
           </div>
@@ -136,7 +136,7 @@ const NetworkRestrictions = ({}) => {
                         'border border-scale-200 w-[250px]',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text">
                         You need additional permissions to update network restrictions
                       </span>
                     </div>

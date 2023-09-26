@@ -65,7 +65,7 @@ const DeleteOrganizationButton = () => {
         onCancel={() => setIsOpen(false)}
         header={
           <div className="flex items-baseline gap-2">
-            <h5 className="text-sm text-scale-1200">Delete organisation</h5>
+            <h5 className="text-sm text">Delete organisation</h5>
             <span className="text-xs text-scale-900">Are you sure?</span>
           </div>
         }
@@ -80,9 +80,9 @@ const DeleteOrganizationButton = () => {
             <div className="space-y-4 py-3">
               <Modal.Content>
                 <p className="text-sm text-scale-900">
-                  This action <span className="text-scale-1200">cannot</span> be undone. This will
-                  permanently delete the <span className="text-scale-1200">{orgName}</span>{' '}
-                  organization and remove all of its projects.
+                  This action <span className="text">cannot</span> be undone. This will permanently
+                  delete the <span className="text">{orgName}</span> organization and remove all of
+                  its projects.
                 </p>
               </Modal.Content>
               <Modal.Separator />

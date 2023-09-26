@@ -36,9 +36,7 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
                 'border border-scale-200',
               ].join(' ')}
             >
-              <span className="text-xs text-scale-1200">
-                You need additional permissions to add wrappers
-              </span>
+              <span className="text-xs text">You need additional permissions to add wrappers</span>
             </div>
           </Tooltip.Content>
         </Tooltip.Portal>

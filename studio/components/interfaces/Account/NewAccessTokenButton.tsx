@@ -56,7 +56,7 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
                   }}
                 >
                   <div className="space-y-1">
-                    <p className="block text-scale-1200">Generate token for experimental API</p>
+                    <p className="block text">Generate token for experimental API</p>
                   </div>
                 </Dropdown.Item>,
               ]}
@@ -82,7 +82,7 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
         onCancel={() => setIsOpen(!isOpen)}
         header={
           <div className="flex items-baseline gap-2">
-            <h5 className="text-sm text-scale-1200">
+            <h5 className="text-sm text">
               {tokenScope === 'V0' ? 'Generate token for experimental API' : 'Generate New Token'}
             </h5>
           </div>

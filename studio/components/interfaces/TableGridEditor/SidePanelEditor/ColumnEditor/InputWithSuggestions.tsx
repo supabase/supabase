@@ -120,9 +120,7 @@ const InputWithSuggestions = ({
                         'border-scale-200 border',
                       ].join(' ')}
                     >
-                      <span className="text-scale-1200 text-xs">
-                        {suggestionsTooltip || 'Suggestions'}
-                      </span>
+                      <span className="text text-xs">{suggestionsTooltip || 'Suggestions'}</span>
                     </div>
                   </Tooltip.Content>
                 </Tooltip.Portal>

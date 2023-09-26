@@ -187,7 +187,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                               )}
                             </div>
                             <div>
-                              <p className="text-scale-1200">{getUserDisplayName(x)}</p>
+                              <p className="text">{getUserDisplayName(x)}</p>
                               {x.invited_id === undefined && (
                                 <p className="text-scale-1100">{x.primary_email}</p>
                               )}
@@ -240,7 +240,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                                         'border border-scale-200 ', //border
                                       ].join(' ')}
                                     >
-                                      <span className="text-xs text-scale-1200">
+                                      <span className="text-xs text">
                                         Role can only be changed after the user has accepted the
                                         invite
                                       </span>
@@ -257,7 +257,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                                         'border border-scale-200 ', //border
                                       ].join(' ')}
                                     >
-                                      <span className="text-xs text-scale-1200">
+                                      <span className="text-xs text">
                                         You need additional permissions to manage this team member
                                       </span>
                                     </div>
@@ -283,7 +283,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                                         'border border-scale-200 ', //border
                                       ].join(' ')}
                                     >
-                                      <span className="text-xs text-scale-1200">
+                                      <span className="text-xs text">
                                         This user has an invalid role, please reach out to us via
                                         support
                                       </span>
@@ -346,12 +346,11 @@ const MembersView = ({ searchString }: MembersViewProps) => {
           <Modal.Content>
             <p className="text-sm text-scale-1100">
               You are changing the role of{' '}
-              <span className="text-scale-1200">{getUserDisplayName(selectedMember)}</span> from{' '}
-              <span className="text-scale-1200">{getRoleNameById(selectedMember?.oldRoleId)}</span>{' '}
-              to{' '}
-              <span className="text-scale-1200">{getRoleNameById(selectedMember?.newRoleId)}</span>
+              <span className="text">{getUserDisplayName(selectedMember)}</span> from{' '}
+              <span className="text">{getRoleNameById(selectedMember?.oldRoleId)}</span> to{' '}
+              <span className="text">{getRoleNameById(selectedMember?.newRoleId)}</span>
             </p>
-            <p className="mt-3 text-sm text-scale-1200">
+            <p className="mt-3 text-sm text">
               By changing the role of this member their permissions will change.
             </p>
           </Modal.Content>

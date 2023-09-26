@@ -70,9 +70,7 @@ const ChooseProjectGitHubPage: NextPageWithLayout = () => {
         <>
           <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
             <header>
-              <h1 className="text-xl text-scale-1200">
-                Link a Supabase project to a GitHub repository
-              </h1>
+              <h1 className="text-xl text">Link a Supabase project to a GitHub repository</h1>
               <Markdown
                 className="text-scale-900"
                 // explain what this integration does

@@ -88,9 +88,7 @@ const RolesList = ({}) => {
               <button
                 className={[
                   'text-xs w-[90px] h-full text-center rounded-l-full flex items-center justify-center transition',
-                  filterType === 'all'
-                    ? 'bg-scale-500 text-scale-1200'
-                    : 'hover:bg-scale-400 text-scale-1100',
+                  filterType === 'all' ? 'bg-scale-500 text' : 'hover:bg-scale-400 text-scale-1100',
                 ].join(' ')}
                 onClick={() => setFilterType('all')}
               >
@@ -101,7 +99,7 @@ const RolesList = ({}) => {
                 className={[
                   'text-xs w-[90px] h-full text-center rounded-r-full flex items-center justify-center transition',
                   filterType === 'active'
-                    ? 'bg-scale-500 text-scale-1200'
+                    ? 'bg-scale-500 text'
                     : 'hover:bg-scale-400 text-scale-1100',
                 ].join(' ')}
                 onClick={() => setFilterType('active')}
@@ -142,7 +140,7 @@ const RolesList = ({}) => {
                 >
                   <p className="text-xs text-scale-1100 pr-2">Connections by roles:</p>
                   {rolesWithActiveConnections.map((role: PostgresRole) => (
-                    <div key={role.id} className="text-xs text-scale-1200">
+                    <div key={role.id} className="text-xs text">
                       {role.name}: {role.active_connections}
                     </div>
                   ))}

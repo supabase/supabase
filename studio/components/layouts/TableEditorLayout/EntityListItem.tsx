@@ -110,7 +110,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
     <div
       className={clsx(
         'group flex items-center justify-between rounded-md',
-        isActive && 'text-scale-1200 bg-scale-300'
+        isActive && 'text bg-scale-300'
       )}
     >
       <Link href={`/project/${projectRef}/editor/${entity.id}`}>
@@ -160,14 +160,12 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                     'border border-scale-200',
                   ].join(' ')}
                 >
-                  <span className="text-xs text-scale-1200 capitalize">
-                    {formatTooltipText(entity.type)}
-                  </span>
+                  <span className="text-xs text capitalize">{formatTooltipText(entity.type)}</span>
                 </div>
               </Tooltip.Content>
             </Tooltip.Portal>
           </Tooltip.Root>
-          <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition max-w-[85%] overflow-hidden text-ellipsis whitespace-nowrap">
+          <p className="text-sm text-scale-1100 group-hover:text transition max-w-[85%] overflow-hidden text-ellipsis whitespace-nowrap">
             {/* only show tooltips if required, to reduce noise */}
             {entity.name.length > 20 ? (
               <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
@@ -183,7 +181,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">{entity.name}</span>
+                      <span className="text-xs text">{entity.name}</span>
                     </div>
                   </Tooltip.Content>
                 </Tooltip.Portal>
@@ -254,7 +252,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
               </Dropdown.Item>,
             ]}
           >
-            <div className="text-scale-900 transition-colors hover:text-scale-1200">
+            <div className="text-scale-900 transition-colors hover:text">
               <IconChevronDown size={14} strokeWidth={2} />
             </div>
           </Dropdown>

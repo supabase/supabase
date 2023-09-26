@@ -62,7 +62,7 @@ const MigrationsEmptyState = () => {
             <button
               type="button"
               className={clsx(
-                'flex w-full items-center justify-between rounded py-3 px-6 text-scale-1200 border bg-scale-100 dark:bg-scale-300',
+                'flex w-full items-center justify-between rounded py-3 px-6 text border bg-scale-100 dark:bg-scale-300',
                 showInstructions && 'rounded-b-none'
               )}
             >

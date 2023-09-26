@@ -167,7 +167,7 @@ const EncryptionKeysManagement = () => {
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text">
                         You need additional permissions to add keys
                       </span>
                     </div>
@@ -183,7 +183,7 @@ const EncryptionKeysManagement = () => {
           {!vault.isLoaded ? (
             <div className="px-6 py-6 space-x-2 flex items-center justify-center">
               <IconLoader className="animate-spin text-scale-1100" size={16} strokeWidth={1.5} />
-              <p className="text-sm text-scale-1200">Loading keys from the Vault</p>
+              <p className="text-sm text">Loading keys from the Vault</p>
             </div>
           ) : (
             <>
@@ -193,10 +193,7 @@ const EncryptionKeysManagement = () => {
                     <div className="px-6 py-4 flex items-center space-x-4">
                       <IconKey className="text-scale-1100" strokeWidth={2} />
                       <div className="space-y-1 min-w-[70%] max-w-[70%]">
-                        <p
-                          className="text-sm truncate text-scale-1200"
-                          title={key.name || DEFAULT_KEY_NAME}
-                        >
+                        <p className="text-sm truncate text" title={key.name || DEFAULT_KEY_NAME}>
                           {key.name || DEFAULT_KEY_NAME}
                         </p>
                         <p title={key.id} className="text-xs text-scale-1100 font-bold truncate">
@@ -227,7 +224,7 @@ const EncryptionKeysManagement = () => {
                                     'border border-scale-200',
                                   ].join(' ')}
                                 >
-                                  <span className="text-xs text-scale-1200">
+                                  <span className="text-xs text">
                                     You need additional permissions to delete keys
                                   </span>
                                 </div>
@@ -245,7 +242,7 @@ const EncryptionKeysManagement = () => {
                 <>
                   {searchValue.length === 0 ? (
                     <div className="px-6 py-6 space-y-1 flex flex-col items-center justify-center">
-                      <p className="text-sm text-scale-1200">No encryption keys added yet</p>
+                      <p className="text-sm text">No encryption keys added yet</p>
                       <p className="text-sm text-scale-1100 text-center">
                         Encryption keys are created by the pgsodium extension and can be used to
                         encrypt your columns and secrets
@@ -253,7 +250,7 @@ const EncryptionKeysManagement = () => {
                     </div>
                   ) : (
                     <div className="px-6 py-4 space-y-1">
-                      <p className="text-sm text-scale-1200">No results found</p>
+                      <p className="text-sm text">No results found</p>
                       <p className="text-sm text-scale-1100">
                         Your search for "{searchValue}" did not return any results
                       </p>
@@ -274,7 +271,7 @@ const EncryptionKeysManagement = () => {
         onCancel={() => setSelectedKeyToRemove(undefined)}
         onConfirm={confirmDeleteKey}
         loading={isDeletingKey}
-        header={<h5 className="text-sm text-scale-1200">Confirm to delete key</h5>}
+        header={<h5 className="text-sm text">Confirm to delete key</h5>}
       >
         <div className="py-4">
           <Modal.Content>
@@ -290,9 +287,7 @@ const EncryptionKeysManagement = () => {
                 The following key will be permanently removed and cannot be recovered.
               </p>
               <div className="space-y-2">
-                <p className="text-sm text-scale-1200">
-                  {selectedKeyToRemove?.name ?? DEFAULT_KEY_NAME}
-                </p>
+                <p className="text-sm text">{selectedKeyToRemove?.name ?? DEFAULT_KEY_NAME}</p>
                 <p className="text-xs text-scale-1100">
                   <code className="!mx-0">ID: {selectedKeyToRemove?.id}</code>
                 </p>
@@ -308,7 +303,7 @@ const EncryptionKeysManagement = () => {
         size="medium"
         visible={showAddKeyModal}
         onCancel={() => setShowAddKeyModal(false)}
-        header={<h5 className="text-sm text-scale-1200">Add a new key</h5>}
+        header={<h5 className="text-sm text">Add a new key</h5>}
       >
         <Form
           id="add-new-key-form"

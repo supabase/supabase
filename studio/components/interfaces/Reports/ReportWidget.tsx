@@ -56,7 +56,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
                           'border border-scale-200',
                         ].join(' ')}
                       >
-                        <span className="text-xs text-scale-1200">{props.tooltip}</span>
+                        <span className="text-xs text">{props.tooltip}</span>
                       </div>
                     </Tooltip.Content>
                   </Tooltip.Portal>
@@ -93,7 +93,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">Open in Logs Explorer</span>
+                    <span className="text-xs text">Open in Logs Explorer</span>
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>

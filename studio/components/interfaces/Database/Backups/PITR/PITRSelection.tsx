@@ -160,7 +160,7 @@ const PITRSelection = () => {
                               'border-scale-200 border w-48 text-center',
                             ].join(' ')}
                           >
-                            <span className="text-scale-1200 text-xs">
+                            <span className="text text-xs">
                               Selected date is out of range where backups are available
                             </span>
                           </div>
@@ -196,7 +196,7 @@ const PITRSelection = () => {
                             type="button"
                             className={`
                             ${prevMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                            text-scale-1100 hover:text-scale-1200 focus:outline-none
+                            text-scale-1100 hover:text focus:outline-none
                         `}
                           >
                             <IconChevronLeft size={16} strokeWidth={2} />
@@ -210,7 +210,7 @@ const PITRSelection = () => {
                             type="button"
                             className={`
                             ${nextMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                            text-scale-1100 hover:text-scale-1200 focus:outline-none
+                            text-scale-1100 hover:text focus:outline-none
                         `}
                           >
                             <IconChevronRight size={16} strokeWidth={2} />

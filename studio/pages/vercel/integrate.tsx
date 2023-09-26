@@ -619,7 +619,7 @@ const ProjectLinkItem = observer(
                 ? 'text-scale-1000'
                 : result.status === 'fail'
                 ? 'text-scale-1000'
-                : 'text-scale-1200'
+                : 'text'
             }`}
           >
             {result?.message ?? 'Processing...'}

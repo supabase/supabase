@@ -180,7 +180,7 @@ const HTTPRequestFields = ({
                       }
                     >
                       <div className="space-y-1">
-                        <p className="block text-scale-1200">Add auth header with service key</p>
+                        <p className="block text">Add auth header with service key</p>
                         <p className="text-scale-1000">
                           Required if your edge function enforces JWT verification
                         </p>
@@ -198,7 +198,7 @@ const HTTPRequestFields = ({
                       }
                     >
                       <div className="space-y-1">
-                        <p className="block text-scale-1200">Add custom source header</p>
+                        <p className="block text">Add custom source header</p>
                         <p className="text-scale-1000">
                           Useful to verify that the edge function was triggered from this webhook
                         </p>

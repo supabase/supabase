@@ -48,7 +48,7 @@ const PITRNotice = ({}) => {
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text">
                       You need additional permissions to amend subscriptions
                     </span>
                   </div>
@@ -66,9 +66,8 @@ const PITRNotice = ({}) => {
         <div className="space-y-2">
           <p className="text-sm">Recovery retention period</p>
           <p className="text-sm text-scale-1100">
-            Database changes are logged every <span className="text-scale-1200">2 minutes</span>,
-            with a total recovery period of up to{' '}
-            <span className="text-brand">{retentionPeriod} days</span>.
+            Database changes are logged every <span className="text">2 minutes</span>, with a total
+            recovery period of up to <span className="text-brand">{retentionPeriod} days</span>.
           </p>
         </div>
       </div>

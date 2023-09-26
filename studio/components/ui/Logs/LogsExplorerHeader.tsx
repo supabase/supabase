@@ -35,7 +35,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
           <IconList size={14} strokeWidth={3} />
         </div>
 
-        <h1 className="text-2xl text-scale-1200">Logs Explorer</h1>
+        <h1 className="text-2xl text">Logs Explorer</h1>
         {subtitle && <span className="text-2xl text-scale-1000">{subtitle}</span>}
       </div>
       <div className="flex flex-row gap-2">
@@ -147,7 +147,7 @@ const Field = ({
   return (
     <Table.tr>
       <Table.td
-        className="font-mono text-xs !p-2 cursor-pointer hover:text-scale-1200 transition flex items-center space-x-2"
+        className="font-mono text-xs !p-2 cursor-pointer hover:text transition flex items-center space-x-2"
         onClick={() =>
           copyToClipboard(field.path, () => {
             setIsCopied(true)
@@ -170,7 +170,7 @@ const Field = ({
                     'border border-scale-200',
                   ].join(' ')}
                 >
-                  <span className="text-xs text-scale-1200">Copied</span>
+                  <span className="text-xs text">Copied</span>
                 </div>
               </Tooltip.Content>
             </Tooltip.Portal>
@@ -189,7 +189,7 @@ const Field = ({
                     'border border-scale-200',
                   ].join(' ')}
                 >
-                  <span className="text-xs text-scale-1200">Copy value</span>
+                  <span className="text-xs text">Copy value</span>
                 </div>
               </Tooltip.Content>
             </Tooltip.Portal>

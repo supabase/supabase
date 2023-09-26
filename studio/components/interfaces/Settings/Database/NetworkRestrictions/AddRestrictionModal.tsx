@@ -156,7 +156,7 @@ const AddRestrictionModal = ({
                                       'border border-scale-200 w-[300px]',
                                     ].join(' ')}
                                   >
-                                    <span className="text-xs text-scale-1200">
+                                    <span className="text-xs text">
                                       Classless inter-domain routing (CIDR) notation is the notation
                                       used to identify networks and hosts in the networks. The block
                                       size tells us how many bits we need to take for the network

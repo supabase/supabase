@@ -79,7 +79,7 @@ const DatabaseUsage = observer(() => {
             {orgLevelBilling ? (
               <Panel.Content>
                 <div className="space-y-1">
-                  <h5 className="text-sm text-scale-1200">Disk Usage</h5>
+                  <h5 className="text-sm text">Disk Usage</h5>
                   <SparkBar
                     type="horizontal"
                     value={databaseSize}
@@ -122,7 +122,7 @@ const DatabaseUsage = observer(() => {
             ) : (
               <Panel.Content>
                 <div className="space-y-1">
-                  <h5 className="text-sm text-scale-1200">Database size</h5>
+                  <h5 className="text-sm text">Database size</h5>
                   <SparkBar
                     type="horizontal"
                     value={databaseSize}
@@ -166,7 +166,7 @@ const DatabaseUsage = observer(() => {
             {!orgLevelBilling && (
               <Panel.Content>
                 <div className="space-y-1">
-                  <h5 className="text-sm text-scale-1200">Database egress</h5>
+                  <h5 className="text-sm text">Database egress</h5>
                   <SparkBar
                     type="horizontal"
                     value={usage?.db_egress?.usage ?? 0}
@@ -188,7 +188,7 @@ const DatabaseUsage = observer(() => {
 
             {orgLevelBilling && (
               <Panel.Content>
-                <p className="text-sm text-scale-1200">
+                <p className="text-sm text">
                   Head to your{' '}
                   <Link href={`/org/${selectedOrganization?.slug}/usage`}>
                     <a>

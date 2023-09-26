@@ -241,7 +241,7 @@ const ComputeInstanceSidePanel = () => {
                       <p
                         className={clsx(
                           'text-sm transition',
-                          isSelected ? 'text-scale-1200' : 'text-scale-1000'
+                          isSelected ? 'text' : 'text-scale-1000'
                         )}
                       >
                         {option.name}
@@ -306,9 +306,7 @@ const ComputeInstanceSidePanel = () => {
                           </p>
                           <div className="flex justify-between items-center mt-2">
                             <div className="flex items-center space-x-1">
-                              <span className="text-scale-1200 text-sm">
-                                ${option.price.toLocaleString()}
-                              </span>
+                              <span className="text text-sm">${option.price.toLocaleString()}</span>
                               <span className="text-scale-1000 translate-y-[1px]">
                                 {' '}
                                 / {option.price_interval === 'monthly' ? 'month' : 'hour'}
@@ -335,7 +333,7 @@ const ComputeInstanceSidePanel = () => {
                                       ].join(' ')}
                                     >
                                       <div className="flex items-center space-x-1">
-                                        <p className="text-scale-1200 text-sm">
+                                        <p className="text text-sm">
                                           ${Number(option.price * 672).toFixed(0)} - $
                                           {Number(option.price * 744).toFixed(0)} per month
                                         </p>
@@ -371,12 +369,10 @@ const ComputeInstanceSidePanel = () => {
                 // Monthly payment with project-level subscription
                 <p className="text-sm text-scale-1100">
                   Upon clicking confirm, the amount of{' '}
-                  <span className="text-scale-1200">
-                    ${selectedCompute?.price.toLocaleString()}
-                  </span>{' '}
-                  will be added to your monthly invoice. Any previous compute addon is prorated and
-                  you're immediately charged for the remaining days of your billing cycle. The addon
-                  is prepaid per month and in case of a downgrade, you get credits for the remaining
+                  <span className="text">${selectedCompute?.price.toLocaleString()}</span> will be
+                  added to your monthly invoice. Any previous compute addon is prorated and you're
+                  immediately charged for the remaining days of your billing cycle. The addon is
+                  prepaid per month and in case of a downgrade, you get credits for the remaining
                   time.
                 </p>
               ) : selectedCategory !== 'micro' ? (

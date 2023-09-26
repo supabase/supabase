@@ -169,7 +169,7 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
                       ${
                         active
                           ? ` bg-scale-1200 text-scale-100 opacity-100 hover:bg-opacity-75`
-                          : ` bg-scale-700 text-scale-1200 opacity-25 hover:opacity-50`
+                          : ` bg-scale-700 text opacity-25 hover:opacity-50`
                       }
                   `}
                     >

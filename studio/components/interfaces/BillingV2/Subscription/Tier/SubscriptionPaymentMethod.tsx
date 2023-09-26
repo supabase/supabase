@@ -155,7 +155,7 @@ const SubscriptionPaymentMethod = ({
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text">
                       Please email support@supbase.io to change your payment method.
                     </span>
                   </div>
@@ -171,7 +171,7 @@ const SubscriptionPaymentMethod = ({
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text">
                       You do not have permission to change the payment method
                     </span>
                   </div>

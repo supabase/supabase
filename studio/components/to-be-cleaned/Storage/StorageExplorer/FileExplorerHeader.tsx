@@ -425,7 +425,7 @@ const FileExplorerHeader = ({
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text">
                       You need additional permissions to upload files
                     </span>
                   </div>
@@ -454,7 +454,7 @@ const FileExplorerHeader = ({
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text">
                       You need additional permissions to create folders
                     </span>
                   </div>
@@ -475,7 +475,7 @@ const FileExplorerHeader = ({
               actions={[
                 <IconX
                   key="close"
-                  className="mx-2 cursor-pointer text-scale-1200"
+                  className="mx-2 cursor-pointer text"
                   size="tiny"
                   strokeWidth={2}
                   onClick={onCancelSearch}

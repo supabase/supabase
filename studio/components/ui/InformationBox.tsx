@@ -39,7 +39,7 @@ const InformationBox = ({
           <div className="flex w-full space-x-3 lg:items-start">
             {icon && <span className="text-scale-900">{icon}</span>}
             <div className="flex-grow">
-              <h5 className="text-sm text-scale-1200">{title}</h5>
+              <h5 className="text-sm text">{title}</h5>
             </div>
           </div>
           {description && !hideCollapse ? (

@@ -186,7 +186,7 @@ const CustomDomainSidePanel = () => {
                   <div className="px-4 py-2">
                     <p className="text-scale-1000">Use the default supabase domain for your API</p>
                     <div className="flex items-center space-x-1 mt-2">
-                      <p className="text-scale-1200 text-sm">$0</p>
+                      <p className="text text-sm">$0</p>
                       <p className="text-scale-1000 translate-y-[1px]"> / month</p>
                     </div>
                   </div>
@@ -209,7 +209,7 @@ const CustomDomainSidePanel = () => {
                     <div className="px-4 py-2">
                       <p className="text-scale-1000">Present a branded experience to your users</p>
                       <div className="flex items-center space-x-1 mt-2">
-                        <p className="text-scale-1200 text-sm">${option.price}</p>
+                        <p className="text text-sm">${option.price}</p>
                         <p className="text-scale-1000 translate-y-[1px]"> / month</p>
                       </div>
                     </div>
@@ -230,12 +230,10 @@ const CustomDomainSidePanel = () => {
               ) : (
                 <p className="text-sm text-scale-1100">
                   Upon clicking confirm, the amount of{' '}
-                  <span className="text-scale-1200">
-                    ${selectedCustomDomain?.price.toLocaleString()}
-                  </span>{' '}
-                  will be added to your monthly invoice. You're immediately charged for the
-                  remaining days of your billing cycle. The addon is prepaid per month and in case
-                  of a downgrade, you get credits for the remaining time.
+                  <span className="text">${selectedCustomDomain?.price.toLocaleString()}</span> will
+                  be added to your monthly invoice. You're immediately charged for the remaining
+                  days of your billing cycle. The addon is prepaid per month and in case of a
+                  downgrade, you get credits for the remaining time.
                 </p>
               )}
             </>

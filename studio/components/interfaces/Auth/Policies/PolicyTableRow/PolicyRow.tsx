@@ -30,7 +30,7 @@ const PolicyRow = ({
       <div className="flex grow flex-col space-y-1">
         <div className="flex items-center space-x-4">
           <p className="font-mono text-xs text-scale-1000">{policy.command}</p>
-          <p className="text-sm text-scale-1200">{policy.name}</p>
+          <p className="text-sm text">{policy.name}</p>
         </div>
         <div className="flex items-center space-x-2">
           <p className="text-scale-1000 text-sm">Applied to:</p>
@@ -56,9 +56,7 @@ const PolicyRow = ({
                     'border border-scale-200 max-w-[220px] text-center',
                   ].join(' ')}
                 >
-                  <span className="text-xs text-scale-1200">
-                    {policy.roles.slice(3).join(', ')}
-                  </span>
+                  <span className="text-xs text">{policy.roles.slice(3).join(', ')}</span>
                 </div>
               </Tooltip.Content>
             </Tooltip.Portal>
@@ -115,7 +113,7 @@ const PolicyRow = ({
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text">
                       You need additional permissions to edit RLS policies
                     </span>
                   </div>

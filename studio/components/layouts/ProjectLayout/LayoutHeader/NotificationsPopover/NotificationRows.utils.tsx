@@ -111,7 +111,7 @@ export const formatNotificationText = (project: Project, notification: Notificat
                     <Link href={upgrade.changelog_link}>
                       <a target="_blank" rel="noreferrer">
                         <IconExternalLink
-                          className="cursor-pointer text-scale-1000 hover:text-scale-1200 transition"
+                          className="cursor-pointer text-scale-1000 hover:text transition"
                           size={12}
                           strokeWidth={2}
                         />
