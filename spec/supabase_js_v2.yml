@@ -1648,6 +1648,56 @@ functions:
           [operators](/docs/guides/database/json#query-the-jsonb-data) for
           querying JSON data.
         hideCodeBlock: true
+      - id: querying-foreign-table-with-inner-join
+        name: Querying foreign table with inner join
+        code: |
+          ```ts
+          const { data, error } = await supabase
+            .from('cities')
+            .select('name, countries!inner(name)')
+            .eq('countries.name', 'Indonesia')
+          ```
+        data:
+          sql: |
+            ```sql
+            create table countries (
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
+              "name" text
+            );
+
+            create table cities (
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
+              "name" text,
+              "country_id" "uuid" references public.countries on delete cascade
+            );
+
+            with country as (
+              insert into countries (name)
+              values ('united kingdom') returning id
+            )
+            insert into cities (name, country_id) values
+            ('London', (select id from country)),
+            ('Manchester', (select id from country)),
+            ('Liverpool', (select id from country)),
+            ('Bristol', (select id from country));
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Bali",
+                "countries": {"name": "Indonesia"}
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          If you don't want to return the foreign table contents, you can leave the parenthesis empty.
+          Like `.select('name, countries!inner()')`.
+        hideCodeBlock: true
 
   - id: insert
     title: 'Create data: insert()'
