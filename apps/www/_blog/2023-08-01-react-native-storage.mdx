@@ -132,7 +132,7 @@ export const supabase = createClient(url, key, {
 })
 ```
 
-We are using the SecureStore from Expo to handle the session of our Supabase client and add in the `createClient` function.
+We are using the AsyncStorage from Expo to handle the session of our Supabase client and add in the `createClient` function.
 
 Later we can import the `supabase` client from this file and use it in our app whenever we need to access Supabase.
 
