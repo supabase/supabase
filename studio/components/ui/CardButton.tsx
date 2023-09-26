@@ -83,10 +83,10 @@ const CardButton = ({
       )}
       {icon && <ImageContainer>{icon}</ImageContainer>}
       <div className="flex h-full w-full flex-col space-y-2">
-        {typeof title === 'string' ? <h5 className="text-scale-1200">{title}</h5> : title}
+        {typeof title === 'string' ? <h5 className="text-foreground">{title}</h5> : title}
         {(children || description) && (
           <div className="flex w-full flex-1 flex-col">
-            <p className="text-sm text-scale-1100">{description}</p>
+            <p className="text-sm text-foreground-light">{description}</p>
             <div className="w-full">{children && children}</div>
           </div>
         )}
@@ -102,7 +102,7 @@ const CardButton = ({
           transition-all
           duration-200
           group-hover:right-3
-          group-hover:text-scale-1200
+          group-hover:text-foreground
         "
         >
           {loading ? <IconLoader className="animate-spin" /> : <IconChevronRight />}

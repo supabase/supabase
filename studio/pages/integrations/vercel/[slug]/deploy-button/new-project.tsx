@@ -22,10 +22,9 @@ import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
 import { NextPageWithLayout } from 'types'
 import { Alert, Button, Checkbox, IconBook, IconLifeBuoy, Input, Listbox, LoadingLine } from 'ui'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
+import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 
 const VercelIntegration: NextPageWithLayout = () => {
-  const [loading, setLoading] = useState<boolean>(false)
-
   return (
     <>
       <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
@@ -37,7 +36,7 @@ const VercelIntegration: NextPageWithLayout = () => {
               content={`Choose the Supabase organization you wish to install in`}
             />
           </header>
-          <CreateProject loading={loading} setLoading={setLoading} />
+          <CreateProject />
           <Alert withIcon variant="info" title="You can uninstall this Integration at any time.">
             <Markdown
               content={`You can remove this integration at any time via Vercel or the Supabase dashboard.`}
@@ -53,13 +52,7 @@ VercelIntegration.getLayout = (page) => (
   <VercelIntegrationWindowLayout>{page}</VercelIntegrationWindowLayout>
 )
 
-const CreateProject = ({
-  loading,
-  setLoading,
-}: {
-  loading: boolean
-  setLoading: (e: boolean) => void
-}) => {
+const CreateProject = () => {
   const router = useRouter()
   const { ui } = useStore()
   const selectedOrganization = useSelectedOrganization()
@@ -69,6 +62,8 @@ const CreateProject = ({
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(-1)
   const [shouldRunMigrations, setShouldRunMigrations] = useState(true)
   const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region)
+
+  const snapshot = useIntegrationInstallationSnapshot()
 
   const delayedCheckPasswordStrength = useRef(
     debounce((value: string) => checkPasswordStrength(value), 300)
@@ -151,7 +146,7 @@ const CreateProject = ({
     },
     onError: (error) => {
       ui.setNotification({ error, category: 'error', message: error.message })
-      setLoading(false)
+      snapshot.setLoading(false)
     },
   })
 
@@ -163,7 +158,7 @@ const CreateProject = ({
     if (!configurationId) return console.error('No configurationId ID set')
     if (!organization) return console.error('No organization ID set')
 
-    setLoading(true)
+    snapshot.setLoading(true)
 
     let dbSql: string | undefined
     if (shouldRunMigrations) {
@@ -241,7 +236,7 @@ const CreateProject = ({
           return
         }
 
-        setLoading(false)
+        snapshot.setLoading(false)
 
         if (next) {
           window.location.href = next
@@ -308,7 +303,7 @@ const CreateProject = ({
                     />
                   )}
                 >
-                  <span className="text-scale-1200">{label}</span>
+                  <span className="text-foreground">{label}</span>
                 </Listbox.Option>
               )
             })}
@@ -328,8 +323,8 @@ const CreateProject = ({
         <Button
           size="medium"
           className="self-end"
-          disabled={loading}
-          loading={loading}
+          disabled={snapshot.loading}
+          loading={snapshot.loading}
           onClick={onCreateProject}
         >
           Create Project

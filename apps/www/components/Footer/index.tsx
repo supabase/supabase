@@ -1,22 +1,23 @@
 import FooterLinks from 'data/Footer.json'
 import SectionContainer from '../Layouts/SectionContainer'
-import DarkModeToggle from '../DarkModeToggle'
 import Link from 'next/link'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import { Badge } from 'ui'
 import Image from 'next/image'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import { useRouter } from 'next/router'
 import { Fragment } from 'react'
+import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
 
 interface Props {
   className?: string
 }
 
 const Footer = (props: Props) => {
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   const { pathname } = useRouter()
+
   const isLaunchWeekPage = pathname.includes('launch-week') || pathname === '/'
 
   return (
@@ -36,7 +37,7 @@ const Footer = (props: Props) => {
                   src={
                     isLaunchWeekPage
                       ? supabaseLogoWordmarkDark
-                      : isDarkMode
+                      : resolvedTheme === 'dark'
                       ? supabaseLogoWordmarkDark
                       : supabaseLogoWordmarkLight
                   }
@@ -149,7 +150,7 @@ const Footer = (props: Props) => {
         </div>
         <div className="border-scale-500 dark:border-scale-600 mt-32 flex justify-between border-t pt-8">
           <small className="small">&copy; Supabase Inc</small>
-          <DarkModeToggle disabled={isLaunchWeekPage} />
+          <ThemeToggle forceDark={isLaunchWeekPage} />
         </div>
       </SectionContainer>
     </footer>

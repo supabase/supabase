@@ -48,7 +48,7 @@ export const StoreProvider = ({ children, rootStore }: PropsWithChildren<StorePr
                     labelTop={`${progress.toFixed(2)}%`}
                   />
                   {description !== undefined && (
-                    <p className="text-xs text-scale-1100">{description}</p>
+                    <p className="text-xs text-foreground-light">{description}</p>
                   )}
                 </div>,
                 { id }

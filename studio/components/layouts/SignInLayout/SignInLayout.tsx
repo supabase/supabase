@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useTheme } from 'common'
+import { useTheme } from 'next-themes'
 import { useFlag } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
 import { BASE_PATH } from 'lib/constants'
@@ -29,7 +29,7 @@ const SignInLayout = ({
   const router = useRouter()
   const pushNext = usePushNext()
   const queryClient = useQueryClient()
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
   const ongoingIncident = useFlag('ongoingIncident')
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
@@ -103,7 +103,7 @@ const SignInLayout = ({
                   <a>
                     <Image
                       src={
-                        isDarkMode
+                        theme === 'dark'
                           ? `${BASE_PATH}/img/supabase-dark.svg`
                           : `${BASE_PATH}/img/supabase-light.svg`
                       }
@@ -133,7 +133,7 @@ const SignInLayout = ({
             <div className="flex-1 flex flex-col justify-center w-[330px] sm:w-[384px]">
               <div className="mb-10">
                 <h1 className="mt-8 mb-2 text-2xl lg:text-3xl">{heading}</h1>
-                <h2 className="text-sm text-scale-1100">{subheading}</h2>
+                <h2 className="text-sm text-foreground-light">{subheading}</h2>
               </div>
 
               {children}
@@ -144,11 +144,11 @@ const SignInLayout = ({
                 <p className="text-xs text-scale-900 sm:mx-auto sm:max-w-sm">
                   By continuing, you agree to Supabase's{' '}
                   <Link href="https://supabase.com/terms">
-                    <a className="underline hover:text-scale-1100">Terms of Service</a>
+                    <a className="underline hover:text-foreground-light">Terms of Service</a>
                   </Link>{' '}
                   and{' '}
                   <Link href="https://supabase.com/privacy">
-                    <a className="underline hover:text-scale-1100">Privacy Policy</a>
+                    <a className="underline hover:text-foreground-light">Privacy Policy</a>
                   </Link>
                   , and to receive periodic emails with updates.
                 </p>
@@ -178,7 +178,7 @@ const SignInLayout = ({
                   />
 
                   <div className="flex flex-col">
-                    <cite className="not-italic font-medium text-scale-1100 whitespace-nowrap">
+                    <cite className="not-italic font-medium text-foreground-light whitespace-nowrap">
                       @{quote.handle}
                     </cite>
                   </div>

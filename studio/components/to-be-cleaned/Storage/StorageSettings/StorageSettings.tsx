@@ -2,14 +2,14 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 import { Button, Form, IconClock, Input, Listbox } from 'ui'
 
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import { STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, StorageSizeUnits } from './StorageSettings.constants'
+import { StorageSizeUnits, STORAGE_FILE_SIZE_LIMIT_MAX_BYTES } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 
 export type StorageSettingsProps = {
   projectRef: string | undefined
@@ -108,7 +108,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
           return (
             <>
               <div className="mb-6">
-                <h3 className="mb-2 text-xl text-scale-1200">Storage Settings</h3>
+                <h3 className="mb-2 text-xl text-foreground">Storage Settings</h3>
                 <div className="text-sm text-scale-900">
                   Configure your project's storage settings
                 </div>
@@ -161,7 +161,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
                             </Listbox>
                           </div>
                         </div>
-                        <p className="text-sm text-scale-1100">
+                        <p className="text-sm text-foreground-light">
                           {selectedUnit !== StorageSizeUnits.BYTES &&
                             `Equivalent to ${convertToBytes(
                               values.fileSizeLimit,
@@ -187,7 +187,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
                   <div className="flex justify-between px-8 py-4">
                     <div className="flex items-center justify-between w-full gap-2">
                       {!canUpdateStorageSettings ? (
-                        <p className="text-sm text-scale-1000">
+                        <p className="text-sm text-foreground-light">
                           You need additional permissions to update storage settings
                         </p>
                       ) : (

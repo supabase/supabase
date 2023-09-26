@@ -51,7 +51,7 @@ const Param = ({
             </label>
 
             <div className="flex items-center gap-4">
-              <span className="text-md text-scale-1200 pb-0.5">{name}</span>
+              <span className="text-md text-foreground pb-0.5">{name}</span>
             </div>
           </div>
         </div>
@@ -63,7 +63,7 @@ const Param = ({
           <div className="mb-4 flex items-center gap-2">
             <label className="font-mono text-xs uppercase text-scale-900 min-w-[55px]">Type</label>
             <div>
-              <span className="flex grow-0 bg-slate-300 px-2 py-0.5 rounded-md text-scale-1000">
+              <span className="flex grow-0 bg-slate-300 px-2 py-0.5 rounded-md text-foreground-light">
                 <span className="flex items-center gap-2 text-sm">
                   <IconCode size="tiny" />
                   <span>{getColumnType(type, format)}</span>
@@ -76,7 +76,7 @@ const Param = ({
               Format
             </label>
             <div>
-              <span className="flex grow-0 bg-slate-300 px-2 py-0.5 rounded-md text-scale-1000">
+              <span className="flex grow-0 bg-slate-300 px-2 py-0.5 rounded-md text-foreground-light">
                 <span className="flex items-center gap-2 text-sm">
                   <IconDatabase size="tiny" />
                   <span>{format}</span>

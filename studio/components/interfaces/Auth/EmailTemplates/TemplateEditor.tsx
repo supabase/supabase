@@ -80,7 +80,7 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
                   if (property.type === 'string') {
                     return (
                       <div key={x} className="space-y-3">
-                        <label className="col-span-12 text-sm text-scale-1200 lg:col-span-5">
+                        <label className="col-span-12 text-sm text-foreground lg:col-span-5">
                           {property.title}
                         </label>
                         <Input

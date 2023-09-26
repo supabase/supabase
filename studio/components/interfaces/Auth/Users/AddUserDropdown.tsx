@@ -1,10 +1,20 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useCheckPermissions } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
 import { useState } from 'react'
 import semver from 'semver'
-import { Button, Dropdown, IconChevronDown, IconMail, IconPlus, IconUserPlus } from 'ui'
+import {
+  Button,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconChevronDown,
+  IconMail,
+  IconUserPlus,
+} from 'ui'
+
+import { useCheckPermissions } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
 import CreateUserModal from './CreateUserModal'
 import InviteUserModal from './InviteUserModal'
 
@@ -29,55 +39,26 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
 
   return (
     <>
-      <Dropdown
-        side="bottom"
-        align="end"
-        size="small"
-        overlay={
-          <>
-            {inviteEnabled && (
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger className="w-full">
-                  <Dropdown.Item
-                    icon={<IconMail size="small" />}
-                    disabled={!canInviteUsers}
-                    onClick={() => setInviteVisible(true)}
-                  >
-                    Send invitation
-                  </Dropdown.Item>
-                </Tooltip.Trigger>
-                {!canInviteUsers && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                          'border border-scale-200',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-scale-1200">
-                          You need additional permissions to invite users
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
-            )}
-
+      <DropdownMenu_Shadcn_>
+        <DropdownMenuTrigger_Shadcn_>
+          <Button type="primary" iconRight={<IconChevronDown strokeWidth={1.5} />}>
+            Add user
+          </Button>
+        </DropdownMenuTrigger_Shadcn_>
+        <DropdownMenuContent_Shadcn_ side="bottom" align="end">
+          {inviteEnabled && (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger className="w-full">
-                <Dropdown.Item
-                  icon={<IconUserPlus size="small" />}
-                  disabled={!canCreateUsers}
-                  onClick={() => setCreateVisible(true)}
+                <DropdownMenuItem_Shadcn_
+                  className="space-x-2"
+                  disabled={!canInviteUsers}
+                  onClick={() => setInviteVisible(true)}
                 >
-                  Create new user
-                </Dropdown.Item>
+                  <IconMail size="small" />
+                  <p className="text">Send invitation</p>
+                </DropdownMenuItem_Shadcn_>
               </Tooltip.Trigger>
-
-              {!canCreateUsers && (
+              {!canInviteUsers && (
                 <Tooltip.Portal>
                   <Tooltip.Content side="bottom">
                     <Tooltip.Arrow className="radix-tooltip-arrow" />
@@ -87,21 +68,48 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
-                        You need additional permissions to create users
+                      <span className="text-xs text-foreground">
+                        You need additional permissions to invite users
                       </span>
                     </div>
                   </Tooltip.Content>
                 </Tooltip.Portal>
               )}
             </Tooltip.Root>
-          </>
-        }
-      >
-        <Button type="primary" iconRight={<IconChevronDown strokeWidth={1.5} />}>
-          Add user
-        </Button>
-      </Dropdown>
+          )}
+
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger className="w-full text-left">
+              <DropdownMenuItem_Shadcn_
+                className="space-x-2"
+                disabled={!canCreateUsers}
+                onClick={() => setCreateVisible(true)}
+              >
+                <IconUserPlus size="small" />
+                <p className="text">Create new user</p>
+              </DropdownMenuItem_Shadcn_>
+            </Tooltip.Trigger>
+
+            {!canCreateUsers && (
+              <Tooltip.Portal>
+                <Tooltip.Content side="bottom">
+                  <Tooltip.Arrow className="radix-tooltip-arrow" />
+                  <div
+                    className={[
+                      'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                      'border border-scale-200',
+                    ].join(' ')}
+                  >
+                    <span className="text-xs text-foreground">
+                      You need additional permissions to create users
+                    </span>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            )}
+          </Tooltip.Root>
+        </DropdownMenuContent_Shadcn_>
+      </DropdownMenu_Shadcn_>
 
       {inviteEnabled && <InviteUserModal visible={inviteVisible} setVisible={setInviteVisible} />}
       <CreateUserModal visible={createVisible} setVisible={setCreateVisible} />

@@ -25,10 +25,10 @@ import { DataPoint } from 'data/analytics/constants'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganization } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 
 const InfrastructureActivity = () => {
   const { ref: projectRef } = useParams()
@@ -178,7 +178,7 @@ const InfrastructureActivity = () => {
         <div className="mx-auto flex flex-col gap-10 pt-6">
           <div>
             <p className="text-xl">Infrastructure Activity</p>
-            <p className="text-sm text-scale-1000">
+            <p className="text-sm text-foreground-light">
               Activity statistics related to your server instance
             </p>
           </div>
@@ -195,7 +195,7 @@ const InfrastructureActivity = () => {
                 loading={isLoadingSubscription}
                 currentBillingPeriodStart={subscription?.current_period_start}
               />
-              <p className="text-sm text-scale-1000">
+              <p className="text-sm text-foreground-light">
                 {dayjs(startDate).format('DD MMM YYYY')} - {dayjs(endDate).format('DD MMM YYYY')}
               </p>
             </>
@@ -218,14 +218,14 @@ const InfrastructureActivity = () => {
                       </div>
                       <div className="grid gap-4">
                         {attribute.description.split('\n').map((value, idx) => (
-                          <p key={`desc-${idx}`} className="text-sm text-scale-1000 pr-8 m-0">
+                          <p key={`desc-${idx}`} className="text-sm text-foreground-light pr-8 m-0">
                             {value}
                           </p>
                         ))}
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <p className="text-sm text-scale-1200 dark:text-scale-1100 mb-2">
+                      <p className="text-sm text-foreground dark:text-foreground-light mb-2">
                         More information
                       </p>
                       {attribute.links.map((link) => (
@@ -259,12 +259,12 @@ const InfrastructureActivity = () => {
 
                         {currentComputeInstanceSpecs.baseline_disk_io_mbs ===
                         currentComputeInstanceSpecs.max_disk_io_mbs ? (
-                          <p className="text-sm text-scale-1000">
+                          <p className="text-sm text-foreground-light">
                             Your current compute can has a baseline and maximum disk throughput of{' '}
                             {currentComputeInstanceSpecs.max_disk_io_mbs?.toLocaleString()} Mbps.
                           </p>
                         ) : (
-                          <p className="text-sm text-scale-1000">
+                          <p className="text-sm text-foreground-light">
                             Your current compute can burst up to{' '}
                             {currentComputeInstanceSpecs.max_disk_io_mbs?.toLocaleString()} Mbps for
                             30 minutes a day and reverts to the baseline performance of{' '}
@@ -276,11 +276,11 @@ const InfrastructureActivity = () => {
                       <div>
                         <p className="text-sm mb-2">Overview</p>
                         <div className="flex items-center justify-between border-b py-1">
-                          <p className="text-xs text-scale-1000">Current compute instance</p>
+                          <p className="text-xs text-foreground-light">Current compute instance</p>
                           <p className="text-xs">{computeInstance?.variant?.name ?? 'Micro'}</p>
                         </div>
                         <div className="flex items-center justify-between border-b py-1">
-                          <p className="text-xs text-scale-1000">
+                          <p className="text-xs text-foreground-light">
                             Maximum IO Bandwidth (burst limit)
                           </p>
                           <p className="text-xs">
@@ -288,7 +288,7 @@ const InfrastructureActivity = () => {
                           </p>
                         </div>
                         <div className="flex items-center justify-between border-b py-1">
-                          <p className="text-xs text-scale-1000">Baseline IO Bandwidth</p>
+                          <p className="text-xs text-foreground-light">Baseline IO Bandwidth</p>
                           <p className="text-xs">
                             {currentComputeInstanceSpecs.baseline_disk_io_mbs?.toLocaleString()}{' '}
                             Mbps
@@ -297,7 +297,7 @@ const InfrastructureActivity = () => {
                         {currentComputeInstanceSpecs.max_disk_io_mbs !==
                           currentComputeInstanceSpecs?.baseline_disk_io_mbs && (
                           <div className="flex items-center justify-between py-1">
-                            <p className="text-xs text-scale-1000">Daily burst time limit</p>
+                            <p className="text-xs text-foreground-light">Daily burst time limit</p>
                             <p className="text-xs">30 mins</p>
                           </div>
                         )}
@@ -335,7 +335,7 @@ const InfrastructureActivity = () => {
                     </div>
 
                     {attribute.key === 'ram_usage' && (
-                      <div className="text-sm text-scale-1000">
+                      <div className="text-sm text-foreground-light">
                         <p>
                           Your compute instance has {currentComputeInstanceSpecs.memory_gb} GB of
                           memory.
@@ -350,13 +350,13 @@ const InfrastructureActivity = () => {
                     )}
 
                     {attribute.key === 'max_cpu_usage' && (
-                      <p className="text-sm text-scale-1000">
+                      <p className="text-sm text-foreground-light">
                         Your compute instance has {currentComputeInstanceSpecs.cpu_cores} CPU cores.
                       </p>
                     )}
 
                     {attribute.chartDescription.split('\n').map((paragraph, idx) => (
-                      <p key={`para-${idx}`} className="text-sm text-scale-1000">
+                      <p key={`para-${idx}`} className="text-sm text-foreground-light">
                         {paragraph}
                       </p>
                     ))}
@@ -381,9 +381,11 @@ const InfrastructureActivity = () => {
                     <Panel>
                       <Panel.Content>
                         <div className="flex flex-col items-center justify-center space-y-2">
-                          <IconBarChart2 className="text-scale-1100 mb-2" />
+                          <IconBarChart2 className="text-foreground-light mb-2" />
                           <p className="text-sm">No data in period</p>
-                          <p className="text-sm text-scale-1000">May take a few minutes to show</p>
+                          <p className="text-sm text-foreground-light">
+                            May take a few minutes to show
+                          </p>
                         </div>
                       </Panel.Content>
                     </Panel>

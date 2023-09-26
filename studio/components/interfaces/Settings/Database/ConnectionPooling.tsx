@@ -80,7 +80,7 @@ const ConnectionPooling = () => {
               }
             >
               <Panel.Content>
-                <p className="text-scale-1000">
+                <p className="text-foreground-light">
                   Please start a new project to enable this feature.
                 </p>
               </Panel.Content>

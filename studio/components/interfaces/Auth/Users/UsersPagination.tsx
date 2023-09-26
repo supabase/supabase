@@ -1,41 +1,49 @@
-import { useContext } from 'react'
-import { observer } from 'mobx-react-lite'
 import { Button } from 'ui'
 
-import { PageContext } from 'pages/project/[ref]/auth/users'
+import { USERS_PAGE_LIMIT } from 'data/auth/users-query'
 
-const UsersPagination = () => {
-  const PageState: any = useContext(PageContext)
+interface UsersPaginationProps {
+  total: number
+  page: number
+  setPage: (page: number) => void
+}
 
-  function onNext() {
-    PageState.fetchData(PageState.page + 1)
-  }
+const UsersPagination = ({ total, page, setPage }: UsersPaginationProps) => {
+  const startRowFromPage = USERS_PAGE_LIMIT * (page - 1) + 1
+  const fromRow = startRowFromPage > total ? total : startRowFromPage
 
-  function onPrevious() {
-    PageState.fetchData(PageState.page - 1)
-  }
+  const endRowFromPage = USERS_PAGE_LIMIT * page
+  const toRow = endRowFromPage > total ? total : endRowFromPage
+
+  const hasPrevious = page > 1
+  const hasNext = toRow < total
 
   return (
     <nav className="flex items-center justify-between overflow-hidden" aria-label="Pagination">
       <div className="hidden sm:block">
         <p className="text-xs text-scale-900">
           Showing
-          <span className="px-1 font-medium text-scale-1100">{PageState.fromRow}</span>
+          <span className="px-1 font-medium text-foreground-light">{fromRow}</span>
           to
-          <span className="px-1 font-medium text-scale-1100">{PageState.toRow}</span>
+          <span className="px-1 font-medium text-foreground-light">{toRow}</span>
           of
-          <span className="px-1 font-medium text-scale-1100">{PageState.totalUsers}</span>
+          <span className="px-1 font-medium text-foreground-light">{total}</span>
           results
         </p>
       </div>
       <div className="flex flex-1 justify-between sm:justify-end">
-        {PageState.hasPrevious && (
-          <Button type="secondary" disabled={!PageState.hasPrevious} onClick={onPrevious}>
+        {hasPrevious && (
+          <Button type="default" disabled={!hasPrevious} onClick={() => setPage(page - 1)}>
             Previous
           </Button>
         )}
-        {PageState.hasNext && (
-          <Button type="secondary" disabled={!PageState.hasNext} className="ml-3" onClick={onNext}>
+        {hasNext && (
+          <Button
+            type="default"
+            disabled={!hasNext}
+            className="ml-3"
+            onClick={() => setPage(page + 1)}
+          >
             Next
           </Button>
         )}
@@ -44,4 +52,4 @@ const UsersPagination = () => {
   )
 }
 
-export default observer(UsersPagination)
+export default UsersPagination

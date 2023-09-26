@@ -63,11 +63,11 @@ const TriggersList = ({
             onClickCta={() => createTrigger()}
           >
             <AlphaPreview />
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               A PostgreSQL trigger is a function invoked automatically whenever an event associated
               with a table occurs.
             </p>
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               An event could be any of the following: INSERT, UPDATE, DELETE. A trigger is a special
               user-defined function associated with a table.
             </p>
@@ -100,7 +100,7 @@ const TriggersList = ({
                       label={schema.name}
                       addOnBefore={() => <span className="text-scale-900">schema</span>}
                     >
-                      <span className="text-scale-1200 text-sm">{schema.name}</span>
+                      <span className="text-foreground text-sm">{schema.name}</span>
                     </Listbox.Option>
                   ))}
                   <Listbox.Option
@@ -118,7 +118,7 @@ const TriggersList = ({
                       label={schema.name}
                       addOnBefore={() => <span className="text-scale-900">schema</span>}
                     >
-                      <span className="text-scale-1200 text-sm">{schema.name}</span>
+                      <span className="text-foreground text-sm">{schema.name}</span>
                     </Listbox.Option>
                   ))}
                 </Listbox>
@@ -148,7 +148,7 @@ const TriggersList = ({
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to create triggers
                       </span>
                     </div>

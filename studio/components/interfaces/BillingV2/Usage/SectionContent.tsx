@@ -1,7 +1,7 @@
+import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { Badge, IconExternalLink } from 'ui'
 import { CategoryAttribute } from './Usage.constants'
-import Link from 'next/link'
 
 export interface SectionContent {
   section: CategoryAttribute
@@ -28,7 +28,7 @@ const SectionContent = ({
                 </div>
                 <div className="grid gap-4">
                   {description.split('\n').map((value, idx) => (
-                    <p key={`desc-${idx}`} className="text-sm text-scale-1000 pr-8">
+                    <p key={`desc-${idx}`} className="text-sm text-foreground-light pr-8">
                       {value}
                     </p>
                   ))}
@@ -36,7 +36,9 @@ const SectionContent = ({
               </div>
               {links && links.length && (
                 <div className="space-y-2">
-                  <p className="text-sm text-scale-1200 dark:text-scale-1100 mb-2">More information</p>
+                  <p className="text-sm text-foreground dark:text-foreground-light mb-2">
+                    More information
+                  </p>
                   {links.map((link) => (
                     <div key={link.url}>
                       <Link href={link.url}>

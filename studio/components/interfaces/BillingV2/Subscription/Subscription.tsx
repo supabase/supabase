@@ -40,7 +40,7 @@ const Subscription = ({}: SubscriptionProps) => {
     <>
       <div className="border-b">
         <div className="1xl:px-28 mx-auto flex flex-col gap-10 px-5 lg:px-16 2xl:px-32 py-6">
-          <h3 className="text-scale-1200 text-xl">Subscription</h3>
+          <h3 className="text-foreground text-xl">Subscription</h3>
         </div>
       </div>
 
