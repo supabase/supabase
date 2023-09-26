@@ -65,7 +65,7 @@ const DeleteOrganizationButton = () => {
         onCancel={() => setIsOpen(false)}
         header={
           <div className="flex items-baseline gap-2">
-            <h5 className="text-sm text-foreground">Delete organisation</h5>
+            <h5 className="text-sm text-foreground">Delete organization</h5>
             <span className="text-xs text-scale-900">Are you sure?</span>
           </div>
         }
