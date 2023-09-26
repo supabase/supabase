@@ -167,7 +167,7 @@ export const TopApiRoutesRenderer = (
               'transition',
               showMore ? 'text-foreground' : 'text-foreground-lighter',
               props.data.length <= 3 ? 'hidden' : '',
-            ].join(" ")}
+            ].join(' ')}
           >
             {!showMore ? 'Show more' : 'Show less'}
           </Button>
