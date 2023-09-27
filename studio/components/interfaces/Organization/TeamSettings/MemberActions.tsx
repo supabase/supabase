@@ -79,11 +79,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
   const {
     mutate: deleteOrganizationMemberInvite,
     isLoading: isOrganizationMemberInviteDeleteLoading,
-  } = useOrganizationMemberInviteDeleteMutation({
-    onSuccess: () => {
-      ui.setNotification({ category: 'success', message: 'Successfully revoked the invitation.' })
-    },
-  })
+  } = useOrganizationMemberInviteDeleteMutation()
 
   const handleMemberDelete = async () => {
     confirmAlert({
@@ -98,22 +94,42 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
   }
 
   const handleResendInvite = async (member: Member) => {
-    if (!slug) return console.error('Slug is required')
-    if (!member.invited_id) return console.error('Member invited ID is required')
     const roleId = (member?.role_ids ?? [])[0]
-    createOrganizationMemberInvite({
-      slug,
-      invitedEmail: member.primary_email,
-      ownerId: member.invited_id,
-      roleId: roleId,
-    })
+    const invitedId = member.invited_id
+
+    if (!slug) return console.error('Slug is required')
+    if (!invitedId) return console.error('Member invited ID is required')
+
+    deleteOrganizationMemberInvite(
+      { slug, invitedId },
+      {
+        onSuccess: () => {
+          createOrganizationMemberInvite({
+            slug,
+            invitedEmail: member.primary_email,
+            ownerId: invitedId,
+            roleId: roleId,
+          })
+        },
+      }
+    )
   }
 
   const handleRevokeInvitation = async (member: Member) => {
     const invitedId = member.invited_id
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
-    deleteOrganizationMemberInvite({ slug, invitedId })
+    deleteOrganizationMemberInvite(
+      { slug, invitedId },
+      {
+        onSuccess: () => {
+          ui.setNotification({
+            category: 'success',
+            message: 'Successfully revoked the invitation.',
+          })
+        },
+      }
+    )
   }
 
   if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
