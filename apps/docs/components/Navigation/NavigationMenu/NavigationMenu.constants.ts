@@ -494,6 +494,22 @@ export const auth = {
           items: [...SocialLoginItems],
         },
         {
+          name: 'Native Mobile Login',
+          url: '/guides/auth/social-login', // TODO dedicated native auth landing?
+          items: [
+            {
+              name: 'Apple',
+              icon: '/docs/img/icons/apple-icon',
+              url: '/guides/auth/social-login/auth-apple',
+            },
+            {
+              name: 'Google',
+              icon: '/docs/img/icons/google-icon',
+              url: '/guides/auth/social-login/auth-google',
+            },
+          ],
+        },
+        {
           name: 'Enterprise SSO',
           url: '/guides/auth/enterprise-sso',
           items: [
