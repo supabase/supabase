@@ -100,7 +100,7 @@ const ServiceStatus = () => {
       isSuccess: isSuccessPostgres,
     },
     {
-      name: 'Postgrest',
+      name: 'PostgREST',
       isLoading: isLoadingPostgrest,
       isError: isErrorPostgrest,
       isSuccess: isSuccessPostgrest,
