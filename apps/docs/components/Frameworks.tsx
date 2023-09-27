@@ -14,12 +14,12 @@ const Frameworks = () => {
       href: '/guides/with-angular',
     },
     {
-      name: 'Expo',
+      name: 'Expo React Native',
       logo: {
         light: '/docs/img/icons/expo-icon.svg',
         dark: '/docs/img/icons/expo-icon-dark.svg',
       },
-      href: '/guides/with-expo',
+      href: '/guides/with-expo-react-native',
     },
     {
       name: 'Flutter',
