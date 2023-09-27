@@ -17,7 +17,7 @@ type Props = {
 
 const DevelopersDropdown = () => {
   const { basePath } = useRouter()
-  const iconsWithFill = ['GitHub Discussions', 'Launch Week']
+  const iconsWithFill = ['GitHub Discussions', 'Launch Week', 'Open Source']
 
   return (
     <>
