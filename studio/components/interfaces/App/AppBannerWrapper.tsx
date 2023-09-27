@@ -7,15 +7,15 @@ import { PropsWithChildren, useEffect } from 'react'
 
 const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const monaco = useMonaco()
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const ongoingIncident = useFlag('ongoingIncident')
 
   useEffect(() => {
-    if (monaco && theme) {
-      const mode: any = getTheme(theme)
+    if (monaco && resolvedTheme) {
+      const mode: any = getTheme(resolvedTheme)
       monaco.editor.defineTheme('supabase', mode)
     }
-  }, [theme, monaco])
+  }, [resolvedTheme, monaco])
 
   return (
     <div className="min-h-full flex flex-col">
