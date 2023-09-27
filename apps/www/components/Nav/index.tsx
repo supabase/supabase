@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { Button, LW8CountdownBanner } from 'ui'
+import { Button } from 'ui'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,7 +12,6 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from 'ui/src/components/shadcn/ui/navigation-menu'
-import Announcement from '~/components/Announcement/Announcement'
 import ScrollProgress from '~/components/ScrollProgress'
 
 import { useIsLoggedIn, useIsUserLoading } from 'common'
@@ -90,10 +89,6 @@ const Nav = () => {
 
   return (
     <>
-      <Announcement link="/launch-week">
-        <LW8CountdownBanner />
-      </Announcement>
-
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
