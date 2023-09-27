@@ -15,7 +15,7 @@ const ProductDropdown = () => {
 
   return (
     <>
-      <ul className="grid gap-2 py-6 px-5 grid-cols-1 w-[300px]">
+      <ul className="grid gap-2 py-6 px-6 grid-cols-1 w-[380px]">
         {Object.values(SolutionsData).map((component) => (
           <NavigationMenuLink key={component.name} asChild>
             <MenuItem
@@ -29,7 +29,7 @@ const ProductDropdown = () => {
         ))}
       </ul>
       <div className="border-l flex flex-col w-[500px] bg-alternative">
-        <div className="p-6">
+        <div className="py-8 px-10">
           <Link href="/customers">
             <a className="inline-flex items-center gap-1 text-muted hover:text-brand text-xs uppercase tracking-widest font-mono mb-6">
               Customer Stories
@@ -61,7 +61,7 @@ const ProductDropdown = () => {
             ))}
           </ul>
         </div>
-        <div className="p-6">
+        <div className="pt-2 pb-8 px-10">
           <p className="text-muted text-xs uppercase tracking-widest font-mono mb-6">
             {ComparisonsData.label}
           </p>
