@@ -63,7 +63,7 @@ const menu = {
 }
 
 const Nav = () => {
-  const { theme, resolvedTheme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const router = useRouter()
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
@@ -87,37 +87,6 @@ const Nav = () => {
   React.useEffect(() => {
     if (width >= 1024) setOpen(false)
   }, [width])
-
-  const menu = {
-    primaryNav: [
-      {
-        title: 'Product',
-        hasDropdown: true,
-        dropdown: <ProductDropdown />,
-        dropdownContainerClassName: 'rounded-lg flex flex-row',
-        subMenu: SolutionsData,
-      },
-      {
-        title: 'Developers',
-        hasDropdown: true,
-        dropdown: <DevelopersDropdown />,
-        dropdownContainerClassName: 'rounded-lg',
-        subMenu: DevelopersData,
-      },
-      {
-        title: 'Pricing',
-        url: '/pricing',
-      },
-      {
-        title: 'Docs',
-        url: '/docs',
-      },
-      {
-        title: 'Blog',
-        url: '/blog',
-      },
-    ],
-  }
 
   return (
     <>
@@ -185,7 +154,7 @@ const Nav = () => {
                             <MenuItem
                               href={menuItem.url}
                               title={menuItem.title}
-                              className="group-hover:bg-transparent hover:text-brand"
+                              className="group-hover:bg-transparent text-strong hover:text-brand"
                             />
                           </NavigationMenuLink>
                         </NavigationMenuItem>
