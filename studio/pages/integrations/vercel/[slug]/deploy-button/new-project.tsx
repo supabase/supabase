@@ -50,10 +50,10 @@ const VercelIntegration: NextPageWithLayout = () => {
         <ScaffoldDivider />
       </main>
       <ScaffoldContainer className="bg-body flex flex-row gap-6 py-6 border-t">
-        <div className="flex items-center gap-2 text-xs text-scale-900">
+        <div className="flex items-center gap-2 text-xs text-foreground-lighter">
           <IconBook size={16} /> Docs
         </div>
-        <div className="flex items-center gap-2 text-xs text-scale-900">
+        <div className="flex items-center gap-2 text-xs text-foreground-lighter">
           <IconLifeBuoy size={16} /> Support
         </div>
       </ScaffoldContainer>

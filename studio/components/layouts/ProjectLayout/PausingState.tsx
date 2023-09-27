@@ -59,7 +59,7 @@ const PausingState = ({ project }: PausingStateProps) => {
                 <div className="absolute flex h-full w-full items-center justify-center">
                   <IconLoader className="animate-spin" size={20} strokeWidth={2} />
                 </div>
-                <IconCircle className="text-scale-900" size={50} strokeWidth={1.5} />
+                <IconCircle className="text-foreground-lighter" size={50} strokeWidth={1.5} />
               </div>
               <p className="text-center">Pausing {project.name}</p>
               <p className="mt-4 text-center text-sm text-foreground-light">

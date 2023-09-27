@@ -12,7 +12,7 @@ const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {}
         <label className="text-base text-foreground-light" htmlFor="policy-name">
           Policy definition
         </label>
-        <p className="text-sm text-scale-900">
+        <p className="text-sm text-foreground-lighter">
           Provide a SQL conditional expression that returns a boolean.
         </p>
       </div>
@@ -31,7 +31,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
         <label className="text-base text-foreground-light" htmlFor="allowed-operation">
           Allowed operation
         </label>
-        <p className="text-sm text-scale-900">
+        <p className="text-sm text-foreground-lighter">
           Based on the operations you have selected, you can use the highlighted functions in the{' '}
           <a
             href="https://supabase.com/docs/reference/javascript/storage-from-list"

@@ -173,7 +173,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                                   <IconUser size={20} strokeWidth={2} />
                                 </span>
                               ) : isEmailUser ? (
-                                <div className="w-[40px] h-[40px] bg-scale-300 border border-scale-400 rounded-full text-scale-900 flex items-center justify-center">
+                                <div className="w-[40px] h-[40px] bg-scale-300 border border-scale-400 rounded-full text-foreground-lighter flex items-center justify-center">
                                   <IconUser strokeWidth={1.5} />
                                 </div>
                               ) : (

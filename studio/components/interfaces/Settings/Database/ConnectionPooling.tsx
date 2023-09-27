@@ -223,7 +223,7 @@ export const PgbouncerConfig = ({ projectRef, bouncerInfo, connectionInfo }: Con
                 errorMessage="You must select one of the two options"
               />
               <div className="!mt-1 flex" style={{ marginLeft: 'calc(33% + 0.5rem)' }}>
-                <p className="text-sm text-scale-900">
+                <p className="text-sm text-foreground-lighter">
                   Specify when a connection can be returned to the pool. To find out the most
                   suitable mode for your use case,{' '}
                   <a

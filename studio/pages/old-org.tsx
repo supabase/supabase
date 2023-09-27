@@ -91,7 +91,9 @@ const Wizard: NextPageWithLayout = () => {
             Cancel
           </Button>
           <div className="flex items-center space-x-3">
-            <p className="text-xs text-scale-900">You can rename your organization later</p>
+            <p className="text-xs text-foreground-lighter">
+              You can rename your organization later
+            </p>
             <Button onClick={onClickSubmit} loading={newOrgLoading} disabled={newOrgLoading}>
               Create organization
             </Button>

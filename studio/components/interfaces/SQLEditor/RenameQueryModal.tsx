@@ -4,7 +4,7 @@ import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { isError } from 'data/utils/error-check'
 import { useFlag, useStore } from 'hooks'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
 import { subscriptionHasHipaaAddon } from '../BillingV2/Subscription/Subscription.utils'
@@ -21,7 +21,6 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
   const { ref } = useParams()
   const snap = useSqlEditorStateSnapshot()
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
-
   const { data: subscription } = useProjectSubscriptionV2Query({ projectRef: ref })
 
   // Customers on HIPAA plans should not have access to Supabase AI
@@ -31,6 +30,10 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
 
   const [nameInput, setNameInput] = useState(name)
   const [descriptionInput, setDescriptionInput] = useState(description)
+
+  useEffect(() => {
+    setNameInput(name)
+  }, [name])
 
   const validate = () => {
     const errors: any = {}

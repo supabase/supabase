@@ -71,7 +71,7 @@ const PolicyDefinition = ({
                 </Tooltip.Portal>
               </Tooltip.Root>
             </div>
-            <p className="text-sm text-scale-900">
+            <p className="text-sm text-foreground-lighter">
               Provide a SQL conditional expression that returns a boolean.
             </p>
           </div>
@@ -118,7 +118,7 @@ const PolicyDefinition = ({
                 </Tooltip.Portal>
               </Tooltip.Root>
             </div>
-            <p className="text-sm text-scale-900">
+            <p className="text-sm text-foreground-lighter">
               Provide a SQL conditional expression that returns a boolean.
             </p>
           </div>

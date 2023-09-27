@@ -109,7 +109,7 @@ const StorageConfig = ({ config, projectRef }: any) => {
             <>
               <div className="mb-6">
                 <h3 className="mb-2 text-xl text-foreground">Storage Settings</h3>
-                <div className="text-sm text-scale-900">
+                <div className="text-sm text-foreground-lighter">
                   Configure your project's storage settings
                 </div>
               </div>

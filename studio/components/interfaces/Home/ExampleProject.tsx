@@ -1,7 +1,7 @@
+import { BASE_PATH } from 'lib/constants'
+import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { IconChevronRight } from 'ui'
-import { useTheme } from 'next-themes'
-import { BASE_PATH } from 'lib/constants'
 
 interface ExampleProjectProps {
   framework: string
@@ -49,7 +49,7 @@ const ExampleProject = ({ framework, title, description, url }: ExampleProjectPr
             absolute
             right-4
             top-3
-            text-scale-900
+            text-foreground-lighter
             transition-all
             duration-200
             group-hover:right-3

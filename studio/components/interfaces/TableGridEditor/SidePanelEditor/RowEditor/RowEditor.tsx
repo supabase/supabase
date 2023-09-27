@@ -1,23 +1,23 @@
-import { useEffect, useMemo, useState } from 'react'
-import { isUndefined, partition, isEmpty, noop } from 'lodash'
-import { SidePanel } from 'ui'
-import { Dictionary } from 'components/grid'
 import type { PostgresTable } from '@supabase/postgres-meta'
+import { Dictionary } from 'components/grid'
+import { isEmpty, isUndefined, noop, partition } from 'lodash'
+import { useEffect, useMemo, useState } from 'react'
+import { SidePanel } from 'ui'
 
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import ActionBar from '../ActionBar'
+import ForeignRowSelector from './ForeignRowSelector/ForeignRowSelector'
 import HeaderTitle from './HeaderTitle'
 import InputField from './InputField'
 import JsonEdit from './JsonEditor'
-import ForeignRowSelector from './ForeignRowSelector/ForeignRowSelector'
+import { JsonEditValue, RowField } from './RowEditor.types'
 import {
   generateRowFields,
-  validateFields,
   generateRowObjectFromFields,
   generateUpdateRowPayload,
+  validateFields,
 } from './RowEditor.utils'
-import { JsonEditValue, RowField } from './RowEditor.types'
 
 export interface RowEditorProps {
   row?: Dictionary<any>
@@ -170,7 +170,7 @@ const RowEditor = ({
                   <div className="space-y-10 py-6">
                     <div>
                       <h3 className="text-base text-foreground">Optional Fields</h3>
-                      <p className="text-sm text-scale-900">
+                      <p className="text-sm text-foreground-lighter">
                         These are columns that do not need any value
                       </p>
                     </div>
