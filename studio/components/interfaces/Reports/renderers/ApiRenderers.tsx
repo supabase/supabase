@@ -247,7 +247,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
         <div className=" truncate max-w-sm lg:max-w-lg">
           <TextFormatter className="text-foreground-light" value={datum.path} />
           <TextFormatter
-            className="max-w-sm text-scale-900 truncate "
+            className="max-w-sm text-foreground-lighter truncate "
             value={decodeURIComponent(datum.search || '')}
           />
         </div>
@@ -264,7 +264,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
           />
         </pre>
       ) : (
-        <p className="text-xs text-scale-900">No query parameters in this request</p>
+        <p className="text-xs text-foreground-lighter">No query parameters in this request</p>
       )}
     </Collapsible.Content>
   </Collapsible>

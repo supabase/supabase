@@ -98,7 +98,7 @@ const CardButton = ({
           absolute
           right-4
           top-4
-          text-scale-900
+          text-foreground-lighter
           transition-all
           duration-200
           group-hover:right-3

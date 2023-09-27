@@ -141,7 +141,7 @@ const SignInLayout = ({
 
             {showDisclaimer && (
               <div className="sm:text-center">
-                <p className="text-xs text-scale-900 sm:mx-auto sm:max-w-sm">
+                <p className="text-xs text-foreground-lighter sm:mx-auto sm:max-w-sm">
                   By continuing, you agree to Supabase's{' '}
                   <Link href="https://supabase.com/terms">
                     <a className="underline hover:text-foreground-light">Terms of Service</a>

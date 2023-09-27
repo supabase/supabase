@@ -153,7 +153,7 @@ const VercelIntegration: NextPageWithLayout = () => {
           <header>
             <h1 className="text-xl text-foreground">Create your first Project Connection</h1>
             <Markdown
-              className="text-scale-900"
+              className="text-foreground-lighter"
               content={`
 This Supabase integration manages your environment variables automatically to provide the latest keys in the unlikely event that you will need to refresh your JWT token.
 `}

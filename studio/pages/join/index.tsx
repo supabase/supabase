@@ -123,7 +123,7 @@ const JoinOrganizationPage = () => {
     ) : token_does_not_exist ? (
       <>
         <p>The invite token is invalid.</p>
-        <p className="text-scale-900">
+        <p className="text-foreground-lighter">
           Try copying and pasting the link from the invite email, or ask the organization owner to
           invite you again.
         </p>
@@ -134,7 +134,7 @@ const JoinOrganizationPage = () => {
           Your email address {profile?.primary_email} does not match the email address this
           invitation was sent to.
         </p>
-        <p className="text-scale-900">
+        <p className="text-foreground-lighter">
           To accept this invitation, you will need to{' '}
           <a
             className="cursor-pointer text-brand"
@@ -152,7 +152,9 @@ const JoinOrganizationPage = () => {
     ) : expired_token ? (
       <>
         <p>The invite token has expired.</p>
-        <p className="text-scale-900">Please request a new one from the organization owner.</p>
+        <p className="text-foreground-lighter">
+          Please request a new one from the organization owner.
+        </p>
       </>
     ) : (
       ''
@@ -172,7 +174,7 @@ const JoinOrganizationPage = () => {
                 {name ? name : organization_name ? `${organization_name}` : 'an organization'}
               </p>
               {!token_does_not_exist && (
-                <p className="text-sm text-scale-900">an organization on Supabase</p>
+                <p className="text-sm text-foreground-lighter">an organization on Supabase</p>
               )}
             </>
           ) : (
@@ -180,7 +182,9 @@ const JoinOrganizationPage = () => {
               <p className="text-3xl text-foreground">{'an organization'}</p>
             </>
           )}
-          {slug && <p className="text-xs text-scale-900">{`organization slug: ${slug}`}</p>}
+          {slug && (
+            <p className="text-xs text-foreground-lighter">{`organization slug: ${slug}`}</p>
+          )}
         </>
       </div>
 
@@ -211,7 +215,7 @@ const JoinOrganizationPage = () => {
 
           {!profile && (
             <div className="flex flex-col gap-3">
-              <p className="text-xs text-scale-900">
+              <p className="text-xs text-foreground-lighter">
                 You will need to sign in to accept this invitation
               </p>
               <div className="flex justify-center gap-3">

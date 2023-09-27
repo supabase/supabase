@@ -36,7 +36,7 @@ const PolicyTableRowHeader = ({
         </Link>
         {isLocked ? (
           <Badge color="scale">
-            <span className="flex gap-2 items-center text-xs uppercase text-scale-900">
+            <span className="flex gap-2 items-center text-xs uppercase text-foreground-lighter">
               <IconLock width={12} /> Locked
             </span>
           </Badge>
