@@ -193,7 +193,8 @@ const Column = ({
             <Popover
               size="xlarge"
               className="pointer-events-auto"
-              align="end"
+              align="end" 
+              modal={true}
               header={
                 <div className="flex items-center justify-center">
                   <h5 className="text-sm text-foreground">Extra options</h5>
