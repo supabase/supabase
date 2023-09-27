@@ -477,6 +477,8 @@ const InputMultiArguments = observer(({ readonly }: InputMultiArgumentsProps) =>
     })
   }
 
+  console.log(_localState?.formState.args)
+
   return (
     <div>
       <div className="flex flex-col">
@@ -562,23 +564,27 @@ const InputArgument = observer(({ idx, name, type, error, readonly }: InputArgum
         error={error}
         disabled={readonly}
       />
-      <Listbox
-        id={`type-${idx}`}
-        className="flex-1"
-        value={type}
-        size="small"
-        onChange={onTypeChange}
-        disabled={readonly}
-      >
-        <Listbox.Option value="integer" label="integer">
-          integer
-        </Listbox.Option>
-        {POSTGRES_DATA_TYPES.map((x: string) => (
-          <Listbox.Option key={x} value={x} label={x}>
-            {x}
+      {readonly ? (
+        <Input disabled readOnly id={`type-${idx}`} size="small" value={type} className="flex-1" />
+      ) : (
+        <Listbox
+          id={`type-${idx}`}
+          className="flex-1"
+          value={type}
+          size="small"
+          onChange={onTypeChange}
+          disabled={readonly}
+        >
+          <Listbox.Option value="integer" label="integer">
+            integer
           </Listbox.Option>
-        ))}
-      </Listbox>
+          {POSTGRES_DATA_TYPES.map((x: string) => (
+            <Listbox.Option key={x} value={x} label={x}>
+              {x}
+            </Listbox.Option>
+          ))}
+        </Listbox>
+      )}
       {!readonly && (
         <Button type="danger" icon={<IconTrash size="tiny" />} onClick={onDelete} size="small" />
       )}
