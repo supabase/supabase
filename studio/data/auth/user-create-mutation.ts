@@ -1,10 +1,12 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
 import { post } from 'lib/common/fetch'
 import { ResponseError } from 'types'
+import { authKeys } from './keys'
 
 export type UserCreateVariables = {
+  projectRef?: string
   protocol: string
   endpoint: string
   serviceApiKey: string
@@ -58,15 +60,22 @@ export async function createUser({ protocol, endpoint, serviceApiKey, user }: Us
 type UserCreateData = Awaited<ReturnType<typeof createUser>>
 
 export const useUserCreateMutation = ({
+  onSuccess,
   onError,
   ...options
 }: Omit<
   UseMutationOptions<UserCreateData, ResponseError, UserCreateVariables>,
   'mutationFn'
 > = {}) => {
+  const queryClient = useQueryClient()
   return useMutation<UserCreateData, ResponseError, UserCreateVariables>(
     (vars) => createUser(vars),
     {
+      async onSuccess(data, variables, context) {
+        const { projectRef } = variables
+        if (projectRef) await queryClient.invalidateQueries(authKeys.users(projectRef))
+        await onSuccess?.(data, variables, context)
+      },
       async onError(data, variables, context) {
         if (onError === undefined) {
           toast.error(`Failed to create user: ${data.message}`)

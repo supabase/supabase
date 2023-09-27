@@ -12,6 +12,7 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
+  IconAlertCircle,
   IconAlertTriangle,
   IconDatabase,
   IconHelpCircle,
@@ -201,6 +202,7 @@ const ForeignKeySelector = ({
       customFooter={
         <ActionBar
           backButtonLabel="Cancel"
+          disableApply={!!column?.format && !matchingColumnTypes}
           applyButtonLabel="Save"
           closePanel={closePanel}
           applyFunction={onSaveChanges}
@@ -237,7 +239,7 @@ const ForeignKeySelector = ({
                   <div className="flex items-center gap-2">
                     {/* For aria searching to target the schema name instead of schema */}
                     <span className="hidden">{schema.name}</span>
-                    <span className="text-scale-1200">{schema.name}</span>
+                    <span className="text-foreground">{schema.name}</span>
                   </div>
                 </Listbox.Option>
               )
@@ -261,8 +263,8 @@ const ForeignKeySelector = ({
                   <div className="flex items-center gap-2">
                     {/* For aria searching to target the table name instead of schema */}
                     <span className="hidden">{table.name}</span>
-                    <span className="text-scale-900">{table.schema}</span>
-                    <span className="text-scale-1200">{table.name}</span>
+                    <span className="text-foreground-lighter">{table.schema}</span>
+                    <span className="text-foreground">{table.name}</span>
                   </div>
                 </Listbox.Option>
               )
@@ -306,28 +308,39 @@ const ForeignKeySelector = ({
                   {(selectedTable?.columns ?? []).map((column: PostgresColumn) => (
                     <Listbox.Option key={column.id} value={column.id} label={column.name}>
                       <div className="flex items-center gap-2">
-                        <span className="text-scale-1200">{column.name}</span>
-                        <span className="text-scale-900">{column.format}</span>
+                        <span className="text-foreground">{column.name}</span>
+                        <span className="text-foreground-lighter">{column.format}</span>
                       </div>
                     </Listbox.Option>
                   ))}
                 </Listbox>
               )}
-              {!matchingColumnTypes && (
-                <Alert_Shadcn_ variant="warning">
-                  <IconAlertTriangle strokeWidth={2} />
-                  <AlertTitle_Shadcn_>The column types don't match</AlertTitle_Shadcn_>
+              {!matchingColumnTypes && !column?.format && (
+                <Alert_Shadcn_ variant="default">
+                  <IconAlertCircle className="h-4 w-4" />
+                  <AlertTitle_Shadcn_>
+                    The referenced column's type will be updated to {selectedColumn?.data_type}
+                  </AlertTitle_Shadcn_>
                   <AlertDescription_Shadcn_ className="leading-6">
                     <span>The referenced column</span>
                     {column?.name && <span className="text-code">{column.name}</span>}
-                    {column?.format ? (
-                      <>
-                        <span> is of type </span>
-                        <span className="text-code">{column.format}</span>
-                      </>
-                    ) : (
-                      <span> has no type</span>
-                    )}
+                    <span>
+                      {' '}
+                      must match the type of the selected foreign column when creating a foreign key
+                      relationship.
+                    </span>
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              )}
+              {!matchingColumnTypes && column?.format && (
+                <Alert_Shadcn_ variant="warning">
+                  <IconAlertTriangle strokeWidth={2} />
+                  <AlertTitle_Shadcn_>Column types do not match</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_ className="leading-6">
+                    <span>The referenced column</span>
+                    {column?.name && <span className="text-code">{column.name}</span>}
+                    <span> is of type </span>
+                    <span className="text-code">{column.format}</span>
                     <span> while the selected foreign column </span>
                     <span className="text-code">
                       {selectedTable?.name}.{selectedColumn?.name}
@@ -397,7 +410,7 @@ const ForeignKeySelector = ({
                   ['no-action', 'cascade', 'restrict'].includes(option.key)
                 ).map((option) => (
                   <Listbox.Option key={option.key} value={option.value} label={option.label}>
-                    <p className="text-scale-1200">{option.label}</p>
+                    <p className="text-foreground">{option.label}</p>
                   </Listbox.Option>
                 ))}
               </Listbox>
@@ -432,7 +445,7 @@ const ForeignKeySelector = ({
               >
                 {FOREIGN_KEY_CASCADE_OPTIONS.map((option) => (
                   <Listbox.Option key={option.key} value={option.value} label={option.label}>
-                    <p className="text-scale-1200">{option.label}</p>
+                    <p className="text-foreground">{option.label}</p>
                   </Listbox.Option>
                 ))}
               </Listbox>

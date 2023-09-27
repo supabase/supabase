@@ -82,7 +82,7 @@ const BackupsList = () => {
           <>
             {!canTriggerScheduledBackups && (
               <InformationBox
-                icon={<IconAlertCircle className="text-scale-1100" strokeWidth={2} />}
+                icon={<IconAlertCircle className="text-foreground-light" strokeWidth={2} />}
                 title="You need additional permissions to trigger a scheduled backup"
               />
             )}
@@ -117,7 +117,7 @@ const BackupsList = () => {
         <Modal.Content>
           <div className="pt-6 pb-5">
             <p>
-              Are you sure you want to restore from $
+              Are you sure you want to restore from
               {dayjs(selectedBackup?.inserted_at).format('DD MMM YYYY')}? This will destroy any new
               data written since this backup was made.
             </p>

@@ -38,9 +38,11 @@ export * from './src/components/Menu'
 export * from './src/components/Modal'
 export * from './src/components/SidePanel'
 export * from './src/components/Dropdown'
+export * from './src/components/ConsentToast'
 export * from './src/components/ContextMenu'
 export * from './src/components/Popover'
 export * from './src/components/ExpandableVideo'
+export * from './src/layout/PortalToast'
 
 // UTILITIES
 
@@ -78,6 +80,9 @@ export * from './src/layout/ai-icon-animation'
 
 // utilities
 export * from './src/lib/utils'
+
+// theme switcher
+export * from './src/components/ThemeProvider/ThemeToggle'
 
 // animated ui
 

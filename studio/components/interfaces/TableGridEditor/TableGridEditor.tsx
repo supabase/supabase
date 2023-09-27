@@ -9,10 +9,10 @@ import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'common'
 import {
   Dictionary,
-  SupaTable,
+  parseSupaTable,
   SupabaseGrid,
   SupabaseGridRef,
-  parseSupaTable,
+  SupaTable,
 } from 'components/grid'
 import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -74,7 +74,6 @@ const TableGridEditor = ({
 
   const canEditTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
   const canEditColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
-
   const isReadOnly = !canEditTables && !canEditColumns
 
   const getEncryptedColumns = async (table: any) => {
@@ -318,7 +317,7 @@ const TableGridEditor = ({
         theme={theme}
         gridProps={{ height: '100%' }}
         storageRef={projectRef}
-        editable={!isReadOnly && canEditTables && canEditViaTableEditor}
+        editable={!isReadOnly && canEditViaTableEditor}
         schema={selectedTable.schema}
         table={gridTable}
         refreshDocs={refreshDocs}
@@ -372,7 +371,7 @@ const TableGridEditor = ({
               <p>
                 SQL Definition of <code className="text-sm">{selectedTable.name}</code>{' '}
               </p>
-              <p className="text-scale-1000 text-sm">(Read only)</p>
+              <p className="text-foreground-light text-sm">(Read only)</p>
             </div>
           ) : null
         }
@@ -382,6 +381,7 @@ const TableGridEditor = ({
 
       {snap.selectedSchemaName !== undefined && (
         <SidePanelEditor
+          editable={!isReadOnly && canEditViaTableEditor}
           selectedTable={selectedTable as PostgresTable}
           onRowCreated={onRowCreated}
           onRowUpdated={onRowUpdated}

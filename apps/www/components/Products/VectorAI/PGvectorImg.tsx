@@ -1,27 +1,27 @@
 import React, { useEffect, useRef } from 'react'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import { DEFAULT_EASE } from '~/lib/animations'
 import { LazyMotion, domAnimation, m } from 'framer-motion'
 
 const PGvectorImg = ({ isHovered }: { isHovered: boolean }) => {
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   const svgRef = useRef<any>()
 
   const colors = {
-    circles1: isDarkMode ? '#105C3B' : '#008B4F',
-    circles2: isDarkMode ? '#1A2520' : '#DDDFDE',
-    pgLogoStart: isDarkMode ? '#70F8BB' : '#7CDBC5',
-    pgLogoEnd: isDarkMode ? '#A3A3A3' : '#006136',
-    pgLogoBg: isDarkMode ? '#161616' : 'white',
-    radialBgStart: isDarkMode ? '#131313' : '#F1F3F5',
-    radialBgEnd: isDarkMode ? '#161616' : '#F8F9FA',
-    coordinatesStart: isDarkMode ? '#23FF98' : '#002313',
-    coordinatesEnd: isDarkMode ? '#49FFAA' : '#032C18',
-    rectStart: isDarkMode ? '#17FDDF' : '#49615E',
-    rectEnd: isDarkMode ? '#10FFE0' : '#202020',
-    arrow: isDarkMode ? '#02FF8F' : '#00542F',
-    asdfStart: isDarkMode ? '#23FF98' : '#002313',
-    asdfEnd: isDarkMode ? '#49FFAA' : '#032C18',
+    circles1: resolvedTheme === 'dark' ? '#105C3B' : '#008B4F',
+    circles2: resolvedTheme === 'dark' ? '#1A2520' : '#DDDFDE',
+    pgLogoStart: resolvedTheme === 'dark' ? '#70F8BB' : '#7CDBC5',
+    pgLogoEnd: resolvedTheme === 'dark' ? '#A3A3A3' : '#006136',
+    pgLogoBg: resolvedTheme === 'dark' ? '#161616' : 'white',
+    radialBgStart: resolvedTheme === 'dark' ? '#131313' : '#F1F3F5',
+    radialBgEnd: resolvedTheme === 'dark' ? '#161616' : '#F8F9FA',
+    coordinatesStart: resolvedTheme === 'dark' ? '#23FF98' : '#002313',
+    coordinatesEnd: resolvedTheme === 'dark' ? '#49FFAA' : '#032C18',
+    rectStart: resolvedTheme === 'dark' ? '#17FDDF' : '#49615E',
+    rectEnd: resolvedTheme === 'dark' ? '#10FFE0' : '#202020',
+    arrow: resolvedTheme === 'dark' ? '#02FF8F' : '#00542F',
+    asdfStart: resolvedTheme === 'dark' ? '#23FF98' : '#002313',
+    asdfEnd: resolvedTheme === 'dark' ? '#49FFAA' : '#032C18',
   }
 
   const transition = (type: string) => ({
