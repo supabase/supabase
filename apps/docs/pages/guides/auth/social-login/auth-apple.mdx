@@ -28,83 +28,9 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
   scrollable
   size="large"
   type="underlined"
-  defaultActiveId="react-native"
+  defaultActiveId="web"
   queryGroup="platform"
 >
-  <TabPanel id="react-native" label="Expo React Native">
-
-    ## Using Native Sign in with Apple in Expo
-
-    In the Supabase JavaScript library, which you can use with web-based native frameworks like React Native or Expo, you can invoke this functionality like so:
-
-    ```ts
-    await supabase.auth.signInWithIdToken({
-      provider: 'apple',
-      token: '<identity token received from the OS>',
-    })
-    ```
-
-    Please take a look at these open-source projects which may help you obtain an ID token directly from the OS:
-
-    - [invertase/react-native-apple-authentication](https://github.com/invertase/react-native-apple-authentication)
-    - [Expo AppleAuthentication](https://docs.expo.dev/versions/latest/sdk/apple-authentication/)
-
-    ### Configuration [#expo-configuration-native-app]
-
-    1. Have an **App ID** which uniquely identifies the app you are building. You can create a new App ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/bundleId) section in the Apple Developer Console (use the filter menu in the upper right side to see all App IDs). These usually are a reverse domain name string, for example `com.example.app`. Make sure you configure Sign in with Apple for the App ID you created or already have, in the Capabilities list. At this time Supabase Auth does not support Server-to-Server notification endpoints, so you should leave that setting blank. (In the past App IDs were referred to as _bundle IDs._)
-    2. Register all of the App IDs that will be using your Supabase project in the [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Authorized Client IDs_.
-
-    <Admonition type="note">
-      If you're building a native app only, you do not need to configure the OAuth flow parameters.
-    </Admonition>
-
-  </TabPanel>
-
-  <TabPanel id="flutter" label="Flutter">
-
-    ## Using Native Sign in with Apple in Flutter
-
-    Unlike the OAuth flow which requires the use of a web browser, the native Sign in with Apple flow on iOS, macOS, watchOS or tvOS uses the [operating system's built-in functionalities](https://developer.apple.com/documentation/authenticationservices) to prompt the user for consent.
-
-    When the user provides consent, Apple issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
-
-    If you are building an iOS or macOS app using Flutter, you can use the [signInWithApple()](/docs/reference/dart/sign-in-with-apple) method to perform Apple sign in:
-
-    ```dart
-    import 'package:supabase_flutter/supabase_flutter.dart';
-
-    final AuthResponse res = await supabase.auth.signInWithApple();
-    final User? user = res.user;
-    ```
-
-    ### Configuration [#flutter-configuration-native-app]
-
-    1. Have an **App ID** which uniquely identifies the app you are building. You can create a new App ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/bundleId) section in the Apple Developer Console (use the filter menu in the upper right side to see all App IDs). These usually are a reverse domain name string, for example `com.example.app`. Make sure you configure Sign in with Apple for the App ID you created or already have, in the Capabilities list. At this time Supabase Auth does not support Server-to-Server notification endpoints, so you should leave that setting blank. (In the past App IDs were referred to as _bundle IDs._)
-    2. Register all of the App IDs that will be using your Supabase project in the [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Authorized Client IDs_.
-
-    <Admonition type="note">
-      If you're building a native app only, you do not need to configure the OAuth flow parameters.
-    </Admonition>
-
-  </TabPanel>
-
-  <TabPanel id="swift" label="Swift">
-
-    ## Using Native Sign in with Apple in Swift
-
-    For apps written in Swift, please consult the [community maintained library](/docs/reference/swift/introduction).
-
-    ### Configuration [#swift-configuration-native-app]
-
-    1. Have an **App ID** which uniquely identifies the app you are building. You can create a new App ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/bundleId) section in the Apple Developer Console (use the filter menu in the upper right side to see all App IDs). These usually are a reverse domain name string, for example `com.example.app`. Make sure you configure Sign in with Apple for the App ID you created or already have, in the Capabilities list. At this time Supabase Auth does not support Server-to-Server notification endpoints, so you should leave that setting blank. (In the past App IDs were referred to as _bundle IDs._)
-    2. Register all of the App IDs that will be using your Supabase project in the [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Authorized Client IDs_.
-
-    <Admonition type="note">
-      If you're building a native app only, you do not need to configure the OAuth flow parameters.
-    </Admonition>
-
-  </TabPanel>
-
   <TabPanel id="web" label="Web">
 
     ## Using the OAuth flow for web
@@ -184,7 +110,169 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     4. Register the Services ID you created to your project's [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Authorized Client IDs_.
 
     <Admonition type="note">
-      If you're building a native app only, you do not need to configure the OAuth flow parameters.
+      If you're using Sign in with Apple JS you do not need to configure the OAuth settings.
+    </Admonition>
+
+  </TabPanel>
+
+  <TabPanel id="react-native" label="Expo React Native">
+
+    ## Using Native Sign in with Apple in Expo
+
+    When working with Expo, you can use the [Expo AppleAuthentication](https://docs.expo.dev/versions/latest/sdk/apple-authentication/) library to obtain and ID token that you can pass to supabase-js [`signInWithIdToken` method](/docs/reference/javascript/auth-signinwithidtoken).
+
+    Follow the [Expo docs](https://docs.expo.dev/versions/latest/sdk/apple-authentication/#installation) for installation and configuration instructions. See the [supabase-js reference](/docs/reference/javascript/initializing?example=react-native-options-async-storage) for instructions on initializing the supabase-js client in React Native.
+
+    ```tsx ./components/Auth.native.tsx
+    import { Platform } from 'react-native'
+    import * as AppleAuthentication from 'expo-apple-authentication'
+    import { supabase } from 'app/utils/supabase'
+
+    export function Auth() {
+      if (Platform.OS === 'ios')
+        return (
+          <AppleAuthentication.AppleAuthenticationButton
+            buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+            buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+            cornerRadius={5}
+            style={{ height: 70 }}
+            onPress={async () => {
+              try {
+                const credential = await AppleAuthentication.signInAsync({
+                  requestedScopes: [
+                    AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+                    AppleAuthentication.AppleAuthenticationScope.EMAIL,
+                  ],
+                })
+                // Sign in via Supabase Auth.
+                if (credential.identityToken) {
+                  const {
+                    error,
+                    data: { user },
+                  } = await supabase.auth.signInWithIdToken({
+                    provider: 'apple',
+                    token: credential.identityToken,
+                  })
+                  console.log(JSON.stringify({ error, user }, null, 2))
+                  if (!error) {
+                    // User is signed in.
+                  }
+                } else {
+                  throw new Error('No identityToken.')
+                }
+              } catch (e) {
+                if (e.code === 'ERR_REQUEST_CANCELED') {
+                  // handle that the user canceled the sign-in flow
+                } else {
+                  // handle other errors
+                }
+              }
+            }}
+          />
+        )
+      return <>{/* Implement Android Auth options. */}</>
+    }
+    ```
+
+    When working with bare React Native, you can use [invertase/react-native-apple-authentication](https://github.com/invertase/react-native-apple-authentication) to obtain the ID token.
+
+    ### Configuration [#expo-configuration-native-app]
+
+    <Admonition type="note">
+      When testing with Expo Go, the Expo App ID `host.exp.Exponent` will be used. Make sure to add this to the "Authorized Client IDs" list in your [Supabase dashboard Apple provider configuration](https://supabase.com/dashboard/project/_/auth/providers)!
+    </Admonition>
+
+    1. Have an **App ID** which uniquely identifies the app you are building. You can create a new App ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/bundleId) section in the Apple Developer Console (use the filter menu in the upper right side to see all App IDs). These usually are a reverse domain name string, for example `com.example.app`. Make sure you configure Sign in with Apple for the App ID you created or already have, in the Capabilities list. At this time Supabase Auth does not support Server-to-Server notification endpoints, so you should leave that setting blank. (In the past App IDs were referred to as _bundle IDs._)
+    2. Register all of the App IDs that will be using your Supabase project in the [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Authorized Client IDs_.
+
+    <Admonition type="note">
+      If you're building a native app only, you do not need to configure the OAuth settings.
+    </Admonition>
+
+  </TabPanel>
+
+  <TabPanel id="flutter" label="Flutter">
+
+    ## Using Native Sign in with Apple in Flutter
+
+    Unlike the OAuth flow which requires the use of a web browser, the native Sign in with Apple flow on iOS, macOS, watchOS or tvOS uses the [operating system's built-in functionalities](https://developer.apple.com/documentation/authenticationservices) to prompt the user for consent.
+
+    When the user provides consent, Apple issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
+
+    If you are building an iOS or macOS app using Flutter, you can use the [signInWithApple()](/docs/reference/dart/sign-in-with-apple) method to perform Apple sign in:
+
+    ```dart
+    import 'package:supabase_flutter/supabase_flutter.dart';
+
+    final AuthResponse res = await supabase.auth.signInWithApple();
+    final User? user = res.user;
+    ```
+
+    ### Configuration [#flutter-configuration-native-app]
+
+    1. Have an **App ID** which uniquely identifies the app you are building. You can create a new App ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/bundleId) section in the Apple Developer Console (use the filter menu in the upper right side to see all App IDs). These usually are a reverse domain name string, for example `com.example.app`. Make sure you configure Sign in with Apple for the App ID you created or already have, in the Capabilities list. At this time Supabase Auth does not support Server-to-Server notification endpoints, so you should leave that setting blank. (In the past App IDs were referred to as _bundle IDs._)
+    2. Register all of the App IDs that will be using your Supabase project in the [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Authorized Client IDs_.
+
+    <Admonition type="note">
+      If you're building a native app only, you do not need to configure the OAuth settings.
+    </Admonition>
+
+  </TabPanel>
+
+  <TabPanel id="swift" label="Swift">
+
+    ## Using Native Sign in with Apple in Swift
+
+    For apps written in Swift, follow the [Apple Developer docs](https://developer.apple.com/documentation/sign_in_with_apple/implementing_user_authentication_with_sign_in_with_apple) for obtaining the ID token and then pass it to the [Swift client's `signInWithIdToken`](https://github.com/supabase-community/gotrue-swift/blob/main/Examples/Shared/Sources/SignInWithAppleView.swift#L36) method.
+
+    ```swift
+    import SwiftUI
+    import AuthenticationServices
+    import Supabase
+    @_spi(Experimental) import GoTrue
+
+    struct SignInView: View {
+        let client = SupabaseClient(supabaseURL: URL(string: "your url")!, supabaseKey: "your anon key")
+
+        var body: some View {
+          SignInWithAppleButton { request in
+            request.requestedScopes = [.email, .fullName]
+          } onCompletion: { result in
+            Task {
+              do {
+                guard let credential = try result.get().credential as? ASAuthorizationAppleIDCredential
+                else {
+                  return
+                }
+
+                guard let idToken = credential.identityToken
+                  .flatMap({ String(data: $0, encoding: .utf8) })
+                else {
+                  return
+                }
+                  try await client.auth.signInWithIdToken(
+                  credentials: .init(
+                    provider: .apple,
+                    idToken: idToken
+                  )
+                )
+              } catch {
+                dump(error)
+              }
+            }
+          }
+          .fixedSize()
+        }
+    }
+    ```
+
+    ### Configuration [#swift-configuration-native-app]
+
+    1. Have an **App ID** which uniquely identifies the app you are building. You can create a new App ID from the [Identifiers](https://developer.apple.com/account/resources/identifiers/list/bundleId) section in the Apple Developer Console (use the filter menu in the upper right side to see all App IDs). These usually are a reverse domain name string, for example `com.example.app`. Make sure you configure Sign in with Apple for the App ID you created or already have, in the Capabilities list. At this time Supabase Auth does not support Server-to-Server notification endpoints, so you should leave that setting blank. (In the past App IDs were referred to as _bundle IDs._)
+    2. Register all of the App IDs that will be using your Supabase project in the [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Authorized Client IDs_.
+
+    <Admonition type="note">
+      If you're building a native app only, you do not need to configure the OAuth settings.
     </Admonition>
 
   </TabPanel>
