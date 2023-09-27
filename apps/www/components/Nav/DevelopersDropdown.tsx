@@ -89,7 +89,9 @@ const DevelopersDropdown = () => {
                         <p className="text-strong mb-0 line-clamp-2 group-hover:text-brand">
                           {announcement.title}
                         </p>
-                        <p className="line-clamp-2 text-sm !mb-0">{announcement.description}</p>
+                        <p className="line-clamp-2 text-sm !mb-0 group-hover:text-light">
+                          {announcement.description}
+                        </p>
                       </div>
                     </a>
                   </Link>

@@ -15,7 +15,7 @@ const ProductDropdown = () => {
 
   return (
     <>
-      <ul className="grid gap-2 p-6 grid-cols-1 w-[330px]">
+      <ul className="grid gap-2 py-6 px-5 grid-cols-1 w-[300px]">
         {Object.values(SolutionsData).map((component) => (
           <NavigationMenuLink key={component.name} asChild>
             <MenuItem
@@ -37,7 +37,7 @@ const ProductDropdown = () => {
             </a>
           </Link>
           <ul className="flex flex-col gap-3">
-            {CustomersData.slice(0, 3).map((customer) => (
+            {CustomersData.slice(0, 4).map((customer) => (
               <li key={customer.organization}>
                 <Link href={customer.url}>
                   <a className="group flex items-center gap-3">
@@ -47,7 +47,7 @@ const ProductDropdown = () => {
                         alt={customer.title}
                         layout="fill"
                         objectFit="contain"
-                        className="!p-3 dark:brightness-200 dark:contrast-0 dark:filter"
+                        className="!p-4 dark:brightness-200 dark:contrast-0 dark:filter"
                       />
                     </div>
                     <div className="flex flex-col">
