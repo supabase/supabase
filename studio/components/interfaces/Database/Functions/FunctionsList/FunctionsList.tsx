@@ -104,7 +104,7 @@ const FunctionsList = ({
                       key={schema.id}
                       value={schema.name}
                       label={schema.name}
-                      addOnBefore={() => <span className="text-scale-900">schema</span>}
+                      addOnBefore={() => <span className="text-foreground-lighter">schema</span>}
                     >
                       <span className="text-foreground text-sm">{schema.name}</span>
                     </Listbox.Option>
@@ -122,7 +122,7 @@ const FunctionsList = ({
                       key={schema.id}
                       value={schema.name}
                       label={schema.name}
-                      addOnBefore={() => <span className="text-scale-900">schema</span>}
+                      addOnBefore={() => <span className="text-foreground-lighter">schema</span>}
                     >
                       <span className="text-foreground text-sm">{schema.name}</span>
                     </Listbox.Option>
@@ -170,14 +170,15 @@ const FunctionsList = ({
             className="table-fixed"
             head={
               <>
-                <Table.th key="name" className="w-1/3 space-x-4">
-                  Name
-                </Table.th>
+                <Table.th key="name">Name</Table.th>
                 <Table.th key="arguments" className="hidden md:table-cell">
                   Arguments
                 </Table.th>
                 <Table.th key="return_type" className="hidden lg:table-cell">
                   Return type
+                </Table.th>
+                <Table.th key="return_type" className="hidden lg:table-cell w-[100px]">
+                  <p className="text-center">Definer</p>
                 </Table.th>
                 <Table.th key="buttons" className="w-1/6"></Table.th>
               </>

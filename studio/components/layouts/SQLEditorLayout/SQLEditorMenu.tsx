@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
-import { Button, IconPlus, IconSearch, IconX, Input, Menu, cn } from 'ui'
+import { Button, cn, IconPlus, IconSearch, IconX, Input, Menu } from 'ui'
 
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
@@ -173,7 +173,7 @@ const SideBarContent = observer(() => {
                           'w-4',
                           'h-4',
                           'cursor-pointer',
-                          isFavoritesFilterOpen ? 'text-foreground' : 'text-scale-900'
+                          isFavoritesFilterOpen ? 'text-foreground' : 'text-foreground-lighter'
                         )}
                         onClick={() => {
                           setFavoritesFilterString('')
@@ -240,7 +240,9 @@ const SideBarContent = observer(() => {
                           'w-4',
                           'h-4',
                           'cursor-pointer',
-                          isProjectSnippetsFilterOpen ? 'text-foreground' : 'text-scale-900'
+                          isProjectSnippetsFilterOpen
+                            ? 'text-foreground'
+                            : 'text-foreground-lighter'
                         )}
                         onClick={() => {
                           setProjectSnippetsFilterString('')
@@ -306,7 +308,7 @@ const SideBarContent = observer(() => {
                         'w-4',
                         'h-4',
                         'cursor-pointer',
-                        isPersonalSnippetsFilterOpen ? 'text-foreground' : 'text-scale-900'
+                        isPersonalSnippetsFilterOpen ? 'text-foreground' : 'text-foreground-lighter'
                       )}
                       onClick={() => {
                         setPersonalSnippetsFilterString('')

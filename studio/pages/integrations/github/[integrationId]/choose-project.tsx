@@ -74,7 +74,7 @@ const ChooseProjectGitHubPage: NextPageWithLayout = () => {
                 Link a Supabase project to a GitHub repository
               </h1>
               <Markdown
-                className="text-scale-900"
+                className="text-foreground-lighter"
                 // explain what this integration does
                 content={`
 This Supabase integration will allow you to link a Supabase project to a GitHub repository. This will allow you to deploy your database schema to your Supabase project.
@@ -100,10 +100,10 @@ This Supabase integration will allow you to link a Supabase project to a GitHub 
         <ScaffoldDivider />
       </main>
       <ScaffoldContainer className="bg-body flex flex-row gap-6 py-6 border-t">
-        <div className="flex items-center gap-2 text-xs text-scale-900">
+        <div className="flex items-center gap-2 text-xs text-foreground-lighter">
           <IconBook size={16} /> Docs
         </div>
-        <div className="flex items-center gap-2 text-xs text-scale-900">
+        <div className="flex items-center gap-2 text-xs text-foreground-lighter">
           <IconLifeBuoy size={16} /> Support
         </div>
       </ScaffoldContainer>

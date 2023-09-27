@@ -203,7 +203,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
         {entity.type === ENTITY_TYPE.TABLE && isActive && !isLocked && (
           <DropdownMenu_Shadcn_>
             <DropdownMenuTrigger_Shadcn_>
-              <div className="text-scale-900 transition-colors hover:text-foreground">
+              <div className="text-foreground-lighter transition-colors hover:text-foreground">
                 <IconChevronDown size={14} strokeWidth={2} />
               </div>
             </DropdownMenuTrigger_Shadcn_>

@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
@@ -25,7 +26,6 @@ import {
   Input,
   Listbox,
 } from 'ui'
-import AlertError from 'components/ui/AlertError'
 
 interface TableListProps {
   onAddTable: () => void
@@ -118,7 +118,7 @@ const TableList = ({
                     key={schema.id}
                     value={schema.name}
                     label={schema.name}
-                    addOnBefore={() => <span className="text-scale-900">schema</span>}
+                    addOnBefore={() => <span className="text-foreground-lighter">schema</span>}
                   >
                     <span className="text-foreground text-sm">{schema.name}</span>
                   </Listbox.Option>
@@ -136,7 +136,7 @@ const TableList = ({
                     key={schema.id}
                     value={schema.name}
                     label={schema.name}
-                    addOnBefore={() => <span className="text-scale-900">schema</span>}
+                    addOnBefore={() => <span className="text-foreground-lighter">schema</span>}
                   >
                     <span className="text-foreground text-sm">{schema.name}</span>
                   </Listbox.Option>
