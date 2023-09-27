@@ -2,6 +2,15 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { proxy, snapshot, useSnapshot } from 'valtio'
 
 export const appState = proxy({
+  activeDocsSection: ['introduction'],
+  showProjectApiDocs: false,
+  setShowProjectApiDocs: (value: boolean) => {
+    appState.showProjectApiDocs = value
+  },
+  setActiveDocsSection: (value: string[]) => {
+    appState.activeDocsSection = value
+  },
+
   isOptedInTelemetry: false,
   setIsOptedInTelemetry: (value: boolean) => {
     appState.isOptedInTelemetry = value

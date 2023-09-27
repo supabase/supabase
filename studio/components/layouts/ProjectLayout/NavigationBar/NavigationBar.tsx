@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger_Shadcn_,
   DropdownMenu_Shadcn_,
   IconCommand,
+  IconFileText,
   IconHome,
   IconSearch,
   IconSettings,
@@ -31,6 +32,7 @@ import {
   generateToolRoutes,
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
+import { useAppStateSnapshot } from 'state/app-state'
 
 const NavigationBar = () => {
   const router = useRouter()
@@ -40,6 +42,7 @@ const NavigationBar = () => {
   const os = detectOS()
   const { setIsOpen } = useCommandMenu()
 
+  const snap = useAppStateSnapshot()
   const { project } = useProjectContext()
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
@@ -104,6 +107,16 @@ const NavigationBar = () => {
       </ul>
       {!navLayoutV2 && (
         <ul className="flex flex-col space-y-4 items-center">
+          <Button
+            type="text"
+            size="tiny"
+            onClick={() => snap.setShowProjectApiDocs(true)}
+            className="border-none"
+          >
+            <div className="py-1">
+              <IconFileText size={18} strokeWidth={2} className="text-foreground-lighter" />
+            </div>
+          </Button>
           {IS_PLATFORM && (
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger asChild>
