@@ -121,7 +121,7 @@ const UpgradingState = () => {
                   <div className="absolute flex items-center justify-center w-full h-full">
                     <IconSettings className="animate-spin" size={20} strokeWidth={2} />
                   </div>
-                  <IconCircle className="text-scale-900" size={50} strokeWidth={1.5} />
+                  <IconCircle className="text-foreground-lighter" size={50} strokeWidth={1.5} />
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">Upgrading in progress</p>

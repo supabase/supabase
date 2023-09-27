@@ -199,7 +199,7 @@ const ExitSurveyModal = ({ visible, onClose }: ExitSurveyModalProps) => {
         </Modal.Content>
 
         <div className="flex items-center justify-between border-t px-4 py-4">
-          <p className="text-xs text-scale-900">
+          <p className="text-xs text-foreground-lighter">
             The unused amount for the remaining of your billing cycle will be refunded as credits
           </p>
           <div className="flex items-center space-x-2">

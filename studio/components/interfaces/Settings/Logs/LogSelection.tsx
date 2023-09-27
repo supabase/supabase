@@ -3,12 +3,14 @@ import { Button, IconX } from 'ui'
 import CopyButton from 'components/ui/CopyButton'
 import Connecting from 'components/ui/Loading/Loading'
 import useSingleLog from 'hooks/analytics/useSingleLog'
+import { useMemo } from 'react'
 import {
-  LogsEndpointParams,
   isDefaultLogPreviewFormat,
   isUnixMicro,
+  LogsEndpointParams,
   unixMicroToIsoTimestamp,
 } from '.'
+import { LogData, QueryType } from './Logs.types'
 import AuthSelectionRenderer from './LogSelectionRenderers/AuthSelectionRenderer'
 import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
 import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
@@ -16,8 +18,6 @@ import DefaultExplorerSelectionRenderer from './LogSelectionRenderers/DefaultExp
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
-import { LogData, QueryType } from './Logs.types'
-import { useMemo } from 'react'
 
 export interface LogSelectionProps {
   log: LogData | null
@@ -147,7 +147,7 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
           </div>
           <div className="flex flex-col gap-1">
             <h3 className="text-sm text-foreground">Select an Event</h3>
-            <p className="text-xs text-scale-900">
+            <p className="text-xs text-foreground-lighter">
               Select an Event to view the code snippet (pretty view) or complete JSON payload (raw
               view).
             </p>
@@ -165,7 +165,7 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
               className="cursor-pointer transition hover:text-foreground h-8 w-8 px-0 py-0 flex items-center justify-center"
               onClick={onClose}
             >
-              <IconX size={14} strokeWidth={2} className="text-scale-900" />
+              <IconX size={14} strokeWidth={2} className="text-foreground-lighter" />
             </Button>
           </div>
           <div className="h-px w-full bg-scale-600 rounded " />

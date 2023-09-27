@@ -54,7 +54,7 @@
 
 .Form .form-text,
 .Form .form-error {
-  @apply block text-sm text-scale-900 my-1;
+  @apply block text-sm text-foreground-lighter my-1;
   display: block;
   margin-left: calc(33% + 0.5rem);
   width: 100%;

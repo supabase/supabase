@@ -120,7 +120,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                 <span className="px-1">Enabled</span>
               </div>
             ) : (
-              <div className="rounded-md border border-scale-500 bg-scale-100 py-1 px-3 text-xs text-scale-900 dark:border-scale-700 dark:bg-scale-300">
+              <div className="rounded-md border border-scale-500 bg-scale-100 py-1 px-3 text-xs text-foreground-lighter dark:border-scale-700 dark:bg-scale-300">
                 Disabled
               </div>
             )}

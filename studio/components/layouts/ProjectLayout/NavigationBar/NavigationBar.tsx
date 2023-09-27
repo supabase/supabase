@@ -1,15 +1,16 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
-import { isUndefined } from 'lodash'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useTheme } from 'next-themes'
 import { useFlag } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
+import { isUndefined } from 'lodash'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import {
   Button,
   DropdownMenuContent_Shadcn_,
+  DropdownMenuGroup_Shadcn_,
   DropdownMenuItem_Shadcn_,
   DropdownMenuLabel_Shadcn_,
   DropdownMenuRadioGroup_Shadcn_,
@@ -31,12 +32,12 @@ import {
   generateToolRoutes,
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
+import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
 
 const NavigationBar = () => {
   const router = useRouter()
   const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
-
   const os = detectOS()
   const { setIsOpen } = useCommandMenu()
 
@@ -114,7 +115,7 @@ const NavigationBar = () => {
                   className="border-none"
                 >
                   <div className="py-1">
-                    <IconSearch size={18} strokeWidth={2} className="text-scale-900" />
+                    <IconSearch size={18} strokeWidth={2} className="text-foreground-lighter" />
                   </div>
                 </Button>
               </Tooltip.Trigger>
@@ -142,7 +143,7 @@ const NavigationBar = () => {
             <DropdownMenuTrigger_Shadcn_>
               <Button asChild type="text" size="tiny">
                 <span className="py-1 h-10 border-none">
-                  <IconUser size={18} strokeWidth={2} className="text-scale-900" />
+                  <IconUser size={18} strokeWidth={2} className="text-foreground-lighter" />
                 </span>
               </Button>
             </DropdownMenuTrigger_Shadcn_>
@@ -159,17 +160,22 @@ const NavigationBar = () => {
                 </>
               )}
               <DropdownMenuLabel_Shadcn_>Theme</DropdownMenuLabel_Shadcn_>
-              <DropdownMenuRadioGroup_Shadcn_
-                key="theme"
-                value={theme === 'dark' ? 'dark' : 'light'}
-                onValueChange={(value: string) => setTheme(value)}
-              >
-                <DropdownMenuRadioItem_Shadcn_ value="system">
-                  System default
-                </DropdownMenuRadioItem_Shadcn_>
-                <DropdownMenuRadioItem_Shadcn_ value="dark">Dark</DropdownMenuRadioItem_Shadcn_>
-                <DropdownMenuRadioItem_Shadcn_ value="light">Light</DropdownMenuRadioItem_Shadcn_>
-              </DropdownMenuRadioGroup_Shadcn_>
+              <DropdownMenuGroup_Shadcn_>
+                <DropdownMenuRadioGroup_Shadcn_
+                  value={theme}
+                  onValueChange={(value) => {
+                    setTheme(value)
+                  }}
+                >
+                  <DropdownMenuRadioItem_Shadcn_ value={'system'}>
+                    System
+                  </DropdownMenuRadioItem_Shadcn_>
+                  <DropdownMenuRadioItem_Shadcn_ value={'dark'}>Dark</DropdownMenuRadioItem_Shadcn_>
+                  <DropdownMenuRadioItem_Shadcn_ value={'light'}>
+                    Light
+                  </DropdownMenuRadioItem_Shadcn_>
+                </DropdownMenuRadioGroup_Shadcn_>
+              </DropdownMenuGroup_Shadcn_>
             </DropdownMenuContent_Shadcn_>
           </DropdownMenu_Shadcn_>
         </ul>

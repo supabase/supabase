@@ -40,7 +40,7 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
                   <IconHelpCircle
                     size={alt ? 18 : 16}
                     strokeWidth={1.5}
-                    className={alt ? 'text-foreground-light' : 'text-scale-900'}
+                    className={alt ? 'text-foreground-light' : 'text-foreground-lighter'}
                   />
                 }
               >
@@ -68,7 +68,7 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
       <PopoverContent_Shadcn_ className="w-[400px] space-y-4 p-0 py-5" align="end" side="bottom">
         <div className="mb-5 space-y-4 px-5">
           <h5 className="text-foreground">Need help with your project?</h5>
-          <p className="text-sm text-scale-900">
+          <p className="text-sm text-foreground-lighter">
             For issues with your project hosted on supabase.com, or other inquiries about our hosted
             services.
           </p>
@@ -95,7 +95,7 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
               </Button>
             </Link>
           </div>
-          <p className="text-sm text-scale-900">
+          <p className="text-sm text-foreground-lighter">
             Expected response time is based on your billing plan. Pro and Pay as You Go plans are
             prioritized.
           </p>
@@ -112,7 +112,7 @@ const HelpPopover = ({ alt = false }: HelpPopoverProps) => {
           <div className="mb-4 px-5">
             <h5 className={'mb-2'}>Reach out to the community</h5>
 
-            <p className="text-sm text-scale-900">
+            <p className="text-sm text-foreground-lighter">
               For other support, including questions on our client libraries, advice, or best
               practices.
             </p>
