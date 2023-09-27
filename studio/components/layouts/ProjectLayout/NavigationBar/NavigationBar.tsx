@@ -10,6 +10,7 @@ import { useRouter } from 'next/router'
 import {
   Button,
   DropdownMenuContent_Shadcn_,
+  DropdownMenuGroup_Shadcn_,
   DropdownMenuItem_Shadcn_,
   DropdownMenuLabel_Shadcn_,
   DropdownMenuRadioGroup_Shadcn_,
@@ -31,12 +32,12 @@ import {
   generateToolRoutes,
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
+import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
 
 const NavigationBar = () => {
   const router = useRouter()
   const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
-
   const os = detectOS()
   const { setIsOpen } = useCommandMenu()
 
@@ -159,17 +160,22 @@ const NavigationBar = () => {
                 </>
               )}
               <DropdownMenuLabel_Shadcn_>Theme</DropdownMenuLabel_Shadcn_>
-              <DropdownMenuRadioGroup_Shadcn_
-                key="theme"
-                value={theme === 'dark' ? 'dark' : 'light'}
-                onValueChange={(value: string) => setTheme(value)}
-              >
-                <DropdownMenuRadioItem_Shadcn_ value="system">
-                  System default
-                </DropdownMenuRadioItem_Shadcn_>
-                <DropdownMenuRadioItem_Shadcn_ value="dark">Dark</DropdownMenuRadioItem_Shadcn_>
-                <DropdownMenuRadioItem_Shadcn_ value="light">Light</DropdownMenuRadioItem_Shadcn_>
-              </DropdownMenuRadioGroup_Shadcn_>
+              <DropdownMenuGroup_Shadcn_>
+                <DropdownMenuRadioGroup_Shadcn_
+                  value={theme}
+                  onValueChange={(value) => {
+                    setTheme(value)
+                  }}
+                >
+                  <DropdownMenuRadioItem_Shadcn_ value={'system'}>
+                    System
+                  </DropdownMenuRadioItem_Shadcn_>
+                  <DropdownMenuRadioItem_Shadcn_ value={'dark'}>Dark</DropdownMenuRadioItem_Shadcn_>
+                  <DropdownMenuRadioItem_Shadcn_ value={'light'}>
+                    Light
+                  </DropdownMenuRadioItem_Shadcn_>
+                </DropdownMenuRadioGroup_Shadcn_>
+              </DropdownMenuGroup_Shadcn_>
             </DropdownMenuContent_Shadcn_>
           </DropdownMenu_Shadcn_>
         </ul>
