@@ -232,7 +232,7 @@ const TableEditorMenu = () => {
                   disabled={!canCreateTables}
                   size="tiny"
                   icon={
-                    <div className="text-scale-900">
+                    <div className="text-foreground-lighter">
                       <IconEdit size={14} strokeWidth={1.5} />
                     </div>
                   }
@@ -283,9 +283,13 @@ const TableEditorMenu = () => {
               className="table-editor-search border-none"
               icon={
                 isSearching ? (
-                  <IconLoader className="animate-spin text-scale-900" size={12} strokeWidth={1.5} />
+                  <IconLoader
+                    className="animate-spin text-foreground-lighter"
+                    size={12}
+                    strokeWidth={1.5}
+                  />
                 ) : (
-                  <IconSearch className="text-scale-900" size={12} strokeWidth={1.5} />
+                  <IconSearch className="text-foreground-lighter" size={12} strokeWidth={1.5} />
                 )
               }
               placeholder="Search tables"
@@ -381,7 +385,7 @@ const TableEditorMenu = () => {
                       >
                         <Tooltip.Root delayDuration={0}>
                           <Tooltip.Trigger asChild>
-                            <div className="text-scale-900 transition-colors hover:text-foreground">
+                            <div className="text-foreground-lighter transition-colors hover:text-foreground">
                               <IconChevronsDown size={18} strokeWidth={1} />
                             </div>
                           </Tooltip.Trigger>
@@ -402,7 +406,7 @@ const TableEditorMenu = () => {
                       </Dropdown>
 
                       <button
-                        className="cursor-pointer text-scale-900 transition-colors hover:text-foreground"
+                        className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
                         onClick={refreshTables}
                       >
                         <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />

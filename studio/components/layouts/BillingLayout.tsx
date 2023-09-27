@@ -17,7 +17,7 @@ const BillingLayout = ({ children }: PropsWithChildren<BillingLayoutProps>) => {
         {/* Header */}
         <div className="flex items-center space-x-4 border-b py-4 px-5 dark:border-dark">
           <Link href={`/project/${selectedProject?.ref}/settings/billing/subscription`} passHref>
-            <a className="text-scale-900 transition-colors hover:text-foreground">
+            <a className="text-foreground-lighter transition-colors hover:text-foreground">
               <IconX size={16} strokeWidth={1.5} />
             </a>
           </Link>

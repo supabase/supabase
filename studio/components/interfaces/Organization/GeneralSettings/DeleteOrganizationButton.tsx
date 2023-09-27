@@ -66,7 +66,7 @@ const DeleteOrganizationButton = () => {
         header={
           <div className="flex items-baseline gap-2">
             <h5 className="text-sm text-foreground">Delete organization</h5>
-            <span className="text-xs text-scale-900">Are you sure?</span>
+            <span className="text-xs text-foreground-lighter">Are you sure?</span>
           </div>
         }
       >
@@ -79,7 +79,7 @@ const DeleteOrganizationButton = () => {
           {() => (
             <div className="space-y-4 py-3">
               <Modal.Content>
-                <p className="text-sm text-scale-900">
+                <p className="text-sm text-foreground-lighter">
                   This action <span className="text-foreground">cannot</span> be undone. This will
                   permanently delete the <span className="text-foreground">{orgName}</span>{' '}
                   organization and remove all of its projects.

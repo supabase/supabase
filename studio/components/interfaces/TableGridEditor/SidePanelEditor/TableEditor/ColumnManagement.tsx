@@ -194,10 +194,10 @@ const ColumnManagement = ({
             {/* Drag handle */}
             {isNewRecord && <div className="w-[5%]" />}
             <div className="w-[25%] flex items-center space-x-2">
-              <h5 className="text-xs text-scale-900">Name</h5>
+              <h5 className="text-xs text-foreground-lighter">Name</h5>
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <h5 className="text-xs text-scale-900">
+                  <h5 className="text-xs text-foreground-lighter">
                     <IconHelpCircle size={15} strokeWidth={1.5} />
                   </h5>
                 </Tooltip.Trigger>
@@ -220,14 +220,14 @@ const ColumnManagement = ({
               </Tooltip.Root>
             </div>
             <div className="w-[25%]">
-              <h5 className="text-xs text-scale-900">Type</h5>
+              <h5 className="text-xs text-foreground-lighter">Type</h5>
             </div>
             <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'} flex items-center space-x-2`}>
-              <h5 className="text-xs text-scale-900">Default Value</h5>
+              <h5 className="text-xs text-foreground-lighter">Default Value</h5>
 
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <h5 className="text-xs text-scale-900">
+                  <h5 className="text-xs text-foreground-lighter">
                     <IconHelpCircle size={15} strokeWidth={1.5} />
                   </h5>
                 </Tooltip.Trigger>
@@ -250,7 +250,7 @@ const ColumnManagement = ({
               </Tooltip.Root>
             </div>
             <div className="w-[10%]">
-              <h5 className="text-xs text-scale-900">Primary</h5>
+              <h5 className="text-xs text-foreground-lighter">Primary</h5>
             </div>
             {/* Empty space */}
             <div className={`${hasImportContent ? 'w-[10%]' : 'w-0'}`} />

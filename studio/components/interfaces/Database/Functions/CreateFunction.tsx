@@ -487,7 +487,7 @@ const InputMultiArguments = observer(({ readonly }: InputMultiArgumentsProps) =>
       </div>
       <div className="space-y-2 pt-4">
         {readonly && isEmpty(_localState!.formState.args.value) && (
-          <span className="text-scale-900">No argument for this function</span>
+          <span className="text-foreground-lighter">No argument for this function</span>
         )}
         {_localState!.formState.args.value.map(
           (x: { name: string; type: string; error?: string }, idx: number) => (

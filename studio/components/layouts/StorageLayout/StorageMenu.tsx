@@ -44,7 +44,7 @@ const StorageMenu = () => {
                 block
                 type="default"
                 icon={
-                  <div className="text-scale-900">
+                  <div className="text-foreground-lighter">
                     <IconEdit size={14} />
                   </div>
                 }

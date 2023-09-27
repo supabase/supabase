@@ -44,7 +44,7 @@ const LangSelector = ({
           className={`${
             selectedLang == 'js'
               ? 'bg-scale-300 font-medium text-foreground dark:bg-scale-200'
-              : 'bg-scale-100 text-scale-900 dark:bg-scale-100'
+              : 'bg-scale-100 text-foreground-lighter dark:bg-scale-100'
           } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-foreground focus:outline-none`}
         >
           JavaScript
@@ -55,14 +55,14 @@ const LangSelector = ({
           className={`${
             selectedLang == 'bash'
               ? 'bg-scale-300 font-medium text-foreground dark:bg-scale-200'
-              : 'bg-scale-100 text-scale-900 dark:bg-scale-100'
+              : 'bg-scale-100 text-foreground-lighter dark:bg-scale-100'
           } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-foreground focus:outline-none`}
         >
           Bash
         </button>
         {selectedLang == 'bash' && (
           <div className="flex">
-            <div className="flex items-center gap-2 p-1 pl-2 text-xs text-scale-900">
+            <div className="flex items-center gap-2 p-1 pl-2 text-xs text-foreground-lighter">
               <IconKey size={12} strokeWidth={1.5} />
               <span>Project API key :</span>
             </div>

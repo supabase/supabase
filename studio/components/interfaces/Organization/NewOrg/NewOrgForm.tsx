@@ -183,7 +183,9 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                 Cancel
               </Button>
               <div className="flex items-center space-x-3">
-                <p className="text-xs text-scale-900">You can rename your organization later</p>
+                <p className="text-xs text-foreground-lighter">
+                  You can rename your organization later
+                </p>
                 <Button
                   htmlType="submit"
                   type="primary"
