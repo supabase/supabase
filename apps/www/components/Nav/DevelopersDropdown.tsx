@@ -17,12 +17,12 @@ type Props = {
 
 const DevelopersDropdown = () => {
   const { basePath } = useRouter()
-  const iconsWithFill = ['GitHub Discussions', 'Launch Week', 'Open Source']
+  const iconsWithFill = ['GitHub Discussions', 'Launch Week']
 
   return (
     <>
       <div className="flex">
-        <div className="w-[500px] p-6 border-r grid gap-3 grid-cols-2">
+        <div className="w-[530px] py-8 px-10 border-r grid gap-3 grid-cols-2">
           {DevelopersData['navigation'].map((column) => (
             <div key={column.label} className="p-2 flex flex-col gap-6">
               <label className="text-muted text-xs uppercase tracking-widest font-mono">
@@ -65,7 +65,7 @@ const DevelopersDropdown = () => {
           ))}
         </div>
         <div className="flex flex-col w-[500px] bg-alternative">
-          <div className="flex-col gap-3 p-6">
+          <div className="flex-col gap-3 py-8 px-10">
             <Link href="/blog">
               <a className="inline-flex items-center gap-1 text-muted hover:text-brand text-xs uppercase tracking-widest font-mono mb-6">
                 Blog

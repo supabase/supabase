@@ -11,41 +11,41 @@ const MenuItem = React.forwardRef<
       <a
         ref={ref}
         className={cn(
-          'group flex flex-col text-light hover:text-strong select-none gap-2 rounded-md py-3 px-4 leading-none no-underline outline-none transition-colors hover:bg-overlay-hover focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground-strong',
-          description && 'items-start',
+          'group flex items-center text-light hover:text-strong select-none gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-overlay-hover focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground-strong',
+          description && 'items-center',
           className
         )}
         {...props}
       >
         {children ?? (
           <>
-            <div className="flex items-center gap-2">
-              {icon && (
-                <div>
-                  <svg
-                    className="h-5 w-5 group-hover:text-brand"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="1.5"
-                      d={icon}
-                      stroke="currentColor"
-                    />
-                  </svg>
-                </div>
-              )}
-              <div className={cn('leading-none', description && 'mt-0.5')}>{title}</div>
-            </div>
-            {description && (
-              <p className="line-clamp-1 text-sm leading-snug text-muted group-hover:text-light">
-                {description}
-              </p>
+            {icon && (
+              <div className="shrink-0 bg-alternative min-w-12 w-12 h-12 flex items-center justify-center rounded-lg">
+                <svg
+                  className="h-5 w-5 group-hover:text-brand"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.5"
+                    d={icon}
+                    stroke="currentColor"
+                  />
+                </svg>
+              </div>
             )}
+            <div className="flex flex-col justify-center gap-1">
+              <div className={cn('leading-none')}>{title}</div>
+              {description && (
+                <p className="line-clamp-1 text-sm leading-snug text-muted group-hover:text-light">
+                  {description}
+                </p>
+              )}
+            </div>
           </>
         )}
       </a>
