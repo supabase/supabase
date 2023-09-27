@@ -477,8 +477,6 @@ const InputMultiArguments = observer(({ readonly }: InputMultiArgumentsProps) =>
     })
   }
 
-  console.log(_localState?.formState.args)
-
   return (
     <div>
       <div className="flex flex-col">
