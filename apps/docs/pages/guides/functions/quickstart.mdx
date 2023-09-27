@@ -37,9 +37,31 @@ Let's create a new Edge Function called `hello-world` inside your project:
 supabase functions new hello-world
 ```
 
-This creates a function stub in your `supabase` folder at `./functions/hello-world/index.ts`.
+This creates a function stub in your `supabase` folder at `./functions/hello-world/index.ts` with the following contents:
+
+```tsx
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+
+console.log("Hello from Functions!")
+
+serve(async (req) => {
+  const { name } = await req.json()
+  const data = {
+    message: `Hello ${name}!`,
+  }
+
+  return new Response(
+    JSON.stringify(data),
+    { headers: { "Content-Type": "application/json" } },
+  )
+})
+```
+
+Every Edge Function uses [Deno](https://deno.com/), which natively supports JSX, TSX, and various [web frameworks](https://docs.deno.com/runtime/manual/getting_started/web_frameworks).
 
 ## Deploy to production
+
+Use the CLI to deploy your functions.
 
 ### Deploy a specific function
 
