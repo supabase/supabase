@@ -154,13 +154,13 @@ const SignInMfaForm = () => {
 
       <div className="my-8">
         <div className="text-sm">
-          <span className="text-scale-1000">Unable to sign in?</span>{' '}
+          <span className="text-foreground-light">Unable to sign in?</span>{' '}
         </div>
         <ul className="list-disc pl-6">
           {factors?.totp.length === 2 && (
             <li>
               <a
-                className="text-sm text-scale-1100 hover:text-scale-1200 cursor-pointer"
+                className="text-sm text-foreground-light hover:text-foreground cursor-pointer"
                 onClick={() =>
                   setSelectedFactor(factors.totp.find((f) => f.id !== selectedFactor?.id)!)
                 }
@@ -177,7 +177,7 @@ const SignInMfaForm = () => {
               <a
                 target="_blank"
                 rel="noreferrer"
-                className="text-sm transition text-scale-1100 hover:text-scale-1200"
+                className="text-sm transition text-foreground-light hover:text-foreground"
               >
                 Reach out to us via support
               </a>

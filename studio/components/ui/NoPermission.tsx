@@ -22,7 +22,7 @@ const NoPermission = ({ resourceText, isFullPage = false }: NoPermissionProps) =
           <div className="space-y-1">
             <p className="text-sm">You need additional permissions to {resourceText}</p>
             <div>
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 Contact your organization owner or adminstrator for assistance.
               </p>
             </div>

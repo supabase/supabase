@@ -20,9 +20,9 @@ export const SingleAttributeTooltipContent = ({
   const formattedValue = unit === 'percentage' ? Number(value).toFixed(2) : Number(value)
   return (
     <>
-      <p className="text-xs text-scale-1000">{name}</p>
+      <p className="text-xs text-foreground-light">{name}</p>
       {isAfterToday ? (
-        <p className="text-scale-1000 text-lg">No data yet</p>
+        <p className="text-foreground-light text-lg">No data yet</p>
       ) : (
         <p className="text-xl">
           {tooltipFormatter !== undefined ? tooltipFormatter(formattedValue) : formattedValue}
@@ -78,7 +78,7 @@ export const MultiAttributeTooltipContent = ({
   return (
     <>
       {isAfterToday ? (
-        <p className="text-scale-1000 text-lg">No data yet</p>
+        <p className="text-foreground-light text-lg">No data yet</p>
       ) : (
         <div className="space-y-1 pb-1">
           {attributes.flatMap((attr) => {

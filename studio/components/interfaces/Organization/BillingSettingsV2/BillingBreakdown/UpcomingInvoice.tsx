@@ -4,8 +4,8 @@ import { partition } from 'lodash'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgUpcomingInvoiceQuery } from 'data/invoices/org-invoice-upcoming-query'
-import { Button, Collapsible, IconChevronRight } from 'ui'
 import { useState } from 'react'
+import { Button, Collapsible, IconChevronRight } from 'ui'
 
 export interface UpcomingInvoiceProps {
   slug?: string
@@ -40,10 +40,14 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
         <table className="w-full">
           <thead>
             <tr className="border-b">
-              <th className="py-2 font-normal text-left text-sm text-scale-1000 w-1/2">Item</th>
-              <th className="py-2 font-normal text-left text-sm text-scale-1000">Count</th>
-              <th className="py-2 font-normal text-left text-sm text-scale-1000">Unit price</th>
-              <th className="py-2 font-normal text-right text-sm text-scale-1000">Price</th>
+              <th className="py-2 font-normal text-left text-sm text-foreground-light w-1/2">
+                Item
+              </th>
+              <th className="py-2 font-normal text-left text-sm text-foreground-light">Count</th>
+              <th className="py-2 font-normal text-left text-sm text-foreground-light">
+                Unit price
+              </th>
+              <th className="py-2 font-normal text-right text-sm text-foreground-light">Price</th>
             </tr>
           </thead>
           <tbody>

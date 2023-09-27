@@ -9,10 +9,10 @@ import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'common'
 import {
   Dictionary,
-  SupaTable,
+  parseSupaTable,
   SupabaseGrid,
   SupabaseGridRef,
-  parseSupaTable,
+  SupaTable,
 } from 'components/grid'
 import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -371,7 +371,7 @@ const TableGridEditor = ({
               <p>
                 SQL Definition of <code className="text-sm">{selectedTable.name}</code>{' '}
               </p>
-              <p className="text-scale-1000 text-sm">(Read only)</p>
+              <p className="text-foreground-light text-sm">(Read only)</p>
             </div>
           ) : null
         }

@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams, useTheme } from 'common'
+import { useParams } from 'common'
+import { useTheme } from 'next-themes'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -12,7 +13,7 @@ import { BASE_PATH } from 'lib/constants'
 const VaultToggle = () => {
   const { meta, ui } = useStore()
   const { ref } = useParams()
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
   const [isEnabling, setIsEnabling] = useState(false)
   const canToggleVault = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
 
@@ -63,15 +64,16 @@ const VaultToggle = () => {
         style={{
           backgroundSize: isNotAvailable ? '50%' : '40%',
           backgroundPosition: '100% 24%',
-          backgroundImage: isDarkMode
-            ? `url("${BASE_PATH}/img/vault-dark.png")`
-            : `url("${BASE_PATH}/img/vault-light.png")`,
+          backgroundImage:
+            theme === 'dark'
+              ? `url("${BASE_PATH}/img/vault-dark.png")`
+              : `url("${BASE_PATH}/img/vault-light.png")`,
         }}
       >
         <div className="w-3/5 space-y-8">
           <div className="space-y-2">
             <h4 className="text-lg">Enable Vault today</h4>
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               Supabase Vault is a Postgres extension for managing secrets and encryption inside your
               database without leaking any sensitive information.
             </p>
@@ -80,10 +82,10 @@ const VaultToggle = () => {
             <div className="space-y-4">
               <div className="rounded border border-scale-500 px-4 py-2 flex items-center justify-between">
                 <div>
-                  <p className="text-scale-1100 text-sm">
+                  <p className="text-foreground-light text-sm">
                     Vault is not available for this project yet.
                   </p>
-                  <p className="text-scale-1000 text-sm">
+                  <p className="text-foreground-light text-sm">
                     Do reach out to us if you're interested!
                   </p>
                 </div>
@@ -137,7 +139,7 @@ const VaultToggle = () => {
                           'border border-scale-200',
                         ].join(' ')}
                       >
-                        <span className="text-xs text-scale-1200">
+                        <span className="text-xs text-foreground">
                           You need additional permissions to enable Vault for this project
                         </span>
                       </div>
