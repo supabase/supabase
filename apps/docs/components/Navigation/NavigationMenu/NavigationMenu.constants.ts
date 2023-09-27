@@ -333,6 +333,19 @@ export const cli = {
   ],
 }
 
+export const NativeMobileLoginItems = [
+  {
+    name: 'Apple',
+    icon: '/docs/img/icons/apple-icon',
+    url: '/guides/auth/social-login/auth-apple?platform=react-native',
+  },
+  {
+    name: 'Google',
+    icon: '/docs/img/icons/google-icon',
+    url: '/guides/auth/social-login/auth-google?platform=react-native',
+  },
+]
+
 export const SocialLoginItems = [
   {
     name: 'Google',
@@ -495,19 +508,8 @@ export const auth = {
         },
         {
           name: 'Native Mobile Login',
-          url: '/guides/auth/social-login', // TODO dedicated native auth landing?
-          items: [
-            {
-              name: 'Apple',
-              icon: '/docs/img/icons/apple-icon',
-              url: '/guides/auth/social-login/auth-apple',
-            },
-            {
-              name: 'Google',
-              icon: '/docs/img/icons/google-icon',
-              url: '/guides/auth/social-login/auth-google',
-            },
-          ],
+          url: '/guides/auth/native-mobile-login',
+          items: [...NativeMobileLoginItems],
         },
         {
           name: 'Enterprise SSO',
