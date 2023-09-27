@@ -11,10 +11,10 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import {
   FormActions,
   FormPanel,
+  FormsContainer,
   FormSection,
   FormSectionContent,
   FormSectionLabel,
-  FormsContainer,
 } from 'components/ui/Forms'
 import Loading from 'components/ui/Loading'
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
@@ -33,13 +33,13 @@ import {
   Input,
 } from 'ui'
 import InputField from './InputField'
-import WrapperTableEditor from './WrapperTableEditor'
 import { WRAPPERS } from './Wrappers.constants'
 import {
   convertKVStringArrayToJson,
   formatWrapperTables,
   makeValidateRequired,
 } from './Wrappers.utils'
+import WrapperTableEditor from './WrapperTableEditor'
 
 const EditWrapper = () => {
   const formId = 'edit-wrapper-form'
@@ -120,7 +120,7 @@ const EditWrapper = () => {
         <div className="flex flex-col items-center justify-center w-full h-full space-y-4">
           <div className="space-y-2 flex flex-col items-center w-[400px]">
             <p>Unknown wrapper</p>
-            <p className="text-sm text-center text-scale-1000">
+            <p className="text-sm text-center text-foreground-light">
               The wrapper ID {id} cannot be found in your project. Head back to select another
               wrapper.
             </p>
@@ -189,7 +189,7 @@ const EditWrapper = () => {
               </a>
             </Link>
           </div>
-          <h3 className="mb-2 text-xl text-scale-1200">Edit wrapper: {wrapper.name}</h3>
+          <h3 className="mb-2 text-xl text-foreground">Edit wrapper: {wrapper.name}</h3>
           <div className="flex items-center space-x-2">
             <Link href="https://supabase.github.io/wrappers/stripe/">
               <a target="_blank" rel="noreferrer">
@@ -312,7 +312,7 @@ const EditWrapper = () => {
                   header={
                     <FormSectionLabel>
                       <p>Foreign Tables</p>
-                      <p className="text-scale-1000 mt-2 w-[90%]">
+                      <p className="text-foreground-light mt-2 w-[90%]">
                         You can query your data from these foreign tables after the wrapper is
                         created
                       </p>
@@ -337,7 +337,7 @@ const EditWrapper = () => {
                               <p className="text-sm">
                                 {table.schema_name}.{table.table_name}
                               </p>
-                              <p className="text-sm text-scale-1000">
+                              <p className="text-sm text-foreground-light">
                                 {wrapperMeta.tables[table.index].label}:{' '}
                                 {table.columns.map((column: any) => column.name).join(', ')}
                               </p>

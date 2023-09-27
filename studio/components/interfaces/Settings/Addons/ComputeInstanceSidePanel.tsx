@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
-import { useParams, useTheme } from 'common'
+import { useParams } from 'common'
+import { useTheme } from 'next-themes'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
@@ -46,7 +47,7 @@ const ComputeInstanceSidePanel = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
   const { project: selectedProject } = useProjectContext()
   const organization = useSelectedOrganization()
   const isOrgBilling = !!organization?.subscription_id
@@ -235,13 +236,13 @@ const ComputeInstanceSidePanel = () => {
                         )}
                         width={160}
                         height={96}
-                        src={isDarkMode ? option.imageUrl : option.imageUrlLight}
+                        src={theme === 'dark' ? option.imageUrl : option.imageUrlLight}
                       />
 
                       <p
                         className={clsx(
                           'text-sm transition',
-                          isSelected ? 'text-scale-1200' : 'text-scale-1000'
+                          isSelected ? 'text-foreground' : 'text-foreground-light'
                         )}
                       >
                         {option.name}
@@ -299,17 +300,19 @@ const ComputeInstanceSidePanel = () => {
                           <p className="text-sm">{option.name}</p>
                         </div>
                         <div className="px-4 py-2">
-                          <p className="text-scale-1000">{option.meta?.memory_gb ?? 0} GB memory</p>
-                          <p className="text-scale-1000">
+                          <p className="text-foreground-light">
+                            {option.meta?.memory_gb ?? 0} GB memory
+                          </p>
+                          <p className="text-foreground-light">
                             {option.meta?.cpu_cores ?? 0}-core {cpuArchitecture} CPU (
                             {option.meta?.cpu_dedicated ? 'Dedicated' : 'Shared'})
                           </p>
                           <div className="flex justify-between items-center mt-2">
                             <div className="flex items-center space-x-1">
-                              <span className="text-scale-1200 text-sm">
+                              <span className="text-foreground text-sm">
                                 ${option.price.toLocaleString()}
                               </span>
-                              <span className="text-scale-1000 translate-y-[1px]">
+                              <span className="text-foreground-light translate-y-[1px]">
                                 {' '}
                                 / {option.price_interval === 'monthly' ? 'month' : 'hour'}
                               </span>
@@ -321,7 +324,7 @@ const ComputeInstanceSidePanel = () => {
                                     <IconInfo
                                       size={14}
                                       strokeWidth={2}
-                                      className="hover:text-scale-1000"
+                                      className="hover:text-foreground-light"
                                     />
                                   </div>
                                 </Tooltip.Trigger>
@@ -335,7 +338,7 @@ const ComputeInstanceSidePanel = () => {
                                       ].join(' ')}
                                     >
                                       <div className="flex items-center space-x-1">
-                                        <p className="text-scale-1200 text-sm">
+                                        <p className="text-foreground text-sm">
                                           ${Number(option.price * 672).toFixed(0)} - $
                                           {Number(option.price * 744).toFixed(0)} per month
                                         </p>
@@ -355,7 +358,7 @@ const ComputeInstanceSidePanel = () => {
             )}
 
             {selectedCategory === 'micro' && (
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 Your database will use the standard Micro size instance of 2-core {cpuArchitecture}{' '}
                 CPU (Shared) with 1GB of memory.
               </p>
@@ -363,15 +366,15 @@ const ComputeInstanceSidePanel = () => {
 
             {hasChanges &&
               (selectedCategory === 'micro' && !isOrgBilling ? (
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of that's unused during the current billing
                   cycle will be returned as credits that can be used for subsequent billing cycles
                 </p>
               ) : selectedCategory !== 'micro' && selectedCompute?.price_interval === 'monthly' ? (
                 // Monthly payment with project-level subscription
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   Upon clicking confirm, the amount of{' '}
-                  <span className="text-scale-1200">
+                  <span className="text-foreground">
                     ${selectedCompute?.price.toLocaleString()}
                   </span>{' '}
                   will be added to your monthly invoice. Any previous compute addon is prorated and
@@ -381,7 +384,7 @@ const ComputeInstanceSidePanel = () => {
                 </p>
               ) : selectedCategory !== 'micro' ? (
                 // Hourly usage-billing with org-based subscription
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   There are no immediate charges when changing compute. Compute Hours are a
                   usage-based item and you're billed at the end of your billing cycle based on your
                   compute usage. Read more about{' '}

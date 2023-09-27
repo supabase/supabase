@@ -95,7 +95,7 @@ const APIDocumentationPanel = ({ visible, onClose }: APIDocumentationPanelProps)
       <div className="Docs Docs--table-editor Docs--inner-wrapper">
         {isErrorJSONSchema && (
           <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
-            <div className="text-scale-1000">
+            <div className="text-foreground-light">
               <p>Error connecting to API</p>
               <p>{`${jsonSchemaError}`}</p>
             </div>

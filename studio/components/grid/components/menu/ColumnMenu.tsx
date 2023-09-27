@@ -3,7 +3,10 @@ import { CalculatedColumn } from '@supabase/react-data-grid'
 import {
   Button,
   Divider,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconChevronDown,
   IconEdit,
   IconLock,
@@ -47,13 +50,14 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
         {state.editable && onEditColumn !== undefined && (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
-              <Dropdown.Item
+              <DropdownMenuItem_Shadcn_
+                className="space-x-2"
                 onClick={onEditColumn}
                 disabled={isEncrypted}
-                icon={<IconEdit size="tiny" />}
               >
-                Edit column
-              </Dropdown.Item>
+                <IconEdit size="tiny" />
+                <p className="text">Edit column</p>
+              </DropdownMenuItem_Shadcn_>
             </Tooltip.Trigger>
             {isEncrypted && (
               <Tooltip.Portal>
@@ -65,7 +69,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text-foreground">
                       Encrypted columns cannot be edited
                     </span>
                   </div>
@@ -74,18 +78,29 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
             )}
           </Tooltip.Root>
         )}
-        <Dropdown.Item
+        <DropdownMenuItem_Shadcn_
+          className="space-x-2"
           onClick={column.frozen ? onUnfreezeColumn : onFreezeColumn}
-          icon={column.frozen ? <IconUnlock size="tiny" /> : <IconLock size="tiny" />}
         >
-          {column.frozen ? 'Unfreeze column' : 'Freeze column'}
-        </Dropdown.Item>
+          {column.frozen ? (
+            <>
+              <IconUnlock size="tiny" />
+              <p className="text">Unfreeze column</p>
+            </>
+          ) : (
+            <>
+              <IconLock size="tiny" />
+              <p className="text">Freeze column</p>
+            </>
+          )}
+        </DropdownMenuItem_Shadcn_>
         {state.editable && onDeleteColumn !== undefined && (
           <>
             <Divider light />
-            <Dropdown.Item onClick={onDeleteColumn} icon={<IconTrash size="tiny" stroke="red" />}>
-              Delete column
-            </Dropdown.Item>
+            <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={onDeleteColumn}>
+              <IconTrash size="tiny" stroke="red" />
+              <p className="text">Delete column</p>
+            </DropdownMenuItem_Shadcn_>
           </>
         )}
       </>
@@ -94,18 +109,24 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
 
   return (
     <>
-      <Dropdown align="end" side="bottom" overlay={renderMenu()}>
-        <Button
-          asChild
-          className="opacity-50"
-          type="text"
-          icon={<IconChevronDown />}
-          style={{ padding: '3px' }}
-        >
-          <span></span>
-        </Button>
-      </Dropdown>
+      <DropdownMenu_Shadcn_>
+        <DropdownMenuTrigger_Shadcn_>
+          <Button
+            asChild
+            className="opacity-50 flex"
+            type="text"
+            icon={<IconChevronDown />}
+            style={{ padding: '3px' }}
+          >
+            <span></span>
+          </Button>
+        </DropdownMenuTrigger_Shadcn_>
+        <DropdownMenuContent_Shadcn_ align="end" side="bottom">
+          {renderMenu()}
+        </DropdownMenuContent_Shadcn_>
+      </DropdownMenu_Shadcn_>
     </>
   )
 }
+
 export default ColumnMenu

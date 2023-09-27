@@ -94,8 +94,8 @@ functions:
           `supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests,
           but an alternative `fetch` implementation can be provided as an option.
           This is most useful in environments where `cross-fetch` is not compatible (for instance Cloudflare Workers).
-      - id: react-native-options
-        name: React Native options
+      - id: react-native-options-async-storage
+        name: React Native options with AsyncStorage
         code: |
           ```js
           import { createClient } from '@supabase/supabase-js'
@@ -112,6 +112,78 @@ functions:
           ```
         description: |
           For React Native we recommend using `AsyncStorage` as the storage implementation for Supabase Auth.
+      - id: react-native-options-secure-storage
+        name: React Native options with Expo SecureStore
+        code: |
+          ```js
+          import { createClient } from '@supabase/supabase-js'
+          import AsyncStorage from '@react-native-async-storage/async-storage';
+          import * as SecureStore from 'expo-secure-store';
+          import * as aesjs from 'aes-js';
+          import 'react-native-get-random-values';
+
+          // As Expo's SecureStore does not support values larger than 2048
+          // bytes, an AES-256 key is generated and stored in SecureStore, while
+          // it is used to encrypt/decrypt values stored in AsyncStorage.
+          class LargeSecureStore {
+            private async _encrypt(key: string, value: string) {
+              const encryptionKey = crypto.getRandomValues(new Uint8Array(256 / 8));
+
+              const cipher = new aesjs.ModeOfOperation.ctr(encryptionKey, new aesjs.Counter(1));
+              const encryptedBytes = cipher.encrypt(aesjs.utils.utf8.toBytes(value));
+
+              await SecureStore.setItemAsync(key, aesjs.utils.hex.fromBytes(encryptionKey));
+
+              return aesjs.utils.hex.fromBytes(encryptedBytes);
+            }
+
+            private async _decrypt(key: string, value: string) {
+              const encryptionKeyHex = await SecureStore.getItemAsync(key);
+              if (!encryptionKeyHex) {
+                return encryptionKeyHex;
+              }
+
+              const cipher = new aesjs.ModeOfOperation.ctr(aesjs.utils.hex.toBytes(encryptionKeyHex), new aesjs.Counter(1));
+              const decryptedBytes = cipher.decrypt(aesjs.utils.hex.toBytes(value));
+
+              return aesjs.utils.utf8.fromBytes(decryptedBytes);
+            }
+
+            async getItem(key: string) {
+              const encrypted = await AsyncStorage.getItem(key);
+              if (!encrypted) { return encrypted; }
+
+              return await this._decrypt(key, encrypted);
+            }
+
+            async removeItem(key: string) {
+              await AsyncStorage.removeItem(key);
+              await SecureStore.deleteItemAsync(key);
+            }
+
+            async setItem(key: string, value: string) {
+              const encrypted = await this._encrypt(key, value);
+
+              await AsyncStorage.setItem(key, encrypted);
+            }
+          }
+
+          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", {
+            auth: {
+              storage: new LargeSecureStore(),
+              autoRefreshToken: true,
+              persistSession: true,
+              detectSessionInUrl: false,
+            },
+          });
+          ```
+        description: |
+          If you wish to encrypt the user's session information, you can use `aes-js` and store the encryption key in Expo SecureStore. The `aes-js` library, a reputable JavaScript-only implementation of the AES encryption algorithm in CTR mode. A new 256-bit encryption key is generated using the `react-native-get-random-values` library. This key is stored inside Expo's SecureStore, while the value is encrypted and placed inside AsyncStorage.
+
+          Please make sure that:
+          - You keep the `expo-secure-storage`, `aes-js` and `react-native-get-random-values` libraries up-to-date.
+          - Choose the correct [`SecureStoreOptions`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestoreoptions) for your app's needs. E.g. [`SecureStore.WHEN_UNLOCKED`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestorewhen_unlocked) regulates when the data can be accessed.
+          - Carefully consider optimizations or other modifications to the above example, as those can lead to introducing subtle security vulnerabilities.
   - id: auth-api
     title: 'Overview'
     notes: |

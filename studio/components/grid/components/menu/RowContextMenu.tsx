@@ -7,6 +7,7 @@ import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmM
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useDispatch, useTrackedState } from '../../store'
 import { copyToClipboard, formatClipboardValue } from '../../utils'
+import { useCallback } from 'react'
 
 export const ROW_CONTEXT_MENU_ID = 'row-context-menu-id'
 
@@ -66,23 +67,26 @@ const RowContextMenu = ({ table, rows }: RowContextMenuProps) => {
     return false
   }
 
-  function onCopyCellContent(p: ItemParams) {
-    const { props } = p
+  const onCopyCellContent = useCallback(
+    (p: ItemParams) => {
+      const { props } = p
 
-    if (!state.selectedCellPosition || !props) {
-      return
-    }
+      if (!state.selectedCellPosition || !props) {
+        return
+      }
 
-    const { rowIdx } = props
-    const row = rows[rowIdx]
+      const { rowIdx } = props
+      const row = rows[rowIdx]
 
-    const columnKey = state.gridColumns[state.selectedCellPosition?.idx as number].key
+      const columnKey = state.gridColumns[state.selectedCellPosition?.idx as number].key
 
-    const value = row[columnKey]
-    const text = formatClipboardValue(value)
+      const value = row[columnKey]
+      const text = formatClipboardValue(value)
 
-    copyToClipboard(text)
-  }
+      copyToClipboard(text)
+    },
+    [rows, state.gridColumns, state.selectedCellPosition]
+  )
 
   return (
     <>

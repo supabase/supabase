@@ -25,7 +25,7 @@ const RolesHelperModal = () => {
               'border border-scale-200 ', //border
             ].join(' ')}
           >
-            <span className="text-xs text-scale-1200">Only available in Team/Enterprise plan.</span>
+            <span className="text-xs text-foreground">Only available in Team/Enterprise plan.</span>
           </div>
         </Tooltip.Content>
       </Tooltip.Portal>
@@ -37,7 +37,7 @@ const RolesHelperModal = () => {
       <IconHelpCircle
         size={16}
         strokeWidth={1.5}
-        className="cursor-pointer transition hover:text-scale-1200"
+        className="cursor-pointer transition hover:text-foreground"
         onClick={() => setShowModal(!showModal)}
       />
       <Modal
