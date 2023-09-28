@@ -1,7 +1,7 @@
 import { filter, has, isEmpty, isNull, isUndefined, keyBy, mapValues, partition } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { FormEvent, createContext, useContext, useEffect, useState } from 'react'
+import { createContext, FormEvent, useContext, useEffect, useState } from 'react'
 import { Button, IconPlus, IconTrash, Input, Listbox, Modal, Radio, SidePanel, Toggle } from 'ui'
 
 import { Dictionary } from 'components/grid'
@@ -14,9 +14,9 @@ import SqlEditor from 'components/ui/SqlEditor'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useStore } from 'hooks'
 import { isResponseOk } from 'lib/common/fetch'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { SupaResponse } from 'types'
 import { convertArgumentTypes, convertConfigParams, hasWhitespace } from './Functions.utils'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 
 // [Refactor] Remove local state, just use the Form component
 
@@ -427,7 +427,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
           }}
         >
           <Modal.Content>
-            <p className="py-4 text-sm text-scale-1100">
+            <p className="py-4 text-sm text-foreground-light">
               There are unsaved changes. Are you sure you want to close the panel? Your changes will
               be lost.
             </p>
@@ -480,14 +480,14 @@ const InputMultiArguments = observer(({ readonly }: InputMultiArgumentsProps) =>
   return (
     <div>
       <div className="flex flex-col">
-        <h5 className="text-base text-scale-1200">Arguments</h5>
-        <p className="text-sm text-scale-1100">
+        <h5 className="text-base text-foreground">Arguments</h5>
+        <p className="text-sm text-foreground-light">
           Arguments can be referenced in the function body using either names or numbers.
         </p>
       </div>
       <div className="space-y-2 pt-4">
         {readonly && isEmpty(_localState!.formState.args.value) && (
-          <span className="text-scale-900">No argument for this function</span>
+          <span className="text-foreground-lighter">No argument for this function</span>
         )}
         {_localState!.formState.args.value.map(
           (x: { name: string; type: string; error?: string }, idx: number) => (
@@ -562,23 +562,27 @@ const InputArgument = observer(({ idx, name, type, error, readonly }: InputArgum
         error={error}
         disabled={readonly}
       />
-      <Listbox
-        id={`type-${idx}`}
-        className="flex-1"
-        value={type}
-        size="small"
-        onChange={onTypeChange}
-        disabled={readonly}
-      >
-        <Listbox.Option value="integer" label="integer">
-          integer
-        </Listbox.Option>
-        {POSTGRES_DATA_TYPES.map((x: string) => (
-          <Listbox.Option key={x} value={x} label={x}>
-            {x}
+      {readonly ? (
+        <Input disabled readOnly id={`type-${idx}`} size="small" value={type} className="flex-1" />
+      ) : (
+        <Listbox
+          id={`type-${idx}`}
+          className="flex-1"
+          value={type}
+          size="small"
+          onChange={onTypeChange}
+          disabled={readonly}
+        >
+          <Listbox.Option value="integer" label="integer">
+            integer
           </Listbox.Option>
-        ))}
-      </Listbox>
+          {POSTGRES_DATA_TYPES.map((x: string) => (
+            <Listbox.Option key={x} value={x} label={x}>
+              {x}
+            </Listbox.Option>
+          ))}
+        </Listbox>
+      )}
       {!readonly && (
         <Button type="danger" icon={<IconTrash size="tiny" />} onClick={onDelete} size="small" />
       )}
@@ -600,7 +604,7 @@ const InputMultiConfigParams = observer(({}) => {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h5 className="text-base text-scale-1200">Config Params</h5>
+        <h5 className="text-base text-foreground">Config Params</h5>
       </div>
       <div className="space-y-2 pt-4">
         {_localState!.formState.configParams.value.map(
@@ -694,12 +698,12 @@ const InputDefinition = observer(({}) => {
   return (
     <div className="space-y-4">
       <div className="flex flex-col">
-        <h5 className="text-base text-scale-1200">Definition</h5>
-        <p className="text-sm text-scale-1100">
+        <h5 className="text-base text-foreground">Definition</h5>
+        <p className="text-sm text-foreground-light">
           The language below should be written in `{_localState!.formState.language.value}`.
         </p>
         {!_localState?.isEditing && (
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             Change the language in the Advanced Settings below.
           </p>
         )}

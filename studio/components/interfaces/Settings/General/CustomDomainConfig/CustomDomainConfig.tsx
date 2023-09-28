@@ -6,13 +6,13 @@ import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { IconAlertCircle } from 'ui'
 import CustomDomainActivate from './CustomDomainActivate'
 import CustomDomainDelete from './CustomDomainDelete'
-import CustomDomainVerify from './CustomDomainVerify'
 import CustomDomainsConfigureHostname from './CustomDomainsConfigureHostname'
 import CustomDomainsShimmerLoader from './CustomDomainsShimmerLoader'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
+import CustomDomainVerify from './CustomDomainVerify'
 
 const CustomDomainConfig = () => {
   const { ref } = useParams()
@@ -47,7 +47,7 @@ const CustomDomainConfig = () => {
           <Panel.Content className="space-y-6">
             <div className="flex items-center justify-center space-x-2 py-8">
               <IconAlertCircle size={16} strokeWidth={1.5} />
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 Failed to retrieve custom domain configuration. Please try again later or{' '}
                 <Link href={`/support/new?ref=${ref}&category=sales`}>
                   <a className="underline">contact support</a>

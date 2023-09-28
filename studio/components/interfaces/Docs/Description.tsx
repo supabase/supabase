@@ -78,7 +78,7 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
 
   if (!canUpdateDescription) {
     return (
-      <span className={`block ${value ? 'text-scale-1200' : ''}`}>{value || 'No description'}</span>
+      <span className={`block ${value ? 'text-foreground' : ''}`}>{value || 'No description'}</span>
     )
   }
 

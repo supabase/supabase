@@ -2,10 +2,10 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IconAlertCircle, Loading } from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
+import { User } from 'data/auth/users-query'
 import { useCheckPermissions } from 'hooks'
 import UserListItem from './UsersListItem'
 import UsersPagination from './UsersPagination'
-import { User } from 'data/auth/users-query'
 
 interface UsersListProps {
   page: number
@@ -60,7 +60,7 @@ const UsersList = ({
                 >
                   <div className="flex items-center space-x-3 opacity-75">
                     <IconAlertCircle size={16} strokeWidth={2} />
-                    <p className="text-scale-1000">
+                    <p className="text-foreground-light">
                       {keywords
                         ? `No users matched the search query "${keywords}"`
                         : 'No users in your project yet'}

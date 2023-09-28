@@ -13,18 +13,6 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/handbook/contributing</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/docs/handbook/introduction</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
     <loc>https://supabase.com/docs/guides/ai</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -97,37 +85,137 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/docs/handbook/contributing</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/handbook/introduction</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
     <loc>https://supabase.com/docs/reference/index</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
+<<<<<<< HEAD
+    <loc>https://supabase.com/docs/guides/ai/choosing-compute-addon</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/ai/concepts</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/ai/engineering-for-scale</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/ai/going-to-prod</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/ai/google-colab</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/ai/hugging-face</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/ai/langchain</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/ai/python-clients</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/ai/structured-unstructured</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/ai/vecs-python-client</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/ai/vector-columns</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/ai/vector-indexes</loc>
+=======
     <loc>https://supabase.com/docs/guides/api/api-keys</loc>
+>>>>>>> @{-1}
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/api/creating-routes</loc>
+    <loc>https://supabase.com/docs/guides/cli/customizing-email-templates</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/api/joins-and-nesting</loc>
+    <loc>https://supabase.com/docs/guides/cli/getting-started</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/api/quickstart</loc>
+    <loc>https://supabase.com/docs/guides/cli/local-development</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/api/securing-your-api</loc>
+    <loc>https://supabase.com/docs/guides/cli/managing-config</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/cli/managing-environments</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/cli/seeding-your-database</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/cli/testing-and-linting</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -295,6 +383,9 @@
   </url>
 
   <url>
+<<<<<<< HEAD
+    <loc>https://supabase.com/docs/guides/database/arrays</loc>
+=======
     <loc>https://supabase.com/docs/guides/cli/customizing-email-templates</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -320,11 +411,14 @@
 
   <url>
     <loc>https://supabase.com/docs/guides/cli/managing-environments</loc>
+>>>>>>> @{-1}
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
+<<<<<<< HEAD
+=======
     <loc>https://supabase.com/docs/guides/cli/seeding-your-database</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -343,6 +437,7 @@
   </url>
 
   <url>
+>>>>>>> @{-1}
     <loc>https://supabase.com/docs/guides/database/column-encryption</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -446,6 +541,45 @@
 
   <url>
     <loc>https://supabase.com/docs/guides/database/webhooks</loc>
+<<<<<<< HEAD
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/api/api-keys</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/api/creating-routes</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/api/joins-and-nesting</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/api/quickstart</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/api/securing-your-api</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/api/using-custom-schemas</loc>
+=======
+>>>>>>> @{-1}
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -799,12 +933,6 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/self-hosting/docker</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
     <loc>https://supabase.com/docs/guides/storage/access-control</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -841,6 +969,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/docs/guides/self-hosting/docker</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
     <loc>https://supabase.com/docs/learn/auth-deep-dive/auth-deep-dive-jwts</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -871,6 +1005,8 @@
   </url>
 
   <url>
+<<<<<<< HEAD
+=======
     <loc>https://supabase.com/docs/guides/api/rest/auto-generated-docs</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -889,6 +1025,7 @@
   </url>
 
   <url>
+>>>>>>> @{-1}
     <loc>https://supabase.com/docs/guides/ai/examples/building-chatgpt-plugins</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -925,24 +1062,57 @@
   </url>
 
   <url>
+<<<<<<< HEAD
+    <loc>https://supabase.com/docs/guides/ai/quickstarts/face-similarity</loc>
+=======
+    <loc>https://supabase.com/docs/guides/ai/integrations/llamaindex</loc>
+>>>>>>> @{-1}
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+<<<<<<< HEAD
+    <loc>https://supabase.com/docs/guides/ai/quickstarts/generate-text-embeddings</loc>
+=======
+    <loc>https://supabase.com/docs/guides/ai/quickstarts/face-similarity</loc>
+>>>>>>> @{-1}
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+<<<<<<< HEAD
+    <loc>https://supabase.com/docs/guides/ai/quickstarts/hello-world</loc>
+=======
+    <loc>https://supabase.com/docs/guides/ai/quickstarts/generate-text-embeddings</loc>
+>>>>>>> @{-1}
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+<<<<<<< HEAD
+    <loc>https://supabase.com/docs/guides/ai/quickstarts/text-deduplication</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
     <loc>https://supabase.com/docs/guides/ai/integrations/llamaindex</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/quickstarts/face-similarity</loc>
+    <loc>https://supabase.com/docs/guides/ai/vector-indexes/hnsw-indexes</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
-    <loc>https://supabase.com/docs/guides/ai/quickstarts/generate-text-embeddings</loc>
-    <changefreq>weekly</changefreq>
-    <changefreq>0.5</changefreq>
-  </url>
-
-  <url>
+    <loc>https://supabase.com/docs/guides/ai/vector-indexes/ivf-indexes</loc>
+=======
     <loc>https://supabase.com/docs/guides/ai/quickstarts/hello-world</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -950,6 +1120,7 @@
 
   <url>
     <loc>https://supabase.com/docs/guides/ai/quickstarts/text-deduplication</loc>
+>>>>>>> @{-1}
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -1015,6 +1186,8 @@
   </url>
 
   <url>
+<<<<<<< HEAD
+=======
     <loc>https://supabase.com/docs/guides/ai/vector-indexes/hnsw-indexes</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -1027,6 +1200,7 @@
   </url>
 
   <url>
+>>>>>>> @{-1}
     <loc>https://supabase.com/docs/guides/auth/quickstarts/nextjs</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -1329,6 +1503,33 @@
   </url>
 
   <url>
+<<<<<<< HEAD
+    <loc>https://supabase.com/docs/guides/api/graphql/graphiql</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/api/rest/auto-generated-docs</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/api/rest/client-libs</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/api/rest/generating-types</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+=======
+>>>>>>> @{-1}
     <loc>https://supabase.com/docs/guides/database/postgres/cascade-deletes</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -1383,12 +1584,15 @@
   </url>
 
   <url>
+<<<<<<< HEAD
+=======
     <loc>https://supabase.com/docs/guides/platform/oauth-apps/build-a-supabase-integration</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
+>>>>>>> @{-1}
     <loc>https://supabase.com/docs/guides/functions/examples/cloudflare-turnstile</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -1449,6 +1653,75 @@
   </url>
 
   <url>
+<<<<<<< HEAD
+    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/flutter</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/kotlin</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/nextjs</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/nuxtjs</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/reactjs</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/redwoodjs</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/refine</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/solidjs</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/sveltekit</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/getting-started/quickstarts/vue</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/platform/oauth-apps/build-a-supabase-integration</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+=======
+>>>>>>> @{-1}
     <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-angular</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -1540,6 +1813,8 @@
 
   <url>
     <loc>https://supabase.com/docs/guides/getting-started/tutorials/with-vue-3</loc>
+<<<<<<< HEAD
+=======
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -1600,6 +1875,7 @@
 
   <url>
     <loc>https://supabase.com/docs/guides/getting-started/quickstarts/vue</loc>
+>>>>>>> @{-1}
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
@@ -1629,12 +1905,15 @@
   </url>
 
   <url>
+<<<<<<< HEAD
+=======
     <loc>https://supabase.com/docs/guides/self-hosting/analytics/config</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
+>>>>>>> @{-1}
     <loc>https://supabase.com/docs/guides/resources/migrating-to-supabase/amazon-rds</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -1671,6 +1950,9 @@
   </url>
 
   <url>
+<<<<<<< HEAD
+    <loc>https://supabase.com/docs/guides/self-hosting/analytics/config</loc>
+=======
     <loc>https://supabase.com/docs/guides/self-hosting/realtime/config</loc>
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
@@ -1678,12 +1960,29 @@
 
   <url>
     <loc>https://supabase.com/docs/guides/self-hosting/storage/config</loc>
+>>>>>>> @{-1}
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>
 
   <url>
     <loc>https://supabase.com/docs/guides/self-hosting/auth/config</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+<<<<<<< HEAD
+    <loc>https://supabase.com/docs/guides/self-hosting/realtime/config</loc>
+    <changefreq>weekly</changefreq>
+    <changefreq>0.5</changefreq>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/docs/guides/self-hosting/storage/config</loc>
+=======
+    <loc>https://supabase.com/docs/guides/database/extensions/wrappers/overview</loc>
+>>>>>>> @{-1}
     <changefreq>weekly</changefreq>
     <changefreq>0.5</changefreq>
   </url>

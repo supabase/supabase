@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
@@ -25,7 +26,6 @@ import {
   Input,
   Listbox,
 } from 'ui'
-import AlertError from 'components/ui/AlertError'
 
 interface TableListProps {
   onAddTable: () => void
@@ -91,7 +91,7 @@ const TableList = ({
   return (
     <>
       <div className="mb-4">
-        <h3 className="mb-1 text-xl text-scale-1200">Database Tables</h3>
+        <h3 className="mb-1 text-xl text-foreground">Database Tables</h3>
       </div>
 
       <div className="flex items-center justify-between">
@@ -118,9 +118,9 @@ const TableList = ({
                     key={schema.id}
                     value={schema.name}
                     label={schema.name}
-                    addOnBefore={() => <span className="text-scale-900">schema</span>}
+                    addOnBefore={() => <span className="text-foreground-lighter">schema</span>}
                   >
-                    <span className="text-scale-1200 text-sm">{schema.name}</span>
+                    <span className="text-foreground text-sm">{schema.name}</span>
                   </Listbox.Option>
                 ))}
                 <Listbox.Option
@@ -136,9 +136,9 @@ const TableList = ({
                     key={schema.id}
                     value={schema.name}
                     label={schema.name}
-                    addOnBefore={() => <span className="text-scale-900">schema</span>}
+                    addOnBefore={() => <span className="text-foreground-lighter">schema</span>}
                   >
-                    <span className="text-scale-1200 text-sm">{schema.name}</span>
+                    <span className="text-foreground text-sm">{schema.name}</span>
                   </Listbox.Option>
                 ))}
               </Listbox>
@@ -177,7 +177,7 @@ const TableList = ({
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         You need additional permissions to create tables
                       </span>
                     </div>
@@ -224,7 +224,7 @@ const TableList = ({
                   {tables.length === 0 && filterString.length === 0 && (
                     <Table.tr key={snap.selectedSchemaName}>
                       <Table.td colSpan={6}>
-                        <p className="text-sm text-scale-1200">No tables created yet</p>
+                        <p className="text-sm text-foreground">No tables created yet</p>
                         <p className="text-sm text-light">
                           There are no tables found in the schema "{snap.selectedSchemaName}"
                         </p>
@@ -234,7 +234,7 @@ const TableList = ({
                   {tables.length === 0 && filterString.length > 0 && (
                     <Table.tr key={snap.selectedSchemaName}>
                       <Table.td colSpan={6}>
-                        <p className="text-sm text-scale-1200">No results found</p>
+                        <p className="text-sm text-foreground">No results found</p>
                         <p className="text-sm text-light">
                           Your search for "{filterString}" did not return any results
                         </p>
@@ -303,7 +303,7 @@ const TableList = ({
                                         'border border-scale-200',
                                       ].join(' ')}
                                     >
-                                      <span className="text-xs text-scale-1200">
+                                      <span className="text-xs text-foreground">
                                         You need additional permissions to edit tables
                                       </span>
                                     </div>
@@ -332,7 +332,7 @@ const TableList = ({
                                         'border border-scale-200',
                                       ].join(' ')}
                                     >
-                                      <span className="text-xs text-scale-1200">
+                                      <span className="text-xs text-foreground">
                                         You need additional permissions to delete tables
                                       </span>
                                     </div>

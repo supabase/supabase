@@ -1,16 +1,16 @@
 import Link from 'next/link'
 import { Button, IconPlus } from 'ui'
 
+import NoProjectsOnPaidOrgInfo from 'components/interfaces/BillingV2/NoProjectsOnPaidOrgInfo'
 import ProjectCard from 'components/interfaces/Home/ProjectList/ProjectCard'
 import ShimmeringCard from 'components/interfaces/Home/ProjectList/ShimmeringCard'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
 import { NextPageWithLayout } from 'types'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import NoProjectsOnPaidOrgInfo from 'components/interfaces/BillingV2/NoProjectsOnPaidOrgInfo'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const {
@@ -63,7 +63,7 @@ const ProjectsPage: NextPageWithLayout = () => {
                   <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
                     <div className="space-y-1">
                       <p>No projects</p>
-                      <p className="text-sm text-scale-1100">
+                      <p className="text-sm text-foreground-light">
                         Get started by creating a new project.
                       </p>
                     </div>
