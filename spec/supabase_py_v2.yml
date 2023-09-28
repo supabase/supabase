@@ -741,13 +741,14 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert`
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Please specify the appropriate content [MIME type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types) if you are uploading images or audio. If no `file_options` are specified, the MIME type defaults to `text/html`.
     examples:
       - id: upload-file
         name: Upload file using filepath
         code: |
-          ```
-          with open(source, 'rb+') as f:
-            res = supabase.storage.from_('bucket').upload(destination, f)
+          ```py
+          with open(filepath, 'rb') as f:
+              supabase.storage.from_("testbucket").upload(file=f,path=path_on_supastorage, file_options={"content-type": "audio/mpeg"})
           ```
   - id: from-move
     title: 'from_.move()'
@@ -761,7 +762,7 @@ functions:
         name: Move file
         code: |
           ```
-          res = supabase.storage.from_(bucket).move('public/avatar1.png', 'private/avatar2.png')
+          res = supabase.storage.from_('bucket_name').move('public/avatar1.png', 'private/avatar2.png')
           ```
 
   - id: from-create-signed-url
@@ -776,7 +777,7 @@ functions:
         name: Create Signed URL
         code: |
           ```
-          res = supabase.storage.from_(bucket_name).create_signed_url(filepath, expiry_duration)
+          res = supabase.storage.from_('bucket_name').create_signed_url(filepath, expiry_duration)
           ```
 
   - id: from-get-public-url
@@ -792,7 +793,7 @@ functions:
         name: Returns the URL for an asset in a public bucket
         code: |
           ```
-          res = supabase.storage.from_(bucket_name).get_public_url('test/avatar1.jpg')
+          res = supabase.storage.from_('bucket_name').get_public_url('test/avatar1.jpg')
           ```
 
   - id: from-download
@@ -808,7 +809,7 @@ functions:
         code: |
           ```
           with open(destination, 'wb+') as f:
-            res = supabase.storage.from_(bucket_name).download(source)
+            res = supabase.storage.from_('bucket_name').download(source)
             f.write(res)
           ```
 
@@ -824,7 +825,7 @@ functions:
         name: Delete file
         code: |
           ```
-          res = supabase.storage.from_('test').remove('test.jpg')
+          res = supabase.storage.from_('bucket_name').remove('test.jpg')
           ```
   - id: from-list
     title: 'from_.list()'
@@ -838,7 +839,7 @@ functions:
         name: List files in a bucket
         code: |
           ```
-          res = supabase.storage.from_('test').list()
+          res = supabase.storage.from_('bucket_name').list()
           ```
   - id: subscribe
     title: on().subscribe()

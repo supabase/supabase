@@ -9,6 +9,7 @@ import { organizationKeys } from './keys'
 export type OrganizationMemberInviteDeleteVariables = {
   slug: string
   invitedId: number
+  invalidateDetail?: boolean
 }
 
 export async function deleteOrganizationMemberInvite({
@@ -45,10 +46,12 @@ export const useOrganizationMemberInviteDeleteMutation = ({
     OrganizationMemberInviteDeleteVariables
   >((vars) => deleteOrganizationMemberInvite(vars), {
     async onSuccess(data, variables, context) {
-      const { slug } = variables
+      const { slug, invalidateDetail } = variables
 
       await Promise.all([
-        queryClient.invalidateQueries(organizationKeys.detail(slug)),
+        ...(invalidateDetail ?? true
+          ? [queryClient.invalidateQueries(organizationKeys.detail(slug))]
+          : []),
         queryClient.invalidateQueries(organizationKeys.roles(slug)),
       ])
 

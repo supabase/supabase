@@ -29,7 +29,7 @@ const PolicyReview = ({
         <div className="space-y-6 py-8">
           <div className="flex items-center justify-between space-y-8">
             <div className="flex flex-col">
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 This is the SQL statement that will be used to create your policy.
               </p>
             </div>
@@ -37,7 +37,7 @@ const PolicyReview = ({
           <div className="space-y-4 overflow-y-auto" style={{ maxHeight: '25rem' }}>
             {isEmpty(policy) ? (
               <div className="my-10 flex items-center justify-center space-x-2 opacity-50">
-                <p className="text-base text-scale-1100">
+                <p className="text-base text-foreground-light">
                   There are no changes made to this policy
                 </p>
               </div>

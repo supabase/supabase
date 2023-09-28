@@ -1,12 +1,14 @@
+import { subscriptionHasHipaaAddon } from 'components/interfaces/BillingV2/Subscription/Subscription.utils'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { isError } from 'data/utils/error-check'
 import {
+  useFlag,
   useLocalStorageQuery,
   useSelectedOrganization,
   useSelectedProject,
   useStore,
-  useFlag,
 } from 'hooks'
 import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import { format } from 'sql-formatter'
@@ -15,8 +17,6 @@ import { AiIconAnimation, Button } from 'ui'
 import { useSqlEditor } from '../SQLEditor'
 import { sqlAiDisclaimerComment } from '../SQLEditor.constants'
 import Results from './Results'
-import { subscriptionHasHipaaAddon } from 'components/interfaces/BillingV2/Subscription/Subscription.utils'
-import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 
 export type UtilityTabResultsProps = {
   id: string
@@ -136,7 +136,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   } else if (!result) {
     return (
       <div className="bg-table-header-light dark:bg-table-header-dark">
-        <p className="m-0 border-0 px-6 py-4 text-sm text-scale-1100">
+        <p className="m-0 border-0 px-6 py-4 text-sm text-foreground-light">
           Click <code>RUN</code> to execute your query.
         </p>
       </div>

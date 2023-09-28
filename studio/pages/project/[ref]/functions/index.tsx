@@ -41,7 +41,7 @@ const PageLayout: NextPageWithLayout = () => {
             {hasFunctions ? (
               <div className="py-6 space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-scale-900">{`${functions.length} function${
+                  <span className="text-sm text-foreground-lighter">{`${functions.length} function${
                     functions.length > 1 ? 's' : ''
                   } deployed`}</span>
                   <Button type="primary" onClick={() => setShowTerminalInstructions(true)}>

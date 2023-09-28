@@ -10,7 +10,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { useTheme } from 'ui'
+import { useTheme } from 'next-themes'
 import classNames from 'classnames'
 import { SITE_ORIGIN } from '~/lib/constants'
 import { Accordion, Badge, IconExternalLink } from 'ui'
@@ -34,7 +34,7 @@ const constellation = [
 ]
 
 export default function launchweek() {
-  const { isDarkMode, toggleTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
   const title = 'Launch Week 6'
   const description = 'Supabase Launch Week 6 | 12-18 Dec 2022'
   const liveDay = null
@@ -62,15 +62,6 @@ export default function launchweek() {
       getCreators()
     }
   }, [supabase])
-
-  useEffect(() => {
-    toggleTheme(true)
-    document.body.className = 'bg-[#121212]'
-    return () => {
-      document.body.className = ''
-      isDarkMode ? toggleTheme(true) : toggleTheme(false)
-    }
-  }, [])
 
   async function getCreators() {
     try {
@@ -319,7 +310,7 @@ export default function launchweek() {
                       className="absolute group-hover/day1:scale-105 opacity-60 group-hover/day1:opacity-100 w-full h-full -z-10 transition-all duration-500"
                       style={{
                         background: `radial-gradient(650px 150px at 50% 100%, ${
-                          isDarkMode ? '#103633' : '#b8e8e7'
+                          theme === 'dark' ? '#103633' : '#b8e8e7'
                         }, transparent)`,
                       }}
                     ></div>
@@ -365,7 +356,7 @@ export default function launchweek() {
                         className="top-0 absolute group-hover/2:scale-105 opacity-60 group-hover/2:opacity-100 w-full h-full -z-10 transition-all duration-500"
                         style={{
                           background: `radial-gradient(90% 130px at 80% 0px, ${
-                            isDarkMode ? '#103633' : '#b8e8e7'
+                            theme === 'dark' ? '#103633' : '#b8e8e7'
                           }, transparent)`,
                         }}
                       ></div>
@@ -384,7 +375,7 @@ export default function launchweek() {
                         className="top-0 absolute group-hover/3:scale-105 opacity-60 group-hover/3:opacity-100 w-full h-full -z-10 transition-all duration-500"
                         style={{
                           background: `radial-gradient(90% 130px at 50% 0px, ${
-                            isDarkMode ? '#103633' : '#b8e8e7'
+                            theme === 'dark' ? '#103633' : '#b8e8e7'
                           }, transparent)`,
                         }}
                       ></div>
@@ -423,7 +414,7 @@ export default function launchweek() {
                       <div className="absolute top-0 right-0 w-full h-full -z-20 ">
                         <Image
                           src={
-                            isDarkMode
+                            theme === 'dark'
                               ? '/images/launchweek/mfa-dark.png'
                               : '/images/launchweek/mfa-light.png'
                           }
@@ -482,7 +473,7 @@ export default function launchweek() {
                       >
                         <Image
                           src={
-                            isDarkMode
+                            theme === 'dark'
                               ? '/images/launchweek/wrappers-visual.svg'
                               : '/images/launchweek/wrappers-visual-light.svg'
                           }
@@ -498,7 +489,7 @@ export default function launchweek() {
                       >
                         <Image
                           src={
-                            isDarkMode
+                            theme === 'dark'
                               ? '/images/launchweek/wrappers-visual-hover.svg'
                               : '/images/launchweek/wrappers-visual-hover-light.svg'
                           }
@@ -549,7 +540,7 @@ export default function launchweek() {
                         >
                           <Image
                             src={
-                              isDarkMode
+                              theme === 'dark'
                                 ? '/images/launchweek/vault-visual.svg'
                                 : '/images/launchweek/vault-visual-light.svg'
                             }
@@ -565,7 +556,7 @@ export default function launchweek() {
                         >
                           <Image
                             src={
-                              isDarkMode
+                              theme === 'dark'
                                 ? '/images/launchweek/vault-visual-hover.svg'
                                 : '/images/launchweek/vault-visual-hover-light.svg'
                             }
@@ -589,7 +580,7 @@ export default function launchweek() {
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
                             src={
-                              isDarkMode
+                              theme === 'dark'
                                 ? '/images/launchweek/TCE-visual.svg'
                                 : '/images/launchweek/TCE-visual-light.svg'
                             }
@@ -605,7 +596,7 @@ export default function launchweek() {
                         >
                           <Image
                             src={
-                              isDarkMode
+                              theme === 'dark'
                                 ? '/images/launchweek/TCE-visual-hover.svg'
                                 : '/images/launchweek/TCE-visual-hover-light.svg'
                             }
@@ -634,7 +625,7 @@ export default function launchweek() {
                         >
                           <Image
                             src={
-                              isDarkMode
+                              theme === 'dark'
                                 ? '/images/launchweek/community-visual.svg'
                                 : '/images/launchweek/community-visual-light.svg'
                             }
@@ -650,7 +641,7 @@ export default function launchweek() {
                         >
                           <Image
                             src={
-                              isDarkMode
+                              theme === 'dark'
                                 ? '/images/launchweek/community-visual-hover.svg'
                                 : '/images/launchweek/community-visual-light-hover.svg'
                             }
@@ -739,7 +730,7 @@ export default function launchweek() {
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
                             src={
-                              isDarkMode
+                              theme === 'dark'
                                 ? '/images/launchweek/PgGraphql-visual.svg'
                                 : '/images/launchweek/PgGraphql-visual-light.svg'
                             }
@@ -755,7 +746,7 @@ export default function launchweek() {
                         >
                           <Image
                             src={
-                              isDarkMode
+                              theme === 'dark'
                                 ? '/images/launchweek/PgGraphql-visual-hover.svg'
                                 : '/images/launchweek/PgGraphql-visual-hover-light.svg'
                             }
@@ -782,7 +773,7 @@ export default function launchweek() {
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
                             src={
-                              isDarkMode
+                              theme === 'dark'
                                 ? '/images/launchweek/custom-domains-visual.svg'
                                 : '/images/launchweek/custom-domains-visual-light.svg'
                             }
@@ -798,7 +789,7 @@ export default function launchweek() {
                         >
                           <Image
                             src={
-                              isDarkMode
+                              theme === 'dark'
                                 ? '/images/launchweek/custom-domains-visual-hover.svg'
                                 : '/images/launchweek/custom-domains-visual-hover-light.svg'
                             }
@@ -825,7 +816,7 @@ export default function launchweek() {
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
                             src={
-                              isDarkMode
+                              theme === 'dark'
                                 ? '/images/launchweek/PITR-visual.svg'
                                 : '/images/launchweek/PITR-visual-light.svg'
                             }
@@ -841,7 +832,7 @@ export default function launchweek() {
                         >
                           <Image
                             src={
-                              isDarkMode
+                              theme === 'dark'
                                 ? '/images/launchweek/PITR-visual-hover.svg'
                                 : '/images/launchweek/PITR-visual-hover-light.svg'
                             }
@@ -868,7 +859,7 @@ export default function launchweek() {
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
                             src={
-                              isDarkMode
+                              theme === 'dark'
                                 ? '/images/launchweek/pg_crdt-visual.svg'
                                 : '/images/launchweek/pg_crdt-visual-light.svg'
                             }
@@ -884,7 +875,7 @@ export default function launchweek() {
                         >
                           <Image
                             src={
-                              isDarkMode
+                              theme === 'dark'
                                 ? '/images/launchweek/pg_crdt-visual-hover.svg'
                                 : '/images/launchweek/pg_crdt-visual-hover-light.svg'
                             }
@@ -911,7 +902,7 @@ export default function launchweek() {
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
                             src={
-                              isDarkMode
+                              theme === 'dark'
                                 ? '/images/launchweek/postgres-visual.svg'
                                 : '/images/launchweek/postgres-visual-light.svg'
                             }
@@ -927,7 +918,7 @@ export default function launchweek() {
                         >
                           <Image
                             src={
-                              isDarkMode
+                              theme === 'dark'
                                 ? '/images/launchweek/postgres-visual-hover.svg'
                                 : '/images/launchweek/postgres-visual-hover-light.svg'
                             }
@@ -954,7 +945,7 @@ export default function launchweek() {
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
                             src={
-                              isDarkMode
+                              theme === 'dark'
                                 ? '/images/launchweek/PostgREST11-visual.svg'
                                 : '/images/launchweek/PostgREST11-visual-light.svg'
                             }
@@ -970,7 +961,7 @@ export default function launchweek() {
                         >
                           <Image
                             src={
-                              isDarkMode
+                              theme === 'dark'
                                 ? '/images/launchweek/PostgREST11-visual-hover.svg'
                                 : '/images/launchweek/PostgREST11-visual-hover-light.svg'
                             }

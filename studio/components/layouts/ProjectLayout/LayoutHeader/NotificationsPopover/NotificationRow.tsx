@@ -1,12 +1,10 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { Notification, NotificationStatus } from '@supabase/shared-types/out/notifications'
 import dayjs from 'dayjs'
-import { Button, IconArchive, IconX } from 'ui'
+import { Button, IconX } from 'ui'
 
 import { useNotificationsDismissMutation } from 'data/notifications/notifications-dismiss-mutation'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
-import { API_URL } from 'lib/constants'
 import { Project } from 'types'
 import NotificationActions from './NotificationActions'
 import { formatNotificationCTAText, formatNotificationText } from './NotificationRows.utils'
@@ -64,7 +62,7 @@ const NotificationRow = ({
           <div className="w-9/10 space-y-2">
             {formatNotificationText(project, notification)}
             {formatNotificationCTAText(availableActions)}
-            <p className="text-scale-1100 text-sm !mt-2">{insertedAt}</p>
+            <p className="text-foreground-light text-sm !mt-2">{insertedAt}</p>
           </div>
           <div className="w-1/10 flex justify-end">
             <div>
@@ -76,7 +74,7 @@ const NotificationRow = ({
                   <IconX
                     size={14}
                     strokeWidth={2}
-                    className="text-scale-1100 group-hover:text-scale-1200 transition"
+                    className="text-foreground-light group-hover:text-foreground transition"
                   />
                 }
                 onClick={() => dismissNotification(notification.id)}

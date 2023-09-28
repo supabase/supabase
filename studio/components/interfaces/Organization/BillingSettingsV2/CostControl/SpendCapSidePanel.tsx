@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
-import { useParams, useTheme } from 'common'
+import { useParams } from 'common'
+import { useTheme } from 'next-themes'
 import Table from 'components/to-be-cleaned/Table'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
@@ -38,7 +39,7 @@ const SpendCapSidePanel = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { slug } = useParams()
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
 
   const [showUsageCosts, setShowUsageCosts] = useState(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
@@ -152,7 +153,7 @@ const SpendCapSidePanel = () => {
                   size={16}
                   className={showUsageCosts ? 'rotate-90' : ''}
                 />
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   How are each resource charged after exceeding the included quota?
                 </p>
               </div>
@@ -178,7 +179,7 @@ const SpendCapSidePanel = () => {
                     <>
                       <Table.tr key={categoryId}>
                         <Table.td>
-                          <p className="text-xs text-scale-1200">{category.title}</p>
+                          <p className="text-xs text-foreground">{category.title}</p>
                         </Table.td>
                         <Table.td>{null}</Table.td>
                       </Table.tr>
@@ -254,14 +255,14 @@ const SpendCapSidePanel = () => {
                       )}
                       width={160}
                       height={96}
-                      src={isDarkMode ? option.imageUrl : option.imageUrlLight}
+                      src={theme === 'dark' ? option.imageUrl : option.imageUrlLight}
                     />
 
                     <p
                       className={clsx(
                         'text-sm transition',
-                        !isFreePlan && 'group-hover:text-scale-1200',
-                        isSelected ? 'text-scale-1200' : 'text-scale-1000'
+                        !isFreePlan && 'group-hover:text-foreground',
+                        isSelected ? 'text-foreground' : 'text-foreground-light'
                       )}
                     >
                       {option.name}
