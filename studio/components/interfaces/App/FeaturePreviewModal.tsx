@@ -1,7 +1,10 @@
+import { useTelemetryProps } from 'common'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button, IconEye, IconEyeOff, Modal, ScrollArea, cn } from 'ui'
 
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import Telemetry from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Markdown } from '../Markdown'
 import { useFeaturePreviewContext } from './FeaturePreviewContext'
@@ -20,7 +23,9 @@ const FEATURE_PREVIEWS = [
 ]
 
 const FeaturePreviewModal = () => {
+  const router = useRouter()
   const snap = useAppStateSnapshot()
+  const telemetryProps = useTelemetryProps()
   const featurePreviewContext = useFeaturePreviewContext()
   const [selectedFeatureKey, setSelectedFeatureKey] = useState<string>(FEATURE_PREVIEWS[0].key)
 
@@ -28,7 +33,18 @@ const FeaturePreviewModal = () => {
   const selectedFeature = FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey)
   const isSelectedFeatureEnabled = flags[selectedFeatureKey]
 
-  const toggleFeature = () => onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
+  const toggleFeature = () => {
+    onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
+    Telemetry.sendEvent(
+      {
+        category: 'ui_feature_previews',
+        action: isSelectedFeatureEnabled ? 'disabled' : 'enabled',
+        label: selectedFeatureKey,
+      },
+      telemetryProps,
+      router
+    )
+  }
 
   return (
     <Modal
