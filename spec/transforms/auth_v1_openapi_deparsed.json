@@ -1,6 +1,11 @@
 {
-  "produces": ["application/json"],
-  "schemes": ["http", "https"],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
   "swagger": "2.0",
   "info": {
     "description": "Documentation of the gotrue API.",
@@ -17,7 +22,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin"],
+        "tags": [
+          "admin"
+        ],
         "summary": "Generates an email action link.",
         "operationId": "admin-generate-link",
         "parameters": [
@@ -248,7 +255,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin"],
+        "tags": [
+          "admin"
+        ],
         "summary": "Get a user.",
         "operationId": "admin-get-user",
         "parameters": [
@@ -429,7 +438,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin"],
+        "tags": [
+          "admin"
+        ],
         "summary": "Update a user.",
         "operationId": "admin-update-user",
         "parameters": [
@@ -610,7 +621,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin"],
+        "tags": [
+          "admin"
+        ],
         "summary": "Deletes a user.",
         "operationId": "admin-delete-user",
         "parameters": [
@@ -638,7 +651,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin"],
+        "tags": [
+          "admin"
+        ],
         "summary": "List all users.",
         "operationId": "admin-list-users",
         "responses": {
@@ -825,7 +840,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin"],
+        "tags": [
+          "admin"
+        ],
         "summary": "Returns the created user.",
         "operationId": "admin-create-user",
         "parameters": [
@@ -1049,7 +1066,9 @@
     },
     "/authorize": {
       "get": {
-        "tags": ["oauth"],
+        "tags": [
+          "oauth"
+        ],
         "summary": "Redirects the user to the 3rd-party OAuth provider to start the OAuth1.0 or OAuth2.0 authentication process.",
         "operationId": "authorize",
         "parameters": [
@@ -1068,7 +1087,9 @@
     },
     "/callback": {
       "get": {
-        "tags": ["oauth"],
+        "tags": [
+          "oauth"
+        ],
         "summary": "Receives the redirect from an external provider during the OAuth authentication process. Starts the process of creating an access and refresh token.",
         "operationId": "callback",
         "responses": {
@@ -1080,7 +1101,9 @@
     },
     "/health": {
       "get": {
-        "tags": ["health"],
+        "tags": [
+          "health"
+        ],
         "summary": "The healthcheck endpoint for gotrue. Returns the current gotrue version.",
         "operationId": "health",
         "responses": {
@@ -1110,7 +1133,9 @@
     },
     "/invite": {
       "post": {
-        "tags": ["invite"],
+        "tags": [
+          "invite"
+        ],
         "summary": "Sends an invite link to the user.",
         "operationId": "invite",
         "parameters": [
@@ -1149,7 +1174,9 @@
             "bearer": []
           }
         ],
-        "tags": ["logout"],
+        "tags": [
+          "logout"
+        ],
         "summary": "Logs out the user.",
         "operationId": "logout",
         "responses": {
@@ -1161,7 +1188,9 @@
     },
     "/otp": {
       "post": {
-        "tags": ["otp"],
+        "tags": [
+          "otp"
+        ],
         "summary": "Passwordless sign-in method for email or phone.",
         "operationId": "otp",
         "parameters": [
@@ -1204,7 +1233,9 @@
     },
     "/recover": {
       "post": {
-        "tags": ["recovery"],
+        "tags": [
+          "recovery"
+        ],
         "summary": "Sends a password recovery email link to the user's email.",
         "operationId": "recovery",
         "parameters": [
@@ -1233,7 +1264,9 @@
     },
     "/settings": {
       "get": {
-        "tags": ["settings"],
+        "tags": [
+          "settings"
+        ],
         "summary": "Returns the configuration settings for the gotrue server.",
         "operationId": "settings",
         "responses": {
@@ -1353,7 +1386,9 @@
     },
     "/signup": {
       "post": {
-        "tags": ["signup"],
+        "tags": [
+          "signup"
+        ],
         "summary": "Password-based signup with either email or phone.",
         "operationId": "signup",
         "parameters": [
@@ -1550,7 +1585,9 @@
     },
     "/token?grant_type=password": {
       "post": {
-        "tags": ["token"],
+        "tags": [
+          "token"
+        ],
         "summary": "Signs in a user with a password.",
         "operationId": "token-password",
         "parameters": [
@@ -1766,7 +1803,9 @@
     },
     "/token?grant_type=refresh_token": {
       "post": {
-        "tags": ["token"],
+        "tags": [
+          "token"
+        ],
         "summary": "Refreshes a user's refresh token.",
         "operationId": "token-refresh",
         "parameters": [
@@ -1979,7 +2018,9 @@
             "bearer": []
           }
         ],
-        "tags": ["user"],
+        "tags": [
+          "user"
+        ],
         "summary": "Get information for the logged-in user.",
         "operationId": "user-get",
         "responses": {
@@ -2152,7 +2193,9 @@
             "bearer": []
           }
         ],
-        "tags": ["user"],
+        "tags": [
+          "user"
+        ],
         "summary": "Returns the updated user.",
         "operationId": "user-put",
         "parameters": [
@@ -2361,7 +2404,9 @@
     },
     "/verify": {
       "get": {
-        "tags": ["verify"],
+        "tags": [
+          "verify"
+        ],
         "summary": "Verifies a sign up.",
         "operationId": "verify-get",
         "parameters": [
@@ -2398,7 +2443,9 @@
         ]
       },
       "post": {
-        "tags": ["verify"],
+        "tags": [
+          "verify"
+        ],
         "summary": "Verifies a sign up.",
         "operationId": "verify-post",
         "parameters": [

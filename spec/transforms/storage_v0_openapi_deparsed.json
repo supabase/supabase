@@ -17,7 +17,9 @@
             ]
           }
         },
-        "required": ["authorization"],
+        "required": [
+          "authorization"
+        ],
         "title": "authSchema"
       },
       "def-1": {
@@ -33,7 +35,11 @@
             "type": "string"
           }
         },
-        "required": ["statusCode", "error", "message"],
+        "required": [
+          "statusCode",
+          "error",
+          "message"
+        ],
         "title": "errorSchema"
       }
     }
@@ -51,7 +57,9 @@
     "/upload/resumable/": {
       "post": {
         "summary": "Handle POST request for TUS Resumable uploads",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "responses": {
           "200": {
             "description": "Default Response"
@@ -60,7 +68,9 @@
       },
       "options": {
         "summary": "Handle OPTIONS request for TUS Resumable uploads",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "description": "Handle OPTIONS request for TUS Resumable uploads",
         "responses": {
           "200": {
@@ -72,7 +82,9 @@
     "/upload/resumable/{wildcard}": {
       "post": {
         "summary": "Handle POST request for TUS Resumable uploads",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "responses": {
           "200": {
             "description": "Default Response"
@@ -81,7 +93,9 @@
       },
       "put": {
         "summary": "Handle PUT request for TUS Resumable uploads",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "responses": {
           "200": {
             "description": "Default Response"
@@ -90,7 +104,9 @@
       },
       "patch": {
         "summary": "Handle PATCH request for TUS Resumable uploads",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "responses": {
           "200": {
             "description": "Default Response"
@@ -99,7 +115,9 @@
       },
       "options": {
         "summary": "Handle OPTIONS request for TUS Resumable uploads",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "description": "Handle OPTIONS request for TUS Resumable uploads",
         "responses": {
           "200": {
@@ -111,7 +129,9 @@
     "/bucket/": {
       "post": {
         "summary": "Create a bucket",
-        "tags": ["bucket"],
+        "tags": [
+          "bucket"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -120,27 +140,37 @@
                 "properties": {
                   "name": {
                     "type": "string",
-                    "examples": ["avatars"]
+                    "examples": [
+                      "avatars"
+                    ]
                   },
                   "id": {
                     "type": "string",
-                    "examples": ["avatars"]
+                    "examples": [
+                      "avatars"
+                    ]
                   },
                   "public": {
                     "type": "boolean",
-                    "examples": [false]
+                    "examples": [
+                      false
+                    ]
                   },
                   "file_size_limit": {
                     "anyOf": [
                       {
                         "type": "integer",
-                        "examples": [1000],
+                        "examples": [
+                          1000
+                        ],
                         "nullable": true,
                         "minimum": 0
                       },
                       {
                         "type": "string",
-                        "examples": ["100MB"],
+                        "examples": [
+                          "100MB"
+                        ],
                         "nullable": true
                       }
                     ]
@@ -148,13 +178,20 @@
                   "allowed_mime_types": {
                     "type": "array",
                     "nullable": true,
-                    "examples": [["image/png", "image/jpg"]],
+                    "examples": [
+                      [
+                        "image/png",
+                        "image/jpg"
+                      ]
+                    ],
                     "items": {
                       "type": "string"
                     }
                   }
                 },
-                "required": ["name"]
+                "required": [
+                  "name"
+                ]
               }
             }
           },
@@ -182,10 +219,14 @@
                   "properties": {
                     "name": {
                       "type": "string",
-                      "examples": ["avatars"]
+                      "examples": [
+                        "avatars"
+                      ]
                     }
                   },
-                  "required": ["name"]
+                  "required": [
+                    "name"
+                  ]
                 }
               }
             }
@@ -208,7 +249,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -218,7 +263,9 @@
       },
       "get": {
         "summary": "Gets all buckets",
-        "tags": ["bucket"],
+        "tags": [
+          "bucket"
+        ],
         "parameters": [
           {
             "schema": {
@@ -254,10 +301,16 @@
                         "type": "boolean"
                       },
                       "file_size_limit": {
-                        "type": ["null", "integer"]
+                        "type": [
+                          "null",
+                          "integer"
+                        ]
                       },
                       "allowed_mime_types": {
-                        "type": ["null", "array"],
+                        "type": [
+                          "null",
+                          "array"
+                        ],
                         "items": {
                           "type": "string"
                         }
@@ -269,7 +322,10 @@
                         "type": "string"
                       }
                     },
-                    "required": ["id", "name"],
+                    "required": [
+                      "id",
+                      "name"
+                    ],
                     "additionalProperties": false,
                     "examples": [
                       {
@@ -277,7 +333,10 @@
                         "name": "bucket2",
                         "public": false,
                         "file_size_limit": 1000000,
-                        "allowed_mime_types": ["image/png", "image/jpeg"],
+                        "allowed_mime_types": [
+                          "image/png",
+                          "image/jpeg"
+                        ],
                         "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
                         "created_at": "2021-02-17T04:43:32.770206+00:00",
                         "updated_at": "2021-02-17T04:43:32.770206+00:00"
@@ -293,7 +352,10 @@
                     "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
                     "public": false,
                     "file_size_limit": 1000000,
-                    "allowed_mime_types": ["image/png", "image/jpeg"],
+                    "allowed_mime_types": [
+                      "image/png",
+                      "image/jpeg"
+                    ],
                     "created_at": "2021-02-17T04:43:32.770206+00:00",
                     "updated_at": "2021-02-17T04:43:32.770206+00:00"
                   }
@@ -319,7 +381,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -331,7 +397,9 @@
     "/bucket/{bucketId}/empty": {
       "post": {
         "summary": "Empty a bucket",
-        "tags": ["bucket"],
+        "tags": [
+          "bucket"
+        ],
         "parameters": [
           {
             "schema": {
@@ -363,7 +431,9 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "examples": ["Successfully emptied"]
+                      "examples": [
+                        "Successfully emptied"
+                      ]
                     }
                   }
                 }
@@ -388,7 +458,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -400,7 +474,9 @@
     "/bucket/{bucketId}": {
       "get": {
         "summary": "Get details of a bucket",
-        "tags": ["bucket"],
+        "tags": [
+          "bucket"
+        ],
         "parameters": [
           {
             "schema": {
@@ -443,10 +519,16 @@
                       "type": "boolean"
                     },
                     "file_size_limit": {
-                      "type": ["null", "integer"]
+                      "type": [
+                        "null",
+                        "integer"
+                      ]
                     },
                     "allowed_mime_types": {
-                      "type": ["null", "array"],
+                      "type": [
+                        "null",
+                        "array"
+                      ],
                       "items": {
                         "type": "string"
                       }
@@ -458,7 +540,10 @@
                       "type": "string"
                     }
                   },
-                  "required": ["id", "name"],
+                  "required": [
+                    "id",
+                    "name"
+                  ],
                   "additionalProperties": false
                 },
                 "example": {
@@ -466,7 +551,10 @@
                   "name": "bucket2",
                   "public": false,
                   "file_size_limit": 1000000,
-                  "allowed_mime_types": ["image/png", "image/jpeg"],
+                  "allowed_mime_types": [
+                    "image/png",
+                    "image/jpeg"
+                  ],
                   "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
                   "created_at": "2021-02-17T04:43:32.770206+00:00",
                   "updated_at": "2021-02-17T04:43:32.770206+00:00"
@@ -492,7 +580,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -502,7 +594,9 @@
       },
       "put": {
         "summary": "Update properties of a bucket",
-        "tags": ["bucket"],
+        "tags": [
+          "bucket"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -511,19 +605,25 @@
                 "properties": {
                   "public": {
                     "type": "boolean",
-                    "examples": [false]
+                    "examples": [
+                      false
+                    ]
                   },
                   "file_size_limit": {
                     "anyOf": [
                       {
                         "type": "integer",
-                        "examples": [1000],
+                        "examples": [
+                          1000
+                        ],
                         "nullable": true,
                         "minimum": 0
                       },
                       {
                         "type": "string",
-                        "examples": ["100MB"],
+                        "examples": [
+                          "100MB"
+                        ],
                         "nullable": true
                       }
                     ]
@@ -533,7 +633,12 @@
                     "nullable": true,
                     "items": {
                       "type": "string",
-                      "examples": [["image/png", "image/jpg"]]
+                      "examples": [
+                        [
+                          "image/png",
+                          "image/jpg"
+                        ]
+                      ]
                     }
                   }
                 }
@@ -563,10 +668,14 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "examples": ["Successfully updated"]
+                      "examples": [
+                        "Successfully updated"
+                      ]
                     }
                   },
-                  "required": ["message"]
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -589,7 +698,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -599,7 +712,9 @@
       },
       "delete": {
         "summary": "Delete a bucket",
-        "tags": ["bucket"],
+        "tags": [
+          "bucket"
+        ],
         "parameters": [
           {
             "schema": {
@@ -631,7 +746,9 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "examples": ["Successfully deleted"]
+                      "examples": [
+                        "Successfully deleted"
+                      ]
                     }
                   }
                 }
@@ -656,7 +773,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -668,7 +789,9 @@
     "/object/{bucketName}/{wildcard}": {
       "delete": {
         "summary": "Delete an object",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "schema": {
@@ -709,7 +832,9 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "examples": ["Successfully deleted"]
+                      "examples": [
+                        "Successfully deleted"
+                      ]
                     }
                   }
                 }
@@ -734,7 +859,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -744,7 +873,9 @@
       },
       "get": {
         "summary": "Get object",
-        "tags": ["deprecated"],
+        "tags": [
+          "deprecated"
+        ],
         "description": "use GET /object/authenticated/{bucketName} instead",
         "parameters": [
           {
@@ -793,7 +924,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -803,7 +938,9 @@
       },
       "put": {
         "summary": "Update the object at an existing key",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "schema": {
@@ -847,10 +984,14 @@
                     },
                     "Key": {
                       "type": "string",
-                      "examples": ["avatars/folder/cat.png"]
+                      "examples": [
+                        "avatars/folder/cat.png"
+                      ]
                     }
                   },
-                  "required": ["Key"]
+                  "required": [
+                    "Key"
+                  ]
                 }
               }
             }
@@ -873,7 +1014,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -883,7 +1028,9 @@
       },
       "post": {
         "summary": "Upload a new object",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "schema": {
@@ -927,10 +1074,14 @@
                     },
                     "Key": {
                       "type": "string",
-                      "examples": ["avatars/folder/cat.png"]
+                      "examples": [
+                        "avatars/folder/cat.png"
+                      ]
                     }
                   },
-                  "required": ["Key"]
+                  "required": [
+                    "Key"
+                  ]
                 }
               }
             }
@@ -953,7 +1104,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -965,7 +1120,9 @@
     "/object/{bucketName}": {
       "delete": {
         "summary": "Delete multiple objects",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -978,10 +1135,17 @@
                       "type": "string"
                     },
                     "minItems": 1,
-                    "examples": [["folder/cat.png", "folder/morecats.png"]]
+                    "examples": [
+                      [
+                        "folder/cat.png",
+                        "folder/morecats.png"
+                      ]
+                    ]
                   }
                 },
-                "required": ["prefixes"]
+                "required": [
+                  "prefixes"
+                ]
               }
             }
           },
@@ -1100,10 +1264,16 @@
                             "type": "boolean"
                           },
                           "file_size_limit": {
-                            "type": ["null", "integer"]
+                            "type": [
+                              "null",
+                              "integer"
+                            ]
                           },
                           "allowed_mime_types": {
-                            "type": ["null", "array"],
+                            "type": [
+                              "null",
+                              "array"
+                            ],
                             "items": {
                               "type": "string"
                             }
@@ -1115,7 +1285,10 @@
                             "type": "string"
                           }
                         },
-                        "required": ["id", "name"],
+                        "required": [
+                          "id",
+                          "name"
+                        ],
                         "additionalProperties": false,
                         "examples": [
                           {
@@ -1123,7 +1296,10 @@
                             "name": "bucket2",
                             "public": false,
                             "file_size_limit": 1000000,
-                            "allowed_mime_types": ["image/png", "image/jpeg"],
+                            "allowed_mime_types": [
+                              "image/png",
+                              "image/jpeg"
+                            ],
                             "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
                             "created_at": "2021-02-17T04:43:32.770206+00:00",
                             "updated_at": "2021-02-17T04:43:32.770206+00:00"
@@ -1131,7 +1307,9 @@
                         ]
                       }
                     },
-                    "required": ["name"],
+                    "required": [
+                      "name"
+                    ],
                     "additionalProperties": false,
                     "examples": [
                       {
@@ -1171,7 +1349,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -1183,7 +1365,9 @@
     "/object/authenticated/{bucketName}/{wildcard}": {
       "get": {
         "summary": "Retrieve an object",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "schema": {
@@ -1232,7 +1416,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -1244,7 +1432,9 @@
     "/object/upload/sign/{bucketName}/{wildcard}": {
       "post": {
         "summary": "Generate a presigned url to upload an object",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "schema": {
@@ -1290,7 +1480,9 @@
                       ]
                     }
                   },
-                  "required": ["url"]
+                  "required": [
+                    "url"
+                  ]
                 }
               }
             }
@@ -1313,7 +1505,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -1323,7 +1519,9 @@
       },
       "put": {
         "summary": "Uploads an object via a presigned URL",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "schema": {
@@ -1364,10 +1562,14 @@
                   "properties": {
                     "Key": {
                       "type": "string",
-                      "examples": ["avatars/folder/cat.png"]
+                      "examples": [
+                        "avatars/folder/cat.png"
+                      ]
                     }
                   },
-                  "required": ["Key"]
+                  "required": [
+                    "Key"
+                  ]
                 }
               }
             }
@@ -1390,7 +1592,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -1402,7 +1608,9 @@
     "/object/sign/{bucketName}/{wildcard}": {
       "post": {
         "summary": "Generate a presigned url to retrieve an object",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1412,28 +1620,41 @@
                   "expiresIn": {
                     "type": "integer",
                     "minimum": 1,
-                    "examples": [60000]
+                    "examples": [
+                      60000
+                    ]
                   },
                   "transform": {
                     "type": "object",
                     "properties": {
                       "height": {
                         "type": "integer",
-                        "examples": [100],
+                        "examples": [
+                          100
+                        ],
                         "minimum": 0
                       },
                       "width": {
                         "type": "integer",
-                        "examples": [100],
+                        "examples": [
+                          100
+                        ],
                         "minimum": 0
                       },
                       "resize": {
                         "type": "string",
-                        "enum": ["cover", "contain", "fill"]
+                        "enum": [
+                          "cover",
+                          "contain",
+                          "fill"
+                        ]
                       },
                       "format": {
                         "type": "string",
-                        "enum": ["origin", "avif"]
+                        "enum": [
+                          "origin",
+                          "avif"
+                        ]
                       },
                       "quality": {
                         "type": "integer",
@@ -1443,7 +1664,9 @@
                     }
                   }
                 },
-                "required": ["expiresIn"]
+                "required": [
+                  "expiresIn"
+                ]
               }
             }
           },
@@ -1494,7 +1717,9 @@
                       ]
                     }
                   },
-                  "required": ["signedURL"]
+                  "required": [
+                    "signedURL"
+                  ]
                 }
               }
             }
@@ -1517,7 +1742,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -1527,7 +1756,9 @@
       },
       "get": {
         "summary": "Retrieve an object via a presigned URL",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "schema": {
@@ -1592,7 +1823,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -1604,7 +1839,9 @@
     "/object/sign/{bucketName}": {
       "post": {
         "summary": "Generate presigned urls to retrieve objects",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1614,7 +1851,9 @@
                   "expiresIn": {
                     "type": "integer",
                     "minimum": 1,
-                    "examples": [60000]
+                    "examples": [
+                      60000
+                    ]
                   },
                   "paths": {
                     "type": "array",
@@ -1622,10 +1861,18 @@
                       "type": "string"
                     },
                     "minItems": 1,
-                    "examples": [["folder/cat.png", "folder/morecats.png"]]
+                    "examples": [
+                      [
+                        "folder/cat.png",
+                        "folder/morecats.png"
+                      ]
+                    ]
                   }
                 },
-                "required": ["expiresIn", "paths"]
+                "required": [
+                  "expiresIn",
+                  "paths"
+                ]
               }
             }
           },
@@ -1663,23 +1910,35 @@
                     "type": "object",
                     "properties": {
                       "error": {
-                        "error": ["string", "null"],
+                        "error": [
+                          "string",
+                          "null"
+                        ],
                         "examples": [
                           "Either the object does not exist or you do not have access to it"
                         ]
                       },
                       "path": {
                         "type": "string",
-                        "examples": ["folder/cat.png"]
+                        "examples": [
+                          "folder/cat.png"
+                        ]
                       },
                       "signedURL": {
-                        "type": ["null", "string"],
+                        "type": [
+                          "null",
+                          "string"
+                        ],
                         "examples": [
                           "/object/sign/avatars/folder/cat.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdmF0YXJzL2ZvbGRlci9jYXQucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.s7Gt8ME80iREVxPhH01ZNv8oUn4XtaWsmiQ5csiUHn4"
                         ]
                       }
                     },
-                    "required": ["error", "path", "signedURL"]
+                    "required": [
+                      "error",
+                      "path",
+                      "signedURL"
+                    ]
                   }
                 }
               }
@@ -1703,7 +1962,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -1715,7 +1978,9 @@
     "/object/move": {
       "post": {
         "summary": "Moves an object",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1724,18 +1989,28 @@
                 "properties": {
                   "bucketId": {
                     "type": "string",
-                    "examples": ["avatars"]
+                    "examples": [
+                      "avatars"
+                    ]
                   },
                   "sourceKey": {
                     "type": "string",
-                    "examples": ["folder/cat.png"]
+                    "examples": [
+                      "folder/cat.png"
+                    ]
                   },
                   "destinationKey": {
                     "type": "string",
-                    "examples": ["folder/newcat.png"]
+                    "examples": [
+                      "folder/newcat.png"
+                    ]
                   }
                 },
-                "required": ["bucketId", "sourceKey", "destinationKey"]
+                "required": [
+                  "bucketId",
+                  "sourceKey",
+                  "destinationKey"
+                ]
               }
             }
           },
@@ -1763,10 +2038,14 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "examples": ["Successfully moved"]
+                      "examples": [
+                        "Successfully moved"
+                      ]
                     }
                   },
-                  "required": ["message"]
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -1789,7 +2068,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -1801,7 +2084,9 @@
     "/object/list/{bucketName}": {
       "post": {
         "summary": "Search for objects under a prefix",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1810,37 +2095,55 @@
                 "properties": {
                   "prefix": {
                     "type": "string",
-                    "examples": ["folder/subfolder"]
+                    "examples": [
+                      "folder/subfolder"
+                    ]
                   },
                   "limit": {
                     "type": "integer",
                     "minimum": 1,
-                    "examples": [10]
+                    "examples": [
+                      10
+                    ]
                   },
                   "offset": {
                     "type": "integer",
                     "minimum": 0,
-                    "examples": [0]
+                    "examples": [
+                      0
+                    ]
                   },
                   "sortBy": {
                     "type": "object",
                     "properties": {
                       "column": {
                         "type": "string",
-                        "enum": ["name", "updated_at", "created_at", "last_accessed_at"]
+                        "enum": [
+                          "name",
+                          "updated_at",
+                          "created_at",
+                          "last_accessed_at"
+                        ]
                       },
                       "order": {
                         "type": "string",
-                        "enum": ["asc", "desc"]
+                        "enum": [
+                          "asc",
+                          "desc"
+                        ]
                       }
                     },
-                    "required": ["column"]
+                    "required": [
+                      "column"
+                    ]
                   },
                   "search": {
                     "type": "string"
                   }
                 },
-                "required": ["prefix"]
+                "required": [
+                  "prefix"
+                ]
               }
             }
           },
@@ -1958,10 +2261,16 @@
                             "type": "boolean"
                           },
                           "file_size_limit": {
-                            "type": ["null", "integer"]
+                            "type": [
+                              "null",
+                              "integer"
+                            ]
                           },
                           "allowed_mime_types": {
-                            "type": ["null", "array"],
+                            "type": [
+                              "null",
+                              "array"
+                            ],
                             "items": {
                               "type": "string"
                             }
@@ -1973,7 +2282,10 @@
                             "type": "string"
                           }
                         },
-                        "required": ["id", "name"],
+                        "required": [
+                          "id",
+                          "name"
+                        ],
                         "additionalProperties": false,
                         "examples": [
                           {
@@ -1981,7 +2293,10 @@
                             "name": "bucket2",
                             "public": false,
                             "file_size_limit": 1000000,
-                            "allowed_mime_types": ["image/png", "image/jpeg"],
+                            "allowed_mime_types": [
+                              "image/png",
+                              "image/jpeg"
+                            ],
                             "owner": "4d56e902-f0a0-4662-8448-a4d9e643c142",
                             "created_at": "2021-02-17T04:43:32.770206+00:00",
                             "updated_at": "2021-02-17T04:43:32.770206+00:00"
@@ -1989,7 +2304,9 @@
                         ]
                       }
                     },
-                    "required": ["name"],
+                    "required": [
+                      "name"
+                    ],
                     "additionalProperties": false,
                     "examples": [
                       {
@@ -2028,7 +2345,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -2040,7 +2361,9 @@
     "/object/info/authenticated/{bucketName}/{wildcard}": {
       "get": {
         "summary": "Retrieve object info",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "schema": {
@@ -2089,7 +2412,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -2101,7 +2428,9 @@
     "/object/info/{bucketName}/{wildcard}": {
       "get": {
         "summary": "Retrieve object info",
-        "tags": ["deprecated"],
+        "tags": [
+          "deprecated"
+        ],
         "description": "use HEAD /object/authenticated/{bucketName} instead",
         "parameters": [
           {
@@ -2150,7 +2479,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -2162,7 +2495,9 @@
     "/object/copy": {
       "post": {
         "summary": "Copies an object",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -2171,18 +2506,28 @@
                 "properties": {
                   "sourceKey": {
                     "type": "string",
-                    "examples": ["folder/source.png"]
+                    "examples": [
+                      "folder/source.png"
+                    ]
                   },
                   "bucketId": {
                     "type": "string",
-                    "examples": ["avatars"]
+                    "examples": [
+                      "avatars"
+                    ]
                   },
                   "destinationKey": {
                     "type": "string",
-                    "examples": ["folder/destination.png"]
+                    "examples": [
+                      "folder/destination.png"
+                    ]
                   }
                 },
-                "required": ["sourceKey", "bucketId", "destinationKey"]
+                "required": [
+                  "sourceKey",
+                  "bucketId",
+                  "destinationKey"
+                ]
               }
             }
           },
@@ -2210,10 +2555,14 @@
                   "properties": {
                     "Key": {
                       "type": "string",
-                      "examples": ["folder/destination.png"]
+                      "examples": [
+                        "folder/destination.png"
+                      ]
                     }
                   },
-                  "required": ["Key"]
+                  "required": [
+                    "Key"
+                  ]
                 }
               }
             }
@@ -2236,7 +2585,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -2248,7 +2601,9 @@
     "/object/public/{bucketName}/{wildcard}": {
       "get": {
         "summary": "Retrieve an object from a public bucket",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "schema": {
@@ -2288,7 +2643,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -2300,7 +2659,9 @@
     "/object/info/public/{bucketName}/{wildcard}": {
       "get": {
         "summary": "Get object info",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "description": "returns object info",
         "parameters": [
           {
@@ -2340,7 +2701,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -2352,7 +2717,9 @@
     "/render/image/authenticated/{bucketName}/{wildcard}": {
       "get": {
         "summary": "Render an authenticated image with the given transformations",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "schema": {
@@ -2377,7 +2744,11 @@
           {
             "schema": {
               "type": "string",
-              "enum": ["cover", "contain", "fill"]
+              "enum": [
+                "cover",
+                "contain",
+                "fill"
+              ]
             },
             "in": "query",
             "name": "resize",
@@ -2386,7 +2757,10 @@
           {
             "schema": {
               "type": "string",
-              "enum": ["origin", "avif"]
+              "enum": [
+                "origin",
+                "avif"
+              ]
             },
             "in": "query",
             "name": "format",
@@ -2449,7 +2823,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -2461,7 +2839,9 @@
     "/render/image/sign/{bucketName}/{wildcard}": {
       "get": {
         "summary": "Render an authenticated image with the given transformations",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "schema": {
@@ -2519,7 +2899,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
@@ -2531,7 +2915,9 @@
     "/render/image/public/{bucketName}/{wildcard}": {
       "get": {
         "summary": "Render a public image with the given transformations",
-        "tags": ["object"],
+        "tags": [
+          "object"
+        ],
         "parameters": [
           {
             "schema": {
@@ -2556,7 +2942,11 @@
           {
             "schema": {
               "type": "string",
-              "enum": ["cover", "contain", "fill"]
+              "enum": [
+                "cover",
+                "contain",
+                "fill"
+              ]
             },
             "in": "query",
             "name": "resize",
@@ -2565,7 +2955,10 @@
           {
             "schema": {
               "type": "string",
-              "enum": ["origin", "avif"]
+              "enum": [
+                "origin",
+                "avif"
+              ]
             },
             "in": "query",
             "name": "format",
@@ -2628,7 +3021,11 @@
                       "type": "string"
                     }
                   },
-                  "required": ["statusCode", "error", "message"],
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ],
                   "title": "errorSchema"
                 }
               }
