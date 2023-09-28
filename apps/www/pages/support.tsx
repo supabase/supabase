@@ -1,6 +1,8 @@
+import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
+import Typed from 'typed.js'
 import {
   Button,
   IconMessageCircle,
@@ -9,7 +11,7 @@ import {
   SearchButton,
   IconSearch,
   IconCommand,
-  IconChevronRight,
+  // IconChevronRight,
 } from 'ui'
 
 import DefaultLayout from '~/components/Layouts/Default'
@@ -24,44 +26,23 @@ const Index = () => {
   const meta_description =
     'Find help and support for Supabase. Our Support team provide answers on all types of issues, including account information, billing, and refunds.'
 
-  // const faqs = [
-  //   {
-  //     label: 'How this and that?',
-  //     url: '#',
-  //   },
-  //   {
-  //     label: 'How this and that and then that and this again?',
-  //     url: '#',
-  //   },
-  //   {
-  //     label: 'How this and that and then that and this again?',
-  //     url: '#',
-  //   },
-  //   {
-  //     label: 'How this and that?',
-  //     url: '#',
-  //   },
-  //   {
-  //     label: 'How this and that and that other thing?',
-  //     url: '#',
-  //   },
-  //   {
-  //     label: 'How this and that and then that and this again?',
-  //     url: '#',
-  //   },
-  //   {
-  //     label: 'How this and that and then that and this again?',
-  //     url: '#',
-  //   },
-  //   {
-  //     label: 'How this and that?',
-  //     url: '#',
-  //   },
-  //   {
-  //     label: 'How this and that and that other thing?',
-  //     url: '#',
-  //   },
-  // ]
+  const typerRef = useRef(null)
+
+  useEffect(() => {
+    const typed = new Typed(typerRef.current, {
+      strings: questions,
+      typeSpeed: 50,
+      backDelay: 4000,
+      showCursor: false,
+    })
+
+    return () => {
+      // Destroy Typed instance during cleanup to stop animation
+      typed.destroy()
+    }
+  }, [])
+
+  // const faqs = []
 
   return (
     <>
@@ -84,7 +65,7 @@ const Index = () => {
           <SectionContainer className="space-y-2 text-center">
             <h1 className="text-brand font-mono text-base uppercase tracking-widest">Support</h1>
             <p className="h1 tracking-[-1px]">Hello, how can we help?</p>
-            <SearchButton className="mx-auto w-full max-w-md">
+            <SearchButton className="mx-auto w-full max-w-lg">
               <div
                 className="
                   flex
@@ -103,9 +84,10 @@ const Index = () => {
               >
                 <div className="flex items-center flex-1 space-x-2">
                   <IconSearch className="text-scale-1100" size={18} strokeWidth={2} />
-                  <p className="text-lighter text-sm group-hover:text-light transition">
-                    {questions[0]}
-                  </p>
+                  <p
+                    ref={typerRef}
+                    className="text-lighter text-sm group-hover:text-light transition"
+                  />
                 </div>
                 <div className="flex items-center h-full space-x-1">
                   <div className="hidden text-lighter md:flex items-center justify-center h-5 w-10 border rounded bg-scale-500 border-scale-700 gap-1">
