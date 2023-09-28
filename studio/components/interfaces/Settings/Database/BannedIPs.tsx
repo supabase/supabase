@@ -16,8 +16,8 @@ import {
   IconGlobe,
   Modal,
 } from 'ui'
-
 import ConfirmationModal from 'components/ui/ConfirmationModal'
+
 import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
 import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mutations'
 
@@ -68,7 +68,7 @@ const BannedIPs = () => {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <FormHeader title="Banned IPs" description="We monitor unsuccessful logins and block IPs for security." />
+        <FormHeader title="Banned IPs" description="We monitor unsuccessful logins and block IPs for security" />
         <div className="flex items-center space-x-2 mb-6">
           <Link href="https://supabase.com/docs/reference/cli/supabase-network-bans">
             <a target="_blank">
@@ -95,8 +95,8 @@ const BannedIPs = () => {
             </div>
           ))
         ) : (
-          <p className="text-scale-1100 text-sm px-8 py-4">There are no banned IP addresses for your project</p>
-        )}
+          <p className="text-scale-1100 text-sm px-8 py-4">There are no banned IP addresses for your project.</p>
+        )} 
       </FormPanel>
 
       <ConfirmationModal
