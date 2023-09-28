@@ -15,7 +15,11 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuRadioGroup_Shadcn_,
+  DropdownMenuRadioItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconCheck,
   IconChevronsDown,
   IconCode,
@@ -345,65 +349,46 @@ const TableEditorMenu = () => {
                     </div>
 
                     <div className="flex gap-3 items-center">
-                      <Dropdown
-                        size="small"
-                        side="bottom"
-                        align="start"
-                        style={{ zIndex: 1 }}
-                        overlay={[
-                          <Dropdown.Item
-                            key="alphabetical"
-                            icon={
-                              sort === 'alphabetical' ? (
-                                <IconCheck size="tiny" />
-                              ) : (
-                                <div className="w-[14px] h-[14px]" />
-                              )
-                            }
-                            onClick={() => {
-                              setSort('alphabetical')
-                            }}
-                          >
-                            Alphabetical
-                          </Dropdown.Item>,
-                          <Dropdown.Item
-                            key="grouped-alphabetical"
-                            icon={
-                              sort === 'grouped-alphabetical' ? (
-                                <IconCheck size="tiny" />
-                              ) : (
-                                <div className="w-[14px] h-[14px]" />
-                              )
-                            }
-                            onClick={() => {
-                              setSort('grouped-alphabetical')
-                            }}
-                          >
-                            Entity Type
-                          </Dropdown.Item>,
-                        ]}
-                      >
-                        <Tooltip.Root delayDuration={0}>
-                          <Tooltip.Trigger asChild>
-                            <div className="text-foreground-lighter transition-colors hover:text-foreground">
-                              <IconChevronsDown size={18} strokeWidth={1} />
-                            </div>
-                          </Tooltip.Trigger>
-                          <Tooltip.Portal>
-                            <Tooltip.Content side="bottom">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                  'border border-scale-200',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs">Sort By</span>
+                      <DropdownMenu_Shadcn_>
+                        <DropdownMenuTrigger_Shadcn_>
+                          <Tooltip.Root delayDuration={0}>
+                            <Tooltip.Trigger asChild>
+                              <div className="text-foreground-lighter transition-colors hover:text-foreground">
+                                <IconChevronsDown size={18} strokeWidth={1} />
                               </div>
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        </Tooltip.Root>
-                      </Dropdown>
+                            </Tooltip.Trigger>
+                            <Tooltip.Portal>
+                              <Tooltip.Content side="bottom">
+                                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                <div
+                                  className={[
+                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
+                                    'border border-scale-200',
+                                  ].join(' ')}
+                                >
+                                  <span className="text-xs">Sort By</span>
+                                </div>
+                              </Tooltip.Content>
+                            </Tooltip.Portal>
+                          </Tooltip.Root>
+                        </DropdownMenuTrigger_Shadcn_>
+                        <DropdownMenuContent_Shadcn_ side="bottom" align="start" className="w-48">
+                          <DropdownMenuRadioGroup_Shadcn_
+                            value={sort}
+                            onValueChange={(value: any) => setSort(value)}
+                          >
+                            <DropdownMenuRadioItem_Shadcn_ key="alphabetical" value="alphabetical">
+                              Alphabetical
+                            </DropdownMenuRadioItem_Shadcn_>
+                            <DropdownMenuRadioItem_Shadcn_
+                              key="grouped-alphabetical"
+                              value="grouped-alphabetical"
+                            >
+                              Entity Type
+                            </DropdownMenuRadioItem_Shadcn_>
+                          </DropdownMenuRadioGroup_Shadcn_>
+                        </DropdownMenuContent_Shadcn_>
+                      </DropdownMenu_Shadcn_>
 
                       <button
                         className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
