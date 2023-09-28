@@ -50,7 +50,7 @@ const MigrationsEmptyState = () => {
       <div className="space-y-8">
         <div className="space-y-2 w-4/5">
           <h4 className="text-lg">Database migrations</h4>
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             Database changes are managed through "migrations" and they are a common way of tracking
             changes to your database over time. You can run migrations against your project's
             database via the Supabase CLI.
@@ -62,7 +62,7 @@ const MigrationsEmptyState = () => {
             <button
               type="button"
               className={clsx(
-                'flex w-full items-center justify-between rounded py-3 px-6 text-scale-1200 border bg-scale-100 dark:bg-scale-300',
+                'flex w-full items-center justify-between rounded py-3 px-6 text-foreground border bg-scale-100 dark:bg-scale-300',
                 showInstructions && 'rounded-b-none'
               )}
             >
