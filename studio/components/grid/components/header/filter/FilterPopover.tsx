@@ -125,7 +125,7 @@ const FilterOverlay = ({ table, filters: filtersFromUrl, setParams }: FilterOver
         {filters.length == 0 && (
           <div className="space-y-1 px-3">
             <h5 className="text-sm text-foreground-light">No filters applied to this view</h5>
-            <p className="text-xs text-scale-900">Add a column below to filter the view</p>
+            <p className="text-xs text-foreground-lighter">Add a column below to filter the view</p>
           </div>
         )}
       </div>

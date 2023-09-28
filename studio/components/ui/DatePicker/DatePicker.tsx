@@ -200,7 +200,7 @@ function _DatePicker({
                       w-12 
                       items-center 
                       justify-center
-                      text-scale-900
+                      text-foreground-lighter
                     `}
                     >
                       <IconArrowRight strokeWidth={1.5} size={14} />

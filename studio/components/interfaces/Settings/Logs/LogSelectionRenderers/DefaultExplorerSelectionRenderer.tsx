@@ -13,7 +13,7 @@ const DefaultExplorerSelectionRenderer = ({ log }: any) => {
   }) => {
     return (
       <div className="grid grid-cols-12">
-        <span className="text-scale-900 text-sm col-span-4">{label}</span>
+        <span className="text-foreground-lighter text-sm col-span-4">{label}</span>
         <span
           className={`text-foreground text-sm col-span-8 overflow-x-auto ${
             code && 'text-xs font-mono'

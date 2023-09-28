@@ -37,14 +37,14 @@ const InformationBox = ({
       <div className="flex flex-col px-4">
         <div className="flex items-center justify-between">
           <div className="flex w-full space-x-3 lg:items-start">
-            {icon && <span className="text-scale-900">{icon}</span>}
+            {icon && <span className="text-foreground-lighter">{icon}</span>}
             <div className="flex-grow">
               <h5 className="text-sm text-foreground">{title}</h5>
             </div>
           </div>
           {description && !hideCollapse ? (
             <div
-              className="cursor-pointer text-scale-900"
+              className="cursor-pointer text-foreground-lighter"
               onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? (

@@ -9,7 +9,7 @@ const FormHeader = ({ title, description }: { title: string; description?: strin
         </ReactMarkdown>
       </h3>
       {description && (
-        <div className="text-scale-900 text-sm">
+        <div className="text-foreground-lighter text-sm">
           <ReactMarkdown>{description}</ReactMarkdown>
         </div>
       )}

@@ -1,4 +1,5 @@
-import { useParams, useTheme } from 'common'
+import { useParams } from 'common'
+import { useTheme } from 'next-themes'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useMemo } from 'react'
@@ -33,7 +34,7 @@ import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { getAddons } from '../Subscription.utils'
 
 const AddOns = () => {
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
   const { ref: projectRef } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -139,10 +140,10 @@ const AddOns = () => {
                       src={
                         computeInstance !== undefined
                           ? `${BASE_PATH}/img/optimized-compute-on${
-                              isDarkMode ? '' : '--light'
+                              theme === 'dark' ? '' : '--light'
                             }.png`
                           : `${BASE_PATH}/img/optimized-compute-off${
-                              isDarkMode ? '' : '--light'
+                              theme === 'dark' ? '' : '--light'
                             }.png`
                       }
                     />
@@ -308,8 +309,8 @@ const AddOns = () => {
                       height={96}
                       src={
                         pitr !== undefined
-                          ? `${BASE_PATH}/img/pitr-on${isDarkMode ? '' : '--light'}.png?v=2`
-                          : `${BASE_PATH}/img/pitr-off${isDarkMode ? '' : '--light'}.png?v=2`
+                          ? `${BASE_PATH}/img/pitr-on${theme === 'dark' ? '' : '--light'}.png?v=2`
+                          : `${BASE_PATH}/img/pitr-off${theme === 'dark' ? '' : '--light'}.png?v=2`
                       }
                     />
                   </div>
@@ -368,8 +369,12 @@ const AddOns = () => {
                       height={96}
                       src={
                         customDomain !== undefined
-                          ? `${BASE_PATH}/img/custom-domain-on${isDarkMode ? '' : '--light'}.png`
-                          : `${BASE_PATH}/img/custom-domain-off${isDarkMode ? '' : '--light'}.png`
+                          ? `${BASE_PATH}/img/custom-domain-on${
+                              theme === 'dark' ? '' : '--light'
+                            }.png`
+                          : `${BASE_PATH}/img/custom-domain-off${
+                              theme === 'dark' ? '' : '--light'
+                            }.png`
                       }
                     />
                   </div>

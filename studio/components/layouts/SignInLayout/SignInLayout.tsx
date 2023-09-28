@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useTheme } from 'common'
+import { useTheme } from 'next-themes'
 import { useFlag } from 'hooks'
 import { usePushNext } from 'hooks/misc/useAutoAuthRedirect'
 import { BASE_PATH } from 'lib/constants'
@@ -29,7 +29,7 @@ const SignInLayout = ({
   const router = useRouter()
   const pushNext = usePushNext()
   const queryClient = useQueryClient()
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
   const ongoingIncident = useFlag('ongoingIncident')
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
@@ -103,7 +103,7 @@ const SignInLayout = ({
                   <a>
                     <Image
                       src={
-                        isDarkMode
+                        theme === 'dark'
                           ? `${BASE_PATH}/img/supabase-dark.svg`
                           : `${BASE_PATH}/img/supabase-light.svg`
                       }
@@ -141,7 +141,7 @@ const SignInLayout = ({
 
             {showDisclaimer && (
               <div className="sm:text-center">
-                <p className="text-xs text-scale-900 sm:mx-auto sm:max-w-sm">
+                <p className="text-xs text-foreground-lighter sm:mx-auto sm:max-w-sm">
                   By continuing, you agree to Supabase's{' '}
                   <Link href="https://supabase.com/terms">
                     <a className="underline hover:text-foreground-light">Terms of Service</a>

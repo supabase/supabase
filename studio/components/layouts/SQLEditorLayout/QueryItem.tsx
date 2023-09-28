@@ -202,7 +202,7 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
   }
 
   return (
-    <div className="group [div&>button[data-state='open']>span]:text-scale-900 flex items-center">
+    <div className="group [div&>button[data-state='open']>span]:text-foreground-lighter flex items-center">
       {IS_PLATFORM ? (
         <DropdownMenu_Shadcn_>
           <DropdownMenuTrigger_Shadcn_ asChild>

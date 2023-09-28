@@ -22,7 +22,7 @@ const RedirectUrlList = ({
           return (
             <ValueContainer key={url}>
               <div className="flex items-center gap-4 font-mono">
-                <span className="text-scale-900">
+                <span className="text-foreground-lighter">
                   <IconGlobe strokeWidth={2} size={14} />
                 </span>
                 <span className="text-sm">{url}</span>

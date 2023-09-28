@@ -210,7 +210,7 @@ const SidebarLinkItem = ({
       <a className="block" target={isExternal ? '_blank' : '_self'}>
         <span className="group flex max-w-full cursor-pointer items-center space-x-2 border-scale-500 py-1 font-normal outline-none ring-scale-1200 focus-visible:z-10 focus-visible:ring-1 group-hover:border-scale-900">
           {isExternal && (
-            <span className="truncate text-sm text-scale-900 transition group-hover:text-foreground-light">
+            <span className="truncate text-sm text-foreground-lighter transition group-hover:text-foreground-light">
               <IconArrowUpRight size={'tiny'} />
             </span>
           )}

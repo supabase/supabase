@@ -26,7 +26,7 @@ const PolicyRow = ({
     <div className="group">
       <Panel.Content className="flex justify-between gap-2 border-b border-panel-border-light py-4 dark:border-panel-border-dark">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-          <div className="font-mono text-xs text-scale-900">{command}</div>
+          <div className="font-mono text-xs text-foreground-lighter">{command}</div>
           <div className="flex flex-col gap-2 lg:flex-row">
             <span className="truncate text-sm text-foreground">{name}</span>
           </div>
@@ -102,7 +102,7 @@ const StoragePoliciesBucketRow = ({
     >
       {policies.length === 0 ? (
         <div className="p-4 px-6">
-          <p className="text-sm text-scale-900">No policies created yet</p>
+          <p className="text-sm text-foreground-lighter">No policies created yet</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 divide-y dark:divide-dark">

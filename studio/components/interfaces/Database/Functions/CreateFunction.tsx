@@ -487,7 +487,7 @@ const InputMultiArguments = observer(({ readonly }: InputMultiArgumentsProps) =>
       </div>
       <div className="space-y-2 pt-4">
         {readonly && isEmpty(_localState!.formState.args.value) && (
-          <span className="text-scale-900">No argument for this function</span>
+          <span className="text-foreground-lighter">No argument for this function</span>
         )}
         {_localState!.formState.args.value.map(
           (x: { name: string; type: string; error?: string }, idx: number) => (
@@ -562,23 +562,27 @@ const InputArgument = observer(({ idx, name, type, error, readonly }: InputArgum
         error={error}
         disabled={readonly}
       />
-      <Listbox
-        id={`type-${idx}`}
-        className="flex-1"
-        value={type}
-        size="small"
-        onChange={onTypeChange}
-        disabled={readonly}
-      >
-        <Listbox.Option value="integer" label="integer">
-          integer
-        </Listbox.Option>
-        {POSTGRES_DATA_TYPES.map((x: string) => (
-          <Listbox.Option key={x} value={x} label={x}>
-            {x}
+      {readonly ? (
+        <Input disabled readOnly id={`type-${idx}`} size="small" value={type} className="flex-1" />
+      ) : (
+        <Listbox
+          id={`type-${idx}`}
+          className="flex-1"
+          value={type}
+          size="small"
+          onChange={onTypeChange}
+          disabled={readonly}
+        >
+          <Listbox.Option value="integer" label="integer">
+            integer
           </Listbox.Option>
-        ))}
-      </Listbox>
+          {POSTGRES_DATA_TYPES.map((x: string) => (
+            <Listbox.Option key={x} value={x} label={x}>
+              {x}
+            </Listbox.Option>
+          ))}
+        </Listbox>
+      )}
       {!readonly && (
         <Button type="danger" icon={<IconTrash size="tiny" />} onClick={onDelete} size="small" />
       )}
