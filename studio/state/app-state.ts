@@ -13,6 +13,10 @@ export const appState = proxy({
   setShowEnableBranchingModal: (value: boolean) => {
     appState.showEnableBranchingModal = value
   },
+  showFeaturePreviewModal: false,
+  setShowFeaturePreviewModal: (value: boolean) => {
+    appState.showFeaturePreviewModal = value
+  },
 })
 
 export const getAppStateSnapshot = () => snapshot(appState)
