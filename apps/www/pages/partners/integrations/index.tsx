@@ -7,7 +7,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartner'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
-import supabase from '~/lib/supabase'
+import supabase from '~/lib/supabaseMisc'
 import { Partner } from '~/types/partners'
 import TileGrid from '../../../components/Partners/TileGrid'
 
