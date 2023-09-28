@@ -36,7 +36,6 @@ Then let's install the additional dependencies: [supabase-js](https://github.com
 ```bash
 npm install @supabase/supabase-js
 npm install react-native-elements @react-native-async-storage/async-storage react-native-url-polyfill
-npx expo install expo-secure-store
 ```
 
 Now let's create a helper file to initialize the Supabase client.
@@ -44,35 +43,122 @@ We need the API URL and the `anon` key that you copied [earlier](#get-the-api-ke
 These variables will be exposed on the browser, and that's completely fine since we have
 [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```ts lib/supabase.ts
-import 'react-native-url-polyfill/auto'
-import * as SecureStore from 'expo-secure-store'
-import { createClient } from '@supabase/supabase-js'
+<Tabs
+  scrollable
+  size="large"
+  type="underlined"
+  defaultActiveId="async-storage"
+  queryGroup="auth-store"
+>
+  <TabPanel id="async-storage" label="AsyncStorage">
 
-const ExpoSecureStoreAdapter = {
-  getItem: (key: string) => {
-    return SecureStore.getItemAsync(key)
-  },
-  setItem: (key: string, value: string) => {
-    SecureStore.setItemAsync(key, value)
-  },
-  removeItem: (key: string) => {
-    SecureStore.deleteItemAsync(key)
-  },
-}
+    ```ts lib/supabase.ts
+    import 'react-native-url-polyfill/auto'
+    import AsyncStorage from '@react-native-async-storage/async-storage'
+    import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
-const supabaseAnonKey = YOUR_REACT_NATIVE_SUPABASE_ANON_KEY
+    const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
+    const supabaseAnonKey = YOUR_REACT_NATIVE_SUPABASE_ANON_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    storage: ExpoSecureStoreAdapter as any,
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: false,
-  },
-})
-```
+    export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        storage: AsyncStorage,
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: false,
+      },
+    })
+    ```
+
+  </TabPanel>
+  <TabPanel id="secure-store" label="SecureStore">
+
+    If you wish to encrypt the user's session information, you can use `aes-js` and store the encryption key in [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore). The [`aes-js` library](https://github.com/ricmoo/aes-js) is a reputable JavaScript-only implementation of the AES encryption algorithm in CTR mode. A new 256-bit encryption key is generated using the `react-native-get-random-values` library. This key is stored inside Expo's SecureStore, while the value is encrypted and placed inside AsyncStorage.
+
+    Please make sure that:
+    - You keep the `expo-secure-storage`, `aes-js` and `react-native-get-random-values` libraries up-to-date.
+    - Choose the correct [`SecureStoreOptions`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestoreoptions) for your app's needs. E.g. [`SecureStore.WHEN_UNLOCKED`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestorewhen_unlocked) regulates when the data can be accessed.
+    - Carefully consider optimizations or other modifications to the above example, as those can lead to introducing subtle security vulnerabilities.
+
+    Install the necessary dependencies in the root of your Expo project:
+
+    ```bash
+    npm install @supabase/supabase-js
+    npm install react-native-elements @react-native-async-storage/async-storage react-native-url-polyfill
+    npm install aes-js react-native-get-random-values
+    npx expo install expo-secure-store
+    ```
+
+    Implement a `LargeSecureStore` class to pass in as Auth storage for the `supabase-js` client:
+
+    ```ts lib/supabase.ts
+    import { createClient } from '@supabase/supabase-js'
+    import AsyncStorage from '@react-native-async-storage/async-storage';
+    import * as SecureStore from 'expo-secure-store';
+    import * as aesjs from 'aes-js';
+    import 'react-native-get-random-values';
+
+    // As Expo's SecureStore does not support values larger than 2048
+    // bytes, an AES-256 key is generated and stored in SecureStore, while
+    // it is used to encrypt/decrypt values stored in AsyncStorage.
+    class LargeSecureStore {
+      private async _encrypt(key: string, value: string) {
+        const encryptionKey = crypto.getRandomValues(new Uint8Array(256 / 8));
+
+        const cipher = new aesjs.ModeOfOperation.ctr(encryptionKey, new aesjs.Counter(1));
+        const encryptedBytes = cipher.encrypt(aesjs.utils.utf8.toBytes(value));
+
+        await SecureStore.setItemAsync(key, aesjs.utils.hex.fromBytes(encryptionKey));
+
+        return aesjs.utils.hex.fromBytes(encryptedBytes);
+      }
+
+      private async _decrypt(key: string, value: string) {
+        const encryptionKeyHex = await SecureStore.getItemAsync(key);
+        if (!encryptionKeyHex) {
+          return encryptionKeyHex;
+        }
+
+        const cipher = new aesjs.ModeOfOperation.ctr(aesjs.utils.hex.toBytes(encryptionKeyHex), new aesjs.Counter(1));
+        const decryptedBytes = cipher.decrypt(aesjs.utils.hex.toBytes(value));
+
+        return aesjs.utils.utf8.fromBytes(decryptedBytes);
+      }
+
+      async getItem(key: string) {
+        const encrypted = await AsyncStorage.getItem(key);
+        if (!encrypted) { return encrypted; }
+
+        return await this._decrypt(key, encrypted);
+      }
+
+      async removeItem(key: string) {
+        await AsyncStorage.removeItem(key);
+        await SecureStore.deleteItemAsync(key);
+      }
+
+      async setItem(key: string, value: string) {
+        const encrypted = await this._encrypt(key, value);
+
+        await AsyncStorage.setItem(key, encrypted);
+      }
+    }
+
+    const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
+    const supabaseAnonKey = YOUR_REACT_NATIVE_SUPABASE_ANON_KEY
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        storage: new LargeSecureStore(),
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: false,
+      },
+    });
+    ```
+
+  </TabPanel>
+</Tabs>
 
 ### Set up a Login component
 

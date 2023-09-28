@@ -21,13 +21,13 @@ const UsersPagination = ({ total, page, setPage }: UsersPaginationProps) => {
   return (
     <nav className="flex items-center justify-between overflow-hidden" aria-label="Pagination">
       <div className="hidden sm:block">
-        <p className="text-xs text-scale-900">
+        <p className="text-xs text-foreground-lighter">
           Showing
-          <span className="px-1 font-medium text-scale-1100">{fromRow}</span>
+          <span className="px-1 font-medium text-foreground-light">{fromRow}</span>
           to
-          <span className="px-1 font-medium text-scale-1100">{toRow}</span>
+          <span className="px-1 font-medium text-foreground-light">{toRow}</span>
           of
-          <span className="px-1 font-medium text-scale-1100">{total}</span>
+          <span className="px-1 font-medium text-foreground-light">{total}</span>
           results
         </p>
       </div>

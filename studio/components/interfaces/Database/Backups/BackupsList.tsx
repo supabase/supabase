@@ -82,7 +82,7 @@ const BackupsList = () => {
           <>
             {!canTriggerScheduledBackups && (
               <InformationBox
-                icon={<IconAlertCircle className="text-scale-1100" strokeWidth={2} />}
+                icon={<IconAlertCircle className="text-foreground-light" strokeWidth={2} />}
                 title="You need additional permissions to trigger a scheduled backup"
               />
             )}

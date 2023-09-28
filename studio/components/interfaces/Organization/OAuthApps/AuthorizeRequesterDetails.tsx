@@ -15,11 +15,11 @@ const AuthorizeRequesterDetails = ({ icon, name, domain }: AuthorizeRequesterDet
               backgroundImage: icon !== null ? `url('${icon}')` : 'none',
             }}
           >
-            {icon === null && <p className="text-scale-1000 text-lg">{name[0]}</p>}
+            {icon === null && <p className="text-foreground-light text-lg">{name[0]}</p>}
           </div>
         </div>
       </div>
-      <p className="text-sm text-scale-1100">
+      <p className="text-sm text-foreground-light">
         {name} ({domain}) is requesting API access to an organization. The application will be able
         to{' '}
         <span className="text-amber-1200">
