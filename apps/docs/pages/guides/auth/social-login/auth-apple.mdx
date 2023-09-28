@@ -135,7 +135,7 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
             buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
             buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
             cornerRadius={5}
-            style={{ height: 70 }}
+            style={{ width: 200, height: 64 }}
             onPress={async () => {
               try {
                 const credential = await AppleAuthentication.signInAsync({
