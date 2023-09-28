@@ -8,15 +8,15 @@ import toast from 'react-hot-toast'
 export type IPDeleteVariables = {
   projectRef: string
   /** can only be one for now */
-  ips: string[] // Renamed from 'ip' to 'ips'
+  ips: string[] 
 }
 
-export async function deleteBannedIPs({ projectRef, ips }: IPDeleteVariables) { // Updated parameter name here
+export async function deleteBannedIPs({ projectRef, ips }: IPDeleteVariables) { 
   const { data, error } = await del(`/v1/projects/{ref}/network-bans`, {
     params: { 
       path: { ref: projectRef } 
     },
-    body: { ipv4_addresses: ips } // Updated parameter name here
+    body: { ipv4_addresses: ips } 
   })
 
   if (error) throw error
@@ -38,11 +38,11 @@ export const useBannedIPsDeleteMutation = ({
     (vars) => deleteBannedIPs(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef, ips } = variables // Updated parameter name here
+        const { projectRef, ips } = variables 
 
         await Promise.all([
           queryClient.invalidateQueries(BannedIPKeys.list(projectRef)),
-          queryClient.invalidateQueries(BannedIPKeys.detail(ips)), // Updated parameter name here
+          queryClient.invalidateQueries(BannedIPKeys.detail(ips)), 
         ])
 
         await onSuccess?.(data, variables, context)

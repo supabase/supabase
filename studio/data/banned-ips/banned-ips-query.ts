@@ -13,23 +13,17 @@ export type BannedIPsError = ResponseError;
 export async function getBannedIPs({ projectRef }: BannedIPVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  // @ts-ignore Just a sample here, TS lint will validate if the endpoint is valid
   const { data, error } = await post(`/v1/projects/{ref}/network-bans/retrieve`, {
     params: { 
       path: { ref: projectRef } 
     },
     signal,
   })
-  // Log the error message if an error occurred
+
   if (error) {
-    console.error('Error fetching banned IPs:', error);
     throw error;
   }
 
-  // Log the data if it's available
-  if (data) {
-    console.log('Banned IPs Data:', data);
-  }
   return data
 }
 
