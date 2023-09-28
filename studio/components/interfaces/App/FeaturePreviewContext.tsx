@@ -2,6 +2,7 @@ import { noop } from 'lodash'
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { EMPTY_OBJ } from 'lib/void'
 
 type FeaturePreviewContextType = {
   flags: { [key: string]: boolean }
@@ -9,7 +10,7 @@ type FeaturePreviewContextType = {
 }
 
 const FeaturePreviewContext = createContext<FeaturePreviewContextType>({
-  flags: {},
+  flags: EMPTY_OBJ,
   onUpdateFlag: noop,
 })
 

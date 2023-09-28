@@ -9,6 +9,8 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { Markdown } from '../Markdown'
 import { useFeaturePreviewContext } from './FeaturePreviewContext'
 
+// [Ivan] We should probably move this to a separate file, together with LOCAL_STORAGE_KEYS. We should make adding new feature previews as simple as possible.
+
 const FEATURE_PREVIEWS = [
   // {
   //   key: LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT,
