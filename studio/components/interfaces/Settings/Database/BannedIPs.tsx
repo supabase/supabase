@@ -2,10 +2,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useParams } from 'common/hooks'
 import { useStore } from 'hooks'
-import {
-  FormHeader,
-  FormPanel,
-} from 'components/ui/Forms'
+import { FormHeader, FormPanel } from 'components/ui/Forms'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -24,13 +21,11 @@ import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mu
 const BannedIPs = () => {
   const { ref } = useParams()
   const [selectedIPToUnban, setSelectedIPToUnban] = useState<string | null>(null) // Track the selected IP for unban
-  const {
-    data: ipList
-  } = useBannedIPsQuery({
+  const { data: ipList } = useBannedIPsQuery({
     projectRef: ref,
   })
 
-  const { ui } = useStore();
+  const { ui } = useStore()
   const [showUnban, setShowUnban] = useState(false)
   const [confirmingIP, setConfirmingIP] = useState<string | null>(null) // Track the IP being confirmed for unban
 
@@ -38,37 +33,40 @@ const BannedIPs = () => {
     onSuccess: () => {
       ui.setNotification({
         category: 'success',
-        message: 'IP address successfully unbanned'
-      });
-      setSelectedIPToUnban(null); // Reset the selected IP for unban
+        message: 'IP address successfully unbanned',
+      })
+      setSelectedIPToUnban(null) // Reset the selected IP for unban
       setShowUnban(false)
     },
     onError: (error) => {
       ui.setNotification({
         category: 'error',
         message: `Failed to unban IP: ${error?.message}`,
-      });
+      })
     },
-  });
+  })
 
   const onConfirmUnbanIP = () => {
-    if (confirmingIP == null || !ref) return;
+    if (confirmingIP == null || !ref) return
     unbanIPs({
       projectRef: ref,
       ips: [confirmingIP], // Pass the IP as an array
-    });
+    })
   }
 
   const openConfirmationModal = (ip: string) => {
-    setSelectedIPToUnban(ip); // Set the selected IP for unban
-    setConfirmingIP(ip); // Set the IP being confirmed for unban
-    setShowUnban(true);
+    setSelectedIPToUnban(ip) // Set the selected IP for unban
+    setConfirmingIP(ip) // Set the IP being confirmed for unban
+    setShowUnban(true)
   }
 
   return (
     <div>
       <div className="flex items-center justify-between">
-        <FormHeader title="Banned IPs" description="We monitor unsuccessful logins and block IPs for security" />
+        <FormHeader
+          title="Banned IPs"
+          description="We monitor unsuccessful logins and block IPs for security"
+        />
         <div className="flex items-center space-x-2 mb-6">
           <Link href="https://supabase.com/docs/reference/cli/supabase-network-bans">
             <a target="_blank">
@@ -95,8 +93,10 @@ const BannedIPs = () => {
             </div>
           ))
         ) : (
-          <p className="text-scale-1100 text-sm px-8 py-4">There are no banned IP addresses for your project.</p>
-        )} 
+          <p className="text-scale-1100 text-sm px-8 py-4">
+            There are no banned IP addresses for your project.
+          </p>
+        )}
       </FormPanel>
 
       <ConfirmationModal
@@ -123,7 +123,7 @@ const BannedIPs = () => {
         </Modal.Content>
       </ConfirmationModal>
     </div>
-  );
+  )
 }
 
 export default BannedIPs
