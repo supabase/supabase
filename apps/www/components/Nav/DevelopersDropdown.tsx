@@ -32,7 +32,7 @@ const DevelopersDropdown = () => {
                 {column.links.map((link: Props) => (
                   <li key={link.text}>
                     <Link href={link.url!}>
-                      <a className="flex group items-center gap-2 text-light hover:text-brand focus-visible:ring-2 focus-visible:outline-none focus-visible:rounded focus-visible:ring-foreground-lighter focus-visible:text-foreground-strong">
+                      <a className="flex group items-center gap-2 text-light hover:text-brand focus-visible:text-brand focus-visible:ring-2 focus-visible:outline-none focus-visible:rounded focus-visible:ring-foreground-lighter">
                         <svg
                           className="h-5 w-5"
                           viewBox="0 0 14 14"
@@ -67,7 +67,7 @@ const DevelopersDropdown = () => {
         <div className="flex flex-col w-[500px] bg-alternative">
           <div className="flex-col gap-3 py-8 px-10">
             <Link href="/blog">
-              <a className="inline-flex items-center gap-1 text-muted hover:text-brand text-xs uppercase tracking-widest font-mono mb-6">
+              <a className="inline-flex items-center gap-1 text-muted hover:text-brand text-xs uppercase tracking-widest font-mono mb-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-brand">
                 Blog
                 <IconChevronRight className="h-3 w-3" />
               </a>
@@ -76,7 +76,7 @@ const DevelopersDropdown = () => {
               {Announcements.map((announcement: any) => (
                 <li key={announcement.title}>
                   <Link href={announcement.url}>
-                    <a className="group flex items-center gap-3 text-lighter">
+                    <a className="group flex items-center gap-3 text-lighter focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded">
                       <div className="relative rounded-md border h-20 w-32 flex-shrink-0 overflow-auto">
                         <Image
                           src={`${basePath}${announcement?.imgUrl}`}
@@ -86,10 +86,10 @@ const DevelopersDropdown = () => {
                         />
                       </div>
                       <div className="flex flex-col gap-1">
-                        <p className="text-strong mb-0 line-clamp-2 group-hover:text-brand">
+                        <p className="text-strong mb-0 line-clamp-2 group-hover:text-brand group-focus-visible:text-brand">
                           {announcement.title}
                         </p>
-                        <p className="line-clamp-2 text-sm !mb-0 group-hover:text-light">
+                        <p className="line-clamp-2 text-sm !mb-0 group-hover:text-light group-focus-visible:text-light">
                           {announcement.description}
                         </p>
                       </div>

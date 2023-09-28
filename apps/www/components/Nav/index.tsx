@@ -92,14 +92,14 @@ const Nav = () => {
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
           className={[
-            'absolute inset-0 h-full w-full opacity-80 bg-scale-200',
+            'absolute inset-0 h-full w-full opacity-80 bg-background',
             !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
             showLaunchWeekNavMode && '!bg-transparent transition-all',
           ].join(' ')}
         />
         <nav
           className={[
-            `relative z-40 border-scale-300 border-b backdrop-blur-sm transition-opacity`,
+            `relative z-40 border-border border-b backdrop-blur-sm transition-opacity`,
             showLaunchWeekNavMode ? '!opacity-100 !border-[#e0d2f430]' : '',
             isLaunchWeekPage && showLaunchWeekNavMode ? '!border-b-0' : '',
           ].join(' ')}
@@ -136,7 +136,7 @@ const Nav = () => {
                     {menu.primaryNav.map((menuItem) =>
                       menuItem.hasDropdown ? (
                         <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
-                          <NavigationMenuTrigger className="bg-transparent data-[state=open]:text-brand data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground-strong">
+                          <NavigationMenuTrigger className="bg-transparent data-[state=open]:text-brand data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground-strong focus-visible:!text-brand">
                             {menuItem.title}
                           </NavigationMenuTrigger>
                           <NavigationMenuContent className={menuItem.dropdownContainerClassName}>
@@ -149,7 +149,7 @@ const Nav = () => {
                             <MenuItem
                               href={menuItem.url}
                               title={menuItem.title}
-                              className="group-hover:bg-transparent text-strong hover:text-brand"
+                              className="group-hover:bg-transparent text-strong hover:text-brand focus-visible:text-brand"
                             />
                           </NavigationMenuLink>
                         </NavigationMenuItem>
@@ -163,26 +163,22 @@ const Nav = () => {
                 {!isUserLoading && (
                   <>
                     {isLoggedIn ? (
-                      <Link href="/dashboard/projects">
-                        <a>
-                          <Button className="hidden text-white lg:block">Dashboard</Button>
-                        </a>
+                      <Link href="/dashboard/projects" passHref>
+                        <Button className="hidden text-white lg:block" asChild>
+                          <a>Dashboard</a>
+                        </Button>
                       </Link>
                     ) : (
                       <>
-                        <Link href="https://supabase.com/dashboard">
-                          <a>
-                            <Button type="default" className="hidden lg:block">
-                              Sign in
-                            </Button>
-                          </a>
+                        <Link href="https://supabase.com/dashboard" passHref>
+                          <Button type="default" className="hidden lg:block" asChild>
+                            <a>Sign in</a>
+                          </Button>
                         </Link>
-                        <Link href="https://supabase.com/dashboard">
-                          <a>
-                            <Button className="hidden text-white lg:block">
-                              Start your project
-                            </Button>
-                          </a>
+                        <Link href="https://supabase.com/dashboard" passHref>
+                          <Button className="hidden text-white lg:block" asChild>
+                            <a>Start your project</a>
+                          </Button>
                         </Link>
                       </>
                     )}

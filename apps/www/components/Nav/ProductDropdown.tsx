@@ -32,7 +32,7 @@ const ProductDropdown = () => {
       <div className="border-l flex flex-col w-[500px] bg-alternative">
         <div className="py-8 px-10">
           <Link href="/customers">
-            <a className="inline-flex items-center gap-1 text-muted hover:text-brand text-xs uppercase tracking-widest font-mono mb-6">
+            <a className="inline-flex items-center gap-1 text-muted hover:text-brand text-xs uppercase tracking-widest font-mono mb-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-brand">
               Customer Stories
               <IconChevronRight className="h-3 w-3" />
             </a>
@@ -41,7 +41,7 @@ const ProductDropdown = () => {
             {CustomersData.slice(0, 4).map((customer) => (
               <li key={customer.organization}>
                 <Link href={customer.url}>
-                  <a className="group flex items-center gap-3">
+                  <a className="group flex items-center gap-3 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded">
                     <div className="relative rounded-md bg-overlay p-2 border h-16 w-32 flex-shrink-0 overflow-auto">
                       <Image
                         src={`${basePath}/${customer.imgUrl}`}
@@ -52,7 +52,7 @@ const ProductDropdown = () => {
                       />
                     </div>
                     <div className="flex flex-col">
-                      <h4 className="text-light group-hover:text-brand text-normal mb-0 text-sm">
+                      <h4 className="text-light group-hover:text-brand group-focus-visible:text-brand text-normal mb-0 text-sm">
                         {customer.title}
                       </h4>
                     </div>
@@ -73,7 +73,7 @@ const ProductDropdown = () => {
                   hasChevron={false}
                   url={link.url}
                   label={link.text}
-                  className="mt-0 hover:text-brand focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay"
+                  className="mt-0 hover:text-brand focus-visible:text-brand focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay"
                 />
               </li>
             ))}

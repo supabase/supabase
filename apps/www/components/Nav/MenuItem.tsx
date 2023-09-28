@@ -22,7 +22,7 @@ const MenuItem = React.forwardRef<
             {icon && (
               <div className="shrink-0 bg-surface-300 min-w-12 w-12 h-12 flex items-center justify-center rounded-lg">
                 <svg
-                  className="h-5 w-5 group-hover:text-brand"
+                  className="h-5 w-5 group-hover:text-brand group-focus-visible:text-brand"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -41,7 +41,7 @@ const MenuItem = React.forwardRef<
             <div className="flex flex-col justify-center gap-1">
               <div className={cn('leading-none')}>{title}</div>
               {description && (
-                <p className="line-clamp-1 text-sm leading-snug text-muted group-hover:text-light">
+                <p className="line-clamp-1 text-sm leading-snug text-muted group-hover:text-light group-focus-visible:text-light">
                   {description}
                 </p>
               )}
