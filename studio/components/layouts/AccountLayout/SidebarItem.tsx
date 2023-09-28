@@ -54,13 +54,13 @@ const SidebarItem = ({
           onClick={onClick}
         >
           {isExternal && (
-            <span className="truncate text-sm text-foreground-lighter transition group-hover:text-foreground-light">
+            <span className="truncate text-sm text-scale-900 transition group-hover:text-scale-1100">
               <IconArrowUpRight size="tiny" />
             </span>
           )}
           <span
             title={label}
-            className="w-full truncate text-sm text-foreground-light transition group-hover:text-foreground"
+            className="w-full truncate text-sm text-scale-1100 transition group-hover:text-scale-1200"
           >
             {isSubitem ? <p>{label}</p> : label}
           </span>

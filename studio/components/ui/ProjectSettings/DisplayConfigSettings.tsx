@@ -40,7 +40,7 @@ const DisplayConfigSettings = () => {
       {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
         <div className="flex items-center justify-center py-8 space-x-2">
           <IconAlertCircle size={16} strokeWidth={1.5} />
-          <p className="text-sm text-foreground-light">
+          <p className="text-sm text-scale-1100">
             {isProjectSettingsError
               ? 'Failed to retrieve configuration'
               : 'Failed to update JWT secret'}
@@ -49,7 +49,7 @@ const DisplayConfigSettings = () => {
       ) : isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
         <div className="flex items-center justify-center py-8 space-x-2">
           <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
-          <p className="text-sm text-foreground-light">
+          <p className="text-sm text-scale-1100">
             {isProjectSettingsLoading ? 'Retrieving API keys' : 'JWT secret is being updated'}
           </p>
         </div>

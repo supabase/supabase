@@ -97,24 +97,7 @@ function useLogsPreview(
     }
   )
 
-  // memoize all this calculations stuff
-  const { logData, error, oldestTimestamp } = useMemo(() => {
-    let logData: LogData[] = []
-
-    let error: null | string | object = rqError ? (rqError as any).message : null
-    data?.pages.forEach((response) => {
-      if (isResponseOk(response) && response.result) {
-        logData = [...logData, ...response.result]
-      }
-      if (!error && response && response.error) {
-        error = response.error
-      }
-    })
-
-    const oldestTimestamp = logData[logData.length - 1]?.timestamp
-
-    return { logData, error, oldestTimestamp }
-  }, [data?.pages])
+  let logData: LogData[] = []
 
   const countUrl = () => {
     return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
@@ -134,10 +117,7 @@ function useLogsPreview(
     ({ signal }) => get<Count>(countUrl(), { signal }),
     {
       refetchOnWindowFocus: false,
-      // refresh each minute only
-      refetchInterval: 60000,
-      // only enable if no errors are found and data has already been loaded
-      enabled: !error && data && data.pages.length > 0 ? true : false,
+      refetchInterval: 5000,
     }
   )
 
@@ -145,7 +125,7 @@ function useLogsPreview(
 
   // chart data
 
-  const chartQuery = useMemo(() => genChartQuery(table, params, filters), [params, filters])
+  const chartQuery = useMemo(()=> genChartQuery(table, params, filters) , [params, filters])
   const chartUrl = useMemo(() => {
     return `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams({
       iso_timestamp_end: params.iso_timestamp_end,
@@ -172,6 +152,18 @@ function useLogsPreview(
     refreshEventChart()
     refetch()
   }
+
+  let error: null | string | object = rqError ? (rqError as any).message : null
+  data?.pages.forEach((response) => {
+    if (isResponseOk(response) && response.result) {
+      logData = [...logData, ...response.result]
+    }
+    if (!error && response && response.error) {
+      error = response.error
+    }
+  })
+
+  const oldestTimestamp = logData[logData.length - 1]?.timestamp
 
   const handleSetFilters: LogsPreviewHook['setFilters'] = (newFilters) => {
     if (typeof newFilters === 'function') {

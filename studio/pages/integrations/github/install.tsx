@@ -124,7 +124,7 @@ const GitHubIntegration: NextPageWithLayout = () => {
           <>
             <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
               <ScaffoldColumn className="mx-auto">
-                <h1 className="text-xl text-foreground">Choose organization</h1>
+                <h1 className="text-xl text-scale-1200">Choose organization</h1>
                 <>
                   <Markdown content={`Choose the Supabase organization you wish to install in`} />
                   <OrganizationPicker
@@ -178,10 +178,10 @@ const GitHubIntegration: NextPageWithLayout = () => {
         <ScaffoldDivider />
       </main>
       <ScaffoldContainer className="bg-body flex flex-row gap-6 py-6">
-        <div className="flex items-center gap-2 text-xs text-foreground-lighter">
+        <div className="flex items-center gap-2 text-xs text-scale-900">
           <IconBook size={16} /> Docs
         </div>
-        <div className="flex items-center gap-2 text-xs text-foreground-lighter">
+        <div className="flex items-center gap-2 text-xs text-scale-900">
           <IconLifeBuoy size={16} /> Support
         </div>
       </ScaffoldContainer>

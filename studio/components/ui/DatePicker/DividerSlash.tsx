@@ -1,6 +1,6 @@
 export default function DividerSlash() {
   return (
-    <span className="text-foreground-lighter">
+    <span className="text-scale-900">
       <svg
         viewBox="0 0 24 24"
         width="14"

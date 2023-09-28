@@ -1,10 +1,5 @@
 import { PropsWithChildren } from 'react'
-import {
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
-} from 'ui'
+import { Dropdown } from 'ui'
 
 interface DropdownControlProps {
   options: {
@@ -14,40 +9,42 @@ interface DropdownControlProps {
     preLabel?: string
   }[]
   onSelect: (value: string | number) => void
+  className?: string
   side?: 'bottom' | 'left' | 'top' | 'right' | undefined
   align?: 'start' | 'center' | 'end' | undefined
+  isNested?: boolean
 }
 
-export const DropdownControl = ({
-  children,
-  side,
-  align,
-  options,
-  onSelect,
-}: PropsWithChildren<DropdownControlProps>) => {
+export const DropdownControl = (p: PropsWithChildren<DropdownControlProps>) => {
+  const { className, children, side, align, isNested } = p
   return (
-    <DropdownMenu_Shadcn_>
-      <DropdownMenuTrigger_Shadcn_>{children}</DropdownMenuTrigger_Shadcn_>
-      <DropdownMenuContent_Shadcn_ side={side} align={align}>
-        <div className="dropdown-control" style={{ maxHeight: '30vh' }}>
-          {options.length === 0 && <p className="dropdown-control__empty-text">No more items</p>}
-          {options.map((x) => {
-            return (
-              <DropdownMenuItem_Shadcn_ key={x.value} onClick={() => onSelect(x.value)}>
-                <div className="flex items-center gap-2">
-                  {x.preLabel && (
-                    <span className="grow text-xs text-foreground-lighter">{x.preLabel}</span>
-                  )}
-                  <span>{x.label}</span>
-                  {x.postLabel && (
-                    <span className="text-xs text-foreground-lighter">{x.postLabel}</span>
-                  )}
-                </div>
-              </DropdownMenuItem_Shadcn_>
-            )
-          })}
-        </div>
-      </DropdownMenuContent_Shadcn_>
-    </DropdownMenu_Shadcn_>
+    <Dropdown
+      className={className}
+      side={side}
+      align={align}
+      overlay={<DropdownItems {...p} />}
+      isNested={isNested}
+    >
+      {children}
+    </Dropdown>
+  )
+}
+
+const DropdownItems = ({ options, onSelect }: DropdownControlProps) => {
+  return (
+    <div className="dropdown-control" style={{ maxHeight: '30vh' }}>
+      {options.length == 0 && <p className="dropdown-control__empty-text">No more items</p>}
+      {options.map((x) => {
+        return (
+          <Dropdown.Item key={x.value} onClick={() => onSelect(x.value)}>
+            <div className="flex items-center gap-2">
+              {x.preLabel && <span className="grow text-xs text-scale-900">{x.preLabel}</span>}
+              <span>{x.label}</span>
+              {x.postLabel && <span className="text-xs text-scale-900">{x.postLabel}</span>}
+            </div>
+          </Dropdown.Item>
+        )
+      })}
+    </div>
   )
 }

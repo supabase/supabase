@@ -5,10 +5,7 @@ import { observer } from 'mobx-react-lite'
 import {
   Badge,
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  Dropdown,
   IconCheck,
   IconEdit3,
   IconMoreVertical,
@@ -47,7 +44,7 @@ const TriggerList = ({
     return (
       <Table.tr key={schema}>
         <Table.td colSpan={6}>
-          <p className="text-sm text-foreground">No triggers created yet</p>
+          <p className="text-sm text-scale-1200">No triggers created yet</p>
           <p className="text-sm text-light">There are no triggers found in the schema "{schema}"</p>
         </Table.td>
       </Table.tr>
@@ -58,7 +55,7 @@ const TriggerList = ({
     return (
       <Table.tr key={schema}>
         <Table.td colSpan={5}>
-          <p className="text-sm text-foreground">No results found</p>
+          <p className="text-sm text-scale-1200">No results found</p>
           <p className="text-sm text-light">
             Your search for "{filterString}" did not return any results
           </p>
@@ -111,31 +108,30 @@ const TriggerList = ({
             {!isLocked && (
               <div className="flex items-center justify-end">
                 {canUpdateTriggers ? (
-                  <DropdownMenu_Shadcn_>
-                    <DropdownMenuTrigger_Shadcn_>
-                      <Button asChild type="default" icon={<IconMoreVertical />}>
-                        <span></span>
-                      </Button>
-                    </DropdownMenuTrigger_Shadcn_>
-                    <DropdownMenuContent_Shadcn_ side="bottom" align="end">
+                  <Dropdown
+                    side="bottom"
+                    align="end"
+                    overlay={
                       <>
-                        <DropdownMenuItem_Shadcn_
-                          className="space-x-2"
+                        <Dropdown.Item
+                          icon={<IconEdit3 size="tiny" />}
                           onClick={() => editTrigger(x)}
                         >
-                          <IconEdit3 size="tiny" />
-                          <p className="text">Edit trigger</p>
-                        </DropdownMenuItem_Shadcn_>
-                        <DropdownMenuItem_Shadcn_
-                          className="space-x-2"
+                          Edit trigger
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          icon={<IconTrash stroke="red" size="tiny" />}
                           onClick={() => deleteTrigger(x)}
                         >
-                          <IconTrash stroke="red" size="tiny" />
-                          <p className="text">Delete trigger</p>
-                        </DropdownMenuItem_Shadcn_>
+                          Delete trigger
+                        </Dropdown.Item>
                       </>
-                    </DropdownMenuContent_Shadcn_>
-                  </DropdownMenu_Shadcn_>
+                    }
+                  >
+                    <Button asChild type="default" icon={<IconMoreVertical />}>
+                      <span></span>
+                    </Button>
+                  </Dropdown>
                 ) : (
                   <Tooltip.Root delayDuration={0}>
                     <Tooltip.Trigger asChild>
@@ -150,7 +146,7 @@ const TriggerList = ({
                             'border border-scale-200',
                           ].join(' ')}
                         >
-                          <span className="text-xs text-foreground">
+                          <span className="text-xs text-scale-1200">
                             You need additional permissions to update triggers
                           </span>
                         </div>

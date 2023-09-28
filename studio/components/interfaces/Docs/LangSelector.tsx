@@ -1,13 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useCheckPermissions } from 'hooks'
-import {
-  Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
-  IconKey,
-} from 'ui'
+import { Button, Dropdown, IconKey } from 'ui'
 
 import { showApiKey } from 'components/interfaces/Docs/Docs.types'
 
@@ -43,9 +36,9 @@ const LangSelector = ({
           onClick={() => setSelectedLang('js')}
           className={`${
             selectedLang == 'js'
-              ? 'bg-scale-300 font-medium text-foreground dark:bg-scale-200'
-              : 'bg-scale-100 text-foreground-lighter dark:bg-scale-100'
-          } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-foreground focus:outline-none`}
+              ? 'bg-scale-300 font-medium text-scale-1200 dark:bg-scale-200'
+              : 'bg-scale-100 text-scale-900 dark:bg-scale-100'
+          } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-scale-1200 focus:outline-none`}
         >
           JavaScript
         </button>
@@ -54,29 +47,29 @@ const LangSelector = ({
           onClick={() => setSelectedLang('bash')}
           className={`${
             selectedLang == 'bash'
-              ? 'bg-scale-300 font-medium text-foreground dark:bg-scale-200'
-              : 'bg-scale-100 text-foreground-lighter dark:bg-scale-100'
-          } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-foreground focus:outline-none`}
+              ? 'bg-scale-300 font-medium text-scale-1200 dark:bg-scale-200'
+              : 'bg-scale-100 text-scale-900 dark:bg-scale-100'
+          } relative inline-flex items-center border-r border-scale-200 p-1 px-2 text-sm transition hover:text-scale-1200 focus:outline-none`}
         >
           Bash
         </button>
         {selectedLang == 'bash' && (
           <div className="flex">
-            <div className="flex items-center gap-2 p-1 pl-2 text-xs text-foreground-lighter">
+            <div className="flex items-center gap-2 p-1 pl-2 text-xs text-scale-900">
               <IconKey size={12} strokeWidth={1.5} />
               <span>Project API key :</span>
             </div>
-            <DropdownMenu_Shadcn_>
-              <DropdownMenuTrigger_Shadcn_>
-                <Button type="default">{showApiKey.name}</Button>
-              </DropdownMenuTrigger_Shadcn_>
-              <DropdownMenuContent_Shadcn_ align="end" side="bottom">
+            <Dropdown
+              align="end"
+              side="bottom"
+              className="cursor-pointer border-none bg-transparent p-0 pl-2 pr-8 text-sm text-scale-900"
+              overlay={
                 <>
-                  <DropdownMenuItem_Shadcn_ key="hide" onClick={() => setShowApiKey(DEFAULT_KEY)}>
+                  <Dropdown.Item key="hide" onClick={() => setShowApiKey(DEFAULT_KEY)}>
                     hide
-                  </DropdownMenuItem_Shadcn_>
+                  </Dropdown.Item>
                   {apiKey && (
-                    <DropdownMenuItem_Shadcn_
+                    <Dropdown.Item
                       key="anon"
                       onClick={() =>
                         setShowApiKey({
@@ -85,11 +78,11 @@ const LangSelector = ({
                         })
                       }
                     >
-                      <p className="text">anon (public)</p>
-                    </DropdownMenuItem_Shadcn_>
+                      anon (public)
+                    </Dropdown.Item>
                   )}
                   {canReadServiceKey && (
-                    <DropdownMenuItem_Shadcn_
+                    <Dropdown.Item
                       key="service"
                       onClick={() =>
                         setShowApiKey({
@@ -98,12 +91,14 @@ const LangSelector = ({
                         })
                       }
                     >
-                      <p className="text">service_role (secret)</p>
-                    </DropdownMenuItem_Shadcn_>
+                      service_role (secret)
+                    </Dropdown.Item>
                   )}
                 </>
-              </DropdownMenuContent_Shadcn_>
-            </DropdownMenu_Shadcn_>
+              }
+            >
+              <Button type="default">{showApiKey.name}</Button>
+            </Dropdown>
           </div>
         )}
       </div>

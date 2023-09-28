@@ -167,7 +167,7 @@ const EncryptionKeysManagement = () => {
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-foreground">
+                      <span className="text-xs text-scale-1200">
                         You need additional permissions to add keys
                       </span>
                     </div>
@@ -182,12 +182,8 @@ const EncryptionKeysManagement = () => {
         <div className="border border-scale-500 rounded">
           {!vault.isLoaded ? (
             <div className="px-6 py-6 space-x-2 flex items-center justify-center">
-              <IconLoader
-                className="animate-spin text-foreground-light"
-                size={16}
-                strokeWidth={1.5}
-              />
-              <p className="text-sm text-foreground">Loading keys from the Vault</p>
+              <IconLoader className="animate-spin text-scale-1100" size={16} strokeWidth={1.5} />
+              <p className="text-sm text-scale-1200">Loading keys from the Vault</p>
             </div>
           ) : (
             <>
@@ -195,23 +191,20 @@ const EncryptionKeysManagement = () => {
                 return (
                   <Fragment key={key.key_id}>
                     <div className="px-6 py-4 flex items-center space-x-4">
-                      <IconKey className="text-foreground-light" strokeWidth={2} />
+                      <IconKey className="text-scale-1100" strokeWidth={2} />
                       <div className="space-y-1 min-w-[70%] max-w-[70%]">
                         <p
-                          className="text-sm truncate text-foreground"
+                          className="text-sm truncate text-scale-1200"
                           title={key.name || DEFAULT_KEY_NAME}
                         >
                           {key.name || DEFAULT_KEY_NAME}
                         </p>
-                        <p
-                          title={key.id}
-                          className="text-xs text-foreground-light font-bold truncate"
-                        >
+                        <p title={key.id} className="text-xs text-scale-1100 font-bold truncate">
                           ID: <span className="font-mono">{key.id}</span>
                         </p>
                       </div>
                       <div className="flex items-center justify-end w-[30%] space-x-4">
-                        <p className="text-sm text-foreground-light">
+                        <p className="text-sm text-scale-1100">
                           Added on {dayjs(key.created).format('MMM D, YYYY')}
                         </p>
                         <Tooltip.Root delayDuration={0}>
@@ -234,7 +227,7 @@ const EncryptionKeysManagement = () => {
                                     'border border-scale-200',
                                   ].join(' ')}
                                 >
-                                  <span className="text-xs text-foreground">
+                                  <span className="text-xs text-scale-1200">
                                     You need additional permissions to delete keys
                                   </span>
                                 </div>
@@ -252,16 +245,16 @@ const EncryptionKeysManagement = () => {
                 <>
                   {searchValue.length === 0 ? (
                     <div className="px-6 py-6 space-y-1 flex flex-col items-center justify-center">
-                      <p className="text-sm text-foreground">No encryption keys added yet</p>
-                      <p className="text-sm text-foreground-light text-center">
+                      <p className="text-sm text-scale-1200">No encryption keys added yet</p>
+                      <p className="text-sm text-scale-1100 text-center">
                         Encryption keys are created by the pgsodium extension and can be used to
                         encrypt your columns and secrets
                       </p>
                     </div>
                   ) : (
                     <div className="px-6 py-4 space-y-1">
-                      <p className="text-sm text-foreground">No results found</p>
-                      <p className="text-sm text-foreground-light">
+                      <p className="text-sm text-scale-1200">No results found</p>
+                      <p className="text-sm text-scale-1100">
                         Your search for "{searchValue}" did not return any results
                       </p>
                     </div>
@@ -281,7 +274,7 @@ const EncryptionKeysManagement = () => {
         onCancel={() => setSelectedKeyToRemove(undefined)}
         onConfirm={confirmDeleteKey}
         loading={isDeletingKey}
-        header={<h5 className="text-sm text-foreground">Confirm to delete key</h5>}
+        header={<h5 className="text-sm text-scale-1200">Confirm to delete key</h5>}
       >
         <div className="py-4">
           <Modal.Content>
@@ -297,10 +290,10 @@ const EncryptionKeysManagement = () => {
                 The following key will be permanently removed and cannot be recovered.
               </p>
               <div className="space-y-2">
-                <p className="text-sm text-foreground">
+                <p className="text-sm text-scale-1200">
                   {selectedKeyToRemove?.name ?? DEFAULT_KEY_NAME}
                 </p>
-                <p className="text-xs text-foreground-light">
+                <p className="text-xs text-scale-1100">
                   <code className="!mx-0">ID: {selectedKeyToRemove?.id}</code>
                 </p>
               </div>
@@ -315,7 +308,7 @@ const EncryptionKeysManagement = () => {
         size="medium"
         visible={showAddKeyModal}
         onCancel={() => setShowAddKeyModal(false)}
-        header={<h5 className="text-sm text-foreground">Add a new key</h5>}
+        header={<h5 className="text-sm text-scale-1200">Add a new key</h5>}
       >
         <Form
           id="add-new-key-form"

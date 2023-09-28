@@ -1,7 +1,6 @@
 import Link from 'next/link'
 
-import { useParams } from 'common'
-import { useTheme } from 'next-themes'
+import { useParams, useTheme } from 'common'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -21,7 +20,7 @@ export interface CostControlProps {}
 
 const CostControl = ({}: CostControlProps) => {
   const { slug } = useParams()
-  const { theme } = useTheme()
+  const { isDarkMode } = useTheme()
 
   const snap = useOrgSettingsPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -46,12 +45,12 @@ const CostControl = ({}: CostControlProps) => {
           <div className="sticky space-y-6 top-12">
             <div className="space-y-2">
               <p className="text-base m-0">Cost Control</p>
-              <p className="text-sm text-foreground-light m-0">
+              <p className="text-sm text-scale-1000 m-0">
                 Control whether to use beyond your plans included quota
               </p>
             </div>
             <div className="space-y-2">
-              <p className="text-sm text-foreground-light">More information</p>
+              <p className="text-sm text-scale-1100">More information</p>
               <div>
                 <Link href="https://supabase.com/docs/guides/platform/spend-cap">
                   <a target="_blank" rel="noreferrer">
@@ -96,7 +95,7 @@ const CostControl = ({}: CostControlProps) => {
                   is exceeded will you be charged for any additional usage.
                 </Alert>
               ) : (
-                <p className="text-sm text-foreground-light">
+                <p className="text-sm text-scale-1000">
                   You can control whether your organization is charged for additional usage beyond
                   the{' '}
                   <Link href="#breakdown">
@@ -118,12 +117,8 @@ const CostControl = ({}: CostControlProps) => {
                       height={96}
                       src={
                         isUsageBillingEnabled
-                          ? `${BASE_PATH}/img/spend-cap-off${
-                              theme === 'dark' ? '' : '--light'
-                            }.png?v=3`
-                          : `${BASE_PATH}/img/spend-cap-on${
-                              theme === 'dark' ? '' : '--light'
-                            }.png?v=3`
+                          ? `${BASE_PATH}/img/spend-cap-off${isDarkMode ? '' : '--light'}.png?v=3`
+                          : `${BASE_PATH}/img/spend-cap-on${isDarkMode ? '' : '--light'}.png?v=3`
                       }
                     />
                   </div>
@@ -132,7 +127,7 @@ const CostControl = ({}: CostControlProps) => {
                   <p className="mb-1">
                     Spend cap is {isUsageBillingEnabled ? 'disabled' : 'enabled'}
                   </p>
-                  <p className="text-sm text-foreground-light">
+                  <p className="text-sm text-scale-1000">
                     {isUsageBillingEnabled ? (
                       <span>You will be charged for any usage above the included quota.</span>
                     ) : (
@@ -144,7 +139,7 @@ const CostControl = ({}: CostControlProps) => {
                     )}
                   </p>
                   {isUsageBillingEnabled && (
-                    <p className="text-sm text-foreground-light mt-1">
+                    <p className="text-sm text-scale-1000 mt-1">
                       Your projects will never become unresponsive. Only when your usage reaches the
                       quota limit will you be charged for any excess usage.
                     </p>

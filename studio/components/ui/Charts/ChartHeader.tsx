@@ -15,14 +15,12 @@ const ChartHeader: React.FC<ChartHeaderProps> = ({
   minimalHeader = false,
 }: ChartHeaderProps) => {
   const chartTitle = (
-    <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
-      {title}
-    </h3>
+    <h3 className={'text-scale-900 ' + (minimalHeader ? 'text-xs' : 'text-sm')}>{title}</h3>
   )
 
   const highlighted = (
     <h5
-      className={`text-foreground text-xl font-normal ${minimalHeader ? 'text-base' : 'text-2xl'}`}
+      className={`text-scale-1200 text-xl font-normal ${minimalHeader ? 'text-base' : 'text-2xl'}`}
     >
       {highlightedValue !== undefined && String(highlightedValue)}
       <span className="text-lg">
@@ -30,7 +28,7 @@ const ChartHeader: React.FC<ChartHeaderProps> = ({
       </span>
     </h5>
   )
-  const label = <h5 className="text-foreground-lighter text-xs">{highlightedLabel}</h5>
+  const label = <h5 className="text-scale-900 text-xs">{highlightedLabel}</h5>
 
   if (minimalHeader) {
     return (

@@ -1,19 +1,18 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
-import { useParams } from 'common'
-import { useTheme } from 'next-themes'
+import { useParams, useTheme } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectSubscriptionUpdateMutation } from 'data/subscriptions/project-subscription-update-mutation'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import Telemetry from 'lib/telemetry'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { pricing } from 'shared-data/pricing'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, Collapsible, IconChevronRight, IconExternalLink, SidePanel } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { pricing } from 'shared-data/pricing'
+import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
 
 const SPEND_CAP_OPTIONS: {
   name: string
@@ -39,7 +38,7 @@ const SpendCapSidePanel = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const { theme } = useTheme()
+  const { isDarkMode } = useTheme()
 
   const [showUsageCosts, setShowUsageCosts] = useState(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
@@ -149,7 +148,7 @@ const SpendCapSidePanel = () => {
                   size={16}
                   className={showUsageCosts ? 'rotate-90' : ''}
                 />
-                <p className="text-sm text-foreground-light">
+                <p className="text-sm text-scale-1100">
                   How are each resource charged after exceeding the included quota?
                 </p>
               </div>
@@ -175,7 +174,7 @@ const SpendCapSidePanel = () => {
                     <>
                       <Table.tr key={categoryId}>
                         <Table.td>
-                          <p className="text-xs text-foreground">{category.title}</p>
+                          <p className="text-xs text-scale-1200">{category.title}</p>
                         </Table.td>
                         <Table.td>{null}</Table.td>
                       </Table.tr>
@@ -186,7 +185,9 @@ const SpendCapSidePanel = () => {
                               <p className="text-xs pl-4">{item.title}</p>
                             </Table.td>
                             <Table.td>
-                              <p className="text-xs pl-4">{item.plans['pro']}</p>
+                              <p className="text-xs pl-4">
+                                {item.plans['pro']}
+                              </p>
                             </Table.td>
                           </Table.tr>
                         )
@@ -251,14 +252,14 @@ const SpendCapSidePanel = () => {
                       )}
                       width={160}
                       height={96}
-                      src={theme === 'dark' ? option.imageUrl : option.imageUrlLight}
+                      src={isDarkMode ? option.imageUrl : option.imageUrlLight}
                     />
 
                     <p
                       className={clsx(
                         'text-sm transition',
-                        !isFreePlan && 'group-hover:text-foreground',
-                        isSelected ? 'text-foreground' : 'text-foreground-light'
+                        !isFreePlan && 'group-hover:text-scale-1200',
+                        isSelected ? 'text-scale-1200' : 'text-scale-1000'
                       )}
                     >
                       {option.name}

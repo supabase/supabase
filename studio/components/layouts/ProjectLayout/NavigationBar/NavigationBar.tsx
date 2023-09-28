@@ -1,23 +1,15 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useParams } from 'common'
+import { useParams, useTheme } from 'common'
+import { isUndefined } from 'lodash'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+
 import { useFlag } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
-import { isUndefined } from 'lodash'
-import { useTheme } from 'next-themes'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuGroup_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuLabel_Shadcn_,
-  DropdownMenuRadioGroup_Shadcn_,
-  DropdownMenuRadioItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  Dropdown,
   IconCommand,
   IconHome,
   IconSearch,
@@ -32,12 +24,12 @@ import {
   generateToolRoutes,
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
-import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
 
 const NavigationBar = () => {
   const router = useRouter()
-  const { theme, setTheme } = useTheme()
+  const { isDarkMode, toggleTheme } = useTheme()
   const { ref: projectRef } = useParams()
+
   const os = detectOS()
   const { setIsOpen } = useCommandMenu()
 
@@ -115,7 +107,7 @@ const NavigationBar = () => {
                   className="border-none"
                 >
                   <div className="py-1">
-                    <IconSearch size={18} strokeWidth={2} className="text-foreground-lighter" />
+                    <IconSearch size={18} strokeWidth={2} className="text-scale-900" />
                   </div>
                 </Button>
               </Tooltip.Trigger>
@@ -129,7 +121,7 @@ const NavigationBar = () => {
                     ].join(' ')}
                   >
                     {os === 'macos' ? (
-                      <IconCommand size={11.5} strokeWidth={1.5} className="text-foreground" />
+                      <IconCommand size={11.5} strokeWidth={1.5} className="text-scale-1200" />
                     ) : (
                       <p className="text-xs">CTRL</p>
                     )}
@@ -139,45 +131,44 @@ const NavigationBar = () => {
               </Tooltip.Portal>
             </Tooltip.Root>
           )}
-          <DropdownMenu_Shadcn_>
-            <DropdownMenuTrigger_Shadcn_>
-              <Button asChild type="text" size="tiny">
-                <span className="py-1 h-10 border-none">
-                  <IconUser size={18} strokeWidth={2} className="text-foreground-lighter" />
-                </span>
-              </Button>
-            </DropdownMenuTrigger_Shadcn_>
-            <DropdownMenuContent_Shadcn_ side="right" align="start">
-              {IS_PLATFORM && (
-                <>
-                  <Link href="/account/me">
-                    <DropdownMenuItem_Shadcn_ key="header" className="space-x-2">
-                      <IconSettings size={14} strokeWidth={1.5} />
-                      <p className="text">Account Preferences</p>
-                    </DropdownMenuItem_Shadcn_>
-                  </Link>
-                  <DropdownMenuSeparator_Shadcn_ />
-                </>
-              )}
-              <DropdownMenuLabel_Shadcn_>Theme</DropdownMenuLabel_Shadcn_>
-              <DropdownMenuGroup_Shadcn_>
-                <DropdownMenuRadioGroup_Shadcn_
-                  value={theme}
-                  onValueChange={(value) => {
-                    setTheme(value)
-                  }}
+          <Dropdown
+            side="right"
+            align="start"
+            overlay={
+              <>
+                {IS_PLATFORM && (
+                  <>
+                    <Link href="/account/me">
+                      <Dropdown.Item
+                        key="header"
+                        icon={<IconSettings size={14} strokeWidth={1.5} />}
+                      >
+                        Account Preferences
+                      </Dropdown.Item>
+                    </Link>
+                    <Dropdown.Separator />
+                  </>
+                )}
+                <Dropdown.Label>Theme</Dropdown.Label>
+                <Dropdown.RadioGroup
+                  key="theme"
+                  value={isDarkMode ? 'dark' : 'light'}
+                  onChange={(e: any) => toggleTheme(e === 'dark')}
                 >
-                  <DropdownMenuRadioItem_Shadcn_ value={'system'}>
-                    System
-                  </DropdownMenuRadioItem_Shadcn_>
-                  <DropdownMenuRadioItem_Shadcn_ value={'dark'}>Dark</DropdownMenuRadioItem_Shadcn_>
-                  <DropdownMenuRadioItem_Shadcn_ value={'light'}>
-                    Light
-                  </DropdownMenuRadioItem_Shadcn_>
-                </DropdownMenuRadioGroup_Shadcn_>
-              </DropdownMenuGroup_Shadcn_>
-            </DropdownMenuContent_Shadcn_>
-          </DropdownMenu_Shadcn_>
+                  {/* [Joshen] Removing system default for now, needs to be supported in useTheme from common packages */}
+                  {/* <Dropdown.Radio value="system">System default</Dropdown.Radio> */}
+                  <Dropdown.Radio value="dark">Dark</Dropdown.Radio>
+                  <Dropdown.Radio value="light">Light</Dropdown.Radio>
+                </Dropdown.RadioGroup>
+              </>
+            }
+          >
+            <Button asChild type="text" size="tiny">
+              <span className="py-1 h-10 border-none">
+                <IconUser size={18} strokeWidth={2} className="text-scale-900" />
+              </span>
+            </Button>
+          </Dropdown>
         </ul>
       )}
     </div>

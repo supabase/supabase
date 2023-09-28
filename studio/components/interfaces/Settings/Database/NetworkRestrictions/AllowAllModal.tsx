@@ -1,3 +1,4 @@
+import { FC } from 'react'
 import { Button, Modal } from 'ui'
 
 import { useParams } from 'common/hooks'
@@ -31,7 +32,7 @@ const AllowAllModal = ({ visible, onClose }: AllowAllModalProps) => {
     >
       <Modal.Content>
         <div className="py-6 space-y-4">
-          <p className="text-sm text-foreground-light">
+          <p className="text-sm text-scale-1100">
             This will allow any IP address to access your project's database. Are you sure?
           </p>
         </div>

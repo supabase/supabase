@@ -36,7 +36,7 @@ const PolicyTableRowHeader = ({
         </Link>
         {isLocked ? (
           <Badge color="scale">
-            <span className="flex gap-2 items-center text-xs uppercase text-foreground-lighter">
+            <span className="flex gap-2 items-center text-xs uppercase text-scale-900">
               <IconLock width={12} /> Locked
             </span>
           </Badge>
@@ -70,7 +70,7 @@ const PolicyTableRowHeader = ({
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-foreground">
+                      <span className="text-xs text-scale-1200">
                         You need additional permissions to create RLS policies
                       </span>
                     </div>
@@ -98,7 +98,7 @@ const PolicyTableRowHeader = ({
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-foreground">
+                      <span className="text-xs text-scale-1200">
                         You need additional permissions to toggle RLS
                       </span>
                     </div>

@@ -9,7 +9,7 @@ import { createClient } from '@supabase/supabase-js'
 import { debounce } from 'lodash'
 
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
-import { useTheme } from 'next-themes'
+import { useTheme } from 'common/Providers'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -42,8 +42,8 @@ export default function TicketsPage({ users }: Props) {
   const DESCRIPTION = 'Supabase Launch Week 8 | 7–11 August 2023'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/8/lw8-og.jpg`
 
-  const { theme, setTheme } = useTheme()
-  const [initialDarkMode] = useState(theme === 'dark')
+  const { isDarkMode, toggleTheme } = useTheme()
+  const [initialDarkMode] = useState(isDarkMode)
   const [isLoading, setIsLoading] = useState(false)
   const [offset, setOffset] = useState(1)
   const [isLast, setIsLast] = useState(false)
@@ -92,11 +92,11 @@ export default function TicketsPage({ users }: Props) {
   }, [])
 
   useEffect(() => {
-    setTheme('dark')
+    toggleTheme(true)
     document.body.className = 'dark bg-[#020405]'
     return () => {
       document.body.className = ''
-      setTheme('dark')
+      toggleTheme(initialDarkMode)
     }
   }, [])
 

@@ -77,8 +77,7 @@ const TextConfirmModal = ({
                   id="confirmValue"
                   label={
                     <span>
-                      Type <span className="text-foreground break-all">{confirmString}</span> to
-                      confirm.
+                      Type <span className="text-scale-1200 break-all">{confirmString}</span> to confirm.
                     </span>
                   }
                   placeholder={confirmPlaceholder}

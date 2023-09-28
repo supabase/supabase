@@ -55,9 +55,9 @@ const SchemasPage: NextPageWithLayout = () => {
                   key={schema.id}
                   value={schema.name}
                   label={schema.name}
-                  addOnBefore={() => <span className="text-foreground-lighter">schema</span>}
+                  addOnBefore={() => <span className="text-scale-900">schema</span>}
                 >
-                  <span className="text-foreground text-sm">{schema.name}</span>
+                  <span className="text-scale-1200 text-sm">{schema.name}</span>
                 </Listbox.Option>
               ))}
               <Listbox.Option
@@ -73,9 +73,9 @@ const SchemasPage: NextPageWithLayout = () => {
                   key={schema.id}
                   value={schema.name}
                   label={schema.name}
-                  addOnBefore={() => <span className="text-foreground-lighter">schema</span>}
+                  addOnBefore={() => <span className="text-scale-900">schema</span>}
                 >
-                  <span className="text-foreground text-sm">{schema.name}</span>
+                  <span className="text-scale-1200 text-sm">{schema.name}</span>
                 </Listbox.Option>
               ))}
             </Listbox>

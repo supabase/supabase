@@ -81,9 +81,6 @@ export * from './src/layout/ai-icon-animation'
 // utilities
 export * from './src/lib/utils'
 
-// theme switcher
-export * from './src/components/ThemeProvider/ThemeToggle'
-
 // animated ui
 
 // shadcn

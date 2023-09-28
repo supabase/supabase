@@ -4,14 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import {
-  Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
-  IconChevronDown,
-} from 'ui'
+import { Button, Dropdown, IconChevronDown } from 'ui'
 
 import {
   useIsProjectActive,
@@ -106,17 +99,11 @@ const RestartServerButton = () => {
               Restart project
             </Button>
             {canRestartProject && isProjectActive && (
-              <DropdownMenu_Shadcn_>
-                <DropdownMenuTrigger_Shadcn_>
-                  <Button
-                    type="default"
-                    className="rounded-l-none px-[4px] py-[5px]"
-                    icon={<IconChevronDown />}
-                    disabled={!canRestartProject}
-                  />
-                </DropdownMenuTrigger_Shadcn_>
-                <DropdownMenuContent_Shadcn_ align="end" side="bottom">
-                  <DropdownMenuItem_Shadcn_
+              <Dropdown
+                align="end"
+                side="bottom"
+                overlay={[
+                  <Dropdown.Item
                     key="database"
                     disabled={isLoading}
                     onClick={() => {
@@ -124,15 +111,22 @@ const RestartServerButton = () => {
                     }}
                   >
                     <div className="space-y-1">
-                      <p className="block text-foreground">Fast database reboot</p>
-                      <p className="block text-foreground-light text-xs">
+                      <p className="block text-scale-1200">Fast database reboot</p>
+                      <p className="block text-scale-1100 text-xs">
                         Restarts only the database - faster but may not be able to recover from all
                         failure modes
                       </p>
                     </div>
-                  </DropdownMenuItem_Shadcn_>
-                </DropdownMenuContent_Shadcn_>
-              </DropdownMenu_Shadcn_>
+                  </Dropdown.Item>,
+                ]}
+              >
+                <Button
+                  type="default"
+                  className="rounded-l-none px-[4px] py-[5px]"
+                  icon={<IconChevronDown />}
+                  disabled={!canRestartProject}
+                />
+              </Dropdown>
             )}
           </div>
         </Tooltip.Trigger>
@@ -146,7 +140,7 @@ const RestartServerButton = () => {
                   'border border-scale-200 ', //border
                 ].join(' ')}
               >
-                <span className="text-xs text-foreground">
+                <span className="text-xs text-scale-1200">
                   {!canRestartProject
                     ? 'You need additional permissions to restart this project'
                     : !isProjectActive
@@ -166,7 +160,7 @@ const RestartServerButton = () => {
         description={
           <>
             Are you sure you want to restart the{' '}
-            <span className="text-foreground">{serviceToRestart}</span>? There will be a few minutes
+            <span className="text-scale-1200">{serviceToRestart}</span>? There will be a few minutes
             of downtime.
           </>
         }

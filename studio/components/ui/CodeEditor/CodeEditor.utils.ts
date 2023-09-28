@@ -9,22 +9,22 @@ export const alignEditor = (editor: any) => {
   })
 }
 
-export const getTheme = (theme: string) => {
+export const getTheme = (isDarkTheme: boolean) => {
   // [TODO] Probably need better theming for light mode
   return {
-    base: theme === 'dark' ? 'vs-dark' : 'vs', // can also be vs-dark or hc-black
+    base: isDarkTheme ? 'vs-dark' : 'vs', // can also be vs-dark or hc-black
     inherit: true, // can also be false to completely replace the builtin rules
     rules: [
-      { background: theme === 'dark' ? '1f1f1f' : 'f0f0f0' },
+      { background: isDarkTheme ? '1f1f1f' : 'f0f0f0' },
       {
         token: '',
-        background: theme === 'dark' ? '1f1f1f' : 'f0f0f0',
-        foreground: theme === 'dark' ? 'd4d4d4' : '444444',
+        background: isDarkTheme ? '1f1f1f' : 'f0f0f0',
+        foreground: isDarkTheme ? 'd4d4d4' : '444444',
       },
       { token: 'string.sql', foreground: '24b47e' },
       { token: 'comment', foreground: '666666' },
-      { token: 'predefined.sql', foreground: theme === 'dark' ? 'D4D4D4' : '444444' },
+      { token: 'predefined.sql', foreground: isDarkTheme ? 'D4D4D4' : '444444' },
     ],
-    colors: { 'editor.background': theme === 'dark' ? '#1f1f1f' : '#f0f0f0' },
+    colors: { 'editor.background': isDarkTheme ? '#1f1f1f' : '#f0f0f0' },
   }
 }

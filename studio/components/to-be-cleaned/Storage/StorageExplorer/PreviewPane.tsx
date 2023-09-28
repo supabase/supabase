@@ -1,28 +1,25 @@
+import { isEmpty } from 'lodash'
+import {
+  Button,
+  Dropdown,
+  IconX,
+  IconLoader,
+  IconClipboard,
+  IconDownload,
+  IconTrash2,
+  IconAlertCircle,
+  IconChevronDown,
+} from 'ui'
+import SVG from 'react-inlinesvg'
+import { formatBytes } from 'lib/helpers'
+import { BASE_PATH } from 'lib/constants'
 import { Transition } from '@headlessui/react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { BASE_PATH } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
-import { isEmpty } from 'lodash'
-import SVG from 'react-inlinesvg'
-import {
-  Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
-  IconAlertCircle,
-  IconChevronDown,
-  IconClipboard,
-  IconDownload,
-  IconLoader,
-  IconTrash2,
-  IconX,
-} from 'ui'
 
 import { useCheckPermissions } from 'hooks'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
+import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 
 const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: string }) => {
   if (!mimeType || !previewUrl) {
@@ -37,7 +34,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
   }
   if (previewUrl === 'loading') {
     return (
-      <div className="flex h-full w-full items-center justify-center text-foreground-lighter">
+      <div className="flex h-full w-full items-center justify-center text-scale-900">
         <IconLoader size={14} strokeWidth={2} className="animate-spin" />
       </div>
     )
@@ -70,7 +67,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
       <div className="flex h-full w-full items-center justify-center px-10">
         <audio key={previewUrl} controls style={{ width: 'inherit' }}>
           <source src={previewUrl} type="audio/mpeg" />
-          <p className="text-sm text-foreground-light">
+          <p className="text-sm text-scale-1100">
             Your browser does not support the audio element.
           </p>
         </audio>
@@ -82,9 +79,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
       <div className="flex h-full w-full items-center justify-center">
         <video key={previewUrl} controls style={{ maxHeight: '100%' }}>
           <source src={previewUrl} type="video/mp4" />
-          <p className="text-sm text-foreground-light">
-            Your browser does not support the video tag.
-          </p>
+          <p className="text-sm text-scale-1100">Your browser does not support the video tag.</p>
         </video>
       </div>
     )
@@ -141,7 +136,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
           style={{ width }}
         >
           {/* Preview Header */}
-          <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
+          <div className="flex w-full justify-end text-scale-900 transition-colors hover:text-scale-1200">
             <IconX
               className="cursor-pointer"
               size={14}
@@ -160,17 +155,17 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
           <div className="w-full space-y-6">
             {/* Preview Information */}
             <div className="space-y-1">
-              <h5 className="break-words text-base text-foreground">{file.name}</h5>
+              <h5 className="break-words text-base text-scale-1200">{file.name}</h5>
               {file.isCorrupted && (
                 <div className="flex items-center space-x-2">
-                  <IconAlertCircle size={14} strokeWidth={2} className="text-foreground-light" />
-                  <p className="text-sm text-foreground-light">
+                  <IconAlertCircle size={14} strokeWidth={2} className="text-scale-1100" />
+                  <p className="text-sm text-scale-1100">
                     File is corrupted, please delete and reupload this file again
                   </p>
                 </div>
               )}
               {mimeType && (
-                <p className="text-sm text-foreground-light">
+                <p className="text-sm text-scale-1100">
                   {mimeType}
                   {size && <span> - {size}</span>}
                 </p>
@@ -180,12 +175,12 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
             {/* Preview Metadata */}
             <div className="space-y-2">
               <div>
-                <label className="mb-1 text-xs text-foreground-lighter">Added on</label>
-                <p className="text-sm text-foreground-light">{createdAt}</p>
+                <label className="mb-1 text-xs text-scale-900">Added on</label>
+                <p className="text-sm text-scale-1100">{createdAt}</p>
               </div>
               <div>
-                <label className="mb-1 text-xs text-foreground-lighter">Last modified</label>
-                <p className="text-sm text-foreground-light">{updatedAt}</p>
+                <label className="mb-1 text-xs text-scale-900">Last modified</label>
+                <p className="text-sm text-scale-1100">{updatedAt}</p>
               </div>
             </div>
 
@@ -209,19 +204,11 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                   Get URL
                 </Button>
               ) : (
-                <DropdownMenu_Shadcn_>
-                  <DropdownMenuTrigger_Shadcn_>
-                    <Button
-                      type="outline"
-                      icon={<IconClipboard size={16} strokeWidth={2} />}
-                      iconRight={<IconChevronDown />}
-                      disabled={file.isCorrupted}
-                    >
-                      Get URL
-                    </Button>
-                  </DropdownMenuTrigger_Shadcn_>
-                  <DropdownMenuContent_Shadcn_ side="bottom" align="center">
-                    <DropdownMenuItem_Shadcn_
+                <Dropdown
+                  side="bottom"
+                  align="center"
+                  overlay={[
+                    <Dropdown.Item
                       key="expires-one-week"
                       className="text-xs"
                       onClick={async () =>
@@ -229,8 +216,8 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                       }
                     >
                       Expire in 1 week
-                    </DropdownMenuItem_Shadcn_>
-                    <DropdownMenuItem_Shadcn_
+                    </Dropdown.Item>,
+                    <Dropdown.Item
                       key="expires-one-month"
                       className="text-xs"
                       onClick={async () =>
@@ -238,8 +225,8 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                       }
                     >
                       Expire in 1 month
-                    </DropdownMenuItem_Shadcn_>
-                    <DropdownMenuItem_Shadcn_
+                    </Dropdown.Item>,
+                    <Dropdown.Item
                       key="expires-one-year"
                       className="text-xs"
                       onClick={async () =>
@@ -247,16 +234,25 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                       }
                     >
                       Expire in 1 year
-                    </DropdownMenuItem_Shadcn_>
-                    <DropdownMenuItem_Shadcn_
+                    </Dropdown.Item>,
+                    <Dropdown.Item
                       key="custom-expiry"
                       className="text-xs"
                       onClick={() => setSelectedFileCustomExpiry(file)}
                     >
                       Custom expiry
-                    </DropdownMenuItem_Shadcn_>
-                  </DropdownMenuContent_Shadcn_>
-                </DropdownMenu_Shadcn_>
+                    </Dropdown.Item>,
+                  ]}
+                >
+                  <Button
+                    type="outline"
+                    icon={<IconClipboard size={16} strokeWidth={2} />}
+                    iconRight={<IconChevronDown />}
+                    disabled={file.isCorrupted}
+                  >
+                    Get URL
+                  </Button>
+                </Dropdown>
               )}
             </div>
             <Tooltip.Root delayDuration={0}>
@@ -281,7 +277,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-foreground">
+                      <span className="text-xs text-scale-1200">
                         You need additional permissions to delete this file
                       </span>
                     </div>

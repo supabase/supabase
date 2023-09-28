@@ -4,11 +4,7 @@ import { compact, debounce, isEqual, noop } from 'lodash'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuRadioGroup_Shadcn_,
-  DropdownMenuRadioItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  Dropdown,
   IconChevronLeft,
   IconChevronRight,
   IconChevronsDown,
@@ -27,8 +23,8 @@ import {
 
 import { useCheckPermissions } from 'hooks'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 
 const HeaderPathEdit = ({ loading, isSearching, breadcrumbs, togglePathEdit }: any) => {
   return (
@@ -329,104 +325,78 @@ const FileExplorerHeader = ({
           >
             Reload
           </Button>
-          <DropdownMenu_Shadcn_>
-            <DropdownMenuTrigger_Shadcn_>
-              <Button
-                asChild
-                icon={
-                  view === 'LIST' ? (
-                    <IconList size={16} strokeWidth={2} />
-                  ) : (
-                    <IconColumns size={16} strokeWidth={2} />
-                  )
-                }
-                type="text"
-                disabled={breadcrumbs.length === 0}
-                onChange={setView}
-              >
-                <span>View as</span>
-              </Button>
-            </DropdownMenuTrigger_Shadcn_>
-
-            <DropdownMenuContent_Shadcn_>
-              <DropdownMenuRadioGroup_Shadcn_
-                key="viewOptions"
-                value={view}
-                onValueChange={setView}
-              >
-                <DropdownMenuRadioItem_Shadcn_ value={STORAGE_VIEWS.COLUMNS}>
-                  Columns
-                </DropdownMenuRadioItem_Shadcn_>
-                <DropdownMenuRadioItem_Shadcn_ value={STORAGE_VIEWS.LIST}>
-                  List
-                </DropdownMenuRadioItem_Shadcn_>
-              </DropdownMenuRadioGroup_Shadcn_>
-            </DropdownMenuContent_Shadcn_>
-          </DropdownMenu_Shadcn_>
-          <DropdownMenu_Shadcn_>
-            <DropdownMenuTrigger_Shadcn_>
-              <Button
-                asChild
-                icon={<IconChevronsDown size={16} strokeWidth={2} />}
-                type="text"
-                disabled={breadcrumbs.length === 0}
-              >
-                <span>Sort by</span>
-              </Button>
-            </DropdownMenuTrigger_Shadcn_>
-            <DropdownMenuContent_Shadcn_>
-              <DropdownMenuRadioGroup_Shadcn_
-                key="sortOptions"
-                value={sortBy}
-                onValueChange={setSortBy}
-              >
-                <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY.NAME}>
-                  Name
-                </DropdownMenuRadioItem_Shadcn_>
-                <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY.CREATED_AT}>
-                  Time created
-                </DropdownMenuRadioItem_Shadcn_>
-                <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY.UPDATED_AT}>
-                  Time modified
-                </DropdownMenuRadioItem_Shadcn_>
-                <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY.LAST_ACCESSED_AT}>
+          <Dropdown
+            overlay={[
+              <Dropdown.RadioGroup key="viewOptions" value={view} onChange={setView}>
+                <Dropdown.Radio value={STORAGE_VIEWS.COLUMNS}>Columns</Dropdown.Radio>
+                <Dropdown.Radio value={STORAGE_VIEWS.LIST}>List</Dropdown.Radio>
+              </Dropdown.RadioGroup>,
+            ]}
+          >
+            <Button
+              asChild
+              icon={
+                view === 'LIST' ? (
+                  <IconList size={16} strokeWidth={2} />
+                ) : (
+                  <IconColumns size={16} strokeWidth={2} />
+                )
+              }
+              type="text"
+              disabled={breadcrumbs.length === 0}
+              onChange={setView}
+            >
+              <span>View as</span>
+            </Button>
+          </Dropdown>
+          <Dropdown
+            overlay={[
+              <Dropdown.RadioGroup key="sortOptions" value={sortBy} onChange={setSortBy}>
+                <Dropdown.Radio value={STORAGE_SORT_BY.NAME}>Name</Dropdown.Radio>
+                <Dropdown.Radio value={STORAGE_SORT_BY.CREATED_AT}>Time created</Dropdown.Radio>
+                <Dropdown.Radio value={STORAGE_SORT_BY.UPDATED_AT}>Time modified</Dropdown.Radio>
+                <Dropdown.Radio value={STORAGE_SORT_BY.LAST_ACCESSED_AT}>
                   Time last accessed
-                </DropdownMenuRadioItem_Shadcn_>
-              </DropdownMenuRadioGroup_Shadcn_>
-            </DropdownMenuContent_Shadcn_>
-          </DropdownMenu_Shadcn_>
-          <DropdownMenu_Shadcn_>
-            <DropdownMenuTrigger_Shadcn_>
-              <Button
-                asChild
-                icon={
-                  sortByOrder === STORAGE_SORT_BY_ORDER.DESC ? (
-                    <IconChevronsDown size={16} strokeWidth={2} />
-                  ) : (
-                    <IconChevronsUp size={16} strokeWidth={2} />
-                  )
-                }
-                type="text"
-                disabled={breadcrumbs.length === 0}
-              >
-                <span>Sort Order</span>
-              </Button>
-            </DropdownMenuTrigger_Shadcn_>
-            <DropdownMenuContent_Shadcn_>
-              <DropdownMenuRadioGroup_Shadcn_
+                </Dropdown.Radio>
+              </Dropdown.RadioGroup>,
+            ]}
+          >
+            <Button
+              asChild
+              icon={<IconChevronsDown size={16} strokeWidth={2} />}
+              type="text"
+              disabled={breadcrumbs.length === 0}
+            >
+              <span>Sort by</span>
+            </Button>
+          </Dropdown>
+          <Dropdown
+            overlay={[
+              <Dropdown.RadioGroup
                 key="sortOrderOptions"
                 value={sortByOrder}
-                onValueChange={setSortByOrder}
+                onChange={setSortByOrder}
               >
-                <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY_ORDER.ASC}>
-                  Ascending
-                </DropdownMenuRadioItem_Shadcn_>
-                <DropdownMenuRadioItem_Shadcn_ value={STORAGE_SORT_BY_ORDER.DESC}>
-                  Descending
-                </DropdownMenuRadioItem_Shadcn_>
-              </DropdownMenuRadioGroup_Shadcn_>
-            </DropdownMenuContent_Shadcn_>
-          </DropdownMenu_Shadcn_>
+                <Dropdown.Radio value={STORAGE_SORT_BY_ORDER.ASC}>Ascending</Dropdown.Radio>
+                <Dropdown.Radio value={STORAGE_SORT_BY_ORDER.DESC}>Descending</Dropdown.Radio>
+              </Dropdown.RadioGroup>,
+            ]}
+          >
+            <Button
+              asChild
+              icon={
+                sortByOrder === STORAGE_SORT_BY_ORDER.DESC ? (
+                  <IconChevronsDown size={16} strokeWidth={2} />
+                ) : (
+                  <IconChevronsUp size={16} strokeWidth={2} />
+                )
+              }
+              type="text"
+              disabled={breadcrumbs.length === 0}
+            >
+              <span>Sort Order</span>
+            </Button>
+          </Dropdown>
         </div>
         <div className="h-6 border-r border-panel-border-light dark:border-panel-border-dark" />
         <div className="flex items-center space-x-1">
@@ -455,7 +425,7 @@ const FileExplorerHeader = ({
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-foreground">
+                    <span className="text-xs text-scale-1200">
                       You need additional permissions to upload files
                     </span>
                   </div>
@@ -484,7 +454,7 @@ const FileExplorerHeader = ({
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-foreground">
+                    <span className="text-xs text-scale-1200">
                       You need additional permissions to create folders
                     </span>
                   </div>
@@ -505,7 +475,7 @@ const FileExplorerHeader = ({
               actions={[
                 <IconX
                   key="close"
-                  className="mx-2 cursor-pointer text-foreground"
+                  className="mx-2 cursor-pointer text-scale-1200"
                   size="tiny"
                   strokeWidth={2}
                   onClick={onCancelSearch}

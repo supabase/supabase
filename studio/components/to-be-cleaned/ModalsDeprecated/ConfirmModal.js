@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { render, unmountComponentAtNode } from 'react-dom'
+import React, { useState } from 'react'
 import { Button, Modal } from 'ui'
+import { render, unmountComponentAtNode } from 'react-dom'
 
 function ConfirmModal({
   title,
@@ -59,7 +59,7 @@ function ConfirmModal({
     >
       {description && (
         <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">{description}</p>
+          <p className="py-4 text-sm text-scale-1100">{description}</p>
         </Modal.Content>
       )}
     </Modal>

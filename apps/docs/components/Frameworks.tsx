@@ -1,8 +1,8 @@
 import ButtonCard from './ButtonCard'
-import { useTheme } from 'next-themes'
+import { useTheme } from 'common/Providers'
 
 const Frameworks = () => {
-  const { resolvedTheme } = useTheme()
+  const { isDarkMode } = useTheme()
 
   const frameworks = [
     {
@@ -110,7 +110,8 @@ const Frameworks = () => {
             layout="horizontal"
             to={x.href}
             title={x.name}
-            icon={resolvedTheme === 'dark' ? x.logo.dark : x.logo.light}
+            // [Joshen] Nice to have: theming
+            icon={isDarkMode ? x.logo.dark : x.logo.light}
           />
         </div>
       ))}
