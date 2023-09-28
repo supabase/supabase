@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useTheme } from 'next-themes'
+import { useWindowSize } from 'react-use'
 
 import { Button, cn } from 'ui'
 import {
@@ -12,54 +14,16 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from 'ui/src/components/shadcn/ui/navigation-menu'
-import ScrollProgress from '~/components/ScrollProgress'
-
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-import { useTheme } from 'next-themes'
-import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
-import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
-
-import { data as DevelopersData } from 'data/Developers'
-import DevelopersDropdown from './DevelopersDropdown'
+import ScrollProgress from '~/components/ScrollProgress'
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
 import MobileMenu from './MobileMenu'
 import MenuItem from './MenuItem'
-import ProductDropdown from './ProductDropdown'
+import { menu } from '~/data/nav'
 
-import SolutionsData from 'data/Solutions'
-import { useWindowSize } from 'react-use'
-
-const menu = {
-  primaryNav: [
-    {
-      title: 'Product',
-      hasDropdown: true,
-      dropdown: <ProductDropdown />,
-      dropdownContainerClassName: 'rounded-lg flex flex-col xl:flex-row',
-      subMenu: SolutionsData,
-    },
-    {
-      title: 'Developers',
-      hasDropdown: true,
-      dropdown: <DevelopersDropdown />,
-      dropdownContainerClassName: 'rounded-lg flex flex-col xl:flex-row',
-      subMenu: DevelopersData,
-    },
-    {
-      title: 'Pricing',
-      url: '/pricing',
-    },
-    {
-      title: 'Docs',
-      url: '/docs',
-    },
-    {
-      title: 'Blog',
-      url: '/blog',
-    },
-  ],
-}
+import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
+import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
 const Nav = () => {
   const { resolvedTheme } = useTheme()
