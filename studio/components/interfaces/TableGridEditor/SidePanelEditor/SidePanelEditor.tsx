@@ -26,6 +26,7 @@ import {
   UpdateColumnPayload,
 } from './SidePanelEditor.types'
 import { ImportContent } from './TableEditor/TableEditor.types'
+import SchemaEditor from './SchemaEditor'
 
 export interface SidePanelEditorProps {
   editable?: boolean
