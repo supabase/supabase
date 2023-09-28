@@ -91,7 +91,9 @@ const Wizard: NextPageWithLayout = () => {
             Cancel
           </Button>
           <div className="flex items-center space-x-3">
-            <p className="text-xs text-scale-900">You can rename your organization later</p>
+            <p className="text-xs text-foreground-lighter">
+              You can rename your organization later
+            </p>
             <Button onClick={onClickSubmit} loading={newOrgLoading} disabled={newOrgLoading}>
               Create organization
             </Button>
@@ -101,7 +103,7 @@ const Wizard: NextPageWithLayout = () => {
     >
       <Panel.Content className="pt-0">
         <p className="text-sm">This is your organization within Supabase.</p>
-        <p className="text-sm text-scale-1100">
+        <p className="text-sm text-foreground-light">
           For example, you can use the name of your company or department.
         </p>
       </Panel.Content>

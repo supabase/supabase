@@ -164,7 +164,7 @@ const ColumnManagement = ({
         </div>
 
         {hasImportContent && (
-          <p className="text-sm text-scale-1000 my-2">
+          <p className="text-sm text-foreground-light my-2">
             Your table will be created with {importContent?.rowCount?.toLocaleString()} rows and the
             following {columns.length} columns.
           </p>
@@ -194,10 +194,10 @@ const ColumnManagement = ({
             {/* Drag handle */}
             {isNewRecord && <div className="w-[5%]" />}
             <div className="w-[25%] flex items-center space-x-2">
-              <h5 className="text-xs text-scale-900">Name</h5>
+              <h5 className="text-xs text-foreground-lighter">Name</h5>
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <h5 className="text-xs text-scale-900">
+                  <h5 className="text-xs text-foreground-lighter">
                     <IconHelpCircle size={15} strokeWidth={1.5} />
                   </h5>
                 </Tooltip.Trigger>
@@ -210,7 +210,7 @@ const ColumnManagement = ({
                         'border border-scale-200 ', //border
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         Recommended to use lowercase and use an underscore to separate words e.g.
                         column_name
                       </span>
@@ -220,14 +220,14 @@ const ColumnManagement = ({
               </Tooltip.Root>
             </div>
             <div className="w-[25%]">
-              <h5 className="text-xs text-scale-900">Type</h5>
+              <h5 className="text-xs text-foreground-lighter">Type</h5>
             </div>
             <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'} flex items-center space-x-2`}>
-              <h5 className="text-xs text-scale-900">Default Value</h5>
+              <h5 className="text-xs text-foreground-lighter">Default Value</h5>
 
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger>
-                  <h5 className="text-xs text-scale-900">
+                  <h5 className="text-xs text-foreground-lighter">
                     <IconHelpCircle size={15} strokeWidth={1.5} />
                   </h5>
                 </Tooltip.Trigger>
@@ -240,7 +240,7 @@ const ColumnManagement = ({
                         'border border-scale-200 ', //border
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">
+                      <span className="text-xs text-foreground">
                         Can either be a literal or an expression. When using an expression wrap your
                         expression in brackets, e.g. (gen_random_uuid())
                       </span>
@@ -250,7 +250,7 @@ const ColumnManagement = ({
               </Tooltip.Root>
             </div>
             <div className="w-[10%]">
-              <h5 className="text-xs text-scale-900">Primary</h5>
+              <h5 className="text-xs text-foreground-lighter">Primary</h5>
             </div>
             {/* Empty space */}
             <div className={`${hasImportContent ? 'w-[10%]' : 'w-0'}`} />
@@ -344,7 +344,7 @@ const ColumnManagement = ({
             <a target="_blank" rel="noreferrer">
               <Button
                 type="text"
-                className="text-scale-1000 hover:text-scale-1200"
+                className="text-foreground-light hover:text-foreground"
                 icon={<IconExternalLink size={12} strokeWidth={2} />}
               >
                 Learn more about data types

@@ -1,28 +1,32 @@
-import saveAs from 'file-saver'
-import Papa from 'papaparse'
-import clsx from 'clsx'
-import SVG from 'react-inlinesvg'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { Entity } from 'data/entity-types/entity-type-query'
+import clsx from 'clsx'
+import saveAs from 'file-saver'
 import Link from 'next/link'
+import Papa from 'papaparse'
+import SVG from 'react-inlinesvg'
 import {
-  Dropdown,
-  IconEdit,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconChevronDown,
   IconCopy,
+  IconDownload,
+  IconEdit,
   IconLock,
   IconTrash,
-  IconChevronDown,
-  IconDownload,
 } from 'ui'
+
+import { parseSupaTable } from 'components/grid'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { Entity } from 'data/entity-types/entity-type-query'
+import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
+import { getTable } from 'data/tables/table-query'
+import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
-import { useParams } from 'common'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { getTable } from 'data/tables/table-query'
-import { parseSupaTable } from 'components/grid'
-import { useStore } from 'hooks'
 
 export interface EntityListItemProps {
   id: number
@@ -110,7 +114,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
     <div
       className={clsx(
         'group flex items-center justify-between rounded-md',
-        isActive && 'text-scale-1200 bg-scale-300'
+        isActive && 'text-foreground bg-scale-300'
       )}
     >
       <Link href={`/project/${projectRef}/editor/${entity.id}`}>
@@ -142,7 +146,8 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                     entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
                     entity.type === ENTITY_TYPE.MATERIALIZED_VIEW &&
                       'text-purple-1000 bg-purple-500',
-                    entity.type === ENTITY_TYPE.PARTITIONED_TABLE && 'text-scale-1100 bg-scale-800'
+                    entity.type === ENTITY_TYPE.PARTITIONED_TABLE &&
+                      'text-foreground-light bg-scale-800'
                   )}
                 >
                   {Object.entries(ENTITY_TYPE)
@@ -160,14 +165,14 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                     'border border-scale-200',
                   ].join(' ')}
                 >
-                  <span className="text-xs text-scale-1200 capitalize">
+                  <span className="text-xs text-foreground capitalize">
                     {formatTooltipText(entity.type)}
                   </span>
                 </div>
               </Tooltip.Content>
             </Tooltip.Portal>
           </Tooltip.Root>
-          <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition max-w-[85%] overflow-hidden text-ellipsis whitespace-nowrap">
+          <p className="text-sm text-foreground-light group-hover:text-foreground transition max-w-[85%] overflow-hidden text-ellipsis whitespace-nowrap">
             {/* only show tooltips if required, to reduce noise */}
             {entity.name.length > 20 ? (
               <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
@@ -183,7 +188,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-scale-1200">{entity.name}</span>
+                      <span className="text-xs text-foreground">{entity.name}</span>
                     </div>
                   </Tooltip.Content>
                 </Tooltip.Portal>
@@ -196,68 +201,71 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
       </Link>
       <div className="pr-3">
         {entity.type === ENTITY_TYPE.TABLE && isActive && !isLocked && (
-          <Dropdown
-            size="small"
-            side="bottom"
-            align="start"
-            overlay={[
-              <Dropdown.Item
+          <DropdownMenu_Shadcn_>
+            <DropdownMenuTrigger_Shadcn_>
+              <div className="text-foreground-lighter transition-colors hover:text-foreground">
+                <IconChevronDown size={14} strokeWidth={2} />
+              </div>
+            </DropdownMenuTrigger_Shadcn_>
+            <DropdownMenuContent_Shadcn_ side="bottom" align="start">
+              <DropdownMenuItem_Shadcn_
                 key="edit-table"
-                icon={<IconEdit size="tiny" />}
+                className="space-x-2"
                 onClick={(e) => {
                   e.stopPropagation()
                   snap.onEditTable()
                 }}
               >
-                Edit Table
-              </Dropdown.Item>,
-              <Dropdown.Item
+                <IconEdit size="tiny" />
+                <p className="text">Edit Table</p>
+              </DropdownMenuItem_Shadcn_>
+              <DropdownMenuItem_Shadcn_
                 key="duplicate-table"
-                icon={<IconCopy size="tiny" />}
+                className="space-x-2"
                 onClick={(e) => {
                   e.stopPropagation()
                   snap.onDuplicateTable()
                 }}
               >
-                Duplicate Table
-              </Dropdown.Item>,
+                <IconCopy size="tiny" />
+                <p className="text">Duplicate Table</p>
+              </DropdownMenuItem_Shadcn_>
               <Link
                 key="view-policies"
                 href={`/project/${projectRef}/auth/policies?search=${entity.id}`}
               >
                 <a>
-                  <Dropdown.Item key="delete-table" icon={<IconLock size="tiny" />}>
-                    View Policies
-                  </Dropdown.Item>
+                  <DropdownMenuItem_Shadcn_ key="delete-table" className="space-x-2">
+                    <IconLock size="tiny" />
+                    <p className="text">View Policies</p>
+                  </DropdownMenuItem_Shadcn_>
                 </a>
-              </Link>,
-              <Dropdown.Item
+              </Link>
+              <DropdownMenuItem_Shadcn_
                 key="download-table-csv"
-                icon={<IconDownload size="tiny" />}
+                className="space-x-2"
                 onClick={(e) => {
                   e.stopPropagation()
                   exportTableAsCSV()
                 }}
               >
-                Export as CSV
-              </Dropdown.Item>,
-              <Dropdown.Separator key="separator" />,
-              <Dropdown.Item
+                <IconDownload size="tiny" />
+                <p className="text">Export as CSV</p>
+              </DropdownMenuItem_Shadcn_>
+              <DropdownMenuSeparator_Shadcn_ />
+              <DropdownMenuItem_Shadcn_
                 key="delete-table"
-                icon={<IconTrash size="tiny" />}
+                className="space-x-2"
                 onClick={(e) => {
                   e.stopPropagation()
                   snap.onDeleteTable()
                 }}
               >
-                Delete Table
-              </Dropdown.Item>,
-            ]}
-          >
-            <div className="text-scale-900 transition-colors hover:text-scale-1200">
-              <IconChevronDown size={14} strokeWidth={2} />
-            </div>
-          </Dropdown>
+                <IconTrash size="tiny" />
+                <p className="text">Delete Table</p>
+              </DropdownMenuItem_Shadcn_>
+            </DropdownMenuContent_Shadcn_>
+          </DropdownMenu_Shadcn_>
         )}
       </div>
     </div>

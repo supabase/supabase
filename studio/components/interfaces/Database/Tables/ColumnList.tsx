@@ -49,9 +49,9 @@ const ColumnList = ({
     <>
       <div className="mb-4 flex items-center space-x-2">
         <div className="flex items-center space-x-2">
-          <h3 className="mb-1 text-xl text-scale-1200">Database Tables</h3>
+          <h3 className="mb-1 text-xl text-foreground">Database Tables</h3>
           <IconChevronRight strokeWidth={1.5} className="text-light" />
-          <h3 className="mb-1 text-xl text-scale-1200">{selectedTable.name}</h3>
+          <h3 className="mb-1 text-xl text-foreground">{selectedTable.name}</h3>
         </div>
       </div>
 
@@ -99,7 +99,7 @@ const ColumnList = ({
                           'border border-scale-200',
                         ].join(' ')}
                       >
-                        <span className="text-xs text-scale-1200">
+                        <span className="text-xs text-foreground">
                           You need additional permissions to create columns
                         </span>
                       </div>
@@ -169,7 +169,7 @@ const ColumnList = ({
                                 'border border-scale-200',
                               ].join(' ')}
                             >
-                              <span className="text-xs text-scale-1200">
+                              <span className="text-xs text-foreground">
                                 You need additional permissions to edit columns
                               </span>
                             </div>
@@ -198,7 +198,7 @@ const ColumnList = ({
                                 'border border-scale-200',
                               ].join(' ')}
                             >
-                              <span className="text-xs text-scale-1200">
+                              <span className="text-xs text-foreground">
                                 You need additional permissions to delete columns
                               </span>
                             </div>
