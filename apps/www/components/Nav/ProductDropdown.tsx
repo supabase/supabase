@@ -10,13 +10,15 @@ import MenuItem from './MenuItem'
 import ComparisonsData from 'data/Comparisons'
 import CustomersData from 'data/CustomerStories'
 import SolutionsData from 'data/Solutions'
+import { useBreakpoint } from 'common'
 
 const ProductDropdown = () => {
   const { basePath } = useRouter()
+  const isTablet = useBreakpoint(1279)
 
   return (
     <>
-      <ul className="grid gap-2 py-6 px-6 grid-cols-1 w-[380px]">
+      <ul className="grid gap-2 py-6 px-7 grid-cols-2 xl:grid-cols-1 w-[700px] xl:w-[380px]">
         {Object.values(SolutionsData).map((component) => (
           <NavigationMenuLink key={component.name} asChild>
             <MenuItem
@@ -29,8 +31,8 @@ const ProductDropdown = () => {
           </NavigationMenuLink>
         ))}
       </ul>
-      <div className="border-l flex flex-col w-[500px] bg-alternative">
-        <div className="py-8 px-10">
+      <div className="border-l grid grid-cols-3 xl:flex xl:flex-col w-full xl:w-[500px] bg-alternative">
+        <div className="col-span-2 xl:w-auto py-8 px-10">
           <Link href="/customers">
             <a className="inline-flex items-center gap-1 text-muted hover:text-brand text-xs uppercase tracking-widest font-mono mb-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-brand">
               Customer Stories
@@ -38,7 +40,7 @@ const ProductDropdown = () => {
             </a>
           </Link>
           <ul className="flex flex-col gap-3">
-            {CustomersData.slice(0, 4).map((customer) => (
+            {CustomersData.slice(0, isTablet ? 2 : 4).map((customer) => (
               <li key={customer.organization}>
                 <Link href={customer.url}>
                   <a className="group flex items-center gap-3 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded">
@@ -62,7 +64,7 @@ const ProductDropdown = () => {
             ))}
           </ul>
         </div>
-        <div className="pt-2 pb-8 px-10">
+        <div className="pt-8 xl:pt-2 pl-0 pr-10 pb-8 xl:pl-10">
           <p className="text-muted text-xs uppercase tracking-widest font-mono mb-6">
             {ComparisonsData.label}
           </p>

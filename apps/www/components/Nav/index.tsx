@@ -36,14 +36,14 @@ const menu = {
       title: 'Product',
       hasDropdown: true,
       dropdown: <ProductDropdown />,
-      dropdownContainerClassName: 'rounded-lg flex flex-row',
+      dropdownContainerClassName: 'rounded-lg flex flex-col xl:flex-row',
       subMenu: SolutionsData,
     },
     {
       title: 'Developers',
       hasDropdown: true,
       dropdown: <DevelopersDropdown />,
-      dropdownContainerClassName: 'rounded-lg',
+      dropdownContainerClassName: 'rounded-lg flex flex-col xl:flex-row',
       subMenu: DevelopersData,
     },
     {
