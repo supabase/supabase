@@ -9,6 +9,10 @@ export const appState = proxy({
       localStorage.setItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
     }
   },
+  showEnableBranchingModal: false,
+  setShowEnableBranchingModal: (value: boolean) => {
+    appState.showEnableBranchingModal = value
+  },
 })
 
 export const getAppStateSnapshot = () => snapshot(appState)
