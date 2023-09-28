@@ -1,7 +1,7 @@
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
-  title: 'Build a User Management App with Expo',
+  title: 'Build a User Management App with Expo React Native',
   description: 'Learn how to use Supabase in your React Native App.',
 }
 
@@ -92,8 +92,9 @@ These variables will be exposed on the browser, and that's completely fine since
     Implement a `LargeSecureStore` class to pass in as Auth storage for the `supabase-js` client:
 
     ```ts lib/supabase.ts
-    import { createClient } from '@supabase/supabase-js'
-    import AsyncStorage from '@react-native-async-storage/async-storage';
+    import "react-native-url-polyfill/auto";
+    import { createClient } from "@supabase/supabase-js";
+    import AsyncStorage from "@react-native-async-storage/async-storage";
     import * as SecureStore from 'expo-secure-store';
     import * as aesjs from 'aes-js';
     import 'react-native-get-random-values';
