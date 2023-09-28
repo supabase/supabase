@@ -136,9 +136,7 @@ const SignInForm = () => {
 
               {/* positioned using absolute instead of labelOptional prop so tabbing between inputs works smoothly */}
               <Link href="/forgot-password">
-                <a className="absolute top-0 right-0 text-sm text-foreground-lighter">
-                  Forgot Password?
-                </a>
+                <a className="absolute top-0 right-0 text-sm text-scale-900">Forgot Password?</a>
               </Link>
             </div>
 

@@ -148,11 +148,7 @@ const TableEditorMenu = () => {
                   type="outline"
                   className="w-full [&>span]:w-full"
                   iconRight={
-                    <IconCode
-                      className="text-foreground-light rotate-90"
-                      strokeWidth={2}
-                      size={12}
-                    />
+                    <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />
                   }
                 >
                   <div>
@@ -232,7 +228,7 @@ const TableEditorMenu = () => {
                   disabled={!canCreateTables}
                   size="tiny"
                   icon={
-                    <div className="text-foreground-lighter">
+                    <div className="text-scale-900">
                       <IconEdit size={14} strokeWidth={1.5} />
                     </div>
                   }
@@ -253,7 +249,7 @@ const TableEditorMenu = () => {
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-foreground">
+                      <span className="text-xs text-scale-1200">
                         You need additional permissions to create tables
                       </span>
                     </div>
@@ -283,13 +279,9 @@ const TableEditorMenu = () => {
               className="table-editor-search border-none"
               icon={
                 isSearching ? (
-                  <IconLoader
-                    className="animate-spin text-foreground-lighter"
-                    size={12}
-                    strokeWidth={1.5}
-                  />
+                  <IconLoader className="animate-spin text-scale-900" size={12} strokeWidth={1.5} />
                 ) : (
-                  <IconSearch className="text-foreground-lighter" size={12} strokeWidth={1.5} />
+                  <IconSearch className="text-scale-900" size={12} strokeWidth={1.5} />
                 )
               }
               placeholder="Search tables"
@@ -310,21 +302,17 @@ const TableEditorMenu = () => {
         {isLoading ? (
           <div className="mx-4 flex items-center space-x-2">
             <IconLoader className="animate-spin" size={14} strokeWidth={1.5} />
-            <p className="text-sm text-foreground-light">Loading entities...</p>
+            <p className="text-sm text-scale-1000">Loading entities...</p>
           </div>
         ) : searchText.length === 0 && (entityTypes?.length ?? 0) === 0 ? (
           <div className="mx-4 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
             <p className="text-xs">No entities available</p>
-            <p className="text-xs text-foreground-light">
-              This schema has no entities available yet
-            </p>
+            <p className="text-xs text-scale-1100">This schema has no entities available yet</p>
           </div>
         ) : searchText.length > 0 && (entityTypes?.length ?? 0) === 0 ? (
           <div className="mx-4 space-y-1 rounded-md border border-scale-400 bg-scale-300 py-3 px-4">
             <p className="text-xs">No results found</p>
-            <p className="text-xs text-foreground-light">
-              There are no entities that match your search
-            </p>
+            <p className="text-xs text-scale-1100">There are no entities that match your search</p>
           </div>
         ) : (
           <Menu
@@ -385,7 +373,7 @@ const TableEditorMenu = () => {
                       >
                         <Tooltip.Root delayDuration={0}>
                           <Tooltip.Trigger asChild>
-                            <div className="text-foreground-lighter transition-colors hover:text-foreground">
+                            <div className="text-scale-900 transition-colors hover:text-scale-1200">
                               <IconChevronsDown size={18} strokeWidth={1} />
                             </div>
                           </Tooltip.Trigger>
@@ -406,7 +394,7 @@ const TableEditorMenu = () => {
                       </Dropdown>
 
                       <button
-                        className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
+                        className="cursor-pointer text-scale-900 transition-colors hover:text-scale-1200"
                         onClick={refreshTables}
                       >
                         <IconRefreshCw className={isRefetching ? 'animate-spin' : ''} size={14} />

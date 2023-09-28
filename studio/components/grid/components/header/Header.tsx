@@ -1,37 +1,33 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import saveAs from 'file-saver'
 import Papa from 'papaparse'
-import { ReactNode, useState } from 'react'
+import { useState, ReactNode } from 'react'
 import {
   Button,
-  cn,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
-  IconArrowUp,
-  IconChevronDown,
   IconDownload,
-  IconFileText,
-  IconTrash,
   IconX,
+  IconTrash,
+  Dropdown,
+  IconChevronDown,
+  IconFileText,
+  IconArrowUp,
 } from 'ui'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import clsx from 'clsx'
-import { useDispatch, useTrackedState } from 'components/grid/store'
-import { Filter, Sort, SupaTable } from 'components/grid/types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useCheckPermissions, useStore, useUrlState } from 'hooks'
+import FilterDropdown from './filter'
+import SortPopover from './sort'
+import RefreshButton from './RefreshButton'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
-import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
+import { Sort, Filter, SupaTable } from 'components/grid/types'
+import { useDispatch, useTrackedState } from 'components/grid/store'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
+import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useCheckPermissions, useStore, useUrlState } from 'hooks'
-import FilterDropdown from './filter'
-import RefreshButton from './RefreshButton'
 import RLSBannerWarning from './RLSBannerWarning'
-import SortPopover from './sort'
+import clsx from 'clsx'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
@@ -128,73 +124,74 @@ const DefaultHeader = ({
           <div className="h-[20px] w-px border-r border-scale-600"></div>
           <div className="flex items-center gap-2">
             {canCreateColumns && (
-              <DropdownMenu_Shadcn_>
-                <DropdownMenuTrigger_Shadcn_ className="flex">
-                  <Button size="tiny" icon={<IconChevronDown size={14} strokeWidth={1.5} />}>
-                    Insert
-                  </Button>
-                </DropdownMenuTrigger_Shadcn_>
-                <DropdownMenuContent_Shadcn_ side="bottom" align="start">
-                  {[
-                    ...(onAddRow !== undefined
-                      ? [
-                          <DropdownMenuItem_Shadcn_
-                            key="add-row"
-                            className="group space-x-2"
-                            onClick={onAddRow}
-                          >
+              <Dropdown
+                side="bottom"
+                align="start"
+                size="medium"
+                overlay={[
+                  ...(onAddRow !== undefined
+                    ? [
+                        <Dropdown.Item
+                          key="add-row"
+                          className="group"
+                          onClick={onAddRow}
+                          icon={
                             <div className="-mt-2 pr-1.5">
                               <div className="border border-scale-1000 w-[15px] h-[4px]" />
                               <div className="border border-scale-1000 w-[15px] h-[4px] my-[2px]" />
                               <div
-                                className={cn([
+                                className={[
                                   'border border-scale-1100 w-[15px] h-[4px] translate-x-0.5',
                                   'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-x-0',
-                                ])}
+                                ].join(' ')}
                               />
                             </div>
-                            <div>
-                              <p className="text">Insert row</p>
-                              <p className="text-foreground-light text-xs">
-                                Insert a new row into {table.name}
-                              </p>
-                            </div>
-                          </DropdownMenuItem_Shadcn_>,
-                        ]
-                      : []),
-                    ...(onAddColumn !== undefined
-                      ? [
-                          <DropdownMenuItem_Shadcn_
-                            key="add-column"
-                            className="group space-x-2"
-                            onClick={onAddColumn}
-                          >
+                          }
+                        >
+                          <div className="">
+                            <p>Insert row</p>
+                            <p className="text-scale-1000 text-xs">
+                              Insert a new row into {table.name}
+                            </p>
+                          </div>
+                        </Dropdown.Item>,
+                      ]
+                    : []),
+                  ...(onAddColumn !== undefined
+                    ? [
+                        <Dropdown.Item
+                          key="add-column"
+                          className="group"
+                          onClick={onAddColumn}
+                          icon={
                             <div className="flex -mt-2 pr-1.5">
                               <div className="border border-scale-1000 w-[4px] h-[15px]" />
                               <div className="border border-scale-1000 w-[4px] h-[15px] mx-[2px]" />
                               <div
-                                className={cn([
+                                className={[
                                   'border border-scale-1100 w-[4px] h-[15px] -translate-y-0.5',
                                   'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-y-0',
-                                ])}
+                                ].join(' ')}
                               />
                             </div>
-                            <div>
-                              <p className="text">Insert column</p>
-                              <p className="text-lighter text-xs">
-                                Insert a new column into {table.name}
-                              </p>
-                            </div>
-                          </DropdownMenuItem_Shadcn_>,
-                        ]
-                      : []),
-                    ...(onImportData !== undefined
-                      ? [
-                          <DropdownMenuItem_Shadcn_
-                            key="import-data"
-                            className="group space-x-2"
-                            onClick={onImportData}
-                          >
+                          }
+                        >
+                          <div className="">
+                            <p>Insert column</p>
+                            <p className="text-scale-1000 text-xs">
+                              Insert a new column into {table.name}
+                            </p>
+                          </div>
+                        </Dropdown.Item>,
+                      ]
+                    : []),
+                  ...(onImportData !== undefined
+                    ? [
+                        <Dropdown.Item
+                          key="import-data"
+                          className="group"
+                          onClick={onImportData}
+                          icon={
                             <div className="relative -mt-2">
                               <IconFileText className="-translate-x-[2px]" />
                               <IconArrowUp
@@ -206,16 +203,21 @@ const DefaultHeader = ({
                                 size={12}
                               />
                             </div>
-                            <div>
-                              <p className="text">Import data from CSV</p>
-                              <p className="text-lighter text-xs">Insert new rows from a CSV</p>
-                            </div>
-                          </DropdownMenuItem_Shadcn_>,
-                        ]
-                      : []),
-                  ]}
-                </DropdownMenuContent_Shadcn_>
-              </DropdownMenu_Shadcn_>
+                          }
+                        >
+                          <div className="">
+                            <p>Import data from CSV</p>
+                            <p className="text-scale-1000 text-xs">Insert new rows from a CSV</p>
+                          </div>
+                        </Dropdown.Item>,
+                      ]
+                    : []),
+                ]}
+              >
+                <Button size="tiny" icon={<IconChevronDown size={14} strokeWidth={1.5} />}>
+                  Insert
+                </Button>
+              </Dropdown>
             )}
           </div>
         </>
@@ -404,7 +406,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           icon={<IconX size="tiny" strokeWidth={2} />}
           onClick={deselectRows}
         />
-        <span className="text-xs text-foreground">
+        <span className="text-xs text-scale-1200">
           {allRowsSelected
             ? `${totalRows} rows selected`
             : selectedRows.size > 1

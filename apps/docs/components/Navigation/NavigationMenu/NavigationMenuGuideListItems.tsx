@@ -1,4 +1,4 @@
-import { useTheme } from 'next-themes'
+import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -29,7 +29,7 @@ const HeaderLink = React.memo(function HeaderLink(props: {
 
 const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any) {
   const router = useRouter()
-  const { resolvedTheme } = useTheme()
+  const { isDarkMode } = useTheme()
   const activeItem = props.subItem.url === router.asPath
   const activeItemRef = useRef(null)
 
@@ -77,8 +77,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
               <Image
                 alt={props.subItem.name + router.basePath}
                 src={
-                  `${router.basePath}` +
-                  `${props.subItem.icon}${resolvedTheme !== 'dark' ? '-light' : ''}.svg`
+                  `${router.basePath}` + `${props.subItem.icon}${!isDarkMode ? '-light' : ''}.svg`
                 }
                 width={15}
                 height={15}

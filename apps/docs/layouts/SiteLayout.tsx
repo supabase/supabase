@@ -1,8 +1,8 @@
-import { useTheme } from 'next-themes'
+import { useTheme } from 'common/Providers'
 import Image from 'next/image'
 import Link from 'next/link'
 import NavigationMenu from '~/components/Navigation/NavigationMenu/NavigationMenu'
-import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
+import TopNavBarRef from '~/components/Navigation/NavigationMenu/TopNavBarRef'
 
 import Head from 'next/head'
 import { PropsWithChildren, memo } from 'react'
@@ -220,13 +220,13 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
 })
 
 const HeaderLogo = memo(function HeaderLogo() {
-  const { resolvedTheme } = useTheme()
+  const { isDarkMode } = useTheme()
   return (
     <Link href="/">
       <a className="px-10 flex items-center gap-2">
         <Image
           className="cursor-pointer"
-          src={resolvedTheme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
+          src={isDarkMode ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
           width={96}
           height={24}
           alt="Supabase Logo"
@@ -334,7 +334,7 @@ const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
           <NavContainer />
           <Container>
             <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
-              <TopNavBar />
+              <TopNavBarRef />
             </div>
             <div
               className={[

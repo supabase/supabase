@@ -1,6 +1,6 @@
 import React, { Fragment, useMemo } from 'react'
 import { useRouter } from 'next/router'
-import { useTheme } from 'next-themes'
+import { useTheme } from 'common/Providers'
 import { IconXCircle, Modal } from 'ui'
 import pricingAddOn from '~/data/PricingAddOnTable.json'
 import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
@@ -13,7 +13,7 @@ interface Props {
 
 export default function ComputePricingModal({ showComputeModal, setShowComputeModal }: Props) {
   const { basePath } = useRouter()
-  const { theme } = useTheme()
+  const { isDarkMode } = useTheme()
   const columnNames = useMemo(
     () =>
       pricingAddOn.database.rows.map((row) =>
@@ -41,7 +41,7 @@ export default function ComputePricingModal({ showComputeModal, setShowComputeMo
                 <img
                   className="w-6"
                   src={`${basePath}/images/pricing/compute-upgrade${
-                    theme === 'dark' ? '-green' : ''
+                    isDarkMode ? '-green' : ''
                   }.svg`}
                 />
               </div>

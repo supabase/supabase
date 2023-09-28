@@ -2,17 +2,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
-import {
-  Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
-  IconEdit,
-  IconMoreVertical,
-  IconTrash,
-} from 'ui'
+import { Button, Dropdown, IconEdit, IconMoreVertical, IconTrash, ScrollArea } from 'ui'
 
 import Panel from 'components/ui/Panel'
 import { useCheckPermissions } from 'hooks'
@@ -39,20 +29,20 @@ const PolicyRow = ({
     >
       <div className="flex grow flex-col space-y-1">
         <div className="flex items-center space-x-4">
-          <p className="font-mono text-xs text-foreground-light">{policy.command}</p>
-          <p className="text-sm text-foreground">{policy.name}</p>
+          <p className="font-mono text-xs text-scale-1000">{policy.command}</p>
+          <p className="text-sm text-scale-1200">{policy.name}</p>
         </div>
         <div className="flex items-center space-x-2">
-          <p className="text-foreground-light text-sm">Applied to:</p>
+          <p className="text-scale-1000 text-sm">Applied to:</p>
           {policy.roles.slice(0, 3).map((role, i) => (
-            <code key={`policy-${role}-${i}`} className="text-foreground-light text-xs">
+            <code key={`policy-${role}-${i}`} className="text-scale-1000 text-xs">
               {role}
             </code>
           ))}
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
               {policy.roles.length > 3 && (
-                <code key={`policy-etc`} className="text-foreground-light text-xs">
+                <code key={`policy-etc`} className="text-scale-1000 text-xs">
                   + {policy.roles.length - 3} more roles
                 </code>
               )}
@@ -66,7 +56,7 @@ const PolicyRow = ({
                     'border border-scale-200 max-w-[220px] text-center',
                   ].join(' ')}
                 >
-                  <span className="text-xs text-foreground">
+                  <span className="text-xs text-scale-1200">
                     {policy.roles.slice(3).join(', ')}
                   </span>
                 </div>
@@ -77,32 +67,34 @@ const PolicyRow = ({
       </div>
       <div>
         {canUpdatePolicies ? (
-          <DropdownMenu_Shadcn_>
-            <DropdownMenuTrigger_Shadcn_>
-              <Button
-                type="default"
-                style={{ paddingLeft: 4, paddingRight: 4 }}
-                icon={<IconMoreVertical />}
-              />
-            </DropdownMenuTrigger_Shadcn_>
-            <DropdownMenuContent_Shadcn_ side="bottom" align="end">
-              <DropdownMenuItem_Shadcn_
-                className="space-x-2"
-                onClick={() => onSelectEditPolicy(policy)}
-              >
-                <IconEdit size={14} />
-                <p className="text">Edit</p>
-              </DropdownMenuItem_Shadcn_>
-              <DropdownMenuSeparator_Shadcn_ />
-              <DropdownMenuItem_Shadcn_
-                className="space-x-2"
-                onClick={() => onSelectDeletePolicy(policy)}
-              >
-                <IconTrash size={14} />
-                <p className="text">Delete</p>
-              </DropdownMenuItem_Shadcn_>
-            </DropdownMenuContent_Shadcn_>
-          </DropdownMenu_Shadcn_>
+          <Dropdown
+            side="bottom"
+            align="end"
+            size="small"
+            overlay={
+              <>
+                <Dropdown.Item
+                  icon={<IconEdit size={14} />}
+                  onClick={() => onSelectEditPolicy(policy)}
+                >
+                  Edit
+                </Dropdown.Item>
+                <Dropdown.Separator />
+                <Dropdown.Item
+                  icon={<IconTrash size={14} />}
+                  onClick={() => onSelectDeletePolicy(policy)}
+                >
+                  Delete
+                </Dropdown.Item>
+              </>
+            }
+          >
+            <Button
+              type="default"
+              style={{ paddingLeft: 4, paddingRight: 4 }}
+              icon={<IconMoreVertical />}
+            />
+          </Dropdown>
         ) : (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger>
@@ -123,7 +115,7 @@ const PolicyRow = ({
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-foreground">
+                    <span className="text-xs text-scale-1200">
                       You need additional permissions to edit RLS policies
                     </span>
                   </div>

@@ -12,11 +12,7 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  Dropdown,
   IconAlertCircle,
   IconAlertTriangle,
   IconChevronDown,
@@ -98,7 +94,7 @@ const JWTSettings = () => {
           {isError ? (
             <div className="flex items-center justify-center py-8 space-x-2">
               <IconAlertCircle size={16} strokeWidth={1.5} />
-              <p className="text-sm text-foreground-light">Failed to retrieve JWT settings</p>
+              <p className="text-sm text-scale-1100">Failed to retrieve JWT settings</p>
             </div>
           ) : (
             <>
@@ -162,7 +158,7 @@ const JWTSettings = () => {
                                       'border border-scale-200',
                                     ].join(' ')}
                                   >
-                                    <span className="text-xs text-foreground">
+                                    <span className="text-xs text-scale-1200">
                                       You need additional permissions to generate a new JWT secret
                                     </span>
                                   </div>
@@ -170,30 +166,31 @@ const JWTSettings = () => {
                               </Tooltip.Portal>
                             </Tooltip.Root>
                           ) : (
-                            <DropdownMenu_Shadcn_>
-                              <DropdownMenuTrigger_Shadcn_>
-                                <Button asChild type="default" iconRight={<IconChevronDown />}>
-                                  <span>Generate a new secret</span>
-                                </Button>
-                              </DropdownMenuTrigger_Shadcn_>
-                              <DropdownMenuContent_Shadcn_ align="end" side="bottom">
-                                <DropdownMenuItem_Shadcn_
-                                  className="space-x-2"
-                                  onClick={() => setIsGeneratingKey(true)}
-                                >
-                                  <IconRefreshCw size={16} />
-                                  <p className="text">Generate a random secret</p>
-                                </DropdownMenuItem_Shadcn_>
-                                <DropdownMenuSeparator_Shadcn_ />
-                                <DropdownMenuItem_Shadcn_
-                                  className="space-x-2"
-                                  onClick={() => setIsCreatingKey(true)}
-                                >
-                                  <IconPenTool size={16} />
-                                  <p className="text">Create my own secret</p>
-                                </DropdownMenuItem_Shadcn_>
-                              </DropdownMenuContent_Shadcn_>
-                            </DropdownMenu_Shadcn_>
+                            <Dropdown
+                              align="end"
+                              side="bottom"
+                              overlay={
+                                <>
+                                  <Dropdown.Item
+                                    onClick={() => setIsGeneratingKey(true)}
+                                    icon={<IconRefreshCw size={16} />}
+                                  >
+                                    Generate a random secret
+                                  </Dropdown.Item>
+                                  <Dropdown.Separator />
+                                  <Dropdown.Item
+                                    onClick={() => setIsCreatingKey(true)}
+                                    icon={<IconPenTool size={16} />}
+                                  >
+                                    Create my own secret
+                                  </Dropdown.Item>
+                                </>
+                              }
+                            >
+                              <Button asChild type="default" iconRight={<IconChevronDown />}>
+                                <span>Generate a new secret</span>
+                              </Button>
+                            </Dropdown>
                           )}
                         </div>
                       </div>
@@ -269,7 +266,7 @@ const JWTSettings = () => {
       >
         <Modal.Content>
           <div className="py-4 space-y-2">
-            <p className="text-sm text-foreground-light">
+            <p className="text-sm text-scale-1100">
               Create a custom JWT secret. Make sure it is a strong combination of characters that
               cannot be guessed easily.
             </p>

@@ -1,5 +1,5 @@
-import DataGrid from '@supabase/react-data-grid'
 import clsx from 'clsx'
+import DataGrid from '@supabase/react-data-grid'
 
 const MAX_ROWS = 20
 const MAX_HEADERS = 20
@@ -38,9 +38,7 @@ const SpreadsheetPreviewGrid = ({
           formatter: ({ row }: { row: any }) => {
             const isEmpty = !row[header]
             return (
-              <span
-                className={clsx('text-sm flex items-center', isEmpty && 'text-foreground-light')}
-              >
+              <span className={clsx('text-sm flex items-center', isEmpty && 'text-scale-1000')}>
                 {isEmpty ? 'NULL' : row[header]}
               </span>
             )

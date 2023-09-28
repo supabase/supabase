@@ -1,32 +1,28 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import clsx from 'clsx'
 import saveAs from 'file-saver'
-import Link from 'next/link'
 import Papa from 'papaparse'
+import clsx from 'clsx'
 import SVG from 'react-inlinesvg'
-import {
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
-  IconChevronDown,
-  IconCopy,
-  IconDownload,
-  IconEdit,
-  IconLock,
-  IconTrash,
-} from 'ui'
-
-import { parseSupaTable } from 'components/grid'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-type-query'
-import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
-import { getTable } from 'data/tables/table-query'
-import { useStore } from 'hooks'
+import Link from 'next/link'
+import {
+  Dropdown,
+  IconEdit,
+  IconCopy,
+  IconLock,
+  IconTrash,
+  IconChevronDown,
+  IconDownload,
+} from 'ui'
 import { BASE_PATH } from 'lib/constants'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
+import { useParams } from 'common'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { getTable } from 'data/tables/table-query'
+import { parseSupaTable } from 'components/grid'
+import { useStore } from 'hooks'
 
 export interface EntityListItemProps {
   id: number
@@ -114,7 +110,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
     <div
       className={clsx(
         'group flex items-center justify-between rounded-md',
-        isActive && 'text-foreground bg-scale-300'
+        isActive && 'text-scale-1200 bg-scale-300'
       )}
     >
       <Link href={`/project/${projectRef}/editor/${entity.id}`}>
@@ -146,8 +142,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                     entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
                     entity.type === ENTITY_TYPE.MATERIALIZED_VIEW &&
                       'text-purple-1000 bg-purple-500',
-                    entity.type === ENTITY_TYPE.PARTITIONED_TABLE &&
-                      'text-foreground-light bg-scale-800'
+                    entity.type === ENTITY_TYPE.PARTITIONED_TABLE && 'text-scale-1100 bg-scale-800'
                   )}
                 >
                   {Object.entries(ENTITY_TYPE)
@@ -165,14 +160,14 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                     'border border-scale-200',
                   ].join(' ')}
                 >
-                  <span className="text-xs text-foreground capitalize">
+                  <span className="text-xs text-scale-1200 capitalize">
                     {formatTooltipText(entity.type)}
                   </span>
                 </div>
               </Tooltip.Content>
             </Tooltip.Portal>
           </Tooltip.Root>
-          <p className="text-sm text-foreground-light group-hover:text-foreground transition max-w-[85%] overflow-hidden text-ellipsis whitespace-nowrap">
+          <p className="text-sm text-scale-1100 group-hover:text-scale-1200 transition max-w-[85%] overflow-hidden text-ellipsis whitespace-nowrap">
             {/* only show tooltips if required, to reduce noise */}
             {entity.name.length > 20 ? (
               <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
@@ -188,7 +183,7 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
                         'border border-scale-200',
                       ].join(' ')}
                     >
-                      <span className="text-xs text-foreground">{entity.name}</span>
+                      <span className="text-xs text-scale-1200">{entity.name}</span>
                     </div>
                   </Tooltip.Content>
                 </Tooltip.Portal>
@@ -201,71 +196,68 @@ const EntityListItem = ({ id, projectRef, item: entity, isLocked }: EntityListIt
       </Link>
       <div className="pr-3">
         {entity.type === ENTITY_TYPE.TABLE && isActive && !isLocked && (
-          <DropdownMenu_Shadcn_>
-            <DropdownMenuTrigger_Shadcn_>
-              <div className="text-foreground-lighter transition-colors hover:text-foreground">
-                <IconChevronDown size={14} strokeWidth={2} />
-              </div>
-            </DropdownMenuTrigger_Shadcn_>
-            <DropdownMenuContent_Shadcn_ side="bottom" align="start">
-              <DropdownMenuItem_Shadcn_
+          <Dropdown
+            size="small"
+            side="bottom"
+            align="start"
+            overlay={[
+              <Dropdown.Item
                 key="edit-table"
-                className="space-x-2"
+                icon={<IconEdit size="tiny" />}
                 onClick={(e) => {
                   e.stopPropagation()
                   snap.onEditTable()
                 }}
               >
-                <IconEdit size="tiny" />
-                <p className="text">Edit Table</p>
-              </DropdownMenuItem_Shadcn_>
-              <DropdownMenuItem_Shadcn_
+                Edit Table
+              </Dropdown.Item>,
+              <Dropdown.Item
                 key="duplicate-table"
-                className="space-x-2"
+                icon={<IconCopy size="tiny" />}
                 onClick={(e) => {
                   e.stopPropagation()
                   snap.onDuplicateTable()
                 }}
               >
-                <IconCopy size="tiny" />
-                <p className="text">Duplicate Table</p>
-              </DropdownMenuItem_Shadcn_>
+                Duplicate Table
+              </Dropdown.Item>,
               <Link
                 key="view-policies"
                 href={`/project/${projectRef}/auth/policies?search=${entity.id}`}
               >
                 <a>
-                  <DropdownMenuItem_Shadcn_ key="delete-table" className="space-x-2">
-                    <IconLock size="tiny" />
-                    <p className="text">View Policies</p>
-                  </DropdownMenuItem_Shadcn_>
+                  <Dropdown.Item key="delete-table" icon={<IconLock size="tiny" />}>
+                    View Policies
+                  </Dropdown.Item>
                 </a>
-              </Link>
-              <DropdownMenuItem_Shadcn_
+              </Link>,
+              <Dropdown.Item
                 key="download-table-csv"
-                className="space-x-2"
+                icon={<IconDownload size="tiny" />}
                 onClick={(e) => {
                   e.stopPropagation()
                   exportTableAsCSV()
                 }}
               >
-                <IconDownload size="tiny" />
-                <p className="text">Export as CSV</p>
-              </DropdownMenuItem_Shadcn_>
-              <DropdownMenuSeparator_Shadcn_ />
-              <DropdownMenuItem_Shadcn_
+                Export as CSV
+              </Dropdown.Item>,
+              <Dropdown.Separator key="separator" />,
+              <Dropdown.Item
                 key="delete-table"
-                className="space-x-2"
+                icon={<IconTrash size="tiny" />}
                 onClick={(e) => {
                   e.stopPropagation()
                   snap.onDeleteTable()
                 }}
               >
-                <IconTrash size="tiny" />
-                <p className="text">Delete Table</p>
-              </DropdownMenuItem_Shadcn_>
-            </DropdownMenuContent_Shadcn_>
-          </DropdownMenu_Shadcn_>
+                Delete Table
+              </Dropdown.Item>,
+            ]}
+          >
+            <div className="text-scale-900 transition-colors hover:text-scale-1200">
+              <IconChevronDown size={14} strokeWidth={2} />
+            </div>
+          </Dropdown>
         )}
       </div>
     </div>

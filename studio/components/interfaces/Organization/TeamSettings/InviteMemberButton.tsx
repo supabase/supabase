@@ -108,7 +108,7 @@ const InviteMemberButton = ({
                   'border border-scale-200',
                 ].join(' ')}
               >
-                <span className="text-xs text-foreground">
+                <span className="text-xs text-scale-1200">
                   You need additional permissions to invite a member to this organization
                 </span>
               </div>

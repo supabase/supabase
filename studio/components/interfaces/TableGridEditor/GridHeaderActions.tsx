@@ -135,7 +135,7 @@ const GridHeaderActions = ({
                     'border border-scale-200',
                   ].join(' ')}
                 >
-                  <span className="text-xs text-foreground">
+                  <span className="text-xs text-scale-1200">
                     You need additional permissions to manage your project's data
                   </span>
                 </div>

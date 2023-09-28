@@ -57,9 +57,7 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [router.isReady, consentValue])
 
   const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
-  const { basePath, pathname } = useRouter()
-
-  const forceDarkMode = pathname === '/' || router.pathname.startsWith('/launch-week')
+  const { basePath } = useRouter()
 
   return (
     <>
@@ -90,13 +88,7 @@ export default function App({ Component, pageProps }: AppProps) {
         }}
       />
       <AuthProvider>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-          forcedTheme={forceDarkMode ? 'dark' : undefined}
-        >
+        <ThemeProvider detectSystemColorPreference={false}>
           <PortalToast />
           <Component {...pageProps} />
         </ThemeProvider>

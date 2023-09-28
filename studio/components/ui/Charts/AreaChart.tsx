@@ -1,12 +1,19 @@
-import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 import { useState } from 'react'
-import { Area, AreaChart as RechartAreaChart, Tooltip, XAxis } from 'recharts'
+import {
+  AreaChart as RechartAreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts'
+import dayjs from 'dayjs'
+import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import ChartHeader from './ChartHeader'
-import { CommonChartProps, Datum } from './Charts.types'
-import { numberFormatter, useChartSize } from './Charts.utils'
+import { Datum, CommonChartProps } from './Charts.types'
+import utc from 'dayjs/plugin/utc'
 import ChartNoData from './NoDataPlaceholder'
+import { numberFormatter, useChartSize } from './Charts.utils'
 dayjs.extend(utc)
 
 export interface AreaChartProps<D = Datum> extends CommonChartProps<D> {
@@ -107,7 +114,7 @@ const AreaChart = ({
         </RechartAreaChart>
       </Container>
       {data && (
-        <div className="text-foreground-lighter -mt-2 flex items-center justify-between text-xs">
+        <div className="text-scale-900 -mt-2 flex items-center justify-between text-xs">
           <span>{dayjs(data[0][xAxisKey]).format(customDateFormat)}</span>
           <span>{dayjs(data[data?.length - 1]?.[xAxisKey]).format(customDateFormat)}</span>
         </div>

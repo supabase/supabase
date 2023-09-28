@@ -18,16 +18,17 @@ import {
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Table from 'components/to-be-cleaned/Table'
-import AlertError from 'components/ui/AlertError'
-import CodeEditor from 'components/ui/CodeEditor'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import AlertError from 'components/ui/AlertError'
 import { DatabaseIndex, useIndexesQuery } from 'data/database/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
+import Table from 'components/to-be-cleaned/Table'
+import CodeEditor from 'components/ui/CodeEditor'
+import CreateIndexSidePanel from './CreateIndexSidePanel'
+import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useStore } from 'hooks'
-import CreateIndexSidePanel from './CreateIndexSidePanel'
+import MonacoEditor from 'components/interfaces/SQLEditor/MonacoEditor'
 
 const Indexes = () => {
   const { ui } = useStore()
@@ -97,8 +98,8 @@ const Indexes = () => {
       <div className="pb-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="mb-1 text-xl text-foreground">Database Indexes</h3>
-            <div className="text-sm text-foreground-lighter">
+            <h3 className="mb-1 text-xl text-scale-1200">Database Indexes</h3>
+            <div className="text-sm text-scale-900">
               Improve query performance against your database
             </div>
           </div>
@@ -141,7 +142,7 @@ const Indexes = () => {
                     key={schema.name}
                     value={schema.name}
                     label={schema.name}
-                    addOnBefore={() => <span className="text-foreground-lighter">schema</span>}
+                    addOnBefore={() => <span className="text-scale-900">schema</span>}
                   >
                     {schema.name}
                   </Listbox.Option>
@@ -185,7 +186,7 @@ const Indexes = () => {
                 {sortedIndexes.length === 0 && search.length === 0 && (
                   <Table.tr>
                     <Table.td colSpan={4}>
-                      <p className="text-sm text-foreground">No indexes created yet</p>
+                      <p className="text-sm text-scale-1200">No indexes created yet</p>
                       <p className="text-sm text-light">
                         There are no indexes found in the schema "{selectedSchema}"
                       </p>
@@ -195,7 +196,7 @@ const Indexes = () => {
                 {sortedIndexes.length === 0 && search.length > 0 && (
                   <Table.tr>
                     <Table.td colSpan={4}>
-                      <p className="text-sm text-foreground">No results found</p>
+                      <p className="text-sm text-scale-1200">No results found</p>
                       <p className="text-sm text-light">
                         Your search for "{search}" did not return any results
                       </p>

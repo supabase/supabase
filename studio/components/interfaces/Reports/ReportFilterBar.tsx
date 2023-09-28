@@ -1,12 +1,7 @@
 import { ComponentProps, useState } from 'react'
 import {
   Button,
-  cn,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  Dropdown,
   IconBox,
   IconChevronDown,
   IconCode,
@@ -152,52 +147,54 @@ const ReportFilterBar = ({
           from={datepickerFrom}
           helpers={datepickerHelpers}
         />
-        <DropdownMenu_Shadcn_>
-          <DropdownMenuTrigger_Shadcn_>
-            <Button
-              asChild
-              type="default"
-              className="inline-flex flex-row gap-2"
-              iconRight={<IconChevronDown size={14} />}
-            >
-              <span>
-                {currentProductFilter === null ? 'All Requests' : currentProductFilter.label}
-              </span>
-            </Button>
-          </DropdownMenuTrigger_Shadcn_>
-          <DropdownMenuContent_Shadcn_ side="bottom" align="start">
-            <DropdownMenuItem_Shadcn_ onClick={() => handleProductFilterChange(null)}>
-              <p className="text">All Requests</p>
-            </DropdownMenuItem_Shadcn_>
-            <DropdownMenuSeparator_Shadcn_ />
-            {PRODUCT_FILTERS.map((productFilter) => {
-              const Icon = productFilter.icon
-              return (
-                <DropdownMenuItem_Shadcn_
-                  key={productFilter.key}
-                  className="space-x-2"
-                  disabled={productFilter.key === currentProductFilter?.key}
-                  onClick={() => handleProductFilterChange(productFilter)}
-                >
-                  <Icon size={20} className="mr-2" />
-                  <div className="flex flex-col">
+        <Dropdown
+          size="small"
+          side="bottom"
+          align="start"
+          overlay={
+            <>
+              <Dropdown.Item onClick={() => handleProductFilterChange(null)}>
+                All Requests
+              </Dropdown.Item>
+              <Dropdown.Separator />
+
+              {PRODUCT_FILTERS.map((productFilter) => {
+                const Icon = productFilter.icon
+                return (
+                  <Dropdown.Item
+                    key={productFilter.key}
+                    disabled={productFilter.key === currentProductFilter?.key}
+                    onClick={() => handleProductFilterChange(productFilter)}
+                    icon={<Icon size={20} className="mr-2" />}
+                  >
                     <p
-                      className={cn(
+                      className={[
                         productFilter.key === currentProductFilter?.key ? 'font-bold' : '',
-                        'inline-block'
-                      )}
+                        'inline-block',
+                      ].join(' ')}
                     >
                       {productFilter.label}
                     </p>
-                    <p className=" text-left text-foreground-light inline-block w-[180px]">
+                    <p className=" text-left text-scale-1000 inline-block w-[180px]">
                       {productFilter.description}
                     </p>
-                  </div>
-                </DropdownMenuItem_Shadcn_>
-              )
-            })}
-          </DropdownMenuContent_Shadcn_>
-        </DropdownMenu_Shadcn_>
+                  </Dropdown.Item>
+                )
+              })}
+            </>
+          }
+        >
+          <Button
+            asChild
+            type="default"
+            className="inline-flex flex-row gap-2"
+            iconRight={<IconChevronDown size={14} />}
+          >
+            <span>
+              {currentProductFilter === null ? 'All Requests' : currentProductFilter.label}
+            </span>
+          </Button>
+        </Dropdown>
         {filters
           .filter(
             (filter) =>
@@ -215,7 +212,7 @@ const ReportFilterBar = ({
                 size="tiny"
                 className="!p-0 !space-x-0"
                 onClick={() => onRemoveFilters([filter])}
-                icon={<IconX size="tiny" className="text-foreground-light" />}
+                icon={<IconX size="tiny" className="text-scale-1100" />}
               >
                 <span className="sr-only">Remove</span>
               </Button>
@@ -225,7 +222,7 @@ const ReportFilterBar = ({
           align="end"
           header={
             <div className="flex justify-between items-center py-1">
-              <h5 className="text-sm text-foreground">Add Filter</h5>
+              <h5 className="text-sm text-scale-1200">Add Filter</h5>
 
               <Button
                 type="primary"
@@ -295,7 +292,7 @@ const ReportFilterBar = ({
             asChild
             type="default"
             size="tiny"
-            icon={<IconPlus size="tiny" className={`text-foreground-light `} />}
+            icon={<IconPlus size="tiny" className={`text-scale-1100 `} />}
           >
             <span>Add filter</span>
           </Button>

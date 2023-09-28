@@ -5,11 +5,7 @@ import { copyToClipboard } from 'lib/helpers'
 import { useState } from 'react'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  Dropdown,
   IconCheck,
   IconClipboard,
   IconEdit,
@@ -69,30 +65,22 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
       </Table.td>
       <Table.td>{dayjs(app.created_at).format('DD/MM/YYYY, HH:mm:ss')}</Table.td>
       <Table.td align="right">
-        <DropdownMenu_Shadcn_>
-          <DropdownMenuTrigger_Shadcn_>
-            <Button type="default" icon={<IconMoreVertical />} className="px-1" />
-          </DropdownMenuTrigger_Shadcn_>
-          <DropdownMenuContent_Shadcn_ align="end" side="bottom">
-            <DropdownMenuItem_Shadcn_
-              className="space-x-2"
-              key="edit"
-              onClick={() => onSelectEdit()}
-            >
-              <IconEdit />
-              <p className="text">Edit app</p>
-            </DropdownMenuItem_Shadcn_>
-            <DropdownMenuSeparator_Shadcn_ />
-            <DropdownMenuItem_Shadcn_
-              className="space-x-2"
-              key="delete"
-              onClick={() => onSelectDelete()}
-            >
-              <IconTrash />
-              <p className="text">Delete app</p>
-            </DropdownMenuItem_Shadcn_>
-          </DropdownMenuContent_Shadcn_>
-        </DropdownMenu_Shadcn_>
+        <Dropdown
+          size="tiny"
+          align="end"
+          side="bottom"
+          overlay={[
+            <Dropdown.Item key="edit" icon={<IconEdit />} onClick={() => onSelectEdit()}>
+              Edit app
+            </Dropdown.Item>,
+            <Dropdown.Separator key="separator" />,
+            <Dropdown.Item key="delete" icon={<IconTrash />} onClick={() => onSelectDelete()}>
+              Delete app
+            </Dropdown.Item>,
+          ]}
+        >
+          <Button type="default" icon={<IconMoreVertical />} className="px-1" />
+        </Dropdown>
       </Table.td>
     </Table.tr>
   )

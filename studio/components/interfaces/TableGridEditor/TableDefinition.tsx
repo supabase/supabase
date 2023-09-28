@@ -1,6 +1,5 @@
 import Editor from '@monaco-editor/react'
-import { useTheme } from 'next-themes'
-import { useParams } from 'common'
+import { useParams, useTheme } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useMemo, useRef } from 'react'
 import { format } from 'sql-formatter'
@@ -23,7 +22,7 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
   const { ref } = useParams()
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
-  const { theme } = useTheme()
+  const { isDarkMode } = useTheme()
   const entityType = useEntityType(id)
   const { project } = useProjectContext()
 
@@ -113,7 +112,7 @@ const TableDefinition = ({ id }: TableDefinitionProps) => {
       </Link>
       <Editor
         className="monaco-editor"
-        theme={theme === 'dark' ? 'vs-dark' : 'vs'}
+        theme={isDarkMode ? 'vs-dark' : 'vs'}
         onMount={handleEditorOnMount}
         defaultLanguage="pgsql"
         value={formattedDefinition}

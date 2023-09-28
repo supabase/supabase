@@ -7,7 +7,7 @@ import Image from 'next/image'
 
 import { ColorSwatchIcon, MenuIcon } from '@heroicons/react/outline'
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
-import { useTheme } from 'next-themes'
+import { useTheme } from 'common/Providers'
 
 const supabase = createClient(
   'https://rsnibhkhsbfnncjmwnkj.supabase.co',
@@ -15,7 +15,7 @@ const supabase = createClient(
 )
 
 function AuthWidgetSection() {
-  const { theme } = useTheme()
+  const { isDarkMode } = useTheme()
   const { basePath } = useRouter()
   const [radius, setRadius] = useState('4px')
   const [brandColor, setBrandColor] = useState({
@@ -84,7 +84,7 @@ function AuthWidgetSection() {
                     <Auth
                       // @ts-ignore
                       socialLayout={layout}
-                      theme={theme === 'dark' ? 'dark' : 'default'}
+                      theme={isDarkMode ? 'dark' : 'default'}
                       providers={['google', 'facebook', 'twitter']}
                       supabaseClient={supabase}
                       localization={{
