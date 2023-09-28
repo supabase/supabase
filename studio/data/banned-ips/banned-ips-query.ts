@@ -1,11 +1,10 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { post } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { BannedIPKeys } from './keys'
 
 export type BannedIPVariables = {
   projectRef?: string
-  ip?: string
 };
 
 export type BannedIPsData = BannedIPVariables[];

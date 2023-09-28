@@ -25,7 +25,7 @@ const BannedIPs = () => {
   const { ref } = useParams()
   const [selectedIPToUnban, setSelectedIPToUnban] = useState<string | null>(null) // Track the selected IP for unban
   const {
-    data: IPlist
+    data: ipList
   } = useBannedIPsQuery({
     projectRef: ref,
   })
@@ -55,7 +55,7 @@ const BannedIPs = () => {
     if (confirmingIP == null || !ref) return;
     unbanIPs({
       projectRef: ref,
-      ip: [confirmingIP], // Pass the IP as an array
+      ips: [confirmingIP], // Pass the IP as an array
     });
   }
 
@@ -80,8 +80,8 @@ const BannedIPs = () => {
         </div>
       </div>
       <FormPanel>
-        {IPlist && IPlist.banned_ipv4_addresses.length > 0 ? (
-          IPlist.banned_ipv4_addresses.map((ip) => (
+        {ipList && ipList.banned_ipv4_addresses.length > 0 ? (
+          ipList.banned_ipv4_addresses.map((ip) => (
             <div key={ip} className="px-8 py-4 flex items-center justify-between">
               <div className="flex items-center space-x-5">
                 <IconGlobe size={16} className="text-scale-1000" />
