@@ -9,11 +9,12 @@ import {
   SearchButton,
   IconSearch,
   IconCommand,
+  IconChevronRight,
 } from 'ui'
 
 import DefaultLayout from '~/components/Layouts/Default'
+import InteractiveShimmerCard from '~/components/InteractiveShimmerCard'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import InteractiveShimmerCard from '../components/InteractiveShimmerCard'
 import { questions } from 'shared-data'
 
 const Index = () => {
@@ -22,6 +23,45 @@ const Index = () => {
   const meta_title = 'Help & Support | Supabase'
   const meta_description =
     'Find help and support for Supabase. Our Support team provide answers on all types of issues, including account information, billing, and refunds.'
+
+  // const faqs = [
+  //   {
+  //     label: 'How this and that?',
+  //     url: '#',
+  //   },
+  //   {
+  //     label: 'How this and that and then that and this again?',
+  //     url: '#',
+  //   },
+  //   {
+  //     label: 'How this and that and then that and this again?',
+  //     url: '#',
+  //   },
+  //   {
+  //     label: 'How this and that?',
+  //     url: '#',
+  //   },
+  //   {
+  //     label: 'How this and that and that other thing?',
+  //     url: '#',
+  //   },
+  //   {
+  //     label: 'How this and that and then that and this again?',
+  //     url: '#',
+  //   },
+  //   {
+  //     label: 'How this and that and then that and this again?',
+  //     url: '#',
+  //   },
+  //   {
+  //     label: 'How this and that?',
+  //     url: '#',
+  //   },
+  //   {
+  //     label: 'How this and that and that other thing?',
+  //     url: '#',
+  //   },
+  // ]
 
   return (
     <>
@@ -77,28 +117,7 @@ const Index = () => {
             </SearchButton>
           </SectionContainer>
         </div>
-        <SectionContainer className="text grid gap-5 md:grid-cols-3">
-          <InteractiveShimmerCard innerClassName="flex flex-col p-5">
-            <div className="mb-4 lg:mb-8 flex-1">
-              <h2 className="text text-lg font-medium">Troubleshooting</h2>
-              <div className="my-2 block">
-                <p className="text-light">
-                  Learn how to diagnose and fix common issues with your Supabase project.
-                </p>
-              </div>
-            </div>
-            <div>
-              <Link
-                href="/docs/guides/platform/troubleshooting"
-                as="/docs/guides/platform/troubleshooting"
-                passHref
-              >
-                <Button size="small" type="default" asChild>
-                  <a target="_blank">Troubleshooting Guide</a>
-                </Button>
-              </Link>
-            </div>
-          </InteractiveShimmerCard>
+        <SectionContainer className="text grid gap-5 md:grid-cols-2 max-w-7xl">
           <InteractiveShimmerCard innerClassName="flex flex-col p-5">
             <div className="mb-4 lg:mb-8 flex-1">
               <h2 className="text text-lg font-medium">Issues and Feature requests</h2>
@@ -172,8 +191,25 @@ const Index = () => {
             </div>
           </InteractiveShimmerCard>
         </SectionContainer>
-        <SectionContainer className="!pt-0">
-          <div className="mx-auto max-w-6xl bg-alternative border rounded-xl p-6 lg:p-16">
+        {/* <SectionContainer className="!pt-0 max-w-7xl">
+          <div className="border-b pb-2">
+            <h2 className="text text-lg font-medium">Troubleshooting</h2>
+          </div>
+          <ul className="grid grid-cols-2 gap-4 mt-8">
+            {faqs.slice(0, 6).map((faq) => (
+              <li key={faq.label}>
+                <Link href={faq.url}>
+                  <a className="text-light hover:text-strong transition-colors flex justify-between items-center">
+                    <span>{faq.label}</span>
+                    <IconChevronRight className="w-4" />
+                  </a>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </SectionContainer> */}
+        <SectionContainer className="!pt-0 max-w-7xl">
+          <div className="mx-auto bg-alternative border rounded-xl p-6 lg:p-16">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 xl:gap-10 justify-between">
               <div className="col-span-full lg:col-span-4 gap-2 flex flex-col">
                 <h2 className="text-2xl lg:text-3xl lg:max-w-[360px] tracking-[-1px]">

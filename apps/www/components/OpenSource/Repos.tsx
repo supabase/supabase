@@ -71,6 +71,7 @@ const Repos = ({ tabs }: Props) => {
   const [apiSwiper, setApiSwiper] = useState(undefined)
   const [swiperState, setSwiperState] = useState<SWIPER_STATE>(SWIPER_STATE.START)
 
+  console.log(repos)
   useEffect(() => {
     async function fetchOctoData() {
       const res = await octokit.request('GET /orgs/{org}/repos', {
