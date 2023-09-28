@@ -6,7 +6,10 @@ import {
   Alert,
   Badge,
   Button,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconCreditCard,
   IconMoreHorizontal,
   IconPlus,
@@ -211,30 +214,30 @@ const PaymentMethods = () => {
                                 </Tooltip.Portal>
                               </Tooltip.Root>
                             ) : (
-                              <Dropdown
-                                size="tiny"
-                                overlay={[
-                                  <Dropdown.Item
+                              <DropdownMenu_Shadcn_>
+                                <DropdownMenuTrigger_Shadcn_>
+                                  <Button
+                                    type="outline"
+                                    icon={<IconMoreHorizontal />}
+                                    loading={isLoadingPaymentMethods}
+                                    className="hover:border-gray-500"
+                                  />
+                                </DropdownMenuTrigger_Shadcn_>
+                                <DropdownMenuContent_Shadcn_>
+                                  <DropdownMenuItem_Shadcn_
                                     key="make-default"
                                     onClick={() => setSelectedMethodForDefault(paymentMethod)}
                                   >
-                                    Make default
-                                  </Dropdown.Item>,
-                                  <Dropdown.Item
+                                    <p className="text">Make default</p>
+                                  </DropdownMenuItem_Shadcn_>
+                                  <DropdownMenuItem_Shadcn_
                                     key="delete-method"
                                     onClick={() => setSelectedMethodToDelete(paymentMethod)}
                                   >
-                                    Delete
-                                  </Dropdown.Item>,
-                                ]}
-                              >
-                                <Button
-                                  type="outline"
-                                  icon={<IconMoreHorizontal />}
-                                  loading={isLoadingPaymentMethods}
-                                  className="hover:border-gray-500"
-                                />
-                              </Dropdown>
+                                    <p className="text">Delete</p>
+                                  </DropdownMenuItem_Shadcn_>
+                                </DropdownMenuContent_Shadcn_>
+                              </DropdownMenu_Shadcn_>
                             )}
                           </>
                         )}

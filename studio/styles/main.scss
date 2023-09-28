@@ -40,7 +40,7 @@ body,
 
 .form-group .form-text,
 .Form .form-text {
-  @apply text-scale-900;
+  @apply text-foreground-lighter;
 }
 
 .form-group input,
@@ -131,11 +131,11 @@ input[type='submit']:hover {
 }
 
 input::placeholder {
-  @apply text-scale-900;
+  @apply text-foreground-lighter;
 }
 
 .form-group input::placeholder {
-  @apply text-scale-900;
+  @apply text-foreground-lighter;
 }
 
 .billing-input-fixed {

@@ -7,7 +7,11 @@ import { useState } from 'react'
 import { ChartIntervals } from 'types'
 import {
   Button,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuRadioGroup_Shadcn_,
+  DropdownMenuRadioItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconArchive,
   IconChevronDown,
   IconDatabase,
@@ -78,23 +82,22 @@ const ProjectUsage = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-row items-center gap-2">
-        <Dropdown
-          side="bottom"
-          align="start"
-          overlay={
-            <Dropdown.RadioGroup value={interval} onChange={setInterval}>
+        <DropdownMenu_Shadcn_>
+          <DropdownMenuTrigger_Shadcn_>
+            <Button asChild type="default" iconRight={<IconChevronDown />}>
+              <span>{selectedInterval.label}</span>
+            </Button>
+          </DropdownMenuTrigger_Shadcn_>
+          <DropdownMenuContent_Shadcn_ side="bottom" align="start">
+            <DropdownMenuRadioGroup_Shadcn_ value={interval} onValueChange={setInterval}>
               {CHART_INTERVALS.map((i) => (
-                <Dropdown.Radio key={i.key} value={i.key}>
+                <DropdownMenuRadioItem_Shadcn_ key={i.key} value={i.key}>
                   {i.label}
-                </Dropdown.Radio>
+                </DropdownMenuRadioItem_Shadcn_>
               ))}
-            </Dropdown.RadioGroup>
-          }
-        >
-          <Button asChild type="default" iconRight={<IconChevronDown />}>
-            <span>{selectedInterval.label}</span>
-          </Button>
-        </Dropdown>
+            </DropdownMenuRadioGroup_Shadcn_>
+          </DropdownMenuContent_Shadcn_>
+        </DropdownMenu_Shadcn_>
         <span className="text-xs text-foreground-light">
           Statistics for past {selectedInterval.label}
         </span>

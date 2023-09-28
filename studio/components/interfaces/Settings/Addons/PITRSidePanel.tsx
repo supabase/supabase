@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
-import { useParams, useTheme } from 'common'
+import { useParams } from 'common'
+import { useTheme } from 'next-themes'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
@@ -40,7 +41,7 @@ const PITRSidePanel = () => {
   const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
   const organization = useSelectedOrganization()
   const isOrgBilling = !!organization?.subscription_id
 
@@ -206,7 +207,7 @@ const PITRSidePanel = () => {
                       )}
                       width={160}
                       height={96}
-                      src={isDarkMode ? option.imageUrl : option.imageUrlLight}
+                      src={theme === 'dark' ? option.imageUrl : option.imageUrlLight}
                     />
 
                     <p

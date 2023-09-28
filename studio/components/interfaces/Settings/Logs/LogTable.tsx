@@ -257,7 +257,9 @@ const LogTable = ({
       </div>
       <div className="flex flex-col gap-1 px-5">
         <h3 className="text-lg text-foreground">No results</h3>
-        <p className="text-sm text-scale-900">Try another search, or adjusting the filters</p>
+        <p className="text-sm text-foreground-lighter">
+          Try another search, or adjusting the filters
+        </p>
       </div>
     </div>
   )

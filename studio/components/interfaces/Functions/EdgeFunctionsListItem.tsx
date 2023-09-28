@@ -50,7 +50,7 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
           <p className="font-mono truncate hidden md:inline">{endpoint}</p>
           <button
             type="button"
-            className="text-scale-900 hover:text-foreground transition"
+            className="text-foreground-lighter hover:text-foreground transition"
             onClick={(event: any) => {
               function onCopy(value: any) {
                 setIsCopied(true)

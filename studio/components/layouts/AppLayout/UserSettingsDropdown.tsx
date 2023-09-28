@@ -1,5 +1,11 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
+
+import { useTheme } from 'next-themes'
+import { useFlag } from 'hooks'
+import { useSignOut } from 'lib/auth'
+import { useProfile } from 'lib/profile'
 import {
   DropdownMenuContent_Shadcn_,
   DropdownMenuGroup_Shadcn_,
@@ -15,12 +21,6 @@ import {
   useCommandMenu,
 } from 'ui'
 
-import { useTheme } from 'common'
-import { useFlag } from 'hooks'
-import { useSignOut } from 'lib/auth'
-import { useProfile } from 'lib/profile'
-import { useState } from 'react'
-
 const UserSettingsDropdown = () => {
   const signOut = useSignOut()
   const router = useRouter()
@@ -28,7 +28,7 @@ const UserSettingsDropdown = () => {
   const { profile } = useProfile()
   const showAuditLogs = useFlag('auditLogs')
   const { setIsOpen: setCommandMenuOpen } = useCommandMenu()
-  const { isDarkMode, toggleTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
 
   const onClickLogout = async () => {
     await signOut()
@@ -98,12 +98,12 @@ const UserSettingsDropdown = () => {
           <DropdownMenuSeparator_Shadcn_ />
           <DropdownMenuLabel_Shadcn_>Theme</DropdownMenuLabel_Shadcn_>
           <DropdownMenuRadioGroup_Shadcn_
-            value={isDarkMode ? 'dark' : 'light'}
+            value={theme}
             onValueChange={(x) => {
-              const dark = x === 'dark'
-              toggleTheme(Boolean(dark))
+              setTheme(x)
             }}
           >
+            <DropdownMenuRadioItem_Shadcn_ value={'system'}>System</DropdownMenuRadioItem_Shadcn_>
             <DropdownMenuRadioItem_Shadcn_ value={'dark'}>Dark</DropdownMenuRadioItem_Shadcn_>
             <DropdownMenuRadioItem_Shadcn_ value={'light'}>Light</DropdownMenuRadioItem_Shadcn_>
           </DropdownMenuRadioGroup_Shadcn_>

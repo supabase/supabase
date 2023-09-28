@@ -7,7 +7,10 @@ import { isEmpty } from 'lodash'
 import SVG from 'react-inlinesvg'
 import {
   Button,
-  Dropdown,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
   IconAlertCircle,
   IconChevronDown,
   IconClipboard,
@@ -34,7 +37,7 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType: string; previewUrl: s
   }
   if (previewUrl === 'loading') {
     return (
-      <div className="flex h-full w-full items-center justify-center text-scale-900">
+      <div className="flex h-full w-full items-center justify-center text-foreground-lighter">
         <IconLoader size={14} strokeWidth={2} className="animate-spin" />
       </div>
     )
@@ -138,7 +141,7 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
           style={{ width }}
         >
           {/* Preview Header */}
-          <div className="flex w-full justify-end text-scale-900 transition-colors hover:text-foreground">
+          <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
             <IconX
               className="cursor-pointer"
               size={14}
@@ -177,11 +180,11 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
             {/* Preview Metadata */}
             <div className="space-y-2">
               <div>
-                <label className="mb-1 text-xs text-scale-900">Added on</label>
+                <label className="mb-1 text-xs text-foreground-lighter">Added on</label>
                 <p className="text-sm text-foreground-light">{createdAt}</p>
               </div>
               <div>
-                <label className="mb-1 text-xs text-scale-900">Last modified</label>
+                <label className="mb-1 text-xs text-foreground-lighter">Last modified</label>
                 <p className="text-sm text-foreground-light">{updatedAt}</p>
               </div>
             </div>
@@ -206,11 +209,19 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                   Get URL
                 </Button>
               ) : (
-                <Dropdown
-                  side="bottom"
-                  align="center"
-                  overlay={[
-                    <Dropdown.Item
+                <DropdownMenu_Shadcn_>
+                  <DropdownMenuTrigger_Shadcn_>
+                    <Button
+                      type="outline"
+                      icon={<IconClipboard size={16} strokeWidth={2} />}
+                      iconRight={<IconChevronDown />}
+                      disabled={file.isCorrupted}
+                    >
+                      Get URL
+                    </Button>
+                  </DropdownMenuTrigger_Shadcn_>
+                  <DropdownMenuContent_Shadcn_ side="bottom" align="center">
+                    <DropdownMenuItem_Shadcn_
                       key="expires-one-week"
                       className="text-xs"
                       onClick={async () =>
@@ -218,8 +229,8 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                       }
                     >
                       Expire in 1 week
-                    </Dropdown.Item>,
-                    <Dropdown.Item
+                    </DropdownMenuItem_Shadcn_>
+                    <DropdownMenuItem_Shadcn_
                       key="expires-one-month"
                       className="text-xs"
                       onClick={async () =>
@@ -227,8 +238,8 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                       }
                     >
                       Expire in 1 month
-                    </Dropdown.Item>,
-                    <Dropdown.Item
+                    </DropdownMenuItem_Shadcn_>
+                    <DropdownMenuItem_Shadcn_
                       key="expires-one-year"
                       className="text-xs"
                       onClick={async () =>
@@ -236,25 +247,16 @@ const PreviewPane = ({ onCopyUrl }: PreviewPaneProps) => {
                       }
                     >
                       Expire in 1 year
-                    </Dropdown.Item>,
-                    <Dropdown.Item
+                    </DropdownMenuItem_Shadcn_>
+                    <DropdownMenuItem_Shadcn_
                       key="custom-expiry"
                       className="text-xs"
                       onClick={() => setSelectedFileCustomExpiry(file)}
                     >
                       Custom expiry
-                    </Dropdown.Item>,
-                  ]}
-                >
-                  <Button
-                    type="outline"
-                    icon={<IconClipboard size={16} strokeWidth={2} />}
-                    iconRight={<IconChevronDown />}
-                    disabled={file.isCorrupted}
-                  >
-                    Get URL
-                  </Button>
-                </Dropdown>
+                    </DropdownMenuItem_Shadcn_>
+                  </DropdownMenuContent_Shadcn_>
+                </DropdownMenu_Shadcn_>
               )}
             </div>
             <Tooltip.Root delayDuration={0}>
