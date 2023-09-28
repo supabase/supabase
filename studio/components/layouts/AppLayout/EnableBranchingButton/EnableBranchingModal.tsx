@@ -104,9 +104,7 @@ const EnableBranchingModal = () => {
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
                   <p className="!leading-normal">
-                    Your project is currently under the legacy billing system and we require
-                    projects to migrate to organization-based billing prior to enabling database
-                    branching for their projects.
+                    Your organization will first need to be migrated to use our new organization-based billing before you can enable Branching.
                   </p>
                   <p className="!leading-normal mt-1">
                     You may do so under the billing settings of your organization.
