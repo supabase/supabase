@@ -158,7 +158,7 @@ const Nav = () => {
           <MobileMenu
             open={open}
             setOpen={setOpen}
-            isDarkMode={resolvedTheme === 'dark'}
+            isDarkMode={isLaunchWeekPage || resolvedTheme === 'dark' || isHomePage}
             menu={menu}
           />
         </nav>
