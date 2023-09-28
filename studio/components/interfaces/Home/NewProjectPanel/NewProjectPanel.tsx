@@ -19,8 +19,8 @@ const NewProjectPanel = () => {
         <div className="flex flex-col space-y-20">
           <div className="flex h-full flex-col justify-between">
             <div className="space-y-2">
-              <h3 className="text-xl text-scale-1200">Welcome to your new project</h3>
-              <p className="text-base text-scale-1100">
+              <h3 className="text-xl text-foreground">Welcome to your new project</h3>
+              <p className="text-base text-foreground-light">
                 Your project has been deployed on its own instance, with its own API all set up and
                 ready to use.
               </p>
@@ -30,10 +30,10 @@ const NewProjectPanel = () => {
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 flex flex-col justify-center space-y-8 lg:col-span-7">
               <div className="space-y-2">
-                <h3 className="text-xl text-scale-1200">
+                <h3 className="text-xl text-foreground">
                   Get started by building out your database
                 </h3>
-                <p className="text-base text-scale-1100">
+                <p className="text-base text-foreground-light">
                   Start building your app by creating tables and inserting data. Our Table Editor
                   makes Postgres as easy to use as a spreadsheet, but there's also our SQL Editor if
                   you need something more.
@@ -96,8 +96,8 @@ const NewProjectPanel = () => {
 
           <div className="flex h-full flex-col justify-between space-y-6">
             <div className="max-w-2xl space-y-2">
-              <h3 className="text-xl text-scale-1200">Explore our other products</h3>
-              <p className="text-base text-scale-1100">
+              <h3 className="text-xl text-foreground">Explore our other products</h3>
+              <p className="text-base text-foreground-light">
                 Supabase provides all the backend features you need to build a product. You can use
                 it completely, or just the features you need.
               </p>
@@ -106,13 +106,13 @@ const NewProjectPanel = () => {
               <Panel>
                 <Panel.Content className="flex flex-col space-y-4 md:px-3">
                   <div className="flex items-center space-x-3">
-                    <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
+                    <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
                       <IconKey strokeWidth={2} size={16} />
                     </div>
                     <h5>Authentication</h5>
                   </div>
                   <div className="flex flex-grow md:min-h-[50px] xl:min-h-[75px]">
-                    <p className="text-sm text-scale-1000">
+                    <p className="text-sm text-foreground-light">
                       A complete user management system that works without any additional tools.
                     </p>
                   </div>
@@ -140,13 +140,13 @@ const NewProjectPanel = () => {
               <Panel>
                 <Panel.Content className="flex flex-col space-y-4 md:px-3">
                   <div className="flex items-center space-x-3">
-                    <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
+                    <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
                       <IconArchive strokeWidth={2} size={16} />
                     </div>
                     <h5>Storage</h5>
                   </div>
                   <div className="flex md:min-h-[50px] xl:min-h-[75px]">
-                    <p className="text-sm text-scale-1000">
+                    <p className="text-sm text-foreground-light">
                       Store, organize, and serve any file types of any size from multiple buckets.
                     </p>
                   </div>
@@ -174,13 +174,13 @@ const NewProjectPanel = () => {
               <Panel>
                 <Panel.Content className="flex flex-col space-y-4 md:px-3">
                   <div className="flex items-center space-x-3">
-                    <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
+                    <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
                       <IconCode strokeWidth={2} size={16} />
                     </div>
                     <h5>Edge Functions</h5>
                   </div>
                   <div className="flex md:min-h-[50px] xl:min-h-[75px]">
-                    <p className="text-sm text-scale-1000">
+                    <p className="text-sm text-foreground-light">
                       Write custom code without deploying or scaling servers, with fast deploy times
                       and low latency.
                     </p>
@@ -208,13 +208,13 @@ const NewProjectPanel = () => {
               <Panel>
                 <Panel.Content className="flex flex-col space-y-4 md:px-3">
                   <div className="flex items-center space-x-4">
-                    <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
+                    <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
                       <IconActivity strokeWidth={2} size={16} />
                     </div>
                     <h5>Realtime</h5>
                   </div>
                   <div className="flex md:min-h-[50px] xl:min-h-[75px]">
-                    <p className="text-sm text-scale-1000">
+                    <p className="text-sm text-foreground-light">
                       Listen to your PostgreSQL database in realtime via websockets.
                     </p>
                   </div>
@@ -241,15 +241,15 @@ const NewProjectPanel = () => {
       <div className="col-span-12 lg:col-span-4">
         <div className="space-y-6">
           <div className="space-y-2">
-            <h3 className="text-xl text-scale-1200">Connecting to your new project</h3>
-            <p className="text-base text-scale-1100 lg:max-w-sm">
+            <h3 className="text-xl text-foreground">Connecting to your new project</h3>
+            <p className="text-base text-foreground-light lg:max-w-sm">
               Interact with your database through the{' '}
               <Link href="https://supabase.com/docs/reference">
                 <a className="text-brand">Supabase client libraries</a>
               </Link>{' '}
               with your API keys.
             </p>
-            <p className="text-base text-scale-1100 lg:max-w-sm">
+            <p className="text-base text-foreground-light lg:max-w-sm">
               More information about your project's keys can be found in your project's API
               settings.
             </p>

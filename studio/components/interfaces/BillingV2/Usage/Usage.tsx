@@ -3,22 +3,22 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { useMemo, useRef, useState } from 'react'
 import { InView } from 'react-intersection-observer'
-import { Button, IconAlertCircle, IconExternalLink, IconInfo, IconLoader, cn } from 'ui'
+import { Button, cn, IconAlertCircle, IconExternalLink, IconInfo, IconLoader } from 'ui'
 
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import InformationBox from 'components/ui/InformationBox'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectSubscriptionV2Query } from 'data/subscriptions/project-subscription-v2-query'
 import { useProjectUsageQuery } from 'data/usage/project-usage-query'
 import { useSelectedOrganization } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
+import Link from 'next/link'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
 import Infrastructure from './Infrastructure'
 import SizeAndCounts from './SizeAndCounts'
 import { USAGE_CATEGORIES, USAGE_STATUS } from './Usage.constants'
 import { getUsageStatus } from './Usage.utils'
-import Link from 'next/link'
-import InformationBox from 'components/ui/InformationBox'
 
 type UsageSectionIds = 'infra' | 'bandwidth' | 'sizeCount' | 'activity'
 
@@ -139,7 +139,7 @@ const Usage = () => {
     <>
       <div>
         <div className="1xl:px-28 mx-auto flex flex-col px-5 lg:px-16 2xl:px-32 pt-6 space-y-4">
-          <h3 className="text-scale-1200 text-xl">{isOrgBilling ? 'Project ' : ''}Usage</h3>
+          <h3 className="text-foreground text-xl">{isOrgBilling ? 'Project ' : ''}Usage</h3>
         </div>
       </div>
       <div>
@@ -167,7 +167,7 @@ const Usage = () => {
                       {isOrgBilling ? 'Organization' : 'Project'} is on the {subscription.plan.name}{' '}
                       plan
                     </p>
-                    <p className="text-sm text-scale-1000">
+                    <p className="text-sm text-foreground-light">
                       {billingCycleStart.format('DD MMM YYYY')} -{' '}
                       {billingCycleEnd.format('DD MMM YYYY')}
                     </p>
@@ -196,7 +196,7 @@ const Usage = () => {
                     className={cn(
                       'flex items-center space-x-2 py-3 hover:opacity-100 transition cursor-pointer',
                       activeTab === category.key
-                        ? 'border-b border-scale-1200 text-scale-1200'
+                        ? 'border-b border-scale-1200 text-foreground'
                         : 'opacity-50'
                     )}
                   >

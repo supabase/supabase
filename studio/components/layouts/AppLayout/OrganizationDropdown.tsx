@@ -56,7 +56,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
               type="text"
               className="pr-2"
               iconRight={
-                <IconCode className="text-scale-1100 rotate-90" strokeWidth={2} size={12} />
+                <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
               }
             >
               <div className="flex items-center space-x-2">
@@ -102,7 +102,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
                 </ScrollArea>
               </CommandGroup_Shadcn_>
               <CommandGroup_Shadcn_ className="border-t">
-                <Link passHref href="new">
+                <Link passHref href="/new">
                   <CommandItem_Shadcn_
                     asChild
                     className="cursor-pointer flex items-center space-x-2 w-full"
