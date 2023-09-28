@@ -1,6 +1,5 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useParams } from 'common/hooks'
 import { useStore } from 'hooks'
 import {
@@ -13,28 +12,20 @@ import {
   Alert_Shadcn_,
   Button,
   IconAlertTriangle,
-  IconGitBranch,
-  IconSearch,
   IconExternalLink,
   IconGlobe,
-  Input,
   Modal,
 } from 'ui'
 
 import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
 import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mutations'
 
 const BannedIPs = () => {
   const { ref } = useParams()
-  const [selectedIPs, setSelectedIPs] = useState<string[]>([])
   const [selectedIPToUnban, setSelectedIPToUnban] = useState<string | null>(null) // Track the selected IP for unban
-  const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
   const {
-    data: IPlist,
-    isLoading,
-    isSuccess,
+    data: IPlist
   } = useBannedIPsQuery({
     projectRef: ref,
   })
@@ -61,7 +52,7 @@ const BannedIPs = () => {
   });
 
   const onConfirmUnbanIP = () => {
-    if (confirmingIP == null) return;
+    if (confirmingIP == null || !ref) return;
     unbanIPs({
       projectRef: ref,
       ip: [confirmingIP], // Pass the IP as an array
