@@ -17,7 +17,7 @@ const ProductDropdown = () => {
   const isTablet = useBreakpoint(1279)
 
   return (
-    <>
+    <div className="flex flex-col xl:flex-row">
       <ul className="grid gap-2 py-6 px-7 grid-cols-2 xl:grid-cols-1 w-[700px] xl:w-[380px]">
         {Object.values(SolutionsData).map((component) => (
           <NavigationMenuLink key={component.name} asChild>
@@ -31,7 +31,7 @@ const ProductDropdown = () => {
           </NavigationMenuLink>
         ))}
       </ul>
-      <div className="border-l grid grid-cols-3 xl:flex xl:flex-col w-full xl:w-[500px] bg-alternative">
+      <div className="border-t xl:border-t-0 xl:border-l grid grid-cols-3 xl:flex xl:flex-col w-full xl:w-[500px] bg-alternative">
         <div className="col-span-2 xl:w-auto py-8 px-10">
           <Link href="/customers">
             <a className="inline-flex items-center gap-1 text-muted hover:text-brand text-xs uppercase tracking-widest font-mono mb-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-brand">
@@ -82,7 +82,7 @@ const ProductDropdown = () => {
           </ul>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

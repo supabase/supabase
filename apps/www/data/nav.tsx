@@ -10,14 +10,14 @@ export const menu = {
       title: 'Product',
       hasDropdown: true,
       dropdown: <ProductDropdown />,
-      dropdownContainerClassName: 'rounded-lg flex flex-col xl:flex-row',
+      dropdownContainerClassName: 'rounded-lg',
       subMenu: SolutionsData,
     },
     {
       title: 'Developers',
       hasDropdown: true,
       dropdown: <DevelopersDropdown />,
-      dropdownContainerClassName: 'rounded-lg flex flex-col xl:flex-row',
+      dropdownContainerClassName: 'rounded-lg',
       subMenu: DevelopersData,
     },
     {
