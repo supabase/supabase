@@ -8,15 +8,15 @@ import toast from 'react-hot-toast'
 export type IPDeleteVariables = {
   projectRef: string
   /** can only be one for now */
-  ips: string[] 
+  ips: string[]
 }
 
-export async function deleteBannedIPs({ projectRef, ips }: IPDeleteVariables) { 
+export async function deleteBannedIPs({ projectRef, ips }: IPDeleteVariables) {
   const { data, error } = await del(`/v1/projects/{ref}/network-bans`, {
-    params: { 
-      path: { ref: projectRef } 
+    params: {
+      path: { ref: projectRef },
     },
-    body: { ipv4_addresses: ips } 
+    body: { ipv4_addresses: ips },
   })
 
   if (error) throw error
@@ -29,20 +29,17 @@ export const useBannedIPsDeleteMutation = ({
   onSuccess,
   onError,
   ...options
-}: Omit<
-  UseMutationOptions<IPDeleteData, ResponseError, IPDeleteVariables>,
-  'mutationFn'
-> = {}) => {
+}: Omit<UseMutationOptions<IPDeleteData, ResponseError, IPDeleteVariables>, 'mutationFn'> = {}) => {
   const queryClient = useQueryClient()
   return useMutation<IPDeleteData, ResponseError, IPDeleteVariables>(
     (vars) => deleteBannedIPs(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef, ips } = variables 
+        const { projectRef, ips } = variables
 
         await Promise.all([
           queryClient.invalidateQueries(BannedIPKeys.list(projectRef)),
-          queryClient.invalidateQueries(BannedIPKeys.detail(ips)), 
+          queryClient.invalidateQueries(BannedIPKeys.detail(ips)),
         ])
 
         await onSuccess?.(data, variables, context)

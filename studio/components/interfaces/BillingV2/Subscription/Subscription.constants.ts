@@ -10,7 +10,7 @@ export const BILLING_BREAKDOWN_METRICS = [
     anchor: 'dbSize',
     metric: 'DATABASE_SIZE',
     category: 'Database',
-    unitName: 'GB'
+    unitName: 'GB',
   },
   {
     key: 'db_egress',
@@ -19,7 +19,7 @@ export const BILLING_BREAKDOWN_METRICS = [
     anchor: 'dbEgress',
     metric: 'DATABASE_EGRESS',
     category: 'Database',
-    unitName: 'GB'
+    unitName: 'GB',
   },
   {
     key: 'monthly_active_users',
@@ -28,7 +28,7 @@ export const BILLING_BREAKDOWN_METRICS = [
     anchor: 'mau',
     metric: 'MONTHLY_ACTIVE_USERS',
     category: 'Authentication',
-    unitName: 'MAU'
+    unitName: 'MAU',
   },
   {
     key: 'monthly_active_sso_users',
@@ -37,7 +37,7 @@ export const BILLING_BREAKDOWN_METRICS = [
     anchor: 'mauSso',
     metric: 'MONTHLY_ACTIVE_SSO_USERS',
     category: 'Authentication',
-    unitName: 'MAU'
+    unitName: 'MAU',
   },
   {
     key: 'storage_size',
@@ -46,7 +46,7 @@ export const BILLING_BREAKDOWN_METRICS = [
     anchor: 'storageSize',
     metric: 'STORAGE_SIZE',
     category: 'Storage',
-    unitName: 'GB'
+    unitName: 'GB',
   },
   {
     key: 'storage_egress',
@@ -55,7 +55,7 @@ export const BILLING_BREAKDOWN_METRICS = [
     anchor: 'storageEgress',
     metric: 'STORAGE_EGRESS',
     category: 'Storage',
-    unitName: 'GB'
+    unitName: 'GB',
   },
   {
     key: 'storage_image_render_count',
@@ -64,7 +64,7 @@ export const BILLING_BREAKDOWN_METRICS = [
     anchor: 'storageImageTransformations',
     metric: 'STORAGE_IMAGES_TRANSFORMED',
     category: 'Storage',
-    unitName: 'image'
+    unitName: 'image',
   },
   {
     key: 'realtime_peak_connection',
@@ -73,7 +73,7 @@ export const BILLING_BREAKDOWN_METRICS = [
     anchor: 'realtimePeakConnections',
     metric: 'REALTIME_PEAK_CONNECTIONS',
     category: 'Realtime',
-    unitName: 'connection'
+    unitName: 'connection',
   },
   {
     key: 'realtime_message_count',
@@ -82,7 +82,7 @@ export const BILLING_BREAKDOWN_METRICS = [
     anchor: 'realtimeMessageCount',
     metric: 'REALTIME_MESSAGE_COUNT',
     category: 'Realtime',
-    unitName: 'message'
+    unitName: 'message',
   },
   {
     key: 'func_invocations',
@@ -91,7 +91,7 @@ export const BILLING_BREAKDOWN_METRICS = [
     anchor: 'funcInvocations',
     metric: 'FUNCTION_INVOCATIONS',
     category: 'Edge Functions',
-    unitName: 'invocation'
+    unitName: 'invocation',
   },
   {
     key: 'func_count',
@@ -100,6 +100,6 @@ export const BILLING_BREAKDOWN_METRICS = [
     anchor: 'funcCount',
     metric: 'FUNCTION_COUNT',
     category: 'Edge Functions',
-    unitName: 'function'
+    unitName: 'function',
   },
 ] as const

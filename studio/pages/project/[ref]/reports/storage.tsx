@@ -94,8 +94,7 @@ const useStorageReport = () => {
       hook.setParams?.((prev: LogsEndpointParams) => ({ ...prev, ...params }))
     })
   }
-  useEffect(()=>{
-    
+  useEffect(() => {
     if (cacheHitRate.changeQuery) {
       cacheHitRate.changeQuery(PRESET_CONFIG.storage.queries.cacheHitRate.sql([]))
     }
@@ -103,7 +102,6 @@ const useStorageReport = () => {
     if (topCacheMisses.changeQuery) {
       topCacheMisses.changeQuery(PRESET_CONFIG.storage.queries.topCacheMisses.sql([]))
     }
-
   }, [])
   const isLoading = activeHooks.some((hook) => hook.isLoading)
   return {
