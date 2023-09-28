@@ -1,5 +1,5 @@
-import Link from 'next/link'
 import React from 'react'
+import Link from 'next/link'
 import { cn } from 'ui'
 
 const MenuItem = React.forwardRef<
@@ -11,7 +11,7 @@ const MenuItem = React.forwardRef<
       <a
         ref={ref}
         className={cn(
-          'group flex items-center text-light hover:text-strong select-none gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-overlay-hover focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground-strong',
+          'group flex items-center text-light hover:text-strong select-none gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-surface-200 focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground-strong',
           description && 'items-center',
           className
         )}
@@ -20,7 +20,7 @@ const MenuItem = React.forwardRef<
         {children ?? (
           <>
             {icon && (
-              <div className="shrink-0 bg-alternative min-w-12 w-12 h-12 flex items-center justify-center rounded-lg">
+              <div className="shrink-0 bg-surface-300 min-w-12 w-12 h-12 flex items-center justify-center rounded-lg">
                 <svg
                   className="h-5 w-5 group-hover:text-brand"
                   xmlns="http://www.w3.org/2000/svg"

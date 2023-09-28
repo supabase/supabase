@@ -1,14 +1,15 @@
 import React from 'react'
-
-import SolutionsData from 'data/Solutions'
-import ComparisonsData from 'data/Comparisons'
-import CustomersData from 'data/CustomerStories'
-import { IconChevronRight, TextLink } from 'ui'
-import { NavigationMenuLink } from 'ui/src/components/shadcn/ui/navigation-menu'
-import MenuItem from './MenuItem'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+
+import { IconChevronRight, TextLink } from 'ui'
+import { NavigationMenuLink } from 'ui/src/components/shadcn/ui/navigation-menu'
+import MenuItem from './MenuItem'
+
+import ComparisonsData from 'data/Comparisons'
+import CustomersData from 'data/CustomerStories'
+import SolutionsData from 'data/Solutions'
 
 const ProductDropdown = () => {
   const { basePath } = useRouter()
