@@ -184,12 +184,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 <PageTelemetry>
                   <TooltipProvider>
                     <RouteValidationWrapper>
-                      <ThemeProvider
-                        attribute="class"
-                        defaultTheme="system"
-                        enableSystem
-                        disableTransitionOnChange
-                      >
+                      <ThemeProvider>
                         <CommandMenuWrapper>
                           <AppBannerWrapper>
                             {getLayout(<Component {...pageProps} />)}

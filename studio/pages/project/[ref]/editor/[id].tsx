@@ -1,4 +1,4 @@
-import { useTheme } from 'next-themes'
+import { useTheme } from 'common'
 import { useParams } from 'common/hooks'
 import { TableGridEditor } from 'components/interfaces'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
@@ -10,7 +10,7 @@ import { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { theme } = useTheme()
+  const { isDarkMode } = useTheme()
   const { id: _id, ref: projectRef } = useParams()
   const id = _id ? Number(_id) : undefined
 
@@ -21,7 +21,7 @@ const TableEditorPage: NextPageWithLayout = () => {
       <TableGridEditor
         isLoadingSelectedTable={isLoading}
         selectedTable={selectedTable}
-        theme={theme === 'dark' ? 'dark' : 'light'}
+        theme={isDarkMode ? 'dark' : 'light'}
       />
       <DeleteConfirmationDialogs
         projectRef={projectRef}

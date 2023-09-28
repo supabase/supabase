@@ -157,7 +157,7 @@ const TaxID = () => {
             !isLoadingTaxIds && (
               <div className="flex w-full justify-between">
                 {!canUpdateTaxIds ? (
-                  <p className="text-sm text-foreground-light">
+                  <p className="text-sm text-scale-1000">
                     You need additional permissions to update this organization's tax IDs
                   </p>
                 ) : (
@@ -231,9 +231,7 @@ const TaxID = () => {
               </div>
             ) : (
               <div>
-                <p className="flex items-center space-x-2 text-sm text-foreground-lighter">
-                  No tax IDs
-                </p>
+                <p className="flex items-center space-x-2 text-sm text-scale-900">No tax IDs</p>
               </div>
             )}
             {canUpdateTaxIds && (

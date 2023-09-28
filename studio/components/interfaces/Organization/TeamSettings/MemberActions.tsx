@@ -1,5 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { observer } from 'mobx-react-lite'
 
 import { useParams } from 'common/hooks'
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
@@ -8,18 +9,8 @@ import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/or
 import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
-import { observer } from 'mobx-react-lite'
 import { Member, Role } from 'types'
-import {
-  Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
-  IconMoreHorizontal,
-  IconTrash,
-} from 'ui'
+import { Button, Dropdown, IconMoreHorizontal, IconTrash } from 'ui'
 import { isInviteExpired } from '../Organization.utils'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 
@@ -51,7 +42,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     resource: { role_id: roleId },
   })
 
-  const { mutate: deleteOrganizationMember, isLoading: isDeletingMember } =
+  const { mutate: deleteOrganizationMember, isLoading: isOrganizationMemberDeleteLoading } =
     useOrganizationMemberDeleteMutation({
       onSuccess: () => {
         ui.setNotification({
@@ -61,21 +52,29 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
       },
     })
 
-  const { mutate: createOrganizationMemberInvite, isLoading: isCreatingInvite } =
-    useOrganizationMemberInviteCreateMutation({
-      onSuccess: () => {
-        ui.setNotification({ category: 'success', message: 'Resent the invitation.' })
-      },
-      onError: (error) => {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to resend invitation: ${error.message}`,
-        })
-      },
-    })
+  const {
+    mutate: createOrganizationMemberInvite,
+    isLoading: isOrganizationMemberInviteCreateLoading,
+  } = useOrganizationMemberInviteCreateMutation({
+    onSuccess: () => {
+      ui.setNotification({ category: 'success', message: 'Resent the invitation.' })
+    },
+    onError: (error) => {
+      ui.setNotification({
+        category: 'error',
+        message: `Failed to resend invitation: ${error.message}`,
+      })
+    },
+  })
 
-  const { mutateAsync: asyncDeleteMemberInvite, isLoading: isDeletingInvite } =
-    useOrganizationMemberInviteDeleteMutation()
+  const {
+    mutate: deleteOrganizationMemberInvite,
+    isLoading: isOrganizationMemberInviteDeleteLoading,
+  } = useOrganizationMemberInviteDeleteMutation({
+    onSuccess: () => {
+      ui.setNotification({ category: 'success', message: 'Successfully revoked the invitation.' })
+    },
+  })
 
   const handleMemberDelete = async () => {
     confirmAlert({
@@ -90,17 +89,13 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
   }
 
   const handleResendInvite = async (member: Member) => {
-    const roleId = (member?.role_ids ?? [])[0]
-    const invitedId = member.invited_id
-
     if (!slug) return console.error('Slug is required')
-    if (!invitedId) return console.error('Member invited ID is required')
-
-    await asyncDeleteMemberInvite({ slug, invitedId, invalidateDetail: false })
+    if (!member.invited_id) return console.error('Member invited ID is required')
+    const roleId = (member?.role_ids ?? [])[0]
     createOrganizationMemberInvite({
       slug,
       invitedEmail: member.primary_email,
-      ownerId: invitedId,
+      ownerId: member.invited_id,
       roleId: roleId,
     })
   }
@@ -109,12 +104,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     const invitedId = member.invited_id
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
-
-    await asyncDeleteMemberInvite({ slug, invitedId })
-    ui.setNotification({
-      category: 'success',
-      message: 'Successfully revoked the invitation.',
-    })
+    deleteOrganizationMemberInvite({ slug, invitedId })
   }
 
   if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
@@ -133,7 +123,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
                   'border border-scale-200 ', //border
                 ].join(' ')}
               >
-                <span className="text-xs text-foreground">
+                <span className="text-xs text-scale-1200">
                   You need additional permissions to manage this team member
                 </span>
               </div>
@@ -144,56 +134,59 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     )
   }
 
-  const isLoading = isDeletingMember || isDeletingInvite || isCreatingInvite
+  const isLoading =
+    isOrganizationMemberDeleteLoading ||
+    isOrganizationMemberInviteDeleteLoading ||
+    isOrganizationMemberInviteCreateLoading
 
   return (
     <div className="flex items-center justify-end">
-      <DropdownMenu_Shadcn_>
-        <DropdownMenuTrigger_Shadcn_>
-          <Button
-            asChild
-            type="text"
-            disabled={isLoading}
-            loading={isLoading}
-            icon={<IconMoreHorizontal />}
-          >
-            <span></span>
-          </Button>
-        </DropdownMenuTrigger_Shadcn_>
-        <DropdownMenuContent_Shadcn_ side="bottom" align="end">
+      <Dropdown
+        side="bottom"
+        align="end"
+        size="small"
+        overlay={
           <>
             {isPendingInviteAcceptance ? (
               <>
                 {canRevokeInvite && (
-                  <DropdownMenuItem_Shadcn_ onClick={() => handleRevokeInvitation(member)}>
+                  <Dropdown.Item onClick={() => handleRevokeInvitation(member)}>
                     <div className="flex flex-col">
                       <p>Cancel invitation</p>
                       <p className="block opacity-50">Revoke this invitation.</p>
                     </div>
-                  </DropdownMenuItem_Shadcn_>
+                  </Dropdown.Item>
                 )}
-                {/* canResendInvite && isExpired */}
-                {true && (
+                {canResendInvite && isExpired && (
                   <>
-                    <DropdownMenuSeparator_Shadcn_ />
-                    <DropdownMenuItem_Shadcn_ onClick={() => handleResendInvite(member)}>
+                    <Dropdown.Separator />
+                    <Dropdown.Item onClick={() => handleResendInvite(member)}>
                       <div className="flex flex-col">
                         <p>Resend invitation</p>
                         <p className="block opacity-50">Invites expire after 24hrs.</p>
                       </div>
-                    </DropdownMenuItem_Shadcn_>
+                    </Dropdown.Item>
                   </>
                 )}
               </>
             ) : (
-              <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={handleMemberDelete}>
-                <IconTrash size={16} />
-                <p className="text">Remove member</p>
-              </DropdownMenuItem_Shadcn_>
+              <Dropdown.Item icon={<IconTrash size={16} />} onClick={handleMemberDelete}>
+                <p>Remove member</p>
+              </Dropdown.Item>
             )}
           </>
-        </DropdownMenuContent_Shadcn_>
-      </DropdownMenu_Shadcn_>
+        }
+      >
+        <Button
+          asChild
+          type="text"
+          disabled={isLoading}
+          loading={isLoading}
+          icon={<IconMoreHorizontal />}
+        >
+          <span></span>
+        </Button>
+      </Dropdown>
     </div>
   )
 }

@@ -184,12 +184,10 @@ const CustomDomainSidePanel = () => {
                     <p className="text-sm">No custom domain</p>
                   </div>
                   <div className="px-4 py-2">
-                    <p className="text-foreground-light">
-                      Use the default supabase domain for your API
-                    </p>
+                    <p className="text-scale-1000">Use the default supabase domain for your API</p>
                     <div className="flex items-center space-x-1 mt-2">
-                      <p className="text-foreground text-sm">$0</p>
-                      <p className="text-foreground-light translate-y-[1px]"> / month</p>
+                      <p className="text-scale-1200 text-sm">$0</p>
+                      <p className="text-scale-1000 translate-y-[1px]"> / month</p>
                     </div>
                   </div>
                 </div>
@@ -209,12 +207,10 @@ const CustomDomainSidePanel = () => {
                       <p className="text-sm">{option.name}</p>
                     </div>
                     <div className="px-4 py-2">
-                      <p className="text-foreground-light">
-                        Present a branded experience to your users
-                      </p>
+                      <p className="text-scale-1000">Present a branded experience to your users</p>
                       <div className="flex items-center space-x-1 mt-2">
-                        <p className="text-foreground text-sm">${option.price}</p>
-                        <p className="text-foreground-light translate-y-[1px]"> / month</p>
+                        <p className="text-scale-1200 text-sm">${option.price}</p>
+                        <p className="text-scale-1000 translate-y-[1px]"> / month</p>
                       </div>
                     </div>
                   </div>
@@ -227,14 +223,14 @@ const CustomDomainSidePanel = () => {
             <>
               {selectedOption === 'cd_none' ||
               (selectedCustomDomain?.price ?? 0) < (subscriptionCDOption?.variant.price ?? 0) ? (
-                <p className="text-sm text-foreground-light">
+                <p className="text-sm text-scale-1100">
                   Upon clicking confirm, the amount of that's unused during the current billing
                   cycle will be returned as credits that can be used for subsequent billing cycles
                 </p>
               ) : (
-                <p className="text-sm text-foreground-light">
+                <p className="text-sm text-scale-1100">
                   Upon clicking confirm, the amount of{' '}
-                  <span className="text-foreground">
+                  <span className="text-scale-1200">
                     ${selectedCustomDomain?.price.toLocaleString()}
                   </span>{' '}
                   will be added to your monthly invoice. You're immediately charged for the

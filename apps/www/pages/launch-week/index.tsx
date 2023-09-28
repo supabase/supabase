@@ -15,7 +15,7 @@ import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/8/LaunchWeekLogoHe
 import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
 import LW8CalloutsSection from '~/components/LaunchWeek/8/LW8CalloutsSection'
 
-import { useTheme } from 'next-themes'
+import { useTheme } from 'common/Providers'
 
 import 'swiper/swiper.min.css'
 
@@ -53,8 +53,8 @@ export default function TicketHome({ users, meetups }: Props) {
   const bgImageId = query.bgImageId?.toString()
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
   const [session, setSession] = useState<Session | null>(null)
-
-  const [initialDarkMode] = useState('dark')
+  const { isDarkMode, toggleTheme } = useTheme()
+  const [initialDarkMode] = useState(isDarkMode)
 
   const defaultUserData = {
     id: query.id?.toString(),
@@ -93,12 +93,11 @@ export default function TicketHome({ users, meetups }: Props) {
   }, [supabase])
 
   useEffect(() => {
-    document.body.classList.add('bg-[#020405]')
-
+    toggleTheme(true)
+    document.body.className = 'dark bg-[#020405]'
     return () => {
-      if (document.body.classList.contains('bg-[#020405]')) {
-        document.body.classList.remove('bg-[#020405]')
-      }
+      document.body.className = ''
+      toggleTheme(initialDarkMode)
     }
   }, [])
 

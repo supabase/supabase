@@ -7,11 +7,7 @@ import { useState } from 'react'
 import { ChartIntervals } from 'types'
 import {
   Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuRadioGroup_Shadcn_,
-  DropdownMenuRadioItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  Dropdown,
   IconArchive,
   IconChevronDown,
   IconDatabase,
@@ -82,23 +78,24 @@ const ProjectUsage = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-row items-center gap-2">
-        <DropdownMenu_Shadcn_>
-          <DropdownMenuTrigger_Shadcn_>
-            <Button asChild type="default" iconRight={<IconChevronDown />}>
-              <span>{selectedInterval.label}</span>
-            </Button>
-          </DropdownMenuTrigger_Shadcn_>
-          <DropdownMenuContent_Shadcn_ side="bottom" align="start">
-            <DropdownMenuRadioGroup_Shadcn_ value={interval} onValueChange={setInterval}>
+        <Dropdown
+          side="bottom"
+          align="start"
+          overlay={
+            <Dropdown.RadioGroup value={interval} onChange={setInterval}>
               {CHART_INTERVALS.map((i) => (
-                <DropdownMenuRadioItem_Shadcn_ key={i.key} value={i.key}>
+                <Dropdown.Radio key={i.key} value={i.key}>
                   {i.label}
-                </DropdownMenuRadioItem_Shadcn_>
+                </Dropdown.Radio>
               ))}
-            </DropdownMenuRadioGroup_Shadcn_>
-          </DropdownMenuContent_Shadcn_>
-        </DropdownMenu_Shadcn_>
-        <span className="text-xs text-foreground-light">
+            </Dropdown.RadioGroup>
+          }
+        >
+          <Button asChild type="default" iconRight={<IconChevronDown />}>
+            <span>{selectedInterval.label}</span>
+          </Button>
+        </Dropdown>
+        <span className="text-xs text-scale-1000">
           Statistics for past {selectedInterval.label}
         </span>
       </div>
@@ -107,7 +104,7 @@ const ProjectUsage = () => {
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
+                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
                   <IconDatabase strokeWidth={2} size={16} />
                 </div>
               }
@@ -132,7 +129,7 @@ const ProjectUsage = () => {
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
+                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
                   <IconKey strokeWidth={2} size={16} />
                 </div>
               }
@@ -156,7 +153,7 @@ const ProjectUsage = () => {
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
+                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
                   <IconArchive strokeWidth={2} size={16} />
                 </div>
               }
@@ -181,7 +178,7 @@ const ProjectUsage = () => {
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
-                <div className="rounded bg-scale-600 p-1.5 text-foreground-light shadow-sm">
+                <div className="rounded bg-scale-600 p-1.5 text-scale-1000 shadow-sm">
                   <IconZap strokeWidth={2} size={16} />
                 </div>
               }

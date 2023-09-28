@@ -1,19 +1,20 @@
 import dayjs from 'dayjs'
+import { Loading } from 'ui'
 import { useState } from 'react'
 import {
-  Bar,
   BarChart as RechartBarChart,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
+  Area,
+  Bar,
   XAxis,
   YAxis,
+  Tooltip,
+  Cell,
+  ResponsiveContainer,
 } from 'recharts'
-import { Loading } from 'ui'
 
-import { CHART_COLORS } from 'components/ui/Charts/Charts.constants'
-import EmptyState from 'components/ui/Charts/EmptyState'
 import { formatBytes } from 'lib/helpers'
+import EmptyState from 'components/ui/Charts/EmptyState'
+import { CHART_COLORS } from 'components/ui/Charts/Charts.constants'
 
 function dataCheck(data: any, attribute: any) {
   const hasData = data && data.find((record: any) => record[attribute])
@@ -80,14 +81,14 @@ const Header = ({
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
 
   const chartTitle = (
-    <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
+    <h3 className={'text-scale-900 ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
       {label ?? attribute}
     </h3>
   )
   const highlighted = (
     <h5
       className={
-        'text-xl font-normal text-foreground ' + (minimalHeader ? 'text-base' : 'text-2xl')
+        'text-xl font-normal text-scale-1200 ' + (minimalHeader ? 'text-base' : 'text-2xl')
       }
     >
       {title}
@@ -95,7 +96,7 @@ const Header = ({
     </h5>
   )
   const date = (
-    <h5 className="text-xs text-foreground-lighter">
+    <h5 className="text-xs text-scale-900">
       {focus ? (
         data && data[focus] && day(data[focus].period_start).format(FOCUS_FORMAT)
       ) : (
@@ -248,7 +249,7 @@ export function BarChart({
                 </RechartBarChart>
               </ResponsiveContainer>
               {data && (
-                <div className="-mt-5 flex items-center justify-between text-xs text-foreground-lighter">
+                <div className="-mt-5 flex items-center justify-between text-xs text-scale-900">
                   <span>
                     {day(data[0].period_start).format(
                       customDateFormat ? customDateFormat : DATE_FORMAT__WITH_TIME

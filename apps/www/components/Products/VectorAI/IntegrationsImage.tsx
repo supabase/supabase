@@ -1,12 +1,12 @@
 import React, { useRef } from 'react'
 import Image from 'next/image'
-import { useTheme } from 'next-themes'
+import { useTheme } from 'common/Providers'
 import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 import { useBreakpoint } from 'common'
 
 const IntegrationsImage = () => {
-  const { resolvedTheme } = useTheme()
+  const { isDarkMode } = useTheme()
   const isMobile = useBreakpoint(767)
   const ref = useRef(null)
   const isInView = useInView(ref, { margin: '-25%', once: true })
@@ -16,10 +16,9 @@ const IntegrationsImage = () => {
 
   console.log('ismobile', isMobile)
 
-  const image =
-    resolvedTheme === 'dark'
-      ? `/images/product/vector/vector-tools-dark${isMobile ? '-mobile' : ''}.svg`
-      : `/images/product/vector/vector-tools-light${isMobile ? '-mobile' : ''}.svg`
+  const image = isDarkMode
+    ? `/images/product/vector/vector-tools-dark${isMobile ? '-mobile' : ''}.svg`
+    : `/images/product/vector/vector-tools-light${isMobile ? '-mobile' : ''}.svg`
 
   return (
     <LazyMotion features={domAnimation}>

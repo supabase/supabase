@@ -19,22 +19,10 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { getURL } from 'lib/helpers'
-import Link from 'next/link'
-import {
-  Alert,
-  Badge,
-  Button,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuItem_Shadcn_,
-  DropdownMenuSeparator_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
-  IconCreditCard,
-  IconMoreHorizontal,
-  IconPlus,
-} from 'ui'
+import { Alert, Badge, Button, Dropdown, IconCreditCard, IconMoreHorizontal, IconPlus } from 'ui'
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
 import DeletePaymentMethodModal from './DeletePaymentMethodModal'
+import Link from 'next/link'
 
 const PaymentMethods = () => {
   const { ui } = useStore()
@@ -68,7 +56,7 @@ const PaymentMethods = () => {
         <ScaffoldSectionDetail>
           <div className="sticky space-y-2 top-12">
             <p className="text-base m-0">Payment methods</p>
-            <p className="text-sm text-foreground-light mb-2 pr-4 m-0">
+            <p className="text-sm text-scale-1000 mb-2 pr-4 m-0">
               After adding a payment method, make sure to mark it as active to use it for billing.
               You can remove unused cards.
             </p>
@@ -117,7 +105,7 @@ const PaymentMethods = () => {
                     footer={
                       <div className="flex items-center justify-between py-4 px-8">
                         {!canUpdatePaymentMethods ? (
-                          <p className="text-sm text-foreground-light">
+                          <p className="text-sm text-scale-1000">
                             You need additional permissions to manage payment methods
                           </p>
                         ) : (
@@ -168,40 +156,41 @@ const PaymentMethods = () => {
                                   </div>
                                   {isActive && <Badge color="green">Active</Badge>}
                                   {canUpdatePaymentMethods && !isActive ? (
-                                    <DropdownMenu_Shadcn_>
-                                      <DropdownMenuTrigger_Shadcn_>
-                                        <Button
-                                          asChild
-                                          type="outline"
-                                          icon={<IconMoreHorizontal />}
-                                          className="hover:border-gray-500 px-1"
-                                        >
-                                          <span />
-                                        </Button>
-                                      </DropdownMenuTrigger_Shadcn_>
-                                      <DropdownMenuContent_Shadcn_ align="end">
-                                        {subscription?.plan.id !== 'free' &&
-                                          subscription?.payment_method_type === 'card' && (
-                                            <>
-                                              <DropdownMenuItem_Shadcn_
+                                    <Dropdown
+                                      size="tiny"
+                                      align="end"
+                                      overlay={[
+                                        ...(subscription?.plan.id !== 'free' &&
+                                        subscription?.payment_method_type === 'card'
+                                          ? [
+                                              <Dropdown.Item
                                                 key="make-default"
                                                 onClick={() =>
                                                   setSelectedMethodForUse(paymentMethod)
                                                 }
                                               >
-                                                <p className="text">Use this card</p>
-                                              </DropdownMenuItem_Shadcn_>
-                                              <DropdownMenuSeparator_Shadcn_ />
-                                            </>
-                                          )}
-                                        <DropdownMenuItem_Shadcn_
+                                                Use this card
+                                              </Dropdown.Item>,
+                                              <Dropdown.Separator key="card-separator" />,
+                                            ]
+                                          : []),
+                                        <Dropdown.Item
                                           key="delete-method"
                                           onClick={() => setSelectedMethodToDelete(paymentMethod)}
                                         >
-                                          <p className="text">Delete card</p>
-                                        </DropdownMenuItem_Shadcn_>
-                                      </DropdownMenuContent_Shadcn_>
-                                    </DropdownMenu_Shadcn_>
+                                          Delete card
+                                        </Dropdown.Item>,
+                                      ]}
+                                    >
+                                      <Button
+                                        asChild
+                                        type="outline"
+                                        icon={<IconMoreHorizontal />}
+                                        className="hover:border-gray-500 px-1"
+                                      >
+                                        <span />
+                                      </Button>
+                                    </Dropdown>
                                   ) : null}
                                 </div>
                               )

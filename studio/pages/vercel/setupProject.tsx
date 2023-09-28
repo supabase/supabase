@@ -301,7 +301,7 @@ const CreateProject = observer(() => {
                     />
                   )}
                 >
-                  <span className="text-foreground">{label}</span>
+                  <span className="text-scale-1200">{label}</span>
                 </Listbox.Option>
               )
             })}

@@ -1,13 +1,14 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { XYCoord } from 'dnd-core'
 import * as React from 'react'
-import { DropTargetMonitor, useDrag, useDrop } from 'react-dnd'
 import { IconArrowRight, IconKey, IconLink, IconLock } from 'ui'
-import { useDispatch, useTrackedState } from '../../store'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd'
+import { XYCoord } from 'dnd-core'
+import { useDispatch } from '../../store'
 import { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
 import { ColumnMenu } from '../menu'
+import { useTrackedState } from '../../store'
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 
 export function ColumnHeader<R>({
   column,
@@ -138,7 +139,7 @@ export function ColumnHeader<R>({
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-foreground">Primary key</span>
+                    <span className="text-xs text-scale-1200">Primary key</span>
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>
@@ -162,7 +163,7 @@ export function ColumnHeader<R>({
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-foreground">Encrypted column</span>
+                    <span className="text-xs text-scale-1200">Encrypted column</span>
                   </div>
                 </Tooltip.Content>
               </Tooltip.Portal>
@@ -197,17 +198,17 @@ function renderColumnIcon(
                 ].join(' ')}
               >
                 <div>
-                  <p className="text-xs text-foreground-light">Foreign key relation:</p>
+                  <p className="text-xs text-scale-1100">Foreign key relation:</p>
                   <div className="flex items-center space-x-1">
-                    <p className="text-xs text-foreground">{name}</p>
+                    <p className="text-xs text-scale-1200">{name}</p>
                     <IconArrowRight size="tiny" strokeWidth={1.5} />
-                    <p className="text-xs text-foreground">
+                    <p className="text-xs text-scale-1200">
                       {foreignKey?.targetTableSchema}.{foreignKey?.targetTableName}.
                       {foreignKey?.targetColumnName}
                     </p>
                   </div>
                   {foreignKey?.deletionAction !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
-                    <p className="text-xs text-foreground mt-1">
+                    <p className="text-xs text-scale-1200 mt-1">
                       On delete: {getForeignKeyCascadeAction(foreignKey?.deletionAction)}
                     </p>
                   )}

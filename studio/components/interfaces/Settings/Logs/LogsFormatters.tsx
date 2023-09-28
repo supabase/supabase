@@ -4,11 +4,11 @@
  * for http response codes
  */
 
-import CopyButton from 'components/ui/CopyButton'
+import { IconAlertCircle, IconInfo } from 'ui'
 import dayjs from 'dayjs'
 import React from 'react'
-import { IconAlertCircle, IconInfo } from 'ui'
 import { isUnixMicro, unixMicroToIsoTimestamp } from '.'
+import CopyButton from 'components/ui/CopyButton'
 
 export const RowLayout: React.FC = ({ children }) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>
@@ -31,10 +31,8 @@ export const SelectionDetailedRow = ({
 }) => {
   return (
     <div className="grid grid-cols-12 group">
-      <span className="text-foreground-lighter text-sm col-span-4 whitespace-pre-wrap">
-        {label}
-      </span>
-      <span className="text-foreground text-sm col-span-6 whitespace-pre-wrap break-all">
+      <span className="text-scale-900 text-sm col-span-4 whitespace-pre-wrap">{label}</span>
+      <span className="text-scale-1200 text-sm col-span-6 whitespace-pre-wrap break-all">
         {valueRender ?? value}
       </span>
       <CopyButton
@@ -78,7 +76,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
             py-1 text-center dark:bg-scale-400
             "
           >
-            <label className="block font-mono text-sm text-foreground-lighter">{value}</label>
+            <label className="block font-mono text-sm text-scale-900">{value}</label>
           </div>
         </div>
       )
@@ -126,7 +124,7 @@ export const ResponseCodeFormatter = ({ value }: any) => {
 
             "
           >
-            <label className="block font-mono text-sm text-foreground-lighter">{value}</label>
+            <label className="block font-mono text-sm text-scale-900">{value}</label>
           </div>
         </div>
       )
@@ -216,7 +214,7 @@ export const SeverityFormatter = ({
       return (
         <Layout>
           <div className="relative rounded px-2 py-1 text-center h-6 flex justify-center items-center bg-scale-300">
-            <label className="block font-mono text-sm text-foreground-lighter">{text}</label>
+            <label className="block font-mono text-sm text-scale-900">{text}</label>
           </div>
         </Layout>
       )
@@ -256,11 +254,7 @@ export const timestampLocalFormatter = (value: string | number) => {
  */
 
 export const HeaderFormmater = ({ value }: any) => {
-  return (
-    <div className="flex h-full items-center text-xs font-normal text-foreground-lighter">
-      {value}
-    </div>
-  )
+  return <div className="flex h-full items-center text-xs font-normal text-scale-900">{value}</div>
 }
 
 /*
@@ -280,7 +274,7 @@ export function jsonSyntaxHighlight(input: Object) {
       var cls = 'number text-tomato-900'
       if (/^"/.test(match)) {
         if (/:$/.test(match)) {
-          cls = 'key text-foreground'
+          cls = 'key text-scale-1200'
         } else {
           cls = 'string text-brand-600'
         }

@@ -17,10 +17,10 @@ const EmptyState = ({
       border-dashed border-scale-600 py-4 text-center
     "
   >
-    <IconBarChart2 className="text-foreground-light" />
+    <IconBarChart2 className="text-scale-1100" />
     <div>
-      <p className="text-xs text-foreground-light">{title}</p>
-      <p className="text-xs text-foreground-light">{message}</p>
+      <p className="text-xs text-scale-1100">{title}</p>
+      <p className="text-xs text-scale-1000">{message}</p>
     </div>
   </div>
 )

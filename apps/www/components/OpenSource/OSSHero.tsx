@@ -1,8 +1,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { useWindowSize } from 'react-use'
-import { useBreakpoint } from 'common'
-import { useTheme } from 'next-themes'
+import { useBreakpoint, useTheme } from 'common'
 import { cn } from 'ui'
 
 import styles from './hero.module.css'
@@ -30,12 +29,12 @@ const OSSHero = () => (
 )
 
 const HeroGrid = () => {
-  const { theme } = useTheme()
+  const { isDarkMode } = useTheme()
   const { width } = useWindowSize()
   const isSm = useBreakpoint(640)
 
   const svgGridOptions = {
-    color: theme === 'dark' ? '#00d4ad' : '#015a42',
+    color: isDarkMode ? '#00d4ad' : '#015a42',
     boxWidth: width ? width * 7 : 7500,
     boxHeight: width ? width * 5 : 6000,
     xLines: isSm ? 20 : 49,

@@ -26,7 +26,7 @@ class MyDocument extends Document {
           />
           <link rel="stylesheet" type="text/css" href={`${BASE_PATH}/css/fonts.css`} />
         </Head>
-        <body>
+        <body className="dark">
           <Main />
           <NextScript />
         </body>

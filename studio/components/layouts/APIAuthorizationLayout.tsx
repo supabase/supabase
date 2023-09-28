@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import Image from 'next/image'
-import { useTheme } from 'next-themes'
+import { useTheme } from 'common'
 import { PropsWithChildren } from 'react'
 import { BASE_PATH } from 'lib/constants'
 import Divider from 'components/ui/Divider'
@@ -8,7 +8,7 @@ import Divider from 'components/ui/Divider'
 export interface APIAuthorizationLayoutProps {}
 
 const APIAuthorizationLayout = ({ children }: PropsWithChildren<APIAuthorizationLayoutProps>) => {
-  const { theme } = useTheme()
+  const { isDarkMode } = useTheme()
   return (
     <>
       <Head>
@@ -23,7 +23,7 @@ const APIAuthorizationLayout = ({ children }: PropsWithChildren<APIAuthorization
                   <span className="sr-only">Supabase</span>
                   <Image
                     src={
-                      theme === 'dark'
+                      isDarkMode
                         ? `${BASE_PATH}/img/supabase-dark.svg`
                         : `${BASE_PATH}/img/supabase-light.svg`
                     }

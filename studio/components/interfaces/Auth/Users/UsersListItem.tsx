@@ -2,9 +2,9 @@ import { Badge } from 'ui'
 
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import Table from 'components/to-be-cleaned/Table'
-import { User } from 'data/auth/users-query'
 import UserDropdown from './UserDropdown'
 import { getDateFromIsoString } from './Users.utils'
+import { User } from 'data/auth/users-query'
 
 interface UserListItemProps {
   user: User
@@ -21,17 +21,17 @@ const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItem
     <Table.tr className="relative" key={user.id}>
       <Table.td className="whitespace-nowrap">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-foreground">{!user.email ? '-' : user.email}</span>
+          <span className="text-sm text-scale-1200">{!user.email ? '-' : user.email}</span>
         </div>
       </Table.td>
       <Table.td className="whitespace-nowrap">
-        <span className="text-foreground">{!user.phone ? '-' : user.phone}</span>
+        <span className="text-scale-1200">{!user.phone ? '-' : user.phone}</span>
       </Table.td>
       <Table.td className="table-cell">
-        <span className="capitalize text-foreground">{user?.raw_app_meta_data?.provider}</span>
+        <span className="capitalize text-scale-1200">{user?.raw_app_meta_data?.provider}</span>
       </Table.td>
       <Table.td className="table-cell">
-        <span className="text-foreground">{createdAt?.format('DD MMM, YYYY HH:mm')}</span>
+        <span className="text-scale-1200">{createdAt?.format('DD MMM, YYYY HH:mm')}</span>
       </Table.td>
       <Table.td className="table-cell">
         {!isUserConfirmed ? (
@@ -50,7 +50,7 @@ const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItem
           <div>...</div>
         </div>
       </Table.td>
-      <Table.td className="table-cell">
+      <Table.td className="text-right">
         <UserDropdown
           user={user}
           canRemoveUser={canRemoveUser}

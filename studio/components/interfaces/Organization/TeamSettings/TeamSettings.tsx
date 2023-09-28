@@ -124,7 +124,7 @@ const TeamSettings = () => {
                           'border border-scale-200',
                         ].join(' ')}
                       >
-                        <span className="text-xs text-foreground">
+                        <span className="text-xs text-scale-1200">
                           An organization requires at least 1 owner
                         </span>
                       </div>

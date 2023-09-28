@@ -44,7 +44,7 @@ const StorageMenu = () => {
                 block
                 type="default"
                 icon={
-                  <div className="text-foreground-lighter">
+                  <div className="text-scale-900">
                     <IconEdit size={14} />
                   </div>
                 }
@@ -65,7 +65,7 @@ const StorageMenu = () => {
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-foreground">
+                    <span className="text-xs text-scale-1200">
                       You need additional permissions to create buckets
                     </span>
                   </div>

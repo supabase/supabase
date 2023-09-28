@@ -64,7 +64,7 @@ const RestoringState = () => {
               </div>
               <div className="space-y-1">
                 <p>Restoration complete!</p>
-                <p className="text-sm text-foreground-light">
+                <p className="text-sm text-scale-1100">
                   Your project has been successfully restored and is now back online.
                 </p>
               </div>
@@ -83,7 +83,7 @@ const RestoringState = () => {
               </div>
               <div className="space-y-1">
                 <p>Something went wrong while restoring your project</p>
-                <p className="text-sm text-foreground-light">
+                <p className="text-sm text-scale-1100">
                   Our engineers have already been notified of this, do hang tight while we are
                   investigating into the issue.
                 </p>
@@ -109,7 +109,7 @@ const RestoringState = () => {
               </div>
               <div className="space-y-1">
                 <p>Restoration in progress</p>
-                <p className="text-sm text-foreground-light">
+                <p className="text-sm text-scale-1100">
                   Restoration can take from a few minutes up to several hours depending on the size
                   of your database. Your project will be offline while the restoration is running.
                 </p>
