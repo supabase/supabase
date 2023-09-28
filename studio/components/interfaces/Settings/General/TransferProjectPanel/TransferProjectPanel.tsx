@@ -23,7 +23,7 @@ const TransferProjectPanel = () => {
               <IconTruck className="mt-1" />
               <div className="space-y-1 xl:max-w-lg">
                 <p className="text-sm">Transfer project to another organization</p>
-                <p className="text-sm text-scale-1100">
+                <p className="text-sm text-foreground-light">
                   To transfer projects, the owner must be a member of both the source and target
                   organizations.
                 </p>

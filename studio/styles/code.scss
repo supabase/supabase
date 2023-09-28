@@ -16,13 +16,13 @@
 
   .token.imports,
   .token.property-access {
-    @apply text-scale-900 #{!important};
+    @apply text-foreground-lighter #{!important};
   }
 
   .token.keyword.module,
   .token.function {
     font-style: normal !important;
-    @apply text-scale-900 #{!important};
+    @apply text-foreground-lighter #{!important};
   }
 
   .token.plain,
@@ -35,7 +35,7 @@
   .token.doc-comment.parameter.punctuation,
   .token.doc-comment.optional-parameter.punctuation {
     font-style: normal !important;
-    @apply text-scale-1100 #{!important};
+    @apply text-foreground-light #{!important};
   }
 
   .token.keyword,
@@ -56,7 +56,7 @@
 
   .token.comment {
     font-style: normal !important;
-    @apply text-scale-900 #{!important};
+    @apply text-foreground-lighter #{!important};
   }
 
   .token.number {

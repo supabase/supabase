@@ -10,7 +10,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
 import { pricing } from 'shared-data/pricing'
 import pricingFaq from '~/data/PricingFAQ.json'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 import ComputePricingModal from '~/components/Pricing/ComputePricingModal'
 import { plans } from 'shared-data/plans'
 import { ArrowNarrowRightIcon } from '@heroicons/react/outline'
@@ -19,7 +19,7 @@ import AnnouncementBadge from '../../components/Announcement/Badge'
 export default function IndexPage() {
   const router = useRouter()
   const { basePath, asPath } = useRouter()
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   const [showComputeModal, setShowComputeModal] = useState(false)
   const [activeMobilePlan, setActiveMobilePlan] = useState('Free')
 
@@ -345,7 +345,7 @@ export default function IndexPage() {
                   <img
                     className="w-full"
                     src={`${basePath}/images/pricing/${addon.heroImg}${
-                      isDarkMode ? '' : '-light'
+                      resolvedTheme === 'dark' ? '' : '-light'
                     }.png`}
                   />
                 </div>
@@ -354,7 +354,7 @@ export default function IndexPage() {
                   <div className="flex items-center gap-2 mt-2">
                     <img
                       src={`${basePath}/images/pricing/${addon.icon}${
-                        isDarkMode ? '' : '-light'
+                        resolvedTheme === 'dark' ? '' : '-light'
                       }.svg`}
                       className="file:"
                       alt="Compute"
@@ -421,7 +421,9 @@ export default function IndexPage() {
           <div>
             <img
               className="w-full"
-              src={`${basePath}/images/pricing/spend-cap${isDarkMode ? '' : '-light'}.png`}
+              src={`${basePath}/images/pricing/spend-cap${
+                resolvedTheme === 'dark' ? '' : '-light'
+              }.png`}
             />
           </div>
         </div>

@@ -96,7 +96,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
       <Collapsible.Trigger asChild>
         <button
           type="button"
-          className="group flex w-full items-center justify-between rounded py-3 px-6 text-scale-1200"
+          className="group flex w-full items-center justify-between rounded py-3 px-6 text-foreground"
         >
           <div className="flex items-center gap-3">
             <IconChevronUp
@@ -120,7 +120,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                 <span className="px-1">Enabled</span>
               </div>
             ) : (
-              <div className="rounded-md border border-scale-500 bg-scale-100 py-1 px-3 text-xs text-scale-900 dark:border-scale-700 dark:bg-scale-300">
+              <div className="rounded-md border border-scale-500 bg-scale-100 py-1 px-3 text-xs text-foreground-lighter dark:border-scale-700 dark:bg-scale-300">
                 Disabled
               </div>
             )}
@@ -140,7 +140,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
               <div
                 className="
                   group border-t
-                  border-scale-500 bg-scale-100 py-6 px-6 text-scale-1200 dark:bg-scale-300
+                  border-scale-500 bg-scale-100 py-6 px-6 text-foreground dark:bg-scale-300
                 "
               >
                 <div className="mx-auto my-6 max-w-lg space-y-6">
@@ -229,7 +229,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                                 'border border-scale-200',
                               ].join(' ')}
                             >
-                              <span className="text-xs text-scale-1200">
+                              <span className="text-xs text-foreground">
                                 You need additional permissions to update provider settings
                               </span>
                             </div>
