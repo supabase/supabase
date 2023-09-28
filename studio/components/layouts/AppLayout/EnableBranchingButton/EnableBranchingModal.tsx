@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import {
   AlertDescription_Shadcn_,
@@ -6,7 +7,6 @@ import {
   Alert_Shadcn_,
   Button,
   IconAlertCircle,
-  IconExternalLink,
   IconFileText,
   IconGitBranch,
   Modal,
@@ -21,8 +21,6 @@ import { IntegrationName } from 'data/integrations/integrations.types'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { useAppUiStateSnapshot } from 'state/app'
 import GithubRepositorySelection from './GithubRepositorySelection'
-import VercelProjectSelection from './VercelProjectSelection'
-import Link from 'next/link'
 
 const EnableBranchingModal = () => {
   const { ui } = useStore()
@@ -33,8 +31,7 @@ const EnableBranchingModal = () => {
   const [selectedBranch, setSelectedBranch] = useState<string>()
   const [addConnectionType, setAddConnectionType] = useState<IntegrationName>()
 
-  // const isOrgBilling = !!selectedOrg?.subscription_id
-  const isOrgBilling = false
+  const isOrgBilling = !!selectedOrg?.subscription_id
 
   useEffect(() => {
     if (snap.showEnableBranchingModal) setSelectedBranch(undefined)
