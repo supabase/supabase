@@ -42,7 +42,7 @@ const BackupItem = ({ index, backup, onSelectBackup }: BackupItemProps) => {
         index ? 'border-t dark:border-dark' : ''
       }`}
     >
-      <p className="text-sm text-scale-1200 ">{generateBackupName(backup)}</p>
+      <p className="text-sm text-foreground ">{generateBackupName(backup)}</p>
       <div className="">{generateSideButtons(backup)}</div>
     </div>
   )

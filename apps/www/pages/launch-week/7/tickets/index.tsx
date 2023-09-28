@@ -14,7 +14,7 @@ import { debounce } from 'lodash'
 import TicketsGrid from '~/components/LaunchWeek/7/TicketsGrid'
 import { Button } from 'ui'
 import Link from 'next/link'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 
 interface Props {
   users: UserData[]
@@ -41,7 +41,7 @@ export default function TicketsPage({ users }: Props) {
   const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/seven/launch-week-7-teaser.jpg`
 
-  const { isDarkMode } = useTheme()
+  const { theme } = useTheme()
   const [isLoading, setIsLoading] = useState(false)
   const [offset, setOffset] = useState(1)
   const [isLast, setIsLast] = useState(false)
@@ -86,7 +86,7 @@ export default function TicketsPage({ users }: Props) {
     window.addEventListener('scroll', handleDebouncedScroll)
 
     return () => {
-      document.body.className = isDarkMode ? 'dark' : 'light'
+      document.body.className = theme === 'dark' ? 'dark' : 'light'
       window.removeEventListener('scroll', handleDebouncedScroll)
     }
   }, [])

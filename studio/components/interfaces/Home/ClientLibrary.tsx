@@ -28,7 +28,7 @@ const ClientLibrary = ({
       />
       <div className="space-y-4">
         <div>
-          <h5 className="flex items-center gap-2 text-base text-scale-1200">
+          <h5 className="flex items-center gap-2 text-base text-foreground">
             {language} {!officialSupport && <Badge color="green">Community</Badge>}
           </h5>
         </div>

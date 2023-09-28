@@ -162,12 +162,6 @@ const tweets = [
     img_url: '/images/twitter-profiles/6f1O8ZOW_400x400.jpg',
   },
   {
-    text: "@MongoDB or @MySQL?!?! Please, let me introduce you to @supabase and the wonderful world of @PostgreSQL before it's too late!!",
-    url: 'https://twitter.com/jim_bisenius/status/1361772978841788416',
-    handle: 'jim_bisenius',
-    img_url: '/images/twitter-profiles/rLgwUZSB_400x400.jpg',
-  },
-  {
     text: 'Where has @supabase been all my life? 😍',
     url: 'https://twitter.com/Elsolo244/status/1360257201911320579',
     handle: 'Elsolo244',
@@ -186,12 +180,6 @@ const tweets = [
     img_url: '/images/twitter-profiles/6rd3xub9_400x400.png',
   },
   {
-    text: '@supabase is the answer to all of firebase’s problems imo',
-    url: 'https://twitter.com/jim_bisenius/status/1358590362953142278',
-    handle: 'jim_bisenius',
-    img_url: '/images/twitter-profiles/rLgwUZSB_400x400.jpg',
-  },
-  {
     text: '@supabase is insane.',
     url: 'https://twitter.com/codewithbhargav/status/1357647840911126528',
     handle: 'codewithbhargav',
@@ -204,12 +192,6 @@ const tweets = [
     img_url: '/images/twitter-profiles/66VSV9Mm_400x400.png',
   },
   {
-    text: 'I’m probably the wrong person to ask because I pick tools based on UX. Supabase was immediately approachable: instant setup, fast web app, auth, and easy APIs. Same reason I liked Firebase when I first discovered.',
-    url: 'https://twitter.com/jasonbarone/status/1357015483619422210',
-    handle: 'jasonbarone',
-    img_url: '/images/twitter-profiles/6zCnwpvi_400x400.jpg',
-  },
-  {
     text: 'Now things are starting to get interesting! Firebase has long been the obvious choice for many #flutter devs for the ease of use. But their databases are NoSQL, which has its downsides... Seems like @supabase is working on something interesting here!',
     url: 'https://twitter.com/RobertBrunhage/status/1356973695865085953',
     handle: 'RobertBrunhage',
@@ -220,12 +202,6 @@ const tweets = [
     url: 'https://twitter.com/NavicsteinR/status/1356927229217959941',
     handle: 'NavicsteinR',
     img_url: '/images/twitter-profiles/w_zNZAs7_400x400.jpg',
-  },
-  {
-    text: 'Next.js, @supabase, @stripe, and @vercel. Supastack™',
-    url: 'https://twitter.com/jasonbarone/status/1356765411832922115',
-    handle: 'jasonbarone',
-    img_url: '/images/twitter-profiles/6zCnwpvi_400x400.jpg',
   },
   {
     text: "I've really enjoyed the DX! Extremely fun to use, which is odd to say about a database at least for me.",
@@ -244,12 +220,6 @@ const tweets = [
     url: 'https://twitter.com/michael_webdev/status/1352885366928404481?s=20',
     handle: 'michael_webdev',
     img_url: '/images/twitter-profiles/SvAyLaWV_400x400.jpg',
-  },
-  {
-    text: 'Next.js, @supabase, @stripe, and @vercel. Supastack™',
-    url: 'https://twitter.com/jasonbarone/status/1356765411832922115?s=20',
-    handle: 'jasonbarone',
-    img_url: '/images/twitter-profiles/6zCnwpvi_400x400.jpg',
   },
   {
     text: 'I just learned about @supabase and im in love 😍 Supabase is an open source Firebase alternative! EarListen (& react) to database changes 💁 Manage users & permissions 🔧 Simple UI for database interaction',

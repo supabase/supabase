@@ -30,7 +30,7 @@ const DisallowAllModal = ({ visible, onClose }: DisallowAllModalProps) => {
     >
       <Modal.Content>
         <div className="py-6 space-y-4">
-          <p className="text-sm text-scale-1100">
+          <p className="text-sm text-foreground-light">
             This will prevent any external IP addresses from accessing your project's database. Are
             you sure?
           </p>

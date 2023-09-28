@@ -3,8 +3,8 @@ import { Button, IconExternalLink, IconEye, IconEyeOff, IconRefreshCw, IconSearc
 
 import CSVButton from 'components/ui/CSVButton'
 import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
-import DatePickers from './Logs.DatePickers'
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
+import DatePickers from './Logs.DatePickers'
 import LogsFilterPopover from './LogsFilterPopover'
 
 interface PreviewFilterPanelProps {
@@ -117,7 +117,7 @@ const PreviewFilterPanel = ({
               handleInputSearch(e.target.value)
             }}
             icon={
-              <div className="text-scale-900">
+              <div className="text-foreground-lighter">
                 <IconSearch size={14} />
               </div>
             }
@@ -126,7 +126,7 @@ const PreviewFilterPanel = ({
               hasEdits && (
                 <button
                   onClick={() => handleInputSearch(search)}
-                  className="mx-2 text-scale-1100 hover:text-scale-1200"
+                  className="mx-2 text-foreground-light hover:text-foreground"
                 >
                   {'↲'}
                 </button>
