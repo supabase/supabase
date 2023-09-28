@@ -100,7 +100,7 @@ const EnableBranchingModal = () => {
               <Alert_Shadcn_ variant="default" className="rounded-none border-0">
                 <IconAlertCircle strokeWidth={2} />
                 <AlertTitle_Shadcn_>
-                  You will need to migrate to organization-based billing first
+                  Organization-based billing migration required
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
                   <p className="!leading-normal">
