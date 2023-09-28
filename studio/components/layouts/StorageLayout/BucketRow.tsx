@@ -2,7 +2,19 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { noop } from 'lodash'
 import Link from 'next/link'
-import { Badge, Button, Dropdown, IconChevronDown, IconEdit2, IconLoader, IconTrash } from 'ui'
+import {
+  Badge,
+  Button,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconChevronDown,
+  IconEdit2,
+  IconLoader,
+  IconTrash,
+} from 'ui'
 
 import { Bucket } from 'data/storage/buckets-query'
 import { useCheckPermissions } from 'hooks'
@@ -29,14 +41,14 @@ const BucketRow = ({
       key={bucket.id}
       className={clsx(
         'group flex items-center justify-between rounded-md',
-        isSelected && 'text-scale-1200 bg-scale-300'
+        isSelected && 'text-foreground bg-scale-300'
       )}
     >
       <Link href={`/project/${projectRef}/storage/buckets/${bucket.id}`}>
         <a className="py-1 px-3 w-full">
           <div className="flex items-center justify-between space-x-2 truncate w-full">
             <p
-              className="text-sm text-scale-1100 group-hover:text-scale-1200 transition truncate"
+              className="text-sm text-foreground-light group-hover:text-foreground transition truncate"
               title={bucket.name}
             >
               {bucket.name}
@@ -45,45 +57,46 @@ const BucketRow = ({
           </div>
         </a>
       </Link>
-      <div className="pr-3">
-        {/* [JOSHEN TODO] need to change this */}
-        {false ? (
-          <IconLoader className="animate-spin" size={16} strokeWidth={2} />
-        ) : canUpdateBuckets && isSelected ? (
-          <Dropdown
-            side="bottom"
-            align="start"
-            overlay={[
-              <Dropdown.Item
-                key="toggle-private"
-                icon={<IconEdit2 size="tiny" />}
-                onClick={() => onSelectEditBucket(bucket)}
-              >
-                Edit bucket
-              </Dropdown.Item>,
-              <Dropdown.Separator key="bucket-separator" />,
-              <Dropdown.Item
-                key="delete-bucket"
-                icon={<IconTrash size="tiny" />}
-                onClick={() => onSelectDeleteBucket(bucket)}
-              >
-                Delete bucket
-              </Dropdown.Item>,
-            ]}
-          >
+      {/* [JOSHEN TODO] need to change this */}
+      {false ? (
+        <IconLoader className="animate-spin" size={16} strokeWidth={2} />
+      ) : canUpdateBuckets && isSelected ? (
+        <DropdownMenu_Shadcn_>
+          <DropdownMenuTrigger_Shadcn_ asChild>
             <Button
               asChild
               type="text"
-              icon={<IconChevronDown size="tiny" strokeWidth={2} className="text-scale-1100" />}
-              style={{ padding: '3px' }}
+              icon={
+                <IconChevronDown size="tiny" strokeWidth={2} className="text-foreground-light" />
+              }
+              className="mr-1 p-0.5"
             >
               <span></span>
             </Button>
-          </Dropdown>
-        ) : (
-          <div className="w-5" />
-        )}
-      </div>
+          </DropdownMenuTrigger_Shadcn_>
+          <DropdownMenuContent_Shadcn_ side="bottom" align="start">
+            <DropdownMenuItem_Shadcn_
+              key="toggle-private"
+              className="space-x-2"
+              onClick={() => onSelectEditBucket(bucket)}
+            >
+              <IconEdit2 size="tiny" />
+              <p className="text">Edit bucket</p>
+            </DropdownMenuItem_Shadcn_>
+            <DropdownMenuSeparator_Shadcn_ />
+            <DropdownMenuItem_Shadcn_
+              key="delete-bucket"
+              className="space-x-2"
+              onClick={() => onSelectDeleteBucket(bucket)}
+            >
+              <IconTrash size="tiny" />
+              <p className="text">Delete bucket</p>
+            </DropdownMenuItem_Shadcn_>
+          </DropdownMenuContent_Shadcn_>
+        </DropdownMenu_Shadcn_>
+      ) : (
+        <div className="w-5" />
+      )}
     </div>
   )
 }

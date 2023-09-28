@@ -1,7 +1,19 @@
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Alert, Button, Dropdown, Form, IconChevronDown, IconExternalLink, Input, Modal } from 'ui'
+import {
+  Alert,
+  Button,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  Form,
+  IconChevronDown,
+  IconExternalLink,
+  Input,
+  Modal,
+} from 'ui'
 
 import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 
@@ -44,11 +56,19 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
             >
               Generate new token
             </Button>
-            <Dropdown
-              align="end"
-              side="bottom"
-              overlay={[
-                <Dropdown.Item
+            <DropdownMenu_Shadcn_>
+              <DropdownMenuTrigger_Shadcn_ asChild>
+                <Button
+                  asChild
+                  type="primary"
+                  className="rounded-l-none px-[4px] py-[5px]"
+                  icon={<IconChevronDown />}
+                >
+                  <span></span>
+                </Button>
+              </DropdownMenuTrigger_Shadcn_>
+              <DropdownMenuContent_Shadcn_ align="end" side="bottom">
+                <DropdownMenuItem_Shadcn_
                   key="experimental-token"
                   onClick={() => {
                     setTokenScope('V0')
@@ -56,20 +76,11 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
                   }}
                 >
                   <div className="space-y-1">
-                    <p className="block text-scale-1200">Generate token for experimental API</p>
+                    <p className="block text-foreground">Generate token for experimental API</p>
                   </div>
-                </Dropdown.Item>,
-              ]}
-            >
-              <Button
-                asChild
-                type="primary"
-                className="rounded-l-none px-[4px] py-[5px]"
-                icon={<IconChevronDown />}
-              >
-                <span></span>
-              </Button>
-            </Dropdown>
+                </DropdownMenuItem_Shadcn_>
+              </DropdownMenuContent_Shadcn_>
+            </DropdownMenu_Shadcn_>
           </div>
         </div>
       </div>
@@ -82,7 +93,7 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
         onCancel={() => setIsOpen(!isOpen)}
         header={
           <div className="flex items-baseline gap-2">
-            <h5 className="text-sm text-scale-1200">
+            <h5 className="text-sm text-foreground">
               {tokenScope === 'V0' ? 'Generate token for experimental API' : 'Generate New Token'}
             </h5>
           </div>

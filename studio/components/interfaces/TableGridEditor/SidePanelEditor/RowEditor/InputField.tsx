@@ -80,15 +80,17 @@ const InputField = ({
         value={field.value ?? ''}
         descriptionText={
           <>
-            {field.comment && <span className="text-sm text-scale-900">{field.comment} </span>}
-            <span className="text-sm text-scale-900">
+            {field.comment && (
+              <span className="text-sm text-foreground-lighter">{field.comment} </span>
+            )}
+            <span className="text-sm text-foreground-lighter">
               {field.comment && '('}Has a foreign key relation to
             </span>
-            <span className="text-code font-mono text-xs text-scale-900">
+            <span className="text-code font-mono text-xs text-foreground-lighter">
               {field.foreignKey.target_table_schema}.{field.foreignKey.target_table_name}.
               {field.foreignKey.target_column_name}
             </span>
-            {field.comment && <span className="text-sm text-scale-900">{`)`}</span>}
+            {field.comment && <span className="text-sm text-foreground-lighter">{`)`}</span>}
           </>
         }
         labelOptional={field.format}

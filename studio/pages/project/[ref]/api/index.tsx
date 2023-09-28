@@ -91,7 +91,7 @@ const DocView = observer(() => {
   if (error || jsonSchemaError)
     return (
       <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
-        <p className="text-scale-1000">
+        <p className="text-foreground-light">
           <p>Error connecting to API</p>
           <p>{`${error || jsonSchemaError}`}</p>
         </p>

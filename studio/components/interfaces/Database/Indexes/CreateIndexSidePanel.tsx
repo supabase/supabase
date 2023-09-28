@@ -6,13 +6,13 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import CodeEditor from 'components/ui/CodeEditor'
 import MultiSelect, { MultiSelectOption } from 'components/ui/MultiSelect'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useIndexesQuery } from 'data/database/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { INDEX_TYPES } from './Indexes.constants'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useIndexesQuery } from 'data/database/indexes-query'
 import { useStore } from 'hooks'
+import { INDEX_TYPES } from './Indexes.constants'
 
 interface CreateIndexSidePanelProps {
   visible: boolean
@@ -143,7 +143,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
 
           {entityTypes.length === 0 ? (
             <div className="space-y-2">
-              <p className="text-sm text-scale-1100 leading-4">Select a table</p>
+              <p className="text-sm text-foreground-light leading-4">Select a table</p>
               <Input
                 disabled
                 placeholder="No tables available in schema"
@@ -170,7 +170,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
 
           {selectedEntity !== '---' && (
             <div>
-              <p className="text-sm text-scale-1100 mb-2">Select up to 32 columns</p>
+              <p className="text-sm text-foreground-light mb-2">Select up to 32 columns</p>
               {isLoadingTableColumns && <ShimmeringLoader className="py-4" />}
               {isSuccessTableColumns && (
                 <MultiSelect

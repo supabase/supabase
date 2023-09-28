@@ -251,7 +251,7 @@ Client Components can be used to trigger the authentication process from event h
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx app/login.jsx
+```jsx app/login/page.jsx
 'use client'
 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
@@ -309,7 +309,7 @@ export default function Login() {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx app/login.tsx
+```tsx app/login/page.tsx
 'use client'
 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
@@ -389,7 +389,7 @@ The combination of [Server Components](https://nextjs.org/docs/getting-started/r
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx app/auth/sign-up.js
+```jsx app/auth/sign-up/route.js
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -421,7 +421,7 @@ export async function POST(request) {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx app/auth/sign-up.ts
+```tsx app/auth/sign-up/route.ts
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -477,7 +477,7 @@ Returning a `301` status redirects from a POST to a GET route
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx app/auth/login.js
+```jsx app/auth/login/route.js
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -506,7 +506,7 @@ export async function POST(request) {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx app/auth/login.ts
+```tsx app/auth/login/route.ts
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -559,7 +559,7 @@ Returning a `301` status redirects from a POST to a GET route
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx app/auth/logout.js
+```jsx app/auth/logout/route.js
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -582,7 +582,7 @@ export async function POST(request) {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx app/auth/logout.ts
+```tsx app/auth/logout/route.ts
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -623,7 +623,7 @@ TypeScript types can be [generated with the Supabase CLI](/docs/reference/javasc
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx app/login.jsx
+```jsx app/login/page.jsx
 export default function Login() {
   return (
     <form action="/auth/login" method="post">
@@ -643,7 +643,7 @@ export default function Login() {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx app/login.tsx
+```tsx app/login/page.tsx
 export default function Login() {
   return (
     <form action="/auth/login" method="post">
@@ -875,7 +875,7 @@ Next.js Server Actions are currently in `alpha` so may change without notice.
 >
 <TabPanel id="js" label="JavaScript">
 
-```jsx app/new-post.jsx
+```jsx app/new-post/page.jsx
 import { cookies } from 'next/headers'
 import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
 import { revalidatePath } from 'next/cache'
@@ -904,7 +904,7 @@ export default async function NewTodo() {
 
 <TabPanel id="ts" label="TypeScript">
 
-```tsx app/new-post.tsx
+```tsx app/new-post/page.tsx
 import { cookies } from 'next/headers'
 import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
 import { revalidatePath } from 'next/cache'
