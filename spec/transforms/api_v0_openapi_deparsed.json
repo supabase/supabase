@@ -63,24 +63,16 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "db_port",
-                    "ref",
-                    "postgres_version",
-                    "status",
-                    "db_host"
-                  ]
+                  "required": ["db_port", "ref", "postgres_version", "status", "db_host"]
                 }
               }
             }
           },
           "500": {
-            "description": "Failed to retrieve database branch"
+            "description": "Failed to update database branch"
           }
         },
-        "tags": [
-          "database branches (beta)"
-        ],
+        "tags": ["database branches (beta)"],
         "security": [
           {
             "bearer": []
@@ -170,9 +162,7 @@
             "description": "Failed to update database branch"
           }
         },
-        "tags": [
-          "database branches (beta)"
-        ],
+        "tags": ["database branches (beta)"],
         "security": [
           {
             "bearer": []
@@ -202,9 +192,7 @@
             "description": "Failed to delete database branch"
           }
         },
-        "tags": [
-          "database branches (beta)"
-        ],
+        "tags": ["database branches (beta)"],
         "security": [
           {
             "bearer": []
@@ -262,28 +250,17 @@
                             "description": "Database version"
                           }
                         },
-                        "required": [
-                          "host",
-                          "version"
-                        ]
+                        "required": ["host", "version"]
                       }
                     },
-                    "required": [
-                      "id",
-                      "organization_id",
-                      "name",
-                      "region",
-                      "created_at"
-                    ]
+                    "required": ["id", "organization_id", "name", "region", "created_at"]
                   }
                 }
               }
             }
           }
         },
-        "tags": [
-          "projects"
-        ],
+        "tags": ["projects"],
         "security": [
           {
             "bearer": []
@@ -315,10 +292,7 @@
                   },
                   "plan": {
                     "type": "string",
-                    "enum": [
-                      "free",
-                      "pro"
-                    ],
+                    "enum": ["free", "pro"],
                     "description": "Subscription plan",
                     "example": "free"
                   },
@@ -344,17 +318,10 @@
                     "example": "us-east-1"
                   },
                   "kps_enabled": {
-                    "type": "boolean",
-                    "deprecated": true
+                    "type": "boolean"
                   }
                 },
-                "required": [
-                  "db_pass",
-                  "name",
-                  "organization_id",
-                  "plan",
-                  "region"
-                ]
+                "required": ["db_pass", "name", "organization_id", "plan", "region"]
               }
             }
           }
@@ -401,19 +368,10 @@
                           "description": "Database version"
                         }
                       },
-                      "required": [
-                        "host",
-                        "version"
-                      ]
+                      "required": ["host", "version"]
                     }
                   },
-                  "required": [
-                    "id",
-                    "organization_id",
-                    "name",
-                    "region",
-                    "created_at"
-                  ]
+                  "required": ["id", "organization_id", "name", "region", "created_at"]
                 }
               }
             }
@@ -459,27 +417,16 @@
                           "description": "Database version"
                         }
                       },
-                      "required": [
-                        "host",
-                        "version"
-                      ]
+                      "required": ["host", "version"]
                     }
                   },
-                  "required": [
-                    "id",
-                    "organization_id",
-                    "name",
-                    "region",
-                    "created_at"
-                  ]
+                  "required": ["id", "organization_id", "name", "region", "created_at"]
                 }
               }
             }
           }
         },
-        "tags": [
-          "projects"
-        ],
+        "tags": ["projects"],
         "security": [
           {
             "bearer": []
@@ -510,10 +457,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "id",
-                      "name"
-                    ]
+                    "required": ["id", "name"]
                   }
                 }
               }
@@ -523,9 +467,7 @@
             "description": "Unexpected error listing organizations"
           }
         },
-        "tags": [
-          "organizations"
-        ],
+        "tags": ["organizations"],
         "security": [
           {
             "bearer": []
@@ -547,9 +489,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "name"
-                ]
+                "required": ["name"]
               }
             }
           }
@@ -569,10 +509,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "id",
-                    "name"
-                  ]
+                  "required": ["id", "name"]
                 }
               }
             }
@@ -581,9 +518,7 @@
             "description": "Unexpected error creating an organization"
           }
         },
-        "tags": [
-          "organizations"
-        ],
+        "tags": ["organizations"],
         "security": [
           {
             "bearer": []
@@ -609,11 +544,7 @@
             "required": true,
             "in": "query",
             "schema": {
-              "enum": [
-                "code",
-                "token",
-                "id_token token"
-              ],
+              "enum": ["code", "token", "id_token token"],
               "type": "string"
             }
           },
@@ -627,7 +558,7 @@
           },
           {
             "name": "scope",
-            "required": false,
+            "required": true,
             "in": "query",
             "schema": {
               "type": "string"
@@ -662,11 +593,7 @@
             "required": false,
             "in": "query",
             "schema": {
-              "enum": [
-                "plain",
-                "sha256",
-                "S256"
-              ],
+              "enum": ["plain", "sha256", "S256"],
               "type": "string"
             }
           }
@@ -676,9 +603,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "oauth (beta)"
-        ]
+        "tags": ["oauth (beta)"]
       }
     },
     "/v1/oauth/token": {
@@ -694,10 +619,7 @@
                 "type": "object",
                 "properties": {
                   "grant_type": {
-                    "enum": [
-                      "authorization_code",
-                      "refresh_token"
-                    ],
+                    "enum": ["authorization_code", "refresh_token"],
                     "type": "string"
                   },
                   "client_id": {
@@ -719,11 +641,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "grant_type",
-                  "client_id",
-                  "client_secret"
-                ]
+                "required": ["grant_type", "client_id", "client_secret"]
               }
             }
           }
@@ -738,9 +656,7 @@
                   "properties": {
                     "token_type": {
                       "type": "string",
-                      "enum": [
-                        "Bearer"
-                      ]
+                      "enum": ["Bearer"]
                     },
                     "access_token": {
                       "type": "string"
@@ -752,309 +668,13 @@
                       "type": "number"
                     }
                   },
-                  "required": [
-                    "token_type",
-                    "access_token",
-                    "refresh_token",
-                    "expires_in"
-                  ]
+                  "required": ["token_type", "access_token", "refresh_token", "expires_in"]
                 }
               }
             }
           }
         },
-        "tags": [
-          "oauth (beta)"
-        ]
-      }
-    },
-    "/v1/snippets": {
-      "get": {
-        "operationId": "listSnippets",
-        "summary": "Lists SQL snippets for the logged in user",
-        "parameters": [
-          {
-            "name": "project_ref",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string"
-                          },
-                          "inserted_at": {
-                            "type": "string"
-                          },
-                          "updated_at": {
-                            "type": "string"
-                          },
-                          "type": {
-                            "type": "string",
-                            "enum": [
-                              "sql"
-                            ]
-                          },
-                          "visibility": {
-                            "type": "string",
-                            "enum": [
-                              "user",
-                              "project",
-                              "org",
-                              "public"
-                            ]
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "description": {
-                            "type": "string",
-                            "nullable": true
-                          },
-                          "project": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "number"
-                              },
-                              "name": {
-                                "type": "string"
-                              }
-                            },
-                            "required": [
-                              "id",
-                              "name"
-                            ]
-                          },
-                          "owner": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "number"
-                              },
-                              "username": {
-                                "type": "string"
-                              }
-                            },
-                            "required": [
-                              "id",
-                              "username"
-                            ]
-                          },
-                          "updated_by": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "number"
-                              },
-                              "username": {
-                                "type": "string"
-                              }
-                            },
-                            "required": [
-                              "id",
-                              "username"
-                            ]
-                          }
-                        },
-                        "required": [
-                          "id",
-                          "inserted_at",
-                          "updated_at",
-                          "type",
-                          "visibility",
-                          "name",
-                          "description",
-                          "project",
-                          "owner",
-                          "updated_by"
-                        ]
-                      }
-                    }
-                  },
-                  "required": [
-                    "data"
-                  ]
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Failed to list user's SQL snippets"
-          }
-        },
-        "tags": [
-          "snippets"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/v1/snippets/{id}": {
-      "get": {
-        "operationId": "getSnippet",
-        "summary": "Gets a specific SQL snippet",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "inserted_at": {
-                      "type": "string"
-                    },
-                    "updated_at": {
-                      "type": "string"
-                    },
-                    "type": {
-                      "type": "string",
-                      "enum": [
-                        "sql"
-                      ]
-                    },
-                    "visibility": {
-                      "enum": [
-                        "user",
-                        "project",
-                        "org",
-                        "public"
-                      ],
-                      "type": "string"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "project": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "number"
-                        },
-                        "name": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "name"
-                      ]
-                    },
-                    "owner": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "number"
-                        },
-                        "username": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "username"
-                      ]
-                    },
-                    "updated_by": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "number"
-                        },
-                        "username": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "username"
-                      ]
-                    },
-                    "content": {
-                      "type": "object",
-                      "properties": {
-                        "favorite": {
-                          "type": "boolean"
-                        },
-                        "schema_version": {
-                          "type": "string"
-                        },
-                        "sql": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "favorite",
-                        "schema_version",
-                        "sql"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "inserted_at",
-                    "updated_at",
-                    "type",
-                    "visibility",
-                    "name",
-                    "description",
-                    "project",
-                    "owner",
-                    "updated_by",
-                    "content"
-                  ]
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Failed to retrieve SQL snippet"
-          }
-        },
-        "tags": [
-          "snippets"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
+        "tags": ["oauth (beta)"]
       }
     },
     "/v1/projects/{ref}/api-keys": {
@@ -1090,10 +710,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "name",
-                      "api_key"
-                    ]
+                    "required": ["name", "api_key"]
                   }
                 }
               }
@@ -1103,9 +720,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "projects"
-        ],
+        "tags": ["projects"],
         "security": [
           {
             "bearer": []
@@ -1184,9 +799,7 @@
             "description": "Failed to retrieve database branches"
           }
         },
-        "tags": [
-          "database branches (beta)"
-        ],
+        "tags": ["database branches (beta)"],
         "security": [
           {
             "bearer": []
@@ -1227,9 +840,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "branch_name"
-                ]
+                "required": ["branch_name"]
               }
             }
           }
@@ -1284,9 +895,7 @@
             "description": "Failed to create database branch"
           }
         },
-        "tags": [
-          "database branches (beta)"
-        ],
+        "tags": ["database branches (beta)"],
         "security": [
           {
             "bearer": []
@@ -1318,9 +927,7 @@
             "description": "Failed to disable preview branching"
           }
         },
-        "tags": [
-          "database branches (beta)"
-        ],
+        "tags": ["database branches (beta)"],
         "security": [
           {
             "bearer": []
@@ -1370,11 +977,7 @@
                       "type": "object"
                     }
                   },
-                  "required": [
-                    "status",
-                    "custom_hostname",
-                    "data"
-                  ]
+                  "required": ["status", "custom_hostname", "data"]
                 }
               }
             }
@@ -1386,9 +989,7 @@
             "description": "Failed to retrieve project's custom hostname config"
           }
         },
-        "tags": [
-          "custom hostname (beta)"
-        ],
+        "tags": ["custom hostname (beta)"],
         "security": [
           {
             "bearer": []
@@ -1422,9 +1023,7 @@
             "description": "Failed to delete project custom hostname configuration"
           }
         },
-        "tags": [
-          "custom hostname (beta)"
-        ],
+        "tags": ["custom hostname (beta)"],
         "security": [
           {
             "bearer": []
@@ -1460,9 +1059,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "custom_hostname"
-                ]
+                "required": ["custom_hostname"]
               }
             }
           }
@@ -1492,11 +1089,7 @@
                       "type": "object"
                     }
                   },
-                  "required": [
-                    "status",
-                    "custom_hostname",
-                    "data"
-                  ]
+                  "required": ["status", "custom_hostname", "data"]
                 }
               }
             }
@@ -1508,9 +1101,7 @@
             "description": "Failed to update project custom hostname configuration"
           }
         },
-        "tags": [
-          "custom hostname (beta)"
-        ],
+        "tags": ["custom hostname (beta)"],
         "security": [
           {
             "bearer": []
@@ -1560,11 +1151,7 @@
                       "type": "object"
                     }
                   },
-                  "required": [
-                    "status",
-                    "custom_hostname",
-                    "data"
-                  ]
+                  "required": ["status", "custom_hostname", "data"]
                 }
               }
             }
@@ -1576,9 +1163,7 @@
             "description": "Failed to verify project custom hostname configuration"
           }
         },
-        "tags": [
-          "custom hostname (beta)"
-        ],
+        "tags": ["custom hostname (beta)"],
         "security": [
           {
             "bearer": []
@@ -1628,11 +1213,7 @@
                       "type": "object"
                     }
                   },
-                  "required": [
-                    "status",
-                    "custom_hostname",
-                    "data"
-                  ]
+                  "required": ["status", "custom_hostname", "data"]
                 }
               }
             }
@@ -1644,9 +1225,7 @@
             "description": "Failed to activate project custom hostname configuration"
           }
         },
-        "tags": [
-          "custom hostname (beta)"
-        ],
+        "tags": ["custom hostname (beta)"],
         "security": [
           {
             "bearer": []
@@ -1686,9 +1265,7 @@
                       }
                     }
                   },
-                  "required": [
-                    "banned_ipv4_addresses"
-                  ]
+                  "required": ["banned_ipv4_addresses"]
                 }
               }
             }
@@ -1700,9 +1277,7 @@
             "description": "Failed to retrieve project's network bans"
           }
         },
-        "tags": [
-          "network bans (beta)"
-        ],
+        "tags": ["network bans (beta)"],
         "security": [
           {
             "bearer": []
@@ -1741,9 +1316,7 @@
                     }
                   }
                 },
-                "required": [
-                  "ipv4_addresses"
-                ]
+                "required": ["ipv4_addresses"]
               }
             }
           }
@@ -1759,9 +1332,7 @@
             "description": "Failed to remove network bans."
           }
         },
-        "tags": [
-          "network bans (beta)"
-        ],
+        "tags": ["network bans (beta)"],
         "security": [
           {
             "bearer": []
@@ -1795,10 +1366,7 @@
                   "type": "object",
                   "properties": {
                     "entitlement": {
-                      "enum": [
-                        "disallowed",
-                        "allowed"
-                      ],
+                      "enum": ["disallowed", "allowed"],
                       "type": "string"
                     },
                     "config": {
@@ -1811,9 +1379,7 @@
                           }
                         }
                       },
-                      "required": [
-                        "dbAllowedCidrs"
-                      ]
+                      "required": ["dbAllowedCidrs"]
                     },
                     "old_config": {
                       "type": "object",
@@ -1825,23 +1391,14 @@
                           }
                         }
                       },
-                      "required": [
-                        "dbAllowedCidrs"
-                      ]
+                      "required": ["dbAllowedCidrs"]
                     },
                     "status": {
-                      "enum": [
-                        "stored",
-                        "applied"
-                      ],
+                      "enum": ["stored", "applied"],
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "entitlement",
-                    "config",
-                    "status"
-                  ]
+                  "required": ["entitlement", "config", "status"]
                 }
               }
             }
@@ -1853,9 +1410,7 @@
             "description": "Failed to retrieve project's network restrictions"
           }
         },
-        "tags": [
-          "network restrictions (beta)"
-        ],
+        "tags": ["network restrictions (beta)"],
         "security": [
           {
             "bearer": []
@@ -1894,9 +1449,7 @@
                     }
                   }
                 },
-                "required": [
-                  "dbAllowedCidrs"
-                ]
+                "required": ["dbAllowedCidrs"]
               }
             }
           }
@@ -1910,10 +1463,7 @@
                   "type": "object",
                   "properties": {
                     "entitlement": {
-                      "enum": [
-                        "disallowed",
-                        "allowed"
-                      ],
+                      "enum": ["disallowed", "allowed"],
                       "type": "string"
                     },
                     "config": {
@@ -1926,9 +1476,7 @@
                           }
                         }
                       },
-                      "required": [
-                        "dbAllowedCidrs"
-                      ]
+                      "required": ["dbAllowedCidrs"]
                     },
                     "old_config": {
                       "type": "object",
@@ -1940,23 +1488,14 @@
                           }
                         }
                       },
-                      "required": [
-                        "dbAllowedCidrs"
-                      ]
+                      "required": ["dbAllowedCidrs"]
                     },
                     "status": {
-                      "enum": [
-                        "stored",
-                        "applied"
-                      ],
+                      "enum": ["stored", "applied"],
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "entitlement",
-                    "config",
-                    "status"
-                  ]
+                  "required": ["entitlement", "config", "status"]
                 }
               }
             }
@@ -1968,9 +1507,7 @@
             "description": "Failed to update project network restrictions"
           }
         },
-        "tags": [
-          "network restrictions (beta)"
-        ],
+        "tags": ["network restrictions (beta)"],
         "security": [
           {
             "bearer": []
@@ -2007,9 +1544,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "root_key"
-                  ]
+                  "required": ["root_key"]
                 }
               }
             }
@@ -2021,9 +1556,7 @@
             "description": "Failed to retrieve project's pgsodium config"
           }
         },
-        "tags": [
-          "pgsodium (beta)"
-        ],
+        "tags": ["pgsodium (beta)"],
         "security": [
           {
             "bearer": []
@@ -2057,9 +1590,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "root_key"
-                ]
+                "required": ["root_key"]
               }
             }
           }
@@ -2076,9 +1607,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "root_key"
-                  ]
+                  "required": ["root_key"]
                 }
               }
             }
@@ -2090,9 +1619,7 @@
             "description": "Failed to update project's pgsodium config"
           }
         },
-        "tags": [
-          "pgsodium (beta)"
-        ],
+        "tags": ["pgsodium (beta)"],
         "security": [
           {
             "bearer": []
@@ -2138,11 +1665,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "max_rows",
-                    "db_schema",
-                    "db_extra_search_path"
-                  ]
+                  "required": ["max_rows", "db_schema", "db_extra_search_path"]
                 }
               }
             }
@@ -2154,9 +1677,7 @@
             "description": "Failed to retrieve project's postgrest config"
           }
         },
-        "tags": [
-          "services"
-        ],
+        "tags": ["services"],
         "security": [
           {
             "bearer": []
@@ -2220,11 +1741,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "max_rows",
-                    "db_schema",
-                    "db_extra_search_path"
-                  ]
+                  "required": ["max_rows", "db_schema", "db_extra_search_path"]
                 }
               }
             }
@@ -2236,9 +1753,7 @@
             "description": "Failed to update project's postgrest config"
           }
         },
-        "tags": [
-          "services"
-        ],
+        "tags": ["services"],
         "security": [
           {
             "bearer": []
@@ -2281,10 +1796,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "name",
-                      "value"
-                    ]
+                    "required": ["name", "value"]
                   }
                 }
               }
@@ -2297,9 +1809,7 @@
             "description": "Failed to retrieve project's secrets"
           }
         },
-        "tags": [
-          "secrets"
-        ],
+        "tags": ["secrets"],
         "security": [
           {
             "apiKeyHeader": [],
@@ -2337,21 +1847,14 @@
                   "type": "object",
                   "properties": {
                     "name": {
-                      "type": "string",
-                      "maxLength": 256,
-                      "pattern": "/^(?!SUPABASE_).*/",
-                      "description": "Secret name must not start with the SUPABASE_ prefix.",
-                      "example": "string"
+                      "type": "string"
                     },
                     "value": {
                       "type": "string",
-                      "maxLength": 24576
+                      "pattern": "/^(?!SUPABASE_).*/"
                     }
                   },
-                  "required": [
-                    "name",
-                    "value"
-                  ]
+                  "required": ["name", "value"]
                 }
               }
             }
@@ -2368,9 +1871,7 @@
             "description": "Failed to create project's secrets"
           }
         },
-        "tags": [
-          "secrets"
-        ],
+        "tags": ["secrets"],
         "security": [
           {
             "apiKeyHeader": [],
@@ -2429,9 +1930,7 @@
             "description": "Failed to delete secrets with given names"
           }
         },
-        "tags": [
-          "secrets"
-        ],
+        "tags": ["secrets"],
         "security": [
           {
             "apiKeyHeader": [],
@@ -2475,18 +1974,13 @@
                           "type": "boolean"
                         }
                       },
-                      "required": [
-                        "database"
-                      ]
+                      "required": ["database"]
                     },
                     "appliedSuccessfully": {
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "currentConfig",
-                    "appliedSuccessfully"
-                  ]
+                  "required": ["currentConfig", "appliedSuccessfully"]
                 }
               }
             }
@@ -2498,9 +1992,7 @@
             "description": "Failed to retrieve project's SSL enforcement config"
           }
         },
-        "tags": [
-          "ssl enforcement (beta)"
-        ],
+        "tags": ["ssl enforcement (beta)"],
         "security": [
           {
             "bearer": []
@@ -2537,14 +2029,10 @@
                         "type": "boolean"
                       }
                     },
-                    "required": [
-                      "database"
-                    ]
+                    "required": ["database"]
                   }
                 },
-                "required": [
-                  "requestedConfig"
-                ]
+                "required": ["requestedConfig"]
               }
             }
           }
@@ -2564,18 +2052,13 @@
                           "type": "boolean"
                         }
                       },
-                      "required": [
-                        "database"
-                      ]
+                      "required": ["database"]
                     },
                     "appliedSuccessfully": {
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "currentConfig",
-                    "appliedSuccessfully"
-                  ]
+                  "required": ["currentConfig", "appliedSuccessfully"]
                 }
               }
             }
@@ -2587,9 +2070,7 @@
             "description": "Failed to update project's SSL enforcement configuration."
           }
         },
-        "tags": [
-          "ssl enforcement (beta)"
-        ],
+        "tags": ["ssl enforcement (beta)"],
         "security": [
           {
             "bearer": []
@@ -2636,9 +2117,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "types"
-                  ]
+                  "required": ["types"]
                 }
               }
             }
@@ -2650,9 +2129,7 @@
             "description": "Failed to generate TypeScript types"
           }
         },
-        "tags": [
-          "projects"
-        ],
+        "tags": ["projects"],
         "security": [
           {
             "apiKeyHeader": [],
@@ -2690,20 +2167,14 @@
                   "type": "object",
                   "properties": {
                     "status": {
-                      "enum": [
-                        "not-used",
-                        "custom-domain-used",
-                        "active"
-                      ],
+                      "enum": ["not-used", "custom-domain-used", "active"],
                       "type": "string"
                     },
                     "custom_domain": {
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "status"
-                  ]
+                  "required": ["status"]
                 }
               }
             }
@@ -2715,9 +2186,7 @@
             "description": "Failed to get project vanity subdomain configuration"
           }
         },
-        "tags": [
-          "vanity subdomain (beta)"
-        ],
+        "tags": ["vanity subdomain (beta)"],
         "security": [
           {
             "bearer": []
@@ -2751,9 +2220,7 @@
             "description": "Failed to delete project vanity subdomain configuration"
           }
         },
-        "tags": [
-          "vanity subdomain (beta)"
-        ],
+        "tags": ["vanity subdomain (beta)"],
         "security": [
           {
             "bearer": []
@@ -2789,9 +2256,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "vanity_subdomain"
-                ]
+                "required": ["vanity_subdomain"]
               }
             }
           }
@@ -2808,9 +2273,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "available"
-                  ]
+                  "required": ["available"]
                 }
               }
             }
@@ -2822,9 +2285,7 @@
             "description": "Failed to check project vanity subdomain configuration"
           }
         },
-        "tags": [
-          "vanity subdomain (beta)"
-        ],
+        "tags": ["vanity subdomain (beta)"],
         "security": [
           {
             "bearer": []
@@ -2860,9 +2321,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "vanity_subdomain"
-                ]
+                "required": ["vanity_subdomain"]
               }
             }
           }
@@ -2879,9 +2338,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "custom_domain"
-                  ]
+                  "required": ["custom_domain"]
                 }
               }
             }
@@ -2893,9 +2350,7 @@
             "description": "Failed to activate project vanity subdomain configuration"
           }
         },
-        "tags": [
-          "vanity subdomain (beta)"
-        ],
+        "tags": ["vanity subdomain (beta)"],
         "security": [
           {
             "bearer": []
@@ -2931,9 +2386,7 @@
                     "type": "number"
                   }
                 },
-                "required": [
-                  "target_version"
-                ]
+                "required": ["target_version"]
               }
             }
           }
@@ -2949,9 +2402,7 @@
             "description": "Failed to initiate project upgrade"
           }
         },
-        "tags": [
-          "database version upgrade (beta)"
-        ],
+        "tags": ["database version upgrade (beta)"],
         "security": [
           {
             "bearer": []
@@ -3005,10 +2456,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "postgres_version",
-                          "app_version"
-                        ]
+                        "required": ["postgres_version", "app_version"]
                       }
                     },
                     "requires_manual_intervention": {
@@ -3041,9 +2489,7 @@
             "description": "Failed to determine project upgrade eligibility"
           }
         },
-        "tags": [
-          "database version upgrade (beta)"
-        ],
+        "tags": ["database version upgrade (beta)"],
         "security": [
           {
             "bearer": []
@@ -3117,25 +2563,15 @@
                             },
                             "status": {
                               "type": "number",
-                              "enum": [
-                                0,
-                                1,
-                                2
-                              ]
+                              "enum": [0, 1, 2]
                             }
                           },
-                          "required": [
-                            "initiated_at",
-                            "target_version",
-                            "status"
-                          ]
+                          "required": ["initiated_at", "target_version", "status"]
                         }
                       ]
                     }
                   },
-                  "required": [
-                    "databaseUpgradeStatus"
-                  ]
+                  "required": ["databaseUpgradeStatus"]
                 }
               }
             }
@@ -3147,9 +2583,7 @@
             "description": "Failed to retrieve project upgrade status"
           }
         },
-        "tags": [
-          "database version upgrade (beta)"
-        ],
+        "tags": ["database version upgrade (beta)"],
         "security": [
           {
             "bearer": []
@@ -3192,11 +2626,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "enabled",
-                    "override_enabled",
-                    "override_active_until"
-                  ]
+                  "required": ["enabled", "override_enabled", "override_active_until"]
                 }
               }
             }
@@ -3205,9 +2635,7 @@
             "description": "Failed to get project readonly mode status"
           }
         },
-        "tags": [
-          "database readonly mode"
-        ],
+        "tags": ["database readonly mode"],
         "security": [
           {
             "bearer": []
@@ -3240,9 +2668,7 @@
             "description": "Failed to disable project's readonly mode"
           }
         },
-        "tags": [
-          "database readonly mode"
-        ],
+        "tags": ["database readonly mode"],
         "security": [
           {
             "bearer": []
@@ -3316,11 +2742,7 @@
                       "type": "string"
                     },
                     "session_replication_role": {
-                      "enum": [
-                        "origin",
-                        "replica",
-                        "local"
-                      ],
+                      "enum": ["origin", "replica", "local"],
                       "type": "string"
                     }
                   }
@@ -3332,9 +2754,7 @@
             "description": "Failed to retrieve project's Postgres config"
           }
         },
-        "tags": [
-          "projects config"
-        ],
+        "tags": ["projects config"],
         "security": [
           {
             "bearer": []
@@ -3408,11 +2828,7 @@
                     "type": "string"
                   },
                   "session_replication_role": {
-                    "enum": [
-                      "origin",
-                      "replica",
-                      "local"
-                    ],
+                    "enum": ["origin", "replica", "local"],
                     "type": "string"
                   }
                 }
@@ -3469,11 +2885,7 @@
                       "type": "string"
                     },
                     "session_replication_role": {
-                      "enum": [
-                        "origin",
-                        "replica",
-                        "local"
-                      ],
+                      "enum": ["origin", "replica", "local"],
                       "type": "string"
                     }
                   }
@@ -3485,9 +2897,7 @@
             "description": "Failed to update project's Postgres config"
           }
         },
-        "tags": [
-          "projects config"
-        ],
+        "tags": ["projects config"],
         "security": [
           {
             "bearer": []
@@ -3500,8 +2910,8 @@
     },
     "/v1/projects/{ref}/config/database/pgbouncer": {
       "get": {
-        "operationId": "v1GetPgbouncerConfig",
-        "summary": "Get project's pgbouncer config",
+        "operationId": "getPgbouncerConfig",
+        "summary": "Gets project's pgbouncer config",
         "parameters": [
           {
             "name": "ref",
@@ -3523,13 +2933,23 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "pool_mode": {
-                      "type": "string",
-                      "enum": [
-                        "transaction",
-                        "session",
-                        "statement"
-                      ]
+                    "db_dns_name": {
+                      "type": "string"
+                    },
+                    "db_host": {
+                      "type": "string"
+                    },
+                    "db_name": {
+                      "type": "string"
+                    },
+                    "db_port": {
+                      "type": "number"
+                    },
+                    "db_ssl": {
+                      "type": "boolean"
+                    },
+                    "db_user": {
+                      "type": "string"
                     },
                     "default_pool_size": {
                       "type": "number"
@@ -3537,10 +2957,46 @@
                     "ignore_startup_parameters": {
                       "type": "string"
                     },
+                    "inserted_at": {
+                      "type": "string"
+                    },
+                    "pgbouncer_enabled": {
+                      "type": "boolean"
+                    },
+                    "supavisor_enabled": {
+                      "type": "boolean"
+                    },
+                    "pgbouncer_status": {
+                      "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
+                      "type": "string"
+                    },
+                    "pool_mode": {
+                      "enum": ["transaction", "session", "statement"],
+                      "type": "string"
+                    },
                     "max_client_conn": {
-                      "type": "number"
+                      "type": "number",
+                      "nullable": true
+                    },
+                    "connectionString": {
+                      "type": "string"
                     }
-                  }
+                  },
+                  "required": [
+                    "db_dns_name",
+                    "db_host",
+                    "db_name",
+                    "db_port",
+                    "db_ssl",
+                    "db_user",
+                    "ignore_startup_parameters",
+                    "inserted_at",
+                    "pgbouncer_enabled",
+                    "supavisor_enabled",
+                    "pgbouncer_status",
+                    "pool_mode",
+                    "connectionString"
+                  ]
                 }
               }
             }
@@ -3549,8 +3005,119 @@
             "description": "Failed to retrieve project's pgbouncer config"
           }
         },
-        "tags": [
-          "projects config"
+        "tags": ["projects config"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "updatePgbouncerConfig",
+        "summary": "Updates project's pgbouncer config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "default_pool_size": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000
+                  },
+                  "max_client_conn": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 0,
+                    "maximum": 18000
+                  },
+                  "ignore_startup_parameters": {
+                    "type": "string"
+                  },
+                  "pgbouncer_enabled": {
+                    "type": "boolean"
+                  },
+                  "pool_mode": {
+                    "enum": ["transaction", "session", "statement"],
+                    "type": "string"
+                  }
+                },
+                "required": ["ignore_startup_parameters", "pgbouncer_enabled", "pool_mode"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "default_pool_size": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 1000
+                    },
+                    "max_client_conn": {
+                      "type": "integer",
+                      "nullable": true,
+                      "minimum": 0,
+                      "maximum": 18000
+                    },
+                    "ignore_startup_parameters": {
+                      "type": "string"
+                    },
+                    "pgbouncer_enabled": {
+                      "type": "boolean"
+                    },
+                    "pool_mode": {
+                      "enum": ["transaction", "session", "statement"],
+                      "type": "string"
+                    },
+                    "pgbouncer_status": {
+                      "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "ignore_startup_parameters",
+                    "pgbouncer_enabled",
+                    "pool_mode",
+                    "pgbouncer_status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to update project's pgbouncer config"
+          }
+        },
+        "tags": ["projects config"],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -3617,9 +3184,7 @@
             "description": "Failed to retrieve project's auth config"
           }
         },
-        "tags": [
-          "projects config"
-        ],
+        "tags": ["projects config"],
         "security": [
           {
             "bearer": []
@@ -3726,9 +3291,7 @@
             "description": "Failed to update project's auth config"
           }
         },
-        "tags": [
-          "projects config"
-        ],
+        "tags": ["projects config"],
         "security": [
           {
             "bearer": []
@@ -3764,9 +3327,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "query"
-                ]
+                "required": ["query"]
               }
             }
           }
@@ -3789,9 +3350,7 @@
             "description": "Failed to run sql query"
           }
         },
-        "tags": [
-          "projects (beta)"
-        ],
+        "tags": ["projects (beta)"],
         "security": [
           {
             "bearer": []
@@ -3827,9 +3386,7 @@
             "description": "Failed to enable Database Webhooks on the project"
           }
         },
-        "tags": [
-          "projects (beta)"
-        ],
+        "tags": ["projects (beta)"],
         "security": [
           {
             "bearer": []
@@ -3925,11 +3482,7 @@
                     "type": "boolean"
                   }
                 },
-                "required": [
-                  "slug",
-                  "name",
-                  "body"
-                ]
+                "required": ["slug", "name", "body"]
               }
             },
             "application/vnd.denoland.eszip": {
@@ -3950,11 +3503,7 @@
                     "type": "boolean"
                   }
                 },
-                "required": [
-                  "slug",
-                  "name",
-                  "body"
-                ]
+                "required": ["slug", "name", "body"]
               }
             }
           }
@@ -3977,11 +3526,7 @@
                       "type": "string"
                     },
                     "status": {
-                      "enum": [
-                        "ACTIVE",
-                        "REMOVED",
-                        "THROTTLED"
-                      ],
+                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
                       "type": "string"
                     },
                     "version": {
@@ -4026,9 +3571,7 @@
             "description": "Failed to create project's function"
           }
         },
-        "tags": [
-          "functions"
-        ],
+        "tags": ["functions"],
         "security": [
           {
             "apiKeyHeader": [],
@@ -4076,11 +3619,7 @@
                         "type": "string"
                       },
                       "status": {
-                        "enum": [
-                          "ACTIVE",
-                          "REMOVED",
-                          "THROTTLED"
-                        ],
+                        "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
                         "type": "string"
                       },
                       "version": {
@@ -4126,9 +3665,7 @@
             "description": "Failed to retrieve project's functions"
           }
         },
-        "tags": [
-          "functions"
-        ],
+        "tags": ["functions"],
         "security": [
           {
             "apiKeyHeader": [],
@@ -4186,11 +3723,7 @@
                       "type": "string"
                     },
                     "status": {
-                      "enum": [
-                        "ACTIVE",
-                        "REMOVED",
-                        "THROTTLED"
-                      ],
+                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
                       "type": "string"
                     },
                     "version": {
@@ -4235,9 +3768,7 @@
             "description": "Failed to retrieve function with given slug"
           }
         },
-        "tags": [
-          "functions"
-        ],
+        "tags": ["functions"],
         "security": [
           {
             "apiKeyHeader": [],
@@ -4379,11 +3910,7 @@
                       "type": "string"
                     },
                     "status": {
-                      "enum": [
-                        "ACTIVE",
-                        "REMOVED",
-                        "THROTTLED"
-                      ],
+                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
                       "type": "string"
                     },
                     "version": {
@@ -4428,9 +3955,7 @@
             "description": "Failed to update function with given slug"
           }
         },
-        "tags": [
-          "functions"
-        ],
+        "tags": ["functions"],
         "security": [
           {
             "apiKeyHeader": [],
@@ -4479,9 +4004,7 @@
             "description": "Failed to delete function with given slug"
           }
         },
-        "tags": [
-          "functions"
-        ],
+        "tags": ["functions"],
         "security": [
           {
             "apiKeyHeader": [],
@@ -4532,9 +4055,7 @@
             "description": "Failed to retrieve function body with given slug"
           }
         },
-        "tags": [
-          "functions"
-        ],
+        "tags": ["functions"],
         "security": [
           {
             "apiKeyHeader": [],
@@ -4572,9 +4093,7 @@
                 "properties": {
                   "type": {
                     "type": "string",
-                    "enum": [
-                      "saml"
-                    ],
+                    "enum": ["saml"],
                     "description": "What type of provider will be created"
                   },
                   "metadata_xml": {
@@ -4626,14 +4145,10 @@
                         }
                       }
                     },
-                    "required": [
-                      "keys"
-                    ]
+                    "required": ["keys"]
                   }
                 },
-                "required": [
-                  "type"
-                ]
+                "required": ["type"]
               }
             }
           }
@@ -4701,15 +4216,10 @@
                               }
                             }
                           },
-                          "required": [
-                            "keys"
-                          ]
+                          "required": ["keys"]
                         }
                       },
-                      "required": [
-                        "id",
-                        "entity_id"
-                      ]
+                      "required": ["id", "entity_id"]
                     },
                     "domains": {
                       "type": "array",
@@ -4729,9 +4239,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "id"
-                        ]
+                        "required": ["id"]
                       }
                     },
                     "created_at": {
@@ -4741,9 +4249,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "id"
-                  ]
+                  "required": ["id"]
                 }
               }
             }
@@ -4755,9 +4261,7 @@
             "description": "SAML 2.0 support is not enabled for this project"
           }
         },
-        "tags": [
-          "sso"
-        ],
+        "tags": ["sso"],
         "security": [
           {
             "bearer": []
@@ -4848,15 +4352,10 @@
                                     }
                                   }
                                 },
-                                "required": [
-                                  "keys"
-                                ]
+                                "required": ["keys"]
                               }
                             },
-                            "required": [
-                              "id",
-                              "entity_id"
-                            ]
+                            "required": ["id", "entity_id"]
                           },
                           "domains": {
                             "type": "array",
@@ -4876,9 +4375,7 @@
                                   "type": "string"
                                 }
                               },
-                              "required": [
-                                "id"
-                              ]
+                              "required": ["id"]
                             }
                           },
                           "created_at": {
@@ -4888,15 +4385,11 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "id"
-                        ]
+                        "required": ["id"]
                       }
                     }
                   },
-                  "required": [
-                    "items"
-                  ]
+                  "required": ["items"]
                 }
               }
             }
@@ -4908,9 +4401,7 @@
             "description": "SAML 2.0 support is not enabled for this project"
           }
         },
-        "tags": [
-          "sso"
-        ],
+        "tags": ["sso"],
         "security": [
           {
             "bearer": []
@@ -5006,15 +4497,10 @@
                               }
                             }
                           },
-                          "required": [
-                            "keys"
-                          ]
+                          "required": ["keys"]
                         }
                       },
-                      "required": [
-                        "id",
-                        "entity_id"
-                      ]
+                      "required": ["id", "entity_id"]
                     },
                     "domains": {
                       "type": "array",
@@ -5034,9 +4520,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "id"
-                        ]
+                        "required": ["id"]
                       }
                     },
                     "created_at": {
@@ -5046,9 +4530,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "id"
-                  ]
+                  "required": ["id"]
                 }
               }
             }
@@ -5060,9 +4542,7 @@
             "description": "Either SAML 2.0 was not enabled for this project, or the provider does not exist"
           }
         },
-        "tags": [
-          "sso"
-        ],
+        "tags": ["sso"],
         "security": [
           {
             "bearer": []
@@ -5149,9 +4629,7 @@
                         }
                       }
                     },
-                    "required": [
-                      "keys"
-                    ]
+                    "required": ["keys"]
                   }
                 }
               }
@@ -5221,15 +4699,10 @@
                               }
                             }
                           },
-                          "required": [
-                            "keys"
-                          ]
+                          "required": ["keys"]
                         }
                       },
-                      "required": [
-                        "id",
-                        "entity_id"
-                      ]
+                      "required": ["id", "entity_id"]
                     },
                     "domains": {
                       "type": "array",
@@ -5249,9 +4722,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "id"
-                        ]
+                        "required": ["id"]
                       }
                     },
                     "created_at": {
@@ -5261,9 +4732,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "id"
-                  ]
+                  "required": ["id"]
                 }
               }
             }
@@ -5275,9 +4744,7 @@
             "description": "Either SAML 2.0 was not enabled for this project, or the provider does not exist"
           }
         },
-        "tags": [
-          "sso"
-        ],
+        "tags": ["sso"],
         "security": [
           {
             "bearer": []
@@ -5371,15 +4838,10 @@
                               }
                             }
                           },
-                          "required": [
-                            "keys"
-                          ]
+                          "required": ["keys"]
                         }
                       },
-                      "required": [
-                        "id",
-                        "entity_id"
-                      ]
+                      "required": ["id", "entity_id"]
                     },
                     "domains": {
                       "type": "array",
@@ -5399,9 +4861,7 @@
                             "type": "string"
                           }
                         },
-                        "required": [
-                          "id"
-                        ]
+                        "required": ["id"]
                       }
                     },
                     "created_at": {
@@ -5411,9 +4871,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "id"
-                  ]
+                  "required": ["id"]
                 }
               }
             }
@@ -5425,117 +4883,7 @@
             "description": "Either SAML 2.0 was not enabled for this project, or the provider does not exist"
           }
         },
-        "tags": [
-          "sso"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/v1/projects/{ref}/database/backups/restore-pitr": {
-      "post": {
-        "operationId": "v1RestorePitr",
-        "summary": "Restores a PITR backup for a database",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "recovery_time_target_unix": {
-                    "type": "number"
-                  }
-                },
-                "required": [
-                  "recovery_time_target_unix"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "backups (beta)"
-        ],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/v1/organizations/{slug}/members": {
-      "get": {
-        "operationId": "v1ListOrganizationMembers",
-        "summary": "List members of an organization",
-        "parameters": [
-          {
-            "name": "slug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "user_id": {
-                        "type": "string"
-                      },
-                      "user_name": {
-                        "type": "string"
-                      },
-                      "email": {
-                        "type": "string"
-                      },
-                      "role_name": {
-                        "type": "string"
-                      }
-                    },
-                    "required": [
-                      "user_id",
-                      "user_name",
-                      "role_name"
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "organizations"
-        ],
+        "tags": ["sso"],
         "security": [
           {
             "bearer": []
@@ -5611,13 +4959,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "db_port",
-          "ref",
-          "postgres_version",
-          "status",
-          "db_host"
-        ]
+        "required": ["db_port", "ref", "postgres_version", "status", "db_host"]
       },
       "UpdateBranchBody": {
         "type": "object",
@@ -5680,10 +5022,7 @@
             "description": "Database version"
           }
         },
-        "required": [
-          "host",
-          "version"
-        ]
+        "required": ["host", "version"]
       },
       "ProjectResponse": {
         "type": "object",
@@ -5722,19 +5061,10 @@
                 "description": "Database version"
               }
             },
-            "required": [
-              "host",
-              "version"
-            ]
+            "required": ["host", "version"]
           }
         },
-        "required": [
-          "id",
-          "organization_id",
-          "name",
-          "region",
-          "created_at"
-        ]
+        "required": ["id", "organization_id", "name", "region", "created_at"]
       },
       "CreateProjectBody": {
         "type": "object",
@@ -5753,10 +5083,7 @@
           },
           "plan": {
             "type": "string",
-            "enum": [
-              "free",
-              "pro"
-            ],
+            "enum": ["free", "pro"],
             "description": "Subscription plan",
             "example": "free"
           },
@@ -5782,17 +5109,10 @@
             "example": "us-east-1"
           },
           "kps_enabled": {
-            "type": "boolean",
-            "deprecated": true
+            "type": "boolean"
           }
         },
-        "required": [
-          "db_pass",
-          "name",
-          "organization_id",
-          "plan",
-          "region"
-        ]
+        "required": ["db_pass", "name", "organization_id", "plan", "region"]
       },
       "OrganizationResponse": {
         "type": "object",
@@ -5804,10 +5124,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "name"
-        ]
+        "required": ["id", "name"]
       },
       "CreateOrganizationBody": {
         "type": "object",
@@ -5816,18 +5133,13 @@
             "type": "string"
           }
         },
-        "required": [
-          "name"
-        ]
+        "required": ["name"]
       },
       "OAuthTokenBody": {
         "type": "object",
         "properties": {
           "grant_type": {
-            "enum": [
-              "authorization_code",
-              "refresh_token"
-            ],
+            "enum": ["authorization_code", "refresh_token"],
             "type": "string"
           },
           "client_id": {
@@ -5849,20 +5161,14 @@
             "type": "string"
           }
         },
-        "required": [
-          "grant_type",
-          "client_id",
-          "client_secret"
-        ]
+        "required": ["grant_type", "client_id", "client_secret"]
       },
       "OAuthTokenResponse": {
         "type": "object",
         "properties": {
           "token_type": {
             "type": "string",
-            "enum": [
-              "Bearer"
-            ]
+            "enum": ["Bearer"]
           },
           "access_token": {
             "type": "string"
@@ -5874,371 +5180,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "token_type",
-          "access_token",
-          "refresh_token",
-          "expires_in"
-        ]
-      },
-      "SnippetProject": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "name"
-        ]
-      },
-      "SnippetUser": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "username": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "username"
-        ]
-      },
-      "SnippetMeta": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "inserted_at": {
-            "type": "string"
-          },
-          "updated_at": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "sql"
-            ]
-          },
-          "visibility": {
-            "type": "string",
-            "enum": [
-              "user",
-              "project",
-              "org",
-              "public"
-            ]
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "project": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "number"
-              },
-              "name": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id",
-              "name"
-            ]
-          },
-          "owner": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "number"
-              },
-              "username": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id",
-              "username"
-            ]
-          },
-          "updated_by": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "number"
-              },
-              "username": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id",
-              "username"
-            ]
-          }
-        },
-        "required": [
-          "id",
-          "inserted_at",
-          "updated_at",
-          "type",
-          "visibility",
-          "name",
-          "description",
-          "project",
-          "owner",
-          "updated_by"
-        ]
-      },
-      "SnippetList": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "string"
-                },
-                "inserted_at": {
-                  "type": "string"
-                },
-                "updated_at": {
-                  "type": "string"
-                },
-                "type": {
-                  "type": "string",
-                  "enum": [
-                    "sql"
-                  ]
-                },
-                "visibility": {
-                  "type": "string",
-                  "enum": [
-                    "user",
-                    "project",
-                    "org",
-                    "public"
-                  ]
-                },
-                "name": {
-                  "type": "string"
-                },
-                "description": {
-                  "type": "string",
-                  "nullable": true
-                },
-                "project": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "number"
-                    },
-                    "name": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "name"
-                  ]
-                },
-                "owner": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "number"
-                    },
-                    "username": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "username"
-                  ]
-                },
-                "updated_by": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "number"
-                    },
-                    "username": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "id",
-                    "username"
-                  ]
-                }
-              },
-              "required": [
-                "id",
-                "inserted_at",
-                "updated_at",
-                "type",
-                "visibility",
-                "name",
-                "description",
-                "project",
-                "owner",
-                "updated_by"
-              ]
-            }
-          }
-        },
-        "required": [
-          "data"
-        ]
-      },
-      "SnippetContent": {
-        "type": "object",
-        "properties": {
-          "favorite": {
-            "type": "boolean"
-          },
-          "schema_version": {
-            "type": "string"
-          },
-          "sql": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "favorite",
-          "schema_version",
-          "sql"
-        ]
-      },
-      "SnippetResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "inserted_at": {
-            "type": "string"
-          },
-          "updated_at": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "sql"
-            ]
-          },
-          "visibility": {
-            "enum": [
-              "user",
-              "project",
-              "org",
-              "public"
-            ],
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "project": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "number"
-              },
-              "name": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id",
-              "name"
-            ]
-          },
-          "owner": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "number"
-              },
-              "username": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id",
-              "username"
-            ]
-          },
-          "updated_by": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "number"
-              },
-              "username": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "id",
-              "username"
-            ]
-          },
-          "content": {
-            "type": "object",
-            "properties": {
-              "favorite": {
-                "type": "boolean"
-              },
-              "schema_version": {
-                "type": "string"
-              },
-              "sql": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "favorite",
-              "schema_version",
-              "sql"
-            ]
-          }
-        },
-        "required": [
-          "id",
-          "inserted_at",
-          "updated_at",
-          "type",
-          "visibility",
-          "name",
-          "description",
-          "project",
-          "owner",
-          "updated_by",
-          "content"
-        ]
+        "required": ["token_type", "access_token", "refresh_token", "expires_in"]
       },
       "ApiKeyResponse": {
         "type": "object",
@@ -6250,10 +5192,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "name",
-          "api_key"
-        ]
+        "required": ["name", "api_key"]
       },
       "CreateBranchBody": {
         "type": "object",
@@ -6268,9 +5207,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "branch_name"
-        ]
+        "required": ["branch_name"]
       },
       "UpdateCustomHostnameResponse": {
         "type": "object",
@@ -6292,11 +5229,7 @@
             "type": "object"
           }
         },
-        "required": [
-          "status",
-          "custom_hostname",
-          "data"
-        ]
+        "required": ["status", "custom_hostname", "data"]
       },
       "UpdateCustomHostnameBody": {
         "type": "object",
@@ -6305,9 +5238,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "custom_hostname"
-        ]
+        "required": ["custom_hostname"]
       },
       "NetworkBanResponse": {
         "type": "object",
@@ -6319,9 +5250,7 @@
             }
           }
         },
-        "required": [
-          "banned_ipv4_addresses"
-        ]
+        "required": ["banned_ipv4_addresses"]
       },
       "RemoveNetworkBanRequest": {
         "type": "object",
@@ -6333,9 +5262,7 @@
             }
           }
         },
-        "required": [
-          "ipv4_addresses"
-        ]
+        "required": ["ipv4_addresses"]
       },
       "NetworkRestrictionsRequest": {
         "type": "object",
@@ -6347,18 +5274,13 @@
             }
           }
         },
-        "required": [
-          "dbAllowedCidrs"
-        ]
+        "required": ["dbAllowedCidrs"]
       },
       "NetworkRestrictionsResponse": {
         "type": "object",
         "properties": {
           "entitlement": {
-            "enum": [
-              "disallowed",
-              "allowed"
-            ],
+            "enum": ["disallowed", "allowed"],
             "type": "string"
           },
           "config": {
@@ -6371,9 +5293,7 @@
                 }
               }
             },
-            "required": [
-              "dbAllowedCidrs"
-            ]
+            "required": ["dbAllowedCidrs"]
           },
           "old_config": {
             "type": "object",
@@ -6385,23 +5305,14 @@
                 }
               }
             },
-            "required": [
-              "dbAllowedCidrs"
-            ]
+            "required": ["dbAllowedCidrs"]
           },
           "status": {
-            "enum": [
-              "stored",
-              "applied"
-            ],
+            "enum": ["stored", "applied"],
             "type": "string"
           }
         },
-        "required": [
-          "entitlement",
-          "config",
-          "status"
-        ]
+        "required": ["entitlement", "config", "status"]
       },
       "PgsodiumConfigResponse": {
         "type": "object",
@@ -6410,9 +5321,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "root_key"
-        ]
+        "required": ["root_key"]
       },
       "UpdatePgsodiumConfigBody": {
         "type": "object",
@@ -6421,9 +5330,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "root_key"
-        ]
+        "required": ["root_key"]
       },
       "PostgrestConfigWithJWTSecretResponse": {
         "type": "object",
@@ -6441,11 +5348,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "max_rows",
-          "db_schema",
-          "db_extra_search_path"
-        ]
+        "required": ["max_rows", "db_schema", "db_extra_search_path"]
       },
       "UpdatePostgrestConfigBody": {
         "type": "object",
@@ -6476,11 +5379,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "max_rows",
-          "db_schema",
-          "db_extra_search_path"
-        ]
+        "required": ["max_rows", "db_schema", "db_extra_search_path"]
       },
       "SecretResponse": {
         "type": "object",
@@ -6492,30 +5391,20 @@
             "type": "string"
           }
         },
-        "required": [
-          "name",
-          "value"
-        ]
+        "required": ["name", "value"]
       },
       "CreateSecretBody": {
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "maxLength": 256,
-            "pattern": "/^(?!SUPABASE_).*/",
-            "description": "Secret name must not start with the SUPABASE_ prefix.",
-            "example": "string"
+            "type": "string"
           },
           "value": {
             "type": "string",
-            "maxLength": 24576
+            "pattern": "/^(?!SUPABASE_).*/"
           }
         },
-        "required": [
-          "name",
-          "value"
-        ]
+        "required": ["name", "value"]
       },
       "SslEnforcements": {
         "type": "object",
@@ -6524,9 +5413,7 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "database"
-        ]
+        "required": ["database"]
       },
       "SslEnforcementResponse": {
         "type": "object",
@@ -6538,18 +5425,13 @@
                 "type": "boolean"
               }
             },
-            "required": [
-              "database"
-            ]
+            "required": ["database"]
           },
           "appliedSuccessfully": {
             "type": "boolean"
           }
         },
-        "required": [
-          "currentConfig",
-          "appliedSuccessfully"
-        ]
+        "required": ["currentConfig", "appliedSuccessfully"]
       },
       "SslEnforcementRequest": {
         "type": "object",
@@ -6561,14 +5443,10 @@
                 "type": "boolean"
               }
             },
-            "required": [
-              "database"
-            ]
+            "required": ["database"]
           }
         },
-        "required": [
-          "requestedConfig"
-        ]
+        "required": ["requestedConfig"]
       },
       "TypescriptResponse": {
         "type": "object",
@@ -6577,28 +5455,20 @@
             "type": "string"
           }
         },
-        "required": [
-          "types"
-        ]
+        "required": ["types"]
       },
       "VanitySubdomainConfigResponse": {
         "type": "object",
         "properties": {
           "status": {
-            "enum": [
-              "not-used",
-              "custom-domain-used",
-              "active"
-            ],
+            "enum": ["not-used", "custom-domain-used", "active"],
             "type": "string"
           },
           "custom_domain": {
             "type": "string"
           }
         },
-        "required": [
-          "status"
-        ]
+        "required": ["status"]
       },
       "VanitySubdomainBody": {
         "type": "object",
@@ -6607,9 +5477,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "vanity_subdomain"
-        ]
+        "required": ["vanity_subdomain"]
       },
       "SubdomainAvailabilityResponse": {
         "type": "object",
@@ -6618,9 +5486,7 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "available"
-        ]
+        "required": ["available"]
       },
       "ActivateVanitySubdomainResponse": {
         "type": "object",
@@ -6629,9 +5495,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "custom_domain"
-        ]
+        "required": ["custom_domain"]
       },
       "UpgradeDatabaseBody": {
         "type": "object",
@@ -6640,9 +5504,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "target_version"
-        ]
+        "required": ["target_version"]
       },
       "ProjectVersion": {
         "type": "object",
@@ -6654,10 +5516,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "postgres_version",
-          "app_version"
-        ]
+        "required": ["postgres_version", "app_version"]
       },
       "ProjectUpgradeEligibilityResponse": {
         "type": "object",
@@ -6683,10 +5542,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "postgres_version",
-                "app_version"
-              ]
+              "required": ["postgres_version", "app_version"]
             }
           },
           "requires_manual_intervention": {
@@ -6747,18 +5603,10 @@
           },
           "status": {
             "type": "number",
-            "enum": [
-              0,
-              1,
-              2
-            ]
+            "enum": [0, 1, 2]
           }
         },
-        "required": [
-          "initiated_at",
-          "target_version",
-          "status"
-        ]
+        "required": ["initiated_at", "target_version", "status"]
       },
       "DatabaseUpgradeStatusResponse": {
         "type": "object",
@@ -6804,25 +5652,15 @@
                   },
                   "status": {
                     "type": "number",
-                    "enum": [
-                      0,
-                      1,
-                      2
-                    ]
+                    "enum": [0, 1, 2]
                   }
                 },
-                "required": [
-                  "initiated_at",
-                  "target_version",
-                  "status"
-                ]
+                "required": ["initiated_at", "target_version", "status"]
               }
             ]
           }
         },
-        "required": [
-          "databaseUpgradeStatus"
-        ]
+        "required": ["databaseUpgradeStatus"]
       },
       "ReadOnlyStatusResponse": {
         "type": "object",
@@ -6837,11 +5675,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "enabled",
-          "override_enabled",
-          "override_active_until"
-        ]
+        "required": ["enabled", "override_enabled", "override_active_until"]
       },
       "PostgresConfigResponse": {
         "type": "object",
@@ -6887,11 +5721,7 @@
             "type": "string"
           },
           "session_replication_role": {
-            "enum": [
-              "origin",
-              "replica",
-              "local"
-            ],
+            "enum": ["origin", "replica", "local"],
             "type": "string"
           }
         }
@@ -6940,25 +5770,31 @@
             "type": "string"
           },
           "session_replication_role": {
-            "enum": [
-              "origin",
-              "replica",
-              "local"
-            ],
+            "enum": ["origin", "replica", "local"],
             "type": "string"
           }
         }
       },
-      "V1PgbouncerConfigResponse": {
+      "ProjectPgBouncerConfig": {
         "type": "object",
         "properties": {
-          "pool_mode": {
-            "type": "string",
-            "enum": [
-              "transaction",
-              "session",
-              "statement"
-            ]
+          "db_dns_name": {
+            "type": "string"
+          },
+          "db_host": {
+            "type": "string"
+          },
+          "db_name": {
+            "type": "string"
+          },
+          "db_port": {
+            "type": "number"
+          },
+          "db_ssl": {
+            "type": "boolean"
+          },
+          "db_user": {
+            "type": "string"
           },
           "default_pool_size": {
             "type": "number"
@@ -6966,10 +5802,109 @@
           "ignore_startup_parameters": {
             "type": "string"
           },
+          "inserted_at": {
+            "type": "string"
+          },
+          "pgbouncer_enabled": {
+            "type": "boolean"
+          },
+          "supavisor_enabled": {
+            "type": "boolean"
+          },
+          "pgbouncer_status": {
+            "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
+            "type": "string"
+          },
+          "pool_mode": {
+            "enum": ["transaction", "session", "statement"],
+            "type": "string"
+          },
           "max_client_conn": {
-            "type": "number"
+            "type": "number",
+            "nullable": true
+          },
+          "connectionString": {
+            "type": "string"
           }
-        }
+        },
+        "required": [
+          "db_dns_name",
+          "db_host",
+          "db_name",
+          "db_port",
+          "db_ssl",
+          "db_user",
+          "ignore_startup_parameters",
+          "inserted_at",
+          "pgbouncer_enabled",
+          "supavisor_enabled",
+          "pgbouncer_status",
+          "pool_mode",
+          "connectionString"
+        ]
+      },
+      "UpdatePgbouncerConfigBody": {
+        "type": "object",
+        "properties": {
+          "default_pool_size": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "max_client_conn": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0,
+            "maximum": 18000
+          },
+          "ignore_startup_parameters": {
+            "type": "string"
+          },
+          "pgbouncer_enabled": {
+            "type": "boolean"
+          },
+          "pool_mode": {
+            "enum": ["transaction", "session", "statement"],
+            "type": "string"
+          }
+        },
+        "required": ["ignore_startup_parameters", "pgbouncer_enabled", "pool_mode"]
+      },
+      "UpdatePoolingConfigResponse": {
+        "type": "object",
+        "properties": {
+          "default_pool_size": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "max_client_conn": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 0,
+            "maximum": 18000
+          },
+          "ignore_startup_parameters": {
+            "type": "string"
+          },
+          "pgbouncer_enabled": {
+            "type": "boolean"
+          },
+          "pool_mode": {
+            "enum": ["transaction", "session", "statement"],
+            "type": "string"
+          },
+          "pgbouncer_status": {
+            "enum": ["COMING_DOWN", "COMING_UP", "DISABLED", "ENABLED", "RELOADING"],
+            "type": "string"
+          }
+        },
+        "required": [
+          "ignore_startup_parameters",
+          "pgbouncer_enabled",
+          "pool_mode",
+          "pgbouncer_status"
+        ]
       },
       "AuthConfigResponse": {
         "type": "object",
@@ -7040,9 +5975,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "query"
-        ]
+        "required": ["query"]
       },
       "CreateFunctionBody": {
         "type": "object",
@@ -7061,11 +5994,7 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "slug",
-          "name",
-          "body"
-        ]
+        "required": ["slug", "name", "body"]
       },
       "FunctionResponse": {
         "type": "object",
@@ -7080,11 +6009,7 @@
             "type": "string"
           },
           "status": {
-            "enum": [
-              "ACTIVE",
-              "REMOVED",
-              "THROTTLED"
-            ],
+            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
             "type": "string"
           },
           "version": {
@@ -7109,15 +6034,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "slug",
-          "name",
-          "status",
-          "version",
-          "created_at",
-          "updated_at"
-        ]
+        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
       },
       "FunctionSlugResponse": {
         "type": "object",
@@ -7132,11 +6049,7 @@
             "type": "string"
           },
           "status": {
-            "enum": [
-              "ACTIVE",
-              "REMOVED",
-              "THROTTLED"
-            ],
+            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
             "type": "string"
           },
           "version": {
@@ -7161,15 +6074,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "slug",
-          "name",
-          "status",
-          "version",
-          "created_at",
-          "updated_at"
-        ]
+        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
       },
       "UpdateFunctionBody": {
         "type": "object",
@@ -7252,18 +6157,14 @@
             }
           }
         },
-        "required": [
-          "keys"
-        ]
+        "required": ["keys"]
       },
       "CreateProviderBody": {
         "type": "object",
         "properties": {
           "type": {
             "type": "string",
-            "enum": [
-              "saml"
-            ],
+            "enum": ["saml"],
             "description": "What type of provider will be created"
           },
           "metadata_xml": {
@@ -7315,14 +6216,10 @@
                 }
               }
             },
-            "required": [
-              "keys"
-            ]
+            "required": ["keys"]
           }
         },
-        "required": [
-          "type"
-        ]
+        "required": ["type"]
       },
       "SamlDescriptor": {
         "type": "object",
@@ -7376,15 +6273,10 @@
                 }
               }
             },
-            "required": [
-              "keys"
-            ]
+            "required": ["keys"]
           }
         },
-        "required": [
-          "id",
-          "entity_id"
-        ]
+        "required": ["id", "entity_id"]
       },
       "Domain": {
         "type": "object",
@@ -7402,9 +6294,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "CreateProviderResponse": {
         "type": "object",
@@ -7464,15 +6354,10 @@
                     }
                   }
                 },
-                "required": [
-                  "keys"
-                ]
+                "required": ["keys"]
               }
             },
-            "required": [
-              "id",
-              "entity_id"
-            ]
+            "required": ["id", "entity_id"]
           },
           "domains": {
             "type": "array",
@@ -7492,9 +6377,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "id"
-              ]
+              "required": ["id"]
             }
           },
           "created_at": {
@@ -7504,9 +6387,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "Provider": {
         "type": "object",
@@ -7566,15 +6447,10 @@
                     }
                   }
                 },
-                "required": [
-                  "keys"
-                ]
+                "required": ["keys"]
               }
             },
-            "required": [
-              "id",
-              "entity_id"
-            ]
+            "required": ["id", "entity_id"]
           },
           "domains": {
             "type": "array",
@@ -7594,9 +6470,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "id"
-              ]
+              "required": ["id"]
             }
           },
           "created_at": {
@@ -7606,9 +6480,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "ListProvidersResponse": {
         "type": "object",
@@ -7673,15 +6545,10 @@
                           }
                         }
                       },
-                      "required": [
-                        "keys"
-                      ]
+                      "required": ["keys"]
                     }
                   },
-                  "required": [
-                    "id",
-                    "entity_id"
-                  ]
+                  "required": ["id", "entity_id"]
                 },
                 "domains": {
                   "type": "array",
@@ -7701,9 +6568,7 @@
                         "type": "string"
                       }
                     },
-                    "required": [
-                      "id"
-                    ]
+                    "required": ["id"]
                   }
                 },
                 "created_at": {
@@ -7713,15 +6578,11 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "id"
-              ]
+              "required": ["id"]
             }
           }
         },
-        "required": [
-          "items"
-        ]
+        "required": ["items"]
       },
       "GetProviderResponse": {
         "type": "object",
@@ -7781,15 +6642,10 @@
                     }
                   }
                 },
-                "required": [
-                  "keys"
-                ]
+                "required": ["keys"]
               }
             },
-            "required": [
-              "id",
-              "entity_id"
-            ]
+            "required": ["id", "entity_id"]
           },
           "domains": {
             "type": "array",
@@ -7809,9 +6665,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "id"
-              ]
+              "required": ["id"]
             }
           },
           "created_at": {
@@ -7821,9 +6675,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "UpdateProviderBody": {
         "type": "object",
@@ -7877,9 +6729,7 @@
                 }
               }
             },
-            "required": [
-              "keys"
-            ]
+            "required": ["keys"]
           }
         }
       },
@@ -7941,15 +6791,10 @@
                     }
                   }
                 },
-                "required": [
-                  "keys"
-                ]
+                "required": ["keys"]
               }
             },
-            "required": [
-              "id",
-              "entity_id"
-            ]
+            "required": ["id", "entity_id"]
           },
           "domains": {
             "type": "array",
@@ -7969,9 +6814,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "id"
-              ]
+              "required": ["id"]
             }
           },
           "created_at": {
@@ -7981,9 +6824,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
+        "required": ["id"]
       },
       "DeleteProviderResponse": {
         "type": "object",
@@ -8043,15 +6884,10 @@
                     }
                   }
                 },
-                "required": [
-                  "keys"
-                ]
+                "required": ["keys"]
               }
             },
-            "required": [
-              "id",
-              "entity_id"
-            ]
+            "required": ["id", "entity_id"]
           },
           "domains": {
             "type": "array",
@@ -8071,9 +6907,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "id"
-              ]
+              "required": ["id"]
             }
           },
           "created_at": {
@@ -8083,42 +6917,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id"
-        ]
-      },
-      "V1RestorePitrBody": {
-        "type": "object",
-        "properties": {
-          "recovery_time_target_unix": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "recovery_time_target_unix"
-        ]
-      },
-      "V1OrganizationMemberResponse": {
-        "type": "object",
-        "properties": {
-          "user_id": {
-            "type": "string"
-          },
-          "user_name": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "role_name": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "user_id",
-          "user_name",
-          "role_name"
-        ]
+        "required": ["id"]
       }
     }
   }
