@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -91,25 +91,25 @@ const Nav = () => {
     <>
       <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
         <div
-          className={[
+          className={cn(
             'absolute inset-0 h-full w-full opacity-80 bg-background',
             !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
-            showLaunchWeekNavMode && '!bg-transparent transition-all',
-          ].join(' ')}
+            showLaunchWeekNavMode && '!bg-transparent transition-all'
+          )}
         />
         <nav
-          className={[
+          className={cn(
             `relative z-40 border-border border-b backdrop-blur-sm transition-opacity`,
             showLaunchWeekNavMode ? '!opacity-100 !border-[#e0d2f430]' : '',
-            isLaunchWeekPage && showLaunchWeekNavMode ? '!border-b-0' : '',
-          ].join(' ')}
+            isLaunchWeekPage && showLaunchWeekNavMode ? '!border-b-0' : ''
+          )}
         >
           <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-16 xl:px-20">
             <div className="flex items-center px-6 lg:px-0 flex-1 sm:items-stretch justify-between">
               <div className="flex items-center">
                 <div className="flex items-center flex-shrink-0">
                   <Link href="/" as="/">
-                    <a className="block w-auto h-6">
+                    <a className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm">
                       <Image
                         src={
                           isLaunchWeekPage || resolvedTheme === 'dark' || isHomePage
@@ -125,7 +125,7 @@ const Nav = () => {
 
                   {isLaunchWeekPage && (
                     <Link href="/launch-week" as="/launch-week">
-                      <a className="hidden ml-2 xl:block font-mono text-sm uppercase leading-4">
+                      <a className="hidden ml-2 xl:block font-mono text-sm uppercase leading-4 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm">
                         Launch Week
                       </a>
                     </Link>
