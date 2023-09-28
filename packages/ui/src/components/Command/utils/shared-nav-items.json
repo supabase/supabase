@@ -203,6 +203,10 @@
         {
           "label": "Network Restrictions",
           "url": "/project/_/settings/database#network-restrictions"
+        },
+        {
+          "label": "Banned IPs",
+          "url": "/project/_/settings/database#banned-ips"
         }
       ]
     }
