@@ -9,6 +9,7 @@ import MenuItem from './MenuItem'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+import { useKey } from 'react-use'
 
 interface Props {
   open: boolean
@@ -30,6 +31,8 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
     exit: { opacity: 0, transition: { duration: 0.05 } },
   }
 
+  useKey('Escape', () => setOpen(false))
+
   return (
     <LazyMotion features={domAnimation}>
       <AnimatePresence exitBeforeEnter>
@@ -43,7 +46,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
           >
             <div className="absolute h-16 px-6 flex items-center justify-between w-screen left-0 top-0 z-50 bg-overlay">
               <Link href="/" as="/">
-                <a className="block w-auto h-6">
+                <a className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm">
                   <Image
                     src={isDarkMode ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight}
                     width={124}
@@ -55,7 +58,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
               <button
                 onClick={() => setOpen(false)}
                 type="button"
-                className="inline-flex items-center justify-center p-2 bg-white rounded-md text-scale-900 focus:ring-brand dark:bg-scale-300 dark:hover:bg-scale-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset"
+                className="inline-flex items-center justify-center p-2 bg-white rounded-md text-lighter focus:ring-brand dark:bg-surface-100 dark:hover:bg-surface-200 hover:bg-surface-100 focus:outline-none focus:ring-2 focus:ring-inset"
               >
                 <span className="sr-only">Close menu</span>
                 <svg
@@ -95,7 +98,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
                         <Accordion.Item
                           header={menuItem.title}
                           id={menuItem.title}
-                          className="block relative py-2 pl-3 pr-4 text-base font-medium text-foreground hover:bg-overlay-hover hover:border-gray-300"
+                          className="block relative py-2 pl-3 pr-4 text-base font-medium text-foreground hover:bg-surface-200"
                         >
                           {menuItem.title === 'Product' ? (
                             Object.values(menuItem.subMenu)?.map((component: any) => (
@@ -150,7 +153,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
                         </Accordion.Item>
                       ) : (
                         <Link href={menuItem.url}>
-                          <a className="block py-2 pl-3 pr-4 text-base font-medium text-scale-900 dark:hover:bg-scale-600 hover:border-gray-300 hover:bg-gray-50 dark:text-white">
+                          <a className="block py-2 pl-3 pr-4 text-base font-medium text-lighter hover:bg-surface-200 dark:text-white focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded">
                             {menuItem.title}
                           </a>
                         </Link>

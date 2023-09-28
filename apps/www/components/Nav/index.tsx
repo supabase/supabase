@@ -35,7 +35,7 @@ const Nav = () => {
 
   const isHomePage = router.pathname === '/'
   const isLaunchWeekPage = router.pathname.includes('launch-week')
-  const showLaunchWeekNavMode = (isLaunchWeekPage || isHomePage) && !open
+  const showLaunchWeekNavMode = isLaunchWeekPage && !open
 
   React.useEffect(() => {
     if (open) {
