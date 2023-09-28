@@ -65,8 +65,8 @@ export const UserReportPage: NextPageWithLayout = () => {
           disabled={!canCreateReport}
           disabledMessage="You need additional permissions to create a report"
         >
-          <p className="text-scale-1100 text-sm">Create custom reports for your projects.</p>
-          <p className="text-scale-1100 text-sm">
+          <p className="text-foreground-light text-sm">Create custom reports for your projects.</p>
+          <p className="text-foreground-light text-sm">
             Get a high level overview of your network traffic, user actions, and infrastructure
             health.
           </p>

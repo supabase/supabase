@@ -15,6 +15,7 @@ import {
   Toggle,
 } from 'ui'
 
+import { useParams } from 'common'
 import { SpendCapModal } from 'components/interfaces/BillingV2'
 import InformationBox from 'components/ui/InformationBox'
 import Panel from 'components/ui/Panel'
@@ -23,7 +24,6 @@ import { invalidateOrganizationsQuery } from 'data/organizations/organizations-q
 import { useStore } from 'hooks'
 import { BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
-import { useParams } from 'common'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -183,7 +183,9 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                 Cancel
               </Button>
               <div className="flex items-center space-x-3">
-                <p className="text-xs text-scale-900">You can rename your organization later</p>
+                <p className="text-xs text-foreground-lighter">
+                  You can rename your organization later
+                </p>
                 <Button
                   htmlType="submit"
                   type="primary"
@@ -198,7 +200,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         >
           <Panel.Content className="pt-0">
             <p className="text-sm">This is your organization within Supabase.</p>
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               For example, you can use the name of your company or department.
             </p>
           </Panel.Content>

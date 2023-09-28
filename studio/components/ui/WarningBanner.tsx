@@ -8,7 +8,7 @@ const WarningBanner = ({ title, description }: { title: string; description?: st
           <IconAlertCircle size={14} strokeWidth={2} />
         </div>
         <div className="flex flex-col items-start gap-x-3 xl:flex-row xl:items-center">
-          <h2 className="text-sm text-scale-1200 dark:text-scale-100">{title}</h2>
+          <h2 className="text-sm text-foreground dark:text-scale-100">{title}</h2>
           {description && (
             <p className="text-xs text-yellow-1200 dark:text-yellow-800">{description}</p>
           )}
