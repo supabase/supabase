@@ -1,19 +1,28 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { observer } from 'mobx-react-lite'
-import { useContext } from 'react'
-import { Button, Dropdown, IconMail, IconMoreHorizontal, IconShieldOff, IconTrash } from 'ui'
-
 import { useParams } from 'common'
+import {
+  Button,
+  cn,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconMail,
+  IconMoreHorizontal,
+  IconShieldOff,
+  IconTrash,
+} from 'ui'
+
 import { confirmAlert } from 'components/to-be-cleaned/ModalsDeprecated/ConfirmModal'
 import { useUserDeleteMFAFactorsMutation } from 'data/auth/user-delete-mfa-factors-mutation'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
 import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mutation'
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
+import { User } from 'data/auth/users-query'
 import { useStore } from 'hooks'
 import { timeout } from 'lib/helpers'
-import { PageContext } from 'pages/project/[ref]/auth/users'
-import { User } from './Users.types'
 
 interface UserDropdownProps {
   user: User
@@ -24,7 +33,6 @@ interface UserDropdownProps {
 const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdownProps) => {
   const { ui } = useStore()
   const { ref } = useParams()
-  const PageState: any = useContext(PageContext)
 
   const { mutate: resetPassword, isLoading: isResetting } = useUserResetPasswordMutation({
     onSuccess: () => {
@@ -80,8 +88,6 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
         try {
           await deleteUser({ projectRef: ref, user })
           ui.setNotification({ category: 'success', message: `Successfully deleted ${user.email}` })
-          PageState.users = PageState.users.filter((x: any) => x.id != user.id)
-          PageState.totalUsers -= 1
         } catch (error) {}
       },
     })
@@ -94,6 +100,8 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
       message: `This is permanent! Are you sure you want to delete the user's MFA factors?`,
       onAsyncConfirm: async () => {
         if (!ref) return console.error('Project ref is required')
+        if (!user.id) return console.error('User id is required')
+
         try {
           await deleteUserMFAFactors({ projectRef: ref, userId: user.id })
           ui.setNotification({
@@ -107,35 +115,49 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
   }
 
   return (
-    <Dropdown
-      size="medium"
-      overlay={
+    <DropdownMenu_Shadcn_>
+      <DropdownMenuTrigger_Shadcn_>
+        <Button
+          asChild
+          type="text"
+          icon={<IconMoreHorizontal />}
+          loading={isLoading}
+          className="hover:border-gray-500 flex"
+        >
+          <span />
+        </Button>
+      </DropdownMenuTrigger_Shadcn_>
+      <DropdownMenuContent_Shadcn_>
         <>
           {user.email !== null ? (
             <>
-              <Dropdown.Item onClick={handleResetPassword} icon={<IconMail size="tiny" />}>
-                Send password recovery
-              </Dropdown.Item>
-              <Dropdown.Item onClick={handleSendMagicLink} icon={<IconMail size="tiny" />}>
-                Send magic link
-              </Dropdown.Item>
+              <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={handleResetPassword}>
+                <IconMail size="tiny" />
+                <p className="text">Send password recovery</p>
+              </DropdownMenuItem_Shadcn_>
+              <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={handleSendMagicLink}>
+                <IconMail size="tiny" />
+                <p className="text">Send magic link</p>
+              </DropdownMenuItem_Shadcn_>
             </>
           ) : null}
           {user.phone !== null ? (
-            <Dropdown.Item onClick={handleSendOtp} icon={<IconMail size="tiny" />}>
-              Send OTP
-            </Dropdown.Item>
+            <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={handleSendOtp}>
+              <IconMail size="tiny" />
+              <p className="text">Send OTP</p>
+            </DropdownMenuItem_Shadcn_>
           ) : null}
-          <Dropdown.Separator />
+          <DropdownMenuSeparator_Shadcn_ />
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger asChild>
-              <Dropdown.Item
+              <DropdownMenuItem_Shadcn_
                 onClick={handleDeleteFactors}
-                icon={<IconShieldOff size="tiny" />}
                 disabled={!canRemoveMFAFactors}
+                className="space-x-2"
               >
-                Remove MFA factors
-              </Dropdown.Item>
+                <IconShieldOff size="tiny" />
+                <p className="text">Remove MFA factors</p>
+              </DropdownMenuItem_Shadcn_>
             </Tooltip.Trigger>
             {/* 
                 [Joshen] Deleting MFA factors should be different ABAC perms i think
@@ -151,7 +173,7 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
                       'border border-scale-200',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text-foreground">
                       You need additional permissions to remove a user's authentication factors.
                     </span>
                   </div>
@@ -161,25 +183,26 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
           </Tooltip.Root>
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger asChild>
-              <Dropdown.Item
+              <DropdownMenuItem_Shadcn_
                 onClick={handleDelete}
-                icon={<IconTrash size="tiny" />}
                 disabled={!canRemoveUser}
+                className="space-x-2"
               >
-                Delete user
-              </Dropdown.Item>
+                <IconTrash size="tiny" />
+                <p className="text">Delete user</p>
+              </DropdownMenuItem_Shadcn_>
             </Tooltip.Trigger>
             {!canRemoveUser && (
               <Tooltip.Portal>
                 <Tooltip.Content side="bottom">
                   <Tooltip.Arrow className="radix-tooltip-arrow" />
                   <div
-                    className={[
+                    className={cn([
                       'rounded bg-scale-100 py-1 px-2 leading-none shadow',
                       'border border-scale-200',
-                    ].join(' ')}
+                    ])}
                   >
-                    <span className="text-xs text-scale-1200">
+                    <span className="text-xs text-foreground">
                       You need additional permissions to delete users
                     </span>
                   </div>
@@ -188,19 +211,9 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
             )}
           </Tooltip.Root>
         </>
-      }
-    >
-      <Button
-        asChild
-        type="text"
-        icon={<IconMoreHorizontal />}
-        loading={isLoading}
-        className="hover:border-gray-500"
-      >
-        <span />
-      </Button>
-    </Dropdown>
+      </DropdownMenuContent_Shadcn_>
+    </DropdownMenu_Shadcn_>
   )
 }
 
-export default observer(UserDropdown)
+export default UserDropdown

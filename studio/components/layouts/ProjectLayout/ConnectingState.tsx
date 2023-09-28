@@ -57,13 +57,13 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
               <div className="mx-auto flex max-w-[300px] items-center justify-center">
                 <div>
                   <div className="flex items-center justify-center w-12 h-12 rounded-md border">
-                    <IconMonitor className="text-scale-1100" size={30} strokeWidth={1.5} />
+                    <IconMonitor className="text-foreground-light" size={30} strokeWidth={1.5} />
                   </div>
                 </div>
                 <ShimmerLine active />
                 <div>
                   <div className="flex items-center justify-center w-12 h-12 rounded-md border">
-                    <IconServer className="text-scale-1100" size={30} strokeWidth={1.5} />
+                    <IconServer className="text-foreground-light" size={30} strokeWidth={1.5} />
                   </div>
                 </div>
               </div>

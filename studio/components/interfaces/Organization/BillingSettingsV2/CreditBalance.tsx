@@ -32,7 +32,7 @@ const CreditBalance = () => {
             {isCredit && <Badge>You have credits available</Badge>}
             {isDebt && <Badge color="red">Outstanding payments</Badge>}
           </div>
-          <p className="text-sm text-scale-1000 m-0">
+          <p className="text-sm text-foreground-light m-0">
             Charges will be deducted from your balance first
           </p>
         </div>
