@@ -99,7 +99,7 @@ const Index = () => {
             </SearchButton>
           </SectionContainer>
         </div>
-        <SectionContainer className="text grid gap-5 md:grid-cols-2 max-w-7xl">
+        <SectionContainer className="text grid gap-5 md:grid-cols-2 max-w-7xl !pb-8">
           <InteractiveShimmerCard innerClassName="flex flex-col p-5">
             <div className="mb-4 lg:mb-8 flex-1">
               <h2 className="text text-lg font-medium">Issues and Feature requests</h2>
