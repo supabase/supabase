@@ -140,14 +140,6 @@ Use this to guarantee that the server has received the message before resolving 
 You can also send a Broadcast message by making an HTTP request to Reatlime servers. This is useful when you want to send messages from your server or client without having to first establish a WebSocket connection.
 
 ```js
-import { RealtimeClient } from '@supabase/realtime-js'
-
-const client = new RealtimeClient(REALTIME_URL, {
-  params: {
-    apikey: API_KEY,
-  },
-})
-
 const channel = client.channel('test-channel')
 
 // No need to subscribe to channel
