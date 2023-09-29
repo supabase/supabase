@@ -159,7 +159,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                     <IconChevronDown
                       size={18}
                       strokeWidth={2}
-                      className={clsx('text-scale-1100', showConfiguration && 'rotate-180')}
+                      className={clsx('text-foreground-light', showConfiguration && 'rotate-180')}
                     />
                   </div>
                 </Collapsible.Trigger>
@@ -209,7 +209,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                           </div>
                           {IS_PLATFORM && (
                             <div className="col-span-12">
-                              <p className="text-scale-1000 text-sm">
+                              <p className="text-foreground-light text-sm">
                                 Note: The{' '}
                                 <Link href={`/project/${ref}/settings/storage`}>
                                   <a className="text-brand opacity-80 hover:opacity-100 transition">

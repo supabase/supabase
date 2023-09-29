@@ -51,7 +51,7 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
             >
               <div className="flex items-center gap-3">
                 <div className="flex items-center space-x-4">
-                  <h1 className="text-2xl text-scale-1200">Edge Functions</h1>
+                  <h1 className="text-2xl text-foreground">Edge Functions</h1>
                 </div>
               </div>
             </div>
@@ -81,13 +81,13 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
                 <div className="flex items-center justify-between w-full">
                   <div className="flex items-center space-x-4">
                     <Link href={`/project/${ref}/functions`}>
-                      <h1 className="cursor-pointer text-2xl text-scale-1200 transition-colors hover:text-scale-1100">
+                      <h1 className="cursor-pointer text-2xl text-foreground transition-colors hover:text-foreground-light">
                         Edge Functions
                       </h1>
                     </Link>
                     {name && (
                       <div className="mt-1.5 flex items-center space-x-4">
-                        <span className="text-scale-1000">
+                        <span className="text-foreground-light">
                           <svg
                             viewBox="0 0 24 24"
                             width="16"
@@ -102,7 +102,7 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
                             <path d="M16 3.549L7.12 20.600"></path>
                           </svg>
                         </span>
-                        <h5 className="text-lg text-scale-1200">{name}</h5>
+                        <h5 className="text-lg text-foreground">{name}</h5>
                       </div>
                     )}
                   </div>

@@ -12,7 +12,7 @@
   @apply flex;
   @apply text-grid;
   @apply border-scale-400 dark:border-scale-500 border-r border-b;
-  @apply text-scale-1200;
+  @apply text-foreground;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -477,13 +477,13 @@
 }
 
 .sb-grid-column-header__inner__name {
-  @apply text-scale-1200 overflow-hidden overflow-ellipsis text-xs select-text;
+  @apply text-foreground overflow-hidden overflow-ellipsis text-xs select-text;
 }
 
 .sb-grid-column-header__inner__format {
   @apply text-xs;
   @apply overflow-hidden overflow-ellipsis font-normal;
-  @apply text-scale-1000;
+  @apply text-foreground-light;
 }
 
 .sb-grid-column-header__inner__primary-key {

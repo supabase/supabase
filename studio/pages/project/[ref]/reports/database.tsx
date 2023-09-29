@@ -79,7 +79,7 @@ const DatabaseUsage = observer(() => {
             {orgLevelBilling ? (
               <Panel.Content>
                 <div className="space-y-1">
-                  <h5 className="text-sm text-scale-1200">Disk Usage</h5>
+                  <h5 className="text-sm text-foreground">Disk Usage</h5>
                   <SparkBar
                     type="horizontal"
                     value={databaseSize}
@@ -103,7 +103,7 @@ const DatabaseUsage = observer(() => {
 
                 {isPaidTier && (
                   <div className="flex justify-between items-center mt-3">
-                    <div className="flex flex-row space-x-3 text-scale-1000 text-sm">
+                    <div className="flex flex-row space-x-3 text-foreground-light text-sm">
                       <Badge>Auto-Scaling</Badge>
                     </div>
 
@@ -122,7 +122,7 @@ const DatabaseUsage = observer(() => {
             ) : (
               <Panel.Content>
                 <div className="space-y-1">
-                  <h5 className="text-sm text-scale-1200">Database size</h5>
+                  <h5 className="text-sm text-foreground">Database size</h5>
                   <SparkBar
                     type="horizontal"
                     value={databaseSize}
@@ -142,7 +142,7 @@ const DatabaseUsage = observer(() => {
 
                 {isPaidTier && (
                   <div className="flex justify-between items-center mt-3">
-                    <div className="flex flex-row space-x-3 text-scale-1000 text-sm">
+                    <div className="flex flex-row space-x-3 text-foreground-light text-sm">
                       {usage?.disk_volume_size_gb && (
                         <span>Disk Size: {usage.disk_volume_size_gb} GB</span>
                       )}
@@ -166,7 +166,7 @@ const DatabaseUsage = observer(() => {
             {!orgLevelBilling && (
               <Panel.Content>
                 <div className="space-y-1">
-                  <h5 className="text-sm text-scale-1200">Database egress</h5>
+                  <h5 className="text-sm text-foreground">Database egress</h5>
                   <SparkBar
                     type="horizontal"
                     value={usage?.db_egress?.usage ?? 0}
@@ -188,7 +188,7 @@ const DatabaseUsage = observer(() => {
 
             {orgLevelBilling && (
               <Panel.Content>
-                <p className="text-sm text-scale-1200">
+                <p className="text-sm text-foreground">
                   Head to your{' '}
                   <Link href={`/org/${selectedOrganization?.slug}/usage`}>
                     <a>
@@ -215,13 +215,13 @@ const DatabaseUsage = observer(() => {
                 />
                 {dateRange && (
                   <div className="flex items-center space-x-2">
-                    <p className="text-scale-1000">
+                    <p className="text-foreground-light">
                       {dayjs(dateRange.period_start.date).format('MMMM D, hh:mma')}
                     </p>
-                    <p className="text-scale-1000">
+                    <p className="text-foreground-light">
                       <IconArrowRight size={12} />
                     </p>
-                    <p className="text-scale-1000">
+                    <p className="text-foreground-light">
                       {dayjs(dateRange.period_end.date).format('MMMM D, hh:mma')}
                     </p>
                   </div>

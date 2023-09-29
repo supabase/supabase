@@ -9,7 +9,18 @@ import Table from 'components/to-be-cleaned/Table'
 import { useDatabaseHooks } from 'data/database-triggers/database-triggers-query'
 import { useCheckPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import { Badge, Button, Dropdown, IconEdit3, IconMoreVertical, IconTrash } from 'ui'
+import {
+  Badge,
+  Button,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuItem_Shadcn_,
+  DropdownMenuSeparator_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconEdit3,
+  IconMoreVertical,
+  IconTrash,
+} from 'ui'
 
 export interface HookListProps {
   schema: string
@@ -78,26 +89,30 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
             <Table.td className="text-right">
               <div className="flex justify-end gap-4">
                 {canUpdateWebhook ? (
-                  <Dropdown
-                    side="left"
-                    overlay={
+                  <DropdownMenu_Shadcn_>
+                    <DropdownMenuTrigger_Shadcn_>
+                      <Button asChild type="default" icon={<IconMoreVertical />} className="px-1">
+                        <span></span>
+                      </Button>
+                    </DropdownMenuTrigger_Shadcn_>
+
+                    <DropdownMenuContent_Shadcn_ side="left">
                       <>
-                        <Dropdown.Item icon={<IconEdit3 size="tiny" />} onClick={() => editHook(x)}>
-                          Edit hook
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                          icon={<IconTrash stroke="red" size="tiny" />}
+                        <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={() => editHook(x)}>
+                          <IconEdit3 size="tiny" />
+                          <p className="text">Edit hook</p>
+                        </DropdownMenuItem_Shadcn_>
+                        <DropdownMenuSeparator_Shadcn_ />
+                        <DropdownMenuItem_Shadcn_
+                          className="space-x-2"
                           onClick={() => deleteHook(x)}
                         >
-                          Delete hook
-                        </Dropdown.Item>
+                          <IconTrash stroke="red" size="tiny" />
+                          <p className="text">Delete hook</p>
+                        </DropdownMenuItem_Shadcn_>
                       </>
-                    }
-                  >
-                    <Button asChild type="default" icon={<IconMoreVertical />} className="px-1">
-                      <span></span>
-                    </Button>
-                  </Dropdown>
+                    </DropdownMenuContent_Shadcn_>
+                  </DropdownMenu_Shadcn_>
                 ) : (
                   <Tooltip.Root delayDuration={0}>
                     <Tooltip.Trigger asChild>
@@ -112,7 +127,7 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
                             'border border-scale-200',
                           ].join(' ')}
                         >
-                          <span className="text-xs text-scale-1200">
+                          <span className="text-xs text-foreground">
                             You need additional permissions to update webhooks
                           </span>
                         </div>

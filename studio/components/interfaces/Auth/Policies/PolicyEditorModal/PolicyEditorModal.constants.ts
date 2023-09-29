@@ -83,7 +83,8 @@ FOR DELETE USING (
     check: '',
     command: 'DELETE',
     roles: [],
-  },  {
+  },
+  {
     id: 'policy-5',
     templateName: 'Enable insert access for users based on their user ID *',
     description:

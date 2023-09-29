@@ -37,7 +37,7 @@ const AccessTokenList = observer(() => {
             tokens && tokens.length == 0 ? (
               <Table.tr>
                 <Table.td colSpan={5} className="p-3 py-12 text-center">
-                  <p className="text-scale-1000">
+                  <p className="text-foreground-light">
                     {isLoading ? 'Checking for tokens' : 'You do not have any tokens created yet'}
                   </p>
                 </Table.td>
@@ -89,7 +89,7 @@ const AccessTokenList = observer(() => {
         }}
       >
         <Modal.Content>
-          <p className="py-4 text-sm text-scale-1100">
+          <p className="py-4 text-sm text-foreground-light">
             {`This action cannot be undone. Are you sure you want to delete "${token?.name}" token?`}
           </p>
         </Modal.Content>

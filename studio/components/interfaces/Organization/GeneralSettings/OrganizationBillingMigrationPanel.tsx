@@ -21,7 +21,7 @@ const OrganizationBillingMigrationPanel = observer(() => {
         <Panel.Content>
           <div className="flex justify-between gap-12">
             <div className="space-y-2">
-              <p className="text-sm text-scale-1100">
+              <p className="text-sm text-foreground-light">
                 You will have a single subscription for all projects inside the organization, rather
                 than individual subscriptions per project. Migrating to organization-based billing
                 is not reversible.
