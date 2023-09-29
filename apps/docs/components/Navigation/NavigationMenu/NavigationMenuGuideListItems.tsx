@@ -29,7 +29,7 @@ const HeaderLink = React.memo(function HeaderLink(props: {
 
 const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any) {
   const router = useRouter()
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const activeItem = props.subItem.url === router.asPath
   const activeItemRef = useRef(null)
 
@@ -78,7 +78,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                 alt={props.subItem.name + router.basePath}
                 src={
                   `${router.basePath}` +
-                  `${props.subItem.icon}${theme !== 'dark' ? '-light' : ''}.svg`
+                  `${props.subItem.icon}${resolvedTheme !== 'dark' ? '-light' : ''}.svg`
                 }
                 width={15}
                 height={15}

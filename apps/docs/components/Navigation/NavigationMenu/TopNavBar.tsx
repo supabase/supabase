@@ -10,7 +10,7 @@ import { REFERENCES } from './NavigationMenu.constants'
 import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
 
 const TopNavBar: FC = () => {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const { asPath, push } = useRouter()
@@ -59,7 +59,9 @@ const TopNavBar: FC = () => {
             <a className=" flex items-center gap-2">
               <Image
                 className="cursor-pointer"
-                src={theme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'}
+                src={
+                  resolvedTheme === 'dark' ? '/docs/supabase-dark.svg' : '/docs/supabase-light.svg'
+                }
                 width={96}
                 height={24}
                 alt="Supabase Logo"
