@@ -19,7 +19,9 @@ import {
   IconAlertTriangle,
   IconChevronDown,
   IconCopy,
+  IconEdit,
   IconEdit2,
+  IconEdit3,
   IconEye,
   IconShare,
   IconTrash,
@@ -302,17 +304,17 @@ const QueryItemActions = observer(({ tabInfo, activeId }: QueryItemActionsProps)
                     This SQL query will become public to all team members
                   </AlertTitle_Shadcn_>
                   <AlertDescription_Shadcn_>
-                    Anyone with access to the project can edit or delete this query.
+                    Anyone with access to the project can view it
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>
                 <ul className="mt-4 space-y-5">
                   <li className="flex gap-3">
                     <IconEye />
-                    <span>Anyone with access to this project will be able to view it.</span>
+                    <span>Project members will have read-only access to this query.</span>
                   </li>
                   <li className="flex gap-3">
                     <IconUnlock />
-                    <span>Anyone will be able to modify or delete it.</span>
+                    <span>Anyone will be able to duplicate it to their personal snippets.</span>
                   </li>
                 </ul>
               </div>
