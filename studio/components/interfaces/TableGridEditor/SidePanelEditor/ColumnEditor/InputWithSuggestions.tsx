@@ -132,7 +132,7 @@ const InputWithSuggestions = ({
                     onClick={() => onSelectSuggestion(suggestion)}
                   >
                     <div>{suggestion.name}</div>
-                    <div className="text-xs text-foreground-lighter">{suggestion.description}</div>
+                    <div className="text-foreground-lighter">{suggestion.description}</div>
                   </DropdownMenuItem_Shadcn_>
                 ))}
               </DropdownMenuContent_Shadcn_>

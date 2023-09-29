@@ -182,7 +182,7 @@ const JWTSettings = () => {
                                   onClick={() => setIsGeneratingKey(true)}
                                 >
                                   <IconRefreshCw size={16} />
-                                  <p className="text">Generate a random secret</p>
+                                  <p>Generate a random secret</p>
                                 </DropdownMenuItem_Shadcn_>
                                 <DropdownMenuSeparator_Shadcn_ />
                                 <DropdownMenuItem_Shadcn_
@@ -190,7 +190,7 @@ const JWTSettings = () => {
                                   onClick={() => setIsCreatingKey(true)}
                                 >
                                   <IconPenTool size={16} />
-                                  <p className="text">Create my own secret</p>
+                                  <p>Create my own secret</p>
                                 </DropdownMenuItem_Shadcn_>
                               </DropdownMenuContent_Shadcn_>
                             </DropdownMenu_Shadcn_>
