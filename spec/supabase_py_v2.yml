@@ -741,13 +741,14 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert`
       - Refer to the [Storage guide](/docs/guides/storage#access-control) on how access control works
+      - Please specify the appropriate content [MIME type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types) if you are uploading images or audio. If no `file_options` are specified, the MIME type defaults to `text/html`.
     examples:
       - id: upload-file
         name: Upload file using filepath
         code: |
-          ```
-          with open(source, 'rb+') as f:
-            res = supabase.storage.from_('bucket_name').upload(destination, f)
+          ```py
+          with open(filepath, 'rb') as f:
+              supabase.storage.from_("testbucket").upload(file=f,path=path_on_supastorage, file_options={"content-type": "audio/mpeg"})
           ```
   - id: from-move
     title: 'from_.move()'
