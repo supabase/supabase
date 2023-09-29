@@ -301,12 +301,13 @@ function TableNode({ data, targetPosition, sourcePosition }: NodeProps<TableNode
 }
 
 const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
-  const { theme } = useTheme()
-  const backgroundPatternColor = theme === 'dark' ? '#2e2e2e' : '#e6e8eb'
-  const edgeStrokeColor = theme === 'dark' ? '#ededed' : '#111318'
+  const { resolvedTheme } = useTheme()
+  const backgroundPatternColor = resolvedTheme === 'dark' ? '#2e2e2e' : '#e6e8eb'
+  const edgeStrokeColor = resolvedTheme === 'dark' ? '#ededed' : '#111318'
 
   const miniMapNodeColor = '#111318'
-  const miniMapMaskColor = theme === 'dark' ? 'rgb(17, 19, 24, .8)' : 'rgb(237, 237, 237, .8)'
+  const miniMapMaskColor =
+    resolvedTheme === 'dark' ? 'rgb(17, 19, 24, .8)' : 'rgb(237, 237, 237, .8)'
 
   const reactFlowInstance = useReactFlow()
   const nodeTypes = useMemo(
@@ -322,7 +323,7 @@ const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
       reactFlowInstance.setEdges(edges)
       setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
     })
-  }, [tables, theme])
+  }, [tables, resolvedTheme])
 
   return (
     <>
