@@ -297,8 +297,8 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/tutorials/with-flutter',
         },
         {
-          name: 'Expo',
-          url: '/guides/getting-started/tutorials/with-expo',
+          name: 'Expo React Native',
+          url: '/guides/getting-started/tutorials/with-expo-react-native',
         },
         {
           name: 'Android Kotlin',
@@ -332,6 +332,19 @@ export const cli = {
     },
   ],
 }
+
+export const NativeMobileLoginItems = [
+  {
+    name: 'Apple',
+    icon: '/docs/img/icons/apple-icon',
+    url: '/guides/auth/social-login/auth-apple?platform=react-native',
+  },
+  {
+    name: 'Google',
+    icon: '/docs/img/icons/google-icon',
+    url: '/guides/auth/social-login/auth-google?platform=react-native',
+  },
+]
 
 export const SocialLoginItems = [
   {
@@ -492,6 +505,11 @@ export const auth = {
           name: 'Social Login',
           url: '/guides/auth/social-login',
           items: [...SocialLoginItems],
+        },
+        {
+          name: 'Native Mobile Login',
+          url: '/guides/auth/native-mobile-login',
+          items: [...NativeMobileLoginItems],
         },
         {
           name: 'Enterprise SSO',
