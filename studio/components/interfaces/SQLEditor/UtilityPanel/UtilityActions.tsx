@@ -6,6 +6,7 @@ import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft } from 'ui'
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
 import SizeToggleButton from './SizeToggleButton'
+import ReadOnlyBadge from './ReadOnlyBadge'
 
 export type UtilityActionsProps = {
   id: string
@@ -26,6 +27,7 @@ const UtilityActions = ({
 
   return (
     <>
+      {IS_PLATFORM && <ReadOnlyBadge id={id} />}
       <SavingIndicator id={id} />
       {IS_PLATFORM && <FavoriteButton id={id} />}
       <SizeToggleButton id={id} />
