@@ -1139,7 +1139,7 @@ fun SignInScreen(
                 .padding(top = 12.dp),
                 onClick = {
                     localSoftwareKeyboardController?.hide()
-                    viewModel.onSignIn()
+                    viewModel.onLogin()
                     coroutineScope.launch {
                         snackBarHostState.showSnackbar(
                             message = "Sign in successfully !",
