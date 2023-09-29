@@ -15,11 +15,11 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   Command_Shadcn_,
-  DropdownMenuContent_Shadcn_,
-  DropdownMenuRadioGroup_Shadcn_,
-  DropdownMenuRadioItem_Shadcn_,
-  DropdownMenuTrigger_Shadcn_,
-  DropdownMenu_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
   IconCheck,
   IconChevronsDown,
   IconCode,
@@ -349,8 +349,8 @@ const TableEditorMenu = () => {
                     </div>
 
                     <div className="flex gap-3 items-center">
-                      <DropdownMenu_Shadcn_>
-                        <DropdownMenuTrigger_Shadcn_>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
                           <Tooltip.Root delayDuration={0}>
                             <Tooltip.Trigger asChild>
                               <div className="text-foreground-lighter transition-colors hover:text-foreground">
@@ -371,24 +371,24 @@ const TableEditorMenu = () => {
                               </Tooltip.Content>
                             </Tooltip.Portal>
                           </Tooltip.Root>
-                        </DropdownMenuTrigger_Shadcn_>
-                        <DropdownMenuContent_Shadcn_ side="bottom" align="start" className="w-48">
-                          <DropdownMenuRadioGroup_Shadcn_
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent side="bottom" align="start" className="w-48">
+                          <DropdownMenuRadioGroup
                             value={sort}
                             onValueChange={(value: any) => setSort(value)}
                           >
-                            <DropdownMenuRadioItem_Shadcn_ key="alphabetical" value="alphabetical">
+                            <DropdownMenuRadioItem key="alphabetical" value="alphabetical">
                               Alphabetical
-                            </DropdownMenuRadioItem_Shadcn_>
-                            <DropdownMenuRadioItem_Shadcn_
+                            </DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem
                               key="grouped-alphabetical"
                               value="grouped-alphabetical"
                             >
                               Entity Type
-                            </DropdownMenuRadioItem_Shadcn_>
-                          </DropdownMenuRadioGroup_Shadcn_>
-                        </DropdownMenuContent_Shadcn_>
-                      </DropdownMenu_Shadcn_>
+                            </DropdownMenuRadioItem>
+                          </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
 
                       <button
                         className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
