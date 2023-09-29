@@ -161,7 +161,7 @@ import { supabase } from '../supabaseClient';
 export function AccountPage() {
   const [showLoading, hideLoading] = useIonLoading();
   const [showToast] = useIonToast();
-  const [session] = useState(() => supabase.auth.session());
+  const { data, error } = await supabase.auth.getSession()
   const router = useIonRouter();
   const [profile, setProfile] = useState({
     username: '',
@@ -175,7 +175,7 @@ export function AccountPage() {
     console.log('get');
     await showLoading();
     try {
-      const user = supabase.auth.user();
+      const { data: { user } } = await supabase.auth.getUser()
       let { data, error, status } = await supabase
         .from('profiles')
         .select(`username, website, avatar_url`)
@@ -210,7 +210,7 @@ export function AccountPage() {
     await showLoading();
 
     try {
-      const user = supabase.auth.user();
+      const { data: { user } } = await supabase.auth.getUser()
 
       const updates = {
         id: user!.id,
