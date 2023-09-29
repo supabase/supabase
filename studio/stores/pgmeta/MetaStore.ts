@@ -15,8 +15,8 @@ import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { timeout, tryParseJson } from 'lib/helpers'
 import { ResponseError } from 'types'
 
-import { IRootStore } from '../RootStore'
 import { IPostgresMetaInterface } from '../common/PostgresMetaInterface'
+import { IRootStore } from '../RootStore'
 import ColumnStore from './ColumnStore'
 import OpenApiStore, { IOpenApiStore } from './OpenApiStore'
 import TableStore, { ITableStore } from './TableStore'
@@ -904,6 +904,9 @@ export default class MetaStore implements IMetaStore {
                 (column?.format ?? '').includes('json')
               ) {
                 formattedRow[header] = tryParseJson(row[header])
+              } else if (row[header] === '') {
+                // if the cell is empty string, convert it to NULL
+                formattedRow[header] = null
               } else {
                 formattedRow[header] = row[header]
               }
