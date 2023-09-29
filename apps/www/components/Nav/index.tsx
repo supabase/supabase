@@ -103,7 +103,9 @@ const Nav = () => {
                           <NavigationMenuTrigger className="bg-transparent data-[state=open]:text-brand data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground-strong focus-visible:!text-brand">
                             {menuItem.title}
                           </NavigationMenuTrigger>
-                          <NavigationMenuContent className={menuItem.dropdownContainerClassName}>
+                          <NavigationMenuContent
+                            className={cn('rounded-xl', menuItem.dropdownContainerClassName)}
+                          >
                             {menuItem.dropdown}
                           </NavigationMenuContent>
                         </NavigationMenuItem>

@@ -41,7 +41,7 @@ const MenuItem = React.forwardRef<
             <div className="flex flex-col justify-center gap-1">
               <div className={cn('leading-none')}>{title}</div>
               {description && (
-                <p className="line-clamp-1 text-sm leading-snug text-muted group-hover:text-light group-focus-visible:text-light">
+                <p className="line-clamp-1 text-sm leading-snug text-lighter group-hover:text-light group-focus-visible:text-light">
                   {description}
                 </p>
               )}
