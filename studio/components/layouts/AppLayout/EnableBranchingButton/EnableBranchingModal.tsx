@@ -19,7 +19,7 @@ import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { IntegrationName } from 'data/integrations/integrations.types'
 import { useSelectedOrganization, useStore } from 'hooks'
-import { useAppUiStateSnapshot } from 'state/app'
+import { useAppStateSnapshot } from 'state/app-state'
 import GithubRepositorySelection from './GithubRepositorySelection'
 
 const EnableBranchingModal = () => {
@@ -27,7 +27,7 @@ const EnableBranchingModal = () => {
   const { ref } = useParams()
   const selectedOrg = useSelectedOrganization()
 
-  const snap = useAppUiStateSnapshot()
+  const snap = useAppStateSnapshot()
   const [selectedBranch, setSelectedBranch] = useState<string>()
   const [addConnectionType, setAddConnectionType] = useState<IntegrationName>()
 
