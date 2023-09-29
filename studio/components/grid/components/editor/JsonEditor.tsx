@@ -35,6 +35,9 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   }, [])
 
   const saveChanges = useCallback((newValue: string | null) => {
+    // if (newValue && newValue.slice(-3, -2) === ',') {
+    //   newValue = newValue.replace(/,(?=\s*?[\}\]])/g, '')
+    // }
     commitChange(newValue)
   }, [])
 
