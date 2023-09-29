@@ -130,7 +130,7 @@ const genWhereStatement = (table: LogsTableName, filters: Filters) => {
 export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   const where = genWhereStatement(table, filters)
   const joins = genCrossJoinUnnests(table)
-  const orderBy = "order by timestamp desc"
+  const orderBy = 'order by timestamp desc'
   switch (table) {
     case 'edge_logs':
       return `select id, timestamp, event_message, request.method, request.path, response.status_code
