@@ -50,7 +50,7 @@ const ProductDropdown = () => {
                         alt={customer.title}
                         layout="fill"
                         objectFit="contain"
-                        className="!p-4 dark:brightness-200 dark:contrast-0 dark:filter"
+                        className="!p-4 brightness-50 contrast-50 dark:contrast-0 filter"
                       />
                     </div>
                     <div className="flex flex-col">
