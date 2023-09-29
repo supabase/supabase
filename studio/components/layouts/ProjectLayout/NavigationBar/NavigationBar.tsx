@@ -44,7 +44,6 @@ const NavigationBar = () => {
   const { ref: projectRef } = useParams()
   const { setIsOpen } = useCommandMenu()
 
-  const snap = useAppStateSnapshot()
   const { project } = useProjectContext()
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')

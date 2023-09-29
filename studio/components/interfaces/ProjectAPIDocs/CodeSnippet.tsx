@@ -5,8 +5,10 @@ import { Markdown } from '../Markdown'
 interface CodeSnippetProps {
   selectedLang: 'bash' | 'js'
   snippet: {
-    title?: string
-    description?: string
+    key: string
+    category: string
+    title: string
+    description: string
     bash: string
     js: string
   }
