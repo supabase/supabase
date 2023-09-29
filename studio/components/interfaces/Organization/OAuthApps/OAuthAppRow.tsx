@@ -80,7 +80,7 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
               onClick={() => onSelectEdit()}
             >
               <IconEdit />
-              <p className="text">Edit app</p>
+              <p>Edit app</p>
             </DropdownMenuItem_Shadcn_>
             <DropdownMenuSeparator_Shadcn_ />
             <DropdownMenuItem_Shadcn_
@@ -89,7 +89,7 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
               onClick={() => onSelectDelete()}
             >
               <IconTrash />
-              <p className="text">Delete app</p>
+              <p>Delete app</p>
             </DropdownMenuItem_Shadcn_>
           </DropdownMenuContent_Shadcn_>
         </DropdownMenu_Shadcn_>

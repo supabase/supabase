@@ -228,13 +228,13 @@ const PaymentMethods = () => {
                                     key="make-default"
                                     onClick={() => setSelectedMethodForDefault(paymentMethod)}
                                   >
-                                    <p className="text">Make default</p>
+                                    <p>Make default</p>
                                   </DropdownMenuItem_Shadcn_>
                                   <DropdownMenuItem_Shadcn_
                                     key="delete-method"
                                     onClick={() => setSelectedMethodToDelete(paymentMethod)}
                                   >
-                                    <p className="text">Delete</p>
+                                    <p>Delete</p>
                                   </DropdownMenuItem_Shadcn_>
                                 </DropdownMenuContent_Shadcn_>
                               </DropdownMenu_Shadcn_>

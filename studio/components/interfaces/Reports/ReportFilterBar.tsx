@@ -167,7 +167,7 @@ const ReportFilterBar = ({
           </DropdownMenuTrigger_Shadcn_>
           <DropdownMenuContent_Shadcn_ side="bottom" align="start">
             <DropdownMenuItem_Shadcn_ onClick={() => handleProductFilterChange(null)}>
-              <p className="text">All Requests</p>
+              <p>All Requests</p>
             </DropdownMenuItem_Shadcn_>
             <DropdownMenuSeparator_Shadcn_ />
             {PRODUCT_FILTERS.map((productFilter) => {

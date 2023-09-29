@@ -55,7 +55,7 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
                   onClick={() => setInviteVisible(true)}
                 >
                   <IconMail size="small" />
-                  <p className="text">Send invitation</p>
+                  <p>Send invitation</p>
                 </DropdownMenuItem_Shadcn_>
               </Tooltip.Trigger>
               {!canInviteUsers && (
@@ -86,7 +86,7 @@ const AddUserDropdown = ({ projectKpsVersion }: AddUserDropdownProps) => {
                 onClick={() => setCreateVisible(true)}
               >
                 <IconUserPlus size="small" />
-                <p className="text">Create new user</p>
+                <p>Create new user</p>
               </DropdownMenuItem_Shadcn_>
             </Tooltip.Trigger>
 

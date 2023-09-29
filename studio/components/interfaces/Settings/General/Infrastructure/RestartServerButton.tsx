@@ -125,7 +125,7 @@ const RestartServerButton = () => {
                   >
                     <div className="space-y-1">
                       <p className="block text-foreground">Fast database reboot</p>
-                      <p className="block text-foreground-light text-xs">
+                      <p className="block text-foreground-light">
                         Restarts only the database - faster but may not be able to recover from all
                         failure modes
                       </p>

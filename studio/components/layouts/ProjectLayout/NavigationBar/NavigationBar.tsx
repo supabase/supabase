@@ -8,6 +8,7 @@ import { FlaskConical } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   DropdownMenuContent_Shadcn_,
@@ -33,7 +34,6 @@ import {
   generateToolRoutes,
 } from './NavigationBar.utils'
 import NavigationIconButton from './NavigationIconButton'
-import { useAppStateSnapshot } from 'state/app-state'
 
 const NavigationBar = () => {
   const os = detectOS()
@@ -157,7 +157,7 @@ const NavigationBar = () => {
                   <Link href="/account/me">
                     <DropdownMenuItem_Shadcn_ key="header" className="space-x-2">
                       <IconSettings size={14} strokeWidth={1.5} />
-                      <p className="text">Account preferences</p>
+                      <p>Account preferences</p>
                     </DropdownMenuItem_Shadcn_>
                   </Link>
                   {showFeaturePreviews && (

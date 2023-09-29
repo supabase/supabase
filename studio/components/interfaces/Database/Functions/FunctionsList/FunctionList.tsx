@@ -19,7 +19,6 @@ import {
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import { useCheckPermissions, useStore } from 'hooks'
-import { toJS } from 'mobx'
 
 interface FunctionListProps {
   schema: string
@@ -115,7 +114,7 @@ const FunctionList = ({
                             onClick={() => router.push(`/project/${projectRef}/api?rpc=${x.name}`)}
                           >
                             <IconFileText size="tiny" />
-                            <p className="text">Client API docs</p>
+                            <p>Client API docs</p>
                           </DropdownMenuItem_Shadcn_>
                         )}
                         <DropdownMenuItem_Shadcn_
@@ -123,14 +122,14 @@ const FunctionList = ({
                           onClick={() => editFunction(x)}
                         >
                           <IconEdit3 size="tiny" />
-                          <p className="text">Edit function</p>
+                          <p>Edit function</p>
                         </DropdownMenuItem_Shadcn_>
                         <DropdownMenuItem_Shadcn_
                           className="space-x-2"
                           onClick={() => deleteFunction(x)}
                         >
                           <IconTrash stroke="red" size="tiny" />
-                          <p className="text">Delete function</p>
+                          <p>Delete function</p>
                         </DropdownMenuItem_Shadcn_>
                       </DropdownMenuContent_Shadcn_>
                     </DropdownMenu_Shadcn_>

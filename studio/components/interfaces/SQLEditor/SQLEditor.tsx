@@ -708,10 +708,10 @@ const SQLEditor = () => {
                           {getDiffTypeButtonLabel(selectedDiffType)}
                         </Button>
                         <DropdownMenu_Shadcn_>
-                          <DropdownMenuTrigger_Shadcn_>
+                          <DropdownMenuTrigger_Shadcn_ asChild>
                             <Button
                               type="primary"
-                              className="rounded-l-none border-l-0 px-[4px] py-[5px]"
+                              className="rounded-l-none border-l-0 px-[4px] py-[5px] flex"
                               icon={<IconChevronDown />}
                             />
                           </DropdownMenuTrigger_Shadcn_>
@@ -735,7 +735,7 @@ const SQLEditor = () => {
                                     }
                                   }}
                                 >
-                                  <p className="text">{getDiffTypeDropdownLabel(diffType)}</p>
+                                  <p>{getDiffTypeDropdownLabel(diffType)}</p>
                                 </DropdownMenuItem_Shadcn_>
                               ))}
                           </DropdownMenuContent_Shadcn_>

@@ -73,7 +73,7 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
                     height={20}
                     alt={`${wrapper.name} wrapper icon`}
                   />
-                  <p className="text">{wrapper.label}</p>
+                  <p>{wrapper.label}</p>
                 </DropdownMenuItem_Shadcn_>
               </a>
             </Link>

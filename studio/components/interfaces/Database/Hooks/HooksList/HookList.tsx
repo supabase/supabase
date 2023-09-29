@@ -100,7 +100,7 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
                       <>
                         <DropdownMenuItem_Shadcn_ className="space-x-2" onClick={() => editHook(x)}>
                           <IconEdit3 size="tiny" />
-                          <p className="text">Edit hook</p>
+                          <p>Edit hook</p>
                         </DropdownMenuItem_Shadcn_>
                         <DropdownMenuSeparator_Shadcn_ />
                         <DropdownMenuItem_Shadcn_
@@ -108,7 +108,7 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
                           onClick={() => deleteHook(x)}
                         >
                           <IconTrash stroke="red" size="tiny" />
-                          <p className="text">Delete hook</p>
+                          <p>Delete hook</p>
                         </DropdownMenuItem_Shadcn_>
                       </>
                     </DropdownMenuContent_Shadcn_>

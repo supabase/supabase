@@ -146,7 +146,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                           }}
                         >
                           <IconTrash className="text-red-800" size="tiny" strokeWidth={2} />
-                          <p className="text">Delete</p>
+                          <p>Delete</p>
                         </DropdownMenuItem_Shadcn_>
                       </DropdownMenuContent_Shadcn_>
                     </DropdownMenu_Shadcn_>
