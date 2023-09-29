@@ -154,7 +154,7 @@ const DeleteConfirmationDialogs = ({
       >
         <Modal.Content>
           <div className="py-4 space-y-4">
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               Are you sure you want to delete the selected column? This action cannot be undone.
             </p>
             <Checkbox
@@ -201,7 +201,7 @@ const DeleteConfirmationDialogs = ({
       >
         <Modal.Content>
           <div className="py-4 space-y-4">
-            <p className="text-sm text-scale-1100">
+            <p className="text-sm text-foreground-light">
               Are you sure you want to delete the selected table? This action cannot be undone.
             </p>
             <Checkbox

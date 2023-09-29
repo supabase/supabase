@@ -30,7 +30,7 @@ const PolicyTemplates = ({
         <TemplatePreview selectedTemplate={selectedTemplate} />
       </div>
       <div className="flex w-full items-center justify-end gap-3 border-t px-6 py-4 dark:border-dark">
-        <span className="text-sm text-scale-900">
+        <span className="text-sm text-foreground-lighter">
           This will override any existing code you've written
         </span>
         <Button

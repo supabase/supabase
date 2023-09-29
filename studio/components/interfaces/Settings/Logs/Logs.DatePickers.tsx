@@ -1,7 +1,16 @@
-import { Alert, Button, Dropdown, IconClock } from 'ui'
 import { DatePicker } from 'components/ui/DatePicker'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
+import {
+  Alert,
+  Button,
+  DropdownMenuContent_Shadcn_,
+  DropdownMenuRadioGroup_Shadcn_,
+  DropdownMenuRadioItem_Shadcn_,
+  DropdownMenuTrigger_Shadcn_,
+  DropdownMenu_Shadcn_,
+  IconClock,
+} from 'ui'
 import { DatetimeHelper, getDefaultHelper, LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from '.'
 
 interface Props {
@@ -40,37 +49,41 @@ const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
 
   return (
     <div className="flex items-center">
-      <Dropdown
-        size="small"
-        side="bottom"
-        align="start"
-        overlay={
-          <>
-            <Dropdown.RadioGroup onChange={handleHelperChange} value={selectedHelper?.text || ''}>
-              {helpers.map((helper) => (
-                <Dropdown.Radio key={helper.text} value={helper.text} disabled={helper.disabled}>
-                  <span
-                    className={[helper.disabled ? 'text-scale-1000 cursor-not-allowed' : ''].join(
-                      ' '
-                    )}
-                  >
-                    {helper.text}
-                  </span>
-                </Dropdown.Radio>
-              ))}
-            </Dropdown.RadioGroup>
-          </>
-        }
-      >
-        <Button
-          asChild
-          type={helperValue ? 'secondary' : 'default'}
-          icon={<IconClock size={12} />}
-          className="rounded-r-none"
-        >
-          <span>{selectedHelper?.text || defaultHelper.text}</span>
-        </Button>
-      </Dropdown>
+      <DropdownMenu_Shadcn_>
+        <DropdownMenuTrigger_Shadcn_>
+          <Button
+            asChild
+            type={helperValue ? 'secondary' : 'default'}
+            icon={<IconClock size={12} />}
+            className="rounded-r-none"
+          >
+            <span>{selectedHelper?.text || defaultHelper.text}</span>
+          </Button>
+        </DropdownMenuTrigger_Shadcn_>
+        <DropdownMenuContent_Shadcn_ side="bottom" align="start">
+          <DropdownMenuRadioGroup_Shadcn_
+            onValueChange={handleHelperChange}
+            value={selectedHelper?.text || ''}
+          >
+            {helpers.map((helper) => (
+              <DropdownMenuRadioItem_Shadcn_
+                key={helper.text}
+                value={helper.text}
+                disabled={helper.disabled}
+              >
+                <span
+                  className={[
+                    helper.disabled ? 'text-foreground-light cursor-not-allowed' : '',
+                  ].join(' ')}
+                >
+                  {helper.text}
+                </span>
+              </DropdownMenuRadioItem_Shadcn_>
+            ))}
+          </DropdownMenuRadioGroup_Shadcn_>
+        </DropdownMenuContent_Shadcn_>
+      </DropdownMenu_Shadcn_>
+
       <DatePicker
         triggerButtonClassName="rounded-l-none"
         triggerButtonType={selectedHelper ? 'default' : 'secondary'}

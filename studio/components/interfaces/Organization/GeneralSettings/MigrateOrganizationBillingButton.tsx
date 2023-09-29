@@ -19,12 +19,12 @@ import {
 } from 'ui'
 
 import { SpendCapModal } from 'components/interfaces/BillingV2'
+import InformationBox from 'components/ui/InformationBox'
 import { useOrganizationBillingMigrationMutation } from 'data/organizations/organization-migrate-billing-mutation'
 import { useOrganizationBillingMigrationPreview } from 'data/organizations/organization-migrate-billing-preview-query'
 import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import PaymentMethodSelection from '../BillingSettingsV2/Subscription/PaymentMethodSelection'
-import InformationBox from 'components/ui/InformationBox'
 
 const MigrateOrganizationBillingButton = observer(() => {
   const { ui } = useStore()
@@ -32,7 +32,7 @@ const MigrateOrganizationBillingButton = observer(() => {
   const organization = useSelectedOrganization()
 
   const disableOrgBillingMigration = useFlag('disableOrgBillingMigration')
-  const canMigrateOrg = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const canMigrateOrg = useCheckPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
 
   const [isOpen, setIsOpen] = useState(false)
   const [tier, setTier] = useState('')
@@ -93,8 +93,6 @@ const MigrateOrganizationBillingButton = observer(() => {
     }
   }, [isOpen])
 
-  const canMigrateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-
   const selectedLimitedUsage = useMemo(
     () => tier === 'PRO' && isSpendCapEnabled,
     [tier, isSpendCapEnabled]
@@ -118,7 +116,7 @@ const MigrateOrganizationBillingButton = observer(() => {
 
   const onConfirmMigrate = async () => {
     if (!tier) return
-    if (!canMigrateOrganization) {
+    if (!canMigrateOrg) {
       return ui.setNotification({
         category: 'error',
         message: 'You do not have the required permissions to migrate this organization',
@@ -136,7 +134,7 @@ const MigrateOrganizationBillingButton = observer(() => {
               loading={!organization?.slug}
               onClick={toggle}
               type="primary"
-              disabled={!canMigrateOrg || disableOrgBillingMigration}
+              disabled={disableOrgBillingMigration}
             >
               Migrate organization
             </Button>
@@ -151,7 +149,7 @@ const MigrateOrganizationBillingButton = observer(() => {
                     'border border-scale-200 ', //border
                   ].join(' ')}
                 >
-                  <span className="text-xs text-scale-1200">
+                  <span className="text-xs text-foreground">
                     {!canMigrateOrg
                       ? 'You need additional permissions to migrate this organization'
                       : 'Migrations are temporarily disabled, please try again later.'}
@@ -170,7 +168,7 @@ const MigrateOrganizationBillingButton = observer(() => {
         onCancel={toggle}
         header={
           <div className="flex items-baseline gap-2">
-            <h5 className="text-sm text-scale-1200">Migrate organization</h5>
+            <h5 className="text-sm text-foreground">Migrate organization</h5>
           </div>
         }
       >
@@ -209,7 +207,7 @@ const MigrateOrganizationBillingButton = observer(() => {
               </>
             )}
           <Modal.Content>
-            <div className="text-scale-1100 text-sm space-y-2">
+            <div className="text-foreground-light text-sm space-y-2">
               <p>
                 Migrating to new organization-based billing combines subscriptions for all projects
                 in the organization into a single subscription.
@@ -254,7 +252,7 @@ const MigrateOrganizationBillingButton = observer(() => {
               })}
             </Listbox>
 
-            <p className="text-sm text-scale-1100 mt-4">
+            <p className="text-sm text-foreground-light mt-4">
               The pricing plan, along with included usage limits will apply to your entire
               organization. See{' '}
               <a
@@ -270,7 +268,7 @@ const MigrateOrganizationBillingButton = observer(() => {
 
             {tier !== '' && tier !== 'FREE' && (
               <div className="my-2 space-y-1 pb-4">
-                <p className="text-sm text-scale-1000">
+                <p className="text-sm text-foreground-light">
                   Paid plans come with one compute instance included. Additional projects will at
                   least cost the compute instance hours used (min $10/month). See{' '}
                   <Link href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute">
@@ -312,7 +310,7 @@ const MigrateOrganizationBillingButton = observer(() => {
                   </div>
 
                   <div className="col-span-12">
-                    <p className="text-sm text-scale-1000">
+                    <p className="text-sm text-foreground-light">
                       When enabled, usage is limited to the plan's quota, with restrictions when
                       limits are exceeded. When disabled, you scale beyond Pro limits without
                       restrictions and pay for over-usage beyond the quota.
@@ -414,16 +412,16 @@ const MigrateOrganizationBillingButton = observer(() => {
                     <table className="w-full">
                       <thead>
                         <tr className="border-b">
-                          <th className="py-2 font-normal text-left text-sm text-scale-1000 w-1/2">
+                          <th className="py-2 font-normal text-left text-sm text-foreground-light w-1/2">
                             Item
                           </th>
-                          <th className="py-2 font-normal text-left text-sm text-scale-1000">
+                          <th className="py-2 font-normal text-left text-sm text-foreground-light">
                             Count
                           </th>
-                          <th className="py-2 font-normal text-left text-sm text-scale-1000">
+                          <th className="py-2 font-normal text-left text-sm text-foreground-light">
                             Unit price
                           </th>
-                          <th className="py-2 font-normal text-right text-sm text-scale-1000">
+                          <th className="py-2 font-normal text-right text-sm text-foreground-light">
                             Price
                           </th>
                         </tr>
@@ -463,7 +461,7 @@ const MigrateOrganizationBillingButton = observer(() => {
           )}
 
           <Modal.Content>
-            <p className="mb-4 text-sm text-scale-1100">
+            <p className="mb-4 text-sm text-foreground-light">
               The migration can take up to 30 seconds, please do not cancel the request or close
               your browser.
             </p>

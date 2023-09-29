@@ -52,6 +52,7 @@ export type ColumnType =
   | 'number'
   | 'primary_key'
   | 'text'
+  | 'citext'
   | 'time'
   | 'unknown'
 
