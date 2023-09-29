@@ -294,6 +294,20 @@ docs.query(
       {
         type: 'customer-story',
         avatar: '',
+        customer: 'mozilla',
+        author: 'Hermina Condei',
+        role: 'Director at MDN, Mozilla',
+        target: '_blank',
+        quote:
+          'We store embeddings in a PostgreSQL database, hosted by Supabase, to perform a similarity search to identify the most relevant sections within the MDN.',
+        image: '/images/customers/logos/mozilla.png',
+        abstract:
+          'MDN introduces an AI assistant powered by Supabase Vector to answer all web development questions in real time.',
+        url: 'https://developer.mozilla.org/en-US/blog/introducing-ai-help/',
+      },
+      {
+        type: 'customer-story',
+        avatar: '',
         customer: 'markprompt',
         author: 'Michael Fester',
         role: 'Co-Founder at Markprompt',
