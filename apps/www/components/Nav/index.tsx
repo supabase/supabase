@@ -95,7 +95,7 @@ const Nav = () => {
                     </Link>
                   )}
                 </div>
-                <NavigationMenu className="hidden pl-4 sm:space-x-4 lg:flex h-16">
+                <NavigationMenu className="hidden pl-4 sm:space-x-4 lg:flex h-16 [&_.menu-viewport]:rounded-xl">
                   <NavigationMenuList>
                     {menu.primaryNav.map((menuItem) =>
                       menuItem.hasDropdown ? (
