@@ -5,23 +5,23 @@ import { BannedIPKeys } from './keys'
 
 export type BannedIPVariables = {
   projectRef?: string
-};
+}
 
-export type BannedIPsData = BannedIPVariables[];
-export type BannedIPsError = ResponseError;
+export type BannedIPsData = BannedIPVariables[]
+export type BannedIPsError = ResponseError
 
 export async function getBannedIPs({ projectRef }: BannedIPVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await post(`/v1/projects/{ref}/network-bans/retrieve`, {
-    params: { 
-      path: { ref: projectRef } 
+    params: {
+      path: { ref: projectRef },
     },
     signal,
   })
 
   if (error) {
-    throw error;
+    throw error
   }
 
   return data
@@ -42,5 +42,3 @@ export const useBannedIPsQuery = <TData = IPData>(
       ...options,
     }
   )
-
-
