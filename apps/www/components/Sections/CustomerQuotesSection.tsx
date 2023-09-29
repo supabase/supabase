@@ -32,7 +32,6 @@ interface Card {
 interface Props {
   title: string | React.ReactNode
   customers: Customer[]
-  secondaryLinks: Customer[]
 }
 
 const CustomerQuotesSection = (props: Props) => {
