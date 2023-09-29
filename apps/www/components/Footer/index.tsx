@@ -2,13 +2,14 @@ import FooterLinks from 'data/Footer.json'
 import SectionContainer from '../Layouts/SectionContainer'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
-import { Badge } from 'ui'
+import { Badge, IconChevronRight, TextLink } from 'ui'
 import Image from 'next/image'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import { useRouter } from 'next/router'
 import { Fragment } from 'react'
 import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
+import { CheckIcon } from '@heroicons/react/outline'
 
 interface Props {
   className?: string
@@ -28,6 +29,27 @@ const Footer = (props: Props) => {
       <h2 id="footerHeading" className="sr-only">
         Footer
       </h2>
+      <div className="w-full !py-0 border-b">
+        <SectionContainer className="grid grid-cols-2 md:flex items-center justify-between md:justify-center gap-8 md:gap-10 !py-6 md:!py-10 text-sm">
+          <div className="flex flex-col md:flex-row gap-2 md:items-center">
+            We protect your data.
+            <Link href="/security">
+              <a className="text-brand hover:underline">More on Security</a>
+            </Link>
+          </div>
+          <span className="hidden md:block h-px w-8 bg-border" />
+          <ul className="flex flex-col md:flex-row gap-2 md:gap-8 justify-center md:items-center">
+            <li className="flex items-center gap-2">
+              <CheckIcon className="w-4 h-4" /> SOC2 Type 2{' '}
+              <span className="text-lighter">Certified</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckIcon className="w-4 h-4" /> HIPAA{' '}
+              <span className="text-lighter">Compliant</span>
+            </li>
+          </ul>
+        </SectionContainer>
+      </div>
       <SectionContainer>
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8 xl:col-span-1">

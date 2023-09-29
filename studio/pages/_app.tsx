@@ -55,6 +55,8 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { RootStore } from 'stores'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
+import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreviewContext'
+import FeaturePreviewModal from 'components/interfaces/App/FeaturePreviewModal'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -192,7 +194,10 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       >
                         <CommandMenuWrapper>
                           <AppBannerWrapper>
-                            {getLayout(<Component {...pageProps} />)}
+                            <FeaturePreviewContextProvider>
+                              {getLayout(<Component {...pageProps} />)}
+                              <FeaturePreviewModal />
+                            </FeaturePreviewContextProvider>
                           </AppBannerWrapper>
                         </CommandMenuWrapper>
                       </ThemeProvider>
