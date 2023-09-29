@@ -3,6 +3,7 @@ import { KeyboardEvent, ReactNode, useCallback, useEffect, useRef } from 'react'
 
 interface BlockKeysProps {
   value: string | null
+  initialValue: unknown | null
   children: ReactNode
   onEscape?: (value: string | null) => void
   onEnter?: (value: string | null) => void
@@ -13,7 +14,7 @@ interface BlockKeysProps {
  * We use this with cell editor to allow editor component to handle keys.
  * Example: press enter to add newline on textEditor
  */
-export const BlockKeys = ({ value, children, onEscape, onEnter }: BlockKeysProps) => {
+export const BlockKeys = ({ value, initialValue, children, onEscape, onEnter }: BlockKeysProps) => {
   const ref = useRef(null)
   const isClickedOutside = useClickedOutside(ref)
 
@@ -37,7 +38,9 @@ export const BlockKeys = ({ value, children, onEscape, onEnter }: BlockKeysProps
   )
 
   useEffect(() => {
-    if (isClickedOutside && onEnter !== undefined) onEnter(value)
+    if (isClickedOutside && onEnter !== undefined && value !== initialValue) {
+      onEnter(value)
+    }
   }, [isClickedOutside])
 
   return (

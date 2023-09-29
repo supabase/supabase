@@ -77,7 +77,12 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
       sideOffset={-35}
       className="rounded-none"
       overlay={
-        <BlockKeys value={value} onEscape={cancelChanges} onEnter={saveChanges}>
+        <BlockKeys
+          value={value}
+          initialValue={jsonString}
+          onEscape={cancelChanges}
+          onEnter={saveChanges}
+        >
           <MonacoEditor
             width={`${gridColumn?.width || column.width}px`}
             value={value ?? ''}
