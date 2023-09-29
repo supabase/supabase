@@ -280,7 +280,7 @@ functions:
       - id: getting-your-data
         name: Getting your data
         code: |
-          ```
+          ```python
           response = supabase.table('countries').select("*").execute()
           ```
         data:
@@ -335,7 +335,9 @@ functions:
           If your database has foreign key relationships, you can query related tables too.
         code: |
           ```
-          response = supabase.table('countries').select('name, cities(name)').execute()
+          response = supabase.table('countries') \
+            .select('name, cities(name)') \
+            .execute()
           ```
         data:
           sql: |
@@ -370,7 +372,9 @@ functions:
         name: Query foreign tables through a join table
         code: |
           ```
-          response = supabase.table('users').select('name, teams(name)').execute()
+          response = supabase.table('users') \
+            .select('name, teams(name)') \
+            .execute()
           ```
         data:
           sql: |
@@ -429,7 +433,9 @@ functions:
         name: Query the same foreign table multiple times
         code: |
           ```
-          response = supabase.table('messages').select('content,from:sender_id(name),to:receiver_id(name)').execute()
+          response = supabase.table('messages') \ 
+            .select('content,from:sender_id(name),to:receiver_id(name)') \
+            .execute()
           ```
         data:
           sql: |
@@ -472,7 +478,10 @@ functions:
         name: Filtering through foreign tables
         code: |
           ```
-          response = supabase.table('cities').select('name, countries(*)').eq('countries.name', 'Estonia').execute()
+          response = supabase.table('cities') \
+            .select('name, countries(*)') \
+            .eq('countries.name', 'Estonia') \
+            .execute()
           ```
         data:
           sql: |
@@ -513,7 +522,9 @@ functions:
         name: Querying foreign table with count
         code: |
           ```
-          response = supabase.table('countries').select('*, cities(count)').execute()
+          response = supabase.table('countries') \
+            .select('*, cities(count)') \
+            .execute()
           ```
         data:
           sql: |
@@ -582,7 +593,9 @@ functions:
         name: Querying JSON data
         code: |
           ```
-          response = supabase.table('users').select('id, name, address->city').execute()
+          response = supabase.table('users') \
+              .select('id, name, address->city') \
+              .execute()
           ```
         data:
           sql: |
@@ -612,16 +625,14 @@ functions:
 
   - id: insert
     title: 'Create data: insert()'
-    $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.insert'
     examples:
       - id: create-a-record
         name: Create a record
         code: |
-          ```
-          data, count = supabase
-          .table('countries')
-          .insert({"id": 1, "name": "Denmark"})
-          .execute()
+          ```python
+          data, count = supabase.table('countries') \
+            .insert({"id": 1, "name": "Denmark"}) \
+            .execute()
           ```
         data:
           sql: |
@@ -632,6 +643,1136 @@ functions:
         response: |
           ```
           APIResponse(data=[{'id': 1, 'name': 'Denmark'}], count=None)
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: update
+    title: 'Modify data: update()'
+    notes: |
+      - `update()` should always be combined with [Filters](/docs/reference/python/using-filters) to target the item(s) you wish to update.
+    examples:
+      - id: updating-your-data
+        name: Updating your data
+        code: |
+          ```python
+          data, count = supabase.table('countries') \
+            .update({'name': 'Austrailia'}) \
+            .eq('id', 1) \
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Denmark');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 1, 'name': 'Austrailia'}], count=None)
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: upsert
+    title: 'Upsert data: upsert()'
+    notes: |
+      - Primary keys must be included in the `values` dict to use upsert.
+    examples:
+      - id: upsert-your-data
+        name: Upsert your data
+        code: |
+          ```python
+          data, count = supabase.table('countries') \
+            .upsert({'id': 1, 'name': 'Austrailia'}) \
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 1, 'name': 'Austrailia'}], count=None)
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: bulk-upsert-your-data
+        name: Bulk Upsert your data
+        code: |
+            ```python
+            data, count = supabase.table('countries') \
+              .upsert([{'id': 1, 'name': 'Albania'}, {'id': 2, 'name': 'Algeria'}]) \
+              .execute()
+            ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 1, 'name': 'Albania'}, {'id': 2, 'name': 'Algeria'}], count=None)
+          ```
+        hideCodeBlock: true
+
+  - id: delete
+    title: 'Delete data: delete()'
+    notes: |
+      - `delete()` should always be combined with [filters](/docs/reference/python/using-filters) to target the item(s) you wish to delete.
+      - If you use `delete()` with filters and you have
+        [RLS](/docs/learn/auth-deep-dive/auth-row-level-security) enabled, only
+        rows visible through `SELECT` policies are deleted. Note that by default
+        no rows are visible, so you need at least one `SELECT`/`ALL` policy that
+        makes the rows visible.
+    examples:
+      - id: delete-records
+        name: Delete records
+        code: |
+          ```python
+          data, count = supabase.table('countries') \
+            .delete() \
+            .eq('id', 1) \
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+  
+            insert into
+              countries (id, name)
+            values
+              (1, 'Spain');
+            ```
+          response: |
+            ```
+            APIResponse(data=[{'id': 1, 'name': 'United States'], count=None)
+            ```
+            hideCodeBlock: true
+            isSpotlight: true
+
+  - id: using-filters
+    title: Using Filters
+    description: |
+      Filters allow you to only return rows that match certain conditions.
+
+      Filters can be used on `select()`, `update()`, `upsert()`, and `delete()` queries.
+
+      If a Postgres function returns a table response, you can also apply filters.
+    examples:
+      - id: applying-filters
+        name: Applying Filters
+        description: |
+          Filters must be applied after any of `select()`, `update()`, `upsert()`,
+          `delete()`, and `rpc()` and before
+          [modifiers](/docs/reference/python/using-modifiers).
+        code: |
+          ```python
+          # Correct
+          data, count = supabase.from('cities') \
+            .select('name, country_id') \
+            .eq('name', 'The Shire') \
+            .execute()
+          
+          # Incorrect
+          data, count = supabase.table('cities') \
+            .eq('name', 'The Shire') \
+            .select('name, country_id') \
+            .execute()
+          ```
+      - id: chaining-filters
+        name: Chaining
+        description: |
+          Filters can be chained together to produce advanced queries. For example,
+          to query cities with population between 1,000 and 10,000.
+        code: |
+          ```python
+          data, count = supabase.table('cities') \
+            .select('name, country_id') \
+            .gte('population', 1000) \
+            .lt('population', 10000) \
+            .execute()
+          ```
+      - id: conditional-chaining
+        name: Conditional chaining
+        description: |
+          Filters can be built up one step at a time and then executed.
+        code: |
+          ```python
+          filterByName = None
+          filterPopLow = 1000
+          filterPopHigh = 10000
+          
+          query = supabase.from('cities').select('name, country_id')
+          
+          if filterByName:
+            query = query.eq('name', filterByName)
+          
+          if filterPopLow: 
+            query = query.gte('population', filterPopLow)
+          
+          if filterPopHigh: 
+            query = query.lt('population', filterPopHigh)
+          
+          response = query.execute()
+          ```
+      - id: filter-by-value-within-json-column
+        name: Filter by values within JSON column
+        code: |
+          ```python
+          data, count = supabase.table('users') \
+            .select('*') \
+            .eq('address->postcode', 90210) \
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+            
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Michael', '{ "postcode": 90210 }'),
+              (2, 'Jane', null);
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 1, 'name': 'Michael', 'address': {'postcode': 90210}}], count=None)
+          ```
+      - id: filter-foreign-tables
+        name: Filter Foreign Tables
+        code: |
+          ```python
+          data, count = supabase.table('countries') \
+            .select('name, cities!inner(name)') \
+            .eq('cities.name', 'Bali') \
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'name': 'Indonesia', 'cities': [{'name': 'Bali'}]}], count=None)
+          ```
+        description: |
+          You can filter on foreign tables in your `select()` query using dot
+          notation.
+
+  - id: eq
+    title: eq()
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```python
+          data, count = supabase.table('countries') \
+            .select('*') \
+            .eq('name', 'Albania') \
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          response: |
+            ```
+            APIResponse(data=[{'id': 2, 'name': 'Albania'}], count=None)
+            ```
+          hideCodeBlock: true
+          isSpotlight: true
+  - id: neq
+    title: neq()
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```python
+            data, count = supabase.table('countries') \
+              .select('*') \
+              .neq('name', 'Albania') \
+              .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+            APIResponse(data=[{'id': 1, 'name': 'Afghanistan'},
+                                {'id': 3, 'name': 'Algeria'}],
+                        count=None)
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: gt
+    title: gt()
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+            ```python
+            data, count = supabase.table('countries') \
+                .select('*') \
+                .gt('id', 2) \
+                .execute()
+            ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 3, 'name': 'Algeria'}], count=None)
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+        description: |
+          When using [reserved words](https://www.postgresql.org/docs/current/sql-keywords-appendix.html) for column names you need
+          to add double quotes e.g. `.gt('"order"', 2)`
+  - id: gte
+    title: gte()
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+            ```python
+            data, count = supabase.table('countries') \
+              .select('*') \
+              .gte('id', 2) \
+              .execute()
+            ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+            ```
+            APIResponse(data=[{'id': 2, 'name': 'Albania'},
+                                {'id': 3, 'name': 'Algeria'}],
+                        count=None)
+            ```
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: lt
+    title: lt()
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+            ```python
+            data, count = supabase.table('countries') \
+              .select('*') \
+              .lt('id', 2) \
+              .execute()
+            ```
+        data:
+          sql: |
+            ```sql
+            create table
+            countries (id int8 primary key, name text);
+            
+            insert into
+            countries (id, name)
+            values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 1, 'name': 'Afghanistan'}], count=None)
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: lte
+    title: lte()
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```python
+          data, count = supabase.table('countries') \
+            .select('*') \
+            .lte('id', 2) \
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+            countries (id int8 primary key, name text);
+            
+            insert into
+            countries (id, name)
+            values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 1, 'name': 'Afghanistan'},
+                              {'id': 2, 'name': 'Albania'}],
+                      count=None)
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: like
+    title: like()
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```python
+          data, count = supabase.table('countries') \
+            .select('*') \
+            .like('name', '%Alba%') \
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+            countries (id int8 primary key, name text);
+            
+            insert into
+            countries (id, name)
+            values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+            ```
+        response: |
+            ```
+            APIResponse(data=[{'id': 2, 'name': 'Albania'}], count=None)
+            ```
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: ilike
+    title: ilike()
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```python
+          data, count = supabase.table('countries') \
+              .select('*') \
+              .ilike('name', '%alba%') \
+              .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+            countries (id int8 primary key, name text);
+            
+            insert into
+            countries (id, name)
+            values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 2, 'name': 'Albania'}], count=None)
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: is
+    title: is_()
+    examples:
+      - id: checking-nullness
+        name: Checking for nullness, True or False
+        code: |
+          ```python
+          data, count = supabase.table('countries') \
+            .select('*') \
+            .is_('name', 'null') \
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, null);
+            ```
+        response: |
+            ```
+            APIResponse(data=[{'id': 2, 'name': None}], count=None)
+            ```
+        description: |
+          Using the `eq()` filter doesn't work when filtering for `null`. Instead, you need to use `is_()`.
+        
+          To query for null values in python use the string 'null' instead of the python `None` value.
+          
+          Note that `is` is a reserved word in Python, so the underscore is added to avoid a syntax error.
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: in
+    title: in_()
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+            ```python
+            data, count = supabase.table('countries') \
+                .select('*') \
+                .in_('name', ['Albania', 'Algeria']) \
+                .execute()
+            ```
+        data:
+          sql: |
+            ```sql
+            create table
+            countries (id int8 primary key, name text);
+            
+            insert into
+            countries (id, name)
+            values
+            (1, 'Afghanistan'),
+            (2, 'Albania'),
+            (3, 'Algeria');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 2, 'name': 'Albania'},
+                              {'id': 3, 'name': 'Algeria'}],
+                      count=None)
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: contains
+    title: contains()
+    examples:
+      - id: on-array-columns
+        name: On array columns
+        code: |
+          ```python
+            data, count = supabase.table('issues') \
+              .select('*') \
+              .contains('tags', ['is:open', 'priority:low']) \
+              .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                tags text[]
+              );
+            insert into
+              issues (id, title, tags)
+            values
+              (1, 'Cache invalidation is not working', array['is:open', 'severity:high', 'priority:low']),
+              (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 1, 'title': 'Cache invalidation is not working', 'tags': ['is:open', 'severity:high', 'priority:low']}], count=None)
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: on-range-columns
+        name: On range columns
+        code: |
+          ```python
+          data, count = supabase.table('reservations') \
+              .select('*') \
+              .contains('during', '[2000-01-01 13:00, 2000-01-01 13:30)') \
+              .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 1, 'room_name': 'Emerald', 'during': '["2000-01-01 13:00:00","2000-01-01 15:00:00")'}], count=None)
+          ```
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        hideCodeBlock: true
+      - id: on-jsonb-columns
+        name: On `jsonb` columns
+        code: |
+          ```python
+          data, count = supabase.table('users') \
+              .select('*') \
+              .contains('address', {'postcode': 90210}) \
+              .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Michael', '{ "postcode": 90210, "street": "Melrose Place" }'),
+              (2, 'Jane', '{}');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 1, 'name': 'Michael', 'address': {'postcode': 90210}}], count=None)
+          ```
+        hideCodeBlock: true
+  - id: contained-by
+    title: contained_by()
+    examples:
+      - id: on-array-columns
+        name: On array columns
+        code: |
+          ```python
+          data, count = supabase.table('classes') \
+            .select('name') \
+            .contained_by('days', ['monday', 'tuesday', 'wednesday', 'friday']) \
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              classes (
+                  id int8 primary key,
+                  name text,
+                  days text[]
+              );
+
+            insert into
+              classes (id, name, days)
+            values
+              (1, 'Chemistry', array['monday', 'friday']),
+              (2, 'History', array['monday', 'wednesday', 'thursday']);
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'name': 'Chemistry'}], count=None)
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: on-range-columns
+        name: On range columns
+        code: |
+          ```python
+          data, count = supabase.table('reservations') \
+            .select('*') \
+            .contained_by('during', '[2000-01-01 00:00, 2000-01-01 23:59)') \
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+            
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 1, 'room_name': 'Emerald', 'during': '["2000-01-01 13:00:00","2000-01-01 15:00:00")'}], count=None)
+          ```
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        hideCodeBlock: true
+      - id: on-jsonb-columns
+        name: On `jsonb` columns
+        code: |
+          ```python
+          data, count = supabase.table('users') \
+              .select('name') \
+              .contained_by('address', {}) \
+              .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+            
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Michael', '{ "postcode": 90210, "street": "Melrose Place" }'),
+              (2, 'Jane', '{}');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'name': 'Jane'}], count=None)
+          ```
+        hideCodeBlock: true
+  - id: match
+    title: match()
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```python
+          data, count = supabase.table('countries') \
+              .select('*') \
+              .match({'id': 2, 'name': 'Albania'}) \
+              .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 2, 'name': 'Albania'}], count=None)
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: not
+    title: not_()
+    examples:
+        - id: with-select
+          name: With `select()`
+          code: |
+            ```python
+            data, count = supabase.table('countries') \
+                .select('*') \
+                .not_.is_('name', 'null') \
+                .execute()
+            ```
+          data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            
+            insert into
+              countries (id, name)
+            values
+              (1, 'Albania'),
+              (2, null);
+            ```
+          response: |
+            ```
+            APIResponse(data=[{'id': 2, 'name': 'Albania'}], count=None)
+            ```
+          hideCodeBlock: true
+          isSpotlight: true
+  - id: filter
+    title: filter()
+    notes: |
+      filter() expects you to use the raw PostgREST syntax for the filter values.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```python
+          data, count = supabase.table('countries') \
+              .select('*') \
+              .filter('name', 'in', '("Algeria","Japan")') \
+              .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 3, 'name': 'Algeria'}], count=None)
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: on-a-foreign-table
+        name: On a foreign table
+        code: |
+          ```python
+          data, count = supabase.table('countries') \
+              .select('name, cities!inner (name)') \
+              .filter('cities.name', 'eq', 'Bali') \
+              .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'name': 'Indonesia', 'cities': [{'name': 'Bali'}]}], count=None)
+          ```
+        hideCodeBlock: true
+
+  - id: using-modifiers
+    title: Using Modifiers
+    description: |
+      Filters work on the row level—they allow you to return rows that
+      only match certain conditions without changing the shape of the rows.
+      Modifiers are everything that don't fit that definition—allowing you to
+      change the format of the response (e.g., returning a CSV string).
+
+      Modifiers must be specified after filters. Some modifiers only apply for
+      queries that return rows (e.g., `select()` or `rpc()` on a function that
+      returns a table response).
+
+  - id: order
+    title: order()
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+            ```python
+            data, count = supabase.table('countries') \
+              .select('*') \
+              .order('name', desc=True) \
+              .execute()
+            ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: | 
+          ```
+          APIResponse(
+            data=[
+              {'id': 1, 'name': None}, 
+              {'id': 3, 'name': 'Algeria'}, 
+              {'id': 2, 'name': 'Albania'}], 
+            count=None
+          )
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: on-a-foreign-table
+        name: On a foreign table
+        code: |
+            ```python
+            data, count = supabase.table('countries') \
+                .select('name, cities(name)') \
+                .order('name', desc=True, foreign_table='cities') \
+                .execute()
+            ```
+        data:
+          sql: |
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'United States'),
+              (2, 'Vanuatu');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 1, 'Atlanta'),
+              (2, 1, 'New York City');
+        response: |
+          ```
+          APIResponse(data=[{'name': 'United States', 'cities': [{'name': 'New York City'}, {'name': 'Atlanta'}]}, {'name': 'Vanuatu', 'cities': []}], count=None)
+          ```
+        description: |
+          Ordering on foreign tables doesn't affect the ordering of
+          the parent table.
+        hideCodeBlock: true
+  - id: limit
+    title: limit()
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```python
+          data, count = supabase.table('countries') \
+            .select('*') \
+            .limit(1) \
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+            ```
+            APIResponse(data=[{'id': 1, 'name': 'Afghanistan'}], count=None)
+            ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: on-a-foreign-table
+        name: On a foreign table
+        code: |
+            ```python
+            data, count = supabase.table('countries') \
+                .select('name, cities(name)') \
+                .limit(1, foreign_table='cities') \
+                .execute()
+            ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'United States');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 1, 'Atlanta'),
+              (2, 1, 'New York City');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'name': 'United States', 'cities': [{'name': 'Atlanta'}]}], count=None)
+          ```
+        hideCodeBlock: true
+  - id: single
+    title: single()
+    examples:
+      - id: with-select()
+        name: With `select()`
+        code: |
+          ```python
+          data, count = supabase.table('countries') \
+            .select('name') \
+            .limit(1) \
+            .single() \
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          SingleAPIResponse(data={'name': 'Afghanistan'}, count=None)
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: maybe-single
+    title: maybe_single()
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```python
+          data, count = supabase.table('countries') \
+            .select('*') \
+            .eq('name', 'Albania') \
+            .maybe_single() \
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          SingleAPIResponse(data={'id': 2, 'name': 'Albania'}, count=None)
           ```
         hideCodeBlock: true
         isSpotlight: true

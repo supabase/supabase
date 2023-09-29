@@ -2754,7 +2754,18 @@ functions:
               (3, 'Algeria');
             ```
         response: |
-
+          ```json
+          {
+            "data": [
+              {
+                "id": 2,
+                "name": "Albania"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         hideCodeBlock: true
         isSpotlight: true
   - id: ilike
@@ -2897,9 +2908,9 @@ functions:
         code: |
           ```ts
           const { data, error } = await supabase
-            .from('users')
+            .from('issues')
             .select()
-            .contains('name', ['is:online', 'faction:red'])
+            .contains('tags', ['is:open', 'priority:low'])
           ```
         data:
           sql: |
