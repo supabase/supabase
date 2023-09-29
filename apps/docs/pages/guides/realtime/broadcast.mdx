@@ -137,14 +137,14 @@ Use this to guarantee that the server has received the message before resolving 
 
 ### Send messages using REST calls
 
-You can also send Broadcast batched messages using a REST call. This is useful if you want to send messages from a server or from a client that doesn't have a Supabase client library.
+You can also send a Broadcast message by making an HTTP request to Reatlime servers. This is useful when you want to send messages from your server or client without having to first establish a WebSocket connection.
 
 ```js
 import { RealtimeClient } from '@supabase/realtime-js'
 
 const client = new RealtimeClient(REALTIME_URL, {
   params: {
-    apikey: API_KEY
+    apikey: API_KEY,
   },
 })
 
@@ -152,18 +152,20 @@ const channel = client.channel('test-channel')
 
 // No need to subscribe to channel
 
-channel.send({
-  type: 'broadcast',
-  event: 'test',
-  payload: { message: "Hi" }
-).then(resp => { console.log(resp) })
+channel
+  .send({
+    type: 'broadcast',
+    event: 'test',
+    payload: { message: 'Hi' },
+  })
+  .then((resp) => {
+    console.log(resp)
+  })
 
 // Remember to clean up the channel
 
 client.removeChannel(channel)
 ```
-
-This example will broadcast two events: one to `channel_name` and another to `channel_name_2`.
 
 export const Page = ({ children }) => <Layout meta={meta} children={children} />
 
