@@ -308,14 +308,14 @@ docs.query(
       {
         type: 'customer-story',
         avatar: '',
-        customer: 'markprompt',
-        author: 'Michael Fester',
-        role: 'Co-Founder at Markprompt',
+        customer: 'quivr',
+        author: 'Stan Girard',
+        role: 'Founder of Quivr',
         quote:
-          'We decided to use Supabase over other specialized vector databases because it enabled us to be GDPR compliant from day one with little effort.',
-        image: '/images/customers/logos/markprompt.png',
-        abstract: 'Markprompt and Supabase - GDPR-Compliant AI Chatbots for Docs and Websites.',
-        url: '/customers/markprompt',
+          'Supabase Vector powered by pgvector allowed us to create a simple and efficient product. We are storing over 1.6 million embeddings and the performance and results are great. Open source develop can easily contribute thanks to the SQL syntax known by millions of developers.',
+        image: '/images/customers/logos/quivr.png',
+        abstract: 'Quivr launch 5,000 Vector databases on Supabase.',
+        url: '/customers/quivr',
       },
       {
         type: 'customer-story',
@@ -329,13 +329,6 @@ docs.query(
         abstract: 'Mendable switches from Pinecone to Supabase for PostgreSQL vector embeddings.',
         url: '/customers/mendableai',
       },
-    ],
-    secondaryLinks: [
-      // {
-      //   customer: 'BerriAI',
-      //   image: '/images/product/vector/community/berriAI.svg',
-      //   url: '/customers/berriai',
-      // },
     ],
   },
 }
